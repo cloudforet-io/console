@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Table.vue renders correctly 1`] = `
+<b-card-stub
+  bodytag="div"
+  footertag="div"
+  header="Table"
+  headertag="div"
+  subtitletag="h6"
+  tag="div"
+  titletag="h4"
+>
+  <b-table-stub
+    apiurl=""
+    currentpage="1"
+    emptyfilteredtext="There are no records matching your request"
+    emptytext="There are no records to show"
+    fields=""
+    footvariant=""
+    headvariant=""
+    items=""
+    labelsortasc="Click to sort Ascending"
+    labelsortdesc="Click to sort Descending"
+    perpage="5"
+    responsive="sm"
+    sortdirection="asc"
+    value=""
+  />
+   
+  <nav>
+    <b-pagination-stub
+      align="left"
+      arialabel="Pagination"
+      ellipsistext="&hellip;"
+      firsttext="&laquo;"
+      hidegotoendbuttons="true"
+      labelfirstpage="Goto first page"
+      labellastpage="Goto last page"
+      labelnextpage="Goto next page"
+      labelpage="Goto page"
+      labelprevpage="Goto previous page"
+      lasttext="&raquo;"
+      limit="5"
+      nexttext="Next"
+      perpage="5"
+      prevtext="Prev"
+      size="md"
+      totalrows="0"
+      value="1"
+    />
+  </nav>
+</b-card-stub>
+`;
