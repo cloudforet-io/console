@@ -32,13 +32,7 @@
       <AppSidebar fixed>
         <SidebarHeader/>
         <SidebarForm/>
-        <SidebarNav v-if="$route.name === 'InfraLayers'" :navItems="infraLayersNav"></SidebarNav>
-        <SidebarNav  v-else-if="$route.name === 'Dashboard'" :navItems="dashboardNav"></SidebarNav>
-        <SidebarNav  v-else-if="$route.name === 'Users'" :navItems="usersNav"></SidebarNav>
-        <SidebarNav  v-else-if="$route.name === 'Projects'" :navItems="projectsNav"></SidebarNav>
-        <SidebarNav  v-else-if="$route.name === 'Networks'" :navItems="networksNav"></SidebarNav>
-        <SidebarNav  v-else-if="$route.name === 'Servers'" :navItems="serversNav"></SidebarNav>
-        <SidebarNav  v-else-if="$route.name === 'Plugins'" :navItems="pluginsNav"></SidebarNav>
+        <SidebarNav :navItems="this.$i18n.messages[this.$i18n.locale][this.$route.name].nav"></SidebarNav>
         <SidebarFooter/>
         <SidebarMinimizer/>
       </AppSidebar>
@@ -85,36 +79,17 @@ export default {
   },
   data () {
     return {
+      usersNav: this.$t('users.nav')
     }
   },
   computed: {
     list () {
       return this.$route.matched.filter((route) => route.name || route.meta.label)
     },
-    ...mapState("dashboard", {
-      dashboardNav: state => state.nav,
-    }),
-    ...mapState("infraLayers", {
-      infraLayersNav: state => state.nav,
-    }),
-    ...mapState("projects", {
-      projectsNav: state => state.nav,
-    }),
-    ...mapState("networks", {
-      networksNav: state => state.nav,
-    }),
-    ...mapState("assets", {
-      assetsNav: state => state.nav,
-    }),
-    ...mapState("servers", {
-      serversNav: state => state.nav,
-    }),
-    ...mapState("plugins", {
-      pluginsNav: state => state.nav,
-    }),
-    ...mapState("users", {
-      usersNav: state => state.nav,
-    }),
+  },
+  mounted() {
+    console.log(this.$route.name)
+    console.log(this.$i18n.messages[this.$i18n.locale][this.$route.name].nav)
   },
 }
 </script>

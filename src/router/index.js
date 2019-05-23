@@ -34,52 +34,62 @@ export default new Router({
     {
       path: '/',
       redirect: '/dashboard',
-      name: 'Home',
+      name: 'home',
+      meta: { label: 'Home'},
       component: DefaultContainer,
       children: [
         {
           path: 'sign-in',
-          name: 'SignIn',
+          name: 'signIn',
+          meta: { label: 'Sign In'},
           component: SignIn
         },
         {
           path: 'dashboard',
-          name: 'Dashboard',
+          name: 'dashboard',
+          meta: { label: 'Dashboard'},
           component: Dashboard
         },
         {
           path: 'infra-layers',
-          name: 'InfraLayers',
+          name: 'infraLayers',
+          meta: { label: 'InfraLayers'},
           component: InfraLayers
         },
         {
           path: 'projects',
-          name: 'Projects',
+          name: 'projects',
+          meta: { label: 'Projects'},
           component: Projects
         },
         {
           path: 'networks',
-          name: 'Networks',
+          name: 'networks',
+          meta: { label: 'Networks'},
           component: Networks
         },
         {
           path: 'assets',
-          name: 'Assets',
+          name: 'assets',
+          meta: { label: 'Assets'},
           component: Assets
         },
         {
           path: 'servers',
-          name: 'Servers',
+          name: 'servers',
+          meta: { label: 'Servers'},
           component: Servers
         },
         {
           path: 'plugins',
-          name: 'Plugins',
+          name: 'plugins',
+          meta: { label: 'Plugins'},
           component: Plugins
         },
         {
           path: 'support-center',
-          name: 'SupportCenter',
+          name: 'supportCenter',
+          meta: { label: 'SupportCenter'},
           component: SupportCenter
         },
         {
@@ -91,12 +101,13 @@ export default new Router({
           children: [
             {
               path: '',
+              name: 'users',
               component: Users,
             },
             {
               path: ':id',
               meta: { label: 'User Details'},
-              name: 'User',
+              name: 'user',
               component: User,
             },
           ]
