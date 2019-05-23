@@ -2,7 +2,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import nav from './navTest'
+import nav from './modules/navTest'
 
 Vue.use(Vuex)
 
