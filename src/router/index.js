@@ -24,6 +24,9 @@ const Page500 = () => import('@/views/pages/Page500')
 const Users = () => import('@/components/users/Users')
 const User = () => import('@/components/users/User')
 
+
+import {loadLanguageAsync} from '@/setup/i18n'
+
 Vue.use(Router)
 
 export default new Router({
@@ -35,8 +38,16 @@ export default new Router({
       path: '/',
       redirect: '/dashboard',
       name: 'home',
-      meta: { label: 'Home'},
+      meta: { label: 'Home' },
       component: DefaultContainer,
+      beforeEnter: (to, from, next) => {
+        if(!to.params.lang) {
+          next();
+          return;
+        }
+        const lang = to.params.lang
+        loadLanguageAsync(lang).then(() => next())
+      },
       children: [
         {
           path: 'sign-in',

@@ -8,7 +8,7 @@ import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import App from './App'
 import router from './router'
-import languages from './languages'
+import { i18n } from '@/setup/i18n'
 import store from './store'
 
 // todo
@@ -20,7 +20,7 @@ Vue.use(BootstrapVue)
 new Vue({
   el: '#app',
   router,
-  i18n: languages,
+  i18n,
   store,
   template: '<App/>',
   components: {
