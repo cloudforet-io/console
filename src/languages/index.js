@@ -7,6 +7,12 @@ import ko from './locales/ko'
 
 Vue.use(VueI18n)
 
+// const en = {
+//   infraLayers: {
+//     nav: 
+//   }
+// }
+
 export default new VueI18n({
   locale: 'en',
   messages: {
