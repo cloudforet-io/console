@@ -12,11 +12,11 @@
         <b-nav-item class="px-3" to="/dashboard" @click="toggle(false)">Dashboard</b-nav-item>
         <b-nav-item class="px-3" to="/users" @click="toggle(true)" exact>Users</b-nav-item>
         <b-nav-item class="px-3" to="/infra-layers" @click="toggle(true)">Infra Layers</b-nav-item>
-        <b-nav-item class="px-3" to="/projects" @click="toggle">Projects</b-nav-item>
-        <b-nav-item class="px-3" to="/networks" @click="toggle">Networks</b-nav-item>
-        <b-nav-item class="px-3" to="/assets" @click="toggle">Assets</b-nav-item>
-        <b-nav-item class="px-3" to="/servers" @click="toggle">Servers</b-nav-item>
-        <b-nav-item class="px-3" to="/support-center" @click="toggle">SupportCenter</b-nav-item>
+        <b-nav-item class="px-3" to="/projects" @click="toggle(true)">Projects</b-nav-item>
+        <b-nav-item class="px-3" to="/networks" @click="toggle(true)">Networks</b-nav-item>
+        <b-nav-item class="px-3" to="/assets" @click="toggle(true)">Assets</b-nav-item>
+        <b-nav-item class="px-3" to="/servers" @click="toggle(true)">Servers</b-nav-item>
+        <b-nav-item class="px-3" to="/support-center" @click="toggle(true)">SupportCenter</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item class="d-md-down-none">
