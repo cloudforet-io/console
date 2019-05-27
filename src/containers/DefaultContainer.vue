@@ -95,7 +95,7 @@ export default {
       }
     },
   },
-  mounted() {
+  created() {
     if (this.$route.name === "dashboard") this.navOpen = false
     else this.navOpen = true
   },
