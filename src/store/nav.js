@@ -23,10 +23,3 @@ export default {
 
   }
 }
-
-// toggle: function(shouldOpen) {
-//   if(shouldOpen != this.navOpen) {
-//     this.$refs.sidebarToggler.$el.click()
-//     this.navOpen = !this.navOpen
-//   }
-// },

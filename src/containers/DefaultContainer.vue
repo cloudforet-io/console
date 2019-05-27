@@ -2,40 +2,32 @@
   <div class="app">
     <AppHeader fixed>
       <SidebarToggler class="d-lg-none" display="md" mobile />
-      <b-link class="navbar-brand" to="#">
+      <b-link class="navbar-brand" to="/dashboard">
         <!-- <img class="navbar-brand-full" src="img/brand/logo.svg" width="89" height="25" alt="CoreUI Logo">
         <img class="navbar-brand-minimized" src="img/brand/sygnet.svg" width="30" height="30" alt="CoreUI Logo"> -->
         [LOGO]
       </b-link>
       <SidebarToggler class="d-none" display="lg" :defaultOpen="navOpen" ref="sidebarToggler" />
+
       <b-navbar-nav class="d-md-down-none">
-        <b-nav-item class="px-3" to="/dashboard">Dashboard</b-nav-item>
-        <b-nav-item class="px-3" to="/users"  exact>Users</b-nav-item>
+        <b-nav-item class="px-3" to="/users" exact>Users</b-nav-item>
         <b-nav-item class="px-3" to="/infra-layers" >Infra Layers</b-nav-item>
         <b-nav-item class="px-3" to="/projects" >Projects</b-nav-item>
         <b-nav-item class="px-3" to="/networks" >Networks</b-nav-item>
         <b-nav-item class="px-3" to="/assets" >Assets</b-nav-item>
         <b-nav-item class="px-3" to="/servers" >Servers</b-nav-item>
-        <b-nav-item class="px-3" to="/support-center" >SupportCenter</b-nav-item>
       </b-navbar-nav>
+
       <b-navbar-nav class="ml-auto">
-        <b-nav-item class="d-md-down-none">
-          [언어변경]
-        </b-nav-item>
-        <b-nav-item class="d-md-down-none">
-          [더보기]
-        </b-nav-item>
+        <LanguageDropdown/>
+        <SiteMenuDropdown/>
         <DefaultHeaderDropdownAccnt/>
       </b-navbar-nav>
     </AppHeader>
+
     <div class="app-body">
-      <AppSidebar fixed>
-        <SidebarHeader/>
-        <SidebarForm/>
-        <SidebarNav :navItems="this.$i18n.messages[this.$i18n.locale][this.$route.name].nav"></SidebarNav>
-        <SidebarFooter/>
-        <SidebarMinimizer/>
-      </AppSidebar>
+      <DefaultSidebar />
+
       <main class="main">
         <Breadcrumb :list="list"/>
         <div class="container-fluid">
@@ -43,6 +35,7 @@
         </div>
       </main>
     </div>
+
     <TheFooter>
       <!--footer-->
       <div>
@@ -58,25 +51,24 @@
 </template>
 
 <script>
-import { Header as AppHeader, SidebarToggler, Sidebar as AppSidebar, SidebarFooter, SidebarForm, SidebarHeader, SidebarMinimizer, SidebarNav, Footer as TheFooter, Breadcrumb } from '@coreui/vue'
+import { Header as AppHeader, SidebarToggler, Footer as TheFooter, Breadcrumb } from '@coreui/vue'
+import LanguageDropdown from './LanguageDropdown'
+import SiteMenuDropdown from './SiteMenuDropdown'
 import DefaultHeaderDropdownAccnt from './DefaultHeaderDropdownAccnt'
-import { createNamespacedHelpers } from 'vuex'
-const { mapState } = createNamespacedHelpers('nav');
+import DefaultSidebar from './DefaultSidebar'
+import { mapState } from 'vuex'
 
 export default {
   name: 'DefaultContainer',
   components: {
     AppHeader,
-    AppSidebar,
+    DefaultSidebar,
+    SidebarToggler,
     TheFooter,
     Breadcrumb,
+    LanguageDropdown,
+    SiteMenuDropdown,
     DefaultHeaderDropdownAccnt,
-    SidebarForm,
-    SidebarFooter,
-    SidebarToggler,
-    SidebarHeader,
-    SidebarNav,
-    SidebarMinimizer
   },
   data () {
     return {
@@ -86,9 +78,9 @@ export default {
     list () {
       return this.$route.matched.filter((route) => route.meta.label)
     },
-    ...mapState({
+    ...mapState('nav', {
       navOpen: state => state.navOpen,
-    })
+    }),
   },
   watch: {
     navOpen () {

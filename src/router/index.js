@@ -14,7 +14,6 @@ const Networks = () => import('@/views/Networks')
 const Assets = () => import('@/views/Assets')
 const Servers = () => import('@/views/Servers')
 const Plugins = () => import('@/views/Plugins')
-const SupportCenter = () => import('@/views/SupportCenter')
 
 // Views - Pages
 const Page404 = () => import('@/views/pages/Page404')
@@ -96,12 +95,6 @@ const router = new Router({
           name: 'plugins',
           meta: { label: 'Plugins'},
           component: Plugins
-        },
-        {
-          path: 'support-center',
-          name: 'supportCenter',
-          meta: { label: 'Support Center'},
-          component: SupportCenter
         },
         {
           path: 'users',
