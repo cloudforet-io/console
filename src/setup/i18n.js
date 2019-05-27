@@ -26,11 +26,10 @@ export async function loadLanguageAsync (lang) {
   console.log('lang', lang)
   if (i18n.locale !== lang) {
     if (!loadedLanguages.includes(lang)) {
-      // var msgs = await axios.get("http://webconsole-front-static.s3-website.ap-northeast-2.amazonaws.com/languages/en.json");
-      const msgs = await import(`@/languages/${lang}.json`);
-      console.log('loadLanguageAsync', msgs);
-      // i18n.setLocaleMessage(lang, msgs.data);
-      i18n.setLocaleMessage(lang, msgs);
+      const msgs =  await axios.get("http://webconsole-front-static.s3-website.ap-northeast-2.amazonaws.com/languages/en.json");
+      i18n.setLocaleMessage(lang, msgs.data);
+      // const msgs =  import(`@/languages/${lang}.json`);
+      // i18n.setLocaleMessage(lang, msgs);
       loadedLanguages.push(lang);
       return setI18nLanguage(lang);
     } 
