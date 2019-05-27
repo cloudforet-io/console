@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Users.vue renders correctly 1`] = `
+<b-row-stub
+  tag="div"
+>
+  <b-col-stub
+    cols="12"
+    tag="div"
+    xl="6"
+  >
+    <b-card-stub
+      bodytag="div"
+      footertag="div"
+      header="Users"
+      headertag="div"
+      name="slide"
+      subtitletag="h6"
+      tag="div"
+      titletag="h4"
+    >
+      <b-table-stub
+        apiurl=""
+        currentpage="1"
+        emptyfilteredtext="There are no records matching your request"
+        emptytext="There are no records to show"
+        fields="[object Object],[object Object],[object Object],[object Object],[object Object]"
+        footvariant=""
+        headvariant=""
+        hover="true"
+        items="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
+        labelsortasc="Click to sort Ascending"
+        labelsortdesc="Click to sort Descending"
+        perpage="5"
+        responsive="sm"
+        sortdirection="asc"
+        striped="true"
+        value=""
+      />
+       
+      <nav>
+        <b-pagination-stub
+          align="left"
+          arialabel="Pagination"
+          ellipsistext="&hellip;"
+          firsttext="&laquo;"
+          hidegotoendbuttons="true"
+          labelfirstpage="Goto first page"
+          labellastpage="Goto last page"
+          labelnextpage="Goto next page"
+          labelpage="Goto page"
+          labelprevpage="Goto previous page"
+          lasttext="&raquo;"
+          limit="5"
+          nexttext="Next"
+          perpage="5"
+          prevtext="Prev"
+          size="sm"
+          totalrows="26"
+          value="1"
+        />
+      </nav>
+    </b-card-stub>
+  </b-col-stub>
+</b-row-stub>
+`;
