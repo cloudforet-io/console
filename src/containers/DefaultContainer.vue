@@ -9,14 +9,14 @@
       </b-link>
       <SidebarToggler class="d-none" display="lg" :defaultOpen="navOpen" ref="sidebarToggler" />
       <b-navbar-nav class="d-md-down-none">
-        <b-nav-item class="px-3" to="/dashboard" @click="toggle(false)">Dashboard</b-nav-item>
-        <b-nav-item class="px-3" to="/users" @click="toggle(true)" exact>Users</b-nav-item>
-        <b-nav-item class="px-3" to="/infra-layers" @click="toggle(true)">Infra Layers</b-nav-item>
-        <b-nav-item class="px-3" to="/projects" @click="toggle(true)">Projects</b-nav-item>
-        <b-nav-item class="px-3" to="/networks" @click="toggle(true)">Networks</b-nav-item>
-        <b-nav-item class="px-3" to="/assets" @click="toggle(true)">Assets</b-nav-item>
-        <b-nav-item class="px-3" to="/servers" @click="toggle(true)">Servers</b-nav-item>
-        <b-nav-item class="px-3" to="/support-center" @click="toggle(true)">SupportCenter</b-nav-item>
+        <b-nav-item class="px-3" to="/dashboard">Dashboard</b-nav-item>
+        <b-nav-item class="px-3" to="/users"  exact>Users</b-nav-item>
+        <b-nav-item class="px-3" to="/infra-layers" >Infra Layers</b-nav-item>
+        <b-nav-item class="px-3" to="/projects" >Projects</b-nav-item>
+        <b-nav-item class="px-3" to="/networks" >Networks</b-nav-item>
+        <b-nav-item class="px-3" to="/assets" >Assets</b-nav-item>
+        <b-nav-item class="px-3" to="/servers" >Servers</b-nav-item>
+        <b-nav-item class="px-3" to="/support-center" >SupportCenter</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item class="d-md-down-none">
@@ -60,7 +60,8 @@
 <script>
 import { Header as AppHeader, SidebarToggler, Sidebar as AppSidebar, SidebarFooter, SidebarForm, SidebarHeader, SidebarMinimizer, SidebarNav, Footer as TheFooter, Breadcrumb } from '@coreui/vue'
 import DefaultHeaderDropdownAccnt from './DefaultHeaderDropdownAccnt'
-import { mapState, mapActions } from 'vuex'
+import { createNamespacedHelpers } from 'vuex'
+const { mapState } = createNamespacedHelpers('nav');
 
 export default {
   name: 'DefaultContainer',
@@ -79,25 +80,20 @@ export default {
   },
   data () {
     return {
-      navOpen: false
     }
   },
   computed: {
     list () {
       return this.$route.matched.filter((route) => route.meta.label)
     },
+    ...mapState({
+      navOpen: state => state.navOpen,
+    })
   },
-  methods: {
-    toggle: function(shouldOpen) {
-      if(shouldOpen != this.navOpen) {
-        this.$refs.sidebarToggler.$el.click()
-        this.navOpen = !this.navOpen
-      }
-    },
-  },
-  created() {
-    if (this.$route.name === "dashboard") this.navOpen = false
-    else this.navOpen = true
+  watch: {
+    navOpen () {
+      this.$refs.sidebarToggler.$el.click()
+    }
   },
 }
 </script>
