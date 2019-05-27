@@ -7,16 +7,16 @@
         <img class="navbar-brand-minimized" src="img/brand/sygnet.svg" width="30" height="30" alt="CoreUI Logo"> -->
         [LOGO]
       </b-link>
-      <SidebarToggler class="d-md-down-none" display="lg" />
+      <SidebarToggler class="d-none" display="lg" :defaultOpen="navOpen" ref="sidebarToggler" />
       <b-navbar-nav class="d-md-down-none">
-        <b-nav-item class="px-3" to="/dashboard">Dashboard</b-nav-item>
-        <b-nav-item class="px-3" to="/users" exact>Users</b-nav-item>
-        <b-nav-item class="px-3" to="/infra-layers">Infra Layers</b-nav-item>
-        <b-nav-item class="px-3" to="/projects">Projects</b-nav-item>
-        <b-nav-item class="px-3" to="/networks">Networks</b-nav-item>
-        <b-nav-item class="px-3" to="/assets">Assets</b-nav-item>
-        <b-nav-item class="px-3" to="/servers">Servers</b-nav-item>
-        <b-nav-item class="px-3" to="/support-center">SupportCenter</b-nav-item>
+        <b-nav-item class="px-3" to="/dashboard" @click="toggle(false)">Dashboard</b-nav-item>
+        <b-nav-item class="px-3" to="/users" @click="toggle(true)" exact>Users</b-nav-item>
+        <b-nav-item class="px-3" to="/infra-layers" @click="toggle(true)">Infra Layers</b-nav-item>
+        <b-nav-item class="px-3" to="/projects" @click="toggle">Projects</b-nav-item>
+        <b-nav-item class="px-3" to="/networks" @click="toggle">Networks</b-nav-item>
+        <b-nav-item class="px-3" to="/assets" @click="toggle">Assets</b-nav-item>
+        <b-nav-item class="px-3" to="/servers" @click="toggle">Servers</b-nav-item>
+        <b-nav-item class="px-3" to="/support-center" @click="toggle">SupportCenter</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item class="d-md-down-none">
@@ -79,17 +79,25 @@ export default {
   },
   data () {
     return {
-      usersNav: this.$t('users.nav')
+      navOpen: false
     }
   },
   computed: {
     list () {
-      return this.$route.matched.filter((route) => route.name || route.meta.label)
+      return this.$route.matched.filter((route) => route.meta.label)
+    },
+  },
+  methods: {
+    toggle: function(shouldOpen) {
+      if(shouldOpen != this.navOpen) {
+        this.$refs.sidebarToggler.$el.click()
+        this.navOpen = !this.navOpen
+      }
     },
   },
   mounted() {
-    console.log(this.$route.name)
-    console.log(this.$i18n.messages[this.$i18n.locale][this.$route.name].nav)
+    if (this.$route.name === "dashboard") this.navOpen = false
+    else this.navOpen = true
   },
 }
 </script>

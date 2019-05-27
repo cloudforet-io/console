@@ -64,7 +64,7 @@ export default new Router({
         {
           path: 'infra-layers',
           name: 'infraLayers',
-          meta: { label: 'InfraLayers'},
+          meta: { label: 'Infra Layers'},
           component: InfraLayers
         },
         {
@@ -100,7 +100,7 @@ export default new Router({
         {
           path: 'support-center',
           name: 'supportCenter',
-          meta: { label: 'SupportCenter'},
+          meta: { label: 'Support Center'},
           component: SupportCenter
         },
         {
