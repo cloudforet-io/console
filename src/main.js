@@ -7,6 +7,7 @@ import BootstrapVue from 'bootstrap-vue'
 import App from './App'
 import router from './router'
 import { i18n } from '@/setup/i18n'
+import { api } from '@/setup/api'
 import store from './store'
 
 // todo
@@ -19,6 +20,7 @@ new Vue({
   el: '#app',
   router,
   i18n,
+  api,
   store,
   components: {
     App
