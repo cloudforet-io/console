@@ -6,12 +6,13 @@ import nav from './nav'
 
 Vue.use(Vuex)
 
+// eslint-disable-next-line no-undef
 const debug = process.env.NODE_ENV !== 'production'
 
 export default new Vuex.Store({
   modules: {
-    nav,
+    nav
   },
   strict: debug
- // plugins: debug ? [createLogger()] : []
+  // plugins: debug ? [createLogger()] : []
 })

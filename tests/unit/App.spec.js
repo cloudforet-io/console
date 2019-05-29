@@ -7,7 +7,6 @@ const localVue = createLocalVue()
 localVue.use(VueRouter)
 const router = new VueRouter()
 
-
 localVue.use(BootstrapVue)
 
 describe('App.vue', () => {

@@ -1,13 +1,13 @@
 <template>
   <div>
-
+    IP Adress
   </div>
 </template>
 
 <script>
-  export default {
-    
-  }
+export default {
+  name: 'IPAdress'
+}
 </script>
 
 <style lang="scss" scoped>

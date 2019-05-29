@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import DefaultHeaderDropdownAccnt from '@/containers/DefaultHeaderDropdownAccnt'
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils'
 
 Vue.use(BootstrapVue)
 

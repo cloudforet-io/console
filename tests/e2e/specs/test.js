@@ -19,7 +19,6 @@ module.exports = {
     // const devServer = browser.globals.devServerURL
     const devServer = process.env.VUE_DEV_SERVER_URL
 
-
     browser.url(devServer).pause(500).expect.element('body').to.be.present
 
     browser.waitForElementVisible('.app', 10000)
@@ -75,7 +74,7 @@ module.exports = {
         this.assert.cssClassPresent('/html/body', 'sidebar-minimized')
         this.assert.cssClassPresent('/html/body', 'brand-minimized')
         this.pause(500)
-        this.assert.cssProperty("/html/body/div/div/main", "margin-left", "50px");
+        this.assert.cssProperty('/html/body/div/div/main', 'margin-left', '50px')
       })
       .pause(500)
       .click('/html/body/div/div/div/button', function (response) {
@@ -85,40 +84,40 @@ module.exports = {
       })
 
     browser
-    .resizeWindow(800, 600)
-    .pause(500)
+      .resizeWindow(800, 600)
+      .pause(500)
 
     browser
-    .pause(500)
-    .click('/html/body/div/header/button[1]', function (response) {
-      console.log('response', typeof response)
-      this.assert.cssClassPresent('/html/body', 'sidebar-show')
-      this.pause(500)
-      this.assert.cssProperty("/html/body/div/div/main", "margin-left", "200px");
-    })
+      .pause(500)
+      .click('/html/body/div/header/button[1]', function (response) {
+        console.log('response', typeof response)
+        this.assert.cssClassPresent('/html/body', 'sidebar-show')
+        this.pause(500)
+        this.assert.cssProperty('/html/body/div/div/main', 'margin-left', '200px')
+      })
 
     browser
-    .pause(500)
-    .click('/html/body/div/div/div/nav/section/ul/li[1]/a', function (response) {
-      console.log('response', typeof response)
-      this.assert.cssClassNotPresent('/html/body', 'sidebar-show')
-    })
+      .pause(500)
+      .click('/html/body/div/div/div/nav/section/ul/li[1]/a', function (response) {
+        console.log('response', typeof response)
+        this.assert.cssClassNotPresent('/html/body', 'sidebar-show')
+      })
 
     browser
-    .resizeWindow(500, 600)
-    .pause(500)
+      .resizeWindow(500, 600)
+      .pause(500)
 
-    .click('/html/body/div/header/button[1]', function (response) {
-      console.log('response', typeof response)
-      this.assert.cssClassPresent('/html/body', 'sidebar-show')
-      this.assert.cssProperty("/html/body/div/div/main", "margin-left", "0px");
-    })
-    .pause(500)
-    .click('/html/body/div/div/main', function (response) {
-      console.log('response', typeof response)
-      this.assert.cssClassNotPresent('/html/body', 'sidebar-show')
-      this.assert.cssProperty("/html/body/div/div/main", "margin-left", "0px");
-    })
+      .click('/html/body/div/header/button[1]', function (response) {
+        console.log('response', typeof response)
+        this.assert.cssClassPresent('/html/body', 'sidebar-show')
+        this.assert.cssProperty('/html/body/div/div/main', 'margin-left', '0px')
+      })
+      .pause(500)
+      .click('/html/body/div/div/main', function (response) {
+        console.log('response', typeof response)
+        this.assert.cssClassNotPresent('/html/body', 'sidebar-show')
+        this.assert.cssProperty('/html/body/div/div/main', 'margin-left', '0px')
+      })
 
     browser
       .pause(5000)

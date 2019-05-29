@@ -1,5 +1,5 @@
 import BootstrapVue from 'bootstrap-vue'
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils'
 import VueRouter from 'vue-router'
 import DefaultContainer from '@/containers/DefaultContainer'
 
@@ -19,7 +19,7 @@ describe('DefaultContainer.vue', () => {
   test('renders correctly', () => {
     const wrapper = shallowMount(DefaultContainer, {
       localVue,
-        router
+      router
     })
     expect(wrapper.element).toMatchSnapshot()
   })

@@ -9,11 +9,11 @@ export const i18n = new VueI18n({
   locale: 'en', // set locale
   fallbackLocale: 'en',
   messages: {
-    en,
+    en
   } // set locale messages
 })
 
-const loadedLanguages = ['en'] // our default language that is preloaded 
+const loadedLanguages = ['en'] // our default language that is preloaded
 
 function setI18nLanguage (lang) {
   i18n.locale = lang
@@ -26,13 +26,14 @@ export async function loadLanguageAsync (lang) {
   console.log('lang', lang)
   if (i18n.locale !== lang) {
     if (!loadedLanguages.includes(lang)) {
-      const msgs =  await axios.get("http://webconsole-front-static.s3-website.ap-northeast-2.amazonaws.com/languages/en.json");
-      i18n.setLocaleMessage(lang, msgs.data);
+      // const url = `${baseURL}/${route.param}/${lang}.json`
+      const msgs = await axios.get('http://webconsole-front-static.s3-website.ap-northeast-2.amazonaws.com/languages/en.json')
+      i18n.setLocaleMessage(lang, msgs.data)
       // const msgs =  import(`@/languages/${lang}.json`);
       // i18n.setLocaleMessage(lang, msgs);
-      loadedLanguages.push(lang);
-      return setI18nLanguage(lang);
-    } 
+      loadedLanguages.push(lang)
+      return setI18nLanguage(lang)
+    }
     return Promise.resolve(setI18nLanguage(lang))
   }
   return Promise.resolve(lang)

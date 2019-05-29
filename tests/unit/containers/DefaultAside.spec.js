@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils'
 import BootstrapVue from 'bootstrap-vue'
 import DefaultAside from '@/containers/DefaultAside'
 

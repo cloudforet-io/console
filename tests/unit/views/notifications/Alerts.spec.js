@@ -34,9 +34,9 @@ describe('Alerts.vue', () => {
     expect(wrapper.element).toMatchSnapshot()
   })
   it('should have methods', () => {
-    expect(typeof Alerts.methods.showAlert ).toEqual('function')
+    expect(typeof Alerts.methods.showAlert).toEqual('function')
     expect(Alerts.methods.showAlert()).toBeUndefined()
-    expect(typeof Alerts.methods.countDownChanged ).toEqual('function')
+    expect(typeof Alerts.methods.countDownChanged).toEqual('function')
     expect(Alerts.methods.countDownChanged(10)).toBeUndefined()
   })
 })
