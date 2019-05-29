@@ -14,7 +14,6 @@ const Networks = () => import('@/views/Networks')
 const Assets = () => import('@/views/Assets')
 const Servers = () => import('@/views/Servers')
 const Plugins = () => import('@/views/Plugins')
-const SupportCenter = () => import('@/views/SupportCenter')
 
 // Views - Pages
 const Page404 = () => import('@/views/pages/Page404')
@@ -24,13 +23,13 @@ const Page500 = () => import('@/views/pages/Page500')
 const Users = () => import('@/components/users/Users')
 const User = () => import('@/components/users/User')
 
-
-import {loadLanguageAsync} from '@/setup/i18n'
-
 Vue.use(Router)
 
-export default new Router({
-  mode: 'hash', // https://router.vuejs.org/api/#mode
+import {loadLanguageAsync} from '@/setup/i18n'
+import store from '@/store'
+
+const router = new Router({
+  mode: 'history', // https://router.vuejs.org/api/#mode
   linkActiveClass: 'open active',
   scrollBehavior: () => ({ y: 0 }),
   routes: [
@@ -64,7 +63,7 @@ export default new Router({
         {
           path: 'infra-layers',
           name: 'infraLayers',
-          meta: { label: 'InfraLayers'},
+          meta: { label: 'Infra Layers'},
           component: InfraLayers
         },
         {
@@ -98,12 +97,6 @@ export default new Router({
           component: Plugins
         },
         {
-          path: 'support-center',
-          name: 'supportCenter',
-          meta: { label: 'SupportCenter'},
-          component: SupportCenter
-        },
-        {
           path: 'users',
           meta: { label: 'Users'},
           component: {
@@ -127,3 +120,11 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.name === 'dashboard') store.dispatch('nav/hideNav')
+  else store.dispatch('nav/showNav')
+  next()
+})
+
+export default router;

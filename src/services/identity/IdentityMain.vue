@@ -1,13 +1,11 @@
 <template>
-  <div>
-
-  </div>
+  <router-view />
 </template>
 
 <script>
-  export default {
-    
-  }
+export default {
+  name: 'IdentityMain'
+}
 </script>
 
 <style lang="scss" scoped>
