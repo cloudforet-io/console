@@ -19,7 +19,7 @@ describe('User.vue', () => {
   it('sets the correct default data', () => {
     expect(typeof User.data).toMatch('function')
     const defaultData = User.data()
-    expect(defaultData.fields).toEqual([{key: 'key'}, {key: 'value'}])
+    expect(defaultData.fields).toEqual([{ key: 'key' }, { key: 'value' }])
   })
   it('is Vue instance', () => {
     const wrapper = shallowMount(User, {
@@ -45,18 +45,18 @@ describe('User.vue', () => {
     expect(wrapper.find('div.card-header').text()).toMatch(caption)
   })
   it('should have methods', () => {
-    const wrapper = shallowMount(User,{
+    const wrapper = shallowMount(User, {
       localVue,
       router
     })
 
-    expect(typeof User.methods.goBack ).toEqual('function')
+    expect(typeof User.methods.goBack).toEqual('function')
     expect(wrapper.vm.goBack()).toBeUndefined()
   })
   test('renders correctly', () => {
     const wrapper = shallowMount(User, {
       localVue,
-        router
+      router
     })
     expect(wrapper.element).toMatchSnapshot()
   })

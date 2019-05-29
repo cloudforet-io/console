@@ -1,13 +1,13 @@
 <template>
   <div>
-
+    Domain
   </div>
 </template>
 
 <script>
-  export default {
-    
-  }
+export default {
+  name: 'Domain'
+}
 </script>
 
 <style lang="scss" scoped>

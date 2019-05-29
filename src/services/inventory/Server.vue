@@ -1,13 +1,13 @@
 <template>
   <div>
-
+    Server
   </div>
 </template>
 
 <script>
-  export default {
-    
-  }
+export default {
+  name: 'Server'
+}
 </script>
 
 <style lang="scss" scoped>

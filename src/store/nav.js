@@ -5,10 +5,10 @@ export default {
   },
   mutations: {
     hideNav (state) {
-      state.navOpen = false;
+      state.navOpen = false
     },
     showNav (state) {
-      state.navOpen = true;
+      state.navOpen = true
     }
   },
   actions: {
@@ -17,7 +17,7 @@ export default {
     },
     hideNav (context) {
       context.commit('hideNav')
-    },
+    }
   },
   getters: {
 

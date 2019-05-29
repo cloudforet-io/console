@@ -1,10 +1,12 @@
 <template>
-  <div />
+  <div>
+    Plugin
+  </div>
 </template>
 
 <script>
 export default {
-
+  name: 'Plugin'
 }
 </script>
 

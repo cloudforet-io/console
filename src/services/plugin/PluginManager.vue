@@ -1,13 +1,13 @@
 <template>
   <div>
-
+    Plugin Manager
   </div>
 </template>
 
 <script>
-  export default {
-    
-  }
+export default {
+  name: 'PluginManager'
+}
 </script>
 
 <style lang="scss" scoped>

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { mount, shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils'
 import BootstrapVue from 'bootstrap-vue'
 import ProgressBars from '@/views/base/ProgressBars'
 
@@ -40,7 +40,7 @@ describe('ProgressBars.vue', () => {
     wrapper.destroy()
   })
   it('should have methods', () => {
-    expect(typeof ProgressBars.methods.clicked  ).toEqual('function')
+    expect(typeof ProgressBars.methods.clicked).toEqual('function')
     expect(ProgressBars.methods.clicked()).toBeUndefined()
   })
 })

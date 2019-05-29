@@ -1,13 +1,13 @@
 <template>
   <div>
-
+    Network
   </div>
 </template>
 
 <script>
-  export default {
-    
-  }
+export default {
+  name: 'Network'
+}
 </script>
 
 <style lang="scss" scoped>

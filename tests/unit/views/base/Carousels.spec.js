@@ -34,9 +34,9 @@ describe('Carousels.vue', () => {
     expect(wrapper.element).toMatchSnapshot()
   })
   it('should have methods', () => {
-    expect(typeof Carousels.methods.onSlideStart ).toEqual('function')
+    expect(typeof Carousels.methods.onSlideStart).toEqual('function')
     expect(Carousels.methods.onSlideStart(1)).toBeUndefined()
-    expect(typeof Carousels.methods.onSlideEnd ).toEqual('function')
+    expect(typeof Carousels.methods.onSlideEnd).toEqual('function')
     expect(Carousels.methods.onSlideEnd(1)).toBeUndefined()
   })
 })

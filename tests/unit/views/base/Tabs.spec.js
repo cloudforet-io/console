@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { mount, shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils'
 import BootstrapVue from 'bootstrap-vue'
 import Tabs from '@/views/base/Tabs'
 
@@ -15,7 +15,7 @@ describe('Tabs.vue', () => {
   it('sets the correct default data', () => {
     expect(typeof Tabs.data).toMatch('function')
     const defaultData = Tabs.data()
-    expect(defaultData.tabs).toEqual(["Calculator", "Shopping cart", "Charts"])
+    expect(defaultData.tabs).toEqual(['Calculator', 'Shopping cart', 'Charts'])
     expect(defaultData.tabIndex).toEqual([0, 0])
   })
   it('is Vue instance', () => {

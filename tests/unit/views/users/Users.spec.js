@@ -1,7 +1,7 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils'
 import BootstrapVue from 'bootstrap-vue'
 import Users from '@/views/users/Users'
-import VueRouter from 'vue-router';
+import VueRouter from 'vue-router'
 
 const localVue = createLocalVue()
 localVue.use(VueRouter)
@@ -22,14 +22,14 @@ describe('Users.vue', () => {
     expect(defaultData.currentPage).toBe(1)
   })
   it('is Vue instance', () => {
-    const wrapper = shallowMount(Users,{
+    const wrapper = shallowMount(Users, {
       localVue,
       router
     })
     expect(wrapper.isVueInstance()).toBe(true)
   })
   it('is Users', () => {
-    const wrapper = shallowMount(Users,{
+    const wrapper = shallowMount(Users, {
       localVue,
       router
     })
@@ -52,14 +52,14 @@ describe('Users.vue', () => {
     expect(wrapper.element).toMatchSnapshot()
   })
   it('should have methods', () => {
-    const wrapper = shallowMount(Users,{
+    const wrapper = shallowMount(Users, {
       localVue,
       router
     })
 
-    expect(typeof Users.methods.userLink  ).toEqual('function')
+    expect(typeof Users.methods.userLink).toEqual('function')
     expect(Users.methods.userLink(42)).toBe('users/42')
-    expect(typeof Users.methods.rowClicked ).toEqual('function')
-    expect(wrapper.vm.rowClicked({id:42})).toBeUndefined()
+    expect(typeof Users.methods.rowClicked).toEqual('function')
+    expect(wrapper.vm.rowClicked({ id: 42 })).toBeUndefined()
   })
 })
