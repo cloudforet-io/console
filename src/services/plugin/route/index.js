@@ -1,9 +1,10 @@
 const BaseHeader = () => import('@/components/base/BaseHeader')
-const PluginMain = () => import('@/services/plugin/PluginMain')
-const PluginSidebar = () => import('@/services/plugin/PluginSidebar')
 
-const Plugin = () => import('@/services/plugin/Plugin')
-const PluginManager = () => import('@/services/plugin/PluginManager')
+const PluginMain = () => import('@/services/plugin/views/PluginMain')
+const PluginSidebar = () => import('@/services/plugin/views/PluginSidebar')
+
+const Plugin = () => import('@/services/plugin/views/Plugin')
+const PluginManager = () => import('@/services/plugin/views/PluginManager')
 
 export default {
   path: 'plugin',
