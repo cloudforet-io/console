@@ -5,7 +5,7 @@
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import App from './App'
-import router from './router'
+import route from './route'
 import { i18n } from '@/setup/i18n'
 import { api } from '@/setup/api'
 import store from './store'
@@ -18,7 +18,7 @@ Vue.use(BootstrapVue)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  router,
+  route,
   i18n,
   api,
   store,
