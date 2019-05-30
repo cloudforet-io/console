@@ -14,6 +14,7 @@ import store from './store'
 // cssVars()
 
 Vue.use(BootstrapVue)
+Vue.prototype.$http = api
 
 /* eslint-disable no-new */
 new Vue({

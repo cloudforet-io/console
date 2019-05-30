@@ -12,11 +12,11 @@ export default {
     }
   },
   actions: {
-    showNav (context) {
-      context.commit('showNav')
+    showNav ({ commit }) {
+      commit('showNav')
     },
-    hideNav (context) {
-      context.commit('hideNav')
+    hideNav ({ commit }) {
+      commit('hideNav')
     }
   },
   getters: {
