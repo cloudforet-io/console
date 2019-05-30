@@ -1,14 +1,15 @@
 const BaseHeader = () => import('@/components/base/BaseHeader')
-const InventoryMain = () => import('@/services/inventory/InventoryMain')
-const InventorySidebar = () => import('@/services/inventory/InventorySidebar')
 
-const NetworkMain = () => import('@/services/inventory/network/NetworkMain')
-const Network = () => import('@/services/inventory/network/Network')
-const IPAdress = () => import('@/services/inventory/network/IPAdress')
-const NetworkType = () => import('@/services/inventory/network/NetworkType')
+const InventoryMain = () => import('@/services/inventory/views/InventoryMain')
+const InventorySidebar = () => import('@/services/inventory/views/InventorySidebar')
 
-const DataCenter = () => import('@/services/inventory/DataCenter')
-const Server = () => import('@/services/inventory/Server')
+const NetworkMain = () => import('@/services/inventory/views/network/NetworkMain')
+const Network = () => import('@/services/inventory/views/network/Network')
+const IPAdress = () => import('@/services/inventory/views/network/IPAdress')
+const NetworkType = () => import('@/services/inventory/views/network/NetworkType')
+
+const DataCenter = () => import('@/services/inventory/views/DataCenter')
+const Server = () => import('@/services/inventory/views/Server')
 
 export default {
   path: 'inventory',

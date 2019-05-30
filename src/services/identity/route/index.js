@@ -1,11 +1,12 @@
 const BaseHeader = () => import('@/components/base/BaseHeader')
-const IdentityMain = () => import('@/services/identity/IdentityMain')
-const IdentitySidebar = () => import('@/services/identity/IdentitySidebar')
 
-const Domain = () => import('@/services/identity/Domain')
-const User = () => import('@/services/identity/User')
-const Project = () => import('@/services/identity/Project')
-const APIKey = () => import('@/services/identity/APIKey')
+const IdentityMain = () => import('@/services/identity/views/IdentityMain')
+const IdentitySidebar = () => import('@/services/identity/views/IdentitySidebar')
+
+const Domain = () => import('@/services/identity/views/Domain')
+const User = () => import('@/services/identity/views/User')
+const Project = () => import('@/services/identity/views/Project')
+const APIKey = () => import('@/services/identity/views/APIKey')
 
 export default {
   path: 'identity',
