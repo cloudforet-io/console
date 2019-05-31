@@ -1,0 +1,29 @@
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  annotations:
+    strategy.spinnaker.io/max-version-history: '2'
+    traffic.spinnaker.io/load-balancers: '["service wconsole-client"]'
+  labels:
+    app: wconsole-client
+  name: wconsole-client
+  namespace: cloudone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wconsole-client
+  template:
+    metadata:
+      labels:
+        app: wconsole-client
+    spec:
+      containers:
+        - name: wconsole-client
+          image: 072548720675.dkr.ecr.ap-northeast-2.amazonaws.com/cloudone/webconsole/client
+          ports:
+            - containerPort: 80
+          env:
+            - name: HELLO
+              value: WORLD
