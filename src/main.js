@@ -9,10 +9,11 @@ import router from './router'
 import { i18n } from '@/setup/i18n'
 import { api } from '@/setup/api'
 import store from './store'
+import dotenv from 'dotenv'
 
 // todo
 // cssVars()
-
+dotenv.config()
 Vue.use(BootstrapVue)
 Vue.prototype.$http = api
 
