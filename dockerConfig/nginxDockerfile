@@ -1,7 +1,7 @@
 FROM nginx:stable
 
 COPY ./dockerConfig/nginx.conf /etc/nginx/conf.d/default.conf
-COPY ./dockerConfig/check.html /var/www/check.html
+COPY ./dockerConfig/check.html /var/www/api/check
 COPY ./dist /var/www
 
 # Define working directory.
