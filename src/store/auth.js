@@ -16,7 +16,9 @@ export default {
   actions: {
     login ({ commit }, { username, password }) {
       // api.post('/auth/register', )
-      commit('login')
+      commit('login', {
+        accessToken: 'abcd'
+      })
     },
     logout ({ commit }) {
       commit('logout')
