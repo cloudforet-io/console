@@ -2,10 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 // Services
-import dashboardRoute from '@/services/dashboard/route'
-import identityRoute from '@/services/identity/route'
-import inventoryRoute from '@/services/inventory/route'
-import pluginRoute from '@/services/plugin/route'
+import dashboardRoute from './dashboardRoute'
+import identityRoute from './identityRoute'
+import inventoryRoute from './inventoryRoute'
+import pluginRoute from './pluginRoute'
 
 import { loadLanguageAsync } from '@/setup/i18n'
 

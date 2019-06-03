@@ -1,6 +1,6 @@
 const BaseHeader = () => import('@/components/base/BaseHeader')
 
-const Dashboard = () => import('@/services/dashboard/views/Dashboard')
+const Dashboard = () => import('@/services/dashboard/Dashboard')
 
 export default {
   path: 'dashboard',
