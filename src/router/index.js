@@ -23,6 +23,12 @@ const router = new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: [
     {
+      path: '/sign-in',
+      name: 'signIn',
+      meta: { label: 'Sign In' },
+      component: SignIn
+    },
+    {
       path: '/',
       redirect: '/dashboard',
       name: 'home',
@@ -38,14 +44,6 @@ const router = new Router({
         next()
       },
       children: [
-        {
-          path: 'sign-in',
-          name: 'signIn',
-          meta: { label: 'Sign In' },
-          components: {
-            main: SignIn
-          }
-        },
         dashboardRoute,
         identityRoute,
         inventoryRoute,
