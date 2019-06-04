@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import cookie from 'vue-cookie'
+import store from '@/store'
 
 // Services
 import dashboardRoute from './dashboardRoute'
@@ -15,6 +17,17 @@ const DefaultContainer = () => import('@/containers/DefaultContainer')
 // Views
 const SignIn = () => import('@/views/SignIn')
 
+const attatchLangauge = (to, from, next) => {
+  if (!to.params.lang) {
+    next()
+    return
+  }
+  const lang = to.params.lang
+  loadLanguageAsync(lang).then(() => next())
+
+  next()
+}
+
 Vue.use(Router)
 
 const router = new Router({
@@ -26,22 +39,20 @@ const router = new Router({
       path: '/sign-in',
       name: 'signIn',
       meta: { label: 'Sign In' },
-      component: SignIn
+      component: SignIn,
+      beforeEnter: (to, from, next) => {
+        if (cookie.get('accessToken')) next('/dashboard')
+        else next()
+      }
     },
     {
       path: '/',
-      redirect: '/dashboard',
       name: 'home',
       component: DefaultContainer,
       beforeEnter: (to, from, next) => {
-        if (!to.params.lang) {
-          next()
-          return
-        }
-        const lang = to.params.lang
-        loadLanguageAsync(lang).then(() => next())
-
-        next()
+        console.log('check auth')
+        if (!cookie.get('accessToken')) next('/sign-in')
+        else next()
       },
       children: [
         dashboardRoute,

@@ -11,7 +11,7 @@
               <b-input-group-prepend>
                 <b-input-group-text><i class="fa fa-user" /></b-input-group-text>
               </b-input-group-prepend>
-              <b-form-input type="text" placeholder="Username" />
+              <b-form-input v-model="username" type="text" placeholder="Username" />
             </b-input-group>
           </b-form-group>
           <b-form-group>
@@ -19,12 +19,12 @@
               <b-input-group-prepend>
                 <b-input-group-text><i class="fa fa-asterisk" /></b-input-group-text>
               </b-input-group-prepend>
-              <b-form-input type="password" placeholder="Password" autocomplete="current-password" />
+              <b-form-input v-model="password" type="password" placeholder="Password" autocomplete="current-password" />
             </b-input-group>
           </b-form-group>
           <div class="form-group form-actions">
-            <b-button type="submit" size="sm" variant="success">
-              Submit
+            <b-button type="button" size="sm" variant="success" @click="login">
+              Login
             </b-button>
           </div>
         </b-form>
@@ -34,14 +34,29 @@
 </template>
 
 <script>
-export default {
-  created () {
-    this.$store.dispatch('auth/login', {
-      username: 'abc',
-      password: 'abc'
-    })
-  }
+import { mapGetters } from 'vuex'
 
+export default {
+  data () {
+    return {
+      username: 'iamnewyorker1222',
+      password: 'this_is_my_scret_password1'
+    }
+  },
+  computed: {
+    ...mapGetters('auth', ['isAuthenticated'])
+  },
+  methods: {
+    async login () {
+      await this.$store.dispatch('auth/login',
+        {
+          username: this.username,
+          password: this.password
+        }
+      )
+      this.$router.go(-1)
+    }
+  }
 }
 </script>
 

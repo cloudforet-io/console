@@ -1,4 +1,5 @@
 import { api } from '@/setup/api'
+import cookie from 'vue-cookie'
 
 export default {
   namespaced: true,
@@ -13,18 +14,21 @@ export default {
       state.accessToken = null
     }
   },
+  getters: {
+    isAuthenticated: state => !!state.accessToken
+  },
   actions: {
-    login ({ commit }, { username, password }) {
-      // api.post('/auth/register', )
-      commit('login', {
-        accessToken: 'abcd'
+    async login ({ commit }, { username, password }) {
+      const res = await api.post('/auth/login', {
+        user_name: username,
+        password: password
       })
+      cookie.set('accessToken', res.data.token, { expires: '3s' })
+      commit('login', { accessToken: res.data.token })
     },
     logout ({ commit }) {
+      cookie.delete('accessToken')
       commit('logout')
     }
-  },
-  getters: {
-
   }
 }
