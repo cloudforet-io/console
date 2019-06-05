@@ -4,18 +4,18 @@ import cookie from 'vue-cookie'
 export default {
   namespaced: true,
   state: {
-    accessToken: null
+    isLoggedIn: false
   },
   mutations: {
-    login (state, { accessToken }) {
-      state.accessToken = accessToken
+    login (state) {
+      state.isLoggedIn = true
     },
     logout (state) {
-      state.accessToken = null
+      state.isLoggedIn = false
     }
   },
   getters: {
-    isAuthenticated: state => !!state.accessToken
+    isLoggedIn: state => state.isLoggedIn
   },
   actions: {
     async login ({ commit }, { username, password }) {
@@ -23,14 +23,13 @@ export default {
         user_name: username,
         password: password
       })
-      cookie.set('accessToken', res.data.token, { expires: '30m' })
-      api.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
-      commit('login', { accessToken: res.data.token })
+      console.log('res.data', res.data)
+      cookie.set('sessionId', res.data, { expires: '3s' })
+      commit('login')
     },
     async logout ({ commit }) {
       await api.post('/auth/logout')
-      cookie.delete('accessToken')
-      api.defaults.headers.common['Authorization'] = undefined
+      cookie.delete('sessionId')
       commit('logout')
     }
   }

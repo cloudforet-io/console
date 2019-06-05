@@ -34,17 +34,16 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 
 export default {
   data () {
     return {
       username: 'iamnewyorker1222',
-      password: 'this_is_my_scret_password1'
+      password: 'this_is_my_scret_password1',
+      fromURL: '/dashboard'
     }
   },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated'])
   },
   methods: {
     async login () {
@@ -54,8 +53,13 @@ export default {
           password: this.password
         }
       )
-      this.$router.go(-1)
+      this.$router.push(this.fromURL)
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (from.fullPath !== '/' && from.fullPath !== '/sign-in') vm.fromURL = from.fullPath
+    })
   }
 }
 </script>

@@ -8,6 +8,7 @@ const PluginManager = () => import('@/services/plugin/PluginManager')
 
 export default {
   path: 'plugin',
+  meta: { label: 'Plugin', requiresAuth: true },
   components: {
     header: BaseHeader,
     sidebar: PluginSidebar,
@@ -17,13 +18,13 @@ export default {
     {
       path: 'plugin',
       name: 'plugin',
-      meta: { label: 'Plugin' },
+      meta: { label: 'Plugin', requiresAuth: true },
       component: Plugin
     },
     {
       path: 'plugin-manager',
       name: 'pluginManager',
-      meta: { label: 'Plugin Manager' },
+      meta: { label: 'Plugin Manager', requiresAuth: true },
       component: PluginManager
     }
   ]
