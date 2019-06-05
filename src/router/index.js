@@ -50,7 +50,6 @@ const router = new Router({
       name: 'home',
       component: DefaultContainer,
       beforeEnter: (to, from, next) => {
-        console.log('check auth')
         if (!cookie.get('accessToken')) next('/sign-in')
         else next()
       },
