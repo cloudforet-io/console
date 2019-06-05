@@ -12,7 +12,7 @@ export default {
   path: 'identity',
   name: 'identity',
   redirect: '/identity/domain',
-  meta: { label: 'Identity' },
+  meta: { label: 'Identity', requiresAuth: true },
   components: {
     header: BaseHeader,
     sidebar: IdentitySidebar,
@@ -22,25 +22,25 @@ export default {
     {
       path: 'domain',
       name: 'domain',
-      meta: { label: 'Domain' },
+      meta: { label: 'Domain', requiresAuth: true },
       component: Domain
     },
     {
       path: 'project',
       name: 'project',
-      meta: { label: 'Project' },
+      meta: { label: 'Project', requiresAuth: true },
       component: Project
     },
     {
       path: 'user',
       name: 'user',
-      meta: { label: 'User' },
+      meta: { label: 'User', requiresAuth: true },
       component: User
     },
     {
       path: 'api-key',
       name: 'apiKey',
-      meta: { label: 'API Key' },
+      meta: { label: 'API Key', requiresAuth: true },
       component: APIKey
     }
   ]

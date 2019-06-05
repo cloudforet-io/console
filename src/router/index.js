@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import cookie from 'vue-cookie'
-import store from '@/store'
 
 // Services
 import dashboardRoute from './dashboardRoute'
@@ -38,21 +37,13 @@ const router = new Router({
     {
       path: '/sign-in',
       name: 'signIn',
-      meta: { label: 'Sign In' },
-      component: SignIn,
-      beforeEnter: (to, from, next) => {
-        if (cookie.get('accessToken')) next('/dashboard')
-        else next()
-      }
+      meta: { label: 'Sign In', requiresAuth: false },
+      component: SignIn
     },
     {
       path: '/',
       name: 'home',
       component: DefaultContainer,
-      beforeEnter: (to, from, next) => {
-        if (!cookie.get('accessToken')) next('/sign-in')
-        else next()
-      },
       children: [
         dashboardRoute,
         identityRoute,
@@ -61,6 +52,21 @@ const router = new Router({
       ]
     }
   ]
+})
+
+router.beforeEach((to, from, next) => {
+  for (var i = to.matched.length - 1; i > -1; i--) {
+    if (to.matched[i].meta.requiresAuth) {
+      if (cookie.get('sessionId')) next()
+      else {
+        next({
+          path: '/sign-in'
+        })
+      }
+      return
+    }
+  }
+  next()
 })
 
 export default router

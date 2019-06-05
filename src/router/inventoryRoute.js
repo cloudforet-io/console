@@ -15,7 +15,7 @@ export default {
   path: 'inventory',
   name: 'inventory',
   redirect: 'inventory/data-center',
-  meta: { label: 'Inventory' },
+  meta: { label: 'Inventory', requiresAuth: true },
   components: {
     header: BaseHeader,
     sidebar: InventorySidebar,
@@ -25,13 +25,13 @@ export default {
     {
       path: 'data-center',
       name: 'dataCenter',
-      meta: { label: 'DataCenter' },
+      meta: { label: 'DataCenter', requiresAuth: true },
       component: DataCenter
     },
     {
       path: 'server',
       name: 'server',
-      meta: { label: 'Server' },
+      meta: { label: 'Server', requiresAuth: true },
       component: Server
     },
     {
@@ -41,19 +41,19 @@ export default {
         {
           path: 'network',
           name: 'network',
-          meta: { label: 'Network' },
+          meta: { label: 'Network', requiresAuth: true },
           component: Network
         },
         {
           path: 'ip-address',
           name: 'ipAddress',
-          meta: { label: 'IP Address' },
+          meta: { label: 'IP Address', requiresAuth: true },
           component: IPAdress
         },
         {
           path: 'type',
           name: 'networkType',
-          meta: { label: 'Network Type' },
+          meta: { label: 'Network Type', requiresAuth: true },
           component: NetworkType
         }
       ]
