@@ -24,6 +24,14 @@ spec:
           image: 072548720675.dkr.ecr.ap-northeast-2.amazonaws.com/cloudone/webconsole/client
           ports:
             - containerPort: 80
+          volumeMounts:
+            - name: nginxConfig
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
           env:
             - name: HELLO
               value: WORLD
+    volumes:
+      - name: nginxConfig
+        configMap:
+          name: nginx.conf
