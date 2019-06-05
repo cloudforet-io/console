@@ -59,6 +59,7 @@ export default {
   beforeRouteEnter (to, from, next) {
     next(vm => {
       if (from.fullPath !== '/sign-in') vm.fromURL = from.fullPath
+      else vm.fromURL = '/dashboard'
     })
   }
 }
