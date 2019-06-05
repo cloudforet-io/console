@@ -23,11 +23,12 @@ export default {
         user_name: username,
         password: password
       })
-      cookie.set('accessToken', res.data.token, { expires: '3s' })
+      cookie.set('accessToken', res.data.token, { expires: '30m' })
       api.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
       commit('login', { accessToken: res.data.token })
     },
-    logout ({ commit }) {
+    async logout ({ commit }) {
+      await api.post('/auth/logout')
       cookie.delete('accessToken')
       api.defaults.headers.common['Authorization'] = undefined
       commit('logout')
