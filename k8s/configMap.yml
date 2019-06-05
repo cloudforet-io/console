@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nginx.conf
+  name: wconsole-client-nginx.conf 
   namespace: cloudone
 data:
-  nginx.conf: |
+  wconsole-client-nginx.conf: |
     server {
         listen 80;
         server_name wconsole.pyengine.net;

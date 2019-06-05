@@ -25,13 +25,13 @@ spec:
           ports:
             - containerPort: 80
           volumeMounts:
-            - name: nginxConfig
+            - name: nginx-config
               mountPath: /etc/nginx/conf.d
               readOnly: true
           env:
             - name: HELLO
               value: WORLD
     volumes:
-      - name: nginxConfig
+      - name: nginx-config
         configMap:
-          name: nginx.conf
+          name: wconsole-client-nginx.conf 
