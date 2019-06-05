@@ -58,7 +58,7 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      if (from.fullPath !== '/' && from.fullPath !== '/sign-in') vm.fromURL = from.fullPath
+      if (from.fullPath !== '/sign-in') vm.fromURL = from.fullPath
     })
   }
 }
