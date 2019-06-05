@@ -31,7 +31,7 @@ spec:
           env:
             - name: HELLO
               value: WORLD
-    volumes:
-      - name: nginx-config
-        configMap:
-          name: wconsole-client-nginx.conf 
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: wconsole-client-nginx.conf 
