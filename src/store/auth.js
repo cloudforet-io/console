@@ -24,7 +24,7 @@ export default {
         password: password
       })
       console.log('res.data', res.data)
-      cookie.set('sessionId', res.data, { expires: '3s' })
+      cookie.set('sessionId', res.data, { expires: '30m' })
       commit('login')
     },
     async logout ({ commit }) {
