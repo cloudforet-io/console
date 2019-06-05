@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wconsole-client-nginx.conf 
+  namespace: cloudone
+data:
+  wconsole-client-nginx.conf: |
+    server {
+        listen 80;
+        server_name wconsole.pyengine.net;
+
+        root /var/www/;
+        index index.html;
+
+        # Force all paths to load either itself (js files) or go through index.html.
+        location / {
+            try_files $uri /index.html;
+        }
+    }
+  
