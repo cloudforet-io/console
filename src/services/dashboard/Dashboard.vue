@@ -873,6 +873,7 @@ import MainChartExample from '@/components/dashboard/MainChartExample'
 import SocialBoxChartExample from '@/components/dashboard/SocialBoxChartExample'
 import CalloutChartExample from '@/components/dashboard/CalloutChartExample'
 import { Callout } from '@coreui/vue'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Dashboard',
@@ -964,6 +965,9 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters('auth', ['isAuthenticated'])
+  },
   methods: {
     variant (value) {
       let $variant
@@ -985,6 +989,7 @@ export default {
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.$store.dispatch('nav/hideNav')
+      // if (!vm.isAuthenticated) vm.$router.push('/sign-in')
     })
   },
   beforeRouteLeave (to, from, next) {
