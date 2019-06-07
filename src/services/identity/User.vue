@@ -7,7 +7,7 @@
     </b-row>
     <b-row>
       <b-col cols="12">
-        <UserDetail />
+        <UserDetail v-if="selectedUserId" />
       </b-col>
     </b-row>
   </div>
@@ -61,7 +61,8 @@ export default {
         { key: 'registered' },
         { key: 'role' },
         { key: 'status', sortable: true }
-      ]
+      ],
+      selectedUserId: null
     }
   },
   mounted () {
