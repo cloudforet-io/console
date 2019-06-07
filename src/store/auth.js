@@ -4,7 +4,8 @@ import cookie from 'vue-cookie'
 export default {
   namespaced: true,
   state: {
-    isLoggedIn: false
+    isLoggedIn: false,
+    nextPath: '/'
   },
   mutations: {
     login (state) {
@@ -12,10 +13,14 @@ export default {
     },
     logout (state) {
       state.isLoggedIn = false
+    },
+    setNextPath (state, { nextPath }) {
+      state.nextPath = nextPath
     }
   },
   getters: {
-    isLoggedIn: state => state.isLoggedIn
+    isLoggedIn: state => state.isLoggedIn,
+    nextPath: state => state.nextPath
   },
   actions: {
     async login ({ commit }, { username, password }) {
@@ -30,6 +35,9 @@ export default {
       await api.post('/auth/logout')
       cookie.delete('sessionId')
       commit('logout')
+    },
+    setNextPath ({ commit }, { nextPath }) {
+      commit('setNextPath', { nextPath })
     }
   }
 }
