@@ -5,6 +5,7 @@
   "author": "CloudOne",
   "scripts": {
     "serve": "vue-cli-service serve --mode local",
+    "build:local": "vue-cli-service build --mode local",
     "build:dev": "vue-cli-service build --mode development",
     "build:stg": "vue-cli-service build --mode staging",
     "build:prod": "vue-cli-service build --mode prod",
