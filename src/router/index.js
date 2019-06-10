@@ -2,13 +2,14 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import cookie from 'vue-cookie'
 
+import { loadLanguageAsync } from '@/setup/i18n'
+import store from '@/store'
+
 // Services
 import dashboardRoute from './dashboardRoute'
 import identityRoute from './identityRoute'
 import inventoryRoute from './inventoryRoute'
 import pluginRoute from './pluginRoute'
-
-import { loadLanguageAsync } from '@/setup/i18n'
 
 // Containers
 const DefaultContainer = () => import('@/containers/DefaultContainer')
@@ -60,6 +61,7 @@ router.beforeEach((to, from, next) => {
     if (to.matched[i].meta.requiresAuth) {
       if (cookie.get('sessionId')) next()
       else {
+        store.dispatch('auth/setNextPath', { nextPath: to.fullPath })
         next({
           path: '/sign-in'
         })

@@ -38,3 +38,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.container-fluid {
+  padding: 20px;
+}
+</style>
