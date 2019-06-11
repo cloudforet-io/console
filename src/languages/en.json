@@ -1,4 +1,8 @@
-{
+{"MSG": {
+  "LOG_IN": "Log in",
+  "LOG_OUT": "Log out",
+  "FORGPW": "Forgot password"
+},
   "assets": {
     "nav": [
       {

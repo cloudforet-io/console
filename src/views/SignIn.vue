@@ -24,11 +24,11 @@
           </b-form-group>
           <div class="form-group form-actions">
             <b-button type="button" size="sm" variant="success" @click="login">             
-            {{ $t('asset1.meta.title') }}
+            {{ $t('MSG.LOG_IN')}}
             </b-button>
-            &nbsp;
+            &nbsp
             <b-button type="button" size="sm" variant="success" @click="forgotpassword">
-              forgot password
+              {{ $t('MSG.FORGPW')}}
             </b-button>
           </div>
 
@@ -64,17 +64,6 @@ export default {
       debugger;
       this.$router.push(this.nextPath)
     },
-    async forgotpassword () {
-      await this.$store.dispatch('auth/login',
-        {
-          username: this.username,
-          password: this.password
-        }
-      )
-      debugger;
-      this.$router.push(this.nextPath)
-    }
-
   }
 }
 </script>

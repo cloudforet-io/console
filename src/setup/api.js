@@ -2,7 +2,8 @@ import axios from 'axios'
 // import store from '@/store'
 
 export const api = axios.create({
-  baseURL: process.env.VUE_APP_API_URL,
+
+  baseURL: `http://localhost:3000/api/`,
   withCredentials: true,
   headers: {
     'Accept': 'application/json',
@@ -10,7 +11,9 @@ export const api = axios.create({
   }
 })
 
+//
 // api.interceptors.response.use(undefined, function (err) {
+//   console.log(process.env.VUE_APP_API_URL);
 //   return new Promise(function (resolve, reject) {
 //     if (err.status === 403 && err.config && !err.config.__isRetryRequest) {
 //     // if you ever get an unauthorized, logout the user
