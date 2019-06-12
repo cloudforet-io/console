@@ -2,9 +2,28 @@
   <div class="animated fadeIn">
     <b-row>
       <b-col cols="6" sm="4" md="1" class="mb-3">
-        <b-button block variant="outline-primary">
-          Add
-        </b-button>
+        <BaseModal :title="'Add User'" :centered="true">
+          <template v-slot:activator="baseModalProps">
+            <b-button block variant="outline-primary" @click="baseModalProps.openModal">
+              Add
+            </b-button>
+          </template>
+          <template v-slot:contents="baseModalProps">
+            <UserDetail v-if="baseModalProps.stillOpen" :updatable="true" />
+          </template>
+        </BaseModal>
+      </b-col>
+      <b-col cols="6" sm="4" md="1" class="mb-3">
+        <BaseModal v-if="selectedUser" :title="'Edit User'" :centered="true">
+          <template v-slot:activator="baseModalProps">
+            <b-button block variant="outline-primary" @click="baseModalProps.openModal">
+              Edit
+            </b-button>
+          </template>
+          <template v-slot:contents="baseModalProps">
+            <UserDetail v-if="baseModalProps.stillOpen" :updatable="true" :user-prop="selectedUser" />
+          </template>
+        </BaseModal>
       </b-col>
     </b-row>
     <b-row>
@@ -17,7 +36,12 @@
     </b-row>
     <b-row>
       <b-col cols="12">
-        <UserDetail v-if="selectedUser" :user="selectedUser" />
+        <b-card v-if="selectedUser">
+          <div slot="header">
+            <strong>User Detail</strong>
+          </div>
+          <UserDetail v-if="selectedUser" :user-prop="selectedUser" />
+        </b-card>
       </b-col>
     </b-row>
   </div>
@@ -25,12 +49,14 @@
 
 <script>
 import BaseTable from '@/components/base/BaseTable.vue'
+const BaseModal = () => import('@/components/base/BaseModal.vue')
 const UserDetail = () => import('@/services/identity/UserDetail.vue')
 
 export default {
   name: 'User',
   components: {
     BaseTable,
+    BaseModal,
     UserDetail
   },
   data () {
@@ -43,10 +69,10 @@ export default {
         { key: 'group', label: 'Group Name', sortable: true },
         { key: 'language', label: 'Language', sortable: true },
         { key: 'domainId', label: 'Domain ID', sortable: true }
-
       ],
       users: [],
-      selectedUser: null
+      selectedUser: null,
+      addModal: false
     }
   },
   mounted () {
@@ -64,7 +90,8 @@ export default {
       this.users = res.data
       this.selectedUser = null
     },
-    rowClicked (item) {
+    rowClicked (item, idx, target) {
+      // this.users[idx]._rowVariant = 'success'
       this.selectedUser = item
     }
   }
