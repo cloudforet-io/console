@@ -15,7 +15,10 @@
         </b-col>
       </b-row>
     </div>
-    <b-table class="b-table" :selectable="selectable" :select-mode="selectMode" :dark="dark" :hover="hover" :striped="striped" :bordered="bordered" :small="small" :fixed="fixed" responsive="sm" :items="items" :fields="captions" :current-page="currentPage" :per-page="perPage" @row-clicked="rowClicked">
+    <b-table class="b-table" :dark="dark" :hover="hover" :striped="striped" :bordered="bordered"
+             :small="small" :fixed="fixed" responsive="sm" :items="items" :fields="captions"
+             :current-page="currentPage" :per-page="perPage" @row-clicked="rowClicked"
+    >
       <template slot="status" slot-scope="data">
         <b-badge :variant="getBadge(data.item.status)">
           {{ data.item.status }}
@@ -23,7 +26,9 @@
       </template>
     </b-table>
     <nav>
-      <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" prev-text="Prev" next-text="Next" hide-goto-end-buttons />
+      <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
+                    prev-text="Prev" next-text="Next" hide-goto-end-buttons
+      />
     </nav>
   </b-card>
 </template>
@@ -48,14 +53,6 @@ export default {
     refreshFn: {
       type: Function,
       default: null
-    },
-    selectable: {
-      type: Boolean,
-      default: false
-    },
-    selectMode: {
-      type: String,
-      default: 'single'
     },
     hover: {
       type: Boolean,
@@ -98,18 +95,20 @@ export default {
       default: () => {}
     }
   },
-  data: () => {
+  data () {
     return {
       currentPage: 1
+      // items: this.tableData
     }
   },
   computed: {
-    items: function () {
+    items () {
       const items = this.tableData
-      return Array.isArray(items) ? items : items()
+      return this.tableData
+      // return Array.isArray(items) ? items : items()
     },
-    totalRows: function () { return this.getRowCount() },
-    captions: function () { return this.fields }
+    totalRows () { return this.getRowCount() },
+    captions () { return this.fields }
   },
   methods: {
     getBadge (status) {
@@ -118,7 +117,7 @@ export default {
           : status === 'Pending' ? 'warning'
             : status === 'Banned' ? 'danger' : 'primary'
     },
-    getRowCount: function () {
+    getRowCount () {
       return this.items.length
     }
   }
