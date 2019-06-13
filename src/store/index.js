@@ -2,8 +2,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import nav from './nav'
 import auth from './auth'
+import nav from './nav'
+import modal from './modal'
 
 Vue.use(Vuex)
 
@@ -13,7 +14,8 @@ const debug = process.env.NODE_ENV !== 'production'
 export default new Vuex.Store({
   modules: {
     auth,
-    nav
+    nav,
+    modal
   },
   strict: debug
   // plugins: debug ? [createLogger()] : []

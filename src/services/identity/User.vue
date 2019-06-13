@@ -2,26 +2,28 @@
   <div class="animated fadeIn">
     <b-row>
       <b-col cols="6" sm="4" md="1" class="mb-3">
-        <BaseModal :title="'Add User'" :centered="true">
-          <template v-slot:activator="baseModalProps">
-            <b-button block variant="outline-primary" @click="baseModalProps.openModal">
+        <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
+          <template #activator>
+            <b-button block variant="outline-primary">
               Add
             </b-button>
           </template>
-          <template v-slot:contents="baseModalProps">
-            <UserDetail v-if="baseModalProps.stillOpen" :updatable="true" />
+          <template #contents>
+            <UserDetail :creatable="true" :updatable="true" />
           </template>
         </BaseModal>
       </b-col>
       <b-col cols="6" sm="4" md="1" class="mb-3">
-        <BaseModal v-if="selectedUser" :title="'Edit User'" :centered="true">
-          <template v-slot:activator="baseModalProps">
-            <b-button block variant="outline-primary" @click="baseModalProps.openModal">
+        <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
+                   :centered="true" :hide-footer="true"
+        >
+          <template #activator>
+            <b-button block variant="outline-primary">
               Edit
             </b-button>
           </template>
-          <template v-slot:contents="baseModalProps">
-            <UserDetail v-if="baseModalProps.stillOpen" :updatable="true" :user-prop="selectedUser" />
+          <template #contents>
+            <UserDetail :updatable="true" :user-prop="selectedUser" />
           </template>
         </BaseModal>
       </b-col>
@@ -72,6 +74,7 @@ export default {
       ],
       users: [],
       selectedUser: null,
+      selectedIdx: undefined,
       addModal: false
     }
   },
@@ -91,8 +94,16 @@ export default {
       this.selectedUser = null
     },
     rowClicked (item, idx, target) {
-      // this.users[idx]._rowVariant = 'success'
-      this.selectedUser = item
+      if (this.selectedUser) {
+        delete this.selectedUser._rowVariant
+        this.users.splice(this.selectedIdx, 1, this.selectedUser)
+      }
+      this.selectedUser = Object.assign({}, item, { _rowVariant: 'success' })
+      this.users.splice(idx, 1, this.selectedUser)
+      this.selectedIdx = idx
+    },
+    okFn () {
+      console.log('ok Fn')
     }
   }
 }

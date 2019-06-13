@@ -36,20 +36,24 @@
       <BaseTags :updatable="updatable" :tags-prop="user.tags" />
     </b-form-group>
 
-    <!-- <div  slot="footer">
-      <b-button type="submit" size="sm" variant="primary">
-        <i class="fa fa-dot-circle-o" /> Submit
+    <div v-if="updatable" class="btn-box mt-5">
+      <b-button class="float-right ml-3 mb-1" size="md" type="button" variant="primary"
+                @click="creatable ? createUser() : updateUser()"
+      >
+        {{ creatable ? 'Create' : 'Update' }}
       </b-button>
-      <b-button type="reset" size="sm" variant="danger">
-        <i class="fa fa-ban" /> Reset
+      <b-button class="float-right mb-1" size="md" type="reset" variant="secondary">
+        Reset
       </b-button>
-    </div> -->
+      <b-button v-if="!creatable" class="float-left" size="md" type="reset" variant="danger" @click="deleteUser">
+        Delete
+      </b-button>
+    </div>
   </b-form>
 </template>
 
 <script>
 import BaseTags from '@/components/base/BaseTags'
-
 export default {
   name: 'UserDetail',
   components: {
@@ -70,9 +74,17 @@ export default {
         tags: []
       })
     },
+    creatable: {
+      type: Boolean,
+      default: false
+    },
     updatable: {
       type: Boolean,
       default: false
+    },
+    completeFn: {
+      type: Function,
+      default: () => () => {}
     }
   },
   data () {
@@ -81,12 +93,32 @@ export default {
   },
   computed: {
     user () {
-      return this.updatable ? Object.assign({}, this.userProp) : this.userProp
+      let obj = this.updatable ? Object.assign({}, this.userProp) : this.userProp
+      return obj
+    }
+  },
+  methods: {
+    createUser () {
+      console.log('creating....')
+      setTimeout(() => {
+        this.$store.dispatch('modal/closeModal')
+      }, 1000)
+    },
+    updateUser () {
+      console.log('updating....')
+      setTimeout(() => {
+        this.$store.dispatch('modal/closeModal')
+      }, 1000)
+    },
+    deleteUser () {
+      console.log('deleting....')
+      setTimeout(() => {
+        this.$store.dispatch('modal/closeModal')
+      }, 1000)
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-
 </style>
