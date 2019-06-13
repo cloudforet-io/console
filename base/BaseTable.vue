@@ -75,7 +75,7 @@ export default {
       default: false
     },
     tableData: {
-      type: [Array, Function],
+      type: Array,
       default: () => []
     },
     fields: {
@@ -92,7 +92,7 @@ export default {
     },
     rowClicked: {
       type: Function,
-      default: () => {}
+      default: () => () => {}
     }
   },
   data () {
@@ -103,9 +103,7 @@ export default {
   },
   computed: {
     items () {
-      const items = this.tableData
       return this.tableData
-      // return Array.isArray(items) ? items : items()
     },
     totalRows () { return this.getRowCount() },
     captions () { return this.fields }
@@ -120,6 +118,10 @@ export default {
     getRowCount () {
       return this.items.length
     }
+    // rowClicked () {
+    //   let res = this.rowClickedFn()
+    //   console.log(res)
+    // }
   }
 }
 </script>

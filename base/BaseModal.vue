@@ -1,18 +1,35 @@
 <template>
   <div>
-    <slot name="activator" :openModal="openModal" />
-    <b-modal v-model="openState" :centered="centered" :title="title" size="lg"
-             @ok="closeModal" @hidden="modalClosed"
+    <div @click="showModal">
+      <slot name="activator" />
+    </div>
+
+    <b-modal :ref="name" :title="title" :centered="centered" :no-close-on-backdrop="backdropOff"
+             :hide-footer="hideFooter" size="lg" @hidden="$store.dispatch('modal/modalHidden')"
     >
-      <slot name="contents" :stillOpen="stillOpen" />
+      <slot v-if="isModalShown" name="contents" />
+
+      <template v-slot:modal-footer>
+        <slot v-if="customFooter" name="footer" />
+        <div v-else>
+          <b-button variant="secondary" size="md" class="float-right" @click="hideModal">
+            Close
+          </b-button>
+        </div>
+      </template>
     </b-modal>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: 'BaseModal',
   props: {
+    name: {
+      type: String,
+      default: 'baseModal'
+    },
     title: {
       type: String,
       default: null
@@ -20,29 +37,47 @@ export default {
     centered: {
       type: Boolean,
       default: false
+    },
+    backdropOff: {
+      type: Boolean,
+      default: false
+    },
+    hideFooter: {
+      type: Boolean,
+      default: false
+    },
+    customFooter: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
     return {
-      openState: false,
-      stillOpen: false
+    }
+  },
+  computed: {
+    ...mapGetters('modal', [
+      'isModalShown',
+      'openState'
+    ])
+  },
+  watch: {
+    openState (v) {
+      if (!v) this.$refs[this.name].hide()
     }
   },
   methods: {
-    openModal () {
-      this.openState = true
-      this.stillOpen = true
+    showModal (e) {
+      this.$store.dispatch('modal/openModal')
+      this.$refs[this.name].show()
     },
-    closeModal () {
-      this.openState = false
-    },
-    modalClosed () {
-      this.stillOpen = false
+    hideModal (e) {
+      this.$store.dispatch('modal/closeModal')
+      this.$refs[this.name].hide()
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-
 </style>

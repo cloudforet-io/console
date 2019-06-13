@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="tags" class="mt-1 mb-3">
+    <div class="mt-1 mb-3">
       <span v-for="(tag, idx) in tags" :key="idx" class="tag-badge mr-2">
         <b-badge v-for="(val, k) in tag" :key="k" variant="light">
           {{ k }} : {{ val }} <i v-if="updatable" class="tag-delete-btn fa fa-times-circle" @click="deleteTag(idx)" />
@@ -39,7 +39,7 @@ export default {
   props: {
     tagsProp: {
       type: Array,
-      default: null
+      default: () => []
     },
     updatable: {
       type: Boolean,
@@ -49,25 +49,18 @@ export default {
   data () {
     return {
       key: '',
-      value: ''
-      // tags: this.updatable ? this.tagsProp.slice(0) : this.tagsProp
+      value: '',
+      updatableTags: []
     }
   },
   computed: {
-    tags: {
-      get () {
-        return this.updatable ? this.tagsProp.slice(0) : this.tagsProp
-      },
-      set (item) {
-        console.log('tags setter')
-      }
+    tags () {
+      return this.updatable ? this.updatableTags : this.tagsProp
     }
   },
-  // watch: {
-  //   tagsProp () {
-  //     this.tags = this.updatable ? this.tagsProp.slice(0) : this.tagsProp
-  //   }
-  // },
+  created () {
+    if (this.updatable) this.updatableTags = this.tagsProp.slice(0)
+  },
   methods: {
     addTag () {
       let newTag = {}
@@ -77,8 +70,7 @@ export default {
       this.value = ''
     },
     deleteTag (idx) {
-      this.tags = this.tags.splice(idx, 1)
-      console.log('deleteTag', this.tags)
+      this.tags.splice(idx, 1)
     }
   }
 }
