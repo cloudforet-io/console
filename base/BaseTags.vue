@@ -10,18 +10,18 @@
     <b-form v-if="updatable">
       <b-row>
         <b-col cols="3" class="text-center">
-          <label for="key">Key</label>
+          <label>Key</label>
         </b-col>
         <b-col cols="3" class="text-center">
-          <label for="value">Value</label>
+          <label>Value</label>
         </b-col>
       </b-row>
       <b-row align-v="center">
         <b-col cols="3">
-          <b-form-input id="key" v-model="key" type="text" />
+          <b-form-input v-model="key" type="text" />
         </b-col> :
         <b-col cols="3">
-          <b-form-input id="value" v-model="value" type="text" />
+          <b-form-input v-model="value" type="text" />
         </b-col>
         <b-col cols="3">
           <b-button type="button" size="sm" variant="light" @click="addTag">
@@ -49,17 +49,13 @@ export default {
   data () {
     return {
       key: '',
-      value: '',
-      updatableTags: []
+      value: ''
     }
   },
   computed: {
     tags () {
-      return this.updatable ? this.updatableTags : this.tagsProp
+      return this.tagsProp
     }
-  },
-  created () {
-    if (this.updatable) this.updatableTags = this.tagsProp.slice(0)
   },
   methods: {
     addTag () {
