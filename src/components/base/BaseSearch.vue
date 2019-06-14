@@ -11,7 +11,13 @@
 
 <script>
 export default {
-  name: 'BaseSearch'
+  name: 'BaseSearch',
+  props: {
+    searchFn: {
+      type: Function,
+      default: () => () => {}
+    }
+  }
 
 }
 </script>

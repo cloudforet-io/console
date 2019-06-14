@@ -6,11 +6,11 @@
           {{ caption }}
         </b-col>
         <b-col cols="10" md="8">
-          <BaseSearch v-if="searchable" />
+          <BaseSearch v-if="searchable" :search-fn="listFn" />
         </b-col>
-        <b-col v-if="refreshFn" cols="1" md="2">
+        <b-col v-if="listFn" cols="1" md="2">
           <div class="refresh-btn text-right">
-            <i class="icon-refresh" @click="refreshFn" />
+            <i class="icon-refresh" @click="listFn" />
           </div>
         </b-col>
       </b-row>
@@ -50,7 +50,7 @@ export default {
       type: Boolean,
       default: false
     },
-    refreshFn: {
+    listFn: {
       type: Function,
       default: null
     },

@@ -28,7 +28,7 @@ export default {
   props: {
     name: {
       type: String,
-      default: 'baseModal'
+      required: true
     },
     title: {
       type: String,

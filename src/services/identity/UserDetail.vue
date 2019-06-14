@@ -1,51 +1,76 @@
 <template>
-  <b-form>
-    <b-form-group label="User ID" label-for="userId" :label-cols="3" :horizontal="true">
-      <b-form-input id="userId" v-model="user.userId" :plaintext="!updatable" type="text" />
+  <b-form @reset.prevent="onReset" @submit.prevent="updatable && creatable ? onCreate() : onUpdate()">
+    <b-form-group label="User ID" :label-cols="3" :horizontal="true">
+      <b-form-input v-model="userId" :plaintext="!updatable" type="text" :state="validateUserId" />
+      <b-form-invalid-feedback :state="validateUserId">
+        Your user ID must be 5-12 characters long.
+      </b-form-invalid-feedback>
+      <b-form-valid-feedback :state="validateUserId">
+        Looks Good.
+      </b-form-valid-feedback>
     </b-form-group>
 
-    <b-form-group label="Name" label-for="name" :label-cols="3" :horizontal="true">
-      <b-form-input id="name" v-model="user.name" :plaintext="!updatable" type="text" />
+    <b-form-group v-if="updatable" label="Password" :label-cols="3" :horizontal="true">
+      <b-form-input v-model="password" :plaintext="!updatable" type="password" :state="validatePassword" />
+      <b-form-invalid-feedback :state="validatePassword">
+        Your Password must be 5-12 characters long.
+      </b-form-invalid-feedback>
+      <b-form-valid-feedback :state="validatePassword" />
     </b-form-group>
 
-    <b-form-group label="E-Mail" label-for="email" :label-cols="3" :horizontal="true">
-      <b-form-input id="email" v-model="user.email" :plaintext="!updatable" type="text" />
+    <b-form-group v-if="updatable" label="Password Check" :label-cols="3" :horizontal="true">
+      <b-form-input v-model="passwordCheck" :plaintext="!updatable" type="password"
+                    :state="validatePasswordCheck"
+      />
+      <b-form-invalid-feedback :state="validatePasswordCheck">
+        Please check your Password again.
+      </b-form-invalid-feedback>
+      <b-form-valid-feedback :state="validatePasswordCheck" />
     </b-form-group>
 
-    <b-form-group label="Phone" label-for="mobile" :label-cols="3" :horizontal="true">
-      <b-form-input id="mobile" v-model="user.mobile" :plaintext="!updatable" type="text" />
+    <b-form-group label="Name" :label-cols="3" :horizontal="true">
+      <b-form-input v-model="name" :plaintext="!updatable" type="text" />
     </b-form-group>
 
-    <b-form-group label="Group Name" label-for="group" :label-cols="3" :horizontal="true">
-      <b-form-input id="group" v-model="user.group" :plaintext="!updatable" type="text" />
+    <b-form-group label="E-Mail" :label-cols="3" :horizontal="true">
+      <b-form-input v-model="email" :plaintext="!updatable" type="text" />
+    </b-form-group>
+
+    <b-form-group label="Phone" :label-cols="3" :horizontal="true">
+      <b-form-input v-model="mobile" :plaintext="!updatable" type="text" />
+    </b-form-group>
+
+    <b-form-group label="Group Name" :label-cols="3" :horizontal="true">
+      <b-form-input v-model="group" :plaintext="!updatable" type="text" />
     </b-form-group>
 
     <b-form-group label="Domain ID" label-for="domainId" :label-cols="3" :horizontal="true">
-      <b-form-input id="domainId" v-model="user.domainId" :plaintext="!updatable" type="text" />
+      <b-form-input v-model="domainId" :plaintext="!updatable" type="text" :state="validateDomainId" />
+      <b-form-invalid-feedback :state="validateDomainId">
+        Please enter your domain ID.
+      </b-form-invalid-feedback>
     </b-form-group>
 
     <b-form-group label="Language" label-for="language" :label-cols="3" :horizontal="true">
-      <b-form-input id="language" v-model="user.language" :plaintext="!updatable" type="text" />
+      <b-form-input v-model="language" :plaintext="!updatable" type="text" />
     </b-form-group>
 
     <b-form-group label="Time Zone" label-for="timezone" :label-cols="3" :horizontal="true">
-      <b-form-input id="timezone" v-model="user.timezone" :plaintext="!updatable" type="text" />
+      <b-form-input v-model="timezone" :plaintext="!updatable" type="text" />
     </b-form-group>
 
-    <b-form-group label="Tags" label-for="tags" :label-cols="3" :horizontal="true">
-      <BaseTags :updatable="updatable" :tags-prop="user.tags" />
+    <b-form-group label="Tags" :label-cols="3" :horizontal="true">
+      <BaseTags :updatable="updatable" :creatable="creatable" :tags-prop="updatable ? updatableTags : tags" />
     </b-form-group>
 
     <div v-if="updatable" class="btn-box mt-5">
-      <b-button class="float-right ml-3 mb-1" size="md" type="button" variant="primary"
-                @click="creatable ? createUser() : updateUser()"
-      >
+      <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="primary">
         {{ creatable ? 'Create' : 'Update' }}
       </b-button>
       <b-button class="float-right mb-1" size="md" type="reset" variant="secondary">
         Reset
       </b-button>
-      <b-button v-if="!creatable" class="float-left" size="md" type="reset" variant="danger" @click="deleteUser">
+      <b-button v-if="!creatable" class="float-left" size="md" type="reset" variant="danger" @click="onDelete">
         Delete
       </b-button>
     </div>
@@ -63,14 +88,15 @@ export default {
     userProp: {
       type: Object,
       default: () => ({
-        userId: '',
-        name: '',
-        email: '',
-        mobile: '',
-        group: '',
-        domainId: '',
-        language: '',
-        timezone: '',
+        userId: null,
+        name: null,
+        password: null,
+        email: null,
+        mobile: null,
+        group: null,
+        domainId: null,
+        language: null,
+        timezone: null,
         tags: []
       })
     },
@@ -81,40 +107,113 @@ export default {
     updatable: {
       type: Boolean,
       default: false
-    },
-    completeFn: {
-      type: Function,
-      default: () => () => {}
     }
   },
   data () {
     return {
+      userId: this.userProp.userId, // required
+      password: this.userProp.password, // required
+      passwordCheck: null, // required
+      name: this.userProp.name,
+      email: this.userProp.email,
+      mobile: this.userProp.mobile,
+      group: this.userProp.group,
+      domainId: this.userProp.domainId, // required
+      language: this.userProp.language,
+      timezone: this.userProp.timezone,
+      updatableTags: this.updatable ? this.userProp.tags.slice(0) : []
     }
   },
   computed: {
-    user () {
-      let obj = this.updatable ? Object.assign({}, this.userProp) : this.userProp
-      return obj
+    tags () {
+      return this.updatable ? this.updatableTags : this.userProp.tags
+    },
+    validateUserId () {
+      if (this.userId === null) return null
+      if (this.userId.length > 4) return true
+      return false
+    },
+    validatePassword () {
+      if (this.password === null) return null
+      if (this.password.length > 4) return true
+      return false
+    },
+    validatePasswordCheck () {
+      if (this.passwordCheck === null) return null
+      if (!this.password) return false
+      if (this.password === this.passwordCheck) return true
+      return false
+    },
+    validateDomainId () {
+      if (this.domainId === null) return null
+      if (this.domainId.length > 0) return true
+      return false
+    },
+    validated () {
+      return !!(this.validateUserId && this.validatePassword &&
+                this.validatePasswordCheck && this.validateDomainId)
     }
   },
   methods: {
-    createUser () {
+    onCreate () {
+      if (!this.validated) {
+        this.userId = this.userId === null ? '' : this.userId
+        this.password = this.password === null ? '' : this.password
+        this.passwordCheck = this.passwordCheck === null ? '' : this.passwordCheck
+        this.domainId = this.domainId === null ? '' : this.domainId
+        return
+      }
       console.log('creating....')
       setTimeout(() => {
         this.$store.dispatch('modal/closeModal')
       }, 1000)
     },
-    updateUser () {
+    onUpdate (e) {
+      if (!this.validated) {
+        this.userId = this.userProp.userId
+        this.password = this.userProp.password
+        this.passwordCheck = ''
+        this.domainId = this.userProp.domainId
+        return
+      }
       console.log('updating....')
       setTimeout(() => {
         this.$store.dispatch('modal/closeModal')
       }, 1000)
     },
-    deleteUser () {
+    onDelete () {
       console.log('deleting....')
       setTimeout(() => {
         this.$store.dispatch('modal/closeModal')
       }, 1000)
+    },
+    onReset () {
+      // always updatable
+      if (this.creatable) {
+        this.userId = null
+        this.password = null
+        this.passwordCheck = null
+        this.name = null
+        this.email = null
+        this.mobile = null
+        this.group = null
+        this.domainId = null
+        this.language =
+        this.timezone = null
+        this.updatableTags = []
+      } else {
+        this.userId = this.userProp.userId
+        this.password = this.userProp.password
+        this.passwordCheck = null
+        this.name = this.userProp.name
+        this.email = this.userProp.email
+        this.mobile = this.userProp.mobile
+        this.group = this.userProp.group
+        this.domainId = this.userProp.domainId
+        this.language = this.userProp.language
+        this.timezone = this.userProp.timezone
+        this.updatableTags = this.userProp.tags.slice(0)
+      }
     }
   }
 }

@@ -31,7 +31,7 @@
     <b-row>
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="10"
-                   caption="Users" :searchable="true" :refresh-fn="listUsers"
+                   caption="Users" :searchable="true" :list-fn="listUsers"
                    :row-clicked="rowClicked"
         />
       </b-col>
