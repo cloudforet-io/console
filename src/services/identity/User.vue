@@ -32,7 +32,7 @@
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="3"
                    caption="Users" :searchable="true" :list-fn="listUsers"
-                   :row-clicked="rowClicked" :row-count="totalCount"
+                   :row-clicked-fn="rowClicked" :total-rows="totalCount"
         />
       </b-col>
     </b-row>
@@ -76,38 +76,36 @@ export default {
       selectedUser: null,
       selectedIdx: undefined,
       addModal: false,
-      totalCount: null
+      totalCount: 17
     }
   },
+  // computed: {
+  //   users () {
+
+  //   }
+  // },
   mounted () {
-    this.listUsers()
+    this.listUsers(3, 0)
   },
   methods: {
-    async listUsers () {
+    async listUsers (limit, skip) {
+      if (limit === undefined) limit = 10
+      if (skip === undefined) skip = 0
+
       let res
       try {
-        res = await this.$http.get('/users')
-        console.log(res.data)
+        res = await this.$http.get(`/identity/users?limit=${limit}&skip=${skip}`)
       } catch (e) {
         console.error(e)
       }
       this.users = res.data
       this.selectedUser = null
-      this.totalCount = this.users.length
       /**
        * TODO: set totalCount with data from server
        */
     },
-    rowClicked (item, idx, target) {
-      if (this.selectedUser) {
-        delete this.selectedUser._rowVariant
-        this.users.splice(this.selectedIdx, 1, this.selectedUser)
-      }
-      this.selectedUser = Object.assign({}, item, { _rowVariant: 'success' })
-      this.users.splice(idx, 1, this.selectedUser)
-      this.selectedIdx = idx
-      console.log('clicked user idx:', idx)
-      console.log('users: ', this.users.map(item => (item.name)))
+    rowClicked (item, idx) {
+      this.selectedUser = item
     }
   }
 }

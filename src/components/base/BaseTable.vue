@@ -17,7 +17,7 @@
     </div>
     <b-table class="b-table" :dark="dark" :hover="hover" :striped="striped" :bordered="bordered"
              :small="small" :fixed="fixed" responsive="sm" :items="items" :fields="captions"
-             :current-page="currentPage" :per-page="perPage" @row-clicked="rowClicked"
+             @row-clicked="rowClicked"
     >
       <template slot="status" slot-scope="data">
         <b-badge :variant="getBadge(data.item.status)">
@@ -25,11 +25,12 @@
         </b-badge>
       </template>
     </b-table>
-    <nav>
-      <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
-                    prev-text="Prev" next-text="Next" hide-goto-end-buttons
-      />
-    </nav>
+    <b-button type="button" @click.prevent="onPrev">
+      Prev
+    </b-button>
+    <b-button type="button" @click.prevent="onNext">
+      Next
+    </b-button>
   </b-card>
 </template>
 
@@ -90,29 +91,28 @@ export default {
       type: Boolean,
       default: false
     },
-    rowClicked: {
+    rowClickedFn: {
       type: Function,
       default: () => () => {}
     },
-    rowCount: {
+    totalRows: {
       type: Number,
       default: null
     }
   },
   data () {
     return {
-      currentPage: 1
-      // items: this.tableData
+      currentPage: 1,
+      selected: null
     }
   },
   computed: {
     items () {
+      console.log('item computed', this.tableData.map(item => (item.name)))
       return this.tableData
     },
-    totalRows () {
-      return this.rowCount ? this.rowCount : this.getRowCount()
-    },
-    captions () { return this.fields }
+    captions () { return this.fields },
+    maxPage () { return Math.ceil(this.totalRows / this.perPage) }
   },
   methods: {
     getBadge (status) {
@@ -121,8 +121,26 @@ export default {
           : status === 'Pending' ? 'warning'
             : status === 'Banned' ? 'danger' : 'primary'
     },
-    getRowCount () {
-      return this.items.length
+    rowClicked (item, idx, target) {
+      if (this.selected) {
+        delete this.selected._rowVariant
+        this.tableData.splice(idx, 1, this.selected)
+      }
+      this.selected = Object.assign({}, item, { _rowVariant: 'success' })
+      this.tableData.splice(idx, 1, this.selected)
+      this.rowClickedFn(item, idx, target)
+    },
+    onPrev () {
+      console.log('prev')
+      if (this.currentPage <= 1) return
+      this.currentPage--
+      this.listFn(this.perPage, this.currentPage * this.perPage)
+    },
+    onNext () {
+      console.log('next')
+      if (this.currentPage >= this.maxPage) return
+      this.currentPage++
+      this.listFn(this.perPage, this.currentPage * this.perPage)
     }
   }
 }
