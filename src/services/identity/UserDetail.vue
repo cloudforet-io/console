@@ -79,6 +79,20 @@
 
 <script>
 import BaseTags from '@/components/base/BaseTags'
+
+const userModel = {
+  userId: null,
+  name: null,
+  password: null,
+  email: null,
+  mobile: null,
+  group: null,
+  domainId: null,
+  language: null,
+  timezone: null,
+  tags: []
+}
+
 export default {
   name: 'UserDetail',
   components: {
@@ -87,18 +101,7 @@ export default {
   props: {
     userProp: {
       type: Object,
-      default: () => ({
-        userId: null,
-        name: null,
-        password: null,
-        email: null,
-        mobile: null,
-        group: null,
-        domainId: null,
-        language: null,
-        timezone: null,
-        tags: []
-      })
+      default: () => (userModel)
     },
     creatable: {
       type: Boolean,
@@ -150,8 +153,12 @@ export default {
       return false
     },
     validated () {
-      return !!(this.validateUserId && this.validatePassword &&
-                this.validatePasswordCheck && this.validateDomainId)
+      return !!(this.validateUserId && this.validatePassword && this.validatePasswordCheck && this.validateDomainId)
+    }
+  },
+  watch: {
+    userProp (updatedUser) {
+      this.resetUserData(updatedUser)
     }
   },
   methods: {
@@ -188,32 +195,21 @@ export default {
       }, 1000)
     },
     onReset () {
-      // always updatable
-      if (this.creatable) {
-        this.userId = null
-        this.password = null
-        this.passwordCheck = null
-        this.name = null
-        this.email = null
-        this.mobile = null
-        this.group = null
-        this.domainId = null
-        this.language =
-        this.timezone = null
-        this.updatableTags = []
-      } else {
-        this.userId = this.userProp.userId
-        this.password = this.userProp.password
-        this.passwordCheck = null
-        this.name = this.userProp.name
-        this.email = this.userProp.email
-        this.mobile = this.userProp.mobile
-        this.group = this.userProp.group
-        this.domainId = this.userProp.domainId
-        this.language = this.userProp.language
-        this.timezone = this.userProp.timezone
-        this.updatableTags = this.userProp.tags.slice(0)
-      }
+      if (this.creatable) this.resetUserData(userModel)
+      else this.resetUserData(this.userProp)
+    },
+    resetUserData (user) {
+      this.userId = user.userId
+      this.password = user.password
+      this.passwordCheck = null
+      this.name = user.name
+      this.email = user.email
+      this.mobile = user.mobile
+      this.group = user.group
+      this.domainId = user.domainId
+      this.language = user.language
+      this.timezone = user.timezone
+      this.updatableTags = user.tags.slice(0)
     }
   }
 }

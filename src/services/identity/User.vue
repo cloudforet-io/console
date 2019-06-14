@@ -30,9 +30,9 @@
     </b-row>
     <b-row>
       <b-col cols="12">
-        <BaseTable :table-data="users" :fields="fields" :per-page="10"
+        <BaseTable :table-data="users" :fields="fields" :per-page="3"
                    caption="Users" :searchable="true" :list-fn="listUsers"
-                   :row-clicked="rowClicked"
+                   :row-clicked="rowClicked" :row-count="totalCount"
         />
       </b-col>
     </b-row>
@@ -75,7 +75,8 @@ export default {
       users: [],
       selectedUser: null,
       selectedIdx: undefined,
-      addModal: false
+      addModal: false,
+      totalCount: null
     }
   },
   mounted () {
@@ -92,6 +93,10 @@ export default {
       }
       this.users = res.data
       this.selectedUser = null
+      this.totalCount = this.users.length
+      /**
+       * TODO: set totalCount with data from server
+       */
     },
     rowClicked (item, idx, target) {
       if (this.selectedUser) {
@@ -101,9 +106,8 @@ export default {
       this.selectedUser = Object.assign({}, item, { _rowVariant: 'success' })
       this.users.splice(idx, 1, this.selectedUser)
       this.selectedIdx = idx
-    },
-    okFn () {
-      console.log('ok Fn')
+      console.log('clicked user idx:', idx)
+      console.log('users: ', this.users.map(item => (item.name)))
     }
   }
 }
