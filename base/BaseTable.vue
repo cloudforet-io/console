@@ -93,6 +93,10 @@ export default {
     rowClicked: {
       type: Function,
       default: () => () => {}
+    },
+    rowCount: {
+      type: Number,
+      default: null
     }
   },
   data () {
@@ -105,7 +109,9 @@ export default {
     items () {
       return this.tableData
     },
-    totalRows () { return this.getRowCount() },
+    totalRows () {
+      return this.rowCount ? this.rowCount : this.getRowCount()
+    },
     captions () { return this.fields }
   },
   methods: {
@@ -118,10 +124,6 @@ export default {
     getRowCount () {
       return this.items.length
     }
-    // rowClicked () {
-    //   let res = this.rowClickedFn()
-    //   console.log(res)
-    // }
   }
 }
 </script>
