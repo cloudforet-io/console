@@ -11,6 +11,7 @@ import { api } from '@/setup/api'
 import store from './store'
 import dotenv from 'dotenv'
 import VueCookie from 'vue-cookie'
+import directive from '@/directives'
 
 // todo
 // cssVars()
@@ -18,6 +19,7 @@ dotenv.config()
 Vue.use(BootstrapVue)
 Vue.use(VueCookie)
 Vue.prototype.$http = api
+directive(Vue)
 
 /* eslint-disable no-new */
 new Vue({

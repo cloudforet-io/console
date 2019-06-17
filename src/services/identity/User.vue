@@ -1,7 +1,7 @@
 <template>
   <div class="animated fadeIn">
     <b-row>
-      <b-col cols="6" sm="4" md="1" class="mb-3">
+      <b-col cols="6" sm="4" md="2" class="mb-3">
         <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
           <template #activator>
             <b-button block variant="outline-primary">
@@ -13,7 +13,7 @@
           </template>
         </BaseModal>
       </b-col>
-      <b-col cols="6" sm="4" md="1" class="mb-3">
+      <b-col cols="6" sm="4" md="2" class="mb-3">
         <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
                    :centered="true" :hide-footer="true"
         >
@@ -79,22 +79,21 @@ export default {
       totalCount: 17
     }
   },
-  // computed: {
-  //   users () {
-
-  //   }
-  // },
   mounted () {
     this.listUsers(3, 0)
   },
   methods: {
-    async listUsers (limit, skip) {
+    async listUsers (limit, skip, sort, search) {
       if (limit === undefined) limit = 10
       if (skip === undefined) skip = 0
+      if (sort === undefined) sort = '-created_date'
+      if (search === undefined) search = {}
 
       let res
       try {
-        res = await this.$http.get(`/identity/users?limit=${limit}&skip=${skip}`)
+        res = await this.$http.get(`/identity/users`, {
+          params: { limit, skip, sort, search }
+        })
       } catch (e) {
         console.error(e)
       }

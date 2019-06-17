@@ -23,13 +23,17 @@ export default {
     nextPath: state => state.nextPath
   },
   actions: {
-    async login ({ commit }, { username, password }) {
-      const res = await api.post('/auth/login', {
-        user_name: username,
-        password: password
-      })
-      cookie.set('sessionId', res.data.sessionId, { expires: '30m' })
-      commit('login')
+    async login (context, { username, password }) {
+      try {
+        const res = await api.post('/auth/login', {
+          user_name: username,
+          password: password
+        })
+        cookie.set('sessionId', res.data.sessionId, { expires: '30m' })
+        context.commit('login')
+      } catch (e) {
+        console.error(e)
+      }
     },
     async logout ({ commit }) {
       await api.post('/auth/logout')
