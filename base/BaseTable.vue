@@ -5,19 +5,32 @@
         <b-col cols="12" md="2" class="mb-md-0 mb-3">
           {{ caption }}
         </b-col>
-        <b-col cols="10" md="8">
-          <BaseSearch v-if="searchable" :search-fn="listFn" />
+        <b-col cols="10" md="6" xl="7" class="mb-md-0 mb-3">
+          <BaseSearch v-if="searchable" :search-fn="listFn" :fields="captions"
+                      :limit="limit" :skip="skip" :sort="sortBy"
+          />
         </b-col>
-        <b-col v-if="listFn" cols="1" md="2">
-          <div class="refresh-btn text-right">
-            <i class="icon-refresh" @click="listFn" />
-          </div>
+        <b-col cols="12" md="4" xl="3" class="text-right">
+          <b-button type="button" @click.prevent="onPrev">
+            Prev
+          </b-button>
+          <span class="ml-2">
+            {{ currentPage }} / {{ maxPage }}
+          </span>
+          <b-button type="button" class="ml-2" @click.prevent="onNext">
+            Next
+          </b-button>
+          <b-button type="button" class="ml-4 refresh-btn"
+                    variant="light" @click.prevent="onRefresh"
+          >
+            <i class="icon-refresh" />
+          </b-button>
         </b-col>
       </b-row>
     </div>
     <b-table class="b-table" :dark="dark" :hover="hover" :striped="striped" :bordered="bordered"
              :small="small" :fixed="fixed" responsive="sm" :items="items" :fields="captions"
-             @row-clicked="rowClicked"
+             @row-clicked="rowClicked" @sort-changed="sortingChanged"
     >
       <template slot="status" slot-scope="data">
         <b-badge :variant="getBadge(data.item.status)">
@@ -25,12 +38,6 @@
         </b-badge>
       </template>
     </b-table>
-    <b-button type="button" @click.prevent="onPrev">
-      Prev
-    </b-button>
-    <b-button type="button" @click.prevent="onNext">
-      Next
-    </b-button>
   </b-card>
 </template>
 
@@ -53,7 +60,7 @@ export default {
     },
     listFn: {
       type: Function,
-      default: null
+      required: true
     },
     hover: {
       type: Boolean,
@@ -103,7 +110,9 @@ export default {
   data () {
     return {
       currentPage: 1,
-      selected: null
+      selected: null,
+      sortBy: null
+
     }
   },
   computed: {
@@ -112,7 +121,9 @@ export default {
       return this.tableData
     },
     captions () { return this.fields },
-    maxPage () { return Math.ceil(this.totalRows / this.perPage) }
+    limit () { return this.perPage },
+    skip () { return (this.currentPage - 1) * this.limit },
+    maxPage () { return Math.ceil(this.totalRows / this.limit) }
   },
   methods: {
     getBadge (status) {
@@ -131,16 +142,21 @@ export default {
       this.rowClickedFn(item, idx, target)
     },
     onPrev () {
-      console.log('prev')
       if (this.currentPage <= 1) return
       this.currentPage--
-      this.listFn(this.perPage, this.currentPage * this.perPage)
+      this.listFn(this.limit, this.skip, this.sortBy)
     },
     onNext () {
-      console.log('next')
       if (this.currentPage >= this.maxPage) return
       this.currentPage++
-      this.listFn(this.perPage, this.currentPage * this.perPage)
+      this.listFn(this.limit, this.skip, this.sortBy)
+    },
+    sortingChanged (ctx) {
+      this.sortBy = ctx.sortDesc ? `-${ctx.sortBy}` : ctx.sortBy
+    },
+    onRefresh () {
+      this.currentPage = 1
+      this.listFn(this.limit, this.skip, this.sortBy)
     }
   }
 }
