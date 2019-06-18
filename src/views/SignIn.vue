@@ -1,14 +1,20 @@
 <template>
     <div id="app" class="app flex-row align-items-center">
       <div class="container">
+
         <b-row class="justify-content-center">
           <b-col md="8">
             <b-card-group>
               <b-card no-body class="p-4">
                 <b-card-body>
                   <b-form>
-                    <h1>Login</h1>
-                    <p class="text-muted">Sign In to your account</p>
+                    <h1>{{ $t('MSG.LOG_IN')}}</h1>
+                    <transition name="slide-fade" v-if="seenGreet">
+                      <p class="message" ><b>{{ $t('MSG.SIGN_IN')}}</b></p>
+                    </transition>
+                    <transition name="slide-fade" v-if="seenError">
+                      <p class="message" style="color: #B82E24"><b>{{$t('MSG.SIGN_FAIL_TITLE')}}</b><br> {{ $t('MSG.SIGN_FAIL_BODY')}}</p>
+                    </transition>
                     <b-input-group class="mb-3">
                       <b-input-group-prepend><b-input-group-text><i class="icon-user"></i></b-input-group-text></b-input-group-prepend>
                       <b-form-input v-model="username" type="text" placeholder="Username" />
@@ -36,7 +42,7 @@
                 <b-card-body class="text-center">
                   <div>
                     <h2> {{ $t('MSG.SIGN_UP')}}</h2>
-                    <p>{{ $t('MSG.SIGN_UP_MSG')}}</p>
+                    <p> {{ $t('MSG.SIGN_UP_MSG')}} </p>
                     <b-button variant="primary" class="active mt-3">{{ $t('MSG.REGISTER')}}</b-button>
                   </div>
                 </b-card-body>
@@ -88,10 +94,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import i18n from '../setup/i18n'
 
 export default {
   data () {
     return {
+      seenGreet: true,
+      seenError: false,
       username: 'iamnewyorker1222',
       password: 'this_is_my_scret_password1'
     }
@@ -103,20 +112,48 @@ export default {
   },
   methods: {
     async login () {
-      await this.$store.dispatch('auth/login',
-        {
-          username: this.username,
-          password: this.password
-        }
-      )
-      this.$router.push(this.nextPath)
+        await this.$store.dispatch('auth/login',
+          {
+            username: this.username,
+            password: this.password
+          }
+        ).then (res => {
+          this.$router.push(this.nextPath)
+        }).catch(error =>{
+          const errObj = JSON.parse(error.message);
+          this.showErorMSG();
+          setTimeout(() => this.showGreetMSG(), 3000);
+        })
     },
+    showErorMSG(){
+      this.seenGreet = false;
+      this.seenError = true;
+
+    },
+    showGreetMSG(){
+      this.seenGreet = true;
+      this.seenError = false;
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+
 .content-body {
   height: 100vh;
 }
+
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
+
 </style>

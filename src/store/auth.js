@@ -6,6 +6,7 @@ export default {
   namespaced: true,
   state: {
     isLoggedIn: false,
+    loginErrorCode: null,
     nextPath: '/'
   },
   mutations: {
@@ -21,35 +22,45 @@ export default {
   },
   getters: {
     isLoggedIn: state => state.isLoggedIn,
-    nextPath: state => state.nextPath
+    nextPath: state => state.nextPath,
   },
   actions: {
     async login ({ commit }, { username, password }) {
-      const res = await api.post('/auth/login', {
+      const res = await api.post('/Auth/login', {
         user_name: username,
         password: password
       }).then (res => {
         cookie.set('sessionId', res.data.sessionId, { expires: '30m' })
         commit('login')
       }, err => {
+        /*
+         * TODO:: Please, create ERR_CODE chart or table to specify its msg and to map error code with msg.
+         */
         const error_code = err.response.status;
+        const error_msg = err.response.data.message;
+
+        const throwableErrorMsg = JSON.stringify({
+          error_code: error_code,
+          error_msg: error_msg
+        });
+
         switch(error_code) {
           case 401: {
-            Vue.notify({
+            /*Vue.notify({
               group: 'auth',
               title: 'Wrong User name or Password ',
               type: 'g-Error',
               duration: 1000,
               speed: 100,
               text: 'Please, confirm your <b> user Name </b> or <b> Password </b>.'
-            })
-            break;
+            })*/
+            throw new Error(throwableErrorMsg);
           }
           case 403: {
-            break;
+            throw new Error(throwableErrorMsg);
           }
           default: {
-            break;
+            throw new Error(throwableErrorMsg);
           }
         }
       })
