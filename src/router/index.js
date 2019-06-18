@@ -44,7 +44,7 @@ const router = new Router({
     {
       path: '/',
       name: 'home',
-      redirect: '/dashboard_m',
+      redirect: '/dashboard',
       component: DefaultContainer,
       children: [
         dashboardRoute,
