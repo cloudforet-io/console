@@ -11,7 +11,7 @@
   "dashboard": {
     "nav": [
       {
-        "name": "Dashboard",
+        "name": "sdsdsd",
         "url": "/dashboard",
         "icon": "icon-pie-chart"
       }
@@ -347,7 +347,7 @@
     ]
   },
   "supportCenter": {
-      "nav": [
+    "nav": [
       {
         "name": "supportCenter",
         "url": "/support-center",

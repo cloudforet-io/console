@@ -52,7 +52,7 @@
 <script>
 import BaseTable from '@/components/base/BaseTable.vue'
 const BaseModal = () => import('@/components/base/BaseModal.vue')
-const UserDetail = () => import('@/services/identity/UserDetail.vue')
+const UserDetail = () => import('./UserDetail.vue')
 
 export default {
   name: 'User',
