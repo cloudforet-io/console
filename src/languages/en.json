@@ -1,4 +1,17 @@
-{
+{"MSG": {
+  "LOG_IN":       "Log In",
+  "LOG_OUT":      "Log Out",
+  "FORGPW":       "Forgot password?",
+  "SIGN_UP":      "Sign up",
+  "SIGN_UP_MSG":  "We make it simple to launch in any clouds and scale up as your company grow - whether you’re running any of cloud machine ; We can handle it.",
+  "SIGN_IN":      "Sign in to your Account.",
+  "SIGN_FAIL_TITLE":    "Wrong Password or Username.",
+  "SIGN_FAIL_BODY":     "Please confirm your Username or Password.",
+  "REGISTER":     "Register Now!"
+},
+  "ERR_CODE": {
+  "ERR_LOG_001": "User ID and Password error"
+},
   "assets": {
     "nav": [
       {
