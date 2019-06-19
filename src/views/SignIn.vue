@@ -121,8 +121,8 @@ export default {
           this.$router.push(this.nextPath)
         }).catch(error =>{
           const errObj = JSON.parse(error.message);
-          this.showErorMSG();
-          setTimeout(() => this.showGreetMSG(), 3000);
+          this.showErorMSG(setTimeout(() => this.showGreetMSG(), 3000));
+
         })
     },
     showErorMSG(){
