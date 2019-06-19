@@ -1,12 +1,10 @@
 <template>
-  <div>
-    Network Type
-  </div>
+  <div />
 </template>
 
 <script>
 export default {
-  name: 'NetworkType'
+  name: 'CollectorPlugin'
 }
 </script>
 

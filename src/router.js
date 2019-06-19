@@ -6,10 +6,9 @@ import { loadLanguageAsync } from '@/setup/i18n'
 import store from '@/store'
 
 // Services
-import dashboardRoute from './dashboardRoute'
-import identityRoute from './identityRoute'
-import inventoryRoute from './inventoryRoute'
-import pluginRoute from './pluginRoute'
+import dashboardRoute from '@/services/dashboard/dashboardRoute'
+import identityRoute from '@/services/identity/identityRoute'
+import inventoryRoute from '@/services/inventory/inventoryRoute'
 
 // Containers
 const DefaultContainer = () => import('@/containers/DefaultContainer')
@@ -49,8 +48,7 @@ const router = new Router({
       children: [
         dashboardRoute,
         identityRoute,
-        inventoryRoute,
-        pluginRoute
+        inventoryRoute
       ]
     }
   ]
