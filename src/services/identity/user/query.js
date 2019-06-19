@@ -14,6 +14,6 @@ export default [
   { label: 'ID' },
   { label: 'Name' },
   { label: 'Group Name' },
-  { label: 'Language', list: ['ko', 'en'] },
-  { label: 'Domain ID', ajax: getValues }
+  { label: 'Language', values: ['ko', 'en'] },
+  { label: 'Domain ID', ajax: { url: '/identity/users', params: null, method: 'GET' } }
 ]

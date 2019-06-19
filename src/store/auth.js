@@ -26,13 +26,14 @@ export default {
   },
   actions: {
     async login ({ commit }, { username, password }) {
-      const res = await api.post('/Auth/login', {
-        user_name: username,
-        password: password
-      }).then(res => {
+      try {
+        const res = await api.post('/Auth/login', {
+          user_name: username,
+          password: password
+        })
         cookie.set('sessionId', res.data.sessionId, { expires: '30m' })
         commit('login')
-      }, err => {
+      } catch (err) {
         /*
          * TODO:: Please, create ERR_CODE chart or table to specify its msg and to map error code with msg.
          */
@@ -65,7 +66,7 @@ export default {
             throw new Error(throwableErrorMsg)
           }
         }
-      })
+      }
     },
     async logout ({ commit }) {
       await api.post('/auth/logout')
