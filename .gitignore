@@ -8,8 +8,6 @@ package-lock.json
 selenium-debug.log
 
 # local env files
-.env.temp
-.env.local
 .env.*.local
 
 # Log files
