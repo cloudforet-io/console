@@ -6,7 +6,7 @@
           {{ caption }}
         </b-col>
         <b-col cols="10" md="6" xl="7" class="mb-md-0 mb-3">
-          <BaseSearch v-if="searchable" :search-fn="listFn" :fields="captions"
+          <BaseSearch v-if="searchable" :search-fn="listFn" :query-data="queryData"
                       :limit="limit" :skip="skip" :sort="sortBy"
           />
         </b-col>
@@ -57,6 +57,10 @@ export default {
     searchable: {
       type: Boolean,
       default: false
+    },
+    queryData: {
+      type: Array,
+      default: () => []
     },
     listFn: {
       type: Function,
