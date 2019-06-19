@@ -13,12 +13,17 @@ import dotenv from 'dotenv'
 import VueCookie from 'vue-cookie'
 import directive from '@/directives'
 import VueInputAutowidth from 'vue-input-autowidth'
+import VueAlert from '@vuejs-pt/vue-alert'
+import Notifications from 'vue-notification'
+import velocity      from 'velocity-animate'
 
 // todo
 // cssVars()
 dotenv.config()
 Vue.use(BootstrapVue)
 Vue.use(VueCookie)
+Vue.use(VueAlert)
+Vue.use(Notifications, { velocity })
 Vue.prototype.$http = api
 directive(Vue)
 Vue.use(VueInputAutowidth)
