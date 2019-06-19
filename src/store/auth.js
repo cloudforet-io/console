@@ -43,7 +43,9 @@ export default {
           error_code: error_code,
           error_msg: error_msg
         });
-
+        /*
+         * TODO:: Please, add each cases for error login author, if any difficulties to handle condition with its response code, Please put notice and update function.
+         */
         switch(error_code) {
           case 401: {
             /*Vue.notify({
