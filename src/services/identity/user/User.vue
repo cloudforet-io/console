@@ -33,6 +33,7 @@
         <BaseTable :table-data="users" :fields="fields" :per-page="3"
                    caption="Users" :searchable="true" :list-fn="listUsers"
                    :row-clicked-fn="rowClicked" :total-rows="totalCount"
+                   :query-data="query"
         />
       </b-col>
     </b-row>
@@ -51,6 +52,7 @@
 
 <script>
 import BaseTable from '@/components/base/BaseTable.vue'
+import query from './query.js'
 const BaseModal = () => import('@/components/base/BaseModal.vue')
 const UserDetail = () => import('./UserDetail.vue')
 
@@ -76,7 +78,8 @@ export default {
       selectedUser: null,
       selectedIdx: undefined,
       addModal: false,
-      totalCount: 17
+      totalCount: 17,
+      query: query
     }
   },
   mounted () {

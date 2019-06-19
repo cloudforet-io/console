@@ -12,6 +12,7 @@ import store from './store'
 import dotenv from 'dotenv'
 import VueCookie from 'vue-cookie'
 import directive from '@/directives'
+import VueInputAutowidth from 'vue-input-autowidth'
 
 // todo
 // cssVars()
@@ -20,6 +21,7 @@ Vue.use(BootstrapVue)
 Vue.use(VueCookie)
 Vue.prototype.$http = api
 directive(Vue)
+Vue.use(VueInputAutowidth)
 
 /* eslint-disable no-new */
 new Vue({
