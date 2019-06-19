@@ -20,7 +20,7 @@
               </b-dropdown-item>
             </b-dropdown>
             <h4 class="mb-0">
-              9.823
+              9.823111
             </h4>
             <p>Members online</p>
           </b-card-body>
@@ -58,7 +58,7 @@
               </b-dropdown-item>
             </b-dropdown>
             <h4 class="mb-0">
-              9.823
+              9.8231111
             </h4>
             <p>Members online</p>
           </b-card-body>
@@ -95,7 +95,7 @@
               </b-dropdown-item>
             </b-dropdown>
             <h4 class="mb-0">
-              9.823
+              9.8231111
             </h4>
             <p>Members online</p>
           </b-card-body>
@@ -132,7 +132,7 @@
               </b-dropdown-item>
             </b-dropdown>
             <h4 class="mb-0">
-              9.823
+              9.8231111
             </h4>
             <p>Members online</p>
           </b-card-body>
@@ -156,7 +156,7 @@
             Traffic
           </h4>
           <div class="small text-muted">
-            November 2017
+            November 2019
           </div>
         </b-col>
         <b-col

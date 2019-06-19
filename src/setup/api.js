@@ -10,7 +10,9 @@ export const api = axios.create({
   }
 })
 
+//
 // api.interceptors.response.use(undefined, function (err) {
+//   console.log(process.env.VUE_APP_API_URL);
 //   return new Promise(function (resolve, reject) {
 //     if (err.status === 403 && err.config && !err.config.__isRetryRequest) {
 //     // if you ever get an unauthorized, logout the user

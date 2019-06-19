@@ -11,12 +11,17 @@ import { api } from '@/setup/api'
 import store from './store'
 import dotenv from 'dotenv'
 import VueCookie from 'vue-cookie'
+import VueAlert from '@vuejs-pt/vue-alert'
+import Notifications from 'vue-notification'
+import velocity      from 'velocity-animate'
 
 // todo
 // cssVars()
 dotenv.config()
 Vue.use(BootstrapVue)
 Vue.use(VueCookie)
+Vue.use(VueAlert)
+Vue.use(Notifications, { velocity })
 Vue.prototype.$http = api
 
 /* eslint-disable no-new */
