@@ -12,6 +12,9 @@
 import { Sidebar as AppSidebar, SidebarFooter, SidebarForm, SidebarHeader, SidebarMinimizer, SidebarNav } from '@coreui/vue'
 
 export default {
+  state: {
+    isSlidedIn: false,
+  },
   name: 'BaseSidebar',
   components: {
     AppSidebar,

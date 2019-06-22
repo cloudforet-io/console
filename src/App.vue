@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" >
     <notifications group="auth" position="top center" :width="500" classes="v-notice"/>
     <notifications group="notice" position="top left" />
     <router-view></router-view>

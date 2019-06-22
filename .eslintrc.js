@@ -15,7 +15,13 @@ module.exports = {
     'vue'
   ],
   env: {
-    browser: true
+    browser: true,
+    jquery: true
+  },
+  globals: {
+    "$": true,
+    "jQuery": true,
+
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',

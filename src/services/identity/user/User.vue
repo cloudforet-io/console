@@ -51,17 +51,21 @@
 </template>
 
 <script>
+import BaseSidebar from '@/components/base/BaseSidebar'
+import $ from 'jquery'
 import BaseTable from '@/components/base/BaseTable.vue'
 import query from './query.js'
 const BaseModal = () => import('@/components/base/BaseModal.vue')
 const UserDetail = () => import('./UserDetail.vue')
+
 
 export default {
   name: 'User',
   components: {
     BaseTable,
     BaseModal,
-    UserDetail
+    UserDetail,
+    BaseSidebar
   },
   data () {
     return {
@@ -83,7 +87,7 @@ export default {
     }
   },
   mounted () {
-    this.listUsers(3, 0)
+    this.listUsers(3, 0);
   },
   methods: {
     async listUsers (limit, skip, sort, search) {

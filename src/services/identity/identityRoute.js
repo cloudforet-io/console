@@ -9,7 +9,7 @@ const Project = () => import('./project/Project')
 export default {
   path: 'identity',
   name: 'identity',
-  redirect: '/identity/domain',
+  redirect: '/identity/project',
   meta: { label: 'Identity', requiresAuth: true },
   components: {
     header: BaseHeader,
