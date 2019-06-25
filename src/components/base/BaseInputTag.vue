@@ -1,12 +1,21 @@
 <template>
   <span class="input-container">
-    <input ref="input" v-model="value" v-focus="isFocused"
+    <input v-if="isUpdateMode" ref="input" v-model="value"
+           v-focus="isFocused" v-autowidth="{maxWidth: '100%', minWidth: '50px', comfortZone: 1}"
+           v-select="textCaptureOption"
            class="pl-2" autocomplete="off" type="text"
            placeholder="Search" @focus="onFocus" @blur="onBlur" @input="onInput"
-           @keyup.delete="onDelete" @keyup.enter="onEnter"
-           @keyup.down="onKeyDown" @keyup.up="onKeyUp"
+           @select="onTextCaptured" @keyup.delete="onDelete" @keyup.enter="onEnter"
+           @mouseup="onTextMouseUp" @keyup.down="onKeyDown" @keyup.up="onKeyUp"
     >
-    <!-- v-autowidth="{maxWidth: '100%', minWidth: '50px', comfortZone: 1}" -->
+
+    <b-badge v-else variant="success" class="tag-badge m-1">
+      <span @click="onUpdateMode">
+        {{ selected.key ? `${selected.key} : ` : 'Search : ' }}{{ selected.value }}
+      </span>
+      <i class="fa fa-times-circle" @click="$emit('delete')" />
+    </b-badge>
+
     <div v-if="isFocused && keyListUp" class="list-container">
       <b-list-group>
         <b-list-group-item v-for="(key, idx) in keyList" :key="`key:${idx}`"
@@ -36,13 +45,16 @@
 <script>
 import { focus } from 'vue-focus'
 export default {
-  name: 'BaseInput',
-  event: ['add'],
+  name: 'BaseInputTag',
   directives: { focus: focus },
   props: {
     listData: {
       type: Array,
       default: () => []
+    },
+    contents: {
+      type: Object,
+      default: () => {}
     }
   },
   data () {
@@ -51,17 +63,26 @@ export default {
       isFocused: false,
       keyListUp: true,
       valueListUp: false,
-      selected: { key: null, value: null },
-      updateMode: false,
+      selected: { key: this.contents.key, value: this.contents.value },
+      isUpdateMode: false,
       keyList: this.listData,
       staticValueList: [],
       valueList: [],
+      textCaptureOption: { switch: true },
+      isTextCaptured: false,
       hoveredItemIdx: null
     }
   },
   computed: {
   },
   created () {
+    this.value = this.contents.key === null ? '' : `${this.contents.key} : `
+    this.value += this.contents.value === null ? '' : this.contents.value
+    this.onTextMouseUp()
+    console.log(`[BaseInputTag] CREATED: ${this.$vnode.key} ${this.value}`)
+  },
+  destroyed () {
+    console.log(`[BaseInputTag] DESTROYED: ${this.$vnode.key} ${this.value}`)
   },
   methods: {
     /**
@@ -140,14 +161,14 @@ export default {
       this.value = `${this.selected.key} : ${this.selected.value}`
     },
     onDelete () {
-      if (this.selected.key === null) {
-        if (this.selected.value === null) {
-          // regard as updating 'key'
-          this.valueListUp = false
-          this.refreshKeyList(this.value)
-          this.keyListUp = true
-          this.selected.key = null
-        }
+      let val = this.value.trim()
+      this.hoveredItemIdx = null
+      if (this.selected.key === null || !val.includes(':')) {
+        // regard as updating 'key'
+        this.valueListUp = false
+        this.refreshKeyList(val)
+        this.keyListUp = true
+        this.selected.key = null
       } else {
         // regard as updating 'value'
         this.keyListUp = false
@@ -155,7 +176,6 @@ export default {
         this.valueListUp = true
         this.selected.value = null
       }
-      this.hoveredItemIdx = null
     },
     onEnter () {
       if (this.hoveredItemIdx !== null) {
@@ -170,36 +190,53 @@ export default {
         }
       }
 
-      if (this.value === null) return
-
-      let val = this.selected.key === null ? this.value.trim() : this.refinedValue()
-      this.selected.value = val === '' ? null : val
-      this.$emit('add', this.selected)
-      this.resetAll()
+      if (this.selected.key === null) {
+        let val = this.value ? this.value.trim() : ''
+        if (val === '') this.value = null
+        else {
+          val = val.startsWith('Search : ') ? this.refinedValue() : val
+          this.selected.value = val
+          this.value = `Search : ${this.selected.value}`
+        }
+      } else { // when 'key' has been set
+        let val = this.value ? this.refinedValue() : ''
+        if (val === '') {
+          this.selected.value = null
+          this.value = `${this.selected.key} : `
+        } else {
+          this.selected.value = val
+          this.value = `${this.selected.key} : ${this.selected.value}`
+        }
+      }
+      this.isFocused = false
     },
     onFocus () {
       this.isFocused = true
     },
     onBlur () {
-      console.log('on blur')
       this.isFocused = false
+      this.isTextCaptured = false
       this.hoveredItemIdx = null
-
-      if (this.selected.key !== null) {
-        let val = this.refinedValue()
-        if (val !== '') {
-          this.selected.value = val
-          this.$emit('add', this.selected)
-          this.resetAll()
-        }
-      }
+      this.isUpdateMode = false
+      this.onEnter()
     },
-    resetAll () {
-      this.value = null
-      this.valueListUp = false
-      this.keyList = this.listData
-      this.keyListUp = true
-      this.selected = { key: null, value: null }
+    onTextCaptured () {
+      this.textCaptureOption = { switch: false }
+    },
+    onTextMouseUp (e) {
+      // This is called after onFocus()
+      if (!this.value) return
+
+      if (this.isTextCaptured) return
+
+      // set text selection
+      if (this.selected.key === null) {
+        if (this.value.startsWith('Search :')) this.value = this.refinedValue()
+        this.textCaptureOption = { switch: true, text: this.selected.value }
+      } else if (this.selected.value !== null) {
+        this.textCaptureOption = { switch: true, text: this.selected.value }
+      } else this.textCaptureOption = { switch: true, index: this.value.length }
+      this.isTextCaptured = true
     },
     onKeyDown () {
       let arr = this.keyListUp ? this.keyList : this.valueList
@@ -218,6 +255,11 @@ export default {
     },
     onMouseout () {
       this.hoveredItemIdx = null
+    },
+    onUpdateMode () {
+      this.isUpdateMode = true
+      this.isFocused = true
+      this.onTextMouseUp()
     }
   }
 }
@@ -227,6 +269,27 @@ export default {
 $input-height: 23px;
 .input-container {
   position: relative;
+  .tag-badge {
+    display: inline-block;
+    max-width: 99%;
+    height: $input-height;
+    line-height: 16px;
+    span {
+      display: inline-block;
+      max-width: 96%;
+      font-size: 1.25em;
+      cursor: pointer;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      vertical-align: text-bottom;
+    }
+    i {
+      font-size: 1.3em;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+  }
   input {
     border: 0;
     background-color: transparent;
@@ -237,7 +300,7 @@ $input-height: 23px;
     display: inline-block;
     z-index: 2;
     left: 0;
-    top: $input-height;
+    top: 23px;
     .list-group-item {
       cursor: pointer;
       &.hovered {
