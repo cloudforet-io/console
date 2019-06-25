@@ -15,7 +15,7 @@ import directive from '@/directives'
 import VueInputAutowidth from 'vue-input-autowidth'
 import VueAlert from '@vuejs-pt/vue-alert'
 import Notifications from 'vue-notification'
-import velocity      from 'velocity-animate'
+import velocity from 'velocity-animate'
 
 // todo
 // cssVars()

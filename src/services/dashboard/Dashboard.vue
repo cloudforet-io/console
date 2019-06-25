@@ -986,11 +986,11 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.$store.dispatch('nav/hideNav')
+      vm.$store.dispatch('sidebar/hideSidebar')
     })
   },
   beforeRouteLeave (to, from, next) {
-    this.$store.dispatch('nav/showNav')
+    this.$store.dispatch('sidebar/showSidebar')
     next()
   }
 }
