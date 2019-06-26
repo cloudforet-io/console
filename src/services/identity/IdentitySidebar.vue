@@ -1,5 +1,5 @@
 <template>
-  <BaseSidebar :nav="nav" />
+  <BaseSidebar :nav="nav"/>
 </template>
 
 <script>
@@ -21,25 +21,15 @@ export default {
           divider: true
         },
         {
-          name: 'Domain',
-          url: '/identity/domain',
-          icon: 'icon-puzzle'
-        },
-        {
           name: 'Project',
           url: '/identity/project',
-          icon: 'icon-puzzle'
+          icon: 'icon-book-open'
         },
         {
           name: 'User',
           url: '/identity/user',
-          icon: 'icon-puzzle'
+          icon: 'fa fa-users fa-lg'
         },
-        {
-          name: 'API Key',
-          url: '/identity/api-key',
-          icon: 'icon-puzzle'
-        }
       ]
     }
   }

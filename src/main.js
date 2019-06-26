@@ -16,17 +16,24 @@ import VueInputAutowidth from 'vue-input-autowidth'
 import VueAlert from '@vuejs-pt/vue-alert'
 import Notifications from 'vue-notification'
 import velocity from 'velocity-animate'
+import CountryFlag from 'vue-country-flag'
+import {$,jQuery} from 'jquery'
+import VueAlertify from 'vue-alertify'
 
-// todo
+//TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
 // cssVars()
 dotenv.config()
+
 Vue.use(BootstrapVue)
 Vue.use(VueCookie)
 Vue.use(VueAlert)
+Vue.use(VueAlertify)
+Vue.use(VueInputAutowidth)
+Vue.use(CountryFlag);
 Vue.use(Notifications, { velocity })
+Vue.use({$,jQuery})
 Vue.prototype.$http = api
 directive(Vue)
-Vue.use(VueInputAutowidth)
 
 /* eslint-disable no-new */
 new Vue({

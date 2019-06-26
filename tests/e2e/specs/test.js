@@ -28,7 +28,7 @@ module.exports = {
       .assert.elementPresent('.app-body > .main > .breadcrumb')
       .assert.elementPresent('.app-body > .main > .container-fluid > .animated')
       .assert.elementPresent('.app-body > .sidebar > .sidebar-nav')
-      .assert.elementPresent('.app-body > .sidebar > .sidebar-minimizer')
+      .assert.elementPresent('.app-body > .sidebar > .sidebar-zer')
       .assert.elementPresent('.app-footer')
       .assert.containsText('.app-footer > div > span', 'creativeLabs')
       .assert.containsText('.app-footer > div.ml-auto > span', 'Powered by')

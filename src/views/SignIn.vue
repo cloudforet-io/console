@@ -112,6 +112,7 @@ export default {
   },
   methods: {
     async login () {
+        console.log(this.$i18n.t('MSG.LOG_IN'));
         await this.$store.dispatch('auth/login',
           {
             username: this.username,
@@ -122,7 +123,6 @@ export default {
         }).catch(error =>{
           const errObj = JSON.parse(error.message);
           this.showErorMSG(setTimeout(() => this.showGreetMSG(), 3000));
-
         })
     },
     showErorMSG(){

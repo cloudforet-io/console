@@ -29,9 +29,9 @@
 
 <script>
 import { Header as AppHeader, SidebarToggler } from '@coreui/vue'
-import LanguageDropdown from '@/components/dropdown/LanguageDropdown'
-import SiteMapDropdown from '@/components/dropdown/SiteMapDropdown'
-import AccountDropdown from '@/components/dropdown/AccountDropdown'
+import SiteMapDropdown from '@/components/dropdown/DPO_001_SiteMapDropdown'
+import AccountDropdown from '@/components/dropdown/DPO_002_AccountDropdown'
+import LanguageDropdown from '@/components/dropdown/DPO_003_LanguageDropdown'
 import { mapGetters } from 'vuex'
 
 export default {
