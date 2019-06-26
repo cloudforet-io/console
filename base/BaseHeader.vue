@@ -3,10 +3,10 @@
     <SidebarToggler class="d-lg-none" display="md" mobile />
     <b-link class="navbar-brand" to="/dashboard">
       <!-- <img class="navbar-brand-full" src="img/brand/logo.svg" width="89" height="25" alt="CoreUI Logo">
-      <img class="navbar-brand-zed" src="img/brand/sygnet.svg" width="30" height="30" alt="CoreUI Logo"> -->
+      <img class="navbar-brand-minimized" src="img/brand/sygnet.svg" width="30" height="30" alt="CoreUI Logo"> -->
       [LOGO]
     </b-link>
-    <SidebarToggler ref="sidebarToggler" class="d-none" display="lg" :default-open="navOpen" />
+    <SidebarToggler ref="sidebarToggler" class="d-none" display="lg" :default-open="isSidebarOpen" />
     <b-navbar-nav class="d-md-down-none">
       <SiteMapDropdown />
       <!-- <b-nav-item class="px-3" to="/identity">
@@ -44,12 +44,12 @@ export default {
     AccountDropdown
   },
   computed: {
-    ...mapState('nav', {
-      navOpen: state => state.navOpen
-    })
+    ...mapGetters('sidebar', [
+      'isSidebarOpen'
+    ])
   },
   watch: {
-    navOpen () {
+    isSidebarOpen () {
       this.$refs.sidebarToggler.$el.click()
     }
   }
