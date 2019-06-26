@@ -4,9 +4,14 @@
       <slot name="activator" />
     </div>
 
-    <b-modal :ref="name" :title="title" :centered="centered" :no-close-on-backdrop="backdropOff"
-             :hide-footer="hideFooter" size="lg" @hidden="$store.dispatch('modal/modalHidden')"
-    >
+    <b-modal :ref="name"
+             :title="title"
+             :centered="centered"
+             :no-close-on-backdrop="backdropOff"
+             :hide-footer="hideFooter"
+             size="lg"
+             @hidden="$store.dispatch('modal/modalHidden')">
+
       <slot v-if="isModalShown" name="contents" />
 
       <template v-slot:modal-footer>
