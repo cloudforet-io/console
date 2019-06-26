@@ -49,7 +49,7 @@ export default {
     ])
   },
   watch: {
-    navOpen () {
+    isSidebarOpen () {
       this.$refs.sidebarToggler.$el.click()
     }
   }
