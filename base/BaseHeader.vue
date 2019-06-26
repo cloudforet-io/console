@@ -6,7 +6,7 @@
       <img class="navbar-brand-minimized" src="img/brand/sygnet.svg" width="30" height="30" alt="CoreUI Logo"> -->
       [LOGO]
     </b-link>
-    <SidebarToggler ref="sidebarToggler" class="d-none" display="lg" :default-open="isSidebarOpen" />
+    <SidebarToggler ref="sidebarToggler" class="d-none" display="lg" :default-open="navOpen" />
     <b-navbar-nav class="d-md-down-none">
       <SiteMapDropdown />
       <!-- <b-nav-item class="px-3" to="/identity">
@@ -44,12 +44,12 @@ export default {
     AccountDropdown
   },
   computed: {
-    ...mapGetters('sidebar', [
-      'isSidebarOpen'
-    ])
+    ...mapState('nav', {
+      navOpen: state => state.navOpen
+    })
   },
   watch: {
-    isSidebarOpen () {
+    navOpen () {
       this.$refs.sidebarToggler.$el.click()
     }
   }
