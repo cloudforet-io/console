@@ -18,7 +18,7 @@ import Notifications from 'vue-notification'
 import velocity      from 'velocity-animate'
 import CountryFlag from 'vue-country-flag'
 import {$,jQuery} from 'jquery'
-import BootstrapVueTreeview from 'bootstrap-vue-treeview'
+import VueAlertify from 'vue-alertify'
 
 //TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
 // cssVars()
@@ -27,11 +27,11 @@ dotenv.config()
 Vue.use(BootstrapVue)
 Vue.use(VueCookie)
 Vue.use(VueAlert)
+Vue.use(VueAlertify)
 Vue.use(VueInputAutowidth)
 Vue.use(CountryFlag);
 Vue.use(Notifications, { velocity })
 Vue.use({$,jQuery})
-Vue.use(BootstrapVueTreeview)
 Vue.prototype.$http = api
 directive(Vue)
 
@@ -47,3 +47,6 @@ new Vue({
   },
   template: '<App/>'
 })
+
+
+

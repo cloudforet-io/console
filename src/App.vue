@@ -16,7 +16,6 @@ export default {
 </script>
 
 <style lang="scss">
-  // CoreUI Icons Set
   @import '~@coreui/icons/css/coreui-icons.min.css';
   /* Import Font Awesome Icons Set */
   $fa-font-path: '~font-awesome/fonts/';
