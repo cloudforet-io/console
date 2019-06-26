@@ -51,8 +51,6 @@
 </template>
 
 <script>
-import BaseSidebar from '@/components/base/BaseSidebar'
-import $ from 'jquery'
 import BaseTable from '@/components/base/BaseTable.vue'
 import query from './query.js'
 const BaseModal = () => import('@/components/base/BaseModal.vue')
@@ -64,8 +62,7 @@ export default {
   components: {
     BaseTable,
     BaseModal,
-    UserDetail,
-    BaseSidebar
+    UserDetail
   },
   data () {
     return {
