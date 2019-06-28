@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import BaseTags from '@/components/base/BaseTags'
+import BaseTags from '@/components/base/tags/BATG_001_BaseTags'
 
 const userModel = {
   userId: null,

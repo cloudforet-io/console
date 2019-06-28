@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import BaseSearch from '@/components/base/BaseSearch.vue'
+import BaseSearch from '@/components/base/search/BASR_001_BaseSearch.vue'
 export default {
   name: 'BaseTable',
   components: {

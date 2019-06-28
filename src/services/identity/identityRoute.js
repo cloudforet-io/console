@@ -1,10 +1,10 @@
-const BaseHeader = () => import('@/components/base/BaseHeader')
+const BaseHeader = () => import('@/containers/header/CTHD_001_Header')
 
-const IdentityMain = () => import('./IdentityMain')
-const IdentitySidebar = () => import('./IdentitySidebar')
+const IdentityMain = () => import('./IDNT_001_IdentityMain')
+const IdentitySidebar = () => import('./IDNT_002_IdentitySidebar')
 
-const User = () => import('./user/User')
-const Project = () => import('./project/Project')
+const User = () => import('./user/IDUS_001_User')
+const Project = () => import('./project/IDPJ_001_Project')
 
 export default {
   path: 'identity',

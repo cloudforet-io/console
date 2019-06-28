@@ -135,6 +135,7 @@
     mounted: function () {
       window.slVueTree = this.$refs.slVueTree;
     },
+
     data() {
       return {
         lastEvent: '',
@@ -142,13 +143,12 @@
         contextMenuIsVisible: false,
       }
     },
-    methods: {
 
+    methods: {
       nodeSelected(nodes, event) {
         this.selectedNodesTitle = nodes.map(node => node.title).join(', ');
         this.lastEvent = `Select nodes: ${this.selectedNodesTitle}`;
       },
-
       nodeToggled(node, event) {
         this.lastEvent = `Node ${node.title} is ${node.isExpanded ? 'expanded' : 'collapsed'}`;
       },
@@ -197,14 +197,27 @@
         this.contextMenuIsVisible = false;
         const treeV = this.$refs.slVueTree;
         console.log('slVueTree', treeV);
-        const paths = treeV.getSelected().map(node => node.path);
+        //const paths = treeV.getSelected().map(node => node.path);
+        if(this.$parent.$children.some(el=> el.$options.name == 'BaseModal')){
+          const editTitle = treeV.getSelected()[0].isLeaf ? 'Create a Project': 'Create a Project Group';
+          this.$parent.projectModaltitle = editTitle;
+          this.$parent.$refs.Modal.showModal();
+        }else{
+          this.$alertify.alert('Modal Error', 'Please, Check Parents Modal');
+        }
 
       },
       addNode(fn, stat, isDir) {
         this.contextMenuIsVisible = false;
         const treeV = this.$refs.slVueTree;
         const paths = treeV.getSelected().map(node => node.path);
-        treeV.remove(paths);
+        if(this.$parent.$children.some(el=> el.$options.name == 'BaseModal')){
+          const editTitle = treeV.getSelected()[0].isLeaf ? 'Create a Project': 'Create a Project Group';
+          this.$parent.projectModaltitle = editTitle;
+          this.$parent.$refs.Modal.showModal();
+        }else{
+          this.$alertify.alert('Modal Error', 'Please, Check Parents Modal');
+        }
       },
       removeNode() {
         this.contextMenuIsVisible = false;
@@ -232,11 +245,11 @@
         this.contextMenuIsVisible = false;
         const treeV = this.$refs.slVueTree;
         const paths = treeV.getSelected()[0].path;
-
         if(this.$parent.$children.some(el=> el.$options.name == 'BaseModal')){
           const editTitle = treeV.getSelected()[0].isLeaf ? 'Edit a Project': 'Edit a Project Group';
           this.$parent.projectModaltitle = editTitle;
           this.$parent.$refs.Modal.showModal();
+
         }else{
           this.$alertify.alert('Modal Error', 'Please, Check Parents Modal');
         }
@@ -252,7 +265,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../assets/css/sl-vue-tree-ecessntial.css';
+  @import '../../../assets/css/sl-vue-tree-ecessntial.css';
 
   .conmenu-leaf {
     border-bottom: #181b1e;

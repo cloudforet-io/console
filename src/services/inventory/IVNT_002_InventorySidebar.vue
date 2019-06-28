@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import BaseSidebar from '@/components/base/BaseSidebar'
+import BaseSidebar from '@/containers/sidebar/CTSB_001_Sidebar'
 
 export default {
   name: 'InventorySidebar',
