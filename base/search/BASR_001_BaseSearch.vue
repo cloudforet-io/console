@@ -25,8 +25,8 @@
 
 <script>
 import { focus } from 'vue-focus'
-import BaseInput from '@/components/base/BaseInput'
-import BaseInputTag from '@/components/base/BaseInputTag'
+import BaseInput from '@/components/base/input/BAIN_001_BaseInput'
+import BaseInputTag from '@/components/base/input/BAIN_002_EXT_BaseInputTag'
 export default {
   name: 'BaseSearch',
   directives: { focus: focus },
