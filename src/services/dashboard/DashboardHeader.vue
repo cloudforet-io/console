@@ -3,7 +3,8 @@
 </template>
 
 <script>
-import BaseHeader from '@/components/base/BaseHeader'
+
+import BaseHeader from '@/containers/header/CTHD_001_Header'
 
 export default {
   name: 'DashboardHeader',

@@ -51,10 +51,10 @@
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue'
-import query from './query.js'
-const BaseModal = () => import('@/components/base/BaseModal.vue')
-const UserDetail = () => import('./UserDetail.vue')
+import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue'
+import query from './search-context/query.js'
+const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue')
+const UserDetail = () => import('./IDUS_002_UserDetail.vue')
 
 
 export default {

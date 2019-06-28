@@ -1,4 +1,4 @@
-const BaseHeader = () => import('@/components/base/BaseHeader')
+const BaseHeader = () => import('@/containers/header/CTHD_001_Header')
 const Dashboard = () => import('@/services/dashboard/Dashboard')
 
 export default {

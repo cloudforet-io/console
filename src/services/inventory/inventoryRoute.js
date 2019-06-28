@@ -1,11 +1,11 @@
-const BaseHeader = () => import('@/components/base/BaseHeader')
+const BaseHeader = () => import('@/containers/header/CTHD_001_Header')
 
-const InventoryMain = () => import('./InventoryMain')
-const InventorySidebar = () => import('./InventorySidebar')
+const InventoryMain = () => import('./IVNT_001_InventoryMain')
+const InventorySidebar = () => import('./IVNT_002_InventorySidebar')
 
-const DataCenter = () => import('./data-center/DataCenter')
-const Server = () => import('./server/Server')
-const CollectorPlugin = () => import('./settings/CollectorPlugin')
+const DataCenter = () => import('./data-center/IVDC_001_DataCenter')
+const Server = () => import('./server/IVSV_001_Server')
+const CollectorPlugin = () => import('./settings/IVST_001_CollectorPlugin')
 
 export default {
   path: 'inventory',
