@@ -87,17 +87,49 @@
               <b-dropdown-item>Net Device</b-dropdown-item>
             </b-dropdown>
           </div>
-          <div class="brand-card-body">
-            <div>
-              <GChart style="width: 100%; height: 400px;"
-                      :settings="{packages: ['corechart']}"
-                      :data="chartData"
-                      :options="options"
-                      :createChart="(el, google) => new google.visualization.PieChart(el)"
-              />
-            </div>
-            <div>
-            </div>
+          <div class="card-body">
+            <table class="Charts">
+              <tr>
+                <td class="donutCell">
+                  <div id="donutchart1" class="donutDiv">
+                    <GChart style="width: 100%; height: 100%;"
+                            :settings="{packages: ['corechart']}"
+                            :data="chartData"
+                            :options="options"
+                            :createChart="(el, google) => new google.visualization.PieChart(el)"
+                    /></div>
+                  <div class="centerLabel">{{seletMsg}}</div>
+                </td>
+                <td class="donutGrid">
+                  <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                      <div class="quote">This is Sparta
+                        <br><a href="#">0</a>
+                      </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                      <div class="quote">This is Sparta
+                        <br><a href="#">0</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                      <div class="quote">This is Sparta
+                        <br><a href="#">0</a>
+                      </div>
+
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                      <div class="quote">This is Sparta
+                        <br><a href="#">0</a>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -112,18 +144,49 @@
               <b-dropdown-item>Net Device</b-dropdown-item>
             </b-dropdown>
           </div>
-          <div class="brand-card-body">
-            <div>
-              <GChart style="width: 100%; height: 400px;"
-                      :settings="{packages: ['corechart']}"
-                      :data="chartData"
-                      :options="options"
-                      :createChart="(el, google) => new google.visualization.PieChart(el)"
-              />
-            </div>
-            <div>
+          <div class="card-body">
+            <table class="Charts">
+              <tr>
+                <td class="donutCell">
+                  <div id="donutchart1" class="donutDiv">
+                    <GChart style="width: 100%; height: 100%;"
+                            :settings="{packages: ['corechart']}"
+                            :data="chartData"
+                            :options="options"
+                            :createChart="(el, google) => new google.visualization.PieChart(el)"
+                    /></div>
+                  <div class="centerLabel">{{seletMsg}}</div>
+                </td>
+                <td class="donutGrid">
+                  <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                      <div class="quote subtitle">This is Sparta
+                        <br><a href="#">0</a>
+                      </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                      <div class="quote subtitle">This is Sparta
+                        <br><a href="#">0</a>
+                      </div>
+                    </div>
+                  </div>
 
-            </div>
+                  <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                      <div class="quote subtitle">This is Sparta
+                        <br><a href="#">0</a>
+                      </div>
+
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                      <div class="quote subtitle">This is Sparta
+                        <br><a href="#">0</a>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -164,17 +227,21 @@
     },
     data() {
       return {
+        seletMsg: 'oh shit!!',
+        percent: 0,
         options : {
           pieHole: 0.7,
-          pieSliceTextStyle: {
-            color: 'black',
-          },
-          legend: 'none'
+          pieSliceText: 'none',
+          legend: { position: 'none' },
+          tooltip: { text: 'percentage' },
+          tooltip: { textStyle: { fontSize: 12 } },
+          animation: {
+            duration: 1000,
+            easing: 'in',
+            startup: true
+          }
         },
-        chartData: [
-          ['Effort', 'Amount given'],
-          ['My all',     12],
-        ]
+        chartData: sampleData1
       }
     },
     props:{
@@ -190,6 +257,10 @@
 </script>
 
 <style lang="scss" scoped>
+  .donutGrid{
+    border-left: 1px solid #eee;
+  }
+
 
   .psColtitleleft{
     text-align: right;
@@ -201,4 +272,35 @@
     text-align: left;
   }
 
+  .donutCell
+  {
+    position: relative;
+  }
+
+  .donutDiv
+  {
+    width: 256px;
+    height: 256px;
+  }
+
+  .centerLabel
+  {
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 256px;
+    line-height: 256px;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 36px;
+    color: maroon;
+  }
+
+  .quote {
+    border-left: 0.5em solid #415ee1;
+    padding: 0.5em;
+    padding-left: 12px;
+    margin: 8px 0px;
+    margin-left: 10px;
+  }
 </style>
