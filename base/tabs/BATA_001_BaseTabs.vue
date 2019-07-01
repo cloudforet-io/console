@@ -23,7 +23,7 @@
         <div class="col-md-12">
           <div class="modal-footer" style="border-top:none; padding-right: 0px" v-show="isfooterVisible">
             <b-button size="md" variant="outline-success">Update</b-button>
-            <b-button size="md" variant="outline-danger">Cancel</b-button>
+            <b-button size="md" variant="outline-danger" @click="closeWindow">Cancel</b-button>
           </div>
       </div>
       </slot>
@@ -67,6 +67,9 @@
       },
       hideFooter:() => {
         this.isfooterVisible = false;
+      },
+      closeWindow (e) {
+        this.$parent.$store.dispatch('modal/closeModal');
       },
     }
   }
