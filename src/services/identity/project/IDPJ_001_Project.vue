@@ -47,7 +47,7 @@
   const projectEditPopupName = () => import ('./IDPJ_002_ProjectEditPopUp_Name')
   const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopUp_Tag')
 
-  const projectAudit = () => import ('./IDPJ_006_ProjectAudit.vue')
+  const projectAudit = () => import ('./IDPJ_007_ProjectAudit.vue')
   const projectMember = () => import('./IDPJ_005_ProjectMember.vue')
   const projectSummary = () => import('./IDPJ_004_ProjectSummary.vue')
 

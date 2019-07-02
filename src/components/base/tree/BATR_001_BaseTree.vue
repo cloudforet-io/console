@@ -45,8 +45,6 @@
 </template>
 
 <script>
-
-
   import {api} from '@/setup/api'
   import SlVueTree from "sl-vue-tree"
 
@@ -61,7 +59,7 @@
       nodes: {
         type: Array,
         default: () => []
-      },
+      }
     },
     mounted: function () {
       window.slVueTree = this.$refs.slVueTree;
@@ -73,11 +71,10 @@
         contextMenuIsVisible: false,
       }
     },
-
     methods: {
       nodeSelected(nodes, event) {
         this.selectedNodesTitle = nodes.map(node => node.title).join(', ');
-        this.lastEvent = `Select nodes: ${this.selectedNodesTitle}`;
+       // this.lastEvent = `Select nodes: ${this.selectedNodesTitle}`;
       },
       nodeToggled(node, event) {
         this.lastEvent = `Node ${node.title} is ${node.isExpanded ? 'expanded' : 'collapsed'}`;
@@ -108,6 +105,7 @@
         e.preventDefault();
       },
 
+
       showContextMenu(node, event) {
         event.preventDefault();
         this.contextMenuIsVisible = true;
@@ -116,6 +114,7 @@
         $contextMenu.style.left = event.clientX + 'px';
         $contextMenu.style.top = event.clientY + 'px';
       },
+
       viewAllNode() {
         this.contextMenuIsVisible = false;
         const treeV = this.$refs.slVueTree;
@@ -126,16 +125,17 @@
       addBaseNode() {
         this.contextMenuIsVisible = false;
         const treeV = this.$refs.slVueTree;
-        console.log('slVueTree', treeV);
-        //const paths = treeV.getSelected().map(node => node.path);
+        const paths = treeV.getSelected()[0].path;
         if(this.$parent.$children.some(el=> el.$options.name == 'BaseModal')){
-          const editTitle = treeV.getSelected()[0].isLeaf ? 'Create a Project': 'Create a Project Group';
+          const editTitle = treeV.getSelected()[0].isLeaf ? 'Edit a Project': 'Edit a Project Group';
           this.$parent.projectModaltitle = editTitle;
           this.$parent.$refs.Modal.showModal();
 
         }else{
           this.$alertify.alert('Modal Error', 'Please, Check Parents Modal');
         }
+
+        // treeV.updateNode(paths, {title: "this is an new item"} );
 
       },
       addNode(fn, stat, isDir) {

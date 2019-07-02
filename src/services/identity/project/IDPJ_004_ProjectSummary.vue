@@ -8,28 +8,28 @@
             <hr>
             <b-container fluid>
               <b-row>
-                <b-col class='psColtitleleft' sm="2">
+                <b-col class='col-xs-6 col-sm-6 col-md-6 col-lg-2 psColtitleleft'>
                   ID
                 </b-col>
-                <b-col class='psColtitleRight' sm="4">
+                <b-col class='col-xs-6 col-sm-6 col-md-6 col-lg-4 psColtitleRight'>
                   abcdef
                 </b-col>
-                <b-col class='psColtitleleft' sm="2">
+                <b-col class='col-xs-6 col-sm-6 col-md-6 col-lg-2 psColtitleleft'>
                   Name
                 </b-col>
-                <b-col class='psColtitleRight' sm="4">
+                <b-col class='col-md-6 col-lg-4 psColtitleRight'>
                   abcdef
                 </b-col>
-                <b-col class='psColtitleleft' sm="2">
+                <b-col class='col-xs-6 col-sm-6 col-md-6 col-lg-2 psColtitleleft'>
                   Created
                 </b-col>
-                <b-col class='psColtitleRight' sm="4">
+                <b-col class='col-md-6 col-lg-4 psColtitleRight'>
                   abcdef
                 </b-col>
-                <b-col class='psColtitleleft' sm="2">
+                <b-col class='col-xs-6 col-sm-6 col-md-6 col-lg-2 psColtitleleft'>
 
                 </b-col>
-                <b-col class='psColtitleRight' sm="4">
+                <b-col class='col-md-6 col-lg-4 psColtitleRight'>
 
                 </b-col>
               </b-row>
@@ -79,7 +79,8 @@
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <div class="card text-left">
           <div class="card-header">
-            <i class="fa fa-globe"></i>Item by Region
+            <i class="fa fa-globe fa-2x"œœœœœœœ> Servers by Region</i>
+
             <b-dropdown class="float-right" variant="p-0" right>
               <template slot="button-content">Server</template>
               <b-dropdown-item>Region</b-dropdown-item>
@@ -88,55 +89,54 @@
             </b-dropdown>
           </div>
           <div class="card-body">
-            <table class="Charts">
-              <tr>
-                <td class="donutCell">
-                  <div id="donutchart1" class="donutDiv">
-                    <GChart style="width: 100%; height: 100%;"
-                            :settings="{packages: ['corechart']}"
-                            :data="chartData"
-                            :options="options"
-                            :createChart="(el, google) => new google.visualization.PieChart(el)"
-                    /></div>
-                  <div class="centerLabel">{{seletMsg}}</div>
-                </td>
-                <td class="donutGrid">
-                  <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                      <div class="quote">This is Sparta
-                        <br><a href="#">0</a>
-                      </div>
+            <b-row>
+              <b-col><div class="donutCell">
+                <div id="donutchart1" class="donutDiv">
+                  <GChart style="width: 100%; height: 100%;"
+                          :settings="{packages: ['corechart']}"
+                          :data="chartData"
+                          :options="options"
+                          :createChart="(el, google) => new google.visualization.PieChart(el)"
+                  /></div>
+                <div class="centerLabel">{{seletMsg}}</div>
+              </div></b-col>
+              <b-col><div class="row">
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                  <div class="quote subtitle">This is Sparta
+                    <br><a href="#">0</a>
+                  </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                  <div class="quote subtitle">This is Sparta
+                    <br><a href="#">0</a>
+                  </div>
+                </div>
+              </div>
+
+                <div class="row">
+                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                    <div class="quote subtitle">This is Sparta
+                      <br><a href="#">0</a>
                     </div>
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                      <div class="quote">This is Sparta
-                        <br><a href="#">0</a>
-                      </div>
+
+                  </div>
+                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                    <div class="quote subtitle">This is Sparta
+                      <br>
+                      <a style="font-size: 22px;" href="#">
+                        <b>0</b>
+                      </a>
                     </div>
                   </div>
-
-                  <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                      <div class="quote">This is Sparta
-                        <br><a href="#">0</a>
-                      </div>
-
-                    </div>
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                      <div class="quote">This is Sparta
-                        <br><a href="#">0</a>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </table>
+                </div></b-col>
+            </b-row>
           </div>
         </div>
       </div>
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <div class="card text-left">
           <div class="card-header">
-            <i class="fa fa-globe"></i>Item by Region
+            <i class="fa fa fa-tags"></i>Servers by Region
             <b-dropdown class="float-right" variant="p-0" right>
               <template slot="button-content">Server</template>
               <b-dropdown-item>Region</b-dropdown-item>
@@ -145,48 +145,56 @@
             </b-dropdown>
           </div>
           <div class="card-body">
-            <table class="Charts">
-              <tr>
-                <td class="donutCell">
-                  <div id="donutchart1" class="donutDiv">
-                    <GChart style="width: 100%; height: 100%;"
-                            :settings="{packages: ['corechart']}"
-                            :data="chartData"
-                            :options="options"
-                            :createChart="(el, google) => new google.visualization.PieChart(el)"
-                    /></div>
-                  <div class="centerLabel">{{seletMsg}}</div>
-                </td>
-                <td class="donutGrid">
-                  <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                      <div class="quote subtitle">This is Sparta
-                        <br><a href="#">0</a>
-                      </div>
+            <b-row>
+              <b-col><div class="donutCell">
+                <div id="donutchart1" class="donutDiv">
+                  <GChart style="width: 100%; height: 100%;"
+                          :settings="{packages: ['corechart']}"
+                          :data="chartData"
+                          :options="options"
+                          :createChart="(el, google) => new google.visualization.PieChart(el)"
+                  /></div>
+                <div class="centerLabel">{{seletMsg}}</div>
+              </div></b-col>
+              <b-col><div class="row">
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                  <div class="quote subtitle">This is Sparta
+                    <br>
+                    <a style="font-size: 22px;" href="#">
+                      <b>0</b>
+                    </a>
+                  </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                  <div class="quote subtitle">This is Sparta
+                    <br>
+                    <a style="font-size: 22px;" href="#">
+                      <b>0</b>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+                <div class="row">
+                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                    <div class="quote subtitle">This is Sparta
+                      <br>
+                      <a style="font-size: 22px;" href="#">
+                        <b>0</b>
+                      </a>
                     </div>
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                      <div class="quote subtitle">This is Sparta
-                        <br><a href="#">0</a>
-                      </div>
+
+                  </div>
+                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
+                    <div class="quote subtitle">This is Sparta
+                      <br>
+                      <a style="font-size: 22px;" href="#">
+                        <b>0</b>
+                      </a>
                     </div>
                   </div>
-
-                  <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                      <div class="quote subtitle">This is Sparta
-                        <br><a href="#">0</a>
-                      </div>
-
-                    </div>
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                      <div class="quote subtitle">This is Sparta
-                        <br><a href="#">0</a>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </table>
+                </div></b-col>
+            </b-row>
           </div>
         </div>
       </div>
@@ -303,4 +311,5 @@
     margin: 8px 0px;
     margin-left: 10px;
   }
+
 </style>
