@@ -27,9 +27,9 @@
     <slot name="contextPanel">
       <div class="contextmenu" ref="contextmenu" v-show="contextMenuIsVisible">
         <div class="contextmenuleaf" @click="addBaseNode"><i class="fa fa-folder"></i>&nbsp Add a Project Group</div>
-        <div class="contextmenuleaf"><i class="fa fa-file"></i>&nbsp Add a Project</div>
+        <div class="contextmenuleaf" @click="addBaseNode"><i class="fa fa-file"></i>&nbsp Add a Project</div>
         <div class="contextmenuleaf" @click="editNode"><i class="fa fa-edit"></i>&nbsp Edit Selected Project</div>
-        <div class="node-leaf-last" @click="removeNode"><i class="fa fa-remove"></i>&nbsp Remove Selected Item</div>
+        <div class="node-leaf-last"  @click="removeNode"><i class="fa fa-remove"></i>&nbsp Remove Selected Item</div>
       </div>
     </slot>
 
@@ -45,92 +45,21 @@
 </template>
 
 <script>
-  let project = [
-    {
-      "title": "Item1",
-      "isLeaf": true
-    },
-    {
-      "title": "Item2",
-      "isLeaf": true,
-      "data": {
-        "visible": false
-      }
-    },
-    {
-      "title": "Folder1",
-      "isSelected": false,
-      "isExpanded": false
-    },
-    {
-      "title": "Folder2",
-      "isExpanded": false,
-      "children": [
-        {
-          "title": "Item3",
-          "isLeaf": true
-        },
-        {
-          "title": "Item4",
-          "isLeaf": true
-        },
-        {
-          "title": "Folder3",
-          "children": [
-            {
-              "title": "Item5",
-              "isLeaf": true
-            }
-          ]
-        }
-      ],
-      "isSelected": true
-    },
-    {
-      "title": "Folder5",
-      "isExpanded": false
-    },
-    {
-      "title": "Item6",
-      "isLeaf": true
-    },
-    {
-      "title": "Item7",
-      "isLeaf": true,
-      "data": {
-        "visible": false
-      }
-    },
-    {
-      "title": "Folder6",
-      "children": [
-        {
-          "title": "Folder7",
-          "children": [
-            {
-              "title": "Item8",
-              "isLeaf": true
-            },
-            {
-              "title": "Item9",
-              "isLeaf": true
-            }
-          ]
-        }
-      ]
-    }
-  ];
-
   import {api} from '@/setup/api'
   import SlVueTree from "sl-vue-tree"
 
   export default {
     name: 'BaseTree',
+    event: ['addModal'],
     components: {
       SlVueTree,
       VueAlertify,
     },
     props: {
+      nodes: {
+        type: Array,
+        default: () => []
+      }
     },
     mounted: function () {
       window.slVueTree = this.$refs.slVueTree;
@@ -139,15 +68,13 @@
     data() {
       return {
         lastEvent: '',
-        nodes: project,
         contextMenuIsVisible: false,
       }
     },
-
     methods: {
       nodeSelected(nodes, event) {
         this.selectedNodesTitle = nodes.map(node => node.title).join(', ');
-        this.lastEvent = `Select nodes: ${this.selectedNodesTitle}`;
+       // this.lastEvent = `Select nodes: ${this.selectedNodesTitle}`;
       },
       nodeToggled(node, event) {
         this.lastEvent = `Node ${node.title} is ${node.isExpanded ? 'expanded' : 'collapsed'}`;
@@ -178,6 +105,7 @@
         e.preventDefault();
       },
 
+
       showContextMenu(node, event) {
         event.preventDefault();
         this.contextMenuIsVisible = true;
@@ -186,6 +114,7 @@
         $contextMenu.style.left = event.clientX + 'px';
         $contextMenu.style.top = event.clientY + 'px';
       },
+
       viewAllNode() {
         this.contextMenuIsVisible = false;
         const treeV = this.$refs.slVueTree;
@@ -196,15 +125,17 @@
       addBaseNode() {
         this.contextMenuIsVisible = false;
         const treeV = this.$refs.slVueTree;
-        console.log('slVueTree', treeV);
-        //const paths = treeV.getSelected().map(node => node.path);
+        const paths = treeV.getSelected()[0].path;
         if(this.$parent.$children.some(el=> el.$options.name == 'BaseModal')){
-          const editTitle = treeV.getSelected()[0].isLeaf ? 'Create a Project': 'Create a Project Group';
+          const editTitle = treeV.getSelected()[0].isLeaf ? 'Edit a Project': 'Edit a Project Group';
           this.$parent.projectModaltitle = editTitle;
           this.$parent.$refs.Modal.showModal();
+
         }else{
           this.$alertify.alert('Modal Error', 'Please, Check Parents Modal');
         }
+
+        // treeV.updateNode(paths, {title: "this is an new item"} );
 
       },
       addNode(fn, stat, isDir) {

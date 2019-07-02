@@ -33,7 +33,7 @@
         <BaseTable :table-data="users" :fields="fields" :per-page="3"
                    caption="Users" :searchable="true" :list-fn="listUsers"
                    :row-clicked-fn="rowClicked" :total-rows="totalCount"
-
+                   :query-data="query"
         />
       </b-col>
     </b-row>
@@ -51,70 +51,32 @@
 </template>
 
 <script>
-  import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue'
-  const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue')
-  const ProjectMemberDetail = () => import('./IDPJ_006_ProjectMemberDetail.vue')
-
+  import CTSB_001_Sidebars from '@/components/base/tabs/BATA_001_BaseTabs'
+  import BaseModal from '@/components/base/modal/BAMO_001_BaseModal'
+  import BaseTree from '@/components/base/tree/BATR_001_BaseTree'
   import {api} from '@/setup/api'
 
   export default {
-    name: 'ProjectMember',
+    name: 'ProjectMemberDetail',
     components: {
-      BaseTable,
-      BaseModal,
-      ProjectMemberDetail
+
     },
     props:{
 
     },
     created(){
-
+        debugger;
     },
-    mounted () {
-      this.listUsers(3, 0);
+    mounted: function () {
+
     },
     data() {
       return {
-          fields: [
-            { key: 'userId', label: 'ID', sortable: true },
-            { key: 'name', label: 'Name', sortable: true },
-            { key: 'email', label: 'Email', sortable: true },
-            { key: 'mobile', label: 'Phone', sortable: true },
-            { key: 'group', label: 'Group Name', sortable: true },
-            { key: 'language', label: 'Language', sortable: true },
-            { key: 'domainId', label: 'Domain ID', sortable: true }
-          ],
-          users: [],
-          selectedUser: null,
-          selectedIdx: undefined,
-          addModal: false,
-          totalCount: 17,
+
       }
     },
     methods: {
-      async listUsers (limit, skip, sort, search) {
-        if (limit === undefined) limit = 10
-        if (skip === undefined) skip = 0
-        if (sort === undefined) sort = '-created_date'
-        if (search === undefined) search = {}
 
-        let res
-        try {
-          res = await this.$http.get(`/identity/users`, {
-            params: { limit, skip, sort, search }
-          })
-        } catch (e) {
-          console.error(e)
-        }
-        this.users = res.data
-        this.selectedUser = null
-        /**
-         * TODO: set totalCount with data from server
-         */
-      },
-      rowClicked (item, idx) {
-        this.selectedUser = item
-      }
     }
   }
 </script>
