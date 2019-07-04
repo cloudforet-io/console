@@ -27,7 +27,7 @@ export default {
   actions: {
     async login ({ commit }, { username, password }) {
       try {
-        const res = await api.post('/Auth/login', {
+        const res = await api.post('/auth/login', {
           user_name: username,
           password: password
         })

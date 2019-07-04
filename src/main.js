@@ -29,7 +29,7 @@ Vue.use(VueCookie)
 Vue.use(VueAlert)
 Vue.use(VueAlertify)
 Vue.use(VueInputAutowidth)
-Vue.use(CountryFlag);
+Vue.use(CountryFlag)
 Vue.use(Notifications, { velocity })
 Vue.use({$,jQuery})
 Vue.use(VueGoogleCharts)
