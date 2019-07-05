@@ -1,8 +1,8 @@
 import { api } from '@/setup/api'
-//This is just sample, Please update with your
+// This is just sample, Please update with your
 export default {
   userId: {
-    type: Array,
+    type: Array
 
   },
   name: null,

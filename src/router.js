@@ -6,9 +6,9 @@ import { loadLanguageAsync } from '@/setup/i18n'
 import store from '@/store'
 
 // Services
-import dashboardRoute from '@/services/dashboard/dashboardRoute'
-import identityRoute from '@/services/identity/identityRoute'
-import inventoryRoute from '@/services/inventory/inventoryRoute'
+import dashboardRoute from '@/services/dashboard/dashboard_route'
+import identityRoute from '@/services/identity/identity_route'
+import inventoryRoute from '@/services/inventory/inventory_route'
 
 // Containers
 const DefaultContainer = () => import('@/containers/DefaultContainer')

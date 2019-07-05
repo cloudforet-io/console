@@ -3,3 +3,12 @@
 textarea:focus, input:focus{
   outline: none;
 }
+
+:focus {
+  outline: none;
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: none;
+}

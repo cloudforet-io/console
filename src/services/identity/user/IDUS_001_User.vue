@@ -1,7 +1,7 @@
 <template>
   <div class="animated fadeIn">
     <b-row>
-      <b-col cols="6" sm="4" md="2" class="mb-3">
+      <b-col cols="6" sm="4" md="2" xl="1" class="mb-3">
         <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
           <template #activator>
             <b-button block variant="outline-primary">
@@ -13,7 +13,7 @@
           </template>
         </BaseModal>
       </b-col>
-      <b-col cols="6" sm="4" md="2" class="mb-3">
+      <b-col cols="6" sm="4" md="2" xl="1" class="mb-3">
         <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
                    :centered="true" :hide-footer="true"
         >
@@ -39,12 +39,17 @@
     </b-row>
     <b-row>
       <b-col cols="12">
-        <b-card v-if="selectedUser">
-          <div slot="header">
-            <strong>User Detail</strong>
-          </div>
-          <UserDetail v-if="selectedUser" :user-prop="selectedUser" />
-        </b-card>
+        <b-tabs v-if="selectedUser">
+          <b-tab active>
+            <template slot="title">
+              <i class="icon-info mr-1" /> User Information
+            </template>
+            <div slot="header">
+              <strong>User Detail</strong>
+            </div>
+            <UserDetail v-if="selectedUser" :user-prop="selectedUser" />
+          </b-tab>
+        </b-tabs>
       </b-col>
     </b-row>
   </div>
@@ -52,10 +57,9 @@
 
 <script>
 import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue'
-import query from './search-context/query.js'
+import query from './search_context/query.js'
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue')
 const UserDetail = () => import('./IDUS_002_UserDetail.vue')
-
 
 export default {
   name: 'User',
@@ -80,11 +84,12 @@ export default {
       selectedIdx: undefined,
       addModal: false,
       totalCount: 17,
-      query: query
+      query: query,
+      isReadyForSearch: false
     }
   },
   mounted () {
-    this.listUsers(3, 0);
+    this.listUsers(3, 0)
   },
   methods: {
     async listUsers (limit, skip, sort, search) {

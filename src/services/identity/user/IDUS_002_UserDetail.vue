@@ -2,10 +2,10 @@
   <b-form @reset.prevent="onReset" @submit.prevent="updatable && creatable ? onCreate() : onUpdate()">
     <b-form-group label="User ID" :label-cols="3" :horizontal="true">
       <b-form-input v-model="userId" :plaintext="!updatable" type="text" :state="validateUserId" />
-      <b-form-invalid-feedback :state="validateUserId">
+      <b-form-invalid-feedback v-if="updatable" :state="validateUserId">
         Your user ID must be 5-12 characters long.
       </b-form-invalid-feedback>
-      <b-form-valid-feedback :state="validateUserId">
+      <b-form-valid-feedback v-if="updatable" :state="validateUserId">
         Looks Good.
       </b-form-valid-feedback>
     </b-form-group>
@@ -46,7 +46,7 @@
 
     <b-form-group label="Domain ID" label-for="domainId" :label-cols="3" :horizontal="true">
       <b-form-input v-model="domainId" :plaintext="!updatable" type="text" :state="validateDomainId" />
-      <b-form-invalid-feedback :state="validateDomainId">
+      <b-form-invalid-feedback v-if="updatable" :state="validateDomainId">
         Please enter your domain ID.
       </b-form-invalid-feedback>
     </b-form-group>

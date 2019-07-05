@@ -31,13 +31,13 @@
     </div>
   </div>-->
   <div>
-    <b-dropdown id="DPO_001_SERVICE" split split-variant="outline-primary" variant="primary"  style='margin-left:10px;' v-bind:text="service" class="sm-1">
+    <b-dropdown id="DPO_001_SERVICE" split split-variant="outline-primary" variant="primary" style="margin-left:10px;" :text="service" class="sm-1">
       <div class="row" style="width:50vw">
         <b-dropdown-item to="/dashboard" class="col-sm-12">
           <i class="icon-docs" /> Dash Board
         </b-dropdown-item>
         <div class="col-sm-6">
-        <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-divider />
           <b-dropdown-header tag="div" class="text-lg-left">
             <strong>Identity</strong>
           </b-dropdown-header>
@@ -55,59 +55,45 @@
           </b-dropdown-item>-->
         </div>
         <div class="col-sm-6">
-          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-divider />
           <b-dropdown-header tag="div" class="text-lg-left">
             <strong>Inventory</strong>
           </b-dropdown-header>
           <b-dropdown-item to="/inventory/data-center">
-            <i class="fa fa-building fa-lg"/> Data Center
+            <i class="fa fa-building fa-lg" /> Data Center
           </b-dropdown-item>
           <b-dropdown-item to="/inventory/server">
             <i class="fa fa-server fa-lg" /> Server
           </b-dropdown-item>
-          <b-dropdown-item to="/inventory/network">
-            <i class="icon-share fa-lg"></i>Network
+          <b-dropdown-item to="/inventory/collector-plugin">
+            <i class="icon-share fa-lg" />Settings(Admin)
           </b-dropdown-item>
-        </div>
-      </div>
-      <div class="row" style="width:50vw">
-        <div class="col-sm-6">
-          <b-dropdown-header tag="div" class="text-lg-left">
-            <strong>Plugin</strong>
-          </b-dropdown-header>
-          <b-dropdown-item to="/plugin/plugin-manager">
-            <i class="fa fa-plug fa-lg" /> Plugin Manager
-          </b-dropdown-item>
-          <b-dropdown-item to="/plugin/plugin">
-            <i class="icon-present fa-lg" /> Plugin
-          </b-dropdown-item>
-        </div>
-        <div class="col-sm-6">
         </div>
       </div>
     </b-dropdown>
   </div>
-
-
 </template>
 
 <script>
-  export default {
-    data: function() {
-      return {
-        service: this.$i18n.t('MSG.DR_SERV'),
-        showMenu: false
-      }
-    },
-    props: {
-      onClick: 'function',
-    },
-    methods: {
-      toggleShow: function() {
-        this.showMenu = !this.showMenu;
-      },
+export default {
+  props: {
+    onClick: {
+      type: Function,
+      default: () => {}
+    }
+  },
+  data: function () {
+    return {
+      service: this.$i18n.t('MSG.DR_SERV'),
+      showMenu: false
+    }
+  },
+  methods: {
+    toggleShow: function () {
+      this.showMenu = !this.showMenu
     }
   }
+}
 </script>
 <style lang="scss" scoped>
   .anchor {
@@ -215,5 +201,3 @@
     }
   }
 </style>
-
-

@@ -31,22 +31,8 @@ export default {
           icon: 'icon-puzzle'
         },
         {
-          title: true,
-          name: 'Network'
-        },
-        {
-          name: 'Network',
-          url: '/inventory/network/network',
-          icon: 'icon-puzzle'
-        },
-        {
-          name: 'Network Type',
-          url: '/inventory/network/type',
-          icon: 'icon-puzzle'
-        },
-        {
-          name: 'IP Address',
-          url: '/inventory/network/ip-address',
+          name: 'Settings(Admin)',
+          url: '/inventory/collector-plugin',
           icon: 'icon-puzzle'
         }
       ]
