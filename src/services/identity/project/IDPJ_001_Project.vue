@@ -13,11 +13,12 @@
                               is="BaseTabs"
                               :tabs="projTabs"
                               :tabIndex="projIndex"
-                              :key="tabs.path" :fill="true"
+                              :key="tabs.path"
+                              :fill="true"
                               :isfooterVisible="true"
                               :creatable="true"
-                              :updatable="true"
-                    >
+                              :updatable="true">
+
                       <template #ModaltabContentsPanel>
                         <div v-if="selectedProject" :project-prop="selectedProject"  :creatable="true" :updatable="true">
 
@@ -44,21 +45,18 @@
 
 <script>
 
-  const projectEditPopupName = () => import ('./IDPJ_002_ProjectEditPopUp_Name')
-  const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopUp_Tag')
+  const projectEditPopupName = () => import ('./IDPJ_002_ProjectEditPopupName')
+  const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopupTag')
 
-  const projectAudit = () => import ('./IDPJ_007_ProjectAudit.vue')
-  const projectMember = () => import('./IDPJ_005_ProjectMember.vue')
-  const projectSummary = () => import('./IDPJ_004_ProjectSummary.vue')
+  import projectAudit from './IDPJ_007_ProjectAudit.vue';
+  import projectMember from './IDPJ_005_ProjectMember.vue';
+  import projectSummary from './IDPJ_004_ProjectSummary.vue';
 
   import BaseTabs from '@/components/base/tabs/BATA_001_BaseTabs'
   import BaseModal from '@/components/base/modal/BAMO_001_BaseModal'
   import BaseTree from '@/components/base/tree/BATR_001_BaseTree'
 
   import {api} from '@/setup/api'
-
-
-
 
   export default {
     name: 'Project',
@@ -167,22 +165,25 @@
         tabs: [
           {
             name: 'summary',
+            isSelected: true,
             tabIcon:"icon-calculator",
             tabTitle:'SUMMARY',
             component: projectSummary
           },
           {
             name: 'member',
+            isSelected: false,
             tabIcon:"icon-user",
             tabTitle:'MEMBER',
             component: projectMember
-          },
+          }/*,
           {
             name: 'audit',
+            isSelected: false,
             tabIcon:"icon-pie-chart",
             tabTitle:'AUDIT',
             component: projectAudit
-          }
+          }*/
         ],
         projIndex: [0],
         projTabs: [

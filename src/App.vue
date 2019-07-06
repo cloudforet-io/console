@@ -14,11 +14,9 @@ export default {
 </script>
 
 <style lang="scss">
-
   .app-body{
     background-color: #fafafa
   }
-
 
   // CoreUI Icons Set
   @import '~@coreui/icons/css/coreui-icons.min.css';

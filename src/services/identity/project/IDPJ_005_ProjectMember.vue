@@ -68,7 +68,6 @@
 
     },
     created(){
-
     },
     mounted () {
       this.listUsers(3, 0);
@@ -100,7 +99,7 @@
 
         let res
         try {
-          res = await this.$http.get(`/identity/users`, {
+          res = await this.$http.get(`/identity/user`, {
             params: { limit, skip, sort, search }
           })
         } catch (e) {
