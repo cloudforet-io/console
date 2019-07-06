@@ -1,19 +1,21 @@
 <template>
-  <b-col xs="12" lg="12">
+      <b-col xs="12" lg="12">
       <b-tabs v-model="tabIndex[0]" :fill="fill">
             <b-tab
               v-for="(tab, idx) in tabs"
               :key="tab.path"
-              :active="idx === 0"
-              :onclick="currentTab = tab">
-                <div name="tabHeader" v-if="!tab.icon" slot="title"><i  :class="tabs[idx].tabIcon" style="color:blue"></i> {{tab.tabTitle}}
+              @click="setCurrentTab(tab)">
+                <div name="tabHeader" v-if="!tab.icon" slot="title"><i  :class="tab.tabIcon" style="color:blue"></i> {{tab.tabTitle}}
                 </div>
                 <br>
+
                 <slot name="tabsContentPanel">
-                  <component
-                    :is="currentTab.component"
-                    class="tab"
-                  ></component>
+                  <keep-alive>
+                    <component
+                      :is="currentTab.component"
+                      class="tab"
+                    ></component>
+                  </keep-alive>
                 </slot>
           </b-tab>
       </b-tabs>
@@ -28,10 +30,9 @@
       </div>
       </slot>
     </b-row>
-  </b-col>
+      </b-col>
 </template>
 <script>
-
   import {api} from '@/setup/api'
 
   export default {
@@ -59,9 +60,14 @@
 
     data() {
       return {
+        currentTab: this.tabs[0]
       }
     },
     methods: {
+      setCurrentTab (tab) {
+        this.currentTab = tab;
+        tab.isActive = true;
+      },
       displayFooter:() => {
         this.isfooterVisible = true;
       },

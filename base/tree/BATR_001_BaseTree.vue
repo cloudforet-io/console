@@ -1,6 +1,6 @@
 <template>
   <div class="row" @click="contextMenuIsVisible=false">
-    <div class="col-2">
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-2">
         <sl-vue-tree v-model="nodes"
                      ref="slVueTree" :allow-multiselect="true"
                      @select="nodeSelected"
@@ -33,12 +33,10 @@
       </div>
     </slot>
 
-    <div class="col-10">
-      <b-card>
-        <slot name="treeSubPanel">
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10">
+      <slot name="treeSubPanel">
 
-        </slot>
-      </b-card>
+      </slot>
     </div>
   </div>
 
