@@ -1,5 +1,5 @@
 const BaseHeader = () => import('@/containers/header/CTHD_001_Header')
-const Dashboard = () => import('@/services/dashboard/Dashboard')
+const DashboardMain = () => import('@/services/dashboard/DSBD_001_DashboardMain')
 
 export default {
   path: 'dashboard',
@@ -7,6 +7,6 @@ export default {
   meta: { label: 'dashboard', requiresAuth: true },
   components: {
     header: BaseHeader,
-    main: Dashboard
+    main: DashboardMain
   }
 }

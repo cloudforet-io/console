@@ -17,12 +17,12 @@ import VueAlert from '@vuejs-pt/vue-alert'
 import Notifications from 'vue-notification'
 import velocity from 'velocity-animate'
 import CountryFlag from 'vue-country-flag'
-import {$,jQuery} from 'jquery'
+import { $, jQuery } from 'jquery'
 import VueAlertify from 'vue-alertify'
 import VueGoogleCharts from 'vue-google-charts'
 import {Tabs, Tab} from 'vue-tabs-component';
 
-//TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
+// TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
 // cssVars()
 dotenv.config()
 Vue.use(BootstrapVue)
@@ -32,7 +32,7 @@ Vue.use(VueAlertify)
 Vue.use(VueInputAutowidth)
 Vue.use(CountryFlag)
 Vue.use(Notifications, { velocity })
-Vue.use({$,jQuery})
+Vue.use({ $, jQuery })
 Vue.use(VueGoogleCharts)
 Vue.component('tabs', Tabs);
 Vue.component('tab', Tab);

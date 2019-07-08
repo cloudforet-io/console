@@ -1,5 +1,5 @@
 <template>
-  <BaseSidebar :nav="nav"/>
+  <BaseSidebar :nav="nav" />
 </template>
 
 <script>
@@ -29,7 +29,7 @@ export default {
           name: 'User',
           url: '/identity/user',
           icon: 'fa fa-users fa-lg'
-        },
+        }
       ]
     }
   }
