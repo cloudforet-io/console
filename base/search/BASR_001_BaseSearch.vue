@@ -3,9 +3,9 @@
     <div class="search-container">
       <b-input-group>
         <b-col ref="inputBox" cols="10" class="p-1 input-box">
-          <BaseInputTag is="BaseInputTag" v-for="(condi, idx) in conditionList" :key="condi.id"
-                        :list-data="queryData" :contents="condi"
-                        @delete="onDeleteTag(idx)"
+          <InputTag v-for="(condi, idx) in conditionList" :key="condi.id"
+                    :list-data="queryData" :contents="condi"
+                    @delete="onDeleteTag(idx)" @update="onUpdateTag"
           />
 
           <BaseInput :list-data="queryData" @add="addQuery" />
@@ -26,11 +26,11 @@
 <script>
 import { focus } from 'vue-focus'
 import BaseInput from '@/components/base/input/BAIN_001_BaseInput'
-import BaseInputTag from '@/components/base/input/BAIN_002_EXT_BaseInputTag'
+import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag'
 export default {
   name: 'BaseSearch',
   directives: { focus: focus },
-  components: { BaseInput, BaseInputTag },
+  components: { BaseInput, InputTag },
   props: {
     searchFn: {
       type: Function,
@@ -55,18 +55,40 @@ export default {
   },
   data () {
     return {
-      conditionList: []
+      conditionList: [{
+        id: 0,
+        key: 'test_key',
+        label: 'TEST',
+        value: 'cloud one',
+        operator: ':',
+        type: 'String',
+        subKey: ''
+      }],
+      lastId: 0
     }
   },
   methods: {
     onDeleteTag (idx) {
       this.$delete(this.conditionList, idx)
     },
-    addQuery (item) {
-      this.conditionList.push({
-        id: this.conditionList.length + 1,
-        key: item.key,
-        value: item.value
+    onUpdateTag (tagId, items) {
+      let matchIdx
+      items.map((item, idx) => {
+        if (idx === 0) {
+          this.conditionList.some((condi, i) => {
+            if (condi.id === tagId) matchIdx = i
+            return condi.id === tagId
+          })
+
+          this.$set(this.conditionList, matchIdx, Object.assign(this.conditionList[matchIdx], item))
+        } else {
+          this.conditionList.splice(matchIdx + idx, 0, Object.assign({ id: ++this.lastId }, item))
+        }
+      })
+    },
+    addQuery (items) {
+      items.map(item => {
+        this.conditionList.push(Object.assign({ id: ++this.lastId }, item))
       })
     }
   }
