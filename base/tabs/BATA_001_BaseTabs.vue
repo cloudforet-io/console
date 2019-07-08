@@ -111,10 +111,10 @@
       },
       updateSelect:() => {
         debugger;
-        var sh = this.$refs.popupTab[0].projectBindingName;
-        const treeV = this.selectedData.tree
+        console.log('this is a test', this.dataforTab);
+        /*const treeV = this.selectedData.tree
         const path = this.selectedData.tree.getSelected()[0].path;
-        treeV.updateNode(path, {title: sh});
+        treeV.updateNode(path, {title: 'asdfasdf'});*/
       },
       deleteSelect:() => {
 
