@@ -14,20 +14,20 @@
                          :centered="true"
                          :hide-footer="true" >
                   <template #contents>
-                    <BaseTabs id="EditBaseTabs"
-                              ref="EditTab"
+                    <BaseTabs ref="EditTab"
                               is="BaseTabs"
                               :tabs="projTabs"
                               :tabIndex="projIndex"
                               :key="tabs.path"
                               :fill="true"
+                              :selectedData="selectedData"
                               :isfooterVisible="true"
                               :isCreatable="createProcess"
                               :isUpdatable="updateProcess"
-                              :isDeletable="deleteProcess">
+                              >
                         <template #ModaltabContentsPanel>
-                            <div v-if="selectedProject" :project-prop="selectedProject">
-                            </div>
+                            <!--<div v-if="selectedProject" :project-prop="selectedProject">
+                            </div>-->
                         </template>
                     </BaseTabs>
                   </template>
@@ -132,7 +132,7 @@
 
   const projectEditPopupName = () => import ('./IDPJ_002_ProjectEditPopupName')
   const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopupTag')
-
+  import { eventBus } from '@/main';
   import projectAudit from './IDPJ_007_ProjectAudit.vue';
   import projectMember from './IDPJ_005_ProjectMember.vue';
   import projectSummary from './IDPJ_004_ProjectSummary.vue';
@@ -154,30 +154,20 @@
       BaseTabs,
       BaseTree,
       BaseModal,
+      eventBus,
       VueAlertify
     },
     props:{
 
     },
-    children: [
-      {
-        path: 'summary',
-        name: 'summary',
-        meta: { label: 'SUMMARY', requiresAuth: true },
-        component: projectSummary
-      },
-      {
-        path: 'member',
-        name: 'member',
-        meta: { label: 'Member', requiresAuth: true },
-        component: projectMember
-      }
-    ],
+    created(){
+
+    },
     data() {
       return {
+        selectedData: [],
         createProcess: false,
         updateProcess: false,
-        deleteProcess: false,
         treeData: sampleNode,
         projectModaltitle: 'Edit a Project',
         modalVisible: false,
@@ -227,13 +217,30 @@
       }
     },
     methods: {
-      manageTabButton(flag,state){
-        /*
-         * CRT
-         * UPT
-         * DEL
+      NodeSelected(item) {
+        this.lastEvent = "You have Selected : " + item[0].title;
+      },
+      editSelected(item) {
+        /*  TODO :: Please Add More Flags if needed.
+         *  CRT
+         *  UPT
+         *  DEL
          */
+        if (['PG','PR','SPG','SPR','RPG','RPR'].includes(item.flag)) {
+          const title = (item.flag.indexOf('PG')>0) ? true: false
+          this.manageTabButton('CRT',true, title);
+          this.$refs.Modal.showModal();
+
+        } else {
+          this.manageTabButton('UPT',true);
+          this.selectedData = item;
+          this.$refs.Modal.showModal();
+
+        }
+      },
+      manageTabButton(flag,state, title){
         if (flag==='CRT') {
+          this.projectModaltitle = (title) ? 'Create a Project Group': 'Create a Project';
           this.updateProcess = !state;
           this.createProcess =  state;
         } else if(flag==='UPT'){
@@ -241,18 +248,6 @@
           this.updateProcess = state;
         } else {
 
-        }
-      },
-      NodeSelected(item) {
-        this.lastEvent = "You have Selected : " + item[0].title;
-      },
-      editSelected(item) {
-        if (['PG','PR','SPG','SPR','RPG','RPR'].includes(item.flag)) {
-          this.manageTabButton('CRT',true);
-          this.$refs.Modal.showModal();
-        } else {
-          this.manageTabButton('UPT',true);
-          this.$refs.Modal.showModal();
         }
       },
     }

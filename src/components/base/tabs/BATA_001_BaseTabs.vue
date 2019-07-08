@@ -14,7 +14,12 @@
                   <keep-alive>
                     <slot name="tabsContentPanel">
                       <component
+                        ref="popupTab"
                         :is="currentTab.component"
+                        :selectedData="dataforTab"
+                        :isCreatable="isCreate"
+                        :isUpdatable="isUpdate"
+                        :isDeletable="isDelete"
                         class="tab">
                       </component>
                     </slot>
@@ -26,7 +31,7 @@
       <slot name="footerArea" >
         <div class="col-md-12">
           <div class="modal-footer" style="border-top:none; padding-right: 0px" v-show="isfooterVisible">
-            <b-button size="md" v-show="isCreatable" @click="CreateNew" variant="outline-primary">Create</b-button>
+            <b-button size="md" v-show="isCreatable" @click="createNew" variant="outline-primary">Create</b-button>
             <b-button size="md" v-show="isUpdatable" @click="updateSelect" variant="outline-success">Update</b-button>
             <b-button size="md" v-show="isDeletable" @click="deleteSelect" variant="outline-danger">Delete</b-button>
             <b-button size="md" variant="outline-warning" @click="closeWindow">Cancel</b-button>
@@ -70,12 +75,22 @@
       isfooterVisible:{
         tyep:Boolean,
         default: false,
+      },
+      selectedData:{
+        type: Object,
+        default: () => {}
       }
     },
-
+    created(){
+      //This is Tabs
+    },
     data() {
       return {
-        currentTab: this.tabs[0]
+        currentTab: this.tabs[0],
+        dataforTab: this.selectedData,
+        isCreate: this.isCreatable,
+        isUpdate: this.isUpdatable,
+        isDelete: this.isDeletable
       }
     },
     methods: {
@@ -91,29 +106,15 @@
       hideFooter:() => {
         this.isfooterVisible = false;
       },
-      displayCreatable:() => {
-        this.isCreatable = true;
-      },
-      hideCreatable:() => {
-        this.isCreatable = false;
-      },
-      displayUpdatable:() => {
-        this.isUpdatable = true;
-      },
-      hideUpdatable:() => {
-        this.isUpdatable = false;
-      },
-      displayDeletable:() => {
-        this.isDeletable = true;
-      },
-      hideDeletable:() => {
-        this.isDeletable = false;
-      },
-      CreateNew:() => {
+      createNew:() => {
 
       },
       updateSelect:() => {
-
+        debugger;
+        var sh = this.$refs.popupTab[0].projectBindingName;
+        const treeV = this.selectedData.tree
+        const path = this.selectedData.tree.getSelected()[0].path;
+        treeV.updateNode(path, {title: sh});
       },
       deleteSelect:() => {
 

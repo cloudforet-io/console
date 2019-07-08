@@ -36,8 +36,8 @@ Vue.use({ $, jQuery })
 Vue.use(VueGoogleCharts)
 Vue.component('tabs', Tabs);
 Vue.component('tab', Tab);
-
 Vue.prototype.$http = api
+Vue.prototype.$bus = new Vue();
 directive(Vue)
 
 /* eslint-disable no-new */
@@ -49,6 +49,7 @@ new Vue({
   store,
   components: {
     App
+
   },
   template: '<App/>'
 })

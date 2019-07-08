@@ -148,7 +148,6 @@
             msg.title,
             msg.content,
             () =>{
-
               prams['flag'] ='R' + prams['flag'];
               this.$emit(emitMethodName, prams)
             },

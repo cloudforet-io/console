@@ -14,9 +14,11 @@
         </BaseModal>
       </b-col>
       <b-col cols="6" sm="4" md="2" class="mb-3">
-        <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
-                   :centered="true" :hide-footer="true"
-        >
+        <BaseModal v-if="selectedUser"
+                   :name="'editUser'"
+                   :title="'Edit User'"
+                   :centered="true"
+                   :hide-footer="true">
           <template #activator>
             <b-button block variant="outline-primary">
               Edit
@@ -68,7 +70,7 @@
 
     },
     created(){
-      debugger;
+
     },
     mounted () {
       this.listUsers(3, 0);
