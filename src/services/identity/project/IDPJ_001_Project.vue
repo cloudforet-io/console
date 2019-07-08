@@ -5,25 +5,30 @@
         <b-card>
           <div>
             <div class="d-flex align-items-center ml-2">
-              Current actions: {{ lastEvent }}
+              {{ lastEvent }}
             </div>
-              <BaseModal  id='IDPJ_001_Project_Edit_Modal' ref="Modal" :name="'EditModal'"  :title="projectModaltitle" :centered="true" :hide-footer="true" >
+                <BaseModal id='IDPJ_001_Project_Edit_Modal'
+                         ref="Modal"
+                         :name="'EditModal'"
+                         :title="projectModaltitle"
+                         :centered="true"
+                         :hide-footer="true" >
                   <template #contents>
                     <BaseTabs id="EditBaseTabs"
+                              ref="EditTab"
                               is="BaseTabs"
                               :tabs="projTabs"
                               :tabIndex="projIndex"
                               :key="tabs.path"
                               :fill="true"
                               :isfooterVisible="true"
-                              :creatable="true"
-                              :updatable="true">
-
-                      <template #ModaltabContentsPanel>
-                        <div v-if="selectedProject" :project-prop="selectedProject"  :creatable="true" :updatable="true">
-
-                        </div>
-                      </template>
+                              :isCreatable="createProcess"
+                              :isUpdatable="updateProcess"
+                              :isDeletable="deleteProcess">
+                        <template #ModaltabContentsPanel>
+                            <div v-if="selectedProject" :project-prop="selectedProject">
+                            </div>
+                        </template>
                     </BaseTabs>
                   </template>
               </BaseModal>
@@ -31,12 +36,16 @@
         </b-card>
       </div>
     </div>
-    <BaseTree ref='projectTree' :nodes="node">
+    <BaseTree ref='projectTree'
+              :tree-prop="treeData"
+              @selected="NodeSelected"
+              @edited="editSelected">
         <template #treeSubPanel>
           <BaseTabs is="BaseTabs" id="ContentsBaseTabs" :tabs="tabs" :tabIndex="tabIndex" :key="tabs.tabTitle">
-            <template #tabContentsPanel>
-
-            </template>
+            <keep-alive>
+              <template #tabContentsPanel>
+              </template>
+            </keep-alive>
           </BaseTabs>
         </template>
     </BaseTree>
@@ -44,6 +53,82 @@
 </template>
 
 <script>
+
+  const sampleNode = [
+    {
+      "title": "Item1",
+      "isLeaf": true
+    },
+    {
+      "title": "Item2",
+      "isLeaf": true,
+      "data": {
+        "visible": false
+      }
+    },
+    {
+      "title": "Folder1",
+      "isSelected": false,
+      "isExpanded": false
+    },
+    {
+      "title": "Folder2",
+      "isExpanded": false,
+      "children": [
+        {
+          "title": "Item3",
+          "isLeaf": true
+        },
+        {
+          "title": "Item4",
+          "isLeaf": true
+        },
+        {
+          "title": "Folder3",
+          "children": [
+            {
+              "title": "Item5",
+              "isLeaf": true
+            }
+          ]
+        }
+      ],
+      "isSelected": true
+    },
+    {
+      "title": "Folder5",
+      "isExpanded": false
+    },
+    {
+      "title": "Item6",
+      "isLeaf": true
+    },
+    {
+      "title": "Item7",
+      "isLeaf": true,
+      "data": {
+        "visible": false
+      }
+    },
+    {
+      "title": "Folder6",
+      "children": [
+        {
+          "title": "Folder7",
+          "children": [
+            {
+              "title": "Item8",
+              "isLeaf": true
+            },
+            {
+              "title": "Item9",
+              "isLeaf": true
+            }
+          ]
+        }
+      ]
+    }
+  ];
 
   const projectEditPopupName = () => import ('./IDPJ_002_ProjectEditPopupName')
   const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopupTag')
@@ -74,93 +159,29 @@
     props:{
 
     },
-    mounted: function () {
-
-    },
+    children: [
+      {
+        path: 'summary',
+        name: 'summary',
+        meta: { label: 'SUMMARY', requiresAuth: true },
+        component: projectSummary
+      },
+      {
+        path: 'member',
+        name: 'member',
+        meta: { label: 'Member', requiresAuth: true },
+        component: projectMember
+      }
+    ],
     data() {
-
       return {
-        node: [
-          {
-            "title": "Item1",
-            "isLeaf": true
-          },
-          {
-            "title": "Item2",
-            "isLeaf": true,
-            "data": {
-              "visible": false
-            }
-          },
-          {
-            "title": "Folder1",
-            "isSelected": false,
-            "isExpanded": false
-          },
-          {
-            "title": "Folder2",
-            "isExpanded": false,
-            "children": [
-              {
-                "title": "Item3",
-                "isLeaf": true
-              },
-              {
-                "title": "Item4",
-                "isLeaf": true
-              },
-              {
-                "title": "Folder3",
-                "children": [
-                  {
-                    "title": "Item5",
-                    "isLeaf": true
-                  }
-                ]
-              }
-            ],
-            "isSelected": true
-          },
-          {
-            "title": "Folder5",
-            "isExpanded": false
-          },
-          {
-            "title": "Item6",
-            "isLeaf": true
-          },
-          {
-            "title": "Item7",
-            "isLeaf": true,
-            "data": {
-              "visible": false
-            }
-          },
-          {
-            "title": "Folder6",
-            "children": [
-              {
-                "title": "Folder7",
-                "children": [
-                  {
-                    "title": "Item8",
-                    "isLeaf": true
-                  },
-                  {
-                    "title": "Item9",
-                    "isLeaf": true
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        projects: null,
-        selectedProject: null,
+        createProcess: false,
+        updateProcess: false,
+        deleteProcess: false,
+        treeData: sampleNode,
         projectModaltitle: 'Edit a Project',
         modalVisible: false,
         lastEvent: 'Right-Click to open context menus on tree.',
-        selectedNodesTitle: '',
         tabIndex: [0],
         tabs: [
           {
@@ -176,14 +197,14 @@
             tabIcon:"icon-user",
             tabTitle:'MEMBER',
             component: projectMember
-          }/*,
+          },
           {
             name: 'audit',
             isSelected: false,
             tabIcon:"icon-pie-chart",
             tabTitle:'AUDIT',
             component: projectAudit
-          }*/
+          }
         ],
         projIndex: [0],
         projTabs: [
@@ -206,9 +227,35 @@
       }
     },
     methods: {
+      manageTabButton(flag,state){
+        /*
+         * CRT
+         * UPT
+         * DEL
+         */
+        if (flag==='CRT') {
+          this.updateProcess = !state;
+          this.createProcess =  state;
+        } else if(flag==='UPT'){
+          this.createProcess = !state;
+          this.updateProcess = state;
+        } else {
 
+        }
+      },
+      NodeSelected(item) {
+        this.lastEvent = "You have Selected : " + item[0].title;
+      },
+      editSelected(item) {
+        if (['PG','PR','SPG','SPR','RPG','RPR'].includes(item.flag)) {
+          this.manageTabButton('CRT',true);
+          this.$refs.Modal.showModal();
+        } else {
+          this.manageTabButton('UPT',true);
+          this.$refs.Modal.showModal();
+        }
+      },
     }
-
   }
 </script>
 

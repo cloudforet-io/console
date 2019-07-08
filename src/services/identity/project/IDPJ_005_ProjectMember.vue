@@ -68,6 +68,7 @@
 
     },
     created(){
+      debugger;
     },
     mounted () {
       this.listUsers(3, 0);
@@ -92,6 +93,7 @@
     },
     methods: {
       async listUsers (limit, skip, sort, search) {
+        console.log("Check :list User")
         if (limit === undefined) limit = 10
         if (skip === undefined) skip = 0
         if (sort === undefined) sort = '-created_date'
