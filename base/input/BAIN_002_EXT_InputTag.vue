@@ -24,7 +24,7 @@ import { focus } from 'vue-focus'
 import BaseInput from '@/components/base/input/BAIN_001_BaseInput'
 export default {
   name: 'InputTag',
-  event: ['delete', 'update', 'mounted'],
+  event: ['delete', 'update'],
   directives: { focus: focus },
   components: { BaseInput },
   props: {

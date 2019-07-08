@@ -5,7 +5,7 @@
 
     <span class="relative-container">
       <input ref="input" v-model="value" v-focus="isFocused"
-             v-autowidth="{maxWidth: '100%', minWidth: minWidth, comfortZone: 1}"
+             v-autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
              class="pl-2" autocomplete="off" type="text"
              placeholder="Search" @focus="onFocus" @blur="onBlur" @input="onInput"
              @keyup.enter="onEnter"
@@ -96,6 +96,10 @@ export default {
     autoselect: {
       type: Boolean,
       default: false
+    },
+    maxWidth: {
+      type: String,
+      default: '100%'
     },
     minWidth: {
       type: String,
