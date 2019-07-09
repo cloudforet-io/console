@@ -1,20 +1,21 @@
 <template>
   <div>
     <div class="search-container">
-      <b-input-group>
-        <b-col ref="inputBox" cols="10" class="p-1 input-box">
-          <InputTag v-for="(condi, idx) in conditionList" :key="condi.id"
-                    :list-data="queryData" :contents="condi"
-                    @delete="onDeleteTag(idx)" @update="onUpdateTag"
-          />
+      <b-input-group class="row no-gutters">
+        <b-col cols="10" class="input-container">
+          <div ref="inputBox" class="p-1 input-box" @click.self="focusOnInput">
+            <InputTag v-for="(condi, idx) in conditionList" :key="condi.id"
+                      :list-data="queryData" :contents="condi"
+                      @delete="deleteTag(idx)" @update="updateTag"
+            />
 
-          <BaseInput :list-data="queryData" @add="addQuery" />
+            <BaseInput ref="input" :list-data="queryData" @add="addQuery" />
+          </div>
+          <span class="input-delete-button" @click="deleteAll"><i class="fa fa-times" /></span>
         </b-col>
 
         <b-input-group-append class="col-2 pl-0">
-          <b-button block variant="primary" :limit="limit" :skip="skip" :sort="sort"
-                    @click.prevent="searchFn(limit, skip, sort, value)"
-          >
+          <b-button block variant="primary" @click="$emit('search', conditionList)">
             <i class="fa fa-search" />
           </b-button>
         </b-input-group-append>
@@ -27,51 +28,50 @@
 import { focus } from 'vue-focus'
 import BaseInput from '@/components/base/input/BAIN_001_BaseInput'
 import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag'
+
+const testdata = [{
+  id: 0,
+  key: 'test_key',
+  label: 'TEST',
+  value: 'cloud one',
+  operator: ':',
+  type: 'String',
+  subKey: ''
+}]
+
 export default {
   name: 'BaseSearch',
+  event: ['search'],
   directives: { focus: focus },
   components: { BaseInput, InputTag },
   props: {
-    searchFn: {
-      type: Function,
-      required: true
+    searchData: {
+      type: Array,
+      default: () => []
     },
     queryData: {
       type: Array,
       default: () => []
-    },
-    limit: {
-      type: Number,
-      default: 10
-    },
-    skip: {
-      type: Number,
-      default: 0
-    },
-    sort: {
-      type: String,
-      default: 'created_date'
     }
   },
   data () {
     return {
-      conditionList: [{
-        id: 0,
-        key: 'test_key',
-        label: 'TEST',
-        value: 'cloud one',
-        operator: ':',
-        type: 'String',
-        subKey: ''
-      }],
-      lastId: 0
+      conditionList: this.searchData.length > 0 ? this.searchData : [],
+      lastId: 0,
+      focusInput: false
     }
   },
   methods: {
-    onDeleteTag (idx) {
+    focusOnInput () {
+      this.$refs.input.isFocused = true
+    },
+    deleteAll () {
+      this.conditionList = []
+    },
+    deleteTag (idx) {
       this.$delete(this.conditionList, idx)
     },
-    onUpdateTag (tagId, items) {
+    updateTag (tagId, items) {
       let matchIdx
       items.map((item, idx) => {
         if (idx === 0) {
@@ -100,11 +100,25 @@ $input-height: 23px;
 
 .search-container {
   position: relative;
-  .input-box {
-    border: 1px solid lightgray;
-    border-radius: 5px 0 0 5px;
-    background-color: #fff;
-    cursor: text;
+  .input-container {
+      border: 1px solid lightgray;
+      border-radius: 5px 0 0 5px;
+      background-color: #fff;
+    .input-box {
+      display: inline-block;
+      width: 95%;
+      cursor: text;
+    }
+    .input-delete-button {
+      display: inline-block;
+      width: 5%;
+      padding-right: 8px;
+      font-size: 1.2em;
+      color: gray;
+      text-align: right;
+      vertical-align: middle;
+      cursor: pointer;
+    }
   }
 }
 </style>
