@@ -14,9 +14,11 @@
         </BaseModal>
       </b-col>
       <b-col cols="6" sm="4" md="2" class="mb-3">
-        <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
-                   :centered="true" :hide-footer="true"
-        >
+        <BaseModal v-if="selectedUser"
+                   :name="'editUser'"
+                   :title="'Edit User'"
+                   :centered="true"
+                   :hide-footer="true">
           <template #activator>
             <b-button block variant="outline-primary">
               Edit
@@ -93,6 +95,7 @@
     },
     methods: {
       async listUsers (limit, skip, sort, search) {
+        console.log("Check :list User")
         if (limit === undefined) limit = 10
         if (skip === undefined) skip = 0
         if (sort === undefined) sort = '-created_date'
@@ -100,7 +103,7 @@
 
         let res
         try {
-          res = await this.$http.get(`/identity/users`, {
+          res = await this.$http.get(`/identity/user`, {
             params: { limit, skip, sort, search }
           })
         } catch (e) {

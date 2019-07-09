@@ -4,39 +4,30 @@
       <b-card>
         <div class="row">
           <div class="col-xs-6 col-sm-6 col-md-6 col-lg-12" style="display: block;">
-            <h4 class="page-header m-t-0"><i class="fa fa-hashtag m-r-5"></i>Base Information</h4>
+            <h4 class="page-header m-t-0">
+              <i class="fa fa-hashtag m-r-5">
+              </i>&nbsp&nbsp Base Information</h4>
             <hr>
             <b-container fluid>
-              <b-row>
-                <b-col class='col-xs-6 col-sm-6 col-md-6 col-lg-2 psColtitleleft'>
-                  ID
-                </b-col>
-                <b-col class='col-xs-6 col-sm-6 col-md-6 col-lg-4 psColtitleRight'>
-                  abcdef
-                </b-col>
-                <b-col class='col-xs-6 col-sm-6 col-md-6 col-lg-2 psColtitleleft'>
-                  Name
-                </b-col>
-                <b-col class='col-md-6 col-lg-4 psColtitleRight'>
-                  abcdef
-                </b-col>
-                <b-col class='col-xs-6 col-sm-6 col-md-6 col-lg-2 psColtitleleft'>
-                  Created
-                </b-col>
-                <b-col class='col-md-6 col-lg-4 psColtitleRight'>
-                  abcdef
-                </b-col>
-                <b-col class='col-xs-6 col-sm-6 col-md-6 col-lg-2 psColtitleleft'>
-
-                </b-col>
-                <b-col class='col-md-6 col-lg-4 psColtitleRight'>
-
-                </b-col>
-              </b-row>
+                <dl class="dl-horizontal m-b-0 row">
+                  <div class="col-sm-12 col-md-6 summary" v-for="info in summaryBaseInfo">
+                    <dt>{{info.title}}</dt>
+                    <dd>{{info.contents}}</dd>
+                  </div>
+                </dl>
             </b-container>
+            <h4 class="page-header">
+              <i class="fa fa-tag m-r-5"></i>&nbsp&nbsp Tag
+            </h4>
             <hr>
-            <h4 class="page-header"><i class="fa fa-tag m-r-5"></i> Tag</h4>
-            <div class="warning-panel" style="display: block;">No tags.</div>
+            <b-container fluid>
+              <dl class="dl-horizontal m-b-0 row">
+                <div class="col-sm-12 col-md-6 summary" v-for="tag in summaryBaseTag">
+                  <dt title="Tag Key">{{tag.tagKey}}</dt>
+                  <dd title="Tag Value">{{tag.tagValue}}</dd>
+                </div>
+              </dl>
+            </b-container>
           </div>
 
         </div>
@@ -45,180 +36,62 @@
     </div>
     <div class="col-xs-12 p-0">
       <div class="row">
-        <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-3">
+        <b-col :class="colSelector(summayAsset.length)"
+               v-for="asset in summayAsset">
           <b-card header-tag="header">
-            <div slot="header" class="mb-0"><i class='fa fa-server fa-2x' style="float:left"></i>
-              <h4>&nbsp &nbsp Server</h4> </div>
-            <h2 align="right"><a href="#">27</a></h2>
-          </b-card>
-        </b-col>
-        <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-3">
-          <b-card header-tag="header">
-            <div slot="header" class="mb-0"><i class='fa fa-database fa-2x' style="float:left"></i>
-              <h4>&nbsp &nbsp Volume</h4> </div>
-            <h2 align="right"><a href="#">2</a></h2>
-          </b-card>
-        </b-col>
-        <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-3">
-          <b-card header-tag="header">
-            <div slot="header" class="mb-0"><i class='fa fa-star fa-2x' style="float:left"></i>
-              <h4>&nbsp &nbsp Project</h4> </div>
-            <h2 align="right"><a href="#">17</a></h2>
-          </b-card>
-        </b-col>
-        <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-3">
-          <b-card header-tag="header">
-            <div slot="header" class="mb-0"><i class='fa fa-users fa-2x' style="float:left"></i>
-              <h4>&nbsp &nbsp Member</h4> </div>
-            <h2 align="right"><a href="#">0</a></h2>
+            <div slot="header" class="mb-0"><i :class='asset.icon' style="float:left"></i>
+              <h4>&nbsp &nbsp {{asset.asKey}}</h4></div>
+            <h2 align="right"><a :href="asset.linkURL">{{asset.assetValue}}</a></h2>
           </b-card>
         </b-col>
       </div>
     </div>
     <div class="row">
-      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-        <div class="card text-left">
-          <div class="card-header">
-            <i class="fa fa-globe fa-2x"œœœœœœœ> Servers by Region</i>
-
-            <b-dropdown class="float-right" variant="p-0" right>
-              <template slot="button-content">Server</template>
-              <b-dropdown-item>Region</b-dropdown-item>
-              <b-dropdown-item>Storage</b-dropdown-item>
-              <b-dropdown-item>Net Device</b-dropdown-item>
-            </b-dropdown>
-          </div>
-          <div class="card-body">
-            <b-row>
-              <b-col><div class="donutCell">
-                <div id="donutchart1" class="donutDiv">
-                  <GChart style="width: 100%; height: 100%;"
-                          :settings="{packages: ['corechart']}"
-                          :data="chartData"
-                          :options="options"
-                          :createChart="(el, google) => new google.visualization.PieChart(el)"
-                  /></div>
-                <div class="centerLabel">{{seletMsg}}</div>
-              </div></b-col>
-              <b-col><div class="row">
-                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                  <div class="quote subtitle">This is Sparta
-                    <br><a href="#">0</a>
-                  </div>
-                </div>
-                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                  <div class="quote subtitle">This is Sparta
-                    <br><a href="#">0</a>
-                  </div>
-                </div>
-              </div>
-
-                <div class="row">
-                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                    <div class="quote subtitle">This is Sparta
-                      <br><a href="#">0</a>
-                    </div>
-
-                  </div>
-                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                    <div class="quote subtitle">This is Sparta
-                      <br>
-                      <a style="font-size: 22px;" href="#">
-                        <b>0</b>
-                      </a>
-                    </div>
-                  </div>
-                </div></b-col>
-            </b-row>
-          </div>
-        </div>
-      </div>
-      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-        <div class="card text-left">
-          <div class="card-header">
-            <i class="fa fa fa-tags"></i>Servers by Region
-            <b-dropdown class="float-right" variant="p-0" right>
-              <template slot="button-content">Server</template>
-              <b-dropdown-item>Region</b-dropdown-item>
-              <b-dropdown-item>Storage</b-dropdown-item>
-              <b-dropdown-item>Net Device</b-dropdown-item>
-            </b-dropdown>
-          </div>
-          <div class="card-body">
-            <b-row>
-              <b-col><div class="donutCell">
-                <div id="donutchart1" class="donutDiv">
-                  <GChart style="width: 100%; height: 100%;"
-                          :settings="{packages: ['corechart']}"
-                          :data="chartData"
-                          :options="options"
-                          :createChart="(el, google) => new google.visualization.PieChart(el)"
-                  /></div>
-                <div class="centerLabel">{{seletMsg}}</div>
-              </div></b-col>
-              <b-col><div class="row">
-                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                  <div class="quote subtitle">This is Sparta
-                    <br>
-                    <a style="font-size: 22px;" href="#">
-                      <b>0</b>
-                    </a>
-                  </div>
-                </div>
-                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                  <div class="quote subtitle">This is Sparta
-                    <br>
-                    <a style="font-size: 22px;" href="#">
-                      <b>0</b>
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-                <div class="row">
-                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                    <div class="quote subtitle">This is Sparta
-                      <br>
-                      <a style="font-size: 22px;" href="#">
-                        <b>0</b>
-                      </a>
-                    </div>
-
-                  </div>
-                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                    <div class="quote subtitle">This is Sparta
-                      <br>
-                      <a style="font-size: 22px;" href="#">
-                        <b>0</b>
-                      </a>
-                    </div>
-                  </div>
-                </div></b-col>
-            </b-row>
-          </div>
-        </div>
-      </div>
+      <BaseDonutChart></BaseDonutChart>
+      <BaseDonutChart></BaseDonutChart>
     </div>
   </div>
 </template>
 
 <script>
-  const sampleData1 = [
-    ['Task', 'Hours per Day'],
-    ['Work',     11],
-    ['Eat',      2],
-    ['Commute',  2],
-    ['Watch TV', 2],
-    ['Sleep',    7]
+/*
+ * Here's Data Set for Current Page
+ * 1. sampleBaseInformation : Base Information Data
+ * 2. sampleBaseTag : tag sample Data
+ */
+
+  const sampleBaseInformation = [
+    {title: 'ID', contents: 'pg-6bc72053'},
+    {title: 'Name', contents: 'AWS KR'},
+    {title: 'Created', contents: '2019-05-12'},
+    {title: '', contents: ''}
+    ];
+
+  const sampleBaseTag = [
+    {tagKey: 'Japan', tagValue: 'Tokyo'},
+    {tagKey: 'South Korea', tagValue: 'Seoul'},
+    {tagKey: 'USA', tagValue: 'Washington D.C.'},
+    {tagKey: 'Canada', tagValue: 'Ottawa'},
+    {tagKey: 'Austria', tagValue: 'Vienna'},
+    {tagKey: 'Germany', tagValue: 'Berlin'},
+    {tagKey: 'G.B', tagValue: 'London'},
+    {tagKey: 'France', tagValue: 'Paris'}
   ];
 
-  const sampleData2 = [
+const sampleAsset = [
+  {asKey: 'Server',   assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server fa-2x'},
+  {asKey: 'Volume', assetValue: 2,    linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database fa-2x'},
+  {asKey: 'Project', assetValue: 17,  linkURL: 'www.bing.com', icon: 'fa fa-star fa-2x'},
+  {asKey: 'Member', assetValue: 0,    linkURL: 'www.naver.com', icon: 'fa fa-users fa-2x'},
+];
+
+  const sampleData1 = [
     ['Task', 'Hours per Day'],
-    ['Work',     11],
-    ['Eat',      2],
-    ['Commute',  2],
+    ['Work', 11],
+    ['Eat', 2],
+    ['Commute', 2],
     ['Watch TV', 2],
-    ['Sleep',    7]
+    ['Sleep', 7]
   ];
 
   import BaseTabs from '@/components/base/tabs/BATA_001_BaseTabs'
@@ -226,23 +99,29 @@
   import BaseTree from '@/components/base/tree/BATR_001_BaseTree'
   import {api} from '@/setup/api'
 
-  import { GChart } from 'vue-google-charts'
+  import {GChart} from 'vue-google-charts'
 
+  const BaseDonutChart = () => import('@/components/base/chart/BACT_001_base_chart.vue')
   export default {
     name: 'ProjectSummary',
     components: {
-      GChart
+      GChart,
+      BaseDonutChart
     },
     data() {
       return {
-        seletMsg: 'oh shit!!',
+        summaryBaseInfo: sampleBaseInformation,
+        summaryBaseTag: sampleBaseTag,
+        summayAsset: sampleAsset,
+        seletMsg: 'This is center MSG',
         percent: 0,
-        options : {
+
+        options: {
           pieHole: 0.7,
           pieSliceText: 'none',
-          legend: { position: 'none' },
-          tooltip: { text: 'percentage' },
-          tooltip: { textStyle: { fontSize: 12 } },
+          legend: {position: 'none'},
+          tooltip: {text: 'percentage'},
+          tooltip: {textStyle: {fontSize: 12}},
           animation: {
             duration: 1000,
             easing: 'in',
@@ -252,47 +131,57 @@
         chartData: sampleData1
       }
     },
-    props:{
-
-    },
+    props: {},
     mounted: function () {
 
     },
     methods: {
-
+      colSelector: (dataLength) => {
+        const colNumber = Math.round(12/dataLength);
+          return 'col-xs-6 col-sm-6 col-md-6 col-lg-'+ colNumber+' col';
+      }
     }
   }
 </script>
 
 <style lang="scss" scoped>
-  .donutGrid{
-    border-left: 1px solid #eee;
-  }
-
-
-  .psColtitleleft{
+  .summary > dt {
+    float: left;
+    width: 160px;
+    overflow: hidden;
+    clear: left;
     text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-height: 20px;
     font-weight: 900;
     color: #777777
   }
 
-  .psColtitleRight{
-    text-align: left;
+  .summary > dd{
+    float: left;
+    margin-left: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-height: 20px;
+    color: #000000
   }
 
-  .donutCell
-  {
+  .donutGrid {
+    border-left: 1px solid #eee;
+  }
+
+  .donutCell {
     position: relative;
   }
 
-  .donutDiv
-  {
+  .donutDiv {
     width: 256px;
     height: 256px;
   }
 
-  .centerLabel
-  {
+  .centerLabel {
     position: absolute;
     left: 2px;
     top: 2px;
