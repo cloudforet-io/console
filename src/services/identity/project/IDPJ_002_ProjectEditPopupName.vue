@@ -14,7 +14,10 @@
           <label :for="`type-${type.type}`">{{ type.textTitle }}:</label>
         </b-col>
         <b-col sm="9">
-          <b-form-input v-model="projectBindingName" ref="nameInputField" :id="`type-${type.type}`" :type="type.type"></b-form-input>
+          <b-form-input v-model="projectProp.projectName"
+                        ref="nameInputField"
+                        :id="`type-${type.type}`"
+                        :type="type.type"></b-form-input>
         </b-col>
       </template>
     </b-row>
@@ -42,26 +45,25 @@
     },
     watch: {
       projectProp (project) {
-        debugger;
         this.setCurrentData(project)
       }
     },
     data() {
       return {
-        projectBindingName: null,
-        projectBindingId: null,
+        projectId: "",
+        projectName: "",
         treeDataSelected: {},
         currentState: null,
         Inputs: [
           {
-            textTitle: 'projectId',
+            textTitle: 'Project Id',
             type: 'text',
-            value: 'projectBindingId'
+            value: 'projectId'
           },
           {
-            textTitle: 'projectName',
+            textTitle: 'Project Name',
             type: 'text',
-            value: 'projectBindingName'
+            value: 'projectName'
           }
         ]
       }
@@ -91,23 +93,12 @@
           return false;
         }
       },
-      onCreate() {
-        if (!this.validated) {
-          return
+      setProp(idx) {
+        if (idx == 0 && this.currentState == 'UPT') {
+          return this.projectProp.projectId
+        } else {
+          return false;
         }
-        console.log('creating....')
-        setTimeout(() => {
-          this.$store.dispatch('modal/closeModal')
-        }, 1000)
-      },
-      onUpdate(e) {
-        if (!this.validated) {
-          return
-        }
-        console.log('updating....')
-        setTimeout(() => {
-          this.$store.dispatch('modal/closeModal')
-        }, 1000)
       },
     }
   }

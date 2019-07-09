@@ -21,9 +21,11 @@
                               :key="tabs.path"
                               :fill="true"
                               :selectedData="selectedData"
-                              :isfooterVisible="true"
                               :isCreatable="createProcess"
                               :isUpdatable="updateProcess"
+                              :isfooterVisible="true"
+                              @create="createProject"
+                              @update="updateProject"
                               >
                         <template #ModaltabContentsPanel>
                             <!--<div v-if="selectedProject" :project-prop="selectedProject">
@@ -249,6 +251,18 @@
         } else {
 
         }
+      },
+      updateProject(items){
+        const treeV = items.tree
+        const path = treeV.getSelected()[0].path;
+        const giveProp = items.tabContents[0].projectProp;
+        treeV.updateNode(path, {title: giveProp.projectName});
+        giveProp.projectName = '';
+        //TODO:: Simulate gRPC Modules on BACK_END
+        this.$refs.Modal.hideModal()
+      },
+      createProject(items){
+
       },
     }
   }
