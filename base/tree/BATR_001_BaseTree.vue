@@ -1,58 +1,55 @@
 <template>
   <div>
-    <div class="col-xs-6 col-sm-6 col-md-6 col-lg- row" v-show="contextTopMenuIsVisible">
-      <!--<b-button variant="outline-primary" @click="excSelected('PG')"><i class="fa fa-folder"></i> Add a Project Group</b-button>
-      <b-button variant="outline-primary" @click="excSelected('PR')"><i class="fa fa-file"></i> Add a Project</b-button>
-      <b-button variant="outline-success" @click="excSelected('SR')"><i class="fa fa-edit"></i> Edit Selected Project</b-button>
-      <b-button variant="outline-danger" @click="excSelected"><i class="fa fa-remove"></i> Remove Selected Item</b-button>-->
-    </div>
-  <div class="row" @click="contextMenuIsVisible=false">
-    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-2">
-        <sl-vue-tree v-model="treeData"
-                     ref="slVueTree" :allow-multiselect="true"
-                     @select="nodeSelected"
-                     @drop="nodeDropped"
-                     @nodecontextmenu="showContextMenu">
-          <template slot="title" slot-scope="{ node }">
-          <span class="item-icon">
-            <i class="fa fa-file" v-if="node.isLeaf"></i>
-            <i class="fa fa-folder" v-if="!node.isLeaf"></i>
-          </span>
-            {{ node.title }}
-          </template>
+      <div class="row" @click="contextMenuIsVisible=false">
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-2">
+            <sl-vue-tree v-model="treeData"
+                         ref="slVueTree" :allow-multiselect="true"
+                         @select="nodeSelected"
+                         @drop="nodeDropped"
+                         @nodecontextmenu="showContextMenu">
+              <template slot="title" slot-scope="{ node }">
+              <span class="item-icon">
+                <i class="fa fa-file" v-if="node.isLeaf"></i>
+                <i class="fa fa-folder" v-if="!node.isLeaf"></i>
+              </span>
+                {{ node.title }}
+              </template>
 
-          <template slot="toggle" slot-scope="{ node }">
-            <span v-if="!node.isLeaf">
-              <i v-if="node.isExpanded" class="fa fa-chevron-down"></i>
-              <i v-if="!node.isExpanded" class="fa fa-chevron-right"></i>
-            </span>
-          </template>
+              <template slot="toggle" slot-scope="{ node }">
+                <span v-if="!node.isLeaf">
+                  <i v-if="node.isExpanded" class="fa fa-chevron-down"></i>
+                  <i v-if="!node.isExpanded" class="fa fa-chevron-right"></i>
+                </span>
+              </template>
 
-          <template slot="sidebar" slot-scope="{ node }">
-            <span class="visible-icon" style="padding:0px 3px 0px 10px; cursor:pointer" @click="event => showContextEllipsis(event, node)">
-              <i  class="fa fa-ellipsis-v"></i>
-            </span>
-          </template>
-        </sl-vue-tree>
-    </div>
+              <template slot="sidebar" slot-scope="{ node }">
+                  <span class="ellipsis" style="padding:0px 3px 0px 10px; cursor:pointer" v-on:click.stop.preven="showContext($event, node)" >
+                  <i  class="fa fa-ellipsis-v"></i>
+                </span>
+              </template>
+            </sl-vue-tree>
+        </div>
 
-      <div class="contextmenu" ref="contextmenu" v-show="contextMenuIsVisible">
-        <div class="contextmenuleaf" @click="excSelected('PG')"><i class="fa fa-folder"></i>&nbsp Add a Project Group</div>
-        <div class="contextmenuleaf" @click="excSelected('PR')"><i class="fa fa-file"></i>&nbsp Add a Project</div>
-        <div class="contextmenuleaf" @click="excSelected('SR')"><i class="fa fa-edit"></i>&nbsp Edit Selected Project</div>
-        <div class="node-leaf-last"  @click="excSelected"><i class="fa fa-remove"></i>&nbsp Remove Selected Item</div>
+        <div class="contextmenu" ref="contextmenu" v-show="contextMenuIsVisible">
+          <div class="contextmenuleaf" @click="excSelected('PG')"><i class="fa fa-folder"></i>&nbsp Add a Project Group</div>
+          <div class="contextmenuleaf" @click="excSelected('PR')"><i class="fa fa-file"></i>&nbsp Add a Project</div>
+          <div class="contextmenuleaf" @click="excSelected('SR')"><i class="fa fa-edit"></i>&nbsp Edit Selected Project</div>
+          <div class="node-leaf-last"  @click="excSelected"><i class="fa fa-remove"></i>&nbsp Remove Selected Item</div>
+        </div>
+
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10" v-show="hasSelected">
+            <slot name="treeSubPanel" >
+            </slot>
+        </div>
       </div>
 
-    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10" v-show="hasSelected">
-          <slot name="treeSubPanel" >
-          </slot>
-    </div>
-  </div></div>
+  </div>
 </template>
 
 <script>
   import {api} from '@/setup/api'
   import SlVueTree from "sl-vue-tree"
+  import { $, jQuery } from 'jquery'
 
   export default {
     name: 'BaseTree',
@@ -91,20 +88,20 @@
       nodeDropped(nodes, position, event) {
         this.lastEvent = `Nodes: ${nodes.map(node => node.title).join(', ')} are dropped ${position.placement} ${position.node.title}`;
       },
-
-      showContextEllipsis(event, node) {
-        this.contextTopMenuIsVisible = true
+      showContext (event, node) {
+        this.showContextMenu(node, event, 'Clicked');
       },
 
-      showContextMenu(node, event, type) {
-        event.preventDefault();
-        this.contextMenuIsVisible = true;
-        const $contextMenu = this.$refs.contextmenu;
-        console.log('X: ' + event.clientX+ ' :Y: '+ event.clientY);
-        this.$refs.slVueTree.select(node.path);
-        $contextMenu.style.left = event.clientX + 'px';
-        $contextMenu.style.top = event.clientY + 'px';
-
+      showContextMenu(node, event, hasClicked) {
+          if(!hasClicked) event.preventDefault();
+          this.contextMenuIsVisible = true;
+          const $contextMenu = this.$refs.contextmenu;
+          let coordinateX = event.clientX
+          let coordinateY = event.clientY
+          this.$refs.slVueTree.select(node.path);
+          $contextMenu.style.left = (hasClicked) ? coordinateX-182 + 'px': coordinateX + 'px';
+          $contextMenu.style.top = coordinateY + 'px';
+          console.log('Final :: coordinate X: ' + coordinateX + ' & coordinate Y: '+ coordinateY);
       },
       excSelected(flag) {
         /*
@@ -117,6 +114,7 @@
         * SPR: Selected Project
         * SR:  Selected Project Group or Project
         *  */
+        this.contextTopMenuIsVisible =false;
         this.contextMenuIsVisible = false;
         const treeV = this.$refs.slVueTree
         const msg = {};
@@ -179,10 +177,6 @@
           treeV.remove(path);
         }
       },
-      displayinfo(show){
-        if(show!=null) this.contextMenuIsVisible = show;
-        else this.contextMenuIsVisible = false;
-      },
     }
   }
 </script>
@@ -194,6 +188,16 @@
     border-bottom: #181b1e;
   }
 
+  .contextmenutop {
+    position: relative;
+    background-color: #fff;
+    color: #23282c;
+    border: 1px solid #c8ced3;
+    border-color: #20a8d8;
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }
+
   .contextmenu {
     position: absolute;
     background-color: #fff;
@@ -203,6 +207,10 @@
     border-radius: 0.25rem;
     cursor: pointer;
     z-index: 99999;
+  }
+
+  .contextmenutop > div {
+    padding: 10px;
   }
 
   .contextmenu > div {
@@ -241,5 +249,12 @@
     display: inline-block;
     text-align: left;
     width: 20px;
+  }
+
+  .ellipsis i{
+    visibility:hidden;
+  }
+  .ellipsis:hover i {
+    visibility:visible;
   }
 </style>

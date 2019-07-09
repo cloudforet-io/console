@@ -43,6 +43,7 @@
 </template>
 <script>
   import {api} from '@/setup/api'
+  let baseTabParams = {}
   export default {
     name: 'BaseTabs',
     components: {
@@ -106,18 +107,20 @@
       hideFooter:() => {
         this.isfooterVisible = false;
       },
-      createNew:() => {
-
+      createNew (){
+        baseTabParams = this.dataforTab;
+        baseTabParams['tabContents'] =  this.$refs.popupTab;
+        this.$emit('create', baseTabParams);
       },
-      updateSelect:() => {
-        debugger;
-        console.log('this is a test', this.dataforTab);
-        /*const treeV = this.selectedData.tree
-        const path = this.selectedData.tree.getSelected()[0].path;
-        treeV.updateNode(path, {title: 'asdfasdf'});*/
+      updateSelect (){
+        baseTabParams = this.dataforTab;
+        baseTabParams['tabContents'] =  this.$refs.popupTab;
+        this.$emit('update', baseTabParams);
       },
       deleteSelect:() => {
-
+        baseTabParams = this.dataforTab;
+        baseTabParams['tabContents'] =  this.$refs.popupTab;
+        this.$emit('delete', baseTabParams);
       },
       closeWindow (e) {
         this.$parent.$store.dispatch('modal/closeModal');
