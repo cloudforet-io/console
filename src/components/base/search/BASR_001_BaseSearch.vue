@@ -4,18 +4,18 @@
       <b-input-group class="row no-gutters">
         <b-col cols="10" class="input-container">
           <div ref="inputBox" class="p-1 input-box" @click.self="focusOnInput">
-            <InputTag v-for="(condi, idx) in conditionList" :key="condi.id"
-                      :list-data="queryData" :contents="condi"
+            <InputTag v-for="(tag, idx) in tagList" :key="tag.id"
+                      :list-data="contextData.queryList" :contents="tag"
                       @delete="deleteTag(idx)" @update="updateTag"
             />
 
-            <BaseInput ref="input" :list-data="queryData" @add="addQuery" />
+            <BaseInput ref="input" :list-data="contextData.queryList" @add="addTag" />
           </div>
           <span class="input-delete-button" @click="deleteAll"><i class="fa fa-times" /></span>
         </b-col>
 
         <b-input-group-append class="col-2 pl-0">
-          <b-button block variant="primary" @click="$emit('search', conditionList)">
+          <b-button block variant="primary" @click="search">
             <i class="fa fa-search" />
           </b-button>
         </b-input-group-append>
@@ -39,57 +39,76 @@ const testdata = [{
   subKey: ''
 }]
 
+const contextDataModel = {
+  queryList: [],
+  autokeyList: []
+}
+
 export default {
   name: 'BaseSearch',
   event: ['search'],
   directives: { focus: focus },
   components: { BaseInput, InputTag },
   props: {
-    searchData: {
-      type: Array,
-      default: () => []
+    contextData: {
+      type: Object,
+      default: () => Object.assign({}, contextDataModel),
+      validator (obj) {
+        /**
+         * TODO: Add validation for queryList format
+         */
+        return obj.queryList !== undefined && obj.queryList !== null && obj.queryList instanceof Array &&
+              obj.autokeyList !== undefined && obj.autokeyList !== null && obj.autokeyList instanceof Array
+      }
     },
-    queryData: {
+    searchData: {
       type: Array,
       default: () => []
     }
   },
   data () {
     return {
-      conditionList: this.searchData.length > 0 ? this.searchData : [],
+      tagList: this.searchData.length > 0 ? this.searchData : [],
       lastId: 0,
-      focusInput: false
+      focusInput: false,
+      filterList: []
     }
   },
   methods: {
     focusOnInput () {
       this.$refs.input.isFocused = true
     },
+    getNewTag (item) {
+      return Object.assign({ id: ++this.lastId }, item)
+    },
     deleteAll () {
-      this.conditionList = []
+      this.tagList = []
     },
     deleteTag (idx) {
-      this.$delete(this.conditionList, idx)
+      this.$delete(this.tagList, idx)
     },
     updateTag (tagId, items) {
       let matchIdx
       items.map((item, idx) => {
         if (idx === 0) {
-          this.conditionList.some((condi, i) => {
-            if (condi.id === tagId) matchIdx = i
-            return condi.id === tagId
+          this.tagList.some((tag, i) => {
+            if (tag.id === tagId) matchIdx = i
+            return tag.id === tagId
           })
 
-          this.$set(this.conditionList, matchIdx, Object.assign(this.conditionList[matchIdx], item))
+          this.$set(this.tagList, matchIdx, Object.assign(this.tagList[matchIdx], item))
         } else {
-          this.conditionList.splice(matchIdx + idx, 0, Object.assign({ id: ++this.lastId }, item))
+          this.tagList.splice(matchIdx + idx, 0, this.getNewTag(item))
         }
       })
     },
-    addQuery (items) {
+    addTag (items) {
       items.map(item => {
-        this.conditionList.push(Object.assign({ id: ++this.lastId }, item))
+        this.tagList.push(this.getNewTag(item))
       })
+    },
+    search () {
+      this.$emit('search', this.tagList)
     }
   }
 }

@@ -32,7 +32,7 @@
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="3"
                    caption="Users" :searchable="true" :row-clicked-fn="rowClicked" :total-rows="totalCount"
-                   :query-data="query" @list="listUsers"
+                   :search-context-data="queryData" @list="listUsers"
         />
       </b-col>
     </b-row>
@@ -83,7 +83,7 @@ export default {
       selectedIdx: undefined,
       addModal: false,
       totalCount: 17,
-      query: query,
+      queryData: query,
       isReadyForSearch: false
     }
   },
