@@ -6,15 +6,15 @@ import { loadLanguageAsync } from '@/setup/i18n'
 import store from '@/store'
 
 // Services
-import dashboardRoute from '@/services/dashboard/dashboard_route'
-import identityRoute from '@/services/identity/identity_route'
-import inventoryRoute from '@/services/inventory/inventory_route'
+import dashboardRoute from '@/service/dashboard/dashboard_route'
+import identityRoute from '@/service/identity/identity_route'
+import inventoryRoute from '@/service/inventory/inventory_route'
 
 // Containers
-const DefaultContainer = () => import('@/containers/DefaultContainer')
+const DefaultContainer = () => import('@/container/DefaultContainer')
 
 // Views
-const SignIn = () => import('@/views/SignIn')
+const SignIn = () => import('@/view/SignIn')
 
 const attatchLangauge = (to, from, next) => {
   if (!to.params.lang) {
