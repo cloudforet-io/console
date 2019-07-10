@@ -14,9 +14,9 @@ export default {
 </script>
 
 <style lang="scss">
-
   .app-body{
-    background-color: #fafafa
+    background-color: #fafafa;
+    font-family: 'Noto Sans', sans-serif;
   }
 
   // CoreUI Icons Set
@@ -32,5 +32,5 @@ export default {
   /* Import Bootstrap Vue Styles */
   @import '~bootstrap-vue/dist/bootstrap-vue.css';
   // Import Main styles for this application
-  @import 'assets/scss/style';
+  @import 'asset/scss/style';
 </style>
