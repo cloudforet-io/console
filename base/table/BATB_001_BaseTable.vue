@@ -6,7 +6,7 @@
           {{ caption }}
         </b-col>
         <b-col cols="10" md="6" xl="7" class="mb-md-0 mb-3">
-          <BaseSearch v-if="searchable" :query-data="queryData" @search="onSearch" />
+          <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
         </b-col>
         <b-col cols="12" md="4" xl="3" class="text-right">
           <b-button type="button" @click.prevent="onPrev">
@@ -57,9 +57,9 @@ export default {
       type: Boolean,
       default: false
     },
-    queryData: {
-      type: Array,
-      default: () => []
+    searchContextData: {
+      type: Object,
+      default: null
     },
     hover: {
       type: Boolean,
