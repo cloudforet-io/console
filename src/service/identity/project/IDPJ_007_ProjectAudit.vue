@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue'
+import BaseTable from '@/component/base/table/BATB_001_BaseTable.vue'
 const BaseModal = () => import('@/component/base/modal/BAMO_001_BaseModal.vue')
 const ProjectMemberDetail = () => import('./IDPJ_006_ProjectMemberDetail.vue')
 
@@ -56,10 +56,7 @@ const thisTestData = [{
   Executor: 'Name',
   Created: '2019,10,16',
   details: 'www.google.com'
-}
-]
-const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue')
-const ProjectMemberDetail = () => import('./IDPJ_006_ProjectMemberDetail.vue')
+}]
 
 export default {
   name: 'ProjectAudit',

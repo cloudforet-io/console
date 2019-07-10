@@ -26,8 +26,8 @@
 
 <script>
 import { focus } from 'vue-focus'
-import BaseInput from '@/components/base/input/BAIN_001_BaseInput'
-import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag'
+import BaseInput from '@/component/base/input/BAIN_001_BaseInput'
+import InputTag from '@/component/base/input/BAIN_002_EXT_InputTag'
 
 const testdata = [{
   id: 0,
