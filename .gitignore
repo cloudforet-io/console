@@ -4,7 +4,7 @@ package-lock.json
 /dist
 /coverage
 
-/tests/e2e/reports/
+/test/e2e/reports/
 selenium-debug.log
 
 # local env files
