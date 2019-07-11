@@ -214,6 +214,10 @@ export default {
       if (this.isLocalSort) return
 
       this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList)
+      /**
+       * TODO:
+       * sortby 분리. ajax 용과 local sortable 을 분리해야 페이지 이동 시 문제가 없음.
+       */
     },
     rowSelected () {
       console.log('row selected')
