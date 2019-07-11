@@ -1,33 +1,42 @@
 <template>
     <div class="card">
       <div class="card-header">
-        <template v-if="chartTitleSetData.isTitleIconUsed">
+        <template v-if="chartTitleData.isTitleIconUsed">
           <span class="d-inline-block">
-           <i :class="chartTitleSetData.TitleIconClass"></i>
+           <i :class="chartTitleData.TitleIconClass"></i>
           </span>
         </template>
           <span class="d-inline-block">
-            <h4>&nbsp&nbsp {{chartTitleSetData.cardTitle}}</h4>
+            <h4>&nbsp&nbsp {{chartTitleData.cardTitle}}</h4>
           </span>
-        <template v-if="chartTitleDownSetData.isDropdownUSed">
+        <template v-if="chartTitleData.isDropdownUsed">
           <b-dropdown class="float-right" variant="p-0" right>
-            <template slot="button-content">{{chartTitleDownSetData.dropDownTitle}}</template>
-              <b-dropdown-item v-for="(opt) in chartTitleDownSetData.dropDownDataArr"
+            <template slot="button-content">{{chartTitleDownData.dropDownTitle}}</template>
+              <b-dropdown-item v-for="(opt, idx) in chartTitleDownData.dropDownDataArr"
+                               :data="opt"
+                               :key="idx"
                                @click="dropdownAction(opt.optionClickMethod, opt)">{{opt.optionTitle}}
               </b-dropdown-item>
           </b-dropdown>
         </template>
       </div>
-      <div class="card-body">
+        <div class="card-body">
+          <b-row>
+            <b-col>
+              <div class="donutCell">
+                <div id="donutchart1" class="donutDiv">
+                  <donut-chart-ext
+                    v-if="loaded"
+                    :chartdata="chartData"
+                    :options="options"/>
+                </div>
+              </div>
+            </b-col>
+            <b-col>
 
-        <div class="text-muted">intro</div>
-        <h4 class="card-title">Heading</h4>
-        <p class="card-text"> a description that takes a couple of lines. It may have two or three lines of text and they'll wrap like this.</p>
-        <ul class="list-inline text-muted">
-          <li class="list-inline-item"><i class="fa fa-tag"></i> tag 1</li>
-          <li class="list-inline-item"><i class="fa fa-tag"></i> tag 2</li>
-        </ul>
-      </div>
+            </b-col>
+          </b-row>
+        </div>
     </div>
 
   <!--<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
@@ -124,54 +133,44 @@
       donutChartExt
     },
     props: {
-      chartTitleSetData:{
+      chartTitleData:{
         type: Object,
         required: true,
         default: {
           isTitleIconUsed: false,
           TitleIconClass: 'fa fa-globe fa-2x',
           cardTitle: 'This is Default Title',
-          isDropdownUSed: false,
+          isDropdownUsed: false,
         }
       },
-      chartTitleDownSetData:{
+      chartTitleDownData:{
         type: Object,
-        required: true,
-        default: {
-          isDropdownUSed: true,
+        required: false,
+        default: () => ({
           dropDownTitle:'Sample Title',
-          dropDownDataArr: [
-            {optionTitle: 'sample title1',
-             optionClickMethod : 'optionAction1'
-            },{optionTitle: 'sample title2',
-              optionClickMethod : 'optionAction1'
-            }
-          ]
-        }
+          dropDownDataArr: [ { optionId: 'id1', optionTitle: 'sample title1', optionClickMethod : 'optionAction1' },
+                             { optionId: 'id2', optionTitle: 'sample title2', optionClickMethod : 'optionAction2' }
+                           ]
+        })
       },
-      dropOption: {
-        type: Object,
-        default: {
-          isUsed: false,
-        },
-        required: true,
+      chartType: {
+        type: String,
+        default: 'donut'
       },
       chartData: {
         type: Object,
-        default: null
+        default: null,
+        required: true,
       },
       options: {
         type: Object,
-        default: null
+        default: null,
+        required: true,
       },
       loaded: {
         type: Boolean,
-        default: false
+        default: true,
       },
-      seletMsg: {
-        type: String,
-        default: 'Title'
-      }
     },
     data: () => ({
 
@@ -180,7 +179,8 @@
       dropdownAction(emitFunction, item){
         this.$emit(emitFunction, item)
       },
-  },
+
+    },
   }
 </script>
 

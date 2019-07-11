@@ -5,7 +5,7 @@
         <b-card>
           <div>
             <div class="d-flex align-items-center ml-2">
-              {{ lastEvent }}
+              <b>{{ lastEvent }} </b>
             </div>
                 <BaseModal id='IDPJ_001_Project_Edit_Modal'
                          ref="Modal"
@@ -28,8 +28,7 @@
                               @update="updateProject"
                               >
                         <template #ModaltabContentsPanel>
-                            <!--<div v-if="selectedProject" :project-prop="selectedProject">
-                            </div>-->
+
                         </template>
                     </BaseTabs>
                   </template>
@@ -134,7 +133,6 @@
 
   const projectEditPopupName = () => import ('./IDPJ_002_ProjectEditPopupName')
   const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopupTag')
-  import { eventBus } from '@/main';
   import projectAudit from './IDPJ_007_ProjectAudit.vue';
   import projectMember from './IDPJ_005_ProjectMember.vue';
   import projectSummary from './IDPJ_004_ProjectSummary.vue';
@@ -156,7 +154,6 @@
       BaseTabs,
       BaseTree,
       BaseModal,
-      eventBus,
       VueAlertify
     },
     props:{
@@ -220,7 +217,7 @@
     },
     methods: {
       NodeSelected(item) {
-        this.lastEvent = "You have Selected : " + item[0].title;
+        this.lastEvent = "Selected Item : " + item[0].title;
       },
       editSelected(item) {
         /*  TODO :: Please Add More Flags if needed.
