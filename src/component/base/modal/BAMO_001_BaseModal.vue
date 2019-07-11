@@ -9,18 +9,14 @@
              :centered="centered"
              :no-close-on-backdrop="backdropOff"
              :hide-footer="hideFooter"
-             size="lg"
-             @hidden="$store.dispatch('modal/modalHidden')">
-
+             :size="size"
+             @ok="$emit('ok')"
+             @hidden="$store.dispatch('modal/modalHidden')"
+    >
       <slot v-if="isModalShown" name="contents" />
 
       <template v-slot:modal-footer>
-        <slot v-if="customFooter" name="footer" />
-        <div v-else>
-          <b-button variant="secondary" size="md" class="float-right" @click="hideModal">
-            Close
-          </b-button>
-        </div>
+        <slot name="footer" />
       </template>
     </b-modal>
   </div>
@@ -30,6 +26,7 @@
 import { mapGetters } from 'vuex'
 export default {
   name: 'BaseModal',
+  event: ['ok'],
   props: {
     name: {
       type: String,
@@ -43,15 +40,15 @@ export default {
       type: Boolean,
       default: false
     },
+    size: {
+      type: String,
+      default: 'lg'
+    },
     backdropOff: {
       type: Boolean,
       default: false
     },
     hideFooter: {
-      type: Boolean,
-      default: false
-    },
-    customFooter: {
       type: Boolean,
       default: false
     }
