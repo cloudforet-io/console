@@ -13,6 +13,12 @@ textarea:focus, input:focus{
   box-shadow: none;
 }
 
+/* Bootstrap table style overwrite */
 .tbody-tr-default {
+  cursor: pointer;
+}
+
+/* Bootstrap checkbox style overwrite */
+.custom-control-label {
   cursor: pointer;
 }

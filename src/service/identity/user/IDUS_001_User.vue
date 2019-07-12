@@ -32,7 +32,7 @@
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="perPage"
                    caption="Users" :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
-                   @rowClicked="rowClicked" @list="listUsers" @limitChanged="limitChanged"
+                   @rowSelected="rowSelected" @list="listUsers" @limitChanged="limitChanged"
         />
       </b-col>
     </b-row>
@@ -70,13 +70,14 @@ export default {
   data () {
     return {
       fields: [
+        { key: 'selected' },
         { key: 'userId', label: 'ID', sortable: true, ajaxSortable: false },
         { key: 'name', label: 'Name', sortable: true, ajaxSortable: true },
         { key: 'email', label: 'Email', sortable: true, ajaxSortable: false },
         { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false },
         { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false },
         { key: 'language', label: 'Language', sortable: true, ajaxSortable: false },
-        { key: 'domainId', label: 'Domain ID', ajaxSortable: false }
+        { key: 'domainId', label: 'Domain ID' }
       ],
       users: [],
       selectedUser: null,
@@ -118,7 +119,7 @@ export default {
        * TODO: set totalCount with data from server
        */
     },
-    rowClicked (item, idx) {
+    rowSelected (items, item) {
       this.selectedUser = item
     },
     limitChanged (val) {

@@ -49,12 +49,29 @@
         </b-col>
       </b-row>
     </div>
-    <b-table class="b-table" :dark="dark" :hover="hover" :striped="striped" :bordered="bordered" :borderless="borderless"
-             :small="small" :fixed="fixed" :responsive="responsive" :stacked="stacked" :items="items" :fields="heads" :no-local-sorting="!isLocalSort"
+    <b-table class="b-table" :items="items" :fields="heads"
+             :striped="striped" :bordered="bordered" :borderless="borderless"
+             :dark="dark" :hover="hover"
+             :small="small" :fixed="fixed" :responsive="responsive" :stacked="stacked"
+             :no-local-sorting="!isLocalSort"
              :tbody-tr-class="rowClass"
-             @row-clicked="rowClicked" @sort-changed="sortingChanged" @row-selected="rowSelected"
-             @context-changed="contextChanged" @head-clicked="headClicked"
+             :selectable="selectable" :select-mode="selectMode"
+             @head-clicked="headClicked"
+             @row-clicked="rowClicked"
+             @row-selected="rowSelected"
+             @sort-changed="sortingChanged"
+             @context-changed="contextChanged"
     >
+      <template v-if="selectable" slot="HEAD_selected">
+        <b-check v-model="isSelectedAll" class="select-all-checkbox" />
+      </template>
+
+      <template v-if="selectable" slot="selected" slot-scope="data">
+        <b-check v-model="data.item.selected" class="select-checkbox"
+                 @change="checkboxClicked"
+        />
+      </template>
+
       <template slot="status" slot-scope="data">
         <b-badge :variant="getBadge(data.item.status)">
           {{ data.item.status }}
@@ -69,7 +86,7 @@ import BaseSearch from '@/component/base/search/BASR_001_BaseSearch.vue'
 import BaseModal from '@/component/base/modal/BAMO_001_BaseModal.vue'
 export default {
   name: 'BaseTable',
-  event: ['list', 'rowClicked', 'limitChanged'],
+  event: ['list', 'rowClicked', 'limitChanged', 'rowSelected'],
   components: {
     BaseSearch,
     BaseModal
@@ -87,6 +104,10 @@ export default {
     searchContextData: {
       type: Object,
       default: null
+    },
+    selectable: {
+      type: Boolean,
+      default: true
     },
     hover: {
       type: Boolean,
@@ -148,21 +169,22 @@ export default {
   data () {
     return {
       currentPage: 1,
-      selectedRow: null,
+      clickedRow: undefined,
+      clickedRows: [],
+      selectMode: 'single',
       sortBy: undefined,
       searchList: [],
       isLocalSort: true,
-      limitInput: this.perPage
+      limitInput: this.perPage,
+      isSelectedAll: false
     }
   },
   computed: {
     items () {
-      console.log('item computed', this.tableData.map(item => (item.name)))
+      console.log('items', this.tableData.map(item => item))
       return this.tableData
     },
-    heads () {
-      return this.fields
-    },
+    heads () { return this.fields },
     limit () { return this.perPage },
     skip () { return (this.currentPage - 1) * this.limit },
     maxPage () { return Math.ceil(this.totalRows / this.limit) }
@@ -178,14 +200,22 @@ export default {
       if (this.limitInput < 1) this.limitInput = 1
       else if (this.limitInput > this.perPageMax) this.limitInput = this.perPageMax
     },
-    rowClicked (item, idx, target) {
-      if (this.selectedRow) {
-        delete this.selectedRow._rowVariant
-        this.tableData.splice(idx, 1, this.selectedRow)
-      }
-      this.selectedRow = Object.assign({}, item, { _rowVariant: 'success' })
-      this.tableData.splice(idx, 1, this.selectedRow)
-      this.$emit('rowClicked', item, idx, target)
+    rowClicked (item, idx, e) {
+      this.$emit('rowClicked', item, idx, e)
+    },
+    rowSelected (items) {
+      if (this.selectMode === 'single') this.selectMode = 'multi'
+
+      let item = items[items.length - 1]
+
+      if (this.clickedRow) this.clickedRow.selected = false
+
+      if (item) item.selected = true
+
+      this.clickedRow = item
+      this.clickedRows = items
+
+      this.$emit('rowSelected', items, item)
     },
     onPrev () {
       if (this.currentPage <= 1) return
@@ -210,17 +240,16 @@ export default {
       else this.isLocalSort = true
     },
     sortingChanged (ctx) {
-      this.sortBy = ctx.sortDesc ? `-${ctx.sortBy}` : ctx.sortBy
+      console.log('sortingChanged')
       if (this.isLocalSort) return
 
+      this.sortBy = ctx.sortDesc ? `-${ctx.sortBy}` : ctx.sortBy
       this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList)
-      /**
-       * TODO:
-       * sortby 분리. ajax 용과 local sortable 을 분리해야 페이지 이동 시 문제가 없음.
-       */
     },
-    rowSelected () {
-      console.log('row selected')
+    checkboxClicked (val) {
+      console.log('checkbox clicked')
+      this.selectMode = 'multi'
+      // if (val)
     },
     contextChanged (ctx) { this.$emit('changed', ctx) },
     rowClass (item, type) { return 'tbody-tr-default' } // custom global style
@@ -260,7 +289,6 @@ export default {
   }
 }
 
-/* Bootstrap table style overwrite */
 .card {
   border: 0;
   box-shadow: 0px 0px 2px 1px #a9a9a94f;
@@ -274,4 +302,5 @@ export default {
     display: inline-table;
   }
 }
+
 </style>
