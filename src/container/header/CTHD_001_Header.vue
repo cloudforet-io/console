@@ -1,10 +1,11 @@
 <template>
   <AppHeader fixed>
     <SidebarToggler class="d-lg-none" display="md" mobile />
-    <b-link class="navbar-brand" to="/dashboard">
+    <b-link class="navbar-brand" to="/">
       <!-- <img class="navbar-brand-full" src="img/brand/logo.svg" width="89" height="25" alt="CoreUI Logo">
-      <img class="navbar-brand-minimized" src="img/brand/sygnet.svg" width="30" height="30" alt="CoreUI Logo"> -->
-      [LOGO]
+      <img class="navbar-brand-minimized" src="img/brand/sygnet.svg" width="30" height="30" alt="Logo"> -->
+      <span class="navbar-brand-full">[LOGO]</span>
+      <span class="navbar-brand-minimized">[logo]</span>
     </b-link>
     <SidebarToggler ref="sidebarToggler" class="d-none" display="lg" :default-open="isSidebarOpen" />
     <b-navbar-nav class="d-md-down-none">

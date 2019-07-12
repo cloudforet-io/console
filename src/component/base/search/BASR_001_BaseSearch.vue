@@ -1,20 +1,21 @@
 <template>
   <div>
     <div class="search-container">
-      <b-input-group>
-        <b-col ref="inputBox" cols="10" class="p-1 input-box">
-          <InputTag v-for="(condi, idx) in conditionList" :key="condi.id"
-                    :list-data="queryData" :contents="condi"
-                    @delete="onDeleteTag(idx)" @update="onUpdateTag"
-          />
+      <b-input-group class="row no-gutters">
+        <b-col cols="10" class="input-container">
+          <div ref="inputBox" class="p-1 input-box" @click.self="focusOnInput">
+            <InputTag v-for="(tag, idx) in tagList" :key="tag.id"
+                      :list-data="contextData.queryList" :contents="tag"
+                      @delete="deleteTag(idx)" @update="updateTag"
+            />
 
-          <BaseInput :list-data="queryData" @add="addQuery" />
+            <BaseInput ref="input" :list-data="contextData.queryList" @add="addTag" />
+          </div>
+          <span class="input-delete-button" @click="deleteAll"><i class="fa fa-times" /></span>
         </b-col>
 
         <b-input-group-append class="col-2 pl-0">
-          <b-button block variant="primary" :limit="limit" :skip="skip" :sort="sort"
-                    @click.prevent="searchFn(limit, skip, sort, value)"
-          >
+          <b-button block variant="primary" @click="search">
             <i class="fa fa-search" />
           </b-button>
         </b-input-group-append>
@@ -27,69 +28,87 @@
 import { focus } from 'vue-focus'
 import BaseInput from '@/component/base/input/BAIN_001_BaseInput'
 import InputTag from '@/component/base/input/BAIN_002_EXT_InputTag'
+
+const testdata = [{
+  id: 0,
+  key: 'test_key',
+  label: 'TEST',
+  value: 'cloud one',
+  operator: ':',
+  type: 'String',
+  subKey: ''
+}]
+
+const contextDataModel = {
+  queryList: [],
+  autokeyList: []
+}
+
 export default {
   name: 'BaseSearch',
+  event: ['search'],
   directives: { focus: focus },
   components: { BaseInput, InputTag },
   props: {
-    searchFn: {
-      type: Function,
-      required: true
+    contextData: {
+      type: Object,
+      default: () => Object.assign({}, contextDataModel),
+      validator (obj) {
+        /**
+         * TODO: Add validation for queryList format
+         */
+        return obj.queryList !== undefined && obj.queryList !== null && obj.queryList instanceof Array &&
+              obj.autokeyList !== undefined && obj.autokeyList !== null && obj.autokeyList instanceof Array
+      }
     },
-    queryData: {
+    searchData: {
       type: Array,
       default: () => []
-    },
-    limit: {
-      type: Number,
-      default: 10
-    },
-    skip: {
-      type: Number,
-      default: 0
-    },
-    sort: {
-      type: String,
-      default: 'created_date'
     }
   },
   data () {
     return {
-      conditionList: [{
-        id: 0,
-        key: 'test_key',
-        label: 'TEST',
-        value: 'cloud one',
-        operator: ':',
-        type: 'String',
-        subKey: ''
-      }],
-      lastId: 0
+      tagList: this.searchData.length > 0 ? this.searchData : [],
+      lastId: 0,
+      focusInput: false,
+      filterList: []
     }
   },
   methods: {
-    onDeleteTag (idx) {
-      this.$delete(this.conditionList, idx)
+    focusOnInput () {
+      this.$refs.input.isFocused = true
     },
-    onUpdateTag (tagId, items) {
+    getNewTag (item) {
+      return Object.assign({ id: ++this.lastId }, item)
+    },
+    deleteAll () {
+      this.tagList = []
+    },
+    deleteTag (idx) {
+      this.$delete(this.tagList, idx)
+    },
+    updateTag (tagId, items) {
       let matchIdx
       items.map((item, idx) => {
         if (idx === 0) {
-          this.conditionList.some((condi, i) => {
-            if (condi.id === tagId) matchIdx = i
-            return condi.id === tagId
+          this.tagList.some((tag, i) => {
+            if (tag.id === tagId) matchIdx = i
+            return tag.id === tagId
           })
 
-          this.$set(this.conditionList, matchIdx, Object.assign(this.conditionList[matchIdx], item))
+          this.$set(this.tagList, matchIdx, Object.assign(this.tagList[matchIdx], item))
         } else {
-          this.conditionList.splice(matchIdx + idx, 0, Object.assign({ id: ++this.lastId }, item))
+          this.tagList.splice(matchIdx + idx, 0, this.getNewTag(item))
         }
       })
     },
-    addQuery (items) {
+    addTag (items) {
       items.map(item => {
-        this.conditionList.push(Object.assign({ id: ++this.lastId }, item))
+        this.tagList.push(this.getNewTag(item))
       })
+    },
+    search () {
+      this.$emit('search', this.tagList)
     }
   }
 }
@@ -100,11 +119,25 @@ $input-height: 23px;
 
 .search-container {
   position: relative;
-  .input-box {
-    border: 1px solid lightgray;
-    border-radius: 5px 0 0 5px;
-    background-color: #fff;
-    cursor: text;
+  .input-container {
+      border: 1px solid lightgray;
+      border-radius: 5px 0 0 5px;
+      background-color: #fff;
+    .input-box {
+      display: inline-block;
+      width: 95%;
+      cursor: text;
+    }
+    .input-delete-button {
+      display: inline-block;
+      width: 5%;
+      padding-right: 8px;
+      font-size: 1.2em;
+      color: gray;
+      text-align: right;
+      vertical-align: middle;
+      cursor: pointer;
+    }
   }
 }
 </style>

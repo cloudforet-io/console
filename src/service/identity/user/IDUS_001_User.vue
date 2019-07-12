@@ -31,9 +31,8 @@
     <b-row>
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="3"
-                   caption="Users" :searchable="true" :list-fn="listUsers"
-                   :row-clicked-fn="rowClicked" :total-rows="totalCount"
-                   :query-data="query"
+                   caption="Users" :searchable="true" :row-clicked-fn="rowClicked" :total-rows="totalCount"
+                   :search-context-data="queryData" @list="listUsers"
         />
       </b-col>
     </b-row>
@@ -84,7 +83,7 @@ export default {
       selectedIdx: undefined,
       addModal: false,
       totalCount: 17,
-      query: query,
+      queryData: query,
       isReadyForSearch: false
     }
   },
@@ -93,15 +92,18 @@ export default {
   },
   methods: {
     async listUsers (limit, skip, sort, search) {
-      if (limit === undefined) limit = 10
-      if (skip === undefined) skip = 0
-      if (sort === undefined) sort = '-created_date'
-      if (search === undefined) search = {}
+      if (limit === undefined || limit === null) limit = 10
+      if (skip === undefined || skip === null) skip = 0
+      if (sort === undefined || sort === null) sort = '-created_date'
+      if (search === undefined || search === null) search = []
 
       let res
       try {
-        res = await this.$http.get(`/identity/user`, {
-          params: { limit, skip, sort, search }
+        res = await this.$http.get(`/identity/users`, {
+          params: { limit, skip, sort }
+          /**
+           * TODO: set limit, skip, sort and search in the right format
+           */
         })
       } catch (e) {
         console.error(e)

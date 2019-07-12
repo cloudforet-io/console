@@ -1,53 +1,55 @@
 <template>
-  <span class="input-container">
+  <span>
+    <span class="input-container">
 
-    <span ref="fakeInput" class="fake" />
+      <span ref="fakeInput" class="fake" />
 
-    <span class="relative-container">
-      <input ref="input" v-model="value" v-focus="isFocused"
-             v-autowidth="{maxWidth: '100%', minWidth: minWidth, comfortZone: 1}"
-             class="pl-2" autocomplete="off" type="text"
-             placeholder="Search" @focus="onFocus" @blur="onBlur" @input="onInput"
-             @keyup.enter="onEnter"
-             @keyup.down="onKeyDown" @keyup.up="onKeyUp"
-      >
+      <span class="relative-container">
+        <input ref="input" v-model="value" v-focus="isFocused"
+               v-autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
+               class="pl-2" autocomplete="off" type="text"
+               placeholder="Search" @focus="onFocus" @blur="onBlur" @input="onInput"
+               @keyup.enter="onEnter"
+               @keyup.down="onKeyDown" @keyup.up="onKeyUp"
+        >
 
-      <div v-if="isFocused && isKeyListShown" ref="listContainer" class="list-container"
-           :style="{top: `${listPosY}px`, height: `${listHeight}px`}"
-      >
-        <b-list-group>
-          <b-list-group-item v-for="(key, idx) in keyList" :key="`key:${idx}`"
-                             ref="list" :class="{'hovered': idx === hoveredItemIdx}"
-                             @mousedown.prevent="onSelectKey(key, idx)"
-                             @mouseover="onMouseover(idx)" @mouseout="onMouseout"
-          >
-            <b-row class="no-gutters justify-content-between">
-              <b-col class="col-8">{{ key.label }}</b-col>
-              <b-col v-if="key.values || key.ajax" class="col-4 caret">
-                <i class="fa fa-caret-right" />
-              </b-col>
-              <b-col v-else-if="key.type" class="col-4 type-caption">{{ key.type }}</b-col>
-            </b-row>
-          </b-list-group-item>
-        </b-list-group>
-      </div>
+        <div v-if="isFocused && isKeyListShown" ref="listContainer" class="list-container"
+             :style="{top: `${listPosY}px`, height: `${listHeight}px`}"
+        >
+          <b-list-group>
+            <b-list-group-item v-for="(key, idx) in keyList" :key="`key:${idx}`"
+                               ref="list" :class="{'hovered': idx === hoveredItemIdx}"
+                               @mousedown.prevent="onSelectKey(key, idx)"
+                               @mouseover="onMouseover(idx)" @mouseout="onMouseout"
+            >
+              <b-row class="no-gutters justify-content-between">
+                <b-col class="col-8">{{ key.label }}</b-col>
+                <b-col v-if="key.values || key.ajax" class="col-4 caret">
+                  <i class="fa fa-caret-right" />
+                </b-col>
+                <b-col v-else-if="key.type" class="col-4 type-caption">{{ key.type }}</b-col>
+              </b-row>
+            </b-list-group-item>
+          </b-list-group>
+        </div>
 
-      <div v-if="isFocused && isValueListShown" ref="listContainer" class="list-container"
-           :style="{left: `${valueListPosX}px`, top: `${listPosY}px`, height: `${listHeight}px`}"
-      >
-        <b-list-group>
-          <b-list-group-item v-for="(val, idx) in valueList" :key="`val:${idx}`"
-                             ref="list" :class="{'hovered': idx === hoveredItemIdx}"
-                             @mousedown.prevent="onSelectValue(val, idx)"
-                             @mouseover="onMouseover(idx)" @mouseout="onMouseout"
-          >
-            {{ val }}
-          </b-list-group-item>
-        </b-list-group>
-      </div>
+        <div v-if="isFocused && isValueListShown" ref="listContainer" class="list-container"
+             :style="{left: `${valueListPosX}px`, top: `${listPosY}px`, height: `${listHeight}px`}"
+        >
+          <b-list-group>
+            <b-list-group-item v-for="(val, idx) in valueList" :key="`val:${idx}`"
+                               ref="list" :class="{'hovered': idx === hoveredItemIdx}"
+                               @mousedown.prevent="onSelectValue(val, idx)"
+                               @mouseover="onMouseover(idx)" @mouseout="onMouseout"
+            >
+              {{ val }}
+            </b-list-group-item>
+          </b-list-group>
+        </div>
+
+      </span>
 
     </span>
-
   </span>
 </template>
 
@@ -96,6 +98,10 @@ export default {
     autoselect: {
       type: Boolean,
       default: false
+    },
+    maxWidth: {
+      type: String,
+      default: '100%'
     },
     minWidth: {
       type: String,
