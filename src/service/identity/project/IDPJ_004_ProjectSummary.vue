@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn">
+  <div class="animated fadeIn" >
     <div class="col-xs-12 p-0">
       <b-card>
         <div class="row">
@@ -50,7 +50,7 @@
         <BaseChart
           :chartTitleData="sampleTitleData1"
           :chartData="chartDataAndOption1.data"
-          :options="chartDataAndOption1.option"
+          :options="chartDataAndOption2.option"
         />
       </div>
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
@@ -98,10 +98,14 @@
 
     },
     mounted: function () {
-      this.setDummnyData();
+
     },
     created: function () {
-
+      this.setDummnyData();
+      this.$bus.$on('treeSelectedEvent', this.setDummnyData)
+    },
+    beforeDestroy: function(){
+      this.$bus.$off('treeSelectedEvent');
     },
     methods: {
       colSelector: (dataLength) => {
@@ -110,20 +114,16 @@
       },
       displayAll: function (params) {
         this.sampledropData2.dropDownTitle = params.optionTitle
-        debugger;
-        alert("You've Clicked Display All");
       },
       displayVM: function (params) {
         this.sampledropData2.dropDownTitle = params.optionTitle
-        alert("You've Clicked VM");
+
       },
       displayOS: function (params) {
         this.sampledropData2.dropDownTitle = params.optionTitle
-        alert("You've Clicked OS");
       },
       setDummnyData: function () {
-
-       /*
+        /*
         * Here's Data Set for Current Page
         * 1. sampleBaseInformation : Base Information Data
         * 2. sampleBaseTag : tag sample Data
@@ -181,7 +181,7 @@
 
         const chartDataAndOption1 = {
           data:{
-            labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
+            labels: ['VueJs', ' Beans. I was trying to explain to somebody as we were flying in, that\'s corn. That\'s beans. And they were very impressed at my agricultural knowledge. Please give it up for Amaury once again for that outstanding introduction. I have a bunch of good friends here today, including somebody who I served with, who is one of the finest senators in the country, and we\'re lucky to have him, your Senator, Dick Durbin is here. I also noticed, by the way, former Governor Edgar here, who I haven\'t seen in a long time, and somehow he has not aged and I have. And it\'s great to see you, Governor. I want to thank President Killeen and everybody at the U of I System for making it possible for me to be here today. And I am deeply honored at the Paul Douglas Award that is being given to me. He is somebody who set the path for so much outstanding public service here in Illinois.', 'ReactJs', 'AngularJs'],
             datasets: [
               {
                 backgroundColor: this.getRandomColorArr(4),
@@ -193,24 +193,27 @@
             responsive: true,
             maintainAspectRatio: true,
             legend: {
-              position: 'right',
-              display: true,
-              labels: {
-                fontColor: 'rgb(255, 99, 132)'
-              }
+              display: false,
             }
           }
         };
 
         const chartDataAndOption2 = {
           data:{
-            labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
-            datasets: [
-              {
-                backgroundColor: this.getRandomColorArr(4),
-                data: [140, 20, 80, 10]
-              }
-            ]
+            labels: ['AWS', 'MS Azure', 'Google cloud'],
+            datasets: [{
+                      data: [12, 4, 8],
+                      backgroundColor: [
+                        "#FF6384",
+                        "#36A2EB",
+                        "#FFCE56"
+                      ],
+                      hoverBackgroundColor: [
+                        "#FF6384",
+                        "#36A2EB",
+                        "#FFCE56"
+                      ]
+                      }]
           },
           option: {
             responsive: true,
@@ -218,6 +221,115 @@
             legend: {
               display: false
             },
+           tooltips: {
+              enabled: false,
+              custom: function(tooltipModel) {
+
+                // Tooltip Element
+                let tooltipEl = document.getElementById('chartjs-tooltip');
+                let dataset = this._data.datasets
+                let dataMeta = dataset[0]._meta;
+
+                // Create element on first render
+                if (!tooltipEl) {
+                  tooltipEl = document.createElement('div');
+                  tooltipEl.id = 'chartjs-tooltip';
+                  tooltipEl.innerHTML =  "<svg></svg>";
+                  document.body.appendChild(tooltipEl);
+                }
+
+                // Hide if no tooltip
+                if (tooltipModel.opacity === 0) {
+                  tooltipEl.style.opacity = 0;
+                  return;
+                }
+
+                // Set caret Position
+                  tooltipEl.classList.remove('above', 'below', 'no-transform');
+                if (tooltipModel.yAlign) {
+                  tooltipEl.classList.add(tooltipModel.yAlign);
+                } else {
+                  tooltipEl.classList.add('no-transform');
+                }
+
+                function getBody(bodyItem) {
+                  return bodyItem.lines;
+                }
+
+                let selectedDonutBody = tooltipModel.body;
+                if (selectedDonutBody) {
+
+                  let selectedData = selectedDonutBody[0].lines[0].split(': ');
+                  let currentColor = dataset[0].backgroundColor[dataset[0].data.indexOf(Number(selectedData[1]))];
+                  let style = 'font-size:12px;'+'color:' + currentColor +';' +  'fill:' + currentColor + ';';
+                  let titleLines = selectedData[0];
+                  let bodyLines = selectedData[1];
+                  let percent = Math.round((Number(bodyLines)/dataMeta[Object.keys(dataMeta)].total) * 100).toFixed(1);
+                  let innerHtml = "<g style='color: black !important'>"
+                                  + "<text y='30' x='8' style='font-size: 12px'>"
+                                  + "<tspan style='font-size: 14px;font-weight: 900;  overflow: hidden;white-space: nowrap;text-overflow: ellipsis'>"+ titleLines +"</tspan>"
+                                  + '<tspan style='+'\"fill:' + currentColor +'"\ x=\"8\" dy=\"17\"> ● </tspan>'
+                                  + "<tspan dx='0'> Count: </tspan>"
+                                  + "<tspan style='font-weight:bold' dx='0'> " +' '+ bodyLines + ' ' +" </tspan>"
+                                  + "<tspan dx='0'>(" + percent +"%)</tspan>"
+                                  + "</text>"
+                                  + "</g>";
+
+                  let textRoot = tooltipEl.querySelector('svg');
+                  textRoot.style.fontFamily ='"Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;'
+                  textRoot.style.background ='rgba(255, 255, 255, .5)'
+                  textRoot.style.color = 'black';
+                  textRoot.style.borderRadius ='5px'
+                  textRoot.style.fontSize ='12px';
+                  textRoot.style.border= '0.8px solid '+ currentColor
+                  textRoot.style.width ='180px';
+                  textRoot.style.height ='80px';
+                  tooltipEl.style.pointerEvents='none'
+                  textRoot.innerHTML = innerHtml;
+                }
+
+                // `this` will be the overall tooltip
+                var position = this._chart.canvas.getBoundingClientRect();
+
+                // Display, position, and set styles for font
+                tooltipEl.style.opacity = 1;
+                tooltipEl.style.position = 'absolute';
+                tooltipEl.style.minHeight='100px';
+                tooltipEl.style.overflow='hidden';
+                tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+                tooltipEl.style.top =  position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+
+              }
+            }
+            /*tooltips: {
+              width: 2000,
+              height: 300,
+              callbacks: {
+                title: function(tooltipItem, data) {
+                  debugger;
+                  return data['labels'][tooltipItem[0]['index']];
+                },
+                label: function(tooltipItem, data) {
+                  return ' Count: ' + data['datasets'][0]['data'][tooltipItem['index']];
+                },
+                afterLabel: function(tooltipItem, data) {
+                  let dataset = data['datasets'][0];
+                  let dataMeta = dataset._meta;
+                  let percent = Math.round((dataset['data'][tooltipItem['index']] / dataMeta[Object.keys(dataMeta)].total) * 100).toFixed(1);
+                  return ' (' + percent + '%)';
+                }
+              },
+
+              opacity: 0.7,
+              backgroundColor: '#FFF',
+              borderWidth: 1.5,
+              borderColor: this.getRandomColor(),
+              titleFontSize: 16,
+              titleFontColor: '#0066ff',
+              bodyFontColor: '#000',
+              bodyFontSize: 14,
+              displayColors: true
+            }*/
           }
         };
 
@@ -290,5 +402,6 @@
     margin: 8px 0px;
     margin-left: 10px;
   }
+
 
 </style>

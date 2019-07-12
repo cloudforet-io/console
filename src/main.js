@@ -2,6 +2,7 @@
 // import 'core-js/es6/string'
 // import 'core-js/es7/array'
 // import cssVars from 'css-vars-ponyfill'
+
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import App from './App'
@@ -21,7 +22,6 @@ import CountryFlag from 'vue-country-flag'
 import { $, jQuery } from 'jquery'
 import VueAlertify from 'vue-alertify'
 
-
 // TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
 // cssVars()
 dotenv.config()
@@ -35,12 +35,15 @@ Vue.use(CountryFlag)
 Vue.use(Notifications, { velocity })
 Vue.use({ $, jQuery })
 Vue.prototype.$http = api
-Vue.prototype.$bus = new Vue();
+
+/* This is a Global Bus Event;
+ * Please, name your '$emit' event name as action + Event such as
+ * nodeSelectedEvent, closeModalEvent
+ */
+Vue.prototype.$bus = new Vue({})
+
 directive(Vue)
 
-
-
-/* eslint-disable no-new */
 new Vue({
 
   el: '#app',

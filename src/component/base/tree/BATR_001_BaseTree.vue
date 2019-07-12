@@ -37,7 +37,7 @@
           <div class="node-leaf-last"  @click="excSelected"><i class="fa fa-remove"></i>&nbsp Remove Selected Item</div>
         </div>
 
-        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10" v-show="hasSelected">
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10" v-if="hasSelected" :key="nodeKey">
             <slot name="treeSubPanel" >
             </slot>
         </div>
@@ -68,6 +68,10 @@
     },
     data() {
       return {
+        /*
+         *  nodeKey is a key to reload any component that has node selected at treeSubPanel
+         */
+        nodeKey: 0,
         contexteActionFlag: null,
         treeData: this.treeProp,
         hasSelected: false,
@@ -78,9 +82,17 @@
     },
     methods: {
       nodeSelected(nodes, event) {
+        this.nodeKey = (this.nodeKey) > 0 ? 0: 1;
         this.lastEvent = nodes;
         this.hasSelected = true;
+        /*
+         * This is a Emit event for Parents vue.
+         */
         this.$emit('selected', nodes)
+        /*
+         * This is a Global Event bus, so Please, make sure that Event$bus is off when components has destroyed.
+         */
+        this.$bus.$emit('treeSelectedEvent', nodes)
       },
       nodeToggled(node, event) {
         this.lastEvent = `Node ${node.title} is ${node.isExpanded ? 'expanded' : 'collapsed'}`;

@@ -27,9 +27,8 @@
                               @create="createProject"
                               @update="updateProject"
                               >
-                        <template #ModaltabContentsPanel>
-
-                        </template>
+                         <template  #ModaltabContentsPanel>
+                         </template>
                     </BaseTabs>
                   </template>
               </BaseModal>
@@ -42,9 +41,14 @@
               @selected="NodeSelected"
               @edited="editSelected">
         <template #treeSubPanel>
-          <BaseTabs is="BaseTabs" id="ContentsBaseTabs" :tabs="tabs" :tabIndex="tabIndex" :key="tabs.tabTitle">
+          <BaseTabs is="BaseTabs"
+                    id="ContentsBaseTabs"
+                    :tabs="tabs"
+                    :tabIndex="tabIndex"
+                    :key="tabs.tabTitle">
             <keep-alive>
-              <template #tabContentsPanel>
+              <template #tabContentsPanel
+                        ref="treeContents">
               </template>
             </keep-alive>
           </BaseTabs>
@@ -234,7 +238,6 @@
           this.manageTabButton('UPT',true);
           this.selectedData = item;
           this.$refs.Modal.showModal();
-
         }
       },
       manageTabButton(flag,state, title){
@@ -242,9 +245,11 @@
           this.projectModaltitle = (title) ? 'Create a Project Group': 'Create a Project';
           this.updateProcess = !state;
           this.createProcess =  state;
+
         } else if(flag==='UPT'){
           this.createProcess = !state;
           this.updateProcess = state;
+
         } else {
 
         }

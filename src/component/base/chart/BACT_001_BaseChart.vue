@@ -21,104 +21,75 @@
         </template>
       </div>
         <div class="card-body">
-          <b-row>
+          <b-row v-if="chartType == 'Bar'">
             <b-col>
-              <div class="donutCell">
-                <div id="donutchart1" class="donutDiv">
-                  <donut-chart-ext
+                <div>
+                  <barChartExt
                     v-if="loaded"
                     :chartdata="chartData"
                     :options="options"/>
                 </div>
+            </b-col>
+            <b-col>
+
+            </b-col>
+          </b-row>
+          <b-row v-else-if="chartType == 'Line'">
+            <b-col>
+              <div>
+                <line-chart-ext
+                  v-if="loaded"
+                  :chartdata="chartData"
+                  :options="options"/>
               </div>
             </b-col>
             <b-col>
 
             </b-col>
           </b-row>
-        </div>
-    </div>
-
-  <!--<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-    <div class="card text-left">
-      <div class="card-header">
-            <template v-if="chartCardIcon">
-              <i class="fa fa-globe fa-2x">
-                  {{chartCardTitle}}
-              </i>
-            </template>
-            <template v-else>
-                 <h5>{{chartCardTitle}}</h5>
-            </template>
-          <b-dropdown class="float-right" variant="p-0" right>
-            <template slot="button-content">Server</template>
-              <b-dropdown-item>Region</b-dropdown-item>
-              <b-dropdown-item>Storage</b-dropdown-item>
-              <b-dropdown-item>Net Device</b-dropdown-item>
-          </b-dropdown>
-
-      </div>
-      <div class="card-body">
-        <b-row>
-          <b-col>
-            <div class="donutCell">
-              <div id="donutchart1" class="donutDiv">
-                <doughnut-chart
+          <b-row v-else-if="chartType == 'Pie'">
+            <b-col>
+              <div>
+                <pie-chart-ext
                   v-if="loaded"
-                  :chartdata="chartdata"
+                  :chartdata="chartData"
                   :options="options"/>
               </div>
-              <div class="centerLabel">{{seletMsg}}</div>
-            </div>
-          </b-col>
-          <b-col>
-            <div class="row">
-              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                <div class="quote subtitle">This is Sparta
-                  <br>
-                  <a style="font-size: 22px;" href="#">
-                    <b>0</b>
-                  </a>
-                </div>
-              </div>
-              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                <div class="quote subtitle">This is Sparta
-                  <br>
-                  <a style="font-size: 22px;" href="#">
-                    <b>0</b>
-                  </a>
-                </div>
-              </div>
-            </div>
+            </b-col>
+            <b-col>
 
-            <div class="row">
-              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                <div class="quote subtitle">This is Sparta
-                  <br>
-                  <a style="font-size: 22px;" href="#">
-                    <b>0</b>
-                  </a>
-                </div>
+            </b-col>
+          </b-row>
+          <b-row v-else>
+            <b-col class="col-lg-5 col-md-12">
+              <div>
+                <donut-chart-ext
+                  v-if="loaded"
+                  :chartdata="chartData"
+                  :options="options"/>
+              </div>
+            </b-col>
+            <b-col class="col-lg-7 col-md-12 row">
+              <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(chartData)">
+                <div class="donut-legend" :style="donutChartDataHandler(chartData, i,'style')">
+                     <div class="donut-legend-title" title="AWS KR">
+                        <b>{{chartData.labels[i]}}</b>
+                      </div>
+                      <div class="donut-legend-data">
+                        <a href="#">
+                          {{donutChartDataHandler(chartData, i,'data')}}
+                        </a>
+                      </div>
+                  </div>
+              </div>
 
-              </div>
-              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 ">
-                <div class="quote subtitle">This is Sparta
-                  <br>
-                  <a style="font-size: 22px;" href="#">
-                    <b>0</b>
-                  </a>
-                </div>
-              </div>
-            </div></b-col>
-        </b-row>
-      </div>
+            </b-col>
+          </b-row>
+        </div>
     </div>
-  </div>-->
-
 </template>
 
 <script>
-
   import barChartExt from '@/component/base/chart/BACT_002_EXT_BaseBarChart.vue';
   import lineChartExt from '@/component/base/chart/BACT_003_EXT_BaseLineChart.vue';
   import pieChartExt from '@/component/base/chart/BACT_004_EXT_BasePieChart.vue';
@@ -176,13 +147,44 @@
 
     }),
     methods:{
-      dropdownAction(emitFunction, item){
+      dropdownAction(emitFunction, item) {
         this.$emit(emitFunction, item)
       },
+      getDataLength(chartData){
+        let dataSet = chartData.datasets
+        return (Array.isArray(dataSet)) ? dataSet[0].data.length : dataSet.data.length;
+      },
+      donutChartDataHandler(chartData, idx ,flag) {
+        let groundData = null
+        if (flag === 'style') {
+          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[idx] : chartData.datasets.backgroundColor[idx];
+          groundData = 'border-left:7px solid ' + groundData;
+        } else if(flag === 'data') {
+          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[idx] : chartData.datasets.data[idx];
+        } else{
 
+        }
+          return groundData;
+      },
     },
   }
 </script>
 
 <style lang="scss" scoped>
+  .donut-legend {
+    padding-left: 12px;
+    margin: 8px 0px;
+  }
+
+  .donut-legend-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'Noto Sans', sans-serif;
+  }
+
+  .donut-legend-data {
+    font-size: 24px;
+    font-family: 'Noto Sans', sans-serif;
+  }
 </style>
