@@ -168,7 +168,8 @@
     },
     data() {
       return {
-        selectedData: [],
+        selectedData: {},
+        processData: {},
         createProcess: false,
         updateProcess: false,
         treeData: sampleNode,
@@ -264,7 +265,7 @@
         this.$refs.Modal.hideModal()
       },
       createProject(items){
-
+          debugger;
       },
     }
   }

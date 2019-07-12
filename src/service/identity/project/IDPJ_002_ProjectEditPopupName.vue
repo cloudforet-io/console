@@ -14,7 +14,7 @@
           <label :for="`type-${type.type}`">{{ type.textTitle }}:</label>
         </b-col>
         <b-col sm="9">
-          <b-form-input v-model="projectProp.projectName"
+          <b-form-input v-model="type.value"
                         ref="nameInputField"
                         :id="`type-${type.type}`"
                         :type="type.type"></b-form-input>
@@ -43,6 +43,10 @@
     mounted: function () {
 
     },
+    beforeDestroy: function(){
+      //this.$props.projectProp
+      debugger;
+    },
     watch: {
       projectProp (project) {
         this.setCurrentData(project)
@@ -58,12 +62,12 @@
           {
             textTitle: 'Project Id',
             type: 'text',
-            value: 'projectId'
+            value: project.projectId
           },
           {
             textTitle: 'Project Name',
             type: 'text',
-            value: 'projectName'
+            value: project.projectName
           }
         ]
       }

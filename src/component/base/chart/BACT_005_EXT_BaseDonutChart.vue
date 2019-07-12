@@ -80,32 +80,32 @@
 
     }
   }
-
-  const tooltipsCallback =  {
-    width: 2000,
-    height: 300,
-    callbacks: {
-      title: function(tooltipItem, data) {
-        return data['labels'][tooltipItem[0]['index']];
+  let selectedColor = '';
+  const tooltipsCallback = {
+      callbacks: {
+        title: function(tooltipItem, data) {
+          return data['labels'][tooltipItem[0]['index']];
+        },
+        label: function(tooltipItem, data) {
+          selectedColor = data['datasets'][0]['backgroundColor'][tooltipItem['index']];
+          console.log(selectedColor);
+          return ' Count: ' + data['datasets'][0]['data'][tooltipItem['index']];
+        },
+        afterLabel: function(tooltipItem, data) {
+          let dataset = data['datasets'][0];
+          let dataMeta = dataset._meta;
+          let percent = Math.round((dataset['data'][tooltipItem['index']] / dataMeta[Object.keys(dataMeta)].total) * 100).toFixed(1);
+          return ' (' + percent + '%)';
+        }
       },
-      label: function(tooltipItem, data) {
-        return ' Count: ' + data['datasets'][0]['data'][tooltipItem['index']];
-      },
-      afterLabel: function(tooltipItem, data) {
-        let dataset = data['datasets'][0];
-        let dataMeta = dataset._meta;
-        let percent = Math.round((dataset['data'][tooltipItem['index']] / dataMeta[Object.keys(dataMeta)].total) * 100).toFixed(1);
-        return ' (' + percent + '%)';
-      }
-    },
-    opacity: 0.7,
-    backgroundColor: '#FFF',
-    borderWidth: 1.5,
-    titleFontSize: 16,
-    titleFontColor: '#0066ff',
-    bodyFontColor: '#000',
-    bodyFontSize: 14,
-    displayColors: true
+      backgroundColor: '#fafaf5',
+      borderColor: selectedColor,
+      borderWidth: 1.5,
+      titleFontSize: 16,
+      titleFontColor: '#0066ff',
+      bodyFontColor: '#000',
+      bodyFontSize: 14,
+      displayColors: true
   };
 
 
@@ -121,7 +121,18 @@
         default: null
       }
     },
+    data() {
+      return {
+      }
+    },
     mounted () {
+      if (this.options.hasOwnProperty('tooltipUseYN')) {
+        if (this.options['tooltipUseYN'] === 1) {
+          this.options['tooltips'] = toolTipsOptionSVG;
+        }else if(this.options['tooltipUseYN'] === 2){
+          this.options['tooltips'] = tooltipsCallback;
+        }
+      }
       this.renderChart(this.chartdata, this.options)
     }
   }

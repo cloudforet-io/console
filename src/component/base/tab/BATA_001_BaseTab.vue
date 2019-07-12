@@ -43,7 +43,7 @@
 </template>
 <script>
   import {api} from '@/setup/api'
-  let baseTabParams = {}
+  let baseTabParams = {};
   export default {
     name: 'BaseTabs',
     components: {
@@ -87,6 +87,7 @@
     },
     data() {
       return {
+        prosData: {},
         currentTab: this.tabs[0],
         dataforTab: this.selectedData,
         isCreate: this.isCreatable,
