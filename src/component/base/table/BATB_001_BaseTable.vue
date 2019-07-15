@@ -55,10 +55,8 @@
              :small="small" :fixed="fixed" :responsive="responsive" :stacked="stacked"
              :no-local-sorting="!isLocalSort"
              :tbody-tr-class="rowClass"
-             :selectable="selectable" :select-mode="selectMode"
              @head-clicked="headClicked"
              @row-clicked="rowClicked"
-             @row-selected="rowSelected"
              @sort-changed="sortingChanged"
              @context-changed="contextChanged"
     >
@@ -108,6 +106,13 @@ export default {
     selectable: {
       type: Boolean,
       default: true
+    },
+    selectMode: {
+      type: String,
+      default: 'single',
+      validator (str) {
+        return str === 'multi' || str === 'single'
+      }
     },
     hover: {
       type: Boolean,
@@ -169,9 +174,10 @@ export default {
   data () {
     return {
       currentPage: 1,
-      clickedRow: undefined,
-      clickedRows: [],
-      selectMode: 'single',
+      selectedRows: [],
+      selectedIdxArr: [],
+      clickedRowIdx: undefined,
+      clickedRowIdxs: [],
       sortBy: undefined,
       searchList: [],
       isLocalSort: true,
@@ -182,6 +188,11 @@ export default {
   computed: {
     items () {
       console.log('items', this.tableData.map(item => item))
+      // if (this.selectable) {
+      //   this.tableData.map(item => {
+      //     item.selected = false
+      //   })
+      // }
       return this.tableData
     },
     heads () { return this.fields },
@@ -201,21 +212,48 @@ export default {
       else if (this.limitInput > this.perPageMax) this.limitInput = this.perPageMax
     },
     rowClicked (item, idx, e) {
+      console.log('row clicked', idx)
+      if (this.selectable) this.rowSelected(item, idx, e)
       this.$emit('rowClicked', item, idx, e)
     },
-    rowSelected (items) {
-      if (this.selectMode === 'single') this.selectMode = 'multi'
+    rowSelected (item, idx, e) {
+      console.log('rowSelected')
+      let newValue
+      if (this.tableData[idx].selected === undefined) newValue = true
+      else newValue = !this.tableData[idx].selected
 
-      let item = items[items.length - 1]
+      switch (this.selectMode) {
+        case 'single':
+          if (this.selectedRows[0] && this.selectedRows[0].item === item) {
+            // this.selectedRows[0].item.selected = !this.selectedRows[0].item.selected
+            this.selectedRows.pop()
+          } else {
+            if (this.selectedRows[0]) this.$set(this.tableData[this.selectedRows[0].idx], 'selected', !this.selectedRows[0].item.selected)
+            this.selectedRows[0] = { idx: idx, item: item }
+          }
+          this.$set(this.tableData[idx], 'selected', newValue)
+          break
+        case 'multi':
+          let isOnceSelected = this.selectedRows.some((row, i) => {
+            if (row.item === item) {
+              this.$set(this.tableData[row.idx], 'selected', newValue)
+              this.selectedRows.splice(i, 1)
+            }
+            return row === item
+          })
+          if (!isOnceSelected) {
+            this.selectedRows.push({ idx: idx, item: item })
+            this.$set(this.tableData[idx], 'selected', newValue)
+          }
+          break
+      }
 
-      if (this.clickedRow) this.clickedRow.selected = false
-
-      if (item) item.selected = true
-
-      this.clickedRow = item
-      this.clickedRows = items
-
-      this.$emit('rowSelected', items, item)
+      this.$emit('rowSelected', this.tableData[idx])
+    },
+    checkboxClicked (val) { // When selected row, emitted after 'rowSelected' event
+      console.log('checkbox clicked')
+      this.selectMode = 'multi'
+      // if (val)
     },
     onPrev () {
       if (this.currentPage <= 1) return
@@ -240,19 +278,18 @@ export default {
       else this.isLocalSort = true
     },
     sortingChanged (ctx) {
-      console.log('sortingChanged')
       if (this.isLocalSort) return
 
       this.sortBy = ctx.sortDesc ? `-${ctx.sortBy}` : ctx.sortBy
       this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList)
     },
-    checkboxClicked (val) {
-      console.log('checkbox clicked')
-      this.selectMode = 'multi'
-      // if (val)
+    contextChanged (ctx) {
+      console.log('context changed')
+      this.$emit('changed', ctx)
     },
-    contextChanged (ctx) { this.$emit('changed', ctx) },
-    rowClass (item, type) { return 'tbody-tr-default' } // custom global style
+    rowClass (item, type) { // custom global style
+      return 'tbody-tr-default'
+    }
   }
 }
 </script>

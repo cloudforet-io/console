@@ -119,7 +119,7 @@ export default {
        * TODO: set totalCount with data from server
        */
     },
-    rowSelected (items, item) {
+    rowSelected (item) {
       this.selectedUser = item
     },
     limitChanged (val) {
