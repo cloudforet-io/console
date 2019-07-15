@@ -8,6 +8,7 @@
                          @drop="nodeDropped"
                          @nodecontextmenu="showContextMenu">
               <template slot="title" slot-scope="{ node }">
+
               <span class="item-icon">
                 <i class="fa fa-file" v-if="node.isLeaf"></i>
                 <i class="fa fa-folder" v-if="!node.isLeaf"></i>
@@ -24,7 +25,7 @@
 
               <template slot="sidebar" slot-scope="{ node }">
                   <span class="ellipsis" style="padding:0px 3px 0px 10px; cursor:pointer" v-on:click.stop.prevent="showContext($event, node)" >
-                  <i  class="fa fa-ellipsis-v"></i>
+                    <i class="fa fa-bars"></i>
                 </span>
               </template>
             </sl-vue-tree>
@@ -119,9 +120,11 @@
         /*
         * Flag:
         * PG:  Project Group
+        * -----------------------
         * RPG: Root Project Group
         * SPG: Selected Project Group
         * PR:  Project
+        * -----------------------
         * RPR: Root Project
         * SPR: Selected Project
         * SR:  Selected Project Group or Project
@@ -164,7 +167,15 @@
             },
             () =>{
               prams['flag'] ='S' + prams['flag'];
-              this.$emit(emitMethodName, prams)
+              if(!prams.tree.getSelected()[0].isLeaf) this.$emit(emitMethodName, prams)
+              else  this.$notify({
+                group: 'auth',
+                type: 'warn',
+                title: 'Not Allowed Action',
+                text: 'Can not Add any Project or Project Group to <b> project </b>. \n Please, Build a Project Group first.',
+                duration: 10000,
+                speed: 500,
+              })
             }
           );
         }else{
@@ -254,8 +265,7 @@
     flex-grow: 1;
     overflow-x: hidden;
     overflow-y: auto;
-    height: 600px;
-    //height: 50vw;
+    height: 40vw;
   }
 
   .item-icon {
@@ -264,10 +274,10 @@
     width: 20px;
   }
 
-  .ellipsis i{
+  /*.ellipsis i{
     visibility:hidden;
   }
   .ellipsis:hover i {
     visibility:visible;
-  }
+  }*/
 </style>

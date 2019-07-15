@@ -99,7 +99,7 @@ export default {
 
       let res
       try {
-        res = await this.$http.get(`/identity/users`, {
+        res = await this.$http.get(`/identity/user`, {
           params: { limit, skip, sort }
           /**
            * TODO: set limit, skip, sort and search in the right format

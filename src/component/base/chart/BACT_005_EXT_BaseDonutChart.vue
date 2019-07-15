@@ -4,7 +4,6 @@
   const toolTipsOptionSVG = {
     enabled: false,
     custom: function(tooltipModel) {
-
       // Tooltip Element
       let tooltipEl = document.getElementById('chartjs-tooltip');
       let dataset = this._data.datasets

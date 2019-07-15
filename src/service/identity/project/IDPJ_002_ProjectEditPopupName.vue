@@ -1,25 +1,31 @@
 <template>
   <b-container fluid>
-    <b-row class="my-1" v-for="(type, idx) in Inputs" :key="Inputs.type">
-      <template v-if="partialRender(idx)">
-        <b-col sm="3">
-          <label :for="`type-${type.type}`">{{ type.textTitle }}:</label>
-        </b-col>
+    <b-row class="my-1">
+      <b-col sm="3">
+        <label class="control-label">Project ID:</label>
+      </b-col>
+      <template v-if="currentState=='UPT'">
         <b-col sm="9">
-          pg-6bc72053
+          This is a Sparta.
         </b-col>
       </template>
       <template v-else>
-        <b-col sm="3">
-          <label :for="`type-${type.type}`">{{ type.textTitle }}:</label>
-        </b-col>
         <b-col sm="9">
-          <b-form-input v-model="type.value"
-                        ref="nameInputField"
-                        :id="`type-${type.type}`"
-                        :type="type.type"></b-form-input>
+          <b-form-input v-model="projectId"
+                        type="text"
+          />
         </b-col>
       </template>
+    </b-row>
+    <b-row class="my-1">
+      <b-col sm="3">
+        <label class="control-label">Project Name:</label>
+      </b-col>
+      <b-col sm="9">
+        <b-form-input v-model="projectName"
+                      type="text"
+                      />
+      </b-col>
     </b-row>
   </b-container>
 </template>
@@ -41,35 +47,16 @@
       },
     },
     mounted: function () {
-
     },
     beforeDestroy: function(){
-      //this.$props.projectProp
-      debugger;
-    },
-    watch: {
-      projectProp (project) {
-        this.setCurrentData(project)
-      }
+      this.$bus.$emit('setTabData', { projectProp: this.projectProp });
     },
     data() {
       return {
-        projectId: "",
-        projectName: "",
+        projectId: this.projectProp.projectId,
+        projectName: this.projectProp.projectName,
         treeDataSelected: {},
         currentState: null,
-        Inputs: [
-          {
-            textTitle: 'Project Id',
-            type: 'text',
-            value: project.projectId
-          },
-          {
-            textTitle: 'Project Name',
-            type: 'text',
-            value: project.projectName
-          }
-        ]
       }
     },
     created() {
@@ -85,11 +72,17 @@
           }
       }
     },
-    methods: {
-      setCurrentData(projectProp){
-        this.projectId = projectProp.projectId
-        this.projectName = projectProp.projectName
+    watch: {
+      projectId: function (newProjectID) {
+        this.projectProp.projectId = newProjectID;
+        this.$bus.$emit('setTabData', { projectProp: this.projectProp });
       },
+      projectName: function (newProejctName) {
+        this.projectProp.projectName = newProejctName;
+        this.$bus.$emit('setTabData',{ projectProp: this.projectProp });
+      }
+    },
+    methods: {
       partialRender(idx) {
         if (idx == 0 && this.currentState == 'UPT') {
           return true;
@@ -109,5 +102,7 @@
 </script>
 
 <style lang="scss" scoped>
-
+  .form-horizontal .control-label {
+    text-align: right !important; /* !important added for priority in SO snippet. */
+  }
 </style>
