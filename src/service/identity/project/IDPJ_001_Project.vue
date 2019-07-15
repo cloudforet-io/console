@@ -6,6 +6,7 @@
           <div>
             <div class="d-flex align-items-center ml-2">
               <b>{{ lastEvent }} </b>
+
             </div>
                 <BaseModal id='IDPJ_001_Project_Edit_Modal'
                          ref="Modal"

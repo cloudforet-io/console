@@ -274,10 +274,4 @@
     width: 20px;
   }
 
-  /*.ellipsis i{
-    visibility:hidden;
-  }
-  .ellipsis:hover i {
-    visibility:visible;
-  }*/
 </style>
