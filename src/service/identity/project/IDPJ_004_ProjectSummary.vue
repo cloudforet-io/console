@@ -1,18 +1,22 @@
 <template>
   <div class="animated fadeIn" >
-    <div class="col-xs-12 p-0">
+    <div>
+
+      <hr>
       <b-card>
         <div class="row">
           <div class="col-xs-6 col-sm-6 col-md-6 col-lg-12" style="display: block;">
             <h4 class="page-header m-t-0">
               <i class="fa fa-hashtag m-r-5">
               </i>&nbsp&nbsp Base Information</h4>
-            <hr>
             <b-container fluid>
                 <dl class="dl-horizontal m-b-0 row">
-                  <div class="col-sm-12 col-md-6 summary" v-for="info in summaryBaseInfo">
+                  <div class="col-sm-12 col-md-6 summary" v-for="(info, idx) in summaryBaseInfo">
                     <dt>{{info.title}}</dt>
                     <dd>{{info.contents}}</dd>
+                    <span @click="selectToCopyToClipboard(info.contents)" class="copy-clipboard" v-b-tooltip.hover title="Copy to Clipboard">
+                           <i class="fa fa-copy"></i>
+                    </span>
                   </div>
                 </dl>
             </b-container>
@@ -25,6 +29,9 @@
                 <div class="col-sm-12 col-md-6 summary" v-for="tag in summaryBaseTag">
                   <dt title="Tag Key">{{tag.tagKey}}</dt>
                   <dd title="Tag Value">{{tag.tagValue}}</dd>
+                    <span @click="selectToCopyToClipboard(tag.tagValue)" class="copy-clipboard" v-b-tooltip.hover title="Copy to Clipboard">
+                           <i class="fa fa-copy"></i>
+                    </span>
                 </div>
               </dl>
             </b-container>
@@ -108,6 +115,15 @@
       this.$bus.$off('treeSelectedEvent');
     },
     methods: {
+      selectToCopyToClipboard(text) {
+        let textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        var sh = document.execCommand("Copy");
+        textArea.remove();
+        console.log('Success', sh);
+      },
       colSelector: (dataLength) => {
         const colNumber = Math.round(12/dataLength);
           return 'col-xs-6 col-sm-6 col-md-6 col-lg-'+ colNumber+' col';
@@ -295,5 +311,12 @@
     margin-left: 10px;
   }
 
-
+  .copy-clipboard i{
+    visibility:hidden;
+    padding:0px 3px 0px 10px;
+    cursor:pointer
+  }
+  .copy-clipboard:hover i {
+    visibility:visible;
+  }
 </style>
