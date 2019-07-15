@@ -43,7 +43,7 @@
 </template>
 <script>
   import {api} from '@/setup/api'
-  let baseTabParams = {}
+  let baseTabParams = {};
   export default {
     name: 'BaseTabs',
     components: {
@@ -83,18 +83,28 @@
       }
     },
     created(){
-      //This is Tabs
+      this.$bus.$on('setTabData', this.setTabData)
+    },
+    beforeDestroy: function(){
+      this.$bus.$off('setTabData');
     },
     data() {
       return {
+        prosData: {},
         currentTab: this.tabs[0],
         dataforTab: this.selectedData,
+        tabContentData: {},
         isCreate: this.isCreatable,
         isUpdate: this.isUpdatable,
         isDelete: this.isDeletable
       }
     },
     methods: {
+      setTabData(dataToSet){
+          for (let key in dataToSet) {
+            this.tabContentData[key] = dataToSet[key];
+          }
+      },
       setCurrentTab (tab) {
         if(!tab.isSelected){
           tab.isSelected = true;

@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn">
+  <div class="animated fadeIn" >
     <div class="col-xs-12 p-0">
       <b-card>
         <div class="row">
@@ -29,15 +29,14 @@
               </dl>
             </b-container>
           </div>
-
         </div>
       </b-card>
       <br>
     </div>
     <div class="col-xs-12 p-0">
       <div class="row">
-        <b-col :class="colSelector(summayAsset.length)"
-               v-for="asset in summayAsset">
+        <b-col :class="colSelector(summaryAsset.length)"
+               v-for="asset in summaryAsset">
           <b-card header-tag="header">
             <div slot="header" class="mb-0"><i :class='asset.icon' style="float:left"></i>
               <h4>&nbsp &nbsp {{asset.asKey}}</h4></div>
@@ -48,104 +47,193 @@
     </div>
     <div class="row">
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-        <BaseDonutChart>
-        </BaseDonutChart>
+        <BaseChart
+          :chartTitleData="sampleTitleData1"
+          :chartData="chartDataAndOption1.data"
+          :options="chartDataAndOption2.option"
+        />
       </div>
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-        <BaseDonutChart>
-        </BaseDonutChart>
+        <BaseChart
+          :chartTitleData="sampleTitleData2"
+          :chartTitleDownData="sampledropData2"
+          :chartData="chartDataAndOption2.data"
+          :options="chartDataAndOption2.option"
+          @displayAll="displayAll"
+          @displayVM="displayVM"
+          @displayOS="displayOS"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-/*
- * Here's Data Set for Current Page
- * 1. sampleBaseInformation : Base Information Data
- * 2. sampleBaseTag : tag sample Data
- */
-
-  const sampleBaseInformation = [
-    {title: 'ID', contents: 'pg-6bc72053'},
-    {title: 'Name', contents: 'AWS KR'},
-    {title: 'Created', contents: '2019-05-12'},
-    {title: '', contents: ''}
-    ];
-
-  const sampleBaseTag = [
-    {tagKey: 'Japan', tagValue: 'Tokyo'},
-    {tagKey: 'South Korea', tagValue: 'Seoul'},
-    {tagKey: 'USA', tagValue: 'Washington D.C.'},
-    {tagKey: 'Canada', tagValue: 'Ottawa'},
-    {tagKey: 'Austria', tagValue: 'Vienna'},
-    {tagKey: 'Germany', tagValue: 'Berlin'},
-    {tagKey: 'G.B', tagValue: 'London'},
-    {tagKey: 'France', tagValue: 'Paris'}
-  ];
-
-const sampleAsset = [
-  {asKey: 'Server',   assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server fa-2x'},
-  {asKey: 'Volume', assetValue: 2,    linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database fa-2x'},
-  {asKey: 'Project', assetValue: 17,  linkURL: 'www.bing.com', icon: 'fa fa-star fa-2x'},
-  {asKey: 'Member', assetValue: 0,    linkURL: 'www.naver.com', icon: 'fa fa-users fa-2x'},
-];
-
-  const sampleData1 = [
-    ['Task', 'Hours per Day'],
-    ['Work', 11],
-    ['Eat', 2],
-    ['Commute', 2],
-    ['Watch TV', 2],
-    ['Sleep', 7]
-  ];
-
   import BaseTabs from '@/component/base/tab/BATA_001_BaseTab'
   import BaseModal from '@/component/base/modal/BAMO_001_BaseModal'
   import BaseTree from '@/component/base/tree/BATR_001_BaseTree'
   import {api} from '@/setup/api'
 
-  import {GChart} from 'vue-google-charts'
-
   const BaseChart = () => import('@/component/base/chart/BACT_001_BaseChart.vue')
   export default {
     name: 'ProjectSummary',
     components: {
-      GChart,
       BaseChart
     },
     data() {
       return {
-        summaryBaseInfo: sampleBaseInformation,
-        summaryBaseTag: sampleBaseTag,
-        summayAsset: sampleAsset,
-        seletMsg: 'This is center MSG',
         percent: 0,
-
-        options: {
-          pieHole: 0.7,
-          pieSliceText: 'none',
-          legend: {position: 'none'},
-          tooltip: {text: 'percentage'},
-          tooltip: {textStyle: {fontSize: 12}},
-          animation: {
-            duration: 1000,
-            easing: 'in',
-            startup: true
-          }
-        },
-        chartData: sampleData1
+        seletMsg: 'This is center MSG',
+        sampleTitleData1: null,
+        sampleTitleData2: null,
+        sampledropData2: null,
+        chartDataAndOption1: null,
+        chartDataAndOption2: null,
+        summaryBaseInfo: null,
+        summaryBaseTag: null,
+        summaryAsset: null,
       }
     },
-    props: {},
+    props: {
+
+    },
     mounted: function () {
 
+    },
+    created: function () {
+      this.setDummnyData();
+      this.$bus.$on('treeSelectedEvent', this.setDummnyData)
+    },
+    beforeDestroy: function(){
+      this.$bus.$off('treeSelectedEvent');
     },
     methods: {
       colSelector: (dataLength) => {
         const colNumber = Math.round(12/dataLength);
           return 'col-xs-6 col-sm-6 col-md-6 col-lg-'+ colNumber+' col';
-      }
+      },
+      displayAll: function (params) {
+        this.sampledropData2.dropDownTitle = params.optionTitle
+      },
+      displayVM: function (params) {
+        this.sampledropData2.dropDownTitle = params.optionTitle
+
+      },
+      displayOS: function (params) {
+        this.sampledropData2.dropDownTitle = params.optionTitle
+      },
+      setDummnyData: function () {
+        /*
+        * Here's Data Set for Current Page
+        * 1. sampleBaseInformation : Base Information Data
+        * 2. sampleBaseTag : tag sample Data
+        * 3. sampleAsset : Data for Asset
+        */
+
+        const sampleBaseInformation = [
+          {title: 'ID', contents: 'pg-6bc72053'},
+          {title: 'Name', contents: 'AWS KR'},
+          {title: 'Created', contents: '2019-05-12'},
+          {title: '', contents: ''}
+        ];
+
+
+        const sampleBaseTag = [
+          {tagKey: 'Japan', tagValue: 'Tokyo'},
+          {tagKey: 'South Korea', tagValue: 'Seoul'},
+          {tagKey: 'USA', tagValue: 'Washington D.C.'},
+          {tagKey: 'Canada', tagValue: 'Ottawa'},
+          {tagKey: 'Austria', tagValue: 'Vienna'},
+          {tagKey: 'Germany', tagValue: 'Berlin'},
+          {tagKey: 'G.B', tagValue: 'London'},
+          {tagKey: 'France', tagValue: 'Paris'}
+        ];
+
+        const sampleAsset = [
+          {asKey: 'Server',   assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server fa-2x'},
+          {asKey: 'Volume', assetValue: 2,    linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database fa-2x'},
+          {asKey: 'Project', assetValue: 17,  linkURL: 'www.bing.com', icon: 'fa fa-star fa-2x'},
+          {asKey: 'Member', assetValue: 0,    linkURL: 'www.naver.com', icon: 'fa fa-users fa-2x'},
+        ];
+
+        const chartTitleSampleData1 ={
+          isTitleIconUsed: true,
+          TitleIconClass: 'fa fa-globe fa-2x',
+          cardTitle: 'Server By Region',
+          isDropdownUSed: false,
+        };
+
+        const chartTitleSampleData2 ={
+          isTitleIconUsed: true,
+          TitleIconClass: 'fa fa-tag fa-2x',
+          cardTitle: 'Server by Type',
+          isDropdownUsed: true,
+        };
+
+        const chartTitleDropSampleData2 = {
+          dropDownTitle:'All Types',
+          dropDownDataArr: [
+            {optionId: 'AT', optionTitle: 'All Types', optionClickMethod : 'displayAll'},
+            {optionId: 'VM', optionTitle: 'VM', optionClickMethod : 'displayVM'},
+            {optionId: 'OS', optionTitle: 'OS', optionClickMethod : 'displayOS'}
+          ]
+        };
+
+        const chartDataAndOption1 = {
+          data:{
+            labels: ['VueJs', ' Beans. I wnois.', 'ReactJs', 'AngularJs'],
+            datasets: [
+              {
+                backgroundColor: this.getRandomColorArr(4),
+                data: [40, 20, 80, 10]
+              }
+            ]
+          },
+          option: {
+            responsive: true,
+            maintainAspectRatio: true,
+            legend: {
+              display: false,
+            }
+          }
+        };
+
+        const chartDataAndOption2 = {
+          data:{
+            labels: ['AWS', 'MS Azure', 'Google cloud'],
+            datasets: [{
+                      data: [12, 4, 8],
+                      backgroundColor: [
+                        "#FF6384",
+                        "#36A2EB",
+                        "#FFCE56"
+                      ],
+                      hoverBackgroundColor: [
+                        "#FF6384",
+                        "#36A2EB",
+                        "#FFCE56"
+                      ]
+                      }]
+          },
+          option: {
+            tooltipUseYN: 2,
+            responsive: true,
+            maintainAspectRatio: true,
+            legend: {
+              display: false
+            },
+          }
+        };
+
+        this.summaryBaseInfo = sampleBaseInformation;
+        this.summaryBaseTag = sampleBaseTag;
+        this.summaryAsset = sampleAsset;
+        this.sampleTitleData1 = chartTitleSampleData1;
+        this.sampleTitleData2 = chartTitleSampleData2;
+        this.sampledropData2 = chartTitleDropSampleData2;
+        this.chartDataAndOption1 = chartDataAndOption1;
+        this.chartDataAndOption2 = chartDataAndOption2;
+      },
     }
   }
 </script>
@@ -194,7 +282,7 @@ const sampleAsset = [
     width: 256px;
     line-height: 256px;
     text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Noto Sans', sans-serif;
     font-size: 36px;
     color: maroon;
   }
@@ -206,5 +294,6 @@ const sampleAsset = [
     margin: 8px 0px;
     margin-left: 10px;
   }
+
 
 </style>

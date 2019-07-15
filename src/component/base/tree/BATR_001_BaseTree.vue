@@ -8,6 +8,7 @@
                          @drop="nodeDropped"
                          @nodecontextmenu="showContextMenu">
               <template slot="title" slot-scope="{ node }">
+
               <span class="item-icon">
                 <i class="fa fa-file" v-if="node.isLeaf"></i>
                 <i class="fa fa-folder" v-if="!node.isLeaf"></i>
@@ -24,7 +25,7 @@
 
               <template slot="sidebar" slot-scope="{ node }">
                   <span class="ellipsis" style="padding:0px 3px 0px 10px; cursor:pointer" v-on:click.stop.prevent="showContext($event, node)" >
-                  <i  class="fa fa-ellipsis-v"></i>
+                    <i class="fa fa-bars"></i>
                 </span>
               </template>
             </sl-vue-tree>
@@ -37,7 +38,7 @@
           <div class="node-leaf-last"  @click="excSelected"><i class="fa fa-remove"></i>&nbsp Remove Selected Item</div>
         </div>
 
-        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10" v-show="hasSelected">
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10" v-if="hasSelected" :key="nodeKey">
             <slot name="treeSubPanel" >
             </slot>
         </div>
@@ -68,6 +69,10 @@
     },
     data() {
       return {
+        /*
+         *  nodeKey is a key to reload any component that has node selected at treeSubPanel
+         */
+        nodeKey: 0,
         contexteActionFlag: null,
         treeData: this.treeProp,
         hasSelected: false,
@@ -78,9 +83,17 @@
     },
     methods: {
       nodeSelected(nodes, event) {
+        this.nodeKey = (this.nodeKey) > 0 ? 0: 1;
         this.lastEvent = nodes;
         this.hasSelected = true;
+        /*
+         * This is a Emit event for Parents vue.
+         */
         this.$emit('selected', nodes)
+        /*
+         * This is a Global Event bus, so Please, make sure that Event$bus is off when components has destroyed.
+         */
+        this.$bus.$emit('treeSelectedEvent', nodes)
       },
       nodeToggled(node, event) {
         this.lastEvent = `Node ${node.title} is ${node.isExpanded ? 'expanded' : 'collapsed'}`;
@@ -107,9 +120,11 @@
         /*
         * Flag:
         * PG:  Project Group
+        * -----------------------
         * RPG: Root Project Group
         * SPG: Selected Project Group
         * PR:  Project
+        * -----------------------
         * RPR: Root Project
         * SPR: Selected Project
         * SR:  Selected Project Group or Project
@@ -152,7 +167,15 @@
             },
             () =>{
               prams['flag'] ='S' + prams['flag'];
-              this.$emit(emitMethodName, prams)
+              if(!prams.tree.getSelected()[0].isLeaf) this.$emit(emitMethodName, prams)
+              else  this.$notify({
+                group: 'auth',
+                type: 'warn',
+                title: 'Not Allowed Action',
+                text: 'Can not Add any Project or Project Group to <b> project </b>. \n Please, Build a Project Group first.',
+                duration: 10000,
+                speed: 500,
+              })
             }
           );
         }else{
@@ -242,8 +265,7 @@
     flex-grow: 1;
     overflow-x: hidden;
     overflow-y: auto;
-    height: 600px;
-    //height: 50vw;
+    height: 40vw;
   }
 
   .item-icon {
@@ -252,10 +274,10 @@
     width: 20px;
   }
 
-  .ellipsis i{
+  /*.ellipsis i{
     visibility:hidden;
   }
   .ellipsis:hover i {
     visibility:visible;
-  }
+  }*/
 </style>

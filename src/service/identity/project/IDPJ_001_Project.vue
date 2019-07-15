@@ -5,7 +5,7 @@
         <b-card>
           <div>
             <div class="d-flex align-items-center ml-2">
-              {{ lastEvent }}
+              <b>{{ lastEvent }} </b>
             </div>
                 <BaseModal id='IDPJ_001_Project_Edit_Modal'
                          ref="Modal"
@@ -27,10 +27,8 @@
                               @create="createProject"
                               @update="updateProject"
                               >
-                        <template #ModaltabContentsPanel>
-                            <!--<div v-if="selectedProject" :project-prop="selectedProject">
-                            </div>-->
-                        </template>
+                         <template  #ModaltabContentsPanel>
+                         </template>
                     </BaseTabs>
                   </template>
               </BaseModal>
@@ -43,9 +41,14 @@
               @selected="NodeSelected"
               @edited="editSelected">
         <template #treeSubPanel>
-          <BaseTabs is="BaseTabs" id="ContentsBaseTabs" :tabs="tabs" :tabIndex="tabIndex" :key="tabs.tabTitle">
+          <BaseTabs is="BaseTabs"
+                    id="ContentsBaseTabs"
+                    :tabs="tabs"
+                    :tabIndex="tabIndex"
+                    :key="tabs.tabTitle">
             <keep-alive>
-              <template #tabContentsPanel>
+              <template #tabContentsPanel
+                        ref="treeContents">
               </template>
             </keep-alive>
           </BaseTabs>
@@ -132,9 +135,30 @@
     }
   ];
 
+  let NodePR = {
+  title: '',
+  isLeaf: true,
+  children: null,
+  isExpanded: true,
+  isSelected: true,
+  isDraggable: true,
+  isSelectable: true,
+  data: {visible:false}
+  };
+
+  let NodePG = {
+    title: '',
+    isLeaf: false,
+    children: null,
+    isExpanded: true,
+    isSelected: true,
+    isDraggable: true,
+    isSelectable: true,
+    data: {visible:false}
+  };
+
   const projectEditPopupName = () => import ('./IDPJ_002_ProjectEditPopupName')
   const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopupTag')
-  import { eventBus } from '@/main';
   import projectAudit from './IDPJ_007_ProjectAudit.vue';
   import projectMember from './IDPJ_005_ProjectMember.vue';
   import projectSummary from './IDPJ_004_ProjectSummary.vue';
@@ -156,7 +180,6 @@
       BaseTabs,
       BaseTree,
       BaseModal,
-      eventBus,
       VueAlertify
     },
     props:{
@@ -167,7 +190,8 @@
     },
     data() {
       return {
-        selectedData: [],
+        selectedData: {},
+        processData: {},
         createProcess: false,
         updateProcess: false,
         treeData: sampleNode,
@@ -220,24 +244,32 @@
     },
     methods: {
       NodeSelected(item) {
-        this.lastEvent = "You have Selected : " + item[0].title;
+        this.lastEvent = "Selected Item : " + item[0].title;
       },
       editSelected(item) {
         /*  TODO :: Please Add More Flags if needed.
-         *  CRT
-         *  UPT
-         *  DEL
+         *  CRT => Create
+         *  UPT => Update
+         *  DEL => Delete
+         ****************
+         *  PG => Project Group
+         *  PR => Project
+         *  SPG => Selected Project Group
+         *  SPR => Selected Project
+         *  RPG => Root Project Group
+         *  RPR => Root Project
          */
         if (['PG','PR','SPG','SPR','RPG','RPR'].includes(item.flag)) {
           const title = (item.flag.indexOf('PG')>0) ? true: false
+          this.selectedData['selectedItem'] = item
           this.manageTabButton('CRT',true, title);
           this.$refs.Modal.showModal();
 
         } else {
+          this.selectedData['selectedItem'] = item
           this.manageTabButton('UPT',true);
           this.selectedData = item;
           this.$refs.Modal.showModal();
-
         }
       },
       manageTabButton(flag,state, title){
@@ -245,24 +277,62 @@
           this.projectModaltitle = (title) ? 'Create a Project Group': 'Create a Project';
           this.updateProcess = !state;
           this.createProcess =  state;
+
         } else if(flag==='UPT'){
           this.createProcess = !state;
           this.updateProcess = state;
+
         } else {
 
         }
       },
-      updateProject(items){
+      async updateProject(items){
+        console.log('item', items);
         const treeV = items.tree
         const path = treeV.getSelected()[0].path;
-        const giveProp = items.tabContents[0].projectProp;
-        treeV.updateNode(path, {title: giveProp.projectName});
-        giveProp.projectName = '';
+        let tabData = this.$refs.EditTab.tabContentData;
+        treeV.updateNode(path, {title: tabData.projectProp.projectName});
+        tabData.projectProp.projectName = null;
         //TODO:: Simulate gRPC Modules on BACK_END
         this.$refs.Modal.hideModal()
+
       },
       createProject(items){
+        console.log('item', items);
 
+        const flag = this.selectedData.selectedItem.flag;
+        const treeV = this.isEmpty(items.tree) ? this.selectedData.selectedItem.tree: items.tree;
+        let tabData = this.$refs.EditTab.tabContentData;
+
+        let newNode = {
+          title: tabData.projectProp.projectName,
+          isLeaf: false,
+          children: null,
+          isExpanded: false,
+          isSelected: true,
+          isDraggable: true,
+          isSelectable: true,
+          data: {visible:false}
+        };
+
+          let placement = "";
+          if (flag=='SPG'){
+            placement = 'inside';
+          }else if(flag=='SPR'){
+            newNode['isLeaf'] = true;
+            placement = 'inside';
+          }else if(flag=='RPG'){
+            placement = 'before';
+          }else{
+            placement = 'before';
+            newNode['isLeaf'] = true;
+          };
+
+        treeV.insert({node: treeV.getSelected()[0],placement: placement}, newNode);
+        tabData.projectProp.projectName = null;
+        tabData.projectProp.projectId = null;
+
+        this.$refs.Modal.hideModal()
       },
     }
   }
