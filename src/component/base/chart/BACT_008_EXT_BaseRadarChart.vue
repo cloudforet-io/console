@@ -1,20 +1,20 @@
 <script>
-  import { Pie } from 'vue-chartjs'
+  import { Radar } from 'vue-chartjs'
   export default {
-    name: 'pieChartExt',
-    extends: Pie,
+    extends: Radar,
+    name: 'RadarChartExt',
     props: {
-      chartdata: {
+      chartData: {
         type: Object,
         default: null
       },
       options: {
         type: Object,
         default: null
-      }
+      },
     },
     mounted () {
-      this.renderChart(this.chartdata, this.options)
-    }
+      this.renderChart(this.chartData, this.options)
+    },
   }
 </script>
