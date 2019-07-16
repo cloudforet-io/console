@@ -1,5 +1,15 @@
-//custom global css
+/*************************
+ *** CUSTOM GLOBAL CSS ***
+ *************************/
 
+
+ /* VARIABLES */
+$gray-op: rgba(142, 152, 178, 0.06);
+$gray: rgba(142, 152, 178, 0.2);
+$lightblue-op: rgba(188, 208, 250, 0.6);
+$lightblue: rgb(188, 208, 250);
+
+/* INIT */
 textarea:focus, input:focus{
   outline: none;
 }
@@ -14,8 +24,23 @@ textarea:focus, input:focus{
 }
 
 /* Bootstrap table style overwrite */
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: $gray-op;
+  &.tbody-tr-selected {
+    background-color: $lightblue-op;
+  }
+}
+.table-hover tbody tr:hover {
+  background-color: $gray;
+  &.tbody-tr-selected {
+    background-color: $lightblue;
+  }
+}
 .tbody-tr-default {
   cursor: pointer;
+}
+.tbody-tr-selected {
+  background-color: $lightblue-op;
 }
 
 /* Bootstrap checkbox style overwrite */

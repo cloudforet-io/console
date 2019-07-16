@@ -119,11 +119,12 @@ export default {
        * TODO: set totalCount with data from server
        */
     },
-    rowSelected (item) {
-      this.selectedUser = item
+    rowSelected (row) {
+      if (row instanceof Array || !row) this.selectedUser = null
+      else this.selectedUser = row.data
     },
     limitChanged (val) {
-      this.perPage = val
+      this.perPage = Number(val)
       this.init()
     }
   }

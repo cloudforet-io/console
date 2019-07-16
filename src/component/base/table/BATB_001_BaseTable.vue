@@ -61,12 +61,17 @@
              @context-changed="contextChanged"
     >
       <template v-if="selectable" slot="HEAD_selected">
-        <b-check v-model="isSelectedAll" class="select-all-checkbox" />
+        <b-check v-model="isSelectedAll" class="select-all-checkbox"
+                 @change="onSelectAll"
+        />
       </template>
 
       <template v-if="selectable" slot="selected" slot-scope="data">
-        <b-check v-model="data.item.selected" class="select-checkbox"
-                 @change="checkboxClicked"
+        <!-- <BaseCheckbox :key="data.index" :selected="dataSelected[data.index]" class="select-checkbox"
+                      @change="checkboxClicked"
+        /> -->
+        <BaseCheckbox :key="data.index" :selected="data.item.selected" class="select-checkbox"
+                      @change="checkboxClicked"
         />
       </template>
 
@@ -82,12 +87,15 @@
 <script>
 import BaseSearch from '@/component/base/search/BASR_001_BaseSearch.vue'
 import BaseModal from '@/component/base/modal/BAMO_001_BaseModal.vue'
+import BaseCheckbox from '@/component/base/checkbox/BACB_001_BaseCheckbox.vue'
+
 export default {
   name: 'BaseTable',
   event: ['list', 'rowClicked', 'limitChanged', 'rowSelected'],
   components: {
     BaseSearch,
-    BaseModal
+    BaseModal,
+    BaseCheckbox
   },
   inheritAttrs: false,
   props: {
@@ -109,7 +117,7 @@ export default {
     },
     selectMode: {
       type: String,
-      default: 'single',
+      default: 'multi',
       validator (str) {
         return str === 'multi' || str === 'single'
       }
@@ -175,28 +183,23 @@ export default {
     return {
       currentPage: 1,
       selectedRows: [],
-      selectedIdxArr: [],
-      clickedRowIdx: undefined,
-      clickedRowIdxs: [],
       sortBy: undefined,
       searchList: [],
       isLocalSort: true,
       limitInput: this.perPage,
-      isSelectedAll: false
+      isSelectedAll: false,
+      emittedBySelectAll: false
     }
   },
   computed: {
     items () {
       console.log('items', this.tableData.map(item => item))
-      // if (this.selectable) {
-      //   this.tableData.map(item => {
-      //     item.selected = false
-      //   })
-      // }
       return this.tableData
     },
     heads () { return this.fields },
-    limit () { return this.perPage },
+    limit () {
+      return this.perPage
+    },
     skip () { return (this.currentPage - 1) * this.limit },
     maxPage () { return Math.ceil(this.totalRows / this.limit) }
   },
@@ -212,48 +215,100 @@ export default {
       else if (this.limitInput > this.perPageMax) this.limitInput = this.perPageMax
     },
     rowClicked (item, idx, e) {
-      console.log('row clicked', idx)
       if (this.selectable) this.rowSelected(item, idx, e)
       this.$emit('rowClicked', item, idx, e)
     },
     rowSelected (item, idx, e) {
-      console.log('rowSelected')
-      let newValue
-      if (this.tableData[idx].selected === undefined) newValue = true
-      else newValue = !this.tableData[idx].selected
+      console.log('row selected')
+      this.selectedRows.map((row, i) => {
+        // if (row.data !== item) this.$set(this.dataSelected, row.idx, false)
+        if (row.data !== item) {
+          row.data.selected = false
+          this.updateTableData(row.idx, row.data)
+        }
+      })
+      this.selectedRows = []
 
-      switch (this.selectMode) {
-        case 'single':
-          if (this.selectedRows[0] && this.selectedRows[0].item === item) {
-            // this.selectedRows[0].item.selected = !this.selectedRows[0].item.selected
-            this.selectedRows.pop()
-          } else {
-            if (this.selectedRows[0]) this.$set(this.tableData[this.selectedRows[0].idx], 'selected', !this.selectedRows[0].item.selected)
-            this.selectedRows[0] = { idx: idx, item: item }
-          }
-          this.$set(this.tableData[idx], 'selected', newValue)
-          break
-        case 'multi':
-          let isOnceSelected = this.selectedRows.some((row, i) => {
-            if (row.item === item) {
-              this.$set(this.tableData[row.idx], 'selected', newValue)
-              this.selectedRows.splice(i, 1)
-            }
-            return row === item
-          })
-          if (!isOnceSelected) {
-            this.selectedRows.push({ idx: idx, item: item })
-            this.$set(this.tableData[idx], 'selected', newValue)
-          }
-          break
+      item.selected = true
+      this.updateTableData(idx, item)
+      // this.$set(this.dataSelected, idx, true)
+      this.selectedRows.push({ idx: idx, data: this.tableData[idx] })
+      this.setIsSelectAll()
+      this.$emit('rowSelected', this.selectedRows[0])
+    },
+    checkSingleMode (item, idx, newValue) {
+      // if (this.selectedRows[0]) this.$set(this.dataSelected, idx, false)
+      if (this.selectedRows[0]) this.selectedRows[0].data.selected = false
+
+      if (newValue) this.selectedRows[0] = { idx: idx, data: item }
+      else this.selectedRows.pop()
+
+      // this.$set(this.dataSelected, idx, newValue)
+      this.updateTableData(idx, newValue)
+      this.setIsSelectAll()
+      this.$emit('rowSelected', this.selectedRows[0])
+    },
+    checkMultiMode (item, idx, newValue) {
+      let isOnceSelected = this.selectedRows.some((row, i) => {
+        if (row.data === item) {
+          // this.$set(this.dataSelected, i, false)
+          row.data.selected = false
+          this.updateTableData(row.idx, row.data)
+          this.selectedRows.splice(i, 1)
+        }
+        return row.data === item
+      })
+      if (!isOnceSelected) {
+        this.selectedRows.push({ idx: idx, data: item })
       }
 
-      this.$emit('rowSelected', this.tableData[idx])
+      // this.$set(this.dataSelected, idx, newValue)
+      item.selected = newValue
+      this.updateTableData(idx, item)
+      this.setIsSelectAll()
+      this.$emit('rowSelected', this.selectedRows)
     },
-    checkboxClicked (val) { // When selected row, emitted after 'rowSelected' event
+    checkboxClicked (val, key) {
       console.log('checkbox clicked')
-      this.selectMode = 'multi'
-      // if (val)
+      switch (this.selectMode) {
+        case 'single':
+          this.checkSingleMode(this.tableData[key], key, val)
+          break
+        case 'multi':
+          this.checkMultiMode(this.tableData[key], key, val)
+          break
+      }
+    },
+    setIsSelectAll () {
+      if (this.selectedRows.length === this.tableData.length) this.isSelectedAll = true
+      else this.isSelectedAll = false
+    },
+    onSelectAll (val) {
+      if (val) {
+        this.selectedRows = []
+        // this.dataSelected.map((selected, i) => {
+        //   this.$set(this.dataSelected, i, true)
+        //   this.selectedRows.push({ data: this.tableData[i], idx: i })
+        // })
+        this.tableData.map((data, i) => {
+          data.selected = true
+          this.updateTableData(i, data)
+          this.selectedRows.push({ data: data, idx: i })
+        })
+      } else {
+        this.selectedRows.map((row, i) => {
+          // this.$set(this.dataSelected, i, false)
+          row.data.selected = false
+          this.updateTableData(row.idx, row.data)
+        })
+        this.selectedRows = []
+      }
+      if (val) this.$emit('rowSelected', this.selectedRows)
+    },
+    updateTableData (idx, data) {
+      if (idx === undefined) idx = 0
+      if (data === undefined) data = this.tableData[idx]
+      this.$set(this.tableData, idx, Object.assign({}, data))
     },
     onPrev () {
       if (this.currentPage <= 1) return
@@ -284,11 +339,12 @@ export default {
       this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList)
     },
     contextChanged (ctx) {
-      console.log('context changed')
       this.$emit('changed', ctx)
     },
     rowClass (item, type) { // custom global style
-      return 'tbody-tr-default'
+      let className = 'tbody-tr-default'
+      if (item.selected) className += ' tbody-tr-selected'
+      return className
     }
   }
 }
