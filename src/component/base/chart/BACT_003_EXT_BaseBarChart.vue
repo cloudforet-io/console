@@ -3,20 +3,28 @@
   import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips'
 
   export default {
-    name: 'barChartExt',
+    name: 'BarChartExt',
     extends: Bar,
+    components:{
+      CustomTooltips,
+    },
     props: {
-      chartdata: {
+      chartData: {
         type: Object,
         default: null
       },
       options: {
         type: Object,
         default: null
+      },
+    },
+    data () {
+      return {
       }
     },
     mounted () {
-      this.renderChart(this.chartdata, this.options)
-    }
+      this.renderChart( this.chartData, this.options)
+    },
+
   }
 </script>

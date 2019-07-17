@@ -4,12 +4,11 @@
   const toolTipsOptionSVG = {
     enabled: false,
     custom: function(tooltipModel) {
-      // Tooltip Element
+
       let tooltipEl = document.getElementById('chartjs-tooltip');
       let dataset = this._data.datasets
       let dataMeta = dataset[0]._meta;
 
-      // Create element on first render
       if (!tooltipEl) {
         tooltipEl = document.createElement('div');
         tooltipEl.id = 'chartjs-tooltip';
@@ -23,7 +22,6 @@
         return;
       }
 
-      // Set caret Position
       tooltipEl.classList.remove('above', 'below', 'no-transform');
       if (tooltipModel.yAlign) {
         tooltipEl.classList.add(tooltipModel.yAlign);
@@ -110,29 +108,34 @@
 
   export default {
     extends: Doughnut,
+    components: {
+    },
     props: {
-      chartdata: {
+      chartData: {
         type: Object,
         default: null
       },
       options: {
         type: Object,
         default: null
-      }
+      },
     },
     data() {
       return {
       }
     },
     mounted () {
-      if (this.options.hasOwnProperty('tooltipUseYN')) {
-        if (this.options['tooltipUseYN'] === 1) {
-          this.options['tooltips'] = toolTipsOptionSVG;
-        }else if(this.options['tooltipUseYN'] === 2){
-          this.options['tooltips'] = tooltipsCallback;
+
+        if (this.options.hasOwnProperty('tooltipUseYN')) {
+          if (this.options['tooltipUseYN'] === 1) {
+            this.options['tooltips'] = toolTipsOptionSVG;
+          }else if(this.options['tooltipUseYN'] === 2){
+            this.options['tooltips'] = tooltipsCallback;
+          }
         }
-      }
-      this.renderChart(this.chartdata, this.options)
-    }
+
+      this.renderChart(this.chartData, this.options)
+    },
+
   }
 </script>

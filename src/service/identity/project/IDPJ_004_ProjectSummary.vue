@@ -1,7 +1,6 @@
 <template>
   <div class="animated fadeIn" >
     <div>
-
       <hr>
       <b-card>
         <div class="row">
@@ -14,7 +13,7 @@
                   <div class="col-sm-12 col-md-6 summary" v-for="(info, idx) in summaryBaseInfo">
                     <dt>{{info.title}}</dt>
                     <dd>{{info.contents}}</dd>
-                    <span @click="selectToCopyToClipboard(info.contents)" class="copy-clipboard" v-b-tooltip.hover title="Copy to Clipboard">
+                    <span @click="CopyToClipboard(info.contents)" class="copy-clipboard" v-b-tooltip.hover title="Copy to Clipboard">
                            <i class="fa fa-copy"></i>
                     </span>
                   </div>
@@ -29,7 +28,7 @@
                 <div class="col-sm-12 col-md-6 summary" v-for="tag in summaryBaseTag">
                   <dt title="Tag Key">{{tag.tagKey}}</dt>
                   <dd title="Tag Value">{{tag.tagValue}}</dd>
-                    <span @click="selectToCopyToClipboard(tag.tagValue)" class="copy-clipboard" v-b-tooltip.hover title="Copy to Clipboard">
+                    <span @click="CopyToClipboard(tag.tagValue)" class="copy-clipboard" v-b-tooltip.hover title="Copy to Clipboard">
                            <i class="fa fa-copy"></i>
                     </span>
                 </div>
@@ -55,17 +54,23 @@
     <div class="row">
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <BaseChart
+          :sampleUseYN="true"
+          :chartType="'Radar'"
           :chartTitleData="sampleTitleData1"
           :chartData="chartDataAndOption1.data"
           :options="chartDataAndOption2.option"
+          :legendOption ="2"
         />
       </div>
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <BaseChart
+          :sampleUseYN="true"
+          :chartType="'Polar'"
           :chartTitleData="sampleTitleData2"
           :chartTitleDownData="sampledropData2"
           :chartData="chartDataAndOption2.data"
           :options="chartDataAndOption2.option"
+          :legendOption ="2"
           @displayAll="displayAll"
           @displayVM="displayVM"
           @displayOS="displayOS"
@@ -79,6 +84,7 @@
   import BaseTabs from '@/component/base/tab/BATA_001_BaseTab'
   import BaseModal from '@/component/base/modal/BAMO_001_BaseModal'
   import BaseTree from '@/component/base/tree/BATR_001_BaseTree'
+
   import {api} from '@/setup/api'
 
   const BaseChart = () => import('@/component/base/chart/BACT_001_BaseChart.vue')
@@ -115,14 +121,8 @@
       this.$bus.$off('treeSelectedEvent');
     },
     methods: {
-      selectToCopyToClipboard(text) {
-        let textArea = document.createElement("textarea");
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        var sh = document.execCommand("Copy");
-        textArea.remove();
-        console.log('Success', sh);
+      CopyToClipboard(text) {
+        this.selectToCopyToClipboard(text);
       },
       colSelector: (dataLength) => {
         const colNumber = Math.round(12/dataLength);
@@ -133,12 +133,12 @@
       },
       displayVM: function (params) {
         this.sampledropData2.dropDownTitle = params.optionTitle
-
       },
       displayOS: function (params) {
         this.sampledropData2.dropDownTitle = params.optionTitle
       },
       setDummnyData: function () {
+
         /*
         * Here's Data Set for Current Page
         * 1. sampleBaseInformation : Base Information Data
