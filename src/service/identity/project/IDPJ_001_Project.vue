@@ -4,9 +4,8 @@
       <div class="col-12">
         <b-card>
           <div>
-            <div class="d-flex align-items-center ml-2">
+            <div class="d-flex align-items-center ml-2" style="padding: 0 0 0 0;">
               <b>{{ lastEvent }} </b>
-
             </div>
                 <BaseModal id='IDPJ_001_Project_Edit_Modal'
                          ref="Modal"
@@ -42,7 +41,8 @@
               @selected="NodeSelected"
               @edited="editSelected">
         <template #treeSubPanel>
-          <BaseTabs is="BaseTabs"
+          <BaseTabs style="padding: 0 0 0 0"
+                    is="BaseTabs"
                     id="ContentsBaseTabs"
                     :tabs="tabs"
                     :tabIndex="tabIndex"
@@ -241,6 +241,11 @@
           },
 
         ]
+      }
+    },
+    mounted: function () {
+      if(!this.sideBarIsMinimized){
+        this.sideBarMiniMaxControl()
       }
     },
     methods: {

@@ -1,13 +1,13 @@
 <template>
   <div class="animated fadeIn" >
     <div>
-      <hr>
       <b-card>
         <div class="row">
           <div class="col-xs-6 col-sm-6 col-md-6 col-lg-12" style="display: block;">
             <h4 class="page-header m-t-0">
               <i class="fa fa-hashtag m-r-5">
               </i>&nbsp&nbsp Base Information</h4>
+            <hr>
             <b-container fluid>
                 <dl class="dl-horizontal m-b-0 row">
                   <div class="col-sm-12 col-md-6 summary" v-for="(info, idx) in summaryBaseInfo">
@@ -52,7 +52,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
         <BaseChart
           :sampleUseYN="true"
           :chartType="'Bar'"

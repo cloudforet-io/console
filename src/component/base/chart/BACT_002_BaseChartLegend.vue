@@ -8,9 +8,11 @@
                 <b>{{selectedData.labels[i]}}</b>
               </div>
               <div class="donut-legend-data">
-                <a href="#">
-                  {{legendDataHandler('data', selectedData, i)}}
-                </a>
+                <template v-for="(n, p) in getDataLength(selectedData, '-')">
+                  <a href="#" v-b-tooltip.hover :title="legendLabelLineExt(selectedData, p)">
+                    {{legendDataHandler('data', selectedData, i, p)}}
+                  </a>
+                </template>
               </div>
             </div>
           </div>

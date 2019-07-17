@@ -58,11 +58,22 @@ export const Mixin = {
         textArea.remove();
         console.log('Success', successFailCondition);
       },
+      /**********************************************************************************
+       * Input   => ()
+       * Output  => (Empty):
+       * Description:  Minimize or Maximize Side bar Menu
+       **********************************************************************************/
+      sideBarMiniMaxControl: function() {
+       let currentStatus = document.body.className;
+        if(currentStatus.indexOf('sidebar-minimized brand-minimized') > -1) document.body.className = "sidebar-lg-show header-fixed sidebar-fixed";
+        else document.body.className = "sidebar-lg-show header-fixed sidebar-fixed sidebar-minimized brand-minimized"
+      },
     },
     data: function() {
-    return {
-
-      }
-    },
+          let status = (document.body.className.indexOf('sidebar-minimized brand-minimized') > -1) ? true : false;
+          return {
+            sideBarIsMinimized: status,
+            }
+          },
 }
 
