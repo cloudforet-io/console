@@ -32,6 +32,7 @@
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="perPage"
                    caption="Users" :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
+                   :busy="isLoading"
                    @rowSelected="rowSelected" @list="listUsers" @limitChanged="limitChanged"
         />
       </b-col>
@@ -86,7 +87,8 @@ export default {
       totalCount: 17,
       queryData: query,
       isReadyForSearch: false,
-      perPage: 3
+      perPage: 3,
+      isLoading: true
     }
   },
   mounted () {
@@ -96,7 +98,14 @@ export default {
     init () {
       this.listUsers(this.perPage, 0)
     },
+    reset () {
+      this.users = []
+      this.selectedUser = null
+      this.isLoading = true
+    },
     async listUsers (limit, skip, sort, search) {
+      this.reset()
+
       if (limit === undefined || limit === null) limit = 10
       if (skip === undefined || skip === null) skip = 0
       if (sort === undefined || sort === null) sort = '-created_date'
@@ -114,7 +123,10 @@ export default {
         console.error(e)
       }
       this.users = res.data
-      this.selectedUser = null
+
+      setTimeout(() => { // this is for test
+        this.isLoading = false
+      }, 1000)
       /**
        * TODO: set totalCount with data from server
        */
