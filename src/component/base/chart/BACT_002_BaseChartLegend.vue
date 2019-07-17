@@ -1,69 +1,93 @@
 <template>
-  <template v-if="legendOption === 1">
-    <b-col class="col-lg-7 col-md-12 row">
-      <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-        <div class="legend" :style="legendDataHandler(selectedData, i,'style')">
-          <div class="legend-title">
-            <b>{{selectedData.labels[i]}}</b>
+  <b-col class="col-lg-7 col-md-12 row">
+    <template v-if="legendOption === 1">
+        <template v-if="chartType === 'Bar'">
+          <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
+            <div class="donut-legend">
+              <div class="donut-legend-title">
+                <b>{{selectedData.labels[i]}}</b>
+              </div>
+              <div class="donut-legend-data">
+                <a href="#">
+                  {{legendDataHandler('data', selectedData, i)}}
+                </a>
+              </div>
+            </div>
           </div>
-          <div class="legend-data">
-            <a href="#">
-              {{legendDataHandler(selectedData, i,'data')}}
-            </a>
+        </template>
+        <template v-else-if="chartType === 'Line'">
+          <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
+            <div class="donut-legend">
+              <div class="donut-legend-title">
+                <b>{{selectedData.labels[i]}}</b>
+              </div>
+              <div class="donut-legend-data">
+                <template v-for="(n, p) in getDataLength(selectedData, '-')">
+                  <a href="#" v-b-tooltip.hover :title="legendLabelLineExt(selectedData, p)">
+                    {{legendDataHandler('data', selectedData, i, p)}}
+                  </a>
+                </template>
+              </div>
+            </div>
           </div>
-        </div>
+        </template>
+        <template v-else-if="chartType === 'Pie'">
+          <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
+            <div class="donut-legend" :style="legendDataHandler(selectedData, i,'style')">
+              <div class="donut-legend-title">
+                <b>{{selectedData.labels[i]}}</b>
+              </div>
+              <div class="donut-legend-data">
+                  <a href="#" >
+                    {{legendDataHandler('data', selectedData, i)}}
+                  </a>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="chartType === 'Radar'">
+
+        </template>
+        <template v-else-if="chartType === 'Polar'">
+
+        </template>
+        <template v-else>
+          <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
+            <div class="donut-legend" :style="legendDataHandler(selectedData, i,'style')">
+              <div class="donut-legend-title">
+                <b>{{selectedData.labels[i]}}</b>
+              </div>
+              <div class="donut-legend-data">
+                <a href="#">
+                  {{legendDataHandler('data', selectedData, i)}}
+                </a>
+              </div>
+            </div>
+          </div>
+        </template>
+    </template>
+    <template v-else-if="legendOption === 2">
+      <div>
+        This is second option
       </div>
-    </b-col>
-  </template>
-  <template v-else-if="legendOption === 2">
-    <b-col>
-
-    </b-col>
-  </template>
-  <template v-else>
-
-  </template>
+    </template>
+  </b-col>
 </template>
 <script>
 
-  import sampleChart from '@/component/base/chart/sample_data/chart_sample_data'
+  import sampleChart from '@/component/base/chart/sample_data/chart_sample_data';
 
   export default {
-    name: 'baseChart',
+    name: 'baseChartLegend',
     components: {
 
     },
     props: {
-      chartTitleData:{
-        type: Object,
-        required: true,
-        default: {
-          isTitleIconUsed: false,
-          TitleIconClass: 'fa fa-globe fa-2x',
-          cardTitle: 'This is Default Title',
-          isDropdownUsed: false,
-        }
-      },
-      chartTitleDownData:{
-        type: Object,
-        required: false,
-        default: () => ({
-          dropDownTitle:'Sample Title',
-          dropDownDataArr: [ { optionId: 'id1', optionTitle: 'sample title1', optionClickMethod : 'optionAction1' },
-                             { optionId: 'id2', optionTitle: 'sample title2', optionClickMethod : 'optionAction2' }
-                           ]
-        })
-      },
       chartType: {
         type: String,
         default: 'Bar',
       },
       chartData: {
-        type: Object,
-        default: null,
-        required: true,
-      },
-      options: {
         type: Object,
         default: null,
         required: true,
@@ -84,47 +108,36 @@
     data () {
       return {
         selectedData : this.chartData,
-        selectedOption: this.options
-      }
-    },
-    created(){
-      if (this.sampleUseYN) {
-        const sampleData = this.getSampleData();
-        this.selectedData = sampleData[0];
-        this.selectedOption = sampleData[1];
       }
     },
     mounted(){
 
     },
     methods:{
-      getSampleData() {
-        let returnVal = null;
-        if(this.chartType === 'Bar') {
-          returnVal = sampleChart.barChartSample();
-        } else if(this.chartType === 'Line') {
-          returnVal = sampleChart.lineChartSample();
-        } else if(this.chartType === 'Pie') {
-          returnVal = sampleChart.pieChartSample();
-        } else {
-          returnVal = sampleChart.donutChartSample();
-        }
-        return returnVal;
-      },
-      dropdownAction(emitFunction, item) {
-        this.$emit(emitFunction, item)
-      },
-      getDataLength(chartData){
+      getDataLength(chartData, type){
+        let length = 0;
         let dataSet = chartData.datasets
-        return (Array.isArray(dataSet)) ? dataSet[0].data.length : dataSet.data.length;
+
+        if(!this.isEmpty(type)){
+          length = dataSet.length;
+        }else{
+          length = (Array.isArray(dataSet)) ? dataSet[0].data.length : dataSet.data.length;
+        }
+
+        return length;
       },
-      legendDataHandler(chartData, idx ,flag) {
+      legendDataHandler(flag, chartData, outerIdx, innerIdx) {
         let groundData = null
         if (flag === 'style') {
-          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[idx] : chartData.datasets.backgroundColor[idx];
+          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[outerIdx] : chartData.datasets.backgroundColor[outerIdx];
           groundData = 'border-left:7px solid ' + groundData;
-        } else if(flag === 'data') {
-          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[idx] : chartData.datasets.data[idx];
+        } else if (flag === 'data') {
+          console.log('idx', outerIdx);
+          if (this.isEmpty(innerIdx)){
+            groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[outerIdx] : chartData.datasets.data[outerIdx];
+          } else {
+            groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[innerIdx].data[outerIdx] : chartData.datasets.data[outerIdx];
+          }
         } else{
         /*
          * TODO:: Please Add a default cases if needed
@@ -132,8 +145,9 @@
         }
           return groundData;
       },
-      setLegendOption(legendProp) {
-
+      legendLabelLineExt(chartData, idx) {
+        let groundData = chartData.datasets[idx];
+        return (groundData.hasOwnProperty('label')) ? groundData.label : "";
       },
     },
   }

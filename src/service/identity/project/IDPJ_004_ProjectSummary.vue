@@ -55,22 +55,22 @@
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <BaseChart
           :sampleUseYN="true"
-          :chartType="'Radar'"
+          :chartType="'Bar'"
           :chartTitleData="sampleTitleData1"
           :chartData="chartDataAndOption1.data"
           :options="chartDataAndOption2.option"
-          :legendOption ="2"
+          :legendOption ="1"
         />
       </div>
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <BaseChart
           :sampleUseYN="true"
-          :chartType="'Polar'"
+          :chartType="''"
           :chartTitleData="sampleTitleData2"
           :chartTitleDownData="sampledropData2"
           :chartData="chartDataAndOption2.data"
           :options="chartDataAndOption2.option"
-          :legendOption ="2"
+          :legendOption ="0"
           @displayAll="displayAll"
           @displayVM="displayVM"
           @displayOS="displayOS"

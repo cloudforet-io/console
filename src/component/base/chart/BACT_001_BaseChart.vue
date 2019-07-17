@@ -22,42 +22,23 @@
       </div>
         <div class="card-body">
           <b-row v-if="chartType === 'Bar'">
-            <b-col class="col-lg-5 col-md-12">
-                <div>
-                  <barChartExt
-                    v-if="loaded"
-                    :sampleUseYN ="sampleUseYN"
-                    :chartData="selectedData"
-                    :options="selectedOption"/>
-                </div>
+            <b-col :class="selectedLegendOption">
+              <div>
+                <bar-chart-ext
+                  v-if="loaded"
+                  :sampleUseYN ="sampleUseYN"
+                  :chartData="selectedData"
+                  :options="selectedOption"/>
+              </div>
             </b-col>
-            <template v-if="legendOption === 1">
-              <b-col class="col-lg-7 col-md-12 row">
-                <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-                  <div class="donut-legend" :style="donutChartDataHandler(selectedData, i,'style')">
-                    <div class="donut-legend-title">
-                      <b>{{selectedData.labels[i]}}</b>
-                    </div>
-                    <div class="donut-legend-data">
-                      <a href="#">
-                        {{donutChartDataHandler(selectedData, i,'data')}}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </b-col>
-            </template>
-            <template v-else-if="legendOption === 2">
-              <b-col>
-
-              </b-col>
-            </template>
-            <template v-else>
-
-            </template>
+              <chartLegend
+                :chartType="chartType"
+                :sampleUseYN ="sampleUseYN"
+                :chartData="selectedData"
+                :legendOption="legendOption"/>
           </b-row>
           <b-row v-else-if="chartType === 'Line'">
-            <b-col class="col-lg-5 col-md-12">
+            <b-col :class="selectedLegendOption">
               <div>
                 <line-chart-ext
                   v-if="loaded"
@@ -66,68 +47,28 @@
                   :options="selectedOption"/>
               </div>
             </b-col>
-            <template v-if="legendOption === 1">
-              <b-col class="col-lg-7 col-md-12 row">
-                <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-                  <div class="donut-legend" :style="donutChartDataHandler(selectedData, i,'style')">
-                    <div class="donut-legend-title">
-                      <b>{{selectedData.labels[i]}}</b>
-                    </div>
-                    <div class="donut-legend-data">
-                      <a href="#">
-                        {{donutChartDataHandler(selectedData, i,'data')}}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </b-col>
-            </template>
-            <template v-else-if="legendOption === 2">
-              <b-col>
-
-              </b-col>
-            </template>
-            <template v-else>
-
-            </template>
+            <chartLegend
+              :chartType="chartType"
+              :sampleUseYN ="sampleUseYN"
+              :chartData="selectedData"
+              :legendOption="legendOption"/>
           </b-row>
           <b-row v-else-if="chartType === 'Pie'">
-            <b-col class="col-lg-5 col-md-12 col-lg-12">
-              <div>
+            <b-col :class="selectedLegendOption">
                 <pie-chart-ext
                   v-if="loaded"
                   :sampleUseYN ="sampleUseYN"
                   :chartData="selectedData"
                   :options="selectedOption"/>
-              </div>
             </b-col>
-            <template v-if="legendOption === 1">
-              <b-col class="col-lg-7 col-md-12 row">
-                <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-                  <div class="donut-legend" :style="donutChartDataHandler(selectedData, i,'style')">
-                    <div class="donut-legend-title">
-                      <b>{{selectedData.labels[i]}}</b>
-                    </div>
-                    <div class="donut-legend-data">
-                      <a href="#">
-                        {{donutChartDataHandler(selectedData, i,'data')}}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </b-col>
-            </template>
-            <template v-else-if="legendOption === 2">
-              <b-col>
-
-              </b-col>
-            </template>
-            <template v-else>
-
-            </template>
+            <chartLegend
+              :chartType="chartType"
+              :sampleUseYN ="sampleUseYN"
+              :chartData="selectedData"
+              :legendOption="legendOption"/>
           </b-row>
           <b-row v-else-if="chartType === 'Polar'">
-            <b-col class="col-lg-5 col-md-12 col-lg-12">
+            <b-col :class="selectedLegendOption">
               <div>
                 <polar-chart-ext
                   v-if="loaded"
@@ -136,33 +77,14 @@
                   :options="selectedOption"/>
               </div>
             </b-col>
-            <template v-if="legendOption === 1">
-              <b-col class="col-lg-7 col-md-12 row">
-                <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-                  <div class="donut-legend" :style="donutChartDataHandler(selectedData, i,'style')">
-                    <div class="donut-legend-title">
-                      <b>{{selectedData.labels[i]}}</b>
-                    </div>
-                    <div class="donut-legend-data">
-                      <a href="#">
-                        {{donutChartDataHandler(selectedData, i,'data')}}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </b-col>
-            </template>
-            <template v-else-if="legendOption === 2">
-              <b-col>
-
-              </b-col>
-            </template>
-            <template v-else>
-
-            </template>
+            <chartLegend
+              :chartType="chartType"
+              :sampleUseYN ="sampleUseYN"
+              :chartData="selectedData"
+              :legendOption="legendOption"/>
           </b-row>
           <b-row v-else-if="chartType === 'Radar'">
-            <b-col class="col-lg-5 col-md-12 col-lg-12">
+            <b-col :class="selectedLegendOption">
               <div>
                 <radar-chart-ext
                   v-if="loaded"
@@ -171,33 +93,14 @@
                   :options="selectedOption"/>
               </div>
             </b-col>
-            <template v-if="legendOption === 1">
-              <b-col class="col-lg-7 col-md-12 row">
-                <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-                  <div class="donut-legend" :style="donutChartDataHandler(selectedData, i,'style')">
-                    <div class="donut-legend-title">
-                      <b>{{selectedData.labels[i]}}</b>
-                    </div>
-                    <div class="donut-legend-data">
-                      <a href="#">
-                        {{donutChartDataHandler(selectedData, i,'data')}}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </b-col>
-            </template>
-            <template v-else-if="legendOption === 2">
-              <b-col>
-
-              </b-col>
-            </template>
-            <template v-else>
-
-            </template>
+            <chartLegend
+              :chartType="chartType"
+              :sampleUseYN ="sampleUseYN"
+              :chartData="selectedData"
+              :legendOption="legendOption"/>
           </b-row>
           <b-row v-else>
-            <b-col class="col-lg-5 col-md-12 ">
+            <b-col :class="selectedLegendOption">
               <div>
                 <donut-chart-ext
                   v-if="loaded"
@@ -206,40 +109,28 @@
                   :options="selectedOption"/>
               </div>
             </b-col>
-            <template v-if="legendOption === 1">
-              <b-col class="col-lg-7 col-md-12 row">
-                <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-                  <div class="donut-legend" :style="donutChartDataHandler(selectedData, i,'style')">
-                    <div class="donut-legend-title">
-                      <b>{{selectedData.labels[i]}}</b>
-                    </div>
-                    <div class="donut-legend-data">
-                      <a href="#">
-                        {{donutChartDataHandler(selectedData, i,'data')}}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </b-col>
-            </template>
-            <template v-else-if="legendOption === 2">
-
-            </template>
-            <template v-else>
-
-            </template>
+            <chartLegend
+              :chartType="chartType"
+              :sampleUseYN ="sampleUseYN"
+              :chartData="selectedData"
+              :legendOption="legendOption"/>
           </b-row>
         </div>
     </div>
 </template>
 
 <script>
+  /*
+   * Note: Graph chart types : ['Bar', 'Line','Pie', 'Radar','Polar','Donut']
+   * default option is Donut, if chartType hasn't set.
+   */
   import barChartExt from '@/component/base/chart/BACT_003_EXT_BaseBarChart.vue';
   import lineChartExt from '@/component/base/chart/BACT_004_EXT_BaseLineChart.vue';
   import pieChartExt from '@/component/base/chart/BACT_005_EXT_BasePieChart.vue';
   import donutChartExt from '@/component/base/chart/BACT_006_EXT_BaseDonutChart.vue';
   import polarChartExt from '@/component/base/chart/BACT_007_EXT_BasePolarAreaChart.vue';
   import radarChartExt from '@/component/base/chart/BACT_008_EXT_BaseRadarChart.vue';
+  import chartLegend from '@/component/base/chart/BACT_002_BaseChartLegend.vue';
   import sampleChart from '@/component/base/chart/sample_data/chart_sample_data';
 
   export default {
@@ -251,6 +142,7 @@
       donutChartExt,
       polarChartExt,
       radarChartExt,
+      chartLegend
     },
     props: {
       chartTitleData:{
@@ -303,15 +195,24 @@
     data () {
       return {
         selectedData : this.chartData,
-        selectedOption: this.options
+        selectedOption: this.options,
+        selectedLegendOption : 'col-lg-5 col-md-12'
       }
     },
     created(){
+      //Set Sample Data for User
       if (this.sampleUseYN) {
         const sampleData = this.getSampleData();
         this.selectedData = sampleData[0];
         this.selectedOption = sampleData[1];
+        console.log('legendOption', this.legendOption)
       }
+
+      //Set new column size if user doesn't use legend option;
+      if(this.legendOption == 0){
+        this.selectedLegendOption = 'col-lg-12 col-md-6'
+      }
+
     },
     mounted(){
 
@@ -341,23 +242,7 @@
         let dataSet = chartData.datasets
         return (Array.isArray(dataSet)) ? dataSet[0].data.length : dataSet.data.length;
       },
-      donutChartDataHandler(chartData, idx ,flag) {
-        let groundData = null
-        if (flag === 'style') {
-          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[idx] : chartData.datasets.backgroundColor[idx];
-          groundData = 'border-left:7px solid ' + groundData;
-        } else if(flag === 'data') {
-          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[idx] : chartData.datasets.data[idx];
-        } else{
-        /*
-         * TODO:: Please Add a default cases if needed
-         */
-        }
-          return groundData;
-      },
-      setLegendOption(legendProp) {
 
-      },
     },
   }
 </script>
