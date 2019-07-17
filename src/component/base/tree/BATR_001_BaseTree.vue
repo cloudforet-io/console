@@ -1,7 +1,7 @@
 <template>
   <div>
       <div class="row" @click="contextMenuIsVisible=false">
-        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-2">
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-2 main-tree-col" >
             <sl-vue-tree v-model="treeData"
                          ref="slVueTree" :allow-multiselect="true"
                          @select="nodeSelected"
@@ -208,6 +208,10 @@
 <style lang="scss" scoped>
   @import '../../../asset/css/sl-vue-tree-ecessntial.css';
 
+  .main-tree-col {
+    padding: 0px 0px 0px 10px;
+
+  }
   .conmenu-leaf {
     border-bottom: #181b1e;
   }
