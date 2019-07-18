@@ -26,18 +26,18 @@
             <span class="next-btn" @click.prevent="onNext"><i class="icon-arrow-right" /></span>
           </b-col>
           <b-col>
-            <BaseModal :name="'tableSettings'" :title="'Table Settings'"
+            <BaseModal ref="modal" :name="'tableSettings'" :title="'Table Settings'"
                        :centered="true" :size="'md'" @ok="limitChanged"
             >
               <template #activator>
                 <span class="settings-btn"><i class="icon-settings" /></span>
               </template>
               <template #contents>
-                <b-form>
-                  <b-form-group label="Rows per page: " :label-cols="3">
-                    <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax" @blur="filterLimit" />
-                  </b-form-group>
-                </b-form>
+                <b-form-group label="Rows per page: " :label-cols="3">
+                  <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax"
+                                @blur="filterLimit" @keydown.enter="onLimitInputEnter"
+                  />
+                </b-form-group>
               </template>
             </BaseModal>
           </b-col>
@@ -47,16 +47,14 @@
         </b-row>
       </b-col>
     </b-row>
-    <b-table class="b-table" primary-key="_id"
-             :style="{minHeight: `${tableMinHeight}px`}"
-             :items="items" :fields="heads"
+    <b-table class="b-table"
+             :items="items" :fields="heads" show-empty
              :striped="striped" :bordered="bordered" :borderless="borderless"
              :dark="dark" :hover="hover"
              :small="small" :fixed="fixed" :responsive="responsive" :stacked="stacked"
              :no-local-sorting="!isLocalSort"
              :tbody-tr-class="rowClass"
              :busy="busy"
-             :tbody-transition-props="transProps"
              @head-clicked="headClicked"
              @row-clicked="rowClicked"
              @sort-changed="sortingChanged"
@@ -66,6 +64,10 @@
         <b-row align-h="center">
           <b-spinner :variant="'secondary'" />
         </b-row>
+      </template>
+
+      <template slot="emptyfiltered" slot-scope="scope">
+        <h4>{{ scope.emptyFilteredText }}</h4>
       </template>
 
       <template v-if="selectable" slot="HEAD_selected">
@@ -149,7 +151,7 @@ export default {
     },
     fixed: {
       type: Boolean,
-      default: false
+      default: true
     },
     responsive: {
       type: String,
@@ -173,7 +175,7 @@ export default {
     },
     perPageMax: {
       type: Number,
-      default: 100
+      default: 20
     },
     dark: {
       type: Boolean,
@@ -196,22 +198,17 @@ export default {
       searchList: [],
       isLocalSort: true,
       limitInput: this.perPage,
-      isSelectedAll: false,
-      transProps: {
-        name: 'flip-list'
-      }
+      isSelectedAll: false
     }
   },
   computed: {
     items () {
-      console.log('items', this.tableData.map(item => item))
       return this.tableData
     },
     heads () { return this.fields },
     limit () { return this.perPage },
     skip () { return (this.currentPage - 1) * this.limit },
-    maxPage () { return Math.ceil(this.totalRows / this.limit) },
-    tableMinHeight () { return this.busy ? 45 * this.limit : 45 * this.tableData.length }
+    maxPage () { return Math.ceil(this.totalRows / this.limit) }
   },
   methods: {
     getBadge (status) {
@@ -229,7 +226,6 @@ export default {
       this.$emit('rowClicked', item, idx, e)
     },
     rowSelected (item, idx, e) {
-      console.log('row selected')
       this.selectedRows.map((row, i) => {
         if (row.data !== item) {
           row.data.selected = false
@@ -346,9 +342,14 @@ export default {
       return className
     },
     limitChanged () {
+      this.filterLimit()
       let currentPageLastRowIdx = this.currentPage * this.limitInput
       if (currentPageLastRowIdx > this.totalRows) this.currentPage = Math.ceil(this.totalRows / this.limitInput)
       this.$emit('limitChanged', this.limitInput)
+    },
+    onLimitInputEnter () {
+      this.$refs.modal.hideModal()
+      this.$refs.modal.$emit('ok')
     }
   }
 }
@@ -389,6 +390,7 @@ export default {
 .card {
   border: 0;
   box-shadow: 0px 0px 2px 1px #a9a9a94f;
+  height: 500px;
   .card-header {
     border: 0;
   }
@@ -397,6 +399,7 @@ export default {
   }
   .b-table {
     display: inline-table;
+    margin: 0;
   }
 }
 

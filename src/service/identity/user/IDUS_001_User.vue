@@ -122,9 +122,14 @@ export default {
       } catch (e) {
         console.error(e)
       }
-      this.users = res.data
 
       setTimeout(() => { // this is for test
+        // let temp = []
+        // for (var i = 0; i < 1000; i++) {
+        //   temp[i] = res.data[0]
+        // }
+        // this.users = temp
+        this.users = res.data
         this.isLoading = false
       }, 1000)
       /**

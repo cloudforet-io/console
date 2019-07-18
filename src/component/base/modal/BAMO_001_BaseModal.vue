@@ -13,7 +13,7 @@
              @ok="$emit('ok')"
              @hidden="$store.dispatch('modal/modalHidden')"
     >
-      <slot v-if="isModalShown" name="contents" />
+      <slot v-if="isModalShown" name="contents" :hide="hideModal" :show="showModal" />
 
       <template v-slot:modal-footer>
         <slot name="footer" />

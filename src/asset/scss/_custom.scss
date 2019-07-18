@@ -51,8 +51,14 @@ textarea:focus, input:focus{
     }
   }
 }
-.b-table .flip-list-move {
-  transition: transform ease-in-out 0.7s;
+.b-table-empty-row {
+  background-color: transparent !important;
+    td {
+      color: gray;
+      vertical-align: middle;
+      text-align: center;
+    }
+
 }
 
 /* Bootstrap checkbox style overwrite */
