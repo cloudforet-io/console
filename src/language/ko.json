@@ -8,7 +8,9 @@
   "SIGN_IN":      "클라우드 원 로그인하기",
   "SIGN_FAIL_TITLE":    "아이디나 패스워드가 에러.",
   "SIGN_FAIL_BODY":     "아이디나 패스워드를 다시 한번 확인해 주세요.",
-  "REGISTER":     "Register Now!"
+  "REGISTER":     "Register Now!",
+  "REMEMBER":     "자동 로그인",
+  "TRTOSIGNUP": "아이디·비번 찾기"
 },
   "ERR_CODE": {
     "ERR_LOG_001": "로그인 에러"

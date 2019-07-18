@@ -14,7 +14,7 @@ import inventoryRoute from '@/service/inventory/inventory_route'
 const DefaultContainer = () => import('@/container/DefaultContainer')
 
 // Views
-const SignIn = () => import('@/view/SignIn')
+const LogIn = () => import('@/view/LogIn')
 
 const attatchLangauge = (to, from, next) => {
   if (!to.params.lang) {
@@ -35,10 +35,10 @@ const router = new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: [
     {
-      path: '/sign-in',
-      name: 'signIn',
-      meta: { label: 'Sign In', requiresAuth: false },
-      component: SignIn
+      path: '/log-in',
+      name: 'logIn',
+      meta: { label: 'Log In', requiresAuth: false },
+      component: LogIn
     },
     {
       path: '/',
@@ -55,13 +55,13 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  for (var i = to.matched.length - 1; i > -1; i--) {
+  for (let i = to.matched.length - 1; i > -1; i--) {
     if (to.matched[i].meta.requiresAuth) {
       if (cookie.get('sessionId')) next()
       else {
         store.dispatch('auth/setNextPath', { nextPath: to.fullPath })
         next({
-          path: '/sign-in'
+          path: '/log-in'
         })
       }
       return
