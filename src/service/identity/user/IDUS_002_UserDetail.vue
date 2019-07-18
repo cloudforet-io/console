@@ -1,6 +1,6 @@
 <template>
   <b-form @reset.prevent="onReset" @submit.prevent="updatable && creatable ? onCreate() : onUpdate()">
-    <b-form-group label="User ID" :label-cols="3" :horizontal="true">
+    <b-form-group label="User ID" :label-cols="3">
       <b-form-input v-model="userId" :plaintext="!updatable" type="text" :state="validateUserId" />
       <b-form-invalid-feedback v-if="updatable" :state="validateUserId">
         Your user ID must be 5-12 characters long.
@@ -10,7 +10,7 @@
       </b-form-valid-feedback>
     </b-form-group>
 
-    <b-form-group v-if="updatable" label="Password" :label-cols="3" :horizontal="true">
+    <b-form-group v-if="updatable" label="Password" :label-cols="3">
       <b-form-input v-model="password" :plaintext="!updatable" type="password" :state="validatePassword" />
       <b-form-invalid-feedback :state="validatePassword">
         Your Password must be 5-12 characters long.
@@ -18,7 +18,7 @@
       <b-form-valid-feedback :state="validatePassword" />
     </b-form-group>
 
-    <b-form-group v-if="updatable" label="Password Check" :label-cols="3" :horizontal="true">
+    <b-form-group v-if="updatable" label="Password Check" :label-cols="3">
       <b-form-input v-model="passwordCheck" :plaintext="!updatable" type="password"
                     :state="validatePasswordCheck"
       />
@@ -28,38 +28,38 @@
       <b-form-valid-feedback :state="validatePasswordCheck" />
     </b-form-group>
 
-    <b-form-group label="Name" :label-cols="3" :horizontal="true">
+    <b-form-group label="Name" :label-cols="3">
       <b-form-input v-model="name" :plaintext="!updatable" type="text" />
     </b-form-group>
 
-    <b-form-group label="E-Mail" :label-cols="3" :horizontal="true">
+    <b-form-group label="E-Mail" :label-cols="3">
       <b-form-input v-model="email" :plaintext="!updatable" type="text" />
     </b-form-group>
 
-    <b-form-group label="Phone" :label-cols="3" :horizontal="true">
+    <b-form-group label="Phone" :label-cols="3">
       <b-form-input v-model="mobile" :plaintext="!updatable" type="text" />
     </b-form-group>
 
-    <b-form-group label="Group Name" :label-cols="3" :horizontal="true">
+    <b-form-group label="Group Name" :label-cols="3">
       <b-form-input v-model="group" :plaintext="!updatable" type="text" />
     </b-form-group>
 
-    <b-form-group label="Domain ID" label-for="domainId" :label-cols="3" :horizontal="true">
+    <b-form-group label="Domain ID" label-for="domainId" :label-cols="3">
       <b-form-input v-model="domainId" :plaintext="!updatable" type="text" :state="validateDomainId" />
       <b-form-invalid-feedback v-if="updatable" :state="validateDomainId">
         Please enter your domain ID.
       </b-form-invalid-feedback>
     </b-form-group>
 
-    <b-form-group label="Language" label-for="language" :label-cols="3" :horizontal="true">
+    <b-form-group label="Language" label-for="language" :label-cols="3">
       <b-form-input v-model="language" :plaintext="!updatable" type="text" />
     </b-form-group>
 
-    <b-form-group label="Time Zone" label-for="timezone" :label-cols="3" :horizontal="true">
+    <b-form-group label="Time Zone" label-for="timezone" :label-cols="3">
       <b-form-input v-model="timezone" :plaintext="!updatable" type="text" />
     </b-form-group>
 
-    <b-form-group label="Tags" :label-cols="3" :horizontal="true">
+    <b-form-group label="Tags" :label-cols="3">
       <BaseTag :updatable="updatable" :creatable="creatable" :tags-prop="updatable ? updatableTags : tags" />
     </b-form-group>
 
@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import BaseTag from '@/component/base/tag/BATG_001_BaseTag.vue';
+import BaseTag from '@/component/base/tag/BATG_001_BaseTag.vue'
 
 const userModel = {
   userId: null,
