@@ -10,7 +10,9 @@
     "SIGN_FAIL_TITLE":"Wrong Password or Username.",
     "SIGN_FAIL_BODY":"Please confirm your Username or Password.",
     "REGISTER":"Register Now!",
-    "REMEMBER":"Remember Me"
+    "REMEMBER":"Remember Me",
+    "TR_NOTI": "Trouble to Log In?",
+    "TR_NOTI_CON": ""
   },
   "ERR_CODE":{
     "ERR_LOG_001":"User ID and Password error"

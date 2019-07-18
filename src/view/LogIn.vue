@@ -22,6 +22,37 @@
     </ul>
 
     <div class="container">
+      <BaseSimpleModal
+        ref="LogInSimpleModal"
+        :simpleModalType="selectedType"
+        :simpleModalTitle="instructionTitle">
+          <template  #contents>
+            <div style="font-family: 'Noto Sans', sans-serif;">We apologize for inconvenience. 'Sign up', 'Password retrieval' feature currently unavailable due to our policies.
+              <br>Please, contact System Administrator for following contacts:
+              <br>
+              <div>● e-mail:<a href="mailto:admin@mz.co.kr"> <b> admin@mz.co.kr</b></a></div>
+              <div>● Phone: <a href="#">+82 (02)<b>1644-2243</b></a></div>
+            </div>
+          </template>
+      </BaseSimpleModal>
+      <div class="modal fade" id="simpleModal" tabindex="-1" role="dialog" aria-labelledby="simpleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="simpleModalLabel">title</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              ...
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <b-row class="justify-content-center">
         <b-col md="8">
           <b-card-group>
@@ -61,8 +92,13 @@
                       </b-form-checkbox>
                     </b-col>
                     <b-col class="col-1 col-xs-1 col-sm-1 col-md-1 col-lg-4 col-xl-4 login-check">
-                      <button type="button" class="btn btn-link login-check" v-b-tooltip.hover
-                              title="Trouble to Log In?">
+                      <button type="button"
+                              class="btn btn-link login-check"
+                              v-b-tooltip.hover
+                              title="Trouble to Log In?"
+                              data-toggle="modal"
+                              data-target="#simpleModal"
+                              @click="popSignUpInstruction" >
                         <i class="fa fa-exclamation-circle"></i>
                       </button>
                     </b-col>
@@ -101,19 +137,25 @@
 </template>
 
 <script>
+  const signupContents = "We apologize for inconvenience. 'Sign up', 'Password retrieval' feature currently unavailable due to our policies."
+    +" Please, contact System Administrator for following contacts: " + "<br>"
+    +"● e-mail: admin@mz.co.kr";
   import {mapGetters} from 'vuex'
-  import i18n from '../setup/i18n'
-
+  import BaseSimpleModal from '@/component/base/modal/BAMO_002_BaseSimpleModal.vue';
   export default {
-    components: {},
-
+    components: {
+      BaseSimpleModal
+    },
     data() {
       return {
+        selectedType: 4,
+        instructionTitle: this.$i18n.t('MSG.TR_NOTI'),
+        instructionContents: signupContents,
         rememberStatus: false,
         seenGreet: true,
         seenError: false,
-        username: '',
-        password: ''
+        username: 'iamnewyorker1222',
+        password: 'this_is_my_scret_password1'
       }
     },
     computed: {
@@ -168,7 +210,9 @@
           localStorage.checkbox = false;
         }
       },
-
+      popSignUpInstruction() {
+        this.$refs.LogInSimpleModal.showModal()
+      },
     }
   }
 </script>
