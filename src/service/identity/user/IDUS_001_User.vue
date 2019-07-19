@@ -32,7 +32,7 @@
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="perPage"
                    caption="Users" :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
-                   :busy="isLoading"
+                   :busy="isLoading" :cardless="true"
                    @rowSelected="rowSelected" @list="listUsers" @limitChanged="limitChanged"
         />
       </b-col>
@@ -113,7 +113,7 @@ export default {
 
       let res
       try {
-        res = await this.$http.get(`/identity/user`, {
+        res = await this.$http.get(`/identity/users`, {
           params: { limit, skip, sort }
           /**
            * TODO: set limit, skip, sort and search in the right format

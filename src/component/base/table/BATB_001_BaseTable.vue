@@ -1,5 +1,5 @@
 <template>
-  <b-card>
+  <b-card :class="{'no-card': cardless}">
     <b-row slot="header" align-v="center">
       <b-col cols="4" sm="6" md="2"
              class="mb-md-0 mb-3"
@@ -145,6 +145,10 @@ export default {
       type: Boolean,
       default: true
     },
+    cardless: {
+      type: Boolean,
+      default: false
+    },
     small: {
       type: Boolean,
       default: false
@@ -187,7 +191,7 @@ export default {
     },
     busy: {
       type: Boolean,
-      default: true
+      default: false
     }
   },
   data () {
@@ -391,6 +395,20 @@ export default {
   border: 0;
   box-shadow: 0px 0px 2px 1px #a9a9a94f;
   height: 500px;
+  &.no-card {
+    border: 0;
+    box-shadow: none;
+    height: 500px;
+    margin: 0;
+    padding: 0;
+    .card-header {
+      background-color: transparent;
+    }
+    .card-body {
+      padding: 0;
+      margin: 0;
+    }
+  }
   .card-header {
     border: 0;
   }
