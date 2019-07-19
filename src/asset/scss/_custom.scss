@@ -8,6 +8,8 @@ $gray-op: rgba(142, 152, 178, 0.06);
 $gray: rgba(142, 152, 178, 0.2);
 $lightblue-op: rgba(188, 208, 250, 0.6);
 $lightblue: rgb(188, 208, 250);
+$red: #e81d2a;
+$green: #2D9E6E;
 
 /* INIT */
 textarea:focus, input:focus{
@@ -22,6 +24,7 @@ textarea:focus, input:focus{
   outline: none;
   box-shadow: none;
 }
+
 
 /* Bootstrap table style overwrite */
 .table-striped tbody tr:nth-of-type(odd) {

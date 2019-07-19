@@ -60,7 +60,9 @@
     </b-form-group>
 
     <b-form-group label="Tags" :label-cols="3">
-      <BaseTag :updatable="updatable" :creatable="creatable" :tags-prop="updatable ? updatableTags : tags" />
+      <b-col :cols="updatable || creatable ? '12' : '5'">
+        <BaseTag ref="baseTag" :tag-data="tags" :editable="updatable || creatable" />
+      </b-col>
     </b-form-group>
 
     <div v-if="updatable" class="btn-box mt-5">
@@ -123,14 +125,11 @@ export default {
       group: this.userProp.group,
       domainId: this.userProp.domainId, // required
       language: this.userProp.language,
-      timezone: this.userProp.timezone,
-      updatableTags: this.updatable ? this.userProp.tags.slice(0) : []
+      timezone: this.userProp.timezone
     }
   },
   computed: {
-    tags () {
-      return this.updatable ? this.updatableTags : this.userProp.tags
-    },
+    tags () { return this.userProp.tags },
     validateUserId () {
       if (this.userId === null) return null
       if (this.userId.length > 4) return true
@@ -209,7 +208,7 @@ export default {
       this.domainId = user.domainId
       this.language = user.language
       this.timezone = user.timezone
-      this.updatableTags = user.tags.slice(0)
+      this.$refs.baseTag.resetRows()
     }
   }
 }
