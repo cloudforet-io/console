@@ -1,8 +1,33 @@
 <template>
   <div div class="animated fadeIn">
     <div class="row">
-
+      <div class="col-12">
+          <BaseModal id='IDPJ001_Project_Edit_Modal'
+                     ref="Modal"
+                     :name="'EditModal'"
+                     :title="projectModalTitle"
+                     :centered="true"
+                     :hide-footer="true" >
+            <template #contents>
+              <BaseTabs ref="EditTab"
+                        is="BaseTabs"
+                        :tabs="modalTabs"
+                        :key="tabs.path"
+                        :fill="true"
+                        :selectedData="selectedData"
+                        :isCreatable="createProcess"
+                        :isUpdatable="updateProcess"
+                        :isFooterVisible="true"
+                        @create="createProject"
+                        @update="updateProject">
+                <template  #ModaltabContentsPanel>
+                </template>
+              </BaseTabs>
+            </template>
+          </BaseModal>
+      </div>
     </div>
+
     <BaseTree ref='projectTree'
               :tree-prop="treeData"
               @selected="NodeSelected"
@@ -15,9 +40,8 @@
           :isFooterVisible="false"
           :tab="tab"
           >
-
           </BaseTabNav>
-                  </template>
+        </template>
     </BaseTree>
   </div>
 </template>
@@ -100,6 +124,7 @@
     }
   ];
 
+
   let NodePR = {
   title: '',
   isLeaf: true,
@@ -144,8 +169,26 @@
       component: projectAudit
     }
   ];
+
   const projectEditPopupName = () => import ('./IDPJ_002_ProjectEditPopupName')
   const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopupTag')
+
+  const modalTab = [
+    {
+      tabIcon:"icon-calculator",
+      tabTitle:'DEFAULT',
+      updatable: true,
+      creatable: true,
+      component: projectEditPopupName
+    },
+    {
+      tabIcon:"icon-user",
+      tabTitle:'TAGS',
+      updatable: true,
+      creatable: true,
+      component: projectEditPopupTag
+    },
+  ];
 
   import projectSummary from './IDPJ_004_ProjectSummary.vue';
   import projectAudit from './IDPJ_007_ProjectAudit.vue';
@@ -180,34 +223,20 @@
     data() {
       return {
         tab: tabs[0].component,
+        /*  Selected Data => Selected node data & flag
+         */
         selectedData: {},
+        /*  Process Data => data that has to be taken by action
+         */
         processData: {},
         createProcess: false,
         updateProcess: false,
         treeData: sampleNode,
-        projectModaltitle: 'Edit a Project',
+        projectModalTitle: 'Edit a Project',
         modalVisible: false,
         lastEvent: 'Right-Click to open context menus on tree.',
-        tabIndex: [0],
         tabs: tabs,
-        projIndex: [0],
-        projTabs: [
-          {
-            tabIcon:"icon-calculator",
-            tabTitle:'DEFAULT',
-            updatable: true,
-            creatable: true,
-            component: projectEditPopupName
-          },
-          {
-            tabIcon:"icon-user",
-            tabTitle:'TAGS',
-            updatable: true,
-            creatable: true,
-            component: projectEditPopupTag
-          },
-
-        ]
+        modalTabs: modalTab
       }
     },
     mounted: function () {
@@ -245,13 +274,13 @@
           this.$refs.Modal.showModal();
         }
       },
-      manageTabButton(flag,state, title){
+      manageTabButton (flag,state, title){
         if (flag==='CRT') {
           this.projectModaltitle = (title) ? 'Create a Project Group': 'Create a Project';
           this.updateProcess = !state;
           this.createProcess =  state;
 
-        } else if(flag==='UPT'){
+        } else if (flag==='UPT'){
           this.createProcess = !state;
           this.updateProcess = state;
 
@@ -260,6 +289,7 @@
         }
       },
       async updateProject(items){
+        debugger;
         console.log('item', items);
         const treeV = items.tree
         const path = treeV.getSelected()[0].path;

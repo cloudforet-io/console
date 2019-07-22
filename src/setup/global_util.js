@@ -77,27 +77,53 @@ export const Mixin = {
      * Description:  Select badges variant by given val
      **********************************************************************************/
     selectBadges: function (s) {
-      const successFlag = ['Active', 'Success'];
-      const secondaryFlag = ['Inactive'];
-      const dangerFlag = ['Banned', 'Failure'];
-      const warningFlag = ['Pending'];
+      const successFlag = ['active', 'success'];
+      const secondaryFlag = ['inactive'];
+      const dangerFlag = ['banned', 'failure', 'fail'];
+      const warningFlag = ['pending'];
       const infoFlag = [];
       const lightFlag = [];
       const darkFlag = [];
-      return successFlag.includes(s) ? 'success'
-        : secondaryFlag.includes(s) ? 'secondary'
-          : dangerFlag.includes(s) ? 'danger'
-            : warningFlag.includes(s) ? 'warning'
-              : infoFlag.includes(s) ? 'info'
-                : lightFlag.includes(s) ? 'light'
-                  : darkFlag.includes(s) ? 'dark'
+      return successFlag.includes(s.toLowerCase()) ? 'success'
+        : secondaryFlag.includes(s.toLowerCase()) ? 'secondary'
+          : dangerFlag.includes(s.toLowerCase()) ? 'danger'
+            : warningFlag.includes(s.toLowerCase()) ? 'warning'
+              : infoFlag.includes(s.toLowerCase()) ? 'info'
+                : lightFlag.includes(s.toLowerCase()) ? 'light'
+                  : darkFlag.includes(s.toLowerCase()) ? 'dark'
                     : 'primary';
+    },
+    /**********************************************************************************
+     * Input   => (s: any String   => String)
+     * Output  => (String): with First letter
+     * Description:  Select badges variant by given val
+     **********************************************************************************/
+    capitalize: (s) => {
+      if (typeof s !== 'string') return ''
+      return s.charAt(0).toUpperCase() + s.slice(1)
+    },
+    /**********************************************************************************
+     * Input   => (s: any String   => String)
+     *             o: any object   => Object)
+     * Output  => print out on console.log
+     * Description:  Console.log if only when it's not in production.
+     **********************************************************************************/
+    consoleLogEnv: function (s, o) {
+     const processEnv = this.$root.$options.components.App.props.processEnv.default;
+     if (!this.isEmpty(processEnv) && processEnv != 'production') {
+       if(!this.isEmpty(o)){
+         console.log(s,o);
+       } else {
+         console.log(s);
+       }
+     }
     },
   },
   data: function () {
     let status = (document.body.className.indexOf('sidebar-minimized brand-minimized') > -1) ? true : false;
     return {
       sideBarIsMinimized: status,
+      currentNodeEnv: null,
     }
   },
 }

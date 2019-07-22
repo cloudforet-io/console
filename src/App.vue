@@ -9,7 +9,13 @@
 <script>
 
 export default {
-  name: 'App'
+  name: 'App',
+  props: {
+    processEnv: {
+      type: String,
+      default: process.env.NODE_ENV,
+    }
+  },
 }
 
 </script>
@@ -19,7 +25,6 @@ export default {
     background-color: #fafafa;
     font-family: 'Noto Sans', sans-serif;
   }
-
   // CoreUI Icons Set
   @import '~@coreui/icons/css/coreui-icons.min.css';
   /* Import Font Awesome Icons Set */

@@ -41,7 +41,6 @@ Vue.prototype.$http = api
  * nodeSelectedEvent, closeModalEvent
  */
 Vue.prototype.$bus = new Vue({})
-
 directive(Vue)
 
 new Vue({

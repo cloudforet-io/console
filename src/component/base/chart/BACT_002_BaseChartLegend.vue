@@ -134,7 +134,7 @@
           groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[outerIdx] : chartData.datasets.backgroundColor[outerIdx];
           groundData = 'border-left:7px solid ' + groundData;
         } else if (flag === 'data') {
-          console.log('idx', outerIdx);
+          this.consoleLogEnv('idx', outerIdx);
           if (this.isEmpty(innerIdx)){
             groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[outerIdx] : chartData.datasets.data[outerIdx];
           } else {

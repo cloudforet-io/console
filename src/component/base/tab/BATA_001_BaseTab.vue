@@ -1,36 +1,33 @@
 <template>
       <b-col xs="12" lg="12">
-          <b-tabs v-model="tabIndex[0]" :fill="fill">
-                <b-tab
-                  :lazy="true"
-                  v-for="(tab, idx) in tabs"
-                  :key="tab.path"
-                  @click="setCurrentTab(tab)">
+          <b-tabs :fill="fill">
+                <b-tab v-for="(tab, idx) in tabs"
+                       :lazy="true"
+                       :key="idx"
+                        @click="setCurrentTab(tab)">
                     <div name="tabHeader" v-if="!tab.icon" slot="title">
                         <i  :class="tab.tabIcon" style="color:blue"></i>
                         {{tab.tabTitle}}
                     </div>
                     <br>
-                  <keep-alive>
                     <slot name="tabsContentPanel">
                       <component
                         ref="popupTab"
                         :is="currentTab.component"
-                        :selectedData="dataforTab"
+                        :selectedData="dataForTab"
                         :isCreatable="isCreate"
                         :isUpdatable="isUpdate"
                         :isDeletable="isDelete"
                         class="tab">
                       </component>
                     </slot>
-                  </keep-alive>
               </b-tab>
 
           </b-tabs>
     <b-row>
       <slot name="footerArea" >
         <div class="col-md-12">
-          <div class="modal-footer" style="border-top:none; padding-right: 0px" v-show="isfooterVisible">
+          <div class="modal-footer" style="border-top:none; padding-right: 0px" v-show="isFooterVisible">
             <b-button size="md" v-show="isCreatable" @click="createNew" variant="outline-primary">Create</b-button>
             <b-button size="md" v-show="isUpdatable" @click="updateSelect" variant="outline-success">Update</b-button>
             <b-button size="md" v-show="isDeletable" @click="deleteSelect" variant="outline-danger">Delete</b-button>
@@ -62,19 +59,19 @@
         default: () => []
       },
       isCreatable:{
-        tyep:Boolean,
+        type:Boolean,
         default: false,
       },
       isUpdatable:{
-        tyep:Boolean,
+        type:Boolean,
         default: false,
       },
       isDeletable:{
-        tyep:Boolean,
+        type:Boolean,
         default: false,
       },
-      isfooterVisible:{
-        tyep:Boolean,
+      isFooterVisible:{
+        type:Boolean,
         default: false,
       },
       selectedData:{
@@ -85,6 +82,8 @@
     created(){
       this.$bus.$on('setTabData', this.setTabData)
     },
+    mounted(){
+    },
     beforeDestroy: function(){
       this.$bus.$off('setTabData');
     },
@@ -92,7 +91,7 @@
       return {
         prosData: {},
         currentTab: this.tabs[0],
-        dataforTab: this.selectedData,
+        dataForTab: this.selectedData,
         tabContentData: {},
         isCreate: this.isCreatable,
         isUpdate: this.isUpdatable,
@@ -112,28 +111,29 @@
         this.currentTab = tab;
       },
       displayFooter:() => {
-        this.isfooterVisible = true;
+        this.isFooterVisible = true;
       },
       hideFooter:() => {
-        this.isfooterVisible = false;
+        this.isFooterVisible = false;
       },
       createNew (){
-        baseTabParams = this.dataforTab;
+        baseTabParams = this.dataForTab;
         baseTabParams['tabContents'] =  this.$refs.popupTab;
         this.$emit('create', baseTabParams);
       },
       updateSelect (){
-        baseTabParams = this.dataforTab;
+        baseTabParams = this.dataForTab;
         baseTabParams['tabContents'] =  this.$refs.popupTab;
         this.$emit('update', baseTabParams);
       },
       deleteSelect:() => {
-        baseTabParams = this.dataforTab;
+        baseTabParams = this.dataForTab;
         baseTabParams['tabContents'] =  this.$refs.popupTab;
         this.$emit('delete', baseTabParams);
       },
       closeWindow (e) {
         this.$parent.$store.dispatch('modal/closeModal');
+
       },
     }
   }

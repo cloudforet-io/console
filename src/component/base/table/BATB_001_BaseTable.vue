@@ -79,7 +79,8 @@
       </template>
 
       <template v-if="selectable" slot="HEAD_selected">
-        <b-check v-model="isSelectedAll" class="select-all-checkbox"
+        <b-check v-model="isSelectedAll"
+                 class="select-all-checkbox"
                  @change="onSelectAll"
         />
       </template>
@@ -92,7 +93,7 @@
 
       <template slot="status" slot-scope="data">
         <h5><b-badge :variant="getBadge(data.item.status)">
-          {{ data.item.status }}
+            {{capitalizeFirstLetter(data.item.status)}}
         </b-badge></h5>
       </template>
 
@@ -369,6 +370,9 @@ export default {
     onLimitInputEnter () {
       this.$refs.modal.hideModal()
       this.$refs.modal.$emit('ok')
+    },
+    capitalizeFirstLetter (s) {
+      return this.capitalize(s);
     }
   }
 }
