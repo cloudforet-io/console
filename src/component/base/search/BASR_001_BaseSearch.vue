@@ -11,7 +11,7 @@
 
             <BaseInput ref="input" :list-data="contextData.queryList" @add="addTag" />
           </div>
-          <span class="input-delete-button" @click="deleteAll"><i class="fa fa-times" /></span>
+          <span class="input-delete-button" @click="deleteAll"><i class="icon-close" /></span>
         </b-col>
 
         <b-input-group-append class="col-2 pl-0">
