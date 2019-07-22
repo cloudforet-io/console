@@ -1,84 +1,107 @@
 <template>
   <div>
-    <div class="mt-1 mb-3">
-      <span v-for="(tag, idx) in tags" :key="idx" class="tag-badge mr-2">
-        <b-badge v-for="(val, k) in tag" :key="k" variant="light">
-          {{ k }} : {{ val }} <i v-if="updatable" class="tag-delete-btn fa fa-times-circle" @click="deleteTag(idx)" />
-        </b-badge>
-      </span>
+    <b-row align-h="between" no-gutters>
+      <b-col cols="12" class="mt-1 ">
+        <b-button v-if="!isEditable && !showSaveBtn" variant="primary" class="edit-btn" @click="onEdit">
+          Edit
+        </b-button>
+      </b-col>
+    </b-row>
+
+    <div class="mt-1 mb-1">
+      <div v-for="(row, idx) in rows" :key="row.rowId">
+        <KeyValueInput ref="tag" :data="row.tag" :read-only="!isEditable" @delete="deleteRow(idx)" />
+      </div>
     </div>
-    <b-form v-if="updatable">
-      <b-row>
-        <b-col cols="3" class="text-center">
-          <label>Key</label>
-        </b-col>
-        <b-col cols="3" class="text-center">
-          <label>Value</label>
-        </b-col>
-      </b-row>
-      <b-row align-v="center">
-        <b-col cols="3">
-          <b-form-input v-model="key" type="text" />
-        </b-col> :
-        <b-col cols="3">
-          <b-form-input v-model="value" type="text" />
-        </b-col>
-        <b-col cols="3">
-          <b-button type="button" size="sm" variant="light" @click="addTag">
-            Add
-          </b-button>
-        </b-col>
-      </b-row>
-    </b-form>
+
+    <b-row v-if="isEditable" no-gutters>
+      <b-col cols="6" class="mt-1">
+        <span class="add-btn" @click="addRow">
+          <i class="fa fa-plus-square" /> Add New
+        </span>
+      </b-col>
+      <b-col v-if="showSaveBtn" cols="5" class="text-right">
+        <b-button class="cancel-btn mr-2" @click="onCancel">
+          Cancel
+        </b-button>
+        <b-button variant="primary" class="save-btn" @click="onSave">
+          Save
+        </b-button>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
 <script>
+import KeyValueInput from '@/component/base/input/BAIN_003_KeyValueInput'
 export default {
   name: 'BaseTag',
+  components: { KeyValueInput },
   props: {
-    tagsProp: {
+    tagData: {
       type: Array,
       default: () => []
     },
-    updatable: {
+    editable: {
       type: Boolean,
       default: false
     }
   },
   data () {
     return {
-      key: '',
-      value: ''
+      rows: this.tagData.map((tag, i) => ({ rowId: i, tag: tag })),
+      lastRowId: this.tagData.length,
+      isEditable: this.editable,
+      showSaveBtn: false
     }
   },
   computed: {
-    tags () {
-      return this.tagsProp
-    }
   },
   methods: {
-    addTag () {
-      let newTag = {}
-      newTag[this.key] = this.value
-      this.tags.push(newTag)
-      this.key = ''
-      this.value = ''
+    addRow () {
+      this.rows.push({ rowId: this.lastRowId++, tag: {} })
     },
-    deleteTag (idx) {
-      this.tags.splice(idx, 1)
+    deleteRow (idx) {
+      this.$delete(this.rows, idx)
+    },
+    resetRows () {
+      this.rows = this.tagData.map((tag, i) => ({ rowId: i, tag: tag }))
+    },
+    onSave () {
+      this.showSaveBtn = false
+      this.isEditable = false
+    },
+    onEdit () {
+      this.showSaveBtn = true
+      this.isEditable = true
+    },
+    onCancel () {
+      this.showSaveBtn = false
+      this.isEditable = false
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.tag-badge {
-  font-size: 1.3em;
-  .tag-delete-btn {
-    vertical-align: text-top;
-    font-size: 0.95em;
-    cursor: pointer;
-  }
+%btn {
+  i {
+      font-size: 1.3em;
+      vertical-align: text-top;
+    }
+  cursor: pointer;
 }
+.add-btn {
+  @extend %btn;
+  color: #2D9E6E;
+}
+// .edit-btn {
+//   @extend %btn;
+//   color: #3E4AC7;
+// }
+// .save-btn {
+//   @extend %btn;
+//   color: #3E4AC7;
+// }
+
 </style>

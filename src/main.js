@@ -33,7 +33,7 @@ Vue.use(VueAlertify)
 Vue.use(VueInputAutowidth)
 Vue.use(CountryFlag)
 Vue.use(Notifications, { velocity })
-Vue.use({ $, jQuery })
+Vue.use({ $, jQuery }),
 Vue.prototype.$http = api
 
 /* This is a Global Bus Event;
