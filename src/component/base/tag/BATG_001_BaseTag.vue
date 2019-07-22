@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <b-row v-if="isEditable" align-h="" no-gutters>
+    <b-row v-if="isEditable" no-gutters>
       <b-col cols="6" class="mt-1">
         <span class="add-btn" @click="addRow">
           <i class="fa fa-plus-square" /> Add New
