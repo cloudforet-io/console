@@ -1,6 +1,7 @@
 <template>
   <div class="animated fadeIn">
-    <b-row>
+    <b-card class="up-corner-no-radius border-top-0">
+      <b-row>
       <b-col cols="6" sm="4" md="2" class="mb-3">
         <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
           <template #activator>
@@ -32,10 +33,15 @@
     </b-row>
     <b-row>
       <b-col cols="12">
-        <BaseTable :table-data="users" :fields="fields" :per-page="3"
-                   caption="Users" :searchable="true" :list-fn="listUsers"
-                   :row-clicked-fn="rowClicked" :total-rows="totalCount"
-
+        <BaseTable :table-data="users"
+                   :fields="fields"
+                   :per-page="3"
+                   :cardless="true"
+                   caption="Users"
+                   :searchable="true"
+                   :list-fn="listUsers"
+                   :row-clicked-fn="rowClicked"
+                   :total-rows="totalCount"
         />
       </b-col>
     </b-row>
@@ -49,6 +55,7 @@
         </b-card>
       </b-col>
     </b-row>
+    </b-card>
   </div>
 </template>
 
@@ -123,5 +130,8 @@
 </script>
 
 <style lang="scss" scoped>
-
+  .up-corner-no-radius{
+    border-top-left-radius: 0px !important;
+    border-top-right-radius: 0px !important;;
+  }
 </style>

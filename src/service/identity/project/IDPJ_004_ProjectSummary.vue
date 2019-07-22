@@ -1,16 +1,16 @@
 <template>
   <div class="animated fadeIn" >
     <div>
-      <b-card>
         <div class="row">
-          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-12" style="display: block;">
-            <h4 class="page-header m-t-0">
-              <i class="fa fa-hashtag m-r-5">
-              </i>&nbsp&nbsp Base Information</h4>
-            <hr>
-            <b-container fluid>
+          <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12" >
+            <b-card class="up-corner-no-radius border-top-0">
+              <h4 class="page-header m-t-0">
+                <i class="fa fa-hashtag m-r-5">
+                </i>&nbsp&nbsp Base Information</h4>
+              <hr>
+              <b-container fluid>
                 <dl class="dl-horizontal m-b-0 row">
-                  <div class="col-sm-12 col-md-6 summary" v-for="(info, idx) in summaryBaseInfo">
+                  <div class="col-sm-12 col-md-6 summary" v-for="(info, idx) in summaryBaseInfo" :key="idx">
                     <dt>{{info.title}}</dt>
                     <dd>{{info.contents}}</dd>
                     <span @click="CopyToClipboard(info.contents)" class="copy-clipboard" v-b-tooltip.hover title="Copy to Clipboard">
@@ -18,26 +18,25 @@
                     </span>
                   </div>
                 </dl>
-            </b-container>
-            <h4 class="page-header">
-              <i class="fa fa-tag m-r-5"></i>&nbsp&nbsp Tag
-            </h4>
-            <hr>
-            <b-container fluid>
-              <dl class="dl-horizontal m-b-0 row">
-                <div class="col-sm-12 col-md-6 summary" v-for="tag in summaryBaseTag">
-                  <dt title="Tag Key">{{tag.tagKey}}</dt>
-                  <dd title="Tag Value">{{tag.tagValue}}</dd>
+              </b-container>
+              <h4 class="page-header">
+                <i class="fa fa-tag m-r-5"></i>&nbsp&nbsp Tag
+              </h4>
+              <hr>
+              <b-container fluid>
+                <dl class="dl-horizontal m-b-0 row">
+                  <div class="col-sm-12 col-md-6 summary" v-for="tag in summaryBaseTag">
+                    <dt title="Tag Key">{{tag.tagKey}}</dt>
+                    <dd title="Tag Value">{{tag.tagValue}}</dd>
                     <span @click="CopyToClipboard(tag.tagValue)" class="copy-clipboard" v-b-tooltip.hover title="Copy to Clipboard">
                            <i class="fa fa-copy"></i>
                     </span>
-                </div>
-              </dl>
-            </b-container>
-          </div>
+                  </div>
+                </dl>
+              </b-container>
+            </b-card>
+          </b-col>
         </div>
-      </b-card>
-      <br>
     </div>
     <div class="col-xs-12 p-0">
       <div class="row">
@@ -55,7 +54,7 @@
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
         <BaseChart
           :sampleUseYN="true"
-          :chartType="'Bar'"
+          :chartType="'Line'"
           :chartTitleData="sampleTitleData1"
           :chartData="chartDataAndOption1.data"
           :options="chartDataAndOption2.option"
@@ -166,10 +165,10 @@
         ];
 
         const sampleAsset = [
-          {asKey: 'Server',   assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server fa-2x'},
-          {asKey: 'Volume', assetValue: 2,    linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database fa-2x'},
-          {asKey: 'Project', assetValue: 17,  linkURL: 'www.bing.com', icon: 'fa fa-star fa-2x'},
-          {asKey: 'Member', assetValue: 0,    linkURL: 'www.naver.com', icon: 'fa fa-users fa-2x'},
+          {asKey: 'Server',   assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server'},
+          {asKey: 'Volume', assetValue: 2,    linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database'},
+          {asKey: 'Project', assetValue: 17,  linkURL: 'www.bing.com', icon: 'fa fa-star'},
+          {asKey: 'Member', assetValue: 0,    linkURL: 'www.naver.com', icon: 'fa fa-users'},
         ];
 
         const chartTitleSampleData1 ={
@@ -197,7 +196,7 @@
 
         const chartDataAndOption1 = {
           data:{
-            labels: ['VueJs', ' Beans. I wnois.', 'ReactJs', 'AngularJs'],
+            labels: ['VueJs', ' Beans', 'ReactJs', 'AngularJs'],
             datasets: [
               {
                 backgroundColor: this.getRandomColorArr(4),
@@ -318,5 +317,9 @@
   }
   .copy-clipboard:hover i {
     visibility:visible;
+  }
+  .up-corner-no-radius{
+    border-top-left-radius: 0px !important;
+    border-top-right-radius: 0px !important;;
   }
 </style>

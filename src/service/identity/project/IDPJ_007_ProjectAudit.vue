@@ -1,124 +1,443 @@
 <template>
   <div class="animated fadeIn">
-    <b-row>
-      <b-col cols="12">
-        <BaseTable :table-data="audits" :fields="fields" :per-page="3"
-                   caption="" :searchable="false" :row-clicked-fn="rowClicked"
-                   :total-rows="totalCount" :query-data="query"
-                   @list="listAudits"
-        />
-      </b-col>
-    </b-row>
+    <b-card class="up-corner-no-radius border-top-0">
+      <b-row>
+        <b-col cols="12">
+          <BaseTable :showCaption="showCaption"
+                     :cardless="true"
+                     :table-data="audits"
+                     :fields="fields"
+                     :per-page="3"
+                     :searchable="false"
+                     :busy="isLoading"
+                     :row-clicked-fn="rowClicked"
+                     :total-rows="totalCount"
+                     @list="listAudits"
+          />
+        </b-col>
+      </b-row>
+    </b-card>
   </div>
 </template>
 
 <script>
-import BaseTable from '@/component/base/table/BATB_001_BaseTable.vue'
-const BaseModal = () => import('@/component/base/modal/BAMO_001_BaseModal.vue')
-const ProjectMemberDetail = () => import('./IDPJ_006_ProjectMemberDetail.vue')
+  import BaseTable from '@/component/base/table/BATB_001_BaseTable.vue'
 
-const thisTestData = [{
-  eventName: 'UpdateProjectGroup',
-  status: 'Success',
-  Description: '정보가 변경되었습니다.',
-  Executor: 'Name',
-  Created: '2019,10,16',
-  details: 'www.google.com'
-},
-{
-  eventName: 'UpdateProjectGroup',
-  status: 'Success',
-  Description: '정보가 변경되었습니다.',
-  Executor: 'Name',
-  Created: '2019,10,16',
-  details: 'www.google.com'
-},
-{
-  eventName: 'UpdateProjectGroup',
-  status: 'Success',
-  Description: '정보가 변경되었습니다.',
-  Executor: 'Name',
-  Created: '2019,10,16',
-  details: 'www.google.com'
-},
-{
-  eventName: 'UpdateProjectGroup',
-  status: 'Success',
-  Description: '정보가 변경되었습니다.',
-  Executor: 'Name',
-  Created: '2019,10,16',
-  details: 'www.google.com'
-},
-{
-  eventName: 'UpdateProjectGroup',
-  status: 'Success',
-  Description: '정보가 변경되었습니다.',
-  Executor: 'Name',
-  Created: '2019,10,16',
-  details: 'www.google.com'
-}]
+  const thisTestData = [{
+    eventName: 'UpdateProjectGroup',
+    status: 'Success',
+    Description: '정보가 변경되었습니다.',
+    Executor: 'Name',
+    Created: '2019,10,16',
+    details: 'www.google.com'
+  },
+    {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    },
+    {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    },
+    {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    },
+    {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    },
+    {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    }, {
+      eventName: 'UpdateProjectGroup',
+      status: 'Success',
+      Description: '정보가 변경되었습니다.',
+      Executor: 'Name',
+      Created: '2019,10,16',
+      details: 'www.google.com'
+    },
 
-export default {
-  name: 'ProjectAudit',
-  components: {
-    BaseTable,
-    BaseModal,
-    ProjectMemberDetail
-  },
-  props: {
+  ]
 
-  },
-  data () {
-    return {
-      fields: [
-        { key: 'eventName', label: 'Event', sortable: true },
-        { key: 'status', label: 'State', sortable: true },
-        { key: 'Description', label: 'Description', sortable: true },
-        { key: 'Executor', label: 'Excutor', sortable: true },
-        { key: 'Created', label: 'Created', sortable: true },
-        { key: 'details', label: '', sortable: true }
-      ],
-      audits: [],
-      selectedAudit: null,
-      selectedIdx: undefined,
-      addModal: false,
-      totalCount: 17
-    }
-  },
-  created () {
+  export default {
+    name: 'ProjectAudit',
+    components: {
+      BaseTable,
+    },
+    props: {},
+    data() {
+      return {
+        isLoading: true,
+        showCaption: false,
+        fields: [
+          {key: 'eventName', label: 'Event', sortable: true},
+          {key: 'status', label: 'State', sortable: true},
+          {key: 'Description', label: 'Description', sortable: true},
+          {key: 'Executor', label: 'Excutor', sortable: true},
+          {key: 'Created', label: 'Created', sortable: true},
+          {key: 'details', label: 'Detailed', sortable: true}
+        ],
+        audits: [],
+        selectedAudit: null,
+        addModal: false,
+        totalCount: 17
+      }
+    },
+    created() {
 
-  },
-  mounted () {
-    this.listAudits(3, 0)
-  },
-  methods: {
-    async listAudits (limit, skip, sort, search) {
-      if (limit === undefined) limit = 10
-      if (skip === undefined) skip = 0
-      if (sort === undefined) sort = '-created_date'
-      if (search === undefined) search = {}
+    },
+    mounted() {
+      this.listAudits(3, 0)
+    },
+    methods: {
 
-      let res
-      /* try {
-          res = await this.$http.get(`/identity/users`, {
-            params: { limit, skip, sort, search }
-          })
-        } catch (e) {
-          console.error(e)
-        } */
-      this.audits = thisTestData
-      this.selectedAudit = null
-      /**
+      async listAudits(limit, skip, sort, search) {
+        if (limit === undefined) limit = 10
+        if (skip === undefined) skip = 0
+        if (sort === undefined) sort = '-created_date'
+        if (search === undefined) search = {}
+
+        let res
+        /* try {
+            res = await this.$http.get(`/identity/users`, {
+              params: { limit, skip, sort, search }
+            })
+          } catch (e) {
+            console.error(e)
+          } */
+        this.audits = thisTestData
+        this.selectedAudit = null
+        this.isLoading = false
+        /**
          * TODO: set totalCount with data from server
          */
-    },
-    rowClicked (item, idx) {
-      this.selectedAudit = item
+      },
+      rowClicked(item, idx) {
+        this.selectedAudit = item
+      }
     }
   }
-}
 </script>
 
 <style lang="scss" scoped>
-
+  .up-corner-no-radius {
+    border-top-left-radius: 0px !important;
+    border-top-right-radius: 0px !important;;
+  }
 </style>

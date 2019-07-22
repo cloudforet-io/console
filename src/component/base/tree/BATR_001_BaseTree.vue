@@ -209,7 +209,7 @@
   @import '../../../asset/css/sl-vue-tree-ecessntial.css';
 
   .main-tree-col {
-    padding: 0px 0px 0px 10px;
+    padding: 0px 0px 0px 15px;
 
   }
   .conmenu-leaf {
