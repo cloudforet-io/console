@@ -1,44 +1,45 @@
 <template>
   <div class="animated fadeIn">
-    <div>
-      <div class="row">
-        <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-          <b-card class="up-corner-no-radius border-top-0">
-            <h4 class="page-header m-t-0">
-              <i class="fa fa-hashtag m-r-5">
-              </i>&nbsp&nbsp Base Information</h4>
-            <hr>
-            <b-container fluid>
-              <dl class="dl-horizontal m-b-0 row">
-                <div class="col-sm-12 col-md-6 summary" v-for="(info, idx) in summaryBaseInfo" :key="idx">
-                  <dt>{{info.title}}</dt>
-                  <dd>{{info.contents}}</dd>
-                  <span @click="CopyToClipboard(info.contents)" class="copy-clipboard" v-b-tooltip.hover
-                        title="Copy to Clipboard">
-                           <i class="fa fa-copy"></i>
-                    </span>
-                </div>
-              </dl>
-            </b-container>
-            <h4 class="page-header">
-              <i class="fa fa-tag m-r-5"></i>&nbsp&nbsp Tag
-            </h4>
-            <hr>
-            <b-container fluid>
-              <dl class="dl-horizontal m-b-0 row">
-                <div class="col-sm-12 col-md-6 summary" v-for="tag in summaryBaseTag">
-                  <dt title="Tag Key">{{tag.tagKey}}</dt>
-                  <dd title="Tag Value">{{tag.tagValue}}</dd>
-                  <span @click="CopyToClipboard(tag.tagValue)" class="copy-clipboard" v-b-tooltip.hover
-                        title="Copy to Clipboard">
-                           <i class="fa fa-copy"></i>
-                    </span>
-                </div>
-              </dl>
-            </b-container>
-          </b-card>
-        </b-col>
-      </div>
+    <div class="row">
+      <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
+        <b-card class="up-corner-no-radius border-top-0">
+          <h4 class="page-header m-t-0">
+            <i class="fa fa-hashtag m-r-5">
+            </i>&nbsp&nbsp Base Information
+          </h4>
+          <hr>
+          <b-container fluid>
+            <dl class="dl-horizontal m-b-0 row">
+              <div class="col-sm-12 col-md-6 summary" v-for="(info, idx) in summaryBaseInfo" :key="idx">
+                <dt>{{info.title}}</dt>
+                <dd>{{info.contents}}</dd>
+                <span class="copy-clipboard" v-b-tooltip.hover
+                      title="Copy to Clipboard"
+                      @click="CopyToClipboard(info.contents)">
+                         <i class="fa fa-copy"></i>
+                  </span>
+              </div>
+            </dl>
+          </b-container>
+          <h4 class="page-header">
+            <i class="fa fa-tag m-r-5"></i>&nbsp&nbsp Tag
+          </h4>
+          <hr>
+          <b-container fluid>
+            <dl class="dl-horizontal m-b-0 row">
+              <div class="col-sm-12 col-md-6 summary" v-for="tag in summaryBaseTag">
+                <dt title="Tag Key">{{tag.tagKey}}</dt>
+                <dd title="Tag Value">{{tag.tagValue}}</dd>
+                <span @click="CopyToClipboard(tag.tagValue)"
+                      class="copy-clipboard"
+                      title="Copy to Clipboard" v-b-tooltip.hover>
+                    <i class="fa fa-copy"></i>
+                  </span>
+              </div>
+            </dl>
+          </b-container>
+        </b-card>
+      </b-col>
     </div>
     <div class="col-xs-12 p-0">
       <div class="row">
@@ -60,24 +61,24 @@
     <div class="row">
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <BaseChart
-          :colDefaultSizer="selectedChartCol"
-          :sampleUseYN="true"
           :chartType="'Line'"
           :chartTitleData="sampleTitleData1"
           :chartData="chartDataAndOption1.data"
-          :options="chartDataAndOption2.option"
+          :colDefaultSizer="selectedChartCol"
           :legendOption="1"
+          :options="chartDataAndOption2.option"
+          :sampleUseYN="true"
         />
       </div>
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <BaseChart
-          :sampleUseYN="false"
-          :chartType="'else'"
+          :chartData="chartDataAndOption2.data"
           :chartTitleData="sampleTitleData2"
           :chartTitleDownData="sampleDropData2"
-          :chartData="chartDataAndOption2.data"
-          :options="chartDataAndOption2.option"
+          :chartType="'else'"
           :legendOption="1"
+          :options="chartDataAndOption2.option"
+          :sampleUseYN="false"
           @displayAll="displayAll"
           @displayVM="displayVM"
           @displayOS="displayOS"

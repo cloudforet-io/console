@@ -11,7 +11,8 @@
               <b-dropdown-item v-for="(opt, idx) in chartTitleDownData.dropDownDataArr"
                                :data="opt"
                                :key="idx"
-                               @click="dropdownAction(opt.optionClickMethod, opt)">{{opt.optionTitle}}
+                               @click="dropdownAction(opt.optionClickMethod, opt)">
+                              {{opt.optionTitle}}
               </b-dropdown-item>
           </b-dropdown>
         </template>
@@ -254,7 +255,7 @@
         const sampleData = this.getSampleData();
         this.selectedData = sampleData[0];
         this.selectedOption = sampleData[1];
-        console.log('legendOption', this.legendOption)
+        this.consoleLogEnv('legendOption', this.legendOption);
       };
       /* LEGEND_OPTION:
        * Note: when flag == 0, No legend for chart.

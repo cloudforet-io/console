@@ -77,8 +77,8 @@
         this.projectProp.projectId = newProjectID;
         this.$bus.$emit('setTabData', { projectProp: this.projectProp });
       },
-      projectName: function (newProejctName) {
-        this.projectProp.projectName = newProejctName;
+      projectName: function (newProjectName) {
+        this.projectProp.projectName = newProjectName;
         this.$bus.$emit('setTabData',{ projectProp: this.projectProp });
       }
     },

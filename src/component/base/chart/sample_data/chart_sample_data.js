@@ -10,7 +10,6 @@ export default {
         }
       ]
     };
-
     const sampleChartOption = {
       responsive: true,
       maintainAspectRatio: false,
@@ -27,9 +26,7 @@ export default {
         }
       }
     }
-
     return [sampleData, sampleChartOption]
-
   },
   lineChartSample: function () {
     const coreUIUtil = require('@coreui/coreui/dist/js/coreui-utilities');
