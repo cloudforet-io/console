@@ -122,5 +122,20 @@
 </script>
 
 <style lang="scss" scoped>
+  .nav>li>a {
+    &.nav-link.active{
+      border-top: 3px #3bafda solid;
+    }
+
+    &.active {
+      color: #3bafda !important;
+      font-weight: bold;
+    };
+
+    &:hover{
+      border-top: 3px #3bafda solid;
+      font-weight: bold;
+    }
+  }
 
 </style>

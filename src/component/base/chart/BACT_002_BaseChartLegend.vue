@@ -1,76 +1,79 @@
 <template>
-  <b-col class="col-lg-7 col-md-12 row">
+  <b-col class="row">
     <template v-if="legendOption === 1">
-        <template v-if="chartType === 'Bar'">
-          <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-            <div class="donut-legend">
-              <div class="donut-legend-title">
-                <b>{{selectedData.labels[i]}}</b>
-              </div>
-              <div class="donut-legend-data">
-                <template v-for="(n, p) in getDataLength(selectedData, '-')">
+      <template v-if="chartType === 'Bar'">
+        <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
+          <div class="legend">
+            <div class="legend-title">
+              <b>{{selectedData.labels[i]}}</b>
+            </div>
+            <div>
+              <template v-for="(n, p) in getDataLength(selectedData, '-')">
+                <div><span :style="legendBackgroundColorLineExt(selectedData,p)"> ● </span>
                   <a href="#" v-b-tooltip.hover :title="legendLabelLineExt(selectedData, p)">
                     {{legendDataHandler('data', selectedData, i, p)}}
                   </a>
-                </template>
-              </div>
+                </div>
+              </template>
             </div>
           </div>
-        </template>
-        <template v-else-if="chartType === 'Line'">
-          <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-            <div class="donut-legend">
-              <div class="donut-legend-title">
-                <b>{{selectedData.labels[i]}}</b>
-              </div>
-              <div class="donut-legend-data">
-                <template v-for="(n, p) in getDataLength(selectedData, '-')">
+        </div>
+      </template>
+      <template v-else-if="chartType === 'Line'">
+        <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
+          <div class="legend">
+            <div class="legend-title">
+              <b>{{selectedData.labels[i]}}</b>
+            </div>
+            <div>
+              <template v-for="(n, p) in getDataLength(selectedData, '-')">
+                <div><span :style="legendBackgroundColorLineExt(selectedData,p)"> ● </span>
                   <a href="#" v-b-tooltip.hover :title="legendLabelLineExt(selectedData, p)">
                     {{legendDataHandler('data', selectedData, i, p)}}
                   </a>
-                </template>
-              </div>
+                </div>
+              </template>
             </div>
           </div>
-        </template>
-        <template v-else-if="chartType === 'Pie'">
-          <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-            <div class="donut-legend" :style="legendDataHandler(selectedData, i,'style')">
-              <div class="donut-legend-title">
-                <b>{{selectedData.labels[i]}}</b>
-              </div>
-              <div class="donut-legend-data">
-                  <a href="#" >
-                    {{legendDataHandler('data', selectedData, i)}}
-                  </a>
-              </div>
+        </div>
+      </template>
+      <template v-else-if="chartType === 'Pie'">
+        <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
+          <div class="donut-legend" :style="legendDataHandler('style', selectedData, i)">
+            <div class="donut-legend-title">
+              <b>{{selectedData.labels[i]}}</b>
+            </div>
+            <div class="donut-legend-data">
+              <a href="#">
+                {{legendDataHandler('data', selectedData, i)}}
+              </a>
             </div>
           </div>
-        </template>
-        <template v-else-if="chartType === 'Radar'">
+        </div>
+      </template>
+      <template v-else-if="chartType === 'Radar'">
 
-        </template>
-        <template v-else-if="chartType === 'Polar'">
+      </template>
+      <template v-else-if="chartType === 'Polar'">
 
-        </template>
-        <template v-else>
-          <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
-            <div class="donut-legend" :style="legendDataHandler(selectedData, i,'style')">
-              <div class="donut-legend-title">
-                <b>{{selectedData.labels[i]}}</b>
-              </div>
-              <div class="donut-legend-data">
-                <a href="#">
-                  {{legendDataHandler('data', selectedData, i)}}
-                </a>
-              </div>
+      </template>
+      <template v-else>
+        <div class="col-xs-4 col-sm-6 col-md-6 col-lg-6" v-for="(n, i) in getDataLength(selectedData)">
+          <div class="legend" :style="legendDataHandler('style', selectedData, i)">
+            <div class="legend-title">
+              <b>{{selectedData.labels[i]}}</b>
+            </div>
+            <div class="legend-data">
+              <a href="#">
+                {{legendDataHandler('data', selectedData, i)}}
+              </a>
             </div>
           </div>
-        </template>
+        </div>
+      </template>
     </template>
     <template v-else-if="legendOption === 2">
       <div>
-        This is second option
       </div>
     </template>
   </b-col>
@@ -81,9 +84,7 @@
 
   export default {
     name: 'baseChartLegend',
-    components: {
-
-    },
+    components: {},
     props: {
       chartType: {
         type: String,
@@ -107,27 +108,44 @@
         default: false
       }
     },
-    data () {
+    data() {
       return {
-        selectedData : this.chartData,
+        selectedData: this.chartData,
       }
     },
-    mounted(){
+    mounted() {
 
     },
-    methods:{
-      getDataLength(chartData, type){
+    methods: {
+      getDataLength(chartData, type) {
         let length = 0;
         let dataSet = chartData.datasets
 
-        if(!this.isEmpty(type)){
+        if (!this.isEmpty(type)) {
           length = dataSet.length;
-        }else{
+        } else {
           length = (Array.isArray(dataSet)) ? dataSet[0].data.length : dataSet.data.length;
         }
 
         return length;
       },
+      donutChartDataHandler(chartData, idx, flag) {
+        let groundData = null
+        if (flag === 'style') {
+          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[idx] : chartData.datasets.backgroundColor[idx];
+          groundData = 'border-left:7px solid ' + groundData;
+        } else if (flag === 'data') {
+          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[idx] : chartData.datasets.data[idx];
+        } else {
+          /*
+           * TODO:: Please Add a default cases if needed
+           */
+        }
+        return groundData;
+      },
+      /*
+       *Please, add a case when graphs is newly added
+       */
       legendDataHandler(flag, chartData, outerIdx, innerIdx) {
         let groundData = null
         if (flag === 'style') {
@@ -135,21 +153,25 @@
           groundData = 'border-left:7px solid ' + groundData;
         } else if (flag === 'data') {
           this.consoleLogEnv('idx', outerIdx);
-          if (this.isEmpty(innerIdx)){
+          if (this.isEmpty(innerIdx)) {
             groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[outerIdx] : chartData.datasets.data[outerIdx];
           } else {
             groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[innerIdx].data[outerIdx] : chartData.datasets.data[outerIdx];
           }
-        } else{
-        /*
-         * TODO:: Please Add a default cases if needed
-         */
+        } else {
+          /*
+           * TODO:: Please Add a default cases if needed
+           */
         }
-          return groundData;
+        return groundData;
       },
       legendLabelLineExt(chartData, idx) {
         let groundData = chartData.datasets[idx];
         return (groundData.hasOwnProperty('label')) ? groundData.label : "";
+      },
+      legendBackgroundColorLineExt(chartData, idx) {
+        let groundData = chartData.datasets[idx];
+        return (groundData.hasOwnProperty('backgroundColor')) ? 'color:' + groundData.backgroundColor + ';' : "";
       },
     },
   }
