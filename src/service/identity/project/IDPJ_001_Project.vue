@@ -2,57 +2,45 @@
   <div div class="animated fadeIn">
     <div class="row">
       <div class="col-12">
-        <b-card>
-          <div>
-            <div class="d-flex align-items-center ml-2" style="padding: 0 0 0 0;">
-              <b>{{ lastEvent }} </b>
-            </div>
-                <BaseModal id='IDPJ_001_Project_Edit_Modal'
-                         ref="Modal"
-                         :name="'EditModal'"
-                         :title="projectModaltitle"
-                         :centered="true"
-                         :hide-footer="true" >
-                  <template #contents>
-                    <BaseTabs ref="EditTab"
-                              is="BaseTabs"
-                              :tabs="projTabs"
-                              :tabIndex="projIndex"
-                              :key="tabs.path"
-                              :fill="true"
-                              :selectedData="selectedData"
-                              :isCreatable="createProcess"
-                              :isUpdatable="updateProcess"
-                              :isfooterVisible="true"
-                              @create="createProject"
-                              @update="updateProject"
-                              >
-                         <template  #ModaltabContentsPanel>
-                         </template>
-                    </BaseTabs>
-                  </template>
-              </BaseModal>
-          </div>
-        </b-card>
+          <BaseModal id='IDPJ001_Project_Edit_Modal'
+                     ref="Modal"
+                     :name="'EditModal'"
+                     :title="projectModalTitle"
+                     :centered="true"
+                     :hide-footer="true" >
+            <template #contents>
+              <BaseTabs ref="EditTab"
+                        is="BaseTabs"
+                        :tabs="modalTabs"
+                        :key="tabs.path"
+                        :fill="true"
+                        :selectedData="selectedData"
+                        :isCreatable="createProcess"
+                        :isUpdatable="updateProcess"
+                        :isFooterVisible="true"
+                        @create="createProject"
+                        @update="updateProject">
+                <template  #ModaltabContentsPanel>
+                </template>
+              </BaseTabs>
+            </template>
+          </BaseModal>
       </div>
     </div>
+
     <BaseTree ref='projectTree'
               :tree-prop="treeData"
               @selected="NodeSelected"
               @edited="editSelected">
         <template #treeSubPanel>
-          <BaseTabs style="padding: 0 0 0 0"
-                    is="BaseTabs"
-                    id="ContentsBaseTabs"
-                    :tabs="tabs"
-                    :tabIndex="tabIndex"
-                    :key="tabs.tabTitle">
-            <keep-alive>
-              <template #tabContentsPanel
-                        ref="treeContents">
-              </template>
-            </keep-alive>
-          </BaseTabs>
+          <BaseTabNav
+          :fill="false"
+          :navTabs="tabs"
+          :keepAlive="true"
+          :isFooterVisible="false"
+          :tab="tab"
+          >
+          </BaseTabNav>
         </template>
     </BaseTree>
   </div>
@@ -136,6 +124,7 @@
     }
   ];
 
+
   let NodePR = {
   title: '',
   isLeaf: true,
@@ -157,31 +146,73 @@
     isSelectable: true,
     data: {visible:false}
   };
+  const tabs = [
+    {
+      name: 'summary',
+      isSelected: true,
+      tabIcon:"icon-calculator",
+      tabTitle:'SUMMARY',
+      component: projectSummary
+    },
+    {
+      name: 'member',
+      isSelected: false,
+      tabIcon:"icon-user",
+      tabTitle:'MEMBER',
+      component: projectMember
+    },
+    {
+      name: 'audit',
+      isSelected: false,
+      tabIcon:"icon-pie-chart",
+      tabTitle:'AUDIT',
+      component: projectAudit
+    }
+  ];
 
   const projectEditPopupName = () => import ('./IDPJ_002_ProjectEditPopupName')
   const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopupTag')
+
+  const modalTab = [
+    {
+      tabIcon:"icon-calculator",
+      tabTitle:'DEFAULT',
+      updatable: true,
+      creatable: true,
+      component: projectEditPopupName
+    },
+    {
+      tabIcon:"icon-user",
+      tabTitle:'TAGS',
+      updatable: true,
+      creatable: true,
+      component: projectEditPopupTag
+    },
+  ];
+
+  import projectSummary from './IDPJ_004_ProjectSummary.vue';
   import projectAudit from './IDPJ_007_ProjectAudit.vue';
   import projectMember from './IDPJ_005_ProjectMember.vue';
-  import projectSummary from './IDPJ_004_ProjectSummary.vue';
 
-  import BaseTabs from '@/component/base/tab/BATA_001_BaseTab'
-  import BaseModal from '@/component/base/modal/BAMO_001_BaseModal'
-  import BaseTree from '@/component/base/tree/BATR_001_BaseTree'
+  import BaseTabNav from '@/component/base/tab/BATA_002_BaseTabNav';
+  import BaseTabs from '@/component/base/tab/BATA_001_BaseTab';
+  import BaseModal from '@/component/base/modal/BAMO_001_BaseModal';
+  import BaseTree from '@/component/base/tree/BATR_001_BaseTree';
 
   import {api} from '@/setup/api'
 
   export default {
     name: 'Project',
     components: {
+      BaseTabNav,
       projectEditPopupName,
       projectEditPopupTag,
-      projectAudit,
       projectMember,
       projectSummary,
+      projectAudit,
       BaseTabs,
       BaseTree,
-      BaseModal,
-      VueAlertify
+      BaseModal
     },
     props:{
 
@@ -191,56 +222,21 @@
     },
     data() {
       return {
+        tab: tabs[0].component,
+        /*  Selected Data => Selected node data & flag
+         */
         selectedData: {},
+        /*  Process Data => data that has to be taken by action
+         */
         processData: {},
         createProcess: false,
         updateProcess: false,
         treeData: sampleNode,
-        projectModaltitle: 'Edit a Project',
+        projectModalTitle: 'Edit a Project',
         modalVisible: false,
         lastEvent: 'Right-Click to open context menus on tree.',
-        tabIndex: [0],
-        tabs: [
-          {
-            name: 'summary',
-            isSelected: true,
-            tabIcon:"icon-calculator",
-            tabTitle:'SUMMARY',
-            component: projectSummary
-          },
-          {
-            name: 'member',
-            isSelected: false,
-            tabIcon:"icon-user",
-            tabTitle:'MEMBER',
-            component: projectMember
-          },
-          {
-            name: 'audit',
-            isSelected: false,
-            tabIcon:"icon-pie-chart",
-            tabTitle:'AUDIT',
-            component: projectAudit
-          }
-        ],
-        projIndex: [0],
-        projTabs: [
-          {
-            tabIcon:"icon-calculator",
-            tabTitle:'DEFAULT',
-            updatable: true,
-            creatable: true,
-            component: projectEditPopupName
-          },
-          {
-            tabIcon:"icon-user",
-            tabTitle:'TAGS',
-            updatable: true,
-            creatable: true,
-            component: projectEditPopupTag
-          },
-
-        ]
+        tabs: tabs,
+        modalTabs: modalTab
       }
     },
     mounted: function () {
@@ -278,13 +274,13 @@
           this.$refs.Modal.showModal();
         }
       },
-      manageTabButton(flag,state, title){
+      manageTabButton (flag,state, title){
         if (flag==='CRT') {
           this.projectModaltitle = (title) ? 'Create a Project Group': 'Create a Project';
           this.updateProcess = !state;
           this.createProcess =  state;
 
-        } else if(flag==='UPT'){
+        } else if (flag==='UPT'){
           this.createProcess = !state;
           this.updateProcess = state;
 
@@ -293,6 +289,7 @@
         }
       },
       async updateProject(items){
+        debugger;
         console.log('item', items);
         const treeV = items.tree
         const path = treeV.getSelected()[0].path;
@@ -345,5 +342,10 @@
 </script>
 
 <style lang="scss" scoped>
-
+  #scrollspy-example {
+    position: relative;
+    height: 200px;
+    overflow-y: scroll;
+    border: 1px solid blue;
+  }
 </style>

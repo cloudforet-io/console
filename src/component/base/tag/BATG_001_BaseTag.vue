@@ -42,6 +42,10 @@ export default {
       type: Array,
       default: () => []
     },
+    showFirstTagRow: {
+      type: Boolean,
+      default: false
+    },
     editable: {
       type: Boolean,
       default: false
@@ -56,6 +60,12 @@ export default {
     }
   },
   computed: {
+  },
+  mounted: function () {
+    if (this.showFirstTagRow) {
+      this.isEditable = true;
+      this.addRow();
+    }
   },
   methods: {
     addRow () {

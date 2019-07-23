@@ -2,9 +2,12 @@
   <b-card :class="{'no-card': cardless}">
     <b-row slot="header" align-v="center">
       <b-col cols="4" sm="6" md="2"
-             class="mb-md-0 mb-3"
-      >
-        {{ caption }}
+             class="mb-md-0 mb-3">
+
+        <template v-if="showCaption">
+          {{ caption }}
+        </template>
+
       </b-col>
       <b-col cols="12" sm="12" md="6" xl="7"
              order="3" order-md="2"
@@ -48,10 +51,15 @@
       </b-col>
     </b-row>
     <b-table class="b-table"
-             :items="items" :fields="heads" show-empty
-             :striped="striped" :bordered="bordered" :borderless="borderless"
+             :items="items"
+             :fields="heads" show-empty
+             :striped="striped"
+             :bordered="bordered"
+             :borderless="borderless"
              :dark="dark" :hover="hover"
-             :small="small" :fixed="fixed" :responsive="responsive" :stacked="stacked"
+             :small="small" :fixed="fixed"
+             :responsive="responsive"
+             :stacked="stacked"
              :no-local-sorting="!isLocalSort"
              :tbody-tr-class="rowClass"
              :busy="busy"
@@ -71,7 +79,8 @@
       </template>
 
       <template v-if="selectable" slot="HEAD_selected">
-        <b-check v-model="isSelectedAll" class="select-all-checkbox"
+        <b-check v-model="isSelectedAll"
+                 class="select-all-checkbox"
                  @change="onSelectAll"
         />
       </template>
@@ -83,10 +92,16 @@
       </template>
 
       <template slot="status" slot-scope="data">
-        <b-badge :variant="getBadge(data.item.status)">
-          {{ data.item.status }}
-        </b-badge>
+        <h5><b-badge :variant="getBadge(data.item.status)">
+            {{capitalizeFirstLetter(data.item.status)}}
+        </b-badge></h5>
       </template>
+
+      <template slot="link" slot-scope="data">
+        <a :href="data.item.link">{{data.item.linkText}}</a>
+      </template>
+
+
     </b-table>
   </b-card>
 </template>
@@ -181,6 +196,10 @@ export default {
       type: Number,
       default: 20
     },
+    showCaption: {
+      type: Boolean,
+      default: false
+    },
     dark: {
       type: Boolean,
       default: false
@@ -216,10 +235,7 @@ export default {
   },
   methods: {
     getBadge (status) {
-      return status === 'Active' ? 'success'
-        : status === 'Inactive' ? 'secondary'
-          : status === 'Pending' ? 'warning'
-            : status === 'Banned' ? 'danger' : 'primary'
+      return this.selectBadges(status);
     },
     filterLimit () {
       if (this.limitInput < 1) this.limitInput = 1
@@ -354,6 +370,9 @@ export default {
     onLimitInputEnter () {
       this.$refs.modal.hideModal()
       this.$refs.modal.$emit('ok')
+    },
+    capitalizeFirstLetter (s) {
+      return this.capitalize(s);
     }
   }
 }
@@ -391,22 +410,26 @@ export default {
   }
 }
 
+
+
 .card {
   border: 0;
   box-shadow: 0px 0px 2px 1px #a9a9a94f;
   height: 500px;
   &.no-card {
     border: 0;
-    box-shadow: none;
+    box-shadow: 0px 0px 2px 1px #a9a9a94f;
     height: 500px;
-    margin: 0;
-    padding: 0;
-    .card-header {
-      background-color: transparent;
-    }
-    .card-body {
-      padding: 0;
-      margin: 0;
+    &.no-card {
+      all: unset;
+
+      .card-header {
+        background-color: transparent;
+      }
+      .card-body {
+        overflow-x: hidden;
+        height: 600px;
+      }
     }
   }
   .card-header {

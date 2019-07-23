@@ -1,29 +1,23 @@
 <template>
-      <b-col xs="12" lg="12">
-          <b-tabs :fill="fill">
-                <b-tab v-for="(tab, idx) in tabs"
-                       :lazy="true"
-                       :key="idx"
-                        @click="setCurrentTab(tab)">
-                    <div name="tabHeader" v-if="!tab.icon" slot="title">
-                        <i  :class="tab.tabIcon" style="color:blue"></i>
-                        {{tab.tabTitle}}
-                    </div>
-                    <br>
-                    <slot name="tabsContentPanel">
-                      <component
-                        ref="popupTab"
-                        :is="currentTab.component"
-                        :selectedData="dataForTab"
-                        :isCreatable="isCreate"
-                        :isUpdatable="isUpdate"
-                        :isDeletable="isDelete"
-                        class="tab">
-                      </component>
-                    </slot>
-              </b-tab>
-
-          </b-tabs>
+   <b-col class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
+     <b-nav tabs :fill="fill">
+       <b-nav-item
+         v-for="(ntab, idx) in navTabs"
+         @click="selectedTab = ntab.component"
+         :active="selectedTab === ntab.component"
+         :key="idx"
+         >
+         {{ntab.tabTitle}}
+       </b-nav-item>
+     </b-nav>
+     <template v-if="keepAlive" >
+       <keep-alive>
+         <component :is="selectedTab"></component>
+       </keep-alive>
+     </template>
+     <template v-else>
+        <component :is="selectedTab"></component>
+     </template>
     <b-row>
       <slot name="footerArea" >
         <div class="col-md-12">
@@ -46,70 +40,59 @@
     components: {
     },
     props: {
+      navTabs:{
+        type: Array,
+        default: () => []
+      },
+      keepAlive:{
+        type: Boolean,
+        default: false,
+      },
       fill:{
         type: Boolean,
         default: false,
       },
-      tabs:{
-        type: Array,
-        default: () => []
-      },
-      tabIndex:{
-        type: Array,
-        default: () => []
+      isFooterVisible:{
+        tyep:Boolean,
+        default: false,
       },
       isCreatable:{
-        type:Boolean,
+        tyep:Boolean,
         default: false,
       },
       isUpdatable:{
-        type:Boolean,
+        tyep:Boolean,
         default: false,
       },
       isDeletable:{
-        type:Boolean,
-        default: false,
-      },
-      isFooterVisible:{
-        type:Boolean,
+        tyep:Boolean,
         default: false,
       },
       selectedData:{
         type: Object,
         default: () => {}
-      }
+      },
+      tab:{
+        type: Object,
+        default: () => {}
+      },
     },
     created(){
-      this.$bus.$on('setTabData', this.setTabData)
-    },
-    mounted(){
+
     },
     beforeDestroy: function(){
-      this.$bus.$off('setTabData');
-    },
+
+      },
     data() {
       return {
         prosData: {},
-        currentTab: this.tabs[0],
-        dataForTab: this.selectedData,
-        tabContentData: {},
+        selectedTab : this.tab,
         isCreate: this.isCreatable,
         isUpdate: this.isUpdatable,
         isDelete: this.isDeletable
       }
     },
     methods: {
-      setTabData(dataToSet){
-          for (let key in dataToSet) {
-            this.tabContentData[key] = dataToSet[key];
-          }
-      },
-      setCurrentTab (tab) {
-        if(!tab.isSelected){
-          tab.isSelected = true;
-        }
-        this.currentTab = tab;
-      },
       displayFooter:() => {
         this.isFooterVisible = true;
       },
@@ -117,29 +100,42 @@
         this.isFooterVisible = false;
       },
       createNew (){
-        baseTabParams = this.dataForTab;
+        baseTabParams = this.dataforTab;
         baseTabParams['tabContents'] =  this.$refs.popupTab;
         this.$emit('create', baseTabParams);
       },
       updateSelect (){
-        baseTabParams = this.dataForTab;
+        baseTabParams = this.dataforTab;
         baseTabParams['tabContents'] =  this.$refs.popupTab;
         this.$emit('update', baseTabParams);
       },
       deleteSelect:() => {
-        baseTabParams = this.dataForTab;
+        baseTabParams = this.dataforTab;
         baseTabParams['tabContents'] =  this.$refs.popupTab;
         this.$emit('delete', baseTabParams);
       },
       closeWindow (e) {
         this.$parent.$store.dispatch('modal/closeModal');
-
       },
     }
   }
 </script>
 
 <style lang="scss" scoped>
+  .nav>li>a {
+    &.nav-link.active{
+      border-top: 3px #3bafda solid;
+    }
 
+    &.active {
+      color: #3bafda !important;
+      font-weight: bold;
+    };
+
+    &:hover{
+      border-top: 3px #3bafda solid;
+      font-weight: bold;
+    }
+  }
 
 </style>

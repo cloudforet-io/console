@@ -1,14 +1,10 @@
 <template>
-    <div class="card">
+    <div class="card"  >
       <div class="card-header">
         <template v-if="chartTitleData.isTitleIconUsed">
-          <span class="d-inline-block">
            <i :class="chartTitleData.TitleIconClass"></i>
-          </span>
         </template>
-          <span class="d-inline-block">
-            <h4>&nbsp&nbsp {{chartTitleData.cardTitle}}</h4>
-          </span>
+            {{chartTitleData.cardTitle}}
         <template v-if="chartTitleData.isDropdownUsed">
           <b-dropdown class="float-right" variant="p-0" right>
             <template slot="button-content">{{chartTitleDownData.dropDownTitle}}</template>
@@ -21,105 +17,148 @@
         </template>
       </div>
         <div class="card-body">
-          <b-row v-if="chartType === 'Bar'">
-            <b-col :class="selectedLegendOption">
+          <b-row v-if="chartType === 'Bar'" :colDefaultSizer="selectedSizer">
+            <b-col :class="selectedColSizeOption.graph">
               <div>
                 <bar-chart-ext
+                  class="wrapper"
                   v-if="loaded"
                   :sampleUseYN ="sampleUseYN"
                   :chartData="selectedData"
                   :options="selectedOption"/>
               </div>
             </b-col>
+            <b-col :class="selectedColSizeOption.legend">
               <chartLegend
                 :chartType="chartType"
                 :sampleUseYN ="sampleUseYN"
                 :chartData="selectedData"
                 :legendOption="legendOption"/>
+            </b-col>
           </b-row>
-          <b-row v-else-if="chartType === 'Line'">
-            <b-col :class="selectedLegendOption">
+          <b-row v-else-if="chartType === 'Line'" :colDefaultSizer="selectedSizer">
+            <b-col :class="selectedColSizeOption.graph">
               <div>
                 <line-chart-ext
+                  class="wrapper"
                   v-if="loaded"
                   :sampleUseYN ="sampleUseYN"
                   :chartData="selectedData"
                   :options="selectedOption"/>
               </div>
             </b-col>
-            <chartLegend
-              :chartType="chartType"
-              :sampleUseYN ="sampleUseYN"
-              :chartData="selectedData"
-              :legendOption="legendOption"/>
+            <b-col :class="selectedColSizeOption.legend">
+              <chartLegend
+                :chartType="chartType"
+                :sampleUseYN ="sampleUseYN"
+                :chartData="selectedData"
+                :legendOption="legendOption"/>
+            </b-col>
           </b-row>
-          <b-row v-else-if="chartType === 'Pie'">
-            <b-col :class="selectedLegendOption">
+          <b-row v-else-if="chartType === 'Pie'" :colDefaultSizer="selectedSizer">
+            <b-col :class="selectedColSizeOption.graph">
                 <pie-chart-ext
+                  class="wrapper"
                   v-if="loaded"
                   :sampleUseYN ="sampleUseYN"
                   :chartData="selectedData"
                   :options="selectedOption"/>
             </b-col>
-            <chartLegend
-              :chartType="chartType"
-              :sampleUseYN ="sampleUseYN"
-              :chartData="selectedData"
-              :legendOption="legendOption"/>
+            <b-col :class="selectedColSizeOption.legend">
+              <chartLegend
+                :chartType="chartType"
+                :sampleUseYN ="sampleUseYN"
+                :chartData="selectedData"
+                :legendOption="legendOption"/>
+            </b-col>
           </b-row>
-          <b-row v-else-if="chartType === 'Polar'">
-            <b-col :class="selectedLegendOption">
+          <b-row v-else-if="chartType === 'Polar'" :colDefaultSizer="selectedSizer">
+            <b-col :class="selectedColSizeOption.graph">
               <div>
                 <polar-chart-ext
+                  class="wrapper"
                   v-if="loaded"
                   :sampleUseYN ="sampleUseYN"
                   :chartData="selectedData"
                   :options="selectedOption"/>
               </div>
             </b-col>
-            <chartLegend
-              :chartType="chartType"
-              :sampleUseYN ="sampleUseYN"
-              :chartData="selectedData"
-              :legendOption="legendOption"/>
+            <b-col :class="selectedColSizeOption.legend">
+              <chartLegend
+                :chartType="chartType"
+                :sampleUseYN ="sampleUseYN"
+                :chartData="selectedData"
+                :legendOption="legendOption"/>
+            </b-col>
           </b-row>
-          <b-row v-else-if="chartType === 'Radar'">
-            <b-col :class="selectedLegendOption">
+          <b-row v-else-if="chartType === 'Radar'" :colDefaultSizer="selectedSizer">
+            <b-col :class="selectedColSizeOption.graph">
               <div>
                 <radar-chart-ext
+                  class="wrapper"
                   v-if="loaded"
                   :sampleUseYN ="sampleUseYN"
                   :chartData="selectedData"
                   :options="selectedOption"/>
               </div>
             </b-col>
+            <b-col :class="selectedColSizeOption.legend">
             <chartLegend
               :chartType="chartType"
               :sampleUseYN ="sampleUseYN"
               :chartData="selectedData"
               :legendOption="legendOption"/>
+            </b-col>
           </b-row>
-          <b-row v-else>
-            <b-col :class="selectedLegendOption">
+          <b-row v-else :colDefaultSizer="selectedSizer">
+            <b-col :class="selectedColSizeOption.graph">
               <div>
                 <donut-chart-ext
+                  class="wrapper"
                   v-if="loaded"
                   :sampleUseYN ="sampleUseYN"
                   :chartData="selectedData"
                   :options="selectedOption"/>
               </div>
             </b-col>
-            <chartLegend
-              :chartType="chartType"
-              :sampleUseYN ="sampleUseYN"
-              :chartData="selectedData"
-              :legendOption="legendOption"/>
+            <b-col :class="selectedColSizeOption.legend">
+              <chartLegend
+                :chartType="chartType"
+                :sampleUseYN ="sampleUseYN"
+                :chartData="selectedData"
+                :legendOption="legendOption"/>
+            </b-col>
           </b-row>
         </div>
     </div>
 </template>
-
 <script>
+  const defaultCol = {
+    Bar: {
+      graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-7',
+      legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-5'
+    },
+    Line: {
+      graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-8',
+      legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-4'
+    },
+    Pie: {
+      graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-5',
+      legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-7'
+    },
+    Radar: {
+      graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-5',
+      legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-7'
+    },
+    Polar: {
+      graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-6',
+      legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-6'
+    },
+    Donut: {
+      graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-6',
+      legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-6'
+    }
+  };
   /*
    * Note: Graph chart types : ['Bar', 'Line','Pie', 'Radar','Polar','Donut']
    * default option is Donut, if chartType hasn't set.
@@ -145,6 +184,11 @@
       chartLegend
     },
     props: {
+      colDefaultSizer: {
+        type: Object,
+        required: false,
+        default: () => {}
+      },
       chartTitleData:{
         type: Object,
         required: true,
@@ -193,29 +237,36 @@
       }
     },
     data () {
+      let typeOfChart = this.chartType;
+      typeOfChart = ['Bar', 'Line','Pie', 'Radar','Polar','Donut'].includes(this.chartType) ? this.chartType :  'Donut';
       return {
-        selectedData : this.chartData,
-        selectedOption: this.options,
-        selectedLegendOption : 'col-lg-5 col-md-12'
+          selectedSizer: this.colDefaultSizer,
+          selectedData : this.chartData,
+          selectedOption: this.options,
+          selectedColSizeOption : defaultCol[typeOfChart]
       }
     },
-    created(){
-      //Set Sample Data for User
+    created() {
+      /* SAMPLE_USE_YN:
+       * This is a flag whether Use Sample Data
+       */
       if (this.sampleUseYN) {
         const sampleData = this.getSampleData();
         this.selectedData = sampleData[0];
         this.selectedOption = sampleData[1];
         console.log('legendOption', this.legendOption)
-      }
-
-      //Set new column size if user doesn't use legend option;
+      };
+      /* LEGEND_OPTION:
+       * Note: when flag == 0, No legend for chart.
+       */
       if(this.legendOption == 0){
-        this.selectedLegendOption = 'col-lg-12 col-md-6'
+        this.selectedColSizeOption = {
+          graph: 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+          legend: 'col-xs-0 col-sm-0 col-md-0 col-lg-0'
+        };
+      } else if(!this.isEmpty(this.colDefaultSizer)) {
+        this.selectedColSizeOption = this.colDefaultSizer;
       }
-
-    },
-    mounted(){
-
     },
     methods:{
       getSampleData() {
@@ -248,20 +299,10 @@
 </script>
 
 <style lang="scss" scoped>
-  .donut-legend {
-    padding-left: 12px;
-    margin: 8px 0px;
-  }
-
-  .donut-legend-title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-family: 'Noto Sans', sans-serif;
-  }
-
-  .donut-legend-data {
-    font-size: 24px;
-    font-family: 'Noto Sans', sans-serif;
+  .wrapper {
+    position: relative;
+    max-height: 500px;
+    height: 40%;
+    width: 100%;
   }
 </style>

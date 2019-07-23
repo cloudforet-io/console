@@ -1,7 +1,11 @@
 <template>
     <b-form @reset.prevent="onReset" @submit.prevent="updatable && creatable ? onCreate() : onUpdate()">
       <b-form-group label="Tags" :label-cols="3" :horizontal="true">
-        <BaseTag :updatable="updatable" :tags-prop="updatable ? updatableTags : tags" />
+        <BaseTag
+          :updatable="updatable"
+          :showFirstTagRow="true"
+          :tags-prop="updatable ? updatableTags : tags" />
+
       </b-form-group>
     </b-form>
 </template>
