@@ -4,6 +4,7 @@
 
     <div class="app-body">
       <router-view name="sidebar" />
+      <router-view name="sub-header" />
       <main class="main">
         <div class="container-fluid">
           <router-view name="main" />

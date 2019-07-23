@@ -32,7 +32,7 @@
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="perPage"
                    caption="Users" :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
-                   :busy="isLoading" :cardless="true"
+                   :busy="isLoading" :cardless="false"
                    @rowSelected="rowSelected" @list="listUsers" @limitChanged="limitChanged"
         />
       </b-col>

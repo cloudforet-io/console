@@ -3,5 +3,14 @@ module.exports = {
   runtimeCompiler: true,
   devServer: {
     host: 'localhost'
+  },
+  css: {
+    loaderOptions: {
+      sass: {
+        data: `
+                @import "~@/asset/scss/_variables.scss";
+            `
+      }
+    }
   }
 }

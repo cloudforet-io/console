@@ -135,6 +135,10 @@ export default {
     },
     striped: {
       type: Boolean,
+      default: false
+    },
+    underlined: {
+      type: Boolean,
       default: true
     },
     bordered: {
@@ -343,6 +347,7 @@ export default {
     rowClass (item, type) { // custom global style
       let className = 'tbody-tr-default'
       if (item && item.selected) className += ' tbody-tr-selected'
+      if (this.underlined) className += ' tbody-tr-underlined'
       return className
     },
     limitChanged () {
@@ -393,8 +398,9 @@ export default {
 
 .card {
   border: 0;
-  box-shadow: 0px 0px 2px 1px #a9a9a94f;
+  box-shadow: 0px 0px 15px 0px $lightgray;
   height: 500px;
+  padding-bottom: 20px;
   &.no-card {
     border: 0;
     box-shadow: none;
@@ -410,6 +416,9 @@ export default {
     }
   }
   .card-header {
+    padding-top: 30px;
+    padding-bottom: 15px;
+    background-color: $white;
     border: 0;
   }
   .card-body {
