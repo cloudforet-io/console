@@ -2,8 +2,27 @@
  ****** GLOBAL CSS *******
  *************************/
 
+ @import url("http://fonts.googleapis.com/css?family=Roboto:100,200,300,400,500,600,700,800");
 
 /* INIT */
+html, body {
+  // font-family: 'Noto Sans', sans-serif;
+  font-family: 'Roboto', sans-serif;
+  background-color: $whiteblue;
+  font-size: 14px;
+  font-weight: 400;
+  color: $black;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  word-wrap: break-word;
+  word-break: keep-all;
+}
+i {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
 textarea:focus, input:focus{
   outline: none;
 }
@@ -14,32 +33,30 @@ textarea:focus, input:focus{
 
 
 
-/*************************
- ***** CUSTOM CoreUI *****
- *************************/
-
- .app {
-  background-color: $whiteblue;
-  /* App */
-  .app-body{
-    background-color: $whiteblue;
-    font-family: 'Noto Sans', sans-serif;
-  }
-
-  /* App Header */
-  .app-header {
-    background-color: transparent;
-    border-bottom: none;
-  }
-}
-
 
 /*************************
- *** CUSTOM Bootstrap ****
+ ********** APP **********
  *************************/
 
-/* b-table */
+ /* App Header */
+ .app-header {
+  .nav-item {
+    button.dropdown-toggle {
+      background-color: transparent;
+      border-color: transparent;
+      font-size: 1rem;
+      color: darken($darkgray, 40%);
+      &:active, &.active, &[aria-expanded="true"] {
+        background-color: transparent;
+        border-color: $gray;
+        color: $black;
+      }
+    }
+  }
+ }
 
+
+/* Base Table */
 // .table-striped tbody tr:nth-of-type(odd) {
 //   background-color: $lightgray;
 //   &.tbody-tr-selected {
@@ -140,6 +157,7 @@ textarea:focus, input:focus{
       font-size: 1.3em;
     }
     .name {
+      padding-left: 15px;
       color: inherit;
       font-weight: inherit;
     }

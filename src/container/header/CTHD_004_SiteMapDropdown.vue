@@ -1,26 +1,22 @@
 <template>
-  <div>
-    <AppHeaderDropdown right no-caret>
-      <template slot="header">
-        <span class="dropdown-default">Services</span> &nbsp;
-        <i class="down-btn fa fa-caret-down" />
-      </template>
-      <template slot="dropdown">
-        <b-dropdown-item to="/identity/project">
-          <div class="item">
-            <i class="icon icon-diamond" />
-            <span class="name">Project</span>
-          </div>
-        </b-dropdown-item>
-        <b-dropdown-item to="/identity/user">
-          <div class="item">
-            <i class="icon icon-people" />
-            <span class="name">User</span>
-          </div>
-        </b-dropdown-item>
-      </template>
-    </AppHeaderDropdown>
-  </div>
+  <b-dropdown class="dropdown" size="sm" no-caret>
+    <template slot="button-content">
+      <span>Services</span> &nbsp;
+      <i class="down-btn fa fa-caret-down" />
+    </template>
+    <b-dropdown-item to="/identity/project">
+      <div class="item">
+        <i class="icon icon-diamond" />
+        <span class="name">Project</span>
+      </div>
+    </b-dropdown-item>
+    <b-dropdown-item to="/identity/user">
+      <div class="item">
+        <i class="icon icon-people" />
+        <span class="name">User</span>
+      </div>
+    </b-dropdown-item>
+  </b-dropdown>
   <!-- <div>
     <b-dropdown :text="service" class="sm-1">
       <b-row>
@@ -60,11 +56,9 @@
 </template>
 
 <script>
-import { HeaderDropdown as AppHeaderDropdown } from '@coreui/vue'
 export default {
   name: 'SiteMapDropdown',
   components: {
-    AppHeaderDropdown
   },
   props: {
     onClick: {
@@ -86,7 +80,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.dropdown-default {
+.dropdown {
   color: $black;
   font-weight: 500;
 }

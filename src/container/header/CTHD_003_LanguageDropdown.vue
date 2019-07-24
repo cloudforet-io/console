@@ -1,26 +1,25 @@
 
 <template>
-  <AppHeaderDropdown right no-caret>
-    <template slot="header">
-      <i class="flag-icon flag-icon-us" /> &nbsp;
+  <b-dropdown size="sm" right no-caret>
+    <template slot="button-content">
+      <i class="icon flag-icon flag-icon-us" /> &nbsp;
+      <span class="name">English</span> &nbsp;
       <i class="down-btn fa fa-caret-down" />
     </template>
-    <template slot="dropdown">
-      <b-dropdown-item>
-        <div class="item">
-          <i class="icon flag-icon flag-icon-us" />
-          <span class="name">English</span>
-        </div>
-      </b-dropdown-item>
-      <b-dropdown-item>
-        <div class="item">
-          <i class="icon flag-icon flag-icon-kr" />
-          <span class="name">한국어
-          </span>
-        </div>
-      </b-dropdown-item>
-    </template>
-  </AppHeaderDropdown>
+    <b-dropdown-item>
+      <div class="item">
+        <i class="icon flag-icon flag-icon-us" />
+        <span class="name">English</span>
+      </div>
+    </b-dropdown-item>
+    <b-dropdown-item>
+      <div class="item">
+        <i class="icon flag-icon flag-icon-kr" />
+        <span class="name">한국어
+        </span>
+      </div>
+    </b-dropdown-item>
+  </b-dropdown>
 
   <!-- <div class="field">
       <div class="control">
@@ -37,12 +36,9 @@
 </template>
 
 <script>
-import { HeaderDropdown as AppHeaderDropdown } from '@coreui/vue'
-
 export default {
   name: 'LanguageDropdown',
   components: {
-    AppHeaderDropdown
   },
   data () {
     return {

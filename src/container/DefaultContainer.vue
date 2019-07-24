@@ -1,37 +1,23 @@
 <template>
   <div class="app">
-    <router-view name="header" />
-
-    <div class="app-body">
-      <router-view name="sidebar" />
-      <router-view name="sub-header" />
-      <main class="main">
-        <div class="container-fluid">
-          <router-view name="main" />
-        </div>
-      </main>
+    <div class="app-header">
+      <router-view name="header" />
     </div>
 
-    <TheFooter>
-      <div>
-        <a href="https://coreui.io">Steamugs.</a>
-        <span class="ml-1">&copy; 2019 Steamugs.</span>
-      </div>
-      <div class="ml-auto">
-        <span class="mr-1">Powered by</span>
-        <a href="https://coreui.io">Steamugs.</a>
-      </div>
-    </TheFooter>
+    <div class="app-body">
+      <!-- <router-view name="sidebar" /> -->
+      <router-view name="sub-header" />
+      <main class="main container-fluid">
+        <router-view name="main" />
+      </main>
+    </div>
   </div>
 </template>
 
 <script>
-import { Footer as TheFooter } from '@coreui/vue'
-
 export default {
   name: 'DefaultContainer',
   components: {
-    TheFooter
   },
   data () {
     return {
@@ -41,7 +27,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container-fluid {
-  padding: 20px;
+.app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  .app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: $header-height;
+    width: 100vw;
+    background-color: transparent;
+    border-bottom: none;
+    z-index: 100;
+  }
+  .app-body{
+    position: absolute;
+    top: $header-height;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - #{$header-height});
+    .main {
+      padding: $side-pad;
+      margin: 0 !important;
+      overflow: scroll;
+    }
+  }
 }
 </style>
