@@ -120,7 +120,7 @@ $input-height: 23px;
 .search-container {
   position: relative;
   .input-container {
-      border: 1px solid lightgray;
+      border: 1px solid $lightgray;
       border-radius: 5px 0 0 5px;
       background-color: #fff;
     .input-box {
@@ -133,9 +133,9 @@ $input-height: 23px;
       width: 5%;
       padding-right: 8px;
       font-size: 1.2em;
-      color: gray;
+      color: $darkgray;
       text-align: right;
-      vertical-align: middle;
+      vertical-align: bottom;
       cursor: pointer;
     }
   }

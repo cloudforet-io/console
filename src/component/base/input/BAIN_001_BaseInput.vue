@@ -435,7 +435,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$blue: #22a7d8;
 .input-container {
   position: relative;
   .fake {
@@ -464,10 +463,10 @@ $blue: #22a7d8;
       .list-group-item {
         cursor: pointer;
         padding: 10px;
-        background-color: #2f3539;
-        color: white;
+        background-color: darken($navy, 5%);
+        color: $lightgray;
         &.hovered {
-          background-color: $blue;
+          background-color: lighten($navy, 9%);
         }
         .caret {
           text-align: right;

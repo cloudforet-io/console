@@ -1,40 +1,43 @@
 <template>
   <div class="animated fadeIn">
     <b-row>
-      <b-col cols="6" sm="4" md="2" xl="1" class="mb-3">
-        <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
-          <template #activator>
-            <b-button block variant="outline-primary">
-              Add
-            </b-button>
-          </template>
-          <template #contents>
-            <UserDetail :creatable="true" :updatable="true" />
-          </template>
-        </BaseModal>
-      </b-col>
-      <b-col cols="6" sm="4" md="2" xl="1" class="mb-3">
-        <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
-                   :centered="true" :hide-footer="true"
-        >
-          <template #activator>
-            <b-button block variant="outline-primary">
-              Edit
-            </b-button>
-          </template>
-          <template #contents>
-            <UserDetail :updatable="true" :user-prop="selectedUser" />
-          </template>
-        </BaseModal>
-      </b-col>
-    </b-row>
-    <b-row>
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="perPage"
-                   caption="Users" :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
-                   :busy="isLoading" :cardless="false"
+                   :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
+                   :show-caption="true" :busy="isLoading" :cardless="false" :underlined="true"
                    @rowSelected="rowSelected" @list="listUsers" @limitChanged="limitChanged"
-        />
+        >
+          <template #caption>
+            <b-row align-v="center" align-h="center">
+              <b-col cols="6">
+                <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
+                  <template #activator>
+                    <b-button block variant="outline-primary">
+                      Add
+                    </b-button>
+                  </template>
+                  <template #contents>
+                    <UserDetail :creatable="true" :updatable="true" />
+                  </template>
+                </BaseModal>
+              </b-col>
+              <b-col cols="6">
+                <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
+                           :centered="true" :hide-footer="true"
+                >
+                  <template #activator>
+                    <b-button block variant="outline-primary">
+                      Edit
+                    </b-button>
+                  </template>
+                  <template #contents>
+                    <UserDetail :updatable="true" :user-prop="selectedUser" />
+                  </template>
+                </BaseModal>
+              </b-col>
+            </b-row>
+          </template>
+        </BaseTable>
       </b-col>
     </b-row>
     <b-row>

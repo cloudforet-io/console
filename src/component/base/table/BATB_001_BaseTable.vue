@@ -5,7 +5,9 @@
         <b-col cols="4" sm="6" md="2"
                class="mb-md-0 mb-3"
         >
-          <span v-if="showCaption">{{ caption }}</span>
+          <template v-if="showCaption">
+            <slot name="caption" />
+          </template>
         </b-col>
         <b-col cols="12" sm="12" md="6" xl="7"
                order="3" order-md="2"
@@ -114,10 +116,6 @@ export default {
   },
   inheritAttrs: false,
   props: {
-    caption: {
-      type: String,
-      default: 'Table'
-    },
     searchable: {
       type: Boolean,
       default: false
@@ -385,7 +383,7 @@ export default {
     vertical-align: middle;
   }
   &:hover {
-    background-color: lightgray;
+    background-color: $lightgray;
   }
 }
 .prev-btn {
@@ -410,13 +408,11 @@ export default {
 
 .card {
   border: 0;
-  box-shadow: 0px 0px 15px 0px $lightgray;
   height: 500px;
   padding-bottom: 20px;
   border-radius: inherit;
   &.no-card {
     border: 0;
-    box-shadow: 0px 0px 2px 1px #a9a9a94f;
     height: 500px;
     &.no-card {
       all: unset;

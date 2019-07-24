@@ -29,9 +29,9 @@
 </template>
 
 <script>
-import AccountDropdown from './CTHD_002_AccountDropdown'
-import LanguageDropdown from './CTHD_003_LanguageDropdown'
-import SiteMapDropdown from './CTHD_004_SiteMapDropdown'
+import AccountDropdown from './CTHD_002_AccountDropdown';
+import LanguageDropdown from './CTHD_003_LanguageDropdown';
+import SiteMapDropdown from './CTHD_004_SiteMapDropdown';
 
 export default {
   name: 'BaseHeader',
@@ -40,7 +40,7 @@ export default {
     SiteMapDropdown,
     AccountDropdown
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -51,6 +51,7 @@ export default {
   .row {
     .header {
       @extend %sheet;
+      background-color: $white;
       padding: 0;
       width: calc(100% - #{$side-pad});
       .nav {
