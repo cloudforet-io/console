@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import { focus } from 'vue-focus'
-import BaseInput from '@/component/base/input/BAIN_001_BaseInput'
-import InputTag from '@/component/base/input/BAIN_002_EXT_InputTag'
+import { focus } from 'vue-focus';
+import BaseInput from '@/component/base/input/BAIN_001_BaseInput';
+import InputTag from '@/component/base/input/BAIN_002_EXT_InputTag';
 
 const testdata = [{
   id: 0,
@@ -37,12 +37,12 @@ const testdata = [{
   operator: ':',
   type: 'String',
   subKey: ''
-}]
+}];
 
 const contextDataModel = {
   queryList: [],
   autokeyList: []
-}
+};
 
 export default {
   name: 'BaseSearch',
@@ -58,7 +58,7 @@ export default {
          * TODO: Add validation for queryList format
          */
         return obj.queryList !== undefined && obj.queryList !== null && obj.queryList instanceof Array &&
-              obj.autokeyList !== undefined && obj.autokeyList !== null && obj.autokeyList instanceof Array
+              obj.autokeyList !== undefined && obj.autokeyList !== null && obj.autokeyList instanceof Array;
       }
     },
     searchData: {
@@ -72,46 +72,46 @@ export default {
       lastId: 0,
       focusInput: false,
       filterList: []
-    }
+    };
   },
   methods: {
     focusOnInput () {
-      this.$refs.input.isFocused = true
+      this.$refs.input.isFocused = true;
     },
     getNewTag (item) {
-      return Object.assign({ id: ++this.lastId }, item)
+      return Object.assign({ id: ++this.lastId }, item);
     },
     deleteAll () {
-      this.tagList = []
+      this.tagList = [];
     },
     deleteTag (idx) {
-      this.$delete(this.tagList, idx)
+      this.$delete(this.tagList, idx);
     },
     updateTag (tagId, items) {
-      let matchIdx
+      let matchIdx;
       items.map((item, idx) => {
         if (idx === 0) {
           this.tagList.some((tag, i) => {
-            if (tag.id === tagId) matchIdx = i
-            return tag.id === tagId
-          })
+            if (tag.id === tagId) matchIdx = i;
+            return tag.id === tagId;
+          });
 
-          this.$set(this.tagList, matchIdx, Object.assign(this.tagList[matchIdx], item))
+          this.$set(this.tagList, matchIdx, Object.assign(this.tagList[matchIdx], item));
         } else {
-          this.tagList.splice(matchIdx + idx, 0, this.getNewTag(item))
+          this.tagList.splice(matchIdx + idx, 0, this.getNewTag(item));
         }
-      })
+      });
     },
     addTag (items) {
       items.map(item => {
-        this.tagList.push(this.getNewTag(item))
-      })
+        this.tagList.push(this.getNewTag(item));
+      });
     },
     search () {
-      this.$emit('search', this.tagList)
+      this.$emit('search', this.tagList);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

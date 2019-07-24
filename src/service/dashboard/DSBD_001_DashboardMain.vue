@@ -865,14 +865,14 @@
 </template>
 
 <script>
-import CardLine1ChartExample from '@/component/dashboard/CardLine1ChartExample'
-import CardLine2ChartExample from '@/component/dashboard/CardLine2ChartExample'
-import CardLine3ChartExample from '@/component/dashboard/CardLine3ChartExample'
-import CardBarChartExample from '@/component/dashboard/CardBarChartExample'
-import MainChartExample from '@/component/dashboard/MainChartExample'
-import SocialBoxChartExample from '@/component/dashboard/SocialBoxChartExample'
-import CalloutChartExample from '@/component/dashboard/CalloutChartExample'
-import { Callout } from '@coreui/vue'
+import CardLine1ChartExample from '@/component/dashboard/CardLine1ChartExample';
+import CardLine2ChartExample from '@/component/dashboard/CardLine2ChartExample';
+import CardLine3ChartExample from '@/component/dashboard/CardLine3ChartExample';
+import CardBarChartExample from '@/component/dashboard/CardBarChartExample';
+import MainChartExample from '@/component/dashboard/MainChartExample';
+import SocialBoxChartExample from '@/component/dashboard/SocialBoxChartExample';
+import CalloutChartExample from '@/component/dashboard/CalloutChartExample';
+import { Callout } from '@coreui/vue';
 
 export default {
   name: 'Dashboard',
@@ -962,36 +962,36 @@ export default {
           label: 'Activity'
         }
       }
-    }
+    };
   },
   computed: {
   },
   methods: {
     variant (value) {
-      let $variant
+      let $variant;
       if (value <= 25) {
-        $variant = 'info'
+        $variant = 'info';
       } else if (value > 25 && value <= 50) {
-        $variant = 'success'
+        $variant = 'success';
       } else if (value > 50 && value <= 75) {
-        $variant = 'warning'
+        $variant = 'warning';
       } else if (value > 75 && value <= 100) {
-        $variant = 'danger'
+        $variant = 'danger';
       }
-      return $variant
+      return $variant;
     },
     flag (value) {
-      return 'flag-icon flag-icon-' + value
+      return 'flag-icon flag-icon-' + value;
     }
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.$store.dispatch('sidebar/hideSidebar')
-    })
+      vm.$store.dispatch('sidebar/hideSidebar');
+    });
   },
   beforeRouteLeave (to, from, next) {
-    this.$store.dispatch('sidebar/showSidebar')
-    next()
+    this.$store.dispatch('sidebar/showSidebar');
+    next();
   }
-}
+};
 </script>

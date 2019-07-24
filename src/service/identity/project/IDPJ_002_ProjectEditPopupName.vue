@@ -24,7 +24,7 @@
       <b-col sm="9">
         <b-form-input v-model="projectName"
                       type="text"
-                      />
+        />
       </b-col>
     </b-row>
   </b-container>
@@ -32,73 +32,73 @@
 
 <script>
 
-  const project = {
+const project = {
     projectId: null,
-    projectName: null,
-  };
+    projectName: null
+};
 
-  export default {
+export default {
     name: 'ProjectEditPopUpName',
     components: {},
     props: {
-      projectProp: {
-        type: Object,
-        default: () => (project)
-      },
+        projectProp: {
+            type: Object,
+            default: () => (project)
+        }
+    },
+    data () {
+        return {
+            projectId: this.projectProp.projectId,
+            projectName: this.projectProp.projectName,
+            treeDataSelected: {},
+            currentState: null
+        };
+    },
+    watch: {
+        projectId: function (newProjectID) {
+            this.projectProp.projectId = newProjectID;
+            this.$bus.$emit('setTabData', { projectProp: this.projectProp });
+        },
+        projectName: function (newProjectName) {
+            this.projectProp.projectName = newProjectName;
+            this.$bus.$emit('setTabData', { projectProp: this.projectProp });
+        }
     },
     mounted: function () {
     },
-    beforeDestroy: function(){
-      this.$bus.$emit('setTabData', { projectProp: this.projectProp });
-    },
-    data() {
-      return {
-        projectId: this.projectProp.projectId,
-        projectName: this.projectProp.projectName,
-        treeDataSelected: {},
-        currentState: null,
-      }
-    },
-    created() {
-      //TODO:: Please, Check this method to confirm
-      if (Object.keys(this.$attrs).length > 0) {
-        this.treeDataSelected = this.$attrs.selectedData;
-        if (this.$attrs.isCreatable) {
-            this.currentState = 'CRT'
-          } else if (this.$attrs.isUpdatable) {
-            this.currentState = 'UPT'
-          } else {
-            this.currentState = 'DEL'
-          }
-      }
-    },
-    watch: {
-      projectId: function (newProjectID) {
-        this.projectProp.projectId = newProjectID;
+    beforeDestroy: function () {
         this.$bus.$emit('setTabData', { projectProp: this.projectProp });
-      },
-      projectName: function (newProjectName) {
-        this.projectProp.projectName = newProjectName;
-        this.$bus.$emit('setTabData',{ projectProp: this.projectProp });
-      }
+    },
+    created () {
+        // TODO:: Please, Check this method to confirm
+        if (Object.keys(this.$attrs).length > 0) {
+            this.treeDataSelected = this.$attrs.selectedData;
+            if (this.$attrs.isCreatable) {
+                this.currentState = 'CRT';
+            } else if (this.$attrs.isUpdatable) {
+                this.currentState = 'UPT';
+            } else {
+                this.currentState = 'DEL';
+            }
+        }
     },
     methods: {
-      partialRender(idx) {
-        if (idx == 0 && this.currentState == 'UPT') {
-          return true;
-        } else {
-          return false;
+        partialRender (idx) {
+            if (idx == 0 && this.currentState == 'UPT') {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        setProp (idx) {
+            if (idx == 0 && this.currentState == 'UPT') {
+                return this.projectProp.projectId;
+            } else {
+                return false;
+            }
         }
-      },
-      setProp(idx) {
-        if (idx == 0 && this.currentState == 'UPT') {
-          return this.projectProp.projectId
-        } else {
-          return false;
-        }
-      },
     }
-  }
+};
 </script>
 
 <style lang="scss" scoped>

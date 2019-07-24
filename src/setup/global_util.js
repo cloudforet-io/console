@@ -9,6 +9,7 @@ export const Mixin = {
      * Description:    generate random color HEX digits.
      **********************************************************************************/
     getGraphColor: (o, r, l) => {
+
       const colorListWithOpacity = ['#ff000080', '#FFA50080', '#0000ff80', '#00FFFF80', '#00FF0080', '#FFC0CB80', '#00808080', '#4B008280', '#ffff0080', '#EE82EE80', '#00000080'];
       const colorListWithOutOpacity = ['#ff0000', '#FFA500', '#0000ff', '#00FFFF', '#00FF00', '#FFC0CB', '#008080', '#4B0082', '#ffff00', '#EE82EE', '#000000'];
 

@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import KeyValueInput from '@/component/base/input/BAIN_003_KeyValueInput'
+import KeyValueInput from '@/component/base/input/BAIN_003_KeyValueInput';
 export default {
   name: 'BaseTag',
   components: { KeyValueInput },
@@ -57,7 +57,7 @@ export default {
       lastRowId: this.tagData.length,
       isEditable: this.editable,
       showSaveBtn: false
-    }
+    };
   },
   computed: {
   },
@@ -69,28 +69,28 @@ export default {
   },
   methods: {
     addRow () {
-      this.rows.push({ rowId: this.lastRowId++, tag: {} })
+      this.rows.push({ rowId: this.lastRowId++, tag: {} });
     },
     deleteRow (idx) {
-      this.$delete(this.rows, idx)
+      this.$delete(this.rows, idx);
     },
     resetRows () {
-      this.rows = this.tagData.map((tag, i) => ({ rowId: i, tag: tag }))
+      this.rows = this.tagData.map((tag, i) => ({ rowId: i, tag: tag }));
     },
     onSave () {
-      this.showSaveBtn = false
-      this.isEditable = false
+      this.showSaveBtn = false;
+      this.isEditable = false;
     },
     onEdit () {
-      this.showSaveBtn = true
-      this.isEditable = true
+      this.showSaveBtn = true;
+      this.isEditable = true;
     },
     onCancel () {
-      this.showSaveBtn = false
-      this.isEditable = false
+      this.showSaveBtn = false;
+      this.isEditable = false;
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

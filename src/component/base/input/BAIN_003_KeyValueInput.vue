@@ -49,14 +49,14 @@ export default {
     return {
       key: Object.keys(this.data)[0] || '',
       value: Object.values(this.data)[0] || ''
-    }
+    };
   },
   methods: {
     /**
      * TODO: validation
      */
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
