@@ -1,94 +1,96 @@
 <template>
-  <b-card :class="{'no-card': cardless}">
-    <b-row slot="header" align-v="center">
-      <b-col cols="4" sm="6" md="2"
-             class="mb-md-0 mb-3"
+  <div class="base-table">
+    <b-card :class="{'no-card': cardless}">
+      <b-row slot="header" align-v="center">
+        <b-col cols="4" sm="6" md="2"
+               class="mb-md-0 mb-3"
+        >
+          <span>{{ caption }}</span>
+        </b-col>
+        <b-col cols="12" sm="12" md="6" xl="7"
+               order="3" order-md="2"
+        >
+          <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
+        </b-col>
+        <b-col cols="8" sm="6" md="4" xl="3"
+               order="2" order-md="3"
+               class="mb-3 mb-md-0"
+        >
+          <b-row align-v="center" no-gutters align-h="between" class="text-center">
+            <b-col>
+              <span class="prev-btn" @click.prevent="onPrev"><i class="icon-arrow-left" /></span>
+            </b-col>
+            <b-col>
+              <span>{{ currentPage }} / {{ maxPage }}</span>
+            </b-col>
+            <b-col>
+              <span class="next-btn" @click.prevent="onNext"><i class="icon-arrow-right" /></span>
+            </b-col>
+            <b-col>
+              <BaseModal ref="modal" :name="'tableSettings'" :title="'Table Settings'"
+                         :centered="true" :size="'md'" @ok="limitChanged"
+              >
+                <template #activator>
+                  <span class="settings-btn"><i class="icon-settings" /></span>
+                </template>
+                <template #contents>
+                  <b-form-group label="Rows per page: " :label-cols="3">
+                    <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax"
+                                  @blur="filterLimit" @keydown.enter="onLimitInputEnter"
+                    />
+                  </b-form-group>
+                </template>
+              </BaseModal>
+            </b-col>
+            <b-col>
+              <span class="refresh-btn" @click="onRefresh"><i class="icon-refresh" /></span>
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row>
+      <b-table class="b-table"
+               :items="items" :fields="heads" show-empty
+               :striped="striped" :bordered="bordered" :borderless="borderless"
+               :dark="dark" :hover="hover"
+               :small="small" :fixed="fixed" :responsive="responsive" :stacked="stacked"
+               :no-local-sorting="!isLocalSort"
+               :tbody-tr-class="rowClass"
+               :busy="busy"
+               @head-clicked="headClicked"
+               @row-clicked="rowClicked"
+               @sort-changed="sortingChanged"
+               @context-changed="contextChanged"
       >
-        {{ caption }}
-      </b-col>
-      <b-col cols="12" sm="12" md="6" xl="7"
-             order="3" order-md="2"
-      >
-        <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
-      </b-col>
-      <b-col cols="8" sm="6" md="4" xl="3"
-             order="2" order-md="3"
-             class="mb-3 mb-md-0"
-      >
-        <b-row align-v="center" no-gutters align-h="between" class="text-center">
-          <b-col>
-            <span class="prev-btn" @click.prevent="onPrev"><i class="icon-arrow-left" /></span>
-          </b-col>
-          <b-col>
-            <span>{{ currentPage }} / {{ maxPage }}</span>
-          </b-col>
-          <b-col>
-            <span class="next-btn" @click.prevent="onNext"><i class="icon-arrow-right" /></span>
-          </b-col>
-          <b-col>
-            <BaseModal ref="modal" :name="'tableSettings'" :title="'Table Settings'"
-                       :centered="true" :size="'md'" @ok="limitChanged"
-            >
-              <template #activator>
-                <span class="settings-btn"><i class="icon-settings" /></span>
-              </template>
-              <template #contents>
-                <b-form-group label="Rows per page: " :label-cols="3">
-                  <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax"
-                                @blur="filterLimit" @keydown.enter="onLimitInputEnter"
-                  />
-                </b-form-group>
-              </template>
-            </BaseModal>
-          </b-col>
-          <b-col>
-            <span class="refresh-btn" @click="onRefresh"><i class="icon-refresh" /></span>
-          </b-col>
-        </b-row>
-      </b-col>
-    </b-row>
-    <b-table class="b-table"
-             :items="items" :fields="heads" show-empty
-             :striped="striped" :bordered="bordered" :borderless="borderless"
-             :dark="dark" :hover="hover"
-             :small="small" :fixed="fixed" :responsive="responsive" :stacked="stacked"
-             :no-local-sorting="!isLocalSort"
-             :tbody-tr-class="rowClass"
-             :busy="busy"
-             @head-clicked="headClicked"
-             @row-clicked="rowClicked"
-             @sort-changed="sortingChanged"
-             @context-changed="contextChanged"
-    >
-      <template slot="table-busy">
-        <b-row align-h="center">
-          <b-spinner :variant="'secondary'" />
-        </b-row>
-      </template>
+        <template slot="table-busy">
+          <b-row align-h="center">
+            <b-spinner :variant="'secondary'" />
+          </b-row>
+        </template>
 
-      <template slot="emptyfiltered" slot-scope="scope">
-        <h4>{{ scope.emptyFilteredText }}</h4>
-      </template>
+        <template slot="emptyfiltered" slot-scope="scope">
+          <h4>{{ scope.emptyFilteredText }}</h4>
+        </template>
 
-      <template v-if="selectable" slot="HEAD_selected">
-        <b-check v-model="isSelectedAll" class="select-all-checkbox"
-                 @change="onSelectAll"
-        />
-      </template>
+        <template v-if="selectable" slot="HEAD_selected">
+          <b-check v-model="isSelectedAll" class="select-all-checkbox"
+                   @change="onSelectAll"
+          />
+        </template>
 
-      <template v-if="selectable" slot="selected" slot-scope="data">
-        <BaseCheckbox :key="data.index" :selected="data.item.selected" class="select-checkbox"
-                      @change="checkboxClicked"
-        />
-      </template>
+        <template v-if="selectable" slot="selected" slot-scope="data">
+          <BaseCheckbox :key="data.index" :selected="data.item.selected" class="select-checkbox"
+                        @change="checkboxClicked"
+          />
+        </template>
 
-      <template slot="status" slot-scope="data">
-        <b-badge :variant="getBadge(data.item.status)">
-          {{ data.item.status }}
-        </b-badge>
-      </template>
-    </b-table>
-  </b-card>
+        <template slot="status" slot-scope="data">
+          <b-badge :variant="getBadge(data.item.status)">
+            {{ data.item.status }}
+          </b-badge>
+        </template>
+      </b-table>
+    </b-card>
+  </div>
 </template>
 
 <script>
@@ -401,6 +403,7 @@ export default {
   box-shadow: 0px 0px 15px 0px $lightgray;
   height: 500px;
   padding-bottom: 20px;
+  border-radius: inherit;
   &.no-card {
     border: 0;
     box-shadow: none;
@@ -420,9 +423,11 @@ export default {
     padding-bottom: 15px;
     background-color: $white;
     border: 0;
+    border-radius: inherit;
   }
   .card-body {
     overflow-x: scroll;
+    border-radius: inherit;
   }
   .b-table {
     display: inline-table;

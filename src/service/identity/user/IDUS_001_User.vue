@@ -149,5 +149,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.base-table {
+  @extend %sheet;
+}
 </style>
