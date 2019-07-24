@@ -12,10 +12,14 @@ html, body {
   font-size: 14px;
   font-weight: 400;
   color: $black;
-  overflow-x: hidden;
-  overflow-y: hidden;
+  width: 100vw;
+  height: 100vh;
   word-wrap: break-word;
   word-break: keep-all;
+}
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 i {
   color: inherit;
@@ -44,8 +48,9 @@ textarea:focus, input:focus{
     button.dropdown-toggle {
       background-color: transparent;
       border-color: transparent;
-      font-size: 1rem;
-      color: darken($darkgray, 40%);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: darken($darkgray, 20%);
       &:active, &.active, &[aria-expanded="true"] {
         background-color: transparent;
         border-color: $gray;
