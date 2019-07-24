@@ -1,31 +1,22 @@
 <template>
-  <div>
-    <button class="anchor" @click="toggleShow">
-      Services
-    </button>
-    <div v-if="showMenu" class="menu">
-      <ul>
-        <div class="row">
-          <div class="col-sm-6">
-            <ul class="multi-column-dropdown">
-              <li><a href="#">One more separated link</a></li>
-            </ul>
-          </div>
-          <div class="col-sm-6">
-            <ul class="multi-column-dropdown">
-              <li><a href="#">Action</a></li>
-              <li><a href="#">Another action</a></li>
-              <li><a href="#">Something else here</a></li>
-              <li class="divider" />
-              <li><a href="#">Separated link</a></li>
-              <li class="divider" />
-              <li><a href="#">One more separated link</a></li>
-            </ul>
-          </div>
-        </div>
-      </ul>
-    </div>
-  </div>
+  <b-dropdown class="dropdown" size="sm" no-caret>
+    <template slot="button-content">
+      <span>Services</span> &nbsp;
+      <i class="down-btn fa fa-caret-down" />
+    </template>
+    <b-dropdown-item to="/identity/project">
+      <div class="item">
+        <i class="icon icon-diamond" />
+        <span class="name">Project</span>
+      </div>
+    </b-dropdown-item>
+    <b-dropdown-item to="/identity/user">
+      <div class="item">
+        <i class="icon icon-people" />
+        <span class="name">User</span>
+      </div>
+    </b-dropdown-item>
+  </b-dropdown>
   <!-- <div>
     <b-dropdown :text="service" class="sm-1">
       <b-row>
@@ -66,6 +57,9 @@
 
 <script>
 export default {
+  name: 'SiteMapDropdown',
+  components: {
+  },
   props: {
     onClick: {
       type: Function,
@@ -86,66 +80,73 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-  .anchor {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    padding: 8px 10px;
-    border-radius: 5px;
-    // transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    &::after {
-      display: inline-block;
-      width: 0;
-      height: 0;
-      margin-left: .5em;
-      vertical-align: .255em;
-      content: "";
-      border-top: .3em solid;
-      border-right: .28em solid transparent;
-      border-bottom: 0;
-      border-left: .28em solid transparent;
-    }
-    &:hover {
-      color: #fff;
-      background-color: gray;
-      cursor: pointer;
-    }
-  }
+.dropdown {
+  color: $black;
+  font-weight: 500;
+}
+.down-btn {
+  color: $black;
+}
+  // .anchor {
+  //   display: flex;
+  //   align-items: center;
+  //   justify-content: center;
+  //   border: 1px solid transparent;
+  //   padding: 8px 10px;
+  //   border-radius: 5px;
+  //   // transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  //   &::after {
+  //     display: inline-block;
+  //     width: 0;
+  //     height: 0;
+  //     margin-left: .5em;
+  //     vertical-align: .255em;
+  //     content: "";
+  //     border-top: .3em solid;
+  //     border-right: .28em solid transparent;
+  //     border-bottom: 0;
+  //     border-left: .28em solid transparent;
+  //   }
+  //   &:hover {
+  //     color: #fff;
+  //     background-color: gray;
+  //     cursor: pointer;
+  //   }
+  // }
 
-  .menu {
-    position: absolute;
-    background-color: #fff;
-    border-radius: 5px;
-    color: #212529;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    font-size: 1rem;
-    list-style: none;
-    margin: .125rem 0 0;
-    padding: .5rem 0;
-    text-align: left;
-  }
+  // .menu {
+  //   position: absolute;
+  //   background-color: #fff;
+  //   border-radius: 5px;
+  //   color: #212529;
+  //   cursor: pointer;
+  //   display: flex;
+  //   flex-direction: column;
+  //   font-size: 1rem;
+  //   list-style: none;
+  //   margin: .125rem 0 0;
+  //   padding: .5rem 0;
+  //   text-align: left;
+  // }
 
-  .multi-column-dropdown {
-    list-style: none;
-    margin: 0px;
-    padding: 0px;
-    li a {
-      display: block;
-      clear: both;
-      line-height: 1.428571429;
-      color: #333;
-      white-space: normal;
+  // .multi-column-dropdown {
+  //   list-style: none;
+  //   margin: 0px;
+  //   padding: 0px;
+  //   li a {
+  //     display: block;
+  //     clear: both;
+  //     line-height: 1.428571429;
+  //     color: #333;
+  //     white-space: normal;
 
-      &:hover {
-        text-decoration: none;
-        color: #262626;
-        background-color: #999;
-      }
-    }
-  }
+  //     &:hover {
+  //       text-decoration: none;
+  //       color: #262626;
+  //       background-color: #999;
+  //     }
+  //   }
+  // }
 
   // .menu-item {
   //   color: #212529;
@@ -177,10 +178,10 @@ export default {
   //   font-weight: 300;
   // }
 
-  @media (max-width: 767px) {
-    .dropdown-menu.multi-column {
-      min-width: 240px !important;
-      overflow-x: hidden;
-    }
-  }
+  // @media (max-width: 767px) {
+  //   .dropdown-menu.multi-column {
+  //     min-width: 240px !important;
+  //     overflow-x: hidden;
+  //   }
+  // }
 </style>

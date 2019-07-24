@@ -1,27 +1,22 @@
 <template>
-  <AppHeaderDropdown right no-caret>
-    <template slot="header">
-      <i class="fa fa-user" />
-      {이름} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <b-dropdown size="sm" right no-caret>
+    <template slot="button-content">
+      <i class="icon-user" /> &nbsp;
+      <span class="name">Username</span>
     </template>
-    <template slot="dropdown">
-      <b-dropdown-header tag="div" class="text-center">
-        <strong>Account</strong>
-      </b-dropdown-header>
-      <b-dropdown-item @click="logout">
-        <i class="fa fa-lock" /> Logout
-      </b-dropdown-item>
-    </template>
-  </AppHeaderDropdown>
+    <b-dropdown-item @click="logout">
+      <div class="item">
+        <i class="icon fa fa-lock" />
+        <span class="name">Logout</span>
+      </div>
+    </b-dropdown-item>
+  </b-dropdown>
 </template>
 
 <script>
-import { HeaderDropdown as AppHeaderDropdown } from '@coreui/vue'
-
 export default {
   name: 'AccountDropdown',
   components: {
-    AppHeaderDropdown
   },
   methods: {
     async logout () {
@@ -31,3 +26,11 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.user {
+  display: flex;
+  align-items: center;
+  color: $black;
+}
+</style>

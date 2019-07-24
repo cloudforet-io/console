@@ -1,60 +1,68 @@
 <template>
-  <AppHeader fixed>
-    <SidebarToggler class="d-lg-none" display="md" mobile />
-    <b-link class="navbar-brand" to="/">
-      <img class="navbar-brand-full" src="@/asset/img/brand/logo.svg" width="89" height="25" alt="CoreUI Logo">
-      <img class="navbar-brand-minimized" src="@/asset/img/brand/sygnet.svg" width="30" height="30" alt="Logo">
-    </b-link>
-    <SidebarToggler ref="sidebarToggler" class="d-none" display="lg" :default-open="isSidebarOpen" />
-    <b-navbar-nav class="d-md-down-none">
-      <SiteMapDropdown />
-      <!-- <b-nav-item class="px-3" to="/identity">
-        Identity
-      </b-nav-item>
-      <b-nav-item class="px-3" to="/inventory">
-        Inventory
-      </b-nav-item>
-      <b-nav-item class="px-3" to="/plugin">
-        Plugin
-      </b-nav-item> -->
-    </b-navbar-nav>
+  <b-row align-h="between" class="header-container no-gutters">
+    <b-col cols="10" class="row no-gutters">
+      <b-navbar class="header">
+        <b-navbar-nav>
+          <b-nav-item>
+            <b-link class="nav brand" to="/">
+              CLOUDONE
+            </b-link>
+          </b-nav-item>
+        </b-navbar-nav>
+        <b-navbar-nav>
+          <b-nav-item><SiteMapDropdown class="nav" /></b-nav-item>
+        </b-navbar-nav>
+      </b-navbar>
+    </b-col>
 
-    <b-navbar-nav class="ml-auto">
-      <LanguageDropdown /> &nbsp;&nbsp;&nbsp;
-      <AccountDropdown />
-    </b-navbar-nav>
-  </AppHeader>
+    <b-col cols="2" class="row no-gutters justify-content-end">
+      <b-navbar class="header">
+        <b-navbar-nav class="ml-auto">
+          <b-nav-item><LanguageDropdown class="nav" /></b-nav-item>
+        </b-navbar-nav>
+        <b-navbar-nav>
+          <b-nav-item><AccountDropdown class="nav" /></b-nav-item>
+        </b-navbar-nav>
+      </b-navbar>
+    </b-col>
+  </b-row>
 </template>
 
 <script>
-import { Header as AppHeader, SidebarToggler } from '@coreui/vue'
-import AccountDropdown from './CTHD_002_AccountDropdown'
-import LanguageDropdown from './CTHD_003_LanguageDropdown'
-import SiteMapDropdown from './CTHD_004_SiteMapDropdown'
-import { mapGetters } from 'vuex'
+import AccountDropdown from './CTHD_002_AccountDropdown';
+import LanguageDropdown from './CTHD_003_LanguageDropdown';
+import SiteMapDropdown from './CTHD_004_SiteMapDropdown';
 
 export default {
   name: 'BaseHeader',
   components: {
-    AppHeader,
-    SidebarToggler,
     LanguageDropdown,
     SiteMapDropdown,
     AccountDropdown
-  },
-  computed: {
-    ...mapGetters('sidebar', [
-      'isSidebarOpen'
-    ])
-  },
-  watch: {
-    isSidebarOpen () {
-      this.$refs.sidebarToggler.$el.click()
-    }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-
+.header-container {
+  background-color: transparent;
+  height: $header-height;
+  padding: $top-pad $side-pad;
+  .row {
+    .header {
+      @extend %sheet;
+      background-color: $white;
+      padding: 0;
+      width: calc(100% - #{$side-pad});
+      .nav {
+        &.brand {
+          padding: 5px;
+          font-weight: 700;
+          font-size: 1.2em;
+          color: $navy;
+        }
+      }
+    }
+  }
+}
 </style>

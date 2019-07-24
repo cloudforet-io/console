@@ -9,7 +9,7 @@
                @delete="$emit('delete')"
     />
 
-    <span v-else class="badge badge-success tag-badge m-1">
+    <span v-else class="badge tag-badge m-1">
       <span @click="onUpdateMode">
         {{ `${label} ${operator} ${value}` }}
       </span>
@@ -70,6 +70,7 @@ $input-height: 23px;
     max-width: 99%;
     height: $input-height;
     line-height: 16px;
+    background-color: rgba($skyblue, 0.4);
     span {
       display: inline-block;
       max-width: 96%;
@@ -84,6 +85,7 @@ $input-height: 23px;
       font-size: 1.3em;
       cursor: pointer;
       margin-left: 5px;
+      color: $darkgray;
     }
   }
 }
