@@ -16,15 +16,15 @@ export default {
   computed: {
     checked: {
       set () {},
-      get () { return this.selected }
+      get () { return this.selected; }
     }
   },
   methods: {
     onChange (val) {
-      this.$emit('change', val, this.$vnode.key)
+      this.$emit('change', val, this.$vnode.key);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

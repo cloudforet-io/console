@@ -5,7 +5,7 @@
 <script>
 export default {
   name: 'IdentityMain'
-}
+};
 </script>
 
 <style lang="scss" scoped>

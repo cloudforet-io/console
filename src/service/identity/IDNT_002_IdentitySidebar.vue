@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import BaseSidebar from '@/container/sidebar/CTSB_001_Sidebar'
+import BaseSidebar from '@/container/sidebar/CTSB_001_Sidebar';
 
 export default {
   name: 'IdentitySidebar',
@@ -31,7 +31,7 @@ export default {
           icon: 'fa fa-users fa-lg'
         }
       ]
-    }
+    };
   }
-}
+};
 </script>

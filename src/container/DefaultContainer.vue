@@ -25,18 +25,18 @@
 </template>
 
 <script>
-import { Footer as TheFooter } from '@coreui/vue'
+import { Footer as TheFooter } from '@coreui/vue';
 
 export default {
-  name: 'DefaultContainer',
-  components: {
-    TheFooter
-  },
-  data () {
-    return {
+    name: 'DefaultContainer',
+    components: {
+        TheFooter
+    },
+    data () {
+        return {
+        };
     }
-  }
-}
+};
 </script>
 
 <style lang="scss" scoped>

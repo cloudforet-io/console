@@ -14,7 +14,6 @@
              @hidden="$store.dispatch('modal/modalHidden')"
     >
       <slot v-if="isModalShown" name="contents" :hide="hideModal" :show="showModal" />
-
       <template v-slot:modal-footer>
         <slot name="footer" />
       </template>
@@ -23,7 +22,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 export default {
   name: 'BaseModal',
   event: ['ok'],
@@ -55,7 +54,7 @@ export default {
   },
   data () {
     return {
-    }
+    };
   },
   computed: {
     ...mapGetters('modal', [
@@ -65,20 +64,20 @@ export default {
   },
   watch: {
     openState (v) {
-      if (!v) this.$refs[this.name].hide()
+      if (!v) this.$refs[this.name].hide();
     }
   },
   methods: {
     showModal (e) {
-      this.$store.dispatch('modal/openModal')
-      this.$refs[this.name].show()
+      this.$store.dispatch('modal/openModal');
+      this.$refs[this.name].show();
     },
     hideModal (e) {
-      this.$store.dispatch('modal/closeModal')
-      this.$refs[this.name].hide()
+      this.$store.dispatch('modal/closeModal');
+      this.$refs[this.name].hide();
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import { focus } from 'vue-focus'
-import BaseInput from '@/component/base/input/BAIN_001_BaseInput'
+import { focus } from 'vue-focus';
+import BaseInput from '@/component/base/input/BAIN_001_BaseInput';
 export default {
   name: 'InputTag',
   event: ['delete', 'update'],
@@ -40,26 +40,26 @@ export default {
   data () {
     return {
       isUpdateMode: false
-    }
+    };
   },
   computed: {
-    subKey () { return this.contents.subKey ? `.${this.contents.subKey}` : '' },
+    subKey () { return this.contents.subKey ? `.${this.contents.subKey}` : ''; },
     label () {
-      return this.contents.key ? `${this.contents.label}${this.subKey}` : 'Search'
+      return this.contents.key ? `${this.contents.label}${this.subKey}` : 'Search';
     },
-    value () { return this.contents.value || '' },
-    operator () { return this.contents.operator }
+    value () { return this.contents.value || ''; },
+    operator () { return this.contents.operator; }
   },
   methods: {
     onUpdateMode () {
-      this.isUpdateMode = true
+      this.isUpdateMode = true;
     },
     onUpdate (items) {
-      this.$emit('update', this.$vnode.key, items)
-      this.isUpdateMode = false
+      this.$emit('update', this.$vnode.key, items);
+      this.isUpdateMode = false;
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
