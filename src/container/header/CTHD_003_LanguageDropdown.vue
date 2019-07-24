@@ -3,7 +3,7 @@
   <b-dropdown size="sm" right no-caret>
     <template slot="button-content">
       <i class="icon flag-icon flag-icon-us" /> &nbsp;
-      <span class="name">English</span> &nbsp;
+      <!-- <span class="name">English</span> &nbsp; -->
       <i class="down-btn fa fa-caret-down" />
     </template>
     <b-dropdown-item>
@@ -49,9 +49,9 @@ export default {
           { code: 'kr', text: '한국어', flag: 'flag-icon flag-icon-kr' }
         ]
       }
-    }
+    };
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -60,6 +60,7 @@ export default {
 }
 .flag-icon {
   box-shadow: 2px 2px 2px 0 $gray;
+  vertical-align: text-top;
 }
 .down-btn {
   color: $black;

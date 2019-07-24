@@ -7,7 +7,7 @@
     <div class="app-body">
       <!-- <router-view name="sidebar" /> -->
       <router-view name="sub-header" />
-      <main class="main container-fluid">
+      <main class="main ">
         <router-view name="main" />
       </main>
     </div>
@@ -28,13 +28,9 @@ export default {
 
 <style lang="scss" scoped>
 .app {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
+  overflow-y: hidden;
   .app-header {
     position: fixed;
-    top: 0;
-    left: 0;
     height: $header-height;
     width: 100vw;
     background-color: transparent;
@@ -42,12 +38,10 @@ export default {
     z-index: 100;
   }
   .app-body{
-    position: absolute;
-    top: $header-height;
-    left: 0;
-    width: 100vw;
-    height: calc(100vh - #{$header-height});
-    overflow: scroll;
+  padding-top: $header-height;
+    // width: 100vw;
+    // height: calc(100vh - #{$header-height});
+    padding-bottom: 1000px;
     .main {
       padding: $side-pad;
       margin: 0 !important;

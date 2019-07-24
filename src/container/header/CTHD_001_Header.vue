@@ -44,22 +44,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$mb: 10px;
 .header-container {
-  background-color: transparent;
-  height: $header-height;
-  padding: $top-pad $side-pad;
+  background-color: rgba($white, 0.95);
+  height: calc(#{$header-height} - #{$mb});
+  box-shadow: 0px 0 5px 0px rgba($black, 0.3);
+  margin-bottom: $mb;
   .row {
     .header {
-      @extend %sheet;
-      background-color: $white;
       padding: 0;
       width: calc(100% - #{$side-pad});
       .nav {
+        margin-right: 20px;
         &.brand {
+          margin-left: 20px;
           padding: 5px;
           font-weight: 700;
-          font-size: 1.2em;
-          color: $navy;
+          font-size: 1.5em;
+          color: lighten($navy, 13%);
+          text-shadow: 3px 2px 3px $darkgray;
         }
       }
     }

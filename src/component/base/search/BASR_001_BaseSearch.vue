@@ -120,7 +120,7 @@ $input-height: 23px;
 .search-container {
   position: relative;
   .input-container {
-      border: 1px solid $lightgray;
+      border: 1px solid $gray;
       border-radius: 5px 0 0 5px;
       background-color: #fff;
     .input-box {
