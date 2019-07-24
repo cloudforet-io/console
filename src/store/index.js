@@ -7,7 +7,6 @@ import sidebar from './sidebar'
 import modal from './modal'
 
 Vue.use(Vuex)
-
 // eslint-disable-next-line no-undef
 const debug = process.env.NODE_ENV !== 'production'
 

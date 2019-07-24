@@ -56,10 +56,10 @@
 </template>
 
 <script>
-import BaseTable from '@/component/base/table/BATB_001_BaseTable.vue'
-import query from './search_context/query.js'
-const BaseModal = () => import('@/component/base/modal/BAMO_001_BaseModal.vue')
-const UserDetail = () => import('./IDUS_002_UserDetail.vue')
+import BaseTable from '@/component/base/table/BATB_001_BaseTable.vue';
+import query from './search_context/query.js';
+const BaseModal = () => import('@/component/base/modal/BAMO_001_BaseModal.vue');
+const UserDetail = () => import('./IDUS_002_UserDetail.vue');
 
 export default {
   name: 'User',
@@ -89,38 +89,38 @@ export default {
       isReadyForSearch: false,
       perPage: 3,
       isLoading: true
-    }
+    };
   },
   mounted () {
-    this.init()
+    this.init();
   },
   methods: {
     init () {
-      this.listUsers(this.perPage, 0)
+      this.listUsers(this.perPage, 0);
     },
     reset () {
-      this.users = []
-      this.selectedUser = null
-      this.isLoading = true
+      this.users = [];
+      this.selectedUser = null;
+      this.isLoading = true;
     },
     async listUsers (limit, skip, sort, search) {
-      this.reset()
+      this.reset();
 
-      if (limit === undefined || limit === null) limit = 10
-      if (skip === undefined || skip === null) skip = 0
-      if (sort === undefined || sort === null) sort = '-created_date'
-      if (search === undefined || search === null) search = []
+      if (limit === undefined || limit === null) limit = 10;
+      if (skip === undefined || skip === null) skip = 0;
+      if (sort === undefined || sort === null) sort = '-created_date';
+      if (search === undefined || search === null) search = [];
 
-      let res
+      let res;
       try {
-        res = await this.$http.get(`/identity/user`, {
+        res = await this.$http.get('/identity/user', {
           params: { limit, skip, sort }
           /**
            * TODO: set limit, skip, sort and search in the right format
            */
-        })
+        });
       } catch (e) {
-        console.error(e)
+        console.error(e);
       }
 
       setTimeout(() => { // this is for test
@@ -129,23 +129,23 @@ export default {
         //   temp[i] = res.data[0]
         // }
         // this.users = temp
-        this.users = res.data
-        this.isLoading = false
-      }, 1000)
+        this.users = res.data;
+        this.isLoading = false;
+      }, 1000);
       /**
        * TODO: set totalCount with data from server
        */
     },
     rowSelected (row) {
-      if (row instanceof Array || !row) this.selectedUser = null
-      else this.selectedUser = row.data
+      if (row instanceof Array || !row) this.selectedUser = null;
+      else this.selectedUser = row.data;
     },
     limitChanged (val) {
-      this.perPage = Number(val)
-      this.init()
+      this.perPage = Number(val);
+      this.init();
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
