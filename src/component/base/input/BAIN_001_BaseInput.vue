@@ -13,7 +13,7 @@
                @keyup.down="onKeyDown" @keyup.up="onKeyUp"
         >
 
-        <div v-if="isFocused && isKeyListShown" ref="listContainer" class="list-container"
+        <div v-if=" isKeyListShown" ref="listContainer" class="list-container"
              :style="{top: `${listPosY}px`, height: `${listHeight}px`}"
         >
           <b-list-group>
@@ -23,7 +23,7 @@
                                @mouseover="onMouseover(idx)" @mouseout="onMouseout"
             >
               <b-row class="no-gutters justify-content-between">
-                <b-col class="col-8">{{ key.label }}</b-col>
+                <b-col class="col-8 key-label">{{ key.label }}</b-col>
                 <b-col v-if="key.values || key.ajax" class="col-4 caret">
                   <i class="fa fa-caret-right" />
                 </b-col>
@@ -462,19 +462,25 @@ export default {
       left: 0;
       .list-group-item {
         cursor: pointer;
-        padding: 10px;
-        background-color: darken($navy, 5%);
+        padding: 5px;
+        background-color: darken($navy, 2%);
         color: $lightgray;
         &.hovered {
           background-color: lighten($navy, 9%);
         }
+        .key-label {
+          text-overflow: ellipsis;
+          overflow:hidden;
+          white-space:nowrap;
+        }
         .caret {
           text-align: right;
-          color: #ccc;
+          color: $darkgray;
         }
         .type-caption {
           text-align: right;
-          color: #bbb;
+          font-weight: 300;
+          color: $darkgray;
         }
       }
     }
