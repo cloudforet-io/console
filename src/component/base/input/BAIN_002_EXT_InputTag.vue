@@ -23,42 +23,42 @@
 import { focus } from 'vue-focus';
 import BaseInput from '@/component/base/input/BAIN_001_BaseInput';
 export default {
-  name: 'InputTag',
-  event: ['delete', 'update'],
-  directives: { focus: focus },
-  components: { BaseInput },
-  props: {
-    listData: {
-      type: Array,
-      default: () => []
+    name: 'InputTag',
+    event: ['delete', 'update'],
+    directives: { focus: focus },
+    components: { BaseInput },
+    props: {
+        listData: {
+            type: Array,
+            default: () => []
+        },
+        contents: {
+            type: Object,
+            default: () => {}
+        }
     },
-    contents: {
-      type: Object,
-      default: () => {}
+    data () {
+        return {
+            isUpdateMode: false
+        };
+    },
+    computed: {
+        subKey () { return this.contents.subKey ? `.${this.contents.subKey}` : ''; },
+        label () {
+            return this.contents.key ? `${this.contents.label}${this.subKey}` : 'Search';
+        },
+        value () { return this.contents.value || ''; },
+        operator () { return this.contents.operator; }
+    },
+    methods: {
+        onUpdateMode () {
+            this.isUpdateMode = true;
+        },
+        onUpdate (items) {
+            this.$emit('update', this.$vnode.key, items);
+            this.isUpdateMode = false;
+        }
     }
-  },
-  data () {
-    return {
-      isUpdateMode: false
-    };
-  },
-  computed: {
-    subKey () { return this.contents.subKey ? `.${this.contents.subKey}` : ''; },
-    label () {
-      return this.contents.key ? `${this.contents.label}${this.subKey}` : 'Search';
-    },
-    value () { return this.contents.value || ''; },
-    operator () { return this.contents.operator; }
-  },
-  methods: {
-    onUpdateMode () {
-      this.isUpdateMode = true;
-    },
-    onUpdate (items) {
-      this.$emit('update', this.$vnode.key, items);
-      this.isUpdateMode = false;
-    }
-  }
 };
 </script>
 
