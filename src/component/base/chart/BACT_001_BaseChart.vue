@@ -162,158 +162,158 @@ import radarChartExt from '@/component/base/chart/BACT_008_EXT_BaseRadarChart.vu
 import chartLegend from '@/component/base/chart/BACT_002_BaseChartLegend.vue';
 import sampleChart from '@/component/base/chart/sample_data/chart_sample_data';
 const defaultCol = {
-  Bar: {
-    graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-7',
-    legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-5'
-  },
-  Line: {
-    graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-8',
-    legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-4'
-  },
-  Pie: {
-    graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-5',
-    legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-7'
-  },
-  Radar: {
-    graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-5',
-    legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-7'
-  },
-  Polar: {
-    graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-6',
-    legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-6'
-  },
-  Donut: {
-    graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-6',
-    legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-6'
-  }
+    Bar: {
+        graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-7',
+        legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-5'
+    },
+    Line: {
+        graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-8',
+        legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-4'
+    },
+    Pie: {
+        graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-5',
+        legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-7'
+    },
+    Radar: {
+        graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-5',
+        legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-7'
+    },
+    Polar: {
+        graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-6',
+        legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-6'
+    },
+    Donut: {
+        graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-6',
+        legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-6'
+    }
 };
 
 export default {
-  name: 'BaseChart',
-  components: {
-    barChartExt,
-    lineChartExt,
-    pieChartExt,
-    donutChartExt,
-    polarChartExt,
-    radarChartExt,
-    chartLegend
-  },
-  props: {
-    colDefaultSizer: {
-      type: Object,
-      required: false,
-      default: () => {
-      }
+    name: 'BaseChart',
+    components: {
+        barChartExt,
+        lineChartExt,
+        pieChartExt,
+        donutChartExt,
+        polarChartExt,
+        radarChartExt,
+        chartLegend
     },
-    chartTitleData: {
-      type: Object,
-      required: true,
+    props: {
+        colDefaultSizer: {
+            type: Object,
+            required: false,
+            default: () => {
+            }
+        },
+        chartTitleData: {
+            type: Object,
+            required: true,
       // eslint-disable-next-line vue/require-valid-default-prop
-      default: {
-        isTitleIconUsed: false,
-        TitleIconClass: 'fa fa-globe fa-2x',
-        cardTitle: 'This is Default Title',
-        isDropdownUsed: false
-      }
+            default: {
+                isTitleIconUsed: false,
+                TitleIconClass: 'fa fa-globe fa-2x',
+                cardTitle: 'This is Default Title',
+                isDropdownUsed: false
+            }
+        },
+        chartTitleDownData: {
+            type: Object,
+            required: false,
+            default: () => ({
+                dropDownTitle: 'Sample Title',
+                dropDownDataArr: [{ optionId: 'id1', optionTitle: 'sample title1', optionClickMethod: 'optionAction1' },
+                    { optionId: 'id2', optionTitle: 'sample title2', optionClickMethod: 'optionAction2' }
+                ]
+            })
+        },
+        chartType: {
+            type: String,
+            default: 'Bar'
+        },
+        chartData: {
+            type: Object,
+            default: null,
+            required: true
+        },
+        options: {
+            type: Object,
+            default: null,
+            required: true
+        },
+        legendOption: {
+            type: Number,
+            default: 0
+        },
+        loaded: {
+            type: Boolean,
+            default: true
+        },
+        sampleUseYN: {
+            type: Boolean,
+            default: false
+        }
     },
-    chartTitleDownData: {
-      type: Object,
-      required: false,
-      default: () => ({
-        dropDownTitle: 'Sample Title',
-        dropDownDataArr: [{ optionId: 'id1', optionTitle: 'sample title1', optionClickMethod: 'optionAction1' },
-          { optionId: 'id2', optionTitle: 'sample title2', optionClickMethod: 'optionAction2' }
-        ]
-      })
+    data () {
+        let typeOfChart = this.chartType;
+        typeOfChart = ['Bar', 'Line', 'Pie', 'Radar', 'Polar', 'Donut'].includes(this.chartType) ? this.chartType : 'Donut';
+        return {
+            selectedSizer: this.colDefaultSizer,
+            selectedData: this.chartData,
+            selectedOption: this.options,
+            selectedColSizeOption: defaultCol[typeOfChart]
+        };
     },
-    chartType: {
-      type: String,
-      default: 'Bar'
-    },
-    chartData: {
-      type: Object,
-      default: null,
-      required: true
-    },
-    options: {
-      type: Object,
-      default: null,
-      required: true
-    },
-    legendOption: {
-      type: Number,
-      default: 0
-    },
-    loaded: {
-      type: Boolean,
-      default: true
-    },
-    sampleUseYN: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data () {
-    let typeOfChart = this.chartType;
-    typeOfChart = ['Bar', 'Line', 'Pie', 'Radar', 'Polar', 'Donut'].includes(this.chartType) ? this.chartType : 'Donut';
-    return {
-      selectedSizer: this.colDefaultSizer,
-      selectedData: this.chartData,
-      selectedOption: this.options,
-      selectedColSizeOption: defaultCol[typeOfChart]
-    };
-  },
-  created () {
+    created () {
     /* SAMPLE_USE_YN:
        * This is a flag whether Use Sample Data
        */
-    if (this.sampleUseYN) {
-      const sampleData = this.getSampleData();
-      this.selectedData = sampleData[0];
-      this.selectedOption = sampleData[1];
-      this.consoleLogEnv('legendOption', this.legendOption);
-    }
-    ;
+        if (this.sampleUseYN) {
+            const sampleData = this.getSampleData();
+            this.selectedData = sampleData[0];
+            this.selectedOption = sampleData[1];
+            this.consoleLogEnv('legendOption', this.legendOption);
+        }
+        
     /* LEGEND_OPTION:
        * Note: when flag == 0, No legend for chart.
        */
-    if (this.legendOption == 0) {
-      this.selectedColSizeOption = {
-        graph: 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-        legend: 'col-xs-0 col-sm-0 col-md-0 col-lg-0'
-      };
-    } else if (!this.isEmpty(this.colDefaultSizer)) {
-      this.selectedColSizeOption = this.colDefaultSizer;
-    }
-  },
-  methods: {
-    getSampleData () {
-      let returnVal = null;
-      if (this.chartType === 'Bar') {
-        returnVal = sampleChart.barChartSample();
-      } else if (this.chartType === 'Line') {
-        returnVal = sampleChart.lineChartSample();
-      } else if (this.chartType === 'Pie') {
-        returnVal = sampleChart.pieChartSample();
-      } else if (this.chartType === 'Polar') {
-        returnVal = sampleChart.polarAreaChartSample();
-      } else if (this.chartType === 'Radar') {
-        returnVal = sampleChart.radarChartSample();
-      } else {
-        returnVal = sampleChart.donutChartSample();
-      }
-      return returnVal;
+        if (this.legendOption == 0) {
+            this.selectedColSizeOption = {
+                graph: 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+                legend: 'col-xs-0 col-sm-0 col-md-0 col-lg-0'
+            };
+        } else if (!this.isEmpty(this.colDefaultSizer)) {
+            this.selectedColSizeOption = this.colDefaultSizer;
+        }
     },
-    dropdownAction (emitFunction, item) {
-      this.$emit(emitFunction, item);
-    },
-    getDataLength (chartData) {
-      let dataSet = chartData.datasets;
-      return (Array.isArray(dataSet)) ? dataSet[0].data.length : dataSet.data.length;
-    }
+    methods: {
+        getSampleData () {
+            let returnVal = null;
+            if (this.chartType === 'Bar') {
+                returnVal = sampleChart.barChartSample();
+            } else if (this.chartType === 'Line') {
+                returnVal = sampleChart.lineChartSample();
+            } else if (this.chartType === 'Pie') {
+                returnVal = sampleChart.pieChartSample();
+            } else if (this.chartType === 'Polar') {
+                returnVal = sampleChart.polarAreaChartSample();
+            } else if (this.chartType === 'Radar') {
+                returnVal = sampleChart.radarChartSample();
+            } else {
+                returnVal = sampleChart.donutChartSample();
+            }
+            return returnVal;
+        },
+        dropdownAction (emitFunction, item) {
+            this.$emit(emitFunction, item);
+        },
+        getDataLength (chartData) {
+            let dataSet = chartData.datasets;
+            return (Array.isArray(dataSet)) ? dataSet[0].data.length : dataSet.data.length;
+        }
 
-  }
+    }
 };
 </script>
 
