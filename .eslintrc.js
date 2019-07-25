@@ -16,11 +16,8 @@ module.exports = {
   ],
   env: {
     browser: true,
-    jquery: true
   },
   globals: {
-    "$": true,
-    "jQuery": true,
   },
   rules: {
     "indent": ["error", 4, {
@@ -30,7 +27,6 @@ module.exports = {
       "ArrayExpression": 1
     }],
     'quotes': ['off', 'single'],
-    'no-console': 'off',
     'comma-dangle': ['error', {
       'arrays': 'never',
       'objects': 'never',

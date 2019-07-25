@@ -9,13 +9,13 @@
 <script>
 
 export default {
-  name: 'App',
-  props: {
-    processEnv: {
-      type: String,
-      default: process.env.NODE_ENV
+    name: 'App',
+    props: {
+        processEnv: {
+            type: String,
+            default: process.env.NODE_ENV
+        }
     }
-  }
 };
 
 </script>

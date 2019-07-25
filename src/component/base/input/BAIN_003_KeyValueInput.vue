@@ -33,29 +33,29 @@
 
 <script>
 export default {
-  name: 'KeyValueInput',
-  event: ['delete'],
-  props: {
-    data: {
-      type: Object,
-      default: () => {}
+    name: 'KeyValueInput',
+    event: ['delete'],
+    props: {
+        data: {
+            type: Object,
+            default: () => {}
+        },
+        readOnly: {
+            type: Boolean,
+            default: false
+        }
     },
-    readOnly: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data () {
-    return {
-      key: Object.keys(this.data)[0] || '',
-      value: Object.values(this.data)[0] || ''
-    };
-  },
-  methods: {
+    data () {
+        return {
+            key: Object.keys(this.data)[0] || '',
+            value: Object.values(this.data)[0] || ''
+        };
+    },
+    methods: {
     /**
      * TODO: validation
      */
-  }
+    }
 };
 </script>
 

@@ -4,26 +4,26 @@
 
 <script>
 export default {
-  name: 'BaseCheckbox',
-  event: ['change'],
-  props: {
-    selected: {
-      type: Boolean,
-      default: false,
-      required: true
+    name: 'BaseCheckbox',
+    event: ['change'],
+    props: {
+        selected: {
+            type: Boolean,
+            default: false,
+            required: true
+        }
+    },
+    computed: {
+        checked: {
+            set () {},
+            get () { return this.selected; }
+        }
+    },
+    methods: {
+        onChange (val) {
+            this.$emit('change', val, this.$vnode.key);
+        }
     }
-  },
-  computed: {
-    checked: {
-      set () {},
-      get () { return this.selected; }
-    }
-  },
-  methods: {
-    onChange (val) {
-      this.$emit('change', val, this.$vnode.key);
-    }
-  }
 };
 </script>
 
