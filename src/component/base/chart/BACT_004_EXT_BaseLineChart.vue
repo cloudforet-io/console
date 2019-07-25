@@ -4,24 +4,24 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 
 export default {
-  name: 'LineChartExt',
-  components: {
-    hexToRgba,
-    CustomTooltips
-  },
-  extends: Line,
-  props: {
-    chartData: {
-      type: Object,
-      default: null
+    name: 'LineChartExt',
+    components: {
+        hexToRgba,
+        CustomTooltips
     },
-    options: {
-      type: Object,
-      default: null
+    extends: Line,
+    props: {
+        chartData: {
+            type: Object,
+            default: null
+        },
+        options: {
+            type: Object,
+            default: null
+        }
+    },
+    mounted () {
+        this.renderChart(this.chartData, this.options);
     }
-  },
-  mounted () {
-    this.renderChart(this.chartData, this.options);
-  }
 };
 </script>

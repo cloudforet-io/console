@@ -77,98 +77,98 @@
 </template>
 <script>
 export default {
-  name: 'BaseChartLegend',
-  components: {},
-  props: {
-    chartType: {
-      type: String,
-      default: 'Bar'
-    },
-    chartData: {
-      type: Object,
-      default: null,
-      required: true
-    },
-    legendOption: {
+    name: 'BaseChartLegend',
+    components: {},
+    props: {
+        chartType: {
+            type: String,
+            default: 'Bar'
+        },
+        chartData: {
+            type: Object,
+            default: null,
+            required: true
+        },
+        legendOption: {
 
-      type: Number,
-      default: 0
+            type: Number,
+            default: 0
+        },
+        loaded: {
+            type: Boolean,
+            default: true
+        },
+        sampleUseYN: {
+            type: Boolean,
+            default: false
+        }
     },
-    loaded: {
-      type: Boolean,
-      default: true
+    data () {
+        return {
+            selectedData: this.chartData
+        };
     },
-    sampleUseYN: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data () {
-    return {
-      selectedData: this.chartData
-    };
-  },
-  mounted () {
+    mounted () {
 
-  },
-  methods: {
-    getDataLength (chartData, type) {
-      let length = 0;
-      let dataSet = chartData.datasets;
-
-      if (!this.isEmpty(type)) {
-        length = dataSet.length;
-      } else {
-        length = (Array.isArray(dataSet)) ? dataSet[0].data.length : dataSet.data.length;
-      }
-
-      return length;
     },
-    donutChartDataHandler (chartData, idx, flag) {
-      let groundData = null;
-      if (flag === 'style') {
-        groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[idx] : chartData.datasets.backgroundColor[idx];
-        groundData = 'border-left:7px solid ' + groundData;
-      } else if (flag === 'data') {
-        groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[idx] : chartData.datasets.data[idx];
-      } else {
+    methods: {
+        getDataLength (chartData, type) {
+            let length = 0;
+            let dataSet = chartData.datasets;
+
+            if (!this.isEmpty(type)) {
+                length = dataSet.length;
+            } else {
+                length = (Array.isArray(dataSet)) ? dataSet[0].data.length : dataSet.data.length;
+            }
+
+            return length;
+        },
+        donutChartDataHandler (chartData, idx, flag) {
+            let groundData = null;
+            if (flag === 'style') {
+                groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[idx] : chartData.datasets.backgroundColor[idx];
+                groundData = 'border-left:7px solid ' + groundData;
+            } else if (flag === 'data') {
+                groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[idx] : chartData.datasets.data[idx];
+            } else {
         /*
            * TODO:: Please Add a default cases if needed
            */
-      }
-      return groundData;
-    },
+            }
+            return groundData;
+        },
     /*
        *Please, add a case when graphs is newly added
        */
-    legendDataHandler (flag, chartData, outerIdx, innerIdx) {
-      let groundData = null;
-      if (flag === 'style') {
-        groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[outerIdx] : chartData.datasets.backgroundColor[outerIdx];
-        groundData = 'border-left:7px solid ' + groundData;
-      } else if (flag === 'data') {
-        this.consoleLogEnv('idx', outerIdx);
-        if (this.isEmpty(innerIdx)) {
-          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[outerIdx] : chartData.datasets.data[outerIdx];
-        } else {
-          groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[innerIdx].data[outerIdx] : chartData.datasets.data[outerIdx];
-        }
-      } else {
+        legendDataHandler (flag, chartData, outerIdx, innerIdx) {
+            let groundData = null;
+            if (flag === 'style') {
+                groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[outerIdx] : chartData.datasets.backgroundColor[outerIdx];
+                groundData = 'border-left:7px solid ' + groundData;
+            } else if (flag === 'data') {
+                this.consoleLogEnv('idx', outerIdx);
+                if (this.isEmpty(innerIdx)) {
+                    groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[outerIdx] : chartData.datasets.data[outerIdx];
+                } else {
+                    groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[innerIdx].data[outerIdx] : chartData.datasets.data[outerIdx];
+                }
+            } else {
         /*
            * TODO:: Please Add a default cases if needed
            */
-      }
-      return groundData;
-    },
-    legendLabelLineExt (chartData, idx) {
-      let groundData = chartData.datasets[idx];
-      return (groundData.hasOwnProperty('label')) ? groundData.label : '';
-    },
-    legendBackgroundColorLineExt (chartData, idx) {
-      let groundData = chartData.datasets[idx];
-      return (groundData.hasOwnProperty('backgroundColor')) ? 'color:' + groundData.backgroundColor + ';' : '';
+            }
+            return groundData;
+        },
+        legendLabelLineExt (chartData, idx) {
+            let groundData = chartData.datasets[idx];
+            return (groundData.hasOwnProperty('label')) ? groundData.label : '';
+        },
+        legendBackgroundColorLineExt (chartData, idx) {
+            let groundData = chartData.datasets[idx];
+            return (groundData.hasOwnProperty('backgroundColor')) ? 'color:' + groundData.backgroundColor + ';' : '';
+        }
     }
-  }
 };
 </script>
 

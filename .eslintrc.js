@@ -23,7 +23,7 @@ module.exports = {
     "jQuery": true,
   },
   rules: {
-    "indent": ["error", 2, {
+    "indent": ["error", 4, {
       "ObjectExpression": 1,
       "flatTernaryExpressions": true,
       "ignoreComments": true,
