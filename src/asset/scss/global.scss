@@ -185,3 +185,44 @@ textarea:focus, input:focus{
     }
   }
 }
+
+/* card */
+// .card {
+//   margin: 20px;
+// }
+
+/* sl-vue-tree */
+.sl-vue-tree.sl-vue-tree-root {
+  background-color: transparent;
+  border: none;
+
+  .sl-vue-tree-nodes-list {
+    .sl-vue-tree-node {
+      &.sl-vue-tree-selected {
+        > .sl-vue-tree-node-item {
+          color: darken($blue, 7%);
+          font-weight: 700;
+          background-color: rgba($blue, 0.1);
+          &:hover {
+            font-weight: 700;
+            background-color: rgba($blue, 0.2);
+          }
+        }
+      }
+      .sl-vue-tree-node-item {
+        border-radius: 7px;
+        cursor: pointer;
+        margin: 5px 0;
+        color: $black;
+        &:hover {
+          font-weight: 600;
+        }
+        .sl-vue-tree-title {
+          .sl-vue-tree-toggle {
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+}

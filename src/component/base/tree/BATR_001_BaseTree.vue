@@ -10,21 +10,22 @@
         >
           <template slot="title" slot-scope="{ node }">
             <span class="item-icon">
-              <i v-if="node.isLeaf" class="fa fa-file" />
-              <i v-if="!node.isLeaf" class="fa fa-folder" />
+              <i v-if="node.isLeaf" class="fa fa-cube" />
+              <template v-else>
+                <i v-if="node.isExpanded" class="fa fa-folder-open-o" />
+                <i v-else class="fa fa-folder-o" />
+              </template>
             </span>
             {{ node.title }}
           </template>
 
           <template slot="toggle" slot-scope="{ node }">
-            <span v-if="!node.isLeaf">
-              <i v-if="node.isExpanded" class="fa fa-chevron-down" />
-              <i v-if="!node.isExpanded" class="fa fa-chevron-right" />
-            </span>
+            <i v-if="node.isExpanded" class="fa fa-angle-down" />
+            <i v-else class="fa fa-angle-right" />
           </template>
 
           <template slot="sidebar" slot-scope="{ node }">
-            <span class="ellipsis" style="padding:0px 3px 0px 10px; cursor:pointer" @click.stop.prevent="showContext($event, node)">
+            <span class="ellipsis" @click.stop.prevent="showContext($event, node)">
               <i class="fa fa-bars" />
             </span>
           </template>
@@ -33,16 +34,16 @@
 
       <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
         <div class="contextmenuleaf" @click="excSelected('PG')">
-          <i class="fa fa-folder" />&nbsp Add a Project Group
+          <i class="fa fa-folder-o" />&nbsp; Add a Project Group
         </div>
         <div class="contextmenuleaf" @click="excSelected('PR')">
-          <i class="fa fa-file" />&nbsp Add a Project
+          <i class="fa fa-cube" />&nbsp; Add a Project
         </div>
         <div class="contextmenuleaf" @click="excSelected('SR')">
-          <i class="fa fa-edit" />&nbsp Edit Selected Project
+          <i class="fa fa-pencil" />&nbsp; Edit Selected Project
         </div>
         <div class="node-leaf-last" @click="excSelected">
-          <i class="fa fa-remove" />&nbsp Remove Selected Item
+          <i class="fa fa-trash-o" />&nbsp; Remove Selected Item
         </div>
       </div>
 
@@ -58,7 +59,7 @@ import SlVueTree from 'sl-vue-tree';
 export default {
   name: 'BaseTree',
   components: {
-    SlVueTree,
+    SlVueTree
   },
   props: {
     treeProp: {
@@ -210,75 +211,68 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../asset/css/sl-vue-tree-ecessntial.css';
+  // .conmenu-leaf {
+  //   border-bottom: #181b1e;
+  // }
+  // .contextmenutop {
+  //   position: relative;
+  //   background-color: #fff;
+  //   color: #23282c;
+  //   border: 1px solid #c8ced3;
+  //   border-color: #20a8d8;
+  //   border-radius: 0.25rem;
+  //   cursor: pointer;
+  // }
+  // .contextmenutop > div {
+  //   padding: 10px;
+  // }
+  // .last-event {
+  //   color: white;
+  //   background-color: rgba(100, 100, 255, 0.5);
+  //   padding: 10px;
+  //   border-radius: 2px;
+  // }
+  // .tree-container {
+  //   flex-grow: 1;
+  // }
+
+  // .sl-vue-tree.sl-vue-tree-root {
+  //   flex-grow: 1;
+  //   overflow-x: hidden;
+  //   overflow-y: auto;
+  //   height: 40vw;
+  // }
 
   .main-tree-col {
-    padding: 0px 0px 0px 15px;
-
-  }
-  .conmenu-leaf {
-    border-bottom: #181b1e;
+    padding: 0px 0px 0px $side-pad;
   }
 
-  .contextmenutop {
-    position: relative;
-    background-color: #fff;
-    color: #23282c;
-    border: 1px solid #c8ced3;
-    border-color: #20a8d8;
-    border-radius: 0.25rem;
+  .item-icon {
+    display: inline-block;
+    text-align: center;
+    width: 20px;
+  }
+  .ellipsis {
+    padding: 0px 3px 0px 10px; 
     cursor: pointer;
   }
 
   .contextmenu {
     position: absolute;
-    background-color: #fff;
-    color: #23282c;
-    border: 1px solid #c8ced3;
-    border-color: #20a8d8;
-    border-radius: 0.25rem;
+    background-color: $navy;
+    color: $lightgray;
     cursor: pointer;
     z-index: 99999;
-  }
-
-  .contextmenutop > div {
-    padding: 10px;
-  }
-
-  .contextmenu > div {
-    padding: 10px;
-  }
-
-  .contextmenuleaf {
-    border-bottom: 0.5px solid #c8ced3;
-  }
-
-  .contextmenu > div:hover {
-    background-color: rgba(159, 206, 255, 0.5);
-  }
-
-  .last-event {
-    color: white;
-    background-color: rgba(100, 100, 255, 0.5);
-    padding: 10px;
-    border-radius: 2px;
-  }
-
-  .tree-container {
-    flex-grow: 1;
-  }
-
-  .sl-vue-tree.sl-vue-tree-root {
-    flex-grow: 1;
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: 40vw;
-  }
-
-  .item-icon {
-    display: inline-block;
-    text-align: left;
-    width: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 4px 0 rgba($black, 0.4);
+     > div {
+      padding: 6px 10px;
+      margin: 5px;
+      border-radius: 5px;
+      &:hover {
+        background-color: rgba($whiteblue, 0.15);
+      }
+    }
   }
 
 </style>

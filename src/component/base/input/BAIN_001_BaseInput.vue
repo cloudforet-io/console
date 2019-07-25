@@ -13,7 +13,7 @@
                @keyup.down="onKeyDown" @keyup.up="onKeyUp"
         >
 
-        <div v-if=" isKeyListShown" ref="listContainer" class="list-container"
+        <div v-if="isFocused && isKeyListShown && keyList.length > 0" ref="listContainer" class="list-container"
              :style="{top: `${listPosY}px`, height: `${listHeight}px`}"
         >
           <b-list-group>
@@ -33,7 +33,8 @@
           </b-list-group>
         </div>
 
-        <div v-if="isFocused && isValueListShown" ref="listContainer" class="list-container"
+        <div v-if="isFocused && isValueListShown && valueList.length > 0" 
+             ref="listContainer" class="list-container"
              :style="{left: `${valueListPosX}px`, top: `${listPosY}px`, height: `${listHeight}px`}"
         >
           <b-list-group>
@@ -457,14 +458,21 @@ export default {
       min-height: 100px;
       max-height: 600px;
       overflow-y: scroll;
-      border-radius: 5px;
       z-index: 3;
       left: 0;
+      .list-group {
+        box-shadow: 0 0 4px 0 rgba($black, 0.4);
+        border-radius: 5px;
+        padding: 10px;
+        background-color: darken($navy, 2%);
+      }
       .list-group-item {
         cursor: pointer;
-        padding: 5px;
-        background-color: darken($navy, 2%);
+        padding: 5px 8px;
         color: $lightgray;
+        font-size: .9rem;
+        background-color: transparent;
+        border-radius: 5px;
         &.hovered {
           background-color: lighten($navy, 9%);
         }
