@@ -50,48 +50,24 @@ $mb: 10px;
   height: calc(#{$header-height} - #{$mb});
   box-shadow: 0px 0 5px 0px rgba($black, 0.3);
   margin-bottom: $mb;
-  .row {
-    height: 100%;
-    .header {
-      height: 100%;
+  font-family: $font-big;
+  .header {
+    padding: 0;
+    width: calc(100% - #{$side-pad});
+    .navbar-nav .nav-item .nav-link {
       padding: 0;
-      width: calc(100% - #{$side-pad});
-      overflow: hidden;
-      .navbar-nav {
-        max-height: 100%;
-        .nav-item {
-          max-height: 100%;
-          button.dropdown-toggle {
-            background-color: transparent;
-            border-color: transparent;
-            font-size: 1.1rem;
-            font-weight: 400;
-            color: darken($darkgray, 20%);
-            &:active, &.active, &[aria-expanded="true"] {
-              background-color: transparent;
-              border-color: $gray;
-              color: $black;
-            }
-          }
-          .nav-link {
-            max-height: 100%;
-            padding: 0;
-            .nav {
-              max-height: 100%;
-              margin-right: 20px;
-              &.brand {
-                margin-left: 20px;
-                padding: 5px;
-                font-weight: 700;
-                font-size: 1.5em;
-                color: lighten($navy, 13%);
-                text-shadow: 3px 2px 3px $darkgray;
-                img {
-                  height: calc(#{$header-height} - #{$mb} - 20px);
-                  filter: sepia(110%) hue-rotate(190deg) saturate(530%);
-                }
-              }
-            }
+      .nav {
+        margin-right: 20px;
+        &.brand {
+          margin-left: 20px;
+          padding: 5px;
+          font-weight: 700;
+          font-size: 1.5em;
+          color: lighten($navy, 13%);
+          text-shadow: 3px 2px 3px $darkgray;
+          img {
+            height: calc(#{$header-height} - #{$mb} - 20px);
+            filter: sepia(110%) hue-rotate(190deg) saturate(530%);
           }
         }
       }

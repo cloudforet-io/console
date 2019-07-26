@@ -6,7 +6,7 @@
 
 /* INIT */
 html, body {
-  font-family: 'Noto Sans', sans-serif;
+  font-family: $font-basic;
   background-color: $whiteblue;
   font-size: 14px;
   font-weight: 400;
@@ -35,7 +35,7 @@ textarea:focus, input:focus{
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Roboto', sans-serif;
+  font-family: $font-big;
 }
 
 
@@ -57,7 +57,6 @@ h1, h2, h3, h4, h5, h6 {
       color: darken($darkgray, 20%);
       &:active, &.active, &[aria-expanded="true"] {
         background-color: transparent;
-        border-color: $gray;
         color: $black;
       }
     }
@@ -130,17 +129,18 @@ h1, h2, h3, h4, h5, h6 {
 
 /* b-dropdown */
 .dropdown-menu {
-  padding: 5px 0 !important;
+  padding: 3px 0 !important;
   border: none;
   box-shadow: 2px 2px 10px 0px rgba($black, 0.2);
 }
 .dropdown-item {
-  padding: 5px 10px;
+  padding: 3px 6px;
   &:hover, &:focus {
     color: $black;
     background-color: transparent;
     .item {
-      background-color: $lightgray;
+      // background-color: $lightgray;
+      font-weight: 500;
     }
   }
   &.active, &:active {
@@ -149,7 +149,7 @@ h1, h2, h3, h4, h5, h6 {
     .item {
       background-color: $skyblue; 
       &:hover, &:focus {
-        background-color: darken($skyblue, 5%); 
+        // background-color: darken($skyblue, 5%); 
       }
     }
   }
