@@ -43,7 +43,7 @@ export default {
     // height: calc(100vh - #{$header-height});
     padding-bottom: 1000px;
     .main {
-      padding: $side-pad;
+      padding: $top-pad $side-pad $bottom-pad $side-pad;
       margin: 0 !important;
     }
   }

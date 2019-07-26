@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="row" @click="contextMenuIsVisible=false">
+    <div class="row no-gutters" @click="contextMenuIsVisible=false">
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-2 main-tree-col">
         <sl-vue-tree ref="slVueTree"
                      v-model="treeData" :allow-multiselect="true"
@@ -46,8 +46,9 @@
           <i class="fa fa-trash-o" />&nbsp; Remove Selected Item
         </div>
       </div>
-
-      <div v-if="hasSelected" :key="nodeKey" class="col-xs-6 col-sm-6 col-md-6 col-lg-10">
+      <div v-if="hasSelected" :key="nodeKey" 
+           class="panel col-xs-6 offset-xs-6 col-lg-10 offset-lg-2"
+      >
         <slot name="treeSubPanel" />
       </div>
     </div>
@@ -243,8 +244,15 @@ export default {
   //   height: 40vw;
   // }
 
+  $main-height: calc(100vh - #{$header-height} - #{$top-pad} - #{$bottom-pad});
+
   .main-tree-col {
-    padding: 0px 0px 0px $side-pad;
+    @extend %sheet;
+    position: fixed;
+    padding: 15px;
+    background-color: $white;
+    height: $main-height;
+    overflow: scroll;
   }
 
   .item-icon {
@@ -273,6 +281,10 @@ export default {
         background-color: rgba($whiteblue, 0.15);
       }
     }
+  }
+
+  .panel {
+    padding-left: $side-pad;
   }
 
 </style>

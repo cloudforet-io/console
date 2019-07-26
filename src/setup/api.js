@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 // import store from '@/store'
 
 export const api = axios.create({
@@ -8,7 +8,7 @@ export const api = axios.create({
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   }
-})
+});
 
 //
 // api.interceptors.response.use(undefined, function (err) {

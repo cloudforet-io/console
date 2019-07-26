@@ -4,7 +4,7 @@
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="perPage"
                    :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
-                   :show-caption="true" :busy="isLoading" :cardless="false" :underlined="true"
+                   :busy="isLoading" :cardless="false" :underlined="true"
                    @rowSelected="rowSelected" @list="listUsers" @limitChanged="limitChanged"
         >
           <template #caption>

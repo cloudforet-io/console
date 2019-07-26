@@ -5,9 +5,7 @@
         <b-col cols="4" sm="6" md="2"
                class="mb-md-0 mb-3"
         >
-          <template v-if="showCaption">
-            <slot name="caption" />
-          </template>
+          <slot name="caption" />
         </b-col>
         <b-col cols="12" sm="12" md="6" xl="7"
                order="3" order-md="2"
@@ -190,10 +188,6 @@ export default {
     perPageMax: {
       type: Number,
       default: 20
-    },
-    showCaption: {
-      type: Boolean,
-      default: false
     },
     dark: {
       type: Boolean,

@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card base">
     <div class="card-header">
       <template v-if="chartTitleData.isTitleIconUsed">
         <i :class="chartTitleData.TitleIconClass" />
@@ -274,7 +274,7 @@ export default {
       this.selectedOption = sampleData[1];
       this.consoleLogEnv('legendOption', this.legendOption);
     }
-    ;
+    
     /* LEGEND_OPTION:
        * Note: when flag == 0, No legend for chart.
        */

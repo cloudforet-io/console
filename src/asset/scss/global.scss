@@ -6,8 +6,7 @@
 
 /* INIT */
 html, body {
-  // font-family: 'Noto Sans', sans-serif;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Noto Sans', sans-serif;
   background-color: $whiteblue;
   font-size: 14px;
   font-weight: 400;
@@ -35,6 +34,10 @@ textarea:focus, input:focus{
   outline: none;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Roboto', sans-serif;
+}
+
 
 
 
@@ -45,6 +48,7 @@ textarea:focus, input:focus{
  /* App Header */
  .app-header {
   .nav-item {
+    max-height: 100%;
     button.dropdown-toggle {
       background-color: transparent;
       border-color: transparent;
@@ -186,11 +190,6 @@ textarea:focus, input:focus{
   }
 }
 
-/* card */
-// .card {
-//   margin: 20px;
-// }
-
 /* sl-vue-tree */
 .sl-vue-tree.sl-vue-tree-root {
   background-color: transparent;
@@ -201,10 +200,11 @@ textarea:focus, input:focus{
       &.sl-vue-tree-selected {
         > .sl-vue-tree-node-item {
           color: darken($blue, 7%);
-          font-weight: 700;
+          font-weight: 500;
           background-color: rgba($blue, 0.1);
           &:hover {
-            font-weight: 700;
+            color: darken($blue, 10%);
+            font-weight: 500;
             background-color: rgba($blue, 0.2);
           }
         }
@@ -213,9 +213,10 @@ textarea:focus, input:focus{
         border-radius: 7px;
         cursor: pointer;
         margin: 5px 0;
-        color: $black;
+        color: darken($darkgray, 20%);
         &:hover {
-          font-weight: 600;
+          color: $black;
+          font-weight: 500;
         }
         .sl-vue-tree-title {
           .sl-vue-tree-toggle {
@@ -224,5 +225,16 @@ textarea:focus, input:focus{
         }
       }
     }
+  }
+}
+
+/* card */
+.card.base {
+  @extend %sheet;
+  border: none;
+  .card-header {
+    border-bottom: none;
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
   }
 }
