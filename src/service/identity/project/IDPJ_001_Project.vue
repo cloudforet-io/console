@@ -157,7 +157,7 @@ let NodePG = {
   isSelectable: true,
   data: { visible: false }
 };
-  const tabs = [
+const tabs = [
   {
     name: 'summary',
     isSelected: true,
@@ -325,7 +325,7 @@ export default {
       } else {
         placement = 'before';
         newNode['isLeaf'] = true;
-      };
+      }
 
       treeV.insert({ node: treeV.getSelected()[0], placement: placement }, newNode);
       tabData.projectProp.projectName = null;
@@ -338,10 +338,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  #scrollspy-example {
-    position: relative;
-    height: 200px;
-    overflow-y: scroll;
-    border: 1px solid blue;
-  }
+  // #scrollspy-example {
+  //   position: relative;
+  //   height: 200px;
+  //   overflow-y: scroll;
+  //   border: 1px solid blue;
+  // }
 </style>

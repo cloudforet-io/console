@@ -153,7 +153,6 @@ export default {
           background-color: $white;
         }
         &:hover{
-          // border-top: 3px $blue solid;
           font-weight: bold;
         }
       }

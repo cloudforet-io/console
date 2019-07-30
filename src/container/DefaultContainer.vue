@@ -6,7 +6,6 @@
 
     <div class="app-body">
       <!-- <router-view name="sidebar" /> -->
-      <router-view name="sub-header" />
       <main class="main ">
         <router-view name="main" />
       </main>
@@ -27,23 +26,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$calc-height: calc(#{$header-height} + #{$sub-header-height});
 .app {
   overflow-y: hidden;
   .app-header {
     position: fixed;
-    height: $header-height;
+    height: $calc-height;
     width: 100vw;
     background-color: transparent;
     border-bottom: none;
     z-index: 100;
   }
   .app-body{
-  padding-top: $header-height;
+  padding-top: $calc-height;
     // width: 100vw;
     // height: calc(100vh - #{$header-height});
     padding-bottom: 1000px;
     .main {
-      padding: $top-pad $side-pad $bottom-pad $side-pad;
       margin: 0 !important;
     }
   }

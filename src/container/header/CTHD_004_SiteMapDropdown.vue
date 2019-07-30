@@ -2,7 +2,7 @@
   <b-dropdown class="dropdown" size="sm" no-caret>
     <template slot="button-content">
       <span>Services</span> &nbsp;
-      <i class="down-btn fa fa-caret-down" />
+      <i class="down-btn fa fa-angle-down" />
     </template>
     <b-dropdown-item to="/identity/project">
       <div class="item">
@@ -70,23 +70,16 @@ export default {
     return {
       service: this.$i18n.t('MSG.DR_SERV'),
       showMenu: false
-    }
+    };
   },
   methods: {
     toggleShow: function () {
-      this.showMenu = !this.showMenu
+      this.showMenu = !this.showMenu;
     }
   }
-}
+};
 </script>
 <style lang="scss" scoped>
-.dropdown {
-  color: $black;
-  font-weight: 500;
-}
-.down-btn {
-  color: $black;
-}
   // .anchor {
   //   display: flex;
   //   align-items: center;

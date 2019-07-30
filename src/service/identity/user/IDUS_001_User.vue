@@ -152,6 +152,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.animated.fadeIn {
+  padding: $top-pad $side-pad $bottom-pad $side-pad;
+}
 .base-table {
   @extend %sheet;
 }

@@ -1,36 +1,38 @@
 <template>
   <div>
     <div class="row no-gutters" @click="contextMenuIsVisible=false">
-      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-2 main-tree-col">
-        <sl-vue-tree ref="slVueTree"
-                     v-model="treeData" :allow-multiselect="true"
-                     @select="nodeSelected"
-                     @drop="nodeDropped"
-                     @nodecontextmenu="showContextMenu"
-        >
-          <template slot="title" slot-scope="{ node }">
-            <span class="item-icon">
-              <i v-if="node.isLeaf" class="fa fa-cube" />
-              <template v-else>
-                <i v-if="node.isExpanded" class="fa fa-folder-open-o" />
-                <i v-else class="fa fa-folder-o" />
-              </template>
-            </span>
-            {{ node.title }}
-          </template>
+      <transition name="tree-trans">
+        <div v-if="showTree" class="col-xs-6 col-sm-6 col-md-6 col-lg-2 main-tree-col">
+          <sl-vue-tree ref="slVueTree"
+                       v-model="treeData" :allow-multiselect="true"
+                       @select="nodeSelected"
+                       @drop="nodeDropped"
+                       @nodecontextmenu="showContextMenu"
+          >
+            <template slot="title" slot-scope="{ node }">
+              <span class="item-icon">
+                <i v-if="node.isLeaf" class="fa fa-cube" />
+                <template v-else>
+                  <i v-if="node.isExpanded" class="fa fa-folder-open-o" />
+                  <i v-else class="fa fa-folder-o" />
+                </template>
+              </span>
+              {{ node.title }}
+            </template>
 
-          <template slot="toggle" slot-scope="{ node }">
-            <i v-if="node.isExpanded" class="fa fa-angle-down" />
-            <i v-else class="fa fa-angle-right" />
-          </template>
+            <template slot="toggle" slot-scope="{ node }">
+              <i v-if="node.isExpanded" class="fa fa-angle-down" />
+              <i v-else class="fa fa-angle-right" />
+            </template>
 
-          <template slot="sidebar" slot-scope="{ node }">
-            <span class="ellipsis" @click.stop.prevent="showContext($event, node)">
-              <i class="fa fa-bars" />
-            </span>
-          </template>
-        </sl-vue-tree>
-      </div>
+            <template slot="sidebar" slot-scope="{ node }">
+              <span class="ellipsis" @click.stop.prevent="showContext($event, node)">
+                <i class="fa fa-bars" />
+              </span>
+            </template>
+          </sl-vue-tree>
+        </div>
+      </transition>
 
       <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
         <div class="contextmenuleaf" @click="excSelected('PG')">
@@ -46,11 +48,13 @@
           <i class="fa fa-trash-o" />&nbsp; Remove Selected Item
         </div>
       </div>
-      <div v-if="hasSelected" :key="nodeKey" 
-           class="panel col-xs-6 offset-xs-6 col-lg-10 offset-lg-2"
-      >
-        <slot name="treeSubPanel" />
-      </div>
+      <transition name="panel-trans">
+        <div v-if="hasSelected" :key="nodeKey" 
+             class="panel col-xs-6 offset-xs-6 col-lg-10 offset-lg-2"
+        >
+          <slot name="treeSubPanel" />
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -79,10 +83,12 @@ export default {
       hasSelected: false,
       lastEvent: null,
       contextMenuIsVisible: false,
-      contextTopMenuIsVisible: false
+      contextTopMenuIsVisible: false,
+      showTree: false
     };
   },
   mounted: function () {
+    this.showTree = true;
     window.slVueTree = this.$refs.slVueTree;
   },
   methods: {
@@ -243,15 +249,30 @@ export default {
   //   overflow-y: auto;
   //   height: 40vw;
   // }
+  .tree-trans-enter-active {
+    transition: all .4s ease-in-out;
+  }
+  .tree-trans-enter {
+    transform: translateX(-250px);
+    opacity: 0;
+  }
+  .panel-trans-enter-active {
+    transition: all .4s ease-in-out;
+  }
+  .panel-trans-enter {
+    opacity: 0;
+  }
 
-  $main-height: calc(100vh - #{$header-height} - #{$top-pad} - #{$bottom-pad});
+  $main-height: calc(100vh - #{$header-height} - 10px);
 
   .main-tree-col {
     @extend %sheet;
+    // border-radius: 0;
     position: fixed;
     padding: 15px;
     background-color: $white;
     height: $main-height;
+    // max-width: 250px;
     overflow: scroll;
   }
 
@@ -273,7 +294,7 @@ export default {
     z-index: 99999;
     border-radius: 5px;
     box-shadow: 0 0 4px 0 rgba($black, 0.4);
-     > div {
+    > div {
       padding: 6px 10px;
       margin: 5px;
       border-radius: 5px;
@@ -284,7 +305,7 @@ export default {
   }
 
   .panel {
-    padding-left: $side-pad;
+    padding: $top-pad $side-pad $bottom-pad $side-pad;
   }
 
 </style>

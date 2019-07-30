@@ -11,25 +11,32 @@ $whiteblue: lighten(#E7EAF3, 5%);
 $skyblue: #ECF1FE;
 $blue: #2C68F9;//#0526ff;
 $pastelblue: #7598f3;
+$blueviolet: blueviolet;
 
 $navy: #0F2965;
 $black: #1a1f3e;
+
+// $gradient: linear-gradient(135deg, darken($blue, 10%) 20%, $blue 40%, $blueviolet);
+$gradient: linear-gradient(45deg, darken($blue, 15%) 10%, $blue 40%, $blueviolet);
+$dark-gradient: linear-gradient(135deg, darken($blue, 10%) 30%, $blueviolet);
 
 /* FONT */
 $font-basic: 'Noto Sans', sans-serif;
 $font-big: 'Roboto', sans-serif;
 
 /* Z-INDEX */
-$header-z: 100;
+$header-z: 9999999;
 
 /* SIZE */
-$header-height: 70px;
+$header-height: 45px;
+$sub-header-height: 35px;
 
 $side-pad: 15px;
 $top-pad: 15px;
 $bottom-pad: 10px;
 
 $border-radius: 7px;
+$box-shadow: 0px 0 10px 0px rgba($black, 0.1);
 
 /* STYLE */
 %box-shadow {

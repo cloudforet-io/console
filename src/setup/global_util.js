@@ -20,9 +20,9 @@ export const Mixin = {
       for (let i = 0; i < l; i++) {
         if (r) { returnColorVal.push(selectedColor[Math.floor(Math.random() * selectedColor.length)]);
         } else { idx = i >= selectedColor.length ? l%selectedColor.length : i;
-                 returnColorVal.push(selectedColor[idx]);
-        };
-      };
+          returnColorVal.push(selectedColor[idx]);
+        }
+      }
       return returnColorVal;
     },
     /**********************************************************************************
@@ -31,7 +31,7 @@ export const Mixin = {
      * Description:    Check whether given value is empty.
      **********************************************************************************/
     isEmpty: function (v) {
-      return (v == "" || v == null || v == undefined || (v != null && typeof v == "object" && !Object.keys(v).length)) ? true : false;
+      return (v == '' || v == null || v == undefined || (v != null && typeof v == 'object' && !Object.keys(v).length)) ? true : false;
     },
     /**********************************************************************************
      * Input        => (c:css Object      => type of Object,
@@ -57,11 +57,11 @@ export const Mixin = {
      * Description:  copy given text to clipboard
      **********************************************************************************/
     selectToCopyToClipboard: function (t) {
-      let textArea = document.createElement("textarea");
+      let textArea = document.createElement('textarea');
       textArea.value = t;
       document.body.appendChild(textArea);
       textArea.select();
-      let successFailCondition = document.execCommand("Copy");
+      let successFailCondition = document.execCommand('Copy');
       textArea.remove();
       console.log('Success', successFailCondition);
     },
@@ -72,8 +72,8 @@ export const Mixin = {
      **********************************************************************************/
     sideBarMiniMaxControl: function () {
       let currentStatus = document.body.className;
-      if (currentStatus.indexOf('sidebar-minimized brand-minimized') > -1) document.body.className = "sidebar-lg-show header-fixed sidebar-fixed";
-      else document.body.className = "sidebar-lg-show header-fixed sidebar-fixed sidebar-minimized brand-minimized";
+      if (currentStatus.indexOf('sidebar-minimized brand-minimized') > -1) document.body.className = 'sidebar-lg-show header-fixed sidebar-fixed';
+      else document.body.className = 'sidebar-lg-show header-fixed sidebar-fixed sidebar-minimized brand-minimized';
     },
     /**********************************************************************************
      * Input   => (s:badges flag String  => String)
@@ -89,13 +89,13 @@ export const Mixin = {
       const lightFlag = [];
       const darkFlag = [];
       return successFlag.includes(s.toLowerCase()) ? 'success'
-            : secondaryFlag.includes(s.toLowerCase()) ? 'secondary'
-            : dangerFlag.includes(s.toLowerCase()) ? 'danger'
-            : warningFlag.includes(s.toLowerCase()) ? 'warning'
-            : infoFlag.includes(s.toLowerCase()) ? 'info'
-            : lightFlag.includes(s.toLowerCase()) ? 'light'
-            : darkFlag.includes(s.toLowerCase()) ? 'dark'
-            : 'primary';
+        : secondaryFlag.includes(s.toLowerCase()) ? 'secondary'
+        : dangerFlag.includes(s.toLowerCase()) ? 'danger'
+        : warningFlag.includes(s.toLowerCase()) ? 'warning'
+        : infoFlag.includes(s.toLowerCase()) ? 'info'
+        : lightFlag.includes(s.toLowerCase()) ? 'light'
+        : darkFlag.includes(s.toLowerCase()) ? 'dark'
+        : 'primary';
     },
     /**********************************************************************************
      * Input   => (s: any String   => String)
@@ -103,8 +103,8 @@ export const Mixin = {
      * Description:  Select badges variant by given val
      **********************************************************************************/
     capitalize: (s) => {
-      if (typeof s !== 'string') return ''
-      return s.charAt(0).toUpperCase() + s.slice(1)
+      if (typeof s !== 'string') return '';
+      return s.charAt(0).toUpperCase() + s.slice(1);
     },
     /**********************************************************************************
      * Input   => (s: any String   => String)
@@ -122,13 +122,17 @@ export const Mixin = {
         }
       }
     },
+    colSelector: function (dataLength) {
+      const colNumber = Math.round(12 / dataLength);
+      return 'col-xs-6 col-sm-6 col-md-6 col-lg-' + colNumber + ' col';
+    }
   },
   data: function () {
     let status = (document.body.className.indexOf('sidebar-minimized brand-minimized') > -1) ? true : false;
     return {
       sideBarIsMinimized: status,
-      currentNodeEnv: null,
-    }
-  },
-}
+      currentNodeEnv: null
+    };
+  }
+};
 

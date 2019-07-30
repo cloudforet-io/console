@@ -3,16 +3,16 @@
     <div class="row">
       <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
         <b-card class="base summary border-top-0">
-          <h4 class="page-header m-t-0">
+          <h5 class="page-header m-t-0">
             <i class="fa fa-hashtag m-r-5" />&nbsp;&nbsp; Base Information
-          </h4>
+          </h5>
           <hr>
           <b-container fluid>
             <dl class="dl-horizontal m-b-0 row">
               <div v-for="(info, idx) in summaryBaseInfo" :key="idx" class="col-sm-12 col-md-6 summary">
                 <dt>{{ info.title }}</dt>
                 <dd>{{ info.contents }}</dd>
-                <span v-b-tooltip.hover class="copy-clipboard"
+                <span class="copy-clipboard"
                       title="Copy to Clipboard"
                       @click="CopyToClipboard(info.contents)"
                 >
@@ -21,9 +21,9 @@
               </div>
             </dl>
           </b-container>
-          <h4 class="page-header">
+          <h5 class="page-header">
             <i class="fa fa-tag m-r-5" />&nbsp;&nbsp; Tag
-          </h4>
+          </h5>
           <hr>
           <b-container fluid>
             <dl class="dl-horizontal m-b-0 row">
@@ -51,7 +51,7 @@
         <b-col v-for="asset in summaryAsset"
                :class="colSelector(summaryAsset.length)"
         >
-          <div class="card base">
+          <!-- <div class="card base">
             <div class="card-header">
               <i :class="asset.icon" /> {{ asset.asKey }}
             </div>
@@ -60,7 +60,19 @@
                 <a :href="asset.linkURL">{{ asset.assetValue }}</a>
               </h2>
             </div>
-          </div>
+          </div> -->
+          <b-row align-h="between" align-v="center" class="assets">
+            <b-col cols="8">
+              <h6>
+                <i :class="asset.icon" />&nbsp;&nbsp; {{ asset.asKey }}
+              </h6>
+            </b-col>
+            <b-col cols="4" class="text-right">
+              <h6>
+                <a :href="asset.linkURL">{{ asset.assetValue }}</a>
+              </h6>
+            </b-col>
+          </b-row>
         </b-col>
       </div>
     </div>
@@ -138,10 +150,6 @@ export default {
     CopyToClipboard (text) {
       this.selectToCopyToClipboard(text);
     },
-    colSelector: (dataLength) => {
-      const colNumber = Math.round(12 / dataLength);
-      return 'col-xs-6 col-sm-6 col-md-6 col-lg-' + colNumber + ' col';
-    },
     displayAll: function (params) {
       this.sampleDropData2.dropDownTitle = params.optionTitle;
     },
@@ -178,6 +186,10 @@ export default {
       ];
 
       const sampleAsset = [
+        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server' },
+        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database' },
+        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server' },
+        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database' },
         { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server' },
         { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database' },
         { asKey: 'Project', assetValue: 17, linkURL: 'www.bing.com', icon: 'fa fa-star' },
@@ -332,6 +344,16 @@ export default {
     &.summary {
       margin-top: 0;
       border-top-left-radius: 0px !important;
+    }
+  }
+
+  .assets {
+    padding: 15px;
+    margin: 15px 0;
+    border: 1px solid lighten($blue, 30%);
+    border-radius: $border-radius;
+    a {
+      text-decoration: underline;
     }
   }
 </style>

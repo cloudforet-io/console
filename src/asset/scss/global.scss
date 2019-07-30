@@ -36,6 +36,7 @@ textarea:focus, input:focus{
 
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-big;
+  margin: 0;
 }
 
 
@@ -52,9 +53,10 @@ h1, h2, h3, h4, h5, h6 {
     button.dropdown-toggle {
       background-color: transparent;
       border-color: transparent;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 400;
       color: darken($darkgray, 20%);
+      color: $white;
       &:active, &.active, &[aria-expanded="true"] {
         background-color: transparent;
         color: $black;

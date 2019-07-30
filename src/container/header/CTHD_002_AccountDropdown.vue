@@ -29,7 +29,7 @@ export default {
 
 <style lang="scss" scoped>
 .icon-user {
-  text-shadow: 3px 2px 3px $gray;
+  // text-shadow: 3px 2px 3px rgba($black, 0.1);
   margin-right: 8px;
 }
 </style>
