@@ -59,7 +59,6 @@ h1, h2, h3, h4, h5, h6 {
       color: $white;
       &:active, &.active, &[aria-expanded="true"] {
         background-color: transparent;
-        color: $black;
       }
     }
   }
@@ -176,6 +175,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* b-button */
+.btn {
+  border-radius: 50px;
+}
 .btn:focus {
   outline: none;
   box-shadow: none;
@@ -189,6 +191,83 @@ h1, h2, h3, h4, h5, h6 {
     &:focus {
       box-shadow: 0 0 5px 1px $skyblue;
     }
+  }
+}
+.btn-secondary {
+  background-color: $gray;
+  border-color: $gray;
+  color: darken($darkgray, 20%);
+  &:not(:disabled):not(.disabled):active {
+    background-color: $gray;
+    border-color: $gray;
+    &:focus {
+      box-shadow: 0 0 5px 1px $gray;
+    }
+  }
+  &:hover {
+    color: darken($darkgray, 30%);
+    background-color: $darkgray;
+    border-color: $darkgray;
+  }
+}
+.btn-dark {
+  background-color: $navy;
+  border-color: $navy;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $navy;
+    border-color: $navy;
+    &:focus {
+      box-shadow: 0 0 5px 1px $navy;
+    }
+  }
+  &:hover {
+    background-color: $black;
+    border-color: $black;
+  }
+}
+.btn-outline-dark {
+  color: $navy;
+  border-color: $navy;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $navy;
+    border-color: $navy;
+    &:focus {
+      box-shadow: 0 0 5px 1px $navy;
+    }
+  }
+  &:hover {
+    background-color: $navy;
+    border-color: $navy;
+  }
+}
+.btn-info {
+  background-color: $blueviolet;
+  border-color: $blueviolet;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $blueviolet;
+    border-color: $blueviolet;
+    &:focus {
+      box-shadow: 0 0 5px 1px $blueviolet;
+    }
+  }
+  &:hover {
+    background-color: darken($blueviolet, 5%);;
+    border-color: darken($blueviolet, 5%);;
+  }
+}
+.btn-outline-info {
+  color: $blueviolet;
+  border-color: $blueviolet;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $blueviolet;
+    border-color: $blueviolet;
+    &:focus {
+      box-shadow: 0 0 5px 1px $blueviolet;
+    }
+  }
+  &:hover {
+    background-color: $blueviolet;
+    border-color: $blueviolet;
   }
 }
 

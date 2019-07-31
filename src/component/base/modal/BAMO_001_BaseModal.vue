@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <div @click="showModal">
+  <span>
+    <span @click="showModal">
       <slot name="activator" />
-    </div>
+    </span>
 
     <b-modal :ref="name"
              :title="title"
@@ -18,7 +18,7 @@
         <slot name="footer" />
       </template>
     </b-modal>
-  </div>
+  </span>
 </template>
 
 <script>

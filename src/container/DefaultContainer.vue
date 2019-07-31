@@ -39,8 +39,6 @@ $calc-height: calc(#{$header-height} + #{$sub-header-height});
   }
   .app-body{
   padding-top: $calc-height;
-    // width: 100vw;
-    // height: calc(100vh - #{$header-height});
     padding-bottom: 1000px;
     .main {
       margin: 0 !important;

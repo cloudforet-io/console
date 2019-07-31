@@ -1,7 +1,7 @@
 <template>
   <b-dropdown size="sm" right no-caret>
     <template slot="button-content">
-      <i class="icon-user" />
+      <!-- <i class="icon-user" /> -->
       <span class="name">Username</span>
     </template>
     <b-dropdown-item @click="logout">

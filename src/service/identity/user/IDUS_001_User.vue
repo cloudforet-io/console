@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <b-row>
+    <b-row class="user-table">
       <b-col cols="12">
         <BaseTable :table-data="users" :fields="fields" :per-page="perPage"
                    :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
@@ -8,39 +8,43 @@
                    @rowSelected="rowSelected" @list="listUsers" @limitChanged="limitChanged"
         >
           <template #caption>
-            <b-row align-v="center" align-h="center">
-              <b-col cols="6">
-                <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
-                  <template #activator>
-                    <b-button block variant="outline-primary">
-                      Add
-                    </b-button>
-                  </template>
-                  <template #contents>
-                    <UserDetail :creatable="true" :updatable="true" />
-                  </template>
-                </BaseModal>
-              </b-col>
-              <b-col cols="6">
-                <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
-                           :centered="true" :hide-footer="true"
-                >
-                  <template #activator>
-                    <b-button block variant="outline-primary">
-                      Edit
-                    </b-button>
-                  </template>
-                  <template #contents>
-                    <UserDetail :updatable="true" :user-prop="selectedUser" />
-                  </template>
-                </BaseModal>
-              </b-col>
-            </b-row>
+            <div>
+              <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
+                <template #activator>
+                  <b-button class="btn" variant="outline-dark">
+                    Add
+                  </b-button>
+                </template>
+                <template #contents>
+                  <UserDetail :creatable="true" :updatable="true" />
+                </template>
+              </BaseModal>
+              <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
+                         :centered="true" :hide-footer="true"
+              >
+                <template #activator>
+                  <b-button class="btn" variant="outline-primary">
+                    Edit
+                  </b-button>
+                </template>
+                <template #contents>
+                  <UserDetail :updatable="true" :user-prop="selectedUser" />
+                </template>
+              </BaseModal>
+            </div>
           </template>
         </BaseTable>
       </b-col>
     </b-row>
     <b-row>
+      <BaseTabNav
+        :fill="false"
+        :nav-tabs="tabs"
+        :keep-alive="true"
+        :is-footer-visible="false"
+        :tab="tab"
+      />
+
       <b-col cols="12">
         <b-tabs v-if="selectedUser">
           <b-tab active>
@@ -61,15 +65,17 @@
 <script>
 import BaseTable from '@/component/base/table/BATB_001_BaseTable.vue';
 import query from './search_context/query.js';
+import UserDetail from './IDUS_002_UserDetail.vue';
 const BaseModal = () => import('@/component/base/modal/BAMO_001_BaseModal.vue');
-const UserDetail = () => import('./IDUS_002_UserDetail.vue');
+const BaseTabNav = () => import('@/component/base/tab/BATA_002_BaseTabNav');
 
 export default {
   name: 'User',
   components: {
     BaseTable,
     BaseModal,
-    UserDetail
+    UserDetail,
+    BaseTabNav
   },
   data () {
     return {
@@ -83,6 +89,16 @@ export default {
         { key: 'language', label: 'Language', sortable: true, ajaxSortable: false },
         { key: 'domainId', label: 'Domain ID' }
       ],
+      tabs: [
+        {
+          name: 'summary',
+          isSelected: true,
+          tabIcon: 'icon-calculator',
+          tabTitle: 'INFO',
+          component: UserDetail
+        }
+      ],
+      tab: UserDetail,
       users: [],
       selectedUser: null,
       selectedIdx: undefined,
@@ -157,5 +173,12 @@ export default {
 }
 .base-table {
   @extend %sheet;
+}
+.btn {
+  padding: 3px 15px;
+  margin: 0 5px;
+}
+.user-table {
+  margin-bottom: 20px;
 }
 </style>

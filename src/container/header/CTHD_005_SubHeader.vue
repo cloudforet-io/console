@@ -1,20 +1,19 @@
 <template>
-  <b-row no-gutters align-v="center" class="sub-header">
-    <b-col cols="1" class="group">
-      <span>identity</span>
+  <div class="sub-header">
+    <div class="group-title">
+      <span class="title">identity</span>
       <span class="triangle" />
-      <span class="triangle-border" />
-    </b-col>
-    <b-col cols="1" class="title ">
-      <span>Server</span>
-    </b-col>
-    <b-col cols="1" class="title active">
-      <span>Network</span>
-    </b-col>
-    <b-col cols="1" class="title">
-      <span>Storage</span>
-    </b-col>
-  </b-row>
+    </div>
+    <div class="item">
+      <span class="title">Server</span>
+    </div>
+    <div class="item active">
+      <span class="title">Network</span>
+    </div>
+    <div class="item">
+      <span class="title">Storage</span>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -24,77 +23,67 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$top-pad: 7px;
-
+$bg-color: rgba($white, .9);
+$top-pad: 9px;
 %item {
-  height: 100%;
-  padding-top: $top-pad;
+  display: inline-block;
+  box-sizing: content-box;
+  height: $sub-header-height;
+  min-width: 150px;
   text-align: center;
-  span {
+  color: lighten($black, 30%);
+  .title {
+    display: inline-block;
+    padding-top: $top-pad;
     vertical-align: sub;
   }
 }
 
-$shape-border: 2px;
-$radius: calc((#{$sub-header-height} - #{$shape-border}) / 2);
-$shape-width: 20px;
-%shape {
-  position: absolute;
-  height: 0;
-  width: 0;
-  top: 0px;
-  border-top: $radius solid transparent;
-  border-bottom: $radius solid transparent;
-}
-
 .sub-header {
-  // background: $dark-gradient;
-  background-color: rgba($white, .9);
+  background-color: $bg-color;
   margin: 0;
   width: 100vw;
   height: $sub-header-height;
-  color: $navy;
   font-weight: 500;
   font-family: $font-big;
   font-size: 0.9rem;
   box-shadow: 0px 0 5px 0px rgba($black, 0.3);
   border: 0;
 
-  .group {
+  .item {
     @extend %item;
-    position: relative;
-    display: inline-block;
-    // margin-right: 50px;
-    width: 100%;
-    border-bottom: 2px solid rgba($blue, 0.2);
-    text-transform: uppercase;
-    .triangle {
-      @extend %shape;
-      z-index: 2;
-      right: calc(-#{$shape-width});
-      border-left: $shape-width solid $white;
-    }
-    .triangle-border {
-      @extend %shape;
-      right: calc(-#{$shape-width} - #{$shape-border});
-      border-left: calc(#{$shape-width} + #{$shape-border}) solid rgba($blue, 0.2);
-      border-top: calc(#{$shape-width} - #{$shape-border}) solid transparent;
-      border-bottom: calc(#{$shape-width} - #{$shape-border}) solid transparent;
-      z-index: 1;
-    }
-  }
-  .title {
-    @extend %item;
-    // margin: 0 10px;
-    // border-radius: 5px;
     cursor: pointer;
-    background-color: white;
     &.active {
       border-bottom: 2px solid $blue;
-      background-color: rgba($blue, 0.05);
+      color: darken($blue, 10%);
+      font-weight: 500;
     }
     &:hover {
-      background-color: rgba($blue, 0.1);
+      font-weight: 800;
+      color: $navy;
+    }
+  }
+
+  $shape-height: $sub-header-height;
+  $shape-width: 25px;
+  $shape-color: darken($skyblue, 1%);
+
+  .group-title {
+    @extend %item;
+    position: relative;
+    text-transform: uppercase;
+    background-color: $shape-color;
+    color: $navy;
+    // margin-right: $shape-width;
+
+    .triangle {
+      position: absolute;
+      height: 0;
+      width: 0;
+      top: 0px;
+      right: calc(-#{$shape-width});
+      border-top: $shape-height solid $shape-color;
+      border-right: $shape-width solid transparent;
     }
   }
 }
