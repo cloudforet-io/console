@@ -83,134 +83,134 @@
 import BaseTag from '@/component/base/tag/BATG_001_BaseTag.vue';
 
 const userModel = {
-  userId: null,
-  name: null,
-  password: null,
-  email: null,
-  mobile: null,
-  group: null,
-  domainId: null,
-  language: null,
-  timezone: null,
-  tags: []
+    userId: null,
+    name: null,
+    password: null,
+    email: null,
+    mobile: null,
+    group: null,
+    domainId: null,
+    language: null,
+    timezone: null,
+    tags: []
 };
 
 export default {
-  name: 'UserDetail',
-  components: {
-    BaseTag
-  },
-  props: {
-    userProp: {
-      type: Object,
-      default: () => (userModel)
+    name: 'UserDetail',
+    components: {
+        BaseTag
     },
-    creatable: {
-      type: Boolean,
-      default: false
+    props: {
+        userProp: {
+            type: Object,
+            default: () => (userModel)
+        },
+        creatable: {
+            type: Boolean,
+            default: false
+        },
+        updatable: {
+            type: Boolean,
+            default: false
+        }
     },
-    updatable: {
-      type: Boolean,
-      default: false
+    data () {
+        return {
+            userId: this.userProp.userId, // required
+            password: this.userProp.password, // required
+            passwordCheck: null, // required
+            name: this.userProp.name,
+            email: this.userProp.email,
+            mobile: this.userProp.mobile,
+            group: this.userProp.group,
+            domainId: this.userProp.domainId, // required
+            language: this.userProp.language,
+            timezone: this.userProp.timezone
+        };
+    },
+    computed: {
+        tags () { return this.userProp.tags; },
+        validateUserId () {
+            if (this.userId === null) return null;
+            if (this.userId.length > 4) return true;
+            return false;
+        },
+        validatePassword () {
+            if (this.password === null) return null;
+            if (this.password.length > 4) return true;
+            return false;
+        },
+        validatePasswordCheck () {
+            if (this.passwordCheck === null) return null;
+            if (!this.password) return false;
+            if (this.password === this.passwordCheck) return true;
+            return false;
+        },
+        validateDomainId () {
+            if (this.domainId === null) return null;
+            if (this.domainId.length > 0) return true;
+            return false;
+        },
+        validated () {
+            return !!(this.validateUserId && this.validatePassword && this.validatePasswordCheck && this.validateDomainId);
+        }
+    },
+    watch: {
+        userProp (updatedUser) {
+            this.resetUserData(updatedUser);
+        }
+    },
+    methods: {
+        onCreate () {
+            if (!this.validated) {
+                this.userId = this.userId === null ? '' : this.userId;
+                this.password = this.password === null ? '' : this.password;
+                this.passwordCheck = this.passwordCheck === null ? '' : this.passwordCheck;
+                this.domainId = this.domainId === null ? '' : this.domainId;
+                return;
+            }
+            console.log('creating....');
+            setTimeout(() => {
+                this.$store.dispatch('modal/closeModal');
+            }, 1000);
+        },
+        onUpdate (e) {
+            if (!this.validated) {
+                this.userId = this.userProp.userId;
+                this.password = this.userProp.password;
+                this.passwordCheck = '';
+                this.domainId = this.userProp.domainId;
+                return;
+            }
+            console.log('updating....');
+            setTimeout(() => {
+                this.$store.dispatch('modal/closeModal');
+            }, 1000);
+        },
+        onDelete () {
+            console.log('deleting....');
+            setTimeout(() => {
+                this.$store.dispatch('modal/closeModal');
+            }, 1000);
+        },
+        onReset () {
+            if (this.creatable) this.resetUserData(userModel);
+            else this.resetUserData(this.userProp);
+        },
+        resetUserData (user) {
+            this.userId = user.userId;
+            this.password = user.password;
+            this.passwordCheck = null;
+            this.name = user.name;
+            this.email = user.email;
+            this.mobile = user.mobile;
+            this.group = user.group;
+            this.domainId = user.domainId;
+            this.language = user.language;
+            this.timezone = user.timezone;
+            this.$refs.baseTag.resetRows();
+        }
     }
-  },
-  data () {
-    return {
-      userId: this.userProp.userId, // required
-      password: this.userProp.password, // required
-      passwordCheck: null, // required
-      name: this.userProp.name,
-      email: this.userProp.email,
-      mobile: this.userProp.mobile,
-      group: this.userProp.group,
-      domainId: this.userProp.domainId, // required
-      language: this.userProp.language,
-      timezone: this.userProp.timezone
-    };
-  },
-  computed: {
-    tags () { return this.userProp.tags; },
-    validateUserId () {
-      if (this.userId === null) return null;
-      if (this.userId.length > 4) return true;
-      return false;
-    },
-    validatePassword () {
-      if (this.password === null) return null;
-      if (this.password.length > 4) return true;
-      return false;
-    },
-    validatePasswordCheck () {
-      if (this.passwordCheck === null) return null;
-      if (!this.password) return false;
-      if (this.password === this.passwordCheck) return true;
-      return false;
-    },
-    validateDomainId () {
-      if (this.domainId === null) return null;
-      if (this.domainId.length > 0) return true;
-      return false;
-    },
-    validated () {
-      return !!(this.validateUserId && this.validatePassword && this.validatePasswordCheck && this.validateDomainId);
-    }
-  },
-  watch: {
-    userProp (updatedUser) {
-      this.resetUserData(updatedUser);
-    }
-  },
-  methods: {
-    onCreate () {
-      if (!this.validated) {
-        this.userId = this.userId === null ? '' : this.userId;
-        this.password = this.password === null ? '' : this.password;
-        this.passwordCheck = this.passwordCheck === null ? '' : this.passwordCheck;
-        this.domainId = this.domainId === null ? '' : this.domainId;
-        return;
-      }
-      console.log('creating....');
-      setTimeout(() => {
-        this.$store.dispatch('modal/closeModal');
-      }, 1000);
-    },
-    onUpdate (e) {
-      if (!this.validated) {
-        this.userId = this.userProp.userId;
-        this.password = this.userProp.password;
-        this.passwordCheck = '';
-        this.domainId = this.userProp.domainId;
-        return;
-      }
-      console.log('updating....');
-      setTimeout(() => {
-        this.$store.dispatch('modal/closeModal');
-      }, 1000);
-    },
-    onDelete () {
-      console.log('deleting....');
-      setTimeout(() => {
-        this.$store.dispatch('modal/closeModal');
-      }, 1000);
-    },
-    onReset () {
-      if (this.creatable) this.resetUserData(userModel);
-      else this.resetUserData(this.userProp);
-    },
-    resetUserData (user) {
-      this.userId = user.userId;
-      this.password = user.password;
-      this.passwordCheck = null;
-      this.name = user.name;
-      this.email = user.email;
-      this.mobile = user.mobile;
-      this.group = user.group;
-      this.domainId = user.domainId;
-      this.language = user.language;
-      this.timezone = user.timezone;
-      this.$refs.baseTag.resetRows();
-    }
-  }
 };
 </script>
 

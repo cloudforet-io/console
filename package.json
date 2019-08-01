@@ -4,15 +4,9 @@
   "description": "CloudOne web console client",
   "author": "CloudOne",
   "scripts": {
-    "serve": "vue-cli-service serve --mode local",
-    "build:local": "vue-cli-service build --mode local",
-    "build:dev": "vue-cli-service build --mode development",
-    "build:stg": "vue-cli-service build --mode staging",
-    "build:prod": "vue-cli-service build --mode prod",
+    "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "eslint --ext .js,.vue src",
-    "test:unit": "vue-cli-service test:unit",
-    "test:e2e": "vue-cli-service test:e2e"
+    "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
     "@coreui/coreui": "^2.1.9",

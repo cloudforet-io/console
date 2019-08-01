@@ -15,7 +15,6 @@ import Notifications from 'vue-notification';
 import velocity from 'velocity-animate';
 import CountryFlag from 'vue-country-flag';
 import VueAlertify from 'vue-alertify';
-
 // TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
 dotenv.config();
 Vue.mixin(Mixin);
@@ -26,7 +25,7 @@ Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
 Vue.use(CountryFlag);
 Vue.use(Notifications, { velocity });
-Vue.prototype.$http = api;
+Vue.prototype.$axios  = api;
 
 /* This is a Global Bus Event;
  * Please, name your '$emit' event name as action + Event such as
@@ -34,7 +33,6 @@ Vue.prototype.$http = api;
  */
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
-
 new Vue({
     el: '#app',
     router,

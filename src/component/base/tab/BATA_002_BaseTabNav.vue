@@ -44,88 +44,88 @@
 import { api } from '@/setup/api';
 let baseTabParams = {};
 export default {
-  name: 'BaseTabs',
-  components: {
-  },
-  props: {
-    navTabs: {
-      type: Array,
-      default: () => []
+    name: 'BaseTabs',
+    components: {
     },
-    keepAlive: {
-      type: Boolean,
-      default: false
+    props: {
+        navTabs: {
+            type: Array,
+            default: () => []
+        },
+        keepAlive: {
+            type: Boolean,
+            default: false
+        },
+        fill: {
+            type: Boolean,
+            default: false
+        },
+        isFooterVisible: {
+            tyep: Boolean,
+            default: false
+        },
+        isCreatable: {
+            tyep: Boolean,
+            default: false
+        },
+        isUpdatable: {
+            tyep: Boolean,
+            default: false
+        },
+        isDeletable: {
+            tyep: Boolean,
+            default: false
+        },
+        selectedData: {
+            type: Object,
+            default: () => {}
+        },
+        tab: {
+            type: Object,
+            default: () => {}
+        }
     },
-    fill: {
-      type: Boolean,
-      default: false
+    data () {
+        return {
+            prosData: {},
+            selectedTab: this.tab,
+            isCreate: this.isCreatable,
+            isUpdate: this.isUpdatable,
+            isDelete: this.isDeletable
+        };
     },
-    isFooterVisible: {
-      tyep: Boolean,
-      default: false
-    },
-    isCreatable: {
-      tyep: Boolean,
-      default: false
-    },
-    isUpdatable: {
-      tyep: Boolean,
-      default: false
-    },
-    isDeletable: {
-      tyep: Boolean,
-      default: false
-    },
-    selectedData: {
-      type: Object,
-      default: () => {}
-    },
-    tab: {
-      type: Object,
-      default: () => {}
-    }
-  },
-  data () {
-    return {
-      prosData: {},
-      selectedTab: this.tab,
-      isCreate: this.isCreatable,
-      isUpdate: this.isUpdatable,
-      isDelete: this.isDeletable
-    };
-  },
-  created () {
+    created () {
 
-  },
-  beforeDestroy: function () {
+    },
+    beforeDestroy: function () {
 
-  },
-  methods: {
-    displayFooter: () => {
-      this.isFooterVisible = true;
     },
-    hideFooter: () => {
-      this.isFooterVisible = false;
-    },
-    createNew () {
-      baseTabParams = this.dataforTab;
-      baseTabParams['tabContents'] = this.$refs.popupTab;
-      this.$emit('create', baseTabParams);
-    },
-    updateSelect () {
-      baseTabParams = this.dataforTab;
-      baseTabParams['tabContents'] = this.$refs.popupTab;
-      this.$emit('update', baseTabParams);
-    },
-    deleteSelect: () => {
-      baseTabParams = this.dataforTab;
-      baseTabParams['tabContents'] = this.$refs.popupTab;
-      this.$emit('delete', baseTabParams);
-    },
-    closeWindow (e) {
-      this.$parent.$store.dispatch('modal/closeModal');
+    methods: {
+        displayFooter: () => {
+            this.isFooterVisible = true;
+        },
+        hideFooter: () => {
+            this.isFooterVisible = false;
+        },
+        createNew () {
+            baseTabParams = this.dataforTab;
+            baseTabParams['tabContents'] = this.$refs.popupTab;
+            this.$emit('create', baseTabParams);
+        },
+        updateSelect () {
+            baseTabParams = this.dataforTab;
+            baseTabParams['tabContents'] = this.$refs.popupTab;
+            this.$emit('update', baseTabParams);
+        },
+        deleteSelect: () => {
+            baseTabParams = this.dataforTab;
+            baseTabParams['tabContents'] = this.$refs.popupTab;
+            this.$emit('delete', baseTabParams);
+        },
+        closeWindow (e) {
+            this.$parent.$store.dispatch('modal/closeModal');
+        }
     }
-  }
 };
 </script>
 

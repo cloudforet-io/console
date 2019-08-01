@@ -1,5 +1,9 @@
 <template>
-  <span><b-check v-model="checked" @change="onChange" /></span>
+  <span>
+    <b-check v-model="checked"
+             @change="onChange"
+    />
+  </span>
 </template>
 
 <script>

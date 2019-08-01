@@ -7,7 +7,10 @@
     </b-col>
     <b-col cols="11" class="row">
       <b-col cols="5">
-        <b-input v-model="key" :plaintext="readOnly" type="text" placeholder="Key"
+        <b-input v-model="key"
+                 :plaintext="readOnly"
+                 type="text"
+                 placeholder="Key"
                  :class="{'text-right': !readOnly}"
         />
       </b-col>

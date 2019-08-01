@@ -65,89 +65,89 @@ const BaseModal = () => import('@/component/base/modal/BAMO_001_BaseModal.vue');
 const UserDetail = () => import('./IDUS_002_UserDetail.vue');
 
 export default {
-  name: 'User',
-  components: {
-    BaseTable,
-    BaseModal,
-    UserDetail
-  },
-  data () {
-    return {
-      fields: [
-        { key: 'selected' },
-        { key: 'userId', label: 'ID', sortable: true, ajaxSortable: false },
-        { key: 'name', label: 'Name', sortable: true, ajaxSortable: true },
-        { key: 'email', label: 'Email', sortable: true, ajaxSortable: false },
-        { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false },
-        { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false },
-        { key: 'language', label: 'Language', sortable: true, ajaxSortable: false },
-        { key: 'domainId', label: 'Domain ID' }
-      ],
-      users: [],
-      selectedUser: null,
-      selectedIdx: undefined,
-      addModal: false,
-      totalCount: 17,
-      queryData: query,
-      isReadyForSearch: false,
-      perPage: 3,
-      isLoading: true
-    };
-  },
-  mounted () {
-    this.init();
-  },
-  methods: {
-    init () {
-      this.listUsers(this.perPage, 0);
+    name: 'User',
+    components: {
+        BaseTable,
+        BaseModal,
+        UserDetail
     },
-    reset () {
-      this.users = [];
-      this.selectedUser = null;
-      this.isLoading = true;
+    data () {
+        return {
+            fields: [
+                { key: 'selected' },
+                { key: 'userId', label: 'ID', sortable: true, ajaxSortable: false },
+                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true },
+                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false },
+                { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false },
+                { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false },
+                { key: 'language', label: 'Language', sortable: true, ajaxSortable: false },
+                { key: 'domainId', label: 'Domain ID' }
+            ],
+            users: [],
+            selectedUser: null,
+            selectedIdx: undefined,
+            addModal: false,
+            totalCount: 17,
+            queryData: query,
+            isReadyForSearch: false,
+            perPage: 3,
+            isLoading: true
+        };
     },
-    async listUsers (limit, skip, sort, search) {
-      this.reset();
+    mounted () {
+        this.init();
+    },
+    methods: {
+        init () {
+            this.listUsers(this.perPage, 0);
+        },
+        reset () {
+            this.users = [];
+            this.selectedUser = null;
+            this.isLoading = true;
+        },
+        async listUsers (limit, skip, sort, search) {
+            this.reset();
 
-      if (limit === undefined || limit === null) limit = 10;
-      if (skip === undefined || skip === null) skip = 0;
-      if (sort === undefined || sort === null) sort = '-created_date';
-      if (search === undefined || search === null) search = [];
+            if (limit === undefined || limit === null) limit = 10;
+            if (skip === undefined || skip === null) skip = 0;
+            if (sort === undefined || sort === null) sort = '-created_date';
+            if (search === undefined || search === null) search = [];
 
-      let res;
-      try {
-        res = await this.$http.get('/identity/user', {
-          params: { limit, skip, sort }
+            let res;
+            try {
+                res = await this.$http.get('/identity/user', {
+                    params: { limit, skip, sort }
           /**
            * TODO: set limit, skip, sort and search in the right format
            */
-        });
-      } catch (e) {
-        console.error(e);
-      }
+                });
+            } catch (e) {
+                console.error(e);
+            }
 
-      setTimeout(() => { // this is for test
+            setTimeout(() => { // this is for test
         // let temp = []
         // for (var i = 0; i < 1000; i++) {
         //   temp[i] = res.data[0]
         // }
         // this.users = temp
-        this.users = res.data;
-        this.isLoading = false;
-      }, 1000);
+                this.users = res.data;
+                this.isLoading = false;
+            }, 1000);
       /**
        * TODO: set totalCount with data from server
        */
-    },
-    rowSelected (row) {
-      if (row instanceof Array || !row) this.selectedUser = null;
-      else this.selectedUser = row.data;
-    },
-    limitChanged (val) {
-      this.perPage = Number(val);
-      this.init();
+        },
+        rowSelected (row) {
+            if (row instanceof Array || !row) this.selectedUser = null;
+            else this.selectedUser = row.data;
+        },
+        limitChanged (val) {
+            this.perPage = Number(val);
+            this.init();
+        }
     }
-  }
 };
 </script>
 

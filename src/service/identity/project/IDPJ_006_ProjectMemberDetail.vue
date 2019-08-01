@@ -1,218 +1,160 @@
 <template>
-  <b-form @reset.prevent="onReset" @submit.prevent="updatable && creatable ? onCreate() : onUpdate()">
-    <b-form-group label="User ID" :label-cols="3">
-      <b-form-input v-model="userId" :plaintext="!updatable" type="text" :state="validateUserId" />
-      <b-form-invalid-feedback v-if="updatable" :state="validateUserId">
-        Your user ID must be 5-12 characters long.
-      </b-form-invalid-feedback>
-      <b-form-valid-feedback v-if="updatable" :state="validateUserId">
-        Looks Good.
-      </b-form-valid-feedback>
-    </b-form-group>
-
-    <b-form-group v-if="updatable" label="Password" :label-cols="3">
-      <b-form-input v-model="password" :plaintext="!updatable" type="password" :state="validatePassword" />
-      <b-form-invalid-feedback :state="validatePassword">
-        Your Password must be 5-12 characters long.
-      </b-form-invalid-feedback>
-      <b-form-valid-feedback :state="validatePassword" />
-    </b-form-group>
-
-    <b-form-group v-if="updatable" label="Password Check" :label-cols="3">
-      <b-form-input v-model="passwordCheck" :plaintext="!updatable" type="password"
-                    :state="validatePasswordCheck"
-      />
-      <b-form-invalid-feedback :state="validatePasswordCheck">
-        Please check your Password again.
-      </b-form-invalid-feedback>
-      <b-form-valid-feedback :state="validatePasswordCheck" />
-    </b-form-group>
-
-    <b-form-group label="Name" :label-cols="3">
-      <b-form-input v-model="name" :plaintext="!updatable" type="text" />
-    </b-form-group>
-
-    <b-form-group label="E-Mail" :label-cols="3">
-      <b-form-input v-model="email" :plaintext="!updatable" type="text" />
-    </b-form-group>
-
-    <b-form-group label="Phone" :label-cols="3">
-      <b-form-input v-model="mobile" :plaintext="!updatable" type="text" />
-    </b-form-group>
-
-    <b-form-group label="Group Name" :label-cols="3">
-      <b-form-input v-model="group" :plaintext="!updatable" type="text" />
-    </b-form-group>
-
-    <b-form-group label="Domain ID" label-for="domainId" :label-cols="3">
-      <b-form-input v-model="domainId" :plaintext="!updatable" type="text" :state="validateDomainId" />
-      <b-form-invalid-feedback v-if="updatable" :state="validateDomainId">
-        Please enter your domain ID.
-      </b-form-invalid-feedback>
-    </b-form-group>
-
-    <b-form-group label="Language" label-for="language" :label-cols="3">
-      <b-form-input v-model="language" :plaintext="!updatable" type="text" />
-    </b-form-group>
-
-    <b-form-group label="Time Zone" label-for="timezone" :label-cols="3">
-      <b-form-input v-model="timezone" :plaintext="!updatable" type="text" />
-    </b-form-group>
-
-    <b-form-group label="Tags" :label-cols="3">
-      <b-col :cols="updatable || creatable ? '12' : '5'">
-        <BaseTag ref="baseTag" :tag-data="tags" :editable="updatable || creatable" />
+  <div class="animated fadeIn">
+    <b-row>
+      <b-col cols="12">
+        <BaseTable :table-data="users"
+                   :fields="fields"
+                   :per-page="perPage"
+                   :searchable="true"
+                   :total-rows="totalCount"
+                   :search-context-data="queryData"
+                   :show-caption="true"
+                   :busy="isLoading"
+                   :cardless="false"
+                   :underlined="true"
+                   @rowSelected="rowSelected"
+                   @list="listUsers"
+                   @limitChanged="limitChanged"
+                   @onSelectAll="rowAllSelected"
+        />
       </b-col>
-    </b-form-group>
-
-    <div v-if="updatable" class="btn-box mt-5">
-      <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="primary">
-        {{ creatable ? 'Create' : 'Update' }}
-      </b-button>
-      <b-button class="float-right mb-1" size="md" type="reset" variant="secondary">
-        Reset
-      </b-button>
-      <b-button v-if="!creatable" class="float-left" size="md" type="reset" variant="danger" @click="onDelete">
-        Delete
-      </b-button>
-    </div>
-  </b-form>
+    </b-row>
+      <b-row>
+          <slot name="footerArea">
+              <div class="col-md-12">
+                  <div class="modal-footer" style="border-top:none; padding-right: 0px">
+                      <b-button size="md" variant="primary" @click="addUser">
+                          Create
+                      </b-button>
+                      <b-button size="md" variant="light" @click="closeWindow">
+                          Cancel
+                      </b-button>
+                  </div>
+              </div>
+          </slot>
+      </b-row>
+  </div>
 </template>
 
 <script>
-import BaseTag from '@/component/base/tag/BATG_001_BaseTag';
-
-const userModel = {
-    userId: null,
-    name: null,
-    password: null,
-    email: null,
-    mobile: null,
-    group: null,
-    domainId: null,
-    language: null,
-    timezone: null,
-    tags: []
-};
+import query from '@/service/identity/project/search_context/search_context';
+import BaseTable from '@/component/base/table/BATB_001_BaseTable.vue';
 
 export default {
-    name: 'ProjectMemberDetail',
+    name: 'ProjectMember',
     components: {
-        BaseTag
+        BaseTable
     },
-    props: {
-        userProp: {
-            type: Object,
-            default: () => (userModel)
-        },
-        creatable: {
-            type: Boolean,
-            default: false
-        },
-        updatable: {
-            type: Boolean,
-            default: false
-        }
-    },
-    data () {
+    data() {
         return {
-            userId: this.userProp.userId, // required
-            password: this.userProp.password, // required
-            passwordCheck: null, // required
-            name: this.userProp.name,
-            email: this.userProp.email,
-            mobile: this.userProp.mobile,
-            group: this.userProp.group,
-            domainId: this.userProp.domainId, // required
-            language: this.userProp.language,
-            timezone: this.userProp.timezone
+            fields: [
+                {key: 'selected'},
+                {key: 'role_id', label: 'User ID', sortable: true, ajaxSortable: false},
+                {key: 'user_name', label: 'Name', sortable: true, ajaxSortable: true},
+                {key: 'email', label: 'Email', sortable: true, ajaxSortable: false},
+                {key: 'group', label: 'Group', sortable: true, ajaxSortable: false}
+            ],
+            users: [],
+            anySelectedRow: false,
+            selectedUserMulti: null,
+            selectedUser: null,
+            selectedIdx: undefined,
+            isFooterVisible: true,
+            addModal: false,
+            totalCount: 17,
+            queryData: query,
+            isReadyForSearch: false,
+            perPage: 3,
+            isLoading: true
         };
     },
-    computed: {
-        tags () { return this.userProp.tags; },
-        validateUserId () {
-            if (this.userId === null) return null;
-            if (this.userId.length > 4) return true;
-            return false;
-        },
-        validatePassword () {
-            if (this.password === null) return null;
-            if (this.password.length > 4) return true;
-            return false;
-        },
-        validatePasswordCheck () {
-            if (this.passwordCheck === null) return null;
-            if (!this.password) return false;
-            if (this.password === this.passwordCheck) return true;
-            return false;
-        },
-        validateDomainId () {
-            if (this.domainId === null) return null;
-            if (this.domainId.length > 0) return true;
-            return false;
-        },
-        validated () {
-            return !!(this.validateUserId && this.validatePassword && this.validatePasswordCheck && this.validateDomainId);
-        }
-    },
-    watch: {
-        userProp (updatedUser) {
-            this.resetUserData(updatedUser);
-        }
+    mounted() {
+        this.init();
     },
     methods: {
-        onCreate () {
-            if (!this.validated) {
-                this.userId = this.userId === null ? '' : this.userId;
-                this.password = this.password === null ? '' : this.password;
-                this.passwordCheck = this.passwordCheck === null ? '' : this.passwordCheck;
-                this.domainId = this.domainId === null ? '' : this.domainId;
-                return;
+        init() {
+            this.listUsers(this.perPage, 0);
+        },
+        reset() {
+            this.users = [];
+            this.selectedUser = null;
+            this.isLoading = true;
+        },
+        async listUsers(limit, skip, sort, search) {
+            this.reset();
+
+            if (this.isEmpty(limit)) {
+                limit = 10;
             }
-            console.log('creating....');
-            setTimeout(() => {
-                this.$store.dispatch('modal/closeModal');
-            }, 1000);
-        },
-        onUpdate (e) {
-            if (!this.validated) {
-                this.userId = this.userProp.userId;
-                this.password = this.userProp.password;
-                this.passwordCheck = '';
-                this.domainId = this.userProp.domainId;
-                return;
+            if (this.isEmpty(skip)) {
+                skip = 0;
             }
-            console.log('updating....');
-            setTimeout(() => {
-                this.$store.dispatch('modal/closeModal');
-            }, 1000);
+            if (this.isEmpty(sort)) {
+                sort = '-created_date';
+            }
+            if (this.isEmpty(search)) {
+                search = [];
+            }
+
+            this.$axios.get('/identity/user', {
+                params: { limit, skip, sort }
+            }).then((response) => {
+                this.users = response.data;
+                this.isLoading = false;
+            }).catch((ex) => {
+                console.error(ex);
+            });
+
         },
-        onDelete () {
-            console.log('deleting....');
-            setTimeout(() => {
-                this.$store.dispatch('modal/closeModal');
-            }, 1000);
+        rowSelected(row) {
+            if (this.isEmpty(row) || row.length < 1) {
+                this.selectedUser = null;
+                this.anySelectedRow = false;
+            } else {
+                this.selectedUser = row;
+                this.selectedUserMulti = row;
+                this.anySelectedRow = true;
+            }
         },
-        onReset () {
-            if (this.creatable) this.resetUserData(userModel);
-            else this.resetUserData(this.userProp);
+        rowAllSelected(row) {
+            if (row instanceof Array && !this.isEmpty(row)) {
+                this.selectedUserMulti = row;
+                this.anySelectedRow = true;
+            } else {
+                this.selectedUserMulti = null;
+                this.anySelectedRow = false;
+            }
         },
-        resetUserData (user) {
-            this.userId = user.userId;
-            this.password = user.password;
-            this.passwordCheck = null;
-            this.name = user.name;
-            this.email = user.email;
-            this.mobile = user.mobile;
-            this.group = user.group;
-            this.domainId = user.domainId;
-            this.language = user.language;
-            this.timezone = user.timezone;
-            this.$refs.baseTag.resetRows();
+        limitChanged(val) {
+            this.perPage = Number(val);
+            this.init();
+        },
+        deleteSelected() {
+            this.$alertify.confirmWithTitle(
+                'Delete Users',
+                'Do you want to delete selected?',
+                () => {
+                    this.consoleLogEnv('success');
+                    this.$alertify.success('Selected User Successfully deleted.');
+                },
+                () => {
+                    this.consoleLogEnv('fail');
+                    this.$alertify.success('Action Cancel');
+                }
+            );
+        },
+        addUser() {
+            console.log('')
+        },
+        closeWindow(e) {
+            this.$parent.$store.dispatch('modal/closeModal');
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
+    .base-table {
+        @extend %sheet;
+    }
 </style>

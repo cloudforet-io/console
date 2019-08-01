@@ -1,58 +1,59 @@
 <template>
   <div class="animated fadeIn">
-    <b-card class="up-corner-no-radius border-top-0">
-      <b-row>
-        <b-col cols="6" sm="4" md="2" xl="1" class="mb-3">
-          <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
-            <template #activator>
-              <b-button block variant="primary">
-                {{ $t('MSG.BUTTON_ADD') }}
-              </b-button>
-            </template>
-            <template #contents>
-              <MemberDetail :creatable="true" :updatable="true" />
-            </template>
-          </BaseModal>
-        </b-col>
-        <b-col cols="6" sm="4" md="2" xl="1" class="mb-3">
-          <BaseModal v-if="selectedUser"
-                     :centered="true"
-                     :hide-footer="true"
-                     :name="'editUser'"
-                     :title="'Edit User'"
-          >
-            <template #activator>
-              <b-button block variant="danger">
-                {{ $t('MSG.BUTTON_DELETE') }}
-              </b-button>
-            </template>
-            <template #contents>
-              <MemberDetail :updatable="true" :user-prop="selectedUser" />
-            </template>
-          </BaseModal>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12">
-          <BaseTable caption="Users"
-                     :table-data="users"
-                     :fields="fields"
-                     :per-page="perPage"
-                     :searchable="true"
-                     :total-rows="totalCount"
-                     :search-context-data="queryData"
-                     :busy="isLoading"
-                     @rowSelected="rowSelected"
-                     @list="listUsers"
-                     @limitChanged="limitChanged"
-          />
-        </b-col>
-      </b-row>
-    </b-card>
+    <b-row>
+      <b-col cols="12">
+        <BaseTable :table-data="users"
+                   :fields="fields"
+                   :per-page="perPage"
+                   :searchable="true"
+                   :total-rows="totalCount"
+                   :search-context-data="queryData"
+                   :show-caption="true"
+                   :busy="isLoading"
+                   :cardless="false"
+                   :underlined="true"
+                   @rowSelected="rowSelected"
+                   @list="listUsers"
+                   @limitChanged="limitChanged"
+                   @onSelectAll="rowAllSelected"
+        >
+          <template #caption>
+            <b-row align-v="center" align-h="center">
+              <b-col cols="6">
+                <BaseModal
+                  :name="'addUser'"
+                  :title="'Add Member'"
+                  :centered="true"
+                  :hide-footer="true"
+                >
+                  <template #activator>
+                    <b-button block variant="primary">
+                      Add
+                    </b-button>
+                  </template>
+                  <template #contents>
+                    <MemberDetail
+                      :creatable="true" :updatable="true"
+                    />
+                  </template>
+                </BaseModal>
+              </b-col>
+              <b-col cols="6">
+                <template v-if="anySelectedRow">
+                  <b-button block variant="danger" @click="deleteSelected">
+                    Delete
+                  </b-button>
+                </template>
+              </b-col>
+            </b-row>
+          </template>
+        </BaseTable>
+      </b-col>
+    </b-row>
   </div>
 </template>
-<script>
 
+<script>
 import query from '@/service/identity/project/search_context/search_context';
 import BaseTable from '@/component/base/table/BATB_001_BaseTable.vue';
 const BaseModal = () => import('@/component/base/modal/BAMO_001_BaseModal');
@@ -78,6 +79,8 @@ export default {
                 { key: 'domainId', label: 'Domain ID' }
             ],
             users: [],
+            anySelectedRow: false,
+            selectedUserMulti: null,
             selectedUser: null,
             selectedIdx: undefined,
             addModal: false,
@@ -101,53 +104,77 @@ export default {
             this.isLoading = true;
         },
         async listUsers (limit, skip, sort, search) {
+
             this.reset();
-
-            if (limit === undefined || limit === null) limit = 10;
-            if (skip === undefined || skip === null) skip = 0;
-            if (sort === undefined || sort === null) sort = '-created_date';
-            if (search === undefined || search === null) search = [];
-
-            let res;
-            try {
-                res = await this.$http.get('/identity/user', {
-                    params: { limit, skip, sort }
-                    /**
-             * TODO: set limit, skip, sort and search in the right format
-             */
-                });
-            } catch (e) {
-                console.error(e);
+            if (this.isEmpty(limit)) {
+                limit = 10;
+            }
+            if (this.isEmpty(skip)) {
+                skip = 0;
+            }
+            if (this.isEmpty(sort)) {
+                sort = '-created_date';
+            }
+            if (this.isEmpty(search)) {
+                search = [];
             }
 
-            setTimeout(() => { // this is for test
-                // let temp = []
-                // for (var i = 0; i < 1000; i++) {
-                //   temp[i] = res.data[0]
-                // }
-                // this.users = temp
-                this.users = res.data;
+            this.$axios.get('/identity/user', {
+                params: { limit, skip, sort }
+            }).then((response) => {
+                this.users = response.data;
                 this.isLoading = false;
-            }, 1000);
+            }).catch((ex) => {
+                console.error(ex);
+            });
+
         /**
          * TODO: set totalCount with data from server
          */
         },
         rowSelected (row) {
-            if (row instanceof Array || !row) this.selectedUser = null;
-            else this.selectedUser = row.data;
+            if (this.isEmpty(row) || row.length < 1) {
+                this.selectedUser = null;
+                this.anySelectedRow = false;
+            } else {
+                this.selectedUser = row;
+                this.selectedUserMulti = row;
+                this.anySelectedRow = true;
+            }
+        },
+        rowAllSelected (row) {
+            if (row instanceof Array && !this.isEmpty(row)) {
+                this.selectedUserMulti = row;
+                this.anySelectedRow = true;
+            } else {
+                this.selectedUserMulti = null;
+                this.anySelectedRow = false;
+            }
         },
         limitChanged (val) {
             this.perPage = Number(val);
             this.init();
+        },
+        deleteSelected(){
+            this.$alertify.confirmWithTitle(
+                'Delete Users',
+                'Do you want to delete selected?',
+                () => {
+                    this.consoleLogEnv('success');
+                    this.$alertify.success('Selected User Successfully deleted.');
+                },
+                () => {
+                    this.consoleLogEnv('fail');
+                    this.$alertify.success('Action Cancel');
+                }
+            );
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-  .up-corner-no-radius {
-    border-top-left-radius: 0px !important;
-    border-top-right-radius: 0px !important;;
+  .base-table {
+    @extend %sheet;
   }
 </style>

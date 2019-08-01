@@ -51,10 +51,15 @@
         </b-col>
       </b-row>
       <b-table class="b-table"
-               :items="items" :fields="heads" show-empty
-               :striped="striped" :bordered="bordered" :borderless="borderless"
+               :items="items"
+               :fields="heads" show-empty
+               :striped="striped"
+               :bordered="bordered" :borderless="borderless"
                :dark="dark" :hover="hover"
-               :small="small" :fixed="fixed" :responsive="responsive" :stacked="stacked"
+               :small="small"
+               :fixed="fixed"
+               :responsive="responsive"
+               :stacked="stacked"
                :no-local-sorting="!isLocalSort"
                :tbody-tr-class="rowClass"
                :busy="busy"
@@ -74,13 +79,16 @@
         </template>
 
         <template v-if="selectable" slot="HEAD_selected">
-          <b-check v-model="isSelectedAll" class="select-all-checkbox"
+          <b-check v-model="isSelectedAll"
+                   class="select-all-checkbox"
                    @change="onSelectAll"
           />
         </template>
 
         <template v-if="selectable" slot="selected" slot-scope="data">
-          <BaseCheckbox :key="data.index" :selected="data.item.selected" class="select-checkbox"
+          <BaseCheckbox :key="data.index"
+                        :selected="data.item.selected"
+                        class="select-checkbox"
                         @change="checkboxClicked"
           />
         </template>
@@ -107,270 +115,290 @@ import BaseModal from '@/component/base/modal/BAMO_001_BaseModal.vue';
 import BaseCheckbox from '@/component/base/checkbox/BACB_001_BaseCheckbox.vue';
 
 export default {
-  name: 'BaseTable',
-  event: ['list', 'rowClicked', 'limitChanged', 'rowSelected'],
-  components: {
-    BaseSearch,
-    BaseModal,
-    BaseCheckbox
-  },
-  inheritAttrs: false,
-  props: {
-    searchable: {
-      type: Boolean,
-      default: false
+    name: 'BaseTable',
+    event: ['list', 'rowClicked', 'limitChanged', 'rowSelected'],
+    components: {
+        BaseSearch,
+        BaseModal,
+        BaseCheckbox
     },
-    searchContextData: {
-      type: Object,
-      default: null
-    },
-    selectable: {
-      type: Boolean,
-      default: true
-    },
-    selectMode: {
-      type: String,
-      default: 'multi',
-      validator (str) {
-        return str === 'multi' || str === 'single';
-      }
-    },
-    hover: {
-      type: Boolean,
-      default: true
-    },
-    striped: {
-      type: Boolean,
-      default: false
-    },
-    underlined: {
-      type: Boolean,
-      default: true
-    },
-    bordered: {
-      type: Boolean,
-      default: false
-    },
-    borderless: {
-      type: Boolean,
-      default: true
-    },
-    cardless: {
-      type: Boolean,
-      default: false
-    },
-    small: {
-      type: Boolean,
-      default: false
-    },
-    fixed: {
-      type: Boolean,
-      default: true
-    },
-    responsive: {
-      type: String,
-      default: 'true'
-    },
-    stacked: {
-      type: String,
-      default: 'false'
-    },
-    tableData: {
-      type: Array,
-      default: () => []
-    },
-    fields: {
-      type: [Array, Object],
-      default: () => []
-    },
-    perPage: {
-      type: Number,
-      default: 10
-    },
-    perPageMax: {
-      type: Number,
-      default: 20
-    },
-    showCaption: {
-      type: Boolean,
-      default: false
-    },
-    dark: {
-      type: Boolean,
-      default: false
-    },
-    totalRows: {
-      type: Number,
-      default: null
-    },
-    busy: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data () {
-    return {
-      currentPage: 1,
-      selectedRows: [],
-      sortBy: undefined,
-      searchList: [],
-      isLocalSort: true,
-      limitInput: this.perPage,
-      isSelectedAll: false
-    };
-  },
-  computed: {
-    items () {
-      return this.tableData;
-    },
-    heads () { return this.fields; },
-    limit () { return this.perPage; },
-    skip () { return (this.currentPage - 1) * this.limit; },
-    maxPage () { return Math.ceil(this.totalRows / this.limit); }
-  },
-  methods: {
-    getBadge (status) {
-      return this.selectBadges(status);
-    },
-    filterLimit () {
-      if (this.limitInput < 1) this.limitInput = 1;
-      else if (this.limitInput > this.perPageMax) this.limitInput = this.perPageMax;
-    },
-    rowClicked (item, idx, e) {
-      if (this.selectable) this.rowSelected(item, idx, e);
-      this.$emit('rowClicked', item, idx, e);
-    },
-    rowSelected (item, idx, e) {
-      this.selectedRows.map((row, i) => {
-        if (row.data !== item) {
-          row.data.selected = false;
-          this.updateTableData(row.idx, row.data);
+    inheritAttrs: false,
+    props: {
+        searchable: {
+            type: Boolean,
+            default: false
+        },
+        searchContextData: {
+            type: Object,
+            default: null
+        },
+        selectable: {
+            type: Boolean,
+            default: true
+        },
+        selectMode: {
+            type: String,
+            default: 'multi',
+            validator (str) {
+                return str === 'multi' || str === 'single';
+            }
+        },
+        hover: {
+            type: Boolean,
+            default: true
+        },
+        striped: {
+            type: Boolean,
+            default: false
+        },
+        underlined: {
+            type: Boolean,
+            default: true
+        },
+        bordered: {
+            type: Boolean,
+            default: false
+        },
+        borderless: {
+            type: Boolean,
+            default: true
+        },
+        cardless: {
+            type: Boolean,
+            default: false
+        },
+        small: {
+            type: Boolean,
+            default: false
+        },
+        fixed: {
+            type: Boolean,
+            default: true
+        },
+        responsive: {
+            type: String,
+            default: 'true'
+        },
+        stacked: {
+            type: String,
+            default: 'false'
+        },
+        tableData: {
+            type: Array,
+            default: () => []
+        },
+        fields: {
+            type: [Array, Object],
+            default: () => []
+        },
+        perPage: {
+            type: Number,
+            default: 10
+        },
+        perPageMax: {
+            type: Number,
+            default: 20
+        },
+        showCaption: {
+            type: Boolean,
+            default: false
+        },
+        dark: {
+            type: Boolean,
+            default: false
+        },
+        totalRows: {
+            type: Number,
+            default: null
+        },
+        busy: {
+            type: Boolean,
+            default: false
         }
-      });
-      this.selectedRows = [];
-
-      item.selected = true;
-      this.updateTableData(idx, item);
-      this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
-      this.setIsSelectAll();
-      this.$emit('rowSelected', this.selectedRows[0]);
     },
-    checkSingleMode (item, idx, newValue) {
-      if (this.selectedRows[0]) this.selectedRows[0].data.selected = false;
-
-      if (newValue) this.selectedRows[0] = { idx: idx, data: item };
-      else this.selectedRows.pop();
-
-      this.updateTableData(idx, newValue);
-      this.setIsSelectAll();
-      this.$emit('rowSelected', this.selectedRows[0]);
+    data () {
+        return {
+            currentPage: 1,
+            selectedRows: [],
+            sortBy: undefined,
+            searchList: [],
+            isLocalSort: true,
+            limitInput: this.perPage,
+            isSelectedAll: false
+        };
     },
-    checkMultiMode (item, idx, newValue) {
-      let isOnceSelected = this.selectedRows.some((row, i) => {
-        if (row.data === item) {
-          row.data.selected = false;
-          this.updateTableData(row.idx, row.data);
-          this.selectedRows.splice(i, 1);
+    computed: {
+        items () {
+            return this.tableData;
+        },
+        heads () { return this.fields; },
+        limit () { return this.perPage; },
+        skip () { return (this.currentPage - 1) * this.limit; },
+        maxPage () { return Math.ceil(this.totalRows / this.limit); }
+    },
+    methods: {
+        getBadge (status) {
+            return this.selectBadges(status);
+        },
+        filterLimit () {
+            if (this.limitInput < 1) this.limitInput = 1;
+            else if (this.limitInput > this.perPageMax) this.limitInput = this.perPageMax;
+        },
+        rowClicked (item, idx, e) {
+            if (this.selectable) {
+                this.rowSelected(item, idx, e);
+            }
+            this.$emit('rowClicked', item, idx, e);
+        },
+        rowSelected (item, idx, e) {
+            this.consoleLogEnv('row Selected');
+            this.selectedRows.map((row) => {
+                if (row.data !== item) {
+                    row.data.selected = false;
+                    this.updateTableData(row.idx, row.data);
+                }
+            });
+            this.selectedRows = [];
+
+            item.selected = true;
+            this.updateTableData(idx, item);
+            this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
+            this.setIsSelectAll();
+            this.$emit('rowSelected', this.selectedRows[0]);
+        },
+        checkSingleMode (item, idx, newValue) {
+            this.consoleLogEnv('check Single-Mode');
+            if (this.selectedRows[0]) {
+                this.selectedRows[0].data.selected = false;
+            }
+            if (newValue) {
+                this.selectedRows[0] = { idx: idx, data: item };
+            } else {
+                this.selectedRows.pop();
+            }
+
+            this.updateTableData(idx, newValue);
+            this.setIsSelectAll();
+            this.$emit('rowSelected', this.selectedRows[0]);
+        },
+        checkMultiMode (item, idx, newValue) {
+            this.consoleLogEnv('check Multi-Mode');
+            let isOnceSelected = this.selectedRows.some((row, i) => {
+                if (row.data._id === item._id) {
+                    row.data.selected = false;
+                    this.updateTableData(row.idx, row.data);
+                    this.$delete(this.selectedRows, i);
+                }
+                return row.data._id === item._id;
+            });
+            if (!isOnceSelected) {
+                this.selectedRows.push({ idx: idx, data: item });
+            }
+            item.selected = newValue;
+            this.updateTableData(idx, item);
+            this.setIsSelectAll();
+            this.$emit('rowSelected', this.selectedRows);
+        },
+        checkboxClicked (val, key) {
+            this.consoleLogEnv('row Selected');
+            switch (this.selectMode) {
+            case 'single':
+                this.checkSingleMode(this.tableData[key], key, val);
+                break;
+            case 'multi':
+                this.checkMultiMode(this.tableData[key], key, val);
+                break;
+            }
+        },
+        setIsSelectAll () {
+            if (this.selectedRows.length === this.tableData.length) {
+                this.isSelectedAll = true;
+            }else{
+                this.isSelectedAll = false;
+            }
+        },
+        onSelectAll (val) {
+            if (val) {
+                this.selectedRows = [];
+                this.tableData.map((data, i) => {
+                    data.selected = true;
+                    this.updateTableData(i, data);
+                    this.selectedRows.push({ data: data, idx: i });
+                });
+            } else {
+                this.selectedRows.map((row) => {
+                    row.data.selected = false;
+                    this.updateTableData(row.idx, row.data);
+                });
+                this.selectedRows = [];
+            }
+
+            this.$emit('onSelectAll', this.selectedRows, this.isSelectedAll );
+        },
+        updateTableData (idx, data) {
+            if (this.isEmpty(idx)) {
+                idx = 0;
+            }
+            if (this.isEmpty(data)) {
+                data = this.tableData[idx];
+            }
+            this.$set(this.tableData, idx, Object.assign({}, data));
+        },
+        onPrev () {
+            if (this.currentPage <= 1) return;
+            this.currentPage--;
+            this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
+        },
+        onNext () {
+            if (this.currentPage >= this.maxPage) return;
+            this.currentPage++;
+            this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
+        },
+        onRefresh () {
+            this.currentPage = 1;
+            this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
+        },
+        onSearch (conditionList) {
+            this.searchList = conditionList;
+            this.$emit('list', this.limit, this.skip, this.sortBy, conditionList);
+        },
+        headClicked (key, item) {
+            if (item.ajaxSortable) {
+                this.isLocalSort = false;
+            }
+            else {
+                this.isLocalSort = true;
+            }
+        },
+        sortingChanged (ctx) {
+            if (this.isLocalSort) return;
+
+            this.sortBy = ctx.sortDesc ? `-${ctx.sortBy}` : ctx.sortBy;
+            this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
+        },
+        contextChanged (ctx) {
+            this.$emit('changed', ctx);
+        },
+        rowClass (item) { // custom global style
+            let className = 'tbody-tr-default';
+            if (item && item.selected) className += ' tbody-tr-selected';
+            if (this.underlined) className += ' tbody-tr-underlined';
+            return className;
+        },
+        limitChanged () {
+            this.filterLimit();
+            let currentPageLastRowIdx = this.currentPage * this.limitInput;
+            if (currentPageLastRowIdx > this.totalRows) this.currentPage = Math.ceil(this.totalRows / this.limitInput);
+            this.$emit('limitChanged', this.limitInput);
+        },
+        onLimitInputEnter () {
+            this.$refs.modal.hideModal();
+            this.$refs.modal.$emit('ok');
+        },
+        capitalizeFirstLetter (s) {
+            return this.capitalize(s);
         }
-        return row.data === item;
-      });
-      if (!isOnceSelected) {
-        this.selectedRows.push({ idx: idx, data: item });
-      }
-
-      item.selected = newValue;
-      this.updateTableData(idx, item);
-      this.setIsSelectAll();
-      this.$emit('rowSelected', this.selectedRows);
-    },
-    checkboxClicked (val, key) {
-      console.log('checkbox clicked');
-      switch (this.selectMode) {
-      case 'single':
-        this.checkSingleMode(this.tableData[key], key, val);
-        break;
-      case 'multi':
-        this.checkMultiMode(this.tableData[key], key, val);
-        break;
-      }
-    },
-    setIsSelectAll () {
-      if (this.selectedRows.length === this.tableData.length) this.isSelectedAll = true;
-      else this.isSelectedAll = false;
-    },
-    onSelectAll (val) {
-      if (val) {
-        this.selectedRows = [];
-        this.tableData.map((data, i) => {
-          data.selected = true;
-          this.updateTableData(i, data);
-          this.selectedRows.push({ data: data, idx: i });
-        });
-      } else {
-        this.selectedRows.map((row, i) => {
-          row.data.selected = false;
-          this.updateTableData(row.idx, row.data);
-        });
-        this.selectedRows = [];
-      }
-      if (val) this.$emit('rowSelected', this.selectedRows);
-    },
-    updateTableData (idx, data) {
-      if (idx === undefined) idx = 0;
-      if (data === undefined) data = this.tableData[idx];
-      this.$set(this.tableData, idx, Object.assign({}, data));
-    },
-    onPrev () {
-      if (this.currentPage <= 1) return;
-      this.currentPage--;
-      this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
-    },
-    onNext () {
-      if (this.currentPage >= this.maxPage) return;
-      this.currentPage++;
-      this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
-    },
-    onRefresh () {
-      this.currentPage = 1;
-      this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
-    },
-    onSearch (conditionList) {
-      this.searchList = conditionList;
-      this.$emit('list', this.limit, this.skip, this.sortBy, conditionList);
-    },
-    headClicked (key, item) {
-      if (item.ajaxSortable) this.isLocalSort = false;
-      else this.isLocalSort = true;
-    },
-    sortingChanged (ctx) {
-      if (this.isLocalSort) return;
-
-      this.sortBy = ctx.sortDesc ? `-${ctx.sortBy}` : ctx.sortBy;
-      this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
-    },
-    contextChanged (ctx) {
-      this.$emit('changed', ctx);
-    },
-    rowClass (item) { // custom global style
-      let className = 'tbody-tr-default';
-      if (item && item.selected) className += ' tbody-tr-selected';
-      if (this.underlined) className += ' tbody-tr-underlined';
-      return className;
-    },
-    limitChanged () {
-      this.filterLimit();
-      let currentPageLastRowIdx = this.currentPage * this.limitInput;
-      if (currentPageLastRowIdx > this.totalRows) this.currentPage = Math.ceil(this.totalRows / this.limitInput);
-      this.$emit('limitChanged', this.limitInput);
-    },
-    onLimitInputEnter () {
-      this.$refs.modal.hideModal();
-      this.$refs.modal.$emit('ok');
-    },
-    capitalizeFirstLetter (s) {
-      return this.capitalize(s);
     }
-  }
 };
 </script>
 

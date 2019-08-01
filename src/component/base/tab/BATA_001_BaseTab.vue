@@ -4,7 +4,8 @@
       <b-tab v-for="(tab, idx) in tabs"
              :key="idx"
              :lazy="true"
-             @click="setCurrentTab(tab)">
+             @click="setCurrentTab(tab)"
+      >
         <div v-if="!tab.icon" slot="title" name="tabHeader">
           <i :class="tab.tabIcon" style="color:blue" />
           {{ tab.tabTitle }}
@@ -49,99 +50,99 @@
 import { api } from '@/setup/api';
 let baseTabParams = {};
 export default {
-  name: 'BaseTabs',
-  components: {
-  },
-  props: {
-    fill: {
-      type: Boolean,
-      default: false
+    name: 'BaseTabs',
+    components: {
     },
-    tabs: {
-      type: Array,
-      default: () => []
+    props: {
+        fill: {
+            type: Boolean,
+            default: false
+        },
+        tabs: {
+            type: Array,
+            default: () => []
+        },
+        tabIndex: {
+            type: Array,
+            default: () => []
+        },
+        isCreatable: {
+            type: Boolean,
+            default: false
+        },
+        isUpdatable: {
+            type: Boolean,
+            default: false
+        },
+        isDeletable: {
+            type: Boolean,
+            default: false
+        },
+        isFooterVisible: {
+            type: Boolean,
+            default: false
+        },
+        selectedData: {
+            type: Object,
+            default: () => {}
+        }
     },
-    tabIndex: {
-      type: Array,
-      default: () => []
+    data () {
+        return {
+            prosData: {},
+            currentTab: this.tabs[0],
+            dataForTab: this.selectedData,
+            tabContentData: {},
+            isCreate: this.isCreatable,
+            isUpdate: this.isUpdatable,
+            isDelete: this.isDeletable
+        };
     },
-    isCreatable: {
-      type: Boolean,
-      default: false
+    created () {
+        this.$bus.$on('setTabData', this.setTabData);
     },
-    isUpdatable: {
-      type: Boolean,
-      default: false
+    mounted () {
     },
-    isDeletable: {
-      type: Boolean,
-      default: false
+    beforeDestroy: function () {
+        this.$bus.$off('setTabData');
     },
-    isFooterVisible: {
-      type: Boolean,
-      default: false
-    },
-    selectedData: {
-      type: Object,
-      default: () => {}
+    methods: {
+        setTabData (dataToSet) {
+            for (let key in dataToSet) {
+                this.tabContentData[key] = dataToSet[key];
+            }
+        },
+        setCurrentTab (tab) {
+            if (!tab.isSelected) {
+                tab.isSelected = true;
+            }
+            this.currentTab = tab;
+        },
+        displayFooter: () => {
+            this.isFooterVisible = true;
+        },
+        hideFooter: () => {
+            this.isFooterVisible = false;
+        },
+        createNew () {
+            baseTabParams = this.dataForTab;
+            baseTabParams['tabContents'] = this.$refs.popupTab;
+            this.$emit('create', baseTabParams);
+        },
+        updateSelect () {
+            baseTabParams = this.dataForTab;
+            baseTabParams['tabContents'] = this.$refs.popupTab;
+            this.$emit('update', baseTabParams);
+        },
+        deleteSelect: () => {
+            baseTabParams = this.dataForTab;
+            baseTabParams['tabContents'] = this.$refs.popupTab;
+            this.$emit('delete', baseTabParams);
+        },
+        closeWindow (e) {
+            this.$parent.$store.dispatch('modal/closeModal');
+        }
     }
-  },
-  data () {
-    return {
-      prosData: {},
-      currentTab: this.tabs[0],
-      dataForTab: this.selectedData,
-      tabContentData: {},
-      isCreate: this.isCreatable,
-      isUpdate: this.isUpdatable,
-      isDelete: this.isDeletable
-    };
-  },
-  created () {
-    this.$bus.$on('setTabData', this.setTabData);
-  },
-  mounted () {
-  },
-  beforeDestroy: function () {
-    this.$bus.$off('setTabData');
-  },
-  methods: {
-    setTabData (dataToSet) {
-      for (let key in dataToSet) {
-        this.tabContentData[key] = dataToSet[key];
-      }
-    },
-    setCurrentTab (tab) {
-      if (!tab.isSelected) {
-        tab.isSelected = true;
-      }
-      this.currentTab = tab;
-    },
-    displayFooter: () => {
-      this.isFooterVisible = true;
-    },
-    hideFooter: () => {
-      this.isFooterVisible = false;
-    },
-    createNew () {
-      baseTabParams = this.dataForTab;
-      baseTabParams['tabContents'] = this.$refs.popupTab;
-      this.$emit('create', baseTabParams);
-    },
-    updateSelect () {
-      baseTabParams = this.dataForTab;
-      baseTabParams['tabContents'] = this.$refs.popupTab;
-      this.$emit('update', baseTabParams);
-    },
-    deleteSelect: () => {
-      baseTabParams = this.dataForTab;
-      baseTabParams['tabContents'] = this.$refs.popupTab;
-      this.$emit('delete', baseTabParams);
-    },
-    closeWindow (e) {
-      this.$parent.$store.dispatch('modal/closeModal');
-    }
-  }
 };
 </script>
 
