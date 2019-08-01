@@ -5,20 +5,23 @@
         <b-nav-item
           v-for="(ntab, idx) in navTabs"
           :key="idx"
-          :class="{active: selectedTab === ntab.component}"
-          :active="selectedTab === ntab.component"
-          @click="selectedTab = ntab.component"
+          :class="{active: selectedTab.component === ntab.component}"
+          :active="selectedTab.tabTitle === ntab.tabTitle"
+          @click="selectedTab = ntab"
         >
           {{ ntab.tabTitle }}
         </b-nav-item>
       </b-nav>
-      <template v-if="keepAlive">
-        <keep-alive>
-          <component :is="selectedTab" />
-        </keep-alive>
-      </template>
+      <slot v-if="useSlot" :name="selectedTab.tabTitle" />
       <template v-else>
-        <component :is="selectedTab" />
+        <template v-if="keepAlive">
+          <keep-alive>
+            <component :is="selectedTab.component" />
+          </keep-alive>
+        </template>
+        <template v-else>
+          <component :is="selectedTab.component" />
+        </template>
       </template>
       <b-row>
         <slot name="footerArea">
@@ -63,6 +66,14 @@ export default {
       type: Boolean,
       default: false
     },
+    defaultTab: {
+      type: Number,
+      default: 0
+    },
+    useSlot: {
+      type: Boolean,
+      default: false
+    },
     isFooterVisible: {
       tyep: Boolean,
       default: false
@@ -90,8 +101,7 @@ export default {
   },
   data () {
     return {
-      prosData: {},
-      selectedTab: this.tab,
+      selectedTab: this.navTabs[this.defaultTab],
       isCreate: this.isCreatable,
       isUpdate: this.isUpdatable,
       isDelete: this.isDeletable
@@ -126,7 +136,7 @@ export default {
       this.$emit('delete', baseTabParams);
     },
     closeWindow (e) {
-      this.$parent.$store.dispatch('modal/closeModal');
+      this.$store.dispatch('modal/closeModal');
     }
   }
 };

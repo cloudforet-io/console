@@ -37,16 +37,19 @@
       </b-col>
     </b-row>
     <b-row>
-      <BaseTabNav
-        :fill="false"
-        :nav-tabs="tabs"
-        :keep-alive="true"
-        :is-footer-visible="false"
-        :tab="tab"
-      />
-
       <b-col cols="12">
-        <b-tabs v-if="selectedUser">
+        <BaseTabNav v-if="selectedUser"
+                    :fill="false"
+                    :nav-tabs="tabs"
+                    :keep-alive="true"
+                    :is-footer-visible="false"
+                    :use-slot="true"
+        >
+          <template #INFO>
+            <UserDetail :user-prop="selectedUser" />
+          </template>
+        </BaseTabNav>
+        <!-- <b-tabs v-if="selectedUser">
           <b-tab active>
             <template slot="title">
               <i class="icon-info mr-1" /> User Information
@@ -56,7 +59,7 @@
             </div>
             <UserDetail v-if="selectedUser" :user-prop="selectedUser" />
           </b-tab>
-        </b-tabs>
+        </b-tabs> -->
       </b-col>
     </b-row>
   </div>
@@ -91,14 +94,11 @@ export default {
       ],
       tabs: [
         {
-          name: 'summary',
-          isSelected: true,
-          tabIcon: 'icon-calculator',
           tabTitle: 'INFO',
           component: UserDetail
         }
       ],
-      tab: UserDetail,
+      defaultTab: 0,
       users: [],
       selectedUser: null,
       selectedIdx: undefined,

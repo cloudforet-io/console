@@ -40,7 +40,6 @@
           :nav-tabs="tabs"
           :keep-alive="true"
           :is-footer-visible="false"
-          :tab="tab"
         />
       </template>
     </BaseTree>
@@ -159,23 +158,14 @@ let NodePG = {
 };
 const tabs = [
   {
-    name: 'summary',
-    isSelected: true,
-    tabIcon: 'icon-calculator',
     tabTitle: 'SUMMARY',
     component: projectSummary
   },
   {
-    name: 'member',
-    isSelected: false,
-    tabIcon: 'icon-user',
     tabTitle: 'MEMBER',
     component: projectMember
   },
   {
-    name: 'audit',
-    isSelected: false,
-    tabIcon: 'icon-pie-chart',
     tabTitle: 'AUDIT',
     component: projectAudit
   }
@@ -219,7 +209,6 @@ export default {
   },
   data () {
     return {
-      tab: tabs[0].component,
       /*  Selected Data => Selected node data & flag
          */
       selectedData: {},

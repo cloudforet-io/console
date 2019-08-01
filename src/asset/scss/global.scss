@@ -25,15 +25,12 @@ i {
   font-size: inherit;
   font-weight: inherit;
 }
-
 textarea:focus, input:focus{
   outline: none;
 }
-
 :focus {
   outline: none;
 }
-
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-big;
   margin: 0;
