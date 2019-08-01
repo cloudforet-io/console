@@ -1,0 +1,27 @@
+<script>
+import { Line } from 'vue-chartjs';
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
+
+export default {
+    name: 'LineChartExt',
+    components: {
+        hexToRgba,
+        CustomTooltips
+    },
+    extends: Line,
+    props: {
+        chartData: {
+            type: Object,
+            default: null
+        },
+        options: {
+            type: Object,
+            default: null
+        }
+    },
+    mounted () {
+        this.renderChart(this.chartData, this.options);
+    }
+};
+</script>
