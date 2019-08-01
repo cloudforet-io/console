@@ -166,7 +166,7 @@ let init = {
 }
 
 /**
- * functions called when component updated
+ * functions called when components updated
  */
 let transitions = {
 

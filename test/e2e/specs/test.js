@@ -26,7 +26,7 @@ module.exports = {
       .assert.elementPresent('.app-header > .navbar-brand')
       .assert.elementPresent('.app-body')
       .assert.elementPresent('.app-body > .main > .breadcrumb')
-      .assert.elementPresent('.app-body > .main > .container-fluid > .animated')
+      .assert.elementPresent('.app-body > .main > .containers-fluid > .animated')
       .assert.elementPresent('.app-body > .sidebar > .sidebar-nav')
       .assert.elementPresent('.app-body > .sidebar > .sidebar-zer')
       .assert.elementPresent('.app-footer')

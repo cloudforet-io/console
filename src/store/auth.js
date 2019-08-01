@@ -35,7 +35,7 @@ export default {
                 commit('login');
             } catch (err) {
         /*
-         * TODO:: Please, create ERR_CODE chart or table to specify its msg and to map error code with msg.
+         * TODO:: Please, create ERR_CODE charts or table to specify its msg and to map error code with msg.
          */
                 const errorCode = err.response.status;
                 const errorMsg = err.response.data.message;
