@@ -13,7 +13,7 @@ export const api = axios.create({
     }
 });
 
-//
+
 // api.interceptors.response.use(undefined, function (err) {
 //   console.log(process.env.VUE_APP_API_URL);
 //   return new Promise(function (resolve, reject) {

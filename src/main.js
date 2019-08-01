@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import App from './App';
-import router from './router';
+import index from './routes';
 import { i18n } from '@/setup/i18n';
 import { api } from '@/setup/api';
 import { Mixin } from '@/setup/global_util';
@@ -16,7 +16,7 @@ import velocity from 'velocity-animate';
 import CountryFlag from 'vue-country-flag';
 import VueAlertify from 'vue-alertify';
 
-// TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
+//TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
 dotenv.config();
 Vue.mixin(Mixin);
 Vue.use(BootstrapVue);
@@ -26,7 +26,7 @@ Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
 Vue.use(CountryFlag);
 Vue.use(Notifications, { velocity });
-Vue.prototype.$http = api;
+Vue.prototype.$axios  = api;
 
 /* This is a Global Bus Event;
  * Please, name your '$emit' event name as action + Event such as
@@ -34,10 +34,9 @@ Vue.prototype.$http = api;
  */
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
-
 new Vue({
     el: '#app',
-    router,
+    router: index,
     i18n,
     api,
     store,

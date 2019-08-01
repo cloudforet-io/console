@@ -181,7 +181,7 @@ exports[`DefaultContainer.vue renders correctly 1`] = `
       <div
         class="container-fluid"
       >
-        <router-view-stub
+        <index-view-stub
           name="default"
         />
       </div>
