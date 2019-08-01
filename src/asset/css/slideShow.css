@@ -6,6 +6,7 @@
   top: 0px;
   left: 0px;
   z-index: 0;
+  list-style-type: none;
 }
 .cb-slideshow:after {
   content: '';

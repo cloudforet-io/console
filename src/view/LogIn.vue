@@ -156,83 +156,83 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import BaseSimpleModal from '@/component/base/modal/BAMO_002_BaseSimpleModal.vue'
-const signupContents = "We apologize for inconvenience. 'Sign up', 'Password retrieval' feature currently unavailable due to our policies." +
+import { mapGetters } from 'vuex';
+import BaseSimpleModal from '@/component/base/modal/BAMO_002_BaseSimpleModal.vue';
+const signupContents = 'We apologize for inconvenience. \'Sign up\', \'Password retrieval\' feature currently unavailable due to our policies.' +
     ' Please, contact System Administrator for following contacts: ' + '<br>' +
-    '● e-mail: admin@mz.co.kr'
+    '● e-mail: admin@mz.co.kr';
 export default {
-  components: {
-    BaseSimpleModal
-  },
-  data () {
-    return {
-      selectedType: 4,
-      instructionTitle: this.$i18n.t('MSG.TR_NOTI'),
-      instructionContents: signupContents,
-      rememberStatus: false,
-      seenGreet: true,
-      seenError: false,
-      username: 'iamnewyorker1222',
-      password: 'this_is_my_scret_password1'
-    }
-  },
-  computed: {
-    ...mapGetters('auth', [
-      'nextPath'
-    ])
-  },
-  mounted () {
-    this.isRemembered()
-  },
-  methods: {
-    async login () {
-      console.log(this.$i18n.t('MSG.LOG_IN'))
-      await this.$store.dispatch('auth/login',
-        {
-          username: this.username,
-          password: this.password
+    components: {
+        BaseSimpleModal
+    },
+    data () {
+        return {
+            selectedType: 4,
+            instructionTitle: this.$i18n.t('MSG.TR_NOTI'),
+            instructionContents: signupContents,
+            rememberStatus: false,
+            seenGreet: true,
+            seenError: false,
+            username: 'iamnewyorker1222',
+            password: 'this_is_my_scret_password1'
+        };
+    },
+    computed: {
+        ...mapGetters('auth', [
+            'nextPath'
+        ])
+    },
+    mounted () {
+        this.isRemembered();
+    },
+    methods: {
+        async login () {
+            console.log(this.$i18n.t('MSG.LOG_IN'));
+            await this.$store.dispatch('auth/login',
+                {
+                    username: this.username,
+                    password: this.password
+                }
+            ).then(res => {
+                this.$router.push(this.nextPath);
+                this.rememberMe();
+            }).catch(error => {
+                const errObj = JSON.parse(error.message);
+                this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
+            });
+        },
+        showErorrMSG () {
+            this.seenGreet = false;
+            this.seenError = true;
+        },
+        showGreetMSG () {
+            this.seenGreet = true;
+            this.seenError = false;
+        },
+        isRemembered () {
+            localStorage.checkbox = (localStorage.checkbox === 'true');
+            if (localStorage && !this.isEmpty(localStorage.username)) {
+                this.rememberStatus = true;
+                this.username = localStorage.username;
+            } else {
+                this.rememberStatus = false;
+                this.username = '';
+            }
+        },
+        rememberMe () {
+            if (this.rememberStatus && !this.isEmpty(this.username)) {
+                localStorage.username = this.username;
+                localStorage.checkbox = this.rememberStatus;
+            } else {
+                localStorage.username = '';
+                localStorage.checkbox = false;
+            }
+        },
+        popSignUpInstruction () {
+            this.$refs.LogInSimpleModal.showModal();
         }
-      ).then(res => {
-        this.$router.push(this.nextPath)
-        this.rememberMe()
-      }).catch(error => {
-        const errObj = JSON.parse(error.message)
-        this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000))
-      })
-    },
-    showErorrMSG () {
-      this.seenGreet = false
-      this.seenError = true
-    },
-    showGreetMSG () {
-      this.seenGreet = true
-      this.seenError = false
-    },
-    isRemembered () {
-      localStorage.checkbox = (localStorage.checkbox === 'true')
-      if (localStorage && !this.isEmpty(localStorage.username)) {
-        this.rememberStatus = true
-        this.username = localStorage.username
-      } else {
-        this.rememberStatus = false
-        this.username = ''
-      }
-    },
-    rememberMe () {
-      if (this.rememberStatus && !this.isEmpty(this.username)) {
-        localStorage.username = this.username
-        localStorage.checkbox = this.rememberStatus
-      } else {
-        localStorage.username = ''
-        localStorage.checkbox = false
-      }
-    },
-    popSignUpInstruction () {
-      this.$refs.LogInSimpleModal.showModal()
     }
-  }
-}
+};
 </script>
 
 <style lang="scss" scoped>
