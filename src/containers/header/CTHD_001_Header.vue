@@ -41,21 +41,21 @@ import LanguageDropdown from './CTHD_003_LanguageDropdown';
 import SubHeader from './CTHD_005_SubHeader';
 
 export default {
-  name: 'BaseHeader',
-  components: {
-    LanguageDropdown,
-    SiteMapDropdown,
-    AccountDropdown,
-    SubHeader
-  },
-  data () {
-    return {
-      show: false
-    };
-  },
-  mounted() {
-    this.show = true;
-  }
+    name: 'BaseHeader',
+    components: {
+        LanguageDropdown,
+        SiteMapDropdown,
+        AccountDropdown,
+        SubHeader
+    },
+    data () {
+        return {
+            show: false
+        };
+    },
+    mounted() {
+        this.show = true;
+    }
 };
 </script>
 
@@ -67,11 +67,7 @@ export default {
   transform: translateY(calc(-#{$header-height}));
   opacity: 0;
 }
-.header-container {
-  // background: $gradient;
-}
 .main-header {
-  // background-color: rgba($white, 0.95);
   background: $gradient;
   box-shadow: 0px 0 10px 0px rgba($black, 0.5);
   height: calc(#{$header-height});

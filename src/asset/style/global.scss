@@ -90,7 +90,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 .tbody-tr-selected {
   background-color: darken($skyblue, 3%);
-  // box-shadow: 0 1px 5px 0 rgba($blue, 0.4);
 }
 
 .tbody-tr-default {
@@ -137,7 +136,6 @@ h1, h2, h3, h4, h5, h6 {
     color: $black;
     background-color: transparent;
     .item {
-      // background-color: $lightgray;
       font-weight: 500;
     }
   }
@@ -146,9 +144,6 @@ h1, h2, h3, h4, h5, h6 {
     background-color: transparent;
     .item {
       background-color: $skyblue; 
-      &:hover, &:focus {
-        // background-color: darken($skyblue, 5%); 
-      }
     }
   }
   /* TODO: separate this part to components */
