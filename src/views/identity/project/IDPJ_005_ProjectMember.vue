@@ -156,7 +156,6 @@ export default {
             this.init();
         },
         deleteSelected(){
-          debugger;
             this.$alertify.confirmWithTitle(
                 'Delete Users',
                 'Do you want to delete selected?',
