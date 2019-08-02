@@ -1,0 +1,15 @@
+/* Bootstrap */
+@import 'node_modules/bootstrap/scss/bootstrap.scss';
+@import 'node_modules/bootstrap-vue/src/index.scss';
+
+/* FontAwesome Pro */
+@import "node_modules/@fortawesome/fontawesome-pro/scss/fontawesome";
+$fa-font-path: "./asset/fonts/fontawesome-pro";
+@import "node_modules/@fortawesome/fontawesome-pro/scss/light.scss";
+@import "node_modules/@fortawesome/fontawesome-pro/scss/brands.scss";
+
+/* CoreUI Icons */
+@import './coreui';
+
+@import './notice';
+@import '~@/asset/style/css/sl-vue-tree-ecessntial.css';

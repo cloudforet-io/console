@@ -16,21 +16,17 @@ module.exports = {
   ],
   env: {
     browser: true,
-    jquery: true
   },
   globals: {
-    "$": true,
-    "jQuery": true,
   },
   rules: {
-    "indent": ["error", 2, {
+    "indent": ["error", 4, {
       "ObjectExpression": 1,
       "flatTernaryExpressions": true,
       "ignoreComments": true,
       "ArrayExpression": 1
     }],
     'quotes': ['off', 'single'],
-    'no-console': 'off',
     'comma-dangle': ['error', {
       'arrays': 'never',
       'objects': 'never',

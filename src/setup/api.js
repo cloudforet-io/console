@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios'
 // import store from '@/store'
 
 export const api = axios.create({
