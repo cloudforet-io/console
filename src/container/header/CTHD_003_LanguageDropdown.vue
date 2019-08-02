@@ -4,7 +4,7 @@
     <template slot="button-content">
       <i class="icon flag-icon flag-icon-us" /> &nbsp;
       <!-- <span class="name">English</span> &nbsp; -->
-      <i class="down-btn fa fa-angle-down" />
+      <i class="down-btn fal fa-angle-down" />
     </template>
     <b-dropdown-item>
       <div class="item">

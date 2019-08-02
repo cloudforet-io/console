@@ -11,12 +11,12 @@
 
             <BaseInput ref="input" :list-data="contextData.queryList" @add="addTag" />
           </div>
-          <span class="input-delete-button" @click="deleteAll"><i class="icon-close" /></span>
+          <span class="input-delete-button" @click="deleteAll"><i class="fal fa-times" /></span>
         </b-col>
 
         <b-input-group-append class="col-2 pl-0">
           <b-button block class="search-btn" @click="search">
-            <i class="fa fa-search" />
+            <i class="fal fa-search" />
           </b-button>
         </b-input-group-append>
       </b-input-group>
@@ -92,7 +92,9 @@ export default {
       items.map((item, idx) => {
         if (idx === 0) {
           this.tagList.some((tag, i) => {
-            if (tag.id === tagId) matchIdx = i;
+            if (tag.id === tagId) {
+matchIdx = i;
+}
             return tag.id === tagId;
           });
 

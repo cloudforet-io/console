@@ -17,7 +17,8 @@
     <b-row v-if="isEditable" no-gutters>
       <b-col cols="6" class="mt-1">
         <span class="add-btn" @click="addRow">
-          <i class="fa fa-plus-square" /> Add New
+          <span class="icon"><i class="fal fa-plus-square" /></span>
+          Add New
         </span>
       </b-col>
       <b-col v-if="showSaveBtn" cols="5" class="text-right">
@@ -95,9 +96,10 @@ export default {
 
 <style lang="scss" scoped>
 %btn {
-  i {
+  vertical-align: middle;
+  .icon {
       font-size: 1.3em;
-      vertical-align: text-top;
+      padding-right: 5px;
     }
   cursor: pointer;
 }
@@ -105,13 +107,5 @@ export default {
   @extend %btn;
   color: #2D9E6E;
 }
-// .edit-btn {
-//   @extend %btn;
-//   color: #3E4AC7;
-// }
-// .save-btn {
-//   @extend %btn;
-//   color: #3E4AC7;
-// }
 
 </style>

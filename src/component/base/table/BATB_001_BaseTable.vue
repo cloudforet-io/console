@@ -18,20 +18,20 @@
         >
           <b-row align-v="center" no-gutters align-h="between" class="text-center">
             <b-col>
-              <span class="prev-btn" @click.prevent="onPrev"><i class="icon-arrow-left" /></span>
+              <span class="prev-btn" @click.prevent="onPrev"><i class="fal fa-chevron-left" /></span>
             </b-col>
             <b-col>
               <span>{{ currentPage }} / {{ maxPage }}</span>
             </b-col>
             <b-col>
-              <span class="next-btn" @click.prevent="onNext"><i class="icon-arrow-right" /></span>
+              <span class="next-btn" @click.prevent="onNext"><i class="fal fa-chevron-right" /></span>
             </b-col>
             <b-col>
               <BaseModal ref="modal" :name="'tableSettings'" :title="'Table Settings'"
                          :centered="true" :size="'md'" @ok="limitChanged"
               >
                 <template #activator>
-                  <span class="settings-btn"><i class="icon-settings" /></span>
+                  <span class="settings-btn"><i class="fal fa-cog" /></span>
                 </template>
                 <template #contents>
                   <b-form-group label="Rows per page: " :label-cols="3">
@@ -43,7 +43,7 @@
               </BaseModal>
             </b-col>
             <b-col>
-              <span class="refresh-btn" @click="onRefresh"><i class="icon-refresh" /></span>
+              <span class="refresh-btn" @click="onRefresh"><i class="fal fa-sync" /></span>
             </b-col>
           </b-row>
         </b-col>
@@ -217,21 +217,34 @@ export default {
     items () {
       return this.tableData;
     },
-    heads () { return this.fields; },
-    limit () { return this.perPage; },
-    skip () { return (this.currentPage - 1) * this.limit; },
-    maxPage () { return Math.ceil(this.totalRows / this.limit); }
+    heads () {
+      return this.fields; 
+    },
+    limit () {
+      return this.perPage; 
+    },
+    skip () {
+      return (this.currentPage - 1) * this.limit; 
+    },
+    maxPage () {
+      return Math.ceil(this.totalRows / this.limit); 
+    }
   },
   methods: {
     getBadge (status) {
       return this.selectBadges(status);
     },
     filterLimit () {
-      if (this.limitInput < 1) this.limitInput = 1;
-      else if (this.limitInput > this.perPageMax) this.limitInput = this.perPageMax;
+      if (this.limitInput < 1) {
+        this.limitInput = 1;
+      } else if (this.limitInput > this.perPageMax) {
+        this.limitInput = this.perPageMax;
+      }
     },
     rowClicked (item, idx, e) {
-      if (this.selectable) this.rowSelected(item, idx, e);
+      if (this.selectable) {
+        this.rowSelected(item, idx, e);
+      }
       this.$emit('rowClicked', item, idx, e);
     },
     rowSelected (item, idx, e) {
@@ -250,10 +263,15 @@ export default {
       this.$emit('rowSelected', this.selectedRows[0]);
     },
     checkSingleMode (item, idx, newValue) {
-      if (this.selectedRows[0]) this.selectedRows[0].data.selected = false;
+      if (this.selectedRows[0]) {
+        this.selectedRows[0].data.selected = false;
+      }
 
-      if (newValue) this.selectedRows[0] = { idx: idx, data: item };
-      else this.selectedRows.pop();
+      if (newValue) {
+        this.selectedRows[0] = { idx: idx, data: item };
+      } else {
+        this.selectedRows.pop();
+      }
 
       this.updateTableData(idx, newValue);
       this.setIsSelectAll();
@@ -289,8 +307,11 @@ export default {
       }
     },
     setIsSelectAll () {
-      if (this.selectedRows.length === this.tableData.length) this.isSelectedAll = true;
-      else this.isSelectedAll = false;
+      if (this.selectedRows.length === this.tableData.length) {
+        this.isSelectedAll = true;
+      } else {
+        this.isSelectedAll = false;
+      }
     },
     onSelectAll (val) {
       if (val) {
@@ -307,20 +328,30 @@ export default {
         });
         this.selectedRows = [];
       }
-      if (val) this.$emit('rowSelected', this.selectedRows);
+      if (val) {
+        this.$emit('rowSelected', this.selectedRows);
+      }
     },
     updateTableData (idx, data) {
-      if (idx === undefined) idx = 0;
-      if (data === undefined) data = this.tableData[idx];
+      if (idx === undefined) {
+        idx = 0;
+      }
+      if (data === undefined) {
+        data = this.tableData[idx];
+      }
       this.$set(this.tableData, idx, Object.assign({}, data));
     },
     onPrev () {
-      if (this.currentPage <= 1) return;
+      if (this.currentPage <= 1) {
+        return;
+      }
       this.currentPage--;
       this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
     },
     onNext () {
-      if (this.currentPage >= this.maxPage) return;
+      if (this.currentPage >= this.maxPage) {
+        return;
+      }
       this.currentPage++;
       this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
     },
@@ -333,11 +364,16 @@ export default {
       this.$emit('list', this.limit, this.skip, this.sortBy, conditionList);
     },
     headClicked (key, item) {
-      if (item.ajaxSortable) this.isLocalSort = false;
-      else this.isLocalSort = true;
+      if (item.ajaxSortable) {
+        this.isLocalSort = false;
+      } else {
+        this.isLocalSort = true;
+      }
     },
     sortingChanged (ctx) {
-      if (this.isLocalSort) return;
+      if (this.isLocalSort) {
+        return;
+      }
 
       this.sortBy = ctx.sortDesc ? `-${ctx.sortBy}` : ctx.sortBy;
       this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
@@ -347,14 +383,20 @@ export default {
     },
     rowClass (item) { // custom global style
       let className = 'tbody-tr-default';
-      if (item && item.selected) className += ' tbody-tr-selected';
-      if (this.underlined) className += ' tbody-tr-underlined';
+      if (item && item.selected) {
+        className += ' tbody-tr-selected';
+      }
+      if (this.underlined) {
+        className += ' tbody-tr-underlined';
+      }
       return className;
     },
     limitChanged () {
       this.filterLimit();
       let currentPageLastRowIdx = this.currentPage * this.limitInput;
-      if (currentPageLastRowIdx > this.totalRows) this.currentPage = Math.ceil(this.totalRows / this.limitInput);
+      if (currentPageLastRowIdx > this.totalRows) {
+        this.currentPage = Math.ceil(this.totalRows / this.limitInput);
+      }
       this.$emit('limitChanged', this.limitInput);
     },
     onLimitInputEnter () {
@@ -388,16 +430,9 @@ export default {
 }
 .refresh-btn {
   @extend %btn;
-  i {
-    font-weight: 500;
-    font-size: 1.2em;
-  }
 }
 .settings-btn {
   @extend %btn;
-  i {
-    font-size: 1.2em;
-  }
 }
 
 .card {

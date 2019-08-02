@@ -6,7 +6,7 @@
     </template>
     <b-dropdown-item @click="logout">
       <div class="item">
-        <i class="icon fa fa-lock" />
+        <i class="fal fa-sign-out" />
         <span class="name">Logout</span>
       </div>
     </b-dropdown-item>

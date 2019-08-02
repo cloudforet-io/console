@@ -28,7 +28,7 @@ export default {
         {
           name: 'User',
           url: '/identity/user',
-          icon: 'fa fa-users fa-lg'
+          icon: 'fal fa-users fa-lg'
         }
       ]
     };
