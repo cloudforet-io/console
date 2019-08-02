@@ -2,7 +2,7 @@
   <b-row align-v="center" align-h="between" no-gutters class="mb-2">
     <b-col v-if="!readOnly" cols="1">
       <span class="delete-btn" @click="$emit('delete')">
-        <i class="fa fa-minus-square" />
+        <span class="icon"><i class="fal fa-minus-square" /></span>
       </span>
     </b-col>
     <b-col cols="11" class="row">
@@ -24,14 +24,6 @@
       </b-col>
     </b-col>
   </b-row>
-
-  <!-- <b-row v-else>
-    <b-col>
-      <span>
-        {{ key }} : {{ value }}
-      </span>
-    </b-col>
-  </b-row> -->
 </template>
 
 <script>
@@ -64,7 +56,7 @@ export default {
 
 <style lang="scss" scoped>
 .delete-btn {
-  i {
+  .icon {
     font-size: 1.3em;
     vertical-align: text-top;
   }
