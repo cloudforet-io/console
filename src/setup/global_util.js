@@ -134,6 +134,10 @@ export const Mixin = {
                     console.log(s);
                 }
             }
+        },
+        colSelector: function (dataLength) {
+            const colNumber = Math.round(12 / dataLength);
+            return 'col-xs-6 col-sm-6 col-md-6 col-lg-' + colNumber + ' col';
         }
     },
     data: function () {

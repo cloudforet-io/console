@@ -70,7 +70,10 @@ $input-height: 23px;
     max-width: 99%;
     height: $input-height;
     line-height: 16px;
-    background-color: rgba($skyblue, 0.4);
+    background-color: rgba($blue, 0.1);
+    border-radius: 50px;
+    padding-left: 10px;
+    padding-right: 10px;
     span {
       display: inline-block;
       max-width: 96%;

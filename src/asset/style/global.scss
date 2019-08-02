@@ -6,8 +6,7 @@
 
 /* INIT */
 html, body {
-  // font-family: 'Noto Sans', sans-serif;
-  font-family: 'Roboto', sans-serif;
+  font-family: $font-basic;
   background-color: $whiteblue;
   font-size: 14px;
   font-weight: 400;
@@ -26,13 +25,15 @@ i {
   font-size: inherit;
   font-weight: inherit;
 }
-
 textarea:focus, input:focus{
   outline: none;
 }
-
 :focus {
   outline: none;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-big;
+  margin: 0;
 }
 
 
@@ -45,16 +46,16 @@ textarea:focus, input:focus{
  /* App Header */
  .app-header {
   .nav-item {
+    max-height: 100%;
     button.dropdown-toggle {
       background-color: transparent;
       border-color: transparent;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 400;
       color: darken($darkgray, 20%);
+      color: $white;
       &:active, &.active, &[aria-expanded="true"] {
         background-color: transparent;
-        border-color: $gray;
-        color: $black;
       }
     }
   }
@@ -126,17 +127,18 @@ textarea:focus, input:focus{
 
 /* b-dropdown */
 .dropdown-menu {
-  padding: 5px 0 !important;
+  padding: 3px 0 !important;
   border: none;
   box-shadow: 2px 2px 10px 0px rgba($black, 0.2);
 }
 .dropdown-item {
-  padding: 5px 10px;
+  padding: 3px 6px;
   &:hover, &:focus {
     color: $black;
     background-color: transparent;
     .item {
-      background-color: $lightgray;
+      // background-color: $lightgray;
+      font-weight: 500;
     }
   }
   &.active, &:active {
@@ -145,7 +147,7 @@ textarea:focus, input:focus{
     .item {
       background-color: $skyblue; 
       &:hover, &:focus {
-        background-color: darken($skyblue, 5%); 
+        // background-color: darken($skyblue, 5%); 
       }
     }
   }
@@ -170,6 +172,9 @@ textarea:focus, input:focus{
 }
 
 /* b-button */
+.btn {
+  border-radius: 50px;
+}
 .btn:focus {
   outline: none;
   box-shadow: none;
@@ -183,5 +188,131 @@ textarea:focus, input:focus{
     &:focus {
       box-shadow: 0 0 5px 1px $skyblue;
     }
+  }
+}
+.btn-secondary {
+  background-color: $gray;
+  border-color: $gray;
+  color: darken($darkgray, 20%);
+  &:not(:disabled):not(.disabled):active {
+    background-color: $gray;
+    border-color: $gray;
+    &:focus {
+      box-shadow: 0 0 5px 1px $gray;
+    }
+  }
+  &:hover {
+    color: darken($darkgray, 30%);
+    background-color: $darkgray;
+    border-color: $darkgray;
+  }
+}
+.btn-dark {
+  background-color: $navy;
+  border-color: $navy;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $navy;
+    border-color: $navy;
+    &:focus {
+      box-shadow: 0 0 5px 1px $navy;
+    }
+  }
+  &:hover {
+    background-color: $black;
+    border-color: $black;
+  }
+}
+.btn-outline-dark {
+  color: $navy;
+  border-color: $navy;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $navy;
+    border-color: $navy;
+    &:focus {
+      box-shadow: 0 0 5px 1px $navy;
+    }
+  }
+  &:hover {
+    background-color: $navy;
+    border-color: $navy;
+  }
+}
+.btn-info {
+  background-color: $blueviolet;
+  border-color: $blueviolet;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $blueviolet;
+    border-color: $blueviolet;
+    &:focus {
+      box-shadow: 0 0 5px 1px $blueviolet;
+    }
+  }
+  &:hover {
+    background-color: darken($blueviolet, 5%);;
+    border-color: darken($blueviolet, 5%);;
+  }
+}
+.btn-outline-info {
+  color: $blueviolet;
+  border-color: $blueviolet;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $blueviolet;
+    border-color: $blueviolet;
+    &:focus {
+      box-shadow: 0 0 5px 1px $blueviolet;
+    }
+  }
+  &:hover {
+    background-color: $blueviolet;
+    border-color: $blueviolet;
+  }
+}
+
+/* sl-vue-tree */
+.sl-vue-tree.sl-vue-tree-root {
+  background-color: transparent;
+  border: none;
+
+  .sl-vue-tree-nodes-list {
+    .sl-vue-tree-node {
+      &.sl-vue-tree-selected {
+        > .sl-vue-tree-node-item {
+          color: darken($blue, 7%);
+          font-weight: 500;
+          background-color: rgba($blue, 0.1);
+          &:hover {
+            color: darken($blue, 10%);
+            font-weight: 500;
+            background-color: rgba($blue, 0.2);
+          }
+        }
+      }
+      .sl-vue-tree-node-item {
+        border-radius: 7px;
+        cursor: pointer;
+        margin: 5px 0;
+        color: darken($darkgray, 20%);
+        &:hover {
+          color: $black;
+          font-weight: 500;
+        }
+        .sl-vue-tree-title {
+          .sl-vue-tree-toggle {
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* card */
+.card.base {
+  @extend %sheet;
+  border: none;
+  .card-header {
+    border-bottom: none;
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
   }
 }

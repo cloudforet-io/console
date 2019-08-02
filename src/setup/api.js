@@ -1,19 +1,16 @@
-import axios from 'axios';
+import axios from 'axios'
 // import store from '@/store'
 
 export const api = axios.create({
-    baseURL: process.env.VUE_APP_API_URL,
-    withCredentials: true,
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    bodyfunction: function (){
-        debugger;
-    }
+  baseURL: process.env.VUE_APP_API_URL,
+  withCredentials: true,
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  }
 });
 
-
+//
 // api.interceptors.response.use(undefined, function (err) {
 //   console.log(process.env.VUE_APP_API_URL);
 //   return new Promise(function (resolve, reject) {
