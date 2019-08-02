@@ -28,7 +28,7 @@
                 >
                   <template #activator>
                     <b-button block variant="primary">
-                      Add
+                      {{ $t('MSG.BTN_ADD') }}
                     </b-button>
                   </template>
                   <template #contents>
@@ -41,7 +41,7 @@
               <b-col cols="6">
                 <template v-if="anySelectedRow">
                   <b-button block variant="danger" @click="deleteSelected">
-                    Delete
+                    {{ $t('MSG.BTN_DELETE') }}
                   </b-button>
                 </template>
               </b-col>
@@ -156,6 +156,7 @@ export default {
             this.init();
         },
         deleteSelected(){
+          debugger;
             this.$alertify.confirmWithTitle(
                 'Delete Users',
                 'Do you want to delete selected?',
@@ -165,7 +166,7 @@ export default {
                 },
                 () => {
                     this.consoleLogEnv('fail');
-                    this.$alertify.success('Action Cancel');
+                    this.$alertify.error('Action Cancel');
                 }
             );
         }

@@ -19,20 +19,20 @@
         />
       </b-col>
     </b-row>
-      <b-row>
-          <slot name="footerArea">
-              <div class="col-md-12">
-                  <div class="modal-footer" style="border-top:none; padding-right: 0px">
-                      <b-button size="md" variant="primary" @click="addUser">
-                          Create
-                      </b-button>
-                      <b-button size="md" variant="light" @click="closeWindow">
-                          Cancel
-                      </b-button>
-                  </div>
-              </div>
-          </slot>
-      </b-row>
+    <b-row>
+      <slot name="footerArea">
+        <div class="col-md-12">
+          <div class="modal-footer" style="border-top:none; padding-right: 0px">
+            <b-button size="md" variant="primary" @click="addUser">
+              {{ $t('MSG.BTN_ADD') }}
+            </b-button>
+            <b-button size="md" variant="light" @click="closeWindow">
+              {{ $t('MSG.BTN_CANCEL') }}
+            </b-button>
+          </div>
+        </div>
+      </slot>
+    </b-row>
   </div>
 </template>
 
@@ -97,7 +97,7 @@ export default {
             }
 
             this.$axios.get('/identity/user', {
-                params: { limit, skip, sort }
+                params: {limit, skip, sort}
             }).then((response) => {
                 this.users = response.data;
                 this.isLoading = false;
@@ -139,12 +139,12 @@ export default {
                 },
                 () => {
                     this.consoleLogEnv('fail');
-                    this.$alertify.success('Action Cancel');
+                    this.$alertify.error('Action Cancel');
                 }
             );
         },
         addUser() {
-            console.log('')
+            console.log('');
         },
         closeWindow(e) {
             this.$parent.$store.dispatch('modal/closeModal');
