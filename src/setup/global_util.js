@@ -44,9 +44,10 @@ export const Mixin = {
      * Description:    Check whether given value is empty.
      **********************************************************************************/
         isEmpty: function (v) {
-            return (v == '' || v == null || v == undefined || (v != null && typeof v == 'object' && !Object.keys(v).length)) ? true : false;
+            return (v === '' || v === null || v === undefined || (v !== null && typeof v === 'object' && !Object.keys(v).length)) ? true : false;
         },
     /**********************************************************************************
+     * Name       : cssStyler
      * Input        => (c:css Object      => type of Object,
      *                  i:use 'Style' YN  => Boolean
      *                  t:use  Trim   YN  => Boolean )
@@ -65,6 +66,7 @@ export const Mixin = {
             return (i) ? 'style=\"' + style + '\"' : style;
         },
     /**********************************************************************************
+     * Name       : selectToCopyToClipboard
      * Input   => (t:text            =>  String)
      * Output  => (Empty):
      * Description:  copy given text to clipboard
@@ -79,6 +81,7 @@ export const Mixin = {
             console.log('Success', successFailCondition);
         },
     /**********************************************************************************
+     * Name       : sideBarMiniMaxControl
      * Input   => ()
      * Output  => (Empty):
      * Description:  Minimize or Maximize Side bar Menu
@@ -89,6 +92,7 @@ export const Mixin = {
             else document.body.className = 'sidebar-lg-show header-fixed sidebar-fixed sidebar-minimized brand-minimized';
         },
     /**********************************************************************************
+     * Name       : selectBadges
      * Input   => (s:badges flag String  => String)
      * Output  => (String): variant value
      * Description:  Select badges variant by given val
@@ -111,8 +115,9 @@ export const Mixin = {
                 : 'primary';
         },
     /**********************************************************************************
+     * Name       : capitalize
      * Input   => (s: any String   => String)
-     * Output  => (String): with First letter
+     * Output  => (String): with upper case of First letter
      * Description:  Select badges variant by given val
      **********************************************************************************/
         capitalize: (s) => {
@@ -120,6 +125,7 @@ export const Mixin = {
             return s.charAt(0).toUpperCase() + s.slice(1);
         },
     /**********************************************************************************
+     * Name       : consoleLogEnv
      * Input   => (s: any String   => String)
      *             o: any object   => Object)
      * Output  => print out on console.log
@@ -135,9 +141,39 @@ export const Mixin = {
                 }
             }
         },
-        colSelector: function (dataLength) {
-            const colNumber = Math.round(12 / dataLength);
+    /**********************************************************************************
+     * Name       : colSelector
+     * Input   => (l: length of data   => Number)
+     * Output  => (String): with First letter
+     * Description:  return String with selected col size
+     **********************************************************************************/
+        colSelector: function (l) {
+            const colNumber = Math.round(12 / l);
             return 'col-xs-6 col-sm-6 col-md-6 col-lg-' + colNumber + ' col';
+        },
+    /**********************************************************************************
+     * Name       : isSelectedType
+     * Input   => (t: type to check  =>  n: Number, s:String, b:Boolean, o:Object, a:Arr
+     *             d: data to check  => Any)
+     * Output  => boolean whether it's checked type
+     * Description:  Console.log if only when it's not in production.
+     **********************************************************************************/
+        isSelectedType: function (d, t) {
+            if (t.toUpperCase() ==='N') {
+                return (Number.isInteger(d) && !isNaN(d));
+            } else if(t.toUpperCase() ==='D' || t.toUpperCase() ==='F') {
+                return (!isNaN(parseFloat(NaN)));
+            } else if(t.toUpperCase() ==='B') {
+                return  ['1','0',1,0,true, false].includes(d);
+            } else if(t.toUpperCase() ==='S') {
+                return  (typeof d === 'string' || d instanceof String);
+            } else if(t.toUpperCase() ==='O') {
+                return (typeof d === 'object' && d !== null && !Array.isArray(d));
+            } else if(t.toUpperCase() ==='A') {
+                return Array.isArray(d);
+            } else {
+                throw 'Please, Check data type';
+            }
         }
     },
     data: function () {

@@ -132,8 +132,15 @@ export default {
     computed: {
         tags () { return this.userProp.tags; },
         validateUserId () {
-            if (this.userId === null) return null;
-            if (this.userId.length > 4) return true;
+
+            if (this.userId === null) {
+              return null;
+            }
+
+            if (this.userId.length > 4) {
+              return true;
+            }
+
             return false;
         },
         validatePassword () {

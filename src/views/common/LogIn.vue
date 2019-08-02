@@ -85,9 +85,11 @@
                   </transition>
                   <b-input-group class="mb-3">
                     <b-input-group-prepend>
-                      <b-input-group-text><i class="icon-user" /></b-input-group-text>
+                      <b-input-group-text>
+                        <i class="icon-user" />
+                      </b-input-group-text>
                     </b-input-group-prepend>
-                    <b-form-input v-model="username" type="text" placeholder="Username" />
+                    <b-form-input v-model="username" type="text" placeholder="User name" />
                   </b-input-group>
                   <b-input-group class="mb-2">
                     <b-input-group-prepend>
