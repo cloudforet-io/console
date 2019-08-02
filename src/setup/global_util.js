@@ -162,7 +162,7 @@ export const Mixin = {
             if (t.toUpperCase() ==='N') {
                 return (Number.isInteger(d) && !isNaN(d));
             } else if(t.toUpperCase() ==='D' || t.toUpperCase() ==='F') {
-                return (!isNaN(parseFloat(NaN)));
+                return (!isNaN(parseFloat(d)));
             } else if(t.toUpperCase() ==='B') {
                 return  ['1','0',1,0,true, false].includes(d);
             } else if(t.toUpperCase() ==='S') {
