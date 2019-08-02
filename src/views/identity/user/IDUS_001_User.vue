@@ -125,10 +125,18 @@ export default {
         async listUsers (limit, skip, sort, search) {
             this.reset();
 
-            if (limit === undefined || limit === null) limit = 10;
-            if (skip === undefined || skip === null) skip = 0;
-            if (sort === undefined || sort === null) sort = '-created_date';
-            if (search === undefined || search === null) search = [];
+            if (limit === undefined || limit === null) {
+                limit = 10;
+            }
+            if (skip === undefined || skip === null) {
+                skip = 0;
+            }
+            if (sort === undefined || sort === null) {
+                sort = '-created_date';
+            }
+            if (search === undefined || search === null) {
+                search = [];
+            }
 
             let res;
             try {
@@ -143,11 +151,6 @@ export default {
             }
 
             setTimeout(() => { // this is for test
-        // let temp = []
-        // for (var i = 0; i < 1000; i++) {
-        //   temp[i] = res.data[0]
-        // }
-        // this.users = temp
                 this.users = res.data;
                 this.isLoading = false;
             }, 1000);
@@ -156,8 +159,11 @@ export default {
        */
         },
         rowSelected (row) {
-            if (row instanceof Array || !row) this.selectedUser = null;
-            else this.selectedUser = row.data;
+            if (row instanceof Array || !row) {
+                this.selectedUser = null;
+            } else {
+                this.selectedUser = row.data;
+            }
         },
         limitChanged (val) {
             this.perPage = Number(val);

@@ -11,23 +11,23 @@
           >
             <template slot="title" slot-scope="{ node }">
               <span class="item-icon">
-                <i v-if="node.isLeaf" class="fa fa-cube" />
+                <i v-if="node.isLeaf" class="fal fa-cube" />
                 <template v-else>
-                  <i v-if="node.isExpanded" class="fa fa-folder-open-o" />
-                  <i v-else class="fa fa-folder-o" />
+                  <i v-if="node.isExpanded" class="fal fa-folder-open" />
+                  <i v-else class="fal fa-folder-minus" />
                 </template>
               </span>
               {{ node.title }}
             </template>
 
             <template slot="toggle" slot-scope="{ node }">
-              <i v-if="node.isExpanded" class="fa fa-angle-down" />
-              <i v-else class="fa fa-angle-right" />
+              <i v-if="node.isExpanded" class="fal fa-angle-down" />
+              <i v-else class="fal fa-angle-right" />
             </template>
 
             <template slot="sidebar" slot-scope="{ node }">
               <span class="ellipsis" @click.stop.prevent="showContext($event, node)">
-                <i class="fa fa-bars" />
+                <i class="fal fa-bars" />
               </span>
             </template>
           </sl-vue-tree>
@@ -36,16 +36,16 @@
 
       <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
         <div class="contextmenuleaf" @click="excSelected('PG')">
-          <i class="fa fa-folder-o" />&nbsp; Add a Project Group
+          <i class="fal fa-folder-minus" />&nbsp; Add a Project Group
         </div>
         <div class="contextmenuleaf" @click="excSelected('PR')">
-          <i class="fa fa-cube" />&nbsp; Add a Project
+          <i class="fal fa-cube" />&nbsp; Add a Project
         </div>
         <div class="contextmenuleaf" @click="excSelected('SR')">
-          <i class="fa fa-pencil" />&nbsp; Edit Selected Project
+          <i class="fal fa-pencil" />&nbsp; Edit Selected Project
         </div>
         <div class="node-leaf-last" @click="excSelected">
-          <i class="fa fa-trash-o" />&nbsp; Remove Selected Item
+          <i class="fal fa-trash" />&nbsp; Remove Selected Item
         </div>
       </div>
       <transition name="panel-trans">
@@ -105,18 +105,20 @@ export default {
          */
             this.$bus.$emit('treeSelectedEvent', nodes);
         },
-        nodeToggled (node, event) {
+        nodeToggled (node) {
             this.lastEvent = `Node ${node.title} is ${node.isExpanded ? 'expanded' : 'collapsed'}`;
         },
-        nodeDropped (nodes, position, event) {
+        nodeDropped (nodes, position) {
             this.lastEvent = `Nodes: ${nodes.map(node => node.title).join(', ')} are dropped ${position.placement} ${position.node.title}`;
         },
-        showContext (event, node) {
+        showContext (event, node) {
             this.showContextMenu(node, event, 'Clicked');
         },
 
         showContextMenu (node, event, hasClicked) {
-            if (!hasClicked) event.preventDefault();
+            if (!hasClicked) {
+                event.preventDefault();
+            }
             this.contextMenuIsVisible = true;
             const $contextMenu = this.$refs.contextmenu;
             let coordinateX = event.clientX;
@@ -177,8 +179,9 @@ export default {
                     },
                     () => {
                         prams['flag'] = 'S' + prams['flag'];
-                        if (!prams.tree.getSelected()[0].isLeaf) this.$emit(emitMethodName, prams);
-                        else {
+                        if (!prams.tree.getSelected()[0].isLeaf) {
+                            this.$emit(emitMethodName, prams);
+                        } else {
                             this.$notify({
                                 group: 'auth',
                                 type: 'warn',
@@ -218,37 +221,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  // .conmenu-leaf {
-  //   border-bottom: #181b1e;
-  // }
-  // .contextmenutop {
-  //   position: relative;
-  //   background-color: #fff;
-  //   color: #23282c;
-  //   border: 1px solid #c8ced3;
-  //   border-color: #20a8d8;
-  //   border-radius: 0.25rem;
-  //   cursor: pointer;
-  // }
-  // .contextmenutop > div {
-  //   padding: 10px;
-  // }
-  // .last-event {
-  //   color: white;
-  //   background-color: rgba(100, 100, 255, 0.5);
-  //   padding: 10px;
-  //   border-radius: 2px;
-  // }
-  // .tree-container {
-  //   flex-grow: 1;
-  // }
-
-  // .sl-vue-tree.sl-vue-tree-root {
-  //   flex-grow: 1;
-  //   overflow-x: hidden;
-  //   overflow-y: auto;
-  //   height: 40vw;
-  // }
   .tree-trans-enter-active {
     transition: all .4s ease-in-out;
   }

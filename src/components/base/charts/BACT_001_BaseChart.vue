@@ -212,7 +212,7 @@ export default {
       // eslint-disable-next-line vue/require-valid-default-prop
             default: {
                 isTitleIconUsed: false,
-                TitleIconClass: 'fa fa-globe fa-2x',
+                TitleIconClass: 'fal fa-globe fa-2x',
                 cardTitle: 'This is Default Title',
                 isDropdownUsed: false
             }

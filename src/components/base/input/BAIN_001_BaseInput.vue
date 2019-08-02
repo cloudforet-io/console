@@ -25,7 +25,7 @@
               <b-row class="no-gutters justify-content-between">
                 <b-col class="col-8 key-label">{{ key.label }}</b-col>
                 <b-col v-if="key.values || key.ajax" class="col-4 caret">
-                  <i class="fa fa-caret-right" />
+                  <i class="fal fa-caret-right" />
                 </b-col>
                 <b-col v-else-if="key.type" class="col-4 type-caption">{{ key.type }}</b-col>
               </b-row>
@@ -157,8 +157,11 @@ export default {
 
             if (this.selected.key) {
                 this.selectedKeyObj = this.findKeyObjFromKeyList(this.selected.label);
-                if (this.selected.subKey) this.value = `${this.selected.label}.${this.selected.subKey} ${this.selected.operator} `;
-                else this.value = `${this.selected.label} ${this.selected.operator} `;
+                if (this.selected.subKey) {
+                    this.value = `${this.selected.label}.${this.selected.subKey} ${this.selected.operator} `;
+                } else {
+                    this.value = `${this.selected.label} ${this.selected.operator} `;
+                }
             }
         },
         onInput (e) {
@@ -177,47 +180,63 @@ export default {
             /**
              * TODO: detect editting key or subkey
              */
-                    } else this.resetKey(keyStr);
+                    } else {
+                        this.resetKey(keyStr);
+                    }
                 } else { // editting value section
                     let valStr = this.value.substring(operatorIdx);
                     this.setOperator(valStr);
                     this.refreshValueList(valStr.substring(this.selected.operator.length));
                 }
-            } else this.resetKey(this.value.trim());
+            } else {
+                this.resetKey(this.value.trim());
+            }
         },
         refreshKeyList (val) {
             val = val.trim().toLowerCase();
             let temp = [];
-            this.listData.map((item, idx) => {
-                if (item.label.toLowerCase().indexOf(val) !== -1) temp.push(item);
+            this.listData.map((item) => {
+                if (item.label.toLowerCase().indexOf(val) !== -1) {
+                    temp.push(item);
+                }
             });
             this.keyList = temp;
         },
         refreshValueList (val) {
             val = val.trim().toLowerCase();
             let temp = [];
-            this.staticValueList.map((value, idx) => {
-                if (value.toLowerCase().indexOf(val) !== -1) temp.push(value);
+            this.staticValueList.map((value) => {
+                if (value.toLowerCase().indexOf(val) !== -1) {
+                    temp.push(value);
+                }
             });
             this.valueList = temp;
         },
-        async onSelectKey (item, idx) {
+        async onSelectKey (item) {
             this.setKey(item);
-            if (this.selected.type === 'SubKey') this.value = `${this.selected.label}.`;
-            else this.value = `${this.selected.label} ${this.selected.operator}`;
+            if (this.selected.type === 'SubKey') {
+                this.value = `${this.selected.label}.`;
+            } else {
+                this.value = `${this.selected.label} ${this.selected.operator}`;
+            }
             this.hideKeyList();
             await this.setValueListByKeyObj();
             this.showValueList();
         },
         async setValueListByKeyObj () {
-            if (!this.selectedKeyObj) return;
+            if (!this.selectedKeyObj) {
+                return;
+            }
 
-            if (this.selectedKeyObj.values) this.staticValueList = this.selectedKeyObj.values;
-            else if (this.selectedKeyObj.ajax) {
+            if (this.selectedKeyObj.values) {
+                this.staticValueList = this.selectedKeyObj.values;
+            } else if (this.selectedKeyObj.ajax) {
                 let res;
                 try {
                     res = await this.$http[this.selectedKeyObj.ajax.method](this.selectedKeyObj.ajax.url,
-                        this.selectedKeyObj.ajax.params ? { params: this.selectedKeyObj.ajax.params } : {});
+                        this.selectedKeyObj.ajax.params ? {
+                            params: this.selectedKeyObj.ajax.params 
+                        } : {});
 
                     this.staticValueList = res.data;
                 } catch (e) {
@@ -239,12 +258,14 @@ export default {
             this.isValueListShown = false;
             this.hoveredItemIdx = null;
         },
-        showKeyList () { this.isKeyListShown = true; },
+        showKeyList () {
+            this.isKeyListShown = true; 
+        },
         hideKeyList () {
             this.isKeyListShown = false;
             this.hoveredItemIdx = null;
         },
-        onSelectValue (val, idx) {
+        onSelectValue (val) {
             this.setOperator(this.value.substring(this.value.indexOf(':')));
             this.setValue(val);
             this.hideValueList();
@@ -291,12 +312,16 @@ export default {
         commit () {
             let val = this.value.trim();
             if (this.commitEventName === 'update' && val === '') {
-              this.$emit('delete');
+                this.$emit('delete');
             }
-            if (val === '') return;
+            if (val === '') {
+                return;
+            }
             this.setSelectedData(val);
 
-            if (this.selectedArr.length === 0) this.selectedArr.push(this.selected);
+            if (this.selectedArr.length === 0) {
+                this.selectedArr.push(this.selected);
+            }
             this.$emit(this.commitEventName, this.selectedArr);
 
             this.setKeyListPosition();
@@ -309,12 +334,16 @@ export default {
                 let valStr = val.substring(operatorIdx);
 
                 this.setOperator(valStr);
-                if (this.selected.type === 'SubKey') this.setSubKey(keyStr);
+                if (this.selected.type === 'SubKey') {
+                    this.setSubKey(keyStr);
+                }
                 this.setValue(valStr.substring(this.selected.operator.length));
             } else {
                 if (val.includes(' ') || val.includes('\n') || val.includes('\t')) {
                     this.setContinuousValue(val);
-                } else this.setValue(val);
+                } else {
+                    this.setValue(val);
+                }
             }
         },
         setKey (keyObj) {
@@ -330,12 +359,17 @@ export default {
             this.selected.value = this.filterValueWithType(val);
         },
         setOperator (val) {
-            if (appendableOperators.includes(val[1])) this.selected.operator = ':' + val[1];
-            else this.selected.operator = ':';
+            if (appendableOperators.includes(val[1])) {
+                this.selected.operator = ':' + val[1];
+            } else {
+                this.selected.operator = ':';
+            }
         },
         findKeyObjFromKeyList (val) {
             for (var i = 0; i < this.keyList.length; i++) {
-                if (val === this.keyList[i].label) return this.keyList[i];
+                if (val === this.keyList[i].label) {
+                    return this.keyList[i];
+                }
             }
             return null;
         },
@@ -358,9 +392,13 @@ export default {
             if (this.selectedKeyObj) {
                 switch (this.selectedKeyObj.type) {
                 case 'Boolean':
-                    if (val === '0' || val === 'false') val = false;
-                    else if (val === '1' || val === 'true') val = true;
-                    else val = '';
+                    if (val === '0' || val === 'false') {
+                        val = false;
+                    } else if (val === '1' || val === 'true') {
+                        val = true;
+                    } else {
+                        val = '';
+                    }
                     break;
                 case 'Number':
                     val = Number(val);
@@ -375,24 +413,31 @@ export default {
         onFocus () {
             this.isFocused = true;
 
-            if (this.autoselect) this.captureText();
+            if (this.autoselect) {
+                this.captureText();
+            }
         },
         onBlur () {
             this.isFocused = false;
             this.hoveredItemIdx = null;
 
             if (this.$listeners.update !== undefined) {
-                if (this.isEnterEmittedBlur) this.isEnterEmittedBlur = false;
-                else this.commit();
+                if (this.isEnterEmittedBlur) {
+                    this.isEnterEmittedBlur = false;
+                } else {
+                    this.commit();
+                }
             }
         },
-        onKeyDown (e) {
+        onKeyDown () {
             let arr = this.isKeyListShown ? this.keyList : this.valueList;
             if (this.hoveredItemIdx === null || this.hoveredItemIdx >= arr.length - 1) {
                 this.hoveredItemIdx = 0;
                 this.$refs.listContainer.scrollTop = 0;
                 return;
-            } else this.hoveredItemIdx++;
+            } else {
+                this.hoveredItemIdx++;
+            }
 
             let listContainerRect = this.$refs.listContainer.getBoundingClientRect();
             let listItemRect = this.$refs.list[this.hoveredItemIdx].getBoundingClientRect();
@@ -406,7 +451,9 @@ export default {
                 this.hoveredItemIdx = arr.length - 1;
                 this.$refs.listContainer.scrollTop = this.$refs.listContainer.scrollHeight;
                 return;
-            } else this.hoveredItemIdx--;
+            } else {
+                this.hoveredItemIdx--;
+            }
 
             let listContainerRect = this.$refs.listContainer.getBoundingClientRect();
             let listItemRect = this.$refs.list[this.hoveredItemIdx].getBoundingClientRect();
@@ -414,10 +461,16 @@ export default {
                 this.$refs.listContainer.scrollTop -= listItemRect.height;
             }
         },
-        onMouseover (idx) { this.hoveredItemIdx = idx; },
-        onMouseout () { this.hoveredItemIdx = null; },
+        onMouseover (idx) {
+            this.hoveredItemIdx = idx; 
+        },
+        onMouseout () {
+            this.hoveredItemIdx = null; 
+        },
         captureText () {
-            if (!this.value) return;
+            if (!this.value) {
+                return;
+            }
 
       // set text selection
             if (this.selected.key !== null && this.selected.value !== null) {

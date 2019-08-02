@@ -4,7 +4,7 @@
       <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
         <b-card class="base summary border-top-0">
           <h5 class="page-header m-t-0">
-            <i class="fa fa-hashtag m-r-5" />&nbsp;&nbsp; Base Information
+            <i class="fal fa-hashtag m-r-5" />&nbsp;&nbsp; Base Information
           </h5>
           <hr>
           <b-container fluid>
@@ -16,13 +16,13 @@
                       title="Copy to Clipboard"
                       @click="CopyToClipboard(info.contents)"
                 >
-                  <i class="fa fa-copy" />
+                  <i class="fal fa-copy" />
                 </span>
               </div>
             </dl>
           </b-container>
           <h5 class="page-header">
-            <i class="fa fa-tag m-r-5" />&nbsp;&nbsp; Tag
+            <i class="fal fa-tags m-r-5" />&nbsp;&nbsp; Tag
           </h5>
           <hr>
           <b-container fluid>
@@ -38,7 +38,7 @@
                       class="copy-clipboard"
                       title="Copy to Clipboard" @click="CopyToClipboard(tag.tagValue)"
                 >
-                  <i class="fa fa-copy" />
+                  <i class="fal fa-copy" />
                 </span>
               </div>
             </dl>
@@ -186,26 +186,26 @@ export default {
       ];
 
       const sampleAsset = [
-        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server' },
-        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database' },
-        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server' },
-        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database' },
-        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fa fa-server' },
-        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fa fa-database' },
-        { asKey: 'Project', assetValue: 17, linkURL: 'www.bing.com', icon: 'fa fa-star' },
-        { asKey: 'Member', assetValue: 0, linkURL: 'www.naver.com', icon: 'fa fa-users' }
+        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
+        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
+        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
+        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
+        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
+        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
+        { asKey: 'Project', assetValue: 17, linkURL: 'www.bing.com', icon: 'fal fa-star' },
+        { asKey: 'Member', assetValue: 0, linkURL: 'www.naver.com', icon: 'fal fa-users' }
       ];
 
       const chartTitleSampleData1 = {
         isTitleIconUsed: true,
-        TitleIconClass: 'fa fa-globe',
+        TitleIconClass: 'fal fa-globe',
         cardTitle: 'Server By Region',
         isDropdownUSed: false
       };
 
       const chartTitleSampleData2 = {
         isTitleIconUsed: true,
-        TitleIconClass: 'fa fa-tag',
+        TitleIconClass: 'fal fa-tag',
         cardTitle: 'Server by Type',
         isDropdownUsed: true
       };

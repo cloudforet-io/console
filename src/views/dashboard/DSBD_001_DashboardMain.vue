@@ -286,7 +286,7 @@
       >
         <div class="brand-card">
           <div class="brand-card-header bg-facebook">
-            <i class="fa fa-facebook" />
+            <i class="fab fa-facebook" />
             <div class="chart-wrapper">
               <social-box-chart-example
                 chart-id="box-chart-01"
@@ -320,7 +320,7 @@
       >
         <div class="brand-card">
           <div class="brand-card-header bg-twitter">
-            <i class="fa fa-twitter" />
+            <i class="fab fa-twitter" />
             <div class="chart-wrapper">
               <social-box-chart-example
                 chart-id="box-chart-02"
@@ -354,7 +354,7 @@
       >
         <div class="brand-card">
           <div class="brand-card-header bg-linkedin">
-            <i class="fa fa-linkedin" />
+            <i class="fab fa-linkedin" />
             <div class="chart-wrapper">
               <social-box-chart-example
                 chart-id="box-chart-03"
@@ -388,7 +388,7 @@
       >
         <div class="brand-card">
           <div class="brand-card-header bg-google-plus">
-            <i class="fa fa-google-plus" />
+            <i class="fab fa-google-plus" />
             <div class="chart-wrapper">
               <social-box-chart-example
                 chart-id="box-chart-04"
@@ -895,7 +895,7 @@ export default {
           user: { name: 'Yiorgos Avraamu', new: true, registered: 'Jan 1, 2015' },
           country: { name: 'USA', flag: 'us' },
           usage: { value: 50, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Mastercard', icon: 'fa fa-cc-mastercard' },
+          payment: { name: 'Mastercard', icon: 'fab fa-cc-mastercard' },
           activity: '10 sec ago'
         },
         {
@@ -903,7 +903,7 @@ export default {
           user: { name: 'Avram Tarasios', new: false, registered: 'Jan 1, 2015' },
           country: { name: 'Brazil', flag: 'br' },
           usage: { value: 22, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Visa', icon: 'fa fa-cc-visa' },
+          payment: { name: 'Visa', icon: 'fab fa-cc-visa' },
           activity: '5 minutes ago'
         },
         {
@@ -911,7 +911,7 @@ export default {
           user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2015' },
           country: { name: 'India', flag: 'in' },
           usage: { value: 74, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Stripe', icon: 'fa fa-cc-stripe' },
+          payment: { name: 'Stripe', icon: 'fab fa-cc-stripe' },
           activity: '1 hour ago'
         },
         {
@@ -919,7 +919,7 @@ export default {
           user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2015' },
           country: { name: 'France', flag: 'fr' },
           usage: { value: 98, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'PayPal', icon: 'fa fa-paypal' },
+          payment: { name: 'PayPal', icon: 'fab fa-paypal' },
           activity: 'Last month'
         },
         {
@@ -927,7 +927,7 @@ export default {
           user: { name: 'Agapetus Tadeáš', new: true, registered: 'Jan 1, 2015' },
           country: { name: 'Spain', flag: 'es' },
           usage: { value: 22, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Google Wallet', icon: 'fa fa-google-wallet' },
+          payment: { name: 'Google Wallet', icon: 'fab fa-google-wallet' },
           activity: 'Last week'
         },
         {
@@ -935,7 +935,7 @@ export default {
           user: { name: 'Friderik Dávid', new: true, registered: 'Jan 1, 2015' },
           country: { name: 'Poland', flag: 'pl' },
           usage: { value: 43, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Amex', icon: 'fa fa-cc-amex' },
+          payment: { name: 'Amex', icon: 'fab fa-cc-amex' },
           activity: 'Last week'
         }
       ],

@@ -2,27 +2,27 @@
   <div id="app" class="app flex-row align-items-center">
     <ul class="cb-slideshow">
       <li>
-        <span></span>
+        <span />
         <div><h3>Clo·ud San·d·box</h3></div>
       </li>
       <li>
-        <span></span>
+        <span />
         <div><h3>com·po·sure</h3></div>
       </li>
       <li>
-        <span></span>
+        <span />
         <div><h3>e·qua·nim·i·ty</h3></div>
       </li>
       <li>
-        <span></span>
+        <span />
         <div><h3>bal·an·ce</h3></div>
       </li>
       <li>
-        <span></span>
+        <span />
         <div><h3>qui·e·tude</h3></div>
       </li>
       <li>
-        <span></span>
+        <span />
         <div><h3>Ma·inf·rame compu·ter</h3></div>
       </li>
     </ul>
@@ -85,15 +85,13 @@
                   </transition>
                   <b-input-group class="mb-3">
                     <b-input-group-prepend>
-                      <b-input-group-text>
-                        <i class="icon-user" />
-                      </b-input-group-text>
+                      <b-input-group-text><i class="fal fa-user" /></b-input-group-text>
                     </b-input-group-prepend>
                     <b-form-input v-model="username" type="text" placeholder="User name" />
                   </b-input-group>
                   <b-input-group class="mb-2">
                     <b-input-group-prepend>
-                      <b-input-group-text><i class="icon-lock" /></b-input-group-text>
+                      <b-input-group-text><i class="fal fa-key" /></b-input-group-text>
                     </b-input-group-prepend>
                     <b-form-input v-model="password" type="password" placeholder="Password"
                                   autocomplete="current-password"
@@ -120,7 +118,7 @@
                               data-target="#simpleModal"
                               @click="popSignUpInstruction"
                       >
-                        <i class="fa fa-exclamation-circle" />
+                        <i class="fal fa-exclamation-circle" />
                       </button>
                     </b-col>
                   </b-row>
@@ -195,11 +193,11 @@ export default {
                     username: this.username,
                     password: this.password
                 }
-            ).then(res => {
+            ).then(() => {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
-            }).catch(error => {
-                const errObj = JSON.parse(error.message);
+            }).catch(() => {
+                // const errObj = JSON.parse(error.message);
                 this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
             });
         },

@@ -10,10 +10,10 @@
     />
 
     <span v-else class="badge tag-badge m-1">
-      <span @click="onUpdateMode">
+      <span class="contents" @click="onUpdateMode">
         {{ `${label} ${operator} ${value}` }}
       </span>
-      <i class="fa fa-times-circle" @click="$emit('delete')" />
+      <span class="icon" @click="$emit('delete')"><i class="fal fa-times-circle" /></span>
     </span>
 
   </span>
@@ -74,7 +74,7 @@ $input-height: 23px;
     border-radius: 50px;
     padding-left: 10px;
     padding-right: 10px;
-    span {
+    .contents {
       display: inline-block;
       max-width: 96%;
       font-size: 1.25em;
@@ -84,7 +84,7 @@ $input-height: 23px;
       overflow: hidden;
       vertical-align: text-bottom;
     }
-    i {
+    .icon {
       font-size: 1.3em;
       cursor: pointer;
       margin-left: 5px;

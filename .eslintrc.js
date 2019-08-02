@@ -55,5 +55,21 @@ module.exports = {
         'allowFirstLine': false
       }
     }],
+    'curly': "error",
+    'object-curly-newline': [
+      "error", {
+        "ObjectPattern": { "multiline": true },
+        "ImportDeclaration": "never",
+        "ExportDeclaration": { "multiline": true, "minProperties": 3 }
+      }
+    ],
+    'object-curly-spacing': [
+      "error",
+      "always", { 
+        "objectsInObjects": false,
+        "arraysInObjects": false
+      }
+    ],
+    'brace-style': "error"
   }
 }
