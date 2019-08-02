@@ -1,10 +1,7 @@
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import App from './App';
-import index from './routes';
-import { i18n } from '@/setup/i18n';
-import { api } from '@/setup/api';
-import { Mixin } from '@/setup/global_util';
+import router from '@/routes/index';
 import store from './store';
 import dotenv from 'dotenv';
 import VueCookie from 'vue-cookie';
@@ -15,6 +12,9 @@ import Notifications from 'vue-notification';
 import velocity from 'velocity-animate';
 import CountryFlag from 'vue-country-flag';
 import VueAlertify from 'vue-alertify';
+import { i18n } from '@/setup/i18n';
+import { api } from '@/setup/api';
+import { Mixin } from '@/setup/global_util';
 
 //TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
 dotenv.config();
@@ -28,15 +28,17 @@ Vue.use(CountryFlag);
 Vue.use(Notifications, { velocity });
 Vue.prototype.$axios  = api;
 
-/* This is a Global Bus Event;
+/**
+ * This is a Global Bus Event;
  * Please, name your '$emit' event name as action + Event such as
  * nodeSelectedEvent, closeModalEvent
- */
+ **/
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
+
 new Vue({
     el: '#app',
-    router: index,
+    router,
     i18n,
     api,
     store,

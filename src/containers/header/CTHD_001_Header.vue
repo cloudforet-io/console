@@ -1,68 +1,97 @@
 <template>
-  <b-row align-h="between" class="header-container no-gutters">
-    <b-col cols="10" class="row no-gutters">
-      <b-navbar class="header">
-        <b-navbar-nav>
-          <b-nav-item>
-            <b-link class="nav brand" to="/">
-              CLOUDONE
-            </b-link>
-          </b-nav-item>
-        </b-navbar-nav>
-        <b-navbar-nav>
-          <b-nav-item><SiteMapDropdown class="nav" /></b-nav-item>
-        </b-navbar-nav>
-      </b-navbar>
-    </b-col>
+  <transition name="slide-fade">
+    <div v-if="show" class="header-container">
+      <b-row align-h="between" no-gutters class="main-header">
+        <b-col cols="10" class="row no-gutters">
+          <b-navbar class="header">
+            <b-navbar-nav>
+              <b-nav-item>
+                <b-link class="nav brand" to="/">
+                  <img src="@/asset/images/brand/dcos.png">
+                </b-link>
+              </b-nav-item>
+            </b-navbar-nav>
+            <b-navbar-nav>
+              <b-nav-item><SiteMapDropdown class="nav" /></b-nav-item>
+            </b-navbar-nav>
+          </b-navbar>
+        </b-col>
 
-    <b-col cols="2" class="row no-gutters justify-content-end">
-      <b-navbar class="header">
-        <b-navbar-nav class="ml-auto">
-          <b-nav-item><LanguageDropdown class="nav" /></b-nav-item>
-        </b-navbar-nav>
-        <b-navbar-nav>
-          <b-nav-item><AccountDropdown class="nav" /></b-nav-item>
-        </b-navbar-nav>
-      </b-navbar>
-    </b-col>
-  </b-row>
+        <b-col cols="2" class="row no-gutters justify-content-end">
+          <b-navbar class="header">
+            <b-navbar-nav class="ml-auto">
+              <b-nav-item><LanguageDropdown class="nav" /></b-nav-item>
+            </b-navbar-nav>
+            <b-navbar-nav>
+              <b-nav-item><AccountDropdown class="nav" /></b-nav-item>
+            </b-navbar-nav>
+          </b-navbar>
+        </b-col>
+      </b-row>
+
+      <SubHeader />
+    </div>
+  </transition>
 </template>
 
 <script>
+import SiteMapDropdown from './CTHD_004_SiteMapDropdown';
 import AccountDropdown from './CTHD_002_AccountDropdown';
 import LanguageDropdown from './CTHD_003_LanguageDropdown';
-import SiteMapDropdown from './CTHD_004_SiteMapDropdown';
+import SubHeader from './CTHD_005_SubHeader';
 
 export default {
   name: 'BaseHeader',
   components: {
     LanguageDropdown,
     SiteMapDropdown,
-    AccountDropdown
+    AccountDropdown,
+    SubHeader
+  },
+  data () {
+    return {
+      show: false
+    };
+  },
+  mounted() {
+    this.show = true;
   }
 };
 </script>
 
 <style lang="scss" scoped>
-$mb: 10px;
+.slide-fade-enter-active {
+  transition: all .4s ease-in-out;
+}
+.slide-fade-enter {
+  transform: translateY(calc(-#{$header-height}));
+  opacity: 0;
+}
 .header-container {
-  background-color: rgba($white, 0.95);
-  height: calc(#{$header-height} - #{$mb});
-  box-shadow: 0px 0 5px 0px rgba($black, 0.3);
-  margin-bottom: $mb;
-  .row {
-    .header {
+  // background: $gradient;
+}
+.main-header {
+  // background-color: rgba($white, 0.95);
+  background: $gradient;
+  box-shadow: 0px 0 10px 0px rgba($black, 0.5);
+  height: calc(#{$header-height});
+  font-family: $font-big;
+  .header {
+    padding: 0;
+    width: calc(100% - #{$side-pad});
+    .navbar-nav .nav-item .nav-link {
       padding: 0;
-      width: calc(100% - #{$side-pad});
+      vertical-align: middle;
       .nav {
         margin-right: 20px;
         &.brand {
           margin-left: 20px;
-          padding: 5px;
-          font-weight: 700;
-          font-size: 1.5em;
-          color: lighten($navy, 13%);
-          text-shadow: 3px 2px 3px $darkgray;
+          margin-right: 20px;
+          padding-top: 6px;
+          img {
+            max-height: calc(#{$header-height} - 6px);
+            filter: sepia(110%) hue-rotate(190deg) saturate(530%);
+          }
         }
       }
     }

@@ -103,7 +103,8 @@ export default {
     props: {
         userProp: {
             type: Object,
-            default: () => (userModel)
+            default: () => (userModel),
+            required: true
         },
         creatable: {
             type: Boolean,

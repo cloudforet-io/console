@@ -4,7 +4,7 @@
     <template slot="button-content">
       <i class="icon flag-icon flag-icon-us" /> &nbsp;
       <!-- <span class="name">English</span> &nbsp; -->
-      <i class="down-btn fa fa-caret-down" />
+      <i class="down-btn fa fa-angle-down" />
     </template>
     <b-dropdown-item>
       <div class="item">
@@ -55,14 +55,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.dropdown-menu {
-  color: $red;
-}
 .flag-icon {
-  box-shadow: 2px 2px 2px 0 $gray;
+  // box-shadow: 2px 2px 2px 0 rgba($black, 0.1);
   vertical-align: text-top;
-}
-.down-btn {
-  color: $black;
 }
 </style>
