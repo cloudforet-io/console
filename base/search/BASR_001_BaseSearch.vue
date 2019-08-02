@@ -15,7 +15,7 @@
         </b-col>
 
         <b-input-group-append class="col-2 pl-0">
-          <b-button block variant="primary" @click="search">
+          <b-button block class="search-btn" @click="search">
             <i class="fa fa-search" />
           </b-button>
         </b-input-group-append>
@@ -123,6 +123,7 @@ $input-height: 23px;
       border: 1px solid $gray;
       border-radius: 5px 0 0 5px;
       background-color: #fff;
+      padding-left: 10px;
     .input-box {
       display: inline-block;
       width: 95%;
@@ -138,6 +139,9 @@ $input-height: 23px;
       vertical-align: bottom;
       cursor: pointer;
     }
+  }
+  .search-btn {
+    border-radius: 0 5px 5px 0;
   }
 }
 </style>

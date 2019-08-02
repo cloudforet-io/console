@@ -1,44 +1,50 @@
 <template>
-  <b-col class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
-    <b-nav tabs :fill="fill">
-      <b-nav-item
-        v-for="(ntab, idx) in navTabs"
-        :key="idx"
-        :active="selectedTab === ntab.component"
-        @click="selectedTab = ntab.component"
-      >
-        {{ ntab.tabTitle }}
-      </b-nav-item>
-    </b-nav>
-    <template v-if="keepAlive">
-      <keep-alive>
-        <component :is="selectedTab" />
-      </keep-alive>
-    </template>
-    <template v-else>
-      <component :is="selectedTab" />
-    </template>
-    <b-row>
-      <slot name="footerArea">
-        <div class="col-md-12">
-          <div v-show="isFooterVisible" class="modal-footer" style="border-top:none; padding-right: 0px">
-            <b-button v-show="isCreatable" size="md" variant="outline-primary" @click="createNew">
-              Create
-            </b-button>
-            <b-button v-show="isUpdatable" size="md" variant="outline-success" @click="updateSelect">
-              Update
-            </b-button>
-            <b-button v-show="isDeletable" size="md" variant="outline-danger" @click="deleteSelect">
-              Delete
-            </b-button>
-            <b-button size="md" variant="outline-warning" @click="closeWindow">
-              Cancel
-            </b-button>
+  <b-row>
+    <b-col class="base-tab-nav col-xs-6 col-sm-6 col-md-12 col-lg-12">
+      <b-nav tabs :fill="fill">
+        <b-nav-item
+          v-for="(ntab, idx) in navTabs"
+          :key="idx"
+          :class="{active: selectedTab.component === ntab.component}"
+          :active="selectedTab.tabTitle === ntab.tabTitle"
+          @click="selectedTab = ntab"
+        >
+          {{ ntab.tabTitle }}
+        </b-nav-item>
+      </b-nav>
+      <slot v-if="useSlot" :name="selectedTab.tabTitle" />
+      <template v-else>
+        <template v-if="keepAlive">
+          <keep-alive>
+            <component :is="selectedTab.component" />
+          </keep-alive>
+        </template>
+        <template v-else>
+          <component :is="selectedTab.component" />
+        </template>
+      </template>
+      <b-row>
+        <slot name="footerArea">
+          <div class="col-md-12">
+            <div v-show="isFooterVisible" class="modal-footer" style="border-top:none; padding-right: 0px">
+              <b-button v-show="isCreatable" size="md" variant="outline-primary" @click="createNew">
+                Create
+              </b-button>
+              <b-button v-show="isUpdatable" size="md" variant="outline-success" @click="updateSelect">
+                Update
+              </b-button>
+              <b-button v-show="isDeletable" size="md" variant="outline-danger" @click="deleteSelect">
+                Delete
+              </b-button>
+              <b-button size="md" variant="outline-warning" @click="closeWindow">
+                Cancel
+              </b-button>
+            </div>
           </div>
-        </div>
-      </slot>
-    </b-row>
-  </b-col>
+        </slot>
+      </b-row>
+    </b-col>
+  </b-row>
 </template>
 <script>
 import { api } from '@/setup/api';
@@ -57,6 +63,14 @@ export default {
             default: false
         },
         fill: {
+            type: Boolean,
+            default: false
+        },
+        defaultTab: {
+            type: Number,
+            default: 0
+        },
+        useSlot: {
             type: Boolean,
             default: false
         },
@@ -87,8 +101,7 @@ export default {
     },
     data () {
         return {
-            prosData: {},
-            selectedTab: this.tab,
+            selectedTab: this.navTabs[this.defaultTab],
             isCreate: this.isCreatable,
             isUpdate: this.isUpdatable,
             isDelete: this.isDeletable
@@ -123,27 +136,37 @@ export default {
             this.$emit('delete', baseTabParams);
         },
         closeWindow (e) {
-            this.$parent.$store.dispatch('modal/closeModal');
+            this.$store.dispatch('modal/closeModal');
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-  .nav>li>a {
-    &.nav-link.active{
-      border-top: 3px #3bafda solid;
+    .base-tab-nav .nav-tabs {
+        border: none;
+        .nav-item {
+            z-index: 1;
+            &.active {
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+                box-shadow: 0px -7px 7px -1px rgba($black, 0.1);
+            }
+            .nav-link {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border: none;
+                &.active{
+                    border-top: 3px $blue solid;
+                    color: $blue;
+                    font-weight: bold;
+                    background-color: $white;
+                }
+                &:hover{
+                    font-weight: bold;
+                }
+            }
+        }
     }
-
-    &.active {
-      color: #3bafda !important;
-      font-weight: bold;
-    };
-
-    &:hover{
-      border-top: 3px #3bafda solid;
-      font-weight: bold;
-    }
-  }
 
 </style>
