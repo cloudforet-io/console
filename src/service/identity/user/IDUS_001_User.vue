@@ -106,7 +106,7 @@ export default {
       totalCount: 17,
       queryData: query,
       isReadyForSearch: false,
-      perPage: 3,
+      perPage: 10,
       isLoading: true
     };
   },
