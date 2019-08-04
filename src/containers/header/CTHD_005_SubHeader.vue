@@ -1,24 +1,25 @@
 <template>
   <div class="sub-header">
-    <div class="group-title">
-      <span class="title">identity</span>
-      <span class="triangle" />
-    </div>
-    <div class="item">
-      <span class="title">Server</span>
-    </div>
-    <div class="item active">
-      <span class="title">Network</span>
-    </div>
-    <div class="item">
-      <span class="title">Storage</span>
+    <div v-for="(nav, idx) in subHeaderList" :key="nav.label"
+        :class="{ 'group-title' :idx === 0,
+                  'item' : idx !== 0,
+                  'active' : $route.meta.label === nav.label }">
+      <span class="title"><router-link :to="nav.link">{{ nav.label }}</router-link></span>
+      <span v-if="idx === 0" class="triangle" />
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
-    name:'SubHeader'
+    name:'SubHeader',
+    computed: {
+      ...mapGetters('subHeader', [
+        'subHeaderList'
+      ])
+    },
 };
 </script>
 
@@ -74,7 +75,9 @@ $top-pad: 9px;
     text-transform: uppercase;
     background-color: $shape-color;
     color: $navy;
-    // margin-right: $shape-width;
+    a {
+      cursor: default;
+    }
 
     .triangle {
       position: absolute;

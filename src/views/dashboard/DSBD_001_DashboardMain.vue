@@ -986,12 +986,10 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.$store.dispatch('sidebar/hideSidebar');
+      vm.$store.dispatch('subHeader/setNavList', [
+        { label: 'Dashboard', link: '/dashboard' }
+        ]);
     });
   },
-  beforeRouteLeave (to, from, next) {
-    this.$store.dispatch('sidebar/showSidebar');
-    next();
-  }
 };
 </script>

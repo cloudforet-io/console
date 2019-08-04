@@ -20,10 +20,13 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
-i {
+i, span, div, h1, h2, h3, h4, h5, h6, input,
+textarea, article, main {
   color: inherit;
   font-size: inherit;
   font-weight: inherit;
+  word-spacing: inherit;
+  letter-spacing: inherit;
 }
 textarea:focus, input:focus{
   outline: none;
@@ -34,6 +37,13 @@ textarea:focus, input:focus{
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-big;
   margin: 0;
+}
+a {
+  color: inherit;
+  &:hover {
+    color: inherit;
+    text-decoration: unset;
+  }
 }
 
 

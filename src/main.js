@@ -5,7 +5,7 @@ import router from '@/routes/index';
 import store from './store';
 import dotenv from 'dotenv';
 import VueCookie from 'vue-cookie';
-import directive from '@/directive';
+import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlert from '@vuejs-pt/vue-alert';
 import Notifications from 'vue-notification';

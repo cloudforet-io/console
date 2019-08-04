@@ -1,83 +1,85 @@
 <template>
-  <!-- <b-dropdown class="dropdown" size="sm" no-caret> -->
   <span class="site-map-component">
     <b-button class="btn toggle" @click="toggleShow">
       <span>Services</span> &nbsp;
-      <i class="fal fa-angle-down" />
+      <i v-if="showMap" class="fal fa-angle-up" />
+      <i v-else class="fal fa-angle-down" />
     </b-button>
-    <transition name="slide-fade">
-      <b-row v-if="showMap" class="map-container">
-
-        <b-col cols="12" class="group">
-          <b-row>
-            <b-col cols="12" class="header item">
-              <i class="fal fa-chart-line" />
-              <span class="title">Dashboard</span>
-            </b-col>
-          </b-row>
-        </b-col>
-        
-        <b-col cols="6" class="group">
-          <b-row>
-            <b-col cols="12" class="header">
-              <i class="fal fa-chart-line" />
-              <span class="title">Identity</span>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col cols="11" offset="1" class="item">
-              <i class="fal fa-chart-line" />
-              <span class="title">User</span>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col cols="11" offset="1" class="item">
-              <i class="fal fa-chart-line" />
-              <span class="title">Project</span>
-            </b-col>
-          </b-row>
-        </b-col>
-        <b-col cols="6" class="group">
-          <b-row>
-            <b-col cols="12" class="header">
-              <i class="fal fa-chart-line" />
-              <span class="title">Inventory</span>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col cols="11" offset="1" class="item">
-              <i class="fal fa-chart-line" />
-              <span class="title">Data Center</span>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col cols="11" offset="1" class="item">
-              <i class="fal fa-chart-line" />
-              <span class="title">Server</span>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col cols="11" offset="1" class="item">
-              <i class="fal fa-chart-line" />
-              <span class="title">Settings</span>
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
+    <transition name="fade">
+    <div v-if="showMap" class="backdrop" @click="showMap = false" />
     </transition>
-  <!-- <b-dropdown-item to="/identity/project">
-      <div class="item">
-        <i class="fal fa-project-diagram" />
-        <span class="name">Project</span>
-      </div>
-    </b-dropdown-item>
-    <b-dropdown-item to="/identity/user">
-      <div class="item">
-        <i class="fal fa-users-class" />
-        <span class="name">User</span>
-      </div>
-    </b-dropdown-item> -->
-  <!-- </b-dropdown> -->
+    <b-row class="map-container" 
+    :class="{ 'slide-fade-in': showMap,
+              'slide-fade-out': !showMap }">
+
+      <b-col cols="12" class="group">
+        <b-row>
+          <b-col cols="12" class="header item">
+            <i class="fal fa-chart-line" />
+            <span class="title" @click="showMap = false">
+              <router-link to="/dashboard">Dashboard</router-link>
+            </span>
+          </b-col>
+        </b-row>
+      </b-col>
+      
+      <b-col cols="6" class="group">
+        <b-row>
+          <b-col cols="12" class="header">
+            <i class="fal fa-address-card" />
+            <span class="title">Identity</span>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="11" offset="1" class="item">
+            <i class="fal fa-users-class" />
+            <span class="title" @click="showMap = false">
+              <router-link to="/identity/user">User</router-link>
+              </span>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="11" offset="1" class="item">
+            <i class="fal fa-project-diagram" />
+            <span class="title" @click="showMap = false">
+              <router-link to="/identity/project">Project</router-link>
+            </span>
+          </b-col>
+        </b-row>
+      </b-col>
+      <b-col cols="6" class="group">
+        <b-row>
+          <b-col cols="12" class="header">
+            <i class="fal fa-warehouse-alt" />
+            <span class="title">Inventory</span>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="11" offset="1" class="item">
+            <i class="fal fa-database" />
+            <span class="title" @click="showMap = false">
+              <router-link to="/inventory/data-center">Data Center</router-link>
+            </span>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="11" offset="1" class="item">
+            <i class="fal fa-server" />
+            <span class="title" @click="showMap = false">
+              <router-link to="/inventory/server">Server</router-link>
+            </span>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="11" offset="1" class="item">
+            <i class="fal fa-compress-arrows-alt" />
+            <span class="title" @click="showMap = false">
+              <router-link to="/inventory/collector-plugin">Collector Plugin</router-link>
+            </span>
+          </b-col>
+        </b-row>
+      </b-col>
+    </b-row>
   </span>
 </template>
 
@@ -95,7 +97,7 @@ export default {
     data: function () {
         return {
             service: this.$i18n.t('MSG.DR_SERV'),
-            showMap: true
+            showMap: false
         };
     },
     methods: {
@@ -118,31 +120,45 @@ export default {
   }
 }
 
-.slide-fade-enter-active {
+.fade-enter-active, .fade-leave-active {
   transition: all .4s ease-in-out;
 }
-.slide-fade-enter {
-  transform: translateY(-250px);
+.fade-enter, .fade-leave-to {
   opacity: 0;
 }
 
+.backdrop {
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  z-index: 10;
+  left: 0;
+  top: $header-height;
+  background-color: rgba($black, 0.3);
+}
 .map-container {
   @extend %sheet;
+  @extend %header-dropdown-trans;
   position: absolute;
-  // height: 200px;
+  z-index: 11;
   width: 500px;
   top: $header-height;
-  z-index: 3;
   background-color: $white;
   padding: 20px 15px;
+  overflow: hidden;
+
   .group {
-    border-bottom: 1px solid $blue;
+    border-bottom: 1px solid $skyblue;
     padding: 10px 15px;
+    margin-bottom: 10px;
+    color: $black;
     .header {
       vertical-align: middle;
       padding: 8px;
       font-size: 1.1rem;
       text-transform: uppercase;
+      letter-spacing: 0.04rem;
+      font-weight: 500;
       cursor: default;
       .title {
         padding-left: 10px;
@@ -151,8 +167,10 @@ export default {
     .item {
       vertical-align: middle;
       padding: 3px;
+      padding-left: 15px;
       font-size: 1.1rem;
       border-radius: 5px;
+      letter-spacing: -0.01rem;
       cursor: pointer;
       &:hover {
         background-color: $skyblue;

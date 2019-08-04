@@ -4,7 +4,7 @@ const DashboardMain = () => import('@/views/dashboard/DSBD_001_DashboardMain');
 export default {
     path: 'dashboard',
     name: 'dashboard',
-    meta: { label: 'dashboard', requiresAuth: true },
+    meta: { label: 'Dashboard', requiresAuth: true },
     components: {
         header: BaseHeader,
         main: DashboardMain
