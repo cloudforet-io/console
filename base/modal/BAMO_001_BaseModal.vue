@@ -24,59 +24,61 @@
 <script>
 import { mapGetters } from 'vuex';
 export default {
-  name: 'BaseModal',
-  event: ['ok'],
-  props: {
-    name: {
-      type: String,
-      required: true
+    name: 'BaseModal',
+    event: ['ok'],
+    props: {
+        name: {
+            type: String,
+            required: true
+        },
+        title: {
+            type: String,
+            default: null
+        },
+        centered: {
+            type: Boolean,
+            default: false
+        },
+        size: {
+            type: String,
+            default: 'lg'
+        },
+        backdropOff: {
+            type: Boolean,
+            default: false
+        },
+        hideFooter: {
+            type: Boolean,
+            default: false
+        }
     },
-    title: {
-      type: String,
-      default: null
+    data () {
+        return {
+        };
     },
-    centered: {
-      type: Boolean,
-      default: false
+    computed: {
+        ...mapGetters('modal', [
+            'isModalShown',
+            'openState'
+        ])
     },
-    size: {
-      type: String,
-      default: 'lg'
+    watch: {
+        openState (v) {
+            if (!v) {
+                this.$refs[this.name].hide();
+            }
+        }
     },
-    backdropOff: {
-      type: Boolean,
-      default: false
-    },
-    hideFooter: {
-      type: Boolean,
-      default: false
+    methods: {
+        showModal (e) {
+            this.$store.dispatch('modal/openModal');
+            this.$refs[this.name].show();
+        },
+        hideModal (e) {
+            this.$store.dispatch('modal/closeModal');
+            this.$refs[this.name].hide();
+        }
     }
-  },
-  data () {
-    return {
-    };
-  },
-  computed: {
-    ...mapGetters('modal', [
-      'isModalShown',
-      'openState'
-    ])
-  },
-  watch: {
-    openState (v) {
-      if (!v) this.$refs[this.name].hide();
-    }
-  },
-  methods: {
-    showModal (e) {
-      this.$store.dispatch('modal/openModal');
-      this.$refs[this.name].show();
-    },
-    hideModal (e) {
-      this.$store.dispatch('modal/closeModal');
-      this.$refs[this.name].hide();
-    }
-  }
 };
 </script>
 
