@@ -6,13 +6,13 @@
           <b-navbar class="header">
             <b-navbar-nav>
               <b-nav-item>
-                <b-link class="nav brand" to="/">
+                <b-link class="nav brand" to="/" @click="hideSiteMapDropdown">
                   <img src="@/asset/images/brand/dcos.png">
                 </b-link>
               </b-nav-item>
             </b-navbar-nav>
             <b-navbar-nav>
-              <b-nav-item><SiteMapDropdown class="nav" /></b-nav-item>
+              <b-nav-item><SiteMapDropdown ref="siteMap" class="nav" /></b-nav-item>
             </b-navbar-nav>
           </b-navbar>
         </b-col>
@@ -53,8 +53,15 @@ export default {
             show: false
         };
     },
-    mounted() {
+    mounted () {
         this.show = true;
+    },
+    methods: {
+        hideSiteMapDropdown () {
+            if (this.$refs.siteMap.showMap) {
+                this.$refs.siteMap.toggleShow();
+            }
+        }
     }
 };
 </script>

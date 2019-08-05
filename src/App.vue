@@ -15,6 +15,16 @@ export default {
             type: String,
             default: process.env.NODE_ENV
         }
+    },
+    data() {
+        return {
+            isRendered: false
+        };
+    },
+    mounted () {
+        setTimeout(() => {
+            this.isRendered = true;
+        }, 3000);
     }
 };
 

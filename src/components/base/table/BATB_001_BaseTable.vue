@@ -49,8 +49,9 @@
         </b-col>
       </b-row>
       <b-table class="b-table"
+               show-empty
                :items="items"
-               :fields="heads" show-empty
+               :fields="heads" 
                :striped="striped"
                :bordered="bordered" :borderless="borderless"
                :dark="dark" :hover="hover"
@@ -68,13 +69,28 @@
       >
         <template slot="table-busy">
           <b-row align-h="center">
-            <b-spinner :variant="'secondary'" />
+            <i class="fad fa-spinner fa-pulse" 
+               :style="{'margin-top': `${10}px`}"
+            />
           </b-row>
         </template>
 
         <template slot="emptyfiltered" slot-scope="scope">
           <h4>{{ scope.emptyFilteredText }}</h4>
         </template>
+
+        <!-- <template slot="thead-top" slot-scope="data">
+          <tr>
+            <th>
+                &nbsp;
+            </th>
+            <th>Type 1</th>
+            <th>
+              Type 2
+            </th>
+            <th>Type 3</th>
+          </tr>
+        </template> -->
 
         <template v-if="selectable" slot="HEAD_selected">
           <b-check v-model="isSelectedAll"
@@ -147,7 +163,7 @@ export default {
         },
         striped: {
             type: Boolean,
-            default: false
+            default: true
         },
         underlined: {
             type: Boolean,
@@ -449,12 +465,10 @@ export default {
 
 .card {
   border: 0;
-  height: 500px;
   padding-bottom: 20px;
   border-radius: inherit;
   &.no-card {
     border: 0;
-    height: 500px;
     &.no-card {
       all: unset;
 

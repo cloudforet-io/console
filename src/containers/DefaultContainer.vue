@@ -5,7 +5,6 @@
     </div>
 
     <div class="app-body">
-      <!-- <router-view name="sidebar" /> -->
       <router-view name="sub-header" />
       <main class="main ">
         <router-view name="main" />
@@ -16,13 +15,13 @@
 
 <script>
 export default {
-  name: 'DefaultContainer',
-  components: {
-  },
-  data () {
-    return {
-    };
-  }
+    name: 'DefaultContainer',
+    components: {
+    },
+    data () {
+        return {
+        };
+    }
 };
 </script>
 
