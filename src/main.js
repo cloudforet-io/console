@@ -5,7 +5,7 @@ import router from '@/routes/index';
 import store from './store';
 import dotenv from 'dotenv';
 import VueCookie from 'vue-cookie';
-import directive from '@/directive';
+import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlert from '@vuejs-pt/vue-alert';
 import Notifications from 'vue-notification';
@@ -26,7 +26,7 @@ Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
 Vue.use(CountryFlag);
 Vue.use(Notifications, { velocity });
-Vue.prototype.$axios  = api;
+Vue.prototype.$axios = api;
 
 /**
  * This is a Global Bus Event;

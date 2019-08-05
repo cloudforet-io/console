@@ -2,22 +2,22 @@
   <transition name="slide-fade">
     <div v-if="show" class="header-container">
       <b-row align-h="between" no-gutters class="main-header">
-        <b-col cols="10" class="row no-gutters">
+        <b-col cols="6" class="row no-gutters">
           <b-navbar class="header">
             <b-navbar-nav>
               <b-nav-item>
-                <b-link class="nav brand" to="/">
+                <b-link class="nav brand" to="/" @click="hideSiteMapDropdown">
                   <img src="@/asset/images/brand/dcos.png">
                 </b-link>
               </b-nav-item>
             </b-navbar-nav>
             <b-navbar-nav>
-              <b-nav-item><SiteMapDropdown class="nav" /></b-nav-item>
+              <b-nav-item><SiteMapDropdown ref="siteMap" class="nav" /></b-nav-item>
             </b-navbar-nav>
           </b-navbar>
         </b-col>
 
-        <b-col cols="2" class="row no-gutters justify-content-end">
+        <b-col cols="6" class="row no-gutters justify-content-end">
           <b-navbar class="header">
             <b-navbar-nav class="ml-auto">
               <b-nav-item><LanguageDropdown class="nav" /></b-nav-item>
@@ -41,21 +41,28 @@ import LanguageDropdown from './CTHD_003_LanguageDropdown';
 import SubHeader from './CTHD_005_SubHeader';
 
 export default {
-  name: 'BaseHeader',
-  components: {
-    LanguageDropdown,
-    SiteMapDropdown,
-    AccountDropdown,
-    SubHeader
-  },
-  data () {
-    return {
-      show: false
-    };
-  },
-  mounted() {
-    this.show = true;
-  }
+    name: 'BaseHeader',
+    components: {
+        LanguageDropdown,
+        SiteMapDropdown,
+        AccountDropdown,
+        SubHeader
+    },
+    data () {
+        return {
+            show: false
+        };
+    },
+    mounted () {
+        this.show = true;
+    },
+    methods: {
+        hideSiteMapDropdown () {
+            if (this.$refs.siteMap.showMap) {
+                this.$refs.siteMap.toggleShow();
+            }
+        }
+    }
 };
 </script>
 
@@ -67,11 +74,7 @@ export default {
   transform: translateY(calc(-#{$header-height}));
   opacity: 0;
 }
-.header-container {
-  // background: $gradient;
-}
 .main-header {
-  // background-color: rgba($white, 0.95);
   background: $gradient;
   box-shadow: 0px 0 10px 0px rgba($black, 0.5);
   height: calc(#{$header-height});

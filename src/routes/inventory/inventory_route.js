@@ -31,9 +31,9 @@ export default {
             component: Server
         },
         {
-            path: 'collector-plugin',
-            name: 'collectorPlugin',
-            meta: { label: 'Collector Plugin', requiresAuth: true },
+            path: 'settings',
+            name: 'settings',
+            meta: { label: 'Settings', requiresAuth: true },
             component: CollectorPlugin
         }
     ]

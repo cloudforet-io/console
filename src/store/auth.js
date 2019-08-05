@@ -1,13 +1,13 @@
 import { api } from '@/setup/api';
 import cookie from 'vue-cookie';
-import Vue from 'vue';
 
 export default {
     namespaced: true,
     state: {
         isLoggedIn: false,
         loginErrorCode: null,
-        nextPath: '/'
+        nextPath: '/',
+        username: ''
     },
     mutations: {
         login (state) {
@@ -18,6 +18,9 @@ export default {
         },
         setNextPath (state, { nextPath }) {
             state.nextPath = nextPath;
+        },
+        setUsername (state, { username }) {
+            state.username = username;
         }
     },
     getters: {
@@ -25,6 +28,9 @@ export default {
         nextPath: state => state.nextPath
     },
     actions: {
+        setUsername ({ commit }, { username }) {
+            commit('setUsername', { username: username });
+        },
         async login ({ commit }, { username, password }) {
             try {
                 const res = await api.post('/auth/login', {
@@ -32,6 +38,8 @@ export default {
                     password: password
                 });
                 cookie.set('sessionId', res.data.sessionId, { expires: '30m' });
+                cookie.set('username', username, { expires: '30m' });
+                commit('setUsername', { username: username });
                 commit('login');
             } catch (err) {
         /*
@@ -71,6 +79,7 @@ export default {
         async logout ({ commit }) {
             await api.post('/auth/logout');
             cookie.delete('sessionId');
+            cookie.delete('username');
             commit('logout');
         },
         setNextPath ({ commit }, { nextPath }) {

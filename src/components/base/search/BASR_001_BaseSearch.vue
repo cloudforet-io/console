@@ -30,89 +30,89 @@ import BaseInput from '@/components/base/input/BAIN_001_BaseInput';
 import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag';
 
 const testdata = [{
-  id: 0,
-  key: 'test_key',
-  label: 'TEST',
-  value: 'cloud one',
-  operator: ':',
-  type: 'String',
-  subKey: ''
+    id: 0,
+    key: 'test_key',
+    label: 'TEST',
+    value: 'cloud one',
+    operator: ':',
+    type: 'String',
+    subKey: ''
 }];
 
 const contextDataModel = {
-  queryList: [],
-  autokeyList: []
+    queryList: [],
+    autokeyList: []
 };
 
 export default {
-  name: 'BaseSearch',
-  event: ['search'],
-  directives: { focus: focus },
-  components: { BaseInput, InputTag },
-  props: {
-    contextData: {
-      type: Object,
-      default: () => Object.assign({}, contextDataModel),
-      validator (obj) {
+    name: 'BaseSearch',
+    event: ['search'],
+    directives: { focus: focus },
+    components: { BaseInput, InputTag },
+    props: {
+        contextData: {
+            type: Object,
+            default: () => Object.assign({}, contextDataModel),
+            validator (obj) {
         /**
          * TODO: Add validation for queryList format
          */
-        return obj.queryList !== undefined && obj.queryList !== null && obj.queryList instanceof Array &&
+                return obj.queryList !== undefined && obj.queryList !== null && obj.queryList instanceof Array &&
               obj.autokeyList !== undefined && obj.autokeyList !== null && obj.autokeyList instanceof Array;
-      }
-    },
-    searchData: {
-      type: Array,
-      default: () => []
-    }
-  },
-  data () {
-    return {
-      tagList: this.searchData.length > 0 ? this.searchData : [],
-      lastId: 0,
-      focusInput: false,
-      filterList: []
-    };
-  },
-  methods: {
-    focusOnInput () {
-      this.$refs.input.isFocused = true;
-    },
-    getNewTag (item) {
-      return Object.assign({ id: ++this.lastId }, item);
-    },
-    deleteAll () {
-      this.tagList = [];
-    },
-    deleteTag (idx) {
-      this.$delete(this.tagList, idx);
-    },
-    updateTag (tagId, items) {
-      let matchIdx;
-      items.map((item, idx) => {
-        if (idx === 0) {
-          this.tagList.some((tag, i) => {
-            if (tag.id === tagId) {
-matchIdx = i;
-}
-            return tag.id === tagId;
-          });
-
-          this.$set(this.tagList, matchIdx, Object.assign(this.tagList[matchIdx], item));
-        } else {
-          this.tagList.splice(matchIdx + idx, 0, this.getNewTag(item));
+            }
+        },
+        searchData: {
+            type: Array,
+            default: () => []
         }
-      });
     },
-    addTag (items) {
-      items.map(item => {
-        this.tagList.push(this.getNewTag(item));
-      });
+    data () {
+        return {
+            tagList: this.searchData.length > 0 ? this.searchData : [],
+            lastId: 0,
+            focusInput: false,
+            filterList: []
+        };
     },
-    search () {
-      this.$emit('search', this.tagList);
+    methods: {
+        focusOnInput () {
+            this.$refs.input.isFocused = true;
+        },
+        getNewTag (item) {
+            return Object.assign({ id: ++this.lastId }, item);
+        },
+        deleteAll () {
+            this.tagList = [];
+        },
+        deleteTag (idx) {
+            this.$delete(this.tagList, idx);
+        },
+        updateTag (tagId, items) {
+            let matchIdx;
+            items.map((item, idx) => {
+                if (idx === 0) {
+                    this.tagList.some((tag, i) => {
+                        if (tag.id === tagId) {
+                            matchIdx = i;
+                        }
+                        return tag.id === tagId;
+                    });
+
+                    this.$set(this.tagList, matchIdx, Object.assign(this.tagList[matchIdx], item));
+                } else {
+                    this.tagList.splice(matchIdx + idx, 0, this.getNewTag(item));
+                }
+            });
+        },
+        addTag (items) {
+            items.map(item => {
+                this.tagList.push(this.getNewTag(item));
+            });
+        },
+        search () {
+            this.$emit('search', this.tagList);
+        }
     }
-  }
 };
 </script>
 

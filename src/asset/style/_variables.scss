@@ -50,6 +50,23 @@ $box-shadow: 0px 0 10px 0px rgba($black, 0.1);
   @extend %border-radius;
 }
 
+/* TRANSITION */
+%header-dropdown-trans {
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: top;
+  &.slide-fade-in {
+    transform: scaleY(1);
+    transform-origin: top;
+    opacity: 1;
+    transition: all .4s ease-in-out;
+  }
+  &.slide-fade-out {
+    transition: all .4s ease-in-out;
+    opacity: 0;
+  }
+}
+
 
 
 

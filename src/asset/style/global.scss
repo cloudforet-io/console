@@ -20,10 +20,13 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
-i {
+i, span, div, h1, h2, h3, h4, h5, h6, input,
+textarea, article, main {
   color: inherit;
   font-size: inherit;
   font-weight: inherit;
+  word-spacing: inherit;
+  letter-spacing: inherit;
 }
 textarea:focus, input:focus{
   outline: none;
@@ -34,6 +37,13 @@ textarea:focus, input:focus{
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-big;
   margin: 0;
+}
+a {
+  color: inherit;
+  &:hover {
+    color: inherit;
+    text-decoration: unset;
+  }
 }
 
 
@@ -63,15 +73,12 @@ h1, h2, h3, h4, h5, h6 {
 
 
 /* Base Table */
-// .table-striped tbody tr:nth-of-type(odd) {
-//   background-color: $lightgray;
-//   &.tbody-tr-selected {
-//     background-color: $skyblue;
-//   }
-// }
 .table.b-table {
-  border-collapse: separate; 
-  border-spacing: 0; 
+  // border-collapse: separate; 
+  // border-spacing: 0; 
+  th, td {
+    padding: 8px;
+  }
   td:last-child {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
@@ -82,29 +89,44 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: darken($whiteblue, 1%);
+  &.tbody-tr-selected {
+    background-color: darken($skyblue, 3%);
+  }
+}
+
 .table-hover tbody tr:hover {
-  background-color: $lightgray;
+  background-color: darken($whiteblue, 5%);
   &.tbody-tr-selected {
     background-color: darken($skyblue, 7%);
   }
 }
+
 .tbody-tr-selected {
   background-color: darken($skyblue, 3%);
-  // box-shadow: 0 1px 5px 0 rgba($blue, 0.4);
 }
 
 .tbody-tr-default {
   cursor: pointer;
-  border-radius: 5px;
 }
+
 .tbody-tr-underlined {
-  border-bottom: 1px solid rgba($lightgray, 0.5);
+  border-bottom: 1px solid $lightgray;
+  &:first-child {
+    border-top: 1px solid $lightgray;
+  }
+  &:last-child {
+    border-bottom: none;
+  }
 }
+
 .table.b-table[aria-busy='true'] {// Busy table styling
   opacity: 1;
   .b-table-busy-slot {
     background-color: transparent;
     border: none;
+    font-size: 2rem;
     td {
       vertical-align: middle;
     }
@@ -137,7 +159,6 @@ h1, h2, h3, h4, h5, h6 {
     color: $black;
     background-color: transparent;
     .item {
-      // background-color: $lightgray;
       font-weight: 500;
     }
   }
@@ -146,9 +167,6 @@ h1, h2, h3, h4, h5, h6 {
     background-color: transparent;
     .item {
       background-color: $skyblue; 
-      &:hover, &:focus {
-        // background-color: darken($skyblue, 5%); 
-      }
     }
   }
   /* TODO: separate this part to components */

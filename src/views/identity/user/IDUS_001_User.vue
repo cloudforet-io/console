@@ -84,7 +84,7 @@ export default {
         return {
             fields: [
                 { key: 'selected' },
-                { key: 'userId', label: 'ID', sortable: true, ajaxSortable: false },
+                { key: 'userId', label: 'ID', sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
                 { key: 'name', label: 'Name', sortable: true, ajaxSortable: true },
                 { key: 'email', label: 'Email', sortable: true, ajaxSortable: false },
                 { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false },
@@ -106,7 +106,7 @@ export default {
             totalCount: 17,
             queryData: query,
             isReadyForSearch: false,
-            perPage: 3,
+            perPage: 10,
             isLoading: true
         };
     },
