@@ -4,18 +4,20 @@
 
 <script>
 export default {
-  name: 'InventoryMain',
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      vm.$store.dispatch('subHeader/setNavList', [
-        { label: 'Inventory', link: '/inventory' },
-        { label: 'Data Center', link: '/inventory/data-center' },
-        { label: 'Server', link: '/inventory/server' },
-        { label: 'Collector Plugin', link: '/inventory/collector-plugin' },
-      ]);
-    });
-  },
-}
+    name: 'InventoryMain',
+    beforeRouteEnter (to, from, next) {
+        next(vm => {
+            vm.$store.dispatch('subHeader/setSubHeader', {
+                headerGroup: { label: 'Inventory', link: '/inventory', icon: 'fal fa-warehouse-alt' },
+                headerList: [
+                    { label: 'Data Center', link: '/inventory/data-center' },
+                    { label: 'Server', link: '/inventory/server' },
+                    { label: 'Settings', link: '/inventory/settings' }
+                ]
+            });
+        });
+    }
+};
 </script>
 
 <style lang="scss" scoped>

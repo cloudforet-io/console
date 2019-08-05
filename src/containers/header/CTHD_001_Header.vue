@@ -2,7 +2,7 @@
   <transition name="slide-fade">
     <div v-if="show" class="header-container">
       <b-row align-h="between" no-gutters class="main-header">
-        <b-col cols="10" class="row no-gutters">
+        <b-col cols="6" class="row no-gutters">
           <b-navbar class="header">
             <b-navbar-nav>
               <b-nav-item>
@@ -17,7 +17,7 @@
           </b-navbar>
         </b-col>
 
-        <b-col cols="2" class="row no-gutters justify-content-end">
+        <b-col cols="6" class="row no-gutters justify-content-end">
           <b-navbar class="header">
             <b-navbar-nav class="ml-auto">
               <b-nav-item><LanguageDropdown class="nav" /></b-nav-item>

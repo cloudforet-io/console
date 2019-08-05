@@ -4,16 +4,18 @@
 
 <script>
 export default {
-  name: 'IdentityMain',
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      vm.$store.dispatch('subHeader/setNavList', [
-        { label: 'Identity', link: '/identity' },
-        { label: 'User', link: '/identity/user' },
-        { label: 'Project', link: '/identity/project' }
-      ]);
-    });
-  },
+    name: 'IdentityMain',
+    beforeRouteEnter (to, from, next) {
+        next(vm => {
+            vm.$store.dispatch('subHeader/setSubHeader', {
+                headerGroup: { label: 'Identity', link: '/identity', icon: 'fal fa-address-card' },
+                headerList: [
+                    { label: 'User', link: '/identity/user' },
+                    { label: 'Project', link: '/identity/project' }
+                ]
+            });
+        });
+    }
 };
 </script>
 

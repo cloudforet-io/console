@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn">
+  <div class="animated fadeIn pt-4 pl-3 pr-3">
     <b-row>
       <b-col sm="6" lg="3">
         <b-card no-body class="bg-primary">
@@ -875,121 +875,122 @@ import CalloutChartExample from '@/components/dashboard/CalloutChartExample';
 import { Callout } from '@coreui/vue';
 
 export default {
-  name: 'Dashboard',
-  components: {
-    Callout,
-    CardLine1ChartExample,
-    CardLine2ChartExample,
-    CardLine3ChartExample,
-    CardBarChartExample,
-    MainChartExample,
-    SocialBoxChartExample,
-    CalloutChartExample
-  },
-  data: function () {
-    return {
-      selected: 'Month',
-      tableItems: [
-        {
-          avatar: { url: 'images/avatars/1.jpg', status: 'success' },
-          user: { name: 'Yiorgos Avraamu', new: true, registered: 'Jan 1, 2015' },
-          country: { name: 'USA', flag: 'us' },
-          usage: { value: 50, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Mastercard', icon: 'fab fa-cc-mastercard' },
-          activity: '10 sec ago'
-        },
-        {
-          avatar: { url: 'images/avatars/2.jpg', status: 'danger' },
-          user: { name: 'Avram Tarasios', new: false, registered: 'Jan 1, 2015' },
-          country: { name: 'Brazil', flag: 'br' },
-          usage: { value: 22, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Visa', icon: 'fab fa-cc-visa' },
-          activity: '5 minutes ago'
-        },
-        {
-          avatar: { url: 'images/avatars/3.jpg', status: 'warning' },
-          user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2015' },
-          country: { name: 'India', flag: 'in' },
-          usage: { value: 74, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Stripe', icon: 'fab fa-cc-stripe' },
-          activity: '1 hour ago'
-        },
-        {
-          avatar: { url: 'images/avatars/4.jpg', status: '' },
-          user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2015' },
-          country: { name: 'France', flag: 'fr' },
-          usage: { value: 98, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'PayPal', icon: 'fab fa-paypal' },
-          activity: 'Last month'
-        },
-        {
-          avatar: { url: 'images/avatars/5.jpg', status: 'success' },
-          user: { name: 'Agapetus Tadeáš', new: true, registered: 'Jan 1, 2015' },
-          country: { name: 'Spain', flag: 'es' },
-          usage: { value: 22, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Google Wallet', icon: 'fab fa-google-wallet' },
-          activity: 'Last week'
-        },
-        {
-          avatar: { url: 'images/avatars/6.jpg', status: 'danger' },
-          user: { name: 'Friderik Dávid', new: true, registered: 'Jan 1, 2015' },
-          country: { name: 'Poland', flag: 'pl' },
-          usage: { value: 43, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Amex', icon: 'fab fa-cc-amex' },
-          activity: 'Last week'
-        }
-      ],
-      tableFields: {
-        avatar: {
-          label: '<i class="icon-people"></i>',
-          class: 'text-center'
-        },
-        user: {
-          label: 'User'
-        },
-        country: {
-          label: 'Country',
-          class: 'text-center'
-        },
-        usage: {
-          label: 'Usage'
-        },
-        payment: {
-          label: 'Payment method',
-          class: 'text-center'
-        },
-        activity: {
-          label: 'Activity'
-        }
-      }
-    };
-  },
-  computed: {
-  },
-  methods: {
-    variant (value) {
-      let $variant;
-      if (value <= 25) {
-        $variant = 'info';
-      } else if (value > 25 && value <= 50) {
-        $variant = 'success';
-      } else if (value > 50 && value <= 75) {
-        $variant = 'warning';
-      } else if (value > 75 && value <= 100) {
-        $variant = 'danger';
-      }
-      return $variant;
+    name: 'Dashboard',
+    components: {
+        Callout,
+        CardLine1ChartExample,
+        CardLine2ChartExample,
+        CardLine3ChartExample,
+        CardBarChartExample,
+        MainChartExample,
+        SocialBoxChartExample,
+        CalloutChartExample
     },
-    flag (value) {
-      return 'flag-icon flag-icon-' + value;
+    data: function () {
+        return {
+            selected: 'Month',
+            tableItems: [
+                {
+                    avatar: { url: 'images/avatars/1.jpg', status: 'success' },
+                    user: { name: 'Yiorgos Avraamu', new: true, registered: 'Jan 1, 2015' },
+                    country: { name: 'USA', flag: 'us' },
+                    usage: { value: 50, period: 'Jun 11, 2015 - Jul 10, 2015' },
+                    payment: { name: 'Mastercard', icon: 'fab fa-cc-mastercard' },
+                    activity: '10 sec ago'
+                },
+                {
+                    avatar: { url: 'images/avatars/2.jpg', status: 'danger' },
+                    user: { name: 'Avram Tarasios', new: false, registered: 'Jan 1, 2015' },
+                    country: { name: 'Brazil', flag: 'br' },
+                    usage: { value: 22, period: 'Jun 11, 2015 - Jul 10, 2015' },
+                    payment: { name: 'Visa', icon: 'fab fa-cc-visa' },
+                    activity: '5 minutes ago'
+                },
+                {
+                    avatar: { url: 'images/avatars/3.jpg', status: 'warning' },
+                    user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2015' },
+                    country: { name: 'India', flag: 'in' },
+                    usage: { value: 74, period: 'Jun 11, 2015 - Jul 10, 2015' },
+                    payment: { name: 'Stripe', icon: 'fab fa-cc-stripe' },
+                    activity: '1 hour ago'
+                },
+                {
+                    avatar: { url: 'images/avatars/4.jpg', status: '' },
+                    user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2015' },
+                    country: { name: 'France', flag: 'fr' },
+                    usage: { value: 98, period: 'Jun 11, 2015 - Jul 10, 2015' },
+                    payment: { name: 'PayPal', icon: 'fab fa-paypal' },
+                    activity: 'Last month'
+                },
+                {
+                    avatar: { url: 'images/avatars/5.jpg', status: 'success' },
+                    user: { name: 'Agapetus Tadeáš', new: true, registered: 'Jan 1, 2015' },
+                    country: { name: 'Spain', flag: 'es' },
+                    usage: { value: 22, period: 'Jun 11, 2015 - Jul 10, 2015' },
+                    payment: { name: 'Google Wallet', icon: 'fab fa-google-wallet' },
+                    activity: 'Last week'
+                },
+                {
+                    avatar: { url: 'images/avatars/6.jpg', status: 'danger' },
+                    user: { name: 'Friderik Dávid', new: true, registered: 'Jan 1, 2015' },
+                    country: { name: 'Poland', flag: 'pl' },
+                    usage: { value: 43, period: 'Jun 11, 2015 - Jul 10, 2015' },
+                    payment: { name: 'Amex', icon: 'fab fa-cc-amex' },
+                    activity: 'Last week'
+                }
+            ],
+            tableFields: {
+                avatar: {
+                    label: '<i class="icon-people"></i>',
+                    class: 'text-center'
+                },
+                user: {
+                    label: 'User'
+                },
+                country: {
+                    label: 'Country',
+                    class: 'text-center'
+                },
+                usage: {
+                    label: 'Usage'
+                },
+                payment: {
+                    label: 'Payment method',
+                    class: 'text-center'
+                },
+                activity: {
+                    label: 'Activity'
+                }
+            }
+        };
+    },
+    computed: {
+    },
+    methods: {
+        variant (value) {
+            let $variant;
+            if (value <= 25) {
+                $variant = 'info';
+            } else if (value > 25 && value <= 50) {
+                $variant = 'success';
+            } else if (value > 50 && value <= 75) {
+                $variant = 'warning';
+            } else if (value > 75 && value <= 100) {
+                $variant = 'danger';
+            }
+            return $variant;
+        },
+        flag (value) {
+            return 'flag-icon flag-icon-' + value;
+        }
+    },
+    beforeRouteEnter (to, from, next) {
+        next(vm => {
+            vm.$store.dispatch('subHeader/setSubHeader', {
+                headerGroup: { label: 'Dashboard', link: '/dashboard', icon: 'fal fa-chart-line' },
+                headerList: []
+            });
+        });
     }
-  },
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      vm.$store.dispatch('subHeader/setNavList', [
-        { label: 'Dashboard', link: '/dashboard' }
-        ]);
-    });
-  },
 };
 </script>

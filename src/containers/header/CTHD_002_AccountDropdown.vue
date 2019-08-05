@@ -1,8 +1,7 @@
 <template>
   <b-dropdown size="sm" right no-caret>
     <template slot="button-content">
-      <!-- <i class="icon-user" /> -->
-      <span class="name">Username</span>
+      <span class="name">{{ $store.state.auth.username }}</span>
     </template>
     <b-dropdown-item @click="logout">
       <div class="item">
@@ -15,21 +14,20 @@
 
 <script>
 export default {
-  name: 'AccountDropdown',
-  components: {
-  },
-  methods: {
-    async logout () {
-      await this.$store.dispatch('auth/logout');
-      this.$router.push({ path: '/log-in' });
+    name: 'AccountDropdown',
+    components: {
+    },
+    methods: {
+        async logout () {
+            await this.$store.dispatch('auth/logout');
+            this.$router.push({ path: '/log-in' });
+        }
     }
-  }
 };
 </script>
 
 <style lang="scss" scoped>
 .icon-user {
-  // text-shadow: 3px 2px 3px rgba($black, 0.1);
   margin-right: 8px;
 }
 </style>
