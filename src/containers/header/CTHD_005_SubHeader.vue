@@ -1,19 +1,4 @@
 <template>
-  <!-- <div class="sub-header">
-    <div v-for="(nav, idx) in subHeaderList" :key="nav.label"
-         :class="{ 'header-group': idx === 0,
-                   'item': idx !== 0,
-                   'active': $route.meta.label === nav.label }"
-    >
-      <span class="title">
-        <router-link :to="nav.link">
-          <template v-if="nav.icon"><i :class="nav.icon" />&nbsp;&nbsp;</template>
-          {{ nav.label }}
-        </router-link>
-      </span>
-      <span v-if="idx === 0" class="triangle" />
-    </div>
-  </div> -->
   <b-row class="sub-header" no-gutters>
     <b-col cols="1" class="header-group">
       <span class="label"><i :class="subHeaderGroup.icon" />&nbsp;&nbsp;{{ subHeaderGroup.label }}</span>
