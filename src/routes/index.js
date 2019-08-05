@@ -14,7 +14,7 @@ import inventoryRoute from '@/routes/inventory/inventory_route';
 const DefaultContainer = () => import('@/containers/DefaultContainer');
 
 // Views
-const LogIn = () => import('@/views/common/LogIn');
+const LogIn = () => import('@/views/common/VICO_002_LogIn');
 
 const attatchLangauge = (to, from, next) => {
     if (!to.params.lang) {
