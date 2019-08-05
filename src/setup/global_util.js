@@ -31,8 +31,10 @@ export const Mixin = {
             let idx = 0;
 
             for (let i = 0; i < l; i++) {
-                if (r) { returnColorVal.push(selectedColor[Math.floor(Math.random() * selectedColor.length)]);
-                } else { idx = i >= selectedColor.length ? l%selectedColor.length : i;
+                if (r) {
+                    returnColorVal.push(selectedColor[Math.floor(Math.random() * selectedColor.length)]);
+                } else {
+                    idx = i >= selectedColor.length ? l%selectedColor.length : i;
                     returnColorVal.push(selectedColor[idx]);
                 }
             }
@@ -88,8 +90,11 @@ export const Mixin = {
      **********************************************************************************/
         sideBarMiniMaxControl: function () {
             let currentStatus = document.body.className;
-            if (currentStatus.indexOf('sidebar-minimized brand-minimized') > -1) document.body.className = 'sidebar-lg-show header-fixed sidebar-fixed';
-            else document.body.className = 'sidebar-lg-show header-fixed sidebar-fixed sidebar-minimized brand-minimized';
+            if (currentStatus.indexOf('sidebar-minimized brand-minimized') > -1) {
+                document.body.className = 'sidebar-lg-show header-fixed sidebar-fixed';
+            } else {
+                document.body.className = 'sidebar-lg-show header-fixed sidebar-fixed sidebar-minimized brand-minimized';
+            }
         },
     /**********************************************************************************
      * Name       : selectBadges
@@ -121,7 +126,9 @@ export const Mixin = {
      * Description:  Select badges variant by given val
      **********************************************************************************/
         capitalize: (s) => {
-            if (typeof s !== 'string') return '';
+            if (typeof s !== 'string') {
+                return '';
+            }
             return s.charAt(0).toUpperCase() + s.slice(1);
         },
     /**********************************************************************************
@@ -164,7 +171,7 @@ export const Mixin = {
             } else if(t.toUpperCase() ==='D' || t.toUpperCase() ==='F') {
                 return (!isNaN(parseFloat(d)));
             } else if(t.toUpperCase() ==='B') {
-                return  ['1','0',1,0,true, false].includes(d);
+                return  ['1', '0', 1, 0, true, false].includes(d);
             } else if(t.toUpperCase() ==='S') {
                 return  (typeof d === 'string' || d instanceof String);
             } else if(t.toUpperCase() ==='O') {
@@ -174,12 +181,75 @@ export const Mixin = {
             } else {
                 throw 'Please, Check data type';
             }
+        },
+    /**********************************************************************************
+     * Name       : selectIconHtml
+     * Input   => (o: icon object   =>  Object)
+     *            {type: type of font awesome ex: fal, fab,
+     *             icon: icon name,
+     *             size: size of icon ex: -1 ~ 10
+     *             color: variant color
+     *            }
+     * Output  => boolean whether it's checked type
+     * Description:  Create a string of <i/> Dom tag with given option
+     **********************************************************************************/
+        selectIconHtml: function (o) {
+            //Note:: Please add a new type letter when New font Type has added.
+            const fontAwesome = ['l','b'];
+            let returnHtml = '';
+            let defaultClass = 'fal ';
+            if (o.hasOwnProperty('type') && fontAwesome.includes(o.type)) {
+                defaultClass = 'fa' + o.type + ' ';
+            }
+            if (o.hasOwnProperty('icon')) {
+                defaultClass += o.icon;
+            }else {
+                defaultClass += 'fa-hashtag';
+            }
+            if (o.hasOwnProperty('size') && o.size > -2 && o.size <= 10) {
+                if(o.size === -1){
+                    defaultClass += ' fa-xs';
+                }else if(o.size === 0){
+                    defaultClass += ' fa-sm';
+                }else if(o.size === 1){
+                    defaultClass += ' fa-lg';
+                }else {
+                    defaultClass += ' fa-'+ o.size +'x';
+                }
+            }
+            if(o.hasOwnProperty('color')) {
+                defaultClass += ' ' + o.color;
+            }
+            returnHtml =`<i class="${defaultClass}"> </i>`;
+            return returnHtml;
+        },
+    /**********************************************************************************
+     * Name       : tr
+     * Input   => (m: message   =>  String)
+     *            {type: type of font awesome ex: fal, fab,
+     *             icon: icon name,
+     *             size: size of icon ex: -1 ~ 10
+     *             color: variant color
+     *            }
+     * Output  => boolean whether it's checked type
+     * Description:  translation of i18n
+     **********************************************************************************/
+        tr: function (m) {
+            let path = m.split('.');
+            let key = 'MSG';
+            if (path[0] !=='MSG' && path.length < 2){
+                key += '.'+m;
+            }else {
+                key = m;
+            }
+            return  this.$i18n.t(key);
         }
     },
+
     data: function () {
-        let status = (document.body.className.indexOf('sidebar-minimized brand-minimized') > -1) ? true : false;
+        //let status = (document.body.className.indexOf('sidebar-minimized brand-minimized') > -1) ? true : false;
         return {
-            sideBarIsMinimized: status,
+            //sideBarIsMinimized: status,
             currentNodeEnv: null
         };
     }

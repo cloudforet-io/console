@@ -47,8 +47,6 @@ a {
 }
 
 
-
-
 /*************************
  ********** APP **********
  *************************/
@@ -333,4 +331,29 @@ a {
     border-top-left-radius: $border-radius;
     border-top-right-radius: $border-radius;
   }
+}
+
+/* i Tag: icon */
+.primary{
+  color:$blue;
+}
+
+.info {
+  color:$blueviolet;
+}
+
+.dark {
+  color:$navy;
+}
+
+.secondary {
+  color:$gray;
+}
+
+.success {
+  color:$green;
+}
+
+.danger {
+  color:$red;
 }

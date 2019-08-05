@@ -1,7 +1,7 @@
 <template>
   <span class="site-map-component">
     <b-button class="btn toggle" @click.stop="toggleShow">
-      <span>{{ $i18n.t('MSG.DR_SERV') }}</span> &nbsp;
+      <span>{{tr('DR_SERV')}}</span> &nbsp;
       <i v-if="showMap" class="fal fa-angle-up" />
       <i v-else class="fal fa-angle-down" />
     </b-button>

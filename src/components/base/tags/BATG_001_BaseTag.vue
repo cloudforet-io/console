@@ -17,7 +17,9 @@
     <b-row v-if="isEditable" no-gutters>
       <b-col cols="6" class="mt-1">
         <span class="add-btn" @click="addRow">
-          <span class="icon"><i class="fal fa-plus-square" /></span>
+          <span class="icon">
+            <i class="fal fa-plus-square" />
+          </span>
           Add New
         </span>
       </b-col>
@@ -36,61 +38,61 @@
 <script>
 import KeyValueInput from '@/components/base/input/BAIN_003_KeyValueInput';
 export default {
-  name: 'BaseTag',
-  components: { KeyValueInput },
-  props: {
-    tagData: {
-      type: Array,
-      default: () => []
+    name: 'BaseTag',
+    components: { KeyValueInput },
+    props: {
+        tagData: {
+            type: Array,
+            default: () => []
+        },
+        showFirstTagRow: {
+            type: Boolean,
+            default: false
+        },
+        editable: {
+            type: Boolean,
+            default: false
+        }
     },
-    showFirstTagRow: {
-      type: Boolean,
-      default: false
+    data () {
+        return {
+            rows: this.tagData.map((tag, i) => ({ rowId: i, tag: tag })),
+            lastRowId: this.tagData.length,
+            isEditable: this.editable,
+            showSaveBtn: false
+        };
     },
-    editable: {
-      type: Boolean,
-      default: false
+    computed: {
+    },
+    mounted: function () {
+        if (this.showFirstTagRow) {
+            this.isEditable = true;
+            this.addRow();
+        }
+    },
+    methods: {
+        addRow () {
+            this.rows.push({ rowId: this.lastRowId++, tag: {}});
+        },
+        deleteRow (idx) {
+            this.$delete(this.rows, idx);
+        },
+        resetRows () {
+            this.rows = this.tagData.map((tag, i) => ({ rowId: i, tag: tag }));
+        },
+        onSave () {
+            this.showSaveBtn = false;
+            this.isEditable = false;
+        },
+        onEdit () {
+            this.showSaveBtn = true;
+            this.isEditable = true;
+        },
+        onCancel () {
+            this.showSaveBtn = false;
+            this.isEditable = false;
+        }
     }
-  },
-  data () {
-    return {
-      rows: this.tagData.map((tag, i) => ({ rowId: i, tag: tag })),
-      lastRowId: this.tagData.length,
-      isEditable: this.editable,
-      showSaveBtn: false
-    };
-  },
-  computed: {
-  },
-  mounted: function () {
-    if (this.showFirstTagRow) {
-      this.isEditable = true;
-      this.addRow();
-    }
-  },
-  methods: {
-    addRow () {
-      this.rows.push({ rowId: this.lastRowId++, tag: {} });
-    },
-    deleteRow (idx) {
-      this.$delete(this.rows, idx);
-    },
-    resetRows () {
-      this.rows = this.tagData.map((tag, i) => ({ rowId: i, tag: tag }));
-    },
-    onSave () {
-      this.showSaveBtn = false;
-      this.isEditable = false;
-    },
-    onEdit () {
-      this.showSaveBtn = true;
-      this.isEditable = true;
-    },
-    onCancel () {
-      this.showSaveBtn = false;
-      this.isEditable = false;
-    }
-  }
 };
 </script>
 

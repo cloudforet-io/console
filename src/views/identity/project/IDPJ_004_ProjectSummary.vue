@@ -15,6 +15,7 @@
                 <span class="copy-clipboard"
                       title="Copy to Clipboard"
                       @click="CopyToClipboard(info.contents)"
+                      v-b-tooltip.hover
                 >
                   <i class="fal fa-copy" />
                 </span>
@@ -138,28 +139,28 @@ export default {
     },
     mounted: function () {
 
-  },
-  created: function () {
-    this.setDummnyData();
-    this.$bus.$on('treeSelectedEvent', this.setDummnyData);
-  },
-  beforeDestroy: function () {
-    this.$bus.$off('treeSelectedEvent');
-  },
-  methods: {
-    CopyToClipboard (text) {
-      this.selectToCopyToClipboard(text);
     },
-    displayAll: function (params) {
-      this.sampleDropData2.dropDownTitle = params.optionTitle;
+    created: function () {
+        this.setDummnyData();
+        this.$bus.$on('treeSelectedEvent', this.setDummnyData);
     },
-    displayVM: function (params) {
-      this.sampleDropData2.dropDownTitle = params.optionTitle;
+    beforeDestroy: function () {
+        this.$bus.$off('treeSelectedEvent');
     },
-    displayOS: function (params) {
-      this.sampleDropData2.dropDownTitle = params.optionTitle;
-    },
-    setDummnyData: function () {
+    methods: {
+        CopyToClipboard (text) {
+            this.selectToCopyToClipboard(text);
+        },
+        displayAll: function (params) {
+            this.sampleDropData2.dropDownTitle = params.optionTitle;
+        },
+        displayVM: function (params) {
+            this.sampleDropData2.dropDownTitle = params.optionTitle;
+        },
+        displayOS: function (params) {
+            this.sampleDropData2.dropDownTitle = params.optionTitle;
+        },
+        setDummnyData: function () {
         /*
         * Here's Data Set for Current Page
         * 1. sampleBaseInformation : Base Information Data
@@ -167,107 +168,107 @@ export default {
         * 3. sampleAsset : Data for Asset
         */
 
-      const sampleBaseInformation = [
-        { title: 'ID', contents: 'pg-6bc72053' },
-        { title: 'Name', contents: 'AWS KR' },
-        { title: 'Created', contents: '2019-05-12' },
-        { title: '', contents: '' }
-      ];
+            const sampleBaseInformation = [
+                { title: 'ID', contents: 'pg-6bc72053' },
+                { title: 'Name', contents: 'AWS KR' },
+                { title: 'Created', contents: '2019-05-12' },
+                { title: '', contents: '' }
+            ];
 
-      const sampleBaseTag = [
-        { tagKey: 'Japan', tagValue: 'Tokyo' },
-        { tagKey: 'South Korea', tagValue: 'Seoul' },
-        { tagKey: 'USA', tagValue: 'Washington D.C.' },
-        { tagKey: 'Canada', tagValue: 'Ottawa' },
-        { tagKey: 'Austria', tagValue: 'Vienna' },
-        { tagKey: 'Germany', tagValue: 'Berlin' },
-        { tagKey: 'G.B', tagValue: 'London' },
-        { tagKey: 'France', tagValue: 'Paris' }
-      ];
+            const sampleBaseTag = [
+                { tagKey: 'Japan', tagValue: 'Tokyo' },
+                { tagKey: 'South Korea', tagValue: 'Seoul' },
+                { tagKey: 'USA', tagValue: 'Washington D.C.' },
+                { tagKey: 'Canada', tagValue: 'Ottawa' },
+                { tagKey: 'Austria', tagValue: 'Vienna' },
+                { tagKey: 'Germany', tagValue: 'Berlin' },
+                { tagKey: 'G.B', tagValue: 'London' },
+                { tagKey: 'France', tagValue: 'Paris' }
+            ];
 
-      const sampleAsset = [
-        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
-        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
-        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
-        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
-        { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
-        { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
-        { asKey: 'Project', assetValue: 17, linkURL: 'www.bing.com', icon: 'fal fa-star' },
-        { asKey: 'Member', assetValue: 0, linkURL: 'www.naver.com', icon: 'fal fa-users' }
-      ];
+            const sampleAsset = [
+                { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
+                { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
+                { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
+                { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
+                { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
+                { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
+                { asKey: 'Project', assetValue: 17, linkURL: 'www.bing.com', icon: 'fal fa-star' },
+                { asKey: 'Member', assetValue: 0, linkURL: 'www.naver.com', icon: 'fal fa-users' }
+            ];
 
-      const chartTitleSampleData1 = {
-        isTitleIconUsed: true,
-        TitleIconClass: 'fal fa-globe',
-        cardTitle: 'Server By Region',
-        isDropdownUSed: false
-      };
+            const chartTitleSampleData1 = {
+                isTitleIconUsed: true,
+                TitleIconClass: 'fal fa-globe',
+                cardTitle: 'Server By Region',
+                isDropdownUSed: false
+            };
 
-      const chartTitleSampleData2 = {
-        isTitleIconUsed: true,
-        TitleIconClass: 'fal fa-tag',
-        cardTitle: 'Server by Type',
-        isDropdownUsed: true
-      };
+            const chartTitleSampleData2 = {
+                isTitleIconUsed: true,
+                TitleIconClass: 'fal fa-tag',
+                cardTitle: 'Server by Type',
+                isDropdownUsed: true
+            };
 
-      const chartTitleDropSampleData2 = {
-        dropDownTitle: 'All Types',
-        dropDownDataArr: [
-          { optionId: 'AT', optionTitle: 'All Types', optionClickMethod: 'displayAll' },
-          { optionId: 'VM', optionTitle: 'VM', optionClickMethod: 'displayVM' },
-          { optionId: 'OS', optionTitle: 'OS', optionClickMethod: 'displayOS' }
-        ]
-      };
+            const chartTitleDropSampleData2 = {
+                dropDownTitle: 'All Types',
+                dropDownDataArr: [
+                    { optionId: 'AT', optionTitle: 'All Types', optionClickMethod: 'displayAll' },
+                    { optionId: 'VM', optionTitle: 'VM', optionClickMethod: 'displayVM' },
+                    { optionId: 'OS', optionTitle: 'OS', optionClickMethod: 'displayOS' }
+                ]
+            };
 
-      const chartDataAndOption1 = {
-        data: {
-          labels: ['S.Korea', 'USA', 'Russia', 'Italy', 'Mexico', 'China'],
-          datasets: [
-            {
-              backgroundColor: this.getGraphColor(true, false, 6),
-              data: [40.2, 120, 80.7, 10.9, 114, 121.02]
-            }
-          ]
-        },
-        option: {
-          responsive: true,
-          maintainAspectRatio: true,
-          legend: {
-            display: false
-          }
+            const chartDataAndOption1 = {
+                data: {
+                    labels: ['S.Korea', 'USA', 'Russia', 'Italy', 'Mexico', 'China'],
+                    datasets: [
+                        {
+                            backgroundColor: this.getGraphColor(true, false, 6),
+                            data: [40.2, 120, 80.7, 10.9, 114, 121.02]
+                        }
+                    ]
+                },
+                option: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    legend: {
+                        display: false
+                    }
+                }
+            };
+
+            let Colors = this.getGraphColor(true, false, 3);
+            const chartDataAndOption2 = {
+                data: {
+                    labels: ['AWS', 'MS Azure', 'Google cloud'],
+                    datasets: [{
+                        data: [12, 4, 8],
+                        backgroundColor: Colors,
+                        hoverBackgroundColor: Colors
+                    }]
+                },
+                option: {
+                    tooltipUseYN: 1,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false
+                    }
+                }
+            };
+
+            this.summaryBaseInfo = sampleBaseInformation;
+            this.summaryBaseTag = sampleBaseTag;
+            this.summaryAsset = sampleAsset;
+            this.sampleTitleData1 = chartTitleSampleData1;
+            this.sampleTitleData2 = chartTitleSampleData2;
+            this.sampleDropData2 = chartTitleDropSampleData2;
+            this.chartDataAndOption1 = chartDataAndOption1;
+            this.chartDataAndOption2 = chartDataAndOption2;
         }
-      };
-
-      let Colors = this.getGraphColor(true, false, 3);
-      const chartDataAndOption2 = {
-        data: {
-          labels: ['AWS', 'MS Azure', 'Google cloud'],
-          datasets: [{
-            data: [12, 4, 8],
-            backgroundColor: Colors,
-            hoverBackgroundColor: Colors
-          }]
-        },
-        option: {
-          tooltipUseYN: 1,
-          responsive: true,
-          maintainAspectRatio: false,
-          legend: {
-            display: false
-          }
-        }
-      };
-
-      this.summaryBaseInfo = sampleBaseInformation;
-      this.summaryBaseTag = sampleBaseTag;
-      this.summaryAsset = sampleAsset;
-      this.sampleTitleData1 = chartTitleSampleData1;
-      this.sampleTitleData2 = chartTitleSampleData2;
-      this.sampleDropData2 = chartTitleDropSampleData2;
-      this.chartDataAndOption1 = chartDataAndOption1;
-      this.chartDataAndOption2 = chartDataAndOption2;
     }
-  }
 };
 </script>
 

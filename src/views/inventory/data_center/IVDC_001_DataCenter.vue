@@ -2,10 +2,10 @@
   <div div class="animated fadeIn">
     <div class="row">
       <div class="col-12">
-        <BaseModal id="IDPJ001_Project_Edit_Modal"
+        <BaseModal id="IVRJ001_Region_Zone_Edit_Modal"
                    ref="Modal"
                    :name="'EditModal'"
-                   :title="projectModalTitle"
+                   :title="dataCenterModalTitle"
                    :centered="true"
                    :hide-footer="true"
         >
@@ -19,8 +19,8 @@
                       :is-creatable="createProcess"
                       :is-updatable="updateProcess"
                       :is-footer-visible="true"
-                      @create="createProject"
-                      @update="updateProject"
+                      @create="createDataCenter"
+                      @update="updateDataCenter"
             >
               <template #ModaltabContentsPanel />
             </BaseTabs>
@@ -29,8 +29,7 @@
       </div>
     </div>
 
-    <BaseTree ref="projectTree"
-              :tree-prop="treeData"
+    <BaseTree :tree-prop="treeData"
               @selected="NodeSelected"
               @edited="editSelected"
     >
@@ -49,14 +48,17 @@
 
 <script>
 
-import projectSummary from './IDPJ_004_ProjectSummary.vue';
-import projectAudit from './IDPJ_007_ProjectAudit.vue';
-import projectMember from './IDPJ_005_ProjectMember.vue';
+
 
 import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
 import BaseTabs from '@/components/base/tab/BATA_001_BaseTab';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseTree from '@/components/base/tree/BATR_001_BaseTree';
+
+import dataCenterSummary from '@/views/inventory/data_center/IVDC_004_DataCenterSummary.vue';
+import dataCenterAdmin from '@/views/inventory/data_center/IVDC_005_DataCenterAdmin.vue';
+import dataCenterAudit from '@/views/inventory/data_center/IVDC_007_DataCenterAudit.vue';
+
 
 import { api } from '@/setup/api';
 
@@ -163,26 +165,26 @@ const tabs = [
         isSelected: true,
         tabIcon: 'icon-calculator',
         tabTitle: 'SUMMARY',
-        component: projectSummary
+        component: dataCenterSummary
     },
     {
         name: 'member',
         isSelected: false,
         tabIcon: 'icon-user',
         tabTitle: 'MEMBER',
-        component: projectMember
+        component: dataCenterAdmin
     },
     {
         name: 'audit',
         isSelected: false,
         tabIcon: 'icon-pie-charts',
         tabTitle: 'AUDIT',
-        component: projectAudit
+        component: dataCenterAudit
     }
 ];
 
-const projectEditPopupName = () => import('./IDPJ_002_ProjectEditPopupName');
-const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopupTag');
+const dataCenterEditPopupName = () => import('@/views/inventory/data_center/IVDC_002_DataCenterEditPopupName');
+const dataCenterEditPopupTag = () => import('@/views/inventory/data_center/IVDC_003_DataCenterEditPopupTag');
 
 const modalTab = [
     {
@@ -190,19 +192,19 @@ const modalTab = [
         tabTitle: 'DEFAULT',
         updatable: true,
         creatable: true,
-        component: projectEditPopupName
+        component: dataCenterEditPopupName
     },
     {
         tabIcon: 'icon-user',
         tabTitle: 'TAGS',
         updatable: true,
         creatable: true,
-        component: projectEditPopupTag
+        component: dataCenterEditPopupTag
     }
 ];
 
 export default {
-    name: 'Project',
+    name: 'DataCenter',
     components: {
         BaseTabNav,
         BaseTabs,
@@ -220,7 +222,7 @@ export default {
             createProcess: false,
             updateProcess: false,
             treeData: sampleNode,
-            projectModalTitle: 'Edit a Project',
+            dataCenterModalTitle: 'Edit a Region/Zone',
             modalVisible: false,
             lastEvent: 'Right-Click to open context menus on tree.',
             tabs: tabs,
@@ -228,6 +230,9 @@ export default {
         };
     },
     created () {
+
+    },
+    mounted: function () {
 
     },
     methods: {
@@ -261,34 +266,34 @@ export default {
         },
         manageTabButton (flag, state, title) {
             if (flag === 'CRT') {
-                this.projectModaltitle = (title) ? 'Create a Project Group' : 'Create a Project';
+                this.dataCenterModaltitle = (title) ? 'Create a Region/Zone Group' : 'Create a Region/Zone';
                 this.updateProcess = !state;
                 this.createProcess = state;
             } else if (flag === 'UPT') {
                 this.createProcess = !state;
                 this.updateProcess = state;
             } else {
-
+                this.consoleLogEnv('Sp cases');
             }
         },
-        async updateProject (items) {
+        async updateDataCenter (items) {
             this.consoleLogEnv('item', items);
             const treeV = items.tree;
             const path = treeV.getSelected()[0].path;
             let tabData = this.$refs.EditTab.tabContentData;
-            treeV.updateNode(path, { title: tabData.projectProp.projectName });
-            tabData.projectProp.projectName = null;
+            treeV.updateNode(path, { title: tabData.dataCenterProp.dataCenterName });
+            tabData.dataCenterProp.dataCenterName = null;
         //TODO:: Simulate gRPC Modules on BACK_END
             this.$refs.Modal.hideModal();
         },
-        createProject (items) {
+        createDataCenter  (items) {
             this.consoleLogEnv('item', items);
             const flag = this.selectedData.selectedItem.flag;
             const treeV = this.isEmpty(items.tree) ? this.selectedData.selectedItem.tree : items.tree;
             let tabData = this.$refs.EditTab.tabContentData;
 
             let newNode = {
-                title: tabData.projectProp.projectName,
+                title: tabData.dataCenterProp.dataCenterName,
                 isLeaf: false,
                 children: null,
                 isExpanded: false,
@@ -311,8 +316,8 @@ export default {
             }
 
             treeV.insert({ node: treeV.getSelected()[0], placement: placement }, newNode);
-            tabData.projectProp.projectName = null;
-            tabData.projectProp.projectId = null;
+            tabData.dataCenterProp.dataCenterName = null;
+            tabData.dataCenterProp.dataCenterId = null;
 
             this.$refs.Modal.hideModal();
         }

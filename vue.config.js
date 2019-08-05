@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-undef
 module.exports = {
     lintOnSave: false,
     runtimeCompiler: true,
@@ -8,7 +7,14 @@ module.exports = {
     css: {
         loaderOptions: {
             sass: {
-                data: ` @import "~@/asset/style/_variables.scss";`
+                data: '@import "~@/asset/style/_variables.scss";'
+            }
+        }
+    },
+    configureWebpack: {
+        resolve: {
+            alias: {
+
             }
         }
     }
