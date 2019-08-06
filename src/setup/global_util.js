@@ -231,13 +231,13 @@ export const Mixin = {
      *             size: size of icon ex: -1 ~ 10
      *             color: variant color
      *            }
-     * Output  => boolean whether it's checked type
+     * Output  => String translation Message
      * Description:  translation of i18n
      **********************************************************************************/
         tr: function (m) {
             let path = m.split('.');
             let key = 'MSG';
-            if (path[0] !=='MSG' && path.length < 2){
+            if (path[0] !== 'MSG' && path.length < 2) {
                 key += '.'+m;
             }else {
                 key = m;
