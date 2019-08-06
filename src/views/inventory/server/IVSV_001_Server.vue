@@ -2,10 +2,18 @@
   <div class="animated fadeIn">
     <b-row class="server-table">
       <b-col cols="12">
-        <BaseTable :table-data="servers" :fields="fields" :per-page="perPage"
-                   :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
-                   :busy="isLoading" :cardless="false" :underlined="true"
-                   @rowSelected="rowSelected" @list="listServers" @limitChanged="limitChanged"
+        <BaseTable :table-data="servers"
+                   :fields="fields"
+                   :per-page="perPage"
+                   :searchable="true"
+                   :total-rows="totalCount"
+                   :search-context-data="queryData"
+                   :busy="isLoading"
+                   :cardless="false"
+                   :underlined="true"
+                   @rowSelected="rowSelected"
+                   @list="listServers"
+                   @limitChanged="limitChanged"
         >
           <template #caption>
             <div>
@@ -15,9 +23,7 @@
                     Add
                   </b-button>
                 </template>
-                <template #contents>
-                  <ServerDetail :creatable="true" :updatable="true" />
-                </template>
+                <template #contents />
               </BaseModal>
               <BaseModal v-if="selectedServer" :name="'editServer'" :title="'Edit Server'"
                          :centered="true" :hide-footer="true"
@@ -27,9 +33,7 @@
                     Edit
                   </b-button>
                 </template>
-                <template #contents>
-                  <ServerDetail :updatable="true" :server-prop="selectedServer" />
-                </template>
+                <template #contents />
               </BaseModal>
             </div>
           </template>
@@ -45,21 +49,30 @@
                     :is-footer-visible="false"
                     :use-slot="true"
         >
-          <template #INFO>
-            <ServerDetail :server-prop="selectedServer" />
+          <template #SUMMARY>
+            <serverSummary>
+            </serverSummary>
+          </template>
+          <template #DATA>
+            <serverData>
+            </serverData>
+          </template>
+          <template #RAWDATA>
+            <serverRawData> </serverRawData>
+          </template>
+          <template #ADMIN>
+            <serverAdmin> </serverAdmin>
+          </template>
+          <template #MONITORING>
+            <serverMonitoring> </serverMonitoring>
+          </template>
+          <template #COMMAND>
+            <serverCommand> </serverCommand>
+          </template>
+          <template #AUDIT>
+            <serverAudit> </serverAudit>
           </template>
         </BaseTabNav>
-        <!-- <b-tabs v-if="selectedServer">
-          <b-tab active>
-            <template slot="title">
-              <i class="icon-info mr-1" /> Server Information
-            </template>
-            <div slot="header">
-              <strong>Server Detail</strong>
-            </div>
-            <ServerDetail v-if="selectedServer" :server-prop="selectedServer" />
-          </b-tab>
-        </b-tabs> -->
       </b-col>
     </b-row>
   </div>
@@ -68,7 +81,15 @@
 <script>
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 import query from './search_context/query.js';
-import ServerDetail from '@/views/inventory/server/IVSV_002_ServerDetail';
+import serverSummary from '@/views/inventory/server/IVSV_002_ServerSummary';
+import serverData from '@/views/inventory/server/IVSV_003_ServerData';
+import serverRawData from '@/views/inventory/server/IVSV_004_ServerRawData';
+import serverAdmin from '@/views/inventory/server/IVSV_005_ServerAdmin';
+import serverMonitoring from '@/views/inventory/server/IVSV_006_ServerMonitoring';
+import serverCommand from '@/views/inventory/server/IVSV_007_ServerCommand';
+import serverAudit from '@/views/inventory/server/IVSV_008_ServerAudit';
+
+
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 
@@ -77,25 +98,52 @@ export default {
     components: {
         BaseTable,
         BaseModal,
-        ServerDetail,
-        BaseTabNav
+        BaseTabNav,
+        serverSummary,
+        serverData,
+        serverRawData,
+        serverAdmin,
+        serverMonitoring,
+        serverCommand,
+        serverAudit
+
     },
     data () {
         return {
             fields: [
                 { key: 'selected' },
-                { key: 'serverId', label: 'ID', sortable: true, ajaxSortable: false },
-                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true },
-                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false },
-                { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false },
-                { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false },
-                { key: 'language', label: 'Language', sortable: true, ajaxSortable: false },
-                { key: 'domainId', label: 'Domain ID' }
+                { key: '_id', label: 'Name', sortable: true, ajaxSortable: false },
+                { key: 'user_name', label: 'State', sortable: true, ajaxSortable: true },
+                { key: 'password', label: 'IP', sortable: true, ajaxSortable: false },
+                { key: 'user_first_name', label: 'Core', sortable: true, ajaxSortable: false },
+                { key: 'user_last_name', label: 'Memory', sortable: true, ajaxSortable: false },
+                { key: 'mobile', label: 'OS Type', sortable: true, ajaxSortable: false },
+                { key: 'role_id', label: 'OS Distro', sortable: true, ajaxSortable: false },
+                { key: 'project_id', label: 'Server Type', sortable: true, ajaxSortable: true },
+                { key: 'project_group_id', label: 'Platform', sortable: true, ajaxSortable: false },
+                { key: 'query', label: 'Disk Size', sortable: true, ajaxSortable: false }
             ],
             tabs: [
                 {
-                    tabTitle: 'INFO',
-                    component: ServerDetail
+                    tabTitle: 'SUMMARY',
+                },
+                {
+                    tabTitle: 'DATA',
+                },
+                {
+                    tabTitle: 'RAW DATA',
+                },
+                {
+                    tabTitle: 'ADMIN',
+                },
+                {
+                    tabTitle: 'MONITORING',
+                },
+                {
+                    tabTitle: 'COMMAND',
+                },
+                {
+                    tabTitle: 'AUDIT',
                 }
             ],
             defaultTab: 0,
@@ -125,19 +173,18 @@ export default {
         async listServers (limit, skip, sort, search) {
             this.reset();
 
-            if (limit === undefined || limit === null) {
+            if (this.isEmpty(limit)) {
                 limit = 10;
             }
-            if (skip === undefined || skip === null) {
+            if (this.isEmpty(skip)) {
                 skip = 0;
             }
-            if (sort === undefined || sort === null) {
+            if (this.isEmpty(sort)) {
                 sort = '-created_date';
             }
-            if (search === undefined || search === null) {
+            if (this.isEmpty(search)) {
                 search = [];
             }
-
             let res;
             try {
                 res = await this.$axios.get('/identity/user', {
