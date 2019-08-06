@@ -28,53 +28,53 @@
 </template>
 <script>
 export default {
-  name: 'SimpleModals',
-  props: {
-    simpleModalType: {
-      type: Number,
-      required: true,
-      default: 1
-    },
-    simpleModalTitle: {
-      type: String,
-      reuired: true,
-      default: 'Simple Modal Title'
+    name: 'SimpleModals',
+    props: {
+        simpleModalType: {
+            type: Number,
+            required: true,
+            default: 1
+        },
+        simpleModalTitle: {
+            type: String,
+            reuired: true,
+            default: 'Simple Modal Title'
 
+        }
+    },
+    data () {
+        return {
+            myModal: false,
+            largeModal: false,
+            smallModal: false,
+            primaryModal: false,
+            successModal: false,
+            warningModal: false,
+            dangerModal: false,
+            infoModal: false
+        };
+    },
+    methods: {
+        showModal () {
+            let modalTypeNumber = this.simpleModalType;
+            if (modalTypeNumber == 1) {
+                this.myModal = true;
+            } else if (modalTypeNumber == 2) {
+                this.largeModal = true;
+            } else if (modalTypeNumber == 3) {
+                this.smallModal = true;
+            } else if (modalTypeNumber == 4) {
+                this.primaryModal = true;
+            } else if (modalTypeNumber == 5) {
+                this.successModal = true;
+            } else if (modalTypeNumber == 6) {
+                this.warningModal = true;
+            } else if (modalTypeNumber == 7) {
+                this.dangerModal = true;
+            } else {
+                this.infoModal = true;
+            }
+        }
     }
-  },
-  data () {
-    return {
-      myModal: false,
-      largeModal: false,
-      smallModal: false,
-      primaryModal: false,
-      successModal: false,
-      warningModal: false,
-      dangerModal: false,
-      infoModal: false
-    };
-  },
-  methods: {
-    showModal () {
-      let modalTypeNumber = this.simpleModalType;
-      if (modalTypeNumber == 1) {
-        this.myModal = true;
-      } else if (modalTypeNumber == 2) {
-        this.largeModal = true;
-      } else if (modalTypeNumber == 3) {
-        this.smallModal = true;
-      } else if (modalTypeNumber == 4) {
-        this.primaryModal = true;
-      } else if (modalTypeNumber == 5) {
-        this.successModal = true;
-      } else if (modalTypeNumber == 6) {
-        this.warningModal = true;
-      } else if (modalTypeNumber == 7) {
-        this.dangerModal = true;
-      } else {
-        this.infoModal = true;
-      }
-    }
-  }
 };
 </script>

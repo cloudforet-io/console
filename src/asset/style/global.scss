@@ -16,10 +16,12 @@ html, body {
   word-wrap: break-word;
   word-break: keep-all;
 }
+
 body {
   overflow-x: hidden;
   overflow-y: auto;
 }
+
 i, span, div, h1, h2, h3, h4, h5, h6, input,
 textarea, article, main {
   color: inherit;
@@ -47,8 +49,6 @@ a {
     text-decoration: unset;
   }
 }
-
-
 
 
 /*************************
@@ -337,4 +337,36 @@ a {
     border-top-left-radius: $border-radius;
     border-top-right-radius: $border-radius;
   }
+}
+
+/* i Tag: icon */
+.primary{
+  color:$blue;
+}
+
+.info {
+  color:$blueviolet;
+}
+
+.dark {
+  color:$navy;
+}
+
+.secondary {
+  color:$gray;
+}
+
+.success {
+  color:$green;
+}
+
+.danger {
+  color:$red;
+}
+
+.button-content > button {
+  border-bottom: 0px !important;
+  border-top: 0px !important;
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
 }

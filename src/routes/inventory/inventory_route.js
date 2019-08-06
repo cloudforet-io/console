@@ -1,11 +1,10 @@
 const BaseHeader = () => import('@/containers/header/CTHD_001_Header');
 
-const InventoryMain = () => import('../../views/inventory/IVNT_001_InventoryMain');
-const InventorySidebar = () => import('../../views/inventory/IVNT_002_InventorySidebar');
+const InventoryMain = () => import('@/views/inventory/IVNT_001_InventoryMain');
 
-const DataCenter = () => import('../../views/inventory/region_zone/IVDC_001_DataCenter');
-const Server = () => import('../../views/inventory/server/IVSV_001_Server');
-const CollectorPlugin = () => import('../../views/inventory/settings/IVST_001_CollectorPlugin');
+const DataCenter = () => import('@/views/inventory/data_center/IVDC_001_DataCenter');
+const Server = () => import('@/views/inventory/server/IVSV_001_Server');
+const CollectorPlugin = () => import('@/views/inventory/settings/IVST_001_CollectorPlugin');
 
 export default {
     path: 'inventory',
@@ -14,7 +13,6 @@ export default {
     meta: { label: 'Inventory', requiresAuth: true },
     components: {
         header: BaseHeader,
-        sidebar: InventorySidebar,
         main: InventoryMain
     },
     children: [

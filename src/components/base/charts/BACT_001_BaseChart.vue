@@ -2,19 +2,15 @@
   <div class="card">
     <div class="card-header">
       <template v-if="chartTitleData.isTitleIconUsed">
-        <i :class="chartTitleData.TitleIconClass" />
+        <span v-html="selectIconHtml(chartTitleData.TitleIconClass)"></span>
       </template>
       {{ chartTitleData.cardTitle }}
       <template v-if="chartTitleData.isDropdownUsed">
-        <b-dropdown class="float-right" variant="p-0" right>
-          <template slot="button-content">
-            {{ chartTitleDownData.dropDownTitle }}
-          </template>
+        <b-dropdown  :text="chartTitleDownData.dropDownTitle" class='button-content float-right' variant="transparent">
           <b-dropdown-item v-for="(opt, idx) in chartTitleDownData.dropDownDataArr"
                            :key="idx"
                            :data="opt"
-                           @click="dropdownAction(opt.optionClickMethod, opt)"
-          >
+                           @click="dropdownAction(opt.optionClickMethod, opt)">
             {{ opt.optionTitle }}
           </b-dropdown-item>
         </b-dropdown>

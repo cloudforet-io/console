@@ -15,6 +15,7 @@
                 <span class="copy-clipboard"
                       title="Copy to Clipboard"
                       @click="CopyToClipboard(info.contents)"
+                      v-b-tooltip.hover
                 >
                   <i class="fal fa-copy" />
                 </span>

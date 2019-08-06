@@ -113,11 +113,11 @@
         </template>
 
         <template slot="status" slot-scope="data">
-          <h5>
+
             <b-badge :variant="getBadge(data.item.status)">
-              {{ capitalizeFirstLetter(data.item.status) }}
+              <h1> {{ capitalizeFirstLetter(data.item.status) }} </h1>
             </b-badge>
-          </h5>
+
         </template>
 
         <template slot="link" slot-scope="data">
