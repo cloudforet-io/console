@@ -8,7 +8,7 @@ metadata:
   labels:
     app: wconsole-client
   name: wconsole-client
-  namespace: cloudone
+  namespace: '${parameters["namespace"]}' 
 spec:
   replicas: 1
   selector:
