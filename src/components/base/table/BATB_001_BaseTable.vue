@@ -1,6 +1,8 @@
 <template>
   <div class="base-table">
-    <b-card :class="{'no-card': cardless}">
+    <b-card :class="{'no-card': cardless}"
+            :style="{ height: `${height}px` }"
+    >
       <b-row slot="header" align-v="center">
         <b-col cols="4" sm="6" md="2"
                class="mb-md-0 mb-3"
@@ -228,6 +230,10 @@ export default {
         busy: {
             type: Boolean,
             default: false
+        },
+        height: {
+            type: Number,
+            default: 500
         }
     },
     data () {
@@ -338,7 +344,7 @@ export default {
         setIsSelectAll () {
             if (this.selectedRows.length === this.tableData.length) {
                 this.isSelectedAll = true;
-            }else{
+            } else {
                 this.isSelectedAll = false;
             }
         },
@@ -465,32 +471,34 @@ export default {
 
 .card {
   border: 0;
-  padding-bottom: 20px;
   border-radius: inherit;
+  background-color: transparent;
   &.no-card {
     border: 0;
-    &.no-card {
-      all: unset;
+    all: unset;
 
-      .card-header {
-        background-color: transparent;
-      }
-      .card-body {
-        overflow-x: hidden;
-        height: 600px;
-      }
+    .card-header {
+      background-color: transparent;
+    }
+    .card-body {
+      box-shadow: none;
+      overflow-x: hidden;
     }
   }
   .card-header {
     padding-top: 30px;
-    padding-bottom: 15px;
-    background-color: $white;
+    padding-bottom: 30px;
+    background-color: $whiteblue;
     border: 0;
     border-radius: inherit;
   }
   .card-body {
     overflow-x: scroll;
-    border-radius: inherit;
+    padding: 30px 20px;
+    background-color: $white;
+    @extend %sheet;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
   .b-table {
     display: inline-table;

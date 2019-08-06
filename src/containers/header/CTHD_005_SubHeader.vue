@@ -1,13 +1,13 @@
 <template>
   <b-row class="sub-header" no-gutters>
-    <b-col cols="1" class="header-group">
+    <b-col cols="2" class="header-group">
       <span class="label">
         <i :class="subHeaderGroup.icon" />&nbsp;&nbsp;
         {{ subHeaderGroup.label }}
       </span>
       <!-- <span class="triangle" /> -->
     </b-col>
-    <b-col cols="10" class="row justify-content-center">
+    <b-col cols="10" class="row ">
       <b-col v-for="nav in subHeaderList" :key="nav.label" cols="2">
         <div class="item" :class="{ 'active': $route.meta.label === nav.label }">
           <span class="label">
@@ -37,7 +37,7 @@ export default {
 
 <style lang="scss" scoped>
 $bg-color: rgba($white, .9);
-$top-pad: 8px;
+$top-pad: 7px;
 $shape-height: $sub-header-height;
 $shape-width: 18px;
 $shape-color: darken($skyblue, 1%);
@@ -45,12 +45,19 @@ $shape-color: darken($skyblue, 1%);
   position: relative;
   display: inline-block;
   height: $sub-header-height;
+  width: 100%;
   text-align: center;
   color: darken($darkgray, 20%);
   .label {
     display: inline-block;
     padding-top: $top-pad;
-    vertical-align: sub;
+    height: 100%;
+    width: 100%;
+    a {
+      display: inline-block;
+      height: 100%;
+      width: 100%;
+    }
   }
 }
 

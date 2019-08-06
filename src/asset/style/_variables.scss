@@ -10,13 +10,14 @@ $white: #fff;
 $whiteblue: lighten(#E7EAF3, 5%);
 $skyblue: #ECF1FE;
 $blue: #2C68F9;
-$blueviolet: blueviolet;
+$violet: blueviolet;
+$blueviolet: mix($blue, $violet, 70%);
 
 $navy: #0F2965;
 $black: #1a1f3e;
 
-$gradient: linear-gradient(45deg, darken($blue, 15%) 10%, $blue 40%, $blueviolet);
-$dark-gradient: linear-gradient(135deg, darken($blue, 10%) 30%, $blueviolet);
+$gradient: linear-gradient(45deg, darken($blue, 15%) 10%, $blue 40%, $violet);
+$dark-gradient: linear-gradient(135deg, darken($blue, 10%) 30%, $violet);
 
 /* FONT */
 $font-basic: 'Noto Sans', sans-serif;
@@ -50,22 +51,6 @@ $box-shadow: 0px 0 10px 0px rgba($black, 0.1);
   @extend %border-radius;
 }
 
-/* TRANSITION */
-%header-dropdown-trans {
-  opacity: 0;
-  transform: scaleY(0);
-  transform-origin: top;
-  &.slide-fade-in {
-    transform: scaleY(1);
-    transform-origin: top;
-    opacity: 1;
-    transition: all .4s ease-in-out;
-  }
-  &.slide-fade-out {
-    transition: all .4s ease-in-out;
-    opacity: 0;
-  }
-}
 
 
 

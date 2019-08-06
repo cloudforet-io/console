@@ -1,11 +1,21 @@
 <template>
   <div class="animated fadeIn">
-    <b-row class="user-table">
-      <b-col cols="12">
-        <BaseTable :table-data="users" :fields="fields" :per-page="perPage"
-                   :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
-                   :busy="isLoading" :cardless="false" :underlined="true"
-                   @rowSelected="rowSelected" @list="listUsers" @limitChanged="limitChanged"
+    <BaseDrag>
+      <template #top-container="{ height }">
+        <BaseTable class="user-table" 
+                   :table-data="users" 
+                   :fields="fields" 
+                   :per-page="perPage"
+                   :searchable="true" 
+                   :total-rows="totalCount" 
+                   :search-context-data="queryData"
+                   :busy="isLoading" 
+                   :cardless="false" 
+                   :underlined="true"
+                   :height="height"
+                   @rowSelected="rowSelected" 
+                   @list="listUsers"
+                   @limitChanged="limitChanged"
         >
           <template #caption>
             <div>
@@ -34,11 +44,9 @@
             </div>
           </template>
         </BaseTable>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col cols="12">
-        <BaseTabNav v-if="selectedUser"
+      </template>
+      <template #bottom-container>
+        <BaseTabNav v-if="selectedUser" class="user-info"
                     :fill="false"
                     :nav-tabs="tabs"
                     :keep-alive="true"
@@ -60,12 +68,13 @@
             <UserDetail v-if="selectedUser" :user-prop="selectedUser" />
           </b-tab>
         </b-tabs> -->
-      </b-col>
-    </b-row>
+      </template>
+    </BaseDrag>
   </div>
 </template>
 
 <script>
+import BaseDrag from '@/components/base/drag/BADG_001_BaseDrag.vue';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
 import query from './search_context/query.js';
 import UserDetail from './IDUS_002_UserDetail.vue';
@@ -75,6 +84,7 @@ const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 export default {
     name: 'User',
     components: {
+        BaseDrag,
         BaseTable,
         BaseModal,
         UserDetail,
@@ -83,13 +93,13 @@ export default {
     data () {
         return {
             fields: [
-                { key: 'selected' },
+                { key: 'selected', thStyle: { width: '50px' }},
                 { key: 'userId', label: 'ID', sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
-                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true },
-                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false },
-                { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false },
-                { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false },
-                { key: 'language', label: 'Language', sortable: true, ajaxSortable: false },
+                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
+                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'language', label: 'Language', sortable: true, ajaxSortable: false , thStyle: { width: '200px' }},
                 { key: 'domainId', label: 'Domain ID' }
             ],
             tabs: [
@@ -185,6 +195,8 @@ export default {
   margin: 0 5px;
 }
 .user-table {
-  margin-bottom: 20px;
+  margin-top: 20px;
+}
+.user-info {
 }
 </style>
