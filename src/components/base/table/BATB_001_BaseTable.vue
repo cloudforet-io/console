@@ -3,53 +3,56 @@
     <b-card :class="{'no-card': cardless}"
             :style="{ height: `${height}px` }"
     >
-      <b-row slot="header" align-v="center">
-        <b-col cols="4" sm="6" md="2"
-               class="mb-md-0 mb-3"
-        >
-          <slot name="caption" />
-        </b-col>
-        <b-col cols="12" sm="12" md="6" xl="7"
-               order="3" order-md="2"
-        >
-          <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
-        </b-col>
-        <b-col cols="8" sm="6" md="4" xl="3"
-               order="2" order-md="3"
-               class="mb-3 mb-md-0"
-        >
-          <b-row align-v="center" no-gutters align-h="between" class="text-center">
-            <b-col>
-              <span class="prev-btn" @click.prevent="onPrev"><i class="fal fa-chevron-left" /></span>
-            </b-col>
-            <b-col>
-              <span>{{ currentPage }} / {{ maxPage }}</span>
-            </b-col>
-            <b-col>
-              <span class="next-btn" @click.prevent="onNext"><i class="fal fa-chevron-right" /></span>
-            </b-col>
-            <b-col>
-              <BaseModal ref="modal" :name="'tableSettings'" :title="'Table Settings'"
-                         :centered="true" :size="'md'" @ok="limitChanged"
-              >
-                <template #activator>
-                  <span class="settings-btn"><i class="fal fa-cog" /></span>
-                </template>
-                <template #contents>
-                  <b-form-group label="Rows per page: " :label-cols="3">
-                    <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax"
-                                  @blur="filterLimit" @keydown.enter="onLimitInputEnter"
-                    />
-                  </b-form-group>
-                </template>
-              </BaseModal>
-            </b-col>
-            <b-col>
-              <span class="refresh-btn" @click="onRefresh"><i class="fal fa-sync" /></span>
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
+      <template #header>
+        <b-row align-v="center">
+          <b-col cols="4" sm="6" md="2"
+                 class="mb-md-0 mb-3"
+          >
+            <slot name="caption" />
+          </b-col>
+          <b-col cols="12" sm="12" md="6" xl="7"
+                 order="3" order-md="2"
+          >
+            <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
+          </b-col>
+          <b-col cols="8" sm="6" md="4" xl="3"
+                 order="2" order-md="3"
+                 class="mb-3 mb-md-0"
+          >
+            <b-row align-v="center" no-gutters align-h="between" class="text-center">
+              <b-col>
+                <span class="prev-btn" @click.prevent="onPrev"><i class="fal fa-chevron-left" /></span>
+              </b-col>
+              <b-col>
+                <span>{{ currentPage }} / {{ maxPage }}</span>
+              </b-col>
+              <b-col>
+                <span class="next-btn" @click.prevent="onNext"><i class="fal fa-chevron-right" /></span>
+              </b-col>
+              <b-col>
+                <BaseModal ref="modal" :name="'tableSettings'" :title="'Table Settings'"
+                           :centered="true" :size="'md'" @ok="limitChanged"
+                >
+                  <template #activator>
+                    <span class="settings-btn"><i class="fal fa-cog" /></span>
+                  </template>
+                  <template #contents>
+                    <b-form-group label="Rows per page: " :label-cols="3">
+                      <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax"
+                                    @blur="filterLimit" @keydown.enter="onLimitInputEnter"
+                      />
+                    </b-form-group>
+                  </template>
+                </BaseModal>
+              </b-col>
+              <b-col>
+                <span class="refresh-btn" @click="onRefresh"><i class="fal fa-sync" /></span>
+              </b-col>
+            </b-row>
+          </b-col>
+        </b-row>
+      </template>
+
       <b-table class="b-table"
                show-empty
                :items="items"

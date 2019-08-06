@@ -1,7 +1,7 @@
 <template>
   <div class="animated fadeIn">
     <BaseDrag>
-      <template #top-container="{ height }">
+      <template #container="{ height }">
         <BaseTable class="user-table" 
                    :table-data="users" 
                    :fields="fields" 
@@ -21,7 +21,7 @@
             <div>
               <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
                 <template #activator>
-                  <b-button class="btn" variant="outline-dark">
+                  <b-button class="btn" variant="outline-primary">
                     Add
                   </b-button>
                 </template>
@@ -33,7 +33,7 @@
                          :centered="true" :hide-footer="true"
               >
                 <template #activator>
-                  <b-button class="btn" variant="outline-primary">
+                  <b-button class="btn" variant="outline-dark">
                     Edit
                   </b-button>
                 </template>
@@ -45,31 +45,20 @@
           </template>
         </BaseTable>
       </template>
-      <template #bottom-container>
-        <BaseTabNav v-if="selectedUser" class="user-info"
-                    :fill="false"
-                    :nav-tabs="tabs"
-                    :keep-alive="true"
-                    :is-footer-visible="false"
-                    :use-slot="true"
-        >
-          <template #INFO>
-            <UserDetail :user-prop="selectedUser" />
-          </template>
-        </BaseTabNav>
-        <!-- <b-tabs v-if="selectedUser">
-          <b-tab active>
-            <template slot="title">
-              <i class="icon-info mr-1" /> User Information
-            </template>
-            <div slot="header">
-              <strong>User Detail</strong>
-            </div>
-            <UserDetail v-if="selectedUser" :user-prop="selectedUser" />
-          </b-tab>
-        </b-tabs> -->
-      </template>
     </BaseDrag>
+    <BaseTabNav v-if="selectedUser" class="user-info"
+                :fill="false"
+                :nav-tabs="tabs"
+                :keep-alive="true"
+                :is-footer-visible="false"
+                :use-slot="true"
+    >
+      <template #INFO>
+        <b-card class="base">
+          <UserDetail :user-prop="selectedUser" />
+        </b-card>
+      </template>
+    </BaseTabNav>
   </div>
 </template>
 
@@ -198,5 +187,6 @@ export default {
   margin-top: 20px;
 }
 .user-info {
+  margin-bottom: 20px;
 }
 </style>
