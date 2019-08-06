@@ -1,9 +1,5 @@
 <template>
   <span class="input-tag-container">
-    <!--  v-select="textCaptureOption" @select="onTextCaptured" @mouseup="onTextMouseUp"
-    v-autowidth="{maxWidth: '100%', minWidth: '50px', comfortZone: 1}"
-    -->
-
     <BaseInput v-if="isUpdateMode" :list-data="listData" :contents="contents"
                :autofocus="true" :autoselect="true" @update="onUpdate"
                @delete="$emit('delete')"
@@ -43,12 +39,18 @@ export default {
         };
     },
     computed: {
-        subKey () { return this.contents.subKey ? `.${this.contents.subKey}` : ''; },
+        subKey () {
+            return this.contents.subKey ? `.${this.contents.subKey}` : ''; 
+        },
         label () {
             return this.contents.key ? `${this.contents.label}${this.subKey}` : 'Search';
         },
-        value () { return this.contents.value || ''; },
-        operator () { return this.contents.operator; }
+        value () {
+            return this.contents.value || ''; 
+        },
+        operator () {
+            return this.contents.operator; 
+        }
     },
     methods: {
         onUpdateMode () {
@@ -69,11 +71,9 @@ $input-height: 23px;
     display: inline-block;
     max-width: 99%;
     height: $input-height;
-    line-height: 16px;
-    background-color: rgba($blue, 0.1);
-    border-radius: 50px;
-    padding-left: 10px;
-    padding-right: 10px;
+    background-color: lighten($blueviolet, 30%);//rgba($blue, 0.1);
+    border-radius: 5px;
+    padding: 6px 8px 0px 8px;
     .contents {
       display: inline-block;
       max-width: 96%;
@@ -82,13 +82,14 @@ $input-height: 23px;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      vertical-align: text-bottom;
+      vertical-align: middle;
     }
     .icon {
       font-size: 1.3em;
       cursor: pointer;
-      margin-left: 5px;
+      margin-left: 8px;
       color: $darkgray;
+      vertical-align: middle;
     }
   }
 }
