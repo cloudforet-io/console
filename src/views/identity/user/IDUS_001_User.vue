@@ -1,17 +1,27 @@
 <template>
   <div class="animated fadeIn">
-    <b-row class="user-table">
-      <b-col cols="12">
-        <BaseTable :table-data="users" :fields="fields" :per-page="perPage"
-                   :searchable="true" :total-rows="totalCount" :search-context-data="queryData"
-                   :busy="isLoading" :cardless="false" :underlined="true"
-                   @rowSelected="rowSelected" @list="listUsers" @limitChanged="limitChanged"
+    <BaseDrag>
+      <template #container="{ height }">
+        <BaseTable class="user-table" 
+                   :table-data="users" 
+                   :fields="fields" 
+                   :per-page="perPage"
+                   :searchable="true" 
+                   :total-rows="totalCount" 
+                   :search-context-data="queryData"
+                   :busy="isLoading" 
+                   :cardless="false" 
+                   :underlined="true"
+                   :height="height"
+                   @rowSelected="rowSelected" 
+                   @list="listUsers"
+                   @limitChanged="limitChanged"
         >
           <template #caption>
             <div>
               <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
                 <template #activator>
-                  <b-button class="btn" variant="outline-dark">
+                  <b-button class="btn" variant="outline-primary">
                     Add
                   </b-button>
                 </template>
@@ -23,7 +33,7 @@
                          :centered="true" :hide-footer="true"
               >
                 <template #activator>
-                  <b-button class="btn" variant="outline-primary">
+                  <b-button class="btn" variant="outline-dark">
                     Edit
                   </b-button>
                 </template>
@@ -34,38 +44,26 @@
             </div>
           </template>
         </BaseTable>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col cols="12">
-        <BaseTabNav v-if="selectedUser"
-                    :fill="false"
-                    :nav-tabs="tabs"
-                    :keep-alive="true"
-                    :is-footer-visible="false"
-                    :use-slot="true"
-        >
-          <template #INFO>
-            <UserDetail :user-prop="selectedUser" />
-          </template>
-        </BaseTabNav>
-        <!-- <b-tabs v-if="selectedUser">
-          <b-tab active>
-            <template slot="title">
-              <i class="icon-info mr-1" /> User Information
-            </template>
-            <div slot="header">
-              <strong>User Detail</strong>
-            </div>
-            <UserDetail v-if="selectedUser" :user-prop="selectedUser" />
-          </b-tab>
-        </b-tabs> -->
-      </b-col>
-    </b-row>
+      </template>
+    </BaseDrag>
+    <BaseTabNav v-if="selectedUser" class="user-info"
+                :fill="false"
+                :nav-tabs="tabs"
+                :keep-alive="true"
+                :is-footer-visible="false"
+                :use-slot="true"
+    >
+      <template #INFO>
+        <b-card class="base">
+          <UserDetail :user-prop="selectedUser" />
+        </b-card>
+      </template>
+    </BaseTabNav>
   </div>
 </template>
 
 <script>
+import BaseDrag from '@/components/base/drag/BADG_001_BaseDrag.vue';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
 import query from './search_context/query.js';
 import UserDetail from './IDUS_002_UserDetail.vue';
@@ -75,6 +73,7 @@ const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 export default {
     name: 'User',
     components: {
+        BaseDrag,
         BaseTable,
         BaseModal,
         UserDetail,
@@ -83,13 +82,13 @@ export default {
     data () {
         return {
             fields: [
-                { key: 'selected' },
+                { key: 'selected', thStyle: { width: '50px' }},
                 { key: 'userId', label: 'ID', sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
-                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true },
-                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false },
-                { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false },
-                { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false },
-                { key: 'language', label: 'Language', sortable: true, ajaxSortable: false },
+                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
+                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'language', label: 'Language', sortable: true, ajaxSortable: false , thStyle: { width: '200px' }},
                 { key: 'domainId', label: 'Domain ID' }
             ],
             tabs: [
@@ -185,6 +184,9 @@ export default {
   margin: 0 5px;
 }
 .user-table {
+  margin-top: 20px;
+}
+.user-info {
   margin-bottom: 20px;
 }
 </style>

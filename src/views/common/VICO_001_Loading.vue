@@ -15,7 +15,7 @@ export default {
     position: relative;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient($blue, $blueviolet);
+    background: linear-gradient($blue, $violet);
     .spinner {
       position: absolute;
       display: inline-block;

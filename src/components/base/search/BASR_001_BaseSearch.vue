@@ -130,6 +130,7 @@ $input-height: 23px;
       display: inline-block;
       width: 95%;
       cursor: text;
+      vertical-align: middle;
     }
     .input-delete-button {
       display: inline-block;
@@ -138,12 +139,17 @@ $input-height: 23px;
       font-size: 1.2em;
       color: $darkgray;
       text-align: right;
-      vertical-align: bottom;
+      vertical-align: middle;
       cursor: pointer;
     }
   }
   .search-btn {
     border-radius: 0 5px 5px 0;
+    color: $navy;
+    width: 120px;
+    i {
+      font-weight: 600;
+    }
   }
 }
 </style>

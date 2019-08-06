@@ -94,8 +94,7 @@ export default {
         };
     },
     methods: {
-        toggleShow: function () {
-            console.log('toggled');
+        toggleShow () {
             this.showMap = !this.showMap;
         }
     }
@@ -115,7 +114,7 @@ export default {
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: all .4s ease-in-out;
+  transition: all .3s ease-in-out;
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
@@ -132,13 +131,26 @@ export default {
 }
 .map-container {
   @extend %sheet;
-  @extend %header-dropdown-trans;
   position: absolute;
   z-index: 11;
   width: 400px;
   top: $header-height;
   background-color: $white;
   padding: 20px 30px;
+
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: top;
+  &.slide-fade-in {
+    transform: scaleY(1);
+    transform-origin: top;
+    opacity: 1;
+    transition: all .3s ease-in;
+  }
+  &.slide-fade-out {
+    transition: all .3s ease-out;
+    opacity: 0;
+  }
 
   %click-item {
     cursor: pointer;
@@ -174,6 +186,12 @@ export default {
       letter-spacing: -0.01rem;
       .title {
         padding-left: 10px;
+        display: inline-block;
+        width: 100%;
+        a {
+          display: inline-block;
+          width: 100%;
+        }
       }
     }
   }

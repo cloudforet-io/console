@@ -38,8 +38,7 @@ $calc-height: calc(#{$header-height} + #{$sub-header-height});
     z-index: 100;
   }
   .app-body{
-  padding-top: $calc-height;
-    padding-bottom: 1000px;
+    padding-top: $calc-height;
     .main {
       margin: 0 !important;
     }
