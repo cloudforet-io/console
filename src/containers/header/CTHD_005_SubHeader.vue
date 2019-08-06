@@ -1,17 +1,22 @@
 <template>
   <b-row class="sub-header" no-gutters>
     <b-col cols="1" class="header-group">
-      <span class="label"><i :class="subHeaderGroup.icon" />&nbsp;&nbsp;{{ subHeaderGroup.label }}</span>
-      <span class="triangle" />
+      <span class="label">
+        <i :class="subHeaderGroup.icon" />&nbsp;&nbsp;
+        {{ subHeaderGroup.label }}
+      </span>
+      <!-- <span class="triangle" /> -->
     </b-col>
-    <b-col v-for="nav in subHeaderList" :key="nav.label" cols="1">
-      <div class="item" :class="{ 'active': $route.meta.label === nav.label }">
-        <span class="label">
-          <router-link :to="nav.link">
-            {{ nav.label }}
-          </router-link>
-        </span>
-      </div>
+    <b-col cols="10" class="row justify-content-center">
+      <b-col v-for="nav in subHeaderList" :key="nav.label" cols="2">
+        <div class="item" :class="{ 'active': $route.meta.label === nav.label }">
+          <span class="label">
+            <router-link :to="nav.link">
+              {{ nav.label }}
+            </router-link>
+          </span>
+        </div>
+      </b-col>
     </b-col>
   </b-row>
 </template>
@@ -32,7 +37,10 @@ export default {
 
 <style lang="scss" scoped>
 $bg-color: rgba($white, .9);
-$top-pad: 9px;
+$top-pad: 8px;
+$shape-height: $sub-header-height;
+$shape-width: 18px;
+$shape-color: darken($skyblue, 1%);
 %item {
   position: relative;
   display: inline-block;
@@ -45,9 +53,6 @@ $top-pad: 9px;
     vertical-align: sub;
   }
 }
-$shape-height: $sub-header-height;
-$shape-width: 18px;
-$shape-color: darken($skyblue, 1%);
 
 .sub-header {
   background-color: $bg-color;
@@ -58,17 +63,14 @@ $shape-color: darken($skyblue, 1%);
   
   .header-group {
     @extend %item;
-    width: 100vw;
     height: $sub-header-height;
-    border: 0;
     text-transform: uppercase;
     font-size: 1.05em;
-    background-color: $shape-color;
     color: $navy;
     cursor: default;
     i {
-      font-size: 1.1em;
-      font-weight: 600;
+      font-size: 1.5em;
+      font-weight: 500;
     }
     .triangle {
       position: absolute;
@@ -87,15 +89,36 @@ $shape-color: darken($skyblue, 1%);
     cursor: pointer;
     min-width: 150px;
     width: 100%;
+
+    border-style: solid;
+    border-image: linear-gradient(to right, transparent, transparent);
+    border-image-slice: 1;
+    border-image-width: 0 0 2px 0;
     &.active {
-      border-bottom: 2px solid $blue;
-      color: darken($blue, 10%);
       font-weight: 500;
+      color: darken($blue, 10%);
+
+      border-image: linear-gradient(to right, lighten($blue, 5%), darken($blue, 15%));
+      border-image-slice: 1;
+      border-image-width: 0 0 2px 0;
+      &:hover {
+        color: darken($blue, 10%);
+        background-color: lighten($shape-color, 3%);
+        background: linear-gradient(to right, transparent, $lightgray, transparent);
+        
+        border-image: linear-gradient(to right, lighten($blue, 5%), darken($blue, 15%));
+        border-image-slice: 1;
+        border-image-width: 0 0 2px 0;
+      }
     }
     &:hover {
       font-weight: 600;
-      color: $navy;
-      background-color: rgba($skyblue, 0.3);
+      color: darken($darkgray, 20%);
+      background: linear-gradient(to right, transparent, $lightgray, transparent);
+      
+      border-image: linear-gradient(to right, $lightgray, $gray, $lightgray);
+      border-image-slice: 1;
+      border-image-width: 0 0 2px 0;
     }
   }
 }

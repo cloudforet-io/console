@@ -27,6 +27,8 @@ textarea, article, main {
   font-weight: inherit;
   word-spacing: inherit;
   letter-spacing: inherit;
+  vertical-align: inherit;
+  text-align: inherit;
 }
 textarea:focus, input:focus{
   outline: none;
