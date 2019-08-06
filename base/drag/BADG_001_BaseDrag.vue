@@ -1,26 +1,26 @@
 <template>
   <div>
-    <slot name="top-container" :height="height" />
+    <slot name="container" :height="containerHeight" />
 
-    <slot v-if="isCustom" name="dragger" />
-    <div v-else class="dragger-container">
+    <div class="dragger-container">
       <div class="line left"
            :class="{'colored': line}" 
            :style="lineStyle"
       />
+
       <span class="dragger" 
             :style="draggerStyle"
             @mousedown="onMousedown"
       >
-        <i class="fad fa-ellipsis-h" />
+        <slot name="dragger" />
+        <i v-if="!$slots.dragger" class="fad fa-ellipsis-h" />
       </span>
+
       <div class="line right" 
            :class="{ 'colored': line }" 
            :style="lineStyle"
       />
     </div>
-
-    <slot name="bottom-container" />
   </div>
 </template>
 
@@ -44,9 +44,17 @@ export default {
             type: Number,
             default: 30
         },
-        topHeight: {
+        height: {
             type: Number,
             default: 400
+        },
+        minHeight: {
+            type: Number,
+            default: 200
+        },
+        maxHeight: {
+            type: Number,
+            default: 1000
         }
     },
     data () {
@@ -58,7 +66,7 @@ export default {
                 'font-size': this.draggerSize,
                 'width': `${this.draggerWidth}px`
             },
-            height: this.topHeight,
+            containerHeight: this.height,
             dragging: false,
             pageY: null
         };
@@ -76,7 +84,11 @@ export default {
                     return;
                 }
 
-                this.height = this.height - (this.pageY - e.pageY);
+                let newHeight = this.containerHeight - (this.pageY - e.pageY);
+                if (newHeight < this.minHeight || newHeight > this.maxHeight) { 
+                    return; 
+                }
+                this.containerHeight = newHeight;
                 this.pageY = e.pageY;
             }
         },
@@ -95,7 +107,8 @@ export default {
 <style lang="scss" scoped>
 .dragger-container {
   position: relative;
-  margin: 30px 0;
+  margin-top: 30px;
+  padding-bottom: 30px;
   .line {
     position: absolute;
     display: inline-block;
@@ -121,7 +134,7 @@ export default {
     font-weight: 600;
     text-align: center;
     cursor: row-resize;
-    color: $black;
+    color: inherit;
   }
 }
 </style>
