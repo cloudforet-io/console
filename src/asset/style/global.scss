@@ -2,8 +2,6 @@
  ****** GLOBAL CSS *******
  *************************/
 
-@import url("http://fonts.googleapis.com/css?family=Roboto:100,200,300,400,500,600,700,800");
-
 /* INIT */
 html, body {
   font-family: $font-basic;
@@ -22,17 +20,16 @@ body {
   overflow-y: auto;
 }
 
-i, span, div, h1, h2, h3, h4, h5, h6, input,
-textarea, article, main {
-  color: inherit;
+i, span, div, input, textarea, article, main {
   font-size: inherit;
   font-weight: inherit;
+  color: inherit;
   word-spacing: inherit;
   letter-spacing: inherit;
   vertical-align: inherit;
   text-align: inherit;
 }
-textarea:focus, input:focus{
+textarea:focus, input:focus {
   outline: none;
 }
 :focus {
@@ -41,6 +38,11 @@ textarea:focus, input:focus{
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-big;
   margin: 0;
+  color: inherit;
+  word-spacing: inherit;
+  letter-spacing: inherit;
+  vertical-align: inherit;
+  text-align: inherit;
 }
 a {
   color: inherit;

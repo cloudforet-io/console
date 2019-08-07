@@ -43,7 +43,7 @@ const index = new Router({
         },
         {
             path: '/',
-            name: 'home',
+            name: 'root',
             redirect: '/dashboard',
             component: DefaultContainer,
             children: [

@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="app flex-row align-items-center">
+  <b-row align-v="center">
     <ul class="cb-slideshow">
       <li>
         <span />
@@ -27,14 +27,14 @@
       </li>
     </ul>
 
-    <div class="container">
+    <div class="container fade-in">
       <BaseSimpleModal
         ref="LogInSimpleModal"
         :simple-modal-type="selectedType"
         :simple-modal-title="instructionTitle"
       >
         <template #contents>
-          <div style="font-family: 'Noto Sans', sans-serif;">
+          <div>
             We apologize for inconvenience. 'Sign up', 'Password retrieval' feature currently unavailable due to our policies.
             <br>Please, contact System Administrator for following contacts:
             <br>
@@ -43,6 +43,7 @@
           </div>
         </template>
       </BaseSimpleModal>
+
       <div id="simpleModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="simpleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -65,13 +66,16 @@
           </div>
         </div>
       </div>
+
       <b-row class="justify-content-center">
         <b-col md="8">
-          <b-card-group>
+          <b-card-group class="card-group">
             <b-card no-body class="p-4">
               <b-card-body>
                 <b-form>
-                  <h1>{{ $t('MSG.LOG_IN') }}</h1>
+                  <h1>
+                    {{ $t('MSG.LOG_IN') }}
+                  </h1>
                   <transition v-if="seenGreet" name="slide-fade">
                     <p class="message">
                       <b>{{ $t('MSG.SIGN_IN') }}</b>
@@ -124,15 +128,10 @@
                   </b-row>
                   <b-row class="row justify-content-end">
                     <b-col class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-4">
-                      <b-button type="button" variant="primary" class="btn-block" @click="login">
+                      <b-button type="button" block class="login-btn" @click="login">
                         {{ $t('MSG.LOG_IN') }}
                       </b-button>
                     </b-col>
-                    <!--<b-col cols="6" class="text-right">
-                      <b-button type="button" variant="link" class="px-0">
-                        {{ $t('MSG.FORGPW')}}
-                      </b-button>
-                    </b-col>-->
                   </b-row>
                 </b-form>
               </b-card-body>
@@ -140,11 +139,9 @@
             <b-card no-body class="text-white bg-primary py-5 d-md-down-none" style="width:44%">
               <b-card-body class="text-center">
                 <div>
-                  <!--<h2> {{ $t('MSG.SIGN_UP')}}</h2>-->
                   <br>
                   <br>
-                  <p> {{ $t('MSG.SIGN_UP_MSG') }} </p>
-                  <!--<b-button variant="primary" class="active mt-3">{{ $t('MSG.REGISTER')}}</b-button>-->
+                  <p> {{ $t('MSG.SIGN_UP_MSG') }}</p>
                 </div>
               </b-card-body>
             </b-card>
@@ -152,7 +149,7 @@
         </b-col>
       </b-row>
     </div>
-  </div>
+  </b-row>
 </template>
 
 <script>
@@ -197,7 +194,6 @@ export default {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
             }).catch(() => {
-                // const errObj = JSON.parse(error.message);
                 this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
             });
         },
@@ -248,5 +244,23 @@ export default {
     top: 30%;
     left: 70%;
     margin-left: -50%;
+  }
+
+  .card-group {
+    @extend %sheet;
+    .input-group-text {
+      border: 0;
+      background: none;
+    }
+    .form-control {
+      border: 1px solid $lightgray;
+      border-radius: 5px;
+    }
+  }
+  .login-btn {
+    border: 0;
+    background: linear-gradient(to right, $blue, $violet);
+    box-shadow: 0 0 5px 1px rgba($navy, 0.3);
+    color: $white;
   }
 </style>

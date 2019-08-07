@@ -182,11 +182,9 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-family: 'Noto Sans', sans-serif;
   }
 
   .legend-data {
     font-size: 24px;
-    font-family: 'Noto Sans', sans-serif;
   }
 </style>

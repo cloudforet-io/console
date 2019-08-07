@@ -3,11 +3,9 @@
     <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
       <b-card class="base summary border-top-0">
         <slot v-if="useSlot" :name="privatePanel" />
-        <template v-for="(item, index) in Panels" :name="Panels[index].panelTitle" v-else>
+        <template v-for="(item, index) in Panels" v-else :name="Panels[index].panelTitle">
           <h5 :key="item.panelTitle" class="page-header m-t-0">
-            <span v-html="iTagBuilder(item.panelIcon)">
-
-            </span>
+            <span v-html="iTagBuilder(item.panelIcon)"/>
             &nbsp;&nbsp {{ item.panelTitle }}
           </h5>
           <hr>
@@ -41,7 +39,7 @@ export default {
             type: Boolean,
             default: false
         },
-        Panels: {
+        panels: {
             type: Array,
             default: () => []
         }
@@ -88,7 +86,6 @@ export default {
     width: 256px;
     line-height: 256px;
     text-align: center;
-    font-family: 'Noto Sans', sans-serif;
     font-size: 36px;
     color: maroon;
   }

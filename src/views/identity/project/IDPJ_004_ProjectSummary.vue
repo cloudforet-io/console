@@ -14,8 +14,8 @@
                 <dd>{{ info.contents }}</dd>
                 <span class="copy-clipboard"
                       title="Copy to Clipboard"
-                      @click="CopyToClipboard(info.contents)"
                       v-b-tooltip.hover
+                      @click="CopyToClipboard(info.contents)"
                 >
                   <i class="fal fa-copy" />
                 </span>
@@ -316,7 +316,6 @@ export default {
     width: 256px;
     line-height: 256px;
     text-align: center;
-    font-family: 'Noto Sans', sans-serif;
     font-size: 36px;
     color: maroon;
   }
