@@ -1,0 +1,239 @@
+/************************************
+ ******* NotoSans - English *********
+ ************************************/
+
+/* NotoSans 100 */
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-ThinItalic.ttf') format('truetype');
+    font-weight: 100;
+    font-style: italic;
+}
+
+/* NotoSans 200 */
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-ExtraLight.ttf') format('truetype');
+    font-weight: 200;
+    font-style: normal;
+}
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-ExtraLightItalic.ttf') format('truetype');
+    font-weight: 200;
+    font-style: italic;
+}
+
+/* NotoSans 300 */
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-LightItalic.ttf') format('truetype');
+    font-weight: 300;
+    font-style: italic;
+}
+
+/* NotoSans 400 */
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+}
+
+/* NotoSans 500 */
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-MediumItalic.ttf') format('truetype');
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* NotoSans 600 */
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-SemiBoldItalic.ttf') format('truetype');
+    font-weight: 600;
+    font-style: italic;
+}
+
+/* NotoSans 700 */
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-BoldItalic.ttf') format('truetype');
+    font-weight: 700;
+    font-style: italic;
+}
+
+/* NotoSans 800 */
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-ExtraBoldItalic.ttf') format('truetype');
+    font-weight: 800;
+    font-style: italic;
+}
+
+/* NotoSans 900 */
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-Black.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: NotoSans;
+    src: url('~@/asset/fonts/NotoSans/NotoSans-BlackItalic.ttf') format('truetype');
+    font-weight: 800;
+    font-style: italic;
+}
+
+/************************************
+ ******* NotoSans - Korean **********
+ ************************************/
+ @font-face {
+     font-family: NotoSansKR;
+     src: url('~@/asset/fonts/NotoSansKR/NotoSans-Thin.woff');
+     font-weight: 200;
+     font-style: normal;
+ }
+ @font-face {
+    font-family: NotoSansKR;
+    src: url('~@/asset/fonts/NotoSansKR/NotoSans-Light.woff');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: NotoSansKR;
+    src: url('~@/asset/fonts/NotoSansKR/NotoSans-Regular.woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+/************************************
+ ********* Roboto - English *********
+ ************************************/
+/* Roboto 100 */
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-ThinItalic.ttf') format('truetype');
+    font-weight: 100;
+    font-style: italic;
+}
+
+/* Roboto 300 */
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-LightItalic.ttf') format('truetype');
+    font-weight: 300;
+    font-style: italic;
+}
+
+/* Roboto 400 */
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-RegularItalic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+}
+
+/* Roboto 500 */
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-MediumItalic.ttf') format('truetype');
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* Roboto 700 */
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-BoldItalic.ttf') format('truetype');
+    font-weight: 700;
+    font-style: italic;
+}
+
+/* Roboto 900 */
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-Black.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: Roboto;
+    src: url('~@/asset/fonts/Roboto/Roboto-BlackItalic.ttf') format('truetype');
+    font-weight: 800;
+    font-style: italic;
+}

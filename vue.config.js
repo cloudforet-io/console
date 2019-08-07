@@ -7,7 +7,10 @@ module.exports = {
     css: {
         loaderOptions: {
             sass: {
-                data: '@import "~@/asset/style/_variables.scss";'
+                data: `
+                @import "~@/asset/style/_variables.scss";
+                @import "~@/asset/style/_font.scss";
+                `
             }
         }
     },
