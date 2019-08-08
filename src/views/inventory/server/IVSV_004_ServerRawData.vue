@@ -1,15 +1,17 @@
 <template>
   <div class="row">
     <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-
+      <b-card class="base summary border-top-0">
+        raw Data
+      </b-card>
     </b-col>
   </div>
 </template>
 
 <script>
 
-  export default {
-    name: 'ServerDetail',
+export default {
+    name: 'ServerRawData',
     components: {
 
     },
@@ -17,7 +19,9 @@
 
     },
     data () {
+        return {
 
+        };
     },
 
     watch: {
@@ -26,7 +30,7 @@
     methods: {
 
     }
-  };
+};
 </script>
 
 <style lang="scss" scoped>

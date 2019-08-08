@@ -25,7 +25,9 @@ import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
 
 const thisTestData = [{
     eventName: 'UpdateProjectGroup',
+
     status: 'fail',
+    variantSize: 5,
     Description: '정보가 변경되었습니다.',
     Executor: 'Name',
     Created: '2019-10-16',

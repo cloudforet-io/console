@@ -56,7 +56,7 @@
       <b-table class="b-table"
                show-empty
                :items="items"
-               :fields="heads" 
+               :fields="heads"
                :striped="striped"
                :bordered="bordered" :borderless="borderless"
                :dark="dark" :hover="hover"
@@ -74,7 +74,7 @@
       >
         <template slot="table-busy">
           <b-row align-h="center">
-            <i class="fad fa-spinner fa-pulse" 
+            <i class="fad fa-spinner fa-pulse"
                :style="{'margin-top': `${10}px`}"
             />
           </b-row>
@@ -85,17 +85,17 @@
         </template>
 
         <!-- <template slot="thead-top" slot-scope="data">
-          <tr>
-            <th>
-                &nbsp;
-            </th>
-            <th>Type 1</th>
-            <th>
-              Type 2
-            </th>
-            <th>Type 3</th>
-          </tr>
-        </template> -->
+                  <tr>
+                    <th>
+                        &nbsp;
+                    </th>
+                    <th>Type 1</th>
+                    <th>
+                      Type 2
+                    </th>
+                    <th>Type 3</th>
+                  </tr>
+                </template> -->
 
         <template v-if="selectable" slot="HEAD_selected">
           <b-check v-model="isSelectedAll"
@@ -112,12 +112,21 @@
           />
         </template>
 
+
         <template slot="status" slot-scope="data">
-
+          <div :style="getVariantSize(data.item.variantSize)">
             <b-badge :variant="getBadge(data.item.status)">
-              <h1> {{ capitalizeFirstLetter(data.item.status) }} </h1>
+              {{ capitalizeFirstLetter(data.item.status) }}
             </b-badge>
+          </div>
+        </template>
 
+        <template slot="state" slot-scope="data">
+          <div>
+            <b-badge :variant="getBadge(data.item.status)">
+              {{ capitalizeFirstLetter(data.item.status) }}
+            </b-badge>
+          </div>
         </template>
 
         <template slot="link" slot-scope="data">
@@ -158,7 +167,7 @@ export default {
         selectMode: {
             type: String,
             default: 'multi',
-            validator (str) {
+            validator(str) {
                 return str === 'multi' || str === 'single';
             }
         },
@@ -239,7 +248,7 @@ export default {
             default: 500
         }
     },
-    data () {
+    data() {
         return {
             currentPage: 1,
             selectedRows: [],
@@ -251,40 +260,43 @@ export default {
         };
     },
     computed: {
-        items () {
+        items() {
             return this.tableData;
         },
-        heads () {
-            return this.fields; 
+        heads() {
+            return this.fields;
         },
-        limit () {
-            return this.perPage; 
+        limit() {
+            return this.perPage;
         },
-        skip () {
-            return (this.currentPage - 1) * this.limit; 
+        skip() {
+            return (this.currentPage - 1) * this.limit;
         },
-        maxPage () {
-            return Math.ceil(this.totalRows / this.limit); 
+        maxPage() {
+            return Math.ceil(this.totalRows / this.limit);
         }
     },
     methods: {
-        getBadge (status) {
+        getVariantSize(size) {
+            return this.setFontSize(size);
+        },
+        getBadge(status) {
             return this.selectBadges(status);
         },
-        filterLimit () {
+        filterLimit() {
             if (this.limitInput < 1) {
                 this.limitInput = 1;
             } else if (this.limitInput > this.perPageMax) {
                 this.limitInput = this.perPageMax;
             }
         },
-        rowClicked (item, idx, e) {
+        rowClicked(item, idx, e) {
             if (this.selectable) {
                 this.rowSelected(item, idx, e);
             }
             this.$emit('rowClicked', item, idx, e);
         },
-        rowSelected (item, idx, e) {
+        rowSelected(item, idx, e) {
             this.consoleLogEnv('row Selected');
             this.selectedRows.map((row) => {
                 if (row.data !== item) {
@@ -300,7 +312,7 @@ export default {
             this.setIsSelectAll();
             this.$emit('rowSelected', this.selectedRows[0]);
         },
-        checkSingleMode (item, idx, newValue) {
+        checkSingleMode(item, idx, newValue) {
             this.consoleLogEnv('check Single-Mode');
             if (this.selectedRows[0]) {
                 this.selectedRows[0].data.selected = false;
@@ -315,7 +327,7 @@ export default {
             this.setIsSelectAll();
             this.$emit('rowSelected', this.selectedRows[0]);
         },
-        checkMultiMode (item, idx, newValue) {
+        checkMultiMode(item, idx, newValue) {
             this.consoleLogEnv('check Multi-Mode');
             let isOnceSelected = this.selectedRows.some((row, i) => {
                 if (row.data._id === item._id) {
@@ -333,7 +345,7 @@ export default {
             this.setIsSelectAll();
             this.$emit('rowSelected', this.selectedRows);
         },
-        checkboxClicked (val, key) {
+        checkboxClicked(val, key) {
             this.consoleLogEnv('row Selected');
             switch (this.selectMode) {
             case 'single':
@@ -344,14 +356,14 @@ export default {
                 break;
             }
         },
-        setIsSelectAll () {
+        setIsSelectAll() {
             if (this.selectedRows.length === this.tableData.length) {
                 this.isSelectedAll = true;
             } else {
                 this.isSelectedAll = false;
             }
         },
-        onSelectAll (val) {
+        onSelectAll(val) {
             if (val) {
                 this.selectedRows = [];
                 this.tableData.map((data, i) => {
@@ -367,9 +379,9 @@ export default {
                 this.selectedRows = [];
             }
 
-            this.$emit('onSelectAll', this.selectedRows, this.isSelectedAll );
+            this.$emit('onSelectAll', this.selectedRows, this.isSelectedAll);
         },
-        updateTableData (idx, data) {
+        updateTableData(idx, data) {
             if (this.isEmpty(idx)) {
                 idx = 0;
             }
@@ -378,36 +390,36 @@ export default {
             }
             this.$set(this.tableData, idx, Object.assign({}, data));
         },
-        onPrev () {
+        onPrev() {
             if (this.currentPage <= 1) {
                 return;
             }
             this.currentPage--;
             this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
         },
-        onNext () {
+        onNext() {
             if (this.currentPage >= this.maxPage) {
                 return;
             }
             this.currentPage++;
             this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
         },
-        onRefresh () {
+        onRefresh() {
             this.currentPage = 1;
             this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
         },
-        onSearch (conditionList) {
+        onSearch(conditionList) {
             this.searchList = conditionList;
             this.$emit('list', this.limit, this.skip, this.sortBy, conditionList);
         },
-        headClicked (key, item) {
+        headClicked(key, item) {
             if (item.ajaxSortable) {
                 this.isLocalSort = false;
             } else {
                 this.isLocalSort = true;
             }
         },
-        sortingChanged (ctx) {
+        sortingChanged(ctx) {
             if (this.isLocalSort) {
                 return;
             }
@@ -415,10 +427,10 @@ export default {
             this.sortBy = ctx.sortDesc ? `-${ctx.sortBy}` : ctx.sortBy;
             this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
         },
-        contextChanged (ctx) {
+        contextChanged(ctx) {
             this.$emit('changed', ctx);
         },
-        rowClass (item) { // custom global style
+        rowClass(item) { // custom global style
             let className = 'tbody-tr-default';
             if (item && item.selected) {
                 className += ' tbody-tr-selected';
@@ -428,7 +440,7 @@ export default {
             }
             return className;
         },
-        limitChanged () {
+        limitChanged() {
             this.filterLimit();
             let currentPageLastRowIdx = this.currentPage * this.limitInput;
             if (currentPageLastRowIdx > this.totalRows) {
@@ -436,11 +448,11 @@ export default {
             }
             this.$emit('limitChanged', this.limitInput);
         },
-        onLimitInputEnter () {
+        onLimitInputEnter() {
             this.$refs.modal.hideModal();
             this.$refs.modal.$emit('ok');
         },
-        capitalizeFirstLetter (s) {
+        capitalizeFirstLetter(s) {
             return this.capitalize(s);
         }
     }
@@ -448,65 +460,76 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-%btn {
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 5px;
-  i {
-    vertical-align: middle;
-  }
-  &:hover {
-    background-color: $lightgray;
-  }
-}
-.prev-btn {
-  @extend %btn;
-}
-.next-btn {
-  @extend %btn;
-}
-.refresh-btn {
-  @extend %btn;
-}
-.settings-btn {
-  @extend %btn;
-}
+    %btn {
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 5px;
 
-.card {
-  border: 0;
-  border-radius: inherit;
-  background-color: transparent;
-  &.no-card {
-    border: 0;
-    all: unset;
+        i {
+            vertical-align: middle;
+        }
 
-    .card-header {
-      background-color: transparent;
+        &:hover {
+            background-color: $lightgray;
+        }
     }
-    .card-body {
-      box-shadow: none;
-      overflow-x: hidden;
+
+    .prev-btn {
+        @extend %btn;
     }
-  }
-  .card-header {
-    padding-top: 30px;
-    padding-bottom: 30px;
-    background-color: $whiteblue;
-    border: 0;
-    border-radius: inherit;
-  }
-  .card-body {
-    overflow-x: scroll;
-    padding: 30px 20px;
-    background-color: $white;
-    @extend %sheet;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-  .b-table {
-    display: inline-table;
-    margin: 0;
-  }
-}
+
+    .next-btn {
+        @extend %btn;
+    }
+
+    .refresh-btn {
+        @extend %btn;
+    }
+
+    .settings-btn {
+        @extend %btn;
+    }
+
+    .card {
+        border: 0;
+        border-radius: inherit;
+        background-color: transparent;
+
+        &.no-card {
+            border: 0;
+            all: unset;
+
+            .card-header {
+                background-color: transparent;
+            }
+
+            .card-body {
+                box-shadow: none;
+                overflow-x: hidden;
+            }
+        }
+
+        .card-header {
+            padding-top: 30px;
+            padding-bottom: 30px;
+            background-color: $whiteblue;
+            border: 0;
+            border-radius: inherit;
+        }
+
+        .card-body {
+            overflow-x: scroll;
+            padding: 30px 20px;
+            background-color: $white;
+            @extend %sheet;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .b-table {
+            display: inline-table;
+            margin: 0;
+        }
+    }
 
 </style>

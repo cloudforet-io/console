@@ -1,15 +1,18 @@
 <template>
   <div class="row">
     <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-
+      <b-card class="base summary border-top-0">
+        Admin
+      </b-card>
     </b-col>
+  </div>
   </div>
 </template>
 
 <script>
 
   export default {
-    name: 'ServerDetail',
+    name: 'ServerAdmin',
     components: {
 
     },
@@ -17,7 +20,9 @@
 
     },
     data () {
+      return {
 
+      };
     },
 
     watch: {

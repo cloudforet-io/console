@@ -330,6 +330,7 @@ a {
   }
 }
 
+
 /* card */
 .card.base {
   @extend %sheet;
@@ -340,6 +341,15 @@ a {
     border-top-right-radius: $border-radius;
   }
 }
+
+/* Dropdown Options on Card */
+.button-content > button {
+  border-bottom: 0px !important;
+  border-top: 0px !important;
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+}
+
 
 /* i Tag: icon */
 .primary{
@@ -366,9 +376,9 @@ a {
   color:$red;
 }
 
-.button-content > button {
-  border-bottom: 0px !important;
-  border-top: 0px !important;
-  padding-bottom: 0px !important;
-  padding-top: 0px !important;
+.warning {
+  color:$orange;
 }
+
+
+

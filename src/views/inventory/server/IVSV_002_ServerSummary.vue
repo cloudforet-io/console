@@ -3,10 +3,10 @@
 </template>
 
 <script>
-import BasePanel from '@/components/base/panel/BAPA_001_BasePanel';
+import BasePanel from '@/components/base/panel/BAPA_002_BasePanel';
 
 export default {
-    name: 'ServerDetail',
+    name: 'ServerSummary',
     components: {
         BasePanel
     },
@@ -31,10 +31,9 @@ export default {
                     color: 'primary'
                 },
                 data: [
-                    { title: 'ID', contents: 'pg-6bc72053' },
-                    { title: 'Name', contents: 'AWS KsssR' },
-                    { title: 'Created', contents: '2019-05-12' },
-                    { title: '', contents: '' }
+                    { title: 'ID', contents: 'pg-6bc72053', copyFlag:true },
+                    { title: 'Name', contents: 'AWS Seoul', copyFlag:true },
+                    { title: 'Created at', contents: '2019-05-12 18:00:12' , copyFlag:true }
                 ]},
             {
                 panelTitle: 'Tag',

@@ -43,34 +43,32 @@
     <b-row>
       <b-col cols="12">
         <BaseTabNav v-if="selectedServer"
+                    :key="selectedServer._id"
                     :fill="false"
                     :nav-tabs="tabs"
                     :keep-alive="true"
                     :is-footer-visible="false"
-                    :use-slot="true"
-        >
+                    :use-slot="true">
           <template #SUMMARY>
-            <serverSummary>
-            </serverSummary>
+            <serverSummary />
           </template>
           <template #DATA>
-            <serverData>
-            </serverData>
+            <serverData />
           </template>
           <template #RAWDATA>
-            <serverRawData> </serverRawData>
+            <serverRawData />
           </template>
           <template #ADMIN>
-            <serverAdmin> </serverAdmin>
+            <serverAdmin />
           </template>
           <template #MONITORING>
-            <serverMonitoring> </serverMonitoring>
+            <serverMonitoring />
           </template>
           <template #COMMAND>
-            <serverCommand> </serverCommand>
+            <serverCommand />
           </template>
           <template #AUDIT>
-            <serverAudit> </serverAudit>
+            <serverAudit />
           </template>
         </BaseTabNav>
       </b-col>
@@ -80,6 +78,9 @@
 
 <script>
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
+import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
+import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
+
 import query from './search_context/query.js';
 import serverSummary from '@/views/inventory/server/IVSV_002_ServerSummary';
 import serverData from '@/views/inventory/server/IVSV_003_ServerData';
@@ -89,9 +90,6 @@ import serverMonitoring from '@/views/inventory/server/IVSV_006_ServerMonitoring
 import serverCommand from '@/views/inventory/server/IVSV_007_ServerCommand';
 import serverAudit from '@/views/inventory/server/IVSV_008_ServerAudit';
 
-
-const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
-const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 
 export default {
     name: 'Server',
@@ -126,30 +124,36 @@ export default {
             tabs: [
                 {
                     tabTitle: 'SUMMARY',
+                    tabIdxTitle: 'SUMMARY'
                 },
                 {
                     tabTitle: 'DATA',
+                    tabIdxTitle: 'DATA'
                 },
                 {
                     tabTitle: 'RAW DATA',
+                    tabIdxTitle: 'RAWDATA'
                 },
                 {
                     tabTitle: 'ADMIN',
+                    tabIdxTitle: 'ADMIN'
                 },
                 {
                     tabTitle: 'MONITORING',
+                    tabIdxTitle: 'MONITORING'
                 },
                 {
                     tabTitle: 'COMMAND',
+                    tabIdxTitle: 'COMMAND'
                 },
                 {
                     tabTitle: 'AUDIT',
+                    tabIdxTitle: 'AUDIT'
                 }
             ],
-            defaultTab: 0,
             servers: [],
             selectedServer: null,
-            selectedIdx: undefined,
+            selectedIdx: null,
             addModal: false,
             totalCount: 17,
             queryData: query,
@@ -200,7 +204,7 @@ export default {
             setTimeout(() => { // this is for test
                 this.servers = res.data;
                 this.isLoading = false;
-            }, 1000);
+            }, 500);
         /**
          * TODO: set totalCount with data from server
          */
