@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 import auth from './auth';
-import subHeader from './sub-header';
+import header from './header';
 import modal from './modal';
 
 Vue.use(Vuex);
@@ -13,7 +13,7 @@ export default new Vuex.Store({
     modules: {
         auth,
         modal,
-        subHeader
+        header
     },
     strict: debug
 

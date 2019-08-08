@@ -7,7 +7,7 @@ export default {
     name: 'IdentityMain',
     beforeRouteEnter (to, from, next) {
         next(vm => {
-            vm.$store.dispatch('subHeader/setSubHeader', {
+            vm.$store.dispatch('header/setSubHeader', {
                 headerGroup: { label: 'Identity', link: '/identity', icon: 'fal fa-address-card' },
                 headerList: [
                     { label: 'User', link: '/identity/user' },

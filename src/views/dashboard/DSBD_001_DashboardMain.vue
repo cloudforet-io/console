@@ -986,7 +986,7 @@ export default {
     },
     beforeRouteEnter (to, from, next) {
         next(vm => {
-            vm.$store.dispatch('subHeader/setSubHeader', {
+            vm.$store.dispatch('header/setSubHeader', {
                 headerGroup: { label: 'Dashboard', link: '/dashboard', icon: 'fal fa-chart-line' },
                 headerList: []
             });

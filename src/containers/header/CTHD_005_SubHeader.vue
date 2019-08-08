@@ -27,7 +27,7 @@ import { mapGetters } from 'vuex';
 export default {
     name:'SubHeader',
     computed: {
-        ...mapGetters('subHeader', [
+        ...mapGetters('header', [
             'subHeaderGroup',
             'subHeaderList'
         ])

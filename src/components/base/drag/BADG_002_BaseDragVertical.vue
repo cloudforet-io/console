@@ -3,11 +3,14 @@
     <slot name="container" :width="containerWidth" />
 
     <div class="dragger-container"
-         :style="draggerContainerStyle"
+         :style="{
+           'height': `${containerHeight}px`,
+           'left': `${containerWidth}px`
+         }"
     >
       <div class="line top"
            :class="{'colored': line}" 
-           :style="lineStyle"
+           :style="{ 'height': `${lineHeight}px` }"
       />
 
       <span class="dragger" 
@@ -15,12 +18,12 @@
             @mousedown="onMousedown"
       >
         <slot name="dragger" />
-        <i v-if="!$slots.dragger" class="fad fa-ellipsis-h" />
+        <i v-if="!$slots.dragger" class="fal fa-grip-lines-vertical" />
       </span>
 
       <div class="line bottom" 
            :class="{ 'colored': line }" 
-           :style="lineStyle"
+           :style="{ 'height': `${lineHeight}px` }"
       />
     </div>
   </div>
@@ -33,10 +36,6 @@ export default {
         isCustom: {
             type: Boolean,
             default: false
-        },
-        height: {
-            type: String,
-            default: '100vh'
         },
         line: {
             type: Boolean,
@@ -65,21 +64,20 @@ export default {
     },
     data () {
         return {
-            lineStyle: {
-                'height': `calc(50% - ${this.height}px)`
-            },
             draggerStyle: {
                 'font-size': this.draggerSize,
                 'height': `${this.draggerHeight}px`
             },
             containerWidth: this.width,
-            draggerContainerStyle: {
-                'height': this.height,
-                'left': `${this.containerWidth}px`
-            },
+            containerHeight: self.innerHeight,
+            lineHeight: (this.containerHeight / 2) - this.draggerHeight,
             dragging: false,
             pageX: null
         };
+    },
+    mounted () {
+        this.containerHeight = this.$scopedSlots.container()[0].context.$el.clientHeight;
+        this.lineHeight = (this.containerHeight / 2) - this.draggerHeight;
     },
     methods: {
         onMousedown () {
@@ -118,7 +116,7 @@ export default {
 .dragger-container {
   position: absolute;
   top: 0;
-  margin-left: 20px;
+  margin-left: 10px;
   padding-right: 20px;
   .line {
     position: absolute;
@@ -144,7 +142,7 @@ export default {
     font-size: 1.5rem;
     font-weight: 600;
     text-align: center;
-    cursor: row-resize;
+    cursor: col-resize;
     color: inherit;
   }
 }
