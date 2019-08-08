@@ -1,16 +1,16 @@
 {
-  "MSG":{
-    "DR_SERV":"Services",
-    "LOG_IN":"Log In",
-    "LOG_OUT":"Log Out",
-    "FORGPW":"Forgot password?",
-    "SIGN_UP":"Sign up",
-    "SIGN_UP_MSG":"We make it simple to launch in any clouds and scale up as your company grow - whether you’re running any of cloud machine ; We can handle it.",
-    "SIGN_IN":"Log in to your Account.",
-    "SIGN_FAIL_TITLE":"Wrong Password or Username.",
-    "SIGN_FAIL_BODY":"Please confirm your Username or Password.",
-    "REGISTER":"Register Now!",
-    "REMEMBER":"Remember Me",
+  "MSG": {
+    "DR_SERV": "Services",
+    "LOG_IN": "Log In",
+    "LOG_OUT": "Log Out",
+    "FORGPW": "Forgot password?",
+    "SIGN_UP": "Sign up",
+    "SIGN_UP_MSG": "We make it simple to launch in any clouds and scale up as your company grow - whether you’re running any of cloud machine ; We can handle it.",
+    "SIGN_IN": "Log in to your Account.",
+    "SIGN_FAIL_TITLE": "Wrong Password or Username.",
+    "SIGN_FAIL_BODY": "Please confirm your Username or Password.",
+    "REGISTER": "Register Now!",
+    "REMEMBER": "Remember Me",
     "TR_NOTI": "Trouble to Log In?",
     "TR_NOTI_CON": "",
     "BTN_CANCEL": "CANCEL",
@@ -21,7 +21,22 @@
     "AUDIT": "AUDIT",
     "TAG": "TAG"
   },
-  "ERR_CODE":{
-    "ERR_LOG_001":"User ID and Password error"
+  "ENUM": {
+    "SERVER_STATE": {
+      "SERVICE": "In Service",
+      "MAINTENANCE": "Maintenance",
+      "CLOSED": "Closed",
+      "DELETED": "Deleted"
+    },
+    "COLLECT_STATE": {
+      "NEW":   "New",
+      "ACTIVE":  "Active",
+      "DISCONNECTED": "Disconnected",
+      "DUPLICATED": "Duplicated",
+      "UNMANAGED": "Unmanaged"
+    }
+  },
+  "ERR_CODE": {
+    "ERR_LOG_001": "User ID and Password error"
   }
 }

@@ -103,10 +103,10 @@ export const Mixin = {
      * Description:  Select badges variant by given val
      **********************************************************************************/
         selectBadges: function (s) {
-            const successFlag = ['active', 'success'];
+            const successFlag = ['active', 'success','vm'];
             const secondaryFlag = ['inactive'];
             const dangerFlag = ['banned', 'failure', 'fail'];
-            const warningFlag = ['pending'];
+            const warningFlag = ['pending','aws'];
             const infoFlag = [];
             const lightFlag = [];
             const darkFlag = [];
@@ -168,15 +168,15 @@ export const Mixin = {
         isSelectedType: function (d, t) {
             if (t.toUpperCase() ==='N') {
                 return (Number.isInteger(d) && !isNaN(d));
-            } else if(t.toUpperCase() ==='D' || t.toUpperCase() ==='F') {
+            } else if (t.toUpperCase() ==='D' || t.toUpperCase() ==='F') {
                 return (!isNaN(parseFloat(d)));
-            } else if(t.toUpperCase() ==='B') {
+            } else if (t.toUpperCase() ==='B') {
                 return  ['1', '0', 1, 0, true, false].includes(d);
-            } else if(t.toUpperCase() ==='S') {
+            } else if (t.toUpperCase() ==='S') {
                 return  (typeof d === 'string' || d instanceof String);
-            } else if(t.toUpperCase() ==='O') {
+            } else if (t.toUpperCase() ==='O') {
                 return (typeof d === 'object' && d !== null && !Array.isArray(d));
-            } else if(t.toUpperCase() ==='A') {
+            } else if (t.toUpperCase() ==='A') {
                 return Array.isArray(d);
             } else {
                 throw 'Please, Check data type';
@@ -194,8 +194,11 @@ export const Mixin = {
      * Description:  Create a string of <i/> Dom tag with given option
      **********************************************************************************/
         selectIconHtml: function (o) {
-            //Note:: Please add a new type letter when New font Type has added.
-            const fontAwesome = ['l','b'];
+             /******************************************************************
+             * Note:: Please add a new type letter when New font Type has added.
+             * ****************************************************************
+             */
+            const fontAwesome = ['l','b','d'];
             let returnHtml = '';
             let defaultClass = 'fal ';
             if (o.hasOwnProperty('type') && fontAwesome.includes(o.type)) {
@@ -203,21 +206,21 @@ export const Mixin = {
             }
             if (o.hasOwnProperty('icon')) {
                 defaultClass += o.icon;
-            }else {
+            } else {
                 defaultClass += 'fa-hashtag';
             }
             if (o.hasOwnProperty('size') && o.size > -2 && o.size <= 10) {
-                if(o.size === -1){
+                if (o.size === -1){
                     defaultClass += ' fa-xs';
-                }else if(o.size === 0){
+                } else if (o.size === 0){
                     defaultClass += ' fa-sm';
-                }else if(o.size === 1){
+                } else if (o.size === 1){
                     defaultClass += ' fa-lg';
-                }else {
+                } else {
                     defaultClass += ' fa-'+ o.size +'x';
                 }
             }
-            if(o.hasOwnProperty('color')) {
+            if (o.hasOwnProperty('color')) {
                 defaultClass += ' ' + o.color;
             }
             returnHtml =`<i class="${defaultClass}"> </i>`;
@@ -239,13 +242,49 @@ export const Mixin = {
             let key = 'MSG';
             if (path[0] !== 'MSG' && path.length < 2) {
                 key += '.'+m;
-            }else {
+            } else {
                 key = m;
             }
             return  this.$i18n.t(key);
+        },
+    /**********************************************************************************
+     * Name       : tr
+     * Input   => (m: message   =>  String)
+     *            {type: type of font awesome ex: fal, fab,
+     *             icon: icon name,
+     *             size: size of icon ex: -1 ~ 10
+     *             color: variant color
+     *            }
+     * Output  => String translation Message
+     * Description:  translation of i18n
+     **********************************************************************************/
+        setFontSize: function (f, pSet) {
+            //Note: Default font-size is on index 3
+            let defaultSet = [10,12,14,16,18,24];
+            let fontSize = 'font-size:';
+            /*if (this.isEmpty(pSet) && this.isSelectedType(pSet, 'a') && pSet.every((element) => typeof element === 'number')) {
+
+            } else {*/
+
+            if (f == 1) {
+                fontSize += '24px';
+            } else if (f == 2) {
+                fontSize += '18px';
+            } else if (f == 4) {
+                fontSize += '14px';
+            } else if (f == 5) {
+                fontSize += '12px';
+            } else if (f == 6) {
+                fontSize += '10px';
+            } else {
+                fontSize += '16px';
+            }
+            /*}*/
+
+
+            return fontSize;
         }
     },
-
     data: function () {
         //let status = (document.body.className.indexOf('sidebar-minimized brand-minimized') > -1) ? true : false;
         return {
