@@ -2,15 +2,14 @@
   <div>
     <div class="row no-gutters" @click="contextMenuIsVisible=false">
       <transition name="tree-trans"
+                  appear
                   @before-enter="beforeEnter"
                   @enter="enter"
       >
         <div v-if="showTree">
-          <!-- class="col-xs-6 col-sm-6 col-md-6 col-lg-2 main-tree-col" -->
-          <BaseDragVertical>
+          <BaseDragVertical :line="false">
             <template #container="{ width }">
-              <sl-vue-tree ref="slVueTree"
-                           v-model="treeData"
+              <sl-vue-tree v-model="treeData"
                            class="main-tree-col"
                            :allow-multiselect="true"
                            :style="{ width: `${width}px` }"
@@ -71,9 +70,7 @@
     </div>
   </div>
 </template>
-    
-  </div>
-</template>
+
 
 <script>
 import BaseDragVertical from '@/components/base/drag/BADG_002_BaseDragVertical.vue';
@@ -112,7 +109,6 @@ export default {
     },
     mounted: function () {
         this.showTree = true;
-        window.slVueTree = this.$refs.slVueTree;
     },
     methods: {
         nodeSelected (nodes, event) {
