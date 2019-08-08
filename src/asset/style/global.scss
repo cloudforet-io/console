@@ -321,8 +321,21 @@ a {
           font-weight: 500;
         }
         .sl-vue-tree-title {
+          width: 100%;
           .sl-vue-tree-toggle {
             text-align: center;
+            width: 20px;
+          }
+          .item-title {
+            display: inline-block;
+            width: calc(100% - 25px);
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            .item-icon {
+              vertical-align: baseline;
+            }
           }
         }
       }

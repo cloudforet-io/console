@@ -78,7 +78,7 @@ const sampleNode = [
         'isExpanded': false
     },
     {
-        'title': 'Folder2',
+        'title': 'Has Many children Long name',
         'isExpanded': false,
         'children': [
             {
@@ -94,12 +94,22 @@ const sampleNode = [
                 'children': [
                     {
                         'title': 'Item5',
-                        'isLeaf': true
+                        'children': [
+                            {
+                                'title': 'Long Name Item-------------.',
+                                'children': [
+                                    {
+                                        'title': 'Example',
+                                        'isLeaf': true
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             }
         ],
-        'isSelected': true
+        'isSelected': false
     },
     {
         'title': 'Folder5',

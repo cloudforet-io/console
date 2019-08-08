@@ -7,7 +7,7 @@ export default {
     name: 'InventoryMain',
     beforeRouteEnter (to, from, next) {
         next(vm => {
-            vm.$store.dispatch('subHeader/setSubHeader', {
+            vm.$store.dispatch('header/setSubHeader', {
                 headerGroup: { label: 'Inventory', link: '/inventory', icon: 'fal fa-warehouse-alt' },
                 headerList: [
                     { label: 'Data Center', link: '/inventory/data-center' },

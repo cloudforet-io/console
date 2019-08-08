@@ -26,7 +26,9 @@ Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
 Vue.use(CountryFlag);
 Vue.use(Notifications, { velocity });
+
 Vue.prototype.$axios = api;
+Vue.prototype.$velocity = velocity;
 
 /**
  * This is a Global Bus Event;
