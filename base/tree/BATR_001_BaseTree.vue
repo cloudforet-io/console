@@ -1,36 +1,48 @@
 <template>
   <div>
     <div class="row no-gutters" @click="contextMenuIsVisible=false">
-      <transition name="tree-trans">
-        <div v-if="showTree" class="col-xs-6 col-sm-6 col-md-6 col-lg-2 main-tree-col">
-          <sl-vue-tree ref="slVueTree"
-                       v-model="treeData" :allow-multiselect="true"
-                       @select="nodeSelected"
-                       @drop="nodeDropped"
-                       @nodecontextmenu="showContextMenu"
-          >
-            <template slot="title" slot-scope="{ node }">
-              <span class="item-icon">
-                <i v-if="node.isLeaf" class="fal fa-cube" />
-                <template v-else>
-                  <i v-if="node.isExpanded" class="fal fa-folder-open" />
-                  <i v-else class="fal fa-folder-minus" />
+      <transition name="tree-trans"
+                  appear
+                  @before-enter="beforeEnter"
+                  @enter="enter"
+      >
+        <div v-if="showTree">
+          <BaseDragVertical :line="false">
+            <template #container="{ width }">
+              <sl-vue-tree v-model="treeData"
+                           class="main-tree-col"
+                           :allow-multiselect="true"
+                           :style="{ width: `${width}px` }"
+                           @select="nodeSelected"
+                           @drop="nodeDropped"
+                           @nodecontextmenu="showContextMenu"
+              >
+                <template slot="title" slot-scope="{ node }">
+                  <span class="item-title">
+                    <span class="item-icon">
+                      <i v-if="node.isLeaf" class="fal fa-cube" />
+                      <template v-else>
+                        <i v-if="node.isExpanded" class="fal fa-folder-open" />
+                        <i v-else class="fal fa-folder-minus" />
+                      </template>
+                    </span>
+                    {{ node.title }}
+                  </span>
                 </template>
-              </span>
-              {{ node.title }}
-            </template>
 
-            <template slot="toggle" slot-scope="{ node }">
-              <i v-if="node.isExpanded" class="fal fa-angle-down" />
-              <i v-else class="fal fa-angle-right" />
-            </template>
+                <template slot="toggle" slot-scope="{ node }">
+                  <i v-if="node.isExpanded" class="fal fa-angle-down" />
+                  <i v-else class="fal fa-angle-right" />
+                </template>
 
-            <template slot="sidebar" slot-scope="{ node }">
+              <!-- <template slot="sidebar" slot-scope="{ node }">
               <span class="ellipsis" @click.stop.prevent="showContext($event, node)">
-                <i class="fal fa-bars" />
+                <i class="fal fa-ellipsis-v-alt" />
               </span>
+            </template> -->
+              </sl-vue-tree>
             </template>
-          </sl-vue-tree>
+          </BaseDragVertical>
         </div>
       </transition>
 
@@ -59,17 +71,25 @@
   </div>
 </template>
 
+
 <script>
+import BaseDragVertical from '@/components/base/drag/BADG_002_BaseDragVertical.vue';
 import SlVueTree from 'sl-vue-tree';
+
 export default {
     name: 'BaseTree',
     components: {
+        BaseDragVertical,
         SlVueTree
     },
     props: {
         treeProp: {
             type: Array,
             default: () => []
+        },
+        treeWidth: {
+            type: Number,
+            default: 250
         }
     },
     data () {
@@ -89,7 +109,6 @@ export default {
     },
     mounted: function () {
         this.showTree = true;
-        window.slVueTree = this.$refs.slVueTree;
     },
     methods: {
         nodeSelected (nodes, event) {
@@ -215,19 +234,40 @@ export default {
                 const path = treeV.getSelected().map(node => node.path);
                 treeV.remove(path);
             }
+        },
+        beforeEnter (el, done) {
+            this.$velocity(el, {
+                translateX: `-${this.treeWidth}px`,
+                opacity: 0
+            });
+        },
+        enter (el, done) {
+            this.$velocity(el, 
+                { 
+                    translateX: '0px',
+                    opacity: 1 
+                }, 
+                { 
+                    duration: 400, 
+                    complete () {
+                        done(); 
+                    } 
+                }
+            );
+            // el.style.transition = 'all .4s ease-in-out';
+            done();
+
+
+            // el.style.transform = `translateX(-${this.treeWidth})`;
+            // el.style.opacity = 0;
+            // debugger;
+            // done();
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-  .tree-trans-enter-active {
-    transition: all .4s ease-in-out;
-  }
-  .tree-trans-enter {
-    transform: translateX(-250px);
-    opacity: 0;
-  }
   .panel-trans-enter-active {
     transition: all .4s ease-in-out;
   }
@@ -235,16 +275,14 @@ export default {
     opacity: 0;
   }
 
-  $main-height: calc(100vh - #{$header-height} - 10px);
+  $main-height: calc(100vh - #{$header-height} - 30px);
 
   .main-tree-col {
     @extend %sheet;
-    // border-radius: 0;
-    position: fixed;
-    padding: 15px;
+    border-radius: 0;
+    padding: 15px 8px;
     background-color: $white;
     height: $main-height;
-    // max-width: 250px;
     overflow: scroll;
   }
 
