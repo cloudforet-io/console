@@ -1,18 +1,33 @@
 <template>
   <b-row>
     <b-col class="base-tab-nav col-xs-6 col-sm-6 col-md-12 col-lg-12">
-      <b-nav tabs :fill="fill">
-        <b-nav-item
-          v-for="(ntab, idx) in navTabs"
-          :key="idx"
-          :class="{active: selectedTab.component === ntab.component}"
-          :active="selectedTab.tabTitle === ntab.tabTitle"
-          @click="selectedTab = ntab"
-        >
-          {{ ntab.tabTitle }}
-        </b-nav-item>
-      </b-nav>
-      <slot v-if="useSlot" :name="selectedTab.tabTitle" />
+      <template v-if="pill">
+        <b-nav pills :fill="fill">
+          <b-nav-item
+                  v-for="(curTab, idx) in navTabs"
+                  :key="idx"
+                  :class="{active: selectedTab.component === curTab.component}"
+                  :active="selectedTab.tabTitle === curTab.tabTitle"
+                  @click="selectedTab = curTab"
+          >
+            {{ curTab.tabTitle }}
+          </b-nav-item>
+        </b-nav>
+      </template>
+      <template v-else>
+        <b-nav tabs :fill="fill">
+          <b-nav-item
+                  v-for="(curTab, idx) in navTabs"
+                  :key="idx"
+                  :class="{active: selectedTab.component === curTab.component}"
+                  :active="selectedTab.tabTitle === curTab.tabTitle"
+                  @click="selectedTab = curTab"
+          >
+            {{ curTab.tabTitle }}
+          </b-nav-item>
+        </b-nav>
+      </template>
+      <slot v-if="useSlot" :name="setTabName(selectedTab)" />
       <template v-else>
         <template v-if="keepAlive">
           <keep-alive>
@@ -75,19 +90,23 @@ export default {
             default: false
         },
         isFooterVisible: {
-            tyep: Boolean,
+            type: Boolean,
             default: false
         },
         isCreatable: {
-            tyep: Boolean,
+            type: Boolean,
             default: false
         },
         isUpdatable: {
-            tyep: Boolean,
+            type: Boolean,
+            default: false
+        },
+        pill: {
+            type: Boolean,
             default: false
         },
         isDeletable: {
-            tyep: Boolean,
+            type: Boolean,
             default: false
         },
         selectedData: {
@@ -137,7 +156,11 @@ export default {
         },
         closeWindow (e) {
             this.$store.dispatch('modal/closeModal');
+        },
+        setTabName (selectedData) {
+            return (selectedData.hasOwnProperty('tabIdxTitle')) ? selectedData.tabIdxTitle : selectedData.tabTitle;
         }
+
     }
 };
 </script>
