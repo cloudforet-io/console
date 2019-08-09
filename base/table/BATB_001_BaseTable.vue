@@ -123,9 +123,7 @@
 
         <template slot="state" slot-scope="data">
           <div>
-            <b-badge :variant="getBadge(data.item.status)">
-              {{ capitalizeFirstLetter(data.item.status) }}
-            </b-badge>
+              <span v-html="iTagBuilder(data.item.state)"/>data.item.state
           </div>
         </template>
 
@@ -141,6 +139,7 @@
 import BaseSearch from '@/components/base/search/BASR_001_BaseSearch.vue';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal.vue';
 import BaseCheckbox from '@/components/base/checkbox/BACB_001_BaseCheckbox.vue';
+import GlobalEnum from '@/setup/enum';
 
 export default {
     name: 'BaseTable',
@@ -148,7 +147,8 @@ export default {
     components: {
         BaseSearch,
         BaseModal,
-        BaseCheckbox
+        BaseCheckbox,
+        GlobalEnum
     },
     inheritAttrs: false,
     props: {
