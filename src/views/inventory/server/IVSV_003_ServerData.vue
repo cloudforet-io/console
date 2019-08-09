@@ -13,43 +13,37 @@
             :use-slot="true"
           >
             <template #DISK>
-              <div class="row">
-                <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-                  <b-card class="base summary border-top-0">
-                    Audit
-                  </b-card>
-                </b-col>
-              </div>
+              <data-disk></data-disk>
             </template>
             <template #MOUNT>
-              <div class="row">
-                <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-                  <b-card class="base summary border-top-0">
-                    Audit
-                  </b-card>
-                </b-col>
-              </div>
+              <data-mount></data-mount>
+            </template>
+            <template #NIC>
+              <data-n-i-c></data-n-i-c>
             </template>
             <template #ROUTE>
-
+              <data-route></data-route>
             </template>
             <template #PORT>
-
+              <data-port></data-port>
             </template>
             <template #PCI>
-
+              <dataPCI></dataPCI>
             </template>
             <template #SOFTWARE>
-
+              <data-software></data-software>
+            </template>
+            <template #SERVICE>
+              <data-service></data-service>
             </template>
             <template #WINUPDATE>
-
+              <data-win-update></data-win-update>
             </template>
             <template #SHARE>
-
+              <data-share></data-share>
             </template>
             <template #SECURITYGROUP>
-
+              <data-security-group></data-security-group>
             </template>
             </BaseTabNav>
         </b-col>
@@ -57,18 +51,34 @@
     </b-col>
   </div>
 </template>
-
 <script>
-import BaseTable from '@/components/base/table/BATB_001_BaseTable';
-import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
+import dataDisk from '@/views/inventory/server/inner_data_tabs/SVID_001_DataDisk.vue';
+import dataMount from '@/views/inventory/server/inner_data_tabs/SVID_002_DataMount.vue';
+import dataNIC from '@/views/inventory/server/inner_data_tabs/SVID_003_DataNIC.vue';
+import dataRoute from '@/views/inventory/server/inner_data_tabs/SVID_004_DataRoute.vue';
+import dataPort from '@/views/inventory/server/inner_data_tabs/SVID_005_DataPort.vue';
+import dataPCI from '@/views/inventory/server/inner_data_tabs/SVID_006_DataPCI.vue';
+import dataSoftware from '@/views/inventory/server/inner_data_tabs/SVID_007_DataSoftware.vue';
+import dataWinUpdate from '@/views/inventory/server/inner_data_tabs/SVID_008_DataWinUpdate.vue';
+import dataShare from '@/views/inventory/server/inner_data_tabs/SVID_009_DataShare.vue';
+import dataSecurityGroup from '@/views/inventory/server/inner_data_tabs/SVID_010_DataSecurityGroup.vue';
+
 
 export default {
     name: 'ServerData',
     components: {
-        BaseTable,
-        BaseModal,
-        BaseTabNav
+        BaseTabNav,
+        dataDisk,
+        dataMount,
+        dataNIC,
+        dataRoute,
+        dataPort,
+        dataPCI,
+        dataSoftware,
+        dataWinUpdate,
+        dataShare,
+        dataSecurityGroup
     },
     props: {
 

@@ -116,7 +116,8 @@ export default {
             fields: [
                 { key: 'selected' },
                 { key: '_id', label: 'Name', sortable: true, ajaxSortable: false },
-                { key: 'user_name', label: 'State', sortable: true, ajaxSortable: true },
+                { key: 'user_name', label: 'ab', sortable: true, ajaxSortable: true },
+                { key: 'state', label: 'State', sortable: true, ajaxSortable: true },
                 { key: 'password', label: 'IP', sortable: true, ajaxSortable: false },
                 { key: 'user_first_name', label: 'Core', sortable: true, ajaxSortable: false },
                 { key: 'user_last_name', label: 'Memory', sortable: true, ajaxSortable: false },
@@ -205,7 +206,7 @@ export default {
             } catch (e) {
                 console.error(e);
             }
-
+            this.bindAdditionalKey(res.data, 'state', 'SERVER_STATE');
             setTimeout(() => { // this is for test
                 this.servers = res.data;
                 this.isLoading = false;
