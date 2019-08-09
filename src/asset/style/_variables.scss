@@ -21,8 +21,10 @@ $gradient: linear-gradient(45deg, darken($blue, 15%) 10%, $blue 40%, $violet);
 $dark-gradient: linear-gradient(135deg, darken($blue, 10%) 30%, $violet);
 
 /* FONT */
-$font-basic: 'NotoSans', sans-serif;
-$font-big: 'Roboto', sans-serif;
+// $font-basic: 'NotoSans', sans-serif;
+// $font-big: 'Roboto', sans-serif;
+$font-basic: sans-serif;
+$font-big: sans-serif;
 
 /* Z-INDEX */
 $header-z: 9999999;
@@ -51,8 +53,3 @@ $box-shadow: 0px 0 10px 0px rgba($black, 0.1);
   @extend %box-shadow;
   @extend %border-radius;
 }
-
-
-
-
-

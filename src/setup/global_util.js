@@ -184,7 +184,7 @@ export const Mixin = {
         },
     /**********************************************************************************
      * Name       : selectIconHtml
-     * Input   => (o: icon object   =>  Object)
+     * Input   => (o: icon object   =>  Object, c: class)
      *            {type: type of font awesome ex: fal, fab,
      *             icon: icon name,
      *             size: size of icon ex: -1 ~ 10
@@ -193,7 +193,7 @@ export const Mixin = {
      * Output  => boolean whether it's checked type
      * Description:  Create a string of <i/> Dom tag with given option
      **********************************************************************************/
-        selectIconHtml: function (o) {
+        selectIconHtml: function (o, c) {
              /******************************************************************
              * Note:: Please add a new type letter when New font Type has added.
              * ****************************************************************
@@ -224,7 +224,7 @@ export const Mixin = {
                 defaultClass += ' ' + o.color;
             }
             returnHtml =`<i class="${defaultClass}"> </i>`;
-            return returnHtml;
+            return c ? defaultClass : returnHtml;
         },
     /**********************************************************************************
      * Name       : tr

@@ -2,7 +2,7 @@
   <div class="animated fadeIn">
     <base-panel :panels="panelData" />
     <div class="col-xs-12 p-0">
-      <base-panel-card :panels-card="panelCardData" />
+      <base-panel-card :panel-card="panelCardData" />
     </div>
     <div class="row">
       <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
@@ -189,8 +189,7 @@ export default {
                 TitleIconClass: {
                     icon: 'fa-globe',
                     type: 'l',
-                    size: 1,
-                    color: 'primary'
+                    size: 1
                 },
                 cardTitle: 'Server By Region',
                 isDropdownUSed: false

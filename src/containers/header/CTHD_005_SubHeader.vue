@@ -5,7 +5,6 @@
         <i :class="subHeaderGroup.icon" />&nbsp;&nbsp;
         {{ subHeaderGroup.label }}
       </span>
-      <!-- <span class="triangle" /> -->
     </b-col>
     <b-col cols="10" class="row ">
       <span v-for="nav in subHeaderList" :key="nav.label">
@@ -42,7 +41,6 @@ $shape-height: $sub-header-height;
 $shape-width: 18px;
 $shape-color: darken($skyblue, 1%);
 %item {
-  position: relative;
   display: inline-block;
   height: $sub-header-height;
   width: 100%;
@@ -65,7 +63,6 @@ $shape-color: darken($skyblue, 1%);
   background-color: $bg-color;
   font-weight: 500;
   font-family: $font-big;
-  font-size: 0.9rem;
   box-shadow: 0px 0 5px 0px rgba($black, 0.3);
   
   .header-group {
@@ -80,16 +77,6 @@ $shape-color: darken($skyblue, 1%);
     i {
       font-size: 1.5em;
       font-weight: 500;
-    }
-    .triangle {
-      position: absolute;
-      height: 0;
-      width: 0;
-      top: 0px;
-      right: calc(-#{$shape-width});
-      border-top: $shape-height solid $shape-color;
-      border-right: $shape-width solid transparent;
-      z-index: 2;
     }
   }
 
