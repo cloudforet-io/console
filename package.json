@@ -20,7 +20,7 @@
     "bootstrap-vue-treeview": "^1.0.8",
     "chart.js": "^2.8.0",
     "core-js": "^2.6.5",
-    "get-value": "^3.0.1",
+    "dot-prop": "^5.1.0",
     "css-vars-ponyfill": "^1.17.2",
     "flag-icon-css": "^3.3.0",
     "jquery": "^3.4.1",
