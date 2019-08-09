@@ -3,26 +3,36 @@
     <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
       <b-card class="base summary border-top-0">
         <slot v-if="useSlot" :name="privatePanel" />
-        <template v-for="(item, index) in Panels" v-else :name="Panels[index].panelTitle">
+        <template v-for="(item, index) in panels" v-else :name="panels[index].panelTitle">
           <h5 :key="item.panelTitle" class="page-header m-t-0">
-            <span v-html="iTagBuilder(item.panelIcon)"/>
-            &nbsp;&nbsp {{ item.panelTitle }}
+            <span v-html="iTagBuilder(item.panelIcon)" />
+              &nbsp;&nbsp; {{ item.panelTitle }}
           </h5>
           <hr>
-
           <b-container fluid>
-            <dl class="dl-horizontal m-b-0 row">
-              <div v-for="(info, idx) in Panels[index].data" :key="idx" class="col-sm-12 col-md-6 summary">
-                <dt>{{ info.title }}</dt>
-                <dd>{{ info.contents }}</dd>
-                <span v-b-tooltip.hover
-                      class="copy-clipboard"
-                      title="Copy to Clipboard"
-                      @click="CopyToClipboard(info.contents)"
-                >
-                  <i class="fal fa-copy" />
+            <template v-if="indexChecker(item.data.length) === 0">
+              <dl>
+                <div class="warning-panel" style="display: block;"> No {{ item.panelTitle }}</div>
+              </dl>
+            </template>
+            <dl class="dl-horizontal mb-0 row">
+              <div v-for="(info, idx) in item.data" :key="idx" class="col-sm-12 col-md-6 summary">
+                <template v-if="indexChecker(item.data.length, idx) === 1">
+                  <dt>{{ info.title }}</dt>
+                  <dd>{{ info.contents }}</dd>
+                  <span v-if="useCopyToSelect(info.copyFlag)"
+                        v-b-tooltip.hover
+                        class="copy-clipboard"
+                        title="Copy to Clipboard"
+                        @click="CopyToClipboard(info.contents)">
+                  <i class="fal fa-copy"/>
                 </span>
+                </template>
               </div>
+                <div class="col-sm-12 col-md-6 summary" v-if="indexChecker(item.data.length) === 2">
+                  <dt></dt>
+                  <dd></dd>
+                </div>
             </dl>
           </b-container>
         </template>
@@ -50,6 +60,12 @@ export default {
         },
         iTagBuilder (iconObject) {
             return this.selectIconHtml(iconObject);
+        },
+        indexChecker (totalLength, currentIndex) {
+            return (totalLength === 0 && this.isEmpty(currentIndex)) ? 0 : (currentIndex <= totalLength-1) ? 1 : 2;
+        },
+        useCopyToSelect (boolean) {
+            return (this.isEmpty(boolean)) ? false: boolean;
         }
     }
 };
@@ -86,6 +102,7 @@ export default {
     width: 256px;
     line-height: 256px;
     text-align: center;
+    font-family: 'Noto Sans', sans-serif;
     font-size: 36px;
     color: maroon;
   }
@@ -107,6 +124,12 @@ export default {
       margin-top: 0;
       border-top-left-radius: 0px !important;
     }
+  }
+
+  .warning-panel{
+    text-align: center;
+    color: #888;
+    font-size: 18px;
   }
 
 </style>

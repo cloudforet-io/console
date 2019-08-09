@@ -156,8 +156,8 @@ export default {
 .dragger-container {
   position: absolute;
   top: 0;
-  margin-left: 10px;
-  padding-right: 20px;
+  margin-left: 7px;
+  padding-right: 10px;
   .line {
     position: absolute;
     display: inline-block;
@@ -183,7 +183,7 @@ export default {
     font-weight: 600;
     text-align: center;
     cursor: col-resize;
-    color: inherit;
+    color: $darkgray;
   }
 }
 </style>
