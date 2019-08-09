@@ -2,15 +2,16 @@
   <div class="card">
     <div class="card-header">
       <template v-if="chartTitleData.isTitleIconUsed">
-        <span v-html="selectIconHtml(chartTitleData.TitleIconClass)"></span>
+        <span v-html="selectIconHtml(chartTitleData.TitleIconClass)" />&nbsp;
       </template>
       {{ chartTitleData.cardTitle }}
       <template v-if="chartTitleData.isDropdownUsed">
-        <b-dropdown  :text="chartTitleDownData.dropDownTitle" class='button-content float-right' variant="transparent">
+        <b-dropdown :text="chartTitleDownData.dropDownTitle" class="button-content float-right" variant="transparent">
           <b-dropdown-item v-for="(opt, idx) in chartTitleDownData.dropDownDataArr"
                            :key="idx"
                            :data="opt"
-                           @click="dropdownAction(opt.optionClickMethod, opt)">
+                           @click="dropdownAction(opt.optionClickMethod, opt)"
+          >
             {{ opt.optionTitle }}
           </b-dropdown-item>
         </b-dropdown>
@@ -319,5 +320,13 @@ export default {
     max-height: 500px;
     height: 40%;
     width: 100%;
+  }
+  .card {
+    @extend %sheet;
+    margin-top: 20px;
+    border: 0;
+    .card-header {
+      border: 0;
+    }
   }
 </style>

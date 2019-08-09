@@ -12,7 +12,9 @@
           <b-container fluid>
             <template v-if="indexChecker(item.data.length) === 0">
               <dl>
-                <div class="warning-panel" style="display: block;"> No {{ item.panelTitle }}</div>
+                <div class="warning-panel" style="display: block;">
+No {{ item.panelTitle }}
+</div>
               </dl>
             </template>
             <dl class="dl-horizontal mb-0 row">
@@ -24,15 +26,16 @@
                         v-b-tooltip.hover
                         class="copy-clipboard"
                         title="Copy to Clipboard"
-                        @click="CopyToClipboard(info.contents)">
-                  <i class="fal fa-copy"/>
-                </span>
+                        @click="CopyToClipboard(info.contents)"
+>
+                    <i class="fal fa-copy" />
+                  </span>
                 </template>
               </div>
-                <div class="col-sm-12 col-md-6 summary" v-if="indexChecker(item.data.length) === 2">
-                  <dt></dt>
-                  <dd></dd>
-                </div>
+              <div v-if="indexChecker(item.data.length) === 2" class="col-sm-12 col-md-6 summary">
+                <dt/>
+                <dd/>
+              </div>
             </dl>
           </b-container>
         </template>

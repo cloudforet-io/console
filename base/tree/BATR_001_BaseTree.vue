@@ -138,7 +138,7 @@ export default {
       /*
          * This is a Emit event for Parents vue.
          */
-            this.$emit('selected', nodes);
+            // this.$emit('selected', nodes);
       /*
          * This is a Global Event bus, so Please, make sure that Event$bus is off when components has destroyed.
          */
@@ -335,7 +335,7 @@ export default {
   }
 
   .panel {
-    padding: $top-pad $side-pad $bottom-pad $side-pad;
+    padding: 50px $side-pad $bottom-pad $side-pad;
   }
 
 </style>
