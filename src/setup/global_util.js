@@ -1,5 +1,6 @@
 import { hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
-
+import { GlobalEnum } from '@/setup/enum.js';
+import get from 'get-value';
 export const Mixin = {
     methods: {
     /**********************************************************************************
@@ -248,7 +249,7 @@ export const Mixin = {
             return  this.$i18n.t(key);
         },
     /**********************************************************************************
-     * Name       : tr
+     * Name       : setFontSize
      * Input   => (m: message   =>  String)
      *            {type: type of font awesome ex: fal, fab,
      *             icon: icon name,
@@ -256,40 +257,46 @@ export const Mixin = {
      *             color: variant color
      *            }
      * Output  => String translation Message
-     * Description:  translation of i18n
+     * Description:  return string with font-size with for h1,h2,h3,h4,h5,h6 and personal set data.
      **********************************************************************************/
-        setFontSize: function (f, pSet) {
-            //Note: Default font-size is on index 3
-            let defaultSet = [10,12,14,16,18,24];
+        setFontSize: function (f) {
             let fontSize = 'font-size:';
-            /*if (this.isEmpty(pSet) && this.isSelectedType(pSet, 'a') && pSet.every((element) => typeof element === 'number')) {
-
-            } else {*/
-
-            if (f == 1) {
-                fontSize += '24px';
-            } else if (f == 2) {
-                fontSize += '18px';
-            } else if (f == 4) {
-                fontSize += '14px';
-            } else if (f == 5) {
-                fontSize += '12px';
-            } else if (f == 6) {
-                fontSize += '10px';
+            let defaultSet = this.defaultFontSizeSet;
+            let length = defaultSet.length;
+            if (this.isSelectedType(f,'s') && f.include('px')) {
+                fontSize += f;
+            } else if ( f > 0 && f < 7 ) {
+                fontSize += defaultSet[length-f] + 'px';
             } else {
-                fontSize += '16px';
+                fontSize += defaultSet[length-3] + 'px';
             }
-            /*}*/
-
-
             return fontSize;
+        },
+        /**********************************************************************************
+         * Name       : tr
+         * Input   => (m: message   =>  String)
+         *            {type: type of font awesome ex: fal, fab,
+         *             icon: icon name,
+         *             size: size of icon ex: -1 ~ 10
+         *             color: variant color
+         *            }
+         * Output  => String translation Message
+         * Description:  translation of i18n
+         **********************************************************************************/
+        bindEnumToHtml: function (p) {
+            if (!this.isEmpty(get(GlobalEnum, p))) {
+                     /*msg: 'In Progress',
+                      icon: 'fal fa-check',
+                      color: 'primary'*/
+                return get(GlobalEnum, p);
+            } else {
+                return '';
+            }
         }
     },
     data: function () {
-        //let status = (document.body.className.indexOf('sidebar-minimized brand-minimized') > -1) ? true : false;
         return {
-            //sideBarIsMinimized: status,
-            currentNodeEnv: null
+            defaultFontSizeSet: [10,12,14,16,18,24]
         };
     }
 };
