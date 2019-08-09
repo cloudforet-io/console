@@ -1,11 +1,16 @@
 <template>
-  <div style="position: relative;">
-    <slot name="container" :width="containerWidth" />
+  <div class="box-container"
+       :style="{'width': `${totalWidth}px`,
+                'height': `${containerHeight}px`}"
+  >
+    <div class="content-container left">
+      <slot name="leftContainer" :width="leftContainerWidth" />
+    </div>
 
-    <div class="dragger-container"
+    <div ref="dragger" class="dragger-container"
          :style="{
            'height': `${containerHeight}px`,
-           'left': `${containerWidth}px`
+           'left': `${leftContainerWidth}px`
          }"
     >
       <div class="line top"
@@ -26,6 +31,14 @@
            :style="{ 'height': `${lineHeight}px` }"
       />
     </div>
+
+    <div class="content-container right"
+         :style="{'width': `${rightContainerWidth}px`,
+                  'left': `${totalWidth - rightContainerWidth}px`,
+                  'height': `${containerHeight}px`}"
+    >
+      <slot name="rightContainer" :width="rightContainerWidth" />
+    </div>
   </div>
 </template>
 
@@ -33,9 +46,9 @@
 export default {
     name: 'BaseDragVertical',
     props: {
-        isCustom: {
-            type: Boolean,
-            default: false
+        height: {
+            type: Number,
+            default: self.innerHeight
         },
         line: {
             type: Boolean,
@@ -49,17 +62,25 @@ export default {
             type: Number,
             default: 30
         },
-        width: {
+        leftWidth: {
             type: Number,
             default: 200
         },
-        minWidth: {
+        minLeftWidth: {
             type: Number,
             default: 150
         },
-        maxWidth: {
+        maxLeftWidth: {
             type: Number,
             default: 600
+        },
+        totalWidth: {
+            type: Number,
+            default: 0
+        },
+        rightWidth: {
+            type: Number,
+            default: 0
         }
     },
     data () {
@@ -68,16 +89,19 @@ export default {
                 'font-size': this.draggerSize,
                 'height': `${this.draggerHeight}px`
             },
-            containerWidth: this.width,
-            containerHeight: self.innerHeight,
+            leftContainerWidth: this.leftWidth,
+            rightContainerWidth: this.totalWidth - this.leftWidth,
+            containerHeight: this.height,
             lineHeight: (this.containerHeight / 2) - this.draggerHeight,
             dragging: false,
             pageX: null
         };
     },
     mounted () {
-        this.containerHeight = this.$scopedSlots.container()[0].context.$el.clientHeight;
+        // this.containerHeight = this.$scopedSlots.leftContainer()[0].context.$el.clientHeight;
         this.lineHeight = (this.containerHeight / 2) - this.draggerHeight;
+        this.rightContainerWidth -= (this.$refs.dragger.clientWidth + this.$refs.dragger.offsetWidth);
+        console.log(this.height);
     },
     methods: {
         onMousedown () {
@@ -91,12 +115,13 @@ export default {
                     this.pageX = e.pageX;
                     return;
                 }
-
-                let newWidth = this.containerWidth - (this.pageX - e.pageX);
-                if (newWidth < this.minWidth || newWidth > this.maxWidth) { 
+                let diff = this.pageX - e.pageX;
+                let newWidth = this.leftContainerWidth - diff;
+                if (newWidth < this.minLeftWidth || newWidth > this.maxLeftWidth) { 
                     return; 
                 }
-                this.containerWidth = newWidth;
+                this.leftContainerWidth = newWidth;
+                this.rightContainerWidth = this.rightContainerWidth + diff;
                 this.pageX = e.pageX;
             }
         },
@@ -113,6 +138,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.box-container {
+    position: relative;
+}
+.content-container {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    overflow: scroll;
+    &.left {
+        left: 0;
+    }
+    &.right {
+
+    }
+}
 .dragger-container {
   position: absolute;
   top: 0;

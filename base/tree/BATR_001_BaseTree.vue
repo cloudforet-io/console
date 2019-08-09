@@ -7,8 +7,12 @@
                   @enter="enter"
       >
         <div v-if="showTree">
-          <BaseDragVertical :line="false">
-            <template #container="{ width }">
+          <BaseDragVertical 
+            :line="false" 
+            :total-width="totalWidth"
+            :height="dragHeight"
+          >
+            <template #leftContainer="{ width }">
               <sl-vue-tree v-model="treeData"
                            class="main-tree-col"
                            :allow-multiselect="true"
@@ -17,7 +21,7 @@
                            @drop="nodeDropped"
                            @nodecontextmenu="showContextMenu"
               >
-                <template slot="title" slot-scope="{ node }">
+                <template #title="{ node }">
                   <span class="item-title">
                     <span class="item-icon">
                       <i v-if="node.isLeaf" class="fal fa-cube" />
@@ -30,7 +34,7 @@
                   </span>
                 </template>
 
-                <template slot="toggle" slot-scope="{ node }">
+                <template #toggle="{ node }">
                   <i v-if="node.isExpanded" class="fal fa-angle-down" />
                   <i v-else class="fal fa-angle-right" />
                 </template>
@@ -41,30 +45,35 @@
               </span>
             </template> -->
               </sl-vue-tree>
+              <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
+                <div class="contextmenuleaf" @click="excSelected('PG')">
+                  <i class="fal fa-folder-minus" />&nbsp; Add a Project Group
+                </div>
+                <div class="contextmenuleaf" @click="excSelected('PR')">
+                  <i class="fal fa-cube" />&nbsp; Add a Project
+                </div>
+                <div class="contextmenuleaf" @click="excSelected('SR')">
+                  <i class="fal fa-pencil" />&nbsp; Edit Selected Project
+                </div>
+                <div class="node-leaf-last" @click="excSelected">
+                  <i class="fal fa-trash" />&nbsp; Remove Selected Item
+                </div>
+              </div>
+            </template>
+
+            <template #rightContainer="{ width }">
+              <transition name="panel-trans">
+                <!-- class="panel col-xs-6 offset-xs-6 col-lg-10 offset-lg-2" -->
+                <div v-if="hasSelected" 
+                     :key="nodeKey"
+                     class="panel"
+                     :style="{ width: `${width}px` }"
+                >
+                  <slot name="treeSubPanel" />
+                </div>
+              </transition>
             </template>
           </BaseDragVertical>
-        </div>
-      </transition>
-
-      <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
-        <div class="contextmenuleaf" @click="excSelected('PG')">
-          <i class="fal fa-folder-minus" />&nbsp; Add a Project Group
-        </div>
-        <div class="contextmenuleaf" @click="excSelected('PR')">
-          <i class="fal fa-cube" />&nbsp; Add a Project
-        </div>
-        <div class="contextmenuleaf" @click="excSelected('SR')">
-          <i class="fal fa-pencil" />&nbsp; Edit Selected Project
-        </div>
-        <div class="node-leaf-last" @click="excSelected">
-          <i class="fal fa-trash" />&nbsp; Remove Selected Item
-        </div>
-      </div>
-      <transition name="panel-trans">
-        <div v-if="hasSelected" :key="nodeKey"
-             class="panel col-xs-6 offset-xs-6 col-lg-10 offset-lg-2"
-        >
-          <slot name="treeSubPanel" />
         </div>
       </transition>
     </div>
@@ -75,6 +84,7 @@
 <script>
 import BaseDragVertical from '@/components/base/drag/BADG_002_BaseDragVertical.vue';
 import SlVueTree from 'sl-vue-tree';
+import { mapGetters } from 'vuex';
 
 export default {
     name: 'BaseTree',
@@ -104,11 +114,21 @@ export default {
             lastEvent: null,
             contextMenuIsVisible: false,
             contextTopMenuIsVisible: false,
-            showTree: false
+            showTree: false,
+            totalWidth: self.innerWidth
         };
+    },
+    computed: {
+        ...mapGetters('layout', [
+            'headerHeight'
+        ]),
+        dragHeight() {
+            return self.innerHeight - this.headerHeight;
+        }
     },
     mounted: function () {
         this.showTree = true;
+        this.totalWidth = this.$el.clientWidth;
     },
     methods: {
         nodeSelected (nodes, event) {
