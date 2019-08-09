@@ -277,9 +277,7 @@ export default {
             } else if (flag === 'UPT') {
                 this.createProcess = !state;
                 this.updateProcess = state;
-            } else {
-
-            }
+            } 
         },
         async updateProject (items) {
             this.consoleLogEnv('item', items);
