@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <BaseDrag>
+    <BaseDrag >
       <template #container="{ height }">
         <BaseTable class="user-table" 
                    :table-data="users" 
@@ -51,8 +51,7 @@
                 :nav-tabs="tabs"
                 :keep-alive="true"
                 :is-footer-visible="false"
-                :use-slot="true"
-    >
+                :use-slot="true">
       <template #INFO>
         <b-card class="base">
           <UserDetail :user-prop="selectedUser" />
@@ -63,10 +62,11 @@
 </template>
 
 <script>
-import BaseDrag from '@/components/base/drag/BADG_001_BaseDrag.vue';
+import BaseDrag from '@/components/base/drag/BADG_002_BaseDragY.vue';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
 import query from './search_context/query.js';
 import UserDetail from './IDUS_002_UserDetail.vue';
+
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
 const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 
@@ -124,16 +124,16 @@ export default {
         async listUsers (limit, skip, sort, search) {
             this.reset();
 
-            if (limit === undefined || limit === null) {
+            if (this.isEmpty(limit)) {
                 limit = 10;
             }
-            if (skip === undefined || skip === null) {
+            if (this.isEmpty(skip)) {
                 skip = 0;
             }
-            if (sort === undefined || sort === null) {
+            if (this.isEmpty(sort)) {
                 sort = '-created_date';
             }
-            if (search === undefined || search === null) {
+            if (this.isEmpty(search)) {
                 search = [];
             }
 

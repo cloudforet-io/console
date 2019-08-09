@@ -82,7 +82,7 @@
 
 
 <script>
-import BaseDragVertical from '@/components/base/drag/BADG_002_BaseDragVertical.vue';
+import BaseDragVertical from '@/components/base/drag/BADG_001_BaseDragX.vue';
 import SlVueTree from 'sl-vue-tree';
 import { mapGetters } from 'vuex';
 
