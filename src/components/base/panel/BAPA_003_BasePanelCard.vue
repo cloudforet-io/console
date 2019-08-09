@@ -2,14 +2,13 @@
   <div class="row">
     <b-col v-for="(asset, idx) in PanelsCard"
            :key="idx"
-           :class="colSelector(PanelsCard.length)"
-    >
-      <b-row align-h="between" align-v="center" class="assets">
-        <b-col cols="8">
-          <h6><span v-html="iTagBuilder(asset.panelIcon)">
-            </span> &nbsp; {{ asset.asKey }}
-          </h6>
-        </b-col>
+           :class="colSelector(PanelsCard.length)">
+        <b-row align-h="between" align-v="center" class="assets">
+          <b-col cols="8">
+            <h6>
+              <span v-html="iTagBuilder(asset.panelIcon)"/>{{ asset.asKey }}
+            </h6>
+          </b-col>
         <b-col cols="4" class="text-right">
           <h6>
             <a :href="asset.linkURL">{{ asset.assetValue }}</a>

@@ -1,383 +1,42 @@
-{"MSG": {
-  "DR_SERV": "서비스",
-  "LOG_IN":       "Log In",
-  "LOG_OUT":      "Log Out",
-  "FORGPW":       "비밀번호 찾기?",
-  "SIGN_UP":      "회원가입",
-  "SIGN_UP_MSG":  "We make it simple to launch in any clouds and scale up as your company grow - whether you’re running any of cloud machine ; 저희가 당신의 짐을 덜어드립니다.",
-  "SIGN_IN":      "클라우드 원 로그인하기",
-  "SIGN_FAIL_TITLE":    "아이디나 패스워드가 에러.",
-  "SIGN_FAIL_BODY":     "아이디나 패스워드를 다시 한번 확인해 주세요.",
-  "REGISTER":     "Register Now!",
-  "REMEMBER":     "자동 로그인",
-  "TRTOSIGNUP": "아이디·비번 찾기"
-},
+{
+  "MSG": {
+    "DR_SERV": "서비스",
+    "LOG_IN": "Log In",
+    "LOG_OUT": "Log Out",
+    "FORGPW": "비밀번호 찾기?",
+    "SIGN_UP": "회원가입",
+    "SIGN_UP_MSG": "모든 클라우드에서 간단하게 시작하십시오. 귀사의 성장과 함께 나아갑니다. 저희가 당신의 짐을 덜어드립니다.",
+    "SIGN_IN": "클라우드 원 로그인하기",
+    "SIGN_FAIL_TITLE": "아이디나 패스워드가 에러.",
+    "SIGN_FAIL_BODY": "아이디나 패스워드를 다시 한번 확인해 주세요.",
+    "REGISTER": "Register Now!",
+    "REMEMBER": "자동 로그인",
+    "TR_NOTI": "아이디·비번 찾기",
+    "TR_NOTI_CON": "",
+    "BTN_CANCEL": "취소",
+    "BTN_EDIT": "에디트",
+    "BTN_DELETE": "삭제",
+    "BTN_ADD": "추가",
+    "SUMMARY": "SUMMARY",
+    "AUDIT": "AUDIT",
+    "TAG": "TAG"
+  },
+  "ENUM": {
+    "SERVER_STATE": {
+      "SERVICE": "서비스 중",
+      "MAINTENANCE": "유지 관리",
+      "CLOSED": "닫힘",
+      "DELETED": "삭제됨"
+    },
+    "COLLECT_STATE": {
+      "NEW":   "신규",
+      "ACTIVE":  "활성화",
+      "DISCONNECTED": "연결 끈김",
+      "DUPLICATED": "중복 됨",
+      "UNMANAGED": "관리 되지 않음"
+    }
+  },
   "ERR_CODE": {
     "ERR_LOG_001": "로그인 에러"
-  },
-  "assets": {
-    "nav": [
-      {
-        "name": "자산",
-        "url": "/assets",
-        "icon": "icon-pie-chart"
-      }
-    ]
-  },
-  "dashboard": {
-    "nav": [
-      {
-        "name": "대시보드",
-        "url": "/dashboard",
-        "icon": "icon-pie-chart"
-      }
-    ]
-  },
-  "infraLayers": {
-    "nav": [
-      {
-        "name": "인프라 레이어",
-        "url": "/infra-layers",
-        "icon": "icon-speedometer",
-        "badge": {
-          "variant": "primary",
-          "text": "NEW"
-        }
-      },
-      {
-        "title": true,
-        "name": "Theme",
-        "class": "",
-        "wrapper": {
-          "element": "",
-          "attributes": {}
-        }
-      },
-      {
-        "name": "Colors",
-        "url": "/theme/colors",
-        "icon": "icon-drop"
-      },
-      {
-        "name": "Typography",
-        "url": "/theme/typography",
-        "icon": "icon-pencil"
-      },
-      {
-        "title": true,
-        "name": "Components",
-        "class": "",
-        "wrapper": {
-          "element": "",
-          "attributes": {}
-        }
-      },
-      {
-        "name": "Base",
-        "url": "/base",
-        "icon": "icon-puzzle",
-        "children": [
-          {
-            "name": "Breadcrumbs",
-            "url": "/base/breadcrumbs",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Cards",
-            "url": "/base/cards",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Carousels",
-            "url": "/base/carousels",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Collapses",
-            "url": "/base/collapses",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Forms",
-            "url": "/base/forms",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Jumbotrons",
-            "url": "/base/jumbotrons",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "List Groups",
-            "url": "/base/list-groups",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Navs",
-            "url": "/base/navs",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Navbars",
-            "url": "/base/navbars",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Paginations",
-            "url": "/base/paginations",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Popovers",
-            "url": "/base/popovers",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Progress Bars",
-            "url": "/base/progress-bars",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Switches",
-            "url": "/base/switches",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Tables",
-            "url": "/base/tables",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Tabs",
-            "url": "/base/tabs",
-            "icon": "icon-puzzle"
-          },
-          {
-            "name": "Tooltips",
-            "url": "/base/tooltips",
-            "icon": "icon-puzzle"
-          }
-        ]
-      },
-      {
-        "name": "Buttons",
-        "url": "/buttons",
-        "icon": "icon-cursor",
-        "children": [
-          {
-            "name": "Buttons",
-            "url": "/buttons/standard-buttons",
-            "icon": "icon-cursor"
-          },
-          {
-            "name": "Button Dropdowns",
-            "url": "/buttons/dropdowns",
-            "icon": "icon-cursor"
-          },
-          {
-            "name": "Button Groups",
-            "url": "/buttons/button-groups",
-            "icon": "icon-cursor"
-          },
-          {
-            "name": "Brand Buttons",
-            "url": "/buttons/brand-buttons",
-            "icon": "icon-cursor"
-          }
-        ]
-      },
-      {
-        "name": "Charts",
-        "url": "/charts",
-        "icon": "icon-pie-chart"
-      },
-      {
-        "name": "Icons",
-        "url": "/icons",
-        "icon": "icon-star",
-        "children": [
-          {
-            "name": "CoreUI Icons",
-            "url": "/icons/coreui-icons",
-            "icon": "icon-star",
-            "badge": {
-              "variant": "info",
-              "text": "NEW"
-            }
-          },
-          {
-            "name": "Flags",
-            "url": "/icons/flags",
-            "icon": "icon-star"
-          },
-          {
-            "name": "Font Awesome",
-            "url": "/icons/font-awesome",
-            "icon": "icon-star",
-            "badge": {
-              "variant": "secondary",
-              "text": "4.7"
-            }
-          },
-          {
-            "name": "Simple Line Icons",
-            "url": "/icons/simple-line-icons",
-            "icon": "icon-star"
-          }
-        ]
-      },
-      {
-        "name": "Notifications",
-        "url": "/notifications",
-        "icon": "icon-bell",
-        "children": [
-          {
-            "name": "Alerts",
-            "url": "/notifications/alerts",
-            "icon": "icon-bell"
-          },
-          {
-            "name": "Badges",
-            "url": "/notifications/badges",
-            "icon": "icon-bell"
-          },
-          {
-            "name": "Modals",
-            "url": "/notifications/modals",
-            "icon": "icon-bell"
-          }
-        ]
-      },
-      {
-        "name": "Widgets",
-        "url": "/widgets",
-        "icon": "icon-calculator",
-        "badge": {
-          "variant": "primary",
-          "text": "NEW"
-        }
-      },
-      {
-        "divider": true
-      },
-      {
-        "title": true,
-        "name": "Extras"
-      },
-      {
-        "name": "Pages",
-        "url": "/pages",
-        "icon": "icon-star",
-        "children": [
-          {
-            "name": "Login",
-            "url": "/pages/login",
-            "icon": "icon-star"
-          },
-          {
-            "name": "Register",
-            "url": "/pages/register",
-            "icon": "icon-star"
-          },
-          {
-            "name": "Error 404",
-            "url": "/pages/404",
-            "icon": "icon-star"
-          },
-          {
-            "name": "Error 500",
-            "url": "/pages/500",
-            "icon": "icon-star"
-          }
-        ]
-      },
-      {
-        "name": "Disabled",
-        "url": "/dashboard",
-        "icon": "icon-ban",
-        "badge": {
-          "variant": "secondary",
-          "text": "NEW"
-        },
-        "attributes": {
-          "disabled": true
-        }
-      },
-      {
-        "name": "Download CoreUI",
-        "url": "http://coreui.io/vue/",
-        "icon": "icon-cloud-download",
-        "class": "mt-auto",
-        "variant": "success",
-        "attributes": {
-          "target": "_blank",
-          "rel": "noopener"
-        }
-      },
-      {
-        "name": "Try CoreUI PRO",
-        "url": "http://coreui.io/pro/vue/",
-        "icon": "icon-layers",
-        "variant": "danger",
-        "attributes": {
-          "target": "_blank",
-          "rel": "noopener"
-        }
-      }
-    ]
-  },
-  "networks": {
-    "nav": [
-      {
-        "name": "Networks",
-        "url": "/networks",
-        "icon": "icon-pie-chart"
-      }
-    ]
-  },
-  "plugins": {
-    "nav": [
-      {
-        "name": "Plugins",
-        "url": "/plugins",
-        "icon": "icon-pie-chart"
-      }
-    ]
-  },
-  "projects": {
-    "nav": [
-      {
-        "name": "Projects",
-        "url": "/projects",
-        "icon": "icon-pie-chart"
-      }
-    ]
-  },
-  "servers": {
-    "nav": [
-      {
-        "name": "Servers",
-        "url": "/servers",
-        "icon": "icon-pie-chart"
-      }
-    ]
-  },
-  "supportCenter": {
-      "nav": [
-      {
-        "name": "supportCenter",
-        "url": "/support-center",
-        "icon": "icon-pie-chart"
-      }
-    ]
-  },
-  "users": {
-    "nav": [
-      {
-        "name": "Users",
-        "url": "/users",
-        "icon": "icon-pie-chart"
-      }
-    ]
   }
 }

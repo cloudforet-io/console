@@ -1,6 +1,6 @@
 <template>
   <b-row class="sub-header" no-gutters>
-    <b-col cols="2" class="header-group">
+    <b-col cols="1" class="header-group">
       <span class="label">
         <i :class="subHeaderGroup.icon" />&nbsp;&nbsp;
         {{ subHeaderGroup.label }}
@@ -8,7 +8,7 @@
       <!-- <span class="triangle" /> -->
     </b-col>
     <b-col cols="10" class="row ">
-      <b-col v-for="nav in subHeaderList" :key="nav.label" cols="2">
+      <span v-for="nav in subHeaderList" :key="nav.label">
         <div class="item" :class="{ 'active': $route.meta.label === nav.label }">
           <span class="label">
             <router-link :to="nav.link">
@@ -16,7 +16,7 @@
             </router-link>
           </span>
         </div>
-      </b-col>
+      </span>
     </b-col>
   </b-row>
 </template>
@@ -75,6 +75,8 @@ $shape-color: darken($skyblue, 1%);
     font-size: 1.05em;
     color: $navy;
     cursor: default;
+    text-align: left;
+    padding-left: 20px;
     i {
       font-size: 1.5em;
       font-weight: 500;
@@ -94,8 +96,7 @@ $shape-color: darken($skyblue, 1%);
   .item {
     @extend %item;
     cursor: pointer;
-    min-width: 150px;
-    width: 100%;
+    width: 170px;
 
     border-style: solid;
     border-image: linear-gradient(to right, transparent, transparent);

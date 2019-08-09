@@ -40,8 +40,8 @@ import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseTree from '@/components/base/tree/BATR_001_BaseTree';
 
 import { api } from '@/setup/api';
-const BasePanel = () => import('@/components/base/panel/BAPA_001_BasePanel');
-const BasePanelCard = () => import('@/components/base/panel/BAPA_002_BasePanelCard');
+const BasePanel = () => import('@/components/base/panel/BAPA_002_BasePanel');
+const BasePanelCard = () => import('@/components/base/panel/BAPA_003_BasePanelCard');
 const BaseChart = () => import('@/components/base/charts/BACT_001_BaseChart');
 export default {
     name: 'ProjectSummary',
