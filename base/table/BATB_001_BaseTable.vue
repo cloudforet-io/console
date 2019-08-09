@@ -84,25 +84,26 @@
           <h4>{{ scope.emptyFilteredText }}</h4>
         </template>
 
-        <!-- <template slot="thead-top" slot-scope="data">
-                  <tr>
-                    <th>
-                        &nbsp;
-                    </th>
-                    <th>Type 1</th>
-                    <th>
-                      Type 2
-                    </th>
-                    <th>Type 3</th>
-                  </tr>
-                </template> -->
-
         <template v-if="selectable" slot="HEAD_selected">
           <b-check v-model="isSelectedAll"
                    class="select-all-checkbox"
                    @change="onSelectAll"
           />
         </template>
+
+        <!-- <template slot="thead-top" slot-scope="data">
+           <tr>
+             <th>
+                 &nbsp;
+             </th>
+             <th>Type 1</th>
+             <th>
+               Type 2
+             </th>
+             <th>Type 3</th>
+           </tr>
+         </template> -->
+
 
         <template v-if="selectable" slot="selected" slot-scope="data">
           <BaseCheckbox :key="data.index"
@@ -122,9 +123,8 @@
         </template>
 
         <template slot="state" slot-scope="data">
-          <div>
-              <span v-html="iTagBuilder(data.item.state)"/>data.item.state
-          </div>
+            <div  v-html="getServerStates(data.item.state)">
+            </div>
         </template>
 
         <template slot="link" slot-scope="data">
@@ -139,7 +139,6 @@
 import BaseSearch from '@/components/base/search/BASR_001_BaseSearch.vue';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal.vue';
 import BaseCheckbox from '@/components/base/checkbox/BACB_001_BaseCheckbox.vue';
-import GlobalEnum from '@/setup/enum';
 
 export default {
     name: 'BaseTable',
@@ -147,8 +146,7 @@ export default {
     components: {
         BaseSearch,
         BaseModal,
-        BaseCheckbox,
-        GlobalEnum
+        BaseCheckbox
     },
     inheritAttrs: false,
     props: {
@@ -277,6 +275,9 @@ export default {
         }
     },
     methods: {
+        getServerStates(state){
+            return this.bindEnumToHtml(state);
+        },
         getVariantSize(size) {
             return this.setFontSize(size);
         },
