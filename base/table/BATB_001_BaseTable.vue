@@ -30,8 +30,12 @@
                 <span class="next-btn" @click.prevent="onNext"><i class="fal fa-chevron-right" /></span>
               </b-col>
               <b-col>
-                <BaseModal ref="modal" :name="'tableSettings'" :title="'Table Settings'"
-                           :centered="true" :size="'md'" @ok="limitChanged"
+                <BaseModal ref="modal" 
+                           name="tableSettings" 
+                           title="Table Settings"
+                           :centered="true" 
+                           :size="'md'" 
+                           @ok="limitChanged"
                 >
                   <template #activator>
                     <span class="settings-btn"><i class="fal fa-cog" /></span>

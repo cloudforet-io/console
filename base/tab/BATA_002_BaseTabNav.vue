@@ -66,8 +66,7 @@ import { api } from '@/setup/api';
 let baseTabParams = {};
 export default {
     name: 'BaseTabs',
-    components: {
-    },
+    event: ['close'],
     props: {
         navTabs: {
             type: Array,
@@ -155,7 +154,7 @@ export default {
             this.$emit('delete', baseTabParams);
         },
         closeWindow (e) {
-            this.$store.dispatch('modal/closeModal');
+            this.$emit('close');
         },
         setTabName (selectedData) {
             return (selectedData.hasOwnProperty('tabIdxTitle')) ? selectedData.tabIdxTitle : selectedData.tabTitle;
