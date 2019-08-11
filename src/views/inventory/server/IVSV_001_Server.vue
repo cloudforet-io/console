@@ -48,9 +48,12 @@
                     :nav-tabs="tabs"
                     :keep-alive="true"
                     :is-footer-visible="false"
-                    :use-slot="true">
+                    :use-slot="true"
+        >
           <template #SUMMARY>
-            <serverSummary />
+            <b-card class="base first-tab">
+              <serverSummary />
+            </b-card>
           </template>
           <template #DATA>
             <serverData />
@@ -197,14 +200,28 @@ export default {
              * TODO: set limit, skip, sort and search in the right format
              */
                 });
+                setTimeout(() => { // this is for test
+                    this.servers = res.data;
+                    this.isLoading = false;
+                }, 500);
             } catch (e) {
                 console.error(e);
+                this.servers = [
+                    {
+                        _id: 'abc',
+                        user_name: 'abbb',
+                        password: 'zzzz',
+                        user_first_name: 'ddddd',
+                        user_last_name: 'ddff',
+                        mobile: '333',
+                        role_id: 'werewr',
+                        project_id: 'rrrr',
+                        project_group_id: 'rrrrzzzz'
+                    }
+                ];
+                this.isLoading = false;
             }
 
-            setTimeout(() => { // this is for test
-                this.servers = res.data;
-                this.isLoading = false;
-            }, 500);
         /**
          * TODO: set totalCount with data from server
          */

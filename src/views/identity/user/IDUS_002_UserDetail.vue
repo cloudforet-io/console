@@ -103,8 +103,7 @@ export default {
     props: {
         userProp: {
             type: Object,
-            default: () => (userModel),
-            required: true
+            default: () => (userModel)
         },
         creatable: {
             type: Boolean,
@@ -130,33 +129,49 @@ export default {
         };
     },
     computed: {
-        tags () { return this.userProp.tags; },
+        tags () {
+            return this.userProp.tags; 
+        },
         validateUserId () {
 
             if (this.userId === null) {
-              return null;
+                return null;
             }
 
             if (this.userId.length > 4) {
-              return true;
+                return true;
             }
 
             return false;
         },
         validatePassword () {
-            if (this.password === null) return null;
-            if (this.password.length > 4) return true;
+            if (this.isEmpty(this.password)) { 
+                return null;
+            }
+            if (this.password.length > 4) { 
+                return true; 
+            }
             return false;
         },
         validatePasswordCheck () {
-            if (this.passwordCheck === null) return null;
-            if (!this.password) return false;
-            if (this.password === this.passwordCheck) return true;
+            if (this.passwordCheck === null) {
+                return null; 
+            }
+            if (!this.password) {
+                return false; 
+            }
+            if (this.password === this.passwordCheck) { 
+                return true;
+            }
             return false;
         },
         validateDomainId () {
-            if (this.domainId === null) return null;
-            if (this.domainId.length > 0) return true;
+            if (this.domainId === null) {
+                return null; 
+            }
+            if (this.domainId.length > 0) { 
+                return true; 
+            }
             return false;
         },
         validated () {
@@ -202,8 +217,11 @@ export default {
             }, 1000);
         },
         onReset () {
-            if (this.creatable) this.resetUserData(userModel);
-            else this.resetUserData(this.userProp);
+            if (this.creatable) { 
+                this.resetUserData(userModel); 
+            } else { 
+                this.resetUserData(this.userProp); 
+            }
         },
         resetUserData (user) {
             this.userId = user.userId;
@@ -223,4 +241,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.btn {
+  padding: 5px 15px;
+}
 </style>

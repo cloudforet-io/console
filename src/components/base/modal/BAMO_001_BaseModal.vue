@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span class="base-modal">
     <span @click="showModal">
       <slot name="activator" />
     </span>
