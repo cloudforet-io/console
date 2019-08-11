@@ -1,84 +1,28 @@
 <template>
   <div class="wrapper">
-    <b-modal v-if="simpleModalType == 1" 
-             v-model="myModal" 
-             :title="simpleModalTitle" 
-             ok-only 
+    <b-modal v-model="modalShow"
+             :title="title" 
+             :class="`modal-${type}`"
+             :size="size"
+             :ok-variant="type"
              no-stacking 
-             @ok="myModal = false"
     >
       <slot name="contents" />
-    </b-modal>
-    <b-modal v-else-if="simpleModalType === 2" 
-             v-model="largeModal" 
-             :title="simpleModalTitle" 
-             size="lg" 
-             ok-only 
-             no-stacking 
-             @ok="largeModal = false"
-    >
-      <slot name="contents" />
-    </b-modal>
-    <b-modal v-else-if="simpleModalType === 3" 
-             v-model="smallModal" 
-             :title="simpleModalTitle"
-             size="sm" 
-             ok-only 
-             no-stacking
-             @ok="smallModal = false"
-    >
-      <slot name="contents" />
-    </b-modal>
-    <b-modal v-else-if="simpleModalType === 4"
-             v-model="primaryModal" 
-             :title="simpleModalTitle" 
-             class="modal-primary" 
-             ok-only 
-             no-stacking
-             @ok="primaryModal = false"
-    >
-      <slot name="contents" />
-    </b-modal>
-    <b-modal v-else-if="simpleModalType === 5"
-             v-model="successModal" 
-             :title="simpleModalTitle" 
-             class="modal-success"
-             ok-variant="success"
-             ok-only no-stacking
-             @ok="successModal = false"
-    >
-      <slot name="contents" />
-    </b-modal>
-    <b-modal v-else-if="simpleModalType === 6"
-             v-model="warningModal" 
-             :title="simpleModalTitle" 
-             class="modal-warning" 
-             ok-variant="warning" 
-             ok-only no-stacking
-             @ok="warningModal = false"
-    >
-      <slot name="contents" />
-    </b-modal>
-    <b-modal v-else-if="simpleModalType === 7" 
-             v-model="dangerModal" 
-             :title="simpleModalTitle" 
-             class="modal-danger" 
-             ok-variant="danger" 
-             ok-only no-stacking
-             @ok="dangerModal = false"
-    >
-      <slot name="contents" />
-    </b-modal>
-    <b-modal v-else 
-             v-model="infoModal" 
-             :title="simpleModalTitle"
-             class="modal-info" 
-             ok-variant="info" 
-             ok-only 
-             no-stacking 
-             @ok="infoModal = false"
-    >
-      <slot name="contents" />
+      <slot name="footer" />
+      <template v-if="!$slots.footer" #modal-footer="{ ok, cancel, hide }">
+        <b-button v-if="!okOnly" size="sm" 
+                  variant="outline-secondary" 
+                  @click="clickCancel"
+        >
+          <span>Cancel</span>
+        </b-button>
+        <b-button size="sm" 
+                  :variant="`outline-${type}`" 
+                  @click="clickOk"
+        >
+          <span>OK</span>
+        </b-button>
+      </template>
     </b-modal>
   </div>
 </template>
@@ -86,51 +30,53 @@
 export default {
     name: 'SimpleModals',
     props: {
-        simpleModalType: {
-            type: Number,
-            required: true,
-            default: 1
-        },
-        simpleModalTitle: {
+        type: {
             type: String,
-            reuired: true,
-            default: 'Simple Modal Title'
-
+            default: 'primary'
+        },
+        size: {
+            type: String,
+            default: 'md'
+        },
+        title: {
+            type: String,
+            required: true,
+            default: 'Modal Title'
+        },
+        okOnly: {
+            type: Boolean,
+            default: true
         }
     },
     data () {
         return {
-            myModal: false,
-            largeModal: false,
-            smallModal: false,
-            primaryModal: false,
-            successModal: false,
-            warningModal: false,
-            dangerModal: false,
-            infoModal: false
+            modalShow: false
         };
     },
     methods: {
         showModal () {
-            let modalTypeNumber = this.simpleModalType;
-            if (modalTypeNumber == 1) {
-                this.myModal = true;
-            } else if (modalTypeNumber == 2) {
-                this.largeModal = true;
-            } else if (modalTypeNumber == 3) {
-                this.smallModal = true;
-            } else if (modalTypeNumber == 4) {
-                this.primaryModal = true;
-            } else if (modalTypeNumber == 5) {
-                this.successModal = true;
-            } else if (modalTypeNumber == 6) {
-                this.warningModal = true;
-            } else if (modalTypeNumber == 7) {
-                this.dangerModal = true;
-            } else {
-                this.infoModal = true;
-            }
+            this.modalShow = true;
+        },
+        closeModal () {
+            this.modalShow = false;
+        },
+        clickOk () {
+            this.$emit('ok');
+            this.closeModal();
+        },
+        clickCancel () {
+            this.$emit('cancel');
+            this.closeModal();
         }
     }
 };
 </script>
+
+<style lang="scss" scoped>
+.btn {
+  padding: 1px 15px;
+  span {
+    vertical-align: sub;
+  }
+}
+</style>

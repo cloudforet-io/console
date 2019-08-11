@@ -20,11 +20,11 @@
           <template #caption>
             <b-row align-v="center" align-h="center">
               <b-col cols="6">
-                <BaseModal
-                  :name="'addUser'"
-                  :title="'Add Member'"
-                  :centered="true"
-                  :hide-footer="true"
+                <BaseModal ref="addUser"
+                           name="addUser"
+                           title="Add Member"
+                           :centered="true"
+                           :hide-footer="true"
                 >
                   <template #activator>
                     <b-button block variant="primary">
@@ -32,8 +32,9 @@
                     </b-button>
                   </template>
                   <template #contents>
-                    <MemberDetail
-                      :creatable="true" :updatable="true"
+                    <MemberDetail :creatable="true" 
+                                  :updatable="true"
+                                  @close="$refs.addUser.hideModal()"
                     />
                   </template>
                 </BaseModal>
@@ -50,6 +51,17 @@
         </BaseTable>
       </b-col>
     </b-row>
+
+    <BaseModal ref="deleteCheck" name="deleteCheck" 
+               title="Delete Member"
+               size="md"
+               @ok="$alertify.success('Selected User Successfully deleted.')"
+               @cancel="$alertify.error('Action Cancel')"
+    >
+      <template #contents>
+        <span>Do you want to delete selected?</span>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
@@ -156,18 +168,7 @@ export default {
             this.init();
         },
         deleteSelected(){
-            this.$alertify.confirmWithTitle(
-                'Delete Users',
-                'Do you want to delete selected?',
-                () => {
-                    this.consoleLogEnv('success');
-                    this.$alertify.success('Selected User Successfully deleted.');
-                },
-                () => {
-                    this.consoleLogEnv('fail');
-                    this.$alertify.error('Action Cancel');
-                }
-            );
+            this.$refs.deleteCheck.showModal();
         }
     }
 };

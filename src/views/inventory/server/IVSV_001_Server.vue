@@ -17,15 +17,23 @@
         >
           <template #caption>
             <div>
-              <BaseModal :name="'addServer'" :title="'Add Server'" :centered="true" :hide-footer="true">
+              <BaseModal ref="addServer"
+                         name="addServer" title="Add Server"
+                         :centered="true" :hide-footer="true"
+              >
                 <template #activator>
                   <b-button class="btn" variant="outline-dark">
                     Add
                   </b-button>
                 </template>
-                <template #contents />
+                <template #contents>
+                  cotents
+                </template>
               </BaseModal>
-              <BaseModal v-if="selectedServer" :name="'editServer'" :title="'Edit Server'"
+              <BaseModal v-if="selectedServer" 
+                         ref="editServer"
+                         name="editServer" 
+                         title="Edit Server"
                          :centered="true" :hide-footer="true"
               >
                 <template #activator>

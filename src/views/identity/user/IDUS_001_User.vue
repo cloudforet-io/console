@@ -19,18 +19,31 @@
         >
           <template #caption>
             <div>
-              <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
+              <BaseModal ref="addUser"
+                         name="addUser" 
+                         title="Add User" 
+                         :centered="true" 
+                         :hide-footer="true"
+              >
                 <template #activator>
                   <b-button class="btn" variant="outline-primary">
                     Add
                   </b-button>
                 </template>
                 <template #contents>
-                  <UserDetail :creatable="true" :updatable="true" />
+                  <UserDetail 
+                    :creatable="true" 
+                    :updatable="true"
+                    @close="$refs.addUser.hideModal()"
+                  />
                 </template>
               </BaseModal>
-              <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
-                         :centered="true" :hide-footer="true"
+              <BaseModal v-if="selectedUser" 
+                         ref="editUser"
+                         name="editUser" 
+                         :title="'Edit User'"
+                         :centered="true" 
+                         :hide-footer="true"
               >
                 <template #activator>
                   <b-button class="btn" variant="outline-dark">
@@ -38,7 +51,10 @@
                   </b-button>
                 </template>
                 <template #contents>
-                  <UserDetail :updatable="true" :user-prop="selectedUser" />
+                  <UserDetail :updatable="true" 
+                              :user-prop="selectedUser" 
+                              @close="$refs.editUser.hideModal()"
+                  />
                 </template>
               </BaseModal>
             </div>

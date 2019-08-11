@@ -97,6 +97,7 @@ const userModel = {
 
 export default {
     name: 'UserDetail',
+    event: ['close', 'ok'],
     components: {
         BaseTag
     },
@@ -194,7 +195,7 @@ export default {
             }
             console.log('creating....');
             setTimeout(() => {
-                this.$store.dispatch('modal/closeModal');
+                this.$emit('close');
             }, 1000);
         },
         onUpdate (e) {
@@ -207,13 +208,13 @@ export default {
             }
             console.log('updating....');
             setTimeout(() => {
-                this.$store.dispatch('modal/closeModal');
+                this.$emit('close');
             }, 1000);
         },
         onDelete () {
             console.log('deleting....');
             setTimeout(() => {
-                this.$store.dispatch('modal/closeModal');
+                this.$emit('close');
             }, 1000);
         },
         onReset () {

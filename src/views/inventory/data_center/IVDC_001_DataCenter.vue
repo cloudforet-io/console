@@ -2,9 +2,8 @@
   <div div class="animated fadeIn">
     <div class="row">
       <div class="col-12">
-        <BaseModal id="IVRJ001_Region_Zone_Edit_Modal"
-                   ref="Modal"
-                   :name="'EditModal'"
+        <BaseModal ref="Modal"
+                   name="EditModal"
                    :title="dataCenterModalTitle"
                    :centered="true"
                    :hide-footer="true"
@@ -21,6 +20,7 @@
                       :is-footer-visible="true"
                       @create="createDataCenter"
                       @update="updateDataCenter"
+                      @close="$refs.Modal.hideModal()"
             >
               <template #ModaltabContentsPanel />
             </BaseTabs>
@@ -31,7 +31,8 @@
 
     <BaseTree :tree-prop="treeData"
               @selected="NodeSelected"
-              @edited="editSelected">
+              @edited="editSelected"
+>
       <template #treeSubPanel>
         <BaseTabNav
           :fill="false"

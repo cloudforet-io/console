@@ -30,28 +30,14 @@
                 </b-col>
               </div>
             </template>
-            <template #ROUTE>
-
-            </template>
-            <template #PORT>
-
-            </template>
-            <template #PCI>
-
-            </template>
-            <template #SOFTWARE>
-
-            </template>
-            <template #WINUPDATE>
-
-            </template>
-            <template #SHARE>
-
-            </template>
-            <template #SECURITYGROUP>
-
-            </template>
-            </BaseTabNav>
+            <template #ROUTE/>
+            <template #PORT/>
+            <template #PCI/>
+            <template #SOFTWARE/>
+            <template #WINUPDATE/>
+            <template #SHARE/>
+            <template #SECURITYGROUP/>
+          </BaseTabNav>
         </b-col>
       </b-card>
     </b-col>

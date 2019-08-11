@@ -13,7 +13,8 @@
             :height="dragHeight"
           >
             <template #leftContainer="{ width }">
-              <sl-vue-tree v-model="treeData"
+              <sl-vue-tree ref="slVueTree"
+                           v-model="treeData"
                            class="main-tree-col"
                            :allow-multiselect="true"
                            :style="{ width: width }"
@@ -45,25 +46,10 @@
               </span>
             </template> -->
               </sl-vue-tree>
-              <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
-                <div class="contextmenuleaf" @click="excSelected('PG')">
-                  <i class="fal fa-folder-minus" />&nbsp; Add a Project Group
-                </div>
-                <div class="contextmenuleaf" @click="excSelected('PR')">
-                  <i class="fal fa-cube" />&nbsp; Add a Project
-                </div>
-                <div class="contextmenuleaf" @click="excSelected('SR')">
-                  <i class="fal fa-pencil" />&nbsp; Edit Selected Project
-                </div>
-                <div class="node-leaf-last" @click="excSelected">
-                  <i class="fal fa-trash" />&nbsp; Remove Selected Item
-                </div>
-              </div>
             </template>
 
             <template #rightContainer="{ width }">
               <transition name="panel-trans">
-                <!-- class="panel col-xs-6 offset-xs-6 col-lg-10 offset-lg-2" -->
                 <div v-if="hasSelected" 
                      :key="nodeKey"
                      class="panel"
@@ -74,9 +60,32 @@
               </transition>
             </template>
           </BaseDragVertical>
+
+          <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
+            <div class="contextmenuleaf" @click="excSelected('PG')">
+              <i class="fal fa-folder-minus" />&nbsp; Add a Project Group
+            </div>
+            <div class="contextmenuleaf" @click="excSelected('PR')">
+              <i class="fal fa-cube" />&nbsp; Add a Project
+            </div>
+            <div class="contextmenuleaf" @click="excSelected('SR')">
+              <i class="fal fa-pencil" />&nbsp; Edit Selected Project
+            </div>
+            <div class="node-leaf-last" @click="excSelected">
+              <i class="fal fa-trash" />&nbsp; Remove Selected Item
+            </div>
+          </div>
         </div>
       </transition>
     </div>
+
+    <BaseModal ref="checkModal" name="checkModal" 
+               :title="modalTitle"
+               :text="modalContents"
+               size="md"
+               @ok="modalOk"
+               @cancel="modalCancel"
+    />
   </div>
 </template>
 
@@ -84,13 +93,15 @@
 <script>
 import BaseDragVertical from '@/components/base/drag/BADG_002_BaseDragVertical.vue';
 import SlVueTree from 'sl-vue-tree';
+const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 import { mapGetters } from 'vuex';
 
 export default {
     name: 'BaseTree',
     components: {
         BaseDragVertical,
-        SlVueTree
+        SlVueTree,
+        BaseModal
     },
     props: {
         treeProp: {
@@ -115,6 +126,10 @@ export default {
             contextMenuIsVisible: false,
             contextTopMenuIsVisible: false,
             showTree: false,
+            modalTitle: '',
+            modalContents: '',
+            modalContext: {},
+            modalEvent: ''
         };
     },
     computed: {
@@ -133,13 +148,13 @@ export default {
             this.nodeKey = (this.nodeKey) > 0 ? 0 : 1;
             this.lastEvent = nodes;
             this.hasSelected = true;
-      /*
-         * This is a Emit event for Parents vue.
-         */
+            /*
+            * This is a Emit event for Parents vue.
+            */
             // this.$emit('selected', nodes);
-      /*
-         * This is a Global Event bus, so Please, make sure that Event$bus is off when components has destroyed.
-         */
+            /*
+            * This is a Global Event bus, so Please, make sure that Event$bus is off when components has destroyed.
+            */
             this.$bus.$emit('treeSelectedEvent', nodes);
         },
         nodeToggled (node) {
@@ -161,9 +176,8 @@ export default {
             let coordinateX = event.clientX;
             let coordinateY = event.clientY;
             this.$refs.slVueTree.select(node.path);
-            $contextMenu.style.left = (hasClicked) ? coordinateX - 182 + 'px' : coordinateX + 'px';
-            $contextMenu.style.top = coordinateY + 'px';
-            console.log('Final :: coordinate X: ' + coordinateX + ' & coordinate Y: ' + coordinateY);
+            $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
+            $contextMenu.style.top = `${coordinateY - this.headerHeight}px`;
         },
         excSelected (flag) {
       /*
@@ -180,29 +194,91 @@ export default {
         *  */
             this.contextTopMenuIsVisible = false;
             this.contextMenuIsVisible = false;
+            this.modalContext = {
+                tree: this.$refs.slVueTree
+            };
             const treeV = this.$refs.slVueTree;
             const msg = {};
             const params = {
                 tree: treeV
             };
+
         // TODO:: Please, Change to Enum in Vue, and add all those MSG into i18n en.json & ko.json
-            if (flag === 'PG') {
-                msg['title'] = 'Create a Project Group';
-                msg['content'] = 'Do you want to create a root Project Group?';
-                params['flag'] = 'PG';
-                this.procSelected('edited', params, msg);
-            } else if (flag === 'PR') {
-                msg['title'] = 'Create a Project';
-                msg['content'] = 'Do you want to create a root Project?';
-                params['flag'] = 'PR';
-                this.procSelected('edited', params, msg);
-            } else if (flag === 'SR') {
-                params['flag'] = 'SR';
-                let msgTitle = params.tree.getSelected()[0].isLeaf ? 'Edit a Project' : 'Edit a Project Group';
-                msg['title'] = msgTitle;
-                this.procSelected('edited', params, msg);
+
+            switch (flag) {
+            case 'PG':
+                this.modalTitle = 'Create a Project Group';
+                this.modalContents = 'Do you want to create a root Project Group?';
+                this.modalContext['flag'] = 'PG';
+                this.modalEvent = 'edited';
+                this.$refs.checkModal.showModal();
+                break;
+            case 'PR':
+                this.modalTitle = 'Create a Project';
+                this.modalContents = 'Do you want to create a root Project?';
+                this.modalContext['flag'] = 'PR';
+                this.modalEvent = 'edited';
+                this.$refs.checkModal.showModal();
+
+                // msg['title'] = 'Create a Project';
+                // msg['content'] = 'Do you want to create a root Project?';
+                // params['flag'] = 'PR';
+                // this.procSelected('edited', params, msg);
+                break;
+            case 'SR':
+                this.modalContext['flag'] = 'SR';
+                this.modalTitle = this.modalContext.tree.getSelected()[0].isLeaf ? 'Edit a Project' : 'Edit a Project Group';
+                this.modalContents = 'Do you want to create a root Project';
+                this.modalContents += this.modalContext.tree.getSelected()[0].isLeaf ? '?' : ' Group?';
+                this.modalEvent = 'edited';
+                this.$refs.checkModal.showModal();
+  
+                // params['flag'] = 'SR';
+                // msg['title'] = params.tree.getSelected()[0].isLeaf ? 'Edit a Project' : 'Edit a Project Group';
+                // this.procSelected('edited', params, msg);
+                break;
+            default:
+                this.modalTitle = 'Delete a Project';
+                this.modalContents = 'Selected item has a nested items underneath, Do you want to delete it?';
+                this.modalContext['flag'] = 'D';
+                if (this.modalContext.tree.getSelected()[0].children.length > 0) {
+                    this.$refs.checkModal.showModal();
+                } else {
+                    const path = this.modalContext.tree.getSelected().map(node => node.path);
+                    this.modalContext.tree.remove(path);
+                }
+                
+                // this.deleteSelected(params.tree);
+                break;
+            }
+        },
+        modalOk () {
+            if (['PG', 'PR'].includes(this.modalContext.flag)) {
+                this.modalContext['flag'] = 'R' + this.modalContext['flag'];
+                this.$emit(this.modalEvent, this.modalContext);
+            } else if (this.modalContext.flag === 'D') {
+                const path = this.modalContext.tree.getSelected().map(node => node.path);
+                this.modalContext.tree.remove(path);
+                this.$alertify.success('Okay');
             } else {
-                this.deleteSelected(params.tree);
+                this.$emit(this.modalEvent, this.modalContext);
+            }
+        },
+        modalCancel () {
+            this.modalContext['flag'] = 'S' + this.modalContext['flag'];
+            if (!this.modalContext.tree.getSelected()[0].isLeaf) {
+                this.$emit(this.modalEvent, this.modalContext);
+            } else if (this.modalContext.flag === 'D') {
+                this.$alertify.error('Cancel');
+            } else {
+                this.$notify({
+                    group: 'auth',
+                    type: 'warn',
+                    title: 'Not Allowed Action',
+                    text: 'Can not Add any Project or Project Group to <b> project </b>. \n Please, Build a Project Group first.',
+                    duration: 10000,
+                    speed: 500
+                });
             }
         },
         procSelected (emitMethodName, prams, msg) {
@@ -253,7 +329,7 @@ export default {
                 treeV.remove(path);
             }
         },
-        beforeEnter (el, done) {
+        beforeEnter (el) {
             this.$velocity(el, {
                 translateX: `-${this.treeWidth}px`,
                 opacity: 0
@@ -272,14 +348,7 @@ export default {
                     } 
                 }
             );
-            // el.style.transition = 'all .4s ease-in-out';
             done();
-
-
-            // el.style.transform = `translateX(-${this.treeWidth})`;
-            // el.style.opacity = 0;
-            // debugger;
-            // done();
         }
     }
 };
