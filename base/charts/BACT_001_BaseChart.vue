@@ -60,7 +60,9 @@
           />
         </b-col>
       </b-row>
-      <b-row v-else-if="chartType === 'Pie'" :col-default-sizer="selectedSizer">
+      <b-row v-else-if="chartType === 'Pie'" 
+             :col-default-sizer="selectedSizer"
+      >
         <b-col :class="selectedColSizeOption.graph">
           <pie-chart-ext
             v-if="loaded"
@@ -121,7 +123,10 @@
           />
         </b-col>
       </b-row>
-      <b-row v-else :col-default-sizer="selectedSizer">
+      <b-row v-else 
+             :col-default-sizer="selectedSizer"
+             align-v="center"
+      >
         <b-col :class="selectedColSizeOption.graph">
           <div>
             <donut-chart-ext
@@ -320,6 +325,7 @@ export default {
     max-height: 500px;
     height: 40%;
     width: 100%;
+    padding: 20px;
   }
   .card {
     @extend %sheet;
@@ -327,6 +333,9 @@ export default {
     border: 0;
     .card-header {
       border: 0;
+    }
+    .card-body {
+      padding: 20px;
     }
   }
 </style>

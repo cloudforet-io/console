@@ -1,27 +1,26 @@
 <template>
-<div style="padding: 15px">
-  <b-row class="row" align-h="center">
-    <b-col v-for="(asset, idx) in panelCard"
-           :key="idx" 
-           cols="12" md="4" lg="3"
-           class="assets row no-gutters align-items-center"
-    >
-        <span class="asset-icon"><i :class="selectIconHtml(asset.panelIcon, true)" /></span>
-        <b-col cols="6" class="asset-info">
-          <span class="asset-name">{{ asset.asKey }}</span>
-        </b-col>
-        <b-col cols="6" class="asset-count">
-          <span>{{ asset.assetValue }}</span>
-          <i class="arrow fal fa-angle-double-right" />
-        </b-col>
-        <!-- <b-col cols="4" class="text-right">
-          <h6>
-            <a :href="asset.linkURL">{{ asset.assetValue }}</a>
-          </h6>
-        </b-col> -->
-    </b-col>
-  </b-row>
-</div>
+  <div style="padding: 15px">
+    <b-row class="row" align-h="between">
+      <b-col v-for="(asset, idx) in panelCard"
+             :key="idx" 
+             cols="12" md="10" lg="6"
+             class="asset-container"
+      >
+        <b-row align-v="center" class="asset">
+          <span class="asset-icon"><i :class="selectIconHtml(asset.panelIcon, true)" /></span>
+          <b-col cols="7" class="asset-info">
+            <span class="asset-name">{{ asset.asKey }}</span>
+          </b-col>
+          <b-col cols="5" class="asset-count">
+            <a :href="asset.linkURL">
+              <span>{{ asset.assetValue }}</span>
+              <i class="arrow fal fa-angle-double-right" />
+            </a>
+          </b-col>
+        </b-row>
+      </b-col>
+    </b-row>
+  </div>
 </template>
 
 <script>
@@ -39,15 +38,19 @@ export default {
 
 <style lang="scss" scoped>
 
-  .assets {
+  .asset-container {
+    text-align: center;
+    max-width: 320px;
+    min-width: 280px;
+    }
+  .asset {
     position: relative;
-    padding: 35px 15px 10px 15px;
-    margin: 30px 20px 15px 20px;
+    padding-top: 35px;
+    margin: 30px 0;
     background-color: $white;
     border-radius: 3px;
     box-shadow: $box-shadow;
     z-index: 1;
-    max-width: 275px;
     a {
       text-decoration: underline;
     }
@@ -55,6 +58,7 @@ export default {
   .asset-icon {
     position: absolute;
     top: -15px;
+    left: 20px;
     display: inline-block;
     height: 40px;
     width: 40px;
@@ -83,7 +87,10 @@ export default {
     text-align: right;
     font-size: 2.5rem;
     font-weight: 700;
-    // color: $violet;
+    padding-right: 25px;
+    a {
+      text-decoration: none;
+    }
     span {
       cursor: pointer;
       vertical-align: middle;
@@ -96,7 +103,6 @@ export default {
     .arrow {
       cursor: pointer;
       vertical-align: middle;
-      margin-right: 25px;
       color: $navy;
       font-size: .6em;
     }
