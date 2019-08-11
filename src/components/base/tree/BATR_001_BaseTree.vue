@@ -9,14 +9,14 @@
         <div v-if="showTree">
           <BaseDragVertical 
             :line="false" 
-            :total-width="totalWidth"
+            :total-width="'100vw'"
             :height="dragHeight"
           >
             <template #leftContainer="{ width }">
               <sl-vue-tree v-model="treeData"
                            class="main-tree-col"
                            :allow-multiselect="true"
-                           :style="{ width: `${width}px` }"
+                           :style="{ width: width }"
                            @select="nodeSelected"
                            @drop="nodeDropped"
                            @nodecontextmenu="showContextMenu"
@@ -67,7 +67,7 @@
                 <div v-if="hasSelected" 
                      :key="nodeKey"
                      class="panel"
-                     :style="{ width: `${width}px` }"
+                     :style="{ width: width }"
                 >
                   <slot name="treeSubPanel" />
                 </div>
@@ -115,7 +115,6 @@ export default {
             contextMenuIsVisible: false,
             contextTopMenuIsVisible: false,
             showTree: false,
-            totalWidth: self.innerWidth
         };
     },
     computed: {
@@ -128,7 +127,6 @@ export default {
     },
     mounted: function () {
         this.showTree = true;
-        this.totalWidth = this.$el.clientWidth;
     },
     methods: {
         nodeSelected (nodes, event) {

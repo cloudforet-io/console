@@ -138,49 +138,49 @@ export default {
                               icon: 'fa-server',
                               type: 'l',
                               size: 1,
-                              color: 'primary'
+                              color: 'light'
                           }},
                 { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', panelIcon: {
                     icon: 'fa-database',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', panelIcon: {
                     icon: 'fa-users',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', panelIcon: {
                     icon: 'fa-database',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', panelIcon: {
                     icon: 'fa-server',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', panelIcon: {
                     icon: 'fa-database',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Project', assetValue: 17, linkURL: 'www.bing.com', panelIcon: {
                     icon: 'fa-star',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Member', assetValue: 0, linkURL: 'www.naver.com', panelIcon: {
                     icon: 'fa-users',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }}
             ];
 

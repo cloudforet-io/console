@@ -74,6 +74,8 @@ $shape-color: darken($skyblue, 1%);
     cursor: default;
     text-align: left;
     padding-left: 20px;
+    margin-right: 20px;
+    min-width: 200px;
     i {
       font-size: 1.5em;
       font-weight: 500;
