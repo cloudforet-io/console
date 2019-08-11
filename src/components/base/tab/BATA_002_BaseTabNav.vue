@@ -1,14 +1,14 @@
 <template>
   <b-row>
-    <b-col class="base-tab-nav col-xs-6 col-sm-6 col-md-12 col-lg-12">
+    <b-col cols="12" class="base-tab-nav">
       <template v-if="pill">
         <b-nav pills :fill="fill">
           <b-nav-item
-                  v-for="(curTab, idx) in navTabs"
-                  :key="idx"
-                  :class="{active: selectedTab.component === curTab.component}"
-                  :active="selectedTab.tabTitle === curTab.tabTitle"
-                  @click="selectedTab = curTab"
+            v-for="(curTab, idx) in navTabs"
+            :key="idx"
+            :class="{active: selectedTab.component === curTab.component}"
+            :active="selectedTab.tabTitle === curTab.tabTitle"
+            @click="selectedTab = curTab"
           >
             {{ curTab.tabTitle }}
           </b-nav-item>
@@ -17,11 +17,11 @@
       <template v-else>
         <b-nav tabs :fill="fill">
           <b-nav-item
-                  v-for="(curTab, idx) in navTabs"
-                  :key="idx"
-                  :class="{active: selectedTab.component === curTab.component}"
-                  :active="selectedTab.tabTitle === curTab.tabTitle"
-                  @click="selectedTab = curTab"
+            v-for="(curTab, idx) in navTabs"
+            :key="idx"
+            :class="{active: selectedTab.component === curTab.component}"
+            :active="selectedTab.tabTitle === curTab.tabTitle"
+            @click="selectedTab = curTab"
           >
             {{ curTab.tabTitle }}
           </b-nav-item>

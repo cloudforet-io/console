@@ -1,6 +1,6 @@
 <template>
-  <div class="row">
-    <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
+  <b-row no-gutters>
+    <b-col cols="12">
       <b-card class="base summary border-top-0">
         <slot v-if="useSlot" :name="privatePanel" />
         <template v-for="(item, index) in panels" v-else :name="panels[index].panelTitle">
@@ -13,8 +13,8 @@
             <template v-if="indexChecker(item.data.length) === 0">
               <dl>
                 <div class="warning-panel" style="display: block;">
-No {{ item.panelTitle }}
-</div>
+                  No {{ item.panelTitle }}
+                </div>
               </dl>
             </template>
             <dl class="dl-horizontal mb-0 row">
@@ -27,21 +27,21 @@ No {{ item.panelTitle }}
                         class="copy-clipboard"
                         title="Copy to Clipboard"
                         @click="CopyToClipboard(info.contents)"
->
+                  >
                     <i class="fal fa-copy" />
                   </span>
                 </template>
               </div>
               <div v-if="indexChecker(item.data.length) === 2" class="col-sm-12 col-md-6 summary">
-                <dt/>
-                <dd/>
+                <dt />
+                <dd />
               </div>
             </dl>
           </b-container>
         </template>
       </b-card>
     </b-col>
-  </div>
+  </b-row>
 </template>
 
 <script>
