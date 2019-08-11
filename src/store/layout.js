@@ -1,7 +1,7 @@
 export default {
     namespaced: true,
     state: {
-        headerHeight: 45 + 35
+        headerHeight: 50 + 35
     },
     mutations: {
         setHeaderHeight (state, { headerHeight }) {
