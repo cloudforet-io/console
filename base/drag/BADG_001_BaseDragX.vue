@@ -14,11 +14,11 @@
          }"
     >
       <div class="line top"
-           :class="{'colored': line}" 
+           :class="{'colored': line}"
            :style="{ 'height': `${lineHeight}px` }"
       />
 
-      <span class="dragger" 
+      <span class="dragger"
             :style="draggerStyle"
             @mousedown="onMousedown"
       >
@@ -26,8 +26,8 @@
         <i v-if="!$slots.dragger" class="fal fa-grip-lines-vertical" />
       </span>
 
-      <div class="line bottom" 
-           :class="{ 'colored': line }" 
+      <div class="line bottom"
+           :class="{ 'colored': line }"
            :style="{ 'height': `${lineHeight}px` }"
       />
     </div>
@@ -111,15 +111,15 @@ export default {
             self.document.addEventListener('mouseup', this.onMouseup);
         },
         onMousemove (e) {
-            if (this.dragging) { 
-                if (this.pageX === null) { 
+            if (this.dragging) {
+                if (this.pageX === null) {
                     this.pageX = e.pageX;
                     return;
                 }
                 let diff = this.pageX - e.pageX;
                 let newWidth = this.leftContainerWidth - diff;
-                if (newWidth < this.minLeftWidth || newWidth > this.maxLeftWidth) { 
-                    return; 
+                if (newWidth < this.minLeftWidth || newWidth > this.maxLeftWidth) {
+                    return;
                 }
                 this.leftContainerWidth = newWidth;
                 // this.rightContainerWidth = this.rightContainerWidth + diff;
@@ -127,7 +127,7 @@ export default {
             }
         },
         onMouseup () {
-            if (this.dragging) { 
+            if (this.dragging) {
                 this.dragging = false;
                 this.pageX = null;
                 self.document.removeEventListener('mousemove', this.onMousemove);
@@ -148,43 +148,43 @@ export default {
     top: 0;
     overflow: scroll;
     &.left {
-        left: 0;
+      left: 0;
     }
     &.right {
 
     }
 }
 .dragger-container {
-  position: absolute;
-  top: 0;
-  margin-left: 7px;
-  padding-right: 10px;
-  .line {
     position: absolute;
-    display: inline-block;
-    border-left: 1px solid;
-    border-color: transparent;
-    &.colored {
-      border-color: $gray;
+    top: 0;
+    margin-left: 7px;
+    padding-right: 10px;
+    .line {
+        position: absolute;
+        display: inline-block;
+        border-left: 1px solid;
+        border-color: transparent;
+        &.colored {
+          border-color: $gray;
+        }
+        &.top {
+          top: 0;
+        }
+        &.bottom {
+          bottom: 0;
+        }
     }
-    &.top {
-      top: 0;
+    .dragger {
+        position: absolute;
+        top: 50%;
+        left: 1px;
+        transform: translate(-50%, -50%);
+        display: inline-block;
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+        cursor: col-resize;
+        color: $darkgray;
     }
-    &.bottom {
-      bottom: 0;
-    }
-  }
-  .dragger {
-    position: absolute;
-    top: 50%;
-    left: 1px;
-    transform: translate(-50%, -50%);
-    display: inline-block;
-    font-size: 1.5rem;
-    font-weight: 600;
-    text-align: center;
-    cursor: col-resize;
-    color: $darkgray;
-  }
 }
 </style>

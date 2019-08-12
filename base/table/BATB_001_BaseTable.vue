@@ -88,25 +88,26 @@
           <h4>{{ scope.emptyFilteredText }}</h4>
         </template>
 
-        <!-- <template slot="thead-top" slot-scope="data">
-                  <tr>
-                    <th>
-                        &nbsp;
-                    </th>
-                    <th>Type 1</th>
-                    <th>
-                      Type 2
-                    </th>
-                    <th>Type 3</th>
-                  </tr>
-                </template> -->
-
         <template v-if="selectable" slot="HEAD_selected">
           <b-check v-model="isSelectedAll"
                    class="select-all-checkbox"
                    @change="onSelectAll"
           />
         </template>
+
+        <!-- <template slot="thead-top" slot-scope="data">
+           <tr>
+             <th>
+                 &nbsp;
+             </th>
+             <th>Type 1</th>
+             <th>
+               Type 2
+             </th>
+             <th>Type 3</th>
+           </tr>
+         </template> -->
+
 
         <template v-if="selectable" slot="selected" slot-scope="data">
           <BaseCheckbox :key="data.index"
@@ -126,11 +127,12 @@
         </template>
 
         <template slot="state" slot-scope="data">
-          <div>
+          <!-- <div>
             <b-badge :variant="getBadge(data.item.status)">
               {{ capitalizeFirstLetter(data.item.status) }}
             </b-badge>
-          </div>
+          </div> -->
+          <div v-html="getServerStates(data.item.state)" />
         </template>
 
         <template slot="link" slot-scope="data">
@@ -281,6 +283,9 @@ export default {
         }
     },
     methods: {
+        getServerStates(state){
+            return this.bindEnumToHtml(state);
+        },
         getVariantSize(size) {
             return this.setFontSize(size);
         },
@@ -300,7 +305,12 @@ export default {
             }
             this.$emit('rowClicked', item, idx, e);
         },
-        rowSelected(item, idx, e) {
+        /**
+         * @param item
+         * @param idx
+         * @param e
+         */
+        rowSelected(item, idx) {
             this.consoleLogEnv('row Selected');
             this.selectedRows.map((row) => {
                 if (row.data !== item) {
@@ -468,11 +478,9 @@ export default {
         cursor: pointer;
         padding: 5px;
         border-radius: 5px;
-
         i {
             vertical-align: middle;
         }
-
         &:hover {
             background-color: $lightgray;
         }
@@ -535,5 +543,4 @@ export default {
             margin: 0;
         }
     }
-
 </style>
