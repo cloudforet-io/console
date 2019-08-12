@@ -5,7 +5,7 @@ const InventoryMain = () => import('@/views/inventory/IVNT_001_InventoryMain');
 
 const DataCenter = () => import('@/views/inventory/data_center/IVDC_001_DataCenter');
 const Server = () => import('@/views/inventory/server/IVSV_001_Server');
-const CollectorPlugin = () => import('@/views/inventory/settings/IVST_001_CollectorPlugin');
+const Settings = () => import('@/views/inventory/settings/IVST_001_Settings');
 
 export default {
     path: 'inventory',
@@ -33,7 +33,7 @@ export default {
             path: 'settings',
             name: 'settings',
             meta: { label: 'Settings', requiresAuth: true },
-            component: CollectorPlugin
+            component: Settings
         }
     ]
 };

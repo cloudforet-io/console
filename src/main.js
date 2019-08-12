@@ -28,6 +28,16 @@ Vue.use(Notifications, { velocity });
 Vue.prototype.$axios = api;
 Vue.prototype.$velocity = velocity;
 
+/*
+api.post('/identity/domain/user', {
+    domain: 'megazone',
+}).then(function (response) {
+    console.log(response);
+}).catch(function (error) {
+    console.log(error);
+});*/
+
+
 /**
  * This is a Global Bus Event;
  * Please, name your '$emit' event name as action + Event such as
@@ -35,18 +45,6 @@ Vue.prototype.$velocity = velocity;
  **/
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
-
-/*
-Vue.http.interceptors.push((request, next) => {
-    console.log(request);
-    if(request.method === 'POST') {
-        request.method = 'PUT';
-    }
-    next(response => {
-        response.json = () => { return { message: response.body } };
-    });
-});
-*/
 
 
 new Vue({
