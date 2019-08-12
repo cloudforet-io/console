@@ -4,11 +4,11 @@
       <slot name="activator" />
     </span>
 
-    <b-modal :ref="name"
+    <b-modal v-model="modalShow"
              :title="title"
              :centered="centered"
-             :class="`modal-${type}`"
              :ok-variant="type"
+             :modal-class="`modal-${type}`"
              :size="size"
              :no-stacking="noStacking"
              :no-close-on-backdrop="backdropOff"
@@ -47,10 +47,6 @@ export default {
     name: 'BaseModal',
     event: ['ok', 'cancel'],
     props: {
-        name: {
-            type: String,
-            required: true
-        },
         type: {
             type: String,
             default: 'primary'
@@ -88,12 +84,19 @@ export default {
             default: false
         }
     },
+    data() {
+        return {
+            modalShow: false,
+            isModalShown: false
+        };
+    },
     methods: {
-        showModal (e) {
-            this.$refs[this.name].show();
+        showModal () {
+            this.modalShow = true;
+            this.isModalShown = true;
         },
-        hideModal (e) {
-            this.$refs[this.name].hide();
+        hideModal () {
+            this.modalShow = false;
         },
         clickOk () {
             this.$emit('ok');

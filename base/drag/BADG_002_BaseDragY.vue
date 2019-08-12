@@ -107,7 +107,7 @@ export default {
 <style lang="scss" scoped>
   .dragger-container {
     position: relative;
-    margin-top: 30px;
+    margin-top: 13px;
     padding-bottom: 30px;
     .line {
       position: absolute;
@@ -136,5 +136,8 @@ export default {
       cursor: row-resize;
       color: inherit;
     }
+    &:active {
+        cursor: row-resize;
+      }
   }
 </style>

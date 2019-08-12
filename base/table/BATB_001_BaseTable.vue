@@ -31,7 +31,6 @@
               </b-col>
               <b-col>
                 <BaseModal ref="modal" 
-                           name="tableSettings" 
                            title="Table Settings"
                            :centered="true" 
                            :size="'md'" 
@@ -59,10 +58,11 @@
 
       <b-table class="b-table"
                show-empty
+               :borderless="true"
                :items="items"
                :fields="heads"
                :striped="striped"
-               :bordered="bordered" :borderless="borderless"
+               :bordered="bordered" 
                :dark="dark" :hover="hover"
                :small="small"
                :fixed="fixed"
@@ -192,10 +192,6 @@ export default {
         bordered: {
             type: Boolean,
             default: false
-        },
-        borderless: {
-            type: Boolean,
-            default: true
         },
         cardless: {
             type: Boolean,
@@ -474,73 +470,66 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    %btn {
-        cursor: pointer;
-        padding: 5px;
-        border-radius: 5px;
-        i {
-            vertical-align: middle;
-        }
-        &:hover {
-            background-color: $lightgray;
-        }
+%btn {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    i {
+        vertical-align: middle;
     }
-
-    .prev-btn {
-        @extend %btn;
+    &:hover {
+        background-color: $lightgray;
     }
+}
 
-    .next-btn {
-        @extend %btn;
-    }
+.prev-btn {
+    @extend %btn;
+}
+.next-btn {
+    @extend %btn;
+}
+.refresh-btn {
+    @extend %btn;
+}
+.settings-btn {
+    @extend %btn;
+}
 
-    .refresh-btn {
-        @extend %btn;
-    }
-
-    .settings-btn {
-        @extend %btn;
-    }
-
-    .card {
+.card {
+    border: 0;
+    border-radius: inherit;
+    background-color: transparent;
+    &.no-card {
         border: 0;
-        border-radius: inherit;
-        background-color: transparent;
-
-        &.no-card {
-            border: 0;
-            all: unset;
-
-            .card-header {
-                background-color: transparent;
-            }
-
-            .card-body {
-                box-shadow: none;
-                overflow-x: hidden;
-            }
-        }
+        all: unset;
 
         .card-header {
-            padding-top: 30px;
-            padding-bottom: 30px;
-            background-color: $whiteblue;
-            border: 0;
-            border-radius: inherit;
+            background-color: transparent;
         }
 
         .card-body {
-            overflow-x: scroll;
-            padding: 30px 20px;
-            background-color: $white;
-            @extend %sheet;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-        }
-
-        .b-table {
-            display: inline-table;
-            margin: 0;
+            box-shadow: none;
+            overflow-x: hidden;
         }
     }
+    .card-header {
+        padding-top: 30px;
+        padding-bottom: 30px;
+        background-color: $whiteblue;
+        border: 0;
+        border-radius: inherit;
+    }
+    .card-body {
+        overflow-x: scroll;
+        padding: 20px 20px;
+        background-color: $white;
+        @extend %sheet;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+    .b-table {
+        display: inline-table;
+        margin: 0;
+    }
+}
 </style>
