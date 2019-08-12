@@ -15,12 +15,12 @@ const DefaultContainer = () => import('@/containers/DefaultContainer');
 
 // Views
 const LogIn = () => import('@/views/common/VICO_002_LogIn');
+const Redirect404 = () => import('@/views/common/VICO_003_Redirect404');
 
 const attatchLangauge = (to, from, next) => {
     if (!to.params.lang) {
         next();
         return;
-
     }
     const lang = to.params.lang;
     loadLanguageAsync(lang).then(() => next());
@@ -35,6 +35,12 @@ const index = new Router({
     linkActiveClass: 'open active',
     scrollBehavior: () => ({ y: 0 }),
     routes: [
+        {
+            path: '/error-page',
+            name: 'error',
+            meta: { label: '', requiresAuth: false },
+            component: Redirect404
+        },
         {
             path: '/log-in',
             name: 'logIn',
@@ -56,6 +62,7 @@ const index = new Router({
 });
 
 index.beforeEach((to, from, next) => {
+    debugger;
     for (let i = to.matched.length - 1; i > -1; i--) {
         if (to.matched[i].meta.requiresAuth) {
             if (cookie.get('sessionId')) {

@@ -107,11 +107,6 @@ export default {
                 { key: '_id', label: 'Name', sortable: true, ajaxSortable: false },
                 { key: 'user_name', label: 'ab', sortable: true, ajaxSortable: true },
                 { key: 'state', label: 'State', sortable: true, ajaxSortable: true },
-                { key: 'password', label: 'IP', sortable: true, ajaxSortable: false },
-                { key: 'user_first_name', label: 'Core', sortable: true, ajaxSortable: false },
-                { key: 'user_last_name', label: 'Memory', sortable: true, ajaxSortable: false },
-                { key: 'mobile', label: 'OS Type', sortable: true, ajaxSortable: false },
-                { key: 'role_id', label: 'OS Distro', sortable: true, ajaxSortable: false },
                 { key: 'project_id', label: 'Server Type', sortable: true, ajaxSortable: true },
                 { key: 'project_group_id', label: 'Platform', sortable: true, ajaxSortable: false },
                 { key: 'query', label: 'Disk Size', sortable: true, ajaxSortable: false }
@@ -155,7 +150,6 @@ export default {
         },
         async listServers(limit, skip, sort, search) {
             this.reset();
-
             if (this.isEmpty(limit)) {
                 limit = 10;
             }

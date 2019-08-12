@@ -52,9 +52,10 @@ export default {
                     error_code: errorCode,
                     error_msg: errorMsg
                 });
-        /*
-         * TODO:: Please, add each cases for error login author, if any difficulties to handle condition with its response code, Please put notice and update function.
-         */
+                /************************************************************
+                 * TODO:: Please, add each cases for error login author,
+                 * if any difficulties to handle condition with its response code, Please put notice and update function.
+                 ************************************************************/
                 switch (errorCode) {
                 case 401: {
               /* Vue.notify({
