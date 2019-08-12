@@ -19,7 +19,7 @@
           <template #caption>
             <div>
               <BaseModal ref="addServer"
-                         name="addServer" title="Add Server"
+                         title="Add Server"
                          :centered="true" :hide-footer="true"
               >
                 <template #activator>
@@ -33,7 +33,6 @@
               </BaseModal>
               <BaseModal v-if="selectedServer" 
                          ref="editServer"
-                         name="editServer" 
                          title="Edit Server"
                          :centered="true" :hide-footer="true"
               >
@@ -250,7 +249,6 @@ export default {
     }
 
     .btn {
-        padding: 3px 15px;
         margin: 0 5px;
     }
 

@@ -3,7 +3,6 @@
     <div class="row">
       <div class="col-12">
         <BaseModal ref="EditModal"
-                   name="EditModal"
                    :title="projectModalTitle"
                    :centered="true"
                    :hide-footer="true"

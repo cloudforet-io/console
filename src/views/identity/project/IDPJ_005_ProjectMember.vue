@@ -21,7 +21,6 @@
             <b-row align-v="center" align-h="center">
               <b-col cols="6">
                 <BaseModal ref="addMember"
-                           name="addMember"
                            title="Add Member"
                            :centered="true"
                            :hide-footer="true"
@@ -51,7 +50,7 @@
       </b-col>
     </b-row>
 
-    <BaseModal ref="deleteUser" name="deleteUser" 
+    <BaseModal ref="deleteUser"
                title="Delete Member"
                size="md"
                @ok="$alertify.success('Selected User Successfully deleted.')"

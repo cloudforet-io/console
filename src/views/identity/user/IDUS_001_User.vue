@@ -20,7 +20,6 @@
           <template #caption>
             <div>
               <BaseModal ref="addUser"
-                         name="addUser" 
                          title="Add User" 
                          :centered="true" 
                          :hide-footer="true"
@@ -40,7 +39,6 @@
               </BaseModal>
               <BaseModal v-if="selectedUser" 
                          ref="editUser"
-                         name="editUser" 
                          :title="'Edit User'"
                          :centered="true" 
                          :hide-footer="true"
@@ -234,7 +232,6 @@ export default {
   @extend %sheet;
 }
 .btn {
-  padding: 3px 15px;
   margin: 0 5px;
 }
 .user-table {

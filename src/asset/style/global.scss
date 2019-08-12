@@ -82,13 +82,14 @@ a {
     th {
       padding: 8px;
       padding-bottom: 25px;
+      border-bottom: 2px solid $gray;
     }
     tr:first-child {
       border-top: none;
     }
   }
   tr:first-child {
-    border-top: 2px solid $skyblue;
+    // border-top: 2px solid $skyblue;
   } 
   td {
     padding: 8px;
@@ -198,6 +199,7 @@ a {
 /* b-button */
 .btn {
   border-radius: 50px;
+  padding: 3px 15px 1px 15px;
 }
 .btn:focus {
   outline: none;
@@ -361,9 +363,27 @@ a {
 
 /* b-modal */
 .modal .modal-dialog {
+  .modal-header {
+    margin-bottom: 20px;
+    padding-top: 15px;
+    padding-bottom: 10px;
+    .close {
+      padding-top: 18px;
+    }
+  }
   .modal-content {
       @extend %sheet;
       border: 0;
+  }
+}
+
+.modal-primary {
+  .modal-header {
+    background-color: rgba($blue, 0.1);
+    color: darken($blue, 20%);
+    .close {
+      color: darken($blue, 20%);
+    }
   }
 }
 

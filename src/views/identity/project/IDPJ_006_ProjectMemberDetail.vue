@@ -34,7 +34,7 @@
       </slot>
     </b-row>
 
-    <BaseModal ref="deleteCheck" name="deleteCheck" 
+    <BaseModal ref="deleteCheck"
                title="Delete Member"
                size="md"
                @ok="$alertify.success('Selected User Successfully deleted.')"
