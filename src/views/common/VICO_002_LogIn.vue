@@ -28,14 +28,9 @@
     </ul>
 
     <div class="container fade-in">
-      <BaseModal
+      <BaseSimpleModal
         ref="LogInSimpleModal"
-        name="LogInSimpleModal"
-        size="md"
-        type="primary"
-        :ok-only="true"
-        :no-stacking="true"
-        :title="$i18n.t('MSG.TR_NOTI')"
+        :title="tr('TR_NOTI')"
       >
         <template #contents>
           <div>
@@ -46,7 +41,7 @@
             <div>● Phone: <a href="#">+82 (02)<b>1644-2243</b></a></div>
           </div>
         </template>
-      </BaseModal>
+      </BaseSimpleModal>
 
       <b-row class="justify-content-center">
         <b-col md="8">
@@ -127,19 +122,20 @@
           </b-card-group>
         </b-col>
       </b-row>
+      </basesimplemodal>
     </div>
   </b-row>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import BaseModal from '@/components/base/modal/BAMO_001_BaseModal.vue';
+import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal.vue';
 const signupContents = 'We apologize for inconvenience. \'Sign up\', \'Password retrieval\' feature currently unavailable due to our policies.' +
     ' Please, contact System Administrator for following contacts: ' + '<br>' +
     '● e-mail: admin@mz.co.kr';
 export default {
     components: {
-        BaseModal
+        BaseSimpleModal
     },
     data () {
         return {

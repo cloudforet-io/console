@@ -7,6 +7,7 @@
              :ok-variant="type"
              no-stacking 
     >
+      <span> {{ text }} </span>
       <slot name="contents" />
       <slot name="footer" />
       <template v-if="!$slots.footer" #modal-footer="{ ok, cancel, hide }">
@@ -28,7 +29,7 @@
 </template>
 <script>
 export default {
-    name: 'SimpleModals',
+    name: 'BaseSimpleModal',
     props: {
         type: {
             type: String,
@@ -46,6 +47,10 @@ export default {
         okOnly: {
             type: Boolean,
             default: true
+        },
+        text: {
+            type: String,
+            default: ''
         }
     },
     data () {
