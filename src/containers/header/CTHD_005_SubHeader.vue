@@ -1,14 +1,13 @@
 <template>
   <b-row class="sub-header" no-gutters>
-    <b-col cols="2" class="header-group">
+    <b-col cols="1" class="header-group">
       <span class="label">
         <i :class="subHeaderGroup.icon" />&nbsp;&nbsp;
         {{ subHeaderGroup.label }}
       </span>
-      <!-- <span class="triangle" /> -->
     </b-col>
     <b-col cols="10" class="row ">
-      <b-col v-for="nav in subHeaderList" :key="nav.label" cols="2">
+      <span v-for="nav in subHeaderList" :key="nav.label">
         <div class="item" :class="{ 'active': $route.meta.label === nav.label }">
           <span class="label">
             <router-link :to="nav.link">
@@ -16,7 +15,7 @@
             </router-link>
           </span>
         </div>
-      </b-col>
+      </span>
     </b-col>
   </b-row>
 </template>
@@ -42,7 +41,6 @@ $shape-height: $sub-header-height;
 $shape-width: 18px;
 $shape-color: darken($skyblue, 1%);
 %item {
-  position: relative;
   display: inline-block;
   height: $sub-header-height;
   width: 100%;
@@ -65,7 +63,6 @@ $shape-color: darken($skyblue, 1%);
   background-color: $bg-color;
   font-weight: 500;
   font-family: $font-big;
-  font-size: 0.9rem;
   box-shadow: 0px 0 5px 0px rgba($black, 0.3);
   
   .header-group {
@@ -75,27 +72,20 @@ $shape-color: darken($skyblue, 1%);
     font-size: 1.05em;
     color: $navy;
     cursor: default;
+    text-align: left;
+    padding-left: 20px;
+    margin-right: 20px;
+    min-width: 200px;
     i {
       font-size: 1.5em;
       font-weight: 500;
-    }
-    .triangle {
-      position: absolute;
-      height: 0;
-      width: 0;
-      top: 0px;
-      right: calc(-#{$shape-width});
-      border-top: $shape-height solid $shape-color;
-      border-right: $shape-width solid transparent;
-      z-index: 2;
     }
   }
 
   .item {
     @extend %item;
     cursor: pointer;
-    min-width: 150px;
-    width: 100%;
+    width: 170px;
 
     border-style: solid;
     border-image: linear-gradient(to right, transparent, transparent);

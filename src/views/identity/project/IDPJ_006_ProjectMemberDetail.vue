@@ -33,26 +33,40 @@
         </div>
       </slot>
     </b-row>
+
+    <BaseModal ref="deleteCheck" name="deleteCheck" 
+               title="Delete Member"
+               size="md"
+               @ok="$alertify.success('Selected User Successfully deleted.')"
+               @cancel="$alertify.error('Action Cancel')"
+    >
+      <template #contents>
+        <span>Do you want to delete selected?</span>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
 <script>
 import query from '@/views/identity/project/search_context/search_context';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
+const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 
 export default {
     name: 'ProjectMember',
+    event: ['close'],
     components: {
-        BaseTable
+        BaseTable,
+        BaseModal
     },
     data() {
         return {
             fields: [
-                {key: 'selected'},
-                {key: 'role_id', label: 'User ID', sortable: true, ajaxSortable: false},
-                {key: 'user_name', label: 'Name', sortable: true, ajaxSortable: true},
-                {key: 'email', label: 'Email', sortable: true, ajaxSortable: false},
-                {key: 'group', label: 'Group', sortable: true, ajaxSortable: false}
+                { key: 'selected' },
+                { key: 'role_id', label: 'User ID', sortable: true, ajaxSortable: false },
+                { key: 'user_name', label: 'Name', sortable: true, ajaxSortable: true },
+                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false },
+                { key: 'group', label: 'Group', sortable: true, ajaxSortable: false }
             ],
             users: [],
             anySelectedRow: false,
@@ -97,7 +111,7 @@ export default {
             }
 
             this.$axios.get('/identity/user', {
-                params: {limit, skip, sort}
+                params: { limit, skip, sort }
             }).then((response) => {
                 this.users = response.data;
                 this.isLoading = false;
@@ -130,24 +144,13 @@ export default {
             this.init();
         },
         deleteSelected() {
-            this.$alertify.confirmWithTitle(
-                'Delete Users',
-                'Do you want to delete selected?',
-                () => {
-                    this.consoleLogEnv('success');
-                    this.$alertify.success('Selected User Successfully deleted.');
-                },
-                () => {
-                    this.consoleLogEnv('fail');
-                    this.$alertify.error('Action Cancel');
-                }
-            );
+            this.$refs.deleteCheck.showModal();
         },
         addUser() {
             console.log('');
         },
         closeWindow(e) {
-            this.$parent.$store.dispatch('modal/closeModal');
+            this.$emit('close');
         }
     }
 };

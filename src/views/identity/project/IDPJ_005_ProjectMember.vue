@@ -20,11 +20,11 @@
           <template #caption>
             <b-row align-v="center" align-h="center">
               <b-col cols="6">
-                <BaseModal
-                  :name="'addUser'"
-                  :title="'Add Member'"
-                  :centered="true"
-                  :hide-footer="true"
+                <BaseModal ref="addMember"
+                           name="addMember"
+                           title="Add Member"
+                           :centered="true"
+                           :hide-footer="true"
                 >
                   <template #activator>
                     <b-button block variant="primary">
@@ -32,8 +32,8 @@
                     </b-button>
                   </template>
                   <template #contents>
-                    <MemberDetail
-                      :creatable="true" :updatable="true"
+                    <MemberDetail :creatable="true" :updatable="true"
+                                  @close="$refs.addMember.hideModal()"
                     />
                   </template>
                 </BaseModal>
@@ -50,6 +50,17 @@
         </BaseTable>
       </b-col>
     </b-row>
+
+    <BaseModal ref="deleteUser" name="deleteUser" 
+               title="Delete Member"
+               size="md"
+               @ok="$alertify.success('Selected User Successfully deleted.')"
+               @cancel="$alertify.error('Action Cancel')"
+    >
+      <template #contents>
+        <span>Do you want to delete selected?</span>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
@@ -119,14 +130,50 @@ export default {
                 search = [];
             }
 
-            this.$axios.get('/identity/user', {
-                params: { limit, skip, sort }
-            }).then((response) => {
-                this.users = response.data;
+            let res = null;
+            try {
+                res = await this.$axios.get('/identity/user', {
+                    params: { limit, skip, sort }
+                });
+
+                setTimeout(() => { // this is for test
+                    this.users = res.data;
+                    this.isLoading = false;
+                }, 1000);
+            } catch (e) {
+                console.error(e);
+                this.users = [
+                    {
+                        userId: 'abc',
+                        name: 'abc',
+                        email: 'abc@abc',
+                        mobile: '222',
+                        group: 'abcabczzz',
+                        language: 'en',
+                        domainId: 'abcabc',
+                        tags: [
+                            { abc: 'abc11' },
+                            { abc2: 'abc2222' },
+                            { abc3: 'abc333' }
+                        ]
+                    },
+                    {
+                        userId: 'zzz',
+                        name: 'zzz',
+                        email: 'zzz@abc',
+                        mobile: '333',
+                        group: 'zdzfzdsfsdf',
+                        language: 'en',
+                        domainId: 'wrwrw',
+                        tags: [
+                            { zzz1: 'ztest' },
+                            { zzz22: 'test222' },
+                            { zzz333: 'teset33' }
+                        ]
+                    }
+                ];
                 this.isLoading = false;
-            }).catch((ex) => {
-                console.error(ex);
-            });
+            }
 
         /**
          * TODO: set totalCount with data from server
@@ -155,19 +202,8 @@ export default {
             this.perPage = Number(val);
             this.init();
         },
-        deleteSelected(){
-            this.$alertify.confirmWithTitle(
-                'Delete Users',
-                'Do you want to delete selected?',
-                () => {
-                    this.consoleLogEnv('success');
-                    this.$alertify.success('Selected User Successfully deleted.');
-                },
-                () => {
-                    this.consoleLogEnv('fail');
-                    this.$alertify.error('Action Cancel');
-                }
-            );
+        deleteSelected () {
+            this.$refs.deleteUser.showModal();
         }
     }
 };

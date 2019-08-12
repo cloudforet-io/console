@@ -51,8 +51,7 @@ import { api } from '@/setup/api';
 let baseTabParams = {};
 export default {
     name: 'BaseTabs',
-    components: {
-    },
+    event: ['close'],
     props: {
         fill: {
             type: Boolean,
@@ -140,7 +139,7 @@ export default {
             this.$emit('delete', baseTabParams);
         },
         closeWindow (e) {
-            this.$parent.$store.dispatch('modal/closeModal');
+            this.$emit('close');
         }
     }
 };

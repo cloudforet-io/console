@@ -13,39 +13,39 @@
             :use-slot="true"
           >
             <template #DISK>
-              <data-disk></data-disk>
+              <data-disk />
             </template>
             <template #MOUNT>
-              <data-mount></data-mount>
+              <data-mount />
             </template>
             <template #NIC>
-              <data-n-i-c></data-n-i-c>
+              <data-n-i-c />
             </template>
             <template #ROUTE>
-              <data-route></data-route>
+              <data-route />
             </template>
             <template #PORT>
-              <data-port></data-port>
+              <data-port />
             </template>
             <template #PCI>
-              <dataPCI></dataPCI>
+              <dataPCI />
             </template>
             <template #SOFTWARE>
-              <data-software></data-software>
+              <data-software />
             </template>
             <template #SERVICE>
-              <data-service></data-service>
+              <data-service />
             </template>
             <template #WINUPDATE>
-              <data-win-update></data-win-update>
+              <data-win-update />
             </template>
             <template #SHARE>
-              <data-share></data-share>
+              <data-share />
             </template>
             <template #SECURITYGROUP>
-              <data-security-group></data-security-group>
+              <data-security-group />
             </template>
-            </BaseTabNav>
+          </BaseTabNav>
         </b-col>
       </b-card>
     </b-col>

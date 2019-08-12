@@ -2,9 +2,8 @@
   <div div class="animated fadeIn">
     <div class="row">
       <div class="col-12">
-        <BaseModal id="IDPJ001_Project_Edit_Modal"
-                   ref="Modal"
-                   :name="'EditModal'"
+        <BaseModal ref="EditModal"
+                   name="EditModal"
                    :title="projectModalTitle"
                    :centered="true"
                    :hide-footer="true"
@@ -21,6 +20,7 @@
                       :is-footer-visible="true"
                       @create="createProject"
                       @update="updateProject"
+                      @close="$refs.EditModal.hideModal()"
             >
               <template #ModaltabContentsPanel />
             </BaseTabs>
@@ -261,12 +261,12 @@ export default {
                 const title = (item.flag.indexOf('PG') > 0);
                 this.selectedData['selectedItem'] = item;
                 this.manageTabButton('CRT', true, title);
-                this.$refs.Modal.showModal();
+                this.$refs.EditModal.showModal();
             } else {
                 this.selectedData['selectedItem'] = item;
                 this.manageTabButton('UPT', true);
                 this.selectedData = item;
-                this.$refs.Modal.showModal();
+                this.$refs.EditModal.showModal();
             }
         },
         manageTabButton (flag, state, title) {
@@ -287,7 +287,7 @@ export default {
             treeV.updateNode(path, { title: tabData.projectProp.projectName });
             tabData.projectProp.projectName = null;
         //TODO:: Simulate gRPC Modules on BACK_END
-            this.$refs.Modal.hideModal();
+            this.$refs.EditModal.hideModal();
         },
         createProject (items) {
             this.consoleLogEnv('item', items);
@@ -322,7 +322,7 @@ export default {
             tabData.projectProp.projectName = null;
             tabData.projectProp.projectId = null;
 
-            this.$refs.Modal.hideModal();
+            this.$refs.EditModal.hideModal();
         }
     }
 };

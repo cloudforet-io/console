@@ -2,7 +2,7 @@
   <div class="animated fadeIn">
     <div class="row">
       <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-        <b-card class="base summary border-top-0">
+        <b-card class="base first-tab summary border-top-0">
           <h5 class="page-header m-t-0">
             <i class="fal fa-hashtag m-r-5" />&nbsp;&nbsp; Base Information
           </h5>
@@ -12,9 +12,9 @@
               <div v-for="(info, idx) in summaryBaseInfo" :key="idx" class="col-sm-12 col-md-6 summary">
                 <dt>{{ info.title }}</dt>
                 <dd>{{ info.contents }}</dd>
-                <span class="copy-clipboard"
+                <span v-b-tooltip.hover
+                      class="copy-clipboard"
                       title="Copy to Clipboard"
-                      v-b-tooltip.hover
                       @click="CopyToClipboard(info.contents)"
                 >
                   <i class="fal fa-copy" />
@@ -336,15 +336,6 @@ export default {
 
   .copy-clipboard:hover i {
     visibility: visible;
-  }
-
-  .card.base {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    &.summary {
-      margin-top: 0;
-      border-top-left-radius: 0px !important;
-    }
   }
 
   .assets {

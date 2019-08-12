@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <BaseDrag >
+    <BaseDrag>
       <template #container="{ height }">
         <BaseTable class="user-table" 
                    :table-data="users" 
@@ -19,18 +19,31 @@
         >
           <template #caption>
             <div>
-              <BaseModal :name="'addUser'" :title="'Add User'" :centered="true" :hide-footer="true">
+              <BaseModal ref="addUser"
+                         name="addUser" 
+                         title="Add User" 
+                         :centered="true" 
+                         :hide-footer="true"
+              >
                 <template #activator>
                   <b-button class="btn" variant="outline-primary">
                     Add
                   </b-button>
                 </template>
                 <template #contents>
-                  <UserDetail :creatable="true" :updatable="true" />
+                  <UserDetail 
+                    :creatable="true" 
+                    :updatable="true"
+                    @close="$refs.addUser.hideModal()"
+                  />
                 </template>
               </BaseModal>
-              <BaseModal v-if="selectedUser" :name="'editUser'" :title="'Edit User'"
-                         :centered="true" :hide-footer="true"
+              <BaseModal v-if="selectedUser" 
+                         ref="editUser"
+                         name="editUser" 
+                         :title="'Edit User'"
+                         :centered="true" 
+                         :hide-footer="true"
               >
                 <template #activator>
                   <b-button class="btn" variant="outline-dark">
@@ -38,7 +51,10 @@
                   </b-button>
                 </template>
                 <template #contents>
-                  <UserDetail :updatable="true" :user-prop="selectedUser" />
+                  <UserDetail :updatable="true" 
+                              :user-prop="selectedUser" 
+                              @close="$refs.editUser.hideModal()"
+                  />
                 </template>
               </BaseModal>
             </div>
@@ -51,10 +67,11 @@
                 :nav-tabs="tabs"
                 :keep-alive="true"
                 :is-footer-visible="false"
-                :use-slot="true">
+                :use-slot="true"
+    >
       <template #INFO>
-        <b-card class="base">
-          <UserDetail :user-prop="selectedUser" />
+        <b-card class="base first-tab">
+          <UserInfo :user-prop="selectedUser" />
         </b-card>
       </template>
     </BaseTabNav>
@@ -66,7 +83,7 @@ import BaseDrag from '@/components/base/drag/BADG_002_BaseDragY.vue';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
 import query from './search_context/query.js';
 import UserDetail from './IDUS_002_UserDetail.vue';
-
+import UserInfo from './IDUS_003_UserInfo.vue';
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
 const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 
@@ -77,7 +94,8 @@ export default {
         BaseTable,
         BaseModal,
         UserDetail,
-        BaseTabNav
+        BaseTabNav,
+        UserInfo
     },
     data () {
         return {
@@ -109,6 +127,11 @@ export default {
             isLoading: true
         };
     },
+    computed: {
+        selectedUserData () {
+            return this.selectedUser;
+        }
+    },
     mounted () {
         this.init();
     },
@@ -137,22 +160,53 @@ export default {
                 search = [];
             }
 
-            let res;
+            let res = null;
             try {
                 res = await this.$axios.get('/identity/user', {
                     params: { limit, skip, sort }
-          /**
-           * TODO: set limit, skip, sort and search in the right format
-           */
+                /**
+                 * TODO: set limit, skip, sort and search in the right format
+                 */
                 });
+
+                setTimeout(() => { // this is for test
+                    this.users = res.data;
+                    this.isLoading = false;
+                }, 1000);
             } catch (e) {
                 console.error(e);
-            }
-
-            setTimeout(() => { // this is for test
-                this.users = res.data;
                 this.isLoading = false;
-            }, 1000);
+                this.users = [
+                    {
+                        userId: 'abc',
+                        name: 'abc',
+                        email: 'abc@abc',
+                        mobile: '222',
+                        group: 'abcabczzz',
+                        language: 'en',
+                        domainId: 'abcabc',
+                        tags: [
+                            { abc: 'abc11' },
+                            { abc2: 'abc2222' },
+                            { abc3: 'abc333' }
+                        ]
+                    },
+                    {
+                        userId: 'zzz',
+                        name: 'zzz',
+                        email: 'zzz@abc',
+                        mobile: '333',
+                        group: 'zdzfzdsfsdf',
+                        language: 'en',
+                        domainId: 'wrwrw',
+                        tags: [
+                            { zzz1: 'ztest' },
+                            { zzz22: 'test222' },
+                            { zzz333: 'teset33' }
+                        ]
+                    }
+                ];
+            }
       /**
        * TODO: set totalCount with data from server
        */

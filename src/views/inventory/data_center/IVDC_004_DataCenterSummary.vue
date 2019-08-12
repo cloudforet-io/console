@@ -1,11 +1,13 @@
 <template>
-  <div class="animated fadeIn">
-    <base-panel :panels="panelData" />
-    <div class="col-xs-12 p-0">
-      <base-panel-card :panels-card="panelCardData" />
-    </div>
-    <div class="row">
-      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+  <b-row no-gutters class="animated fadeIn mb-3 pb-5">
+    <b-col cols="12" class="p-0">
+      <base-panel :panels="panelData" />
+    </b-col>
+    <b-col cols="12" class="p-0 mt-2 mb-3">
+      <base-panel-card :panel-card="panelCardData" />
+    </b-col>
+    <b-row align-h="center">
+      <b-col xs="10" lg="9" xl="6">
         <BaseChart
           :chart-type="'Line'"
           :chart-title-data="sampleTitleData1"
@@ -15,8 +17,8 @@
           :options="chartDataAndOption2.option"
           :sample-use-y-n="true"
         />
-      </div>
-      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+      </b-col>
+      <b-col xs="10" lg="9" xl="6">
         <BaseChart
           :chart-data="chartDataAndOption2.data"
           :chart-title-data="sampleTitleData2"
@@ -29,9 +31,9 @@
           @displayVM="displayVM"
           @displayOS="displayOS"
         />
-      </div>
-    </div>
-  </div>
+      </b-col>
+    </b-row>
+  </b-row>
 </template>
 
 <script>
@@ -138,49 +140,49 @@ export default {
                               icon: 'fa-server',
                               type: 'l',
                               size: 1,
-                              color: 'primary'
+                              color: 'light'
                           }},
                 { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', panelIcon: {
                     icon: 'fa-database',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', panelIcon: {
                     icon: 'fa-users',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', panelIcon: {
                     icon: 'fa-database',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', panelIcon: {
                     icon: 'fa-server',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', panelIcon: {
                     icon: 'fa-database',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Project', assetValue: 17, linkURL: 'www.bing.com', panelIcon: {
                     icon: 'fa-star',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }},
                 { asKey: 'Member', assetValue: 0, linkURL: 'www.naver.com', panelIcon: {
                     icon: 'fa-users',
                     type: 'l',
                     size: 1,
-                    color: 'primary'
+                    color: 'light'
                 }}
             ];
 
@@ -189,8 +191,7 @@ export default {
                 TitleIconClass: {
                     icon: 'fa-globe',
                     type: 'l',
-                    size: 1,
-                    color: 'primary'
+                    size: 1
                 },
                 cardTitle: 'Server By Region',
                 isDropdownUSed: false

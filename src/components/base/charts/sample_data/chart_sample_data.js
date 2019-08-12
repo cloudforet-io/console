@@ -7,7 +7,7 @@ export default {
             labels: ['2018-01', '2018-02', '2018-03', '2018-04', '2018-05', '2018-06', '2018-07', '2018-08', '2018-09', '2018-10', '2018-11', '2018-12'],
             datasets: [{
                 label: 'GitHub Commits',
-                backgroundColor: '#f87979',
+                backgroundColor: '#2C68F9',
                 data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11]
             }
             ]
@@ -35,17 +35,17 @@ export default {
             labels: ['2017-01', '2017-02', '2017-03', '2017-04', '2017-05', '2017-06', '2017-07', '2017-08', '2017-09'],
             datasets: [{
                 label: 'KosDaq',
-                backgroundColor: hexToRgba('#EE82EE', 30),
+                backgroundColor: hexToRgba('#8a2be2', 70),
                 data: [130, 139, 210, 150, 230, 170, 135, 122, 173]
             },
             {
                 label: 'Nasdaq',
-                backgroundColor: hexToRgba('#36a2eb', 20),
+                backgroundColor: hexToRgba('#2D9E6E', 70),
                 data: [139, 280, 340, 135, 140.22, 20.11, 145.13, 122, 173]
             },
             {
                 label: 'Nikkei',
-                backgroundColor: hexToRgba('#FFA500', 20),
+                backgroundColor: hexToRgba('#FFAE08', 70),
                 data: [130.22, 139.44, 110.11, 250.11, 231.56, 301.12, 135.12, 122, 173]
             }
             ]

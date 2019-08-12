@@ -30,8 +30,12 @@
                 <span class="next-btn" @click.prevent="onNext"><i class="fal fa-chevron-right" /></span>
               </b-col>
               <b-col>
-                <BaseModal ref="modal" :name="'tableSettings'" :title="'Table Settings'"
-                           :centered="true" :size="'md'" @ok="limitChanged"
+                <BaseModal ref="modal" 
+                           name="tableSettings" 
+                           title="Table Settings"
+                           :centered="true" 
+                           :size="'md'" 
+                           @ok="limitChanged"
                 >
                   <template #activator>
                     <span class="settings-btn"><i class="fal fa-cog" /></span>
@@ -123,8 +127,12 @@
         </template>
 
         <template slot="state" slot-scope="data">
-            <div  v-html="getServerStates(data.item.state)">
-            </div>
+          <!-- <div>
+            <b-badge :variant="getBadge(data.item.status)">
+              {{ capitalizeFirstLetter(data.item.status) }}
+            </b-badge>
+          </div> -->
+          <div v-html="getServerStates(data.item.state)" />
         </template>
 
         <template slot="link" slot-scope="data">
@@ -297,7 +305,12 @@ export default {
             }
             this.$emit('rowClicked', item, idx, e);
         },
-        rowSelected(item, idx, e) {
+        /**
+         * @param item
+         * @param idx
+         * @param e
+         */
+        rowSelected(item, idx) {
             this.consoleLogEnv('row Selected');
             this.selectedRows.map((row) => {
                 if (row.data !== item) {
@@ -465,11 +478,9 @@ export default {
         cursor: pointer;
         padding: 5px;
         border-radius: 5px;
-
         i {
             vertical-align: middle;
         }
-
         &:hover {
             background-color: $lightgray;
         }
@@ -532,5 +543,4 @@ export default {
             margin: 0;
         }
     }
-
 </style>

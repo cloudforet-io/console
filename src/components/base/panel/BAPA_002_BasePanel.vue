@@ -1,44 +1,49 @@
 <template>
-  <div class="row">
-    <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-      <b-card class="base summary border-top-0">
+  <b-row no-gutters>
+    <b-col cols="12">
+      <b-card>
         <slot v-if="useSlot" :name="privatePanel" />
-        <template v-for="(item, index) in panels" v-else :name="panels[index].panelTitle">
-          <h5 :key="item.panelTitle" class="page-header m-t-0">
-            <span v-html="iTagBuilder(item.panelIcon)" />
+        <template v-for="(item) in panels" v-else :name="item.panelTitle">
+          <div :key="item.panelTitle">
+            <h5 class="page-header m-t-0">
+              <i :class="selectIconHtml(item.panelIcon, true)" />
               &nbsp;&nbsp; {{ item.panelTitle }}
-          </h5>
-          <hr>
-          <b-container fluid>
-            <template v-if="indexChecker(item.data.length) === 0">
-              <dl>
-                <div class="warning-panel" style="display: block;"> No {{ item.panelTitle }}</div>
-              </dl>
-            </template>
-            <dl class="dl-horizontal mb-0 row">
-              <div v-for="(info, idx) in item.data" :key="idx" class="col-sm-12 col-md-6 summary">
-                <template v-if="indexChecker(item.data.length, idx) === 1">
-                  <dt>{{ info.title }}</dt>
-                  <dd>{{ info.contents }}</dd>
-                  <span v-if="useCopyToSelect(info.copyFlag)"
-                        v-b-tooltip.hover
-                        class="copy-clipboard"
-                        title="Copy to Clipboard"
-                        @click="CopyToClipboard(info.contents)">
-                  <i class="fal fa-copy"/>
-                </span>
-                </template>
-              </div>
-                <div class="col-sm-12 col-md-6 summary" v-if="indexChecker(item.data.length) === 2">
-                  <dt></dt>
-                  <dd></dd>
+            </h5>
+            <hr>
+            <b-container fluid>
+              <template v-if="indexChecker(item.data.length) === 0">
+                <dl>
+                  <div class="warning-panel" style="display: block;">
+                    No {{ item.panelTitle }}
+                  </div>
+                </dl>
+              </template>
+              <dl class="dl-horizontal mb-0 row">
+                <div v-for="(info, idx) in item.data" :key="idx" class="col-sm-12 col-md-6 summary">
+                  <template v-if="indexChecker(item.data.length, idx) === 1">
+                    <dt>{{ info.title }}</dt>
+                    <dd>{{ info.contents }}</dd>
+                    <span v-if="useCopyToSelect(info.copyFlag)"
+                          v-b-tooltip.hover
+                          class="copy-clipboard"
+                          title="Copy to Clipboard"
+                          @click="CopyToClipboard(info.contents)"
+                    >
+                      <i class="fal fa-copy" />
+                    </span>
+                  </template>
                 </div>
-            </dl>
-          </b-container>
+                <div v-if="indexChecker(item.data.length) === 2" class="col-sm-12 col-md-6 summary">
+                  <dt />
+                  <dd />
+                </div>
+              </dl>
+            </b-container>
+          </div>
         </template>
       </b-card>
     </b-col>
-  </div>
+  </b-row>
 </template>
 
 <script>
@@ -57,9 +62,6 @@ export default {
     methods: {
         CopyToClipboard (text) {
             this.selectToCopyToClipboard(text);
-        },
-        iTagBuilder (iconObject) {
-            return this.selectIconHtml(iconObject);
         },
         indexChecker (totalLength, currentIndex) {
             return (totalLength === 0 && this.isEmpty(currentIndex)) ? 0 : (currentIndex <= totalLength-1) ? 1 : 2;
@@ -130,6 +132,9 @@ export default {
     text-align: center;
     color: #888;
     font-size: 18px;
+  }
+  .card {
+    border: 0;
   }
 
 </style>

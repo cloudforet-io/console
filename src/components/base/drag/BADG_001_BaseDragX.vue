@@ -1,10 +1,10 @@
 <template>
   <div class="box-container"
-       :style="{'width': `${totalWidth}px`,
+       :style="{'width': totalWidth,
                 'height': `${containerHeight}px`}"
   >
     <div class="content-container left">
-      <slot name="leftContainer" :width="leftContainerWidth" />
+      <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
     </div>
 
     <div ref="dragger" class="dragger-container"
@@ -33,11 +33,11 @@
     </div>
 
     <div class="content-container right"
-         :style="{'width': `${rightContainerWidth}px`,
-                  'left': `${totalWidth - rightContainerWidth}px`,
+         :style="{'width': `calc(100vw - ${leftContainerWidth + draggerWidth}px)`,
+                  'left': `${leftContainerWidth + draggerWidth}px`,
                   'height': `${containerHeight}px`}"
     >
-      <slot name="rightContainer" :width="rightContainerWidth" />
+      <slot name="rightContainer" :width="`calc(100vw - ${leftContainerWidth + draggerWidth}px)`" />
     </div>
   </div>
 </template>
@@ -75,8 +75,8 @@ export default {
             default: 600
         },
         totalWidth: {
-            type: Number,
-            default: 0
+            type: String,
+            default: '100vw'
         },
         rightWidth: {
             type: Number,
@@ -90,17 +90,18 @@ export default {
                 'height': `${this.draggerHeight}px`
             },
             leftContainerWidth: this.leftWidth,
-            rightContainerWidth: this.totalWidth - this.leftWidth,
+            // rightContainerWidth: this.totalWidth - this.leftWidth,
             containerHeight: this.height,
             lineHeight: (this.containerHeight / 2) - this.draggerHeight,
+            draggerWidth: 30,
             dragging: false,
             pageX: null
         };
     },
     mounted () {
-      // this.containerHeight = this.$scopedSlots.leftContainer()[0].context.$el.clientHeight;
         this.lineHeight = (this.containerHeight / 2) - this.draggerHeight;
-        this.rightContainerWidth -= (this.$refs.dragger.clientWidth + this.$refs.dragger.offsetWidth);
+        this.draggerWidth = this.$refs.dragger.clientWidth + this.$refs.dragger.offsetWidth;
+        // this.rightContainerWidth -= this.draggerWidth;
         console.log(this.height);
     },
     methods: {
@@ -121,7 +122,7 @@ export default {
                     return;
                 }
                 this.leftContainerWidth = newWidth;
-                this.rightContainerWidth = this.rightContainerWidth + diff;
+                // this.rightContainerWidth = this.rightContainerWidth + diff;
                 this.pageX = e.pageX;
             }
         },
@@ -138,10 +139,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .box-container {
+.box-container {
     position: relative;
-  }
-  .content-container {
+}
+.content-container {
     display: inline-block;
     position: absolute;
     top: 0;
@@ -152,38 +153,38 @@ export default {
     &.right {
 
     }
-  }
-  .dragger-container {
+}
+.dragger-container {
     position: absolute;
     top: 0;
-    margin-left: 10px;
-    padding-right: 20px;
+    margin-left: 7px;
+    padding-right: 10px;
     .line {
-      position: absolute;
-      display: inline-block;
-      border-left: 1px solid;
-      border-color: transparent;
-      &.colored {
-        border-color: $gray;
-      }
-      &.top {
-        top: 0;
-      }
-      &.bottom {
-        bottom: 0;
-      }
+        position: absolute;
+        display: inline-block;
+        border-left: 1px solid;
+        border-color: transparent;
+        &.colored {
+          border-color: $gray;
+        }
+        &.top {
+          top: 0;
+        }
+        &.bottom {
+          bottom: 0;
+        }
     }
     .dragger {
-      position: absolute;
-      top: 50%;
-      left: 1px;
-      transform: translate(-50%, -50%);
-      display: inline-block;
-      font-size: 1.5rem;
-      font-weight: 600;
-      text-align: center;
-      cursor: col-resize;
-      color: inherit;
+        position: absolute;
+        top: 50%;
+        left: 1px;
+        transform: translate(-50%, -50%);
+        display: inline-block;
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+        cursor: col-resize;
+        color: $darkgray;
     }
-  }
+}
 </style>

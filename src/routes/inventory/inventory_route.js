@@ -1,4 +1,5 @@
-const BaseHeader = () => import('@/containers/header/CTHD_001_Header');
+// const BaseHeader = () => import('@/containers/header/CTHD_001_Header');
+import BaseHeader from '@/containers/header/CTHD_001_Header';
 
 const InventoryMain = () => import('@/views/inventory/IVNT_001_InventoryMain');
 

@@ -1,4 +1,5 @@
-const BaseHeader = () => import('@/containers/header/CTHD_001_Header');
+// const BaseHeader = () => import('@/containers/header/CTHD_001_Header');
+import BaseHeader from '@/containers/header/CTHD_001_Header';
 const IdentityMain = () => import('@/views/identity/IDNT_001_IdentityMain');
 const User = () => import('@/views/identity/user/IDUS_001_User');
 const Project = () => import('@//views/identity/project/IDPJ_001_Project');

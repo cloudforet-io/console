@@ -18,20 +18,28 @@
         >
           <template #caption>
             <div>
-              <BaseModal :name="'addServer'" :title="'Add Server'" :centered="true" :hide-footer="true">
+              <BaseModal ref="addServer"
+                         name="addServer" title="Add Server"
+                         :centered="true" :hide-footer="true"
+              >
                 <template #activator>
                   <b-button class="btn" variant="outline-dark">
-                    {{tr('BTN_ADD')}}
+                    {{ tr('BTN_ADD') }}
                   </b-button>
                 </template>
-                <template #contents />
+                <template #contents>
+                  cotents
+                </template>
               </BaseModal>
-              <BaseModal v-if="selectedServer" :name="'editServer'" :title="'Edit Server'"
+              <BaseModal v-if="selectedServer" 
+                         ref="editServer"
+                         name="editServer" 
+                         title="Edit Server"
                          :centered="true" :hide-footer="true"
               >
                 <template #activator>
                   <b-button class="btn" variant="outline-primary">
-                    {{tr('BTN_DELETE')}}
+                    {{ tr('BTN_DELETE') }}
                   </b-button>
                 </template>
                 <template #contents />
@@ -53,7 +61,9 @@
                     :use-slot="true"
         >
           <template #SUMMARY>
-            <serverSummary />
+            <b-card class="base first-tab">
+              <serverSummary />
+            </b-card>
           </template>
           <template #DATA>
             <serverData />
@@ -203,17 +213,17 @@ export default {
                          * TODO: set limit, skip, sort and search in the right format
                          */
                 });
-            } catch (e) {
-                console.error(e);
-            }
-            this.bindAdditionalKey(res.data, 'state', 'SERVER_STATE');
-            setTimeout(() => { // this is for test
-                this.servers = res.data;
-                this.isLoading = false;
-            }, 500);
+                this.bindAdditionalKey(res.data, 'state', 'SERVER_STATE');
+                setTimeout(() => { // this is for test
+                    this.servers = res.data;
+                    this.isLoading = false;
+                }, 500);
                 /**
                  * TODO: set totalCount with data from server
                  */
+            } catch (e) {
+                console.error(e);
+            }
         },
         rowSelected(row) {
             if (row instanceof Array || !row) {

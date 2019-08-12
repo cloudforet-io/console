@@ -30,8 +30,7 @@
     <div class="container fade-in">
       <BaseSimpleModal
         ref="LogInSimpleModal"
-        :simple-modal-type="selectedType"
-        :simple-modal-title="instructionTitle"
+        :title="tr('TR_NOTI')"
       >
         <template #contents>
           <div>
@@ -43,29 +42,6 @@
           </div>
         </template>
       </BaseSimpleModal>
-
-      <div id="simpleModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="simpleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 id="simpleModalLabel" class="modal-title">
-                title
-              </h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              ...
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <b-row class="justify-content-center">
         <b-col md="8">
@@ -118,8 +94,6 @@
                               type="button"
                               class="btn btn-link login-check"
                               title="Trouble to Log In?"
-                              data-toggle="modal"
-                              data-target="#simpleModal"
                               @click="popSignUpInstruction"
                       >
                         <i class="fal fa-exclamation-circle" />
@@ -148,6 +122,7 @@
           </b-card-group>
         </b-col>
       </b-row>
+      </basesimplemodal>
     </div>
   </b-row>
 </template>
@@ -164,8 +139,6 @@ export default {
     },
     data () {
         return {
-            selectedType: 4,
-            instructionTitle: this.$i18n.t('MSG.TR_NOTI'),
             instructionContents: signupContents,
             rememberStatus: false,
             seenGreet: true,

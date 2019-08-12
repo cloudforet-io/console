@@ -20,7 +20,7 @@ export const GlobalEnum = {
                 msg: 'Deleted', //danger
                 icon: 'fal fa-trash',
                 color: 'danger'
-            },
+            }
         }),
     COLLECT_STATE: Object.freeze(
         {
@@ -48,6 +48,6 @@ export const GlobalEnum = {
                 msg: 'Unmanaged', // secondary
                 icon: 'fal fa-question-circle',
                 color: 'secondary'
-            },
+            }
         })
 };

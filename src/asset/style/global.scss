@@ -6,7 +6,7 @@
 html, body {
   font-family: $font-basic;
   background-color: $whiteblue;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   color: $black;
   width: 100vw;
@@ -348,10 +348,22 @@ a {
 .card.base {
   @extend %sheet;
   border: none;
+  &.first-tab {
+    margin-top: 0;
+    border-top-left-radius: 0px !important;
+  }
   .card-header {
     border-bottom: none;
     border-top-left-radius: $border-radius;
     border-top-right-radius: $border-radius;
+  }
+}
+
+/* b-modal */
+.modal .modal-dialog {
+  .modal-content {
+      @extend %sheet;
+      border: 0;
   }
 }
 
@@ -365,7 +377,7 @@ a {
 
 
 /* i Tag: icon */
-.primary{
+.primary {
   color:$blue;
 }
 
@@ -391,6 +403,10 @@ a {
 
 .warning {
   color:$orange;
+}
+
+.light {
+  color:$white;
 }
 
 

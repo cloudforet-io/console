@@ -14,19 +14,16 @@ export const Mixin = {
      **********************************************************************************/
         getGraphColor: (o, r, l) => {
             const colorListWithOpacity = [
-                hexToRgba('#ff0000', 50),
-                hexToRgba('#FFA500', 30),
-                hexToRgba('#0000ff', 30),
-                hexToRgba('#00FFFF', 30),
-                hexToRgba('#00FF00', 30),
-                hexToRgba('#FFC0CB', 30),
-                hexToRgba('#008080', 30),
-                hexToRgba('#4B0082', 30),
-                hexToRgba('#ffff00', 30),
-                hexToRgba('#EE82EE', 30),
-                hexToRgba('#000000', 30)
+                hexToRgba('#2C68F9', 70),
+                hexToRgba('#e81d2a', 70),
+                hexToRgba('#8a2be2', 70),
+                hexToRgba('#1a1f3e', 70),
+                hexToRgba('#0F2965', 70),
+                hexToRgba('#4856f2', 70),
+                hexToRgba('#FFAE08', 70),
+                hexToRgba('#2D9E6E', 70)
             ];
-            const colorListWithOutOpacity = ['#ff0000', '#FFA500', '#0000ff', '#00FFFF', '#00FF00', '#FFC0CB', '#008080', '#4B0082', '#ffff00', '#EE82EE', '#000000'];
+            const colorListWithOutOpacity = ['#2C68F9', '#e81d2a', '#8a2be2', '#1a1f3e', '#4856f2', '#FFAE08', '#2D9E6E' ];
 
             let selectedColor = (o) ? colorListWithOpacity: colorListWithOutOpacity;
             let returnColorVal =  l == 0 ? (r) ? selectedColor[Math.floor(Math.random() * selectedColor.length)] : selectedColor[0]: [];
@@ -186,7 +183,7 @@ export const Mixin = {
         },
     /**********************************************************************************
      * Name       : selectIconHtml
-     * Input   => (o: icon object   =>  Object)
+     * Input   => (o: icon object   =>  Object, c: class)
      *            {type: type of font awesome ex: fal, fab,
      *             icon: icon name,
      *             size: size of icon ex: -1 ~ 10
@@ -195,7 +192,7 @@ export const Mixin = {
      * Output  => boolean whether it's checked type
      * Description:  Create a string of <i/> Dom tag with given option
      **********************************************************************************/
-        selectIconHtml: function (o) {
+        selectIconHtml: function (o, c) {
              /******************************************************************
              * Note:: Please add a new type letter when New font Type has added.
              * ****************************************************************
@@ -226,7 +223,7 @@ export const Mixin = {
                 defaultClass += ' ' + o.color;
             }
             returnHtml =`<i class="${defaultClass}"> </i>`;
-            return returnHtml;
+            return c ? defaultClass : returnHtml;
         },
     /**********************************************************************************
      * Name       : tr
