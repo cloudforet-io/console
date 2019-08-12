@@ -119,19 +119,14 @@
 
 
         <template slot="status" slot-scope="data">
-          <div :style="getVariantSize(data.item.status.variantSize)">
-            <b-badge :variant="getBadge(data.item.status.flag)">
-              {{ capitalizeFirstLetter(data.item.status.flag) }}
+          <div :style="getVariantSize(data.item.status)">
+            <b-badge :variant="getBadge(data.item.status)">
+              {{ capitalizeFirstLetter(data.item.status) }}
             </b-badge>
           </div>
         </template>
 
         <template slot="state" slot-scope="data">
-          <!-- <div>
-            <b-badge :variant="getBadge(data.item.status)">
-              {{ capitalizeFirstLetter(data.item.status) }}
-            </b-badge>
-          </div> -->
           <div v-html="getServerStates(data.item.state)" />
         </template>
 
@@ -287,13 +282,20 @@ export default {
             return this.bindEnumToHtml(state);
         },
         getVariantSize(size) {
-            return this.setFontSize(size);
+            let variantFontSize = 3;
+            if (size.hasOwnProperty('variantSize')){
+                variantFontSize = size.variantSize;
+            }
+            return this.setFontSize(variantFontSize);
         },
         getBadge(status) {
+            let badge = '';
             if (this.isEmpty(status)){
-                status = '';
+                status = badge;
+            } else if (status.hasOwnProperty('flag')){
+                badge = status.flag;
             }
-            return this.selectBadges(status);
+            return this.selectBadges(badge);
         },
         filterLimit() {
             if (this.limitInput < 1) {
