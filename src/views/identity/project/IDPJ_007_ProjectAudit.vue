@@ -25,7 +25,10 @@ import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
 
 const thisTestData = [{
     eventName: 'UpdateProjectGroup',
-    status: 'fail',
+    status: {
+        flag: 'fail',
+        variantSize: 3
+    } ,
     Description: '정보가 변경되었습니다.',
     Executor: 'Name',
     Created: '2019-10-16',
@@ -34,16 +37,22 @@ const thisTestData = [{
 },
 {
     eventName: 'UpdateProjectGroup',
-    status: 'Success',
+    status: {
+        flag: 'Success',
+        variantSize: 3
+    },
     Description: '정보가 변경되었습니다.',
     Executor: 'Name',
-    Created: '2019,10,16',
+    Created: '2019-10-16',
     linkText: 'update Group',
     link: 'www.google.com'
 },
 {
     eventName: 'UpdateProjectGroup',
-    status: 'Success',
+    status: {
+        flag: 'fail',
+        variantSize: 2
+    },
     Description: '정보가 변경되었습니다.',
     Created: '2019-10-16',
     Executor: 'Name',
@@ -52,7 +61,10 @@ const thisTestData = [{
 },
 {
     eventName: 'UpdateProjectGroup',
-    status: 'Success',
+    status: {
+        flag: 'fail',
+        variantSize: 3
+    },
     Description: '정보가 변경되었습니다.',
     Created: '2019-10-16',
     Executor: 'Name',
@@ -61,7 +73,10 @@ const thisTestData = [{
 },
 {
     eventName: 'UpdateProjectGroup',
-    status: 'Success',
+    status: {
+        flag: 'fail',
+        variantSize: 2
+    },
     Description: '정보가 변경되었습니다.',
     Created: '2019-10-16',
     Executor: 'Name',
@@ -126,9 +141,9 @@ export default {
             this.audits = thisTestData;
             this.selectedAudit = null;
             this.isLoading = false;
-        /**
-         * TODO: set totalCount with data from server
-         */
+          /**
+           * TODO: set totalCount with data from server
+           */
         },
         rowClicked (item, idx) {
             this.selectedAudit = item;

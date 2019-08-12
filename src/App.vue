@@ -15,7 +15,7 @@ export default {
             type: String,
             default: process.env.NODE_ENV
         }
-    }
+    },
 };
 
 </script>

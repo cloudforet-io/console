@@ -56,7 +56,7 @@ const index = new Router({
 });
 
 index.beforeEach((to, from, next) => {
-    for (var i = to.matched.length - 1; i > -1; i--) {
+    for (let i = to.matched.length - 1; i > -1; i--) {
         if (to.matched[i].meta.requiresAuth) {
             if (cookie.get('sessionId')) {
                 store.dispatch('auth/setUsername', { username: cookie.get('username') });
