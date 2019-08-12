@@ -32,7 +32,7 @@
     <BaseTree :tree-prop="treeData"
               @selected="NodeSelected"
               @edited="editSelected"
->
+    >
       <template #treeSubPanel>
         <BaseTabNav
           :fill="false"

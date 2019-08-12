@@ -1,7 +1,7 @@
 <template>
   <div class="animated fadeIn">
-    <b-row class="server-table">
-      <b-col cols="12">
+    <BaseDragY>
+      <template #container="{ height }">
         <BaseTable :table-data="servers"
                    :fields="fields"
                    :per-page="perPage"
@@ -9,6 +9,7 @@
                    :total-rows="totalCount"
                    :search-context-data="queryData"
                    :busy="isLoading"
+                   :height="height"
                    :cardless="false"
                    :underlined="true"
                    @rowSelected="rowSelected"
@@ -23,7 +24,7 @@
               >
                 <template #activator>
                   <b-button class="btn" variant="outline-dark">
-                    Add
+                    {{ tr('BTN_ADD') }}
                   </b-button>
                 </template>
                 <template #contents>
@@ -38,7 +39,7 @@
               >
                 <template #activator>
                   <b-button class="btn" variant="outline-primary">
-                    Edit
+                    {{ tr('BTN_DELETE') }}
                   </b-button>
                 </template>
                 <template #contents />
@@ -46,8 +47,9 @@
             </div>
           </template>
         </BaseTable>
-      </b-col>
-    </b-row>
+      </template>
+    </BaseDragY>
+
     <b-row>
       <b-col cols="12">
         <BaseTabNav v-if="selectedServer"
@@ -91,6 +93,7 @@
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
+import BaseDragY from '@/components/base/drag/BADG_002_BaseDragY.vue';
 
 import query from './search_context/query.js';
 import serverSummary from '@/views/inventory/server/IVSV_002_ServerSummary';
@@ -105,6 +108,7 @@ import serverAudit from '@/views/inventory/server/IVSV_008_ServerAudit';
 export default {
     name: 'Server',
     components: {
+        BaseDragY,
         BaseTable,
         BaseModal,
         BaseTabNav,
@@ -117,12 +121,13 @@ export default {
         serverAudit
 
     },
-    data () {
+    data() {
         return {
             fields: [
                 { key: 'selected' },
                 { key: '_id', label: 'Name', sortable: true, ajaxSortable: false },
-                { key: 'user_name', label: 'State', sortable: true, ajaxSortable: true },
+                { key: 'user_name', label: 'ab', sortable: true, ajaxSortable: true },
+                { key: 'state', label: 'State', sortable: true, ajaxSortable: true },
                 { key: 'password', label: 'IP', sortable: true, ajaxSortable: false },
                 { key: 'user_first_name', label: 'Core', sortable: true, ajaxSortable: false },
                 { key: 'user_last_name', label: 'Memory', sortable: true, ajaxSortable: false },
@@ -173,19 +178,19 @@ export default {
             isLoading: true
         };
     },
-    mounted () {
+    mounted() {
         this.init();
     },
     methods: {
-        init () {
+        init() {
             this.listServers(this.perPage, 0);
         },
-        reset () {
+        reset() {
             this.servers = [];
             this.selectedServer = null;
             this.isLoading = true;
         },
-        async listServers (limit, skip, sort, search) {
+        async listServers(limit, skip, sort, search) {
             this.reset();
 
             if (this.isEmpty(limit)) {
@@ -204,44 +209,30 @@ export default {
             try {
                 res = await this.$axios.get('/identity/user', {
                     params: { limit, skip, sort }
-            /**
-             * TODO: set limit, skip, sort and search in the right format
-             */
+                        /**
+                         * TODO: set limit, skip, sort and search in the right format
+                         */
                 });
+                this.bindAdditionalKey(res.data, 'state', 'SERVER_STATE');
                 setTimeout(() => { // this is for test
                     this.servers = res.data;
                     this.isLoading = false;
                 }, 500);
+                /**
+                 * TODO: set totalCount with data from server
+                 */
             } catch (e) {
                 console.error(e);
-                this.servers = [
-                    {
-                        _id: 'abc',
-                        user_name: 'abbb',
-                        password: 'zzzz',
-                        user_first_name: 'ddddd',
-                        user_last_name: 'ddff',
-                        mobile: '333',
-                        role_id: 'werewr',
-                        project_id: 'rrrr',
-                        project_group_id: 'rrrrzzzz'
-                    }
-                ];
-                this.isLoading = false;
             }
-
-        /**
-         * TODO: set totalCount with data from server
-         */
         },
-        rowSelected (row) {
+        rowSelected(row) {
             if (row instanceof Array || !row) {
                 this.selectedServer = null;
             } else {
                 this.selectedServer = row.data;
             }
         },
-        limitChanged (val) {
+        limitChanged(val) {
             this.perPage = Number(val);
             this.init();
         }
@@ -250,17 +241,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .animated.fadeIn {
-    padding: $top-pad $side-pad $bottom-pad $side-pad;
-  }
-  .base-table {
-    @extend %sheet;
-  }
-  .btn {
-    padding: 3px 15px;
-    margin: 0 5px;
-  }
-  .server-table {
-    margin-bottom: 20px;
-  }
+    .animated.fadeIn {
+        padding: $top-pad $side-pad $bottom-pad $side-pad;
+    }
+
+    .base-table {
+        @extend %sheet;
+    }
+
+    .btn {
+        padding: 3px 15px;
+        margin: 0 5px;
+    }
+
+    .server-table {
+        margin-bottom: 20px;
+    }
 </style>

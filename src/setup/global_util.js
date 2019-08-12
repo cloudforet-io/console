@@ -1,4 +1,6 @@
 import { hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
+import { GlobalEnum } from '@/setup/enum';
+import dotProp from 'dot-prop';
 
 export const Mixin = {
     methods: {
@@ -62,7 +64,7 @@ export const Mixin = {
                     return style += key + ':' + val + ';';
                 }
             });
-            return (i) ? 'style=\"' + style + '\"' : style;
+            return (i) ? `style="${style}"` : style;
         },
     /**********************************************************************************
      * Name       : selectToCopyToClipboard
@@ -245,7 +247,7 @@ export const Mixin = {
             return  this.$i18n.t(key);
         },
     /**********************************************************************************
-     * Name       : tr
+     * Name       : setFontSize
      * Input   => (m: message   =>  String)
      *            {type: type of font awesome ex: fal, fab,
      *             icon: icon name,
@@ -253,40 +255,74 @@ export const Mixin = {
      *             color: variant color
      *            }
      * Output  => String translation Message
-     * Description:  translation of i18n
+     * Description:  return string with font-size with for h1,h2,h3,h4,h5,h6 and personal set data.
      **********************************************************************************/
-        setFontSize: function (f, pSet) {
-            //Note: Default font-size is on index 3
-            let defaultSet = [10,12,14,16,18,24];
+        setFontSize: function (f) {
             let fontSize = 'font-size:';
-            /*if (this.isEmpty(pSet) && this.isSelectedType(pSet, 'a') && pSet.every((element) => typeof element === 'number')) {
-
-            } else {*/
-
-            if (f == 1) {
-                fontSize += '24px';
-            } else if (f == 2) {
-                fontSize += '18px';
-            } else if (f == 4) {
-                fontSize += '14px';
-            } else if (f == 5) {
-                fontSize += '12px';
-            } else if (f == 6) {
-                fontSize += '10px';
+            let defaultSet = this.defaultFontSizeSet;
+            let length = defaultSet.length;
+            if (this.isSelectedType(f,'s') && f.include('px')) {
+                fontSize += f;
+            } else if ( f > 0 && f < 7 ) {
+                fontSize += defaultSet[length-f] + 'px';
             } else {
-                fontSize += '16px';
+                fontSize += defaultSet[length-3] + 'px';
             }
-            /*}*/
-
-
             return fontSize;
+        },
+        /**********************************************************************************
+         * Name       : bindEnumToHtml
+         * Input   => (m: message   =>  String)
+         *            {type: type of font awesome ex: fal, fab,
+         *             icon: icon name,
+         *             size: size of icon ex: -1 ~ 10
+         *             color: variant color
+         *            }
+         * Output  => String translation Message
+         * Description:  translation of i18n
+         **********************************************************************************/
+        bindEnumToHtml: function (p) {
+            if (!this.isEmpty(dotProp.get(GlobalEnum,p.toUpperCase()))) {
+                const icon = dotProp.get(GlobalEnum,p.toUpperCase() + '.icon');
+                const color = dotProp.get(GlobalEnum,p.toUpperCase() + '.color');
+                const msg = this.isEmpty(this.tr('ENUM.' + p.toUpperCase())) ? dotProp.get(GlobalEnum,p.toUpperCase() +  '.msg') : this.tr('ENUM.' + p.toUpperCase());
+
+                /***********
+                msg: 'In Progress',
+                icon: 'fal fa-check',
+                color: 'primary'
+                ************/
+
+                return `<span class="${color}"><i class="${icon}"> </i></span> &nbsp; ${msg}`;
+
+            } else {
+                return '';
+            }
+        },
+        /**********************************************************************************
+         * Name       : bindAdditionalKey
+         * Input   => (t: data                         =>  Array of data Object
+         *             k: key                          =>  String
+         *             v: additional value to attach   =>  String
+         *             l: location  =>  where to bind additional key at (b: back, or rest default: front)
+         * Output  => String translation Message
+         * Description:  translation of i18n
+         **********************************************************************************/
+        bindAdditionalKey: function (d, k, i, l) {
+            let returnVal = d;
+            if (this.isSelectedType(d,'a')){
+                for (let current of returnVal) {
+                    current[k] = (l === 'b') ? current[k] =   current[k] + '.' + i : current[k] = i +  '.' + current[k];
+                }
+            } else {
+                returnVal = (l === 'b') ? returnVal =   returnVal + '.' + i : returnVal = i + '.' +  returnVal;
+            }
+            return returnVal;
         }
     },
     data: function () {
-        //let status = (document.body.className.indexOf('sidebar-minimized brand-minimized') > -1) ? true : false;
         return {
-            //sideBarIsMinimized: status,
-            currentNodeEnv: null
+            defaultFontSizeSet: [10, 12, 14, 16, 18, 24]
         };
     }
 };

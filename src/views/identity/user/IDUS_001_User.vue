@@ -79,14 +79,13 @@
 </template>
 
 <script>
-import BaseDrag from '@/components/base/drag/BADG_001_BaseDrag.vue';
+import BaseDrag from '@/components/base/drag/BADG_002_BaseDragY.vue';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
 import query from './search_context/query.js';
 import UserDetail from './IDUS_002_UserDetail.vue';
 import UserInfo from './IDUS_003_UserInfo.vue';
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
 const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
-const BasePanel = () => import('@/components/base/panel/BAPA_002_BasePanel');
 
 export default {
     name: 'User',
@@ -96,8 +95,7 @@ export default {
         BaseModal,
         UserDetail,
         BaseTabNav,
-        UserInfo,
-        BasePanel
+        UserInfo
     },
     data () {
         return {
@@ -149,16 +147,16 @@ export default {
         async listUsers (limit, skip, sort, search) {
             this.reset();
 
-            if (limit === undefined || limit === null) {
+            if (this.isEmpty(limit)) {
                 limit = 10;
             }
-            if (skip === undefined || skip === null) {
+            if (this.isEmpty(skip)) {
                 skip = 0;
             }
-            if (sort === undefined || sort === null) {
+            if (this.isEmpty(sort)) {
                 sort = '-created_date';
             }
-            if (search === undefined || search === null) {
+            if (this.isEmpty(search)) {
                 search = [];
             }
 

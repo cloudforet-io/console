@@ -3,12 +3,11 @@
     <b-col cols="12" class="base-tab-nav">
       <template v-if="pill">
         <b-nav pills :fill="fill">
-          <b-nav-item
-            v-for="(curTab, idx) in navTabs"
-            :key="idx"
-            :class="{active: selectedTab.component === curTab.component}"
-            :active="selectedTab.tabTitle === curTab.tabTitle"
-            @click="selectedTab = curTab"
+          <b-nav-item v-for="(curTab, idx) in navTabs"
+                      :key="idx"
+                      :class="{active: selectedTab.component === curTab.component}"
+                      :active="selectedTab.tabTitle === curTab.tabTitle"
+                      @click="selectedTab = curTab"
           >
             {{ curTab.tabTitle }}
           </b-nav-item>
@@ -16,12 +15,11 @@
       </template>
       <template v-else>
         <b-nav tabs :fill="fill">
-          <b-nav-item
-            v-for="(curTab, idx) in navTabs"
-            :key="idx"
-            :class="{active: selectedTab.component === curTab.component}"
-            :active="selectedTab.tabTitle === curTab.tabTitle"
-            @click="selectedTab = curTab"
+          <b-nav-item v-for="(curTab, idx) in navTabs"
+                      :key="idx"
+                      :class="{active: selectedTab.component === curTab.component}"
+                      :active="selectedTab.tabTitle === curTab.tabTitle"
+                      @click="selectedTab = curTab"
           >
             {{ curTab.tabTitle }}
           </b-nav-item>
@@ -51,7 +49,7 @@
               <b-button v-show="isDeletable" size="md" variant="outline-danger" @click="deleteSelect">
                 Delete
               </b-button>
-              <b-button size="md" variant="outline-warning" @click="closeWindow">
+              <b-button size="md" variant="outline-warning" @click="$emit('close')">
                 Cancel
               </b-button>
             </div>
@@ -62,7 +60,7 @@
   </b-row>
 </template>
 <script>
-import { api } from '@/setup/api';
+// import { api } from '@/setup/api';
 let baseTabParams = {};
 export default {
     name: 'BaseTabs',
@@ -153,13 +151,9 @@ export default {
             baseTabParams['tabContents'] = this.$refs.popupTab;
             this.$emit('delete', baseTabParams);
         },
-        closeWindow (e) {
-            this.$emit('close');
-        },
         setTabName (selectedData) {
             return (selectedData.hasOwnProperty('tabIdxTitle')) ? selectedData.tabIdxTitle : selectedData.tabTitle;
         }
-
     }
 };
 </script>
