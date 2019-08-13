@@ -34,14 +34,6 @@ Vue.prototype.$velocity = velocity;
 
 let domain = url.parse(window.location.origin);
 
-api.post('/identity/domain/list', {
-    name: 'megazone',
-}).then(function (response) {
-    console.log(response);
-}).catch(function (error) {
-    console.log(error);
-});
-
 
 /*****************************************************************
  * This is a Global Bus Event;

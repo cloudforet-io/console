@@ -2,7 +2,7 @@
   <div class="wrapper">
     <b-modal v-model="modalShow"
              :title="title" 
-             :class="`modal-${type}`"
+             :modal-class="`modal-${type}`"
              :size="size"
              :ok-variant="type"
              no-stacking 

@@ -34,7 +34,7 @@
       </slot>
     </b-row>
 
-    <BaseModal ref="deleteMember" name="deleteMember" 
+    <BaseModal ref="deleteMember"
                title="Delete Member"
                size="md"
                @ok="$alertify.success('Selected User Successfully deleted.')"
@@ -108,7 +108,7 @@ export default {
                 search = [];
             }
 
-            this.$axios.get('/identity/user', {
+            this.$axios.post('/identity/user/list', {
                 params: { limit, skip, sort }
             }).then((response) => {
                 this.users = response.data;
