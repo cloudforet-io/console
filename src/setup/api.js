@@ -34,7 +34,6 @@ api.interceptors.request.use(function (config) {
 
 // Add a response interceptor
 api.interceptors.response.use(function (response) {
-    debugger;
     return response;
 }, function (error) {
     // Do something with response error
