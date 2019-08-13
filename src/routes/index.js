@@ -58,8 +58,9 @@ const index = new Router({
 index.beforeEach((to, from, next) => {
     for (var i = to.matched.length - 1; i > -1; i--) {
         if (to.matched[i].meta.requiresAuth) {
-            if (cookie.get('sessionId')) {
-                store.dispatch('auth/setUsername', { username: cookie.get('username') });
+            if (sessionStorage.getItem('token')) {
+                store.dispatch('auth/setUsername', { username: sessionStorage.getItem('username') });
+                store.dispatch('auth/setToken', { token: sessionStorage.getItem('token') });
                 next();
             } else {
                 store.dispatch('auth/setNextPath', { nextPath: to.fullPath });

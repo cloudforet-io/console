@@ -99,13 +99,14 @@ export default {
         return {
             fields: [
                 { key: 'selected', thStyle: { width: '50px' }},
-                { key: 'userId', label: 'ID', sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
+                { key: 'user_id', label: 'ID', sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
                 { key: 'name', label: 'Name', sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
                 { key: 'email', label: 'Email', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
                 { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
                 { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
                 { key: 'language', label: 'Language', sortable: true, ajaxSortable: false , thStyle: { width: '200px' }},
-                { key: 'domainId', label: 'Domain ID' }
+                { key: 'domain_id', label: 'Domain ID', thStyle: { width: '200px' }},
+                { key: 'timezone', label: 'Timezone', thStyle: { width: '200px' }}
             ],
             tabs: [
                 {
@@ -118,7 +119,7 @@ export default {
             selectedUser: null,
             selectedIdx: undefined,
             addModal: false,
-            totalCount: 17,
+            totalCount: 0,
             queryData: query,
             isReadyForSearch: false,
             perPage: 10,
@@ -160,50 +161,21 @@ export default {
 
             let res = null;
             try {
-                res = await this.$axios.get('/identity/user', {
-                    params: { limit, skip, sort }
+                res = await this.$axios.post('/identity/user/list', {
+                    // params: { limit, skip, sort }
                 /**
                  * TODO: set limit, skip, sort and search in the right format
                  */
                 });
-
+                debugger;
                 setTimeout(() => { // this is for test
-                    this.users = res.data;
+                    this.users = res.data.results;
+                    this.totalCount = res.data.total_count;
                     this.isLoading = false;
                 }, 1000);
             } catch (e) {
                 console.error(e);
                 this.isLoading = false;
-                this.users = [
-                    {
-                        userId: 'abc',
-                        name: 'abc',
-                        email: 'abc@abc',
-                        mobile: '222',
-                        group: 'abcabczzz',
-                        language: 'en',
-                        domainId: 'abcabc',
-                        tags: [
-                            { abc: 'abc11' },
-                            { abc2: 'abc2222' },
-                            { abc3: 'abc333' }
-                        ]
-                    },
-                    {
-                        userId: 'zzz',
-                        name: 'zzz',
-                        email: 'zzz@abc',
-                        mobile: '333',
-                        group: 'zdzfzdsfsdf',
-                        language: 'en',
-                        domainId: 'wrwrw',
-                        tags: [
-                            { zzz1: 'ztest' },
-                            { zzz22: 'test222' },
-                            { zzz333: 'teset33' }
-                        ]
-                    }
-                ];
             }
       /**
        * TODO: set totalCount with data from server

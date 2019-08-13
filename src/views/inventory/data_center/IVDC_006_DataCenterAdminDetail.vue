@@ -108,7 +108,7 @@ export default {
                 search = [];
             }
 
-            this.$axios.get('/identity/user', {
+            this.$axios.post('/identity/user/list', {
                 params: { limit, skip, sort }
             }).then((response) => {
                 this.users = response.data;

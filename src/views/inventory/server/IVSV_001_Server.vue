@@ -206,7 +206,7 @@ export default {
             }
             let res;
             try {
-                res = await this.$axios.get('/identity/user', {
+                res = await this.$axios.post('/identity/user/list', {
                     params: { limit, skip, sort }
                         /**
                          * TODO: set limit, skip, sort and search in the right format

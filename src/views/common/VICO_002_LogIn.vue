@@ -143,8 +143,9 @@ export default {
             rememberStatus: false,
             seenGreet: true,
             seenError: false,
-            username: 'iamnewyorker1222',
-            password: 'this_is_my_scret_password1'
+            username: 'admin',
+            password: 'admin',
+            domainId: 'domain-b1ac05bfcc38'
         };
     },
     computed: {
@@ -161,7 +162,8 @@ export default {
             await this.$store.dispatch('auth/login',
                 {
                     username: this.username,
-                    password: this.password
+                    password: this.password,
+                    domainId: this.domainId
                 }
             ).then(() => {
                 this.$router.push(this.nextPath);

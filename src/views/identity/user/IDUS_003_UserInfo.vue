@@ -5,13 +5,13 @@
 <script>
 const BasePanel = () => import('@/components/base/panel/BAPA_002_BasePanel');
 const userModel = {
-    userId: null,
+    user_id: null,
     name: null,
     password: null,
     email: null,
     mobile: null,
     group: null,
-    domainId: null,
+    domain_id: null,
     language: null,
     timezone: null,
     tags: []
@@ -41,13 +41,13 @@ export default {
                         color: 'primary'
                     },
                     data: [
-                        { title: 'ID', contents: this.userProp.userId },
+                        { title: 'ID', contents: this.userProp.user_id },
                         { title: 'Name', contents: this.userProp.name },
                         { title: 'Email', contents: this.userProp.email },
                         { title: 'Phone', contents: this.userProp.mobile },
                         { title: 'Group Name', contents: this.userProp.group },
                         { title: 'Language', contents: this.userProp.language },
-                        { title: 'Domain ID', contents: this.userProp.domainId }
+                        { title: 'Domain ID', contents: this.userProp.domain_id }
                     ]
                 },
                 {
@@ -58,12 +58,13 @@ export default {
                         size: 1,
                         color: 'danger'
                     },
-                    data: this.userProp.tags.map((tag) => {
-                        return {
-                            title: Object.keys(tag)[0],
-                            contents: Object.values(tag)[0]
-                        };
-                    })
+                    data: []
+                    // this.userProp.tags.map((tag) => {
+                    //     return {
+                    //         title: Object.keys(tag)[0],
+                    //         contents: Object.values(tag)[0]
+                    //     };
+                    // })
                 }
             ];
         }
