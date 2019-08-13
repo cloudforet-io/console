@@ -34,7 +34,7 @@
     "vue-alertify": "^1.1.0",
     "vue-lodash": "^2.0.2",
     "vue-chartjs": "^3.4.2",
-    "vue-cookie": "^1.1.4",
+    "vue-json-pretty": "^1.6.0",
     "vue-country-flag": "^1.1.1",
     "vue-eagle-modal": "^1.0.5",
     "vue-focus": "^2.1.0",
