@@ -293,6 +293,36 @@ a {
     border-color: $violet;
   }
 }
+.btn-danger {
+  background-color: $red;
+  border-color: $red;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $red;
+    border-color: $red;
+    &:focus {
+      box-shadow: 0 0 5px 1px $red;
+    }
+  }
+  &:hover {
+    background-color: $red;
+    border-color: $red;
+  }
+}
+.btn-outline-danger {
+  color: $red;
+  border-color: $red;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $red;
+    border-color: $red;
+    &:focus {
+      box-shadow: 0 0 5px 1px $red;
+    }
+  }
+  &:hover {
+    background-color: $red;
+    border-color: $red;
+  }
+}
 
 /* sl-vue-tree */
 .sl-vue-tree.sl-vue-tree-root {
@@ -385,6 +415,21 @@ a {
       color: darken($blue, 20%);
     }
   }
+}
+
+
+/* b-form */
+.form-control {
+  border: none;
+  border-radius: 3px;
+  box-shadow: 0 0 1px 0px rgba($black, 0.6);
+}
+.was-validated .form-control:valid, 
+.form-control.is-valid {
+  background-image: none;
+}
+.valid-feedback {
+  color: $green;
 }
 
 /* Dropdown Options on Card */

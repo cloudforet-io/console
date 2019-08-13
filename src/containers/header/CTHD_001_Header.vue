@@ -14,12 +14,6 @@
             <b-navbar-nav>
               <b-nav-item><SiteMapDropdown ref="siteMap" class="nav" /></b-nav-item>
             </b-navbar-nav>
-            <!-- <b-navbar-nav class="ml-auto mr-auto">
-              <div class="group-name">
-                <i :class="subHeaderGroup.icon" />
-                <span>{{ subHeaderGroup.label }}</span>
-              </div>
-            </b-navbar-nav> -->
 
             <b-navbar-nav class="ml-auto">
               <b-nav-item><LanguageDropdown class="nav" /></b-nav-item>
@@ -41,7 +35,6 @@ import SiteMapDropdown from './CTHD_004_SiteMapDropdown';
 import AccountDropdown from './CTHD_002_AccountDropdown';
 import LanguageDropdown from './CTHD_003_LanguageDropdown';
 import SubHeader from './CTHD_005_SubHeader';
-import { mapGetters } from 'vuex';
 
 export default {
     name: 'BaseHeader',
@@ -55,11 +48,6 @@ export default {
         return {
             show: false
         };
-    },
-    computed: {
-        ...mapGetters('subHeader', [
-            'subHeaderGroup'
-        ])
     },
     mounted () {
         this.show = true;

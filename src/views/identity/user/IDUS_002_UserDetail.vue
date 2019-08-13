@@ -66,13 +66,13 @@
     </b-form-group>
 
     <div v-if="updatable" class="btn-box mt-5">
-      <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="primary">
+      <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="outline-primary">
         {{ creatable ? 'Create' : 'Update' }}
       </b-button>
-      <b-button class="float-right mb-1" size="md" type="reset" variant="secondary">
+      <b-button class="float-right mb-1" size="md" type="reset" variant="outline-secondary">
         Reset
       </b-button>
-      <b-button v-if="!creatable" class="float-left" size="md" type="reset" variant="danger" @click="onDelete">
+      <b-button v-if="!creatable" class="float-left" size="md" type="reset" variant="outline-danger" @click="onDelete">
         Delete
       </b-button>
     </div>
@@ -131,7 +131,7 @@ export default {
     },
     computed: {
         tags () {
-            return this.userProp.tags;
+            return this.dictToKeyValueArray(this.userProp.tags);
         },
         validateUserId () {
 
@@ -199,6 +199,8 @@ export default {
             }, 1000);
         },
         onUpdate (e) {
+            this.$refs.baseTag.validate();
+          
             if (!this.validated) {
                 this.userId = this.userProp.user_id;
                 this.password = this.userProp.password;
@@ -206,10 +208,11 @@ export default {
                 this.domainId = this.userProp.domain_id;
                 return;
             }
-            console.log('updating....');
-            setTimeout(() => {
-                this.$emit('close');
-            }, 1000);
+
+            // console.log('updating....');
+            // setTimeout(() => {
+            //     this.$emit('close');
+            // }, 1000);
         },
         onDelete () {
             console.log('deleting....');

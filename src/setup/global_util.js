@@ -197,7 +197,7 @@ export const Mixin = {
              * Note:: Please add a new type letter when New font Type has added.
              * ****************************************************************
              */
-            const fontAwesome = ['l','b','d'];
+            const fontAwesome = ['l','b','d','s'];
             let returnHtml = '';
             let defaultClass = 'fal ';
             if (o.hasOwnProperty('type') && fontAwesome.includes(o.type)) {
@@ -318,12 +318,19 @@ export const Mixin = {
                 returnVal = (l === 'b') ? returnVal =   returnVal + '.' + i : returnVal = i + '.' +  returnVal;
             }
             return returnVal;
+        },
+        dictToKeyValueArray: function (obj) {
+            let arr = [];
+            for (var key in obj) {
+                arr.push({ [key]: obj[key] });
+            }
+            return arr;
         }
     },
     data: function () {
         return {
             defaultFontSizeSet: [10, 12, 14, 16, 18, 24],
-            isFirstLogin: false,
+            isFirstLogin: false
         };
     }
 };

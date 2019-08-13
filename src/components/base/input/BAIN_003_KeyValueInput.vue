@@ -2,7 +2,7 @@
   <b-row align-v="center" align-h="between" no-gutters class="mb-2">
     <b-col v-if="!readOnly" cols="1">
       <span class="delete-btn" @click="$emit('delete')">
-        <span class="icon"><i class="fal fa-minus-square" /></span>
+        <span class="icon"><i class="fal fa-minus-circle" /></span>
       </span>
     </b-col>
     <b-col cols="11" class="row">
@@ -61,7 +61,7 @@ export default {
     vertical-align: text-top;
   }
   cursor: pointer;
-  color: #e81d2a;
+  color: $red;
 }
 .colon {
   display: block;
