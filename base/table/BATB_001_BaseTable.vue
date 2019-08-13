@@ -119,9 +119,9 @@
 
 
         <template slot="status" slot-scope="data">
-          <div :style="getVariantSize(data.item.variantSize)">
-            <b-badge :variant="getBadge(data.item.status)">
-              {{ capitalizeFirstLetter(data.item.status) }}
+          <div :style="getVariantSize(data.item.status.variantSize)">
+            <b-badge :variant="getBadge(data.item.status.flag)">
+              {{ capitalizeFirstLetter(data.item.status.flag) }}
             </b-badge>
           </div>
         </template>
@@ -286,6 +286,9 @@ export default {
             return this.setFontSize(size);
         },
         getBadge(status) {
+            if (this.isEmpty(status)){
+                status = '';
+            }
             return this.selectBadges(status);
         },
         filterLimit() {
