@@ -33,7 +33,7 @@ export default {
     props: {
         type: {
             type: String,
-            default: 'primary'
+            default: 'secondary'
         },
         size: {
             type: String,

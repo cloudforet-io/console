@@ -18,9 +18,8 @@
       <b-col cols="6" class="mt-1">
         <span class="add-btn" @click="addRow">
           <span class="icon">
-            <i class="fal fa-plus-square" />
+            <i class="fas fa-plus-circle" />
           </span>
-          Add New
         </span>
       </b-col>
       <b-col v-if="showSaveBtn" cols="5" class="text-right">
@@ -45,10 +44,6 @@ export default {
             type: Array,
             default: () => []
         },
-        // tagData: {
-        //     type: Object,
-        //     default: () => {}
-        // },
         showFirstTagRow: {
             type: Boolean,
             default: false
@@ -60,8 +55,7 @@ export default {
     },
     data () {
         return {
-            rows: this.tagDatathis.tagData.map((tag, i) => ({ rowId: i, tag: tag })),
-            // rows:  new Map(Object.entries(this.tagData)),
+            rows: this.tagData.map((tag, i) => ({ rowId: i, tag: tag })),
             lastRowId: this.tagData.length,
             isEditable: this.editable,
             showSaveBtn: false
@@ -99,23 +93,35 @@ export default {
         onCancel () {
             this.showSaveBtn = false;
             this.isEditable = false;
+        },
+        validate () {
+            console.log('tag validate');
+            let obj = {};
+            this.rows.some((row, i) => {
+                if (this.isEmpty(this.$refs.tag[i].key)) { 
+                    return 'Key is empty'; 
+                }
+
+                if (this.isEmpty(row.tag)) {
+                    this.rows[i].tag = { [this.$refs.tag[i].key]: this.$refs.tag[i].value };
+                }
+
+                return true;
+            });
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-%btn {
-  vertical-align: middle;
+.add-btn {
+  vertical-align: text-bottom;
+  cursor: pointer;
+  color: $green;
   .icon {
-      font-size: 1.3em;
+      font-size: 1.33em;
       padding-right: 5px;
     }
-  cursor: pointer;
-}
-.add-btn {
-  @extend %btn;
-  color: #2D9E6E;
 }
 
 </style>
