@@ -37,6 +37,7 @@ export default {
         },
         setToken ({ commit }, { token }) {
             commit('setToken', { token });
+            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         },
         async login ({ commit }, { username, password, domainId }) {
             try {

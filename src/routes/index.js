@@ -61,6 +61,7 @@ index.beforeEach((to, from, next) => {
             if (sessionStorage.getItem('token')) {
                 store.dispatch('auth/setUsername', { username: sessionStorage.getItem('username') });
                 store.dispatch('auth/setToken', { token: sessionStorage.getItem('token') });
+                debugger;
                 next();
             } else {
                 store.dispatch('auth/setNextPath', { nextPath: to.fullPath });
