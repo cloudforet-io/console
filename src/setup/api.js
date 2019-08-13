@@ -3,11 +3,11 @@ import axios from 'axios';
 
 export const api = axios.create({
     baseURL: process.env.VUE_APP_API_URL,
-    withCredentials: true,
-    headers: {
+    withCredentials: true
+    /*headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
-    }
+    }*/
 });
 
 //
@@ -23,9 +23,20 @@ export const api = axios.create({
 //     throw err
 //   })
 // })
-// let token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJjYXQiOiJBUEkiLCJ2ZXIiOiIyMDE5LTAzLTE4Iiwia2V5IjoiNTZiYzlkZmQxNjdmNDExN2JmNTRlODUxZTc1ZWRhNDIiLCJkaWQiOiJkb21haW4tYjFhYzA1YmZjYzM4In0.GxQHRPRxdWa1wgGj6_hYx7ffOXDRLqkXro33OcftzTK8bzqe0DCczP4asXadpj3Wf5NRdk0miB_h0J-2u_ThCHRfW1dv1RVej3bNI6mffHU1syazexOoscqVkxLOzPVZeqHVIFBgaSjztDONv1zZQoYjsaKJscgZ-JOGLHivE7MKnPbdKu6RXLoLVk6gAx8jaYuquTGisd_x6qqEugLX2Ru8z0skMlY4_Hfr2gVaGLXk7ILvJRUPl9zYX2lXMZwk_I_d2Iwls18Y1JMNN6ZHDe0ky8Gj9HbVuWh3bWbNif3edUIyU0kUf7uJtfbui2BTBjYbyZHVu2LottZkcG0ahw';
-// api.interceptors.request.use((config) => {
-//     config.headers.Authorization = `Bearer ${token}`;
 
-//     return config;
-// });
+api.interceptors.request.use(function (config) {
+    // Do something before request is sent
+    return config;
+}, function (error) {
+    // Do something with request error
+    return Promise.reject(error);
+});
+
+// Add a response interceptor
+api.interceptors.response.use(function (response) {
+    debugger;
+    return response;
+}, function (error) {
+    // Do something with response error
+    return Promise.reject(error);
+});
