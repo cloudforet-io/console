@@ -131,8 +131,7 @@ export default {
     },
     computed: {
         tags () {
-            debugger;
-            return this.userProp.tags; 
+            return this.userProp.tags;
         },
         validateUserId () {
 
