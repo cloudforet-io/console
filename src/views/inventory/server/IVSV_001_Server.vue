@@ -125,7 +125,7 @@ export default {
             fields: [
                 { key: 'selected' },
                 { key: '_id', label: 'Name', sortable: true, ajaxSortable: false },
-                { key: 'user_name', label: 'ab', sortable: true, ajaxSortable: true },
+                { key: 'name', label: 'ab', sortable: true, ajaxSortable: true },
                 { key: 'state', label: 'State', sortable: true, ajaxSortable: true },
                 { key: 'password', label: 'IP', sortable: true, ajaxSortable: false },
                 { key: 'user_first_name', label: 'Core', sortable: true, ajaxSortable: false },
@@ -170,7 +170,7 @@ export default {
             selectedServer: null,
             selectedIdx: null,
             addModal: false,
-            totalCount: 17,
+            totalCount: 0,
             queryData: query,
             isReadyForSearch: false,
             perPage: 3,
@@ -204,26 +204,23 @@ export default {
             if (this.isEmpty(search)) {
                 search = [];
             }
-            let res;
+
+            let res = null;
             try {
                 res = await this.$axios.post('/identity/user/list', {
-                    params: { limit, skip, sort }
-                        /**
-                         * TODO: set limit, skip, sort and search in the right format
-                         */
-                });
-
-                this.bindAdditionalKey(res.data, 'state', 'SERVER_STATE');
-
-                setTimeout(() => { // this is for test
-                    this.servers = res.data;
-                    this.isLoading = false;
-                }, 500);
+                // params: { limit, skip, sort }
                 /**
-                 * TODO: set totalCount with data from server
-                 */
+                  * TODO: set limit, skip, sort and search in the right format
+                  */
+                });
+                setTimeout(() => { // this is for test
+                    this.servers = res.data.results;
+                    this.totalCount = res.data.total_count;
+                    this.isLoading = false;
+                }, 1000);
             } catch (e) {
                 console.error(e);
+                this.isLoading = false;
             }
         },
         rowSelected(row) {

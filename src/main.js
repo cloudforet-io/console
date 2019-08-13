@@ -4,7 +4,6 @@ import App from './App';
 import router from '@/routes/index';
 import store from './store';
 import dotenv from 'dotenv';
-import VueCookie from 'vue-cookie';
 import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
@@ -22,7 +21,6 @@ dotenv.config();
 
 Vue.mixin(Mixin);
 Vue.use(BootstrapVue);
-Vue.use(VueCookie);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
 Vue.use(CountryFlag);
@@ -33,7 +31,6 @@ Vue.prototype.$axios = api;
 Vue.prototype.$velocity = velocity;
 
 let domain = url.parse(window.location.origin);
-
 
 /*****************************************************************
  * This is a Global Bus Event;
