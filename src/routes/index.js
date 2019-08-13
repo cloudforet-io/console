@@ -67,6 +67,7 @@ const index = new Router({
 
 
 index.beforeEach(async (to, from, next) => {
+
     if (!isFirstLogin) {
         try {
             const response  = await api.post('/identity/domain/list', { name: 'megazone' });
