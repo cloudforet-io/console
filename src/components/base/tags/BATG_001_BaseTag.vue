@@ -45,6 +45,10 @@ export default {
             type: Array,
             default: () => []
         },
+        // tagData: {
+        //     type: Object,
+        //     default: () => {}
+        // },
         showFirstTagRow: {
             type: Boolean,
             default: false
@@ -56,7 +60,8 @@ export default {
     },
     data () {
         return {
-            rows: this.tagData.map((tag, i) => ({ rowId: i, tag: tag })),
+            rows: this.tagDatathis.tagData.map((tag, i) => ({ rowId: i, tag: tag })),
+            // rows:  new Map(Object.entries(this.tagData)),
             lastRowId: this.tagData.length,
             isEditable: this.editable,
             showSaveBtn: false
@@ -64,7 +69,10 @@ export default {
     },
     computed: {
     },
-    mounted: function () {
+    created () {
+        debugger;
+    },
+    mounted () {
         if (this.showFirstTagRow) {
             this.isEditable = true;
             this.addRow();

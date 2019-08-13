@@ -79,7 +79,7 @@
       </transition>
     </div>
 
-    <BaseModal ref="checkModal" name="checkModal" 
+    <BaseModal ref="checkModal"
                :title="modalTitle"
                :text="modalContents"
                size="md"

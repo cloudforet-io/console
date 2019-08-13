@@ -83,16 +83,16 @@
 import BaseTag from '@/components/base/tags/BATG_001_BaseTag.vue';
 
 const userModel = {
-    userId: null,
+    user_id: null,
     name: null,
     password: null,
     email: null,
     mobile: null,
     group: null,
-    domainId: null,
+    domain_id: null,
     language: null,
     timezone: null,
-    tags: []
+    tags: {}
 };
 
 export default {
@@ -117,20 +117,21 @@ export default {
     },
     data () {
         return {
-            userId: this.userProp.userId, // required
+            userId: this.userProp.user_id, // required
             password: this.userProp.password, // required
             passwordCheck: null, // required
             name: this.userProp.name,
             email: this.userProp.email,
             mobile: this.userProp.mobile,
             group: this.userProp.group,
-            domainId: this.userProp.domainId, // required
+            domainId: this.userProp.domain_id, // required
             language: this.userProp.language,
             timezone: this.userProp.timezone
         };
     },
     computed: {
         tags () {
+            debugger;
             return this.userProp.tags; 
         },
         validateUserId () {
@@ -200,10 +201,10 @@ export default {
         },
         onUpdate (e) {
             if (!this.validated) {
-                this.userId = this.userProp.userId;
+                this.userId = this.userProp.user_id;
                 this.password = this.userProp.password;
                 this.passwordCheck = '';
-                this.domainId = this.userProp.domainId;
+                this.domainId = this.userProp.domain_id;
                 return;
             }
             console.log('updating....');
@@ -225,14 +226,14 @@ export default {
             }
         },
         resetUserData (user) {
-            this.userId = user.userId;
+            this.userId = user.user_id;
             this.password = user.password;
             this.passwordCheck = null;
             this.name = user.name;
             this.email = user.email;
             this.mobile = user.mobile;
             this.group = user.group;
-            this.domainId = user.domainId;
+            this.domainId = user.domain_id;
             this.language = user.language;
             this.timezone = user.timezone;
             this.$refs.baseTag.resetRows();
@@ -242,7 +243,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.btn {
-  padding: 5px 15px;
-}
 </style>

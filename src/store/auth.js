@@ -1,5 +1,4 @@
 import { api } from '@/setup/api';
-import cookie from 'vue-cookie';
 
 export default {
     namespaced: true,
@@ -7,11 +6,13 @@ export default {
         isLoggedIn: false,
         loginErrorCode: null,
         nextPath: '/',
-        username: ''
+        username: '',
+        token: null
     },
     mutations: {
-        login (state) {
+        login (state, { token }) {
             state.isLoggedIn = true;
+            state.token = token;
         },
         logout (state) {
             state.isLoggedIn = false;
@@ -21,6 +22,9 @@ export default {
         },
         setUsername (state, { username }) {
             state.username = username;
+        },
+        setToken (state, { token }) {
+            state.token = token;
         }
     },
     getters: {
@@ -29,18 +33,24 @@ export default {
     },
     actions: {
         setUsername ({ commit }, { username }) {
-            commit('setUsername', { username: username });
+            commit('setUsername', { username });
         },
-        async login ({ commit }, { username, password }) {
+        setToken ({ commit }, { token }) {
+            commit('setToken', { token });
+            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        },
+        async login ({ commit }, { username, password, domainId }) {
             try {
-                const res = await api.post('/auth/login', {
-                    user_name: username,
-                    password: password
+                const res = await api.post('/identity/token/issue', {
+                    'user_id': username,
+                    'password': password,
+                    'domain_id': domainId
                 });
-                cookie.set('sessionId', res.data.sessionId, { expires: '30m' });
-                cookie.set('username', username, { expires: '30m' });
                 commit('setUsername', { username: username });
-                commit('login');
+                commit('login', { token: res.data.access_token });
+                sessionStorage.setItem('token', res.data.access_token);
+                sessionStorage.setItem('username', username);
+                api.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
             } catch (err) {
         /*
          * TODO:: Please, create ERR_CODE charts or table to specify its msg and to map error code with msg.
@@ -77,9 +87,9 @@ export default {
             }
         },
         async logout ({ commit }) {
-            await api.post('/auth/logout');
-            cookie.delete('sessionId');
-            cookie.delete('username');
+            // await api.post('/auth/logout');
+            sessionStorage.removeItem('username');
+            sessionStorage.removeItem('token');
             commit('logout');
         },
         setNextPath ({ commit }, { nextPath }) {

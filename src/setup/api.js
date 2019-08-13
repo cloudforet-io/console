@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const api = axios.create({
     baseURL: process.env.VUE_APP_API_URL,
-    withCredentials: true,
+    withCredentials: true
     /*headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -34,7 +34,6 @@ api.interceptors.request.use(function (config) {
 
 // Add a response interceptor
 api.interceptors.response.use(function (response) {
-    debugger;
     return response;
 }, function (error) {
     // Do something with response error
