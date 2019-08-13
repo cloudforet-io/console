@@ -70,7 +70,7 @@ export default {
     computed: {
     },
     created () {
-        debugger;
+
     },
     mounted () {
         if (this.showFirstTagRow) {

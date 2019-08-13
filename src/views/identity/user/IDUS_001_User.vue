@@ -167,7 +167,6 @@ export default {
                  * TODO: set limit, skip, sort and search in the right format
                  */
                 });
-                debugger;
                 setTimeout(() => { // this is for test
                     this.users = res.data.results;
                     this.totalCount = res.data.total_count;
