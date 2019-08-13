@@ -131,8 +131,8 @@
 import { mapGetters } from 'vuex';
 import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal.vue';
 const signupContents = 'We apologize for inconvenience. \'Sign up\', \'Password retrieval\' feature currently unavailable due to our policies.' +
-    ' Please, contact System Administrator for following contacts: ' + '<br>' +
-    '● e-mail: admin@mz.co.kr';
+        ' Please, contact System Administrator for following contacts: ' + '<br>' +
+        '● e-mail: admin@mz.co.kr';
 export default {
     components: {
         BaseSimpleModal
@@ -144,8 +144,7 @@ export default {
             seenGreet: true,
             seenError: false,
             username: 'admin',
-            password: 'admin',
-            domainId: 'domain-b1ac05bfcc38'
+            password: 'admin'
         };
     },
     computed: {
@@ -163,7 +162,7 @@ export default {
                 {
                     username: this.username,
                     password: this.password,
-                    domainId: this.domainId
+                    domainId: sessionStorage.getItem('domain_id')
                 }
             ).then(() => {
                 this.$router.push(this.nextPath);
@@ -207,35 +206,35 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../asset/style/css/slideShow.css';
+    @import '../../asset/style/css/slideShow.css';
 
-  .login-check {
-    float: right;
-    padding: 0px 6px 6px 0px;
-  }
-
-  .container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .card-group {
-    @extend %sheet;
-    .input-group-text {
-      border: 0;
-      background: none;
+    .login-check {
+        float: right;
+        padding: 0px 6px 6px 0px;
     }
-    .form-control {
-      border: 1px solid $lightgray;
-      border-radius: 5px;
+
+    .container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
-  }
-  .login-btn {
-    border: 0;
-    background: linear-gradient(to right, $blue, $violet);
-    box-shadow: 0 0 5px 1px rgba($navy, 0.3);
-    color: $white;
-  }
+
+    .card-group {
+        @extend %sheet;
+        .input-group-text {
+            border: 0;
+            background: none;
+        }
+        .form-control {
+            border: 1px solid $lightgray;
+            border-radius: 5px;
+        }
+    }
+    .login-btn {
+        border: 0;
+        background: linear-gradient(to right, $blue, $violet);
+        box-shadow: 0 0 5px 1px rgba($navy, 0.3);
+        color: $white;
+    }
 </style>

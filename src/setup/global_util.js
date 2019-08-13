@@ -322,7 +322,8 @@ export const Mixin = {
     },
     data: function () {
         return {
-            defaultFontSizeSet: [10, 12, 14, 16, 18, 24]
+            defaultFontSizeSet: [10, 12, 14, 16, 18, 24],
+            isFirstLogin: false,
         };
     }
 };

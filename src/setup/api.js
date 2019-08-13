@@ -1,28 +1,18 @@
 import axios from 'axios';
-// import store from '@/store'
+import store from '@/store';
+import router from '@/routes/index';
+
 
 export const api = axios.create({
     baseURL: process.env.VUE_APP_API_URL,
-    withCredentials: true
-    /*headers: {
+    withCredentials: true,
+    headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
-    }*/
+    }
 });
 
-//
-// api.interceptors.response.use(undefined, function (err) {
-//   console.log(process.env.VUE_APP_API_URL);
-//   return new Promise(function (resolve, reject) {
-//     if (err.status === 403 && err.config && !err.config.__isRetryRequest) {
-//     // if you ever get an unauthorized, logout the user
-//       console.log('interceptor')
-//       store.dispatch('auth/logout')
-//     // you can also redirect to /login if needed !
-//     }
-//     throw err
-//   })
-// })
+
 
 api.interceptors.request.use(function (config) {
     // Do something before request is sent
@@ -34,8 +24,20 @@ api.interceptors.request.use(function (config) {
 
 // Add a response interceptor
 api.interceptors.response.use(function (response) {
+    /*router.app.$router.push('/error-page');
+    store.dispatch('auth/setNextPath', { nextPath: '/error-page'});*/
+
     return response;
 }, function (error) {
-    // Do something with response error
-    return Promise.reject(error);
+
+    return new Promise(function (resolve, reject) {
+        if (error.status === 403 && error.config && !error.config.__isRetryRequest) {
+            // if you ever get an unauthorized, logout the user
+            console.log('axios intercepted');
+            store.dispatch('auth/logout');
+            // you can also redirect to /login if needed !
+        }
+        throw error;
+    });
 });
+

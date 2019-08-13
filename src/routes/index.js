@@ -1,9 +1,12 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import cookie from 'vue-cookie';
+import { api } from '@/setup/api';
+import url from 'url';
 
 import { loadLanguageAsync } from '@/setup/i18n';
 import store from '@/store';
+
+let isFirstLogin = null;
 
 // Services
 import dashboardRoute from '@/routes/dashboard/dashboard_route';
@@ -15,16 +18,15 @@ const DefaultContainer = () => import('@/containers/DefaultContainer');
 
 // Views
 const LogIn = () => import('@/views/common/VICO_002_LogIn');
+const Redirect404 = () => import('@/views/common/VICO_003_Redirect404');
 
 const attatchLangauge = (to, from, next) => {
     if (!to.params.lang) {
         next();
         return;
-
     }
     const lang = to.params.lang;
     loadLanguageAsync(lang).then(() => next());
-
     next();
 };
 
@@ -36,14 +38,21 @@ const index = new Router({
     scrollBehavior: () => ({ y: 0 }),
     routes: [
         {
+            path: '/error-page',
+            name: 'error',
+            meta: { label: '', requiresAuth: false, requiresDomainCheck: true },
+            component: Redirect404
+        },
+        {
             path: '/log-in',
             name: 'logIn',
-            meta: { label: 'Log In', requiresAuth: false },
+            meta: { label: 'Log In', requiresAuth: false, requiresDomainCheck: true },
             component: LogIn
         },
         {
             path: '/',
             name: 'root',
+            meta: { label: 'root', requiresDomainCheck: true },
             redirect: '/dashboard',
             component: DefaultContainer,
             children: [
@@ -55,13 +64,23 @@ const index = new Router({
     ]
 });
 
-index.beforeEach((to, from, next) => {
+
+
+index.beforeEach(async (to, from, next) => {
+    if (!isFirstLogin) {
+        try {
+            const response  = await api.post('/identity/domain/list', { name: 'megazone' });
+            isFirstLogin = baseRedirectChecker(response);
+        } catch (error) {
+            console.error('Data 없음', error);
+        }
+    }
+
     for (let i = to.matched.length - 1; i > -1; i--) {
         if (to.matched[i].meta.requiresAuth) {
             if (sessionStorage.getItem('token')) {
                 store.dispatch('auth/setUsername', { username: sessionStorage.getItem('username') });
                 store.dispatch('auth/setToken', { token: sessionStorage.getItem('token') });
-                debugger;
                 next();
             } else {
                 store.dispatch('auth/setNextPath', { nextPath: to.fullPath });
@@ -71,8 +90,47 @@ index.beforeEach((to, from, next) => {
             }
             return;
         }
+        if (to.matched[i].meta.requiresDomainCheck) {
+            if (isFirstLogin === 1) {
+                to.matched[i].meta.requiresDomainCheck = false;
+                console.log('to redirect: ', isFirstLogin);
+                next({
+                    path: '/log-in'
+                });
+            } else  if (isFirstLogin  === 2 ){
+                to.matched[i].meta.requiresDomainCheck = false;
+                console.log('to redirect: ', isFirstLogin);
+                next({
+                    path: '/error-page'
+                });
+            } else  if (isFirstLogin  === 3 ){
+                to.matched[i].meta.requiresDomainCheck = false;
+                console.log('to redirect: ', isFirstLogin);
+                next({
+                    path: '/error-page'
+                });
+            }
+            return;
+        }
     }
     next();
 });
+
+function baseRedirectChecker(rep){
+    let response = rep.data
+    if (response.total_count > 0) {
+        let result = response.results[0];
+        if (!result.plugin_info ||
+            !result.plugin_info.options ||
+            !result.plugin_info.options.auth_type ) {
+            sessionStorage.setItem("domain_id", result.domain_id);
+            return 1;
+        } else {
+            return 2;
+        };
+    } else {
+        return 3;
+    }
+};
 
 export default index;

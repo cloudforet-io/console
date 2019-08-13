@@ -1,14 +1,19 @@
 <template>
-  <base-panel :panels="panelData" />
+  <div>
+    <base-panel :panels="panelData" />
+    <base-notice-panel />
+  </div>
 </template>
 
 <script>
 import BasePanel from '@/components/base/panel/BAPA_002_BasePanel';
+import BaseNoticePanel from '@/components/base/panel/BAPA_001_BaseNoticePanel';
 
 export default {
     name: 'ServerSummary',
     components: {
         BasePanel
+        ,BaseNoticePanel
     },
     props: {
 
@@ -32,9 +37,9 @@ export default {
                     color: 'primary'
                 },
                 data: [
-                    { title: 'ID', contents: 'pg-6bc72053', copyFlag:true },
-                    { title: 'Name', contents: 'AWS Seoul', copyFlag:true },
-                    { title: 'Created at', contents: '2019-05-12 18:00:12' , copyFlag:true }
+                    { title: 'ID', contents: 'pg-6bc72053', copyFlag: true },
+                    { title: 'Name', contents: 'AWS Seoul', copyFlag: true },
+                    { title: 'Created at', contents: '2019-05-12 18:00:12' , copyFlag: true }
                 ]},
             {
                 panelTitle: 'Tag',
