@@ -1,21 +1,29 @@
 <template>
   <div>
     <b-row align-h="between" no-gutters>
-      <b-col cols="12" class="mt-1 ">
-        <b-button v-if="!isEditable && !showSaveBtn" variant="primary" class="edit-btn" @click="onEdit">
+      <b-col cols="12" class="mt-1">
+        <b-button v-if="!isEditable && !showSaveBtn" 
+                  variant="primary"
+                  class="edit-btn" 
+                  @click="onEdit"
+        >
           Edit
         </b-button>
       </b-col>
     </b-row>
 
-    <div class="mt-1 mb-1">
+    <div>
       <div v-for="(row, idx) in rows" :key="row.rowId">
-        <KeyValueInput ref="tag" :data="row.tag" :read-only="!isEditable" @delete="deleteRow(idx)" />
+        <KeyValueInput ref="tag" 
+                       :data="row.tag" 
+                       :read-only="!isEditable" 
+                       @delete="deleteRow(idx)"
+        />
       </div>
     </div>
 
-    <b-row v-if="isEditable" no-gutters>
-      <b-col cols="6" class="mt-1">
+    <b-row v-if="isEditable" no-gutters align-h="between">
+      <b-col cols="12">
         <span class="add-btn" @click="addRow">
           <span class="icon">
             <i class="fas fa-plus-circle" />
@@ -58,7 +66,8 @@ export default {
             rows: this.tagData.map((tag, i) => ({ rowId: i, tag: tag })),
             lastRowId: this.tagData.length,
             isEditable: this.editable,
-            showSaveBtn: false
+            showSaveBtn: false,
+            tags: {}
         };
     },
     computed: {
@@ -95,19 +104,21 @@ export default {
             this.isEditable = false;
         },
         validate () {
-            console.log('tag validate');
-            let obj = {};
-            this.rows.some((row, i) => {
-                if (this.isEmpty(this.$refs.tag[i].key)) { 
-                    return 'Key is empty'; 
+            this.tags = {}; 
+            let tag = null;
+            let isValid = true;
+            this.rows.map((row, i) => {
+                tag = this.$refs.tag[i];
+                if (!tag.isNotNull()) {
+                    isValid = false;
                 }
-
-                if (this.isEmpty(row.tag)) {
-                    this.rows[i].tag = { [this.$refs.tag[i].key]: this.$refs.tag[i].value };
+                if (tag.key in this.tags) {
+                    tag.setDuplicated();
+                    isValid = false;
                 }
-
-                return true;
+                this.tags[tag.key] = tag.value;
             });
+            return isValid;
         }
     }
 };
