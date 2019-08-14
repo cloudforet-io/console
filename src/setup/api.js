@@ -24,7 +24,7 @@ api.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
     return new Promise(function (resolve, reject) {
-        if (error.status === 403 && error.config && !error.config.__isRetryRequest) {
+        if (error.response.status === 403 /*&& error.config && !error.config.__isRetryRequest*/ || error.response.status === 401) {
             // if you ever get an unauthorized, logout the user
             console.log('axios intercepted');
             store.dispatch('auth/logout');

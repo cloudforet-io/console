@@ -31,7 +31,7 @@
                   cotents
                 </template>
               </BaseModal>
-              <BaseModal v-if="selectedServer" 
+              <BaseModal v-if="selectedServer"
                          ref="editServer"
                          title="Edit Server"
                          :centered="true" :hide-footer="true"
@@ -189,7 +189,9 @@ export default {
             this.selectedServer = null;
             this.isLoading = true;
         },
+
         async listServers(limit, skip, sort, search) {
+
             this.reset();
 
             if (this.isEmpty(limit)) {
@@ -205,23 +207,17 @@ export default {
                 search = [];
             }
 
-            let res = null;
-            try {
-                res = await this.$axios.post('/identity/user/list', {
-                // params: { limit, skip, sort }
-                /**
-                  * TODO: set limit, skip, sort and search in the right format
-                  */
-                });
-                setTimeout(() => { // this is for test
-                    this.servers = res.data.results;
-                    this.totalCount = res.data.total_count;
-                    this.isLoading = false;
-                }, 1000);
-            } catch (e) {
-                console.error(e);
+            await this.$axios.post('/identity/user/list', {
+                params: { limit, skip, sort }
+            }).then((response) => {
+                this.servers = response.data.results;
+                this.totalCount = response.data.total_count;
                 this.isLoading = false;
-            }
+            }).catch((error) => {
+                console.error(error);
+                this.isLoading = false;
+            });
+
         },
         rowSelected(row) {
             if (row instanceof Array || !row) {
