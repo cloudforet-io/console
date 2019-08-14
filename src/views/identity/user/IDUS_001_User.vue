@@ -26,26 +26,24 @@
               >
                 <template #activator>
                   <b-button class="btn" variant="outline-primary">
-                    Add
+                    {{ tr('BTN_ADD') }}
                   </b-button>
                 </template>
                 <template #contents>
                   <UserDetail 
                     :creatable="true" 
                     :updatable="true"
-                    @close="$refs.addUser.hideModal()"
-                  />
+                    @close="$refs.addUser.hideModal()"/>
                 </template>
               </BaseModal>
               <BaseModal v-if="selectedUser" 
                          ref="editUser"
                          :title="'Edit User'"
                          :centered="true" 
-                         :hide-footer="true"
-              >
+                         :hide-footer="true">
                 <template #activator>
                   <b-button class="btn" variant="outline-dark">
-                    Edit
+                    {{ tr('BTN_EDIT') }}
                   </b-button>
                 </template>
                 <template #contents>

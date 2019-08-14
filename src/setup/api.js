@@ -22,13 +22,12 @@ api.interceptors.response.use(function (response) {
     //router.push('/error-page');
     //store.dispatch('auth/setNextPath', { nextPath: '/error-page'});
     return response;
-}, function (error) {
+}, function (err) {
     return new Promise(function (resolve, reject) {
-        if (error.response.status === 403 /*&& error.config && !error.config.__isRetryRequest*/ || error.response.status === 401) {
-            // if you ever get an unauthorized, logout the user
-            console.log('axios intercepted');
+        const error = err.response;
+        if (error.status === 403  /*&& error.config && !error.config.__isRetryRequest*/ || error.status === 401) {
+            console.log('Current Error Code: ', error.status);
             store.dispatch('auth/logout');
-            // you can also redirect to /login if needed !
         }
         throw error;
     });
