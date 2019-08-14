@@ -6,13 +6,10 @@
       <template #header>
         <b-row align-v="center">
           <b-col cols="4" sm="6" md="2"
-                 class="mb-md-0 mb-3"
-          >
-            <slot name="caption" />
+                 class="mb-md-0 mb-3">
+            <slot name="caption"/>
           </b-col>
-          <b-col cols="12" sm="12" md="6" xl="7"
-                 order="3" order-md="2"
-          >
+          <b-col cols="12" sm="12" md="6" xl="7" order="3" order-md="2">
             <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
           </b-col>
           <b-col cols="8" sm="6" md="4" xl="3"
@@ -274,6 +271,9 @@ export default {
         }
     },
     methods: {
+        capitalizeFirstLetter(s) {
+            return s.hasOwnProperty('text') ? this.capitalize(s.text) : s.hasOwnProperty('flag') ? this.capitalize(s.flag) : '';
+        },
         getServerStates(state){
             return this.bindEnumToHtml(state);
         },
@@ -466,9 +466,6 @@ export default {
         onLimitInputEnter() {
             this.$refs.modal.hideModal();
             this.$refs.modal.$emit('ok');
-        },
-        capitalizeFirstLetter(s) {
-            return this.capitalize(s);
         }
     }
 };

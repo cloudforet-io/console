@@ -4,15 +4,14 @@
       <b-col v-for="(asset, idx) in panelCard"
              :key="idx" 
              cols="12" md="10" lg="6"
-             class="asset-container"
-      >
+             class="asset-container">
         <b-row align-v="center" class="asset">
           <span class="asset-icon"><i :class="selectIconHtml(asset.panelIcon, true)" /></span>
           <b-col cols="7" class="asset-info">
             <span class="asset-name">{{ asset.asKey }}</span>
           </b-col>
           <b-col cols="5" class="asset-count">
-            <a :href="asset.linkURL">
+            <a :href="asset.linkURL" target="_blank">
               <span>{{ asset.assetValue }}</span>
               <i class="arrow fal fa-angle-double-right" />
             </a>
