@@ -5,7 +5,6 @@
              :modal-class="`modal-${type}`"
              :size="size"
              :ok-variant="type"
-             no-stacking 
     >
       <span> {{ text }} </span>
       <slot name="contents" />
@@ -30,6 +29,7 @@
 <script>
 export default {
     name: 'BaseSimpleModal',
+    event: ['ok', 'cancel'],
     props: {
         type: {
             type: String,
