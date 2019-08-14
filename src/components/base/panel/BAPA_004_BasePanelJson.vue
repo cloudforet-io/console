@@ -32,19 +32,19 @@ export default {
     props: {
         highlightSelectedNode:{
             type: Boolean,
-            default: true,
+            default: true
         },
         selectOnClickNode:{
             type: Boolean,
-            default: true,
+            default: true
         },
         showDoubleQuotes:{
             type: Boolean,
-            default: true,
+            default: true
         },
         showLength: {
             type: Boolean,
-            default: true,
+            default: true
         },
         showLine: {
             type: Boolean,
@@ -62,6 +62,10 @@ export default {
             type: Number,
             default: 3
         },
+        jsonData: {
+            type: Object,
+            default: () => {}
+        },
         noticePanelData: {
             type: Object,
             default: () => {}
@@ -71,24 +75,7 @@ export default {
         return {
             renderOK: true,
             val: '',
-            data: {
-                status: 200,
-                error: '',
-                data: [{
-                    news_id: 51184,
-                    title: 'iPhone X Review: Innovative future with real black technology',
-                    source: 'Netease phone'
-                }, {
-                    news_id: 51183,
-                    title: 'Traffic paradise: How to design streets for people and unmanned vehicles in the future?',
-                    source: 'Netease smart'
-                }, {
-                    news_id: 51182,
-                    title: 'Teslamask\'s American Business Relations: The government does not pay billions to build factories',
-                    source: 'AI Finance',
-                    members: ['Daniel', 'Mike', 'John']
-                }]
-            },
+            selectedData: this.jsonData,
             value: 'res.error',
             selectableType: 'single',
             path: 'res',
@@ -102,7 +89,7 @@ export default {
                 this.cache = JSON.parse(this.val);
                 return this.cache;
             } catch (err) {
-                return this.cache || this.data;
+                return this.cache || this.selectedData;
             }
         }
     },
@@ -120,7 +107,7 @@ export default {
         }
     },
     created() {
-        this.val = JSON.stringify(this.data);
+        this.val = JSON.stringify(this.selectedData);
     },
     methods: {
         handleClick(path, data, treeName = '') {

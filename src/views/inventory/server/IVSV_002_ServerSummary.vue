@@ -1,7 +1,7 @@
 <template>
   <div>
-    <base-panel :panels="panelData" />
     <base-notice-panel :notice-panel-data="selectedNoticePanelData" />
+    <base-panel :panels="panelData" />
   </div>
 </template>
 
@@ -38,7 +38,11 @@ export default {
                     color: 'primary'
                 },
                 data: [
-                    { title: 'ID', contents: 'pg-6bc72053', copyFlag: true },
+                    { title: 'ID', contents: 'pg-6bc72053', status: {
+                        flag: 'fail',
+                        variantSize: 2,
+                        text: 'VM'
+                    }},
                     { title: 'Name', contents: 'AWS Seoul', copyFlag: true },
                     { title: 'Created at', contents: '2019-05-12 18:00:12' , copyFlag: true }
                 ]},
@@ -52,7 +56,7 @@ export default {
                 },
                 data: [
                     { title: 'Japan', contents: 'Tokyo' },
-                    { title: 'South Korea', contents: 'Seoul' },
+                    { title: 'South Korea', contents: 'Seoul' ,link: 'www.yahoo.com' },
                     { title: 'USA', contents: 'Washington D.C.' },
                     { title: 'Canada', contents: 'Ottawa' },
                     { title: 'Austria', contents: 'Vienna' },

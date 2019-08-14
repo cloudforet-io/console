@@ -22,7 +22,28 @@
                 <div v-for="(info, idx) in item.data" :key="idx" class="col-sm-12 col-md-6 summary">
                   <template v-if="indexChecker(item.data.length, idx) === 1">
                     <dt>{{ info.title }}</dt>
-                    <dd>{{ info.contents }}</dd>
+                    <template v-if="!isEmpty(info.link)">
+                      <dd>
+                        <b><a :href="info.link" target="_blank" class="ddlink"> {{ info.contents }}</a></b>
+                      </dd>
+                    </template>
+
+                    <template v-else-if="!isEmpty(info.status)">
+                      <dd :style="getVariantSize(info.status)">
+                        <b-badge :variant="getBadge(info.status)">
+                          {{ capitalizeFirstLetter(info.status) }}
+                        </b-badge>
+                      </dd>
+                    </template>
+
+                    <template v-else-if="!isEmpty(info.state)">
+                      <dd v-html="getServerStates(info.state)" />
+                    </template>
+
+                    <template v-else>
+                      <dd>{{ info.contents }}</dd>
+                    </template>
+
                     <span v-if="useCopyToSelect(info.copyFlag)"
                           v-b-tooltip.hover
                           class="copy-clipboard"
@@ -68,12 +89,38 @@ export default {
         },
         useCopyToSelect (boolean) {
             return (this.isEmpty(boolean)) ? false: boolean;
+        },
+        capitalizeFirstLetter(s) {
+            return s.hasOwnProperty('text') ? this.capitalize(s.text) : s.hasOwnProperty('flag') ? this.capitalize(s.flag) : '';
+        },
+        getVariantSize(size) {
+            let variantFontSize = 3;
+            if (size.hasOwnProperty('variantSize')){
+                variantFontSize = size.variantSize;
+            }
+            return this.setFontSize(variantFontSize);
+        },
+        getBadge(status) {
+            let badge = '';
+            if (this.isEmpty(status)){
+                status = badge;
+            } else if (status.hasOwnProperty('flag')){
+                badge = status.flag;
+            }
+            return this.selectBadges(badge);
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
+  .ddlink{
+    color: $blue;
+    &:hover {
+      color: $red;
+      text-decoration: underline;
+    }
+  }
   .summary > dt {
     float: left;
     width: 160px;
