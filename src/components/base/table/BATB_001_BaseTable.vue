@@ -11,6 +11,7 @@
           </b-col>
           <b-col cols="12" sm="12" md="6" xl="7" order="3" order-md="2">
             <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
+            <BaseSearch v-else-if="noContextSearchable" @search="onSearch" />
           </b-col>
           <b-col cols="8" sm="6" md="4" xl="3"
                  order="2" order-md="3"
@@ -150,6 +151,10 @@ export default {
     },
     inheritAttrs: false,
     props: {
+        noContextSearchable: {
+          type: Boolean,
+        default: false
+        },
         searchable: {
             type: Boolean,
             default: false

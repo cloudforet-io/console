@@ -2,11 +2,11 @@
   <div class="row">
     <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
         <BaseTable :show-caption="showCaption"
+                   :no-context-searchable="true"
                    :cardless="true"
                    :table-data="audits"
                    :fields="fields"
                    :per-page="3"
-                   :searchable="true"
                    :busy="isLoading"
                    :row-clicked-fn="rowClicked"
                    :total-rows="totalCount"
@@ -24,7 +24,7 @@ const thisTestData = [{
         variantSize: 3,
         text: 'Success'
     } ,
-    Description: '정보가 변경되었습니다.',
+    Description: '정보가 변경되aa었습니다.',
     Executor: 'Name',
     Created: '2019-10-16',
     linkText: 'update Group',
