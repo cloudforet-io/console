@@ -17,10 +17,10 @@
     "AUDIT": "AUDIT",
     "TAG": "TAG",
     "BTN_CANCEL": "취소",
-    "BTN_EDIT": "에디트",
+    "BTN_EDIT": "변경",
     "BTN_DELETE": "삭제",
-    "BTN_ADD": "추가하기",
-    "BTN_UPT": "갱신하기",
+    "BTN_ADD": "추가",
+    "BTN_UPT": "업데이트",
     "BTN_CRT": "신규등록",
     "BTN_S_MANT": "유지 보수 설정",
     "BTN_US_MANT": "유지 보수 해제",
@@ -28,7 +28,8 @@
     "CHG_POOL": "풀 변경하기",
     "IMPORT": "가져오기(Import)",
     "COL_INFO": "정보 수집하기",
-    "EXPORT": "내보내기(Export)"
+    "EXPORT": "내보내기(Export)",
+    "SEARCH": "검색"
   },
   "COL_NM": {
     "C_COMMAND_ID": "커맨드 아이디",
@@ -44,12 +45,16 @@
     "C_NIC": "NIC",
     "C_SR_GROUP": "보안 그룹",
     "C_SUMMARY": "개요·서머리",
-    "USER_ID": "유저 아이디",
+    "ID": "아이디",
     "NAME": "이름",
-    "EMAIL": "이메일(E-mail)",
+    "EMAIL": "이메일",
+    "PHONE": "전화번호",
     "GROUP": "그룹",
-    "TYPE": "타입(Type)",
-    "ROLE": "역활(Role)",
+    "LANGUAGE": "언어",
+    "DOMAIN_ID": "도메인 아이디",
+    "TIMEZONE": "타임존",
+    "TYPE": "타입",
+    "ROLE": "권한(Role)",
     "STATE": "상태(State)",
     "STATUS": "상태(Status)",
     "CREAT": "생성일",
@@ -69,6 +74,10 @@
     "DESC": "디스크립션",
     "EXECR": "실행자",
     "EVENT": "이벤트"
+  },
+  "PN": {
+    "BASE_INFO": "기본 정보",
+    "TAG": "태그"
   },
   "ENUM": {
     "SERVER_STATE": {

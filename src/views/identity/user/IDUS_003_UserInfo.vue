@@ -55,37 +55,16 @@ export default {
         }
     },
     computed: {
-        selectedUserData () {
+        userData () {
             return [
-                { 
-                    panelTitle: 'Base Information',
-                    panelIcon: {
-                        icon: 'fa-hashtag',
-                        type: 'l',
-                        size: 1,
-                        color: 'primary'
-                    },
-                    data: [
-                        { title: 'ID', contents: this.userProp.user_id, copyFlag: true },
-                        { title: 'Name', contents: this.userProp.name, copyFlag: true },
-                        { title: 'Email', contents: this.userProp.email, copyFlag: true },
-                        { title: 'Phone', contents: this.userProp.mobile, copyFlag: true },
-                        { title: 'Group Name', contents: this.userProp.group, copyFlag: true },
-                        { title: 'Language', contents: this.userProp.language, copyFlag: true },
-                        { title: 'Domain ID', contents: this.userProp.domain_id, copyFlag: true }
-                    ]
-                },
-                {
-                    panelTitle: 'Tag',
-                    panelIcon: {
-                        icon: 'fa-tags',
-                        type: 'l',
-                        size: 1,
-                        color: 'danger'
-                    },
-                    data: this.tagData,
-                    editable: true
-                }
+                { title: this.tr('COL_NM.ID'), contents: this.userProp.user_id, copyFlag: true },
+                { title: this.tr('COL_NM.NAME'), contents: this.userProp.name, copyFlag: true },
+                { title: this.tr('COL_NM.EMAIL'), contents: this.userProp.email, copyFlag: true },
+                { title: this.tr('COL_NM.PHONE'), contents: this.userProp.mobile, copyFlag: true },
+                { title: this.tr('COL_NM.GROUP'), contents: this.userProp.group, copyFlag: true },
+                { title: this.tr('COL_NM.LANGUAGE'), contents: this.userProp.language, copyFlag: true },
+                { title: this.tr('COL_NM.DOMAIN_ID'), contents: this.userProp.domain_id, copyFlag: true },
+                { title: this.tr('COL_NM.TIMEZONE'), contents: this.userProp.timezone, copyFlag: true }
             ];
         },
         tagData () {
@@ -101,6 +80,31 @@ export default {
         },
         tags () {
             return this.dictToKeyValueArray(this.userProp.tags);
+        },
+        selectedUserData () {
+            return [
+                { 
+                    panelTitle: this.tr('PN.BASE_INFO'),
+                    panelIcon: {
+                        icon: 'fa-hashtag',
+                        type: 'l',
+                        size: 1,
+                        color: 'primary'
+                    },
+                    data: this.userData
+                },
+                {
+                    panelTitle: this.tr('PN.TAG'),
+                    panelIcon: {
+                        icon: 'fa-tags',
+                        type: 'l',
+                        size: 1,
+                        color: 'danger'
+                    },
+                    data: this.tagData,
+                    editable: true
+                }
+            ];
         }
     },
     methods: {

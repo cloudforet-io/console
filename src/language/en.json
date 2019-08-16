@@ -28,7 +28,8 @@
     "IMPORT": "Import",
     "EXPORT": "Export",
     "COL_INFO": "Collect Info",
-    "CHG_POOL": "Change Pool"
+    "CHG_POOL": "Change Pool",
+    "SEARCH": "Search"
   },
   "COL_NM": {
     "C_COMMAND_ID": "COMMAND ID",
@@ -44,9 +45,14 @@
     "C_NIC": "NIC",
     "C_SR_GROUP": "SECURITY GROUP",
     "C_SUMMARY": "SUMMARY",
+    "ID": "ID",
     "NAME": "Name",
     "EMAIL": "E-mail",
+    "PHONE": "Phone",
     "GROUP": "Group",
+    "LANGUAGE": "Language",
+    "DOMAIN_ID": "Domain ID",
+    "TIMEZONE": "Timezone",
     "TYPE": "Type",
     "ROLE": "Role",
     "STATE": "State",
@@ -68,6 +74,10 @@
     "DESC": "Description",
     "EXECR": "Executor",
     "EVENT": "Event"
+  },
+  "PN": {
+    "BASE_INFO": "Base Information",
+    "TAG": "Tags"
   },
   "ENUM": {
     "SERVER_STATE": {
