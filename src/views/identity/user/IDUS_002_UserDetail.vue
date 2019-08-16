@@ -262,6 +262,8 @@ export default {
                 this.passwordCheck = '';
                 return;
             }
+
+            debugger;
             
             try {
                 await this.$axios.post('/identity/user/update', {

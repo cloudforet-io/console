@@ -19,6 +19,7 @@ module.exports = {
             alias: {
 
             }
-        }
+        },
+        devtool: 'source-map'
     }
 };

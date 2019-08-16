@@ -58,7 +58,7 @@ export default {
                         size: 1,
                         color: 'danger'
                     },
-                    data: []
+                    data: this.tags
                     // this.userProp.tags.map((tag) => {
                     //     return {
                     //         title: Object.keys(tag)[0],
@@ -67,9 +67,17 @@ export default {
                     // })
                 }
             ];
+        },
+        tags () {
+            let tagData = [];
+            for (var key in this.userProp.tags) {
+                tagData.push({ title: key, contents: this.userProp.tags[key] });
+            }
+            return tagData;
         }
     },
     created() {
+        
     }
 };
 </script>
