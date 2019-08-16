@@ -31,7 +31,7 @@
                   cotents
                 </template>
               </BaseModal>
-              <BaseModal v-if="selectedServer" 
+              <BaseModal v-if="selectedServer"
                          ref="editServer"
                          title="Edit Server"
                          :centered="true" :hide-footer="true"
@@ -52,7 +52,7 @@
     <b-row>
       <b-col cols="12">
         <BaseTabNav v-if="selectedServer"
-                    :key="selectedServer._id"
+                    :key="selectedServer.user_id"
                     :fill="false"
                     :nav-tabs="tabs"
                     :keep-alive="true"
@@ -73,15 +73,6 @@
           <template #ADMIN>
             <serverAdmin />
           </template>
-          <template #MONITORING>
-            <serverMonitoring />
-          </template>
-          <template #COMMAND>
-            <serverCommand />
-          </template>
-          <template #AUDIT>
-            <serverAudit />
-          </template>
         </BaseTabNav>
       </b-col>
     </b-row>
@@ -99,10 +90,6 @@ import serverSummary from '@/views/inventory/server/IVSV_002_ServerSummary';
 import serverData from '@/views/inventory/server/IVSV_003_ServerData';
 import serverRawData from '@/views/inventory/server/IVSV_004_ServerRawData';
 import serverAdmin from '@/views/inventory/server/IVSV_005_ServerAdmin';
-import serverMonitoring from '@/views/inventory/server/IVSV_006_ServerMonitoring';
-import serverCommand from '@/views/inventory/server/IVSV_007_ServerCommand';
-import serverAudit from '@/views/inventory/server/IVSV_008_ServerAudit';
-
 
 export default {
     name: 'Server',
@@ -115,17 +102,14 @@ export default {
         serverData,
         serverRawData,
         serverAdmin,
-        serverMonitoring,
-        serverCommand,
-        serverAudit
 
     },
     data() {
         return {
             fields: [
                 { key: 'selected' },
-                { key: '_id', label: 'Name', sortable: true, ajaxSortable: false },
-                { key: 'user_name', label: 'ab', sortable: true, ajaxSortable: true },
+                { key: 'user_id', label: 'Name', sortable: true, ajaxSortable: false },
+                { key: 'name', label: 'ab', sortable: true, ajaxSortable: true },
                 { key: 'state', label: 'State', sortable: true, ajaxSortable: true },
                 { key: 'password', label: 'IP', sortable: true, ajaxSortable: false },
                 { key: 'user_first_name', label: 'Core', sortable: true, ajaxSortable: false },
@@ -138,39 +122,27 @@ export default {
             ],
             tabs: [
                 {
-                    tabTitle: 'SUMMARY',
+                    tabTitle: this.tr('COL_NM.SUMMARY'),
                     tabIdxTitle: 'SUMMARY'
                 },
                 {
-                    tabTitle: 'DATA',
+                    tabTitle: this.tr('COL_NM.DT'),
                     tabIdxTitle: 'DATA'
                 },
                 {
-                    tabTitle: 'RAW DATA',
+                    tabTitle: this.tr('COL_NM.RAW_DT'),
                     tabIdxTitle: 'RAWDATA'
                 },
                 {
-                    tabTitle: 'ADMIN',
+                    tabTitle: this.tr('COL_NM.ADMIN'),
                     tabIdxTitle: 'ADMIN'
-                },
-                {
-                    tabTitle: 'MONITORING',
-                    tabIdxTitle: 'MONITORING'
-                },
-                {
-                    tabTitle: 'COMMAND',
-                    tabIdxTitle: 'COMMAND'
-                },
-                {
-                    tabTitle: 'AUDIT',
-                    tabIdxTitle: 'AUDIT'
                 }
             ],
             servers: [],
             selectedServer: null,
             selectedIdx: null,
             addModal: false,
-            totalCount: 17,
+            totalCount: 0,
             queryData: query,
             isReadyForSearch: false,
             perPage: 3,
@@ -189,9 +161,9 @@ export default {
             this.selectedServer = null;
             this.isLoading = true;
         },
+
         async listServers(limit, skip, sort, search) {
             this.reset();
-
             if (this.isEmpty(limit)) {
                 limit = 10;
             }
@@ -204,27 +176,18 @@ export default {
             if (this.isEmpty(search)) {
                 search = [];
             }
-            let res;
-            try {
-                res = await this.$axios.post('/identity/user/list', {
-                    params: { limit, skip, sort }
-                        /**
-                         * TODO: set limit, skip, sort and search in the right format
-                         */
-                });
 
-                this.bindAdditionalKey(res.data, 'state', 'SERVER_STATE');
+            await this.$axios.post('/identity/user/list', {
+                params: { limit, skip, sort }
+            }).then((response) => {
+                this.servers = response.data.results;
+                this.totalCount = response.data.total_count;
+                this.isLoading = false;
+            }).catch((error) => {
+                console.error(error);
+                this.isLoading = false;
+            });
 
-                setTimeout(() => { // this is for test
-                    this.servers = res.data;
-                    this.isLoading = false;
-                }, 500);
-                /**
-                 * TODO: set totalCount with data from server
-                 */
-            } catch (e) {
-                console.error(e);
-            }
         },
         rowSelected(row) {
             if (row instanceof Array || !row) {

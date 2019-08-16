@@ -15,32 +15,8 @@
             <template #DISK>
               <data-disk />
             </template>
-            <template #MOUNT>
-              <data-mount />
-            </template>
             <template #NIC>
               <data-n-i-c />
-            </template>
-            <template #ROUTE>
-              <data-route />
-            </template>
-            <template #PORT>
-              <data-port />
-            </template>
-            <template #PCI>
-              <dataPCI />
-            </template>
-            <template #SOFTWARE>
-              <data-software />
-            </template>
-            <template #SERVICE>
-              <data-service />
-            </template>
-            <template #WINUPDATE>
-              <data-win-update />
-            </template>
-            <template #SHARE>
-              <data-share />
             </template>
             <template #SECURITYGROUP>
               <data-security-group />
@@ -70,14 +46,7 @@ export default {
     components: {
         BaseTabNav,
         dataDisk,
-        dataMount,
         dataNIC,
-        dataRoute,
-        dataPort,
-        dataPCI,
-        dataSoftware,
-        dataWinUpdate,
-        dataShare,
         dataSecurityGroup
     },
     props: {
@@ -87,43 +56,15 @@ export default {
         return {
             tabs: [
                 {
-                    tabTitle: 'DISK',
+                    tabTitle: this.tr('COL_NM.DISK'),
                     tabIdxTitle: 'DISK'
                 },
                 {
-                    tabTitle: 'MOUNT',
-                    tabIdxTitle: 'MOUNT'
-                },
-                {
-                    tabTitle: 'NIC',
+                    tabTitle: this.tr('COL_NM.NIC'),
                     tabIdxTitle: 'NIC'
                 },
                 {
-                    tabTitle: 'ROUTE',
-                    tabIdxTitle: 'ROUTE'
-                },
-                {
-                    tabTitle: 'PORT',
-                    tabIdxTitle: 'PORT'
-                },
-                {
-                    tabTitle: 'PCI',
-                    tabIdxTitle: 'PCI'
-                },
-                {
-                    tabTitle: 'SOFTWARE',
-                    tabIdxTitle: 'SOFTWARE'
-                },
-                {
-                    tabTitle: 'WIN UPDATE',
-                    tabIdxTitle: 'WINUPDATE'
-                },
-                {
-                    tabTitle: 'SHARE',
-                    tabIdxTitle: 'SHARE'
-                },
-                {
-                    tabTitle: 'SECURITY GROUP',
+                    tabTitle: this.tr('COL_NM.SR_GROUP'),
                     tabIdxTitle: 'SECURITYGROUP'
                 }
             ],
