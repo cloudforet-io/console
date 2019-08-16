@@ -6,6 +6,8 @@ export default {
         isLoggedIn: false,
         loginErrorCode: null,
         nextPath: '/',
+        userId: '',
+        token: null
     },
     mutations: {
         login (state) {
@@ -16,6 +18,12 @@ export default {
         },
         setNextPath (state, { nextPath }) {
             state.nextPath = nextPath;
+        },
+        setUserId (state, { userId }) {
+            state.userId = userId;
+        },
+        setToken (state, { token }) {
+            state.token = token;
         }
 
     },
@@ -24,25 +32,31 @@ export default {
         nextPath: state => state.nextPath
     },
     actions: {
-        setUsername ({ commit }, { username }) {
-            commit('setUsername', { username: username });
+        setUserId ({ commit }, { username }) {
+            commit('setUserId', { userId: username });
         },
 
-        async login ({ commit }, { username, password, domainId }) {
+        setToken ({ commit }, { token }) {
+            commit('setToken', { token });
+            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        },
+
+        async login ({ commit }, { userId, password, domainId }) {
             try {
+
                 const res = await api.post('/identity/token/issue', {
                     credentials:{
-                        'user_id': username,
+                        'user_id': userId,
                         'password': password,
                     },
                     'domain_id': domainId
                 });
 
-                commit('setUsername', { username: username });
+                commit('setUserId', { userId: userId });
                 commit('login', { token: res.data.access_token });
 
                 sessionStorage.setItem('token', res.data.access_token);
-                sessionStorage.setItem('username', username);
+                sessionStorage.setItem('userId', userId);
                 api.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
 
             } catch (err) {
@@ -82,7 +96,7 @@ export default {
             }
         },
         async logout ({ commit }) {
-            sessionStorage.removeItem('username');
+            sessionStorage.removeItem('userId');
             sessionStorage.removeItem('token');
             commit('logout');
         },
