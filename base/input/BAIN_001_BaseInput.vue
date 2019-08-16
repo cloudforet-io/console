@@ -8,7 +8,7 @@
         <input ref="input" v-model="value" v-focus="isFocused"
                v-autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
                class="pl-2" autocomplete="off" type="text"
-               placeholder="Search" @focus="onFocus" @blur="onBlur" @input="onInput"
+               :placeholder="tr('SEARCH')" @focus="onFocus" @blur="onBlur" @input="onInput"
                @keyup.enter="onEnter"
                @keyup.down="onKeyDown" @keyup.up="onKeyUp" @keyup.esc="onBlur"
         >
