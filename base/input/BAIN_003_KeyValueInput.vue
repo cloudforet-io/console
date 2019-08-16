@@ -1,33 +1,36 @@
 <template>
-  <b-row align-v="center" align-h="between" no-gutters>
-    <b-col cols="12" class="row m-0">
-      <div v-if="!readOnly" class="delete-btn" @click="$emit('delete')">
-        <span class="icon"><i class="fal fa-minus-circle" /></span>
-      </div>
-      <b-col cols="5">
-        <b-form-group>
-          <b-form-input v-model="key"
-                        :plaintext="readOnly"
-                        type="text"
-                        placeholder="Key"
-                        :class="{'text-right': !readOnly}"
-                        :state="validateKey"
-                        @input="keyChanged"
-          />
-          <b-form-invalid-feedback v-if="!readOnly" :state="validateKey">
-            <div v-if="!validateKeyNull">
-              This is a mendatory field.
-            </div>
-            <div v-else-if="!validateKeyUnique">
-              Key must be unique.
-            </div>
-          </b-form-invalid-feedback>
-        </b-form-group>
-      </b-col>
-      <div class="colon text-center">
-        :
-      </div>
-      <b-col cols="5">
+  <b-row :align-h="align" no-gutters>
+    <div v-if="!readOnly" 
+         class="delete-btn" 
+         @click="$emit('delete')"
+    >
+      <span class="icon"><i class="fal fa-minus-circle" /></span>
+    </div>
+    <b-col cols="5">
+      <b-form-group>
+        <b-form-input v-model="key"
+                      :plaintext="readOnly"
+                      type="text"
+                      placeholder="Key"
+                      :class="{'text-right': !readOnly}"
+                      :state="validateKey"
+                      @input="keyChanged"
+        />
+        <b-form-invalid-feedback v-if="!readOnly" :state="validateKey">
+          <div v-if="!validateKeyNull">
+            This is a mendatory field.
+          </div>
+          <div v-else-if="!validateKeyUnique">
+            Key must be unique.
+          </div>
+        </b-form-invalid-feedback>
+      </b-form-group>
+    </b-col>
+    <div class="colon text-center">
+      <span>:</span>
+    </div>
+    <b-col cols="5">
+      <b-form-group>
         <b-form-input v-model="value" 
                       :plaintext="readOnly" 
                       type="text" 
@@ -37,7 +40,7 @@
         <b-form-invalid-feedback v-if="!readOnly" :state="validateValue">
           This is a mendatory field.
         </b-form-invalid-feedback>
-      </b-col>
+      </b-form-group>
     </b-col>
   </b-row>
 </template>
@@ -54,6 +57,10 @@ export default {
         readOnly: {
             type: Boolean,
             default: false
+        },
+        align: {
+            type: String,
+            default: 'start'
         }
     },
     data () {
@@ -104,16 +111,18 @@ export default {
 
 <style lang="scss" scoped>
 .delete-btn {
-  .icon {
-    font-size: 1.3em;
-    vertical-align: text-top;
-  }
-  cursor: pointer;
-  color: $red;
+    cursor: pointer;
+    color: $red;
+    margin-right: 10px;
+    .icon {
+        font-size: 1.3em;
+        vertical-align: text-top;
+    }
 }
 .colon {
   display: block;
   padding: 5px;
+  margin: 0 8px;
 }
 .form-control {
     height: 1.8rem;
