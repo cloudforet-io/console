@@ -98,17 +98,6 @@ export default {
     },
     data () {
         return {
-            fields: [
-                { key: 'selected', thStyle: { width: '50px' }},
-                { key: 'user_id', label: 'ID', sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
-                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
-                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'language', label: 'Language', sortable: true, ajaxSortable: false , thStyle: { width: '200px' }},
-                { key: 'domain_id', label: 'Domain ID', thStyle: { width: '200px' }},
-                { key: 'timezone', label: 'Timezone', thStyle: { width: '200px' }}
-            ],
             tabs: [
                 {
                     tabTitle: 'INFO',
@@ -129,6 +118,19 @@ export default {
         };
     },
     computed: {
+        fields () {
+            return [
+                { key: 'selected', thStyle: { width: '50px' }},
+                { key: 'user_id', label: 'ID', sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
+                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
+                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'language', label: 'Language', sortable: true, ajaxSortable: false , thStyle: { width: '200px' }},
+                { key: 'domain_id', label: 'Domain ID', thStyle: { width: '200px' }},
+                { key: 'timezone', label: 'Timezone', thStyle: { width: '200px' }}
+            ];
+        },
         selectedUserData () {
             return this.selectedUser;
         }
