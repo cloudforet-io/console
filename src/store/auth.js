@@ -6,8 +6,6 @@ export default {
         isLoggedIn: false,
         loginErrorCode: null,
         nextPath: '/',
-        username: '',
-        token: null
     },
     mutations: {
         login (state) {
@@ -18,12 +16,6 @@ export default {
         },
         setNextPath (state, { nextPath }) {
             state.nextPath = nextPath;
-        },
-        setUsername (state, { username }) {
-            state.username = username;
-        },
-        setToken (state, { token }) {
-            state.token = token;
         }
 
     },
@@ -35,17 +27,14 @@ export default {
         setUsername ({ commit }, { username }) {
             commit('setUsername', { username: username });
         },
-        setToken ({ commit }, { token }) {
-            commit('setToken', { token });
-            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        },
 
         async login ({ commit }, { username, password, domainId }) {
             try {
-
                 const res = await api.post('/identity/token/issue', {
-                    'user_id': username,
-                    'password': password,
+                    credentials:{
+                        'user_id': username,
+                        'password': password,
+                    },
                     'domain_id': domainId
                 });
 
