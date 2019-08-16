@@ -10,7 +10,7 @@
                class="pl-2" autocomplete="off" type="text"
                placeholder="Search" @focus="onFocus" @blur="onBlur" @input="onInput"
                @keyup.enter="onEnter"
-               @keyup.down="onKeyDown" @keyup.up="onKeyUp"
+               @keyup.down="onKeyDown" @keyup.up="onKeyUp" @keyup.esc="onBlur"
         >
 
         <div v-if="isFocused && isKeyListShown && keyList.length > 0" ref="listContainer" class="list-container"
