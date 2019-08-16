@@ -5,10 +5,22 @@
         <slot v-if="useSlot" :name="privatePanel" />
         <template v-for="(item) in panels" v-else :name="item.panelTitle">
           <div :key="item.panelTitle">
-            <h5 class="page-header m-t-0">
-              <i :class="selectIconHtml(item.panelIcon, true)" />
-              &nbsp;&nbsp; {{ item.panelTitle }}
-            </h5>
+            <b-row class="page-header m-t-0" align-h="between">
+              <b-col>
+                <h5>
+                  <i :class="selectIconHtml(item.panelIcon, true)" />
+                  &nbsp;&nbsp; {{ item.panelTitle }}
+                </h5>
+              </b-col>
+              <b-col class="text-right">
+                <span v-if="item.editable" 
+                      class="edit-btn"
+                      @click="$emit('edit')"
+                >
+                  <i class="fal fa-edit" />
+                </span>
+              </b-col>
+            </b-row>
             <hr>
             <b-container fluid>
               <template v-if="indexChecker(item.data.length) === 0">
@@ -70,6 +82,7 @@
 <script>
 export default {
     name: 'BasePanel',
+    event: ['edit'],
     props: {
         useSlot: {
             type: Boolean,
@@ -182,6 +195,12 @@ export default {
   }
   .card {
     border: 0;
+  }
+
+  .edit-btn {
+      color: $black;
+      font-size: 1.2em;
+      cursor: pointer;
   }
 
 </style>

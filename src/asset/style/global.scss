@@ -81,8 +81,8 @@ a {
   thead {
     th {
       padding: 8px;
-      padding-bottom: 25px;
-      border-bottom: 2px solid $gray;
+      padding-bottom: 10px;
+      border-bottom: 1px solid $gray;
     }
     tr:first-child {
       border-top: none;
@@ -293,6 +293,36 @@ a {
     border-color: $violet;
   }
 }
+.btn-danger {
+  background-color: $red;
+  border-color: $red;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $red;
+    border-color: $red;
+    &:focus {
+      box-shadow: 0 0 5px 1px $red;
+    }
+  }
+  &:hover {
+    background-color: $red;
+    border-color: $red;
+  }
+}
+.btn-outline-danger {
+  color: $red;
+  border-color: $red;
+  &:not(:disabled):not(.disabled):active {
+    background-color: $red;
+    border-color: $red;
+    &:focus {
+      box-shadow: 0 0 5px 1px $red;
+    }
+  }
+  &:hover {
+    background-color: $red;
+    border-color: $red;
+  }
+}
 
 /* sl-vue-tree */
 .sl-vue-tree.sl-vue-tree-root {
@@ -385,6 +415,33 @@ a {
       color: darken($blue, 20%);
     }
   }
+}
+
+
+/* b-form */
+.form-group {
+    margin-bottom: 10px;
+}
+.form-control {
+  border: none;
+  border-radius: 3px;
+  border: 1px solid darken($lightgray, 5%);
+  padding: 0.375rem 0.75rem;
+}
+.was-validated .form-control:valid, 
+.form-control.is-valid {
+    border: 1px solid darken($lightgray, 5%);
+    background-image: none;
+    padding: 0.375rem 0.75rem;
+}
+.was-validated .form-control:invalid, 
+.form-control.is-invalid {
+    border: 1px solid darken($lightgray, 5%);
+    background-image: none;
+    padding: 0.375rem 0.75rem;
+}
+.valid-feedback {
+  color: $green;
 }
 
 /* Dropdown Options on Card */

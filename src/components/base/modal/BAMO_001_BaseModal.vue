@@ -49,7 +49,7 @@ export default {
     props: {
         type: {
             type: String,
-            default: 'primary'
+            default: 'secondary'
         },
         title: {
             type: String,
@@ -82,6 +82,10 @@ export default {
         hideFooter: {
             type: Boolean,
             default: false
+        },
+        interactive: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -100,11 +104,15 @@ export default {
         },
         clickOk () {
             this.$emit('ok');
-            this.hideModal();
+            if (!this.interactive) {
+                this.hideModal();
+            }
         },
         clickCancel () {
             this.$emit('cancel');
-            this.hideModal();
+            if (!this.interactive) {
+                this.hideModal();
+            }
         }
     }
 };

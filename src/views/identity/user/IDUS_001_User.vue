@@ -33,14 +33,16 @@
                   <UserDetail 
                     :creatable="true" 
                     :updatable="true"
-                    @close="$refs.addUser.hideModal()"/>
+                    @create="createUser"
+                  />
                 </template>
               </BaseModal>
               <BaseModal v-if="selectedUser" 
                          ref="editUser"
-                         :title="'Edit User'"
+                         title="Edit User"
                          :centered="true" 
-                         :hide-footer="true">
+                         :hide-footer="true"
+              >
                 <template #activator>
                   <b-button class="btn" variant="outline-dark">
                     {{ tr('BTN_EDIT') }}
@@ -49,7 +51,8 @@
                 <template #contents>
                   <UserDetail :updatable="true" 
                               :user-prop="selectedUser" 
-                              @close="$refs.editUser.hideModal()"
+                              @update="updateUser"
+                              @delete="deleteUser"
                   />
                 </template>
               </BaseModal>
@@ -67,7 +70,7 @@
     >
       <template #INFO>
         <b-card class="base first-tab">
-          <UserInfo :user-prop="selectedUser" />
+          <UserInfo :user-prop="selectedUser" @update="updateSelectedUserInfo" />
         </b-card>
       </template>
     </BaseTabNav>
@@ -121,7 +124,8 @@ export default {
             queryData: query,
             isReadyForSearch: false,
             perPage: 10,
-            isLoading: true
+            isLoading: true,
+            meta: {}
         };
     },
     computed: {
@@ -139,10 +143,15 @@ export default {
         reset () {
             this.users = [];
             this.selectedUser = null;
+            this.selectedIdx = undefined;
             this.isLoading = true;
+        },
+        saveMeta (limit, skip, sort, search) {
+            this.meta = { limit, skip, sort, search };
         },
         async listUsers (limit, skip, sort, search) {
             this.reset();
+            this.saveMeta(limit, skip, sort, search);
 
             if (this.isEmpty(limit)) {
                 limit = 10;
@@ -178,16 +187,36 @@ export default {
        * TODO: set totalCount with data from server
        */
         },
-        rowSelected (row) {
+        rowSelected (row, idx) {
             if (row instanceof Array || !row) {
                 this.selectedUser = null;
+                this.selectedIdx = undefined;
             } else {
                 this.selectedUser = row.data;
+                this.selectedIdx = idx;
             }
         },
         limitChanged (val) {
             this.perPage = Number(val);
             this.init();
+        },
+        updateSelectedUserInfo (user) {
+            this.selectedUser = user;
+        },
+        updateUser (user) {
+            this.$refs.editUser.hideModal();
+            this.selectedUser = user;
+            this.selectedUser.selected = true;
+            this.$set(this.users, this.selectedIdx, user);
+        },
+        createUser () {
+            this.$refs.addUser.hideModal();
+            this.listUsers();
+        },
+        deleteUser () {
+            console.log('delete user');
+            this.$refs.editUser.hideModal();
+            this.listUsers();
         }
     }
 };
