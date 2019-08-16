@@ -22,7 +22,11 @@
     "BTN_ADD": "ADD",
     "BTN_CRT": "Create",
     "BTN_S_MANT": "Set Maintenance",
-    "BTN_US_MANT": "Unset Maintenance"
+    "BTN_US_MANT": "Unset Maintenance",
+    "CHG_PRO": "Set Maintenance",
+    "IMPORT": "IMPORT",
+    "EXPORT": "EXPORT",
+    "CHG_POOL": "Unset Maintenance"
   },
   "COL_NM": {
     "COMMAND_ID": "COMMAND ID",

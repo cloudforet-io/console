@@ -23,9 +23,7 @@
                          :centered="true" :hide-footer="true"
               >
                 <template #activator>
-                  <b-button class="btn" variant="outline-dark">
-                    {{ tr('BTN_ADD') }}
-                  </b-button>
+
                 </template>
                 <template #contents>
                   cotents
