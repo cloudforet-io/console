@@ -3,7 +3,7 @@
     <b-col cols="12">
       <b-card>
         <slot v-if="useSlot" :name="privatePanel" />
-        <template v-for="(item) in panels" v-else :name="item.panelTitle">
+        <template v-for="(item) in panelList" v-else :name="item.panelTitle">
           <div :key="item.panelTitle">
             <b-row class="page-header m-t-0" align-h="between">
               <b-col>
@@ -91,6 +91,11 @@ export default {
         panels: {
             type: Array,
             default: () => []
+        }
+    },
+    computed: {
+        panelList() {
+            return this.panels;
         }
     },
     methods: {
