@@ -110,6 +110,7 @@ export default {
             });
         },
         search () {
+            debugger;
             this.$emit('search', this.tagList);
         }
     }
