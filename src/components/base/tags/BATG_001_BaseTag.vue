@@ -17,6 +17,7 @@
         <KeyValueInput ref="tag" 
                        :data="row.tag" 
                        :read-only="!isEditable" 
+                       :align="align"
                        @delete="deleteRow(idx)"
         />
       </div>
@@ -59,6 +60,10 @@ export default {
         editable: {
             type: Boolean,
             default: false
+        },
+        align: {
+            type: String,
+            default: 'start'
         }
     },
     data () {

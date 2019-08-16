@@ -6,8 +6,9 @@
       <template #header>
         <b-row align-v="center">
           <b-col cols="4" sm="6" md="2"
-                 class="mb-md-0 mb-3">
-            <slot name="caption"/>
+                 class="mb-md-0 mb-3"
+          >
+            <slot name="caption" />
           </b-col>
           <b-col cols="12" sm="12" md="6" xl="7" order="3" order-md="2">
             <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
@@ -152,8 +153,8 @@ export default {
     inheritAttrs: false,
     props: {
         noContextSearchable: {
-          type: Boolean,
-        default: false
+            type: Boolean,
+            default: false
         },
         searchable: {
             type: Boolean,
@@ -330,7 +331,7 @@ export default {
             this.updateTableData(idx, item);
             this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
             this.setIsSelectAll();
-            this.$emit('rowSelected', this.selectedRows[0]);
+            this.$emit('rowSelected', this.selectedRows[0], idx);
         },
         checkSingleMode(item, idx, newValue) {
             this.consoleLogEnv('check Single-Mode');
@@ -345,7 +346,7 @@ export default {
 
             this.updateTableData(idx, newValue);
             this.setIsSelectAll();
-            this.$emit('rowSelected', this.selectedRows[0]);
+            this.$emit('rowSelected', this.selectedRows[0], idx);
         },
         checkMultiMode(item, idx, newValue) {
             this.consoleLogEnv('check Multi-Mode');
@@ -528,7 +529,7 @@ export default {
     }
     .card-body {
         overflow-x: scroll;
-        padding: 20px 20px;
+        padding: 5px 20px 20px 20px;
         background-color: $white;
         @extend %sheet;
         border-top-left-radius: 0;

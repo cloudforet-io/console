@@ -120,7 +120,7 @@ const userModel = {
 
 export default {
     name: 'UserDetail',
-    event: ['close', 'ok', 'refresh'],
+    event: ['delete', 'create', 'update'],
     components: {
         BaseTag,
         BaseSimpleModal
@@ -148,7 +148,7 @@ export default {
             email: this.userProp.email,
             mobile: this.userProp.mobile,
             group: this.userProp.group,
-            domainId: sessionStorage.getItem('domain_id'),
+            domainId: sessionStorage.getItem('domainId'),
             language: this.userProp.language,
             timezone: this.userProp.timezone,
             userIdUnique: null
@@ -226,62 +226,79 @@ export default {
             } catch (e) {
                 console.error(e);
             }
-            
-            
         },
-        async onCreate () {
-            if (!this.$refs.baseTag.validate() && !this.validated) {
+        validate () {
+            let result = true;
+
+            if (!this.$refs.baseTag.validate()) {
+                result = false;
+            }
+
+            if (this.creatable && !this.validateUserId) {
+                if (this.creatable) {
+                    this.userId = this.userId === null ? '' : this.userId;
+                } 
+                result = false;  
+            }
+
+            if (!this.validatePassword) {
+                if (this.creatable) {
+                    this.password = this.password === null ? '' : this.password;
+                } else {
+                    this.password = this.userProp.password;
+                } 
+                result = false;
+            }
+
+            if (!this.validatePasswordCheck) {
+                if (this.creatable) {
+                    this.passwordCheck = this.passwordCheck === null ? '' : this.passwordCheck;
+                } else {
+                    this.passwordCheck = '';
+                } 
+                result = false;
+            }
+            return result;
+        },
+        resetUnvalidFields () {
+            if (this.creatable) {
                 this.userId = this.userId === null ? '' : this.userId;
                 this.password = this.password === null ? '' : this.password;
                 this.passwordCheck = this.passwordCheck === null ? '' : this.passwordCheck;
-                return;
-            }
-
-            try {
-                await this.$axios.post('/identity/user/create', {
-                    user_id: this.userId,
-                    password: this.password,
-                    name: this.name,
-                    state: this.state,
-                    email: this.email,
-                    mobile: this.mobile,
-                    group: this.group,
-                    language: this.language,
-                    timezone: this.timezone,
-                    tags: this.$refs.baseTag.tags
-                });
-                this.$emit('close');
-            } catch (e) {
-                console.error(e);
-            }
-        },
-        async onUpdate () {
-            if (!this.$refs.baseTag.validate() && !this.validated) {
+            } else {
                 this.userId = this.userProp.user_id;
                 this.password = this.userProp.password;
                 this.passwordCheck = '';
+            }
+        },
+        async onCreate () {
+            if (!this.validate()) {
                 return;
             }
 
-            debugger;
-            
+            let res = null;
             try {
-                await this.$axios.post('/identity/user/update', {
-                    roles: [],
-                    user_id: this.userId,
-                    password: this.password,
-                    name: this.name,
-                    state: this.state,
-                    email: this.email,
-                    mobile: this.mobile,
-                    group: this.group,
-                    language: this.language,
-                    timezone: this.timezone,
-                    tags: this.$refs.baseTag.tags
-                });
-                this.$emit('close');
+                res = await this.$axios.post('/identity/user/create', this.getUserData());
+                this.$emit('create', res.data);
+                this.$alertify.success('User Successfully Created.');
             } catch (e) {
                 console.error(e);
+                this.$alertify.error('ERROR OCCURED during Creating User.');
+            }
+        },
+        async onUpdate () {
+            if (!this.validate()) {
+                return;
+            }
+
+            let res = null;
+            try {
+                res = await this.$axios.post('/identity/user/update', this.getUserData());
+                this.$emit('update', res.data);
+                this.$alertify.success('User Successfully Updated.');
+            } catch (e) {
+                console.error(e);
+                this.$alertify.error('ERROR OCCURED during Updating User.');
             }
         },
         async onDelete () {
@@ -292,10 +309,11 @@ export default {
                 await this.$axios.post('/identity/user/delete', {
                     user_id: this.userId
                 });
-                this.$emit('close');
-                this.$alertify.success('Selected User Successfully deleted.');
+                this.$emit('delete');
+                this.$alertify.success('Selected User Successfully Deleted.');
             } catch (e) {
                 console.error(e);
+                this.$alertify.error('ERROR OCCURED during Deleting User.');
             }
         },
         onReset () {
@@ -304,6 +322,20 @@ export default {
             } else { 
                 this.resetUserData(this.userProp); 
             }
+        },
+        getUserData () {
+            return {
+                user_id: this.userId,
+                password: this.password,
+                name: this.name,
+                state: this.state,
+                email: this.email,
+                mobile: this.mobile,
+                group: this.group,
+                language: this.language,
+                timezone: this.timezone,
+                tags: this.$refs.baseTag.tags
+            };
         },
         resetUserData (user) {
             this.userId = user.user_id;
