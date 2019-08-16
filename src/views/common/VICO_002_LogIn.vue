@@ -67,7 +67,7 @@
                     <b-input-group-prepend>
                       <b-input-group-text><i class="fal fa-user" /></b-input-group-text>
                     </b-input-group-prepend>
-                    <b-form-input v-model="username" type="text" placeholder="User name" />
+                    <b-form-input v-model="userId" type="text" placeholder="User ID" />
                   </b-input-group>
                   <b-input-group class="mb-2">
                     <b-input-group-prepend>
@@ -143,7 +143,7 @@ export default {
             rememberStatus: false,
             seenGreet: true,
             seenError: false,
-            username: 'admin',
+            userId: 'admin',
             password: 'admin'
         };
     },
@@ -157,12 +157,12 @@ export default {
     },
     methods: {
         async login () {
-            console.log(this.$i18n.t('MSG.LOG_IN'));
+            console.log(this.tr('MSG.LOG_IN'));
             await this.$store.dispatch('auth/login',
                 {
-                    username: this.username,
+                    userId: this.userId,
                     password: this.password,
-                    domainId: sessionStorage.getItem('domain_id')
+                    domainId: sessionStorage.getItem('domainId')
                 }
             ).then(() => {
                 this.$router.push(this.nextPath);
@@ -181,20 +181,20 @@ export default {
         },
         isRemembered () {
             localStorage.checkbox = (localStorage.checkbox === 'true');
-            if (localStorage && !this.isEmpty(localStorage.username)) {
+            if (localStorage && !this.isEmpty(localStorage.userId)) {
                 this.rememberStatus = true;
-                this.username = localStorage.username;
+                this.userId = localStorage.userId;
             } else {
                 this.rememberStatus = false;
-                this.username = '';
+                this.userId = '';
             }
         },
         rememberMe () {
-            if (this.rememberStatus && !this.isEmpty(this.username)) {
-                localStorage.username = this.username;
+            if (this.rememberStatus && !this.isEmpty(this.userId)) {
+                localStorage.userId = this.userId;
                 localStorage.checkbox = this.rememberStatus;
             } else {
-                localStorage.username = '';
+                localStorage.userId = '';
                 localStorage.checkbox = false;
             }
         },

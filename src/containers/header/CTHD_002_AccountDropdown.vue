@@ -1,7 +1,7 @@
 <template>
   <b-dropdown size="sm" right no-caret>
     <template slot="button-content">
-      <span class="name">{{ $store.state.auth.username }}</span>
+      <span class="name">{{ userId}}</span>
     </template>
     <b-dropdown-item @click="logout">
       <div class="item">
@@ -15,7 +15,14 @@
 <script>
 export default {
     name: 'AccountDropdown',
+    created(){
+        this.userId = sessionStorage.getItem('userId');
+    },
     components: {
+    },data () {
+        return {
+            userId: null
+        };
     },
     methods: {
         async logout () {
