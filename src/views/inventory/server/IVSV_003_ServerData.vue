@@ -56,15 +56,15 @@ export default {
         return {
             tabs: [
                 {
-                    tabTitle: this.tr('COL_NM.DISK'),
+                    tabTitle: this.tr('COL_NM.C_DISK'),
                     tabIdxTitle: 'DISK'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.NIC'),
+                    tabTitle: this.tr('COL_NM.C_NIC'),
                     tabIdxTitle: 'NIC'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.SR_GROUP'),
+                    tabTitle: this.tr('COL_NM.C_SR_GROUP'),
                     tabIdxTitle: 'SECURITYGROUP'
                 }
             ],
