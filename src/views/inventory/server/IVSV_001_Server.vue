@@ -17,30 +17,70 @@
                    @limitChanged="limitChanged"
         >
           <template #caption>
-            <div>
-              <BaseModal ref="addServer"
-                         title="Add Server"
-                         :centered="true" :hide-footer="true"
-              >
-                <template #activator>
+            <div class="row">
+              <b-col cols="6">
+                <BaseModal  ref="addServer"
+                            title="Add Server"
+                            :centered="true" :hide-footer="true"
+                >
+                  <template #activator>
+                    <b-button block variant="primary">
+                      {{ tr('BTN_CRT') }}
+                    </b-button>
+                  </template>
+                  <template #contents>
 
-                </template>
-                <template #contents>
-                  cotents
-                </template>
-              </BaseModal>
-              <BaseModal v-if="selectedServer"
-                         ref="editServer"
-                         title="Edit Server"
-                         :centered="true" :hide-footer="true"
-              >
-                <template #activator>
-                  <b-button class="btn" variant="outline-primary">
-                    {{ tr('BTN_DELETE') }}
-                  </b-button>
-                </template>
-                <template #contents />
-              </BaseModal>
+                  </template>
+                </BaseModal>
+              </b-col>
+              <b-col cols="6">
+                      <b-dropdown class="dropdown" text="Actions" variant="secondary">
+                        <b-dropdown-item class="b-dro-pad">
+                          <i class="fad fa-comment-plus mr-1"></i>
+                          &nbsp;{{ tr('BTN_CRT') }}
+                        </b-dropdown-item>
+                        <b-dropdown-item class="b-dro-pad">
+                          <i class="fal fa-comment-edit mr-1"/>
+                          {{ tr('BTN_UPT') }}
+                        </b-dropdown-item>
+                        <b-dropdown-item  class="b-dro-pad">
+                          <i class="fad fa-comment-minus mr-1"></i>
+                          {{ tr('BTN_DELETE')}}
+                        </b-dropdown-item>
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item  class="b-dro-pad">
+                          <i class="fad fa-exclamation-circle mr-1"></i>
+                          {{ tr('BTN_S_MANT')}}
+                        </b-dropdown-item>
+                        <b-dropdown-item  class="b-dro-pad">
+                          <i class="fad fa-empty-set mr-1"></i>
+                          {{ tr('BTN_US_MANT')}}
+                        </b-dropdown-item>
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item  class="b-dro-pad">
+                          <i class="fad fa-comment-alt-edit mr-1"></i>
+                          {{ tr('CHG_PRO')}}
+                        </b-dropdown-item>
+                        <b-dropdown-item  class="b-dro-pad">
+                          <i class="fad fa-comment-alt-edit mr-1"></i>
+                          {{ tr('CHG_POOL')}}
+                        </b-dropdown-item>
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item  class="b-dro-pad">
+                          <i class="fad fa-file-import mr-1"></i>
+                          &nbsp;{{tr('IMPORT')}}
+                        </b-dropdown-item>
+                        <b-dropdown-item  class="b-dro-pad">
+                          <i class="fad fa-file-export mr-1"></i>
+                          {{tr('EXPORT')}}
+                        </b-dropdown-item>
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item  class="b-dro-pad">
+                          <i class="fad fa-sync mr-1"></i>
+                          {{ tr('COL_INFO')}}
+                        </b-dropdown-item>
+                      </b-dropdown>
+              </b-col>
             </div>
           </template>
         </BaseTable>
@@ -106,33 +146,35 @@ export default {
         return {
             fields: [
                 { key: 'selected' },
-                { key: 'user_id', label: 'Name', sortable: true, ajaxSortable: false },
-                { key: 'name', label: 'ab', sortable: true, ajaxSortable: true },
-                { key: 'state', label: 'State', sortable: true, ajaxSortable: true },
-                { key: 'password', label: 'IP', sortable: true, ajaxSortable: false },
-                { key: 'user_first_name', label: 'Core', sortable: true, ajaxSortable: false },
-                { key: 'user_last_name', label: 'Memory', sortable: true, ajaxSortable: false },
-                { key: 'mobile', label: 'OS Type', sortable: true, ajaxSortable: false },
-                { key: 'role_id', label: 'OS Distro', sortable: true, ajaxSortable: false },
-                { key: 'project_id', label: 'Server Type', sortable: true, ajaxSortable: true },
-                { key: 'project_group_id', label: 'Platform', sortable: true, ajaxSortable: false },
-                { key: 'query', label: 'Disk Size', sortable: true, ajaxSortable: false }
+                { key: 'user_id', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: false },
+                { key: 'name', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true },
+                { key: 'state', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true },
+                { key: 'password', label: this.tr('COL_NM.CORE'), sortable: true, ajaxSortable: false },
+                { key: 'user_first_name', label: this.tr('COL_NM.MEMORY'), sortable: true, ajaxSortable: false },
+                { key: 'user_last_name', label: this.tr('COL_NM.O_TYPE'), sortable: true, ajaxSortable: false },
+                { key: 'mobile', label: this.tr('COL_NM.O_DIS'), sortable: true, ajaxSortable: false },
+                { key: 'role_id', label: this.tr('COL_NM.SE_TYPE'), sortable: true, ajaxSortable: false },
+                { key: 'project_id', label: this.tr('COL_NM.PLATFORM'), sortable: true, ajaxSortable: true },
+                { key: 'pp', label: this.tr('COL_NM.PROJ'), sortable: true, ajaxSortable: false },
+                { key: 'pool', label: this.tr('COL_NM.POOL'), sortable: true, ajaxSortable: false },
+                { key: 'project_group_id', label: this.tr('COL_NM.UPDATE'), sortable: true, ajaxSortable: false },
+                { key: 'query', label: this.tr('COL_NM.DISK_SZ'), sortable: true, ajaxSortable: false }
             ],
             tabs: [
                 {
-                    tabTitle: this.tr('COL_NM.SUMMARY'),
+                    tabTitle: this.tr('COL_NM.C_SUMMARY'),
                     tabIdxTitle: 'SUMMARY'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.DT'),
+                    tabTitle: this.tr('COL_NM.C_DT'),
                     tabIdxTitle: 'DATA'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.RAW_DT'),
+                    tabTitle: this.tr('COL_NM.C_RAW_DT'),
                     tabIdxTitle: 'RAWDATA'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.ADMIN'),
+                    tabTitle: this.tr('COL_NM.C_ADMIN'),
                     tabIdxTitle: 'ADMIN'
                 }
             ],
@@ -218,4 +260,9 @@ export default {
     .server-table {
         margin-bottom: 20px;
     }
+
+    .b-dro-pad {
+     padding: 0px 10px 0px 10px;
+    }
+
 </style>

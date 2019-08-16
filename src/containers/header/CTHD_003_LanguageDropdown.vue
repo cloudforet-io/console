@@ -29,10 +29,30 @@ export default {
             selected: { code: 'en', text: 'English', flag: 'flag-icon flag-icon-us' }
         };
     },
+    created(){
+        this.init();
+    },
     methods: {
         changeLanguage (idx) {
             this.selected = this.languages[idx];
             this.$i18n.locale = this.selected.code;
+            if (!this.isEmpty(sessionStorage.userId)) {
+                const localeInfo = {
+                    userId: sessionStorage.userId,
+                    locale_code: this.selected.code,
+                    idx: idx
+                };
+                localStorage.setItem('locale', JSON.stringify(localeInfo));
+            }
+        },
+        init() {
+            if (localStorage.hasOwnProperty('locale') && !this.isEmpty(localStorage.locale)) {
+                const selectedLocale = JSON.parse(localStorage.getItem('locale'));
+                if (sessionStorage.getItem('userId') === selectedLocale.userId) {
+                    this.selected = this.languages[selectedLocale.idx];
+                    this.$i18n.locale = this.selected.code;
+                }
+            }
         }
     }
 };
