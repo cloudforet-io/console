@@ -2,6 +2,7 @@
   <div class="row">
     <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
       <BaseTable :show-caption="showCaption"
+                 :no-context-searchable="true"
                  :cardless="true"
                  :table-data="audits"
                  :fields="fields"
