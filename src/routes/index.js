@@ -80,8 +80,6 @@ index.beforeEach(async (to, from, next) => {
     for (let i = to.matched.length - 1; i > -1; i--) {
         if (to.matched[i].meta.requiresAuth) {
             if (sessionStorage.getItem('token')) {
-                store.dispatch('auth/setUsername', { username: sessionStorage.getItem('username') });
-                store.dispatch('auth/setToken', { token: sessionStorage.getItem('token') });
                 next();
             } else {
                 store.dispatch('auth/setNextPath', { nextPath: to.fullPath });
@@ -94,19 +92,16 @@ index.beforeEach(async (to, from, next) => {
         if (to.matched[i].meta.requiresDomainCheck) {
             if (isFirstLogin === 1) {
                 to.matched[i].meta.requiresDomainCheck = false;
-                console.log('to redirect: ', isFirstLogin);
                 next({
                     path: '/log-in'
                 });
             } else  if (isFirstLogin  === 2 ){
                 to.matched[i].meta.requiresDomainCheck = false;
-                console.log('to redirect: ', isFirstLogin);
                 next({
                     path: '/error-page'
                 });
             } else  if (isFirstLogin  === 3 ){
                 to.matched[i].meta.requiresDomainCheck = false;
-                console.log('to redirect: ', isFirstLogin);
                 next({
                     path: '/error-page'
                 });
@@ -118,7 +113,8 @@ index.beforeEach(async (to, from, next) => {
 });
 
 function baseRedirectChecker(rep){
-    let response = rep.data
+    let response = rep.data;
+    console.log('This is a Sparta');
     if (response.total_count > 0) {
         let result = response.results[0];
         if (!result.plugin_info ||

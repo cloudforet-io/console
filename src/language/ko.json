@@ -21,8 +21,11 @@
     "BTN_DELETE": "삭제",
     "BTN_ADD": "추가하기",
     "BTN_CRT": "신규등록",
-    "BTN_S_MANT": "Set Maintenance",
-    "BTN_US_MANT": "Unset Maintenance"
+    "BTN_S_MANT": "유지 보수 설정",
+    "BTN_US_MANT": "유지 보수 해제",
+    "CHG_PRO": "Set Maintenance",
+    "IMPORT": "가져오기(Import)",
+    "EXPORT": "내보내기(Export)"
   },
   "COL_NM": {
     "USER_ID": "유저 ID",
