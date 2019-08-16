@@ -59,6 +59,10 @@ import BaseTree from '@/components/base/tree/BATR_001_BaseTree';
 
 import { api } from '@/setup/api';
 
+
+
+
+
 const sampleNode = [
     {
         'title': 'Item1',
@@ -218,17 +222,15 @@ export default {
         BaseTree,
         BaseModal
     },
-    props: {
-
-    },
-    data () {
+    props: {},
+    data() {
         return {
             tab: tabs[0].component,
             selectedData: {}, //Selected Data => Selected node data & flag
             processData: {}, //Process Data => data that has to be taken by action
             createProcess: false,
             updateProcess: false,
-            treeData: sampleNode,
+            treeData: [],
             projectModalTitle: 'Edit a Project',
             modalVisible: false,
             lastEvent: 'Right-Click to open context menus on tree.',
@@ -236,26 +238,45 @@ export default {
             modalTabs: modalTab
         };
     },
-    created () {
-
+    created() {
+        this.init();
     },
     methods: {
-        NodeSelected (item) {
+        init() {
+            this.listProject();
+        },
+        async listProject() {
+            await this.$axios.post('/identity/project/tree', {
+                item_id: null,
+                item_type: 'ROOT',
+                sort: {
+                    'key': 'name'
+                }
+            }).then((response) => {
+                debugger;
+                this.treeData = this.treeDataHandler(response.data.results);
+            }).catch((error) => {
+                console.error(error);
+                this.isLoading = false;
+            });
+
+        },
+        NodeSelected(item) {
             this.lastEvent = 'Selected Item : ' + item[0].title;
         },
-        editSelected (item) {
-        /*  TODO :: Please Add More Flags if needed.
-           *  CRT => Create
-           *  UPT => Update
-           *  DEL => Delete
-           ****************
-           *  PG => Project Group
-           *  PR => Project
-           *  SPG => Selected Project Group
-           *  SPR => Selected Project
-           *  RPG => Root Project Group
-           *  RPR => Root Project
-           */
+        editSelected(item) {
+                /*  TODO :: Please Add More Flags if needed.
+                   *  CRT => Create
+                   *  UPT => Update
+                   *  DEL => Delete
+                   ****************
+                   *  PG => Project Group
+                   *  PR => Project
+                   *  SPG => Selected Project Group
+                   *  SPR => Selected Project
+                   *  RPG => Root Project Group
+                   *  RPR => Root Project
+                   */
             if (['PG', 'PR', 'SPG', 'SPR', 'RPG', 'RPR'].includes(item.flag)) {
                 const title = (item.flag.indexOf('PG') > 0);
                 this.selectedData['selectedItem'] = item;
@@ -268,7 +289,7 @@ export default {
                 this.$refs.EditModal.showModal();
             }
         },
-        manageTabButton (flag, state, title) {
+        manageTabButton(flag, state, title) {
             if (flag === 'CRT') {
                 this.projectModaltitle = (title) ? 'Create a Project Group' : 'Create a Project';
                 this.updateProcess = !state;
@@ -276,19 +297,19 @@ export default {
             } else if (flag === 'UPT') {
                 this.createProcess = !state;
                 this.updateProcess = state;
-            } 
+            }
         },
-        async updateProject (items) {
+        async updateProject(items) {
             this.consoleLogEnv('item', items);
             const treeV = items.tree;
             const path = treeV.getSelected()[0].path;
             let tabData = this.$refs.EditTab.tabContentData;
             treeV.updateNode(path, { title: tabData.projectProp.projectName });
             tabData.projectProp.projectName = null;
-        //TODO:: Simulate gRPC Modules on BACK_END
+                //TODO:: Simulate gRPC Modules on BACK_END
             this.$refs.EditModal.hideModal();
         },
-        createProject (items) {
+        createProject(items) {
             this.consoleLogEnv('item', items);
             const flag = this.selectedData.selectedItem.flag;
             const treeV = this.isEmpty(items.tree) ? this.selectedData.selectedItem.tree : items.tree;
@@ -316,7 +337,6 @@ export default {
                 placement = 'before';
                 newNode['isLeaf'] = true;
             }
-
             treeV.insert({ node: treeV.getSelected()[0], placement: placement }, newNode);
             tabData.projectProp.projectName = null;
             tabData.projectProp.projectId = null;
@@ -328,10 +348,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  #scrollspy-example {
-    position: relative;
-    height: 200px;
-    overflow-y: scroll;
-    border: 1px solid blue;
-  }
+    #scrollspy-example {
+        position: relative;
+        height: 200px;
+        overflow-y: scroll;
+        border: 1px solid blue;
+    }
 </style>

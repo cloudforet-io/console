@@ -319,12 +319,42 @@ export const Mixin = {
             }
             return returnVal;
         },
+        /**********************************************************************************
+         * Name       : dictToKeyValueArray
+         * Input   => (t: data                         =>  Array of data Object
+         *             k: key                          =>  String
+         *             v: additional value to attach   =>  String
+         *             l: location  =>  where to bind additional key at (b: back, or rest default: front)
+         * Output  => String translation Message
+         * Description:  translation of i18n
+         **********************************************************************************/
         dictToKeyValueArray: function (obj) {
             let arr = [];
             for (var key in obj) {
                 arr.push({ [key]: obj[key] });
             }
             return arr;
+        },
+        /**********************************************************************************
+         * Name       : bindAdditionalKey
+         * Input   => (t: data                         =>  Array of data Object
+         *             k: key                          =>  String
+         *             v: additional value to attach   =>  String
+         *             l: location  =>  where to bind additional key at (b: back, or rest default: front)
+         * Output  => String translation Message
+         * Description:  translation of i18n
+         **********************************************************************************/
+        treeDataHandler: function (t) {
+            let returnTree = [];
+            debugger;
+            if (!t.hasOwnProperty("items") && t.items.length > 0) {
+                t.items.forEach(function (curItem, curIndex){
+                    let obj = {};
+                    debugger;
+
+                });
+            }
+            return returnTree;
         }
     },
     data: function () {
