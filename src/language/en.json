@@ -77,7 +77,8 @@
   },
   "PN": {
     "BASE_INFO": "Base Information",
-    "TAG": "Tags"
+    "TAG": "Tags",
+    "INFO": "Info"
   },
   "ENUM": {
     "SERVER_STATE": {

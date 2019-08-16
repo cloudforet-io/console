@@ -100,8 +100,8 @@ export default {
         return {
             tabs: [
                 {
-                    tabTitle: 'INFO',
-                    component: UserDetail
+                    tabTitle: this.tr('PN.INFO'),
+                    tabIdxTitle: 'INFO'
                 }
             ],
             defaultTab: 0,

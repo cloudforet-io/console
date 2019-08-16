@@ -69,6 +69,9 @@ export default {
         navTabs: {
             type: Array,
             default: () => []
+            /**
+             * TODO: set validation
+             */
         },
         keepAlive: {
             type: Boolean,
