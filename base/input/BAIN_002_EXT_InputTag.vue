@@ -31,6 +31,10 @@ export default {
         contents: {
             type: Object,
             default: () => {}
+        },
+        idx: {
+            type: Number,
+            required: true
         }
     },
     data () {
@@ -57,7 +61,7 @@ export default {
             this.isUpdateMode = true;
         },
         onUpdate (items) {
-            this.$emit('update', this.$vnode.key, items);
+            this.$emit('update', items, this.idx);
             this.isUpdateMode = false;
         }
     }
