@@ -168,8 +168,9 @@ export default {
             if (this.selected.key) { // to detect the case of editting key section
                 let operatorIdx = this.value.indexOf(':');
 
-                if (operatorIdx < 0 && !this.selected.type === 'SubKey' &&
-            !this.value.trim().startsWith(this.selected.label)) {
+                if (operatorIdx < 0 && 
+                !this.selected.type === 'SubKey' &&
+                !this.value.trim().startsWith(this.selected.label)) {
                     this.resetKey();
                     return;
                 }
@@ -318,7 +319,6 @@ export default {
                 return;
             }
             this.setSelectedData(val);
-
             if (this.selectedArr.length === 0) {
                 this.selectedArr.push(this.selected);
             }
@@ -356,7 +356,7 @@ export default {
             this.selected.subKey = val.substring(this.selected.label.length + 1);
         },
         setValue (val) {
-            this.selected.value = this.filterValueWithType(val);
+            this.selected.value = this.filterValueWithType(val.trim());
         },
         setOperator (val) {
             if (appendableOperators.includes(val[1])) {

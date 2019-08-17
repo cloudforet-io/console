@@ -192,7 +192,6 @@ export default {
             // ];
             
             this.saveMeta(limit, start, sort, filter, filterOr);
-
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/list', {
