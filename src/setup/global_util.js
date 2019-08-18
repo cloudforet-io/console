@@ -348,7 +348,9 @@ export const Mixin = {
                 d.items.forEach((curItem, curIndex) =>{
                     let obj = {};
                     console.log(curItem);
-                    obj['id'] = curItem.id;
+                    obj['data'] = {
+                        id: curItem.id
+                    };
                     obj['title'] = curItem.name;
                     obj['isLeaf'] = this._.get(GlobalEnum,`${treeKey}.${curItem.item_type}.isLeaf`);
                     obj['isExpanded'] = false;
