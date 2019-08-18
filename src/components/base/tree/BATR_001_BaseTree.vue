@@ -13,39 +13,41 @@
             :height="dragHeight"
           >
             <template #leftContainer="{ width }">
-              <sl-vue-tree ref="slVueTree"
-                           v-model="treeData"
-                           class="main-tree-col"
-                           :allow-multiselect="true"
-                           :style="{ width: width }"
-                           @select="nodeSelected"
-                           @drop="nodeDropped"
-                           @nodecontextmenu="showContextMenu"
-              >
-                <template #title="{ node }">
-                  <span class="item-title">
-                    <span class="item-icon">
-                      <i v-if="node.isLeaf" class="fal fa-cube" />
-                      <template v-else>
-                        <i v-if="node.isExpanded" class="fal fa-folder-open" />
-                        <i v-else class="fal fa-folder-minus" />
-                      </template>
+              <div :key="treeKey">
+                <sl-vue-tree ref="slVueTree"
+                             v-model="selectedTreeProp"
+                             style="width:400px"
+                             class="main-tree-col"
+                             :allow-multiselect="true"
+                             :style="{ width: width }"
+                             @select="nodeSelected"
+                             @drop="nodeDropped"
+                             @nodecontextmenu="showContextMenu"
+                >
+                  <template #title="{ node }">
+                    <span class="item-title">
+                      <span class="item-icon">
+                        <i v-if="node.isLeaf" class="fal fa-cube" />
+                        <template v-else>
+                          <i v-if="node.isExpanded" class="fal fa-folder-open" />
+                          <i v-else class="fal fa-folder-minus" />
+                        </template>
+                      </span>
+                      {{ node.title }}
                     </span>
-                    {{ node.title }}
+                  </template>
+                  <template #toggle="{ node }">
+                    <i v-if="node.isExpanded" class="fal fa-angle-down" />
+                    <i v-else class="fal fa-angle-right" />
+                  </template>
+
+                  <!-- <template slot="sidebar" slot-scope="{ node }">
+                  <span class="ellipsis" @click.stop.prevent="showContext($event, node)">
+                    <i class="fal fa-ellipsis-v-alt" />
                   </span>
-                </template>
-
-                <template #toggle="{ node }">
-                  <i v-if="node.isExpanded" class="fal fa-angle-down" />
-                  <i v-else class="fal fa-angle-right" />
-                </template>
-
-              <!-- <template slot="sidebar" slot-scope="{ node }">
-              <span class="ellipsis" @click.stop.prevent="showContext($event, node)">
-                <i class="fal fa-ellipsis-v-alt" />
-              </span>
-            </template> -->
-              </sl-vue-tree>
+                </template> -->
+                </sl-vue-tree>
+              </div>
             </template>
 
             <template #rightContainer="{ width }">
@@ -61,17 +63,31 @@
             </template>
           </BaseDragVertical>
 
-          <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
-            <div class="contextmenuleaf" @click="excSelected('PG')">
+          <div v-show="contextMenuIsVisible"
+               ref="contextmenu"
+               class="contextmenu"
+          >
+            <div class="contextmenuleaf"
+                 @click="excSelected('PG')"
+            >
               <i class="fal fa-folder-minus" />&nbsp; Add a Project Group
             </div>
-            <div class="contextmenuleaf" @click="excSelected('PR')">
+            <div class="contextmenuleaf"
+                 @click="excSelected('PR')"
+            >
               <i class="fal fa-cube" />&nbsp; Add a Project
             </div>
-            <div class="contextmenuleaf" @click="excSelected('SR')">
+            <div v-show="selectedContexProp"
+                 class="contextmenuleaf"
+                 @click="excSelected('SR')"
+            >
               <i class="fal fa-pencil" />&nbsp; Edit Selected Project
             </div>
-            <div class="node-leaf-last" @click="excSelected">
+
+            <div v-show="selectedContexProp"
+                 class="node-leaf-last"
+                 @click="excSelected"
+            >
               <i class="fal fa-trash" />&nbsp; Remove Selected Item
             </div>
           </div>
@@ -108,6 +124,10 @@ export default {
             type: Array,
             default: () => []
         },
+        contextInit: {
+            type: Boolean,
+            default: false
+        },
         treeWidth: {
             type: Number,
             default: 250
@@ -115,16 +135,17 @@ export default {
     },
     data () {
         return {
-      /*
-         *  nodeKey is a key to reload any component that has node selected at treeSubPanel
-         */
+            /**
+             *  nodeKey is a key to reload any component that has node selected at treeSubPanel
+             */
+            treeKey: 0,
             nodeKey: 0,
+            treeData: null,
             contexteActionFlag: null,
-            treeData: this.treeProp,
             hasSelected: false,
             lastEvent: null,
             contextMenuIsVisible: false,
-            contextTopMenuIsVisible: false,
+            contextTopMenuIsVisible: true,
             showTree: false,
             modalTitle: '',
             modalContents: '',
@@ -138,13 +159,35 @@ export default {
         ]),
         dragHeight() {
             return self.innerHeight - this.headerHeight;
+        },
+        selectedTreeProp:  {
+            get:  function() {
+                let returnVal = this.treeProp;
+                if (this.isEmpty(returnVal)){
+                    returnVal = [{ title: '!Please, Right Click me',
+                        isLeaf: true,
+                        init: true }];
+                }
+                return returnVal;
+            },
+            set: function (value) {
+                this.treeData = value;
+            }
+        },
+        selectedContexProp () {
+            return this.contextInit;
         }
     },
-    mounted: function () {
+    mounted() {
+        if (!this.treeKey){
+            this.treeKey = 1;
+            console.log(this.treeKey);
+        }
+        console.log('#############', this.contextInit);
         this.showTree = true;
     },
     methods: {
-        nodeSelected (nodes, event) {
+        nodeSelected (nodes) {
             this.nodeKey = (this.nodeKey) > 0 ? 0 : 1;
             this.lastEvent = nodes;
             this.hasSelected = true;
