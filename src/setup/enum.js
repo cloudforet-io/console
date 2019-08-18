@@ -1,4 +1,14 @@
 export const GlobalEnum = {
+    TREE: Object.freeze({
+        PROJECT: {
+            PROJECT:{
+                isLeaf: true
+            },
+            PROJECT_GROUP:{
+                isLeaf: false
+            }
+        }
+    }),
     SERVER_STATE: Object.freeze(
         {
             SERVICE: {

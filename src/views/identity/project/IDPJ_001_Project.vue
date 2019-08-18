@@ -29,7 +29,9 @@
     </div>
 
     <BaseTree ref="projectTree"
+              :tree-key="treeKey"
               :tree-prop="treeData"
+              :context-init="contextStatus"
               @selected="NodeSelected"
               @edited="editSelected"
     >
@@ -56,98 +58,6 @@ import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
 import BaseTabs from '@/components/base/tab/BATA_001_BaseTab';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseTree from '@/components/base/tree/BATR_001_BaseTree';
-
-import { api } from '@/setup/api';
-
-
-
-
-
-const sampleNode = [
-    {
-        'title': 'Item1',
-        'isLeaf': true
-    },
-    {
-        'title': 'Item2',
-        'isLeaf': true,
-        'data': {
-            'visible': false
-        }
-    },
-    {
-        'title': 'Folder1',
-        'isSelected': false,
-        'isExpanded': false
-    },
-    {
-        'title': 'Has Many children Long name',
-        'isExpanded': false,
-        'children': [
-            {
-                'title': 'Item3',
-                'isLeaf': true
-            },
-            {
-                'title': 'Item4',
-                'isLeaf': true
-            },
-            {
-                'title': 'Folder3',
-                'children': [
-                    {
-                        'title': 'Item5',
-                        'children': [
-                            {
-                                'title': 'Long Name Item-------------.',
-                                'children': [
-                                    {
-                                        'title': 'Example',
-                                        'isLeaf': true
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ],
-        'isSelected': false
-    },
-    {
-        'title': 'Folder5',
-        'isExpanded': false
-    },
-    {
-        'title': 'Item6',
-        'isLeaf': true
-    },
-    {
-        'title': 'Item7',
-        'isLeaf': true,
-        'data': {
-            'visible': false
-        }
-    },
-    {
-        'title': 'Folder6',
-        'children': [
-            {
-                'title': 'Folder7',
-                'children': [
-                    {
-                        'title': 'Item8',
-                        'isLeaf': true
-                    },
-                    {
-                        'title': 'Item9',
-                        'isLeaf': true
-                    }
-                ]
-            }
-        ]
-    }
-];
 
 let NodePR = {
     title: '',
@@ -222,9 +132,12 @@ export default {
         BaseTree,
         BaseModal
     },
-    props: {},
+    props: {
+
+    },
     data() {
         return {
+            treeKey: 1,
             tab: tabs[0].component,
             selectedData: {}, //Selected Data => Selected node data & flag
             processData: {}, //Process Data => data that has to be taken by action
@@ -235,16 +148,15 @@ export default {
             modalVisible: false,
             lastEvent: 'Right-Click to open context menus on tree.',
             tabs: tabs,
-            modalTabs: modalTab
+            modalTabs: modalTab,
+            contextStatus: true
         };
     },
-    created() {
-        this.init();
+    created (){
+        this.listProject();
+        this.treeKey = this.treeKey > 0 ? 0 : 1;
     },
     methods: {
-        init() {
-            this.listProject();
-        },
         async listProject() {
             await this.$axios.post('/identity/project/tree', {
                 item_id: null,
@@ -253,13 +165,17 @@ export default {
                     'key': 'name'
                 }
             }).then((response) => {
-                debugger;
-                this.treeData = this.treeDataHandler(response.data.results);
+                const responsedData = this.treeDataHandler(response.data, 'PROJECT');
+                this.treeData = this.isEmpty(responsedData) ? [{ title: '!Please, Right Click me',
+                    isLeaf: true,
+                    init: true }] : responsedData;
+                if (this.isEmpty(this.treeData)) {
+                    this.contextStatus = false;
+                }
+                console.log(this.treeData);
             }).catch((error) => {
                 console.error(error);
-                this.isLoading = false;
             });
-
         },
         NodeSelected(item) {
             this.lastEvent = 'Selected Item : ' + item[0].title;

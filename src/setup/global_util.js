@@ -1,7 +1,6 @@
 import { hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import { GlobalEnum } from '@/setup/enum';
-import dotProp from 'dot-prop';
-
+import VueLodash from 'vue-lodash';
 export const Mixin = {
     methods: {
     /**********************************************************************************
@@ -282,10 +281,10 @@ export const Mixin = {
          * Description:  translation of i18n
          **********************************************************************************/
         bindEnumToHtml: function (p) {
-            if (!this.isEmpty(dotProp.get(GlobalEnum,p.toUpperCase()))) {
-                const icon = dotProp.get(GlobalEnum,p.toUpperCase() + '.icon');
-                const color = dotProp.get(GlobalEnum,p.toUpperCase() + '.color');
-                const msg = this.isEmpty(this.tr('ENUM.' + p.toUpperCase())) ? dotProp.get(GlobalEnum,p.toUpperCase() +  '.msg') : this.tr('ENUM.' + p.toUpperCase());
+            if (!this.isEmpty(this._.get(GlobalEnum,p.toUpperCase()))) {
+                const icon = this._.get(GlobalEnum,p.toUpperCase() + '.icon');
+                const color = this._.get(GlobalEnum,p.toUpperCase() + '.color');
+                const msg = this.isEmpty(this.tr('ENUM.' + p.toUpperCase())) ? this._.get(GlobalEnum,p.toUpperCase() +  '.msg') : this.tr('ENUM.' + p.toUpperCase());
 
                 /***********
                 msg: 'In Progress',
@@ -336,22 +335,29 @@ export const Mixin = {
             return arr;
         },
         /**********************************************************************************
-         * Name       : bindAdditionalKey
-         * Input   => (t: data                         =>  Array of data Object
-         *             k: key                          =>  String
-         *             v: additional value to attach   =>  String
-         *             l: location  =>  where to bind additional key at (b: back, or rest default: front)
-         * Output  => String translation Message
-         * Description:  translation of i18n
+         * Name       : treeDataHandler
+         * Input   => (d: data                         =>  Array of data Object
+         *             t: Type                         =>  Tree Type in Enum values
+         * Output  => Object Array which
+         * Description:  return tree array of object which suits for BaseTree
          **********************************************************************************/
-        treeDataHandler: function (t) {
+        treeDataHandler: function (d, t) {
             let returnTree = [];
-            debugger;
-            if (!t.hasOwnProperty("items") && t.items.length > 0) {
-                t.items.forEach(function (curItem, curIndex){
+            let treeKey = this.isEmpty(t) ? 'TREE': 'TREE.'+ t;
+            if (d.hasOwnProperty('items') && d.items.length > 0) {
+                d.items.forEach((curItem, curIndex) =>{
                     let obj = {};
-                    debugger;
-
+                    console.log(curItem);
+                    obj['data'] = {
+                        id: curItem.id
+                    };
+                    obj['title'] = curItem.name;
+                    obj['isLeaf'] = this._.get(GlobalEnum,`${treeKey}.${curItem.item_type}.isLeaf`);
+                    obj['isExpanded'] = false;
+                    if (curItem.has_child){
+                        obj['children'] = [];
+                    }
+                    returnTree.push(obj);
                 });
             }
             return returnTree;
@@ -359,6 +365,8 @@ export const Mixin = {
     },
     data: function () {
         return {
+            globalProp: null,
+            _: VueLodash,
             defaultFontSizeSet: [10, 12, 14, 16, 18, 24],
             isFirstLogin: false
         };
