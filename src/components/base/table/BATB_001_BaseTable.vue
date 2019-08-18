@@ -94,20 +94,6 @@
           />
         </template>
 
-        <!-- <template slot="thead-top" slot-scope="data">
-           <tr>
-             <th>
-                 &nbsp;
-             </th>
-             <th>Type 1</th>
-             <th>
-               Type 2
-             </th>
-             <th>Type 3</th>
-           </tr>
-         </template> -->
-
-
         <template v-if="selectable" slot="selected" slot-scope="data">
           <BaseCheckbox :key="data.index"
                         :selected="data.item.selected"
@@ -252,8 +238,9 @@ export default {
         return {
             currentPage: 1,
             selectedRows: [],
-            sortBy: undefined,
-            searchList: [],
+            sort: undefined,
+            filter: [],
+            filterOr: [],
             isLocalSort: true,
             limitInput: this.perPage,
             isSelectedAll: false
@@ -269,7 +256,7 @@ export default {
         limit() {
             return this.perPage;
         },
-        skip() {
+        start() {
             return (this.currentPage - 1) * this.limit;
         },
         maxPage() {
@@ -416,22 +403,23 @@ export default {
                 return;
             }
             this.currentPage--;
-            this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
+            this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
         onNext() {
             if (this.currentPage >= this.maxPage) {
                 return;
             }
             this.currentPage++;
-            this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
+            this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
         onRefresh() {
             this.currentPage = 1;
-            this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
+            this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
-        onSearch(conditionList) {
-            this.searchList = conditionList;
-            this.$emit('list', this.limit, this.skip, this.sortBy, conditionList);
+        onSearch(filter, filterOr) {
+            this.filter = filter;
+            this.filterOr = filterOr;
+            this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
         headClicked(key, item) {
             if (item.ajaxSortable) {
@@ -445,8 +433,11 @@ export default {
                 return;
             }
 
-            this.sortBy = ctx.sortDesc ? `-${ctx.sortBy}` : ctx.sortBy;
-            this.$emit('list', this.limit, this.skip, this.sortBy, this.searchList);
+            this.sort = {
+                key: ctx.sort,
+                desc: ctx.sortDesc ? 1 : 0
+            };
+            this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
         contextChanged(ctx) {
             this.$emit('changed', ctx);

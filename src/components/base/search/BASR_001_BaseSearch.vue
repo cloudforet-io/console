@@ -4,12 +4,16 @@
       <b-input-group class="row no-gutters">
         <b-col cols="10" class="input-container">
           <div ref="inputBox" class="p-1 input-box" @click.self="focusOnInput">
-            <InputTag v-for="(tag, idx) in tagList" :key="tag.id"
-                      :list-data="contextData.queryList" :contents="tag"
-                      @delete="deleteTag(idx)" @update="updateTag"
+            <InputTag v-for="(tag, idx) in tagList" 
+                      :key="tag.id"
+                      :idx="idx"
+                      :list-data="contextData.queryList" 
+                      :contents="tag"
+                      @delete="deleteTagAndSearch(idx)"
+                      @update="upsertTagAndSearch"
             />
 
-            <BaseInput ref="input" :list-data="contextData.queryList" @add="addTag" />
+            <BaseInput ref="input" :list-data="contextData.queryList" @add="addTagAndSearch" />
           </div>
           <span class="input-delete-button" @click="deleteAll"><i class="fal fa-times" /></span>
         </b-col>
@@ -69,48 +73,176 @@ export default {
     data () {
         return {
             tagList: this.searchData.length > 0 ? this.searchData : [],
+            queryList: [],
             lastId: 0,
             focusInput: false,
-            filterList: []
+            filterList: [],
+            filterOrList: []
         };
     },
-    methods: {
-        focusOnInput () {
-            this.$refs.input.isFocused = true;
-        },
-        getNewTag (item) {
-            return Object.assign({ id: ++this.lastId }, item);
-        },
-        deleteAll () {
-            this.tagList = [];
-        },
-        deleteTag (idx) {
-            this.$delete(this.tagList, idx);
-        },
-        updateTag (tagId, items) {
-            let matchIdx;
-            items.map((item, idx) => {
-                if (idx === 0) {
-                    this.tagList.some((tag, i) => {
-                        if (tag.id === tagId) {
-                            matchIdx = i;
-                        }
-                        return tag.id === tagId;
-                    });
+    created () {
 
-                    this.$set(this.tagList, matchIdx, Object.assign(this.tagList[matchIdx], item));
+    },
+    methods: {
+        addTagAndSearch (items) {
+            this.addTag(items);
+            this.search();
+        },
+        addTag (tags) {
+            tags.map((tag) => {
+                let newTag = this.getNewTag(tag);
+                this.addQuery(newTag);
+                this.tagList.push(newTag);
+            });
+        },
+        addQuery (obj) {
+            if (this.isEmpty(obj.key)) {
+                this.addQueryToFilterOrListWithAutoKey(obj);
+            } else {
+                let idx = this.getIdxFromFilterList(obj);
+                if (this.isEmpty(idx)) {
+                    this.addQueryToFilterList(obj);
                 } else {
-                    this.tagList.splice(matchIdx + idx, 0, this.getNewTag(item));
+                    this.deleteQueryFromFilterList(idx);
+                    this.addQueryToFilterOrList(obj);
+                }
+            }
+        },
+        addQueryToFilterOrListWithAutoKey (obj) {
+            this.contextData.autokeyList.map((autokey) => {
+                this.filterOrList.push({ 
+                    key: autokey,
+                    value: obj.value,
+                    operator: this.getOperator(obj.operator)
+                });
+                obj.filterIdxList.push(this.filterOrList.length - 1);
+            });
+            obj.filterName = 'filterOr';
+        },
+        addQueryToFilterOrList (obj) {
+            this.filterOrList.push({
+                key: obj.key,
+                value: obj.value,
+                operator: this.getOperator(obj.operator) 
+            });
+            obj.filterName = 'filterOr';
+            obj.filterIdxList.push(this.filterOrList.length - 1);
+        },
+        addQueryToFilterList (obj) {
+            this.filterList.push({
+                key: obj.key,
+                value: obj.value,
+                operator: this.getOperator(obj.operator) 
+            });
+            obj.filterName = 'filter';
+            obj.filterIdxList.push(this.filterList.length - 1);
+        },
+        upsertTagAndSearch (tags, idx) {
+            this.upsertTag(tags, idx);
+            this.search();
+        },
+        upsertTag (tags, startIdx) {
+            tags.map((tag, idx) => {
+                if (idx === 0) {
+                    this.updateTag(tag, startIdx);
+                    this.updateQuery(this.tagList[startIdx]);
+                } else {
+                    this.insertTag(tag, startIdx + idx);
+                    this.addQuery(this.tagList[startIdx + idx]);
                 }
             });
         },
-        addTag (items) {
-            items.map(item => {
-                this.tagList.push(this.getNewTag(item));
+        updateTag (tag, idx) {
+            this.$set(this.tagList, idx, Object.assign(this.tagList[idx], tag));
+        },
+        updateQuery (obj) {
+            this.deleteQuery(obj);
+            this.addQuery(obj);
+        },
+        updateQueryFromFilterOrList (obj) {
+            obj.filterIdxList.map((idx) => {
+                this.filterOrList[idx] = {
+                    key: obj.key,
+                    value: obj.value,
+                    operator: this.getOperator(obj.operator)
+                };
             });
         },
+        updateQueryFromFilterList (obj) {
+            obj.filterIdxList.map((idx) => {
+                this.filterList[idx] = {
+                    key: obj.key,
+                    value: obj.value,
+                    operator: this.getOperator(obj.operator)
+                };
+            });
+        },
+        insertTag (tag, idx) {
+            this.tagList.splice(idx, 0, this.getNewTag(tag));
+        },
+        deleteTagAndSearch (idx) {
+            this.deleteTag(idx);
+            this.search();
+        },
+        deleteTag (idx) {
+            this.deleteQuery(this.tagList[idx]);
+            this.$delete(this.tagList, idx);
+        },
+        deleteQuery (obj) {
+            if (obj.filterName === 'filter') {
+                this.deleteQueryFromFilterList(obj);
+            }  else if (obj.filterName === 'filterOr') {
+                this.deleteQueryFromFilterOrList(obj);
+            }
+        },
+        deleteQueryFromFilterList (obj) {
+            this.filterList.splice(obj.filterIdxList[0], obj.filterIdxList.length);
+            obj.filterIdxList = [];
+            obj.filterName = '';
+        },
+        deleteQueryFromFilterOrList (obj) {
+            this.filterOrList.splice(obj.filterIdxList[0], obj.filterIdxList.length);
+            obj.filterIdxList = [];
+            obj.filterName = '';
+        },
+        deleteAll () {
+            this.tagList = [];
+            this.filterList = [];
+            this.filterOrList = [];
+        },
         search () {
-            this.$emit('search', this.tagList);
+            this.$emit('search', this.filterList, this.filterOrList);
+        },
+        getNewTag (item) {
+            return Object.assign({ 
+                id: ++this.lastId, 
+                filterName: '', 
+                filterIdxList: []
+            }, item);
+        },
+        getIdxFromFilterList (obj) {
+            let idx = null;
+            this.filterList.some((item, i) => {
+                if (item.key === obj.key) { 
+                    idx = i;
+                }
+                return item.key === obj.key; 
+            });
+            return idx;
+        },
+        getOperator (op) {
+            switch (op) {
+            case ':': return 'contain';
+            case ':=': return 'eq';
+            case ':>': return 'gte';
+            case ':<': return 'lte';
+            case ':!': return 'not_contain';
+            case ':$': return 'regex';
+            default: return 'contain';
+            }
+        },
+        focusOnInput () {
+            this.$refs.input.isFocused = true;
         }
     }
 };

@@ -100,8 +100,8 @@ export default {
         return {
             tabs: [
                 {
-                    tabTitle: 'INFO',
-                    component: UserDetail
+                    tabTitle: this.tr('PN.INFO'),
+                    tabIdxTitle: 'INFO'
                 }
             ],
             defaultTab: 0,
@@ -114,7 +114,7 @@ export default {
             isReadyForSearch: false,
             perPage: 10,
             isLoading: true,
-            meta: {}
+            query: {}
         };
     },
     computed: {
@@ -148,33 +148,54 @@ export default {
             this.selectedIdx = undefined;
             this.isLoading = true;
         },
-        saveMeta (limit, skip, sort, search) {
-            this.meta = { limit, skip, sort, search };
-        },
-        async listUsers (limit, skip, sort, search) {
-            this.reset();
-            this.saveMeta(limit, skip, sort, search);
-
+        saveMeta (limit, start, sort, filter, filterOr) {
             if (this.isEmpty(limit)) {
                 limit = 10;
             }
-            if (this.isEmpty(skip)) {
-                skip = 0;
+            if (this.isEmpty(start)) {
+                start = 0;
             }
             if (this.isEmpty(sort)) {
-                sort = '-created_date';
+                sort = {};
             }
-            if (this.isEmpty(search)) {
-                search = [];
+            if (this.isEmpty(filter)) {
+                filter = [];
             }
-
+            if (this.isEmpty(filterOr)) {
+                filterOr = [];
+            }
+            
+            this.query = { 
+                sort, 
+                page: {
+                    start: start, 
+                    limit
+                }, 
+                filter,
+                filter_or: filterOr
+            };
+        },
+        async listUsers (limit, start, sort, filter, filterOr) {
+            this.reset();
+            // sort = {
+            //     key: 'user_id',
+            //     desc: true
+            // };
+            // start = 4;
+            // limit = 2;
+            // filter = [
+            //     { k: 'user_id', v: 'nobody', o: 'eq' }
+            // ];
+            // filterOr = [
+            //     { k: 'user_id', v: 'nobody', o: 'eq' },
+            //     { k: 'user_id', v: 'admin', o: 'eq' }
+            // ];
+            
+            this.saveMeta(limit, start, sort, filter, filterOr);
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/list', {
-                    // params: { limit, skip, sort }
-                /**
-                 * TODO: set limit, skip, sort and search in the right format
-                 */
+                    query: this.query
                 });
                 setTimeout(() => { // this is for test
                     this.users = res.data.results;

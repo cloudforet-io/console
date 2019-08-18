@@ -77,7 +77,8 @@
   },
   "PN": {
     "BASE_INFO": "기본 정보",
-    "TAG": "태그"
+    "TAG": "태그",
+    "INFO": "정보"
   },
   "ENUM": {
     "SERVER_STATE": {
