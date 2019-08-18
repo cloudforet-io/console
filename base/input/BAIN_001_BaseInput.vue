@@ -187,8 +187,8 @@ export default {
                 let operatorIdx = this.inputText.indexOf(':');
 
                 if (operatorIdx < 0 && 
-                !this.selected.type === 'SubKey' &&
-                !this.inputText.trim().startsWith(this.selected.label)) {
+                (!this.selected.type === 'SubKey' ||
+                !this.inputText.trim().startsWith(this.selected.label))) {
                     this.resetKey();
                     return;
                 }
