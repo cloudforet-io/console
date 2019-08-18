@@ -68,18 +68,18 @@
                class="contextmenu"
           >
             <div class="contextmenuleaf"
-                 @click="excSelected('PG')"
+                 @click="excSelected('NG')"
             >
               <i class="fal fa-folder-minus" />&nbsp; Add a Project Group
             </div>
             <div class="contextmenuleaf"
-                 @click="excSelected('PR')"
+                 @click="excSelected('ND')"
             >
               <i class="fal fa-cube" />&nbsp; Add a Project
             </div>
             <div v-show="selectedContexProp"
                  class="contextmenuleaf"
-                 @click="excSelected('SR')"
+                 @click="excSelected('NR')"
             >
               <i class="fal fa-pencil" />&nbsp; Edit Selected Project
             </div>
@@ -187,6 +187,9 @@ export default {
         this.showTree = true;
     },
     methods: {
+        setActions(){
+
+        },
         nodeSelected (nodes) {
             this.nodeKey = (this.nodeKey) > 0 ? 0 : 1;
             this.lastEvent = nodes;
@@ -223,18 +226,18 @@ export default {
             $contextMenu.style.top = `${coordinateY - this.headerHeight}px`;
         },
         excSelected (flag) {
-      /*
-        * Flag:
-        * PG:  Project Group
-        * -----------------------
-        * RPG: Root Project Group
-        * SPG: Selected Project Group
-        * PR:  Project
-        * -----------------------
-        * RPR: Root Project
-        * SPR: Selected Project
-        * SR:  Selected Project Group or Project
-        *  */
+            /*********************
+            * Flag:
+            * NG:  Node Group
+            * -----------------------
+            * RNG: Root Node Group
+            * SNG: Selected Node Group
+            * PR:  Project
+            * -----------------------
+            * RND: Root Node
+            * SND: Selected Node
+            * NR:  Selected Node Group or Node
+            ***********************/
             this.contextTopMenuIsVisible = false;
             this.contextMenuIsVisible = false;
             this.modalContext = {
@@ -246,39 +249,28 @@ export default {
                 tree: treeV
             };
 
-        // TODO:: Please, Change to Enum in Vue, and add all those MSG into i18n en.json & ko.json
-
             switch (flag) {
-            case 'PG':
+            case 'NG':
                 this.modalTitle = 'Create a Project Group';
                 this.modalContents = 'Do you want to create a root Project Group?';
-                this.modalContext['flag'] = 'PG';
+                this.modalContext['flag'] = 'NG';
                 this.modalEvent = 'edited';
                 this.$refs.checkModal.showModal();
                 break;
-            case 'PR':
+            case 'ND':
                 this.modalTitle = 'Create a Project';
                 this.modalContents = 'Do you want to create a root Project?';
-                this.modalContext['flag'] = 'PR';
+                this.modalContext['flag'] = 'ND';
                 this.modalEvent = 'edited';
                 this.$refs.checkModal.showModal();
-
-                // msg['title'] = 'Create a Project';
-                // msg['content'] = 'Do you want to create a root Project?';
-                // params['flag'] = 'PR';
-                // this.procSelected('edited', params, msg);
                 break;
-            case 'SR':
-                this.modalContext['flag'] = 'SR';
+            case 'NR':
+                this.modalContext['flag'] = 'NR';
                 this.modalTitle = this.modalContext.tree.getSelected()[0].isLeaf ? 'Edit a Project' : 'Edit a Project Group';
                 this.modalContents = 'Do you want to create a root Project';
                 this.modalContents += this.modalContext.tree.getSelected()[0].isLeaf ? '?' : ' Group?';
                 this.modalEvent = 'edited';
-                this.$refs.checkModal.showModal();
-  
-                // params['flag'] = 'SR';
-                // msg['title'] = params.tree.getSelected()[0].isLeaf ? 'Edit a Project' : 'Edit a Project Group';
-                // this.procSelected('edited', params, msg);
+                this.modalOk ();
                 break;
             default:
                 this.modalTitle = 'Delete a Project';
@@ -290,13 +282,12 @@ export default {
                     const path = this.modalContext.tree.getSelected().map(node => node.path);
                     this.modalContext.tree.remove(path);
                 }
-                
                 // this.deleteSelected(params.tree);
                 break;
             }
         },
         modalOk () {
-            if (['PG', 'PR'].includes(this.modalContext.flag)) {
+            if (['NG', 'ND'].includes(this.modalContext.flag)) {
                 this.modalContext['flag'] = 'R' + this.modalContext['flag'];
                 this.$emit(this.modalEvent, this.modalContext);
             } else if (this.modalContext.flag === 'D') {
@@ -325,7 +316,7 @@ export default {
             }
         },
         procSelected (emitMethodName, prams, msg) {
-            if (['PG', 'PR'].includes(prams.flag)) {
+            if (['NG', 'ND'].includes(prams.flag)) {
                 this.$alertify.confirmWithTitle(
                     msg.title,
                     msg.content,
