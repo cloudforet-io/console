@@ -5,22 +5,36 @@
       <span ref="fakeInput" class="fake" />
 
       <span class="relative-container">
-        <input ref="input" v-model="value" v-focus="isFocused"
+        <input ref="input" 
+               v-model="inputText" 
+               v-focus="isFocused"
                v-autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
-               class="pl-2" autocomplete="off" type="text"
-               :placeholder="tr('SEARCH')" @focus="onFocus" @blur="onBlur" @input="onInput"
+               class="pl-2" 
+               autocomplete="off" 
+               type="text"
+               :placeholder="tr('SEARCH')"
+               @focus="onFocus" 
+               @blur="onBlur" 
+               @input="onInput"
                @keyup.enter="onEnter"
-               @keyup.down="onKeyDown" @keyup.up="onKeyUp" @keyup.esc="onBlur"
+               @keyup.down="onKeyDown"
+               @keyup.up="onKeyUp" 
+               @keyup.esc="onBlur"
         >
 
-        <div v-if="isFocused && isKeyListShown && keyList.length > 0" ref="listContainer" class="list-container"
+        <div v-if="isFocused && isKeyListShown && keyList.length > 0" 
+             ref="listContainer" 
+             class="list-container"
              :style="{top: `${listPosY}px`, height: `${listHeight}px`}"
         >
           <b-list-group>
-            <b-list-group-item v-for="(key, idx) in keyList" :key="`key:${idx}`"
-                               ref="list" :class="{'hovered': idx === hoveredItemIdx}"
+            <b-list-group-item v-for="(key, idx) in keyList" 
+                               :key="`key:${idx}`"
+                               ref="list" 
+                               :class="{'hovered': idx === hoveredItemIdx}"
                                @mousedown.prevent="onSelectKey(key, idx)"
-                               @mouseover="onMouseover(idx)" @mouseout="onMouseout"
+                               @mouseover="onMouseover(idx)" 
+                               @mouseout="onMouseout"
             >
               <b-row class="no-gutters justify-content-between">
                 <b-col class="col-8 key-label">{{ key.label }}</b-col>
@@ -34,14 +48,18 @@
         </div>
 
         <div v-if="isFocused && isValueListShown && valueList.length > 0" 
-             ref="listContainer" class="list-container"
+             ref="listContainer" 
+             class="list-container"
              :style="{left: `${valueListPosX}px`, top: `${listPosY}px`, height: `${listHeight}px`}"
         >
           <b-list-group>
-            <b-list-group-item v-for="(val, idx) in valueList" :key="`val:${idx}`"
-                               ref="list" :class="{'hovered': idx === hoveredItemIdx}"
+            <b-list-group-item v-for="(val, idx) in valueList"  
+                               ref="list" 
+                               :key="`val:${idx}`"
+                               :class="{'hovered': idx === hoveredItemIdx}"
                                @mousedown.prevent="onSelectValue(val, idx)"
-                               @mouseover="onMouseover(idx)" @mouseout="onMouseout"
+                               @mouseover="onMouseover(idx)" 
+                               @mouseout="onMouseout"
             >
               {{ val }}
             </b-list-group-item>
@@ -111,12 +129,12 @@ export default {
     },
     data () {
         return {
-            value: '',
+            inputText: '',
             isFocused: false,
             isKeyListShown: true,
             isValueListShown: false,
             selected: {},
-            selectedArr: [],
+            selectedList: [],
             selectedKeyObj: null,
             keyList: this.listData,
             staticValueList: [],
@@ -134,7 +152,7 @@ export default {
 
         this.initSelectedData();
 
-        this.value += this.selected.value;
+        this.inputText += this.selected.value;
 
         this.isFocused = this.autofocus;
     },
@@ -158,25 +176,25 @@ export default {
             if (this.selected.key) {
                 this.selectedKeyObj = this.findKeyObjFromKeyList(this.selected.label);
                 if (this.selected.subKey) {
-                    this.value = `${this.selected.label}.${this.selected.subKey} ${this.selected.operator} `;
+                    this.inputText = `${this.selected.label}.${this.selected.subKey} ${this.selected.operator} `;
                 } else {
-                    this.value = `${this.selected.label} ${this.selected.operator} `;
+                    this.inputText = `${this.selected.label} ${this.selected.operator} `;
                 }
             }
         },
         onInput (e) {
             if (this.selected.key) { // to detect the case of editting key section
-                let operatorIdx = this.value.indexOf(':');
+                let operatorIdx = this.inputText.indexOf(':');
 
                 if (operatorIdx < 0 && 
                 !this.selected.type === 'SubKey' &&
-                !this.value.trim().startsWith(this.selected.label)) {
+                !this.inputText.trim().startsWith(this.selected.label)) {
                     this.resetKey();
                     return;
                 }
 
                 if (e.target.selectionStart <= operatorIdx) { // editting key section
-                    let keyStr = this.value.substring(0, operatorIdx).trim();
+                    let keyStr = this.inputText.substring(0, operatorIdx).trim();
                     if (this.selected.type === 'SubKey') {
             /**
              * TODO: detect editting key or subkey
@@ -184,13 +202,13 @@ export default {
                     } else {
                         this.resetKey(keyStr);
                     }
-                } else { // editting value section
-                    let valStr = this.value.substring(operatorIdx);
+                } else { // editting inputText section
+                    let valStr = this.inputText.substring(operatorIdx);
                     this.setOperator(valStr);
                     this.refreshValueList(valStr.substring(this.selected.operator.length));
                 }
             } else {
-                this.resetKey(this.value.trim());
+                this.resetKey(this.inputText.trim());
             }
         },
         refreshKeyList (val) {
@@ -216,9 +234,9 @@ export default {
         async onSelectKey (item) {
             this.setKey(item);
             if (this.selected.type === 'SubKey') {
-                this.value = `${this.selected.label}.`;
+                this.inputText = `${this.selected.label}.`;
             } else {
-                this.value = `${this.selected.label} ${this.selected.operator}`;
+                this.inputText = `${this.selected.label} ${this.selected.operator}`;
             }
             this.hideKeyList();
             await this.setValueListByKeyObj();
@@ -267,14 +285,14 @@ export default {
             this.hoveredItemIdx = null;
         },
         onSelectValue (val) {
-            this.setOperator(this.value.substring(this.value.indexOf(':')));
+            this.setOperator(this.inputText.substring(this.inputText.indexOf(':')));
             this.setValue(val);
             this.hideValueList();
-            this.value = `${this.selected.label} ${this.selected.operator} ${this.selected.value}`;
+            this.inputText = `${this.selected.label} ${this.selected.operator} ${this.selected.value}`;
         },
         resetKey (val) {
             this.hideValueList();
-            this.refreshKeyList(val || this.value);
+            this.refreshKeyList(val || this.inputText);
             this.showKeyList();
             this.selectedKeyObj = null;
             this.selected = Object.assign({}, contentsModel);
@@ -287,12 +305,12 @@ export default {
             this.selected.value = '';
         },
         resetAll () {
-            this.value = '';
+            this.inputText = '';
             this.hideValueList();
             this.keyList = this.listData;
             this.showKeyList();
             this.selectedKeyObj = null;
-            this.selectedArr = [];
+            this.selectedList = [];
             this.selected = Object.assign({}, contentsModel);
         },
         onEnter () {
@@ -311,7 +329,7 @@ export default {
             this.isEnterEmittedBlur = true;
         },
         commit () {
-            let val = this.value.trim();
+            let val = this.inputText.trim();
             if (this.commitEventName === 'update' && val === '') {
                 this.$emit('delete');
             }
@@ -319,10 +337,10 @@ export default {
                 return;
             }
             this.setSelectedData(val);
-            if (this.selectedArr.length === 0) {
-                this.selectedArr.push(this.selected);
+            if (this.selectedList.length === 0) {
+                this.selectedList.push(this.selected);
             }
-            this.$emit(this.commitEventName, this.selectedArr);
+            this.$emit(this.commitEventName, this.selectedList);
 
             this.setKeyListPosition();
             this.resetAll();
@@ -382,7 +400,7 @@ export default {
                         this.selected.value = val.substring(start, i);
                         this.selected.operator = ':';
                         this.selected.type = 'String';
-                        this.selectedArr.push(Object.assign({}, contentsModel, this.selected));
+                        this.selectedList.push(Object.assign({}, contentsModel, this.selected));
                     }
                     start = i + 1;
                 }
@@ -468,20 +486,20 @@ export default {
             this.hoveredItemIdx = null; 
         },
         captureText () {
-            if (!this.value) {
+            if (!this.inputText) {
                 return;
             }
 
       // set text selection
             if (this.selected.key !== null && this.selected.value !== null) {
-                let start = this.value.indexOf(':') + this.selected.operator.length;
-                this.$refs.input.setSelectionRange(start, this.value.length);
+                let start = this.inputText.indexOf(':') + this.selected.operator.length;
+                this.$refs.input.setSelectionRange(start, this.inputText.length);
                 this.hideKeyList();
                 this.setValueListByKeyObj();
-                this.refreshValueList(this.value.substring(start));
+                this.refreshValueList(this.inputText.substring(start));
                 this.showValueList();
             } else {
-                this.$refs.input.setSelectionRange(0, this.value.length);
+                this.$refs.input.setSelectionRange(0, this.inputText.length);
                 this.hideValueList();
                 this.showKeyList();
             }
