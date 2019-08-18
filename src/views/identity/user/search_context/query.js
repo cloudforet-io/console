@@ -3,7 +3,7 @@ export default {
         { label: 'ID', key: 'user_id' },
         { label: 'Name', key: 'name' },
         { label: 'Email', key: 'email' },
-        { label: 'Phone', key: 'mobile', type: 'Number' },
+        { label: 'Phone', key: 'mobile' },
         { label: 'Group', key: 'group' },
         { label: 'Language', key: 'language', values: ['ko', 'en']},
         { label: 'Domain ID', key: 'domain_id', ajax: { url: '/identity/domain/list', params: null, method: 'POST' }},
