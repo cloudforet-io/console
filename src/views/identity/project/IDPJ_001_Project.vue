@@ -82,6 +82,7 @@ let NodePG = {
     isSelectable: true,
     data: { visible: false }
 };
+
 const tabs = [
     {
         name: 'summary',
@@ -173,7 +174,6 @@ export default {
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0],'data.init'))) {
                     this.isInitializing = true;
                 }
-
                 console.log(this.treeData);
             }).catch((error) => {
                 console.error(error);
@@ -186,17 +186,18 @@ export default {
 
         },
         editSelected(item) {
-                  /*  TODO :: Please Add More Flags if needed.
+                  /*******************************************
+                   * TODO :: Please Add More Flags if needed.
                    *  CRT => Create
                    *  UPT => Update
                    *  DEL => Delete
-                   ****CRT***********
+                   ****CRT***********************************
                    *  NG => Node Group
                    *  SNG => Selected Project Group
                    *  SND => Selected Project
                    *  RNG => Root Project Group
                    *  RND => Root Project
-                   ****UPT**************
+                   ****UPT***********************************
                    *  SN => Selected Node Group or Node
                    */
             if (['SN'].includes(item.flag)) {
@@ -232,57 +233,70 @@ export default {
             this.$refs.EditModal.hideModal();
         },
         async createProject(items) {
-            debugger;
+
             this.consoleLogEnv('item', items);
             const flag = this.selectedData.selectedItem.flag;
             const treeV = this.isEmpty(items.tree) ? this.selectedData.selectedItem.tree : items.tree;
             const selected = treeV.getSelected()[0];
             let tabData = this.$refs.EditTab.tabContentData;
 
-            let creationUrl = null;
+            let url = null;
+            let passParam = {};
 
-            let newNode = {
-                title: tabData.projectProp.projectName,
-                isLeaf: false,
-                children: null,
-                isExpanded: false,
-                isSelected: true,
-                isDraggable: true,
-                isSelectable: true,
-                data: { visible: false }
-            };
+            let newNode = this.getSelectedNode();
+            newNode['title'] = tabData.projectProp.projectName;
 
-            let placement = '';
-            if (flag == 'SNG') {
-                placement = 'inside';
-            } else if (flag == 'SND') {
-                newNode['isLeaf'] = true;
-                placement = 'inside';
-            } else if (flag == 'RNG') {
-                placement = 'before';
-            } else {
-                placement = 'before';
+            //Any flag with selected value, then create Nodes into Selected items or before its item on same layer
+            const placement = flag.charAt(0) === 'S' ? 'inside': 'before';
+
+            if (flag == 'SND') {
                 newNode['isLeaf'] = true;
             }
 
-            //Initialization for Project Group, Origin
-            if (this.isInitializing) {
-                creationUrl = '/identity/project-group/create';
+            this.consoleLogEnv('current Action Flag:',flag);
+
+
+            //Initialization Set URL
+            if (this.isInitializing || flag.includes('NG')) {
+                url = '/identity/project-group/create';
             } else {
-                creationUrl = '/identity/project-group/create';
+                url = '/identity/project-group/create';
             }
+
+            if (this.isInitializing){
+                passParam['is_root']= true;
+                passParam['name'] = tabData.projectProp.projectName;
+                passParam['domain_id'] = sessionStorage.domainId;
+            }
+
+
+
+            await this.$axios.post(url, passParam).then((response) => {
+
+                const responseData = !this.isEmpty(response.data) ? [response.data] : [{}];
+
+                if (!this.isEmpty(responseData)){
+                    if (this.isInitializing) {
+                        newNode['data']['id'] = responseData[0].project_group_id;
+                        newNode['data']['is_root'] = responseData[0].is_root;
+                        treeV.insert({ node: treeV.getSelected()[0], placement: placement }, newNode);
+                        treeV.remove([treeV.getSelected()[1]].map(node => node.path));
+                        this.isInitializing = false;
+                    }
+                }
+
+            }).catch((error) => {
+                console.error(error);
+            });
 
             //treeV.insert({ node: treeV.getSelected()[0], placement: placement }, newNode);
             tabData.projectProp.projectName = null;
             tabData.projectProp.projectId = null;
-
-
             this.$refs.EditModal.hideModal();
         },
         getNextLayerOnTree (tree){
-            debugger;
-        },
 
+        },
         async deletedSelectedOnTree (pramTree){
             const itemType = pramTree.tree.getSelected()[0].data.item_type;
             const deleteId = pramTree.tree.getSelected()[0].data.id;
