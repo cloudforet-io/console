@@ -1,6 +1,6 @@
 <template>
   <b-container fluid>
-    <b-row class="my-1">
+    <b-row class="my-1" v-if="isInitialized">
       <b-col sm="3">
         <label class="control-label">Project ID:</label>
       </b-col>
@@ -50,6 +50,7 @@ export default {
     },
     data () {
         return {
+            isInitialized: true,
             placeHolderId: null,
             placeHolderName: null,
             projectId: this.projectProp.projectId,
@@ -75,8 +76,9 @@ export default {
         this.$bus.$emit('setTabData', { projectProp: this.projectProp });
     },
     created () {
-        // TODO:: Please, Check this method to confirm
-        const selectedNode = this.$attrs['selected-data'].tree.getSelected()[0];
+        //TODO:: Please, Check this method to confirm
+        const selectedNode = this.$attrs['selected-data'].selectedItem.tree.getSelected()[0];
+
         if (Object.keys(this.$attrs).length > 0) {
             this.treeDataSelected = this.$attrs.selectedData;
             if (this.$attrs['is-creatable']) {
@@ -89,6 +91,10 @@ export default {
             } else {
                 this.currentState = 'DEL';
             }
+        }
+
+        if (!this.isEmpty(this._.get(selectedNode,'data.init'))) {
+           this.isInitialized = false;
         }
     },
     methods: {
