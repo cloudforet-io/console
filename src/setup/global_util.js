@@ -344,8 +344,9 @@ export const Mixin = {
         treeDataHandler: function (d, t) {
             let returnTree = [];
             let treeKey = this.isEmpty(t) ? 'TREE': 'TREE.'+ t;
+
             if (d.hasOwnProperty('items') && d.items.length > 0) {
-                d.items.forEach((curItem, curIndex) =>{
+                d.items.forEach((curItem) =>{
                     let obj = {};
                     console.log(curItem);
                     obj['data'] = {
@@ -359,9 +360,15 @@ export const Mixin = {
                     }
                     returnTree.push(obj);
                 });
+            } else {
+                returnTree =  [{ title: 'Please, Right Click me',
+                    isLeaf: true,
+                    init: true }];
             }
+
+
             return returnTree;
-        }
+        },
     },
     data: function () {
         return {

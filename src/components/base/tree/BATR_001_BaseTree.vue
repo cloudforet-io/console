@@ -72,24 +72,25 @@
             >
               <i class="fal fa-folder-minus" />&nbsp; Add a Project Group
             </div>
-            <div class="contextmenuleaf"
-                 @click="excSelected('ND')"
-            >
-              <i class="fal fa-cube" />&nbsp; Add a Project
-            </div>
-            <div v-show="selectedContexProp"
-                 class="contextmenuleaf"
-                 @click="excSelected('NR')"
-            >
-              <i class="fal fa-pencil" />&nbsp; Edit Selected Project
-            </div>
 
-            <div v-show="selectedContexProp"
-                 class="node-leaf-last"
-                 @click="excSelected"
-            >
-              <i class="fal fa-trash" />&nbsp; Remove Selected Item
-            </div>
+            <template v-if="selectedContexPropVisible">
+              <div class="contextmenuleaf"
+                   @click="excSelected('ND')"
+              >
+                <i class="fal fa-cube" />&nbsp; Add a Project
+              </div>
+              <div class="contextmenuleaf"
+                   @click="excSelected('NR')"
+              >
+                <i class="fal fa-pencil" />&nbsp; Edit Selected Project
+              </div>
+
+              <div class="node-leaf-last"
+                   @click="excSelected"
+              >
+                <i class="fal fa-trash" />&nbsp; Remove Selected Item
+              </div>
+            </template>
           </div>
         </div>
       </transition>
@@ -174,8 +175,9 @@ export default {
                 this.treeData = value;
             }
         },
-        selectedContexProp () {
-            return this.contextInit;
+        selectedContexPropVisible () {
+            console.log('contxtInit', !this.contextInit);
+            return !this.contextInit;
         }
     },
     mounted() {
@@ -183,7 +185,7 @@ export default {
             this.treeKey = 1;
             console.log(this.treeKey);
         }
-        console.log('#############', this.contextInit);
+        console.log('#############', !this.contextInit);
         this.showTree = true;
     },
     methods: {
@@ -227,17 +229,17 @@ export default {
         },
         excSelected (flag) {
             /*********************
-            * Flag:
-            * NG:  Node Group
-            * -----------------------
-            * RNG: Root Node Group
-            * SNG: Selected Node Group
-            * PR:  Project
-            * -----------------------
-            * RND: Root Node
-            * SND: Selected Node
-            * NR:  Selected Node Group or Node
-            ***********************/
+           * Flag:
+           * NG:  Node Group
+           * RNG: Root Node Group
+           * SNG: Selected Node Group
+           *-------------------------
+           * ND:  Node
+           * RND: Root Node
+           * SND: Selected Node
+           *-------------------------
+           * NR:  Selected Node Group or Node
+           ***********************/
             this.contextTopMenuIsVisible = false;
             this.contextMenuIsVisible = false;
             this.modalContext = {
@@ -250,21 +252,27 @@ export default {
             };
 
             switch (flag) {
-            case 'NG':
+              case 'NG':   //Node Group
                 this.modalTitle = 'Create a Project Group';
                 this.modalContents = 'Do you want to create a root Project Group?';
                 this.modalContext['flag'] = 'NG';
                 this.modalEvent = 'edited';
-                this.$refs.checkModal.showModal();
+                //In case of No Node is available for Trees which means Init Node to Create first Node Group.
+                if (this.isEmpty(this._.get(treeV.getSelected()[0],'data.init'))){
+                    this.$refs.checkModal.showModal();
+                } else {
+                    this.modalOk ();
+                }
                 break;
-            case 'ND':
+            case 'ND':  //Node
+                debugger;
                 this.modalTitle = 'Create a Project';
                 this.modalContents = 'Do you want to create a root Project?';
                 this.modalContext['flag'] = 'ND';
                 this.modalEvent = 'edited';
-                this.$refs.checkModal.showModal();
+                this.modalCancel ();
                 break;
-            case 'NR':
+            case 'NR':  //Node Group or Node
                 this.modalContext['flag'] = 'NR';
                 this.modalTitle = this.modalContext.tree.getSelected()[0].isLeaf ? 'Edit a Project' : 'Edit a Project Group';
                 this.modalContents = 'Do you want to create a root Project';

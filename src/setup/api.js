@@ -25,6 +25,7 @@ api.interceptors.response.use(function (response) {
         sessionStorage.setItem('token', response.headers.AccessToken);
         api.defaults.headers.common['Authorization'] = `Bearer ${response.headers.AccessToken}`;
     }
+
     return response;
 }, function (err) {
     return new Promise(function (resolve, reject) {

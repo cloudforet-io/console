@@ -31,7 +31,7 @@
     <BaseTree ref="projectTree"
               :tree-key="treeKey"
               :tree-prop="treeData"
-              :context-init="contextStatus"
+              :context-init="isInitializing"
               @selected="NodeSelected"
               @edited="editSelected"
     >
@@ -149,7 +149,7 @@ export default {
             lastEvent: 'Right-Click to open context menus on tree.',
             tabs: tabs,
             modalTabs: modalTab,
-            contextStatus: true
+            isInitializing: false
         };
     },
     created (){
@@ -165,13 +165,13 @@ export default {
                     'key': 'name'
                 }
             }).then((response) => {
-                const responsedData = this.treeDataHandler(response.data, 'PROJECT');
-                this.treeData = this.isEmpty(responsedData) ? [{ title: '!Please, Right Click me',
-                    isLeaf: true,
-                    init: true }] : responsedData;
-                if (this.isEmpty(this.treeData)) {
-                    this.contextStatus = false;
+                const responseData = this.treeDataHandler(response.data, 'PROJECT');
+                this.treeData = responseData;
+                //Note: Initialize Project trees and then display only a context, This must be included as well.
+                if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0],'data.init'))) {
+                    this.isInitializing = true;
                 }
+
                 console.log(this.treeData);
             }).catch((error) => {
                 console.error(error);
@@ -181,20 +181,20 @@ export default {
             this.lastEvent = 'Selected Item : ' + item[0].title;
         },
         editSelected(item) {
-                /*  TODO :: Please Add More Flags if needed.
+                  /*  TODO :: Please Add More Flags if needed.
                    *  CRT => Create
                    *  UPT => Update
                    *  DEL => Delete
                    ****************
-                   *  PG => Project Group
-                   *  PR => Project
-                   *  SPG => Selected Project Group
-                   *  SPR => Selected Project
-                   *  RPG => Root Project Group
-                   *  RPR => Root Project
+                   *  NG => Node Group
+                   *  NR => *
+                   *  SNG => Selected Project Group
+                   *  SND => Selected Project
+                   *  RNG => Root Project Group
+                   *  RND => Root Project
                    */
-            if (['PG', 'PR', 'SPG', 'SPR', 'RPG', 'RPR'].includes(item.flag)) {
-                const title = (item.flag.indexOf('PG') > 0);
+            if (['NG', 'ND', 'SNG', 'SNR', 'RNG', 'RND'].includes(item.flag)) {
+                const title = (item.flag.indexOf('NG') > 0);
                 this.selectedData['selectedItem'] = item;
                 this.manageTabButton('CRT', true, title);
                 this.$refs.EditModal.showModal();
@@ -225,11 +225,15 @@ export default {
                 //TODO:: Simulate gRPC Modules on BACK_END
             this.$refs.EditModal.hideModal();
         },
-        createProject(items) {
+        async createProject(items) {
+            debugger;
             this.consoleLogEnv('item', items);
             const flag = this.selectedData.selectedItem.flag;
             const treeV = this.isEmpty(items.tree) ? this.selectedData.selectedItem.tree : items.tree;
+            const selected = treeV.getSelected()[0];
             let tabData = this.$refs.EditTab.tabContentData;
+
+            let creationUrl = null;
 
             let newNode = {
                 title: tabData.projectProp.projectName,
@@ -241,23 +245,36 @@ export default {
                 isSelectable: true,
                 data: { visible: false }
             };
+
             let placement = '';
-            if (flag == 'SPG') {
+            if (flag == 'SNG') {
                 placement = 'inside';
-            } else if (flag == 'SPR') {
+            } else if (flag == 'SND') {
                 newNode['isLeaf'] = true;
                 placement = 'inside';
-            } else if (flag == 'RPG') {
+            } else if (flag == 'RNG') {
                 placement = 'before';
             } else {
                 placement = 'before';
                 newNode['isLeaf'] = true;
             }
-            treeV.insert({ node: treeV.getSelected()[0], placement: placement }, newNode);
+
+            //Initialization for Project Group, Origin
+            if (this.isInitializing) {
+                creationUrl = '/identity/project-group/create';
+            } else {
+                creationUrl = '/identity/project-group/create';
+            }
+
+            //treeV.insert({ node: treeV.getSelected()[0], placement: placement }, newNode);
             tabData.projectProp.projectName = null;
             tabData.projectProp.projectId = null;
 
+
             this.$refs.EditModal.hideModal();
+        },
+        applyOnTreeView (tree, placement, newNode){
+
         }
     }
 };
