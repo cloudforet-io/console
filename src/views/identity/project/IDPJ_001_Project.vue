@@ -34,6 +34,8 @@
               :context-init="isInitializing"
               @selected="NodeSelected"
               @edited="editSelected"
+              @delete="deletedSelectedOnTree"
+              @nextLayer="getNextLayerOnTree"
     >
       <template #treeSubPanel>
         <BaseTabNav
@@ -180,28 +182,32 @@ export default {
         NodeSelected(item) {
             this.lastEvent = 'Selected Item : ' + item[0].title;
         },
+        getNextSelected(item){
+
+        },
         editSelected(item) {
                   /*  TODO :: Please Add More Flags if needed.
                    *  CRT => Create
                    *  UPT => Update
                    *  DEL => Delete
-                   ****************
+                   ****CRT***********
                    *  NG => Node Group
-                   *  NR => *
                    *  SNG => Selected Project Group
                    *  SND => Selected Project
                    *  RNG => Root Project Group
                    *  RND => Root Project
+                   ****UPT**************
+                   *  SN => Selected Node Group or Node
                    */
-            if (['NG', 'ND', 'SNG', 'SNR', 'RNG', 'RND'].includes(item.flag)) {
-                const title = (item.flag.indexOf('NG') > 0);
-                this.selectedData['selectedItem'] = item;
-                this.manageTabButton('CRT', true, title);
-                this.$refs.EditModal.showModal();
-            } else {
+            if (['SN'].includes(item.flag)) {
                 this.selectedData['selectedItem'] = item;
                 this.manageTabButton('UPT', true);
                 this.selectedData = item;
+                this.$refs.EditModal.showModal();
+            } else {
+                const title = (item.flag.indexOf('NG') > 0);
+                this.selectedData['selectedItem'] = item;
+                this.manageTabButton('CRT', true, title);
                 this.$refs.EditModal.showModal();
             }
         },
@@ -273,7 +279,43 @@ export default {
 
             this.$refs.EditModal.hideModal();
         },
-        applyOnTreeView (tree, placement, newNode){
+        getNextLayerOnTree (tree){
+            debugger;
+        },
+
+        async deletedSelectedOnTree (pramTree){
+            const itemType = pramTree.tree.getSelected()[0].data.item_type;
+            const deleteId = pramTree.tree.getSelected()[0].data.id;
+            let url = null;
+            let passParam = {};
+            if (itemType === 'PROJECT_GROUP') {
+                url = '/identity/project-group/delete';
+                passParam['project_group_id'] = deleteId;
+                passParam['domain_id'] = sessionStorage.domainId;
+            } else if (itemType === 'PROJECT') {
+                url = '/identity/project/delete';
+                passParam['project_id'] = deleteId;
+                passParam['domain_id'] = sessionStorage.domainId;
+            } else {
+                this.consoleLogEnv('No available Type');
+                return;
+            }
+
+            await this.$axios.post(url, passParam).then((response) => {
+                const responseData = response.data;
+                console.log(responseData);
+                if (this.isEmpty(responseData)){
+                    pramTree.tree.remove(pramTree.path);
+                    this.$alertify.success('Okay');
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+
+
+
+
+
 
         }
     }

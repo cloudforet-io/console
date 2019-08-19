@@ -38,7 +38,7 @@
                   </template>
                   <template #toggle="{ node }">
                     <i v-if="node.isExpanded" class="fal fa-angle-down" />
-                    <i v-else class="fal fa-angle-right" />
+                    <i v-else class="fal fa-angle-right" @click="getNextLayer" />
                   </template>
 
                   <!-- <template slot="sidebar" slot-scope="{ node }">
@@ -80,7 +80,7 @@
                 <i class="fal fa-cube" />&nbsp; Add a Project
               </div>
               <div class="contextmenuleaf"
-                   @click="excSelected('NR')"
+                   @click="excSelected('SN')"
               >
                 <i class="fal fa-pencil" />&nbsp; Edit Selected Project
               </div>
@@ -185,7 +185,6 @@ export default {
             this.treeKey = 1;
             console.log(this.treeKey);
         }
-        console.log('#############', !this.contextInit);
         this.showTree = true;
     },
     methods: {
@@ -238,7 +237,7 @@ export default {
            * RND: Root Node
            * SND: Selected Node
            *-------------------------
-           * NR:  Selected Node Group or Node
+           * SN:  Selected Node Group or Node
            ***********************/
             this.contextTopMenuIsVisible = false;
             this.contextMenuIsVisible = false;
@@ -252,7 +251,7 @@ export default {
             };
 
             switch (flag) {
-              case 'NG':   //Node Group
+            case 'NG'://Node Group
                 this.modalTitle = 'Create a Project Group';
                 this.modalContents = 'Do you want to create a root Project Group?';
                 this.modalContext['flag'] = 'NG';
@@ -264,15 +263,14 @@ export default {
                     this.modalOk ();
                 }
                 break;
-            case 'ND':  //Node
-                debugger;
+            case 'ND'://Node
                 this.modalTitle = 'Create a Project';
                 this.modalContents = 'Do you want to create a root Project?';
                 this.modalContext['flag'] = 'ND';
                 this.modalEvent = 'edited';
                 this.modalCancel ();
                 break;
-            case 'NR':  //Node Group or Node
+            case 'SN'://Selected Node Group or Node
                 this.modalContext['flag'] = 'NR';
                 this.modalTitle = this.modalContext.tree.getSelected()[0].isLeaf ? 'Edit a Project' : 'Edit a Project Group';
                 this.modalContents = 'Do you want to create a root Project';
@@ -287,8 +285,7 @@ export default {
                 if (this.modalContext.tree.getSelected()[0].children.length > 0) {
                     this.$refs.checkModal.showModal();
                 } else {
-                    const path = this.modalContext.tree.getSelected().map(node => node.path);
-                    this.modalContext.tree.remove(path);
+                    this.deleteSelected(this.modalContext.tree);
                 }
                 // this.deleteSelected(params.tree);
                 break;
@@ -299,9 +296,7 @@ export default {
                 this.modalContext['flag'] = 'R' + this.modalContext['flag'];
                 this.$emit(this.modalEvent, this.modalContext);
             } else if (this.modalContext.flag === 'D') {
-                const path = this.modalContext.tree.getSelected().map(node => node.path);
-                this.modalContext.tree.remove(path);
-                this.$alertify.success('Okay');
+                this.deleteSelected(this.modalContext.tree);
             } else {
                 this.$emit(this.modalEvent, this.modalContext);
             }
@@ -323,54 +318,20 @@ export default {
                 });
             }
         },
-        procSelected (emitMethodName, prams, msg) {
-            if (['NG', 'ND'].includes(prams.flag)) {
-                this.$alertify.confirmWithTitle(
-                    msg.title,
-                    msg.content,
-                    () => {
-                        prams['flag'] = 'R' + prams['flag'];
-                        this.$emit(emitMethodName, prams);
-                    },
-                    () => {
-                        prams['flag'] = 'S' + prams['flag'];
-                        if (!prams.tree.getSelected()[0].isLeaf) {
-                            this.$emit(emitMethodName, prams);
-                        } else {
-                            this.$notify({
-                                group: 'auth',
-                                type: 'warn',
-                                title: 'Not Allowed Action',
-                                text: 'Can not Add any Project or Project Group to <b> project </b>. \n Please, Build a Project Group first.',
-                                duration: 10000,
-                                speed: 500
-                            });
-                        }
-                    }
-                );
-            } else {
-                this.$emit(emitMethodName, prams);
-            }
+        deleteSelected(tree){
+            const prams = {
+                path: tree.getSelected().map(node => node.path),
+                tree: tree
+            };
+            this.$emit('delete', prams);
         },
-        deleteSelected (treeV) {
-            if (treeV.getSelected()[0].children.length > 0) {
-                this.$alertify.confirmWithTitle(
-                    'Delete a Project',
-                    'Selected item has a nested items underneath, Do you want to delete it?',
-                    () => {
-                        const path = treeV.getSelected().map(node => node.path);
-                        treeV.remove(path);
-                        this.$alertify.success('Okay');
-                    },
-                    () => {
-                        this.$alertify.error('Cancel');
-                    }
-                );
-            } else {
-                const path = treeV.getSelected().map(node => node.path);
-                treeV.remove(path);
-            }
+        getNextLayer(){
+            const prams =  {
+                treeV:this.$refs.slVueTree
+            };
+            this.$emit('nextLayer', prams);
         },
+
         beforeEnter (el) {
             this.$velocity(el, {
                 translateX: `-${this.treeWidth}px`,
