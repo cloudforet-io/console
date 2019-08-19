@@ -126,7 +126,6 @@ export default {
         createNew () {
             baseTabParams = this.dataForTab;
             baseTabParams['tabContents'] = this.$refs.popupTab;
-            debugger;
             this.$emit('create', baseTabParams);
         },
         updateSelect () {

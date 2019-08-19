@@ -364,12 +364,33 @@ export const Mixin = {
             } else {
                 returnTree =  [{ title: 'Please, Right Click me',
                     isLeaf: true,
-                    init: true }];
+                    data: {
+                        init: true
+                    }}];
             }
-
 
             return returnTree;
         },
+        /**********************************************************************************
+         * Name       : getSelectedNode
+         * Input   => (f: flag                         =>  String)
+         * Output  => Node
+         * Description:  return tree array of object which suits for BaseTree
+         **********************************************************************************/
+        getSelectedNode: function () {
+            let selectedNode = {
+                title: '',
+                isLeaf: false,
+                children: null,
+                isExpanded: false,
+                isSelected: true,
+                isDraggable: true,
+                isSelectable: true,
+                data: { visible: false }
+            };
+
+            return selectedNode;
+        }
     },
     data: function () {
         return {
