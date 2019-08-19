@@ -1,3 +1,4 @@
+import { Mixin } from '@/setup/global_util';
 export default {
     queryList: [
         { label: 'ID', key: 'user_id' },
@@ -5,9 +6,12 @@ export default {
         { label: 'Email', key: 'email' },
         { label: 'Phone', key: 'mobile' },
         { label: 'Group', key: 'group' },
-        { label: 'Language', key: 'language', values: ['ko', 'en']},
+        { label: 'Language', key: 'language', values: ['en', 'ko']},
         // { label: 'Domain ID', key: 'domain_id', ajax: { url: '/identity/domain/list', params: null, method: 'POST' }},
-        { label: 'Timezone', key: 'timezone', values: ['utc+0']}
+        { 
+            label: 'Timezone', key: 'timezone', 
+            values: Mixin.methods.getAllTimezones()
+        }
     ],
     autokeyList: ['user_id', 'name', 'email']
 };
