@@ -147,16 +147,16 @@ export default {
                 groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[outerIdx] : chartData.datasets.backgroundColor[outerIdx];
                 groundData = 'border-left:7px solid ' + groundData;
             } else if (flag === 'data') {
-                this.consoleLogEnv('idx', outerIdx);
+                this.consoleLogEnv('outer idx: ', outerIdx);
                 if (this.isEmpty(innerIdx)) {
                     groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[outerIdx] : chartData.datasets.data[outerIdx];
                 } else {
                     groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[innerIdx].data[outerIdx] : chartData.datasets.data[outerIdx];
                 }
             } else {
-        /*
-           * TODO:: Please Add a default cases if needed
-           */
+            /**
+              * TODO:: Please Add a default cases if needed
+              */
             }
             return groundData;
         },
