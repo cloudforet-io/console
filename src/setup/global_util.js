@@ -350,7 +350,8 @@ export const Mixin = {
                     let obj = {};
                     console.log(curItem);
                     obj['data'] = {
-                        id: curItem.id
+                        id: curItem.id,
+                        item_type : curItem.item_type
                     };
                     obj['title'] = curItem.name;
                     obj['isLeaf'] = this._.get(GlobalEnum,`${treeKey}.${curItem.item_type}.isLeaf`);
