@@ -1,6 +1,7 @@
 <template>
   <b-form @reset.prevent="onReset"
-          @submit.prevent="updatable && creatable ? onCreate() : onUpdate()">
+          @submit.prevent="updatable && creatable ? onCreate() : onUpdate()"
+  >
     <b-form-group label="Tags" :label-cols="3" :horizontal="true">
       <BaseTag
         :updatable="updatable"
@@ -65,8 +66,11 @@ export default {
     },
     methods: {
         onReset () {
-            if (this.creatable) this.resetProjectData(projectModel);
-            else this.resetProjectData(this.projectProp);
+            if (this.creatable) {
+                this.resetProjectData(projectModel);
+            } else {
+                this.resetProjectData(this.projectProp);
+            }
         },
         resetProjectData (project) {
             this.updatableTags = project.tags.slice(0);

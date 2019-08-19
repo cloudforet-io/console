@@ -29,16 +29,16 @@
         <div class="col-md-12">
           <div v-show="isFooterVisible" class="modal-footer" style="border-top:none; padding-right: 0px">
             <b-button v-show="isCreatable" size="md" variant="outline-primary" @click="createNew">
-              Create
+              {{tr('BTN_CRT')}}
             </b-button>
             <b-button v-show="isUpdatable" size="md" variant="outline-success" @click="updateSelect">
-              Update
+              {{tr('BTN_UPT')}}
             </b-button>
             <b-button v-show="isDeletable" size="md" variant="outline-danger" @click="deleteSelect">
-              Delete
+              {{tr('BTN_DELETE')}}
             </b-button>
-            <b-button size="md" variant="outline-warning" @click="closeWindow">
-              Cancel
+            <b-button size="md" variant="outline-secondary" @click="closeWindow">
+              {{tr('BTN_CANCEL')}}
             </b-button>
           </div>
         </div>
@@ -126,6 +126,7 @@ export default {
         createNew () {
             baseTabParams = this.dataForTab;
             baseTabParams['tabContents'] = this.$refs.popupTab;
+            debugger;
             this.$emit('create', baseTabParams);
         },
         updateSelect () {
