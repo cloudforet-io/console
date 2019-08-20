@@ -334,7 +334,6 @@ export const Mixin = {
             for (let key in obj) {
                 arr.push({ [key]: obj[key] });
             }
-            debugger
             return arr;
         },
         /**********************************************************************************
@@ -400,7 +399,7 @@ export const Mixin = {
                 isSelectable: true,
                 data: { visible: false }
             };
-         return selectedNode;
+            return selectedNode;
         },
         /**********************************************************************************
          * Name       : getDatefromTimeStamp
@@ -421,7 +420,7 @@ export const Mixin = {
         getTimeStampfromDate: function () {
 
             return 'a';
-        },
+        }
     },
     data: function () {
         return {
