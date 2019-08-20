@@ -11,7 +11,17 @@ export default {
         { 
             label: 'Timezone', key: 'timezone', 
             values: Mixin.methods.getAllTimezones()
-        }
+        },
+        { label: 'test', key: 'name', ajax: {
+            url: '/identity/user/list',
+            method: 'post',
+            getList (res) {
+                return res.data.results.map((user) => {
+                    return user.name;
+                });
+            }
+
+        }}
     ],
     autokeyList: ['user_id', 'name', 'email']
 };
@@ -21,3 +31,5 @@ export default {
  *
  *
  */
+
+// ajax: { url: '/identity/users', params: null, method: 'GET' } },

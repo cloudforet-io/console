@@ -3,6 +3,8 @@
     <BaseInput v-if="isUpdateMode" :list-data="listData" :contents="contents"
                :autofocus="true" :autoselect="true" @update="onUpdate"
                @delete="$emit('delete')"
+               @moveLeft="onMoveLeft"
+               @moveRight="onMoveRight"
     />
 
     <span v-else class="badge tag-badge m-1">
@@ -63,6 +65,14 @@ export default {
         onUpdate (items) {
             this.$emit('update', items, this.idx);
             this.isUpdateMode = false;
+        },
+        onMoveLeft () {
+            this.isUpdateMode = false;
+            this.$emit('moveLeft');
+        },
+        onMoveRight () {
+            this.isUpdateMode = false;
+            this.$emit('moveRight');
         }
     }
 };
