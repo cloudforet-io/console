@@ -73,27 +73,20 @@
 
     <b-form-group label="Language" :label-cols="3">
       <b-col cols="5" class="p-0">
-        <b-form-select v-model="language">
-          <option :value="null" selected disabled hidden>
-            Choose Language
-          </option>
-          <option v-for="lang in languageList" :key="lang">
-            {{ lang }}
-          </option>
-        </b-form-select>
+        <model-select v-model="language"
+                      :options="languageList"
+                      placeholder="select item"
+        />
       </b-col>
-    </b-form-group>
+    </b-form-group> 
+    
 
-    <b-form-group label="Time Zone" label-for="timezone" :label-cols="3">
+    <b-form-group label="Time Zone" :label-cols="3">
       <b-col cols="8" class="p-0">
-        <b-form-select v-model="timezone">
-          <option :value="null" selected disabled hidden>
-            Choose Timezone
-          </option>
-          <option v-for="country in timezoneList" :key="country">
-            {{ country }}
-          </option>
-        </b-form-select>
+        <model-select v-model="timezone"
+                      :options="timezoneList"
+                      placeholder="select item"
+        />
       </b-col>
     </b-form-group>
 
@@ -110,25 +103,13 @@
       <b-button class="float-right mb-1" size="md" type="reset" variant="outline-secondary">
         Reset
       </b-button>
-      <b-button v-if="!creatable" class="float-left" size="md" type="reset" variant="outline-danger" @click="onDelete">
-        Delete
-      </b-button>
     </div>
-
-    <BaseSimpleModal
-      ref="DeleteCheck"
-      title="User Delete"
-      text="Are you sure you want to delete?"
-      type="danger"
-      :ok-only="false"
-      @ok="deleteUser"
-    />
   </b-form>
 </template>
 
 <script>
 import BaseTag from '@/components/base/tags/BATG_001_BaseTag.vue';
-import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal.vue';
+import { ModelSelect } from 'vue-search-select';
 
 const userModel = {
     user_id: null,
@@ -147,7 +128,7 @@ export default {
     event: ['delete', 'create', 'update'],
     components: {
         BaseTag,
-        BaseSimpleModal
+        ModelSelect
     },
     props: {
         userProp: {
@@ -175,12 +156,16 @@ export default {
             domainId: sessionStorage.getItem('domainId'),
             language: this.userProp.language,
             timezone: this.userProp.timezone,
-            languageList: this.$i18n.availableLocales,
-            timezoneList: this.getAllTimezones(),
             userIdUnique: null
         };
     },
     computed: {
+        languageList () {
+            return this.getLanguageSelectList();
+        },
+        timezoneList () {
+            return this.getTimezoneSelectList();
+        },
         tags () {
             return this.dictToKeyValueArray(this.userProp.tags);
         },
@@ -328,21 +313,6 @@ export default {
             } catch (e) {
                 console.error(e);
                 this.$alertify.error('ERROR OCCURED during Updating User.');
-            }
-        },
-        async onDelete () {
-            this.$refs.DeleteCheck.showModal();
-        },
-        async deleteUser () {
-            try {
-                await this.$axios.post('/identity/user/delete', {
-                    user_id: this.userId
-                });
-                this.$emit('delete');
-                this.$alertify.success('Selected User Successfully Deleted.');
-            } catch (e) {
-                console.error(e);
-                this.$alertify.error('ERROR OCCURED during Deleting User.');
             }
         },
         onReset () {

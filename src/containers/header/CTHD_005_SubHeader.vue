@@ -3,7 +3,7 @@
     <b-col cols="1" class="header-group">
       <span class="label">
         <i :class="subHeaderGroup.icon" />&nbsp;&nbsp;
-        {{ subHeaderGroup.label }}
+        <span>{{ subHeaderGroup.label }}</span>
       </span>
     </b-col>
     <b-col cols="10" class="row ">
@@ -76,6 +76,7 @@ $shape-color: darken($skyblue, 1%);
     padding-left: 20px;
     margin-right: 20px;
     min-width: 200px;
+    vertical-align: middle;
     i {
       font-size: 1.5em;
       font-weight: 500;

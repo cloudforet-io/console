@@ -9,6 +9,10 @@ export const GlobalEnum = {
             }
         }
     }),
+    LANGUAGES: Object.freeze([
+        { value: 'en', text: 'English' },
+        { value: 'ko', text: '한국어' }
+    ]),
     SERVER_STATE: Object.freeze(
         {
             SERVICE: {

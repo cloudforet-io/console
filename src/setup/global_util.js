@@ -383,6 +383,32 @@ export const Mixin = {
             return Object.keys(timezone.getAllTimezones());
         },
         /**********************************************************************************
+         * Name       : getAllTimezones
+         *             
+         * Output  => Array
+         * Description:  return Array of timezone String.
+         **********************************************************************************/
+        getTimezoneSelectList: function () {
+            let results = [];
+            let timezones = timezone.getAllTimezones();
+            for (var tz in timezones) {
+                results.push({
+                    value: tz,
+                    text: `${tz} ${timezones[tz].offsetStr}`
+                });
+            }
+            return results;
+        },
+        /**********************************************************************************
+         * Name       : getLanguageSelectList
+         *             
+         * Output  => Array
+         * Description:  return Array of language select list.
+         **********************************************************************************/
+        getLanguageSelectList: function () {
+            return GlobalEnum.LANGUAGES;
+        },
+        /**********************************************************************************
          * Name       : getSelectedNode
          * Input   => (f: flag                         =>  String)
          * Output  => Node

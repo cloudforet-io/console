@@ -19,48 +19,75 @@
         >
           <template #caption>
             <div>
-              <BaseModal ref="addUser"
-                         title="Add User" 
-                         :centered="true" 
-                         :hide-footer="true"
+              <b-button class="btn mr-4" variant="outline-primary" @click="onClickAdd">
+                {{ tr('BTN_ADD') }}
+              </b-button>
+              <b-dropdown v-if="selectedUser" no-caret
+                          variant="outline-secondary"
+                          class="no-selected"
               >
-                <template #activator>
-                  <b-button class="btn" variant="outline-primary">
-                    {{ tr('BTN_ADD') }}
-                  </b-button>
+                <template #button-content>
+                  <span>Actions</span> &nbsp;
+                  <i class="fal fa-angle-down" />
                 </template>
-                <template #contents>
-                  <UserDetail 
-                    :creatable="true" 
-                    :updatable="true"
-                    @create="createUser"
-                  />
-                </template>
-              </BaseModal>
-              <BaseModal v-if="selectedUser" 
-                         ref="editUser"
-                         title="Edit User"
-                         :centered="true" 
-                         :hide-footer="true"
-              >
-                <template #activator>
-                  <b-button class="btn" variant="outline-dark">
-                    {{ tr('BTN_EDIT') }}
-                  </b-button>
-                </template>
-                <template #contents>
-                  <UserDetail :updatable="true" 
-                              :user-prop="selectedUser" 
-                              @update="updateUser"
-                              @delete="deleteUser"
-                  />
-                </template>
-              </BaseModal>
+                <b-dropdown-item @click="onClickUpdate">
+                  <div class="item sm">
+                    <i class="icon fal fa-pencil-alt" />
+                    <span class="name">{{ tr('BTN_UPT') }}</span>
+                  </div>
+                </b-dropdown-item>
+                <b-dropdown-item @click="onClickDelete">
+                  <div class="item sm">
+                    <i class="icon fal fa-trash-alt" />
+                    <span class="name">{{ tr('BTN_DELETE') }}</span>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
             </div>
           </template>
         </BaseTable>
       </template>
     </BaseDrag>
+
+    <BaseModal ref="addUser"
+               title="Add User" 
+               :centered="true" 
+               :hide-footer="true"
+               :backdrop-off="true"
+    >
+      <template #contents>
+        <UserDetail 
+          :creatable="true" 
+          :updatable="true"
+          @create="createUser"
+        />
+      </template>
+    </BaseModal>
+    <BaseModal v-if="selectedUser" 
+               ref="editUser"
+               title="Edit User"
+               :centered="true" 
+               :hide-footer="true"
+               :backdrop-off="true"
+    >
+      <template #contents>
+        <UserDetail :updatable="true" 
+                    :user-prop="selectedUser" 
+                    @update="updateUser"
+        />
+      </template>
+    </BaseModal>
+
+    <BaseSimpleModal
+      ref="DeleteCheck"
+      title="User Delete"
+      text="Are you sure you want to delete?"
+      type="danger"
+      :ok-only="false"
+      @ok="deleteUser"
+    />
+
+              
     <BaseTabNav v-if="selectedUser" class="user-info"
                 :fill="false"
                 :nav-tabs="tabs"
@@ -84,6 +111,7 @@ import query from './search_context/query.js';
 import UserDetail from './IDUS_002_UserDetail.vue';
 import UserInfo from './IDUS_003_UserInfo.vue';
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
+const BaseSimpleModal = () => import('@/components/base/modal/BAMO_002_BaseSimpleModal.vue');
 const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 
 export default {
@@ -92,6 +120,7 @@ export default {
         BaseDrag,
         BaseTable,
         BaseModal,
+        BaseSimpleModal,
         UserDetail,
         BaseTabNav,
         UserInfo
@@ -236,10 +265,26 @@ export default {
             this.$refs.addUser.hideModal();
             this.listUsers();
         },
-        deleteUser () {
-            console.log('delete user');
-            this.$refs.editUser.hideModal();
-            this.listUsers();
+        async deleteUser () {
+            try {
+                await this.$axios.post('/identity/user/delete', {
+                    user_id: this.selectedUser.user_id
+                });
+                this.$alertify.success('Selected User Successfully Deleted.');
+                this.listUsers();
+            } catch (e) {
+                console.error(e);
+                this.$alertify.error('ERROR OCCURED during Deleting User.');
+            }
+        },
+        onClickAdd () {
+            this.$refs.addUser.showModal();
+        },
+        onClickUpdate () {
+            this.$refs.editUser.showModal();
+        },
+        onClickDelete () {
+            this.$refs.DeleteCheck.showModal();
         }
     }
 };
