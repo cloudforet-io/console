@@ -14,8 +14,8 @@
                       :tabs="modalTabs"
                       :fill="true"
                       :selected-data="selectedData"
-                      :is-creatable="createProcess"
-                      :is-updatable="updateProcess"
+                      :is-creatable.camel="createProcess"
+                      :is-updatable.camel="updateProcess"
                       :is-footer-visible="true"
                       @create="createProject"
                       @update="updateProject"
@@ -163,6 +163,7 @@ export default {
         async listProject() {
             await this.$axios.post('/identity/project/tree', {
                 item_id: null,
+                is_root: true,
                 item_type: 'ROOT',
                 sort: {
                     'key': 'name'
@@ -206,7 +207,7 @@ export default {
                 this.selectedData = item;
                 this.$refs.EditModal.showModal();
             } else {
-                const title = (item.flag.indexOf('NG') > 0);
+                const title = (item.flag.indexOf('NG') > -1);
                 this.selectedData['selectedItem'] = item;
                 this.manageTabButton('CRT', true, title);
                 this.$refs.EditModal.showModal();
@@ -256,23 +257,34 @@ export default {
             this.consoleLogEnv('current Action Flag:',flag);
 
 
-            //Initialization Set URL
+            //Initialization Set URL is create-project or project Group
             if (this.isInitializing || flag.includes('NG')) {
                 url = '/identity/project-group/create';
             } else {
-                url = '/identity/project-group/create';
+                url = '/identity/project/create';
             }
+
+
+            /*
+            *  *  SNG => Selected Project Group
+                   *  SND => Selected Project
+                   *  RNG => Root Project Group
+            *
+            *
+            * */
 
             if (this.isInitializing){
                 passParam['is_root']= true;
                 passParam['name'] = tabData.projectProp.projectName;
                 passParam['domain_id'] = sessionStorage.domainId;
+            } else if (flag === 'SNG' || flag === 'SND'){
+                passParam['parent_project_group_id'] = 'aa';
+                passParam['name'] = tabData.projectProp.projectName;
+                passParam['domain_id'] = sessionStorage.domainId;
+
             }
 
-
-
             await this.$axios.post(url, passParam).then((response) => {
-
                 const responseData = !this.isEmpty(response.data) ? [response.data] : [{}];
 
                 if (!this.isEmpty(responseData)){

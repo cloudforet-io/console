@@ -329,10 +329,12 @@ export const Mixin = {
          * Description:  translation of i18n
          **********************************************************************************/
         dictToKeyValueArray: function (obj) {
+
             let arr = [];
-            for (var key in obj) {
+            for (let key in obj) {
                 arr.push({ [key]: obj[key] });
             }
+            debugger
             return arr;
         },
         /**********************************************************************************
@@ -398,13 +400,31 @@ export const Mixin = {
                 isSelectable: true,
                 data: { visible: false }
             };
+         return selectedNode;
+        },
+        /**********************************************************************************
+         * Name       : getDatefromTimeStamp
+         * Input   => (f: flag                         =>  String)
+         * Output  => Node
+         * Description:  return tree array of object which suits for BaseTree
+         **********************************************************************************/
+        getDatefromTimeStamp: function () {
 
-            return selectedNode;
-        }
+            return 'a';
+        },
+        /**********************************************************************************
+         * Name       : getDatefromTimeStamp
+         * Input   => (f: flag                         =>  String)
+         * Output  => Node
+         * Description:  return tree array of object which suits for BaseTree
+         **********************************************************************************/
+        getTimeStampfromDate: function () {
+
+            return 'a';
+        },
     },
     data: function () {
         return {
-            globalProp: null,
             _: VueLodash,
             defaultFontSizeSet: [10, 12, 14, 16, 18, 24],
             isFirstLogin: false
