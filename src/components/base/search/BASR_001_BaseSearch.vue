@@ -99,11 +99,15 @@ export default {
             if (this.isEmpty(obj.key)) {
                 this.addQueryToFilterOrListWithAutoKey(obj);
             } else {
-                let idx = this.getIdxFromFilterList(obj);
+                let idx = this.getIdxFromFilterListWithTag(obj);
                 if (this.isEmpty(idx)) {
                     this.addQueryToFilterList(obj);
                 } else {
-                    this.deleteQueryFromFilterList(idx);
+                    let tag = this.getSameKeyTagFromTagListWithFilterName(obj, 'filter');
+                    if (!this.isEmpty(tag)) {
+                        this.deleteQueryFromFilterList(tag);
+                        this.addQueryToFilterOrList(tag);
+                    }
                     this.addQueryToFilterOrList(obj);
                 }
             }
@@ -220,7 +224,7 @@ export default {
                 filterIdxList: []
             }, item);
         },
-        getIdxFromFilterList (obj) {
+        getIdxFromFilterListWithTag (obj) {
             let idx = null;
             this.filterList.some((item, i) => {
                 if (item.key === obj.key) { 
@@ -229,6 +233,19 @@ export default {
                 return item.key === obj.key; 
             });
             return idx;
+        },
+        getSameKeyTagFromTagListWithFilterName (obj, filterName) {
+            let tag = null;
+            if (this.isEmpty(filterName)) {
+                filterName = 'filter';
+            }
+            this.tagList.some((item, i) => {
+                if (item.key === obj.key && item.filterName === filterName) { 
+                    tag = item;
+                }
+                return !!(item.key === obj.key && item.filterName === filterName); 
+            });
+            return tag;
         },
         getOperator (op) {
             switch (op) {

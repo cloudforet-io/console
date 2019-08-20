@@ -24,8 +24,12 @@
 
         <div v-if="isFocused && isKeyListShown && keyList.length > 0" 
              ref="listContainer" 
-             class="list-container"
-             :style="{top: `${listPosY}px`, height: `${listHeight}px`}"
+             class="list-container key"
+             :style="{
+               left: `${keyListPosX}px`, 
+               top: `${listPosY}px`,
+               height: `${listHeight}px`
+             }"
         >
           <b-list-group>
             <b-list-group-item v-for="(key, idx) in keyList" 
@@ -47,10 +51,14 @@
           </b-list-group>
         </div>
 
-        <div v-if="isFocused && isValueListShown && valueList.length > 0" 
+        <div v-if=" isValueListShown && valueList.length > 0" 
              ref="listContainer" 
              class="list-container"
-             :style="{left: `${valueListPosX}px`, top: `${listPosY}px`, height: `${listHeight}px`}"
+             :style="{
+               left: `${valueListPosX}px`, 
+               top: `${listPosY}px`,
+               height: `${listHeight}px`
+             }"
         >
           <b-list-group>
             <b-list-group-item v-for="(val, idx) in valueList"  
@@ -74,6 +82,7 @@
 
 <script>
 import { focus } from 'vue-focus';
+import { mapGetters } from 'vuex';
 
 const contentsModel = {
     label: '',
@@ -142,10 +151,16 @@ export default {
             hoveredItemIdx: null,
             commitEventName: 'add',
             isEnterEmittedBlur: false,
+            keyListPosX: 0,
             valueListPosX: 0,
             listPosY: 0,
             listHeight: 0
         };
+    },
+    computed: {
+        ...mapGetters('layout', [
+            'headerHeight'
+        ])
     },
     created () {
         this.commitEventName = this.$listeners.update !== undefined ? 'update' : 'add';
@@ -157,13 +172,15 @@ export default {
         this.isFocused = this.autofocus;
     },
     mounted () {
-        this.setKeyListPosition();
+        this.setListPosition();
     },
     methods: {
-        setKeyListPosition () {
+        setListPosition () {
             let inputRect = this.$refs.input.getBoundingClientRect();
-            this.listPosY = inputRect.height;
-            this.listHeight = self.innerHeight - inputRect.y - inputRect.height - 60;
+            let paddingBottom = 60;
+            this.listHeight = self.innerHeight - inputRect.bottom - paddingBottom;
+            this.keyListPosX = inputRect.left;
+            this.listPosY = inputRect.bottom;
         },
         initSelectedData () {
             this.selected.label = this.contents.label || '';
@@ -269,9 +286,9 @@ export default {
         showValueList () {
             this.isValueListShown = true;
 
-      // set list position X
+            // set list position X
             this.$refs.fakeInput.textContent = `${this.selected.label} ${this.selected.operator} `;
-            this.valueListPosX = this.$refs.fakeInput.clientWidth;
+            this.valueListPosX = this.keyListPosX + this.$refs.fakeInput.clientWidth;
         },
         hideValueList () {
             this.isValueListShown = false;
@@ -342,8 +359,8 @@ export default {
             }
             this.$emit(this.commitEventName, this.selectedList);
 
-            this.setKeyListPosition();
             this.resetAll();
+            this.setListPosition();
         },
         setSelectedData (val) {
             if (this.selected.key) {
@@ -457,10 +474,17 @@ export default {
                 this.hoveredItemIdx++;
             }
 
+            if (this.isEmpty(this.$refs.listContainer) ||
+                this.isEmpty(this.$refs.list[this.hoveredItemIdx])) {
+                return;
+            }
+
             let listContainerRect = this.$refs.listContainer.getBoundingClientRect();
             let listItemRect = this.$refs.list[this.hoveredItemIdx].getBoundingClientRect();
-            if (listContainerRect.height < listItemRect.y - listContainerRect.y + listItemRect.height) {
-                this.$refs.listContainer.scrollTop += listItemRect.height;
+            let diff = listItemRect.bottom - listContainerRect.bottom;
+            let pad = 10;
+            if (diff > 0) {
+                this.$refs.listContainer.scrollTop += diff + pad;
             }
         },
         onKeyUp () {
@@ -473,10 +497,17 @@ export default {
                 this.hoveredItemIdx--;
             }
 
+            if (this.isEmpty(this.$refs.listContainer) ||
+                this.isEmpty(this.$refs.list[this.hoveredItemIdx])) {
+                return;
+            }
+
             let listContainerRect = this.$refs.listContainer.getBoundingClientRect();
             let listItemRect = this.$refs.list[this.hoveredItemIdx].getBoundingClientRect();
-            if (listItemRect.y < listContainerRect.y) {
-                this.$refs.listContainer.scrollTop -= listItemRect.height;
+            let diff = listItemRect.top - listContainerRect.top;
+            let pad = 10;
+            if (diff < 0) {
+                this.$refs.listContainer.scrollTop += diff - pad;
             }
         },
         onMouseover (idx) {
@@ -520,24 +551,25 @@ export default {
     position: relative;
     input {
       border: 0;
-      // border: 1px solid red;
       background-color: transparent;
       word-break: break-all;
     }
     .list-container {
-      position: absolute;
+      position: fixed;
       display: inline-block;
-      width: 250px;
       min-height: 100px;
-      max-height: 600px;
       overflow-y: scroll;
       z-index: 3;
       left: 0;
+      width: auto;
+      min-width: 250px;
+      border-radius: 5px;
       .list-group {
         box-shadow: 0 0 4px 0 rgba($black, 0.4);
         border-radius: 5px;
         padding: 10px;
         background-color: darken($navy, 2%);
+        width: auto;
       }
       .list-group-item {
         cursor: pointer;
@@ -546,13 +578,16 @@ export default {
         font-size: .9rem;
         background-color: transparent;
         border-radius: 5px;
+        width: auto;
+        white-space: nowrap;
         &.hovered {
           background-color: lighten($navy, 9%);
         }
         .key-label {
-          text-overflow: ellipsis;
-          overflow:hidden;
+        //   text-overflow: ellipsis;
+        //   overflow:hidden;
           white-space:nowrap;
+          padding-right: 20px;
         }
         .caret {
           text-align: right;

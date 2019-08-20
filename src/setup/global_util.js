@@ -1,6 +1,7 @@
 import { hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import { GlobalEnum } from '@/setup/enum';
 import VueLodash from 'vue-lodash';
+import timezone from 'countries-and-timezones';
 export const Mixin = {
     methods: {
     /**********************************************************************************
@@ -337,7 +338,7 @@ export const Mixin = {
         /**********************************************************************************
          * Name       : treeDataHandler
          * Input   => (d: data                         =>  Array of data Object
-         *             t: Type                         =>  Tree Type in Enum values
+         *             t: Type                         =>  Tree Type in Enum values)
          * Output  => Object Array which
          * Description:  return tree array of object which suits for BaseTree
          **********************************************************************************/
@@ -370,6 +371,15 @@ export const Mixin = {
             }
 
             return returnTree;
+        },
+        /**********************************************************************************
+         * Name       : getAllTimezones
+         *             
+         * Output  => Array
+         * Description:  return Array of timezone String.
+         **********************************************************************************/
+        getAllTimezones: function () {
+            return Object.keys(timezone.getAllTimezones());
         },
         /**********************************************************************************
          * Name       : getSelectedNode
