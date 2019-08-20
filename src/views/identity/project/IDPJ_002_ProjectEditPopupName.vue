@@ -1,18 +1,18 @@
 <template>
   <b-container fluid>
-    <b-row class="my-1" v-if="isInitialized">
+    <b-row v-if="isInitialized" class="my-1">
       <b-col sm="3">
         <label class="control-label">Project ID:</label>
       </b-col>
       <template v-if="currentState=='UPT'">
         <b-col sm="9">
-         {{projectId}}
+          {{ projectId }}
         </b-col>
       </template>
       <template v-else>
         <b-col sm="9">
           <b-form-input v-model="projectId"
-                        :placeholder ="placeHolderId"
+                        :placeholder="placeHolderId"
                         type="text"
           />
         </b-col>
@@ -24,7 +24,7 @@
       </b-col>
       <b-col sm="9">
         <b-form-input v-model="projectName"
-                      :placeholder ="projectName"
+                      :placeholder="projectName"
                       type="text"
         />
       </b-col>
@@ -77,10 +77,11 @@ export default {
     },
     created () {
         //TODO:: Please, Check this method to confirm
-        const selectedNode = this.$attrs['selected-data'].selectedItem.tree.getSelected()[0];
+        const selectedNode = this.$attrs['selected-data'].tree.getSelected()[0];
 
         if (Object.keys(this.$attrs).length > 0) {
             this.treeDataSelected = this.$attrs.selectedData;
+
             if (this.$attrs['is-creatable']) {
                 this.currentState = 'CRT';
             } else if (this.$attrs['is-updatable']) {
@@ -94,7 +95,7 @@ export default {
         }
 
         if (!this.isEmpty(this._.get(selectedNode,'data.init'))) {
-           this.isInitialized = false;
+            this.isInitialized = false;
         }
     },
     methods: {
@@ -112,7 +113,9 @@ export default {
                 return false;
             }
         }
+
     }
+
 };
 </script>
 

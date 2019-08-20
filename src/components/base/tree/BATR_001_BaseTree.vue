@@ -244,11 +244,8 @@ export default {
             this.modalContext = {
                 tree: this.$refs.slVueTree
             };
+
             const treeV = this.$refs.slVueTree;
-            const msg = {};
-            const params = {
-                tree: treeV
-            };
 
             switch (flag) {
             case 'NG'://Node Group
@@ -271,7 +268,7 @@ export default {
                 this.modalCancel ();
                 break;
             case 'SN'://Selected Node Group or Node
-                this.modalContext['flag'] = 'NR';
+                this.modalContext['flag'] = 'SN';
                 this.modalTitle = this.modalContext.tree.getSelected()[0].isLeaf ? 'Edit a Project' : 'Edit a Project Group';
                 this.modalContents = 'Do you want to create a root Project';
                 this.modalContents += this.modalContext.tree.getSelected()[0].isLeaf ? '?' : ' Group?';
