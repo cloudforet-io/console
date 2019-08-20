@@ -1,10 +1,16 @@
 <template>
-  <b-form @reset.prevent="onReset" @submit.prevent="updatable && creatable ? onCreate() : onUpdate()">
-    <b-form-group label="User ID" :label-cols="3">
+  <b-form @reset.prevent="onReset" 
+          @submit.prevent="updatable && creatable ? onCreate() : onUpdate()"
+  >
+    <b-form-group label="User ID" 
+                  :label-cols="3"
+                  :description="validateUserId === null ? 'Your user ID must be 5-12 characters long.' : null"
+    >
       <b-input-group>
         <b-form-input v-model="userId" 
-                      :plaintext="!creatable" 
                       type="text" 
+                      autocomplete="off"
+                      :plaintext="!creatable" 
                       :state="validateUserId"
                       @input="changedUserId"
         />
@@ -28,7 +34,7 @@
     </b-form-group>
 
     <b-form-group v-if="updatable" label="Password" :label-cols="3">
-      <b-form-input v-model="password" :plaintext="!updatable" type="password" :state="validatePassword" />
+      <b-form-input v-model="password" autocomplete="new-password" type="password" :state="validatePassword" />
       <b-form-invalid-feedback :state="validatePassword">
         Your Password must be 5-12 characters long.
       </b-form-invalid-feedback>
@@ -36,7 +42,7 @@
     </b-form-group>
 
     <b-form-group v-if="updatable" label="Password Check" :label-cols="3">
-      <b-form-input v-model="passwordCheck" :plaintext="!updatable" type="password"
+      <b-form-input v-model="passwordCheck" type="password"
                     :state="validatePasswordCheck"
       />
       <b-form-invalid-feedback :state="validatePasswordCheck">
@@ -46,31 +52,49 @@
     </b-form-group>
 
     <b-form-group label="Name" :label-cols="3">
-      <b-form-input v-model="name" :plaintext="!updatable" type="text" />
+      <b-form-input v-model="name" type="text" />
     </b-form-group>
 
     <b-form-group label="E-Mail" :label-cols="3">
-      <b-form-input v-model="email" :plaintext="!updatable" type="text" />
+      <b-form-input v-model="email" type="text" />
     </b-form-group>
 
     <b-form-group label="Phone" :label-cols="3">
-      <b-form-input v-model="mobile" :plaintext="!updatable" type="text" />
+      <b-form-input v-model="mobile" type="text" />
     </b-form-group>
 
     <b-form-group label="Group Name" :label-cols="3">
-      <b-form-input v-model="group" :plaintext="!updatable" type="text" />
+      <b-form-input v-model="group" type="text" />
     </b-form-group>
 
-    <b-form-group label="Domain ID" label-for="domainId" :label-cols="3">
+    <b-form-group label="Domain ID" :label-cols="3">
       <b-form-input v-model="domainId" plaintext type="text" />
     </b-form-group>
 
-    <b-form-group label="Language" label-for="language" :label-cols="3">
-      <b-form-input v-model="language" :plaintext="!updatable" type="text" />
+    <b-form-group label="Language" :label-cols="3">
+      <b-col cols="5" class="p-0">
+        <b-form-select v-model="language">
+          <option :value="null" selected disabled hidden>
+            Choose Language
+          </option>
+          <option v-for="lang in languageList" :key="lang">
+            {{ lang }}
+          </option>
+        </b-form-select>
+      </b-col>
     </b-form-group>
 
     <b-form-group label="Time Zone" label-for="timezone" :label-cols="3">
-      <b-form-input v-model="timezone" :plaintext="!updatable" type="text" />
+      <b-col cols="8" class="p-0">
+        <b-form-select v-model="timezone">
+          <option :value="null" selected disabled hidden>
+            Choose Timezone
+          </option>
+          <option v-for="country in timezoneList" :key="country">
+            {{ country }}
+          </option>
+        </b-form-select>
+      </b-col>
     </b-form-group>
 
     <b-form-group label="Tags" :label-cols="3" class="mt-4">
@@ -151,6 +175,8 @@ export default {
             domainId: sessionStorage.getItem('domainId'),
             language: this.userProp.language,
             timezone: this.userProp.timezone,
+            languageList: this.$i18n.availableLocales,
+            timezoneList: this.getAllTimezones(),
             userIdUnique: null
         };
     },
@@ -173,6 +199,9 @@ export default {
             return this.userIdUnique;
         },
         validateUserId () {
+            if (this.validateUserIdLength === null) {
+                return null;
+            }
             return  !!(this.validateUserIdLength && this.validateUserIdUnique);
         },
         validatePassword () {
