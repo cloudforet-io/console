@@ -1,29 +1,14 @@
 <template>
-  <b-form @reset.prevent="onReset"
-          @submit.prevent="updatable && creatable ? onCreate() : onUpdate()"
-  >
-    <b-form-group label="Tags" :label-cols="3" :horizontal="true">
-      <BaseTag
-        :updatable="updatable"
-        :show-first-tag-row="true"
-        :tags-prop="updatable ? updatableTags : tags"
-      />
-    </b-form-group>
-  </b-form>
+  <b-form-group label="Tags" :label-cols="3" :horizontal="true">
+    <BaseTag
+      :tag-data="tags"
+      :editable="true"
+    />
+  </b-form-group>
 </template>
 
 <script>
 import BaseTag from '@/components/base/tags/BATG_001_BaseTag';
-import { api } from '@/setup/api';
-
-const projectModel = {
-    name: null,
-    parent_project_group_id: null,
-    template_id: null,
-    domain_id: null,
-    user_id: null,
-    tags: []
-};
 
 export default {
     name: 'ProjectEditPopUpTag',
@@ -31,50 +16,49 @@ export default {
         BaseTag
     },
     props: {
-        projectProp: {
-            type: Object,
-            default: () => (projectModel)
-        },
-        creatable: {
-            type: Boolean,
-            default: false
-        },
-        updatable: {
-            type: Boolean,
-            default: true
-        }
+
     },
     data () {
         return {
-            name: this.projectProp.name,
-            parent_project_group_id: this.projectProp.parent_project_group_id, // required
-            template_id: this.projectProp.template_id,
-            domain_id: this.projectProp.domain_id,
-            user_id: this.projectProp.user_id,
-            updatableTags: this.updatable ? this.projectProp.tags.slice(0) : []
+            selectedTag: null,
         };
     },
     computed: {
+        tagData () {
+            let tagData = [];
+            for (let key in this.userProp.tags) {
+                tagData.push({
+                    title: key,
+                    contents: this.userProp.tags[key],
+                    copyFlag: true
+                });
+            }
+            return tagData;
+        },
         tags () {
-            return this.updatable ? this.updatableTags : this.projectProp.tags;
+
+            console.log('this.selectedTags', this.selectedTag);
+            return this.dictToKeyValueArray(this.selectedTag);
         }
     },
-    watch: {
-        userProp (updatedUser) {
-            this.resetUserData(updatedUser);
-        }
+    created (){
+        this.onCreate();
     },
     methods: {
-        onReset () {
-            if (this.creatable) {
-                this.resetProjectData(projectModel);
-            } else {
-                this.resetProjectData(this.projectProp);
-            }
+        async onCreate () {
+            const selected = this.$attrs['selected-data'].tree.getSelected()[0];
+            const url = selected.data.item_type === 'PROJECT_GROUP' ? '/identity/project-group/get' : '/identity/project/get';
+            let param = selected.data.item_type === 'PROJECT_GROUP' ? { project_group_id: selected.data.id } : { project_id:selected.data.id };
+
+            await this.$axios.post(url, param).then((response) => {
+                const selectedTags = response.data.tags;
+                this.selectedTag = selectedTags;
+                console.log('this.selectedTags', this.selectedTag);
+            }).catch((error) => {
+                console.error(error);
+            });
+
         },
-        resetProjectData (project) {
-            this.updatableTags = project.tags.slice(0);
-        }
     }
 };
 </script>

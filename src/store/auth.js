@@ -52,6 +52,7 @@ export default {
                     'domain_id': domainId
                 });
 
+
                 commit('setUserId', { userId: userId });
                 commit('login', { token: res.data.access_token });
 
