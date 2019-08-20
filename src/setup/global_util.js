@@ -351,7 +351,8 @@ export const Mixin = {
                     let obj = {};
                     console.log(curItem);
                     obj['data'] = {
-                        id: curItem.id
+                        id: curItem.id,
+                        item_type : curItem.item_type
                     };
                     obj['title'] = curItem.name;
                     obj['isLeaf'] = this._.get(GlobalEnum,`${treeKey}.${curItem.item_type}.isLeaf`);
@@ -364,9 +365,10 @@ export const Mixin = {
             } else {
                 returnTree =  [{ title: 'Please, Right Click me',
                     isLeaf: true,
-                    init: true }];
+                    data: {
+                        init: true
+                    }}];
             }
-
 
             return returnTree;
         },
@@ -378,6 +380,26 @@ export const Mixin = {
          **********************************************************************************/
         getAllTimezones: function () {
             return Object.keys(timezone.getAllTimezones());
+        },
+        /**********************************************************************************
+         * Name       : getSelectedNode
+         * Input   => (f: flag                         =>  String)
+         * Output  => Node
+         * Description:  return tree array of object which suits for BaseTree
+         **********************************************************************************/
+        getSelectedNode: function () {
+            let selectedNode = {
+                title: '',
+                isLeaf: false,
+                children: null,
+                isExpanded: false,
+                isSelected: true,
+                isDraggable: true,
+                isSelectable: true,
+                data: { visible: false }
+            };
+
+            return selectedNode;
         }
     },
     data: function () {
