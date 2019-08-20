@@ -225,6 +225,8 @@ export default {
             this.tagList = [];
             this.filterList = [];
             this.filterOrList = [];
+            this.$refs.input.inputText = '';
+            this.focusOnInput();
         },
         search () {
             this.$emit('search', this.filterList, this.filterOrList);
