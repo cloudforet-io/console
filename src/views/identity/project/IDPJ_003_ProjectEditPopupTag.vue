@@ -20,21 +20,10 @@ export default {
     },
     data () {
         return {
-            selectedTag: null,
+            selectedTag: []
         };
     },
     computed: {
-        tagData () {
-            let tagData = [];
-            for (let key in this.userProp.tags) {
-                tagData.push({
-                    title: key,
-                    contents: this.userProp.tags[key],
-                    copyFlag: true
-                });
-            }
-            return tagData;
-        },
         tags () {
 
             console.log('this.selectedTags', this.selectedTag);
@@ -58,7 +47,7 @@ export default {
                 console.error(error);
             });
 
-        },
+        }
     }
 };
 </script>

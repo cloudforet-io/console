@@ -29,6 +29,7 @@ export default {
 $calc-height: calc(#{$header-height} + #{$sub-header-height});
 .app {
   overflow-y: hidden;
+  min-height: 100vh;
   .app-header {
     position: fixed;
     height: $calc-height;

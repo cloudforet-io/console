@@ -75,7 +75,11 @@ export default {
             tags: {}
         };
     },
-    computed: {
+    watch: {
+        tagData () {
+            this.rows = this.tagData.map((tag, i) => ({ rowId: i, tag: tag }));
+            this.lastRowId = this.tagData.length;
+        }
     },
     created () {
 

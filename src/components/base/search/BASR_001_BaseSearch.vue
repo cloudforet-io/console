@@ -4,16 +4,28 @@
       <b-input-group class="row no-gutters">
         <b-col cols="10" class="input-container">
           <div ref="inputBox" class="p-1 input-box" @click.self="focusOnInput">
-            <InputTag v-for="(tag, idx) in tagList" 
+            <InputTag v-for="(tag, idx) in tagList"
+                      ref="tag"
                       :key="tag.id"
+                      class="input-tag"
+                      :tabindex="idx"
                       :idx="idx"
                       :list-data="contextData.queryList" 
                       :contents="tag"
+                      :class="{focused: tag.focused}"
                       @delete="deleteTagAndSearch(idx)"
                       @update="upsertTagAndSearch"
+                      @moveLeft="moveFocusToLeft(idx)"
+                      @moveRight="moveFocusToRight(idx)"
             />
 
-            <BaseInput ref="input" :list-data="contextData.queryList" @add="addTagAndSearch" />
+            <BaseInput ref="input" 
+                       :list-data="contextData.queryList"
+                       add-only
+                       @add="addTagAndSearch" 
+                       @moveLeft="moveFocusToLeft(tagList.length - 1)"
+                       @moveRight="moveFocusToRight(tagList.length - 1)"
+            />
           </div>
           <span class="input-delete-button" @click="deleteAll"><i class="fal fa-times" /></span>
         </b-col>
@@ -221,7 +233,8 @@ export default {
             return Object.assign({ 
                 id: ++this.lastId, 
                 filterName: '', 
-                filterIdxList: []
+                filterIdxList: [],
+                focused: false
             }, item);
         },
         getIdxFromFilterListWithTag (obj) {
@@ -260,6 +273,27 @@ export default {
         },
         focusOnInput () {
             this.$refs.input.isFocused = true;
+        },
+        moveFocusToLeft (idx) {
+            if (--idx > 0) {
+                return;
+            }
+            console.log('move focus to LEFT', idx);
+            if (this.tagList[idx + 1]) {
+                this.tagList[idx + 1].focused = false;
+            }
+            this.tagList[idx].focused = true;
+            this.$refs.tag[idx].$el.focus();
+        },
+        moveFocusToRight (idx) {
+            if (++idx < this.tagList.length) {
+                return;
+            }
+            console.log('move focus to RIGHT', idx);
+            if (this.tagList[idx - 1]) {
+                this.tagList[idx - 1].focused = false;
+            }
+            this.tagList[idx].focused = true;
         }
     }
 };
@@ -276,10 +310,15 @@ $input-height: 23px;
       background-color: #fff;
       padding-left: 10px;
     .input-box {
-      display: inline-block;
-      width: 95%;
-      cursor: text;
-      vertical-align: middle;
+        display: inline-block;
+        width: 95%;
+        cursor: text;
+        vertical-align: middle;
+        .input-tag{
+            &:focus {
+                color: red;
+            }
+        }
     }
     .input-delete-button {
       display: inline-block;
