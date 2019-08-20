@@ -20,6 +20,9 @@
                @keyup.down="onKeyDown"
                @keyup.up="onKeyUp" 
                @keyup.esc="onBlur"
+               @keydown.left="onLeft"
+               @keydown.right="onRight"
+               @mousedown="onMousedownInput"
         >
 
         <div v-if="isFocused && isKeyListShown && keyList.length > 0" 
@@ -51,7 +54,7 @@
           </b-list-group>
         </div>
 
-        <div v-if=" isValueListShown && valueList.length > 0" 
+        <div v-if="isFocused && isValueListShown && valueList.length > 0" 
              ref="listContainer" 
              class="list-container"
              :style="{
@@ -127,6 +130,10 @@ export default {
             type: Boolean,
             default: false
         },
+        addOnly: {
+            type: Boolean,
+            default: false
+        },
         maxWidth: {
             type: String,
             default: '100%'
@@ -154,7 +161,10 @@ export default {
             keyListPosX: 0,
             valueListPosX: 0,
             listPosY: 0,
-            listHeight: 0
+            listHeight: 0,
+            selectionStart: 0,
+            selectionEnd: 0,
+            isBlurWithoutCommit: false
         };
     },
     computed: {
@@ -179,8 +189,7 @@ export default {
             let inputRect = this.$refs.input.getBoundingClientRect();
             let paddingBottom = 60;
             this.listHeight = self.innerHeight - inputRect.bottom - paddingBottom;
-            this.keyListPosX = inputRect.left;
-            this.listPosY = inputRect.bottom;
+            this.listPosY = inputRect.height;
         },
         initSelectedData () {
             this.selected.label = this.contents.label || '';
@@ -200,8 +209,11 @@ export default {
             }
         },
         onInput (e) {
+            this.selectionStart = e.target.selectionStart;
+            this.selectionEnd = e.target.selectionEnd;
+
             if (this.selected.key) { // to detect the case of editting key section
-                let operatorIdx = this.inputText.indexOf(':');
+                let operatorIdx = this.getOperatorIdx();
 
                 if (operatorIdx < 0 && 
                 (!this.selected.type === 'SubKey' ||
@@ -213,20 +225,24 @@ export default {
                 if (e.target.selectionStart <= operatorIdx) { // editting key section
                     let keyStr = this.inputText.substring(0, operatorIdx).trim();
                     if (this.selected.type === 'SubKey') {
-            /**
-             * TODO: detect editting key or subkey
-             */
+                    /**
+                     * TODO: detect editting key or subkey
+                     */
                     } else {
                         this.resetKey(keyStr);
                     }
-                } else { // editting inputText section
+                } else { // editting value section
                     let valStr = this.inputText.substring(operatorIdx);
                     this.setOperator(valStr);
                     this.refreshValueList(valStr.substring(this.selected.operator.length));
+                    this.showValueList();
                 }
             } else {
                 this.resetKey(this.inputText.trim());
             }
+        },
+        getOperatorIdx () {
+            return this.inputText.indexOf(':');
         },
         refreshKeyList (val) {
             val = val.trim().toLowerCase();
@@ -267,14 +283,12 @@ export default {
             if (this.selectedKeyObj.values) {
                 this.staticValueList = this.selectedKeyObj.values;
             } else if (this.selectedKeyObj.ajax) {
-                let res;
+                let res = null;
                 try {
-                    res = await this.$http[this.selectedKeyObj.ajax.method](this.selectedKeyObj.ajax.url,
-                        this.selectedKeyObj.ajax.params ? {
-                            params: this.selectedKeyObj.ajax.params 
-                        } : {});
+                    res = await this.$axios[this.selectedKeyObj.ajax.method](this.selectedKeyObj.ajax.url,
+                        this.selectedKeyObj.ajax.params || {});
 
-                    this.staticValueList = res.data;
+                    this.staticValueList = this.selectedKeyObj.ajax.getList(res);
                 } catch (e) {
                     console.error(e);
                 }
@@ -306,6 +320,8 @@ export default {
             this.setValue(val);
             this.hideValueList();
             this.inputText = `${this.selected.label} ${this.selected.operator} ${this.selected.value}`;
+            this.commit();
+            this.isEnterEmittedBlur = true;
         },
         resetKey (val) {
             this.hideValueList();
@@ -456,6 +472,11 @@ export default {
             this.isFocused = false;
             this.hoveredItemIdx = null;
 
+            if (this.isBlurWithoutCommit) {
+                this.isBlurWithoutCommit = false;
+                return;
+            }
+
             if (this.$listeners.update !== undefined) {
                 if (this.isEnterEmittedBlur) {
                     this.isEnterEmittedBlur = false;
@@ -468,7 +489,9 @@ export default {
             let arr = this.isKeyListShown ? this.keyList : this.valueList;
             if (this.hoveredItemIdx === null || this.hoveredItemIdx >= arr.length - 1) {
                 this.hoveredItemIdx = 0;
-                this.$refs.listContainer.scrollTop = 0;
+                if (this.$refs.listContainer) {
+                    this.$refs.listContainer.scrollTop = 0;
+                }
                 return;
             } else {
                 this.hoveredItemIdx++;
@@ -491,7 +514,9 @@ export default {
             if (this.hoveredItemIdx === null || this.hoveredItemIdx <= 0) {
                 let arr = this.isKeyListShown ? this.keyList : this.valueList;
                 this.hoveredItemIdx = arr.length - 1;
-                this.$refs.listContainer.scrollTop = this.$refs.listContainer.scrollHeight;
+                if (this.$refs.listContainer) {
+                    this.$refs.listContainer.scrollTop = this.$refs.listContainer.scrollHeight;
+                }
                 return;
             } else {
                 this.hoveredItemIdx--;
@@ -534,6 +559,31 @@ export default {
                 this.hideValueList();
                 this.showKeyList();
             }
+        },
+        onMousedownInput (e) {
+            this.selectionStart = e.target.selectionStart;
+            this.selectionEnd = e.target.selectionEnd;
+
+            if (this.selected.key && this.getOperatorIdx() < e.target.selectionStart) {
+                this.showValueList();
+            }
+        },
+        onLeft () {
+            if (this.selectionStart > 0) {
+                console.log('ignore left');
+                return;
+            }
+            this.isBlurWithoutCommit = true;
+            this.isFocused = false;
+            this.$emit('moveLeft');
+        },
+        onRight () {
+            if (this.addOnly || this.selectionStart < this.inputText.length) {
+                return;
+            }
+            this.isBlurWithoutCommit = true;
+            this.isFocused = false;
+            this.$emit('moveRight');
         }
     }
 };
@@ -555,7 +605,7 @@ export default {
       word-break: break-all;
     }
     .list-container {
-      position: fixed;
+      position: absolute;
       display: inline-block;
       min-height: 100px;
       overflow-y: scroll;
