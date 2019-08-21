@@ -435,6 +435,12 @@ $form-padding: 0.375rem 0.75rem;
     border-radius: 3px;
     padding: $form-padding;
     border: 1px solid darken($lightgray, 5%);
+    &::placeholder {
+        color: darken($lightgray, 10%);
+    }
+    .text.default {
+        color: darken($lightgray, 10%);
+    }
 }
 .form-control {
   @extend %form-input;

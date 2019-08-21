@@ -406,7 +406,21 @@ export const Mixin = {
          * Description:  return Array of language select list.
          **********************************************************************************/
         getLanguageSelectList: function () {
-            return GlobalEnum.LANGUAGES;
+            return Object.values(GlobalEnum.LANGUAGES);
+        },
+        /**********************************************************************************
+         * Name       : getLanguageName
+         * Input   => (lang                         =>  String)
+         *             
+         * Output  => String
+         * Description:  return String of language name.
+         **********************************************************************************/
+        getLanguageName: function (lang) {
+            let langObj = GlobalEnum.LANGUAGES[lang];
+            if (!langObj) {
+                return null;
+            }
+            return langObj.text;
         },
         /**********************************************************************************
          * Name       : getSelectedNode

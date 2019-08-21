@@ -1,24 +1,25 @@
 <template>
   <div class="base-table">
-    <b-card :class="{'no-card': cardless}"
+    <b-card :class="{ 'no-card': cardless,
+                      dark: darkHeader }"
             :style="{ height: `${height}px` }"
     >
       <template #header>
-        <b-row align-v="center">
-          <b-col cols="4" sm="6" md="2"
-                 class="mb-md-0 mb-3"
-          >
+        <b-row align-v="center" align-h="between" class="header-container">
+          <div class="caption-container">
             <slot name="caption" />
-          </b-col>
-          <b-col cols="12" sm="12" md="6" xl="7" order="3" order-md="2">
-            <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
-            <BaseSearch v-else-if="noContextSearchable" @search="onSearch" />
-          </b-col>
-          <b-col cols="8" sm="6" md="4" xl="3"
-                 order="2" order-md="3"
-                 class="mb-3 mb-md-0"
-          >
-            <b-row align-v="center" no-gutters align-h="between" class="text-center">
+          </div>
+          <div class="searchbox-container order-md-2 order-3">
+            <div class="searchbox">
+              <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
+              <BaseSearch v-else-if="noContextSearchable" @search="onSearch" />
+            </div>
+          </div>
+          <div class="tool-container mr-0 order-md-3 order-2">
+            <b-row align-v="center"
+                   no-gutters 
+                   align-h="end" 
+            >
               <b-col>
                 <span class="prev-btn" @click.prevent="onPrev"><i class="fal fa-chevron-left" /></span>
               </b-col>
@@ -51,7 +52,7 @@
                 <span class="refresh-btn" @click="onRefresh"><i class="fal fa-sync" /></span>
               </b-col>
             </b-row>
-          </b-col>
+          </div>
         </b-row>
       </template>
 
@@ -205,6 +206,10 @@ export default {
             type: [Array, Object],
             default: () => []
         },
+        fieldId: {
+            type: String,
+            default: null
+        },
         perPage: {
             type: Number,
             default: 10
@@ -232,6 +237,10 @@ export default {
         height: {
             type: Number,
             default: 500
+        },
+        darkHeader: {
+            type: Boolean,
+            default: true
         }
     },
     data() {
@@ -263,21 +272,30 @@ export default {
             return Math.ceil(this.totalRows / this.limit);
         }
     },
+    created () {
+        this.validateProperties();
+    },
     methods: {
-        capitalizeFirstLetter(s) {
+        validateProperties () {
+            if (this.selectable && this.selectMode === 'multi' && this.isEmpty(this.fieldId)) {
+                throw new Error('The required property was not provided.\n\
+             \'fieldId\' property is required when it is selectable with \'multi\' mode.');
+            }
+        },
+        capitalizeFirstLetter (s) {
             return s.hasOwnProperty('text') ? this.capitalize(s.text) : s.hasOwnProperty('flag') ? this.capitalize(s.flag) : '';
         },
-        getServerStates(state){
+        getServerStates (state) {
             return this.bindEnumToHtml(state);
         },
-        getVariantSize(size) {
+        getVariantSize (size) {
             let variantFontSize = 3;
             if (size.hasOwnProperty('variantSize')){
                 variantFontSize = size.variantSize;
             }
             return this.setFontSize(variantFontSize);
         },
-        getBadge(status) {
+        getBadge (status) {
             let badge = '';
             if (this.isEmpty(status)){
                 status = badge;
@@ -286,14 +304,14 @@ export default {
             }
             return this.selectBadges(badge);
         },
-        filterLimit() {
+        filterLimit () {
             if (this.limitInput < 1) {
                 this.limitInput = 1;
             } else if (this.limitInput > this.perPageMax) {
                 this.limitInput = this.perPageMax;
             }
         },
-        rowClicked(item, idx, e) {
+        rowClicked (item, idx, e) {
             if (this.selectable) {
                 this.rowSelected(item, idx, e);
             }
@@ -304,8 +322,7 @@ export default {
          * @param idx
          * @param e
          */
-        rowSelected(item, idx) {
-            this.consoleLogEnv('row Selected');
+        rowSelected (item, idx) {
             this.selectedRows.map((row) => {
                 if (row.data !== item) {
                     row.data.selected = false;
@@ -320,8 +337,7 @@ export default {
             this.setIsSelectAll();
             this.$emit('rowSelected', this.selectedRows[0], idx);
         },
-        checkSingleMode(item, idx, newValue) {
-            this.consoleLogEnv('check Single-Mode');
+        checkSingleMode (item, idx, newValue) {
             if (this.selectedRows[0]) {
                 this.selectedRows[0].data.selected = false;
             }
@@ -335,15 +351,14 @@ export default {
             this.setIsSelectAll();
             this.$emit('rowSelected', this.selectedRows[0], idx);
         },
-        checkMultiMode(item, idx, newValue) {
-            this.consoleLogEnv('check Multi-Mode');
+        checkMultiMode (item, idx, newValue) {
             let isOnceSelected = this.selectedRows.some((row, i) => {
-                if (row.data._id === item._id) {
+                if (row.data[this.fieldId] === item[this.fieldId]) {
                     row.data.selected = false;
                     this.updateTableData(row.idx, row.data);
                     this.$delete(this.selectedRows, i);
                 }
-                return row.data._id === item._id;
+                return row.data[this.fieldId] === item[this.fieldId];
             });
             if (!isOnceSelected) {
                 this.selectedRows.push({ idx: idx, data: item });
@@ -351,9 +366,9 @@ export default {
             item.selected = newValue;
             this.updateTableData(idx, item);
             this.setIsSelectAll();
-            this.$emit('rowSelected', this.selectedRows);
+            this.$emit('rowSelected', this.selectedRows, idx);
         },
-        checkboxClicked(val, key) {
+        checkboxClicked (val, key) {
             this.consoleLogEnv('row Selected');
             switch (this.selectMode) {
             case 'single':
@@ -364,14 +379,14 @@ export default {
                 break;
             }
         },
-        setIsSelectAll() {
+        setIsSelectAll () {
             if (this.selectedRows.length === this.tableData.length) {
                 this.isSelectedAll = true;
             } else {
                 this.isSelectedAll = false;
             }
         },
-        onSelectAll(val) {
+        onSelectAll (val) {
             if (val) {
                 this.selectedRows = [];
                 this.tableData.map((data, i) => {
@@ -389,7 +404,7 @@ export default {
 
             this.$emit('onSelectAll', this.selectedRows, this.isSelectedAll);
         },
-        updateTableData(idx, data) {
+        updateTableData (idx, data) {
             if (this.isEmpty(idx)) {
                 idx = 0;
             }
@@ -398,37 +413,37 @@ export default {
             }
             this.$set(this.tableData, idx, Object.assign({}, data));
         },
-        onPrev() {
+        onPrev () {
             if (this.currentPage <= 1) {
                 return;
             }
             this.currentPage--;
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
-        onNext() {
+        onNext () {
             if (this.currentPage >= this.maxPage) {
                 return;
             }
             this.currentPage++;
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
-        onRefresh() {
+        onRefresh () {
             this.currentPage = 1;
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
-        onSearch(filter, filterOr) {
+        onSearch (filter, filterOr) {
             this.filter = filter;
             this.filterOr = filterOr;
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
-        headClicked(key, item) {
+        headClicked (key, item) {
             if (item.ajaxSortable) {
                 this.isLocalSort = false;
             } else {
                 this.isLocalSort = true;
             }
         },
-        sortingChanged(ctx) {
+        sortingChanged (ctx) {
             if (this.isLocalSort) {
                 return;
             }
@@ -439,10 +454,10 @@ export default {
             };
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
-        contextChanged(ctx) {
+        contextChanged (ctx) {
             this.$emit('changed', ctx);
         },
-        rowClass(item) { // custom global style
+        rowClass (item) { // custom global style
             let className = 'tbody-tr-default';
             if (item && item.selected) {
                 className += ' tbody-tr-selected';
@@ -452,7 +467,7 @@ export default {
             }
             return className;
         },
-        limitChanged() {
+        limitChanged () {
             this.filterLimit();
             let currentPageLastRowIdx = this.currentPage * this.limitInput;
             if (currentPageLastRowIdx > this.totalRows) {
@@ -460,7 +475,7 @@ export default {
             }
             this.$emit('limitChanged', this.limitInput);
         },
-        onLimitInputEnter() {
+        onLimitInputEnter () {
             this.$refs.modal.hideModal();
             this.$refs.modal.$emit('ok');
         }
@@ -477,7 +492,7 @@ export default {
         vertical-align: middle;
     }
     &:hover {
-        background-color: $lightgray;
+        background-color: rgba($darkgray, 0.5);
     }
 }
 
@@ -501,22 +516,27 @@ export default {
     &.no-card {
         border: 0;
         all: unset;
-
         .card-header {
             background-color: transparent;
         }
-
         .card-body {
             box-shadow: none;
             overflow-x: hidden;
         }
     }
+    &.dark {
+        .card-header {
+            background-color: $gray;
+        }
+    }
     .card-header {
-        padding-top: 30px;
-        padding-bottom: 30px;
-        background-color: $whiteblue;
+        padding-top: 15px;
+        padding-bottom: 15px;
         border: 0;
+        background-color: $whiteblue;
         border-radius: inherit;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
     }
     .card-body {
         overflow-x: scroll;
@@ -529,6 +549,34 @@ export default {
     .b-table {
         display: inline-table;
         margin: 0;
+    }
+    $caption-min-width: 220px;
+    $caption-max-width: 240px;
+    $tool-min-width: 250px;
+    $tool-max-width: 340px;
+    $pad-side: 20px;
+    .header-container {
+        padding-left: $pad-side;
+        padding-right: $pad-side;
+    }
+    .caption-container {
+        min-width: $caption-min-width;
+        max-width: $caption-max-width;
+    }
+    .searchbox-container {
+        width: calc(100% - #{$caption-max-width} - #{$tool-max-width});
+        text-align: right;
+        .searchbox {
+            display: inline-block;
+            text-align: left;
+            width: 100%;
+        }
+    }
+    .tool-container {
+        display: inline-block;
+        min-width: $tool-min-width;
+        max-width: $tool-max-width;
+        text-align: right;
     }
 }
 </style>

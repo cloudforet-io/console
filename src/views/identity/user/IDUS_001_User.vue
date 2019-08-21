@@ -13,6 +13,7 @@
                    :cardless="false" 
                    :underlined="true"
                    :height="height"
+                   field-id="user_id"
                    @rowSelected="rowSelected" 
                    @list="listUsers"
                    @limitChanged="limitChanged"
@@ -54,6 +55,7 @@
                :centered="true" 
                :hide-footer="true"
                :backdrop-off="true"
+               size="xl"
     >
       <template #contents>
         <UserDetail 
@@ -69,6 +71,7 @@
                :centered="true" 
                :hide-footer="true"
                :backdrop-off="true"
+               size="xl"
     >
       <template #contents>
         <UserDetail :updatable="true" 
@@ -155,8 +158,17 @@ export default {
                 { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
                 { key: 'mobile', label: this.tr('COL_NM.PHONE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
                 { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'language', label: this.tr('COL_NM.LANGUAGE'), sortable: true, ajaxSortable: false , thStyle: { width: '200px' }},
-                { key: 'domain_id', label: this.tr('COL_NM.DOMAIN_ID'), thStyle: { width: '200px' }},
+                { 
+                    key: 'language', 
+                    label: this.tr('COL_NM.LANGUAGE'), 
+                    sortable: true, 
+                    ajaxSortable: false , 
+                    thStyle: { width: '200px' },
+                    filterByFormatted: true,
+                    formatter: (val) => {
+                        return this.getLanguageName(val);
+                    }
+                },
                 { key: 'timezone', label: this.tr('COL_NM.TIMEZONE'), thStyle: { width: '200px' }}
             ];
         },
@@ -235,18 +247,27 @@ export default {
                 console.error(e);
                 this.isLoading = false;
             }
-      /**
-       * TODO: set totalCount with data from server
-       */
         },
         rowSelected (row, idx) {
-            if (row instanceof Array || !row) {
-                this.selectedUser = null;
-                this.selectedIdx = undefined;
+            if (this.isEmpty(row)) {
+                this.initSelectedUser();
+            } else if (row instanceof Array) {
+                if (row.length === 1) {
+                    this.setSelectedUser(row[0].data, idx);
+                } else {
+                    this.initSelectedUser();
+                }
             } else {
-                this.selectedUser = row.data;
-                this.selectedIdx = idx;
+                this.setSelectedUser(row.data, idx);
             }
+        },
+        initSelectedUser () {
+            this.selectedUser = null;
+            this.selectedIdx = undefined;
+        },
+        setSelectedUser (user, idx) {
+            this.selectedUser = user;
+            this.selectedIdx = idx;
         },
         limitChanged (val) {
             this.perPage = Number(val);
