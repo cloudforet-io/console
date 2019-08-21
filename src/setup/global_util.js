@@ -4,14 +4,14 @@ import VueLodash from 'vue-lodash';
 import timezone from 'countries-and-timezones';
 export const Mixin = {
     methods: {
-    /**********************************************************************************
-     * Name       : getGraphColor
-     * Input      : => (o: opacity,   => Boolean,
-     *                  r: random,    => Boolean,
-     *                  l: length     => Number)
-     * Output     : => (String || Array of String contains Hex color)
-     * Description:    generate random color HEX digits.
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : getGraphColor
+         * Input      : => (o: opacity,   => Boolean,
+         *                  r: random,    => Boolean,
+         *                  l: length     => Number)
+         * Output     : => (String || Array of String contains Hex color)
+         * Description:    generate random color HEX digits.
+         **********************************************************************************/
         getGraphColor: (o, r, l) => {
             const colorListWithOpacity = [
                 hexToRgba('#2C68F9', 70),
@@ -39,22 +39,22 @@ export const Mixin = {
             }
             return returnColorVal;
         },
-    /**********************************************************************************
-     * Input        => (v:value: => Any)
-     * Output       => (Boolean)
-     * Description:    Check whether given value is empty.
-     **********************************************************************************/
+        /**********************************************************************************
+         * Input        => (v:value: => Any)
+         * Output       => (Boolean)
+         * Description:    Check whether given value is empty.
+         **********************************************************************************/
         isEmpty: function (v) {
             return (v === '' || v === null || v === undefined || (v !== null && typeof v === 'object' && !Object.keys(v).length)) ? true : false;
         },
-    /**********************************************************************************
-     * Name       : cssStyler
-     * Input        => (c:css Object      => type of Object,
-     *                  i:use 'Style' YN  => Boolean
-     *                  t:use  Trim   YN  => Boolean )
-     * Output       => (String): All trimmed css String by condition;
-     * Description:    Generate full String of css given Object c by condition of i, t
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : cssStyler
+         * Input        => (c:css Object      => type of Object,
+         *                  i:use 'Style' YN  => Boolean
+         *                  t:use  Trim   YN  => Boolean )
+         * Output       => (String): All trimmed css String by condition;
+         * Description:    Generate full String of css given Object c by condition of i, t
+         **********************************************************************************/
         cssStyler: function (c, i, t) {
             let style = '';
             Object.entries(c).forEach(([key, val]) => {
@@ -66,12 +66,12 @@ export const Mixin = {
             });
             return (i) ? `style="${style}"` : style;
         },
-    /**********************************************************************************
-     * Name       : selectToCopyToClipboard
-     * Input   => (t:text            =>  String)
-     * Output  => (Empty):
-     * Description:  copy given text to clipboard
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : selectToCopyToClipboard
+         * Input   => (t:text            =>  String)
+         * Output  => (Empty):
+         * Description:  copy given text to clipboard
+         **********************************************************************************/
         selectToCopyToClipboard: function (t) {
             let textArea = document.createElement('textarea');
             textArea.value = t;
@@ -81,26 +81,12 @@ export const Mixin = {
             textArea.remove();
             console.log('Success', successFailCondition);
         },
-    /**********************************************************************************
-     * Name       : sideBarMiniMaxControl
-     * Input   => ()
-     * Output  => (Empty):
-     * Description:  Minimize or Maximize Side bar Menu
-     **********************************************************************************/
-        sideBarMiniMaxControl: function () {
-            let currentStatus = document.body.className;
-            if (currentStatus.indexOf('sidebar-minimized brand-minimized') > -1) {
-                document.body.className = 'sidebar-lg-show header-fixed sidebar-fixed';
-            } else {
-                document.body.className = 'sidebar-lg-show header-fixed sidebar-fixed sidebar-minimized brand-minimized';
-            }
-        },
-    /**********************************************************************************
-     * Name       : selectBadges
-     * Input   => (s:badges flag String  => String)
-     * Output  => (String): variant value
-     * Description:  Select badges variant by given val
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : selectBadges
+         * Input   => (s:badges flag String  => String)
+         * Output  => (String): variant value
+         * Description:  Select badges variant by given val
+         **********************************************************************************/
         selectBadges: function (s) {
             const successFlag = ['active', 'success','vm'];
             const secondaryFlag = ['inactive'];
@@ -111,32 +97,32 @@ export const Mixin = {
             const darkFlag = [];
             return successFlag.includes(s.toLowerCase()) ? 'success'
                 : secondaryFlag.includes(s.toLowerCase()) ? 'secondary'
-                : dangerFlag.includes(s.toLowerCase()) ? 'danger'
-                : warningFlag.includes(s.toLowerCase()) ? 'warning'
-                : infoFlag.includes(s.toLowerCase()) ? 'info'
-                : lightFlag.includes(s.toLowerCase()) ? 'light'
-                : darkFlag.includes(s.toLowerCase()) ? 'dark'
-                : 'primary';
+                    : dangerFlag.includes(s.toLowerCase()) ? 'danger'
+                        : warningFlag.includes(s.toLowerCase()) ? 'warning'
+                            : infoFlag.includes(s.toLowerCase()) ? 'info'
+                                : lightFlag.includes(s.toLowerCase()) ? 'light'
+                                    : darkFlag.includes(s.toLowerCase()) ? 'dark'
+                                        : 'primary';
         },
-    /**********************************************************************************
-     * Name       : capitalize
-     * Input   => (s: any String   => String)
-     * Output  => (String): with upper case of First letter
-     * Description:  Select badges variant by given val
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : capitalize
+         * Input   => (s: any String   => String)
+         * Output  => (String): with upper case of First letter
+         * Description:  Select badges variant by given val
+         **********************************************************************************/
         capitalize: (s) => {
             if (typeof s !== 'string') {
                 return '';
             }
             return s.charAt(0).toUpperCase() + s.slice(1);
         },
-    /**********************************************************************************
-     * Name       : consoleLogEnv
-     * Input   => (s: any String   => String)
-     *             o: any object   => Object)
-     * Output  => print out on console.log
-     * Description:  Console.log if only when it's not in production.
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : consoleLogEnv
+         * Input   => (s: any String   => String)
+         *             o: any object   => Object)
+         * Output  => print out on console.log
+         * Description:  Console.log if only when it's not in production.
+         **********************************************************************************/
         consoleLogEnv: function (s, o) {
             const processEnv = this.$root.$options.components.App.props.processEnv.default;
             if (!this.isEmpty(processEnv) && processEnv != 'production') {
@@ -147,23 +133,23 @@ export const Mixin = {
                 }
             }
         },
-    /**********************************************************************************
-     * Name       : colSelector
-     * Input   => (l: length of data   => Number)
-     * Output  => (String): with First letter
-     * Description:  return String with selected col size
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : colSelector
+         * Input   => (l: length of data   => Number)
+         * Output  => (String): with First letter
+         * Description:  return String with selected col size
+         **********************************************************************************/
         colSelector: function (l) {
             const colNumber = Math.round(12 / l);
             return 'col-xs-6 col-sm-6 col-md-6 col-lg-' + colNumber + ' col';
         },
-    /**********************************************************************************
-     * Name       : isSelectedType
-     * Input   => (t: type to check  =>  n: Number, s:String, b:Boolean, o:Object, a:Arr
-     *             d: data to check  => Any)
-     * Output  => boolean whether it's checked type
-     * Description:  Console.log if only when it's not in production.
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : isSelectedType
+         * Input   => (t: type to check  =>  n: Number, s:String, b:Boolean, o:Object, a:Arr
+         *             d: data to check  => Any)
+         * Output  => boolean whether it's checked type
+         * Description:  Console.log if only when it's not in production.
+         **********************************************************************************/
         isSelectedType: function (d, t) {
             if (t.toUpperCase() ==='N') {
                 return (Number.isInteger(d) && !isNaN(d));
@@ -181,19 +167,19 @@ export const Mixin = {
                 throw 'Please, Check data type';
             }
         },
-    /**********************************************************************************
-     * Name       : selectIconHtml
-     * Input   => (o: icon object   =>  Object, c: class)
-     *            {type: type of font awesome ex: fal, fab,
-     *             icon: icon name,
-     *             size: size of icon ex: -1 ~ 10
-     *             color: variant color
-     *            }
-     * Output  => boolean whether it's checked type
-     * Description:  Create a string of <i/> Dom tag with given option
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : selectIconHtml
+         * Input   => (o: icon object   =>  Object, c: class)
+         *            {type: type of font awesome ex: fal, fab,
+         *             icon: icon name,
+         *             size: size of icon ex: -1 ~ 10
+         *             color: variant color
+         *            }
+         * Output  => boolean whether it's checked type
+         * Description:  Create a string of <i/> Dom tag with given option
+         **********************************************************************************/
         selectIconHtml: function (o, c) {
-             /******************************************************************
+            /******************************************************************
              * Note:: Please add a new type letter when New font Type has added.
              * ****************************************************************
              */
@@ -225,17 +211,17 @@ export const Mixin = {
             returnHtml =`<i class="${defaultClass}"> </i>`;
             return c ? defaultClass : returnHtml;
         },
-    /**********************************************************************************
-     * Name       : tr
-     * Input   => (m: message   =>  String)
-     *            {type: type of font awesome ex: fal, fab,
-     *             icon: icon name,
-     *             size: size of icon ex: -1 ~ 10
-     *             color: variant color
-     *            }
-     * Output  => String translation Message
-     * Description:  translation of i18n
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : tr
+         * Input   => (m: message   =>  String)
+         *            {type: type of font awesome ex: fal, fab,
+         *             icon: icon name,
+         *             size: size of icon ex: -1 ~ 10
+         *             color: variant color
+         *            }
+         * Output  => String translation Message
+         * Description:  translation of i18n
+         **********************************************************************************/
         tr: function (m) {
             let path = m.split('.');
             let key = 'MSG';
@@ -246,17 +232,17 @@ export const Mixin = {
             }
             return  this.$i18n.t(key);
         },
-    /**********************************************************************************
-     * Name       : setFontSize
-     * Input   => (m: message   =>  String)
-     *            {type: type of font awesome ex: fal, fab,
-     *             icon: icon name,
-     *             size: size of icon ex: -1 ~ 10
-     *             color: variant color
-     *            }
-     * Output  => String translation Message
-     * Description:  return string with font-size with for h1,h2,h3,h4,h5,h6 and personal set data.
-     **********************************************************************************/
+        /**********************************************************************************
+         * Name       : setFontSize
+         * Input   => (m: message   =>  String)
+         *            {type: type of font awesome ex: fal, fab,
+         *             icon: icon name,
+         *             size: size of icon ex: -1 ~ 10
+         *             color: variant color
+         *            }
+         * Output  => String translation Message
+         * Description:  return string with font-size with for h1,h2,h3,h4,h5,h6 and personal set data.
+         **********************************************************************************/
         setFontSize: function (f) {
             let fontSize = 'font-size:';
             let defaultSet = this.defaultFontSizeSet;
@@ -288,10 +274,10 @@ export const Mixin = {
                 const msg = this.isEmpty(this.tr('ENUM.' + p.toUpperCase())) ? this._.get(GlobalEnum,p.toUpperCase() +  '.msg') : this.tr('ENUM.' + p.toUpperCase());
 
                 /***********
-                msg: 'In Progress',
-                icon: 'fal fa-check',
-                color: 'primary'
-                ************/
+                 msg: 'In Progress',
+                 icon: 'fal fa-check',
+                 color: 'primary'
+                 ************/
 
                 return `<span class="${color}"><i class="${icon}"> </i></span> &nbsp; ${msg}`;
 
@@ -329,7 +315,6 @@ export const Mixin = {
          * Description:  translation of i18n
          **********************************************************************************/
         dictToKeyValueArray: function (obj) {
-
             let arr = [];
             for (let key in obj) {
                 arr.push({ [key]: obj[key] });
@@ -375,7 +360,7 @@ export const Mixin = {
         },
         /**********************************************************************************
          * Name       : getAllTimezones
-         *             
+         *
          * Output  => Array
          * Description:  return Array of timezone String.
          **********************************************************************************/
@@ -383,52 +368,12 @@ export const Mixin = {
             return Object.keys(timezone.getAllTimezones());
         },
         /**********************************************************************************
-         * Name       : getAllTimezones
-         *             
-         * Output  => Array
-         * Description:  return Array of timezone String.
-         **********************************************************************************/
-        getTimezoneSelectList: function () {
-            let results = [];
-            let timezones = timezone.getAllTimezones();
-            for (var tz in timezones) {
-                results.push({
-                    value: tz,
-                    text: `${tz} ${timezones[tz].offsetStr}`
-                });
-            }
-            return results;
-        },
-        /**********************************************************************************
-         * Name       : getLanguageSelectList
-         *             
-         * Output  => Array
-         * Description:  return Array of language select list.
-         **********************************************************************************/
-        getLanguageSelectList: function () {
-            return Object.values(GlobalEnum.LANGUAGES);
-        },
-        /**********************************************************************************
-         * Name       : getLanguageName
-         * Input   => (lang                         =>  String)
-         *             
-         * Output  => String
-         * Description:  return String of language name.
-         **********************************************************************************/
-        getLanguageName: function (lang) {
-            let langObj = GlobalEnum.LANGUAGES[lang];
-            if (!langObj) {
-                return null;
-            }
-            return langObj.text;
-        },
-        /**********************************************************************************
          * Name       : getSelectedNode
-         * Input   => (f: flag                         =>  String)
+         * Input   => (o: any data Object to bind                         =>  Object)
          * Output  => Node
          * Description:  return tree array of object which suits for BaseTree
          **********************************************************************************/
-        getSelectedNode: function () {
+        getSelectedNode: function (o) {
             let selectedNode = {
                 title: '',
                 isLeaf: false,
@@ -439,6 +384,19 @@ export const Mixin = {
                 isSelectable: true,
                 data: { visible: false }
             };
+            if (!this.isEmpty(o)) {
+                for (let [key, val] of Object.entries(o)) {
+                    if (key==='name') {
+                        selectedNode['title'] = val;
+                    } else if (key === 'has_child') {
+                        selectedNode['isLeaf'] = !val;
+                    } else if (key === 'domain_id') {
+                        continue;
+                    } else {
+                        selectedNode['data'][key] = val;
+                    }
+                }
+            }
             return selectedNode;
         },
         /**********************************************************************************
@@ -470,4 +428,3 @@ export const Mixin = {
         };
     }
 };
-

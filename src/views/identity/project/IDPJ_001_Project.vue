@@ -8,21 +8,19 @@
                    :hide-footer="true"
         >
           <template #contents>
-            <BaseTabs is="BaseTabs"
-                      ref="EditTab"
-                      :key="tabs.path"
-                      :tabs="modalTabs"
-                      :fill="true"
-                      :selected-data="selectedData"
-                      :is-creatable.camel="createProcess"
-                      :is-updatable.camel="updateProcess"
-                      :is-footer-visible="true"
-                      @create="createProject"
-                      @update="updateProject"
-                      @close="$refs.EditModal.hideModal()"
-            >
-              <template #ModaltabContentsPanel />
-            </BaseTabs>
+            <BaseTabNav
+              ref="EditTab"
+              :fill="true"
+              :nav-tabs="modalTabs"
+              :keep-alive="true"
+              :is-footer-visible="true"
+              :selected-data="selectedData"
+              :is-creatable="createProcess"
+              :is-updatable="updateProcess"
+              @create="createProsProcess"
+              @update="updateProject"
+              @close="$refs.EditModal.hideModal()"
+            />
           </template>
         </BaseModal>
       </div>
@@ -55,33 +53,12 @@
 import projectSummary from './IDPJ_004_ProjectSummary.vue';
 import projectAudit from './IDPJ_007_ProjectAudit.vue';
 import projectMember from './IDPJ_005_ProjectMember.vue';
+import projectEditPopupName from '@/views/identity/project/IDPJ_002_ProjectEditPopupName';
+import projectEditPopupTag from '@/views/identity/project/IDPJ_003_ProjectEditPopupTag';
 
 import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
-import BaseTabs from '@/components/base/tab/BATA_001_BaseTab';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseTree from '@/components/base/tree/BATR_001_BaseTree';
-
-let NodePR = {
-    title: '',
-    isLeaf: true,
-    children: null,
-    isExpanded: true,
-    isSelected: true,
-    isDraggable: true,
-    isSelectable: true,
-    data: { visible: false }
-};
-
-let NodePG = {
-    title: '',
-    isLeaf: false,
-    children: null,
-    isExpanded: true,
-    isSelected: true,
-    isDraggable: true,
-    isSelectable: true,
-    data: { visible: false }
-};
 
 const tabs = [
     {
@@ -107,22 +84,15 @@ const tabs = [
     }
 ];
 
-const projectEditPopupName = () => import('./IDPJ_002_ProjectEditPopupName');
-const projectEditPopupTag = () => import('./IDPJ_003_ProjectEditPopupTag');
-
-const modalTab = [
+const modalTabs = [
     {
         tabIcon: 'icon-calculator',
         tabTitle: 'DEFAULT',
-        updatable: true,
-        creatable: true,
         component: projectEditPopupName
     },
     {
         tabIcon: 'icon-user',
         tabTitle: 'TAGS',
-        updatable: true,
-        creatable: true,
         component: projectEditPopupTag
     }
 ];
@@ -131,7 +101,6 @@ export default {
     name: 'Project',
     components: {
         BaseTabNav,
-        BaseTabs,
         BaseTree,
         BaseModal
     },
@@ -142,6 +111,9 @@ export default {
         return {
             treeKey: 1,
             tab: tabs[0].component,
+            tabs: tabs,
+            modalTab: modalTabs[0].component,
+            modalTabs: modalTabs,
             selectedData: {}, //Selected Data => Selected node data & flag
             processData: {}, //Process Data => data that has to be taken by action
             createProcess: false,
@@ -150,8 +122,6 @@ export default {
             projectModalTitle: 'Edit a Project',
             modalVisible: false,
             lastEvent: 'Right-Click to open context menus on tree.',
-            tabs: tabs,
-            modalTabs: modalTab,
             isInitializing: false
         };
     },
@@ -183,7 +153,7 @@ export default {
         NodeSelected(item) {
             this.lastEvent = 'Selected Item : ' + item[0].title;
         },
-        getNextSelected(item){
+        getNextLayerOnTree (tree){
 
         },
         editSelected(item) {
@@ -202,13 +172,13 @@ export default {
                    *  SN => Selected Node Group or Node
                    */
             if (['SN'].includes(item.flag)) {
-                this.selectedData['selectedItem'] = item;
+                this.selectedData = item;
                 this.manageTabButton('UPT', true);
                 this.selectedData = item;
                 this.$refs.EditModal.showModal();
             } else {
                 const title = (item.flag.indexOf('NG') > -1);
-                this.selectedData['selectedItem'] = item;
+                this.selectedData = item;
                 this.manageTabButton('CRT', true, title);
                 this.$refs.EditModal.showModal();
             }
@@ -223,109 +193,114 @@ export default {
                 this.updateProcess = state;
             }
         },
-        async updateProject(items) {
-            this.consoleLogEnv('item', items);
-            const treeV = items.tree;
-            const path = treeV.getSelected()[0].path;
-            let tabData = this.$refs.EditTab.tabContentData;
-            treeV.updateNode(path, { title: tabData.projectProp.projectName });
-            tabData.projectProp.projectName = null;
-                //TODO:: Simulate gRPC Modules on BACK_END
-            this.$refs.EditModal.hideModal();
+        validateProject (){
+            let isDefaultValidated = false;
+            let isTagValidated = false;
+            let params = {};
+            if (this.$refs.EditTab.$children[2].validateProject()){
+                isDefaultValidated = true;
+                params['name'] = this.$refs.EditTab.$children[2]._data.projectName;
+            }
+            if (!this.isEmpty(this.$refs.EditTab.$children[3])){
+                if (this.$refs.EditTab.$children[3].$refs.projectTag.validate()) {
+                    params['tags'] = this.$refs.EditTab.$children[3].$refs.projectTag.tags;
+                    isTagValidated = true;
+                }
+            } else {
+                isTagValidated = true;
+            }
+            if (this.$refs.EditTab.selectedTab.tabTitle == 'DEFAULT'){
+                if (isDefaultValidated && !isTagValidated){
+                    this.$refs.EditTab.selectedTab = this.modalTabs[1];
+                }
+            } else {
+                if (isTagValidated && !isDefaultValidated){
+                    this.$refs.EditTab.selectedTab = this.modalTabs[0];
+                }
+            }
+            return (isTagValidated && isDefaultValidated) ? params : null;
+        },
+        async createProsProcess(items) {
+            const flag = this.selectedData.flag;
+            const treeV = this.isEmpty(items.tree) ? this.selectedData.tree : items.tree;
+            if (['NG','RNG','SNG'].includes(flag)) {
+                this.createProjectGroup(items, flag, treeV);
+            } else {
+                this.createProject(items, flag, treeV);
+            }
+        },
+        async createProjectGroup(items, flag, tree) {
+
+            let url = '/identity/project-group/create';
+            let param = this.validateProject();
+
+            if (param){
+                param['domain_id'] = sessionStorage.domainId;
+                const selected = tree.getSelected()[0];
+
+                if (flag === 'SNG') {
+                    param['parent_project_group_id'] = selected.data.id;
+                } else {
+                    param['is_root']= true;
+                }
+
+                await this.$axios.post(url, param).then((response) => {
+                    const responseData = !this.isEmpty(response.data) ? response.data : {};
+                    if (!this.isEmpty(responseData)){
+                        const placement = flag.charAt(0) === 'S' ? 'inside': 'before';
+                        const InitializedPG = { id: responseData.project_group_id, item_type:'PROJECT_GROUP', is_root: responseData.is_root, name: param.name};
+                        let newNode = this.getSelectedNode(InitializedPG);
+
+                        /*if (flag === 'SNG') {
+
+                        } else {
+
+                        }*/
+
+                        tree.insert({ node: tree.getSelected()[0], placement: placement }, newNode);
+                        if (this.isInitializing){
+                            tree.remove([tree.getSelected()[1]].map(node => node.path));
+                            this.isInitializing = false;
+                        }
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                });
+                this.$refs.EditModal.hideModal();
+            }
         },
         async createProject(items) {
 
-            this.consoleLogEnv('item', items);
-            const flag = this.selectedData.selectedItem.flag;
-            const treeV = this.isEmpty(items.tree) ? this.selectedData.selectedItem.tree : items.tree;
-            const selected = treeV.getSelected()[0];
-            let tabData = this.$refs.EditTab.tabContentData;
-
-            let url = null;
-            let passParam = {};
-
-            let newNode = this.getSelectedNode();
-            newNode['title'] = tabData.projectProp.projectName;
-
-            //Any flag with selected value, then create Nodes into Selected items or before its item on same layer
-            const placement = flag.charAt(0) === 'S' ? 'inside': 'before';
-
-            if (flag == 'SND') {
-                newNode['isLeaf'] = true;
-            }
-
-            this.consoleLogEnv('current Action Flag:',flag);
-
-
-            //Initialization Set URL is create-project or project Group
-            if (this.isInitializing || flag.includes('NG')) {
-                url = '/identity/project-group/create';
-            } else {
-                url = '/identity/project/create';
-            }
-
-
-            /*
-            *  *  SNG => Selected Project Group
-                   *  SND => Selected Project
-                   *  RNG => Root Project Group
-            *
-            *
-            * */
-
-            if (this.isInitializing){
-                passParam['is_root']= true;
-                passParam['name'] = tabData.projectProp.projectName;
-                passParam['domain_id'] = sessionStorage.domainId;
-            } else if (flag === 'SNG' || flag === 'SND'){
-                passParam['parent_project_group_id'] = 'aa';
-                passParam['name'] = tabData.projectProp.projectName;
-                passParam['domain_id'] = sessionStorage.domainId;
-
-            }
-
-            await this.$axios.post(url, passParam).then((response) => {
-                const responseData = !this.isEmpty(response.data) ? [response.data] : [{}];
-
-                if (!this.isEmpty(responseData)){
-                    if (this.isInitializing) {
-                        newNode['data']['id'] = responseData[0].project_group_id;
-                        newNode['data']['is_root'] = responseData[0].is_root;
-                        treeV.insert({ node: treeV.getSelected()[0], placement: placement }, newNode);
-                        treeV.remove([treeV.getSelected()[1]].map(node => node.path));
-                        this.isInitializing = false;
-                    }
-                }
-
-            }).catch((error) => {
-                console.error(error);
-            });
-
-            //treeV.insert({ node: treeV.getSelected()[0], placement: placement }, newNode);
-            tabData.projectProp.projectName = null;
-            tabData.projectProp.projectId = null;
-            this.$refs.EditModal.hideModal();
         },
-        getNextLayerOnTree (tree){
+        async updateProject(items) {
+            this.consoleLogEnv('Update Project : ', items);
+            const itemType = items.tree.getSelected()[0].data.item_type;
+            const selectedId = items.tree.getSelected()[0].data.id;
+            const url = itemType === 'PROJECT_GROUP' ? '/identity/project-group/update': '/identity/project/update';
+            const key = itemType === 'PROJECT_GROUP' ? 'project_group_id': 'project_id';
+            let param = this.validateProject();
 
+            if (!this.isEmpty(param)){
+                param[key] = selectedId;
+                await this.$axios.post(url, param).then((response) => {
+                    if (response.data.project_group_id === selectedId) {
+                        const treeV = items.tree;
+                        const path = treeV.getSelected()[0].path;
+                        treeV.updateNode(path, { title: this.$refs.EditTab.$children[2]._data.projectName });
+                        this.$refs.EditModal.hideModal();
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                });
+            }
         },
         async deletedSelectedOnTree (pramTree){
             const itemType = pramTree.tree.getSelected()[0].data.item_type;
-            const deleteId = pramTree.tree.getSelected()[0].data.id;
-            let url = null;
-            let passParam = {};
-            if (itemType === 'PROJECT_GROUP') {
-                url = '/identity/project-group/delete';
-                passParam['project_group_id'] = deleteId;
-                passParam['domain_id'] = sessionStorage.domainId;
-            } else if (itemType === 'PROJECT') {
-                url = '/identity/project/delete';
-                passParam['project_id'] = deleteId;
-                passParam['domain_id'] = sessionStorage.domainId;
-            } else {
-                this.consoleLogEnv('No available Type');
-                return;
-            }
+            const selectedId = pramTree.tree.getSelected()[0].data.id;
+            const url = itemType === 'PROJECT_GROUP' ? '/identity/project-group/delete': '/identity/project/delete';
+            const key = itemType === 'PROJECT_GROUP' ? 'project_group_id': 'project_id';
+            let passParam = { domain_id: sessionStorage.domainId };
+            passParam[key] = selectedId;
 
             await this.$axios.post(url, passParam).then((response) => {
                 const responseData = response.data;
@@ -333,15 +308,20 @@ export default {
                 if (this.isEmpty(responseData)){
                     pramTree.tree.remove(pramTree.path);
                     this.$alertify.success('Okay');
+                    if (this.treeData.length === 1) {
+                        this.isInitializing = true;
+                        this.treeData = [{ title: 'Please, Right Click me',
+                            isLeaf: true,
+                            data: {
+                                init: true
+                            }}];
+                    }
                 }
+
+
             }).catch((error) => {
                 console.error(error);
             });
-
-
-
-
-
 
         }
     }
