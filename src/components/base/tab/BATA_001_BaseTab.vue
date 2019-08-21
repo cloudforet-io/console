@@ -4,23 +4,21 @@
       <b-tab v-for="(tab, idx) in tabs"
              :key="idx"
              :lazy="true"
-             @click="setCurrentTab(tab)"
-      >
+             @click="setCurrentTab(tab)">
         <div v-if="!tab.icon" slot="title" name="tabHeader">
           <i :class="tab.tabIcon" style="color:blue" />
           {{ tab.tabTitle }}
         </div>
         <br>
         <slot name="tabsContentPanel">
-          <component
-            :is="currentTab.component"
-            ref="popupTab"
-            :selected-data="dataForTab"
-            :is-creatable="isCreate"
-            :is-updatable="isUpdate"
-            :is-deletable="isDelete"
-            class="tab"
-          />
+            <component :is="currentTab.component"
+                        ref="popupTab"
+                        :selected-data="dataForTab"
+                        :is-creatable="isCreate"
+                        :is-updatable="isUpdate"
+                        :is-deletable="isDelete"
+                        class="tab"
+            />
         </slot>
       </b-tab>
     </b-tabs>

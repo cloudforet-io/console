@@ -30,14 +30,8 @@
 <script>
 import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
 import dataDisk from '@/views/inventory/server/inner_data_tabs/SVID_001_DataDisk.vue';
-import dataMount from '@/views/inventory/server/inner_data_tabs/SVID_002_DataMount.vue';
 import dataNIC from '@/views/inventory/server/inner_data_tabs/SVID_003_DataNIC.vue';
-import dataRoute from '@/views/inventory/server/inner_data_tabs/SVID_004_DataRoute.vue';
-import dataPort from '@/views/inventory/server/inner_data_tabs/SVID_005_DataPort.vue';
-import dataPCI from '@/views/inventory/server/inner_data_tabs/SVID_006_DataPCI.vue';
-import dataSoftware from '@/views/inventory/server/inner_data_tabs/SVID_007_DataSoftware.vue';
-import dataWinUpdate from '@/views/inventory/server/inner_data_tabs/SVID_008_DataWinUpdate.vue';
-import dataShare from '@/views/inventory/server/inner_data_tabs/SVID_009_DataShare.vue';
+
 import dataSecurityGroup from '@/views/inventory/server/inner_data_tabs/SVID_010_DataSecurityGroup.vue';
 
 
