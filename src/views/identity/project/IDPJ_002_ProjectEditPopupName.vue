@@ -4,24 +4,25 @@
       <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
         <b-card class="base first-tab summary">
           <b-container fluid class="mt-4">
-            <b-row v-if="isInitialized" class="my-1">
+            <b-row v-if="currentState=='UPT'" class="my-1">
               <b-col sm="3">
-                <label class="control-label">Project ID:</label>
+                <label class="control-label">{{tr('PG_ID')}} :</label>
               </b-col>
-              <template v-if="currentState=='UPT'">
+              <b-col sm="9">
+                {{ projectId }}
+              </b-col>
+            </b-row>
+            <b-row v-if="currentState=='CRT' && !isEmpty(projectGroup)" class="my-1">
+              <b-col sm="3">
+                <label class="control-label">{{tr('PG_GR')}} :</label>
+              </b-col>
                 <b-col sm="9">
-                  {{ projectId }}
+                  {{ projectGroup }}
                 </b-col>
-              </template>
-              <template v-else>
-                <b-col sm="9">
-                  <b-form-input v-model="projectId" :placeholder="placeHolderId" type="text" />
-                </b-col>
-              </template>
             </b-row>
             <b-row class="my-1">
               <b-col sm="3">
-                <label class="control-label">Project Name:</label>
+                <label class="control-label">{{tr('PG_NM')}} :</label>
               </b-col>
               <b-col sm="9">
                 <b-form-group>
@@ -62,6 +63,7 @@ export default {
             isInitialized: true,
             placeHolderId: null,
             placeHolderName: null,
+            projectGroup: null,
             projectId: this.projectProp.projectId,
             projectName: this.projectProp.projectName,
             treeDataSelected: {},
@@ -99,8 +101,8 @@ export default {
             }
         }
 
-        if (!this.isEmpty(this._.get(selectedNode,'data.init')) || this.currentState === 'CRT') {
-            this.isInitialized = false;
+        if (this.currentState === 'CRT' && this.$attrs['selected-data'].flag.charAt(0) == 'S') {
+            this.projectGroup = this.$attrs['selected-data'].tree.getSelected()[0].title;
         }
     },
     methods: {

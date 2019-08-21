@@ -29,6 +29,9 @@
     "EXPORT": "Export",
     "COL_INFO": "Collect Info",
     "CHG_POOL": "Change Pool",
+    "PG_ID": "Project ID",
+    "PG_NM": "Project Name",
+    "PG_GR": "Project Group",
     "SEARCH": "Search"
   },
   "COL_NM": {

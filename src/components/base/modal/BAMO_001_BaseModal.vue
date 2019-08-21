@@ -30,13 +30,15 @@
                   variant="outline-secondary" 
                   @click="clickCancel"
         >
-          <span>Cancel</span>
+          <span v-if="useCustomMsg">{{customYesOrNoMsg.NO}}</span>
+          <span v-else>Cancel</span>
         </b-button>
         <b-button size="sm" 
                   :variant="`outline-${type}`" 
                   @click="clickOk"
         >
-          <span>OK</span>
+          <span v-if="useCustomMsg">{{customYesOrNoMsg.YES}}</span>
+          <span v-else>OK</span>
         </b-button>
       </template>
     </b-modal>
@@ -51,6 +53,14 @@ export default {
         type: {
             type: String,
             default: 'secondary'
+        },
+        useCustomMsg: {
+          type: Boolean,
+          default: false
+        },
+        customYesOrNoMsg: {
+            type: Object,
+            default: null
         },
         title: {
             type: String,
@@ -118,7 +128,7 @@ export default {
             if (!this.interactive) {
                 this.hideModal();
             }
-        }
+        },
     }
 };
 </script>

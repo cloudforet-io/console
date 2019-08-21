@@ -29,6 +29,9 @@
     "IMPORT": "가져오기(Import)",
     "COL_INFO": "정보 수집하기",
     "EXPORT": "내보내기(Export)",
+    "PG_ID": "프로젝트 아이디",
+    "PG_NM": "프로젝트 명",
+    "PG_GR": "프로젝트 그룹",
     "SEARCH": "검색"
   },
   "COL_NM": {
