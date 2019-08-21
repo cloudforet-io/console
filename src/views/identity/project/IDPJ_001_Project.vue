@@ -104,9 +104,6 @@ export default {
         BaseTree,
         BaseModal
     },
-    props: {
-
-    },
     data() {
         return {
             treeKey: 1,
@@ -248,19 +245,17 @@ export default {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
                         const placement = flag.charAt(0) === 'S' ? 'inside': 'before';
-                        const InitializedPG = { id: responseData.project_group_id, item_type:'PROJECT_GROUP', is_root: responseData.is_root, name: param.name};
+                        const InitializedPG = { id: responseData.project_group_id, item_type:'PROJECT_GROUP', is_root: responseData.is_root, name: param.name };
                         let newNode = this.getSelectedNode(InitializedPG);
+                        tree.insert({ node: tree.getSelected()[0], placement: placement }, newNode);
 
-                        /*if (flag === 'SNG') {
+                        if (flag === 'SNG') {
 
                         } else {
-
-                        }*/
-
-                        tree.insert({ node: tree.getSelected()[0], placement: placement }, newNode);
-                        if (this.isInitializing){
-                            tree.remove([tree.getSelected()[1]].map(node => node.path));
-                            this.isInitializing = false;
+                            if (this.isInitializing){
+                                tree.remove([tree.getSelected()[1]].map(node => node.path));
+                                this.isInitializing = false;
+                            }
                         }
                     }
                 }).catch((error) => {

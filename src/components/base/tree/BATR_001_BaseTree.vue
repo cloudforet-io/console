@@ -13,7 +13,7 @@
             :height="dragHeight"
           >
             <template #leftContainer="{ width }">
-              <div :key="treeKey">
+              <div>
                 <sl-vue-tree ref="slVueTree"
                              v-model="selectedTreeProp"
                              style="width:400px"
@@ -97,9 +97,12 @@
     </div>
 
     <BaseModal ref="checkModal"
+               :useCustomMsg="true"
                :title="modalTitle"
                :text="modalContents"
+               :type="'primary'"
                size="md"
+               :customYesOrNoMsg="customBtn"
                @ok="modalOk"
                @cancel="modalCancel"
     />
@@ -136,10 +139,7 @@ export default {
     },
     data () {
         return {
-            /**
-             *  nodeKey is a key to reload any component that has node selected at treeSubPanel
-             */
-            treeKey: 0,
+            customBtn: {NO: 'No', YES: 'Yes'},
             nodeKey: 0,
             treeData: null,
             contexteActionFlag: null,
@@ -181,10 +181,6 @@ export default {
         }
     },
     mounted() {
-        if (!this.treeKey){
-            this.treeKey = 1;
-            console.log(this.treeKey);
-        }
         this.showTree = true;
     },
     methods: {
