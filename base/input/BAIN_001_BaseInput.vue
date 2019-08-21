@@ -19,9 +19,10 @@
                @keyup.enter="onEnter"
                @keyup.down="onKeyDown"
                @keyup.up="onKeyUp" 
-               @keyup.esc="onBlur"
+               @keyup.esc="onEsc"
                @keydown.left="onLeft"
                @keydown.right="onRight"
+               @keydown.delete="onDelete"
                @mousedown="onMousedownInput"
         >
 
@@ -100,7 +101,7 @@ const appendableOperators = ['=', '>', '<', '!', '$'];
 
 export default {
     name: 'BaseInput',
-    event: ['add', 'update', 'delete'],
+    event: ['add', 'update', 'delete', 'deleteLeft'],
     directives: { focus: focus },
     props: {
     /**
@@ -584,6 +585,15 @@ export default {
             this.isBlurWithoutCommit = true;
             this.isFocused = false;
             this.$emit('moveRight');
+        },
+        onEsc () {
+            this.hideKeyList();
+            this.hideValueList();
+        },
+        onDelete (e) {
+            if (e.target.value === '') {
+                this.$emit('deleteLeft');
+            }
         }
     }
 };
