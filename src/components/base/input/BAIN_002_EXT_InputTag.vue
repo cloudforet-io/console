@@ -5,9 +5,10 @@
                @delete="$emit('delete')"
                @moveLeft="onMoveLeft"
                @moveRight="onMoveRight"
+               @deleteLeft="$emit('deleteLeft')"
     />
 
-    <span v-else class="badge tag-badge m-1">
+    <span v-else class="badge tag-badge">
       <span class="contents" @click="onUpdateMode">
         {{ `${label} ${operator} ${value}` }}
       </span>
@@ -79,15 +80,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$input-height: 23px;
+$input-height: 30px;
+$margin-top: 3px;
+$margin-bottom: 3px;
 .input-tag-container {
   .tag-badge {
     display: inline-block;
     max-width: 99%;
-    height: $input-height;
-    background-color: lighten($blueviolet, 30%);//rgba($blue, 0.1);
+    height: calc(#{$input-height} - #{$margin-top} - #{$margin-bottom} );
+    background-color: lighten($blueviolet, 30%);
     border-radius: 5px;
-    padding: 6px 8px 0px 8px;
+    padding: 6px 8px 0 8px;
+    margin-right: 4px;
+    margin-bottom: $margin-bottom;
+    margin-top: $margin-top;
     .contents {
       display: inline-block;
       max-width: 96%;

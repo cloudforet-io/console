@@ -2,8 +2,8 @@
   <div>
     <div class="search-container">
       <b-input-group class="row no-gutters">
-        <b-col cols="10" class="input-container">
-          <div ref="inputBox" class="p-1 input-box" @click.self="focusOnInput">
+        <div class="input-container">
+          <div ref="inputBox" class="input-box" @click.self="focusOnInput">
             <InputTag v-for="(tag, idx) in tagList"
                       ref="tag"
                       :key="tag.id"
@@ -17,22 +17,25 @@
                       @update="upsertTagAndSearch"
                       @moveLeft="moveFocusToLeft(idx)"
                       @moveRight="moveFocusToRight(idx)"
+                      @deleteLeft="deleteLeftTag(idx - 1)"
             />
 
             <BaseInput ref="input" 
+                       class="input"
                        :list-data="contextData.queryList"
                        add-only
                        @add="addTagAndSearch" 
                        @moveLeft="moveFocusToLeft(tagList.length - 1)"
                        @moveRight="moveFocusToRight(tagList.length - 1)"
+                       @deleteLeft="deleteLeftTag(tagList.length - 1)"
             />
           </div>
           <span class="input-delete-button" @click="deleteAll"><i class="fal fa-times" /></span>
-        </b-col>
+        </div>
 
-        <b-input-group-append class="col-2 pl-0">
+        <b-input-group-append class="pl-0">
           <b-button block class="search-btn" @click="search">
-            <i class="fal fa-search" />
+            <i class="fas fa-search" />
           </b-button>
         </b-input-group-append>
       </b-input-group>
@@ -225,6 +228,8 @@ export default {
             this.tagList = [];
             this.filterList = [];
             this.filterOrList = [];
+            this.$refs.input.inputText = '';
+            this.focusOnInput();
         },
         search () {
             this.$emit('search', this.filterList, this.filterOrList);
@@ -278,7 +283,7 @@ export default {
             if (--idx > 0) {
                 return;
             }
-            console.log('move focus to LEFT', idx);
+            // console.log('move focus to LEFT', idx);
             if (this.tagList[idx + 1]) {
                 this.tagList[idx + 1].focused = false;
             }
@@ -289,54 +294,73 @@ export default {
             if (++idx < this.tagList.length) {
                 return;
             }
-            console.log('move focus to RIGHT', idx);
+            // console.log('move focus to RIGHT', idx);
             if (this.tagList[idx - 1]) {
                 this.tagList[idx - 1].focused = false;
             }
             this.tagList[idx].focused = true;
+        },
+        deleteLeftTag (idx) {
+            if (idx >= 0) {
+                this.deleteTagAndSearch(idx);
+            }
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-$input-height: 23px;
+$input-height: 30px;
+$line-height: 30px;
+$search-btn-width: 50px;
 
 .search-container {
   position: relative;
   .input-container {
-      border: 1px solid $gray;
-      border-radius: 5px 0 0 5px;
-      background-color: #fff;
-      padding-left: 10px;
+    border: 0;
+    border-radius: 5px 0 0 5px;
+    background-color: #fff;
+    padding-left: 5px;
+    width: calc(100% - #{$search-btn-width});
+    vertical-align: middle;
+    line-height: $line-height;
+
+    $close-btn-width: 35px;
     .input-box {
         display: inline-block;
-        width: 95%;
+        width: calc(100% - #{$close-btn-width});
         cursor: text;
         vertical-align: middle;
-        .input-tag{
+        min-height: $input-height;
+        .input-tag {
             &:focus {
-                color: red;
             }
+        }
+        .input {
+            display: inline-block;
+            vertical-align: middle;
         }
     }
     .input-delete-button {
       display: inline-block;
-      width: 5%;
+      width: $close-btn-width;
       padding-right: 8px;
       font-size: 1.2em;
       color: $darkgray;
-      text-align: right;
+      text-align: center;
       vertical-align: middle;
       cursor: pointer;
     }
   }
   .search-btn {
+      border: 0;
     border-radius: 0 5px 5px 0;
-    color: $navy;
-    width: 120px;
-    i {
-      font-weight: 600;
+    color: darken($darkgray, 25%);
+    width: $search-btn-width;
+    background: $darkgray;
+    &:hover {
+        color: $white;
+        background: $navy;
     }
   }
 }

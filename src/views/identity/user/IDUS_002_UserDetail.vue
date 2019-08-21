@@ -1,110 +1,138 @@
 <template>
-  <b-form @reset.prevent="onReset" @submit.prevent="updatable && creatable ? onCreate() : onUpdate()">
-    <b-form-group label="User ID" :label-cols="3">
-      <b-input-group>
-        <b-form-input v-model="userId" 
-                      :plaintext="!creatable" 
-                      type="text" 
-                      :state="validateUserId"
-                      @input="changedUserId"
+  <b-form @reset.prevent="onReset" 
+          @submit.prevent="updatable && creatable ? onCreate() : onUpdate()"
+  >
+    <b-row>
+      <b-col cols="6">
+        <BaseField v-model="userId" 
+                   :plaintext="!creatable" 
+                   :state="validateUserId"
+                   label="User ID : "
+                   label-cols="3"
+                   placeholder="User ID"
+                   autocomplete="off"
+                   required
+                   description="Your user ID must be 5-12 characters long."
+                   valid-message="This is Available."
+                   :invalid-message="getUserValidMessage()"
+                   @input="changedUserId"
+        >
+          <template #append>
+            <b-button variant="light"
+                      :disabled="!validateUserIdLength"
+                      @click="checkIdAvailability"
+            >
+              Check availability
+            </b-button>
+          </template>
+        </BaseField>
+
+        <BaseField v-if="updatable" 
+                   v-model="password" 
+                   :state="validatePassword"
+                   type="password"
+                   label="Password : "
+                   label-cols="3"
+                   placeholder="Password"
+                   autocomplete="new-password"
+                   required
+                   description="Your Password must be 5-12 characters long."
+                   valid-message="This is Good."
+                   invalid-message="Your Password must be 5-12 characters long."
         />
-        <b-input-group-append v-if="creatable">
-          <b-button variant="light"
-                    :disabled="!validateUserIdLength"
-                    @click="checkIdAvailability"
-          >
-            Check availability
-          </b-button>
-        </b-input-group-append>
-      </b-input-group>
-      <b-form-invalid-feedback v-if="creatable" :state="validateUserId">
-        <span v-if="!validateUserIdLength">Your user ID must be 5-12 characters long.</span>
-        <span v-else-if="validateUserIdUnique === null">Please check availability.</span>
-        <span v-else-if="!validateUserIdUnique">This is duplicated. Please use another ID.</span>
-      </b-form-invalid-feedback>
-      <b-form-valid-feedback v-if="creatable" :state="validateUserId">
-        This is Available.
-      </b-form-valid-feedback>
-    </b-form-group>
 
-    <b-form-group v-if="updatable" label="Password" :label-cols="3">
-      <b-form-input v-model="password" :plaintext="!updatable" type="password" :state="validatePassword" />
-      <b-form-invalid-feedback :state="validatePassword">
-        Your Password must be 5-12 characters long.
-      </b-form-invalid-feedback>
-      <b-form-valid-feedback :state="validatePassword" />
-    </b-form-group>
+        <BaseField v-if="updatable" 
+                   v-model="passwordCheck" 
+                   label="Password Check : " 
+                   :label-cols="3" 
+                   label-align="right"
+                   placeholder="Password Check"
+                   type="password"
+                   :state="validatePasswordCheck"
+                   invalid-message="Please check your Password again."
+        />
 
-    <b-form-group v-if="updatable" label="Password Check" :label-cols="3">
-      <b-form-input v-model="passwordCheck" :plaintext="!updatable" type="password"
-                    :state="validatePasswordCheck"
-      />
-      <b-form-invalid-feedback :state="validatePasswordCheck">
-        Please check your Password again.
-      </b-form-invalid-feedback>
-      <b-form-valid-feedback :state="validatePasswordCheck" />
-    </b-form-group>
+        <BaseField v-model="name" 
+                   label="Name : "
+                   :label-cols="3" 
+                   placeholder="Name"
+        />
 
-    <b-form-group label="Name" :label-cols="3">
-      <b-form-input v-model="name" :plaintext="!updatable" type="text" />
-    </b-form-group>
+        <BaseField v-model="email" 
+                   label="E-Mail : " 
+                   :label-cols="3"
+                   placeholder="Email"
+        />
 
-    <b-form-group label="E-Mail" :label-cols="3">
-      <b-form-input v-model="email" :plaintext="!updatable" type="text" />
-    </b-form-group>
+        <BaseField v-model="mobile" 
+                   label="Phone : " 
+                   :label-cols="3"
+                   placeholder="Phone"
+        />
 
-    <b-form-group label="Phone" :label-cols="3">
-      <b-form-input v-model="mobile" :plaintext="!updatable" type="text" />
-    </b-form-group>
-
-    <b-form-group label="Group Name" :label-cols="3">
-      <b-form-input v-model="group" :plaintext="!updatable" type="text" />
-    </b-form-group>
-
-    <b-form-group label="Domain ID" label-for="domainId" :label-cols="3">
-      <b-form-input v-model="domainId" plaintext type="text" />
-    </b-form-group>
-
-    <b-form-group label="Language" label-for="language" :label-cols="3">
-      <b-form-input v-model="language" :plaintext="!updatable" type="text" />
-    </b-form-group>
-
-    <b-form-group label="Time Zone" label-for="timezone" :label-cols="3">
-      <b-form-input v-model="timezone" :plaintext="!updatable" type="text" />
-    </b-form-group>
-
-    <b-form-group label="Tags" :label-cols="3" class="mt-4">
-      <b-col :cols="updatable || creatable ? '12' : '5'" class="p-0">
-        <BaseTag ref="baseTag" :tag-data="tags" :editable="updatable || creatable" />
+        <BaseField v-model="group" 
+                   label="Group : " 
+                   :label-cols="3" 
+                   placeholder="Group"
+        />
       </b-col>
-    </b-form-group>
+      <b-col cols="6">
+        <b-form-group label="Language : " 
+                      :label-cols="3" :label-cols-xl="2"
+                      label-align="right"
+        >
+          <b-col cols="5" class="p-0">
+            <model-select v-model="language"
+                          :options="languageList"
+                          placeholder="Select Language"
+            />
+          </b-col>
+        </b-form-group> 
+    
 
-    <div v-if="updatable" class="btn-box mt-5">
-      <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="outline-primary">
-        {{ creatable ? 'Create' : 'Update' }}
-      </b-button>
-      <b-button class="float-right mb-1" size="md" type="reset" variant="outline-secondary">
-        Reset
-      </b-button>
-      <b-button v-if="!creatable" class="float-left" size="md" type="reset" variant="outline-danger" @click="onDelete">
-        Delete
-      </b-button>
-    </div>
-
-    <BaseSimpleModal
-      ref="DeleteCheck"
-      title="User Delete"
-      text="Are you sure you want to delete?"
-      type="danger"
-      :ok-only="false"
-      @ok="deleteUser"
-    />
+        <b-form-group label="Time Zone : " 
+                      :label-cols="3" :label-cols-xl="2"
+                      label-align="right"
+        >
+          <b-col cols="8" class="p-0">
+            <model-select v-model="timezone"
+                          :options="timezoneList"
+                          placeholder="Select Timezone"
+            />
+          </b-col>
+        </b-form-group>
+        <b-form-group label="Tags : " 
+                      :label-cols="3" :label-cols-xl="2"
+                      label-align="right"
+                      class="mt-4"
+        >
+          <b-col cols="10" class="p-0">
+            <BaseTag ref="baseTag" 
+                     :tag-data="tags" 
+                     :show-first-tag-row="creatable ? true : false"
+                     editable
+            />
+          </b-col>
+        </b-form-group>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col v-if="updatable" class="btn-box mt-5">
+        <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="outline-primary">
+          {{ creatable ? 'Create' : 'Update' }}
+        </b-button>
+        <b-button class="float-right mb-1" size="md" type="reset" variant="outline-secondary">
+          Reset
+        </b-button>
+      </b-col>
+    </b-row>
   </b-form>
 </template>
 
 <script>
 import BaseTag from '@/components/base/tags/BATG_001_BaseTag.vue';
-import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal.vue';
+import BaseField from '@/components/base/form/BAFM_001_BaseField.vue';
+import { ModelSelect } from 'vue-search-select';
 
 const userModel = {
     user_id: null,
@@ -122,8 +150,9 @@ export default {
     name: 'UserDetail',
     event: ['delete', 'create', 'update'],
     components: {
+        BaseField,
         BaseTag,
-        BaseSimpleModal
+        ModelSelect
     },
     props: {
         userProp: {
@@ -148,13 +177,18 @@ export default {
             email: this.userProp.email,
             mobile: this.userProp.mobile,
             group: this.userProp.group,
-            domainId: sessionStorage.getItem('domainId'),
-            language: this.userProp.language,
-            timezone: this.userProp.timezone,
+            language: this.userProp.language || this.$i18n.locale,
+            timezone: this.userProp.timezone || sessionStorage.getItem('timezone'),
             userIdUnique: null
         };
     },
     computed: {
+        languageList () {
+            return this.getLanguageSelectList();
+        },
+        timezoneList () {
+            return this.getTimezoneSelectList();
+        },
         tags () {
             return this.dictToKeyValueArray(this.userProp.tags);
         },
@@ -173,6 +207,9 @@ export default {
             return this.userIdUnique;
         },
         validateUserId () {
+            if (this.validateUserIdLength === null) {
+                return null;
+            }
             return  !!(this.validateUserIdLength && this.validateUserIdUnique);
         },
         validatePassword () {
@@ -185,16 +222,14 @@ export default {
             return false;
         },
         validatePasswordCheck () {
-            if (this.passwordCheck === null) {
+            console.log('validation of password check');
+            if (this.isEmpty(this.password) || this.isEmpty(this.passwordCheck)) {
                 return null; 
-            }
-            if (!this.password) {
+            } else if (this.password !== this.passwordCheck) {
                 return false; 
-            }
-            if (this.password === this.passwordCheck) { 
+            } else {
                 return true;
             }
-            return false;
         },
         validated () {
             return !!(this.validateUserId && 
@@ -206,6 +241,8 @@ export default {
         userProp (updatedUser) {
             this.resetUserData(updatedUser);
         }
+    },
+    created() {
     },
     methods: {
         changedUserId () {
@@ -301,21 +338,6 @@ export default {
                 this.$alertify.error('ERROR OCCURED during Updating User.');
             }
         },
-        async onDelete () {
-            this.$refs.DeleteCheck.showModal();
-        },
-        async deleteUser () {
-            try {
-                await this.$axios.post('/identity/user/delete', {
-                    user_id: this.userId
-                });
-                this.$emit('delete');
-                this.$alertify.success('Selected User Successfully Deleted.');
-            } catch (e) {
-                console.error(e);
-                this.$alertify.error('ERROR OCCURED during Deleting User.');
-            }
-        },
         onReset () {
             if (this.creatable) { 
                 this.resetUserData(userModel); 
@@ -348,6 +370,16 @@ export default {
             this.language = user.language;
             this.timezone = user.timezone;
             this.$refs.baseTag.resetRows();
+        },
+        getUserValidMessage () {
+            if (!this.validateUserIdLength) {
+                return 'Your user ID must be 5-12 characters long.';
+            } else if (this.validateUserIdUnique === null) {
+                return 'Please check availability.';
+            } else if (!this.validateUserIdUnique) {
+                return 'This is duplicated. Please use another ID.';
+            }
+            return '';
         }
     }
 };
@@ -359,12 +391,14 @@ export default {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
     }
-
     .input-group-append {
         .btn {
             border-radius:  0 5px 5px 0;
             border: 1px solid darken($lightgray, 5%);
         }
     }
+}
+.required {
+    color: $violet;
 }
 </style>

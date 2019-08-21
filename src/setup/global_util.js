@@ -383,6 +383,46 @@ export const Mixin = {
             return Object.keys(timezone.getAllTimezones());
         },
         /**********************************************************************************
+         * Name       : getAllTimezones
+         *             
+         * Output  => Array
+         * Description:  return Array of timezone String.
+         **********************************************************************************/
+        getTimezoneSelectList: function () {
+            let results = [];
+            let timezones = timezone.getAllTimezones();
+            for (var tz in timezones) {
+                results.push({
+                    value: tz,
+                    text: `${tz} ${timezones[tz].offsetStr}`
+                });
+            }
+            return results;
+        },
+        /**********************************************************************************
+         * Name       : getLanguageSelectList
+         *             
+         * Output  => Array
+         * Description:  return Array of language select list.
+         **********************************************************************************/
+        getLanguageSelectList: function () {
+            return Object.values(GlobalEnum.LANGUAGES);
+        },
+        /**********************************************************************************
+         * Name       : getLanguageName
+         * Input   => (lang                         =>  String)
+         *             
+         * Output  => String
+         * Description:  return String of language name.
+         **********************************************************************************/
+        getLanguageName: function (lang) {
+            let langObj = GlobalEnum.LANGUAGES[lang];
+            if (!langObj) {
+                return null;
+            }
+            return langObj.text;
+        },
+        /**********************************************************************************
          * Name       : getSelectedNode
          * Input   => (f: flag                         =>  String)
          * Output  => Node

@@ -12,6 +12,7 @@
              :size="size"
              :no-stacking="noStacking"
              :no-close-on-backdrop="backdropOff"
+             :no-close-on-esc="escCloseOff"
              :hide-footer="hideFooter"
              @ok="$emit('ok')"
              @hidden="isModalShown = false"
@@ -78,6 +79,10 @@ export default {
         backdropOff: {
             type: Boolean,
             default: false
+        },
+        escCloseOff: {
+            type: Boolean,
+            default: true
         },
         hideFooter: {
             type: Boolean,

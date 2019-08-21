@@ -1,7 +1,7 @@
 <template>
   <b-dropdown size="sm" right no-caret>
     <template slot="button-content">
-      <span class="name">{{ userId}}</span>
+      <span class="name">{{ userId }}</span>
     </template>
     <b-dropdown-item @click="logout">
       <div class="item">
@@ -15,14 +15,14 @@
 <script>
 export default {
     name: 'AccountDropdown',
-    created(){
-        this.userId = sessionStorage.getItem('userId');
-    },
     components: {
     },data () {
         return {
             userId: null
         };
+    },
+    created(){
+        this.userId = sessionStorage.getItem('userId');
     },
     methods: {
         async logout () {
