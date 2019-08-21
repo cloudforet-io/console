@@ -116,6 +116,13 @@ export default {
             this.tags = {}; 
             let tag = null;
             let isValid = true;
+
+            //Skip Validation When show First Row is True, and User hasn't punch in any tag values.
+            if (this.showFirstTagRow && this.rows.length === 1 &&
+                 this.isEmpty(this.$refs.tag[0].key) && this.isEmpty(this.$refs.tag[0].value)) {
+                return isValid;
+            }
+
             this.rows.map((row, i) => {
                 tag = this.$refs.tag[i];
                 if (!tag.isNotNull()) {

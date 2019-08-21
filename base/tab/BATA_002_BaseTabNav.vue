@@ -3,8 +3,9 @@
     <b-col cols="12" class="base-tab-nav">
       <template v-if="pill">
         <b-nav pills :fill="fill">
-          <b-nav-item v-for="(curTab, idx) in navTabs"
+          <b-nav-item v-for="(curTab, idx) in navTabs" :lazy="false"
                       :key="idx"
+                      :id="curTab.tabTitle"
                       :class="{active: selectedTab.component === curTab.component}"
                       :active="selectedTab.tabTitle === curTab.tabTitle"
                       @click="selectedTab = curTab"
@@ -14,9 +15,10 @@
         </b-nav>
       </template>
       <template v-else>
-        <b-nav tabs :fill="fill">
-          <b-nav-item v-for="(curTab, idx) in navTabs"
+        <b-nav tabs :fill="fill" >
+          <b-nav-item v-for="(curTab, idx) in navTabs" :lazy="false"
                       :key="idx"
+                      :id="curTab.tabTitle"
                       :class="{active: selectedTab.component === curTab.component}"
                       :active="selectedTab.tabTitle === curTab.tabTitle"
                       @click="selectedTab = curTab"
@@ -25,32 +27,44 @@
           </b-nav-item>
         </b-nav>
       </template>
-      <slot v-if="useSlot" :name="setTabName(selectedTab)" />
+      <slot v-if="useSlot" :name="setTabName(selectedTab)"/>
       <template v-else>
         <template v-if="keepAlive">
           <keep-alive>
-            <component :is="selectedTab.component" />
+            <component :is="selectedTab.component"
+                       ref="contents"
+                       :selected-data="dataForTab"
+                       :is-creatable="isCreate"
+                       :is-updatable="isUpdate"
+                       :is-deletable="isDelete"
+            />
           </keep-alive>
         </template>
         <template v-else>
-          <component :is="selectedTab.component" />
+          <component :is="selectedTab.component"
+                     ref="contents"
+                     :selected-data="dataForTab"
+                     :is-creatable="isCreate"
+                     :is-updatable="isUpdate"
+                     :is-deletable="isDelete"
+          />
         </template>
       </template>
       <b-row>
         <slot name="footerArea">
-          <div class="col-md-12">
-            <div v-show="isFooterVisible" class="modal-footer" style="border-top:none; padding-right: 0px">
-              <b-button v-show="isCreatable" size="md" variant="outline-primary" @click="createNew">
-                {{tr('BTN_CRT')}}
+          <div class="col-md-12 mt-4">
+            <div v-show="isFooterVisible" class="modal-footer" style="border-top:none; padding-right: 5px">
+              <b-button size="md" variant="outline-secondary" @click="$emit('close')">
+                {{ tr('BTN_CANCEL') }}
               </b-button>
-              <b-button v-show="isUpdatable" size="md" variant="outline-success" @click="updateSelect">
-                {{tr('BTN_UPT')}}
+              <b-button v-show="isCreatable" size="md" variant="outline-primary" @click="createNew">
+                {{ tr('BTN_CRT') }}
+              </b-button>
+              <b-button v-show="isUpdatable" size="md" variant="outline-primary" @click="updateSelect">
+                {{ tr('BTN_UPT') }}
               </b-button>
               <b-button v-show="isDeletable" size="md" variant="outline-danger" @click="deleteSelect">
-                {{tr('BTN_DELETE')}}
-              </b-button>
-              <b-button size="md" variant="outline-warning" @click="$emit('close')">
-                {{tr('BTN_CANCEL')}}
+                {{ tr('BTN_DELETE') }}
               </b-button>
             </div>
           </div>
@@ -63,7 +77,7 @@
 // import { api } from '@/setup/api';
 let baseTabParams = {};
 export default {
-    name: 'BaseTabs',
+    name: 'BaseTabNavs',
     event: ['close'],
     props: {
         navTabs: {
@@ -120,19 +134,27 @@ export default {
     },
     data () {
         return {
+            prosData: {},
             selectedTab: this.navTabs[this.defaultTab],
+            dataForTab: this.selectedData,
+            tabContentData: {},
             isCreate: this.isCreatable,
             isUpdate: this.isUpdatable,
             isDelete: this.isDeletable
         };
     },
     created () {
-
+        this.$bus.$on('setTabData', this.setTabData);
     },
     beforeDestroy: function () {
-
+        this.$bus.$off('setTabData');
     },
     methods: {
+        setTabData (dataToSet) {
+            for (let key in dataToSet) {
+                this.tabContentData[key] = dataToSet[key];
+            }
+        },
         displayFooter: () => {
             this.isFooterVisible = true;
         },
@@ -140,17 +162,17 @@ export default {
             this.isFooterVisible = false;
         },
         createNew () {
-            baseTabParams = this.dataforTab;
+            baseTabParams = this.dataForTab;
             baseTabParams['tabContents'] = this.$refs.popupTab;
             this.$emit('create', baseTabParams);
         },
         updateSelect () {
-            baseTabParams = this.dataforTab;
+            baseTabParams = this.dataForTab;
             baseTabParams['tabContents'] = this.$refs.popupTab;
             this.$emit('update', baseTabParams);
         },
         deleteSelect: () => {
-            baseTabParams = this.dataforTab;
+            baseTabParams = this.dataForTab;
             baseTabParams['tabContents'] = this.$refs.popupTab;
             this.$emit('delete', baseTabParams);
         },

@@ -284,7 +284,6 @@ export default {
                 } else {
                     this.deleteSelected(this.modalContext.tree);
                 }
-                // this.deleteSelected(params.tree);
                 break;
             }
         },
