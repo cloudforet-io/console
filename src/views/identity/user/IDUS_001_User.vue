@@ -20,18 +20,18 @@
         >
           <template #caption>
             <div>
-              <b-button class="btn mr-4" variant="outline-primary" @click="onClickAdd">
+              <b-button class="btn mr-4" variant="primary" @click="onClickAdd">
                 {{ tr('BTN_ADD') }}
               </b-button>
-              <b-dropdown v-if="selectedUser" no-caret
-                          variant="outline-secondary"
+              <b-dropdown v-if="hasSelectedUser" no-caret
+                          variant="outline-dark"
                           class="no-selected"
               >
                 <template #button-content>
                   <span>Actions</span> &nbsp;
                   <i class="fal fa-angle-down" />
                 </template>
-                <b-dropdown-item @click="onClickUpdate">
+                <b-dropdown-item v-if="selectedUser" @click="onClickUpdate">
                   <div class="item sm">
                     <i class="icon fal fa-pencil-alt" />
                     <span class="name">{{ tr('BTN_UPT') }}</span>
@@ -50,37 +50,29 @@
       </template>
     </BaseDrag>
 
-    <BaseModal ref="addUser"
-               title="Add User" 
-               :centered="true" 
-               :hide-footer="true"
-               :backdrop-off="true"
+    <BaseModal ref="userDetailModal"
+               :title="isCreateMode ? 'Add User' : 'Edit User'"
+               centered
+               hide-footer
+               backdrop-off
+               prevent-esc-close
                size="xl"
+               interactive
+               @esc="checkCancel"
+               @cancel="checkCancel"
     >
       <template #contents>
-        <UserDetail 
-          :creatable="true" 
-          :updatable="true"
-          @create="createUser"
-        />
-      </template>
-    </BaseModal>
-    <BaseModal v-if="selectedUser" 
-               ref="editUser"
-               title="Edit User"
-               :centered="true" 
-               :hide-footer="true"
-               :backdrop-off="true"
-               size="xl"
-    >
-      <template #contents>
-        <UserDetail :updatable="true" 
-                    :user-prop="selectedUser" 
+        <UserDetail ref="userDetail"
+                    :user-prop="isCreateMode ? undefined : selectedUser" 
+                    :creatable="isCreateMode ? true : false"
+                    size="xl"
+                    @create="createUser"
                     @update="updateUser"
+                    @cancel="hideUserDetail"
         />
       </template>
     </BaseModal>
-
+    
     <BaseSimpleModal
       ref="DeleteCheck"
       title="User Delete"
@@ -91,7 +83,7 @@
     />
 
               
-    <BaseTabNav v-if="selectedUser" class="user-info"
+    <BaseTabNav v-if="hasSelectedUser" class="user-info"
                 :fill="false"
                 :nav-tabs="tabs"
                 :keep-alive="true"
@@ -104,6 +96,9 @@
         </b-card>
       </template>
     </BaseTabNav>
+    <div v-else class="empty">
+      <span class="msg">Select a User Above.</span>
+    </div>
   </div>
 </template>
 
@@ -111,19 +106,20 @@
 import BaseDrag from '@/components/base/drag/BADG_002_BaseDragY.vue';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
 import query from './search_context/query.js';
-import UserDetail from './IDUS_002_UserDetail.vue';
 import UserInfo from './IDUS_003_UserInfo.vue';
-const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
 const BaseSimpleModal = () => import('@/components/base/modal/BAMO_002_BaseSimpleModal.vue');
 const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
+
+const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
+const UserDetail = () => import('./IDUS_002_UserDetail.vue');
 
 export default {
     name: 'User',
     components: {
         BaseDrag,
         BaseTable,
-        BaseModal,
         BaseSimpleModal,
+        BaseModal,
         UserDetail,
         BaseTabNav,
         UserInfo
@@ -139,6 +135,7 @@ export default {
             defaultTab: 0,
             users: [],
             selectedUser: null,
+            selectedUsers: [],
             selectedIdx: undefined,
             addModal: false,
             totalCount: 0,
@@ -146,7 +143,8 @@ export default {
             isReadyForSearch: false,
             perPage: 10,
             isLoading: true,
-            query: {}
+            query: {},
+            isCreateMode: true
         };
     },
     computed: {
@@ -172,8 +170,11 @@ export default {
                 { key: 'timezone', label: this.tr('COL_NM.TIMEZONE'), thStyle: { width: '200px' }}
             ];
         },
-        selectedUserData () {
+        selectedUserList () {
             return this.selectedUser;
+        },
+        hasSelectedUser () {
+            return !this.isEmpty(this.selectedUserList) || !this.isEmpty(this.selectedUser);
         }
     },
     mounted () {
@@ -255,7 +256,7 @@ export default {
                 if (row.length === 1) {
                     this.setSelectedUser(row[0].data, idx);
                 } else {
-                    this.initSelectedUser();
+                    this.selectedUsers = row;
                 }
             } else {
                 this.setSelectedUser(row.data, idx);
@@ -277,13 +278,13 @@ export default {
             this.selectedUser = user;
         },
         updateUser (user) {
-            this.$refs.editUser.hideModal();
+            this.hideUserDetail();
             this.selectedUser = user;
             this.selectedUser.selected = true;
             this.$set(this.users, this.selectedIdx, user);
         },
         createUser () {
-            this.$refs.addUser.hideModal();
+            this.hideUserDetail();
             this.listUsers();
         },
         async deleteUser () {
@@ -299,13 +300,24 @@ export default {
             }
         },
         onClickAdd () {
-            this.$refs.addUser.showModal();
+            this.isCreateMode = true;
+            this.showUserDetail();
         },
         onClickUpdate () {
-            this.$refs.editUser.showModal();
+            this.isCreateMode = false;
+            this.showUserDetail();
         },
         onClickDelete () {
             this.$refs.DeleteCheck.showModal();
+        },
+        showUserDetail () {
+            this.$refs.userDetailModal.showModal();
+        },
+        hideUserDetail () {
+            this.$refs.userDetailModal.hideModal();
+        },
+        checkCancel () {
+            this.$refs.userDetail.onCancel();
         }
     }
 };
@@ -326,5 +338,15 @@ export default {
 }
 .user-info {
   margin-bottom: 20px;
+}
+.empty {
+    text-align: center;
+    margin-top: 40px;
+    .msg {
+        color: $darkgray;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
 }
 </style>

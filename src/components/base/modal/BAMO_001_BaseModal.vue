@@ -5,24 +5,31 @@
     </span>
 
     <b-modal v-model="modalShow"
-             :title="title"
              :centered="centered"
              :ok-variant="type"
              :modal-class="`modal-${type}`"
              :size="size"
              :no-stacking="noStacking"
              :no-close-on-backdrop="backdropOff"
-             :no-close-on-esc="escCloseOff"
              :hide-footer="hideFooter"
              @ok="$emit('ok')"
              @hidden="isModalShown = false"
+             @cancel="clickCancel"
+             @hide="onHide"
     >
-      <span>{{ text }}</span>
+      <template #modal-header>
+        <h5 class="modal-title">{{ title }}</h5>
+        <button tabindex="-1" type="button" aria-label="Close" class="close" @click="clickCancel">
+          <i class="fal fa-times" />
+        </button>
+      </template>
 
       <slot name="contents"
-            :hide="hideModal" 
-            :show="showModal"
+            :hide="onHide" 
+            :ok="clickOk"
+            :cancel="clickCancel"
       />
+      <span v-if="!$slots.contents">{{ text }}</span>
 
       <slot name="footer" />
       <template v-if="!$slots.footer" #modal-footer="{ ok, cancel, hide }">
@@ -30,14 +37,14 @@
                   variant="outline-secondary" 
                   @click="clickCancel"
         >
-          <span v-if="useCustomMsg">{{customYesOrNoMsg.NO}}</span>
+          <span v-if="useCustomMsg">{{ customYesOrNoMsg.NO }}</span>
           <span v-else>Cancel</span>
         </b-button>
         <b-button size="sm" 
                   :variant="`outline-${type}`" 
                   @click="clickOk"
         >
-          <span v-if="useCustomMsg">{{customYesOrNoMsg.YES}}</span>
+          <span v-if="useCustomMsg">{{ customYesOrNoMsg.YES }}</span>
           <span v-else>OK</span>
         </b-button>
       </template>
@@ -55,8 +62,8 @@ export default {
             default: 'secondary'
         },
         useCustomMsg: {
-          type: Boolean,
-          default: false
+            type: Boolean,
+            default: false
         },
         customYesOrNoMsg: {
             type: Object,
@@ -90,9 +97,9 @@ export default {
             type: Boolean,
             default: false
         },
-        escCloseOff: {
+        preventEscClose: {
             type: Boolean,
-            default: true
+            default: false
         },
         hideFooter: {
             type: Boolean,
@@ -117,18 +124,26 @@ export default {
         hideModal () {
             this.modalShow = false;
         },
-        clickOk () {
-            this.$emit('ok');
+        clickOk (e) {
             if (!this.interactive) {
                 this.hideModal();
             }
+            this.$emit('ok', e);
         },
-        clickCancel () {
-            this.$emit('cancel');
+        clickCancel (e) {
             if (!this.interactive) {
                 this.hideModal();
             }
+            this.$emit('cancel', e);
         },
+        onHide (e) {
+            if (this.preventEscClose && e.trigger === 'esc') {
+                e.preventDefault();
+                this.$emit('esc', e);
+            } else {
+                this.$emit('hide', e);
+            }
+        }
     }
 };
 </script>

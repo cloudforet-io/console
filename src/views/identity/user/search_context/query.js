@@ -8,7 +8,6 @@ export default {
         { label: 'Phone', key: 'mobile' },
         { label: 'Group', key: 'group' },
         { label: 'Language', key: 'language', values: Object.keys(GlobalEnum.LANGUAGES) },
-        // { label: 'Domain ID', key: 'domain_id', ajax: { url: '/identity/domain/list', params: null, method: 'POST' }},
         { 
             label: 'Timezone', key: 'timezone', 
             values: Mixin.methods.getAllTimezones()
@@ -32,5 +31,3 @@ export default {
  *
  *
  */
-
-// ajax: { url: '/identity/users', params: null, method: 'GET' } },

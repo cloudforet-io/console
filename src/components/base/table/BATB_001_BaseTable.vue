@@ -542,9 +542,7 @@ export default {
         overflow-x: scroll;
         padding: 5px 20px 20px 20px;
         background-color: $white;
-        @extend %sheet;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
+        border-radius: 0 $border-radius $border-radius 0;
     }
     .b-table {
         display: inline-table;

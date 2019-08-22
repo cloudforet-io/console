@@ -458,6 +458,52 @@ export const Mixin = {
         getTimeStampfromDate: function () {
 
             return 'a';
+        },
+        /**********************************************************************************
+         * Name       : validateLength
+         * Input   => (value                           =>  String
+         *             boolOnly                        =>  Bolean
+         *             minLength                       =>  Number
+         *             maxLength                       =>  Number)
+         * Output  => Boolean or Null
+         * Description:  return the result of validation
+         **********************************************************************************/
+        validateLength: function (value, boolOnly, minLength, maxLength) {
+            if (this.isEmpty(value)) {
+                if (boolOnly) {
+                    return false;
+                } else {
+                    return null;
+                }
+            }
+            if (value.length < minLength) {
+                return false;
+            }
+            if (!this.isEmpty(this.maxLength) && value.length > maxLength) {
+                return false;
+            }
+            return true;
+        },
+        /**********************************************************************************
+         * Name       : validateLength
+         * Input   => (value                           =>  String
+         *             boolOnly                        =>  Bolean
+         *             checkValue                      =>  String)
+         * Output  => Boolean or Null
+         * Description:  return the result of validation
+         **********************************************************************************/
+        validateSameness: function (value, boolOnly, checkValue) {
+            if (this.isEmpty(value) || this.isEmpty(checkValue)) {
+                if (boolOnly) {
+                    return false;
+                } else {
+                    return null;
+                }
+            }
+            if (value !== checkValue) {
+                return false; 
+            } 
+            return true;
         }
     },
     data: function () {
