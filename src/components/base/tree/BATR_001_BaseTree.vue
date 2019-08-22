@@ -22,6 +22,7 @@
                              :style="{ width: width }"
                              @select="nodeSelected"
                              @drop="nodeDropped"
+                             @toggle="nodeToggled"
                              @nodecontextmenu="showContextMenu"
                 >
                   <template #title="{ node }">
@@ -38,7 +39,7 @@
                   </template>
                   <template #toggle="{ node }">
                     <i v-if="node.isExpanded" class="fal fa-angle-down" />
-                    <i v-else class="fal fa-angle-right" @click="getNextLayer" />
+                    <i v-else class="fal fa-angle-right" />
                   </template>
 
                   <!-- <template slot="sidebar" slot-scope="{ node }">
@@ -97,12 +98,12 @@
     </div>
 
     <BaseModal ref="checkModal"
-               :useCustomMsg="true"
+               :use-custom-msg="true"
                :title="modalTitle"
                :text="modalContents"
                :type="'primary'"
                size="md"
-               :customYesOrNoMsg="customBtn"
+               :custom-yes-or-no-msg="customBtn"
                @ok="modalOk"
                @cancel="modalCancel"
     />
@@ -115,7 +116,7 @@ import BaseDragVertical from '@/components/base/drag/BADG_001_BaseDragX.vue';
 import SlVueTree from 'sl-vue-tree';
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 import { mapGetters } from 'vuex';
-
+//@click="getNextLayer"
 export default {
     name: 'BaseTree',
     components: {
@@ -139,7 +140,7 @@ export default {
     },
     data () {
         return {
-            customBtn: {NO: 'No', YES: 'Yes'},
+            customBtn: { NO: 'No', YES: 'Yes' },
             nodeKey: 0,
             treeData: null,
             contexteActionFlag: null,
@@ -184,9 +185,6 @@ export default {
         this.showTree = true;
     },
     methods: {
-        setActions(){
-
-        },
         nodeSelected (nodes) {
             this.nodeKey = (this.nodeKey) > 0 ? 0 : 1;
             this.lastEvent = nodes;
@@ -201,13 +199,14 @@ export default {
             this.$bus.$emit('treeSelectedEvent', nodes);
         },
         nodeToggled (node) {
-            this.lastEvent = `Node ${node.title} is ${node.isExpanded ? 'expanded' : 'collapsed'}`;
+            if (!node.isExpanded ) {
+                if (!node.data.is_cached){
+                    this.$emit('toggled', { node: node, treeV:this.$refs.slVueTree });
+                }
+            }
         },
         nodeDropped (nodes, position) {
             this.lastEvent = `Nodes: ${nodes.map(node => node.title).join(', ')} are dropped ${position.placement} ${position.node.title}`;
-        },
-        showContext (event, node) {
-            this.showContextMenu(node, event, 'Clicked');
         },
 
         showContextMenu (node, event, hasClicked) {
