@@ -97,12 +97,12 @@ export const Mixin = {
             const darkFlag = [];
             return successFlag.includes(s.toLowerCase()) ? 'success'
                 : secondaryFlag.includes(s.toLowerCase()) ? 'secondary'
-                    : dangerFlag.includes(s.toLowerCase()) ? 'danger'
-                        : warningFlag.includes(s.toLowerCase()) ? 'warning'
-                            : infoFlag.includes(s.toLowerCase()) ? 'info'
-                                : lightFlag.includes(s.toLowerCase()) ? 'light'
-                                    : darkFlag.includes(s.toLowerCase()) ? 'dark'
-                                        : 'primary';
+                : dangerFlag.includes(s.toLowerCase()) ? 'danger'
+                : warningFlag.includes(s.toLowerCase()) ? 'warning'
+                : infoFlag.includes(s.toLowerCase()) ? 'info'
+                : lightFlag.includes(s.toLowerCase()) ? 'light'
+                : darkFlag.includes(s.toLowerCase()) ? 'dark'
+                : 'primary';
         },
         /**********************************************************************************
          * Name       : capitalize
@@ -366,6 +366,46 @@ export const Mixin = {
          **********************************************************************************/
         getAllTimezones: function () {
             return Object.keys(timezone.getAllTimezones());
+        },
+         /**********************************************************************************
+         * Name       : getAllTimezones
+         *             
+         * Output  => Array
+         * Description:  return Array of timezone String.
+         **********************************************************************************/
+        getTimezoneSelectList: function () {
+            let results = [];
+            let timezones = timezone.getAllTimezones();
+            for (var tz in timezones) {
+                results.push({
+                    value: tz,
+                    text: `${tz} ${timezones[tz].offsetStr}`
+                });
+            }
+            return results;
+        },
+        /**********************************************************************************
+         * Name       : getLanguageSelectList
+         *             
+         * Output  => Array
+         * Description:  return Array of language select list.
+         **********************************************************************************/
+        getLanguageSelectList: function () {
+            return Object.values(GlobalEnum.LANGUAGES);
+        },
+        /**********************************************************************************
+         * Name       : getLanguageName
+         * Input   => (lang                         =>  String)
+         *             
+         * Output  => String
+         * Description:  return String of language name.
+         **********************************************************************************/
+        getLanguageName: function (lang) {
+            let langObj = GlobalEnum.LANGUAGES[lang];
+            if (!langObj) {
+                return null;
+            }
+            return langObj.text;
         },
         /**********************************************************************************
          * Name       : getSelectedNode
