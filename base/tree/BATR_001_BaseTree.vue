@@ -68,30 +68,32 @@
                ref="contextmenu"
                class="contextmenu"
           >
-            <div class="contextmenuleaf"
+            <div v-if="contextIndividualVisible[0]"
+                 class="contextmenuleaf"
                  @click="excSelected('NG')"
             >
               <i class="fal fa-folder-minus" />&nbsp; Add a Project Group
             </div>
 
-            <template v-if="selectedContexPropVisible">
-              <div class="contextmenuleaf"
+              <div v-if="contextIndividualVisible[1]"
+                   class="contextmenuleaf"
                    @click="excSelected('ND')"
               >
                 <i class="fal fa-cube" />&nbsp; Add a Project
               </div>
-              <div class="contextmenuleaf"
+              <div v-if="contextIndividualVisible[2]"
+                   class="contextmenuleaf"
                    @click="excSelected('SN')"
               >
                 <i class="fal fa-pencil" />&nbsp; Edit Selected Project
               </div>
 
-              <div class="node-leaf-last"
+              <div v-if="contextIndividualVisible[3]"
+                   class="node-leaf-last"
                    @click="excSelected"
               >
                 <i class="fal fa-trash" />&nbsp; Remove Selected Item
               </div>
-            </template>
           </div>
         </div>
       </transition>
@@ -143,16 +145,15 @@ export default {
             customBtn: { NO: 'No', YES: 'Yes' },
             nodeKey: 0,
             treeData: null,
-            contexteActionFlag: null,
             hasSelected: false,
             lastEvent: null,
             contextMenuIsVisible: false,
-            contextTopMenuIsVisible: true,
             showTree: false,
             modalTitle: '',
             modalContents: '',
             modalContext: {},
-            modalEvent: ''
+            modalEvent: '',
+            contextIndividualVisible: [true, true, true, true]
         };
     },
     computed: {
@@ -176,10 +177,6 @@ export default {
                 this.treeData = value;
             }
         },
-        selectedContexPropVisible () {
-            console.log('contxtInit', !this.contextInit);
-            return !this.contextInit;
-        }
     },
     mounted() {
         this.showTree = true;
@@ -206,13 +203,26 @@ export default {
             }
         },
         nodeDropped (nodes, position) {
-            this.lastEvent = `Nodes: ${nodes.map(node => node.title).join(', ')} are dropped ${position.placement} ${position.node.title}`;
+            this.$emit('dropped', {
+                nodes: nodes,
+                position: position,
+                treeV:this.$refs.slVueTree
+            })
+            console.log( `Nodes: ${nodes.map(node => node.title).join(', ')} are dropped ${position.placement} ${position.node.title}`);
         },
 
         showContextMenu (node, event, hasClicked) {
             if (!hasClicked) {
                 event.preventDefault();
             }
+            if (!this.isEmpty(this._.get(node,'data.init'))){
+                this.contextIndividualVisible =  [true, false, false, false];
+            } else if(node.isLeaf){
+                this.contextIndividualVisible =  [false, false, true, true];
+            } else {
+                this.contextIndividualVisible =  [true, true, true, true];
+            }
+
             this.contextMenuIsVisible = true;
             const $contextMenu = this.$refs.contextmenu;
             let coordinateX = event.clientX;
@@ -234,7 +244,6 @@ export default {
            *-------------------------
            * SN:  Selected Node Group or Node
            ***********************/
-            this.contextTopMenuIsVisible = false;
             this.contextMenuIsVisible = false;
             this.modalContext = {
                 tree: this.$refs.slVueTree
@@ -309,6 +318,10 @@ export default {
                 });
             }
         },
+        displayContextByType(){
+            debugger
+            return false;
+        },
         deleteSelected(tree){
             const prams = {
                 path: tree.getSelected().map(node => node.path),
@@ -316,13 +329,6 @@ export default {
             };
             this.$emit('delete', prams);
         },
-        getNextLayer(){
-            const prams =  {
-                treeV:this.$refs.slVueTree
-            };
-            this.$emit('nextLayer', prams);
-        },
-
         beforeEnter (el) {
             this.$velocity(el, {
                 translateX: `-${this.treeWidth}px`,
