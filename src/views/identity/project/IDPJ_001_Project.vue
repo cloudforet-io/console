@@ -33,7 +33,7 @@
               @selected="NodeSelected"
               @edited="editSelected"
               @delete="deletedSelectedOnTree"
-              @nextLayer="getNextLayerOnTree"
+              @toggled="getNextLayerOnTree"
     >
       <template #treeSubPanel>
         <BaseTabNav
@@ -150,9 +150,6 @@ export default {
         NodeSelected(item) {
             this.lastEvent = 'Selected Item : ' + item[0].title;
         },
-        getNextLayerOnTree (tree){
-
-        },
         editSelected(item) {
                   /*******************************************
                    * TODO :: Please Add More Flags if needed.
@@ -217,6 +214,33 @@ export default {
             }
             return (isTagValidated && isDefaultValidated) ? params : null;
         },
+        async getNextLayerOnTree (nodeObj){
+            this.consoleLogEnv('Execute function get Next Layer On Tree');
+            let childrenNode = [];
+            let url = '/identity/project/tree';
+            const selected = nodeObj.treeV.getSelected()[0];
+            const path = selected.path;
+            const dataParam = nodeObj.node.data;
+            dataParam['is_cached'] = true;
+
+            let param = {
+                item_type: 'PROJECT_GROUP',
+                item_id:this._.get(nodeObj.node, 'data.id'),
+                domain_id: sessionStorage.domainId
+            };
+
+            await this.$axios.post(url, param).then((response) => {
+                childrenNode = this.getSelectedNodeArr(response.data.items);
+                nodeObj.treeV.updateNode(path, { data: dataParam });
+                if (!this.isEmpty(childrenNode)){
+                    childrenNode.forEach(curItem =>{
+                        nodeObj.treeV.insert({ node: nodeObj.node, placement: 'inside' }, curItem);
+                    });
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        },
         async createProsProcess(items) {
             const flag = this.selectedData.flag;
             const treeV = this.isEmpty(items.tree) ? this.selectedData.tree : items.tree;
@@ -226,36 +250,33 @@ export default {
                 this.createProject(items, flag, treeV);
             }
         },
-        async createProjectGroup(items, flag, tree) {
 
+        async createProjectGroup(items, flag, tree) {
             let url = '/identity/project-group/create';
             let param = this.validateProject();
-
             if (param){
                 param['domain_id'] = sessionStorage.domainId;
                 const selected = tree.getSelected()[0];
-
                 if (flag === 'SNG') {
                     param['parent_project_group_id'] = selected.data.id;
                 } else {
                     param['is_root']= true;
                 }
-
                 await this.$axios.post(url, param).then((response) => {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
                         const placement = flag.charAt(0) === 'S' ? 'inside': 'before';
                         const InitializedPG = { id: responseData.project_group_id, item_type:'PROJECT_GROUP', is_root: responseData.is_root, name: param.name };
                         let newNode = this.getSelectedNode(InitializedPG);
-                        tree.insert({ node: tree.getSelected()[0], placement: placement }, newNode);
 
                         if (flag === 'SNG') {
-
+                            this.applyActionOnScreen(items, flag, tree,{ node: newNode, placement: placement });
                         } else {
-                            if (this.isInitializing){
-                                tree.remove([tree.getSelected()[1]].map(node => node.path));
-                                this.isInitializing = false;
-                            }
+                            tree.insert({ node: tree.getSelected()[0], placement: placement }, newNode);
+                        }
+                        if (this.isInitializing){
+                            tree.remove([tree.getLastNode()].map(node => node.path));
+                            this.isInitializing = false;
                         }
                     }
                 }).catch((error) => {
@@ -264,8 +285,26 @@ export default {
                 this.$refs.EditModal.hideModal();
             }
         },
-        async createProject(items) {
+        async createProject(items, flag, tree) {
+            let url = '/identity/project/create';
+            let param = this.validateProject();
+            if (param){
+                const selected = tree.getSelected()[0];
+                param['domain_id'] = sessionStorage.domainId;
+                param['project_group_id'] = selected.data.id;
 
+                await this.$axios.post(url, param).then((response) => {
+                    const responseData = !this.isEmpty(response.data) ? response.data : {};
+                    if (!this.isEmpty(responseData)){
+                        const InitializedPG = { id: responseData.project_id, item_type:'PROJECT', name: param.name };
+                        let newNode = this.getSelectedNode(InitializedPG);
+                        this.applyActionOnScreen(items, flag, tree,{ node: newNode, placement: 'inside' });
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                });
+                this.$refs.EditModal.hideModal();
+            }
         },
         async updateProject(items) {
             this.consoleLogEnv('Update Project : ', items);
@@ -305,19 +344,34 @@ export default {
                     this.$alertify.success('Okay');
                     if (this.treeData.length === 1) {
                         this.isInitializing = true;
-                        this.treeData = [{ title: 'Please, Right Click me',
+                        this.treeData = [{ title: '! Please, Right Click me',
                             isLeaf: true,
                             data: {
                                 init: true
                             }}];
                     }
                 }
-
-
             }).catch((error) => {
                 console.error(error);
+                if (error.data.error.code.includes('ERROR_EXIST_CHILD')) {
+                    this.$alertify.error('Item has child, Please delete Child first.');
+                }
             });
-
+        },
+        async applyActionOnScreen(items, flag, tree, data) {
+            const selected = tree.getSelected()[0];
+            const path = selected.path;
+            if (!selected.isExpanded) {
+                if (selected.data.is_cached) {
+                    tree.insert({ node: tree.getSelected()[0], placement: data.placement }, data.node);
+                    tree.updateNode(path, { isExpanded: true });
+                } else {
+                    this.getNextLayerOnTree({ treeV: tree, node: selected });
+                    tree.updateNode(path, { isExpanded: true });
+                }
+            } else {
+                tree.insert({ node: tree.getSelected()[0], placement: data.placement }, data.node);
+            }
         }
     }
 };

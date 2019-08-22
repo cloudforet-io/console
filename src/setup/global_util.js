@@ -338,10 +338,11 @@ export const Mixin = {
                     console.log(curItem);
                     obj['data'] = {
                         id: curItem.id,
-                        item_type : curItem.item_type
+                        item_type : curItem.item_type,
+                        is_cached : false
                     };
                     obj['title'] = curItem.name;
-                    obj['isLeaf'] = this._.get(GlobalEnum,`${treeKey}.${curItem.item_type}.isLeaf`);
+                    obj['isLeaf'] = curItem.has_child ? false: true;0;
                     obj['isExpanded'] = false;
                     if (curItem.has_child){
                         obj['children'] = [];
@@ -414,12 +415,13 @@ export const Mixin = {
          * Description:  return tree array of object which suits for BaseTree
          **********************************************************************************/
         getSelectedNode: function (o) {
+            const filterArr = ['PROJECT'];
             let selectedNode = {
                 title: '',
                 isLeaf: false,
-                children: null,
+                children: [],
                 isExpanded: false,
-                isSelected: true,
+                isSelected: false,
                 isDraggable: true,
                 isSelectable: true,
                 data: { visible: false }
@@ -430,6 +432,8 @@ export const Mixin = {
                         selectedNode['title'] = val;
                     } else if (key === 'has_child') {
                         selectedNode['isLeaf'] = !val;
+                    } else if (key === 'item_type' && filterArr.includes(val)) {
+                        selectedNode['isLeaf'] =  true;
                     } else if (key === 'domain_id') {
                         continue;
                     } else {
@@ -438,6 +442,21 @@ export const Mixin = {
                 }
             }
             return selectedNode;
+        },
+        /**********************************************************************************
+         * Name       : getSelectedNode
+         * Input   => (o: any data Object to bind                         =>  Object)
+         * Output  => Node
+         * Description:  return tree array of object which suits for BaseTree
+         **********************************************************************************/
+        getSelectedNodeArr: function (dataArr) {
+            let NodeArray = [];
+            if (dataArr.length > 0 ) {
+                dataArr.forEach(curItem =>{
+                    NodeArray.push(this.getSelectedNode(curItem));
+                });
+            }
+            return NodeArray;
         },
         /**********************************************************************************
          * Name       : getDatefromTimeStamp
