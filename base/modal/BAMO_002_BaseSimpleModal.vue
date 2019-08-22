@@ -1,11 +1,18 @@
 <template>
   <div class="wrapper">
     <b-modal v-model="modalShow"
-             :title="title" 
              :modal-class="`modal-${type}`"
              :size="size"
              :ok-variant="type"
     >
+      <template #modal-header>
+        <h5 class="modal-title">
+          {{ title }}
+        </h5>
+        <button tabindex="-1" type="button" aria-label="Close" class="close" @click="clickCancel">
+          <i class="fal fa-times" />
+        </button>
+      </template>
       <span> {{ text }} </span>
       <slot name="contents" />
       <slot name="footer" />

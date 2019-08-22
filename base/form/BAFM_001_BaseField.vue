@@ -4,26 +4,37 @@
       <legend v-if="!isEmpty(label)" class="col-form-label text-right"
               :class="`col-${labelCols} ${labelClass}`"
       >
-        <span v-if="required" class="required">*</span> 
+        <span v-if="!plaintext && required" class="required">*</span> 
         {{ label }}
       </legend>
-      <b-input-group class="col-9">
-        <b-form-input :value="input"
+      <b-input-group :class="`col-${fieldCols ? fieldCols : 12 - labelCols}
+                     ${fieldClass}`"
+      >
+        <b-form-input v-if="type !== 'select'" 
+                      :class="{append: $scopedSlots.append}"
+                      :value="value"
                       :type="type" 
                       :plaintext="plaintext" 
                       :state="state"
                       :placeholder="placeholder"
                       :required="browserRequired"
                       :autocomplete="autocomplete"
+                      :tabindex="tabindex"
                       @input="onInput"
+        />
+        <ModelSelect v-else
+                     :value="value"
+                     :options="options"
+                     :placeholder="placeholder"
+                     @input="onSelect"
         />
         <b-input-group-append v-if="$scopedSlots.append">
           <slot name="append" />
         </b-input-group-append>
       </b-input-group>
     </b-row>
-    <b-row align-h="end" class="form-row">
-      <b-col cols="9">
+    <b-row v-if="!plaintext" align-h="end" class="form-row">
+      <b-col :class="`col-${fieldCols ? fieldCols : 12 - labelCols} ${fieldClass}`">
         <b-form-invalid-feedback :state="state">
           {{ invalidMessage }}
         </b-form-invalid-feedback>
@@ -41,14 +52,19 @@
 </template>
 
 <script>
+import { ModelSelect } from 'vue-search-select';
+
 export default {
     name: 'BaseField',
+    components: {
+        ModelSelect
+    },
     model: {
-        prop: 'input',
+        prop: 'value',
         event: 'input'
     },
     props: {
-        input: {
+        value: {
             type: String,
             default: null
         },
@@ -68,17 +84,33 @@ export default {
             type: String,
             default: 'off'
         },
+        tabindex: {
+            type: String,
+            default: '0'
+        },
         label: {
             type: String,
             default: ''
         },
         labelCols: {
-            type: [String, Number],
-            default: '12'
+            type: Number,
+            default: 3
         },
         labelClass: {
             type: String,
             default: ''
+        },
+        fieldCols: {
+            type: Number,
+            default: 0
+        },
+        fieldClass: {
+            type: String,
+            default: ''
+        },
+        options: {
+            type: [Array, Object],
+            default: () => []
         },
         required: {
             type: Boolean,
@@ -105,16 +137,30 @@ export default {
             default: ''
         }
     },
+    data () {
+        return {
+            select: this.value
+        };
+    },
     methods: {
         onInput (val, e) {
             this.$emit('input', val, e);
+        },
+        onSelect (val) {
+            this.$emit('input', val);
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-.input-group {
+.form-row {
+      align-items: center;
+      legend.col-form-label {
+            word-break: break-word;
+      }
+}
+.input-group.append {
     .form-control {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
