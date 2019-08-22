@@ -25,7 +25,7 @@
 
     <b-row v-if="isEditable" no-gutters align-h="between">
       <b-col cols="12">
-        <span class="add-btn" @click="addRow">
+        <span class="add-btn" tabindex="0" @click="addRow">
           <span class="icon">
             <i class="fas fa-plus-circle" />
           </span>
@@ -99,6 +99,9 @@ export default {
         },
         resetRows () {
             this.rows = this.tagData.map((tag, i) => ({ rowId: i, tag: tag }));
+            if (this.showFirstTagRow) {
+                this.addRow();
+            }
         },
         onSave () {
             this.showSaveBtn = false;
@@ -145,6 +148,11 @@ export default {
   vertical-align: text-bottom;
   cursor: pointer;
   color: $green;
+  &:hover, &:focus {
+      .icon {
+          text-shadow: 0 0 10px rgba($green, 0.7);
+      }
+  }
   .icon {
       font-size: 1.33em;
       padding-right: 5px;
