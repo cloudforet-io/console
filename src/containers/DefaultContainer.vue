@@ -42,6 +42,7 @@ $calc-height: calc(#{$header-height} + #{$sub-header-height});
     padding-top: $calc-height;
     .main {
       margin: 0 !important;
+      min-height: calc(100vh - #{$total-header-height});
     }
   }
 }

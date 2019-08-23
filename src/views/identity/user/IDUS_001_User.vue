@@ -14,7 +14,8 @@
                    :underlined="true"
                    :height="height"
                    field-id="user_id"
-                   @rowSelected="rowSelected" 
+                   @rowSelected="rowSelected"
+                   @onSelectAll="onAllRowSelected"
                    @list="listUsers"
                    @limitChanged="limitChanged"
         >
@@ -92,7 +93,13 @@
     >
       <template #INFO>
         <b-card class="base first-tab">
-          <UserInfo :user-prop="selectedUser" @update="updateSelectedUserInfo" />
+          <MultiUsersInfo v-if="isMultiSelected" 
+                          :users-data="multiSelectedUserList"
+          />
+          <UserInfo v-else 
+                    :user-data="selectedUser"
+                    @update="updateSelectedUserInfo"
+          />
         </b-card>
       </template>
     </BaseTabNav>
@@ -103,26 +110,30 @@
 </template>
 
 <script>
-import BaseDrag from '@/components/base/drag/BADG_002_BaseDragY.vue';
-import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
+import BaseDrag from '@/components/base/drag/BADG_002_BaseDragY';
+import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 import query from './search_context/query.js';
-import UserInfo from './IDUS_003_UserInfo.vue';
-const BaseSimpleModal = () => import('@/components/base/modal/BAMO_002_BaseSimpleModal.vue');
-const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 
-const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
-const UserDetail = () => import('./IDUS_002_UserDetail.vue');
+const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
+const UserInfo = () => import('./IDUS_003_UserInfo');
+const MultiUsersInfo = () => import('./IDUS_004_MutiUsersInfo');
+
+const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
+const UserDetail = () => import('./IDUS_002_UserDetail');
+
+const BaseSimpleModal = () => import('@/components/base/modal/BAMO_002_BaseSimpleModal');
 
 export default {
     name: 'User',
     components: {
         BaseDrag,
         BaseTable,
-        BaseSimpleModal,
+        BaseTabNav,
+        UserInfo,
+        MultiUsersInfo,
         BaseModal,
         UserDetail,
-        BaseTabNav,
-        UserInfo
+        BaseSimpleModal
     },
     data () {
         return {
@@ -135,7 +146,6 @@ export default {
             defaultTab: 0,
             users: [],
             selectedUser: null,
-            selectedUsers: [],
             selectedIdx: undefined,
             addModal: false,
             totalCount: 0,
@@ -144,7 +154,9 @@ export default {
             perPage: 10,
             isLoading: true,
             query: {},
-            isCreateMode: true
+            isCreateMode: true,
+            isMultiSelected: false,
+            multiSelectedList: []
         };
     },
     computed: {
@@ -170,11 +182,13 @@ export default {
                 { key: 'timezone', label: this.tr('COL_NM.TIMEZONE'), thStyle: { width: '200px' }}
             ];
         },
-        selectedUserList () {
-            return this.selectedUser;
-        },
         hasSelectedUser () {
-            return !this.isEmpty(this.selectedUserList) || !this.isEmpty(this.selectedUser);
+            return !!(this.isMultiSelected || this.selectedUser);
+        },
+        multiSelectedUserList () {
+            return this.multiSelectedList.map((item) => {
+                return item.data;
+            });
         }
     },
     mounted () {
@@ -189,6 +203,8 @@ export default {
             this.selectedUser = null;
             this.selectedIdx = undefined;
             this.isLoading = true;
+            this.multiSelectedList = [];
+            this.isMultiSelected = false;
         },
         saveMeta (limit, start, sort, filter, filterOr) {
             if (this.isEmpty(limit)) {
@@ -249,26 +265,39 @@ export default {
                 this.isLoading = false;
             }
         },
-        rowSelected (row, idx) {
-            if (this.isEmpty(row)) {
-                this.initSelectedUser();
-            } else if (row instanceof Array) {
-                if (row.length === 1) {
-                    this.setSelectedUser(row[0].data, idx);
-                } else {
-                    this.selectedUsers = row;
-                }
+        rowSelected (selected, isSelection, rows) {
+            if (rows && rows.length > 1) {
+                this.isMultiSelected = true;
+                this.multiSelectedList = rows;
             } else {
-                this.setSelectedUser(row.data, idx);
+                this.isMultiSelected = false;
+            }
+
+            if (isSelection && !this.isMultiSelected) {
+                this.setSelectedUser(selected);
+            } else if (rows && rows.length === 1) {
+                this.setSelectedUser(rows[0]);
+            } else {
+                this.initSelectedUser();
             }
         },
+        onAllRowSelected (isSelectedAll, rows) {
+            if (isSelectedAll) {
+                this.isMultiSelected = true;
+                this.multiSelectedList = rows;
+            } else {
+                this.isMultiSelected = false;
+            }
+            this.initSelectedUser();
+
+        },
         initSelectedUser () {
-            this.selectedUser = null;
+            this.selectedUser = undefined;
             this.selectedIdx = undefined;
         },
-        setSelectedUser (user, idx) {
-            this.selectedUser = user;
-            this.selectedIdx = idx;
+        setSelectedUser (item) {
+            this.selectedUser = this.users[item.idx];
+            this.selectedIdx = item.idx;
         },
         limitChanged (val) {
             this.perPage = Number(val);
@@ -279,8 +308,8 @@ export default {
         },
         updateUser (user) {
             this.hideUserDetail();
+            user.selected = true;
             this.selectedUser = user;
-            this.selectedUser.selected = true;
             this.$set(this.users, this.selectedIdx, user);
         },
         createUser () {

@@ -174,16 +174,6 @@ export default {
     color: maroon;
   }
 
-  .copy-clipboard i {
-    visibility: hidden;
-    padding: 0px 3px 0px 10px;
-    cursor: pointer
-  }
-
-  .copy-clipboard:hover i {
-    visibility: visible;
-  }
-
   .card.base {
     margin-top: 10px;
     margin-bottom: 10px;

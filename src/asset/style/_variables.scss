@@ -32,6 +32,7 @@ $header-z: 9999999;
 /* SIZE */
 $header-height: 50px;
 $sub-header-height: 35px;
+$total-header-height: calc(#{$header-height} + #{$sub-header-height});
 
 $side-pad: 15px;
 $top-pad: 15px;
