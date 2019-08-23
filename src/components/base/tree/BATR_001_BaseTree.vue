@@ -114,7 +114,7 @@
     <BaseSimpleModal ref="BATR001_treeAlertNotice" :title="tr('MODAL_TITLE.NOT_ALLOW')">
       <template #contents>
         <div>
-          {{tr('MODAL_MSG.LEAF_NOMOVE',['Rmx']) }}
+          {{tr('MODAL_MSG.LEAF_NOMOVE',[tr('PG')]) }}
         </div>
       </template>
     </BaseSimpleModal>

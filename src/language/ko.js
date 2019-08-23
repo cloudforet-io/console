@@ -32,6 +32,7 @@ export const ko ={
         PG_ID: '프로젝트 아이디',
         PG_NM: '프로젝트 명',
         PG_GR: '프로젝트 그룹',
+        PG: "프로젝트",
         SEARCH: '검색'
     },
     COL_NM: {
@@ -79,10 +80,10 @@ export const ko ={
         EVENT: '이벤트'
     },
     MODAL_TITLE: {
-        NOT_ALLOW: 'Action not allowed'
+        NOT_ALLOW: '수행불가 작업'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: "Can not locate {0} to Root {1}, {2}."
+        LEAF_NOMOVE: "{0} 는 Root 포지션에 위치할 수 없습니다."
     },
     PN: {
         BASE_INFO: '기본 정보',
