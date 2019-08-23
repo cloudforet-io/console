@@ -83,7 +83,7 @@ export const en = {
         NOT_ALLOW: 'Action not allowed'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: "{0} can not be located at Root position."
+        LEAF_NOMOVE: " '{0}' can not be located at Root position."
     },
     PN: {
         BASE_INFO:

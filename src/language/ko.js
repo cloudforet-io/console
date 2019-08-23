@@ -83,7 +83,7 @@ export const ko ={
         NOT_ALLOW: '수행불가 작업'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: "{0} 는 Root 포지션에 위치할 수 없습니다."
+        LEAF_NOMOVE: "'{0}' 는 Root 포지션에 위치할 수 없습니다."
     },
     PN: {
         BASE_INFO: '기본 정보',
