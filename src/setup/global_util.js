@@ -213,16 +213,12 @@ export const Mixin = {
         },
         /**********************************************************************************
          * Name       : tr
-         * Input   => (m: message   =>  String)
-         *            {type: type of font awesome ex: fal, fab,
-         *             icon: icon name,
-         *             size: size of icon ex: -1 ~ 10
-         *             color: variant color
-         *            }
+         * Input   => (m: message   =>  String
+         *             a: argument  =>  String or  Array)
          * Output  => String translation Message
          * Description:  translation of i18n
          **********************************************************************************/
-        tr: function (m) {
+        tr: function (m, a) {
             let path = m.split('.');
             let key = 'MSG';
             if (path[0] !== 'MSG' && path.length < 2) {
@@ -230,7 +226,7 @@ export const Mixin = {
             } else {
                 key = m;
             }
-            return  this.$i18n.t(key);
+            return  this.isEmpty(a) ? this.$i18n.t(key) : this.$i18n.t(key, a);
         },
         /**********************************************************************************
          * Name       : setFontSize
@@ -324,25 +320,29 @@ export const Mixin = {
         /**********************************************************************************
          * Name       : treeDataHandler
          * Input   => (d: data                         =>  Array of data Object
-         *             t: Type                         =>  Tree Type in Enum values)
+         *             o: Object                         =>  Tree Type in Enum values)
          * Output  => Object Array which
          * Description:  return tree array of object which suits for BaseTree
          **********************************************************************************/
-        treeDataHandler: function (d, t) {
+        treeDataHandler: function (d, o) {
             let returnTree = [];
-            let treeKey = this.isEmpty(t) ? 'TREE': 'TREE.'+ t;
-
             if (d.hasOwnProperty('items') && d.items.length > 0) {
                 d.items.forEach((curItem) =>{
-                    let obj = {};
                     console.log(curItem);
-                    obj['data'] = {
+                    let obj = {};
+                    let dataObj = {
                         id: curItem.id,
                         item_type : curItem.item_type,
                         is_cached : false
                     };
+
+                    if (!this.isEmpty(o)){
+                        Object.assign(dataObj, o);
+                    }
+
+                    obj['data'] = dataObj;
                     obj['title'] = curItem.name;
-                    obj['isLeaf'] = curItem.has_child ? false: true;0;
+                    obj['isLeaf'] = curItem.has_child ? false: true;
                     obj['isExpanded'] = false;
                     if (curItem.has_child){
                         obj['children'] = [];
