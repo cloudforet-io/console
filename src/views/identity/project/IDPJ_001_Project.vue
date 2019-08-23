@@ -130,13 +130,13 @@ export default {
         async listProject() {
             await this.$axios.post('/identity/project/tree', {
                 item_id: null,
-                is_root: true,
                 item_type: 'ROOT',
                 sort: {
                     'key': 'name'
                 }
             }).then((response) => {
-                const responseData = this.treeDataHandler(response.data, 'PROJECT');
+
+                const responseData = this.treeDataHandler(response.data, { is_root: true });
                 this.treeData = responseData;
                 //Note: Initialize Project trees and then display only a context, This must be included as well.
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0],'data.init'))) {
