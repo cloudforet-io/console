@@ -32,6 +32,7 @@ export const en = {
         PG_ID: 'Project ID',
         PG_NM: 'Project Name',
         PG_GR: 'Project Group',
+        PG: 'Project',
         SEARCH: 'Search'
     },
     COL_NM: {
@@ -82,7 +83,7 @@ export const en = {
         NOT_ALLOW: 'Action not allowed'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: "Can not locate {0} to Root."
+        LEAF_NOMOVE: "{0} can not be located at Root position."
     },
     PN: {
         BASE_INFO:
