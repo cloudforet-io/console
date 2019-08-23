@@ -71,27 +71,27 @@
           >
             <div v-if="contextIndividualVisible[0]"
                  class="contextmenuleaf"
-                 @click="excSelected('NG')"
+                 @click="contextExecutor('NG')"
             >
               <i class="fal fa-folder-minus" />&nbsp; Add a Project Group
             </div>
 
             <div v-if="contextIndividualVisible[1]"
                  class="contextmenuleaf"
-                 @click="excSelected('ND')"
+                 @click="contextExecutor('ND')"
             >
               <i class="fal fa-cube" />&nbsp; Add a Project
             </div>
             <div v-if="contextIndividualVisible[2]"
                  class="contextmenuleaf"
-                 @click="excSelected('SN')"
+                 @click="contextExecutor('SN')"
             >
               <i class="fal fa-pencil" />&nbsp; Edit Selected Project
             </div>
 
             <div v-if="contextIndividualVisible[3]"
                  class="node-leaf-last"
-                 @click="excSelected"
+                 @click="contextExecutor"
             >
               <i class="fal fa-trash" />&nbsp; Remove Selected Item
             </div>
@@ -114,11 +114,10 @@
     <BaseSimpleModal ref="BATR001_treeAlertNotice" :title="tr('MODAL_TITLE.NOT_ALLOW')">
       <template #contents>
         <div>
-          {{tr('MODAL_MSG.LEAF_NOMOVE',[tr('PG')]) }}
+          {{ tr('MODAL_MSG.LEAF_NOMOVE',[tr('PG')]) }}
         </div>
       </template>
     </BaseSimpleModal>
-
   </div>
 </template>
 <script>
@@ -127,7 +126,6 @@ import BaseDragVertical from '@/components/base/drag/BADG_001_BaseDragX.vue';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal.vue';
 import { mapGetters } from 'vuex';
-//@click="getNextLayer"
 export default {
     name: 'BaseTree',
     components: {
@@ -205,30 +203,6 @@ export default {
             */
             this.$bus.$emit('treeSelectedEvent', nodes);
         },
-        nodeToggled (node) {
-            if (!node.isExpanded ) {
-                if (!node.data.is_cached){
-                    this.$emit('toggled', { node: node, treeV:this.$refs.slVueTree });
-                }
-            }
-        },
-        beforeNodeDropped (node, position, cancel) {
-            if (node[0].isLeaf && position.node.data.hasOwnProperty('is_root')){
-                if (position.node.data.is_root && position.placement !== 'inside'){
-                    cancel(true);
-                    this.$refs.BATR001_treeAlertNotice.showModal();
-                    return;
-                }
-            }
-        },
-        nodeDropped (nodes, position) {
-            this.$emit('dropped', {
-                nodes: nodes,
-                position: position,
-                treeV:this.$refs.slVueTree
-            });
-        },
-
         showContextMenu (node, event, hasClicked) {
             if (!hasClicked) {
                 event.preventDefault();
@@ -249,7 +223,7 @@ export default {
             $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
             $contextMenu.style.top = `${coordinateY - this.headerHeight}px`;
         },
-        excSelected (flag) {
+        contextExecutor (flag, exData) {
             /*********************
            * Flag:
            * NG:  Node Group
@@ -262,12 +236,11 @@ export default {
            *-------------------------
            * SN:  Selected Node Group or Node
            ***********************/
+            const treeV = this.$refs.slVueTree;
             this.contextMenuIsVisible = false;
             this.modalContext = {
-                tree: this.$refs.slVueTree
+                tree: treeV
             };
-
-            const treeV = this.$refs.slVueTree;
 
             switch (flag) {
             case 'NG'://Node Group
@@ -295,6 +268,12 @@ export default {
                 this.modalContents = 'Do you want to create a root Project';
                 this.modalContents += this.modalContext.tree.getSelected()[0].isLeaf ? '?' : ' Group?';
                 this.modalEvent = 'edited';
+                this.modalOk ();
+                break;
+            case 'MV':
+                this.modalContext['flag'] = 'MV';
+                this.modalContext['dropData'] = exData;
+                this.modalEvent = 'dropped';
                 this.modalOk ();
                 break;
             default:
@@ -336,9 +315,67 @@ export default {
                 });
             }
         },
-        displayContextByType(){
-            debugger;
-            return false;
+        beforeNodeDropped (node, position, cancel) {
+            if (node[0].isLeaf && position.node.data.hasOwnProperty('is_root')){
+                if (position.node.data.is_root && position.placement !== 'inside'){
+                    cancel(true);
+                    this.$refs.BATR001_treeAlertNotice.showModal();
+                    return;
+                }
+            };
+
+            /*this.contextExecutor('MV', {
+                nodes: node,
+                position: position,
+                cancel: cancel
+            });*/
+
+            this.$emit('dropped', {
+                nodes: node,
+                position: position,
+                treeV:this.$refs.slVueTree,
+                cancel: cancel
+            });
+        },
+        nodeDropped (nodes, position, cancel) {
+            if (!position.node.data.is_cached) {
+                  /* refrence 참조값이 같아서 변조가 일어남.
+                      let sourceNode_path = nodes[0].path;
+                      let toNode_path = position.node.path;
+                  */
+                const treeV = this.$refs.slVueTree;
+                let sourceNode_path = JSON.parse(JSON.stringify(nodes[0].path));
+                let toNode_path = JSON.parse(JSON.stringify(position.node.path));
+
+                if (sourceNode_path.length === toNode_path.length){
+                    sourceNode_path.pop();
+                    toNode_path.pop();
+                    if (sourceNode_path.toString() === toNode_path.toString()){
+                        let updateValue = position.node.path.slice(-1)[0] === 0 ? 0 : position.node.path.slice(-1)[0]-1;
+                        position.node.path[position.node.path.length-1] = updateValue;
+                    }
+
+                    treeV.updateNode(position.node.path,{ isExpanded:true });
+                    position.node.path.push(0);
+                    console.log('position.node.path', position.node.path);
+                    treeV.select(position.node.path, { addToSelection: false });
+                    treeV.remove(treeV.getSelected().map(node => node.path));
+                    position.node.path.pop();
+                    treeV.select(position.node.path, { addToSelection: false });
+                    this.nodeToggled(position.node);
+                }
+                //;
+
+                //this.$emit('afterDrop', { node: position.node, treeV:treeV });
+            }
+        },
+        nodeToggled (node) {
+            if (!node.isExpanded ) {
+                if (!node.data.is_cached){
+                    console.log('nodeToggled: ', node.data.is_cached);
+                    this.$emit('toggled', { node: node, treeV: this.$refs.slVueTree });
+                }
+            }
         },
         deleteSelected(tree){
             const prams = {
