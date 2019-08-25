@@ -72,7 +72,11 @@ export default {
     },
     methods: {
         CopyToClipboard (key) {
-            this.selectToCopyToClipboard(key);
+            let result = '';
+            this.usersData.map((user) => {
+                result += ` ${user[key]}`;
+            });
+            this.selectToCopyToClipboard(result);
         }
     }
 };
