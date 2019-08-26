@@ -167,6 +167,8 @@ export default {
             ).then(() => {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
+                this.setTimeZone();
+
             }).catch(() => {
                 this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
             });
@@ -200,6 +202,18 @@ export default {
         },
         popSignUpInstruction () {
             this.$refs.LogInSimpleModal.showModal();
+        },
+        async setTimeZone(){
+            await this.$axios.post('identity/user/get', {
+                user_id: this.userId,
+                domainId: sessionStorage.getItem('domainId')
+            }).then((response) => {
+                const timeZone = this.isEmpty(response.data.timezone) ? 'Etc/GMT' : response.data.timezone;
+                localStorage.timeZone = timeZone;
+
+            }).catch(() => {
+                this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
+            });
         }
     }
 };

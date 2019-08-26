@@ -10,8 +10,8 @@ export const GlobalEnum = {
         }
     }),
     LANGUAGES: Object.freeze({
-        en: { value: 'en', text: 'English' },
-        ko: { value: 'ko', text: '한국어' }
+        en: { value: 'en', text: 'English' , nation: 'US'},
+        ko: { value: 'ko', text: '한국어', nation: 'KR' }
     }),
     SERVER_STATE: Object.freeze(
         {

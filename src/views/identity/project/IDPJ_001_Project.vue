@@ -32,9 +32,8 @@
               @selected="NodeSelected"
               @edited="editSelected"
               @delete="deletedSelectedOnTree"
-              @dropped="moveProject"
+              @noCacheDrop="moveProject"
               @toggled="getNextLayerOnTree"
-              @afterDrop="getNextLayerOnTree"
     >
       <template #treeSubPanel>
         <BaseTabNav
@@ -75,13 +74,6 @@ const tabs = [
         tabIcon: 'icon-user',
         tabTitle: 'MEMBER',
         component: projectMember
-    },
-    {
-        name: 'audit',
-        isSelected: false,
-        tabIcon: 'icon-pie-charts',
-        tabTitle: 'AUDIT',
-        component: projectAudit
     }
 ];
 
@@ -127,7 +119,7 @@ export default {
     },
     methods: {
         NodeSelected(item) {
-            this.lastEvent = 'Selected Item : ' + item[0].title;
+
         },
         async listProject() {
             await this.$axios.post('/identity/project/tree', {
@@ -218,7 +210,7 @@ export default {
             let url = '/identity/project/tree';
             const selected = this.isEmpty(nodeObj.treeV.getSelected()[0]) ? nodeObj.node: nodeObj.treeV.getSelected()[0];
             const path = selected.path;
-            console.log('###############', path)
+            console.log('###############', path);
             const dataParam = nodeObj.node.data;
             dataParam['is_cached'] = true;
 
@@ -374,9 +366,8 @@ export default {
             }
         },
         async moveProject(items) {
+
             this.consoleLogEnv('Move Selected Items : ', items);
-            const treeV = items.tree;
-            const dropData = items.dropData;
 
             const fromItem = items.nodes[0];
             const toItem = items.position.node;
@@ -404,6 +395,15 @@ export default {
             }).catch((error) => {
                 console.error(error);
             });
+
+            if (!items.position.node.data.is_cached){
+                if (items.isCanceled) {
+                    items.position.node.path[items.position.node.path.length-1] = items.position.node.path[items.position.node.path.length-1]-1;
+                    items.treeV.select(items.position.node.path, { addToSelection: false });
+                }
+                items.treeV.updateNode(items.position.node.path, { isExpanded: true });
+                this.getNextLayerOnTree({ treeV: items.treeV, node: items.position.node });
+            }
 
         },
         async closeSelected(){
