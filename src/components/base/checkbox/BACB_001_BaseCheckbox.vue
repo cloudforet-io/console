@@ -1,6 +1,8 @@
 <template>
   <span>
     <b-check v-model="checked"
+             :inline="inline"
+             :class="type"
              @change="onChange"
     />
   </span>
@@ -15,6 +17,14 @@ export default {
             type: Boolean,
             default: false,
             required: true
+        },
+        inline: {
+            type: Boolean,
+            default: true
+        },
+        type: {
+            type: String,
+            default: 'primary'
         }
     },
     computed: {

@@ -84,19 +84,20 @@
       <template #contents>
         <h4>Are you sure you want to delete selected user(s) below?</h4>
         <br>
-        <ul>
-          <li v-if="selectedUser">
-            <h5>{{ selectedUser.name }}</h5>
-          </li>
+        <div class="delete-user">
+          <span v-if="selectedUser" class="user-name">
+            {{ selectedUser.name }}
+          </span>
           <div v-for="(user) in multiSelectedUserList" v-else :key="user.user_id">
             <BaseCheckbox :key="user.user_id"
                           :selected="user.selected"
                           class="select-checkbox"
+                          type="danger"
             />
             <!-- @change="checkboxClicked" -->
-            <h5>{{ user.name }}</h5>
+            <span class="user-name">{{ user.name }}</span>
           </div>
-        </ul>
+        </div>
       </template>
     </BaseModal>
 
@@ -404,5 +405,11 @@ export default {
         font-weight: 600;
     }
 
+}
+.delete-user {
+    vertical-align: middle;
+}
+.user-name {
+    font-size: 1.2rem;
 }
 </style>
