@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
-import en from '@/language/en.json';
-import ko from '@/language/ko.json';
+import { en } from '@/language/en.js';
+import { ko } from '@/language/ko.js';
 import axios from 'axios';
 
 Vue.use(VueI18n);

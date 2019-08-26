@@ -21,6 +21,7 @@ api.interceptors.request.use(function (config) {
 api.interceptors.response.use(function (response) {
     //router.push('/error-page');
     //store.dispatch('auth/setNextPath', { nextPath: '/error-page'});
+
     if (response.headers.hasOwnProperty("AccessToken")) {
         sessionStorage.setItem('token', response.headers.AccessToken);
         api.defaults.headers.common['Authorization'] = `Bearer ${response.headers.AccessToken}`;

@@ -138,16 +138,15 @@ export default {
             }
             return groundData;
         },
-    /*
-       *Please, add a case when graphs is newly added
-       */
+        /*
+         *Please, add a case when graphs is newly added
+         */
         legendDataHandler (flag, chartData, outerIdx, innerIdx) {
             let groundData = null;
             if (flag === 'style') {
                 groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].backgroundColor[outerIdx] : chartData.datasets.backgroundColor[outerIdx];
                 groundData = 'border-left:7px solid ' + groundData;
             } else if (flag === 'data') {
-                this.consoleLogEnv('outer idx: ', outerIdx);
                 if (this.isEmpty(innerIdx)) {
                     groundData = (Array.isArray(chartData.datasets)) ? chartData.datasets[0].data[outerIdx] : chartData.datasets.data[outerIdx];
                 } else {

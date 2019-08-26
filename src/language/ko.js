@@ -1,0 +1,111 @@
+export const ko ={
+    MSG: {
+        DR_SERV: '서비스',
+        LOG_IN: 'Log In',
+        LOG_OUT: 'Log Out',
+        FORGPW: '비밀번호 찾기?',
+        SIGN_UP: '회원가입',
+        SIGN_UP_MSG: '모든 클라우드에서 간단하게 시작하십시오. 귀사의 성장과 함께 나아갑니다. 저희가 당신의 짐을 덜어드립니다.',
+        SIGN_IN: '클라우드 원 로그인하기',
+        SIGN_FAIL_TITLE: '아이디나 패스워드가 에러.',
+        SIGN_FAIL_BODY: '아이디나 패스워드를 다시 한번 확인해 주세요.',
+        REGISTER: 'Register Now!',
+        REMEMBER: '자동 로그인',
+        TR_NOTI: '아이디·비번 찾기',
+        TR_NOTI_CON: '',
+        SUMMARY: 'SUMMARY',
+        AUDIT: 'AUDIT',
+        TAG: 'TAG',
+        BTN_CANCEL: '취소',
+        BTN_EDIT: '변경',
+        BTN_DELETE: '삭제',
+        BTN_ADD: '추가',
+        BTN_UPT: '업데이트',
+        BTN_CRT: '신규등록',
+        BTN_S_MANT: '유지 보수 설정',
+        BTN_US_MANT: '유지 보수 해제',
+        CHG_PRO: '프로젝트 변경하기',
+        CHG_POOL: '풀 변경하기',
+        IMPORT: '가져오기(Import)',
+        COL_INFO: '정보 수집하기',
+        EXPORT: '내보내기(Export)',
+        PG_ID: '프로젝트 아이디',
+        PG_NM: '프로젝트 명',
+        PG_GR: '프로젝트 그룹',
+        PG: "프로젝트",
+        SEARCH: '검색'
+    },
+    COL_NM: {
+        C_COMMAND_ID: '커맨드 아이디',
+        C_USER_ID: '유저 아이디',
+        C_NAME: '이름',
+        C_RAW_DT: '로우 데이터',
+        C_ADMIN: '관리자(Admin)',
+        C_COMMAND: '커맨드',
+        C_AUDIT: '심사(Audit)',
+        C_DT: '데이터',
+        C_EVENT: '이벤트',
+        C_DISK: '디스크',
+        C_NIC: 'NIC',
+        C_SR_GROUP: '보안 그룹',
+        C_SUMMARY: '개요·서머리',
+        ID: '아이디',
+        NAME: '이름',
+        EMAIL: '이메일',
+        PHONE: '전화번호',
+        GROUP: '그룹',
+        LANGUAGE: '언어',
+        DOMAIN_ID: '도메인 아이디',
+        TIMEZONE: '타임존',
+        TYPE: '타입',
+        ROLE: '권한(Role)',
+        STATE: '상태(State)',
+        STATUS: '상태(Status)',
+        CREAT: '생성일',
+        FINISH: '완료일',
+        UPDATE: '갱신일',
+        RESULT: '결과',
+        IP: '아이피(IP)',
+        CORE: '코어(Core)',
+        MEMORY: '메모리',
+        O_TYPE: 'OS 타입',
+        O_DIS: 'OS 배포',
+        SE_TYPE: '서버 타입',
+        PLATFORM: '플랫폼',
+        POOL: '풀(Pool)',
+        PROJ: '프로젝트',
+        DISK_SZ: '디스크 사이즈',
+        DESC: '디스크립션',
+        EXECR: '실행자',
+        EVENT: '이벤트'
+    },
+    MODAL_TITLE: {
+        NOT_ALLOW: '수행불가 작업'
+    },
+    MODAL_MSG: {
+        LEAF_NOMOVE: "'{0}' 는 Root 포지션에 위치할 수 없습니다."
+    },
+    PN: {
+        BASE_INFO: '기본 정보',
+        TAG: '태그',
+        INFO: '정보'
+    },
+    ENUM: {
+        SERVER_STATE: {
+            SERVICE: '서비스 중',
+            MAINTENANCE: '유지 관리',
+            CLOSED: '닫힘',
+            DELETED: '삭제됨'
+        },
+        COLLECT_STATE: {
+            NEW:   '신규',
+            ACTIVE:  '활성화',
+            DISCONNECTED: '연결 끈김',
+            DUPLICATED: '중복 됨',
+            UNMANAGED: '관리 되지 않음'
+        }
+    },
+    ERR_CODE: {
+        ERR_LOG_001: '로그인 에러'
+    }
+};
