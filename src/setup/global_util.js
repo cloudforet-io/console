@@ -463,9 +463,26 @@ export const Mixin = {
          * Output  => Node
          * Description:  return tree array of object which suits for BaseTree
          **********************************************************************************/
-        getDatefromTimeStamp: function () {
+        getDatefromTimeStamp: function (ts, tz, tzr) {
+            const mxTimezones = timezone.getAllTimezones();
 
-            return 'a';
+            const options = {
+                timeZone : 'UTC',
+                hour12: false,
+                timeZoneName: 'long',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute:'2-digit',
+                second: '2-digit'
+            };
+
+            if(!this.isEmpty(mxTimezones[tz])){
+                options['timeZone'] = tz;
+            }
+            const DateTime = this.isEmpty(tzr) ? new Date(ts * 1000).toLocaleString('sq-AL', options).substring(0,19) : new Date(ts * 1000).toLocaleString('sq-AL', options);
+            return DateTime;
         },
         /**********************************************************************************
          * Name       : getDatefromTimeStamp
