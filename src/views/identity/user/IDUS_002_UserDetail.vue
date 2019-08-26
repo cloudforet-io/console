@@ -160,12 +160,13 @@
     </b-form>
 
     <BaseSimpleModal
-      ref="checkModal"
-      :title="checkTitle"
-      :text="checkText"
+      ref="IDUS002_CheckModal"
+      title="Reset"
+      text="Are you sure you want to reset a form you entered?"
       type="danger"
+      centered
       :ok-only="false"
-      @ok="onCheckOk"
+      @ok="onConfirmReset"
     />
   </div>
 </template>
@@ -217,13 +218,10 @@ export default {
             timezone: this.userProp.timezone || sessionStorage.getItem('timezone'),
             userIdUnique: null,
             showValidation: false,
-            isLocalUser: true,
+            isLocalUser: true
             /**
              * TODO: check whether this user is 'localUser' or not.
              */
-            checkTitle: 'Create User Check',
-            checkText: 'Are you sure you want to create a User?',
-            cancelation: false
         };
     },
     computed: {
@@ -281,31 +279,15 @@ export default {
         },
         onSubmit () {
             if (this.validate()) {
-                this.showCheckModal();
+                if (this.creatable) {
+                    this.createUser();
+                } else {
+                    this.updateUser();
+                }
             }
         },
         showCheckModal () {
-            if (this.creatable) {
-                this.checkTitle = 'Create User Check';
-                this.checkText = 'Are you sure you want to create a User?';
-            } else {
-                this.checkTitle = 'Update User Check';
-                this.checkText = 'Are you sure you want to update this User?';
-            }
-            this.$refs.checkModal.showModal();
-        },
-        onCheckOk () {
-            if (this.cancelation) {
-                this.$emit('cancel');
-                this.cancelation = false;
-                return;
-            }
-
-            if (this.creatable) {
-                this.createUser();
-            } else {
-                this.updateUser();
-            }
+            this.$refs.IDUS002_CheckModal.showModal();
         },
         async createUser () {
             let res = null;
@@ -346,6 +328,12 @@ export default {
             }
         },
         onReset () {
+            this.showCheckModal();
+        },
+        onConfirmReset () {
+            this.reset();
+        },
+        reset () {
             this.showValidation = false;
             if (this.creatable) { 
                 this.resetUserData(userModel); 
@@ -440,15 +428,7 @@ export default {
             return '';
         },
         onCancel () {
-            this.cancelation = true;
-            if (this.creatable) {
-                this.checkTitle = 'Create User Cancel';
-                this.checkText = 'Are you sure you want to cancel Creating a User?';
-            } else {
-                this.checkTitle = 'Update User Cancel';
-                this.checkText = 'Are you sure you want to cancel Updating this User?';
-            }
-            this.$refs.checkModal.showModal();
+            this.$emit('cancel');
         }
     }
 };

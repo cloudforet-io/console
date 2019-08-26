@@ -8,9 +8,7 @@
                size="md"
     >
       <template #contents>
-        <b-form @reset.prevent="onReset" 
-                @submit.prevent="onUpdate"
-        >
+        <b-form @submit.prevent="onUpdate">
           <b-row>
             <b-col cols="12">
               <BaseField :value="userId" 
@@ -71,27 +69,15 @@
               </b-button>
               <b-button class="float-right mb-1" size="md" 
                         type="button" variant="outline-secondary"
-                        @click="onCancel"
+                        @click="hideModal"
               >
                 Cancel
-              </b-button>
-              <b-button class="float-left mb-1" size="md" type="reset" variant="outline-secondary">
-                Reset
               </b-button>
             </b-col>
           </b-row>
         </b-form>
       </template>
     </BaseModal>
-
-    <BaseSimpleModal
-      ref="checkModal"
-      title="Profile Update"
-      text="Are you sure you want to update?"
-      type="primary"
-      :ok-only="false"
-      @ok="updateUser"
-    />
   </span>
 </template>
 
@@ -150,26 +136,22 @@ export default {
         },
         hideModal () {
             this.$refs.baseModal.hideModal();
+            this.reset();
         },
-        onReset () {
+        reset () {
             this.showValidation = false;
             this.resetPassword();
             this.setUser(this.userData);
         },
-        onCancel () {
-            this.hideModal();
-            this.onReset();
-        },
         onUpdate () {
             this.showValidation = true;
-            this.$refs.checkModal.showModal();   
+            this.updateUser();
         },
         async updateUser () {
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/update', this.getUserForUpdate());
                 this.userData = res.data;
-                this.onReset();
                 this.hideModal();
                 this.$alertify.success('Profile Successfully Updated.');
             } catch (e) {

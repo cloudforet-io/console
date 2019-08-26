@@ -51,7 +51,7 @@
       </template>
     </BaseDrag>
 
-    <BaseModal ref="userDetailModal"
+    <BaseModal ref="IDUS001_UserDetailModal"
                :title="isCreateMode ? 'Add User' : 'Edit User'"
                centered
                hide-footer
@@ -63,7 +63,7 @@
                @cancel="checkCancel"
     >
       <template #contents>
-        <UserDetail ref="userDetail"
+        <UserDetail ref="IDUS001_UserDetail"
                     :user-prop="isCreateMode ? undefined : selectedUser" 
                     :creatable="isCreateMode ? true : false"
                     size="xl"
@@ -74,14 +74,31 @@
       </template>
     </BaseModal>
     
-    <BaseSimpleModal
+    <BaseModal
       ref="DeleteCheck"
       title="User Delete"
-      text="Are you sure you want to delete?"
       type="danger"
-      :ok-only="false"
+      centered
       @ok="deleteUser"
-    />
+    >
+      <template #contents>
+        <h4>Are you sure you want to delete selected user(s) below?</h4>
+        <br>
+        <ul>
+          <li v-if="selectedUser">
+            <h5>{{ selectedUser.name }}</h5>
+          </li>
+          <div v-for="(user) in multiSelectedUserList" v-else :key="user.user_id">
+            <BaseCheckbox :key="user.user_id"
+                          :selected="user.selected"
+                          class="select-checkbox"
+            />
+            <!-- @change="checkboxClicked" -->
+            <h5>{{ user.name }}</h5>
+          </div>
+        </ul>
+      </template>
+    </BaseModal>
 
               
     <BaseTabNav v-if="hasSelectedUser" class="user-info"
@@ -121,7 +138,8 @@ const MultiUsersInfo = () => import('./IDUS_004_MutiUsersInfo');
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 const UserDetail = () => import('./IDUS_002_UserDetail');
 
-const BaseSimpleModal = () => import('@/components/base/modal/BAMO_002_BaseSimpleModal');
+const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox');
+
 
 export default {
     name: 'User',
@@ -133,7 +151,7 @@ export default {
         MultiUsersInfo,
         BaseModal,
         UserDetail,
-        BaseSimpleModal
+        BaseCheckbox
     },
     data () {
         return {
@@ -340,13 +358,13 @@ export default {
             this.$refs.DeleteCheck.showModal();
         },
         showUserDetail () {
-            this.$refs.userDetailModal.showModal();
+            this.$refs.IDUS001_UserDetailModal.showModal();
         },
         hideUserDetail () {
-            this.$refs.userDetailModal.hideModal();
+            this.$refs.IDUS001_UserDetailModal.hideModal();
         },
         checkCancel () {
-            this.$refs.userDetail.onCancel();
+            this.$refs.IDUS001_UserDetail.onCancel();
         }
     }
 };

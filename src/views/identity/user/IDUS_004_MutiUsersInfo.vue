@@ -18,7 +18,7 @@
           <i v-b-tooltip.hover.right
              class="fal fa-copy"
              :title="`Copy all ${field.label}s`"
-             @click="CopyToClipboard(field.key)"
+             @click="copyAllToClipboard(field.key)"
           />
         </span>
       </template>
@@ -71,7 +71,7 @@ export default {
         }
     },
     methods: {
-        CopyToClipboard (key) {
+        copyAllToClipboard (key) {
             let result = '';
             this.usersData.map((user) => {
                 result += ` ${user[key]}`;
