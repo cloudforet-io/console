@@ -110,8 +110,9 @@
     >
       <template #INFO>
         <b-card class="base first-tab">
-          <MultiUsersInfo v-if="isMultiSelected" 
-                          :users-data="multiSelectedUserList"
+          <BaseMultiPanel v-if="isMultiSelected" 
+                          :data="multiSelectedUserList"
+                          :data-fields="multiInfoFields" 
           />
           <UserInfo v-else 
                     :user-data="selectedUser"
@@ -133,7 +134,7 @@ import query from './search_context/query.js';
 
 const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 const UserInfo = () => import('./IDUS_003_UserInfo');
-const MultiUsersInfo = () => import('./IDUS_004_MutiUsersInfo');
+const BaseMultiPanel = () => import('@/components/base/panel/BAPA_005_BaseMultiPanel');
 
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 const UserDetail = () => import('./IDUS_002_UserDetail');
@@ -148,7 +149,7 @@ export default {
         BaseTable,
         BaseTabNav,
         UserInfo,
-        MultiUsersInfo,
+        BaseMultiPanel,
         BaseModal,
         UserDetail,
         BaseCheckbox
@@ -198,6 +199,14 @@ export default {
                     }
                 },
                 { key: 'timezone', label: this.tr('COL_NM.TIMEZONE'), thStyle: { width: '200px' }}
+            ];
+        },
+        multiInfoFields () {
+            return [
+                { key: 'user_id',label: this.tr('COL_NM.ID') },
+                { key: 'name', label: this.tr('COL_NM.NAME') },
+                { key: 'email', label: this.tr('COL_NM.EMAIL') },
+                { key: 'group', label: this.tr('COL_NM.GROUP') }
             ];
         },
         hasSelectedUser () {
