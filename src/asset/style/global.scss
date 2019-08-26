@@ -93,26 +93,49 @@ a {
   }
 }
 
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: darken($whiteblue, 1%);
-  &.tbody-tr-selected {
+%row {
+    background-color: $white;
+}
+%striped-row {
+    background-color: darken($whiteblue, 1%);
+}
+%selected-row {
     background-color: darken($skyblue, 3%);
-  }
+}
+%striped-hovered-row {
+    background-color: darken($whiteblue, 5%);
+}
+%selected-hovered-row {
+    background-color: darken($skyblue, 7%); 
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    @extend %striped-row;
+    &.tbody-tr-selectable.tbody-tr-selected {
+        @extend %selected-row;
+    }
+    &:hover.tbody-tr-default {
+        @extend %striped-row;
+    }
 }
 
 .table-hover tbody tr:hover {
-  background-color: darken($whiteblue, 5%);
-  &.tbody-tr-selected {
-    background-color: darken($skyblue, 7%);
-  }
+    &.tbody-tr-default {
+        @extend %row;
+    }
+    &.tbody-tr-selectable {
+        @extend %striped-hovered-row;    
+        &.tbody-tr-selected {
+            @extend %selected-hovered-row;
+        }
+    }
 }
 
-.tbody-tr-selected {
-  background-color: darken($skyblue, 3%);
-}
-
-.tbody-tr-default {
+.tbody-tr-selectable {
   cursor: pointer;
+  &.tbody-tr-selected {
+    @extend %selected-row;
+  }
 }
 
 .tbody-tr-underlined {
@@ -520,6 +543,24 @@ $form-padding: 0.375rem 0.75rem;
   padding-bottom: 0px !important;
   padding-top: 0px !important;
 }
+
+/* copy-clipboard */
+.copy-clipboard {
+    position: relative;
+    .contents {
+        cursor: text;
+    }
+    i {
+        visibility: hidden;
+        padding: 0px 3px 0px 10px;
+        cursor: pointer
+    }
+    &:hover i {
+        visibility: visible;
+    }
+    
+}
+
 
 
 /* i Tag: icon */

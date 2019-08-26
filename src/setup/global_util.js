@@ -79,7 +79,6 @@ export const Mixin = {
             textArea.select();
             let successFailCondition = document.execCommand('Copy');
             textArea.remove();
-            console.log('Success', successFailCondition);
         },
         /**********************************************************************************
          * Name       : selectBadges

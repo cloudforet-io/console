@@ -20,7 +20,9 @@ export default {
     computed: {
         checked: {
             set () {},
-            get () { return this.selected; }
+            get () {
+                return this.selected; 
+            }
         }
     },
     methods: {

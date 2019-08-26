@@ -4,7 +4,7 @@
                       dark: darkHeader }"
             :style="{ height: `${height}px` }"
     >
-      <template #header>
+      <template v-if="!headerless" #header>
         <b-row align-v="center" align-h="between" class="header-container">
           <div class="caption-container">
             <slot name="caption" />
@@ -58,6 +58,7 @@
 
       <b-table class="b-table"
                show-empty
+               sticky-header
                :borderless="true"
                :items="items"
                :fields="heads"
@@ -76,7 +77,7 @@
                @sort-changed="sortingChanged"
                @context-changed="contextChanged"
       >
-        <template slot="table-busy">
+        <template #table-busy>
           <b-row align-h="center">
             <i class="fad fa-spinner fa-pulse"
                :style="{'margin-top': `${10}px`}"
@@ -84,18 +85,25 @@
           </b-row>
         </template>
 
-        <template slot="emptyfiltered" slot-scope="scope">
+        <template #emptyfiltered="scope">
           <h4>{{ scope.emptyFilteredText }}</h4>
         </template>
 
-        <template v-if="selectable" slot="HEAD_selected">
+        <template v-for="headerSlot in getCustomHeaderSlotNameList()" 
+                  :slot="headerSlot" 
+                  slot-scope="data"
+        >
+          <slot :name="headerSlot" :field="data.field" />
+        </template>
+
+        <template v-if="selectable" #HEAD_selected>
           <b-check v-model="isSelectedAll"
                    class="select-all-checkbox"
                    @change="onSelectAll"
           />
         </template>
 
-        <template v-if="selectable" slot="selected" slot-scope="data">
+        <template v-if="selectable" #selected="data">
           <BaseCheckbox :key="data.index"
                         :selected="data.item.selected"
                         class="select-checkbox"
@@ -104,7 +112,7 @@
         </template>
 
 
-        <template slot="status" slot-scope="data">
+        <template #status="data">
           <div :style="getVariantSize(data.item.status)">
             <b-badge :variant="getBadge(data.item.status)">
               {{ capitalizeFirstLetter(data.item.status) }}
@@ -112,11 +120,11 @@
           </div>
         </template>
 
-        <template slot="state" slot-scope="data">
+        <template #state="data">
           <div v-html="getServerStates(data.item.state)" />
         </template>
 
-        <template slot="link" slot-scope="data">
+        <template #link="data">
           <a :href="data.item.link">{{ data.item.linkText }}</a>
         </template>
       </b-table>
@@ -131,7 +139,7 @@ import BaseCheckbox from '@/components/base/checkbox/BACB_001_BaseCheckbox.vue';
 
 export default {
     name: 'BaseTable',
-    event: ['list', 'rowClicked', 'limitChanged', 'rowSelected'],
+    event: ['list', 'rowClicked', 'limitChanged', 'rowSelected', 'onSelectAll'],
     components: {
         BaseSearch,
         BaseModal,
@@ -241,6 +249,10 @@ export default {
         darkHeader: {
             type: Boolean,
             default: true
+        },
+        headerless: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -335,9 +347,11 @@ export default {
             this.updateTableData(idx, item);
             this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
             this.setIsSelectAll();
-            this.$emit('rowSelected', this.selectedRows[0], idx);
+            this.$emit('rowSelected', this.selectedRows[0], true);
         },
         checkSingleMode (item, idx, newValue) {
+            let isSelection = true;
+
             if (this.selectedRows[0]) {
                 this.selectedRows[0].data.selected = false;
             }
@@ -345,11 +359,12 @@ export default {
                 this.selectedRows[0] = { idx: idx, data: item };
             } else {
                 this.selectedRows.pop();
+                isSelection = false;
             }
 
             this.updateTableData(idx, newValue);
             this.setIsSelectAll();
-            this.$emit('rowSelected', this.selectedRows[0], idx);
+            this.$emit('rowSelected', { idx: idx, data: item }, isSelection);
         },
         checkMultiMode (item, idx, newValue) {
             let isOnceSelected = this.selectedRows.some((row, i) => {
@@ -366,10 +381,10 @@ export default {
             item.selected = newValue;
             this.updateTableData(idx, item);
             this.setIsSelectAll();
-            this.$emit('rowSelected', this.selectedRows, idx);
+
+            this.$emit('rowSelected', { idx: idx, data: item }, !isOnceSelected, this.selectedRows);
         },
         checkboxClicked (val, key) {
-            this.consoleLogEnv('row Selected');
             switch (this.selectMode) {
             case 'single':
                 this.checkSingleMode(this.tableData[key], key, val);
@@ -401,8 +416,9 @@ export default {
                 });
                 this.selectedRows = [];
             }
+            this.setIsSelectAll();
 
-            this.$emit('onSelectAll', this.selectedRows, this.isSelectedAll);
+            this.$emit('onSelectAll', this.isSelectedAll, this.selectedRows);
         },
         updateTableData (idx, data) {
             if (this.isEmpty(idx)) {
@@ -418,6 +434,7 @@ export default {
                 return;
             }
             this.currentPage--;
+            this.reset();
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
         onNext () {
@@ -425,15 +442,18 @@ export default {
                 return;
             }
             this.currentPage++;
+            this.reset();
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
         onRefresh () {
             this.currentPage = 1;
+            this.reset();
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
         onSearch (filter, filterOr) {
             this.filter = filter;
             this.filterOr = filterOr;
+            this.reset();
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
         headClicked (key, item) {
@@ -452,13 +472,21 @@ export default {
                 key: ctx.sort,
                 desc: ctx.sortDesc ? 1 : 0
             };
+            this.reset();
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
+        },
+        reset () {
+            console.log('reset');
+            this.isSelectedAll = false;
         },
         contextChanged (ctx) {
             this.$emit('changed', ctx);
         },
         rowClass (item) { // custom global style
             let className = 'tbody-tr-default';
+            if (this.selectable) {
+                className += ' tbody-tr-selectable';
+            }
             if (item && item.selected) {
                 className += ' tbody-tr-selected';
             }
@@ -478,6 +506,15 @@ export default {
         onLimitInputEnter () {
             this.$refs.modal.hideModal();
             this.$refs.modal.$emit('ok');
+        },
+        getCustomHeaderSlotNameList () {
+            let result = [];
+            Object.keys(this.$scopedSlots).map((slot) => {
+                if (slot.startsWith('HEAD')) {
+                    result.push(slot);
+                }
+            });
+            return result;
         }
     }
 };

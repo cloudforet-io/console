@@ -48,38 +48,38 @@ export default {
         BaseTag
     },
     props: {
-        userProp: {
+        userData: {
             type: Object,
             default: () => (userModel),
             required: true
         }
     },
     computed: {
-        userData () {
+        user () {
             return [
-                { title: this.tr('COL_NM.ID'), contents: this.userProp.user_id, copyFlag: true },
-                { title: this.tr('COL_NM.NAME'), contents: this.userProp.name, copyFlag: true },
-                { title: this.tr('COL_NM.EMAIL'), contents: this.userProp.email, copyFlag: true },
-                { title: this.tr('COL_NM.PHONE'), contents: this.userProp.mobile, copyFlag: true },
-                { title: this.tr('COL_NM.GROUP'), contents: this.userProp.group, copyFlag: true },
-                { title: this.tr('COL_NM.LANGUAGE'), contents: this.userProp.language, copyFlag: true },
-                { title: this.tr('COL_NM.DOMAIN_ID'), contents: this.userProp.domain_id, copyFlag: true },
-                { title: this.tr('COL_NM.TIMEZONE'), contents: this.userProp.timezone, copyFlag: true }
+                { title: this.tr('COL_NM.ID'), contents: this.userData.user_id, copyFlag: true },
+                { title: this.tr('COL_NM.NAME'), contents: this.userData.name, copyFlag: true },
+                { title: this.tr('COL_NM.EMAIL'), contents: this.userData.email, copyFlag: true },
+                { title: this.tr('COL_NM.PHONE'), contents: this.userData.mobile, copyFlag: true },
+                { title: this.tr('COL_NM.GROUP'), contents: this.userData.group, copyFlag: true },
+                { title: this.tr('COL_NM.LANGUAGE'), contents: this.userData.language, copyFlag: true },
+                { title: this.tr('COL_NM.DOMAIN_ID'), contents: this.userData.domain_id, copyFlag: true },
+                { title: this.tr('COL_NM.TIMEZONE'), contents: this.userData.timezone, copyFlag: true }
             ];
         },
-        tagData () {
-            let tagData = [];
-            for (var key in this.userProp.tags) {
-                tagData.push({ 
+        tag () {
+            let tag = [];
+            for (var key in this.userData.tags) {
+                tag.push({ 
                     title: key, 
-                    contents: this.userProp.tags[key],
+                    contents: this.userData.tags[key],
                     copyFlag: true 
                 });
             }
-            return tagData;
+            return tag;
         },
         tags () {
-            return this.dictToKeyValueArray(this.userProp.tags);
+            return this.dictToKeyValueArray(this.userData.tags);
         },
         selectedUserData () {
             return [
@@ -91,7 +91,7 @@ export default {
                         size: 1,
                         color: 'primary'
                     },
-                    data: this.userData
+                    data: this.user
                 },
                 {
                     panelTitle: this.tr('PN.TAG'),
@@ -101,7 +101,7 @@ export default {
                         size: 1,
                         color: 'danger'
                     },
-                    data: this.tagData,
+                    data: this.tag,
                     editable: true
                 }
             ];
@@ -113,7 +113,7 @@ export default {
                 let res = null;
                 try {
                     res = await this.$axios.post('/identity/user/update', {
-                        user_id: this.userProp.user_id,
+                        user_id: this.userData.user_id,
                         tags: this.$refs.baseTag.tags
                     });
                     this.$refs.tagEditModal.hideModal();

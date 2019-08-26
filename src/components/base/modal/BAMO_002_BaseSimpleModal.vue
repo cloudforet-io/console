@@ -4,6 +4,7 @@
              :modal-class="`modal-${type}`"
              :size="size"
              :ok-variant="type"
+             :centered="centered"
     >
       <template #modal-header>
         <h5 class="modal-title">
@@ -58,6 +59,10 @@ export default {
         text: {
             type: String,
             default: ''
+        },
+        centered: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
