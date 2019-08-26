@@ -476,7 +476,6 @@ export default {
             this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
         },
         reset () {
-            console.log('reset');
             this.isSelectedAll = false;
         },
         contextChanged (ctx) {
