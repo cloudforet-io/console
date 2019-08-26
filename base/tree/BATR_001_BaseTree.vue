@@ -10,6 +10,7 @@
           <BaseDragVertical 
             :line="false" 
             :total-width="'100vw'"
+            :left-width="getLeftTreeWidth"
             :height="dragHeight"
           >
             <template #leftContainer="{ width }">
@@ -151,6 +152,7 @@ export default {
     data () {
         return {
             customBtn: { NO: 'No', YES: 'Yes' },
+            selectedLeftWidth: 300,
             nodeKey: 0,
             treeData: null,
             hasSelected: false,
@@ -184,6 +186,10 @@ export default {
             set: function (value) {
                 this.treeData = value;
             }
+        },
+        getLeftTreeWidth()  {
+            console.log(this.selectedLeftWidth);
+            return this.selectedLeftWidth;
         }
     },
     mounted() {
@@ -191,9 +197,12 @@ export default {
     },
     methods: {
         nodeSelected (nodes) {
-            this.nodeKey = (this.nodeKey) > 0 ? 0 : 1;
-            this.lastEvent = nodes;
+            this.nodeKey = (this.nodeKey !== nodes[0].data.id) ? nodes[0].data.id : this.nodeKey;
             this.hasSelected = true;
+            debugger;
+
+
+
             /*
             * This is a Emit event for Parents vue.
             */
@@ -201,6 +210,7 @@ export default {
             /*
             * This is a Global Event bus, so Please, make sure that Event$bus is off when components has destroyed.
             */
+            this.$emit('selected', { nodes:nodes, treeV: this.$refs.slVueTree });
             this.$bus.$emit('treeSelectedEvent', nodes);
         },
         showContextMenu (node, event, hasClicked) {
@@ -315,6 +325,21 @@ export default {
                 });
             }
         },
+        doTheyShareSameParent(fromNode, toNode){
+            let isNeedToProcessOnSC = false;
+            if (!toNode.node.data.is_cached) {
+                let sourceNode_path = JSON.parse(JSON.stringify(fromNode[0].path));
+                let toNode_path = JSON.parse(JSON.stringify(toNode.node.path));
+                if (sourceNode_path.length === toNode_path.length){
+                    sourceNode_path.pop();
+                    toNode_path.pop();
+                    if (JSON.stringify(sourceNode_path) === JSON.stringify(toNode_path)){
+                        isNeedToProcessOnSC = true;
+                    }
+                }
+            }
+            return isNeedToProcessOnSC;
+        },
         beforeNodeDropped (node, position, cancel) {
             if (node[0].isLeaf && position.node.data.hasOwnProperty('is_root')){
                 if (position.node.data.is_root && position.placement !== 'inside'){
@@ -322,52 +347,36 @@ export default {
                     this.$refs.BATR001_treeAlertNotice.showModal();
                     return;
                 }
-            };
-
-            /*this.contextExecutor('MV', {
-                nodes: node,
-                position: position,
-                cancel: cancel
-            });*/
-
-            this.$emit('dropped', {
-                nodes: node,
-                position: position,
-                treeV:this.$refs.slVueTree,
-                cancel: cancel
-            });
-        },
-        nodeDropped (nodes, position, cancel) {
-            if (!position.node.data.is_cached) {
-                  /* refrence 참조값이 같아서 변조가 일어남.
-                      let sourceNode_path = nodes[0].path;
-                      let toNode_path = position.node.path;
-                  */
-                const treeV = this.$refs.slVueTree;
-                let sourceNode_path = JSON.parse(JSON.stringify(nodes[0].path));
-                let toNode_path = JSON.parse(JSON.stringify(position.node.path));
-
-                if (sourceNode_path.length === toNode_path.length){
-                    sourceNode_path.pop();
-                    toNode_path.pop();
-                    if (sourceNode_path.toString() === toNode_path.toString()){
-                        let updateValue = position.node.path.slice(-1)[0] === 0 ? 0 : position.node.path.slice(-1)[0]-1;
-                        position.node.path[position.node.path.length-1] = updateValue;
-                    }
-
-                    treeV.updateNode(position.node.path,{ isExpanded:true });
-                    position.node.path.push(0);
-                    console.log('position.node.path', position.node.path);
-                    treeV.select(position.node.path, { addToSelection: false });
-                    treeV.remove(treeV.getSelected().map(node => node.path));
-                    position.node.path.pop();
-                    treeV.select(position.node.path, { addToSelection: false });
-                    this.nodeToggled(position.node);
-                }
-                //;
-
-                //this.$emit('afterDrop', { node: position.node, treeV:treeV });
             }
+            debugger;
+            const treeV = this.$refs.slVueTree;
+            const shareParam = this.doTheyShareSameParent(node, position);
+            const isCanceled = shareParam ? true: false;
+
+            if (!position.node.data.is_cached) {
+                treeV.remove(treeV.getSelected().map(node => node.path));
+                cancel(true);
+            }
+
+            this.$emit('noCacheDrop', {
+                nodes: node,
+                position: position,
+                treeV: this.$refs.slVueTree,
+                cancel: cancel,
+                isCanceled: isCanceled
+            });
+
+            if (this.doTheyShareSameParent(node, position)) {
+                return;
+            }
+        },
+        nodeDropped (node, position, cancel) {
+            debugger;
+            /*if (this.doTheyShareSameParent(node, position)) {
+                const treeV = this.$refs.slVueTree;
+                this.$emit('afterDrop', { node: position.node, treeV:treeV , cancel: cancel });
+            }*/
+
         },
         nodeToggled (node) {
             if (!node.isExpanded ) {
