@@ -1,33 +1,9 @@
 <template>
-  <div>
-    <BaseTable class="user-table" 
-               :table-data="users" 
-               :fields="fields" 
-               :selectable="false"
-               cardless
-               headerless
-               underlined
-    >
-      <template v-for="field in fields" 
-                :slot="`HEAD_${field.key}`"
-      >
-        <span :key="field.key" class="copy-clipboard">
-          <span class="contents">
-            {{ field.label }}
-          </span>
-          <i v-b-tooltip.hover.right
-             class="fal fa-copy"
-             :title="`Copy all ${field.label}s`"
-             @click="copyAllToClipboard(field.key)"
-          />
-        </span>
-      </template>
-    </BaseTable>
-  </div>
+  <BaseMultiPanel :data="users" :data-fields="fields" />
 </template>
 
 <script>
-import BaseTable from '@/components/base/table/BATB_001_BaseTable';
+import BaseMultiPanel from '@/components/base/panel/BAPA_005_BaseMultiPanel';
 
 const userModel = {
     user_id: null,
@@ -45,7 +21,7 @@ const userModel = {
 export default {
     name: 'MultiUsersInfo',
     components: {
-        BaseTable
+        BaseMultiPanel
     },
     props: {
         usersData: {
