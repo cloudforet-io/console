@@ -39,6 +39,7 @@
         <BaseTabNav
           :fill="false"
           :nav-tabs="tabs"
+          :selected-data="selectedData"
           :keep-alive="true"
           :is-footer-visible="false"
           :tab="tab"
@@ -119,11 +120,10 @@ export default {
     },
     methods: {
         NodeSelected(item) {
-
+            this.selectedData = item;
         },
         async listProject() {
             await this.$axios.post('/identity/project/tree', {
-                item_id: null,
                 item_type: 'ROOT',
                 sort: {
                     'key': 'name'
@@ -210,7 +210,6 @@ export default {
             let url = '/identity/project/tree';
             const selected = this.isEmpty(nodeObj.treeV.getSelected()[0]) ? nodeObj.node: nodeObj.treeV.getSelected()[0];
             const path = selected.path;
-            console.log('###############', path);
             const dataParam = nodeObj.node.data;
             dataParam['is_cached'] = true;
 
@@ -366,14 +365,11 @@ export default {
             }
         },
         async moveProject(items) {
-
             this.consoleLogEnv('Move Selected Items : ', items);
-
             const fromItem = items.nodes[0];
             const toItem = items.position.node;
             const url = fromItem.isLeaf ? '/identity/project/update' : '/identity/project-group/update';
             let param = {};
-
             if (fromItem.isLeaf) {
                 param['project_id'] = fromItem.data.id;
                 param['project_group_id'] = toItem.data.id;
@@ -382,7 +378,7 @@ export default {
                 param['project_group_id'] = fromItem.data.id;
                 if (items.position.placement !== 'inside' && toItem.data.hasOwnProperty('is_root')){
                     if (toItem.data.is_root) {
-                        param['is_root'] = true;
+                        param['release_parent_project_group'] = true;
                     }
                 }
             }

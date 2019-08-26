@@ -199,9 +199,6 @@ export default {
         nodeSelected (nodes) {
             this.nodeKey = (this.nodeKey !== nodes[0].data.id) ? nodes[0].data.id : this.nodeKey;
             this.hasSelected = true;
-            debugger;
-
-
 
             /*
             * This is a Emit event for Parents vue.
@@ -211,7 +208,7 @@ export default {
             * This is a Global Event bus, so Please, make sure that Event$bus is off when components has destroyed.
             */
             this.$emit('selected', { nodes:nodes, treeV: this.$refs.slVueTree });
-            this.$bus.$emit('treeSelectedEvent', nodes);
+            //this.$bus.$emit('treeSelectedEvent', { nodes:nodes, treeV: this.$refs.slVueTree });
         },
         showContextMenu (node, event, hasClicked) {
             if (!hasClicked) {
@@ -341,6 +338,7 @@ export default {
             return isNeedToProcessOnSC;
         },
         beforeNodeDropped (node, position, cancel) {
+
             if (node[0].isLeaf && position.node.data.hasOwnProperty('is_root')){
                 if (position.node.data.is_root && position.placement !== 'inside'){
                     cancel(true);
@@ -348,7 +346,6 @@ export default {
                     return;
                 }
             }
-            debugger;
             const treeV = this.$refs.slVueTree;
             const shareParam = this.doTheyShareSameParent(node, position);
             const isCanceled = shareParam ? true: false;
@@ -371,7 +368,6 @@ export default {
             }
         },
         nodeDropped (node, position, cancel) {
-            debugger;
             /*if (this.doTheyShareSameParent(node, position)) {
                 const treeV = this.$refs.slVueTree;
                 this.$emit('afterDrop', { node: position.node, treeV:treeV , cancel: cancel });

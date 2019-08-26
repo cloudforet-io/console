@@ -7,7 +7,7 @@
             <BaseTag ref="projectTag"
                      :tag-data="tags"
                      :editable="true"
-                     :show-first-tag-row="true"
+
             />
           </b-form-group>
         </b-card>
