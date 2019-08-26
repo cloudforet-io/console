@@ -88,14 +88,14 @@
           <span v-if="selectedUser" class="user-name">
             {{ selectedUser.name }}
           </span>
-          <div v-for="(user) in multiSelectedUserList" v-else :key="user.user_id">
-            <BaseCheckbox :key="user.user_id"
-                          :selected="user.selected"
+          <div v-for="(item, idx) in multiDeleteList" v-else :key="item.data.user_id">
+            <BaseCheckbox :key="item.data.user_id"
+                          :selected="item._isDelete"
                           class="select-checkbox"
                           type="danger"
+                          @change="checkDeleteUser(idx, $event)"
             />
-            <!-- @change="checkboxClicked" -->
-            <span class="user-name">{{ user.name }}</span>
+            <span class="user-name">{{ item.data.name }}</span>
           </div>
         </div>
       </template>
@@ -176,7 +176,8 @@ export default {
             query: {},
             isCreateMode: true,
             isMultiSelected: false,
-            multiSelectedList: []
+            multiSelectedList: [],
+            multiDeleteList: []
         };
     },
     computed: {
@@ -344,11 +345,22 @@ export default {
             this.hideUserDetail();
             this.listUsers();
         },
+        getDeleteParams () {
+            let params = { user_ids: []};
+            if (this.isMultiSelected) {
+                this.multiDeleteList.map((item) => {
+                    if (item._isDelete) {
+                        params.user_ids.push(item.data.user_id);
+                    }
+                });
+            } else {
+                params.user_ids.push(this.selectedUser.user_id);
+            }
+            return params;
+        },
         async deleteUser () {
             try {
-                await this.$axios.post('/identity/user/delete', {
-                    user_id: this.selectedUser.user_id
-                });
+                await this.$axios.post('/identity/user/delete', this.getDeleteParams());
                 this.$alertify.success('Selected User Successfully Deleted.');
                 this.listUsers();
             } catch (e) {
@@ -364,7 +376,16 @@ export default {
             this.isCreateMode = false;
             this.showUserDetail();
         },
+        setDeleteItems () {
+            if (this.isMultiSelected) {
+                this.multiDeleteList = this.multiSelectedList.map((item) => {
+                    item._isDelete = true;
+                    return item;
+                });
+            }
+        },
         onClickDelete () {
+            this.setDeleteItems();
             this.$refs.DeleteCheck.showModal();
         },
         showUserDetail () {
@@ -375,6 +396,9 @@ export default {
         },
         checkCancel () {
             this.$refs.IDUS001_UserDetail.onCancel();
+        },
+        checkDeleteUser (i, value) {
+            this.$set(this.multiDeleteList[i], '_isDelete', value);
         }
     }
 };

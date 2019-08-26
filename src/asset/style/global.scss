@@ -170,8 +170,27 @@ a {
 }
 
 /* b-checkbox */
-.custom-control-label {
-  cursor: pointer;
+
+@mixin checkbox-color($color) {
+    .custom-control-input:checked ~ .custom-control-label::before {
+        background-color: $color;
+        border-color: $color;
+    }
+  }
+  
+.custom-checkbox {
+    &.primary { @include checkbox-color($primary); }
+    &.secondary { @include checkbox-color($primary); }
+    &.danger { @include checkbox-color($danger); }
+    &.dark { @include checkbox-color($dark); }
+    &.info { @include checkbox-color($info); }
+    &.warning { @include checkbox-color($warning); }
+    &.light { @include checkbox-color($light); }
+    &.success { @include checkbox-color($success); }
+
+    .custom-control-label {
+      cursor: pointer;
+    }
 }
 
 /* b-dropdown */
