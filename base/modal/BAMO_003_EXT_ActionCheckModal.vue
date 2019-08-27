@@ -11,19 +11,12 @@
         <br>
         <BaseTable :table-data="data" 
                    :fields="fields"
+                   :selectable="false"
                    field-id="user_id"
                    cardless
                    headerless
                    underlined
-        >
-          <!-- <template :slot="`HEAD_selected`" { field }> -->
-          <!-- <BaseCheckbox key="_selected"
-                          v-model="isSelectedAll"
-                          class="select-checkbox"
-                          :type="type"
-            /> -->
-          <!-- </template> -->
-        </BaseTable>
+        />
       </template>
     </BaseModal>
 
@@ -52,17 +45,15 @@
 </template>
 
 <script>
-const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox');
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 
 export default {
     name: 'ActionCheckModal',
-    event: ['commit', 'close', 'success'],
+    event: ['commit', 'failed', 'succeed'],
     components: {
         BaseModal,
-        BaseTable,
-        BaseCheckbox
+        BaseTable
     },
     props: {
         title: {
@@ -90,10 +81,6 @@ export default {
             type: Array,
             default: () => [],
             required: true
-        },
-        checkable: {
-            type: Boolean,
-            default: false
         },
         action: {
             type: Function,
@@ -131,19 +118,10 @@ export default {
     },
     data() {
         return {
-            commitItems: [],
             failedItemList: []
         };
     },
     computed: {
-        items () {
-            return this.data.map((item) => {
-                if (this.checkable) {
-                    item.selected = true;
-                }
-                return item;
-            });
-        },
         failedItemFields () {
             return [
                 { key: this.primaryKey, label: this.primaryKey },
@@ -159,7 +137,6 @@ export default {
     },
     methods: {
         onOk () {
-            this.setCommitItems();
             if (this.action) {
                 if (this.runAsSync) {
                     this.doActionSync();
@@ -168,19 +145,19 @@ export default {
                     this.hideModal();
                 }
             } else {
-                this.$emit('commit', this.commitItems);
+                this.$emit('commit');
                 this.hideModal();
             }
         },
         doAction () {
-            this.action(this.commitItems);  
+            this.action(this.data);  
         },
         async doActionSync () {
             try {
-                await this.action(this.commitItems);
+                await this.action(this.data);
                 this.hideModal();
                 this.$alertify.success(this.successMessage);
-                this.$emit('success');
+                this.$emit('succeed');
             } catch (e) {
                 console.error(e);
                 this.$alertify.error(this.failMessage);
@@ -212,17 +189,9 @@ export default {
         },
         hideResultModal () {
             this.$refs.BAMO003_ActionResultModal.hideModal();
-            this.$emit('close');
-        },
-        setCommitItems () {
-            this.items.map((item) => {
-                if (item.selected) {
-                    this.commitItems.push(item);
-                }
-            });
+            this.$emit('failed');
         },
         reset () {
-            this.commitItems = [];
             this.failedItemList = [];
         }
     }
