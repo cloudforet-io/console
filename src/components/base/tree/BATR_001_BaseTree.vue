@@ -190,7 +190,7 @@ export default {
         getLeftTreeWidth()  {
             console.log(this.selectedLeftWidth);
             const keyName = this.$parent.$options.name + '_treeWidth';
-            return localStorage.hasOwnProperty(keyName) ? localStorage[keyName] : this.selectedLeftWidth;
+            return localStorage.hasOwnProperty(keyName) ? parseInt(localStorage[keyName]) : this.selectedLeftWidth;
         }
     },
     mounted() {

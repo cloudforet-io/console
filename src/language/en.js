@@ -50,6 +50,7 @@ export const en = {
         C_SR_GROUP: 'SECURITY GROUP',
         C_SUMMARY: 'SUMMARY',
         ID: 'ID',
+        UID: 'User ID',
         NAME: 'Name',
         EMAIL: 'E-mail',
         PHONE: 'Phone',
