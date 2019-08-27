@@ -32,14 +32,16 @@
                     </b-button>
                   </template>
                   <template #contents>
-                    <MemberDetail :creatable="true" :updatable="true"
+                    <MemberDetail :creatable="true"
+                                  :updatable="true"
+                                  :selectedData="anySelectedRow"
                                   @close="$refs.addMember.hideModal()"
                     />
                   </template>
                 </BaseModal>
               </b-col>
               <b-col cols="6">
-                <template v-if="anySelectedRow">
+                <template v-if="hasSelectedMember">
                   <b-button block variant="danger" @click="deleteSelected">
                     {{ $t('MSG.BTN_DELETE') }}
                   </b-button>
@@ -51,49 +53,65 @@
       </b-col>
     </b-row>
 
-    <BaseModal ref="IDPJ005_DeleteUser"
-               title="Delete Member"
-               size="md"
-               @ok="$alertify.success('Selected User Successfully deleted.')"
-               @cancel="$alertify.error('Action Cancel')"
-    >
-      <template #contents>
-        <span>Do you want to delete selected?</span>
-      </template>
-    </BaseModal>
+    <ActionCheckModal ref="IDPJ005_DeleteUser"
+                      primary-key="user_id"
+                      :data="selectedMembers"
+                      :fields="selectedFields"
+                      :action="actionProcess"
+                      :title="actionCommandData.title"
+                      :type="actionCommandData.type"
+                      :text="actionCommandData.text"
+                      @succeed="listMembers"
+                      @failed="listMembers"
+    />
   </div>
 </template>
 
 <script>
 import searchContext from '@/views/identity/project/search_context/search_context';
-import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
-const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
-const MemberDetail = () => import('@/views/identity/project/IDPJ_006_ProjectMemberDetail');
+import BaseTable from '@/components/base/table/BATB_001_BaseTable';
+import ActionCheckModal from '@/components/base/modal/BAMO_003_EXT_ActionCheckModal';
+import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
+import MemberDetail from '@/views/identity/project/IDPJ_006_ProjectMemberDetail';
 
 export default {
     name: 'ProjectMember',
     components: {
         BaseTable,
         BaseModal,
-        MemberDetail
+        MemberDetail,
+        ActionCheckModal
     },
     data () {
         return {
             members: [],
-            anySelectedRow: false,
-            selectedMemberMulti: null,
-            selectedMember: null,
+            anySelectedRow: this.$attrs['selected-data'],
             selectedIdx: undefined,
             addModal: false,
-            totalCount: 17,
+            totalCount: 0,
             searchQueryData: searchContext,
             searchQuery: {},
+            actionCommandData:{},
             isReadyForSearch: false,
             perPage: 3,
-            isLoading: true
+            actionFlag: null,
+            isLoading: true,
+            selectedItems: [],
+            selectedMember: null
         };
     },
     computed: {
+        selectedFields () {
+            return [
+                { key: 'user_id', label: this.tr('COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
+                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
+                { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'role', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'roles', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false,  thClass: 'd-none', tdClass: 'd-none' }
+            ];
+        },
         fields () {
             return [
                 { key: 'selected', thStyle: { width: '50px' }},
@@ -106,11 +124,14 @@ export default {
                 { key: 'roles', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false,  thClass: 'd-none', tdClass: 'd-none' }
             ];
         },
-        hasSelectedUser () {
-            return !!(this.isMultiSelected || this.selectedUser);
+        isMultiSelected () {
+            return this.selectedItems.length > 1;
         },
-        multiSelectedUserList () {
-            return this.multiSelectedList.map((item) => {
+        hasSelectedMember () {
+            return this.selectedItems.length > 0;
+        },
+        selectedMembers () {
+            return this.selectedItems.map((item) => {
                 return item.data;
             });
         }
@@ -143,7 +164,6 @@ export default {
             if (this.isEmpty(filterOr)) {
                 filterOr = [];
             }
-
             this.searchQuery = {
                 sort,
                 page: {
@@ -157,16 +177,20 @@ export default {
             this.reset();
             this.saveMeta(limit, start, sort, filter, filterOr);
             let url = null;
+            let param = {
+                query: this.searchQuery
+            };
 
             if (this.$attrs['selected-data'].nodes[0].data.item_type === 'PROJECT_GROUP'){
                 url = '/identity/project-group/member/list';
-                this.searchQuery['project_group_id'] =  this.$attrs['selected-data'].nodes[0].data.id;
+                param['project_group_id'] =  this.$attrs['selected-data'].nodes[0].data.id;
             } else {
                 url = '/identity/project/member/list';
-                this.searchQuery['project_id'] =  this.$attrs['selected-data'].nodes[0].data.id;
+                param['project_id'] =  this.$attrs['selected-data'].nodes[0].data.id;
             }
 
-            await this.$axios.post(url, this.searchQuery).then((response) => {
+            console.log('Parameters', JSON.stringify(param));
+            await this.$axios.post(url,param).then((response) => {
                 let results = [];
                 if (!this.isEmpty(response.data.results)){
                     response.data.results.forEach(function(current){
@@ -183,36 +207,80 @@ export default {
                 console.error(error);
                 this.isLoading = false;
             });
-
-        /**
-         * TODO: set totalCount with data from server
-         */
         },
-        rowSelected (row) {
-            if (this.isEmpty(row) || row.length < 1) {
-                this.selectedMember = null;
-                this.anySelectedRow = false;
-            } else {
-                this.selectedMember = row;
-                this.selectedMemberMulti = row;
-                this.anySelectedRow = true;
+        rowSelected (rows) {
+            this.selectedItems = rows;
+            if (rows.length === 1) {
+                this.selectedIdx = rows[0].idx;
             }
         },
-        rowAllSelected (row) {
-            if (row instanceof Array && !this.isEmpty(row)) {
-                this.selectedMemberMulti = row;
-                this.anySelectedRow = true;
-            } else {
-                this.selectedMemberMulti = null;
-                this.anySelectedRow = false;
-            }
+        rowAllSelected (isSelectedAll, rows) {
+            this.selectedItems = rows;
         },
         limitChanged (val) {
             this.perPage = Number(val);
             this.init();
         },
-        deleteSelected () {
+        getSelectedInfo(key){
+            const selectedObj = this.$attrs['selected-data'].nodes[0];
+            const Obj = {
+                id: selectedObj.data.id,
+                is_cached: selectedObj.data.is_cached,
+                is_root: selectedObj.data.is_root,
+                item_type: selectedObj.data.item_type
+            };
+
+            if (this.isEmpty(selectedObj)){
+                return false;
+            } else if (this.isEmpty(key)){
+                return Obj;
+            } else if (Obj.hasOwnProperty(key)){
+                return Obj[key];
+            } else {
+                return false;
+            }
+        },
+        async actionProcess () {
+            let url = null;
+            let param = {};
+
+            if (this.actionFlag ==='delete'){
+                if (this.getSelectedInfo('item_type') === 'PROJECT_GROUP'){
+                    url = '/identity/project-group/member/remove';
+                    param['project_group_id'] =  this.getSelectedInfo('id');
+                    param['user_id'] =  this.selectedMembers[0].user_id;
+                } else {
+                    url = '/identity/project/member/remove';
+                    param['project_id'] =  this.getSelectedInfo('id');
+                    param['user_id'] =  this.selectedMembers[0].user_id;
+                }
+            }
+
+            if (!this.isEmpty(url) && !this.isEmpty(url)) {
+                await this.$axios.post(url,param);
+                   /*     .then((response) => {
+                    if (this.isEmpty(response.data)){
+                        console.log('success');
+                    }
+                }).catch((error) =>{
+                    console.log(error);
+                });*/
+            }
+        },
+        actionCommand(){
+            let itemType = this.getSelectedInfo('item_type') === 'PROJECT_GROUP' ? this.tr('PG_GR') : this.tr('PG');
+            if (this.actionFlag ==='delete'){
+                let obj = {};
+                obj['title'] = this.tr('DEL_MEM');
+                obj['type'] = 'danger';
+                obj['text'] =  this.tr('DELETE_YN', [itemType]);
+                this.actionCommandData = obj;
+            }
             this.$refs.IDPJ005_DeleteUser.showModal();
+        },
+        deleteSelected () {
+            this.actionFlag = 'delete';
+            this.actionCommand();
         }
     }
 };

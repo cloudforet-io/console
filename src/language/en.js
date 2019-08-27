@@ -35,7 +35,10 @@ export const en = {
         PG_NM: 'Project Name',
         PG_GR: 'Project Group',
         PG: 'Project',
+        DELETE_YN: 'Are you sure to delete those following members from selected {0}?',
+        DEL_MEM: 'Delete Member',
         SEARCH: 'Search'
+
     },
     COL_NM: {
         C_COMMAND_ID: 'COMMAND ID',
