@@ -25,7 +25,7 @@
                 {{ tr('BTN_ADD') }}
               </b-button>
               <b-dropdown v-if="hasSelectedUser" no-caret
-                          variant="outline-dark"
+                          variant="outline-info"
                           class="no-selected"
               >
                 <template #button-content>
