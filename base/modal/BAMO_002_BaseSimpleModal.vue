@@ -25,7 +25,7 @@
           <span>Cancel</span>
         </b-button>
         <b-button size="sm" 
-                  :variant="`outline-${type}`" 
+                  :variant="`${type}`" 
                   @click="clickOk"
         >
           <span>OK</span>
