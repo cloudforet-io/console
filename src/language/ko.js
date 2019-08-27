@@ -50,6 +50,7 @@ export const ko ={
         C_SR_GROUP: '보안 그룹',
         C_SUMMARY: '개요·서머리',
         ID: '아이디',
+        UID: '유저 아이디',
         NAME: '이름',
         EMAIL: '이메일',
         PHONE: '전화번호',

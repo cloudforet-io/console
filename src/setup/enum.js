@@ -13,6 +13,24 @@ export const GlobalEnum = {
         en: { value: 'en', text: 'English' , nation: 'US'},
         ko: { value: 'ko', text: '한국어', nation: 'KR' }
     }),
+    MEMBER_STATE: Object.freeze(
+        {
+            ENABLED: {
+                msg: 'Enabled',
+                icon: 'fal fa-check',
+                color: 'primary'
+            },
+            DISABLED: {
+                msg:  'Disabled',
+                icon: 'fal fa-minus',
+                color: 'info'
+            },
+            UNIDENTIFIED: {
+                msg: 'Unidentified',
+                icon:  'fal fa-traffic-cone',
+                color: 'secondary'
+            }
+        }),
     SERVER_STATE: Object.freeze(
         {
             SERVICE: {

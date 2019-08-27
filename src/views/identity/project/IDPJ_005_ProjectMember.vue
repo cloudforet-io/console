@@ -2,18 +2,19 @@
   <div class="animated fadeIn">
     <b-row>
       <b-col cols="12">
-        <BaseTable :table-data="users"
+        <BaseTable :table-data="members"
                    :fields="fields"
                    :per-page="perPage"
                    :searchable="true"
                    :total-rows="totalCount"
-                   :search-context-data="queryData"
+                   :field-id="'user_id'"
+                   :search-context-data="searchQueryData"
                    :show-caption="true"
                    :busy="isLoading"
                    :cardless="false"
                    :underlined="true"
                    @rowSelected="rowSelected"
-                   @list="listUsers"
+                   @list="listMembers"
                    @limitChanged="limitChanged"
                    @onSelectAll="rowAllSelected"
         >
@@ -50,7 +51,7 @@
       </b-col>
     </b-row>
 
-    <BaseModal ref="deleteUser"
+    <BaseModal ref="IDPJ005_DeleteUser"
                title="Delete Member"
                size="md"
                @ok="$alertify.success('Selected User Successfully deleted.')"
@@ -64,7 +65,7 @@
 </template>
 
 <script>
-import query from '@/views/identity/project/search_context/search_context';
+import searchContext from '@/views/identity/project/search_context/search_context';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 const MemberDetail = () => import('@/views/identity/project/IDPJ_006_ProjectMemberDetail');
@@ -78,101 +79,110 @@ export default {
     },
     data () {
         return {
-            fields: [
-                { key: 'selected' },
-                { key: 'userId', label: 'ID', sortable: true, ajaxSortable: false },
-                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true },
-                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false },
-                { key: 'mobile', label: 'Phone', sortable: true, ajaxSortable: false },
-                { key: 'group', label: 'Group Name', sortable: true, ajaxSortable: false },
-                { key: 'language', label: 'Language', sortable: true, ajaxSortable: false },
-                { key: 'domainId', label: 'Domain ID' }
-            ],
-            users: [],
+            members: [],
             anySelectedRow: false,
-            selectedUserMulti: null,
-            selectedUser: null,
+            selectedMemberMulti: null,
+            selectedMember: null,
             selectedIdx: undefined,
             addModal: false,
             totalCount: 17,
-            queryData: query,
+            searchQueryData: searchContext,
+            searchQuery: {},
             isReadyForSearch: false,
             perPage: 3,
             isLoading: true
         };
+    },
+    computed: {
+        fields () {
+            return [
+                { key: 'selected', thStyle: { width: '50px' }},
+                { key: 'user_id', label: this.tr('COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
+                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
+                { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'role', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'roles', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false,  thClass: 'd-none', tdClass: 'd-none' }
+            ];
+        },
+        hasSelectedUser () {
+            return !!(this.isMultiSelected || this.selectedUser);
+        },
+        multiSelectedUserList () {
+            return this.multiSelectedList.map((item) => {
+                return item.data;
+            });
+        }
     },
     mounted () {
         this.init();
     },
     methods: {
         init () {
-            this.listUsers(this.perPage, 0);
+            this.listMembers(this.perPage, 0);
         },
         reset () {
-            this.users = [];
-            this.selectedUser = null;
+            this.members = [];
+            this.selectedMember = null;
             this.isLoading = true;
         },
-        async listUsers (limit, skip, sort, search) {
-
-            this.reset();
+        saveMeta (limit, start, sort, filter, filterOr) {
             if (this.isEmpty(limit)) {
                 limit = 10;
             }
-            if (this.isEmpty(skip)) {
-                skip = 0;
+            if (this.isEmpty(start)) {
+                start = 0;
             }
             if (this.isEmpty(sort)) {
-                sort = '-created_date';
+                sort = {};
             }
-            if (this.isEmpty(search)) {
-                search = [];
+            if (this.isEmpty(filter)) {
+                filter = [];
+            }
+            if (this.isEmpty(filterOr)) {
+                filterOr = [];
             }
 
-            let res = null;
-            try {
-                res = await this.$axios.post('/identity/user/list', {
-                    params: { limit, skip, sort }
-                });
+            this.searchQuery = {
+                sort,
+                page: {
+                    start: start,
+                    limit
+                },
+                filter_or: filterOr
+            };
+        },
+        async listMembers (limit, start, sort, filter, filterOr) {
+            this.reset();
+            this.saveMeta(limit, start, sort, filter, filterOr);
+            let url = null;
 
-                setTimeout(() => { // this is for test
-                    this.users = res.data;
-                    this.isLoading = false;
-                }, 1000);
-            } catch (e) {
-                console.error(e);
-                this.users = [
-                    {
-                        userId: 'abc',
-                        name: 'abc',
-                        email: 'abc@abc',
-                        mobile: '222',
-                        group: 'abcabczzz',
-                        language: 'en',
-                        domainId: 'abcabc',
-                        tags: [
-                            { abc: 'abc11' },
-                            { abc2: 'abc2222' },
-                            { abc3: 'abc333' }
-                        ]
-                    },
-                    {
-                        userId: 'zzz',
-                        name: 'zzz',
-                        email: 'zzz@abc',
-                        mobile: '333',
-                        group: 'zdzfzdsfsdf',
-                        language: 'en',
-                        domainId: 'wrwrw',
-                        tags: [
-                            { zzz1: 'ztest' },
-                            { zzz22: 'test222' },
-                            { zzz333: 'teset33' }
-                        ]
-                    }
-                ];
+            if (this.$attrs['selected-data'].nodes[0].data.item_type === 'PROJECT_GROUP'){
+                url = '/identity/project-group/member/list';
+                this.searchQuery['project_group_id'] =  this.$attrs['selected-data'].nodes[0].data.id;
+            } else {
+                url = '/identity/project/member/list';
+                this.searchQuery['project_id'] =  this.$attrs['selected-data'].nodes[0].data.id;
+            }
+
+            await this.$axios.post(url, this.searchQuery).then((response) => {
+                let results = [];
+                if (!this.isEmpty(response.data.results)){
+                    response.data.results.forEach(function(current){
+                        current.user_info['role'] = current.user_info.roles.join(', ');
+                        results.push(current.user_info);
+                    });
+                    this.bindAdditionalKey(results, 'state', 'MEMBER_STATE');
+
+                }
+                this.members = results;
+                console.log(response.data.results);
                 this.isLoading = false;
-            }
+            }).catch((error) =>{
+                console.error(error);
+                this.isLoading = false;
+            });
 
         /**
          * TODO: set totalCount with data from server
@@ -180,20 +190,20 @@ export default {
         },
         rowSelected (row) {
             if (this.isEmpty(row) || row.length < 1) {
-                this.selectedUser = null;
+                this.selectedMember = null;
                 this.anySelectedRow = false;
             } else {
-                this.selectedUser = row;
-                this.selectedUserMulti = row;
+                this.selectedMember = row;
+                this.selectedMemberMulti = row;
                 this.anySelectedRow = true;
             }
         },
         rowAllSelected (row) {
             if (row instanceof Array && !this.isEmpty(row)) {
-                this.selectedUserMulti = row;
+                this.selectedMemberMulti = row;
                 this.anySelectedRow = true;
             } else {
-                this.selectedUserMulti = null;
+                this.selectedMemberMulti = null;
                 this.anySelectedRow = false;
             }
         },
@@ -202,7 +212,7 @@ export default {
             this.init();
         },
         deleteSelected () {
-            this.$refs.deleteUser.showModal();
+            this.$refs.IDPJ005_DeleteUser.showModal();
         }
     }
 };
