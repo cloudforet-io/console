@@ -121,7 +121,10 @@ export default {
                 if (newWidth < this.minLeftWidth || newWidth > this.maxLeftWidth) {
                     return;
                 }
+
                 this.leftContainerWidth = newWidth;
+                const widthKey = this.$parent.$parent.$options.name + '_treeWidth';
+                localStorage[widthKey] = this.leftContainerWidth;
                 // this.rightContainerWidth = this.rightContainerWidth + diff;
                 this.pageX = e.pageX;
             }
