@@ -41,7 +41,7 @@
           <span v-else>Cancel</span>
         </b-button>
         <b-button size="sm" 
-                  :variant="`outline-${type}`" 
+                  :variant="`${type}`" 
                   @click="clickOk"
         >
           <span v-if="useCustomMsg">{{ customYesOrNoMsg.YES }}</span>
