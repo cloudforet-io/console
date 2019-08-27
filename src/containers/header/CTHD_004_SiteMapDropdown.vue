@@ -15,8 +15,8 @@
 
       <b-col cols="12" class="group">
         <b-row>
-          <b-col cols="12" class="header clickable">
-            <i class="fal fa-chart-line" />
+          <b-col cols="12" class="header clickable bordered">
+            <span class="icon"><i class="fa fa-chart-line" /></span>
             <span class="title" @click="showMap = false">
               <router-link to="/dashboard">Dashboard</router-link>
             </span>
@@ -24,30 +24,30 @@
         </b-row>
       </b-col>
       
-      <b-col cols="6" class="group bordered">
+      <b-col cols="6" class="group">
         <b-row>
           <b-col cols="12" class="header">
-            <i class="fal fa-warehouse-alt" />
+            <span class="icon"><i class="fa fa-warehouse-alt" /></span>
             <span class="title">Inventory</span>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="11" offset="1" class="item">
-            <span class="title" @click="showMap = false">
+            <span class="title " @click="showMap = false">
               <router-link to="/inventory/data-center">Data Center</router-link>
             </span>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="11" offset="1" class="item">
-            <span class="title" @click="showMap = false">
+            <span class="title " @click="showMap = false">
               <router-link to="/inventory/server">Server</router-link>
             </span>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="11" offset="1" class="item">
-            <span class="title" @click="showMap = false">
+            <span class="title " @click="showMap = false">
               <router-link to="/inventory/settings">Settings</router-link>
             </span>
           </b-col>
@@ -57,20 +57,20 @@
       <b-col cols="6" class="group">
         <b-row>
           <b-col cols="12" class="header">
-            <i class="fal fa-address-card" />
+            <span class="icon"><i class="fa fa-address-card" /></span>
             <span class="title">Identity</span>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="11" offset="1" class="item">
-            <span class="title" @click="showMap = false">
+            <span class="title " @click="showMap = false">
               <router-link to="/identity/user">User</router-link>
             </span>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="11" offset="1" class="item">
-            <span class="title" @click="showMap = false">
+            <span class="title " @click="showMap = false">
               <router-link to="/identity/project">Project</router-link>
             </span>
           </b-col>
@@ -133,11 +133,12 @@ export default {
   background-color: rgba($black, 0.3);
 }
 .map-container {
-  @extend %sheet;
+  border-radius: 3px;
+  box-shadow: 0px 15px 20px 2px rgba($black, 0.5);;
   position: absolute;
   z-index: 11;
   width: 400px;
-  top: $header-height;
+  top: calc(#{$header-height} - 7px);
   background-color: $white;
   padding: 20px 30px;
 
@@ -159,28 +160,30 @@ export default {
     cursor: pointer;
     border-radius: 5px;
     &:hover {
-      background-color: $skyblue;
+      background-color: rgba($blueviolet, 0.3);
+      font-weight: 600;
+      color: $navy;
     }
   }
 
   .group {
     color: $black;
-    &.bordered {
-        border-right: 1px solid $gray;
-    }
     .header {
       vertical-align: middle;
       padding: 8px;
-      font-size: 1rem;
-      text-transform: uppercase;
+      font-size: 1.2rem;
+    //   text-transform: uppercase;
       letter-spacing: 0.04rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: default;
       .title {
         padding-left: 10px;
         vertical-align: middle;
       }
-      i {
+      .icon {
+          display: inline-block;
+          width: 25px;
+          text-align: center;
           vertical-align: baseline;
       }
       &.clickable {
@@ -191,8 +194,8 @@ export default {
       @extend %click-item;
       vertical-align: middle;
       padding: 3px;
-      padding-left: 15px;
-      font-size: 1rem;
+      padding-left: 18px;
+      font-size: 1.08rem;
       letter-spacing: -0.01rem;
       .title {
         padding-left: 10px;
@@ -205,6 +208,11 @@ export default {
       }
     }
   }
+
+    .bordered {
+        border-bottom: 1px solid $gray;
+        margin-bottom: 10px;
+    }
   
 }
 </style>
