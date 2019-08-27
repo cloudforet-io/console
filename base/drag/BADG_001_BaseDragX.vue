@@ -89,7 +89,7 @@ export default {
                 'font-size': this.draggerSize,
                 'height': `${this.draggerHeight}px`
             },
-            leftContainerWidth: this.leftWidth,
+            leftContainerWidth: parseInt(this.leftWidth),
             // rightContainerWidth: this.totalWidth - this.leftWidth,
             containerHeight: this.height,
             lineHeight: (this.containerHeight / 2) - this.draggerHeight,
@@ -125,7 +125,6 @@ export default {
                 this.leftContainerWidth = newWidth;
                 const widthKey = this.$parent.$parent.$options.name + '_treeWidth';
                 localStorage[widthKey] = this.leftContainerWidth;
-                // this.rightContainerWidth = this.rightContainerWidth + diff;
                 this.pageX = e.pageX;
             }
         },
