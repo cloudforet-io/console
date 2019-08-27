@@ -22,6 +22,8 @@ export const en = {
         BTN_ADD: 'Add',
         BTN_UPT: 'Update',
         BTN_CRT: 'Create',
+        BTN_ENABLE: 'Enable',
+        BTN_DISABLE: 'Disable',
         BTN_S_MANT: 'Set Maintenance',
         BTN_US_MANT: 'Unset Maintenance',
         CHG_PRO: 'Change Project',
@@ -84,7 +86,7 @@ export const en = {
         NOT_ALLOW: 'Action not allowed'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: " '{0}' can not be located at Root position."
+        LEAF_NOMOVE: ' \'{0}\' can not be located at Root position.'
     },
     PN: {
         BASE_INFO:
