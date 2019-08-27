@@ -76,7 +76,7 @@
     >
       <template #contents>
         <UserDetail ref="IDUS001_UserDetail"
-                    :user-prop="isCreateMode ? undefined : selectedUsers[0]" 
+                    :user-prop="isCreateMode ? undefined : selectedItems[0].data" 
                     :creatable="isCreateMode ? true : false"
                     size="xl"
                     @create="createUser"
@@ -87,16 +87,15 @@
     </BaseModal>
 
     <ActionCheckModal ref="IDUS001_ActionCheckModal" 
-                      :data="multiSelectedUserList" 
+                      :data="selectedUsers" 
                       :fields="multiActionFields"
-                      :checkable="isMultiSelected"
                       :action="action"
                       :title="actionCheckTitle"
                       :type="actionCheckType"
                       :text="actionCheckText"
                       primary-key="user_id"
-                      @success="listUsers"
-                      @close="listUsers"
+                      @succeed="listUsers"
+                      @failed="listUsers"
     />
     
               
@@ -110,11 +109,11 @@
       <template #INFO>
         <b-card class="base first-tab">
           <BaseMultiPanel v-if="isMultiSelected" 
-                          :data="multiSelectedUserList"
+                          :data="selectedUsers"
                           :data-fields="multiInfoFields" 
           />
           <UserInfo v-else 
-                    :user-data="selectedUsers[0]"
+                    :user-data="selectedItems[0].data"
                     @update="updateSelectedUserInfo"
           />
         </b-card>
@@ -162,7 +161,7 @@ export default {
             ],
             defaultTab: 0,
             users: [],
-            selectedIdx: undefined,
+            selectedItems: [],
             addModal: false,
             totalCount: 0,
             queryData: query,
@@ -174,8 +173,7 @@ export default {
             action: null,
             actionCheckTitle: '',
             actionCheckType: '',
-            actionCheckText: '',
-            selectedItems: []
+            actionCheckText: ''
         };
     },
     computed: {
@@ -211,7 +209,6 @@ export default {
         },
         multiActionFields () {
             return [
-                { key: 'selected' },
                 { key: 'user_id',label: this.tr('COL_NM.ID') },
                 { key: 'name', label: this.tr('COL_NM.NAME') },
                 { key: 'email', label: this.tr('COL_NM.EMAIL') }
@@ -220,21 +217,13 @@ export default {
         isMultiSelected () {
             return this.selectedItems.length > 1;
         },
+        hasSelectedUser () {
+            return this.selectedItems.length > 0;
+        },
         selectedUsers () {
             return this.selectedItems.map((item) => {
                 return item.data;
             });
-        },
-        hasSelectedUser () {
-            return this.selectedItems.length > 0;
-        },
-        multiSelectedUserList () {
-            return this.selectedItems.map((item) => {
-                return item.data;
-            });
-        },
-        deleteUserList () {
-            return this.isMultiSelected ? this.multiSelectedUserList : this.selectedUsers;
         }
     },
     mounted () {
@@ -247,7 +236,6 @@ export default {
         reset () {
             this.users = [];
             this.selectedItems = [];
-            this.selectedIdx = undefined;
             this.isLoading = true;
         },
         saveMeta (limit, start, sort, filter, filterOr) {
@@ -311,9 +299,6 @@ export default {
         },
         rowSelected (rows) {
             this.selectedItems = rows;
-            if (rows.length === 1) {
-                this.selectedIdx = rows[0].idx;
-            }
         },
         onAllRowSelected (isSelectedAll, rows) {
             this.selectedItems = rows;
@@ -329,15 +314,15 @@ export default {
             this.hideUserDetail();
             user.selected = true;
             this.selectedItems[0].data = user;
-            this.$set(this.users, this.selectedIdx, user);
+            this.$set(this.users, this.selectedItems[0].idx, user);
         },
         createUser () {
             this.hideUserDetail();
             this.listUsers();
         },
-        getParams (deleteItems) {
+        getParams (items) {
             let params = { users: []};
-            deleteItems.map((item) => {
+            items.map((item) => {
                 params.users.push(item.user_id);
             });
             return params;
