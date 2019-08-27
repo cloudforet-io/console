@@ -95,9 +95,6 @@ export default {
             filterOrList: []
         };
     },
-    created () {
-
-    },
     methods: {
         addTagAndSearch (items) {
             this.addTag(items);
@@ -114,47 +111,53 @@ export default {
             if (this.isEmpty(obj.key)) {
                 this.addQueryToFilterOrListWithAutoKey(obj);
             } else {
-                let idx = this.getIdxFromFilterListWithTag(obj);
-                if (this.isEmpty(idx)) {
-                    this.addQueryToFilterList(obj);
-                } else {
-                    let tag = this.getSameKeyTagFromTagListWithFilterName(obj, 'filter');
-                    if (!this.isEmpty(tag)) {
-                        this.deleteQueryFromFilterList(tag);
-                        this.addQueryToFilterOrList(tag);
-                    }
-                    this.addQueryToFilterOrList(obj);
-                }
+                this.addQueryToFilterList(obj);
             }
         },
         addQueryToFilterOrListWithAutoKey (obj) {
+            if (this.filterOrList.length === 0) {
+                this.generateValueEmptyFilterOrList();
+            } 
+
+            this.filterOrList.map((filter) => {
+                filter.value.push(obj.value);
+            });
+            obj.filterName = 'filterOr';
+            obj.filterIdx = null;
+            obj.valueIdx = this.filterOrList[0].value.length - 1;
+        },
+        generateValueEmptyFilterOrList () {
             this.contextData.autokeyList.map((autokey) => {
                 this.filterOrList.push({ 
                     key: autokey,
-                    value: obj.value,
-                    operator: this.getOperator(obj.operator)
+                    value: [],
+                    operator: this.getOperator(':')
                 });
-                obj.filterIdxList.push(this.filterOrList.length - 1);
             });
-            obj.filterName = 'filterOr';
-        },
-        addQueryToFilterOrList (obj) {
-            this.filterOrList.push({
-                key: obj.key,
-                value: obj.value,
-                operator: this.getOperator(obj.operator) 
-            });
-            obj.filterName = 'filterOr';
-            obj.filterIdxList.push(this.filterOrList.length - 1);
         },
         addQueryToFilterList (obj) {
-            this.filterList.push({
-                key: obj.key,
-                value: obj.value,
-                operator: this.getOperator(obj.operator) 
+            let idx = 0;
+            let isExist = this.filterList.some((item, i) => {
+                if (item.key === obj.key && item.operator === this.getOperator(obj.operator)) {
+                    idx = i;
+                }
+                return item.key === obj.key && item.operator === this.getOperator(obj.operator); 
             });
+
+            if (isExist) {
+                this.filterList[idx].value.push(obj.value);
+                obj.valueIdx = this.filterList[idx].value.length - 1;
+            } else {
+                this.filterList.push({
+                    key: obj.key,
+                    value: [obj.value],
+                    operator: this.getOperator(obj.operator)
+                });
+                obj.valueIdx = 0;
+            }
+            
             obj.filterName = 'filter';
-            obj.filterIdxList.push(this.filterList.length - 1);
+            obj.filterIdx = idx;
         },
         upsertTagAndSearch (tags, idx) {
             this.upsertTag(tags, idx);
@@ -178,24 +181,6 @@ export default {
             this.deleteQuery(obj);
             this.addQuery(obj);
         },
-        updateQueryFromFilterOrList (obj) {
-            obj.filterIdxList.map((idx) => {
-                this.filterOrList[idx] = {
-                    key: obj.key,
-                    value: obj.value,
-                    operator: this.getOperator(obj.operator)
-                };
-            });
-        },
-        updateQueryFromFilterList (obj) {
-            obj.filterIdxList.map((idx) => {
-                this.filterList[idx] = {
-                    key: obj.key,
-                    value: obj.value,
-                    operator: this.getOperator(obj.operator)
-                };
-            });
-        },
         insertTag (tag, idx) {
             this.tagList.splice(idx, 0, this.getNewTag(tag));
         },
@@ -215,13 +200,17 @@ export default {
             }
         },
         deleteQueryFromFilterList (obj) {
-            this.filterList.splice(obj.filterIdxList[0], obj.filterIdxList.length);
-            obj.filterIdxList = [];
+            this.filterList[obj.filterIdx].value.splice(obj.valueIdx, 1);
+            obj.filterIdx = null;
+            obj.valueIdx = null;
             obj.filterName = '';
         },
         deleteQueryFromFilterOrList (obj) {
-            this.filterOrList.splice(obj.filterIdxList[0], obj.filterIdxList.length);
-            obj.filterIdxList = [];
+            this.filterOrList.map((filter) => {
+                filter.value.splice(obj.valueIdx, 1);
+            });
+            obj.filterIdx = null;
+            obj.valueIdx = null;
             obj.filterName = '';
         },
         deleteAll () {
@@ -238,42 +227,20 @@ export default {
             return Object.assign({ 
                 id: ++this.lastId, 
                 filterName: '', 
-                filterIdxList: [],
+                filterIdx: null,
+                valueIdx: null,
                 focused: false
             }, item);
         },
-        getIdxFromFilterListWithTag (obj) {
-            let idx = null;
-            this.filterList.some((item, i) => {
-                if (item.key === obj.key) { 
-                    idx = i;
-                }
-                return item.key === obj.key; 
-            });
-            return idx;
-        },
-        getSameKeyTagFromTagListWithFilterName (obj, filterName) {
-            let tag = null;
-            if (this.isEmpty(filterName)) {
-                filterName = 'filter';
-            }
-            this.tagList.some((item, i) => {
-                if (item.key === obj.key && item.filterName === filterName) { 
-                    tag = item;
-                }
-                return !!(item.key === obj.key && item.filterName === filterName); 
-            });
-            return tag;
-        },
         getOperator (op) {
             switch (op) {
-            case ':': return 'contain';
-            case ':=': return 'eq';
-            case ':>': return 'gte';
-            case ':<': return 'lte';
-            case ':!': return 'not_contain';
-            case ':$': return 'regex';
-            default: return 'contain';
+            case ':': return 'contain_in';
+            case ':=': return 'in';
+            case ':>': return 'gte'; // 무조건 filterList
+            case ':<': return 'lte'; // 무조건 filterList
+            case ':!': return 'not_in'; 
+            case ':/': return 'regex_in'; 
+            default: return 'contain_in';
             }
         },
         focusOnInput () {
