@@ -22,6 +22,8 @@ export const ko ={
         BTN_ADD: '추가',
         BTN_UPT: '업데이트',
         BTN_CRT: '신규등록',
+        BTN_ENABLE: '활성화',
+        BTN_DISABLE: '비활성화',
         BTN_S_MANT: '유지 보수 설정',
         BTN_US_MANT: '유지 보수 해제',
         CHG_PRO: '프로젝트 변경하기',
@@ -32,7 +34,7 @@ export const ko ={
         PG_ID: '프로젝트 아이디',
         PG_NM: '프로젝트 명',
         PG_GR: '프로젝트 그룹',
-        PG: "프로젝트",
+        PG: '프로젝트',
         SEARCH: '검색'
     },
     COL_NM: {
@@ -83,7 +85,7 @@ export const ko ={
         NOT_ALLOW: '수행불가 작업'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: "'{0}' 는 Root 포지션에 위치할 수 없습니다."
+        LEAF_NOMOVE: '\'{0}\' 는 Root 포지션에 위치할 수 없습니다.'
     },
     PN: {
         BASE_INFO: '기본 정보',

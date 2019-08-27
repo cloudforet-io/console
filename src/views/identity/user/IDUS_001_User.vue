@@ -6,12 +6,12 @@
                    :table-data="users" 
                    :fields="fields" 
                    :per-page="perPage"
-                   :searchable="true" 
+                   searchable
                    :total-rows="totalCount" 
                    :search-context-data="queryData"
                    :busy="isLoading" 
                    :cardless="false" 
-                   :underlined="true"
+                   underlined
                    :height="height"
                    field-id="user_id"
                    @rowSelected="rowSelected"
@@ -32,7 +32,7 @@
                   <span>Actions</span> &nbsp;
                   <i class="fal fa-angle-down" />
                 </template>
-                <b-dropdown-item v-if="selectedUser" @click="onClickUpdate">
+                <b-dropdown-item v-if="!isMultiSelected" @click="onClickUpdate">
                   <div class="item sm">
                     <i class="icon fal fa-pencil-alt" />
                     <span class="name">{{ tr('BTN_UPT') }}</span>
@@ -42,6 +42,18 @@
                   <div class="item sm">
                     <i class="icon fal fa-trash-alt" />
                     <span class="name">{{ tr('BTN_DELETE') }}</span>
+                  </div>
+                </b-dropdown-item>
+                <b-dropdown-item @click="onClickEnable">
+                  <div class="item sm">
+                    <i class="icon fal fa-check-circle" />
+                    <span class="name">{{ tr('BTN_ENABLE') }}</span>
+                  </div>
+                </b-dropdown-item>
+                <b-dropdown-item @click="onClickDisable">
+                  <div class="item sm">
+                    <i class="icon fal fa-ban" />
+                    <span class="name">{{ tr('BTN_DISABLE') }}</span>
                   </div>
                 </b-dropdown-item>
               </b-dropdown>
@@ -64,7 +76,7 @@
     >
       <template #contents>
         <UserDetail ref="IDUS001_UserDetail"
-                    :user-prop="isCreateMode ? undefined : selectedUser" 
+                    :user-prop="isCreateMode ? undefined : selectedUsers[0]" 
                     :creatable="isCreateMode ? true : false"
                     size="xl"
                     @create="createUser"
@@ -73,34 +85,20 @@
         />
       </template>
     </BaseModal>
-    
-    <BaseModal
-      ref="DeleteCheck"
-      title="User Delete"
-      type="danger"
-      centered
-      @ok="deleteUser"
-    >
-      <template #contents>
-        <h4>Are you sure you want to delete selected user(s) below?</h4>
-        <br>
-        <div class="delete-user">
-          <span v-if="selectedUser" class="user-name">
-            {{ selectedUser.name }}
-          </span>
-          <div v-for="(item, idx) in multiDeleteList" v-else :key="item.data.user_id">
-            <BaseCheckbox :key="item.data.user_id"
-                          :selected="item._isDelete"
-                          class="select-checkbox"
-                          type="danger"
-                          @change="checkDeleteUser(idx, $event)"
-            />
-            <span class="user-name">{{ item.data.name }}</span>
-          </div>
-        </div>
-      </template>
-    </BaseModal>
 
+    <ActionCheckModal ref="IDUS001_ActionCheckModal" 
+                      :data="multiSelectedUserList" 
+                      :fields="multiActionFields"
+                      :checkable="isMultiSelected"
+                      :action="action"
+                      :title="actionCheckTitle"
+                      :type="actionCheckType"
+                      :text="actionCheckText"
+                      primary-key="user_id"
+                      @success="listUsers"
+                      @close="listUsers"
+    />
+    
               
     <BaseTabNav v-if="hasSelectedUser" class="user-info"
                 :fill="false"
@@ -116,7 +114,7 @@
                           :data-fields="multiInfoFields" 
           />
           <UserInfo v-else 
-                    :user-data="selectedUser"
+                    :user-data="selectedUsers[0]"
                     @update="updateSelectedUserInfo"
           />
         </b-card>
@@ -140,8 +138,7 @@ const BaseMultiPanel = () => import('@/components/base/panel/BAPA_005_BaseMultiP
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 const UserDetail = () => import('./IDUS_002_UserDetail');
 
-const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox');
-
+const ActionCheckModal = () => import('@/components/base/modal/BAMO_003_EXT_ActionCheckModal.vue');
 
 export default {
     name: 'User',
@@ -153,7 +150,7 @@ export default {
         BaseMultiPanel,
         BaseModal,
         UserDetail,
-        BaseCheckbox
+        ActionCheckModal
     },
     data () {
         return {
@@ -165,7 +162,6 @@ export default {
             ],
             defaultTab: 0,
             users: [],
-            selectedUser: null,
             selectedIdx: undefined,
             addModal: false,
             totalCount: 0,
@@ -175,9 +171,11 @@ export default {
             isLoading: true,
             query: {},
             isCreateMode: true,
-            isMultiSelected: false,
-            multiSelectedList: [],
-            multiDeleteList: []
+            action: null,
+            actionCheckTitle: '',
+            actionCheckType: '',
+            actionCheckText: '',
+            selectedItems: []
         };
     },
     computed: {
@@ -211,13 +209,32 @@ export default {
                 { key: 'group', label: this.tr('COL_NM.GROUP') }
             ];
         },
-        hasSelectedUser () {
-            return !!(this.isMultiSelected || this.selectedUser);
+        multiActionFields () {
+            return [
+                { key: 'selected' },
+                { key: 'user_id',label: this.tr('COL_NM.ID') },
+                { key: 'name', label: this.tr('COL_NM.NAME') },
+                { key: 'email', label: this.tr('COL_NM.EMAIL') }
+            ];
         },
-        multiSelectedUserList () {
-            return this.multiSelectedList.map((item) => {
+        isMultiSelected () {
+            return this.selectedItems.length > 1;
+        },
+        selectedUsers () {
+            return this.selectedItems.map((item) => {
                 return item.data;
             });
+        },
+        hasSelectedUser () {
+            return this.selectedItems.length > 0;
+        },
+        multiSelectedUserList () {
+            return this.selectedItems.map((item) => {
+                return item.data;
+            });
+        },
+        deleteUserList () {
+            return this.isMultiSelected ? this.multiSelectedUserList : this.selectedUsers;
         }
     },
     mounted () {
@@ -229,11 +246,9 @@ export default {
         },
         reset () {
             this.users = [];
-            this.selectedUser = null;
+            this.selectedItems = [];
             this.selectedIdx = undefined;
             this.isLoading = true;
-            this.multiSelectedList = [];
-            this.isMultiSelected = false;
         },
         saveMeta (limit, start, sort, filter, filterOr) {
             if (this.isEmpty(limit)) {
@@ -294,79 +309,47 @@ export default {
                 this.isLoading = false;
             }
         },
-        rowSelected (selected, isSelection, rows) {
-            if (rows && rows.length > 1) {
-                this.isMultiSelected = true;
-                this.multiSelectedList = rows;
-            } else {
-                this.isMultiSelected = false;
-            }
-
-            if (isSelection && !this.isMultiSelected) {
-                this.setSelectedUser(selected);
-            } else if (rows && rows.length === 1) {
-                this.setSelectedUser(rows[0]);
-            } else {
-                this.initSelectedUser();
+        rowSelected (rows) {
+            this.selectedItems = rows;
+            if (rows.length === 1) {
+                this.selectedIdx = rows[0].idx;
             }
         },
         onAllRowSelected (isSelectedAll, rows) {
-            if (isSelectedAll) {
-                this.isMultiSelected = true;
-                this.multiSelectedList = rows;
-            } else {
-                this.isMultiSelected = false;
-            }
-            this.initSelectedUser();
-
-        },
-        initSelectedUser () {
-            this.selectedUser = undefined;
-            this.selectedIdx = undefined;
-        },
-        setSelectedUser (item) {
-            this.selectedUser = this.users[item.idx];
-            this.selectedIdx = item.idx;
+            this.selectedItems = rows;
         },
         limitChanged (val) {
             this.perPage = Number(val);
             this.init();
         },
         updateSelectedUserInfo (user) {
-            this.selectedUser = user;
+            this.selectedItems[0].data = user;
         },
         updateUser (user) {
             this.hideUserDetail();
             user.selected = true;
-            this.selectedUser = user;
+            this.selectedItems[0].data = user;
             this.$set(this.users, this.selectedIdx, user);
         },
         createUser () {
             this.hideUserDetail();
             this.listUsers();
         },
-        getDeleteParams () {
-            let params = { user_ids: []};
-            if (this.isMultiSelected) {
-                this.multiDeleteList.map((item) => {
-                    if (item._isDelete) {
-                        params.user_ids.push(item.data.user_id);
-                    }
-                });
-            } else {
-                params.user_ids.push(this.selectedUser.user_id);
-            }
+        getParams (deleteItems) {
+            let params = { users: []};
+            deleteItems.map((item) => {
+                params.users.push(item.user_id);
+            });
             return params;
         },
-        async deleteUser () {
-            try {
-                await this.$axios.post('/identity/user/delete', this.getDeleteParams());
-                this.$alertify.success('Selected User Successfully Deleted.');
-                this.listUsers();
-            } catch (e) {
-                console.error(e);
-                this.$alertify.error('ERROR OCCURED during Deleting User.');
-            }
+        async deleteUser (commitItems) {
+            await this.$axios.post('/identity/user/delete', this.getParams(commitItems));
+        },
+        async enableUser (commitItems) {
+            await this.$axios.post('/identity/user/enable', this.getParams(commitItems));
+        },
+        async disableUser (commitItems) {
+            await this.$axios.post('/identity/user/disable', this.getParams(commitItems));
         },
         onClickAdd () {
             this.isCreateMode = true;
@@ -376,17 +359,26 @@ export default {
             this.isCreateMode = false;
             this.showUserDetail();
         },
-        setDeleteItems () {
-            if (this.isMultiSelected) {
-                this.multiDeleteList = this.multiSelectedList.map((item) => {
-                    item._isDelete = true;
-                    return item;
-                });
-            }
-        },
         onClickDelete () {
-            this.setDeleteItems();
-            this.$refs.DeleteCheck.showModal();
+            this.action = this.deleteUser;
+            this.actionCheckTitle = 'User Delete';
+            this.actionCheckType = 'danger';
+            this.actionCheckText = 'Are you sure you want to Delete selected users below?';
+            this.$refs.IDUS001_ActionCheckModal.showModal();
+        },
+        onClickEnable () {
+            this.action = this.enableUser;
+            this.actionCheckTitle = 'User Enable';
+            this.actionCheckType = 'warning';
+            this.actionCheckText = 'Are you sure you want to Enable selected users below?';
+            this.$refs.IDUS001_ActionCheckModal.showModal();
+        },
+        onClickDisable () {
+            this.action = this.disableUser;
+            this.actionCheckTitle = 'User Disable';
+            this.actionCheckType = 'warning';
+            this.actionCheckText = 'Are you sure you want to Disable selected users below?';
+            this.$refs.IDUS001_ActionCheckModal.showModal();
         },
         showUserDetail () {
             this.$refs.IDUS001_UserDetailModal.showModal();
@@ -396,9 +388,6 @@ export default {
         },
         checkCancel () {
             this.$refs.IDUS001_UserDetail.onCancel();
-        },
-        checkDeleteUser (i, value) {
-            this.$set(this.multiDeleteList[i], '_isDelete', value);
         }
     }
 };

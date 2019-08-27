@@ -229,7 +229,6 @@ export default {
                 filterName: '', 
                 filterIdx: null,
                 valueIdx: null,
-                // filterIdxList: [],
                 focused: false
             }, item);
         },
