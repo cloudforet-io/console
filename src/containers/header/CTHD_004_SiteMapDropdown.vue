@@ -13,7 +13,7 @@
                      'slide-fade-out': !showMap }"
     >
 
-      <b-col cols="6" class="group">
+      <b-col cols="12" class="group">
         <b-row>
           <b-col cols="12" class="header clickable">
             <i class="fal fa-chart-line" />
@@ -22,29 +22,9 @@
             </span>
           </b-col>
         </b-row>
-        <b-row>
-          <b-col cols="12" class="header">
-            <i class="fal fa-address-card" />
-            <span class="title">Identity</span>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="11" offset="1" class="item">
-            <span class="title" @click="showMap = false">
-              <router-link to="/identity/user">User</router-link>
-            </span>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="11" offset="1" class="item">
-            <span class="title" @click="showMap = false">
-              <router-link to="/identity/project">Project</router-link>
-            </span>
-          </b-col>
-        </b-row>
       </b-col>
       
-      <b-col cols="6" class="group">
+      <b-col cols="6" class="group bordered">
         <b-row>
           <b-col cols="12" class="header">
             <i class="fal fa-warehouse-alt" />
@@ -69,6 +49,29 @@
           <b-col cols="11" offset="1" class="item">
             <span class="title" @click="showMap = false">
               <router-link to="/inventory/settings">Settings</router-link>
+            </span>
+          </b-col>
+        </b-row>
+      </b-col>
+
+      <b-col cols="6" class="group">
+        <b-row>
+          <b-col cols="12" class="header">
+            <i class="fal fa-address-card" />
+            <span class="title">Identity</span>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="11" offset="1" class="item">
+            <span class="title" @click="showMap = false">
+              <router-link to="/identity/user">User</router-link>
+            </span>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="11" offset="1" class="item">
+            <span class="title" @click="showMap = false">
+              <router-link to="/identity/project">Project</router-link>
             </span>
           </b-col>
         </b-row>
@@ -162,6 +165,9 @@ export default {
 
   .group {
     color: $black;
+    &.bordered {
+        border-right: 1px solid $gray;
+    }
     .header {
       vertical-align: middle;
       padding: 8px;
@@ -172,6 +178,10 @@ export default {
       cursor: default;
       .title {
         padding-left: 10px;
+        vertical-align: middle;
+      }
+      i {
+          vertical-align: baseline;
       }
       &.clickable {
         @extend %click-item;

@@ -170,14 +170,13 @@ a {
 }
 
 /* b-checkbox */
-
 @mixin checkbox-color($color) {
     .custom-control-input:checked ~ .custom-control-label::before {
         background-color: $color;
         border-color: $color;
     }
-  }
-  
+}
+
 .custom-checkbox {
     &.primary { @include checkbox-color($primary); }
     &.secondary { @include checkbox-color($primary); }
@@ -251,142 +250,62 @@ a {
 .btn {
   border-radius: 50px;
   padding: 3px 15px 1px 15px;
+  font-size: 1.02em;
 }
 .btn:focus {
   outline: none;
 }
-.btn-primary {
-  background-color: $blue;
-  border-color: $blue;
-  &:not(:disabled):not(.disabled):active {
-    background-color: $blue;
-    border-color: $blue;
-    &:focus {
-      box-shadow: 0 0 5px 1px $skyblue;
-    }
-  }
+
+.btn-sm, .btn-group-sm > .btn {
 }
-.btn-secondary {
-  background-color: $gray;
-  border-color: $gray;
-  color: darken($darkgray, 20%);
-  &:not(:disabled):not(.disabled):active {
-    background-color: $gray;
-    border-color: $gray;
-    &:focus {
-      box-shadow: 0 0 5px 1px $gray;
-    }
-  }
-  &:hover {
-    color: darken($darkgray, 30%);
-    background-color: $darkgray;
-    border-color: $darkgray;
-  }
-}
-.btn-outline-secondary {
-    color: darken($darkgray, 30%);
-    border-color: darken($darkgray, 30%);
-    &:not(:disabled):not(.disabled):active {
-        background-color: darken($darkgray, 30%);
-        border-color: darken($darkgray, 30%);
-        &:focus {
-            box-shadow: 0 0 5px 1px darken($darkgray, 30%);
+
+@mixin btn-color($theme, $color, $oposite-color) {
+    &.btn-#{$theme} {
+        background-color: $color;
+        border-color: $color;
+        &:not(:disabled):not(.disabled):active {
+            color: $oposite-color;
+            background-color: darken($color, 10%);
+            border-color: darken($color, 10%);
+            &:focus {
+                box-shadow: 0 0 5px 1px rgba($color, .5);
+            }
+        }
+        &:hover {
+            color: $oposite-color;
+            background-color: darken($color, 10%);
+            border-color: darken($color, 10%);
         }
     }
-    &:hover {
-        background-color: darken($darkgray, 30%);
-        border-color: darken($darkgray, 30%);
+    &.btn-outline-#{$theme} {
+        color: $color;
+        border-color: $color;
+        background-color: transparent;
+        &:not(:disabled):not(.disabled):active {
+            color: $oposite-color;
+            background-color: $color;
+            border-color: $color;
+            &:focus {
+                box-shadow: 0 0 5px 1px rgba($color, .5);
+            }
+        }
+        &:hover {
+            color: $oposite-color;
+            background-color: $color;
+            border-color: $color;
+        }
     }
 }
-.btn-dark {
-  background-color: $navy;
-  border-color: $navy;
-  &:not(:disabled):not(.disabled):active {
-    background-color: $navy;
-    border-color: $navy;
-    &:focus {
-      box-shadow: 0 0 5px 1px $navy;
-    }
-  }
-  &:hover {
-    background-color: $black;
-    border-color: $black;
-  }
-}
-.btn-outline-dark {
-  color: $navy;
-  border-color: $navy;
-  &:not(:disabled):not(.disabled):active {
-    background-color: $navy;
-    border-color: $navy;
-    &:focus {
-      box-shadow: 0 0 5px 1px $navy;
-    }
-  }
-  &:hover {
-    background-color: $navy;
-    border-color: $navy;
-  }
-}
-.btn-info {
-  background-color: $violet;
-  border-color: $violet;
-  &:not(:disabled):not(.disabled):active {
-    background-color: $violet;
-    border-color: $violet;
-    &:focus {
-      box-shadow: 0 0 5px 1px $violet;
-    }
-  }
-  &:hover {
-    background-color: darken($violet, 5%);;
-    border-color: darken($violet, 5%);;
-  }
-}
-.btn-outline-info {
-  color: $violet;
-  border-color: $violet;
-  &:not(:disabled):not(.disabled):active {
-    background-color: $violet;
-    border-color: $violet;
-    &:focus {
-      box-shadow: 0 0 5px 1px $violet;
-    }
-  }
-  &:hover {
-    background-color: $violet;
-    border-color: $violet;
-  }
-}
-.btn-danger {
-  background-color: $red;
-  border-color: $red;
-  &:not(:disabled):not(.disabled):active {
-    background-color: $red;
-    border-color: $red;
-    &:focus {
-      box-shadow: 0 0 5px 1px $red;
-    }
-  }
-  &:hover {
-    background-color: $red;
-    border-color: $red;
-  }
-}
-.btn-outline-danger {
-  color: $red;
-  border-color: $red;
-  &:not(:disabled):not(.disabled):active {
-    background-color: $red;
-    border-color: $red;
-    &:focus {
-      box-shadow: 0 0 5px 1px $red;
-    }
-  }
-  &:hover {
-    background-color: $red;
-    border-color: $red;
-  }
+
+.btn { 
+    @include btn-color('primary', $primary, $white);
+    @include btn-color('secondary', $secondary, darken($secondary, 30%)); 
+    @include btn-color('light', $light, $black);
+    @include btn-color('danger', $danger, $white); 
+    @include btn-color('success', $success, $white);
+    @include btn-color('warning', $warning, $white);
+    @include btn-color('dark', $dark, $white);
+    @include btn-color('info', $info, $white);
 }
 
 /* sl-vue-tree */
@@ -472,15 +391,24 @@ a {
   }
 }
 
-.modal-primary {
-  .modal-header {
-    background-color: rgba($blue, 0.1);
-    color: darken($blue, 20%);
-    .close {
-      color: darken($blue, 20%);
+@mixin modal-color($color) {
+    .modal-header {
+        background-color: rgba($color, 0.1);
+        color: darken($color, 20%);
+        .close {
+            color: darken($color, 20%);
+        }
     }
-  }
 }
+  
+.modal-primary { @include modal-color($primary); }
+.modal-secondary { @include modal-color($secondary); }
+.modal-danger { @include modal-color($danger); }
+.modal-dark { @include modal-color($dark); }
+.modal-info { @include modal-color($info); }
+.modal-warning { @include modal-color($warning); }
+.modal-light { @include modal-color($light); }
+.modal-success { @include modal-color($success); }
 
 
 /* b-form */
