@@ -33,8 +33,7 @@
               @edited="editSelected"
               @delete="deletedSelectedOnTree"
               @noCacheDrop="moveProject"
-              @toggled="getNextLayerOnTree"
-    >
+              @toggled="getNextLayerOnTree">
       <template #treeSubPanel>
         <BaseTabNav
           :fill="false"
@@ -382,7 +381,6 @@ export default {
                     }
                 }
             }
-
             await this.$axios.post(url, param).then((response) => {
                 const responseData = response.data;
                 if (!this.isEmpty(responseData)){
@@ -391,7 +389,6 @@ export default {
             }).catch((error) => {
                 console.error(error);
             });
-
             if (!items.position.node.data.is_cached){
                 if (items.isCanceled) {
                     items.position.node.path[items.position.node.path.length-1] = items.position.node.path[items.position.node.path.length-1]-1;
@@ -400,7 +397,6 @@ export default {
                 items.treeV.updateNode(items.position.node.path, { isExpanded: true });
                 this.getNextLayerOnTree({ treeV: items.treeV, node: items.position.node });
             }
-
         },
         async closeSelected(){
             this.$refs.IDPJ001_EditModal.hideModal();

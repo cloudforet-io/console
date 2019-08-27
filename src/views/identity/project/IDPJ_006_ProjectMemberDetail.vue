@@ -2,21 +2,27 @@
   <div class="animated fadeIn">
     <b-row>
       <b-col cols="12">
-        <BaseTable :table-data="users"
+        <BaseTable :table-data="members"
                    :fields="fields"
+                   :field-id="'user_id'"
                    :per-page="perPage"
                    :searchable="true"
                    :total-rows="totalCount"
-                   :search-context-data="queryData"
+                   :search-context-data="memberModalQueryData"
                    :show-caption="true"
                    :busy="isLoading"
                    :cardless="false"
                    :underlined="true"
+                   :off-caption="true"
                    @rowSelected="rowSelected"
-                   @list="listUsers"
+                   @list="listMembersOnModal"
                    @limitChanged="limitChanged"
                    @onSelectAll="rowAllSelected"
         />
+        <br>
+        <b-card>
+          {{ selectedMembersOnSc }}
+        </b-card>
       </b-col>
     </b-row>
     <b-row>
@@ -33,121 +39,189 @@
         </div>
       </slot>
     </b-row>
-
-    <BaseModal ref="deleteCheck"
-               title="Delete Member"
-               size="md"
-               @ok="$alertify.success('Selected User Successfully deleted.')"
-               @cancel="$alertify.error('Action Cancel')"
-    >
-      <template #contents>
-        <span>Do you want to delete selected?</span>
-      </template>
-    </BaseModal>
   </div>
 </template>
-
 <script>
+
 import query from '@/views/identity/project/search_context/search_context';
-import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
-const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
+import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 
 export default {
     name: 'ProjectMember',
     event: ['close'],
     components: {
-        BaseTable,
-        BaseModal
+        BaseTable
     },
     data() {
         return {
-            fields: [
-                { key: 'selected' },
-                { key: 'role_id', label: 'User ID', sortable: true, ajaxSortable: false },
-                { key: 'user_name', label: 'Name', sortable: true, ajaxSortable: true },
-                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false },
-                { key: 'group', label: 'Group', sortable: true, ajaxSortable: false }
-            ],
-            users: [],
+            members: [],
             anySelectedRow: false,
             selectedUserMulti: null,
             selectedUser: null,
             selectedIdx: undefined,
             isFooterVisible: true,
-            addModal: false,
-            totalCount: 17,
-            queryData: query,
-            isReadyForSearch: false,
-            perPage: 3,
-            isLoading: true
+            memberModalQueryData: query,
+            memberModalQuery: {},
+            totalCount: 0,
+            perPage: 10,
+            isLoading: true,
+            selectedModalItems: [],
+            selectedModalMember: null
         };
     },
+    computed: {
+        fields () {
+            return [
+                { key: 'selected' },
+                { key: 'user_id', label: 'User ID', sortable: true, ajaxSortable: false ,thStyle: { width: '150px' }},
+                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true ,thStyle: { width: '150px' }},
+                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false , thStyle: { width: '230px' }},
+                { key: 'group', label: 'Group', sortable: true, ajaxSortable: false, thStyle: { width: '150px' }}
+            ];
+        },
+        isMultiSelected () {
+            return this.selectedModalItems.length > 1;
+        },
+        hasSelectedMember () {
+            return this.selectedModalItems.length > 0;
+        },
+        selectedMembers () {
+            return this.selectedModalItems.map((item) => {
+                return item.data;
+            });
+        },
+        selectedMembersOnSc () {
+            let lombok = {};
+            this.selectedModalItems.map((item) => {
+                return lombok[item.data.user_id] = item.data.name;
+            });
+            let lombokStr = JSON.stringify(lombok);
+            return lombokStr.substring(1, lombokStr.length-1);
+        }
+    },
     mounted() {
-        this.init();
+        this.isLoading = false;
     },
     methods: {
         init() {
-            this.listUsers(this.perPage, 0);
+            this.listMembersOnModal(this.perPage, 0);
         },
-        reset() {
-            this.users = [];
-            this.selectedUser = null;
+        reset () {
+            this.members = [];
+            this.selectedModalMember = null;
             this.isLoading = true;
         },
-        async listUsers(limit, skip, sort, search) {
-            this.reset();
-
+        saveMeta (limit, start, sort, filter, filterOr) {
             if (this.isEmpty(limit)) {
                 limit = 10;
             }
-            if (this.isEmpty(skip)) {
-                skip = 0;
+            if (this.isEmpty(start)) {
+                start = 0;
             }
             if (this.isEmpty(sort)) {
-                sort = '-created_date';
+                sort = {};
             }
-            if (this.isEmpty(search)) {
-                search = [];
+            if (this.isEmpty(filter)) {
+                filter = [];
             }
-
-            this.$axios.post('/identity/user/list', {
-                params: { limit, skip, sort }
+            if (this.isEmpty(filterOr)) {
+                filterOr = [];
+            }
+            this.searchQuery = {
+                sort,
+                page: {
+                    start: start,
+                    limit
+                },
+                filter_or: filterOr
+            };
+        },
+        saveMemberModalMeta (limit, start, sort, filter, filterOr) {
+            if (this.isEmpty(limit)) {
+                limit = 10;
+            }
+            if (this.isEmpty(start)) {
+                start = 0;
+            }
+            if (this.isEmpty(sort)) {
+                sort = {};
+            }
+            if (this.isEmpty(filter)) {
+                filter = [];
+            }
+            if (this.isEmpty(filterOr)) {
+                filterOr = [];
+            }
+            this.memberModalQuery = {
+                sort,
+                page: {
+                    start: start,
+                    limit
+                },
+                filter_or: filterOr
+            };
+        },
+        async listMembersOnModal (limit, start, sort, filter, filterOr){
+            this.reset();
+            this.saveMemberModalMeta(limit, start, sort, filter, filterOr);
+            await this.$axios.post('/identity/user/list',{
+                query: this.memberModalQuery
             }).then((response) => {
-                this.users = response.data;
+                this.members = response.data.results;
+                this.totalCount = response.data.total_count;
                 this.isLoading = false;
-            }).catch((ex) => {
-                console.error(ex);
+            }).catch((error) =>{
+                console.error(error);
+                this.isLoading = false;
             });
-
         },
-        rowSelected(row) {
-            if (this.isEmpty(row) || row.length < 1) {
-                this.selectedUser = null;
-                this.anySelectedRow = false;
-            } else {
-                this.selectedUser = row;
-                this.selectedUserMulti = row;
-                this.anySelectedRow = true;
+        rowSelected (rows) {
+            this.selectedModalItems = rows;
+            if (rows.length === 1) {
+                this.selectedIdx = rows[0].idx;
+                this.selectedModalMember = rows[0];
             }
         },
-        rowAllSelected(row) {
-            if (row instanceof Array && !this.isEmpty(row)) {
-                this.selectedUserMulti = row;
-                this.anySelectedRow = true;
-            } else {
-                this.selectedUserMulti = null;
-                this.anySelectedRow = false;
-            }
+        rowAllSelected (isSelectedAll, rows) {
+            this.selectedModalItems = rows;
         },
         limitChanged(val) {
             this.perPage = Number(val);
             this.init();
         },
         deleteSelected() {
-            this.$refs.deleteCheck.showModal();
+            this.$refs.IDPJ006_DeleteCheck.showModal();
         },
-        addUser() {
-            console.log('');
+        async addUser() {
+            let url = null;
+            const projectSelected = this.$attrs['selectedData'].nodes[0].data;
+            const selected_id = projectSelected.id;
+            const selected_type = projectSelected.item_type;
+
+            let param = {
+                query: this.searchQuery
+            };
+
+            if (selected_type === 'PROJECT_GROUP'){
+                url = '/identity/project-group/member/add';
+                param['project_group_id'] =  selected_id;
+            } else {
+                url = '/identity/project/member/add';
+                param['project_id'] =  selected_id;
+            }
+
+            if (this.selectedModalItems.length === 1){
+                param['user_id'] = this.selectedModalMember.data.user_id;
+            } else {
+                alert('Cannot do now');
+            }
+
+            await this.$axios.post(url, param).then((response) => {
+                this.$parent.$parent.$parent.$parent.$parent.listMembers();
+                this.$emit('close');
+            }).catch((error) =>{
+                console.error(error);
+            });
         },
         closeWindow(e) {
             this.$emit('close');

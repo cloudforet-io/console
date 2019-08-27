@@ -35,6 +35,8 @@ export const ko ={
         PG_NM: '프로젝트 명',
         PG_GR: '프로젝트 그룹',
         PG: '프로젝트',
+        DELETE_YN: '선택하신 {0} 의 아래에 멤버들을 삭제 하시겠습니까?',
+        DEL_MEM: '멤버 삭제',
         SEARCH: '검색'
     },
     COL_NM: {
