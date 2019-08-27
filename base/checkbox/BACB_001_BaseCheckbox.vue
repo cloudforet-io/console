@@ -1,8 +1,9 @@
 <template>
   <span>
-    <b-check v-model="checked"
+    <b-check :checked="selected"
              :inline="inline"
              :class="type"
+             @input="onInput"
              @change="onChange"
     />
   </span>
@@ -11,12 +12,15 @@
 <script>
 export default {
     name: 'BaseCheckbox',
-    event: ['change'],
+    event: ['change', 'input'],
+    model: {
+        prop: 'selected',
+        event: 'input'
+    },
     props: {
         selected: {
             type: Boolean,
-            default: false,
-            required: true
+            default: false
         },
         inline: {
             type: Boolean,
@@ -27,17 +31,12 @@ export default {
             default: 'primary'
         }
     },
-    computed: {
-        checked: {
-            set () {},
-            get () {
-                return this.selected; 
-            }
-        }
-    },
     methods: {
         onChange (val) {
             this.$emit('change', val, this.$vnode.key);
+        },
+        onInput (val) {
+            this.$emit('input', val, this.$vnode.key);
         }
     }
 };

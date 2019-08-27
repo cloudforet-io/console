@@ -96,16 +96,17 @@
           <slot :name="headerSlot" :field="data.field" />
         </template>
 
+
         <template v-if="selectable" #HEAD_selected>
-          <b-check v-model="isSelectedAll"
-                   class="select-all-checkbox"
-                   @change="onSelectAll"
+          <BaseCheckbox :selected="isSelectedAll"
+                        class="select-all-checkbox"
+                        @change="onSelectAll"
           />
         </template>
 
         <template v-if="selectable" #selected="data">
           <BaseCheckbox :key="data.index"
-                        :selected="data.item.selected"
+                        v-model="data.item.selected"
                         class="select-checkbox"
                         @change="checkboxClicked"
           />
@@ -347,14 +348,10 @@ export default {
             this.updateTableData(idx, item);
             this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
             this.setIsSelectAll();
-            this.$emit('rowSelected', this.selectedRows[0], true);
+            this.$emit('rowSelected', this.selectedRows, true);
         },
         checkSingleMode (item, idx, newValue) {
             let isSelection = true;
-
-            if (this.selectedRows[0]) {
-                this.selectedRows[0].data.selected = false;
-            }
             if (newValue) {
                 this.selectedRows[0] = { idx: idx, data: item };
             } else {
@@ -364,12 +361,11 @@ export default {
 
             this.updateTableData(idx, newValue);
             this.setIsSelectAll();
-            this.$emit('rowSelected', { idx: idx, data: item }, isSelection);
+            this.$emit('rowSelected', this.selectedRows, isSelection);
         },
-        checkMultiMode (item, idx, newValue) {
+        checkMultiMode (item, idx) {
             let isOnceSelected = this.selectedRows.some((row, i) => {
                 if (row.data[this.fieldId] === item[this.fieldId]) {
-                    row.data.selected = false;
                     this.updateTableData(row.idx, row.data);
                     this.$delete(this.selectedRows, i);
                 }
@@ -378,11 +374,10 @@ export default {
             if (!isOnceSelected) {
                 this.selectedRows.push({ idx: idx, data: item });
             }
-            item.selected = newValue;
             this.updateTableData(idx, item);
             this.setIsSelectAll();
 
-            this.$emit('rowSelected', { idx: idx, data: item }, !isOnceSelected, this.selectedRows);
+            this.$emit('rowSelected', this.selectedRows, !isOnceSelected);
         },
         checkboxClicked (val, key) {
             switch (this.selectMode) {
@@ -417,7 +412,6 @@ export default {
                 this.selectedRows = [];
             }
             this.setIsSelectAll();
-
             this.$emit('onSelectAll', this.isSelectedAll, this.selectedRows);
         },
         updateTableData (idx, data) {
