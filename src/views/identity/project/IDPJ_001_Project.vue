@@ -324,7 +324,6 @@ export default {
         },
         async updateProject(items) {
             this.consoleLogEnv('Update Project : ', items);
-
             const itemType = items.tree.getSelected()[0].data.item_type;
             const selectedId = items.tree.getSelected()[0].data.id;
             const url = itemType === 'PROJECT_GROUP' ? '/identity/project-group/update': '/identity/project/update';

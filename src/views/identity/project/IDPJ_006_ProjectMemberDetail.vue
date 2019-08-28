@@ -202,7 +202,7 @@ export default {
         },
         async addUser() {
             let url = null;
-            const projectSelected = this.$attrs['selectedData'].nodes[0].data;
+            const projectSelected = this.$attrs['selected-data'].nodes[0].data;
             const selected_id = projectSelected.id;
             const selected_type = projectSelected.item_type;
 
@@ -217,6 +217,7 @@ export default {
                 url = '/identity/project/member/add';
                 param['project_id'] =  selected_id;
             }
+
             if (this.selectedModalItems.length > 0){
                 const currentUsers = this.selectedModalItems;
                 param['users'] = this.getSelectedValArr(currentUsers,'data.user_id');
@@ -227,7 +228,7 @@ export default {
             await this.$axios.post(url, param).then((response) => {
                 this.$parent.$parent.$parent.$parent.$parent.listMembers();
                 this.$emit('close');
-            }).catch((error) =>{
+            }).catch((error) => {
                 console.error(error);
             });
         },

@@ -553,7 +553,7 @@ export const Mixin = {
         getSelectedValArr: function (data, path) {
             let returnArray = [];
             if (data.length > 0){
-                data.forEach(function(currentItem, index){
+                data.forEach((currentItem, index) =>{
                     if (!this.isEmpty(this._.get(currentItem, path))){
                         returnArray.push(this._.get(currentItem, path));
                     }
