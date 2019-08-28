@@ -224,8 +224,6 @@ export default {
             this.$emit('search', this.filterList, this.filterOrList);
         },
         onClickSearch () {
-            console.log('on click search');
-            console.log(this.tagList);
             this.$refs.input.onEnter();
         },
         getNewTag (item) {
