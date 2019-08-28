@@ -22,8 +22,11 @@ api.interceptors.response.use(function (response) {
     //router.push('/error-page');
     //store.dispatch('auth/setNextPath', { nextPath: '/error-page'});
     if (response.headers.hasOwnProperty('access-token')) {
+        console.log('Before update Token Key', sessionStorage.token);
         sessionStorage.setItem('token', response.headers['access-token']);
+        console.log('after update Token Key', sessionStorage.token);
         api.defaults.headers.common['Authorization'] = `Bearer ${response.headers['access-token']}`;
+        console.log(api.defaults.headers.common['Authorization']);
     }
     return response;
 }, function (err) {
