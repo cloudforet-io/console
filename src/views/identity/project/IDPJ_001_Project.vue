@@ -33,7 +33,8 @@
               @edited="editSelected"
               @delete="deletedSelectedOnTree"
               @noCacheDrop="moveProject"
-              @toggled="getNextLayerOnTree">
+              @toggled="getNextLayerOnTree"
+    >
       <template #treeSubPanel>
         <BaseTabNav
           :fill="false"
@@ -115,7 +116,7 @@ export default {
         };
     },
     created (){
-        console.log("This is Test for Dev Server");
+        console.log('This is Test for Dev Server');
         this.listProject();
     },
     methods: {
@@ -182,20 +183,33 @@ export default {
             let isTagValidated = false;
             let params = {};
 
-            debugger;
+            let popupNameIdx = null;
+            let popupTagIdx = null;
+            const tabChildren = this.$refs.IDPJ001_EditTab.$children;
 
-            if (this.$refs.IDPJ001_EditTab.$children[2].validateProject()){
+            tabChildren.forEach(function(curItem, index){
+                const itemOption = curItem.$options;
+                if (itemOption.name === 'ProjectEditPopUpName') {
+                    popupNameIdx = index;
+                }
+                if (itemOption.name === 'ProjectEditPopUpTag') {
+                    popupTagIdx = index;
+                }
+            });
+
+            if (tabChildren[popupNameIdx].validateProject()){
                 isDefaultValidated = true;
-                params['name'] = this.$refs.IDPJ001_EditTab.$children[2]._data.projectName;
+                params['name'] = tabChildren[popupNameIdx]._data.projectName;
             }
-            if (!this.isEmpty(this.$refs.IDPJ001_EditTab.$children[3])){
-                if (this.$refs.IDPJ001_EditTab.$children[3].$refs.projectTag.validate()) {
-                    params['tags'] = this.$refs.IDPJ001_EditTab.$children[3].$refs.projectTag.tags;
+            if (popupTagIdx !==null){
+                if (tabChildren[popupTagIdx].$refs.projectTag.validate()) {
+                    params['tags'] = tabChildren[popupTagIdx].$refs.projectTag.tags;
                     isTagValidated = true;
                 }
             } else {
                 isTagValidated = true;
             }
+
             if (this.$refs.IDPJ001_EditTab.selectedTab.tabTitle == 'DEFAULT'){
                 if (isDefaultValidated && !isTagValidated){
                     this.$refs.IDPJ001_EditTab.selectedTab = this.modalTabs[1];
