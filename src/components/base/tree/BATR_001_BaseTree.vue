@@ -22,6 +22,7 @@
                              :allow-multiselect="true"
                              :style="{ width: width }"
                              @select="nodeSelected"
+                             @nodeclick="nodeClicked"
                              @beforedrop="beforeNodeDropped"
                              @drop="nodeDropped"
                              @toggle="nodeToggled"
@@ -199,11 +200,15 @@ export default {
     },
     methods: {
         nodeSelected (nodes) {
-
-            this.nodeKey = (this.nodeKey !== nodes[0].data.id) ? nodes[0].data.id : this.nodeKey;
+            // console.log('node selected', nodes);
+            // this.nodeKey = (this.nodeKey !== nodes[0].data.id) ? nodes[0].data.id : this.nodeKey;
+            // this.hasSelected = true;
+            // this.$emit('selected', { nodes:nodes, treeV: this.$refs.slVueTree });
+        },
+        nodeClicked (node) {
+            this.nodeKey = (this.nodeKey !== node.data.id) ? node.data.id : this.nodeKey;
             this.hasSelected = true;
-            this.$emit('selected', { nodes:nodes, treeV: this.$refs.slVueTree });
-
+            this.$emit('selected', { node: node, treeV: this.$refs.slVueTree });
         },
         showContextMenu (node, event, hasClicked) {
             if (!hasClicked) {
@@ -333,7 +338,7 @@ export default {
             return isNeedToProcessOnSC;
         },
         beforeNodeDropped (node, position, cancel) {
-            let trStringKey = 'TREE_TYPE'
+            let trStringKey = 'TREE_TYPE';
             const itemType = node[0].data.item_type;
             if (node[0].isLeaf && position.node.data.hasOwnProperty('is_root')){
                 if (position.node.data.is_root && position.placement !== 'inside'){
@@ -385,7 +390,8 @@ export default {
             }*/
 
         },
-        nodeToggled (node) {
+        nodeToggled (node, event) {
+            console.log('toggled', event);
             if (!node.isExpanded ) {
                 if (!node.data.is_cached){
                     console.log('nodeToggled: ', node.data.is_cached);

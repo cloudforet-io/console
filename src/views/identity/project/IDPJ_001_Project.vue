@@ -250,13 +250,13 @@ export default {
             });
             console.log('Tree Data', this.treeData);
         },
-        async createProsProcess(items) {
+        async createProsProcess(item) {
             const flag = this.selectedData.flag;
-            const treeV = this.isEmpty(items.tree) ? this.selectedData.tree : items.tree;
+            const treeV = this.isEmpty(item.tree) ? this.selectedData.tree : item.tree;
             if (['NG','RNG','SNG'].includes(flag)) {
-                this.createProjectGroup(items, flag, treeV);
+                this.createProjectGroup(item, flag, treeV);
             } else {
-                this.createProject(items, flag, treeV);
+                this.createProject(item, flag, treeV);
             }
         },
         async createProjectGroup(items, flag, tree) {
@@ -314,10 +314,10 @@ export default {
                 this.$refs.IDPJ001_EditModal.hideModal();
             }
         },
-        async updateProject(items) {
-            this.consoleLogEnv('Update Project : ', items);
-            const itemType = items.tree.getSelected()[0].data.item_type;
-            const selectedId = items.tree.getSelected()[0].data.id;
+        async updateProject(item) {
+            this.consoleLogEnv('Update Project : ', item);
+            const itemType = item.tree.getSelected()[0].data.item_type;
+            const selectedId = item.tree.getSelected()[0].data.id;
             const url = itemType === 'PROJECT_GROUP' ? '/identity/project-group/update': '/identity/project/update';
             const key = itemType === 'PROJECT_GROUP' ? 'project_group_id': 'project_id';
             let param = this.validateProject();
@@ -326,7 +326,7 @@ export default {
                 param[key] = selectedId;
                 await this.$axios.post(url, param).then((response) => {
                     if (response.data.project_group_id === selectedId) {
-                        const treeV = items.tree;
+                        const treeV = item.tree;
                         const path = treeV.getSelected()[0].path;
                         treeV.updateNode(path, { title: this.$refs.IDPJ001_EditTab.$children[2]._data.projectName });
                         this.$refs.IDPJ001_EditModal.hideModal();
