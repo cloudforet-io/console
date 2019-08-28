@@ -39,6 +39,10 @@ export const ko ={
         DEL_MEM: '멤버 삭제',
         SEARCH: '검색'
     },
+    TREE_TYPE: {
+        PROJECT: '프로젝트',
+        PROJECT_GROUP: '프로젝트 그룹'
+    },
     COL_NM: {
         C_COMMAND_ID: '커맨드 아이디',
         C_USER_ID: '유저 아이디',
@@ -88,7 +92,8 @@ export const ko ={
         NOT_ALLOW: '수행불가 작업'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: '\'{0}\' 는 Root 포지션에 위치할 수 없습니다.'
+        LEAF_NOMOVE: '\'{0}\' 는 Root 포지션에 위치할 수 없습니다.',
+        LEAF_PUSHTO: '\'{0}\' 는 \'{1}\' 으로 위치 시킬 수 없습니다.'
     },
     PN: {
         BASE_INFO: '기본 정보',

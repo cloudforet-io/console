@@ -40,6 +40,10 @@ export const en = {
         SEARCH: 'Search'
 
     },
+    TREE_TYPE: {
+        PROJECT: 'Project',
+        PROJECT_GROUP: 'Project Group'
+    },
     COL_NM: {
         C_COMMAND_ID: 'COMMAND ID',
         C_USER_ID: 'USER ID',
@@ -89,7 +93,8 @@ export const en = {
         NOT_ALLOW: 'Action not allowed'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: ' \'{0}\' can not be located at Root position.'
+        LEAF_NOMOVE: ' \'{0}\' can not be located at Root position.',
+        LEAF_PUSHTO:  'Can\'t locate \'{0}\' into \'{1}\', Please Check your Action.'
     },
     PN: {
         BASE_INFO:

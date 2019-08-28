@@ -333,10 +333,14 @@ export default {
             return isNeedToProcessOnSC;
         },
         beforeNodeDropped (node, position, cancel) {
+            let trStringKey = 'TREE_TYPE'
+            const itemType = node[0].data.item_type;
             if (node[0].isLeaf && position.node.data.hasOwnProperty('is_root')){
                 if (position.node.data.is_root && position.placement !== 'inside'){
                     cancel(true);
-                    this.noticePanelMsg = this.tr('MODAL_MSG.LEAF_NOMOVE',[tr('PG')]);
+                    let perItem = itemType.split('_');
+                    trStringKey.concat('.', perItem[0]);
+                    this.noticePanelMsg = this.tr('MODAL_MSG.LEAF_NOMOVE',[this.tr(trStringKey)]);
                     this.$refs.BATR001_treeAlertNotice.showModal();
                     return;
                 }
@@ -344,7 +348,10 @@ export default {
 
             if (position.node.isLeaf){
                 cancel(true);
-                this.noticePanelMsg = this.tr('MODAL_MSG.LEAF_NOMOVE',[tr('PG')]);
+                let itemGroup = trStringKey.concat('.', itemType);
+                let perItem = itemType.split('_');
+                let itemSingle = trStringKey.concat('.', perItem[0]);
+                this.noticePanelMsg = this.tr('MODAL_MSG.LEAF_PUSHTO',[this.tr(itemGroup), this.tr(itemSingle)]);
                 this.$refs.BATR001_treeAlertNotice.showModal();
                 return;
             }
