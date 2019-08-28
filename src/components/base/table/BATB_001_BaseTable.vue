@@ -6,10 +6,16 @@
     >
       <template v-if="!headerless" #header>
         <b-row align-v="center" align-h="between" class="header-container">
-          <div class="caption-container">
+          <div v-if="!offCaption" class="caption-container">
             <slot name="caption" />
           </div>
-          <div class="searchbox-container order-md-2 order-3">
+          <div v-if="offCaption" class="searchbox-noCaption order-md-2 order-3">
+            <div class="searchbox">
+              <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
+              <BaseSearch v-else-if="noContextSearchable" @search="onSearch" />
+            </div>
+          </div>
+          <div v-else class="searchbox-container order-md-2 order-3">
             <div class="searchbox">
               <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
               <BaseSearch v-else-if="noContextSearchable" @search="onSearch" />
@@ -149,6 +155,10 @@ export default {
     inheritAttrs: false,
     props: {
         noContextSearchable: {
+            type: Boolean,
+            default: false
+        },
+        offCaption: {
             type: Boolean,
             default: false
         },
@@ -601,6 +611,15 @@ export default {
             width: 100%;
         }
     }
+    .searchbox-noCaption {
+    width: calc(100% - #{$tool-max-width};
+    text-align: right;
+    .searchbox {
+      display: inline-block;
+      text-align: left;
+      width: 100%;
+    }
+  }
     .tool-container {
         display: inline-block;
         min-width: $tool-min-width;

@@ -32,14 +32,14 @@
               @selected="NodeSelected"
               @edited="editSelected"
               @delete="deletedSelectedOnTree"
-              @dropped="moveProject"
+              @noCacheDrop="moveProject"
               @toggled="getNextLayerOnTree"
-              @afterDrop="getNextLayerOnTree"
     >
       <template #treeSubPanel>
         <BaseTabNav
           :fill="false"
           :nav-tabs="tabs"
+          :selected-data="selectedData"
           :keep-alive="true"
           :is-footer-visible="false"
           :tab="tab"
@@ -75,13 +75,6 @@ const tabs = [
         tabIcon: 'icon-user',
         tabTitle: 'MEMBER',
         component: projectMember
-    },
-    {
-        name: 'audit',
-        isSelected: false,
-        tabIcon: 'icon-pie-charts',
-        tabTitle: 'AUDIT',
-        component: projectAudit
     }
 ];
 
@@ -123,15 +116,15 @@ export default {
         };
     },
     created (){
+        console.log('This is Test for Dev Server');
         this.listProject();
     },
     methods: {
         NodeSelected(item) {
-            this.lastEvent = 'Selected Item : ' + item[0].title;
+            this.selectedData = item;
         },
         async listProject() {
             await this.$axios.post('/identity/project/tree', {
-                item_id: null,
                 item_type: 'ROOT',
                 sort: {
                     'key': 'name'
@@ -189,18 +182,34 @@ export default {
             let isDefaultValidated = false;
             let isTagValidated = false;
             let params = {};
-            if (this.$refs.IDPJ001_EditTab.$children[2].validateProject()){
+
+            let popupNameIdx = null;
+            let popupTagIdx = null;
+            const tabChildren = this.$refs.IDPJ001_EditTab.$children;
+
+            tabChildren.forEach(function(curItem, index){
+                const itemOption = curItem.$options;
+                if (itemOption.name === 'ProjectEditPopUpName') {
+                    popupNameIdx = index;
+                }
+                if (itemOption.name === 'ProjectEditPopUpTag') {
+                    popupTagIdx = index;
+                }
+            });
+
+            if (tabChildren[popupNameIdx].validateProject()){
                 isDefaultValidated = true;
-                params['name'] = this.$refs.IDPJ001_EditTab.$children[2]._data.projectName;
+                params['name'] = tabChildren[popupNameIdx]._data.projectName;
             }
-            if (!this.isEmpty(this.$refs.IDPJ001_EditTab.$children[3])){
-                if (this.$refs.IDPJ001_EditTab.$children[3].$refs.projectTag.validate()) {
-                    params['tags'] = this.$refs.IDPJ001_EditTab.$children[3].$refs.projectTag.tags;
+            if (popupTagIdx !==null){
+                if (tabChildren[popupTagIdx].$refs.projectTag.validate()) {
+                    params['tags'] = tabChildren[popupTagIdx].$refs.projectTag.tags;
                     isTagValidated = true;
                 }
             } else {
                 isTagValidated = true;
             }
+
             if (this.$refs.IDPJ001_EditTab.selectedTab.tabTitle == 'DEFAULT'){
                 if (isDefaultValidated && !isTagValidated){
                     this.$refs.IDPJ001_EditTab.selectedTab = this.modalTabs[1];
@@ -218,7 +227,6 @@ export default {
             let url = '/identity/project/tree';
             const selected = this.isEmpty(nodeObj.treeV.getSelected()[0]) ? nodeObj.node: nodeObj.treeV.getSelected()[0];
             const path = selected.path;
-            console.log('###############', path)
             const dataParam = nodeObj.node.data;
             dataParam['is_cached'] = true;
 
@@ -375,14 +383,10 @@ export default {
         },
         async moveProject(items) {
             this.consoleLogEnv('Move Selected Items : ', items);
-            const treeV = items.tree;
-            const dropData = items.dropData;
-
             const fromItem = items.nodes[0];
             const toItem = items.position.node;
             const url = fromItem.isLeaf ? '/identity/project/update' : '/identity/project-group/update';
             let param = {};
-
             if (fromItem.isLeaf) {
                 param['project_id'] = fromItem.data.id;
                 param['project_group_id'] = toItem.data.id;
@@ -391,11 +395,10 @@ export default {
                 param['project_group_id'] = fromItem.data.id;
                 if (items.position.placement !== 'inside' && toItem.data.hasOwnProperty('is_root')){
                     if (toItem.data.is_root) {
-                        param['is_root'] = true;
+                        param['release_parent_project_group'] = true;
                     }
                 }
             }
-
             await this.$axios.post(url, param).then((response) => {
                 const responseData = response.data;
                 if (!this.isEmpty(responseData)){
@@ -404,7 +407,14 @@ export default {
             }).catch((error) => {
                 console.error(error);
             });
-
+            if (!items.position.node.data.is_cached){
+                if (items.isCanceled) {
+                    items.position.node.path[items.position.node.path.length-1] = items.position.node.path[items.position.node.path.length-1]-1;
+                    items.treeV.select(items.position.node.path, { addToSelection: false });
+                }
+                items.treeV.updateNode(items.position.node.path, { isExpanded: true });
+                this.getNextLayerOnTree({ treeV: items.treeV, node: items.position.node });
+            }
         },
         async closeSelected(){
             this.$refs.IDPJ001_EditModal.hideModal();

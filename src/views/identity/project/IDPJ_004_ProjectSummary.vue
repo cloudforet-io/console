@@ -1,84 +1,13 @@
 <template>
-  <div class="animated fadeIn">
-    <div class="row">
-      <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-        <b-card class="base first-tab summary border-top-0">
-          <h5 class="page-header m-t-0">
-            <i class="fal fa-hashtag m-r-5" />&nbsp;&nbsp; Base Information
-          </h5>
-          <hr>
-          <b-container fluid>
-            <dl class="dl-horizontal m-b-0 row">
-              <div v-for="(info, idx) in summaryBaseInfo" :key="idx" class="col-sm-12 col-md-6 summary">
-                <dt>{{ info.title }}</dt>
-                <dd>{{ info.contents }}</dd>
-                <span v-b-tooltip.hover
-                      class="copy-clipboard"
-                      title="Copy to Clipboard"
-                      @click="CopyToClipboard(info.contents)"
-                >
-                  <i class="fal fa-copy" />
-                </span>
-              </div>
-            </dl>
-          </b-container>
-          <h5 class="page-header">
-            <i class="fal fa-tags m-r-5" />&nbsp;&nbsp; Tag
-          </h5>
-          <hr>
-          <b-container fluid>
-            <dl class="dl-horizontal m-b-0 row">
-              <div v-for="tag in summaryBaseTag" class="col-sm-12 col-md-6 summary">
-                <dt title="Tag Key">
-                  {{ tag.tagKey }}
-                </dt>
-                <dd title="Tag Value">
-                  {{ tag.tagValue }}
-                </dd>
-                <span v-b-tooltip.hover
-                      class="copy-clipboard"
-                      title="Copy to Clipboard" @click="CopyToClipboard(tag.tagValue)"
-                >
-                  <i class="fal fa-copy" />
-                </span>
-              </div>
-            </dl>
-          </b-container>
-        </b-card>
-      </b-col>
-    </div>
-    <div class="col-xs-12 p-0">
-      <div class="row">
-        <b-col v-for="asset in summaryAsset"
-               :class="colSelector(summaryAsset.length)"
-        >
-          <!-- <div class="card base">
-            <div class="card-header">
-              <i :class="asset.icon" /> {{ asset.asKey }}
-            </div>
-            <div class="card-body">
-              <h2 align="right">
-                <a :href="asset.linkURL">{{ asset.assetValue }}</a>
-              </h2>
-            </div>
-          </div> -->
-          <b-row align-h="between" align-v="center" class="assets">
-            <b-col cols="8">
-              <h6>
-                <i :class="asset.icon" />&nbsp;&nbsp; {{ asset.asKey }}
-              </h6>
-            </b-col>
-            <b-col cols="4" class="text-right">
-              <h6>
-                <a :href="asset.linkURL">{{ asset.assetValue }}</a>
-              </h6>
-            </b-col>
-          </b-row>
-        </b-col>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+  <b-row no-gutters class="animated fadeIn mb-3 pb-5">
+    <b-col cols="12" class="p-0">
+      <base-panel :panels="selectedSummaryData" />
+    </b-col>
+    <b-col cols="12" class="p-0 mt-2 mb-3">
+      <base-panel-card :panel-card="panelCardData" />
+    </b-col>
+    <b-row align-h="center">
+      <b-col xs="10" lg="9" xl="6">
         <BaseChart
           :chart-type="'Line'"
           :chart-title-data="sampleTitleData1"
@@ -88,8 +17,8 @@
           :options="chartDataAndOption2.option"
           :sample-use-y-n="true"
         />
-      </div>
-      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+      </b-col>
+      <b-col xs="10" lg="9" xl="6">
         <BaseChart
           :chart-data="chartDataAndOption2.data"
           :chart-title-data="sampleTitleData2"
@@ -102,9 +31,9 @@
           @displayVM="displayVM"
           @displayOS="displayOS"
         />
-      </div>
-    </div>
-  </div>
+      </b-col>
+    </b-row>
+  </b-row>
 </template>
 
 <script>
@@ -113,39 +42,97 @@ import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseTree from '@/components/base/tree/BATR_001_BaseTree';
 
 import { api } from '@/setup/api';
+const BasePanel = () => import('@/components/base/panel/BAPA_002_BasePanel');
+const BasePanelCard = () => import('@/components/base/panel/BAPA_003_BasePanelCard');
+const BaseChart = () => import('@/components/base/charts/BACT_001_BaseChart');
 
-const BaseChart = () => import('@/components/base/charts/BACT_001_BaseChart.vue');
+const SummaryModel = {
+    id: null,
+    title: null,
+    create: null,
+    tags: []
+};
+
+
 export default {
     name: 'ProjectSummary',
     components: {
-        BaseChart
+        BaseChart,
+        BasePanel,
+        BasePanelCard
     },
-    props: {},
+    props: {
+        summaryData: {
+            type: Object,
+            default: () => (SummaryModel)
+        }
+    },
     data () {
         return {
             selectedChartCol: {
                 graph: 'col-xs-12 col-sm-12 col-md-6 col-lg-6',
                 legend: 'col-xs-12 col-sm-12 col-md-6 col-lg-6'
             },
+            panelData: null,
+            panelCardData: [],
             sampleTitleData1: null,
             sampleTitleData2: null,
             sampleDropData2: null,
             chartDataAndOption1: null,
-            chartDataAndOption2: null,
-            summaryBaseInfo: null,
-            summaryBaseTag: null,
-            summaryAsset: null
+            chartDataAndOption2: null
         };
     },
-    mounted: function () {
-
+    computed: {
+        topPanel() {
+            return [
+                { title: this.tr('COL_NM.ID'), contents: this.summaryData.id, copyFlag: true },
+                { title: this.tr('COL_NM.NAME'), contents: this.summaryData.title, copyFlag: true },
+                { title: this.tr('COL_NM.CREAT'), contents: this.summaryData.create, copyFlag: true }
+            ];
+        },
+        tag () {
+            let tag = [];
+            for (var key in this.summaryData.tags) {
+                tag.push({
+                    title: key,
+                    contents: this.summaryData.tags[key],
+                    copyFlag: true
+                });
+            }
+            return tag;
+        },
+        tags () {
+            return this.dictToKeyValueArray(this.summaryData.tags);
+        },
+        selectedSummaryData () {
+            return [
+                {
+                    panelTitle: this.tr('PN.BASE_INFO'),
+                    panelIcon: {
+                        icon: 'fa-hashtag',
+                        type: 'l',
+                        size: 1,
+                        color: 'primary'
+                    },
+                    data: this.topPanel
+                },
+                {
+                    panelTitle: this.tr('PN.TAG'),
+                    panelIcon: {
+                        icon: 'fa-tags',
+                        type: 'l',
+                        size: 1,
+                        color: 'danger'
+                    },
+                    data: this.tag,
+                    editable: true
+                }
+            ];
+        }
     },
     created: function () {
-        this.setDummnyData();
-        this.$bus.$on('treeSelectedEvent', this.setDummnyData);
-    },
-    beforeDestroy: function () {
-        this.$bus.$off('treeSelectedEvent');
+        this.setDummyData();
+        this.setInitData();
     },
     methods: {
         CopyToClipboard (text) {
@@ -160,53 +147,96 @@ export default {
         displayOS: function (params) {
             this.sampleDropData2.dropDownTitle = params.optionTitle;
         },
-        setDummnyData: function () {
-        /*
-        * Here's Data Set for Current Page
-        * 1. sampleBaseInformation : Base Information Data
-        * 2. sampleBaseTag : tags sample Data
-        * 3. sampleAsset : Data for Asset
-        */
+        async setInitData() {
+            const selectedNode = this.$attrs['selected-data'].nodes[0];
+            let url = null;
+            let param = {};
+            if (selectedNode.data.item_type === 'PROJECT_GROUP'){
+                url = '/identity/project-group/get';
+                param['project_group_id'] = selectedNode.data.id;
+            } else {
+                url = '/identity/project/get';
+                param['project_id'] = selectedNode.data.id;
+            }
+            await this.$axios.post(url, param).then((response) => {
+                if (!this.isEmpty(response.data)){
+                    this.summaryData.id = response.data.hasOwnProperty('project_group_id') ? response.data.project_group_id : response.data.project_id;
+                    this.summaryData.title =  response.data.name;
+                    this.summaryData.create = this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone);
+                    this.summaryData.tags = response.data.tags;
+                }
+            }).catch((error) =>{
+                console.error(error);
+            });
 
-            const sampleBaseInformation = [
-                { title: 'ID', contents: 'pg-6bc72053' },
-                { title: 'Name', contents: 'AWS KR' },
-                { title: 'Created', contents: '2019-05-12' },
-                { title: '', contents: '' }
-            ];
-
-            const sampleBaseTag = [
-                { tagKey: 'Japan', tagValue: 'Tokyo' },
-                { tagKey: 'South Korea', tagValue: 'Seoul' },
-                { tagKey: 'USA', tagValue: 'Washington D.C.' },
-                { tagKey: 'Canada', tagValue: 'Ottawa' },
-                { tagKey: 'Austria', tagValue: 'Vienna' },
-                { tagKey: 'Germany', tagValue: 'Berlin' },
-                { tagKey: 'G.B', tagValue: 'London' },
-                { tagKey: 'France', tagValue: 'Paris' }
-            ];
-
+        },
+        setDummyData(){
             const sampleAsset = [
-                { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
-                { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
-                { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
-                { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
-                { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', icon: 'fal fa-server' },
-                { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', icon: 'fal fa-database' },
-                { asKey: 'Project', assetValue: 17, linkURL: 'www.bing.com', icon: 'fal fa-star' },
-                { asKey: 'Member', assetValue: 0, linkURL: 'www.naver.com', icon: 'fal fa-users' }
+                { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', panelIcon:
+                    {
+                        icon: 'fa-server',
+                        type: 'l',
+                        size: 1,
+                        color: 'light'
+                    }},
+                { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', panelIcon: {
+                    icon: 'fa-database',
+                    type: 'l',
+                    size: 1,
+                    color: 'light'
+                }},
+                { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', panelIcon: {
+                    icon: 'fa-users',
+                    type: 'l',
+                    size: 1,
+                    color: 'light'
+                }},
+                { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', panelIcon: {
+                    icon: 'fa-database',
+                    type: 'l',
+                    size: 1,
+                    color: 'light'
+                }},
+                { asKey: 'Server', assetValue: 27, linkURL: 'www.google.com', panelIcon: {
+                    icon: 'fa-server',
+                    type: 'l',
+                    size: 1,
+                    color: 'light'
+                }},
+                { asKey: 'Volume', assetValue: 2, linkURL: 'www.yahoo.co.jp', panelIcon: {
+                    icon: 'fa-database',
+                    type: 'l',
+                    size: 1,
+                    color: 'light'
+                }},
+                { asKey: 'Project', assetValue: 17, linkURL: 'www.bing.com', panelIcon: {
+                    icon: 'fa-star',
+                    type: 'l',
+                    size: 1,
+                    color: 'light'
+                }},
+                { asKey: 'Member', assetValue: 0, linkURL: 'www.naver.com', panelIcon: {
+                    icon: 'fa-users',
+                    type: 'l',
+                    size: 1,
+                    color: 'light'
+                }}
             ];
 
             const chartTitleSampleData1 = {
                 isTitleIconUsed: true,
-                TitleIconClass: 'fal fa-globe',
+                TitleIconClass: {
+                    icon: 'fa-globe',
+                    type: 'l',
+                    size: 1
+                },
                 cardTitle: 'Server By Region',
                 isDropdownUSed: false
             };
 
             const chartTitleSampleData2 = {
                 isTitleIconUsed: true,
-                TitleIconClass: 'fal fa-tag',
+                TitleIconClass: 'fa-tag',
                 cardTitle: 'Server by Type',
                 isDropdownUsed: true
             };
@@ -259,9 +289,7 @@ export default {
                 }
             };
 
-            this.summaryBaseInfo = sampleBaseInformation;
-            this.summaryBaseTag = sampleBaseTag;
-            this.summaryAsset = sampleAsset;
+            this.panelCardData = sampleAsset;
             this.sampleTitleData1 = chartTitleSampleData1;
             this.sampleTitleData2 = chartTitleSampleData2;
             this.sampleDropData2 = chartTitleDropSampleData2;
@@ -273,52 +301,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .summary > dt {
-    float: left;
-    width: 160px;
-    overflow: hidden;
-    clear: left;
-    text-align: right;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-height: 20px;
-    font-weight: 900;
-    color: #777777
-  }
 
-  .summary > dd {
-    float: left;
-    margin-left: 20px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-height: 20px;
-    color: #000000
-  }
-
-  .donutGrid {
-    border-left: 1px solid #eee;
-  }
-
-  .donutCell {
-    position: relative;
-  }
-
-  .donutDiv {
-    width: 256px;
-    height: 256px;
-  }
-
-  .centerLabel {
-    position: absolute;
-    left: 2px;
-    top: 2px;
-    width: 256px;
-    line-height: 256px;
-    text-align: center;
-    font-size: 36px;
-    color: maroon;
-  }
 
   .quote {
     border-left: 0.5em solid #415ee1;
@@ -328,23 +311,13 @@ export default {
     margin-left: 10px;
   }
 
-  .copy-clipboard i {
-    visibility: hidden;
-    padding: 0px 3px 0px 10px;
-    cursor: pointer
-  }
-
-  .copy-clipboard:hover i {
-    visibility: visible;
-  }
-
-  .assets {
-    padding: 15px;
-    margin: 15px 0;
-    border: 1px solid lighten($blue, 30%);
-    border-radius: $border-radius;
-    a {
-      text-decoration: underline;
+  .card.base {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    &.summary {
+      margin-top: 0;
+      border-top-left-radius: 0px !important;
     }
   }
+
 </style>

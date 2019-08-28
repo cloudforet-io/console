@@ -35,7 +35,14 @@ export const en = {
         PG_NM: 'Project Name',
         PG_GR: 'Project Group',
         PG: 'Project',
+        DELETE_YN: 'Are you sure to delete those following members from selected {0}?',
+        DEL_MEM: 'Delete Member',
         SEARCH: 'Search'
+
+    },
+    TREE_TYPE: {
+        PROJECT: 'Project',
+        PROJECT_GROUP: 'Project Group'
     },
     COL_NM: {
         C_COMMAND_ID: 'COMMAND ID',
@@ -52,6 +59,7 @@ export const en = {
         C_SR_GROUP: 'SECURITY GROUP',
         C_SUMMARY: 'SUMMARY',
         ID: 'ID',
+        UID: 'User ID',
         NAME: 'Name',
         EMAIL: 'E-mail',
         PHONE: 'Phone',
@@ -85,7 +93,8 @@ export const en = {
         NOT_ALLOW: 'Action not allowed'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: ' \'{0}\' can not be located at Root position.'
+        LEAF_NOMOVE: ' \'{0}\' can not be located at Root position.',
+        LEAF_PUSHTO:  'Can\'t locate \'{0}\' into \'{1}\', Please Check your Action.'
     },
     PN: {
         BASE_INFO:

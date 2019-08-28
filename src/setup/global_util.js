@@ -225,7 +225,11 @@ export const Mixin = {
             } else {
                 key = m;
             }
-            return  this.isEmpty(a) ? this.$i18n.t(key) : this.$i18n.t(key, a);
+            if (this.$i18n.te(key)) {
+                return  this.isEmpty(a) ? this.$i18n.t(key) : this.$i18n.t(key, a);
+            } else {
+                return  '';
+            }
         },
         /**********************************************************************************
          * Name       : setFontSize
@@ -266,14 +270,14 @@ export const Mixin = {
             if (!this.isEmpty(this._.get(GlobalEnum,p.toUpperCase()))) {
                 const icon = this._.get(GlobalEnum,p.toUpperCase() + '.icon');
                 const color = this._.get(GlobalEnum,p.toUpperCase() + '.color');
-                const msg = this.isEmpty(this.tr('ENUM.' + p.toUpperCase())) ? this._.get(GlobalEnum,p.toUpperCase() +  '.msg') : this.tr('ENUM.' + p.toUpperCase());
 
+                const msg = this.isEmpty(this.tr('ENUM.' + p.toUpperCase())) ? this._.get(GlobalEnum,p.toUpperCase() +  '.msg') : this.tr('ENUM.' + p.toUpperCase());
+                console.log(this.tr('ENUM.' + p.toUpperCase()));
                 /***********
                  msg: 'In Progress',
                  icon: 'fal fa-check',
                  color: 'primary'
                  ************/
-
                 return `<span class="${color}"><i class="${icon}"> </i></span> &nbsp; ${msg}`;
 
             } else {
@@ -355,7 +359,6 @@ export const Mixin = {
                         init: true
                     }}];
             }
-
             return returnTree;
         },
         /**********************************************************************************
@@ -463,9 +466,25 @@ export const Mixin = {
          * Output  => Node
          * Description:  return tree array of object which suits for BaseTree
          **********************************************************************************/
-        getDatefromTimeStamp: function () {
+        getDatefromTimeStamp: function (ts, tz, tzr) {
+            const mxTimezones = timezone.getAllTimezones();
+            const options = {
+                timeZone : 'UTC',
+                hour12: false,
+                timeZoneName: 'long',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute:'2-digit',
+                second: '2-digit'
+            };
 
-            return 'a';
+            if (!this.isEmpty(mxTimezones[tz])){
+                options['timeZone'] = tz;
+            }
+            const DateTime = this.isEmpty(tzr) ? new Date(ts * 1000).toLocaleString('sq-AL', options).substring(0,19) : new Date(ts * 1000).toLocaleString('sq-AL', options);
+            return DateTime;
         },
         /**********************************************************************************
          * Name       : getDatefromTimeStamp
@@ -503,7 +522,7 @@ export const Mixin = {
             return true;
         },
         /**********************************************************************************
-         * Name       : validateLength
+         * Name       : validateSameness
          * Input   => (value                           =>  String
          *             boolOnly                        =>  Bolean
          *             checkValue                      =>  String)
