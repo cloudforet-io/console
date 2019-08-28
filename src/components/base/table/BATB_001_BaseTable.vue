@@ -60,7 +60,7 @@
                show-empty
                sticky-header
                :borderless="true"
-               :items="items"
+               :items="tableData"
                :fields="heads"
                :striped="striped"
                :bordered="bordered" 
@@ -269,9 +269,6 @@ export default {
         };
     },
     computed: {
-        items() {
-            return this.tableData;
-        },
         heads() {
             return this.fields;
         },
@@ -283,6 +280,13 @@ export default {
         },
         maxPage() {
             return Math.ceil(this.totalRows / this.limit);
+        } 
+    },
+    watch: {
+        busy (val) {
+            if (!val) {
+                this.resetSelectedRows();
+            }
         }
     },
     created () {
@@ -290,9 +294,13 @@ export default {
     },
     methods: {
         validateProperties () {
-            if (this.selectable && this.selectMode === 'multi' && this.isEmpty(this.fieldId)) {
+            // if (this.selectable && this.selectMode === 'multi' && this.isEmpty(this.fieldId)) {
+            //     throw new Error('The required property was not provided.\n\
+            //  \'fieldId\' property is required when it is selectable with \'multi\' mode.');
+            // }
+            if (this.selectable && this.selectMode === 'multi' && this.isEmpty(this.busy)) {
                 throw new Error('The required property was not provided.\n\
-             \'fieldId\' property is required when it is selectable with \'multi\' mode.');
+             \'busy\' property is required when it is selectable with \'multi\' mode for detecting refresh.');
             }
         },
         capitalizeFirstLetter (s) {
@@ -337,57 +345,54 @@ export default {
          */
         rowSelected (item, idx) {
             this.selectedRows.map((row) => {
-                if (row.data !== item) {
-                    row.data.selected = false;
-                    this.updateTableData(row.idx, row.data);
-                }
+                this.updateTableDataSelectedValue(row.idx, false);
             });
-            this.selectedRows = [];
+            this.resetSelectedRows();
 
-            item.selected = true;
-            this.updateTableData(idx, item);
+            this.updateTableDataSelectedValue(idx, true);
             this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
+
             this.setIsSelectAll();
             this.$emit('rowSelected', this.selectedRows, true);
-        },
-        checkSingleMode (item, idx, newValue) {
-            let isSelection = true;
-            if (newValue) {
-                this.selectedRows[0] = { idx: idx, data: item };
-            } else {
-                this.selectedRows.pop();
-                isSelection = false;
-            }
-
-            this.updateTableData(idx, newValue);
-            this.setIsSelectAll();
-            this.$emit('rowSelected', this.selectedRows, isSelection);
-        },
-        checkMultiMode (item, idx) {
-            let isOnceSelected = this.selectedRows.some((row, i) => {
-                if (row.data[this.fieldId] === item[this.fieldId]) {
-                    this.updateTableData(row.idx, row.data);
-                    this.$delete(this.selectedRows, i);
-                }
-                return row.data[this.fieldId] === item[this.fieldId];
-            });
-            if (!isOnceSelected) {
-                this.selectedRows.push({ idx: idx, data: item });
-            }
-            this.updateTableData(idx, item);
-            this.setIsSelectAll();
-
-            this.$emit('rowSelected', this.selectedRows, !isOnceSelected);
         },
         checkboxClicked (val, key) {
             switch (this.selectMode) {
             case 'single':
-                this.checkSingleMode(this.tableData[key], key, val);
+                this.setSelectedRowsWithSingleMode(key, val);
                 break;
             case 'multi':
-                this.checkMultiMode(this.tableData[key], key, val);
+                this.setSelectedRowsWithMultiMode(key, val);
                 break;
             }
+            this.setIsSelectAll();
+            this.$emit('rowSelected', this.selectedRows, val);
+        },
+        setSelectedRowsWithSingleMode (idx, val) {
+            if (val) {
+                this.selectedRows.map((row) => {
+                    this.updateTableDataSelectedValue(row.idx, false);
+                });
+                this.resetSelectedRows();
+                this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
+            } else {
+                this.selectedRows.pop();
+            }
+        },
+        setSelectedRowsWithMultiMode (idx, val) {
+            if (val) {
+                this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
+            } else {
+                this.selectedRows.some((row, i) => {
+                    if (idx === row.idx) {
+                        this.$delete(this.selectedRows, i);
+                    }
+                    return idx === row.idx;
+                });
+            }
+            
+        },
+        resetSelectedRows () {
+            this.selectedRows = [];
         },
         setIsSelectAll () {
             if (this.selectedRows.length === this.tableData.length) {
@@ -398,30 +403,26 @@ export default {
         },
         onSelectAll (val) {
             if (val) {
-                this.selectedRows = [];
+                this.resetSelectedRows();
                 this.tableData.map((data, i) => {
-                    data.selected = true;
-                    this.updateTableData(i, data);
+                    this.updateTableDataSelectedValue(i, val);
                     this.selectedRows.push({ data: data, idx: i });
                 });
             } else {
                 this.selectedRows.map((row) => {
-                    row.data.selected = false;
-                    this.updateTableData(row.idx, row.data);
+                    this.updateTableDataSelectedValue(row.idx, val);
                 });
-                this.selectedRows = [];
+                this.resetSelectedRows();
             }
             this.setIsSelectAll();
             this.$emit('onSelectAll', this.isSelectedAll, this.selectedRows);
         },
-        updateTableData (idx, data) {
+        updateTableDataSelectedValue (idx, value) {
             if (this.isEmpty(idx)) {
                 idx = 0;
             }
-            if (this.isEmpty(data)) {
-                data = this.tableData[idx];
-            }
-            this.$set(this.tableData, idx, Object.assign({}, data));
+            this.tableData[idx].selected = value;
+            this.$set(this.tableData, idx, Object.assign({}, this.tableData[idx]));
         },
         onPrev () {
             if (this.currentPage <= 1) {
