@@ -163,8 +163,10 @@ export default {
                 this.$alertify.error(this.failMessage);
                 if (this.showFailResult) {
                     this.hideModal();
-                    this.setFailList(e.data.error.fail_items);
-                    this.showResultModal();
+                    if (e.data.error.fail_items) {
+                        this.setFailList(e.data.error.fail_items);
+                        this.showResultModal();
+                    }
                 }
             }
         },
