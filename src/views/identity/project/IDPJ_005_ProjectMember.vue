@@ -34,7 +34,7 @@
                   <template #contents>
                     <MemberDetail :creatable="true"
                                   :updatable="true"
-                                  :selectedData="anySelectedRow"
+                                  :selected-data="anySelectedRow"
                                   @close="$refs.addMember.hideModal()"
                     />
                   </template>
@@ -106,7 +106,7 @@ export default {
                 { key: 'user_id', label: this.tr('COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
                 { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
                 { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }}
             ];
         },
         fields () {
@@ -190,6 +190,7 @@ export default {
             await this.$axios.post(url,param).then((response) => {
                 let results = [];
                 if (!this.isEmpty(response.data.results)){
+
                     response.data.results.forEach(function(current){
                         current.user_info['role'] = current.user_info.roles.join(', ');
                         results.push(current.user_info);
@@ -241,17 +242,23 @@ export default {
             let url = null;
             let param = {};
 
-            if (this.actionFlag ==='delete'){
-                if (this.getSelectedInfo('item_type') === 'PROJECT_GROUP'){
-                    url = '/identity/project-group/member/remove';
-                    param['project_group_id'] =  this.getSelectedInfo('id');
-                    param['user_id'] =  this.selectedMembers[0].user_id;
-                } else {
-                    url = '/identity/project/member/remove';
-                    param['project_id'] =  this.getSelectedInfo('id');
-                    param['user_id'] =  this.selectedMembers[0].user_id;
+            if (this.selectedMembers.length > 0){
+                const membersIds = this.selectedMembers;
+                if (this.actionFlag ==='delete'){
+                    if (this.getSelectedInfo('item_type') === 'PROJECT_GROUP'){
+                        url = '/identity/project-group/member/remove';
+                        param['project_group_id'] =  this.getSelectedInfo('id');
+                        param['users'] =  this.getSelectedValArr(membersIds, 'user_id');
+                    } else {
+                        url = '/identity/project/member/remove';
+                        param['project_id'] =  this.getSelectedInfo('id');
+                        param['users'] =  this.getSelectedValArr(membersIds, 'user_id');
+                    }
                 }
+            } else {
+                return;
             }
+
 
             if (!this.isEmpty(url) && !this.isEmpty(url)) {
                 await this.$axios.post(url,param);

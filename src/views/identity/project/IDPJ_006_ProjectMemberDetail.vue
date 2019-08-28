@@ -217,11 +217,10 @@ export default {
                 url = '/identity/project/member/add';
                 param['project_id'] =  selected_id;
             }
-
-            if (this.selectedModalItems.length === 1){
-                param['user_id'] = this.selectedModalMember.data.user_id;
+            if (this.selectedModalItems.length > 0){
+                const currentUsers = this.selectedModalItems;
+                param['users'] = this.getSelectedValArr(currentUsers,'data.user_id');
             } else {
-                alert('Cannot do now');
                 return;
             }
 
