@@ -180,6 +180,7 @@ export default {
             let isDefaultValidated = false;
             let isTagValidated = false;
             let params = {};
+            debugger;
             if (this.$refs.IDPJ001_EditTab.$children[2].validateProject()){
                 isDefaultValidated = true;
                 params['name'] = this.$refs.IDPJ001_EditTab.$children[2]._data.projectName;
