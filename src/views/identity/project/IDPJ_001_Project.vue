@@ -183,27 +183,17 @@ export default {
             let isTagValidated = false;
             let params = {};
 
-            let popupNameIdx = null;
-            let popupTagIdx = null;
             const tabChildren = this.$refs.IDPJ001_EditTab.$children;
+            let indexes = this.getRightTabIndexinChildren();
 
-            tabChildren.forEach(function(curItem, index){
-                const itemOption = curItem.$options;
-                if (itemOption.name === 'ProjectEditPopUpName') {
-                    popupNameIdx = index;
-                }
-                if (itemOption.name === 'ProjectEditPopUpTag') {
-                    popupTagIdx = index;
-                }
-            });
-
-            if (tabChildren[popupNameIdx].validateProject()){
+            if (tabChildren[indexes[0]].validateProject()){
                 isDefaultValidated = true;
-                params['name'] = tabChildren[popupNameIdx]._data.projectName;
+                params['name'] = tabChildren[indexes[0]]._data.projectName;
             }
-            if (popupTagIdx !==null){
-                if (tabChildren[popupTagIdx].$refs.projectTag.validate()) {
-                    params['tags'] = tabChildren[popupTagIdx].$refs.projectTag.tags;
+
+            if (indexes.length > 1){
+                if (tabChildren[indexes[1]].$refs.projectTag.validate()) {
+                    params['tags'] = tabChildren[indexes[1]].$refs.projectTag.tags;
                     isTagValidated = true;
                 }
             } else {
@@ -314,13 +304,45 @@ export default {
                 this.$refs.IDPJ001_EditModal.hideModal();
             }
         },
+        getRightTabIndexinChildren(){
+            let returnVal = [];
+            let popupNameIdx = null;
+            let popupTagIdx = null;
+            const tabChildren = this.$refs.IDPJ001_EditTab.$children;
+
+            tabChildren.forEach(function(curItem, index){
+                const itemOption = curItem.$options;
+                if (itemOption.name === 'ProjectEditPopUpName') {
+                    popupNameIdx = index;
+                    returnVal.push(popupNameIdx);
+                }
+                if (itemOption.name === 'ProjectEditPopUpTag') {
+                    popupTagIdx = index;
+                    returnVal.push(popupTagIdx);
+                }
+            });
+            return returnVal;
+        },
         async updateProject(items) {
             this.consoleLogEnv('Update Project : ', items);
+
+            let popupNameIdx = null;
+            const tabChildren = this.$refs.IDPJ001_EditTab.$children;
+            tabChildren.forEach(function(curItem, index){
+                const itemOption = curItem.$options;
+                if (itemOption.name === 'ProjectEditPopUpName') {
+                    popupNameIdx = index;
+                }
+            });
+
             const itemType = items.tree.getSelected()[0].data.item_type;
             const selectedId = items.tree.getSelected()[0].data.id;
+
             const url = itemType === 'PROJECT_GROUP' ? '/identity/project-group/update': '/identity/project/update';
             const key = itemType === 'PROJECT_GROUP' ? 'project_group_id': 'project_id';
             let param = this.validateProject();
+
+            let indexes = this.getRightTabIndexinChildren();
 
             if (!this.isEmpty(param)){
                 param[key] = selectedId;
@@ -328,7 +350,7 @@ export default {
                     if (response.data.project_group_id === selectedId) {
                         const treeV = items.tree;
                         const path = treeV.getSelected()[0].path;
-                        treeV.updateNode(path, { title: this.$refs.IDPJ001_EditTab.$children[2]._data.projectName });
+                        treeV.updateNode(path, { title: this.$refs.IDPJ001_EditTab.$children[indexes[0]]._data.projectName });
                         this.$refs.IDPJ001_EditModal.hideModal();
                     }
                 }).catch((error) => {
