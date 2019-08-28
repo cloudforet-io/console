@@ -107,9 +107,6 @@ export default {
                 { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
                 { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
                 { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'role', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'roles', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false,  thClass: 'd-none', tdClass: 'd-none' }
             ];
         },
         fields () {
