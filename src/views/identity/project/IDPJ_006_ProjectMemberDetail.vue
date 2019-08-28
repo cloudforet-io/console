@@ -21,7 +21,7 @@
         />
         <br>
         <b-card>
-          {{ selectedMembersOnSc }}
+          <div v-html="selectedMembersOnSc" />
         </b-card>
       </b-col>
     </b-row>
@@ -91,12 +91,20 @@ export default {
             });
         },
         selectedMembersOnSc () {
+            let htmlStr = '';
             let lombok = {};
             this.selectedModalItems.map((item) => {
                 return lombok[item.data.user_id] = item.data.name;
             });
             let lombokStr = JSON.stringify(lombok);
-            return lombokStr.substring(1, lombokStr.length-1);
+            let lombokArr = JSON.stringify(lombok).split(',');
+            lombokArr.forEach(function(curItem){
+                let removedStr = curItem.replace('{','');
+                removedStr = removedStr.replace('}','');
+                htmlStr += `<b-button variant="light">${removedStr}</b-button>`;
+            });
+            console.log(htmlStr);
+            return htmlStr;
         }
     },
     mounted() {
@@ -214,6 +222,7 @@ export default {
                 param['user_id'] = this.selectedModalMember.data.user_id;
             } else {
                 alert('Cannot do now');
+                return;
             }
 
             await this.$axios.post(url, param).then((response) => {

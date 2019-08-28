@@ -115,7 +115,7 @@
     <BaseSimpleModal ref="BATR001_treeAlertNotice" :title="tr('MODAL_TITLE.NOT_ALLOW')">
       <template #contents>
         <div>
-          {{ tr('MODAL_MSG.LEAF_NOMOVE',[tr('PG')]) }}
+          {{ noticePanelMsg }}
         </div>
       </template>
     </BaseSimpleModal>
@@ -163,7 +163,8 @@ export default {
             modalContents: '',
             modalContext: {},
             modalEvent: '',
-            contextIndividualVisible: [true, true, true, true]
+            contextIndividualVisible: [true, true, true, true],
+            noticePanelMsg: ''
         };
     },
     computed: {
@@ -332,14 +333,23 @@ export default {
             return isNeedToProcessOnSC;
         },
         beforeNodeDropped (node, position, cancel) {
-
             if (node[0].isLeaf && position.node.data.hasOwnProperty('is_root')){
                 if (position.node.data.is_root && position.placement !== 'inside'){
                     cancel(true);
+                    this.noticePanelMsg = this.tr('MODAL_MSG.LEAF_NOMOVE',[tr('PG')]);
                     this.$refs.BATR001_treeAlertNotice.showModal();
                     return;
                 }
             }
+
+            if (position.node.isLeaf){
+                cancel(true);
+                this.noticePanelMsg = this.tr('MODAL_MSG.LEAF_NOMOVE',[tr('PG')]);
+                this.$refs.BATR001_treeAlertNotice.showModal();
+                return;
+            }
+
+            /*if(position.node.isLeaf && node)*/
             const treeV = this.$refs.slVueTree;
             const shareParam = this.doTheyShareSameParent(node, position);
             const isCanceled = shareParam ? true: false;
