@@ -34,7 +34,7 @@
         </div>
 
         <b-input-group-append class="pl-0">
-          <b-button block class="search-btn" @click="search">
+          <b-button block class="search-btn" @click="onClickSearch">
             <i class="fas fa-search" />
           </b-button>
         </b-input-group-append>
@@ -222,6 +222,11 @@ export default {
         },
         search () {
             this.$emit('search', this.filterList, this.filterOrList);
+        },
+        onClickSearch () {
+            console.log('on click search');
+            console.log(this.tagList);
+            this.$refs.input.onEnter();
         },
         getNewTag (item) {
             return Object.assign({ 
