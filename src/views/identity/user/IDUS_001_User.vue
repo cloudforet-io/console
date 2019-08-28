@@ -5,7 +5,7 @@
         <BaseTable class="user-table" 
                    :table-data="users" 
                    :fields="fields" 
-                   :per-page="perPage"
+                   :per-page="query.page.limit"
                    searchable
                    :total-rows="totalCount" 
                    :search-context-data="queryData"
@@ -71,8 +71,8 @@
                prevent-esc-close
                size="xl"
                interactive
-               @esc="checkCancel"
-               @cancel="checkCancel"
+               @esc="hideUserDetail"
+               @cancel="hideUserDetail"
     >
       <template #contents>
         <UserDetail ref="IDUS001_UserDetail"
@@ -166,9 +166,16 @@ export default {
             totalCount: 0,
             queryData: query,
             isReadyForSearch: false,
-            perPage: 10,
             isLoading: true,
-            query: {},
+            query: { 
+                sort: {}, 
+                page: {
+                    start: 0, 
+                    limit: 10
+                }, 
+                filter: [],
+                filter_or: []
+            },
             isCreateMode: true,
             action: null,
             actionCheckTitle: '',
@@ -227,43 +234,20 @@ export default {
         }
     },
     mounted () {
-        this.init();
+        this.listUsers();
     },
     methods: {
-        init () {
-            this.listUsers(this.perPage, 0);
-        },
         reset () {
             this.users = [];
             this.selectedItems = [];
             this.isLoading = true;
         },
-        saveMeta (limit, start, sort, filter, filterOr) {
-            if (this.isEmpty(limit)) {
-                limit = 10;
-            }
-            if (this.isEmpty(start)) {
-                start = 0;
-            }
-            if (this.isEmpty(sort)) {
-                sort = {};
-            }
-            if (this.isEmpty(filter)) {
-                filter = [];
-            }
-            if (this.isEmpty(filterOr)) {
-                filterOr = [];
-            }
-            
-            this.query = { 
-                sort, 
-                page: {
-                    start: start, 
-                    limit
-                }, 
-                filter,
-                filter_or: filterOr
-            };
+        setQuery (limit, start, sort, filter, filterOr) {
+            this.query.page.limit = limit || 10;
+            this.query.page.start = start || 0;
+            this.query.sort = sort || {};
+            this.query.filter = filter || [];
+            this.query.filterOr = filterOr || [];
         },
         async listUsers (limit, start, sort, filter, filterOr) {
             this.reset();
@@ -281,7 +265,7 @@ export default {
             //     { k: 'user_id', v: 'admin', o: 'eq' }
             // ];
             
-            this.saveMeta(limit, start, sort, filter, filterOr);
+            this.setQuery(limit, start, sort, filter, filterOr);
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/list', {
@@ -304,8 +288,8 @@ export default {
             this.selectedItems = rows;
         },
         limitChanged (val) {
-            this.perPage = Number(val);
-            this.init();
+            this.query.page.limit = Number(val);
+            this.listUsers();
         },
         updateSelectedUserInfo (user) {
             this.selectedItems[0].data = user;
@@ -370,9 +354,6 @@ export default {
         },
         hideUserDetail () {
             this.$refs.IDUS001_UserDetailModal.hideModal();
-        },
-        checkCancel () {
-            this.$refs.IDUS001_UserDetail.onCancel();
         }
     }
 };
