@@ -48,7 +48,7 @@
 <script>
 export default {
     name: 'KeyValueInput',
-    event: ['delete'],
+    event: ['delete', 'mounted'],
     props: {
         data: {
             type: Object,
@@ -93,6 +93,9 @@ export default {
             }
             return !this.isEmpty(this.value);
         }
+    },
+    mounted() {
+        this.$emit('mounted');
     },
     methods: {
         isNotNull() {

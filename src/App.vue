@@ -7,7 +7,7 @@
 </template>
 
 <script>
-
+console.log(process.env.NODE_ENV);
 export default {
     name: 'App',
     props: {
@@ -15,7 +15,7 @@ export default {
             type: String,
             default: process.env.NODE_ENV
         }
-    },
+    }
 };
 
 </script>

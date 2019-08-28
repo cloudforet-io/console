@@ -19,13 +19,19 @@
                        :read-only="!isEditable" 
                        :align="align"
                        @delete="deleteRow(idx)"
+                       @mounted="$emit('addedRow')"
         />
       </div>
     </div>
 
     <b-row v-if="isEditable" no-gutters align-h="between">
       <b-col cols="12">
-        <span class="add-btn" tabindex="0" @click="addRow">
+        <span class="add-btn" 
+              tabindex="0" 
+              @click="addRow"
+              @keyup.space="addRow"
+              @keyup.enter="addRow"
+        >
           <span class="icon">
             <i class="fas fa-plus-circle" />
           </span>
@@ -47,6 +53,7 @@
 import KeyValueInput from '@/components/base/input/BAIN_003_KeyValueInput';
 export default {
     name: 'BaseTag',
+    event: ['addedRow'],
     components: { KeyValueInput },
     props: {
         tagData: {

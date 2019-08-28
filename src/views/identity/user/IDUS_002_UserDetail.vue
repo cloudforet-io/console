@@ -13,17 +13,23 @@
                      placeholder="User ID"
                      autocomplete="off"
                      required
-                     description="Your user ID must be 5-12 characters long."
+                     :description="isLocalUser ? 'Your user ID must be 5-12 characters long.' : null"
                      valid-message="This is Available."
                      :invalid-message="getUserValidMessage()"
                      @input="changedUserId"
           >
             <template v-if="creatable" #append>
-              <b-button variant="light"
+                
+              <b-button v-if="isLocalUser" variant="light"
                         :disabled="!validateUserIdLength"
                         @click="checkIdAvailability"
               >
                 Check availability
+              </b-button>
+              <b-button v-else variant="light"
+                        @click="findUser"
+              >
+                Sync
               </b-button>
             </template>
           </BaseField>
@@ -127,11 +133,12 @@
                         label-align="right"
                         class="mt-4"
           >
-            <b-col cols="10" class="p-0">
-              <BaseTag ref="baseTag" 
+            <b-col ref="IDUS002_BaseTagContainer" cols="10" class="tag-container p-0">
+              <BaseTag ref="IDUS002_BaseTag" 
                        :tag-data="tags" 
                        :show-first-tag-row="creatable ? true : false"
                        editable
+                       @addedRow="onTagRowAdded"
               />
             </b-col>
           </b-form-group>
@@ -161,8 +168,8 @@
 
     <BaseSimpleModal
       ref="IDUS002_CheckModal"
-      title="Reset"
-      text="Are you sure you want to reset a form you entered?"
+      :title="noticeTitle"
+      :text="noticeText"
       type="danger"
       centered
       :ok-only="false"
@@ -203,6 +210,10 @@ export default {
         creatable: {
             type: Boolean,
             default: false
+        },
+        isLocalUser: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -218,10 +229,8 @@ export default {
             timezone: this.userProp.timezone || sessionStorage.getItem('timezone'),
             userIdUnique: null,
             showValidation: false,
-            isLocalUser: true
-            /**
-             * TODO: check whether this user is 'localUser' or not.
-             */
+            noticeTitle: '',
+            noticeText: ''
         };
     },
     computed: {
@@ -241,6 +250,9 @@ export default {
             return this.userIdUnique;
         },
         validateUserId () {
+            if (!this.isLocalUser) {
+                return null;
+            }
             if (this.validateUserIdLength === null) {
                 return null;
             }
@@ -327,7 +339,29 @@ export default {
                 console.error(e);
             }
         },
+        async findUser () {
+            console.log('find user')
+            let res = null;
+            try {
+                // res = await this.$axios.post('/identity/user/find', {
+                //     user_id: this.userId
+                // });
+
+                this.onFailFindUser();
+
+                
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        onFailFindUser () {
+            this.noticeTitle = 'User Find Failed';
+            this.noticeText = 'The User you entered is missing. Please check if you entered the correct User ID.';
+            this.showCheckModal();
+        },
         onReset () {
+            this.noticeTitle = 'Reset';
+            this.noticeText = 'Are you sure you want to reset a form you entered?';
             this.showCheckModal();
         },
         onConfirmReset () {
@@ -345,7 +379,7 @@ export default {
             this.showValidation = true;
             
             let result = true;
-            if (!this.$refs.baseTag.validate()) {
+            if (!this.$refs.IDUS002_BaseTag.validate()) {
                 result = false;
             }
 
@@ -386,6 +420,9 @@ export default {
                 this.passwordCheck = '';
             }
         },
+        onTagRowAdded () {
+            this.$refs.IDUS002_BaseTagContainer.scrollTop = this.$refs.IDUS002_BaseTagContainer.scrollHeight;
+        },
         changedUserId () {
             this.userIdUnique = null;
         },
@@ -400,7 +437,7 @@ export default {
                 group: this.group,
                 language: this.language,
                 timezone: this.timezone,
-                tags: this.$refs.baseTag.tags
+                tags: this.$refs.IDUS002_BaseTag.tags
             };
         },
         resetUserData (user) {
@@ -413,8 +450,8 @@ export default {
             this.group = user.group;
             this.language = user.language || this.$i18n.locale;
             this.timezone = user.timezone || sessionStorage.getItem('timezone');
-            if (this.$refs.baseTag) {
-                this.$refs.baseTag.resetRows();
+            if (this.$refs.IDUS002_BaseTag) {
+                this.$refs.IDUS002_BaseTag.resetRows();
             }
         },
         getUserValidMessage () {
@@ -452,5 +489,9 @@ export default {
 }
 .required {
     color: $violet;
+}
+.tag-container {
+    height: 260px;
+    overflow-y: scroll;
 }
 </style>

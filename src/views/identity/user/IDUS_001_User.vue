@@ -78,6 +78,7 @@
         <UserDetail ref="IDUS001_UserDetail"
                     :user-prop="isCreateMode ? undefined : selectedItems[0].data" 
                     :creatable="isCreateMode ? true : false"
+                    :is-local-user="isLocalMode"
                     size="xl"
                     @create="createUser"
                     @update="updateUser"
@@ -177,6 +178,7 @@ export default {
                 filter_or: []
             },
             isCreateMode: true,
+            isLocalMode: false,
             action: null,
             actionCheckTitle: '',
             actionCheckType: '',
@@ -187,23 +189,24 @@ export default {
         fields () {
             return [
                 { key: 'selected', thStyle: { width: '50px' }},
-                { key: 'user_id', label: this.tr('COL_NM.ID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
+                { key: 'user_id', label: this.tr('COL_NM.ID'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
                 { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
-                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'mobile', label: this.tr('COL_NM.PHONE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
+                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
+                { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
+                { key: 'mobile', label: this.tr('COL_NM.PHONE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
+                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
                 { 
                     key: 'language', 
                     label: this.tr('COL_NM.LANGUAGE'), 
                     sortable: true, 
-                    ajaxSortable: false , 
+                    ajaxSortable: true , 
                     thStyle: { width: '200px' },
                     filterByFormatted: true,
                     formatter: (val) => {
                         return this.getLanguageName(val);
                     }
                 },
-                { key: 'timezone', label: this.tr('COL_NM.TIMEZONE'), thStyle: { width: '200px' }}
+                { key: 'timezone', label: this.tr('COL_NM.TIMEZONE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }}
             ];
         },
         multiInfoFields () {
@@ -274,6 +277,7 @@ export default {
                 setTimeout(() => { // this is for test
                     this.users = res.data.results;
                     this.totalCount = res.data.total_count;
+                    this.bindAdditionalKey(this.users, 'state', 'MEMBER_STATE');
                     this.isLoading = false;
                 }, 1000);
             } catch (e) {
