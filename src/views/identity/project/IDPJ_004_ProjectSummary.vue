@@ -125,7 +125,7 @@ export default {
                         color: 'danger'
                     },
                     data: this.tag,
-                    editable: true
+                    editable: false
                 }
             ];
         }

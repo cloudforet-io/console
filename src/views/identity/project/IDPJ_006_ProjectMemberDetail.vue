@@ -56,187 +56,187 @@
 </template>
 <script>
 
-  import query from '@/views/identity/project/search_context/search_context';
-  import BaseTable from '@/components/base/table/BATB_001_BaseTable';
-  import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag';
+import query from '@/views/identity/project/search_context/search_context';
+import BaseTable from '@/components/base/table/BATB_001_BaseTable';
+import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag';
 
-  export default {
+export default {
     name: 'ProjectMember',
     event: ['close'],
     components: {
-      BaseTable,
-      InputTag
+        BaseTable,
+        InputTag
     },
     data() {
-      return {
-        projectMemberData:{ members:[], tagList: []} ,
-        anySelectedRow: false,
-        selectedUserMulti: null,
-        selectedUser: null,
-        selectedIdx: undefined,
-        isFooterVisible: true,
-        memberModalQueryData: query,
-        memberModalQuery: {},
-        totalCount: 0,
-        perPage: 10,
-        isLoading: true,
-        selectedModalItems: [],
-        selectedModalObject: {},
-        selectedModalMember: null
+        return {
+            projectMemberData:{ members:[], tagList: []} ,
+            anySelectedRow: false,
+            selectedUserMulti: null,
+            selectedUser: null,
+            selectedIdx: undefined,
+            isFooterVisible: true,
+            memberModalQueryData: query,
+            memberModalQuery: {},
+            totalCount: 0,
+            perPage: 10,
+            isLoading: true,
+            selectedModalItems: [],
+            selectedModalObject: {},
+            selectedModalMember: null
 
-      };
+        };
     },
     computed: {
-      fields () {
-        return [
-          { key: 'user_id', label: 'User ID', sortable: true, ajaxSortable: false ,thStyle: { width: '150px' }},
-          { key: 'name', label: 'Name', sortable: true, ajaxSortable: true ,thStyle: { width: '150px' }},
-          { key: 'email', label: 'Email', sortable: true, ajaxSortable: false , thStyle: { width: '230px' }},
-          { key: 'group', label: 'Group', sortable: true, ajaxSortable: false, thStyle: { width: '150px' }}
-        ];
-      },
-      isMultiSelected () {
-        return this.selectedModalItems.length > 1;
-      },
-      hasSelectedMember () {
-        return this.selectedModalItems.length > 0;
-      },
-      selectedMembers () {
-        return this.selectedModalItems.map((item) => {
-          return item.data;
-        });
-      }
+        fields () {
+            return [
+                { key: 'user_id', label: 'User ID', sortable: true, ajaxSortable: false ,thStyle: { width: '150px' }},
+                { key: 'name', label: 'Name', sortable: true, ajaxSortable: true ,thStyle: { width: '150px' }},
+                { key: 'email', label: 'Email', sortable: true, ajaxSortable: false , thStyle: { width: '230px' }},
+                { key: 'group', label: 'Group', sortable: true, ajaxSortable: false, thStyle: { width: '150px' }}
+            ];
+        },
+        isMultiSelected () {
+            return this.selectedModalItems.length > 1;
+        },
+        hasSelectedMember () {
+            return this.selectedModalItems.length > 0;
+        },
+        selectedMembers () {
+            return this.selectedModalItems.map((item) => {
+                return item.data;
+            });
+        }
     },
     mounted() {
-      this.isLoading = false;
+        this.isLoading = false;
     },
     methods: {
-      init() {
-        this.listMembersOnModal(this.perPage, 0);
-      },
-      reset () {
-        this.projectMemberData.members = [];
-        this.selectedModalMember = null;
-        this.isLoading = true;
-      },
-      saveMemberModalMeta (limit, start, sort, filter, filterOr) {
-        if (this.isEmpty(limit)) {
-          limit = 10;
-        }
-        if (this.isEmpty(start)) {
-          start = 0;
-        }
-        if (this.isEmpty(sort)) {
-          sort = {};
-        }
-        if (this.isEmpty(filter)) {
-          filter = [];
-        }
-        if (this.isEmpty(filterOr)) {
-          filterOr = [];
-        }
-        this.memberModalQuery = {
-          sort,
-          page: {
-            start: start,
-            limit
-          },
-          filter_or: filterOr,
-          filter: [
-            { key: 'user_id' ,value: this.$attrs.memebers, operator: 'not_in' }
-          ]
-        };
-      },
-      async listMembersOnModal (limit, start, sort, filter, filterOr){
-        this.reset();
-        this.saveMemberModalMeta(limit, start, sort, filter, filterOr);
-        await this.$axios.post('/identity/user/list',{
-          query: this.memberModalQuery
-        }).then((response) => {
-          this.projectMemberData.members = response.data.results;
-          this.totalCount = response.data.total_count;
-          this.isLoading = false;
-        }).catch((error) =>{
-          console.error(error);
-          this.isLoading = false;
-        });
-      },
-      rowSelected (rows) {
-        this.selectedModalItems = rows;
-        if (rows.length === 1) {
-          this.selectedIdx = rows[0].idx;
-          this.selectedModalMember = rows[0];
-        }
+        init() {
+            this.listMembersOnModal(this.perPage, 0);
+        },
+        reset () {
+            this.projectMemberData.members = [];
+            this.selectedModalMember = null;
+            this.isLoading = true;
+        },
+        saveMemberModalMeta (limit, start, sort, filter, filterOr) {
+            if (this.isEmpty(limit)) {
+                limit = 10;
+            }
+            if (this.isEmpty(start)) {
+                start = 0;
+            }
+            if (this.isEmpty(sort)) {
+                sort = {};
+            }
+            if (this.isEmpty(filter)) {
+                filter = [];
+            }
+            if (this.isEmpty(filterOr)) {
+                filterOr = [];
+            }
+            this.memberModalQuery = {
+                sort,
+                page: {
+                    start: start,
+                    limit
+                },
+                filter_or: filterOr,
+                filter: [
+                    { key: 'user_id' ,value: this.$attrs.memebers, operator: 'not_in' }
+                ]
+            };
+        },
+        async listMembersOnModal (limit, start, sort, filter, filterOr){
+            this.reset();
+            this.saveMemberModalMeta(limit, start, sort, filter, filterOr);
+            await this.$axios.post('/identity/user/list',{
+                query: this.memberModalQuery
+            }).then((response) => {
+                this.projectMemberData.members = response.data.results;
+                this.totalCount = response.data.total_count;
+                this.isLoading = false;
+            }).catch((error) =>{
+                console.error(error);
+                this.isLoading = false;
+            });
+        },
+        rowSelected (rows) {
+            this.selectedModalItems = rows;
+            if (rows.length === 1) {
+                this.selectedIdx = rows[0].idx;
+                this.selectedModalMember = rows[0];
+            }
 
-        const selectedObject ={
-          key: rows[0].data.user_id,
-          subKey: rows[0].data.name
-        };
+            const selectedObject ={
+                key: rows[0].data.user_id,
+                subKey: rows[0].data.name
+            };
 
-        const el = this.projectMemberData.tagList.filter(function(el) {
-          return el.key === rows[0].data.user_id;
-        });
+            const el = this.projectMemberData.tagList.filter(function(el) {
+                return el.key === rows[0].data.user_id;
+            });
 
-        if (!el.length){
-          this.projectMemberData.tagList.push(selectedObject);
-          console.log('tagValue', this.projectMemberData.tagList);
-          this.onfocusOnBottom();
+            if (!el.length){
+                this.projectMemberData.tagList.push(selectedObject);
+                console.log('tagValue', this.projectMemberData.tagList);
+                this.onfocusOnBottom();
+            }
+        },
+        rowAllSelected (isSelectedAll, rows) {
+            this.selectedModalItems = rows;
+        },
+        limitChanged(val) {
+            this.perPage = Number(val);
+            this.init();
+        },
+        deleteSelected() {
+            this.$refs.IDPJ006_DeleteCheck.showModal();
+        },
+        async addUser() {
+            let url = null;
+
+            const projectSelected = this.$attrs['selected-data'];
+            const selected_id = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.id : projectSelected.nodes[0].data.id;
+            const selected_type = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.item_type : projectSelected.nodes[0].data.item_type;
+
+            let param = {
+                query: this.searchQuery
+            };
+
+            if (selected_type === 'PROJECT_GROUP'){
+                url = '/identity/project-group/member/add';
+                param['project_group_id'] =  selected_id;
+            } else {
+                url = '/identity/project/member/add';
+                param['project_id'] =  selected_id;
+            }
+
+            if (this.selectedModalItems.length > 0){
+                const currentUsers = this.projectMemberData.tagList;
+                param['users'] = this.getSelectedValArr(currentUsers,'key');
+            } else {
+                return;
+            }
+
+            await this.$axios.post(url, param).then((response) => {
+                this.$parent.$parent.$parent.$parent.$parent.listMembers();
+                this.$emit('close');
+            }).catch((error) => {
+                console.error(error);
+            });
+        },
+        deleteMember (idx) {
+            this.$delete(this.projectMemberData.tagList, idx);
+        },
+        onfocusOnBottom () {
+            this.$refs.IDPJ006_tagPanel.scrollTop = this.$refs.IDPJ006_tagPanel.scrollHeight;
+        },
+        closeWindow(e) {
+            this.$emit('close');
         }
-      },
-      rowAllSelected (isSelectedAll, rows) {
-        this.selectedModalItems = rows;
-      },
-      limitChanged(val) {
-        this.perPage = Number(val);
-        this.init();
-      },
-      deleteSelected() {
-        this.$refs.IDPJ006_DeleteCheck.showModal();
-      },
-      async addUser() {
-        let url = null;
-
-        const projectSelected = this.$attrs['selected-data'];
-        const selected_id = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.id : projectSelected.nodes[0].data.id;
-        const selected_type = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.item_type : projectSelected.nodes[0].data.item_type;
-
-        let param = {
-          query: this.searchQuery
-        };
-
-        if (selected_type === 'PROJECT_GROUP'){
-          url = '/identity/project-group/member/add';
-          param['project_group_id'] =  selected_id;
-        } else {
-          url = '/identity/project/member/add';
-          param['project_id'] =  selected_id;
-        }
-
-        if (this.selectedModalItems.length > 0){
-          const currentUsers = this.projectMemberData.tagList;
-          param['users'] = this.getSelectedValArr(currentUsers,'key');
-        } else {
-          return;
-        }
-
-        await this.$axios.post(url, param).then((response) => {
-          this.$parent.$parent.$parent.$parent.$parent.listMembers();
-          this.$emit('close');
-        }).catch((error) => {
-          console.error(error);
-        });
-      },
-      deleteMember (idx) {
-        this.$delete(this.projectMemberData.tagList, idx);
-      },
-      onfocusOnBottom () {
-        this.$refs.IDPJ006_tagPanel.scrollTop = this.$refs.IDPJ006_tagPanel.scrollHeight;
-      },
-      closeWindow(e) {
-        this.$emit('close');
-      }
     }
-  };
+};
 </script>
 
 <style lang="scss" scoped>

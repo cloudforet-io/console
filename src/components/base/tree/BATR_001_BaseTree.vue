@@ -27,8 +27,8 @@
                              @nodecontextmenu="showContextMenu"
                 >
                   <template #title="{ node }">
-                    <span v-if="node.isLeaf" class="leaf-space" />
-                    <span class="item-icon">
+                    <span v-if="node.data.init" class="fas fa-exclamation-triangle" />
+                    <span v-else class="item-icon">
                       <i v-if="node.isLeaf" class="fas fa-cube" />
                       <i v-else-if="node.isExpanded" class="fal fa-folder-open" />
                       <i v-else class="fal fa-folder-minus" />
@@ -54,7 +54,7 @@
             <template #rightContainer="{ width }">
               <transition name="panel-trans">
                 <div v-if="hasSelected"
-                     :key="nodeKey"
+                     :key="getNodekeyComputed"
                      class="panel"
                      :style="{ width: width }"
                 >
@@ -186,6 +186,9 @@ export default {
             set: function (value) {
                 this.treeData = value;
             }
+        },
+        getNodekeyComputed(){
+            return this.nodeKey;
         },
         getLeftTreeWidth()  {
             console.log(this.selectedLeftWidth);
@@ -429,6 +432,12 @@ export default {
                 this.$emit('afterDrop', { node: position.node, treeV:treeV , cancel: cancel });
             }*/
 
+        },
+        refreshSubPanel(key){
+            if (this.isEmpty(key)){
+                this.nodeKey = 0;
+                this.nodeKey = key;
+            }
         },
         deleteSelected(tree){
             const prams = {
