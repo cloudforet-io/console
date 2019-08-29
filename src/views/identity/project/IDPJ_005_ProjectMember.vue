@@ -190,6 +190,7 @@ export default {
             await this.$axios.post(url,param).then((response) => {
                 let results = [];
                 if (!this.isEmpty(response.data.results)){
+
                     response.data.results.forEach(function(current){
                         current.user_info['role'] = current.user_info.roles.join(', ');
                         results.push(current.user_info);
@@ -241,17 +242,23 @@ export default {
             let url = null;
             let param = {};
 
-            if (this.actionFlag ==='delete'){
-                if (this.getSelectedInfo('item_type') === 'PROJECT_GROUP'){
-                    url = '/identity/project-group/member/remove';
-                    param['project_group_id'] =  this.getSelectedInfo('id');
-                    param['user_id'] =  this.selectedMembers[0].user_id;
-                } else {
-                    url = '/identity/project/member/remove';
-                    param['project_id'] =  this.getSelectedInfo('id');
-                    param['user_id'] =  this.selectedMembers[0].user_id;
+            if (this.selectedMembers.length > 0){
+                const membersIds = this.selectedMembers;
+                if (this.actionFlag ==='delete'){
+                    if (this.getSelectedInfo('item_type') === 'PROJECT_GROUP'){
+                        url = '/identity/project-group/member/remove';
+                        param['project_group_id'] =  this.getSelectedInfo('id');
+                        param['users'] =  this.getSelectedValArr(membersIds, 'user_id');
+                    } else {
+                        url = '/identity/project/member/remove';
+                        param['project_id'] =  this.getSelectedInfo('id');
+                        param['users'] =  this.getSelectedValArr(membersIds, 'user_id');
+                    }
                 }
+            } else {
+                return;
             }
+
 
             if (!this.isEmpty(url) && !this.isEmpty(url)) {
                 await this.$axios.post(url,param);

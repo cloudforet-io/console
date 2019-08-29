@@ -202,9 +202,10 @@ export default {
         },
         async addUser() {
             let url = null;
-            const projectSelected = this.$attrs['selectedData'].nodes[0].data;
-            const selected_id = projectSelected.id;
-            const selected_type = projectSelected.item_type;
+
+            const projectSelected = this.$attrs['selected-data'];
+            const selected_id = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.id : projectSelected.nodes[0].data.id;
+            const selected_type = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.item_type : projectSelected.nodes[0].data.item_type;
 
             let param = {
                 query: this.searchQuery
@@ -218,17 +219,17 @@ export default {
                 param['project_id'] =  selected_id;
             }
 
-            if (this.selectedModalItems.length === 1){
-                param['user_id'] = this.selectedModalMember.data.user_id;
+            if (this.selectedModalItems.length > 0){
+                const currentUsers = this.selectedModalItems;
+                param['users'] = this.getSelectedValArr(currentUsers,'data.user_id');
             } else {
-                alert('Cannot do now');
                 return;
             }
 
             await this.$axios.post(url, param).then((response) => {
                 this.$parent.$parent.$parent.$parent.$parent.listMembers();
                 this.$emit('close');
-            }).catch((error) =>{
+            }).catch((error) => {
                 console.error(error);
             });
         },

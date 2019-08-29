@@ -541,6 +541,25 @@ export const Mixin = {
                 return false; 
             } 
             return true;
+        },
+        /**********************************************************************************
+         * Name       : validateSameness
+         * Input   => (value                           =>  String
+         *             boolOnly                        =>  Bolean
+         *             checkValue                      =>  String)
+         * Output  => Boolean or Null
+         * Description:  return the result of validation
+         **********************************************************************************/
+        getSelectedValArr: function (data, path) {
+            let returnArray = [];
+            if (data.length > 0){
+                data.forEach((currentItem, index) =>{
+                    if (!this.isEmpty(this._.get(currentItem, path))){
+                        returnArray.push(this._.get(currentItem, path));
+                    }
+                });
+            }
+            return returnArray;
         }
     },
     data: function () {
