@@ -54,12 +54,15 @@
 
             <template #rightContainer="{ width }">
               <transition name="panel-trans">
-                <div v-if="hasSelected" 
+                <div v-if="hasSelected"
                      :key="nodeKey"
                      class="panel"
                      :style="{ width: width }"
                 >
                   <slot name="treeSubPanel" />
+                </div>
+                <div v-else class="empty">
+                  <span class="msg">Please, Click a item from left tree Panel.</span>
                 </div>
               </transition>
             </template>
@@ -202,9 +205,13 @@ export default {
             this.clickedNode = node;
             this.addClickedClass(node);
             
-            this.nodeKey = (this.nodeKey !== node.data.id) ? node.data.id : this.nodeKey;
-            this.hasSelected = true;
-            this.$emit('selected', { node: node, treeV: this.$refs.slVueTree });
+            if (!node.data.hasOwnProperty('init')) {
+                this.nodeKey = (this.nodeKey !== node.data.id) ? node.data.id : this.nodeKey;
+                this.hasSelected = true;
+                this.$emit('selected', { node: node, treeV: this.$refs.slVueTree });
+            } else {
+                this.hasSelected = false;
+            }
         },
         nodeToggled (node) {
             if (!node.isExpanded ) {
@@ -491,5 +498,14 @@ export default {
   .panel {
     padding: 50px $side-pad $bottom-pad $side-pad;
   }
+  .empty {
+    text-align: left;
+    margin-top: 20px;
+    .msg {
+      color: $darkgray;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
 
+  }
 </style>
