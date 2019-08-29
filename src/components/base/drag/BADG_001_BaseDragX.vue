@@ -8,16 +8,12 @@
     </div>
 
     <div ref="dragger" class="dragger-container"
+         :class="{ line: line }"
          :style="{
            'height': `${containerHeight}px`,
            'left': `${leftContainerWidth}px`
          }"
     >
-      <div class="line top"
-           :class="{'colored': line}"
-           :style="{ 'height': `${lineHeight}px` }"
-      />
-
       <span class="dragger"
             :style="draggerStyle"
             @mousedown="onMousedown"
@@ -25,11 +21,6 @@
         <slot name="dragger" />
         <i v-if="!$slots.dragger" class="fal fa-grip-lines-vertical" />
       </span>
-
-      <div class="line bottom"
-           :class="{ 'colored': line }"
-           :style="{ 'height': `${lineHeight}px` }"
-      />
     </div>
 
     <div class="content-container right"
@@ -90,7 +81,6 @@ export default {
                 'height': `${this.draggerHeight}px`
             },
             leftContainerWidth: parseInt(this.leftWidth),
-            // rightContainerWidth: this.totalWidth - this.leftWidth,
             containerHeight: this.height,
             lineHeight: (this.containerHeight / 2) - this.draggerHeight,
             draggerWidth: 30,
@@ -101,7 +91,6 @@ export default {
     mounted () {
         this.lineHeight = (this.containerHeight / 2) - this.draggerHeight;
         this.draggerWidth = this.$refs.dragger.clientWidth + this.$refs.dragger.offsetWidth;
-        // this.rightContainerWidth -= this.draggerWidth;
         this.consoleLogEnv('This is a height', this.height);
     },
     methods: {
@@ -152,37 +141,19 @@ export default {
     &.left {
       left: 0;
     }
-    &.right {
-
-    }
 }
 .dragger-container {
     position: absolute;
     top: 0;
-    margin-left: 7px;
-    padding-right: 10px;
-    .line {
-        position: absolute;
-        display: inline-block;
-        border-left: 1px solid;
-        border-color: transparent;
-        &.colored {
-          border-color: $gray;
-        }
-        &.top {
-          top: 0;
-        }
-        &.bottom {
-          bottom: 0;
-        }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &.line {
+        border-left: 1px solid $lightgray;
+        border-right: 1px solid $lightgray;
     }
     .dragger {
-        position: absolute;
-        top: 50%;
-        left: 1px;
-        transform: translate(-50%, -50%);
         display: inline-block;
-        font-size: 1.5rem;
         font-weight: 600;
         text-align: center;
         cursor: col-resize;

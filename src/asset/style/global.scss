@@ -315,6 +315,9 @@ a {
         &:hover {
             background-color: $bg-color;
         }
+        &:focus {
+            border: 1px solid red;
+        }
     }
 }
 .sl-vue-tree.sl-vue-tree-root {
