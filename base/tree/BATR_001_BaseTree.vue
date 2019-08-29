@@ -8,7 +8,6 @@
       >
         <div v-if="showTree">
           <BaseDragVertical 
-            :line="false" 
             :total-width="'100vw'"
             :left-width="getLeftTreeWidth"
             :height="dragHeight"
@@ -215,10 +214,23 @@ export default {
         },
         nodeToggled (node) {
             if (!node.isExpanded ) {
+                this.setClickedNodeItem(node);
                 if (!node.data.is_cached){
                     console.log('nodeToggled: ', node.data.is_cached);
                     this.$emit('toggled', { node: node, treeV: this.$refs.slVueTree });
                 }
+            }
+        },
+        setClickedNodeItem(node) {
+            let hasNoClickedItem = node.path.some((path, i) => {
+                return path !== this.clickedNode.path[i];
+            });
+            if (!hasNoClickedItem) {
+                let addClassInterval = setInterval(() => {
+                    if (this.addClickedClass(this.clickedNode)) {
+                        clearInterval(addClassInterval);
+                    }
+                }, 10);
             }
         },
         getNodeEl (node) {
@@ -226,11 +238,17 @@ export default {
         },
         addClickedClass (node) {
             let elem = this.getNodeEl(node);
-            elem.classList.add('sl-vue-node-clicked');
+            if (elem) {
+                elem.classList.add('sl-vue-node-clicked');
+                return true;
+            }
+            return false;
         },
         removeClickedClass (node) {
             let elem = this.getNodeEl(node);
-            elem.classList.remove('sl-vue-node-clicked');
+            if (elem) {
+                elem.classList.remove('sl-vue-node-clicked');
+            }
         },
         showContextMenu (node, event, hasClicked) {
             if (!hasClicked) {
