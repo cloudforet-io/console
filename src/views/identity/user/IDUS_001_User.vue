@@ -250,7 +250,7 @@ export default {
             this.query.page.start = start || 0;
             this.query.sort = sort || {};
             this.query.filter = filter || [];
-            this.query.filterOr = filterOr || [];
+            this.query.filter_or = filterOr || [];
         },
         async listUsers (limit, start, sort, filter, filterOr) {
             this.reset();
