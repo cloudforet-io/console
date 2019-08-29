@@ -34,6 +34,7 @@
                   <template #contents>
                     <MemberDetail :creatable="true"
                                   :updatable="true"
+                                  :memebers="memberUserIDs"
                                   :selected-data="anySelectedRow"
                                   @close="$refs.addMember.hideModal()"
                     />
@@ -85,6 +86,7 @@ export default {
     data () {
         return {
             members: [],
+            memberUserIDs: [],
             anySelectedRow: this.$attrs['selected-data'],
             selectedIdx: undefined,
             addModal: false,
@@ -190,11 +192,13 @@ export default {
             await this.$axios.post(url,param).then((response) => {
                 let results = [];
                 if (!this.isEmpty(response.data.results)){
-
+                    let memberUserIds =[];
                     response.data.results.forEach(function(current){
                         current.user_info['role'] = current.user_info.roles.join(', ');
-                        results.push(current.user_info);
+                        results.push(current.user_info)
+                        memberUserIds.push(current.user_info.user_id);
                     });
+                    this.memberUserIDs = memberUserIds;
                     this.bindAdditionalKey(results, 'state', 'MEMBER_STATE');
 
                 }

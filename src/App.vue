@@ -7,6 +7,7 @@
 </template>
 
 <script>
+console.log(process.env.VUE_APP_API_WAN);
 export default {
     name: 'App',
     props: {

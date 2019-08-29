@@ -3,12 +3,15 @@
     <div class="row">
       <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
         <b-card class="base">
-          <b-form-group label="Tags" :label-cols="3" :horizontal="true" class="ml-3 mt-4">
-            <BaseTag ref="projectTag"
-                     :tag-data="tags"
-                     :editable="true"
-
-            />
+          <b-form-group label="Tags" :label-cols="3" :horizontal="true" class="ml-3 mt-4 ">
+            <b-col ref="IDPJ003_PopUpTag" cols="10" class="row-scroll p-0">
+              <BaseTag ref="projectTag"
+                       :tag-data="tags"
+                       :editable="true"
+                       :show-first-tag-row="creatable ? true : false"
+                       @addedRow="onTagRowAdded"
+              />
+            </b-col>
           </b-form-group>
         </b-card>
       </b-col>
@@ -28,7 +31,8 @@ export default {
     },
     data () {
         return {
-            selectedTag: []
+            selectedTag: [],
+            creatable: true,
         };
     },
     computed: {
@@ -50,6 +54,7 @@ export default {
                 await this.$axios.post(url, param).then((response) => {
                     const selectedTags = response.data.tags;
                     if (!this.isEmpty(selectedTags)){
+                        this.creatable = false;
                         this.selectedTag = selectedTags;
                         console.log('this.selectedTags', this.selectedTag);
                     }
@@ -57,11 +62,17 @@ export default {
                     console.error(error);
                 });
             }
+        },
+        onTagRowAdded () {
+            this.$refs.IDPJ003_PopUpTag.scrollTop = this.$refs.IDPJ003_PopUpTag.scrollHeight;
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-
+  .row-scroll {
+    max-height: 150px;
+    overflow-y:scroll;
+  }
 </style>
