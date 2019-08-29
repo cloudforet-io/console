@@ -11,7 +11,6 @@
                    :search-context-data="memberModalQueryData"
                    :show-caption="true"
                    :busy="isLoading"
-                   :cardless="false"
                    :underlined="true"
                    :off-caption="true"
                    @rowSelected="rowSelected"
@@ -33,7 +32,8 @@
                       :contents="tag"
                       :class="{focused: tag.focused}"
                       @delete="deleteMember(idx)"
-            /> </b-col>
+            />
+          </b-col>
         </b-card>
       </b-col>
     </b-row>
@@ -224,7 +224,7 @@ export default {
             this.$delete(this.tagList, idx);
         },
         onfocusOnBottom () {
-          this.$refs.IDPJ006_tagPanel.scrollTop = this.$refs.IDPJ006_tagPanel.scrollHeight;
+            this.$refs.IDPJ006_tagPanel.scrollTop = this.$refs.IDPJ006_tagPanel.scrollHeight;
         },
         closeWindow(e) {
             this.$emit('close');

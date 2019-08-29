@@ -135,6 +135,11 @@ export default {
                 });
             });
         },
+        removeEmptyValueFilterList () {
+            this._.remove(this.filterOrList, (filter) => {
+                return filter.value.length === 0;
+            });
+        },
         addQueryToFilterList (obj) {
             let idx = 0;
             let isExist = this.filterList.some((item, i) => {
@@ -221,6 +226,7 @@ export default {
             this.focusOnInput();
         },
         search () {
+            this.removeEmptyValueFilterList();
             this.$emit('search', this.filterList, this.filterOrList);
         },
         onClickSearch () {
