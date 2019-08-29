@@ -87,7 +87,6 @@ export default {
         return {
             members: [],
             memberUserIDs: [],
-            anySelectedRow: this.$attrs['selected-data'],
             selectedIdx: undefined,
             addModal: false,
             totalCount: 0,
@@ -103,6 +102,9 @@ export default {
         };
     },
     computed: {
+        anySelectedRow(){
+            return this.$attrs['selected-data'];
+        },
         selectedFields () {
             return [
                 { key: 'user_id', label: this.tr('COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
@@ -195,7 +197,7 @@ export default {
                     let memberUserIds =[];
                     response.data.results.forEach(function(current){
                         current.user_info['role'] = current.user_info.roles.join(', ');
-                        results.push(current.user_info)
+                        results.push(current.user_info);
                         memberUserIds.push(current.user_info.user_id);
                     });
                     this.memberUserIDs = memberUserIds;
