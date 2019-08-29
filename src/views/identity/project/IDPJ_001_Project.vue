@@ -273,7 +273,7 @@ export default {
                             tree.insert({ node: tree.getSelected()[0], placement: placement }, newNode);
                         }
                         if (this.isInitializing){
-                            tree.remove([tree.getLastNode()].map(node => node.path));
+                            tree.remove([tree.getFirstNode()].map(node => node.path));
                             this.isInitializing = false;
                         }
                     }
