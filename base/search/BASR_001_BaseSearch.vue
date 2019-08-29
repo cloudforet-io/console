@@ -135,7 +135,7 @@ export default {
                 });
             });
         },
-        removeEmptyValueFilterList () {
+        removeEmptyValueFilterOrList () {
             this._.remove(this.filterOrList, (filter) => {
                 return filter.value.length === 0;
             });
@@ -226,7 +226,7 @@ export default {
             this.focusOnInput();
         },
         search () {
-            this.removeEmptyValueFilterList();
+            this.removeEmptyValueFilterOrList();
             this.$emit('search', this.filterList, this.filterOrList);
         },
         onClickSearch () {
