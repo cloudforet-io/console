@@ -4,21 +4,22 @@
       <b-tab v-for="(tab, idx) in tabs"
              :key="idx"
              :lazy="true"
-             @click="setCurrentTab(tab)">
+             @click="setCurrentTab(tab)"
+      >
         <div v-if="!tab.icon" slot="title" name="tabHeader">
           <i :class="tab.tabIcon" style="color:blue" />
           {{ tab.tabTitle }}
         </div>
         <br>
         <slot name="tabsContentPanel">
-            <component :is="currentTab.component"
-                        ref="popupTab"
-                        :selected-data="dataForTab"
-                        :is-creatable="isCreate"
-                        :is-updatable="isUpdate"
-                        :is-deletable="isDelete"
-                        class="tab"
-            />
+          <component :is="currentTab.component"
+                     ref="popupTab"
+                     :selected-data="dataForTab"
+                     :is-creatable="isCreate"
+                     :is-updatable="isUpdate"
+                     :is-deletable="isDelete"
+                     class="tab"
+          />
         </slot>
       </b-tab>
     </b-tabs>
@@ -27,16 +28,16 @@
         <div class="col-md-12">
           <div v-show="isFooterVisible" class="modal-footer" style="border-top:none; padding-right: 0px">
             <b-button v-show="isCreatable" size="md" variant="outline-primary" @click="createNew">
-              {{tr('BTN_CRT')}}
+              {{ tr('BTN_CRT') }}
             </b-button>
             <b-button v-show="isUpdatable" size="md" variant="outline-success" @click="updateSelect">
-              {{tr('BTN_UPT')}}
+              {{ tr('BTN_UPT') }}
             </b-button>
             <b-button v-show="isDeletable" size="md" variant="outline-danger" @click="deleteSelect">
-              {{tr('BTN_DELETE')}}
+              {{ tr('BTN_DELETE') }}
             </b-button>
             <b-button size="md" variant="outline-secondary" @click="closeWindow">
-              {{tr('BTN_CANCEL')}}
+              {{ tr('BTN_CANCEL') }}
             </b-button>
           </div>
         </div>
