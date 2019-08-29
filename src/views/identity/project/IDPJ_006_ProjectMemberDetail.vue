@@ -21,7 +21,19 @@
         />
         <br>
         <b-card>
-          <div v-html="selectedMembersOnSc" />
+          <b-col ref="IDPJ006_tagPanel" cols="12" class="row-scroll p-0">
+            <InputTag v-for="(tag, idx) in tagList"
+                      ref="tag"
+                      :key="tag.id"
+                      :use-tag-only="true"
+                      class="input-tag"
+                      :tabindex="idx"
+                      :idx="idx"
+                      :list-data="[]"
+                      :contents="tag"
+                      :class="{focused: tag.focused}"
+                      @delete="deleteMember(idx)"
+            /> </b-col>
         </b-card>
       </b-col>
     </b-row>
@@ -45,16 +57,19 @@
 
 import query from '@/views/identity/project/search_context/search_context';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
+import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag';
 
 export default {
     name: 'ProjectMember',
     event: ['close'],
     components: {
-        BaseTable
+        BaseTable,
+        InputTag
     },
     data() {
         return {
             members: [],
+            tagList: [],
             anySelectedRow: false,
             selectedUserMulti: null,
             selectedUser: null,
@@ -66,13 +81,14 @@ export default {
             perPage: 10,
             isLoading: true,
             selectedModalItems: [],
+            selectedModalObject: {},
             selectedModalMember: null
+
         };
     },
     computed: {
         fields () {
             return [
-                { key: 'selected' },
                 { key: 'user_id', label: 'User ID', sortable: true, ajaxSortable: false ,thStyle: { width: '150px' }},
                 { key: 'name', label: 'Name', sortable: true, ajaxSortable: true ,thStyle: { width: '150px' }},
                 { key: 'email', label: 'Email', sortable: true, ajaxSortable: false , thStyle: { width: '230px' }},
@@ -89,22 +105,6 @@ export default {
             return this.selectedModalItems.map((item) => {
                 return item.data;
             });
-        },
-        selectedMembersOnSc () {
-            let htmlStr = '';
-            let lombok = {};
-            this.selectedModalItems.map((item) => {
-                return lombok[item.data.user_id] = item.data.name;
-            });
-            let lombokStr = JSON.stringify(lombok);
-            let lombokArr = JSON.stringify(lombok).split(',');
-            lombokArr.forEach(function(curItem){
-                let removedStr = curItem.replace('{','');
-                removedStr = removedStr.replace('}','');
-                htmlStr += `<b-button variant="light">${removedStr}</b-button>`;
-            });
-            console.log(htmlStr);
-            return htmlStr;
         }
     },
     mounted() {
@@ -118,31 +118,6 @@ export default {
             this.members = [];
             this.selectedModalMember = null;
             this.isLoading = true;
-        },
-        saveMeta (limit, start, sort, filter, filterOr) {
-            if (this.isEmpty(limit)) {
-                limit = 10;
-            }
-            if (this.isEmpty(start)) {
-                start = 0;
-            }
-            if (this.isEmpty(sort)) {
-                sort = {};
-            }
-            if (this.isEmpty(filter)) {
-                filter = [];
-            }
-            if (this.isEmpty(filterOr)) {
-                filterOr = [];
-            }
-            this.searchQuery = {
-                sort,
-                page: {
-                    start: start,
-                    limit
-                },
-                filter_or: filterOr
-            };
         },
         saveMemberModalMeta (limit, start, sort, filter, filterOr) {
             if (this.isEmpty(limit)) {
@@ -166,7 +141,10 @@ export default {
                     start: start,
                     limit
                 },
-                filter_or: filterOr
+                filter_or: filterOr,
+                filter: [
+                    { key: 'user_id' ,value: this.$attrs.memebers, operator: 'not_in' }
+                ]
             };
         },
         async listMembersOnModal (limit, start, sort, filter, filterOr){
@@ -189,6 +167,15 @@ export default {
                 this.selectedIdx = rows[0].idx;
                 this.selectedModalMember = rows[0];
             }
+
+            const selectedObject ={
+                key: rows[0].data.user_id,
+                subKey: rows[0].data.name
+            };
+
+            this.selectedModalObject[selectedObject.key] = selectedObject.subKey;
+            this.tagList.push(selectedObject);
+            this.onfocusOnBottom();
         },
         rowAllSelected (isSelectedAll, rows) {
             this.selectedModalItems = rows;
@@ -233,6 +220,12 @@ export default {
                 console.error(error);
             });
         },
+        deleteMember (idx) {
+            this.$delete(this.tagList, idx);
+        },
+        onfocusOnBottom () {
+          this.$refs.IDPJ006_tagPanel.scrollTop = this.$refs.IDPJ006_tagPanel.scrollHeight;
+        },
         closeWindow(e) {
             this.$emit('close');
         }
@@ -241,7 +234,62 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .base-table {
-        @extend %sheet;
+  $input-height: 30px;
+  $line-height: 30px;
+  $search-btn-width: 50px;
+
+  .search-container {
+    position: relative;
+    .input-container {
+      border: 0;
+      border-radius: 5px 0 0 5px;
+      background-color: #fff;
+      padding-left: 5px;
+      width: calc(100% - #{$search-btn-width});
+      vertical-align: middle;
+      line-height: $line-height;
+
+      $close-btn-width: 35px;
+      .input-box {
+        display: inline-block;
+        width: calc(100% - #{$close-btn-width});
+        cursor: text;
+        vertical-align: middle;
+        min-height: $input-height;
+        .input-tag {
+          &:focus {
+          }
+        }
+        .input {
+          display: inline-block;
+          vertical-align: middle;
+        }
+      }
+      .input-delete-button {
+        display: inline-block;
+        width: $close-btn-width;
+        padding-right: 8px;
+        font-size: 1.2em;
+        color: $darkgray;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+      }
     }
+    .search-btn {
+      border: 0;
+      border-radius: 0 5px 5px 0;
+      color: darken($darkgray, 25%);
+      width: $search-btn-width;
+      background: $darkgray;
+      &:hover {
+        color: $white;
+        background: $navy;
+      }
+    }
+  }
+  .row-scroll {
+    height: 150px;
+    overflow-y:scroll;
+  }
 </style>

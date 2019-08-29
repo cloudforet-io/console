@@ -9,7 +9,10 @@
     />
 
     <span v-else class="badge tag-badge">
-      <span class="contents" @click="onUpdateMode">
+      <span v-if="useTagOnly" class="contents" @click="onUpdateMode">
+        {{ `${tagOnlyKey} : ${tagOnlySubKey}` }}
+      </span>
+      <span v-else class="contents" @click="onUpdateMode">
         {{ `${label} ${operator} ${value}` }}
       </span>
       <span class="icon" @click="$emit('delete')"><i class="fal fa-times-circle" /></span>
@@ -35,6 +38,10 @@ export default {
             type: Object,
             default: () => {}
         },
+        useTagOnly: {
+            type: Boolean,
+            default: false
+        },
         idx: {
             type: Number,
             required: true
@@ -46,6 +53,12 @@ export default {
         };
     },
     computed: {
+        tagOnlyKey () {
+            return this.contents.key ? ` ${this.contents.key}` : '';
+        },
+        tagOnlySubKey () {
+            return this.contents.subKey ? `${this.contents.subKey}` : '';
+        },
         subKey () {
             return this.contents.subKey ? `.${this.contents.subKey}` : ''; 
         },
