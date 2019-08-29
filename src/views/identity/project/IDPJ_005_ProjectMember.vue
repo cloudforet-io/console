@@ -178,12 +178,12 @@ export default {
                 query: this.searchQuery
             };
 
-            if (this.$attrs['selected-data'].nodes[0].data.item_type === 'PROJECT_GROUP'){
+            if (this.$attrs['selected-data'].node.data.item_type === 'PROJECT_GROUP'){
                 url = '/identity/project-group/member/list';
-                param['project_group_id'] =  this.$attrs['selected-data'].nodes[0].data.id;
+                param['project_group_id'] =  this.$attrs['selected-data'].node.data.id;
             } else {
                 url = '/identity/project/member/list';
-                param['project_id'] =  this.$attrs['selected-data'].nodes[0].data.id;
+                param['project_id'] =  this.$attrs['selected-data'].node.data.id;
             }
 
             console.log('Parameters', JSON.stringify(param));
@@ -220,7 +220,7 @@ export default {
             this.init();
         },
         getSelectedInfo(key){
-            const selectedObj = this.$attrs['selected-data'].nodes[0];
+            const selectedObj = this.$attrs['selected-data'].node;
             const Obj = {
                 id: selectedObj.data.id,
                 is_cached: selectedObj.data.is_cached,

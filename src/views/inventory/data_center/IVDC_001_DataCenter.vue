@@ -276,9 +276,9 @@ export default {
                 this.consoleLogEnv('Sp cases');
             }
         },
-        async updateDataCenter (items) {
-            this.consoleLogEnv('item', items);
-            const treeV = items.tree;
+        async updateDataCenter (item) {
+            this.consoleLogEnv('item', item);
+            const treeV = item.tree;
             const path = treeV.getSelected()[0].path;
             let tabData = this.$refs.EditTab.tabContentData;
             treeV.updateNode(path, { title: tabData.dataCenterProp.dataCenterName });
@@ -286,10 +286,10 @@ export default {
         //TODO:: Simulate gRPC Modules on BACK_END
             this.$refs.Modal.hideModal();
         },
-        createDataCenter  (items) {
-            this.consoleLogEnv('item', items);
+        createDataCenter  (item) {
+            this.consoleLogEnv('item', item);
             const flag = this.selectedData.selectedItem.flag;
-            const treeV = this.isEmpty(items.tree) ? this.selectedData.selectedItem.tree : items.tree;
+            const treeV = this.isEmpty(item.tree) ? this.selectedData.selectedItem.tree : item.tree;
             let tabData = this.$refs.EditTab.tabContentData;
 
             let newNode = {

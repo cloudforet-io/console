@@ -240,13 +240,13 @@ export default {
             });
             console.log('Tree Data', this.treeData);
         },
-        async createProsProcess(items) {
+        async createProsProcess(item) {
             const flag = this.selectedData.flag;
-            const treeV = this.isEmpty(items.tree) ? this.selectedData.tree : items.tree;
+            const treeV = this.isEmpty(item.tree) ? this.selectedData.tree : item.tree;
             if (['NG','RNG','SNG'].includes(flag)) {
-                this.createProjectGroup(items, flag, treeV);
+                this.createProjectGroup(item, flag, treeV);
             } else {
-                this.createProject(items, flag, treeV);
+                this.createProject(item, flag, treeV);
             }
         },
         async createProjectGroup(items, flag, tree) {
@@ -336,7 +336,7 @@ export default {
                     if (response.data[key] === selectedId) {
                         const treeV = items.tree;
                         const path = treeV.getSelected()[0].path;
-                        treeV.updateNode(path, { title: param.name});
+                        treeV.updateNode(path, { title: param.name });
                         this.$refs.IDPJ001_EditModal.hideModal();
                     }
                 }).catch((error) => {
