@@ -21,7 +21,6 @@
                              class="main-tree-col"
                              :allow-multiselect="true"
                              :style="{ width: width }"
-                             @select="nodeSelected"
                              @nodeclick="nodeClicked"
                              @beforedrop="beforeNodeDropped"
                              @drop="nodeDropped"
@@ -199,12 +198,6 @@ export default {
         this.showTree = true;
     },
     methods: {
-        nodeSelected (nodes) {
-            // console.log('node selected', nodes);
-            // this.nodeKey = (this.nodeKey !== nodes[0].data.id) ? nodes[0].data.id : this.nodeKey;
-            // this.hasSelected = true;
-            // this.$emit('selected', { nodes:nodes, treeV: this.$refs.slVueTree });
-        },
         nodeClicked (node) {
             this.nodeKey = (this.nodeKey !== node.data.id) ? node.data.id : this.nodeKey;
             this.hasSelected = true;
