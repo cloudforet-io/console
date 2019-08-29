@@ -399,7 +399,6 @@ export default {
                     return idx === row.idx;
                 });
             }
-            
         },
         resetSelectedRows () {
             this.selectedRows = [];
