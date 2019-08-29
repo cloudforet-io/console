@@ -28,14 +28,13 @@
                              @nodecontextmenu="showContextMenu"
                 >
                   <template #title="{ node }">
+                    <span v-if="node.isLeaf" class="leaf-space" />
+                    <span class="item-icon">
+                      <i v-if="node.isLeaf" class="fas fa-cube" />
+                      <i v-else-if="node.isExpanded" class="fal fa-folder-open" />
+                      <i v-else class="fal fa-folder-minus" />
+                    </span>
                     <span class="item-title">
-                      <span class="item-icon">
-                        <i v-if="node.isLeaf" class="fal fa-cube" />
-                        <template v-else>
-                          <i v-if="node.isExpanded" class="fal fa-folder-open" />
-                          <i v-else class="fal fa-folder-minus" />
-                        </template>
-                      </span>
                       {{ node.title }}
                     </span>
                   </template>
@@ -84,7 +83,7 @@
                  class="contextmenuleaf"
                  @click="contextExecutor('ND')"
             >
-              <i class="fal fa-cube" />&nbsp; Add a Project
+              <i class="fas fa-cube" />&nbsp; Add a Project
             </div>
             <div v-if="contextIndividualVisible[2]"
                  class="contextmenuleaf"
@@ -115,13 +114,10 @@
                @cancel="modalCancel"
     />
 
-    <BaseSimpleModal ref="BATR001_treeAlertNotice" :title="tr('MODAL_TITLE.NOT_ALLOW')">
-      <template #contents>
-        <div>
-          {{ noticePanelMsg }}
-        </div>
-      </template>
-    </BaseSimpleModal>
+    <BaseSimpleModal ref="BATR001_treeAlertNotice" 
+                     :title="tr('MODAL_TITLE.NOT_ALLOW')"
+                     :text="noticePanelMsg"
+    />
   </div>
 </template>
 <script>
@@ -167,7 +163,8 @@ export default {
             modalContext: {},
             modalEvent: '',
             contextIndividualVisible: [true, true, true, true],
-            noticePanelMsg: ''
+            noticePanelMsg: '',
+            clickedNode: null
         };
     },
     computed: {
@@ -202,6 +199,12 @@ export default {
     },
     methods: {
         nodeClicked (node) {
+            if (this.clickedNode) {
+                this.removeClickedClass(this.clickedNode);
+            }
+            this.clickedNode = node;
+            this.addClickedClass(node);
+            
             if (!node.data.hasOwnProperty('init')) {
                 this.nodeKey = (this.nodeKey !== node.data.id) ? node.data.id : this.nodeKey;
                 this.hasSelected = true;
@@ -209,6 +212,25 @@ export default {
             } else {
                 this.hasSelected = false;
             }
+        },
+        nodeToggled (node) {
+            if (!node.isExpanded ) {
+                if (!node.data.is_cached){
+                    console.log('nodeToggled: ', node.data.is_cached);
+                    this.$emit('toggled', { node: node, treeV: this.$refs.slVueTree });
+                }
+            }
+        },
+        getNodeEl (node) {
+            return this.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
+        },
+        addClickedClass (node) {
+            let elem = this.getNodeEl(node);
+            elem.classList.add('sl-vue-node-clicked');
+        },
+        removeClickedClass (node) {
+            let elem = this.getNodeEl(node);
+            elem.classList.remove('sl-vue-node-clicked');
         },
         showContextMenu (node, event, hasClicked) {
             if (!hasClicked) {
@@ -390,15 +412,6 @@ export default {
             }*/
 
         },
-        nodeToggled (node, event) {
-            console.log('toggled', event);
-            if (!node.isExpanded ) {
-                if (!node.data.is_cached){
-                    console.log('nodeToggled: ', node.data.is_cached);
-                    this.$emit('toggled', { node: node, treeV: this.$refs.slVueTree });
-                }
-            }
-        },
         deleteSelected(tree){
             const prams = {
                 path: tree.getSelected().map(node => node.path),
@@ -448,17 +461,21 @@ export default {
     background-color: $white;
     height: $main-height;
     overflow: scroll;
+    .leaf-space {
+        display: inline-block;
+        width: 20px;
+    }
+    .item-icon {
+        display: inline-block;
+        text-align: center;
+        width: 20px;
+    }
+    .ellipsis {
+        padding: 0px 3px 0px 10px;
+        cursor: pointer;
+    }
   }
 
-  .item-icon {
-    display: inline-block;
-    text-align: center;
-    width: 20px;
-  }
-  .ellipsis {
-    padding: 0px 3px 0px 10px;
-    cursor: pointer;
-  }
 
   .contextmenu {
     position: absolute;
