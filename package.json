@@ -4,7 +4,7 @@
   "description": "CloudOne web console client",
   "author": "CloudOne",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve ",
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src"
   },
