@@ -148,7 +148,7 @@ export default {
             this.sampleDropData2.dropDownTitle = params.optionTitle;
         },
         async setInitData() {
-            const selectedNode = this.$attrs['selected-data'].nodes[0];
+            const selectedNode = this.$attrs['selected-data'].node;
             let url = null;
             let param = {};
             if (selectedNode.data.item_type === 'PROJECT_GROUP'){
