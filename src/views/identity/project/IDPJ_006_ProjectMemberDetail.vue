@@ -202,9 +202,10 @@ export default {
         },
         async addUser() {
             let url = null;
-            const projectSelected = this.$attrs['selected-data'].nodes[0].data;
-            const selected_id = projectSelected.id;
-            const selected_type = projectSelected.item_type;
+
+            const projectSelected = this.$attrs['selected-data'];
+            const selected_id = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.id : projectSelected.nodes[0].data.id;
+            const selected_type = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.item_type : projectSelected.nodes[0].data.item_type;
 
             let param = {
                 query: this.searchQuery
