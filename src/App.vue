@@ -7,7 +7,7 @@
 </template>
 
 <script>
-console.log('STG Updated', '1.0.0.1');
+console.log('STG, DEV', process.env.NODE_ENV);
 export default {
     name: 'App',
     props: {
