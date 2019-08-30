@@ -9,7 +9,7 @@ RUN mkdir -p ${BUILD_PATH}
 COPY package.json ${BUILD_PATH}/package.json
 WORKDIR ${BUILD_PATH}
 
-RUN npm config set @fortawesome:registry https://npm.fontawesome.com/41279D14-4A9B-414D-8BD0-970A9A6F1981
+RUN npm config set @fortawesome:registry ${FONT_AWESOME_API_KEY}
 RUN npm install es6-object-assign
 RUN npm install
 
