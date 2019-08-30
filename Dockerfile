@@ -4,7 +4,6 @@ ENV BUILD_PATH /opt/cloudone/wconsole-client
 ENV ROOT_PATH /var/www
 
 RUN apt-get update && apt-get install -y nginx
-RUN yarn global add @vue/cli -g
 RUN mkdir -p ${BUILD_PATH}
 
 COPY package.json ${BUILD_PATH}/package.json
