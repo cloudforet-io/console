@@ -68,9 +68,9 @@ export default {
     line-height: 180%;
   }
   .text-pink {
-    color: #f76397;
+    color: $red;
   }
   .label-inverse {
-    background-color: #4c5667;
+    background-color: $gray;
   }
 </style>

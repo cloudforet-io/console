@@ -22,13 +22,13 @@
                   variant="outline-secondary" 
                   @click="clickCancel"
         >
-          <span>Cancel</span>
+          <span>{{ tr('BTN_CANCEL') }}</span>
         </b-button>
         <b-button size="sm" 
                   :variant="`${type}`" 
                   @click="clickOk"
         >
-          <span>OK</span>
+          <span>{{ tr('BTN_CONFIRM') }}</span>
         </b-button>
       </template>
     </b-modal>

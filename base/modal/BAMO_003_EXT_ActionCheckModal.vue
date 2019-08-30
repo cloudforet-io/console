@@ -1,13 +1,13 @@
 <template>
   <div>
     <BaseModal ref="BAMO003_ActionCheckModal"
-               :title="title"
+               :title="modalTitle"
                :type="type"
                :centered="centered"
                @ok="onOk"
     >
       <template #contents>
-        <h4>{{ text }}</h4>
+        <h4>{{ modalText }}</h4>
         <br>
         <BaseTable :table-data="data" 
                    :fields="fields"
@@ -21,14 +21,14 @@
     </BaseModal>
 
     <BaseModal ref="BAMO003_ActionResultModal"
-               title="Action Failed"
+               :title="tr('ACTION.TITLE_FAILED')"
                type="danger"
                :centered="centered"
                ok-only
                @ok="hideResultModal"
     >
       <template #contents>
-        <h4>Failed to excute the requested action for items below: </h4>
+        <h4>{{ tr('ACTION.FAILED') }}</h4>
         <br>
         <div>
           <BaseTable :table-data="failedItemList" 
@@ -58,7 +58,7 @@ export default {
     props: {
         title: {
             type: String,
-            default: 'Action Check'
+            default: null
         },
         type: {
             type: String,
@@ -70,7 +70,7 @@ export default {
         },
         text: {
             type: String,
-            default: 'Are you sure you want to delete selected item(s) below?'
+            default: null
         },
         data: {
             type: Array,
@@ -102,11 +102,11 @@ export default {
         },
         failMessage: {
             type: String,
-            default: 'ERROR OCCURED'
+            default: null
         },
         successMessage: {
             type: String,
-            default: 'Succeed'
+            default: null
         },
         /**
          * It is used when getting failed items. 
@@ -118,14 +118,18 @@ export default {
     },
     data() {
         return {
-            failedItemList: []
+            failedItemList: [],
+            modalTitle: this.title || this.tr('ACTION.TITLE_DEFAULT'),
+            modalText: this.text || this.tr('ACTION.CHECK_DEFAULT'),
+            modalFailMsg: this.failMessage || this.tr('ACTION.ERROR'),
+            modalsuccessMsg: this.successMessage || this.tr('ACTION.SUCCESS')
         };
     },
     computed: {
         failedItemFields () {
             return [
                 { key: this.primaryKey, label: this.primaryKey },
-                { key: 'reason', label: 'Reason for Failure' }
+                { key: 'reason', label: this.tr('COL_NM.FAIL_REASON') }
             ];
         }
     },
@@ -156,11 +160,11 @@ export default {
             try {
                 await this.action(this.data);
                 this.hideModal();
-                this.$alertify.success(this.successMessage);
+                this.$alertify.success(this.modalsuccessMsg);
                 this.$emit('succeed');
             } catch (e) {
                 console.error(e);
-                this.$alertify.error(this.failMessage);
+                this.$alertify.error(this.modalFailMsg);
                 if (this.showFailResult) {
                     this.hideModal();
                     if (e.data.error.fail_items) {
