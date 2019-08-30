@@ -1,7 +1,7 @@
 <template>
   <span>
-    <BaseModal ref="baseModal"
-               title="Profile"
+    <BaseModal ref="VICO004_ProfileModal"
+               :title="tr('PROFILE')"
                centered
                hide-footer
                backdrop-off
@@ -13,51 +13,52 @@
             <b-col cols="12">
               <BaseField :value="userId" 
                          plaintext 
-                         label="User ID : "
+                         :label="`${tr('USER.ID')} : `"
                          :label-cols="3"
-                         placeholder="User ID"
+                         :placeholder="tr('USER.ID')"
                          tabindex="-1"
               />
 
               <BaseField v-model="name" 
-                         label="Name : "
+                         :label="`${tr('USER.NAME')} : `"
                          :label-cols="3" 
-                         placeholder="Name"
+                         :placeholder="tr('USER.NAME')"
               />
 
               <BaseField v-model="email" 
-                         label="E-Mail : " 
+                         :label="`${tr('USER.EMAIL')} : `"
                          :label-cols="3"
-                         placeholder="Email"
+                         :placeholder="tr('USER.EMAIL')"
               />
 
               <BaseField v-model="mobile" 
-                         label="Phone : " 
+                         :label="`${tr('USER.PHONE')} : `"
                          :label-cols="3"
-                         placeholder="Phone"
+                         :placeholder="tr('USER.PHONE')"
               />
 
               <BaseField v-model="group" 
-                         label="Group : " 
+                         :label="`${tr('USER.GROUP')} : `"
                          :label-cols="3" 
-                         placeholder="Group"
+                         :placeholder="tr('USER.GROUP')"
               />
+
               <BaseField v-model="language" 
-                         label="Language : " 
+                         :label="`${tr('USER.LANG')} : `"
                          :label-cols="3"
                          :field-cols="5"
                          type="select"
                          :options="languageList"
-                         placeholder="Select Language"
+                         :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
               />
 
               <BaseField v-model="timezone" 
-                         label="Time Zone : " 
+                         :label="`${tr('USER.TIME')} : `"
                          :label-cols="3"
                          :field-cols="9"
                          type="select"
                          :options="timezoneList"
-                         placeholder="Select Timezone"
+                         :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
               />
 
             </b-col>
@@ -65,13 +66,13 @@
           <b-row>
             <b-col class="btn-box mt-5">
               <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="primary">
-                Update
+                {{ tr('BTN_UPT') }}
               </b-button>
               <b-button class="float-right mb-1" size="md" 
                         type="button" variant="outline-secondary"
                         @click="hideModal"
               >
-                Cancel
+                {{ tr('BTN_CANCEL') }}
               </b-button>
             </b-col>
           </b-row>
@@ -83,7 +84,6 @@
 
 <script>
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
-import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal';
 import BaseField from '@/components/base/form/BAFM_001_BaseField.vue';
 const userModel = {
     user_id: null,
@@ -99,7 +99,6 @@ export default {
     name: 'ProfileModal',
     components: {
         BaseModal,
-        BaseSimpleModal,
         BaseField
     },
     data() {
@@ -132,10 +131,10 @@ export default {
     methods: {
         showModal () {
             this.init();
-            this.$refs.baseModal.showModal();
+            this.$refs.VICO004_ProfileModal.showModal();
         },
         hideModal () {
-            this.$refs.baseModal.hideModal();
+            this.$refs.VICO004_ProfileModal.hideModal();
             this.reset();
         },
         reset () {
@@ -153,10 +152,10 @@ export default {
                 res = await this.$axios.post('/identity/user/update', this.getUserForUpdate());
                 this.userData = res.data;
                 this.hideModal();
-                this.$alertify.success('Profile Successfully Updated.');
+                this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('PROFILE'), this.tr('UPT_PAST')]));
             } catch (e) {
                 console.error(e);
-                this.$alertify.error('ERROR OCCURED during Updating Profile.');
+                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), this.tr('PROFILE')]));
             } 
         },
         async init () {
@@ -173,7 +172,7 @@ export default {
                 this.userData = res.data;
             } catch (e) {
                 console.error(e);
-                this.$alertify.error('ERROR OCCURED during Getting Profile.');
+                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('PROFILE')]));
             }
         },
         setUser (user) {

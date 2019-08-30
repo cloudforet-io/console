@@ -33,7 +33,7 @@
             </template>
           </BaseField>
 
-          <BaseField v-if="creatable && !isLocalUser" 
+          <BaseField v-if="creatable && isLocalUser" 
                      v-model="password" 
                      :state="validatePassword"
                      type="password"
@@ -47,7 +47,7 @@
                      invalid-message="Your Password must be 5-12 characters long."
           />
 
-          <BaseField v-if="creatable && !isLocalUser" 
+          <BaseField v-if="creatable && isLocalUser" 
                      v-model="passwordCheck" 
                      :label="`${tr('USER.PWD_CHECK')} : `"
                      :label-cols="3" 
@@ -82,7 +82,7 @@
                      :placeholder="tr('USER.GROUP')"
           />
 
-          <BaseField v-if="!creatable || isLocalUser" 
+          <BaseField v-if="!creatable || !isLocalUser" 
                      v-model="language" 
                      :label="`${tr('USER.LANG')} : `"
                      :label-cols="3"
@@ -93,7 +93,7 @@
           />
     
 
-          <BaseField v-if="!creatable || isLocalUser" 
+          <BaseField v-if="!creatable || !isLocalUser" 
                      v-model="timezone" 
                      :label="`${tr('USER.TIME')} : `"
                      :label-cols="3"
@@ -104,7 +104,7 @@
           />
         </b-col>
         <b-col cols="6">
-          <BaseField v-if="creatable && !isLocalUser" 
+          <BaseField v-if="creatable && isLocalUser" 
                      v-model="language" 
                      :label="`${tr('USER.LANG')} : `"
                      :label-cols="3"
@@ -116,8 +116,8 @@
           />
     
 
-          <BaseField v-if="creatable && !isLocalUser" 
-                     v-model="timezo" 
+          <BaseField v-if="creatable && isLocalUser" 
+                     v-model="timezone" 
                      :label="`${tr('USER.TIME')} : `"
                      :label-cols="3"
                      label-class="col-xl-2"
@@ -171,7 +171,8 @@
       :text="noticeText"
       type="danger"
       centered
-      :ok-only="false"
+      sm
+      ok-only
       @ok="onConfirmReset"
     />
   </div>
@@ -337,15 +338,17 @@ export default {
             console.log('find user');
             let res = null;
             try {
-                // res = await this.$axios.post('/identity/user/find', {
-                //     user_id: this.userId
-                // });
-
-                this.onFailFindUser();
-
-                
+                res = await this.$axios.post('/identity/user/find', {
+                    keyword: this.userId
+                });
+                if (res.data.results[0].state === 'UNIDENTIFIED') {
+                    this.onFailFindUser();
+                } else {
+                    this.resetUserData(res.data.results[0]);
+                }
             } catch (e) {
                 console.error(e);
+                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('FIND_CONT'), this.tr('USER')]));
             }
         },
         onFailFindUser () {
