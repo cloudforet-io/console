@@ -46,11 +46,12 @@ export default {
 
                 const res = await api.post('/identity/token/issue', {
                     credentials:{
-                        // access_token: 'ya29.Glt0B5GBBwPInMa7IyLJDkEFeWByPaNf6n_YxqtKcpHPHK7nWENc6-Vb0IUEdwF6Aq99zCxeQ7SRalUL898CzbCv0d23qkoD6bdtbOCM9UGx3WFWJANUo2IdYe-W'
+                        // access_token: 'ya29.Glt0B1F9aOXkZLqKgjBGuMPKeDpinR7YW1s24YZFDKHzucw5t0KqNIb-COixm7kiSr9yqbw0FzD5xfvkJ8PrnZkrKDn6sJwW5llXAmqDID08aRkRektABovXWBHO'
                         'user_id': userId,
                         'password': password
                     },
                     'domain_id': domainId
+                    // 'domain_id': 'domain-2fba0c6a4a94'
                 });
 
                 commit('setUserId', { userId: userId });

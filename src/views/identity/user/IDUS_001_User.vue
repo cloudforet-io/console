@@ -8,7 +8,7 @@
                    :per-page="query.page.limit"
                    searchable
                    :total-rows="totalCount" 
-                   :search-context-data="queryData"
+                   :search-context-data="contextData"
                    :busy="isLoading" 
                    :cardless="false" 
                    underlined
@@ -129,7 +129,7 @@
 <script>
 import BaseDragHorizontal from '@/components/base/drag/BADG_002_BaseDragHorizontal';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
-import query from './search_context/query.js';
+import contextData from './search_context/query.js';
 
 const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 const UserInfo = () => import('./IDUS_003_UserInfo');
@@ -160,14 +160,13 @@ export default {
                     tabIdxTitle: this.tr('INFO')
                 }
             ],
-            defaultTab: 0,
             users: [],
             selectedItems: [],
             addModal: false,
             totalCount: 0,
-            queryData: query,
             isReadyForSearch: false,
             isLoading: true,
+            contextData: contextData,
             query: { 
                 sort: {}, 
                 page: {
@@ -178,7 +177,7 @@ export default {
                 filter_or: []
             },
             isCreateMode: true,
-            isLocalMode: true,
+            isLocalMode: false,
             action: null,
             actionCheckTitle: '',
             actionCheckType: '',
@@ -254,20 +253,6 @@ export default {
         },
         async listUsers (limit, start, sort, filter, filterOr) {
             this.reset();
-            // sort = {
-            //     key: 'user_id',
-            //     desc: true
-            // };
-            // start = 4;
-            // limit = 2;
-            // filter = [
-            //     { k: 'user_id', v: 'nobody', o: 'eq' }
-            // ];
-            // filterOr = [
-            //     { k: 'user_id', v: 'nobody', o: 'eq' },
-            //     { k: 'user_id', v: 'admin', o: 'eq' }
-            // ];
-            
             this.setQuery(limit, start, sort, filter, filterOr);
             let res = null;
             try {
@@ -280,6 +265,7 @@ export default {
                 this.isLoading = false;
             } catch (e) {
                 console.error(e);
+                this.$alertify(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('USER')]));
                 this.isLoading = false;
             }
         },
@@ -335,27 +321,30 @@ export default {
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DELETE'), this.tr('USER')]);
             this.actionCheckType = 'danger';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DELETE'), this.tr('USER')]);
-            this.$refs.IDUS001_ActionCheckModal.showModal();
+            this.showActionModal();
         },
         onClickEnable () {
             this.action = this.enableUser;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_ENABLE'), this.tr('USER')]);
             this.actionCheckType = 'warning';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_ENABLE'), this.tr('USER')]);
-            this.$refs.IDUS001_ActionCheckModal.showModal();
+            this.showActionModal();
         },
         onClickDisable () {
             this.action = this.disableUser;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DISABLE'), this.tr('USER')]);
             this.actionCheckType = 'warning';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DISABLE'), this.tr('USER')]);
-            this.$refs.IDUS001_ActionCheckModal.showModal();
+            this.showActionModal();
         },
         showUserDetail () {
             this.$refs.IDUS001_UserDetailModal.showModal();
         },
         hideUserDetail () {
             this.$refs.IDUS001_UserDetailModal.hideModal();
+        },
+        showActionModal () {
+            this.$refs.IDUS001_ActionCheckModal.showModal();
         }
     }
 };
@@ -387,10 +376,10 @@ export default {
     }
 
 }
-.delete-user {
-    vertical-align: middle;
-}
-.user-name {
-    font-size: 1.2rem;
-}
+// .delete-user {
+//     vertical-align: middle;
+// }
+// .user-name {
+//     font-size: 1.2rem;
+// }
 </style>

@@ -230,12 +230,16 @@ a {
     border-radius: 5px;
     &.sm {
         padding: 5px;
+        padding-right: 10px;
     }
     .icon {
-      margin-left: 0;
-      color: inherit;
-      font-weight: inherit;
-      font-size: 1.3em;
+        display: inline-block;
+        margin-left: 0;
+        color: inherit;
+        font-weight: inherit;
+        font-size: 1.3em;
+        width: 20px;
+        text-align: center;
     }
     .name {
       padding-left: 15px;

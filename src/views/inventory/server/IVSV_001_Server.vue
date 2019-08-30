@@ -2,137 +2,151 @@
   <div class="animated fadeIn">
     <BaseDragHorizontal>
       <template #container="{ height }">
-        <BaseTable :table-data="servers"
+        <BaseTable class="server-table"
+                   :table-data="servers"
                    :fields="fields"
-                   :per-page="perPage"
-                   :searchable="true"
+                   :per-page="query.page.limit"
+                   searchable
                    :total-rows="totalCount"
-                   :search-context-data="queryData"
+                   :search-context-data="contextData"
                    :busy="isLoading"
-                   :height="height"
                    :cardless="false"
-                   :underlined="true"
+                   underlined
+                   :height="height"
+                   field-id="server_id"
                    @rowSelected="rowSelected"
+                   @onSelectAll="onAllRowSelected"
                    @list="listServers"
                    @limitChanged="limitChanged"
         >
           <template #caption>
-            <div class="row">
-              <b-col cols="6">
-                <BaseModal ref="addServer"
-                           title="Add Server"
-                           :centered="true" :hide-footer="true"
-                >
-                  <template #activator>
-                    <b-button block variant="primary">
-                      {{ tr('BTN_CRT') }}
-                    </b-button>
-                  </template>
-                  <template #contents />
-                </BaseModal>
-              </b-col>
-              <b-col cols="6">
-                <b-dropdown class="dropdown" text="Actions" variant="secondary">
-                  <b-dropdown-item class="b-dro-pad">
-                    <i class="fad fa-comment-plus mr-1" />
-                          &nbsp;{{ tr('BTN_CRT') }}
-                  </b-dropdown-item>
-                  <b-dropdown-item class="b-dro-pad">
-                    <i class="fal fa-comment-edit mr-1" />
-                    {{ tr('BTN_UPT') }}
-                  </b-dropdown-item>
-                  <b-dropdown-item class="b-dro-pad">
-                    <i class="fad fa-comment-minus mr-1" />
-                    {{ tr('BTN_DELETE') }}
-                  </b-dropdown-item>
-                  <b-dropdown-divider />
-                  <b-dropdown-item class="b-dro-pad">
-                    <i class="fad fa-exclamation-circle mr-1" />
-                    {{ tr('BTN_S_MANT') }}
-                  </b-dropdown-item>
-                  <b-dropdown-item class="b-dro-pad">
-                    <i class="fad fa-empty-set mr-1" />
-                    {{ tr('BTN_US_MANT') }}
-                  </b-dropdown-item>
-                  <b-dropdown-divider />
-                  <b-dropdown-item class="b-dro-pad">
-                    <i class="fad fa-comment-alt-edit mr-1" />
-                    {{ tr('CHG_PRO') }}
-                  </b-dropdown-item>
-                  <b-dropdown-item class="b-dro-pad">
-                    <i class="fad fa-comment-alt-edit mr-1" />
-                    {{ tr('CHG_POOL') }}
-                  </b-dropdown-item>
-                  <b-dropdown-divider />
-                  <b-dropdown-item class="b-dro-pad">
-                    <i class="fad fa-file-import mr-1" />
-                    &nbsp;{{ tr('IMPORT') }}
-                  </b-dropdown-item>
-                  <b-dropdown-item class="b-dro-pad">
-                    <i class="fad fa-file-export mr-1" />
-                    {{ tr('EXPORT') }}
-                  </b-dropdown-item>
-                  <b-dropdown-divider />
-                  <b-dropdown-item class="b-dro-pad">
-                    <i class="fad fa-sync mr-1" />
-                    {{ tr('COL_INFO') }}
-                  </b-dropdown-item>
-                </b-dropdown>
-              </b-col>
+            <div>
+              <b-dropdown v-if="hasSelectedServer" no-caret
+                          variant="outline-info"
+                          class="no-selected"
+              >
+                <template #button-content>
+                  <span>{{ tr('BTN_ACTION') }}</span> &nbsp;
+                  <i class="fal fa-angle-down" />
+                </template>
+                <b-dropdown-item @click="onClickDelete">
+                  <div class="item sm">
+                    <i class="icon fal fa-trash-alt" />
+                    <span class="name">{{ tr('BTN_DELETE') }}</span>
+                  </div>
+                </b-dropdown-item>
+
+                <b-dropdown-divider />
+
+                <b-dropdown-item>
+                  <div class="item sm">
+                    <i class="icon fal fa-traffic-cone" />
+                    <span class="name">{{ tr('BTN_S_MANT') }}</span>
+                  </div>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <div class="item sm">
+                    <i class="icon fal fa-play-circle" />
+                    <span class="name">{{ tr('BTN_S_SERV') }}</span>
+                  </div>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <div class="item sm">
+                    <i class="icon fal fa-stop-circle" />
+                    <span class="name">{{ tr('BTN_S_CLOSE') }}</span>
+                  </div>
+                </b-dropdown-item>
+
+                <b-dropdown-divider />
+
+                <b-dropdown-item>
+                  <div class="item sm">
+                    <i class="icon fal fa-layer-group" />
+                    <span class="name">{{ tr('CHG_PRO') }}</span>
+                  </div>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                  <div class="item sm">
+                    <i class="icon fal fa-map-pin" />
+                    <span class="name">{{ tr('CHG_POOL') }}</span>
+                  </div>
+                </b-dropdown-item>
+
+                <b-dropdown-divider />
+
+                <b-dropdown-item>
+                  <div class="item sm">
+                    <i class="icon fal fa-sync-alt" />
+                    <span class="name">{{ tr('COL_INFO') }}</span>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
             </div>
           </template>
         </BaseTable>
       </template>
     </BaseDragHorizontal>
 
-    <b-row>
-      <b-col cols="12">
-        <BaseTabNav v-if="selectedServer"
-                    :key="selectedServer.user_id"
-                    :fill="false"
-                    :nav-tabs="tabs"
-                    :keep-alive="true"
-                    :is-footer-visible="false"
-                    :use-slot="true"
-        >
-          <template #SUMMARY>
-            <b-card class="base first-tab">
-              <serverSummary />
-            </b-card>
-          </template>
-          <template #DATA>
-            <serverData />
-          </template>
-          <template #RAWDATA>
-            <serverRawData />
-          </template>
-          <template #ADMIN>
-            <serverAdmin />
-          </template>
-        </BaseTabNav>
-      </b-col>
-    </b-row>
+    <ActionCheckModal ref="IDSV001_ActionCheckModal" 
+                      :data="selectedServers" 
+                      :fields="multiActionFields"
+                      :action="action"
+                      :title="actionCheckTitle"
+                      :type="actionCheckType"
+                      :text="actionCheckText"
+                      primary-key="user_id"
+                      @succeed="listServers"
+                      @failed="listServers"
+    />
+
+    <BaseTabNav v-if="hasSelectedServer" class="server-info"
+                :fill="false"
+                :nav-tabs="tabs"
+                :keep-alive="true"
+                :is-footer-visible="false"
+                :use-slot="true"
+    >
+      <template #SUMMARY>
+        <b-card class="base first-tab">
+          <ServerSummary />
+        </b-card>
+      </template>
+      <template #DATA>
+        <ServerData />
+      </template>
+      <template #RAWDATA>
+        <ServerRawData />
+      </template>
+      <template #ADMIN>
+        <ServerAdmin />
+      </template>
+    </BaseTabNav>
+    <div v-else class="empty">
+      <span class="msg">{{ tr('PANEL.NO_SELECT', [tr('SERVER')]) }}</span>
+    </div>
   </div>
 </template>
 
 <script>
-import BaseTable from '@/components/base/table/BATB_001_BaseTable';
-import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
-import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
-import BaseDragHorizontal from '@/components/base/drag/BADG_002_BaseDragHorizontal.vue';
+import contextData from './search_context/query.js';
 
-import query from './search_context/query.js';
-import ServerSummary from '@/views/inventory/server/IVSV_002_ServerSummary';
-import ServerData from '@/views/inventory/server/IVSV_003_ServerData';
-import ServerRawData from '@/views/inventory/server/IVSV_004_ServerRawData';
-import ServerAdmin from '@/views/inventory/server/IVSV_005_ServerAdmin';
+import BaseDragHorizontal from '@/components/base/drag/BADG_002_BaseDragHorizontal.vue';
+import BaseTable from '@/components/base/table/BATB_001_BaseTable';
+
+const ActionCheckModal = () => import('@/components/base/modal/BAMO_003_EXT_ActionCheckModal.vue');
+const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
+
+const ServerSummary = () => import('@/views/inventory/server/IVSV_002_ServerSummary');
+const ServerData = () => import('@/views/inventory/server/IVSV_003_ServerData');
+const ServerRawData = () => import('@/views/inventory/server/IVSV_004_ServerRawData');
+const ServerAdmin = () => import('@/views/inventory/server/IVSV_005_ServerAdmin');
 
 export default {
     name: 'Server',
     components: {
         BaseDragHorizontal,
         BaseTable,
-        BaseModal,
+        ActionCheckModal,
         BaseTabNav,
         ServerSummary,
         ServerData,
@@ -161,14 +175,26 @@ export default {
                 }
             ],
             servers: [],
-            selectedServer: null,
+            selectedItems: [],
             selectedIdx: null,
             addModal: false,
             totalCount: 0,
-            queryData: query,
             isReadyForSearch: false,
-            perPage: 3,
-            isLoading: true
+            isLoading: true,
+            contextData: contextData,
+            query: { 
+                sort: {}, 
+                page: {
+                    start: 0, 
+                    limit: 10
+                }, 
+                filter: [],
+                filter_or: []
+            },
+            action: null,
+            actionCheckTitle: '',
+            actionCheckType: '',
+            actionCheckText: ''
         };
     },
     computed: {
@@ -189,82 +215,117 @@ export default {
                 { key: 'project_group_id', label: this.tr('COL_NM.UPDATE'), sortable: true, ajaxSortable: false },
                 { key: 'query', label: this.tr('COL_NM.DISK_SZ'), sortable: true, ajaxSortable: false }
             ];
+        },
+        multiInfoFields () {
+            return [
+                { key: 'user_id',label: this.tr('COL_NM.ID') },
+                { key: 'name', label: this.tr('COL_NM.NAME') },
+                { key: 'email', label: this.tr('COL_NM.EMAIL') },
+                { key: 'group', label: this.tr('COL_NM.GROUP') }
+            ];
+        },
+        multiActionFields () {
+            return [
+                { key: 'user_id',label: this.tr('COL_NM.ID') },
+                { key: 'name', label: this.tr('COL_NM.NAME') },
+                { key: 'email', label: this.tr('COL_NM.EMAIL') }
+            ];
+        },
+        isMultiSelected () {
+            return this.selectedItems.length > 1;
+        },
+        hasSelectedServer () {
+            return this.selectedItems.length > 0;
+        },
+        selectedServers () {
+            return this.selectedItems.map((item) => {
+                return item.data;
+            });
         }
     },
     mounted() {
-        this.init();
+        this.listServers();
     },
     methods: {
-        init() {
-            this.listServers(this.perPage, 0);
-        },
         reset() {
             this.servers = [];
-            this.selectedServer = null;
+            this.selectedItems = [];
             this.isLoading = true;
         },
-
-        async listServers(limit, skip, sort, search) {
-            this.reset();
-            if (this.isEmpty(limit)) {
-                limit = 10;
-            }
-            if (this.isEmpty(skip)) {
-                skip = 0;
-            }
-            if (this.isEmpty(sort)) {
-                sort = '-created_date';
-            }
-            if (this.isEmpty(search)) {
-                search = [];
-            }
-
-            await this.$axios.post('/identity/user/list', {
-                params: { limit, skip, sort }
-            }).then((response) => {
-                this.servers = response.data.results;
-                this.totalCount = response.data.total_count;
-                this.isLoading = false;
-            }).catch((error) => {
-                console.error(error);
-                this.isLoading = false;
-            });
-
+        setQuery (limit, start, sort, filter, filterOr) {
+            this.query.page.limit = limit || 10;
+            this.query.page.start = start || 0;
+            this.query.sort = sort || {};
+            this.query.filter = filter || [];
+            this.query.filter_or = filterOr || [];
         },
-        rowSelected(row) {
-            if (row instanceof Array || !row) {
-                this.selectedServer = null;
-            } else {
-                this.selectedServer = row.data;
+        async listServers (limit, start, sort, filter, filterOr) {
+            this.reset();
+            this.setQuery(limit, start, sort, filter, filterOr);
+            let res = null;
+            try {
+                res = await this.$axios.post('/identity/user/list', {
+                    query: this.query
+                });
+                this.servers = res.data.results;
+                this.totalCount = res.data.total_count;
+                this.isLoading = false;
+            } catch (e) {
+                console.error(e);
+                this.$alertify(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
+                this.isLoading = false;
             }
+        },
+        rowSelected (rows) {
+            this.selectedItems = rows;
+        },
+        onAllRowSelected (isSelectedAll, rows) {
+            this.selectedItems = rows;
         },
         limitChanged(val) {
-            this.perPage = Number(val);
-            this.init();
+            this.query.page.limit = Number(val);
+            this.listServers();
+        },
+        getParams (items) {
+            let params = { servers: []};
+            items.map((item) => {
+                params.servers.push(item.user_id);
+            });
+            return params;
+        },
+        showActionModal () {
+            this.$refs.IDSV001_ActionCheckModal.showModal();
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-    .animated.fadeIn {
-        padding: $top-pad $side-pad $bottom-pad $side-pad;
+.animated.fadeIn {
+    padding: $top-pad $side-pad $bottom-pad $side-pad;
+}
+.base-table {
+    @extend %sheet;
+}
+.btn {
+    margin: 0 5px;
+}
+.server-table {
+    margin-top: 20px;
+}
+.server-info {
+  margin-bottom: 20px;
+}
+.empty {
+    text-align: center;
+    margin-top: 40px;
+    .msg {
+        color: $darkgray;
+        font-size: 1.3rem;
+        font-weight: 600;
     }
-
-    .base-table {
-        @extend %sheet;
-    }
-
-    .btn {
-        margin: 0 5px;
-    }
-
-    .server-table {
-        margin-bottom: 20px;
-    }
-
-    .b-dro-pad {
-     padding: 0px 10px 0px 10px;
-    }
-
+}
+.icon {
+    font-size: 1rem !important;
+}
 </style>
