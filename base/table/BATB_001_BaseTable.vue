@@ -37,7 +37,7 @@
               </b-col>
               <b-col>
                 <BaseModal ref="modal" 
-                           title="Table Settings"
+                           :title="tr('TABLE.SETTINGS')"
                            :centered="true" 
                            :size="'md'" 
                            @ok="limitChanged"
@@ -46,7 +46,7 @@
                     <span class="settings-btn"><i class="fal fa-cog" /></span>
                   </template>
                   <template #contents>
-                    <b-form-group label="Rows per page: " :label-cols="3">
+                    <b-form-group :label="tr('TABLE.LIMIT_LABEL')" :label-cols="3">
                       <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax"
                                     @blur="filterLimit" @keydown.enter="onLimitInputEnter"
                       />
@@ -399,7 +399,6 @@ export default {
                     return idx === row.idx;
                 });
             }
-            
         },
         resetSelectedRows () {
             this.selectedRows = [];
