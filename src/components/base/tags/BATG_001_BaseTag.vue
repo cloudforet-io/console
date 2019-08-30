@@ -92,12 +92,20 @@ export default {
 
     },
     mounted () {
-        if (this.showFirstTagRow) {
-            this.isEditable = true;
-            this.addRow();
-        }
+        this.addFirstRowWhenStart();
     },
     methods: {
+        addFirstRowWhenStart(trigger){
+            if (this.isEmpty(trigger)){
+                if (this.showFirstTagRow) {
+                    this.isEditable = true;
+                    this.addRow();
+                }
+            } else {
+                this.isEditable = true;
+                this.addRow();
+            }
+        },
         addRow () {
             this.rows.push({ rowId: this.lastRowId++, tag: {}});
         },

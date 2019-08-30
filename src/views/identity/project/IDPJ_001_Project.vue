@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <BaseTree ref="projectTree"
+    <BaseTree ref="IDPJ001_ProjectTree"
               :tree-prop="treeData"
               :context-init="isInitializing"
               @selected="NodeSelected"
@@ -37,6 +37,7 @@
     >
       <template #treeSubPanel>
         <BaseTabNav
+          ref="IDPJ001_TreeSubPanel"
           :fill="false"
           :nav-tabs="tabs"
           :selected-data="selectedData"
@@ -52,7 +53,6 @@
 <script>
 
 import projectSummary from './IDPJ_004_ProjectSummary.vue';
-import projectAudit from './IDPJ_007_ProjectAudit.vue';
 import projectMember from './IDPJ_005_ProjectMember.vue';
 import projectEditPopupName from '@/views/identity/project/IDPJ_002_ProjectEditPopupName';
 import projectEditPopupTag from '@/views/identity/project/IDPJ_003_ProjectEditPopupTag';
@@ -184,16 +184,15 @@ export default {
             let params = {};
 
             const tabChildren = this.$refs.IDPJ001_EditTab.$children;
-            let indexes = this.getRightTabIndexinChildren();
+            let childrenIdx = this.getRightChildrenIndex(tabChildren, ['ProjectEditPopUpName','ProjectEditPopUpTag']);
 
-            if (tabChildren[indexes[0]].validateProject()){
+            if (tabChildren[childrenIdx[0]].validateProject()){
                 isDefaultValidated = true;
-                params['name'] = tabChildren[indexes[0]]._data.projectName;
+                params['name'] = tabChildren[childrenIdx[0]]._data.projectName;
             }
-
-            if (indexes.length > 1){
-                if (tabChildren[indexes[1]].$refs.projectTag.validate()) {
-                    params['tags'] = tabChildren[indexes[1]].$refs.projectTag.tags;
+            if (childrenIdx.length > 1){
+                if (tabChildren[childrenIdx[1]].$refs.IDPJ003_ProjectTag.validate()) {
+                    params['tags'] = tabChildren[childrenIdx[1]].$refs.IDPJ003_ProjectTag.tags;
                     isTagValidated = true;
                 }
             } else {
@@ -304,24 +303,6 @@ export default {
                 this.$refs.IDPJ001_EditModal.hideModal();
             }
         },
-        getRightTabIndexinChildren(){
-            let returnVal = [];
-            let popupNameIdx = null;
-            let popupTagIdx = null;
-            const tabChildren = this.$refs.IDPJ001_EditTab.$children;
-
-            tabChildren.forEach(function(curItem, index){
-                const itemOption = curItem.$options;
-                if (itemOption.name === 'ProjectEditPopUpName') {
-                    popupNameIdx = index;
-                    returnVal.push(popupNameIdx);
-                } else if (itemOption.name === 'ProjectEditPopUpTag') {
-                    popupTagIdx = index;
-                    returnVal.push(popupTagIdx);
-                }
-            });
-            return returnVal;
-        },
         async updateProject(items) {
             this.consoleLogEnv('Update Project : ', items);
             const itemType = items.tree.getSelected()[0].data.item_type;
@@ -329,13 +310,15 @@ export default {
             const url = itemType === 'PROJECT_GROUP' ? '/identity/project-group/update': '/identity/project/update';
             const key = itemType === 'PROJECT_GROUP' ? 'project_group_id': 'project_id';
             let param = this.validateProject();
-
             if (!this.isEmpty(param)){
                 param[key] = selectedId;
                 await this.$axios.post(url, param).then((response) => {
                     if (response.data[key] === selectedId) {
                         const treeV = items.tree;
                         const path = treeV.getSelected()[0].path;
+                        const updateSummary = this.$refs.IDPJ001_TreeSubPanel.$children;
+                        const updateIndex = this.getRightChildrenIndex(updateSummary,'ProjectSummary');
+                        updateSummary[updateIndex].setInitData();
                         treeV.updateNode(path, { title: param.name });
                         this.$refs.IDPJ001_EditModal.hideModal();
                     }

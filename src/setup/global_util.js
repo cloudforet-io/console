@@ -560,6 +560,34 @@ export const Mixin = {
                 });
             }
             return returnArray;
+        },
+        /**********************************************************************************
+         * Name       : validateSameness
+         * Input   => (value                           =>  String
+         *             boolOnly                        =>  Bolean
+         *             checkValue                      =>  String)
+         * Output  => Boolean or Null
+         * Description:  return the result of validation
+         **********************************************************************************/
+        getRightChildrenIndex(ref_data, key){
+            let returnVal = [];
+            if (this.isEmpty(key)){
+                return returnVal;
+            };
+
+            //means Array
+            if (this.isSelectedType(key,'a')) {
+                key.forEach(function(curItem){
+                    const index = ref_data.findIndex(x => x.$options.name === curItem);
+                    if(index > -1){
+                        returnVal.push(index);
+                    }
+                });
+            } else {
+                returnVal = ref_data.findIndex(x => x.$options.name === key);
+            };
+
+            return returnVal;
         }
     },
     data: function () {

@@ -3,31 +3,31 @@
     <b-col cols="12" class="base-tab-nav">
       <template v-if="pill">
         <b-nav pills :fill="fill">
-          <b-nav-item v-for="(curTab, idx) in navTabs" :lazy="false"
+          <b-nav-item v-for="(curTab, idx) in navTabs" :id="curTab.tabTitle"
                       :key="idx"
-                      :id="curTab.tabTitle"
+                      :lazy="false"
                       :class="{active: selectedTab.component === curTab.component}"
                       :active="selectedTab.tabTitle === curTab.tabTitle"
-                      @click="selectedTab = curTab"
+                      @click="tabSelected(curTab, idx)"
           >
             {{ curTab.tabTitle }}
           </b-nav-item>
         </b-nav>
       </template>
       <template v-else>
-        <b-nav tabs :fill="fill" >
-          <b-nav-item v-for="(curTab, idx) in navTabs" :lazy="false"
+        <b-nav tabs :fill="fill">
+          <b-nav-item v-for="(curTab, idx) in navTabs" :id="curTab.tabTitle"
                       :key="idx"
-                      :id="curTab.tabTitle"
+                      :lazy="false"
                       :class="{active: selectedTab.component === curTab.component}"
                       :active="selectedTab.tabTitle === curTab.tabTitle"
-                      @click="selectedTab = curTab"
+                      @click="tabSelected(curTab, idx)"
           >
             {{ curTab.tabTitle }}
           </b-nav-item>
         </b-nav>
       </template>
-      <slot v-if="useSlot" :name="setTabName(selectedTab)"/>
+      <slot v-if="useSlot" :name="setTabName(selectedTab)" />
       <template v-else>
         <template v-if="keepAlive">
           <keep-alive>
@@ -135,6 +135,7 @@ export default {
     data () {
         return {
             prosData: {},
+            selectedIndex: 0,
             selectedTab: this.navTabs[this.defaultTab],
             dataForTab: this.selectedData,
             tabContentData: {},
@@ -143,13 +144,12 @@ export default {
             isDelete: this.isDeletable
         };
     },
-    created () {
-        this.$bus.$on('setTabData', this.setTabData);
-    },
-    beforeDestroy: function () {
-        this.$bus.$off('setTabData');
-    },
     methods: {
+        tabSelected(selectedTab, index){
+            console.log('tab', this.selectedIndex);
+            this.selectedIndex = index;
+            this.selectedTab = selectedTab;
+        },
         setTabData (dataToSet) {
             for (let key in dataToSet) {
                 this.tabContentData[key] = dataToSet[key];
