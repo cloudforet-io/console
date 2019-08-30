@@ -411,6 +411,16 @@ export const Mixin = {
             return langObj.text;
         },
         /**********************************************************************************
+         * Name       : getLanguage
+         * Input   => (value                         =>  String)
+         *             
+         * Output  => Object
+         * Description:  return Object of language.
+         **********************************************************************************/
+        getLanguage: function (value) {
+            return GlobalEnum.LANGUAGES[value];
+        },
+        /**********************************************************************************
          * Name       : getSelectedNode
          * Input   => (o: any data Object to bind                         =>  Object)
          * Output  => Node
@@ -594,7 +604,8 @@ export const Mixin = {
         return {
             _: VueLodash,
             defaultFontSizeSet: [10, 12, 14, 16, 18, 24],
-            isFirstLogin: false
+            isFirstLogin: false,
+            ENUM: GlobalEnum
         };
     }
 };

@@ -8,13 +8,13 @@
       <b-dropdown-item @click="onClickProfile">
         <div class="item">
           <i class="fal fa-address-card" />
-          <span class="name">Profile</span>
+          <span class="name">{{ tr('PROFILE') }}</span>
         </div>
       </b-dropdown-item>
       <b-dropdown-item @click="logout">
         <div class="item">
           <i class="fal fa-sign-out" />
-          <span class="name">Logout</span>
+          <span class="name">{{ tr('LOG_OUT') }}</span>
         </div>
       </b-dropdown-item>
     </b-dropdown>

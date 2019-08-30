@@ -249,7 +249,7 @@ export default {
     .input-container {
       border: 0;
       border-radius: 5px 0 0 5px;
-      background-color: #fff;
+      background-color: $white;
       padding-left: 5px;
       width: calc(100% - #{$search-btn-width});
       vertical-align: middle;

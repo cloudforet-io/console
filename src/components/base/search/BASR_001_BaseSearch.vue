@@ -135,7 +135,7 @@ export default {
                 });
             });
         },
-        removeEmptyValueFilterList () {
+        removeEmptyValueFilterOrList () {
             this._.remove(this.filterOrList, (filter) => {
                 return filter.value.length === 0;
             });
@@ -226,7 +226,7 @@ export default {
             this.focusOnInput();
         },
         search () {
-            this.removeEmptyValueFilterList();
+            this.removeEmptyValueFilterOrList();
             this.$emit('search', this.filterList, this.filterOrList);
         },
         onClickSearch () {
@@ -243,13 +243,13 @@ export default {
         },
         getOperator (op) {
             switch (op) {
-            case ':': return 'contain_in';
-            case ':=': return 'in';
-            case ':>': return 'gte'; // 무조건 filterList
-            case ':<': return 'lte'; // 무조건 filterList
-            case ':!': return 'not_in'; 
-            case ':/': return 'regex_in'; 
-            default: return 'contain_in';
+            case this.ENUM.OPERATORS.CONTAIN_IN.sign: return this.ENUM.OPERATORS.CONTAIN_IN.string;
+            case this.ENUM.OPERATORS.IN.sign: return this.ENUM.OPERATORS.IN.string;
+            case this.ENUM.OPERATORS.GTE.sign: return this.ENUM.OPERATORS.GTE.string;
+            case this.ENUM.OPERATORS.LTE.sign: return this.ENUM.OPERATORS.LTE.string;
+            case this.ENUM.OPERATORS.NOT_IN.sign: return this.ENUM.OPERATORS.NOT_IN.string;
+            case this.ENUM.OPERATORS.REGEX_IN.sign: return this.ENUM.OPERATORS.REGEX_IN.string;
+            default: return this.ENUM.OPERATORS.CONTAIN_IN.string;
             }
         },
         focusOnInput () {
@@ -295,7 +295,7 @@ $search-btn-width: 50px;
   .input-container {
     border: 0;
     border-radius: 5px 0 0 5px;
-    background-color: #fff;
+    background-color: $white;
     padding-left: 5px;
     width: calc(100% - #{$search-btn-width});
     vertical-align: middle;
@@ -308,10 +308,6 @@ $search-btn-width: 50px;
         cursor: text;
         vertical-align: middle;
         min-height: $input-height;
-        .input-tag {
-            &:focus {
-            }
-        }
         .input {
             display: inline-block;
             vertical-align: middle;

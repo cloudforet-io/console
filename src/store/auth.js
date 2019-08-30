@@ -46,8 +46,9 @@ export default {
 
                 const res = await api.post('/identity/token/issue', {
                     credentials:{
+                        // access_token: 'ya29.Glt0B5GBBwPInMa7IyLJDkEFeWByPaNf6n_YxqtKcpHPHK7nWENc6-Vb0IUEdwF6Aq99zCxeQ7SRalUL898CzbCv0d23qkoD6bdtbOCM9UGx3WFWJANUo2IdYe-W'
                         'user_id': userId,
-                        'password': password,
+                        'password': password
                     },
                     'domain_id': domainId
                 });

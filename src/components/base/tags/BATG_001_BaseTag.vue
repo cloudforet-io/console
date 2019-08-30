@@ -7,7 +7,7 @@
                   class="edit-btn" 
                   @click="onEdit"
         >
-          Edit
+          {{ tr('BTN_EDIT') }}
         </b-button>
       </b-col>
     </b-row>
@@ -39,10 +39,10 @@
       </b-col>
       <b-col v-if="showSaveBtn" cols="5" class="text-right">
         <b-button class="cancel-btn mr-2" @click="onCancel">
-          Cancel
+          {{ tr('BTN_CANCEL') }}
         </b-button>
         <b-button variant="primary" class="save-btn" @click="onSave">
-          Save
+          {{ tr('BTN_SAVE') }}
         </b-button>
       </b-col>
     </b-row>

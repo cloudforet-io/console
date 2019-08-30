@@ -18,7 +18,7 @@
           <b-col cols="12" class="header clickable bordered">
             <span class="icon"><i class="fa fa-chart-line" /></span>
             <span class="title" @click="showMap = false">
-              <router-link to="/dashboard">Dashboard</router-link>
+              <router-link to="/dashboard">{{ tr('DASHBOARD') }}</router-link>
             </span>
           </b-col>
         </b-row>
@@ -28,27 +28,27 @@
         <b-row>
           <b-col cols="12" class="header">
             <span class="icon"><i class="fa fa-warehouse-alt" /></span>
-            <span class="title">Inventory</span>
+            <span class="title">{{ tr('INVENTORY') }}</span>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="11" offset="1" class="item">
             <span class="title " @click="showMap = false">
-              <router-link to="/inventory/data-center">Data Center</router-link>
+              <router-link to="/inventory/data-center">{{ tr('DATA_CENTER') }}</router-link>
             </span>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="11" offset="1" class="item">
             <span class="title " @click="showMap = false">
-              <router-link to="/inventory/server">Server</router-link>
+              <router-link to="/inventory/server">{{ tr('SERVER') }}</router-link>
             </span>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="11" offset="1" class="item">
             <span class="title " @click="showMap = false">
-              <router-link to="/inventory/settings">Settings</router-link>
+              <router-link to="/inventory/settings">{{ tr('SETTINGS') }}</router-link>
             </span>
           </b-col>
         </b-row>
@@ -58,20 +58,20 @@
         <b-row>
           <b-col cols="12" class="header">
             <span class="icon"><i class="fa fa-address-card" /></span>
-            <span class="title">Identity</span>
+            <span class="title">{{ tr('IDENTITY') }}</span>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="11" offset="1" class="item">
             <span class="title " @click="showMap = false">
-              <router-link to="/identity/user">User</router-link>
+              <router-link to="/identity/user">{{ tr('USER') }}</router-link>
             </span>
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="11" offset="1" class="item">
             <span class="title " @click="showMap = false">
-              <router-link to="/identity/project">Project</router-link>
+              <router-link to="/identity/project">{{ tr('PROJECT') }}</router-link>
             </span>
           </b-col>
         </b-row>

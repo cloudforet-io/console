@@ -7,7 +7,7 @@
              @click="setCurrentTab(tab)"
       >
         <div v-if="!tab.icon" slot="title" name="tabHeader">
-          <i :class="tab.tabIcon" style="color:blue" />
+          <i class="tab-icon" :class="tab.tabIcon" />
           {{ tab.tabTitle }}
         </div>
         <br>
@@ -145,5 +145,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+ .tab-icon {
+     color: $blue;
+ }
 </style>

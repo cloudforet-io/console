@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <BaseDragY>
+    <BaseDragHorizontal>
       <template #container="{ height }">
         <BaseTable :table-data="servers"
                    :fields="fields"
@@ -83,7 +83,7 @@
           </template>
         </BaseTable>
       </template>
-    </BaseDragY>
+    </BaseDragHorizontal>
 
     <b-row>
       <b-col cols="12">
@@ -119,25 +119,25 @@
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
-import BaseDragY from '@/components/base/drag/BADG_002_BaseDragY.vue';
+import BaseDragHorizontal from '@/components/base/drag/BADG_002_BaseDragHorizontal.vue';
 
 import query from './search_context/query.js';
-import serverSummary from '@/views/inventory/server/IVSV_002_ServerSummary';
-import serverData from '@/views/inventory/server/IVSV_003_ServerData';
-import serverRawData from '@/views/inventory/server/IVSV_004_ServerRawData';
-import serverAdmin from '@/views/inventory/server/IVSV_005_ServerAdmin';
+import ServerSummary from '@/views/inventory/server/IVSV_002_ServerSummary';
+import ServerData from '@/views/inventory/server/IVSV_003_ServerData';
+import ServerRawData from '@/views/inventory/server/IVSV_004_ServerRawData';
+import ServerAdmin from '@/views/inventory/server/IVSV_005_ServerAdmin';
 
 export default {
     name: 'Server',
     components: {
-        BaseDragY,
+        BaseDragHorizontal,
         BaseTable,
         BaseModal,
         BaseTabNav,
-        serverSummary,
-        serverData,
-        serverRawData,
-        serverAdmin
+        ServerSummary,
+        ServerData,
+        ServerRawData,
+        ServerAdmin
 
     },
     data() {

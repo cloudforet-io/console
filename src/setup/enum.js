@@ -10,8 +10,8 @@ export const GlobalEnum = {
         }
     }),
     LANGUAGES: Object.freeze({
-        en: { value: 'en', text: 'English' , nation: 'US'},
-        ko: { value: 'ko', text: '한국어', nation: 'KR' }
+        en: { value: 'en', text: 'English' , nation: 'US', icon: 'flag-icon flag-icon-us' },
+        ko: { value: 'ko', text: '한국어', nation: 'KR', icon: 'flag-icon flag-icon-kr' }
     }),
     MEMBER_STATE: Object.freeze(
         {
@@ -81,5 +81,31 @@ export const GlobalEnum = {
                 icon: 'fal fa-question-circle',
                 color: 'secondary'
             }
-        })
+        }),
+    OPERATORS: Object.freeze({
+        CONTAIN_IN: {
+            string: 'contain_in',
+            sign: ':'
+        },
+        IN: {
+            string: 'in',
+            sign: ':='
+        },
+        GTE: {
+            string: 'gte',
+            sign: ':>'
+        },
+        LTE: {
+            string: 'lte',
+            sign: ':<'
+        },
+        NOT_IN: {
+            string: 'not_in',
+            sign: ':!'
+        },
+        REGEX_IN: {
+            string: 'regex_in',
+            sign: ':/'
+        }
+    })
 };

@@ -121,7 +121,7 @@
 </template>
 <script>
 import SlVueTree from 'sl-vue-tree';
-import BaseDragVertical from '@/components/base/drag/BADG_001_BaseDragX.vue';
+import BaseDragVertical from '@/components/base/drag/BADG_001_BaseDragVertical.vue';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal.vue';
 import { mapGetters } from 'vuex';

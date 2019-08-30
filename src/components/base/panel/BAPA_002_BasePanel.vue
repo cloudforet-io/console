@@ -26,7 +26,7 @@
               <template v-if="indexChecker(item.data.length) === 0">
                 <dl>
                   <div class="warning-panel" style="display: block;">
-                    No {{ item.panelTitle }}
+                    {{ tr('PANEL.NO_ITEM', [item.panelTitle]) }}
                   </div>
                 </dl>
               </template>
@@ -149,7 +149,7 @@ export default {
     white-space: nowrap;
     min-height: 20px;
     font-weight: 900;
-    color: #777777
+    color: $gray;
   }
 
   .summary > dd {
@@ -159,7 +159,7 @@ export default {
     text-overflow: ellipsis;
     white-space: nowrap;
     min-height: 20px;
-    color: #000000
+    color: $black;
   }
 
   .centerLabel {
@@ -171,7 +171,7 @@ export default {
     text-align: center;
     font-family: 'Noto Sans', sans-serif;
     font-size: 36px;
-    color: maroon;
+    color: darken($red, 5%);
   }
 
   .card.base {
@@ -185,7 +185,7 @@ export default {
 
   .warning-panel{
     text-align: center;
-    color: #888;
+    color: $gray;
     font-size: 18px;
   }
   .card {

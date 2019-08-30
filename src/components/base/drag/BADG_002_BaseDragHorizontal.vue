@@ -26,7 +26,7 @@
 
 <script>
 export default {
-    name: 'BaseDrag',
+    name: 'BaseDragHorizontal',
     props: {
         isCustom: {
             type: Boolean,
