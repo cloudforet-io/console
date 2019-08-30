@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <BaseDragY>
+    <BaseDragHorizontal>
       <template #container="{ height }">
         <BaseTable :table-data="servers"
                    :fields="fields"
@@ -48,7 +48,7 @@
           </template>
         </BaseTable>
       </template>
-    </BaseDragY>
+    </BaseDragHorizontal>
 
     <b-row>
       <b-col cols="12">
@@ -81,7 +81,7 @@
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
-import BaseDragY from '@/components/base/drag/BADG_002_BaseDragY.vue';
+import BaseDragHorizontal from '@/components/base/drag/BADG_002_BaseDragHorizontal.vue';
 
 import query from './search_context/query.js';
 import serverSummary from '@/views/inventory/settings/IVST_002_SettingsSummary';
@@ -92,13 +92,13 @@ import serverRawData from '@/views/inventory/settings/IVST_004_SettingsJob';
 export default {
     name: 'Settings',
     components: {
-        BaseDragY,
+        BaseDragHorizontal,
         BaseTable,
         BaseModal,
         BaseTabNav,
         serverSummary,
         serverData,
-        serverRawData,
+        serverRawData
     },
     data() {
         return {

@@ -268,7 +268,7 @@ export default {
 
 
   .quote {
-    border-left: 0.5em solid #415ee1;
+    border-left: 0.5em solid $blue;
     padding: 0.5em;
     padding-left: 12px;
     margin: 8px 0px;

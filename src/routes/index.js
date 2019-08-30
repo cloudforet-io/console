@@ -99,7 +99,7 @@ index.beforeEach(async (to, from, next) => {
             } else  if (isFirstLogin  === 2 ){
                 to.matched[i].meta.requiresDomainCheck = false;
                 next({
-                    path: '/error-page'
+                    path: '/log-in'
                 });
             } else  if (isFirstLogin  === 3 ){
                 to.matched[i].meta.requiresDomainCheck = false;
@@ -114,20 +114,20 @@ index.beforeEach(async (to, from, next) => {
 });
 
 function baseRedirectChecker(rep){
-    let response = rep.data
+    let response = rep.data;
     if (response.total_count > 0) {
         let result = response.results[0];
         if (!result.plugin_info ||
             !result.plugin_info.options ||
             !result.plugin_info.options.auth_type ) {
-            sessionStorage.setItem("domainId", result.domain_id);
+            sessionStorage.setItem('domainId', result.domain_id);
             return 1;
         } else {
             return 2;
-        };
+        }
     } else {
         return 3;
     }
-};
+}
 
 export default index;

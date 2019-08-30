@@ -8,39 +8,38 @@
           <BaseField v-model="userId" 
                      :plaintext="!creatable" 
                      :state="validateUserId"
-                     label="User ID : "
+                     :label="`${tr('USER.ID')} : `"
                      :label-cols="3"
-                     placeholder="User ID"
+                     :placeholder="tr('USER.ID')"
                      autocomplete="off"
                      required
-                     :description="isLocalUser ? 'Your user ID must be 5-12 characters long.' : null"
-                     valid-message="This is Available."
+                     :description="isLocalUser ? tr('FORM.UNVALID.LENGTH', [tr('USER.ID'), 5, 12]) : null"
+                     :valid-message="tr('FORM.VALID.AVAIL')"
                      :invalid-message="getUserValidMessage()"
                      @input="changedUserId"
           >
             <template v-if="creatable" #append>
-                
               <b-button v-if="isLocalUser" variant="light"
                         :disabled="!validateUserIdLength"
                         @click="checkIdAvailability"
               >
-                Check availability
+                {{ tr('BTN_AVAIL') }}
               </b-button>
               <b-button v-else variant="light"
                         @click="findUser"
               >
-                Sync
+                {{ tr('BTN_FIND') }}
               </b-button>
             </template>
           </BaseField>
 
-          <BaseField v-if="creatable && isLocalUser" 
+          <BaseField v-if="creatable && !isLocalUser" 
                      v-model="password" 
                      :state="validatePassword"
                      type="password"
-                     label="Password : "
+                     :label="`${tr('USER.PWD')} : `"
                      :label-cols="3"
-                     placeholder="Password"
+                     :placeholder="tr('USER.PWD')"
                      autocomplete="new-password"
                      required
                      description="Your Password must be 5-12 characters long."
@@ -48,87 +47,87 @@
                      invalid-message="Your Password must be 5-12 characters long."
           />
 
-          <BaseField v-if="creatable && isLocalUser" 
+          <BaseField v-if="creatable && !isLocalUser" 
                      v-model="passwordCheck" 
-                     label="Password Check : " 
+                     :label="`${tr('USER.PWD_CHECK')} : `"
                      :label-cols="3" 
                      label-align="right"
-                     placeholder="Password Check"
+                     :placeholder="tr('USER.PWD_CHECK')"
                      type="password"
                      :state="validatePasswordCheck"
                      invalid-message="Please check your Password again."
           />
 
           <BaseField v-model="name" 
-                     label="Name : "
+                     :label="`${tr('USER.NAME')} : `"
                      :label-cols="3" 
-                     placeholder="Name"
+                     :placeholder="tr('USER.NAME')"
           />
 
           <BaseField v-model="email" 
-                     label="E-Mail : " 
+                     :label="`${tr('USER.EMAIL')} : `"
                      :label-cols="3"
-                     placeholder="Email"
+                     :placeholder="tr('USER.EMAIL')"
           />
 
           <BaseField v-model="mobile" 
-                     label="Phone : " 
+                     :label="`${tr('USER.PHONE')} : `"
                      :label-cols="3"
-                     placeholder="Phone"
+                     :placeholder="tr('USER.PHONE')"
           />
 
           <BaseField v-model="group" 
-                     label="Group : " 
+                     :label="`${tr('USER.GROUP')} : `"
                      :label-cols="3" 
-                     placeholder="Group"
+                     :placeholder="tr('USER.GROUP')"
           />
 
-          <BaseField v-if="!creatable" 
+          <BaseField v-if="!creatable || isLocalUser" 
                      v-model="language" 
-                     label="Language : " 
+                     :label="`${tr('USER.LANG')} : `"
                      :label-cols="3"
                      :field-cols="5"
                      type="select"
                      :options="languageList"
-                     placeholder="Select Language"
+                     :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
           />
     
 
-          <BaseField v-if="!creatable" 
+          <BaseField v-if="!creatable || isLocalUser" 
                      v-model="timezone" 
-                     label="Time Zone : " 
+                     :label="`${tr('USER.TIME')} : `"
                      :label-cols="3"
                      :field-cols="9"
                      type="select"
                      :options="timezoneList"
-                     placeholder="Select Timezone"
+                     :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
           />
         </b-col>
         <b-col cols="6">
-          <BaseField v-if="creatable" 
+          <BaseField v-if="creatable && !isLocalUser" 
                      v-model="language" 
-                     label="Language : " 
+                     :label="`${tr('USER.LANG')} : `"
                      :label-cols="3"
                      label-class="col-xl-2"
                      :field-cols="5"
                      type="select"
                      :options="languageList"
-                     placeholder="Select Language"
+                     :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
           />
     
 
-          <BaseField v-if="creatable" 
-                     v-model="timezone" 
-                     label="Time Zone : " 
+          <BaseField v-if="creatable && !isLocalUser" 
+                     v-model="timezo" 
+                     :label="`${tr('USER.TIME')} : `"
                      :label-cols="3"
                      label-class="col-xl-2"
                      :field-cols="9"
                      type="select"
                      :options="timezoneList"
-                     placeholder="Select Timezone"
+                     :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
           />
           
-          <b-form-group label="Tags : " 
+          <b-form-group :label="`${tr('USER.TAG')} : `"
                         :label-cols="3" :label-cols-xl="2"
                         label-align="right"
                         class="mt-4"
@@ -147,20 +146,20 @@
       <b-row>
         <b-col class="btn-box mt-5">
           <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="primary">
-            {{ creatable ? 'Create' : 'Update' }}
+            {{ creatable ? tr('BTN_CRT') : tr('BTN_UPT') }}
           </b-button>
           <b-button class="float-right mb-1" size="md" 
                     type="button" variant="outline-secondary"
                     @click="onCancel"
           >
-            Cancel
+            {{ tr('BTN_CANCEL') }}
           </b-button>
           <b-button class="float-left mb-1" 
                     size="md" 
                     type="reset"
                     variant="outline-secondary"
           >
-            Reset
+            {{ tr('BTN_RESET') }}
           </b-button>
         </b-col>
       </b-row>
@@ -276,11 +275,6 @@ export default {
                         this.validatePasswordCheck);
         }
     },
-    // watch: {
-    //     userProp (updatedUser) {
-    //         this.resetUserData(updatedUser);
-    //     }
-    // },
     created() {
         this.init();
     },
@@ -306,10 +300,10 @@ export default {
             try {
                 res = await this.$axios.post('/identity/user/create', this.getUserData());
                 this.$emit('create', res.data);
-                this.$alertify.success('User Successfully Created.');
+                this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('USER'), this.tr('CRT_PAST')]));
             } catch (e) {
                 console.error(e);
-                this.$alertify.error('ERROR OCCURED during Creating User.');
+                this.$alertify.error(this.tr('ALERT.SUCCESS', [this.tr('CRT_CONT'), this.tr('USER')]));
             }
         },
         async updateUser () {
@@ -317,10 +311,10 @@ export default {
             try {
                 res = await this.$axios.post('/identity/user/update', this.getUserData());
                 this.$emit('update', res.data);
-                this.$alertify.success('User Successfully Updated.');
+                this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('USER'), this.tr('UPT_PAST')]));
             } catch (e) {
                 console.error(e);
-                this.$alertify.error('ERROR OCCURED during Updating User.');
+                this.$alertify.error(this.tr('ALERT.SUCCESS', [this.tr('UPT_CONT'), this.tr('USER')]));
             }
         },
         async checkIdAvailability () {
@@ -340,7 +334,7 @@ export default {
             }
         },
         async findUser () {
-            console.log('find user')
+            console.log('find user');
             let res = null;
             try {
                 // res = await this.$axios.post('/identity/user/find', {
@@ -355,13 +349,13 @@ export default {
             }
         },
         onFailFindUser () {
-            this.noticeTitle = 'User Find Failed';
-            this.noticeText = 'The User you entered is missing. Please check if you entered the correct User ID.';
+            this.noticeTitle = this.tr('USER.FIND.FAILED.TITLE');
+            this.noticeText = this.tr('USER.FIND.FAILED.MISSING');
             this.showCheckModal();
         },
         onReset () {
-            this.noticeTitle = 'Reset';
-            this.noticeText = 'Are you sure you want to reset a form you entered?';
+            this.noticeTitle = this.tr('BTN_RESET');
+            this.noticeText = this.tr('FORM.CHECK.RESET');
             this.showCheckModal();
         },
         onConfirmReset () {
@@ -456,11 +450,11 @@ export default {
         },
         getUserValidMessage () {
             if (!this.validateUserIdLength) {
-                return 'Your user ID must be 5-12 characters long.';
+                return this.tr('FORM.UNVALID.LENGTH', [this.tr('USER.ID'), 5, 12]);
             } else if (this.validateUserIdUnique === null) {
-                return 'Please check availability.';
+                return this.tr('FORM.CHECK.AVAIL');
             } else if (!this.validateUserIdUnique) {
-                return 'This is duplicated. Please use another ID.';
+                return this.tr('USER.ID_DUPL');
             }
             return '';
         },

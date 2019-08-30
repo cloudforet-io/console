@@ -18,10 +18,10 @@
         />
         <b-form-invalid-feedback v-if="!readOnly" :state="validateKey">
           <div v-if="!validateKeyNull">
-            This is a mendatory field.
+            {{ tr('FORM.UNVALID.MENDATORY') }}
           </div>
           <div v-else-if="!validateKeyUnique">
-            Key must be unique.
+            {{ tr('FORM.UNVALID.UNIQUE') }}
           </div>
         </b-form-invalid-feedback>
       </b-form-group>
@@ -38,7 +38,7 @@
                       :state="validateValue"
         />
         <b-form-invalid-feedback v-if="!readOnly" :state="validateValue">
-          This is a mendatory field.
+          {{ tr('FORM.UNVALID.MENDATORY') }}
         </b-form-invalid-feedback>
       </b-form-group>
     </b-col>

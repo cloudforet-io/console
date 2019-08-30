@@ -2,13 +2,13 @@
 <template>
   <b-dropdown size="sm" right no-caret>
     <template #button-content>
-      <span class="lang name">{{ selected.code }}</span> &nbsp;
-      <i class="icon" :class="selected.flag" /> &nbsp;
+      <span class="lang name">{{ selected.value }}</span> &nbsp;
+      <i class="icon" :class="selected.icon" /> &nbsp;
       <i class="fal fa-angle-down" />
     </template>
-    <b-dropdown-item v-for="(lang, idx) in languages" :key="lang.code" @click="changeLanguage(idx)">
+    <b-dropdown-item v-for="(lang, idx) in languages" :key="lang.value" @click="changeLanguage(idx)">
       <div class="item">
-        <i class="icon" :class="lang.flag" />
+        <i class="icon" :class="lang.icon" />
         <span class="name">{{ lang.text }}</span>
       </div>
     </b-dropdown-item>
@@ -22,24 +22,28 @@ export default {
     },
     data () {
         return {
-            languages: [
-                { code: 'en', text: 'English', flag: 'flag-icon flag-icon-us' },
-                { code: 'ko', text: '한국어', flag: 'flag-icon flag-icon-kr' }
-            ],
-            selected: { code: 'en', text: 'English', flag: 'flag-icon flag-icon-us' }
+            /**
+             * TODO: Get User's language from the Stroage.
+             */
+            selected: this.getLanguage('en')
         };
     },
-    created(){
+    computed: {
+        languages () {
+            return this.getLanguageSelectList();
+        }
+    },
+    created () {
         this.init();
     },
     methods: {
         changeLanguage (idx) {
             this.selected = this.languages[idx];
-            this.$i18n.locale = this.selected.code;
+            this.$i18n.locale = this.selected.value;
             if (!this.isEmpty(sessionStorage.userId)) {
                 const localeInfo = {
                     userId: sessionStorage.userId,
-                    locale_code: this.selected.code,
+                    locale_code: this.selected.value,
                     idx: idx
                 };
                 localStorage.setItem('locale', JSON.stringify(localeInfo));
@@ -50,7 +54,7 @@ export default {
                 const selectedLocale = JSON.parse(localStorage.getItem('locale'));
                 if (sessionStorage.getItem('userId') === selectedLocale.userId) {
                     this.selected = this.languages[selectedLocale.idx];
-                    this.$i18n.locale = this.selected.code;
+                    this.$i18n.locale = this.selected.value;
                 }
             }
         }

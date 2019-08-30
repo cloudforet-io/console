@@ -1,6 +1,6 @@
 <template>
   <div class="animated fadeIn">
-    <BaseDrag>
+    <BaseDragHorizontal>
       <template #container="{ height }">
         <BaseTable class="user-table" 
                    :table-data="users" 
@@ -29,7 +29,7 @@
                           class="no-selected"
               >
                 <template #button-content>
-                  <span>Actions</span> &nbsp;
+                  <span>{{ tr('BTN_ACTION') }}</span> &nbsp;
                   <i class="fal fa-angle-down" />
                 </template>
                 <b-dropdown-item v-if="!isMultiSelected" @click="onClickUpdate">
@@ -61,10 +61,10 @@
           </template>
         </BaseTable>
       </template>
-    </BaseDrag>
+    </BaseDragHorizontal>
 
     <BaseModal ref="IDUS001_UserDetailModal"
-               :title="isCreateMode ? 'Add User' : 'Edit User'"
+               :title="tr('TITLE', [isCreateMode ? tr('BTN_ADD') : tr('BTN_EDIT'), tr('USER')])"
                centered
                hide-footer
                backdrop-off
@@ -121,13 +121,13 @@
       </template>
     </BaseTabNav>
     <div v-else class="empty">
-      <span class="msg">Select a User Above.</span>
+      <span class="msg">{{ tr('PANEL.NO_SELECT', [tr('USER')]) }}</span>
     </div>
   </div>
 </template>
 
 <script>
-import BaseDrag from '@/components/base/drag/BADG_002_BaseDragY';
+import BaseDragHorizontal from '@/components/base/drag/BADG_002_BaseDragHorizontal';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 import query from './search_context/query.js';
 
@@ -143,7 +143,7 @@ const ActionCheckModal = () => import('@/components/base/modal/BAMO_003_EXT_Acti
 export default {
     name: 'User',
     components: {
-        BaseDrag,
+        BaseDragHorizontal,
         BaseTable,
         BaseTabNav,
         UserInfo,
@@ -156,8 +156,8 @@ export default {
         return {
             tabs: [
                 {
-                    tabTitle: this.tr('PN.INFO'),
-                    tabIdxTitle: 'INFO'
+                    tabTitle: this.tr('PANEL.INFO'),
+                    tabIdxTitle: this.tr('INFO')
                 }
             ],
             defaultTab: 0,
@@ -178,7 +178,7 @@ export default {
                 filter_or: []
             },
             isCreateMode: true,
-            isLocalMode: false,
+            isLocalMode: true,
             action: null,
             actionCheckTitle: '',
             actionCheckType: '',
@@ -274,12 +274,10 @@ export default {
                 res = await this.$axios.post('/identity/user/list', {
                     query: this.query
                 });
-                setTimeout(() => { // this is for test
-                    this.users = res.data.results;
-                    this.totalCount = res.data.total_count;
-                    this.bindAdditionalKey(this.users, 'state', 'MEMBER_STATE');
-                    this.isLoading = false;
-                }, 1000);
+                this.users = res.data.results;
+                this.totalCount = res.data.total_count;
+                this.bindAdditionalKey(this.users, 'state', 'MEMBER_STATE');
+                this.isLoading = false;
             } catch (e) {
                 console.error(e);
                 this.isLoading = false;
@@ -334,23 +332,23 @@ export default {
         },
         onClickDelete () {
             this.action = this.deleteUser;
-            this.actionCheckTitle = 'User Delete';
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DELETE'), this.tr('USER')]);
             this.actionCheckType = 'danger';
-            this.actionCheckText = 'Are you sure you want to Delete selected users below?';
+            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DELETE'), this.tr('USER')]);
             this.$refs.IDUS001_ActionCheckModal.showModal();
         },
         onClickEnable () {
             this.action = this.enableUser;
-            this.actionCheckTitle = 'User Enable';
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_ENABLE'), this.tr('USER')]);
             this.actionCheckType = 'warning';
-            this.actionCheckText = 'Are you sure you want to Enable selected users below?';
+            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_ENABLE'), this.tr('USER')]);
             this.$refs.IDUS001_ActionCheckModal.showModal();
         },
         onClickDisable () {
             this.action = this.disableUser;
-            this.actionCheckTitle = 'User Disable';
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DISABLE'), this.tr('USER')]);
             this.actionCheckType = 'warning';
-            this.actionCheckText = 'Are you sure you want to Disable selected users below?';
+            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DISABLE'), this.tr('USER')]);
             this.$refs.IDUS001_ActionCheckModal.showModal();
         },
         showUserDetail () {

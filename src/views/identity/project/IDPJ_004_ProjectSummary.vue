@@ -107,7 +107,7 @@ export default {
         selectedSummaryData () {
             return [
                 {
-                    panelTitle: this.tr('PN.BASE_INFO'),
+                    panelTitle: this.tr('PANEL.BASE_INFO'),
                     panelIcon: {
                         icon: 'fa-hashtag',
                         type: 'l',
@@ -117,7 +117,7 @@ export default {
                     data: this.topPanel
                 },
                 {
-                    panelTitle: this.tr('PN.TAG'),
+                    panelTitle: this.tr('PANEL.TAG'),
                     panelIcon: {
                         icon: 'fa-tags',
                         type: 'l',
