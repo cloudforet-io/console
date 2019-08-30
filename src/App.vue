@@ -7,7 +7,7 @@
 </template>
 
 <script>
-console.log(process.env.VUE_APP_API_WAN);
+console.log('STG Updated', '1.0.0.1');
 export default {
     name: 'App',
     props: {
