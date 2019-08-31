@@ -12,7 +12,6 @@
         <BaseTable :table-data="data" 
                    :fields="fields"
                    :selectable="false"
-                   field-id="user_id"
                    cardless
                    headerless
                    underlined

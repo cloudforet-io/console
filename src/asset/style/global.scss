@@ -200,6 +200,7 @@ a {
 }
 .b-dropdown.no-selected {
     .dropdown-item:hover .item {
+        font-weight: 400;
         background-color: $lightgray;
     }
 }

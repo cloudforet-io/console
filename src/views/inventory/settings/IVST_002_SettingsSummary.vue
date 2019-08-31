@@ -23,7 +23,6 @@ export default {
     },
     methods: {
         setInitData(){
-            this.bindEnumToHtml('SERVER_STATE.MAINTENANCE');
             const samplePanelData = [{ panelTitle: 'Base Information',
                 panelIcon: {
                     icon: 'fa-hashtag',

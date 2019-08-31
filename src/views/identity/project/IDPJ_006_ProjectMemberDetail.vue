@@ -4,7 +4,6 @@
       <b-col cols="12">
         <BaseTable :table-data="projectMemberData.members"
                    :fields="fields"
-                   :field-id="'user_id'"
                    :per-page="perPage"
                    :searchable="true"
                    :total-rows="totalCount"

@@ -127,7 +127,7 @@
                      :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
           />
           
-          <b-form-group :label="`${tr('USER.TAG')} : `"
+          <b-form-group :label="`${tr('TAG')} : `"
                         :label-cols="3" :label-cols-xl="2"
                         label-align="right"
                         class="mt-4"

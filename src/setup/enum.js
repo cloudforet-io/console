@@ -34,7 +34,7 @@ export const GlobalEnum = {
     SERVER_STATE: Object.freeze(
         {
             SERVICE: {
-                msg: 'In Progress', //primary //fal-
+                msg: 'In Progress', //primary
                 icon: 'fal fa-check',
                 color: 'primary'
             },
