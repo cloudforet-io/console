@@ -107,7 +107,7 @@
     >
       <template #SUMMARY>
         <b-card class="base first-tab">
-          <ServerSummary />
+          <ServerSummary :server-data="selectedItems[0].data" />
         </b-card>
       </template>
       <template #DATA>

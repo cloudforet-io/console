@@ -1,72 +1,65 @@
 <template>
   <div>
-    <BaseNoticePanel :notice-panel-data="selectedNoticePanelData" />
-    <BasePanel :panels="panelData" />
+    <BaseNoticePanel :notice-panel-data="sampleNoticePanel" />
+    <BasePanel :panels="panelData" 
+               @edit="showTagEditModal"
+    />
+    <BaseModal ref="IVSV002_TagEditModal" 
+               :title="tr('TITLE', [tr('BTN_EDIT'), tr('TAG')])"
+               centered
+               size="md"
+               type="primary"
+               interactive
+               @ok="onEditTags"
+               @cancel="hideTagEditModal"
+    >
+      <template #contents>
+        <BaseTag ref="IVSV002_Tags" 
+                 :tag-data="tags" 
+                 editable
+                 align="between"
+        />
+      </template>
+    </BaseModal>
   </div>
 </template>
 
 <script>
-import BasePanel from '@/components/base/panel/BAPA_002_BasePanel';
-import BaseNoticePanel from '@/components/base/panel/BAPA_001_BaseNoticePanel';
-
+const BaseNoticePanel = () => import('@/components/base/panel/BAPA_001_BaseNoticePanel');
+const BasePanel = () => import('@/components/base/panel/BAPA_002_BasePanel');
+const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
+const BaseTag = () => import('@/components/base/tags/BATG_001_BaseTag');
+const serverModel = {
+    user_id: null,
+    name: null,
+    password: null,
+    email: null,
+    mobile: null,
+    group: null,
+    domain_id: null,
+    language: null,
+    timezone: null,
+    tag: []
+};
 export default {
     name: 'ServerSummary',
     components: {
-        BasePanel
-        ,BaseNoticePanel
+        BaseNoticePanel,
+        BasePanel,
+        BaseModal,
+        BaseTag
     },
     props: {
-
+        serverData: {
+            type: Object,
+            default: () => (serverModel),
+            required: true
+        }
     },
     data () {
         return {
-            panelData: null,
-            selectedNoticePanelData: null
-        };
-    },
-    created: function () {
-        this.setInitData();
-    },
-    methods: {
-        setInitData () {
-            const samplePanelData = [{ panelTitle: 'Base Information',
-                panelIcon: {
-                    icon: 'fa-hashtag',
-                    type: 'l',
-                    size: 1,
-                    color: 'primary'
-                },
-                data: [
-                    { title: 'ID', contents: 'pg-6bc72053', status: {
-                        flag: 'fail',
-                        variantSize: 2,
-                        text: 'VM'
-                    }},
-                    { title: 'Name', contents: 'AWS Seoul', copyFlag: true },
-                    { title: 'Created at', contents: '2019-05-12 18:00:12' , copyFlag: true }
-                ]},
-            {
-                panelTitle: 'Tag',
-                panelIcon: {
-                    icon: 'fa-tags',
-                    type: 'l',
-                    size: 1,
-                    color: 'danger'
-                },
-                data: [
-                    { title: 'Japan', contents: 'Tokyo' },
-                    { title: 'South Korea', contents: 'Seoul' ,link: 'www.yahoo.com' },
-                    { title: 'USA', contents: 'Washington D.C.' },
-                    { title: 'Canada', contents: 'Ottawa' },
-                    { title: 'Austria', contents: 'Vienna' },
-                    { title: 'Germany', contents: 'Berlin' },
-                    { title: 'G.B', contents: 'London' },
-                    { title: 'France', contents: 'Paris' }
-                ]
-            }];
-
-            const sampleNoticePanel = {
-                header:{
+            sampleNoticePanel: {
+                header: {
                     headerIcon: {
                         icon: 'fa-exclamation-circle',
                         type: 'l',
@@ -74,20 +67,88 @@ export default {
                         color: 'primary'
                     },
                     text:'리눅스 정보 추가 수집 필요'
-                }, contents:[{ text:' This is sample test' },
+                }, 
+                contents: [
+                    { text:' This is sample test' },
                     { text:'네트워크 ACL에서 SSH (TCP 22) 및 ICMP 포트 오픈 확인' },
                     { text:'클라우드 인스턴스 인 경우 Security Group 추가 확인' },
                     { text:'사내 LDAP 연동 또는 리눅스 계정(sdiadmin) 생성' },
                     { text:'SUDO NOPASSWD 권한 설정' },
                     { text:'Actions > Collect Info 버튼 클릭 후 Linux Collector 실행' },
                     { text:'리눅스 수집 실패 시 COMMAND 탭에서 로그 확인 (수집 실패 원인)\n' }
-                ], footer:{
+                ], 
+                footer: {
                     title: '수집 관련 문의:',
                     text: 'sdi-dev@ncsoft.com'
                 }
-            };
-            this.selectedNoticePanelData = sampleNoticePanel;
-            this.panelData = samplePanelData;
+            }
+        };
+    },
+    computed: {
+        server () {
+            return [
+                { title: this.tr('COL_NM.ID'), contents: this.serverData.user_id, copyFlag: true },
+                { title: this.tr('COL_NM.NAME'), contents: this.serverData.name, copyFlag: true },
+                { title: this.tr('COL_NM.EMAIL'), contents: this.serverData.email, copyFlag: true },
+                { title: this.tr('COL_NM.PHONE'), contents: this.serverData.mobile, copyFlag: true },
+                { title: this.tr('COL_NM.GROUP'), contents: this.serverData.group, copyFlag: true },
+                { title: this.tr('COL_NM.STATE'), state: this.serverData.state, stateType: 'MEMBER_STATE', copyFlag: true },
+                { title: this.tr('COL_NM.LANGUAGE'), contents: this.serverData.language, copyFlag: true },
+                { title: this.tr('COL_NM.DOMAIN_ID'), contents: this.serverData.domain_id, copyFlag: true },
+                { title: this.tr('COL_NM.TIMEZONE'), contents: this.serverData.timezone, copyFlag: true }
+            ];
+        },
+        tag () {
+            let tag = [];
+            for (var key in this.serverData.tags) {
+                tag.push({ 
+                    title: key, 
+                    contents: this.serverData.tags[key],
+                    copyFlag: true 
+                });
+            }
+            return tag;
+        },
+        tags () {
+            return this.dictToKeyValueArray(this.serverData.tags);
+        },
+        panelData () {
+            return [
+                { 
+                    panelTitle: this.tr('PANEL.BASE_INFO'),
+                    panelIcon: { icon: 'fa-hashtag', type: 'l', size: 1, color: 'primary' },
+                    data: this.server
+                },
+                {
+                    panelTitle: this.tr('PANEL.TAG'),
+                    panelIcon: { icon: 'fa-tags', type: 'l', size: 1, color: 'danger' },
+                    data: this.tag,
+                    editable: true
+                }
+            ];
+        }
+    },
+    methods: {
+        async onEditTags () {
+            if (this.$refs.IVSV002_Tags.validate()) {
+                let res = null;
+                try {
+                    res = await this.$axios.post('/identity/user/update', {
+                        user_id: this.serverData.user_id,
+                        tags: this.$refs.IVSV002_Tags.tags
+                    });
+                    this.hideTagEditModal();
+                    this.$emit('update', res.data);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        },
+        showTagEditModal () {
+            this.$refs.IVSV002_TagEditModal.showModal();
+        },
+        hideTagEditModal () {
+            this.$refs.IVSV002_TagEditModal.hideModal();
         }
     }
 };

@@ -15,7 +15,7 @@ export const en = {
         TR_NOTI_CON: '',
         SUMMARY: 'SUMMARY',
         AUDIT: 'AUDIT',
-        TAG: 'TAG',
+        TAG: 'Tags',
         BTN_CANCEL: 'Cancel',
         BTN_EDIT: 'Edit',
         BTN_SAVE: 'Save',
