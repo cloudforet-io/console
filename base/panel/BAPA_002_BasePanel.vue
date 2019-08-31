@@ -49,7 +49,9 @@
                     </template>
 
                     <template v-else-if="!isEmpty(info.state)">
-                      <dd v-html="getServerStates(info.state)" />
+                      <dd>
+                        <BaseStateTag :state="info.stateType" :data="info.state" />
+                      </dd>
                     </template>
 
                     <template v-else>
@@ -80,9 +82,13 @@
 </template>
 
 <script>
+const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag');
 export default {
     name: 'BasePanel',
     event: ['edit'],
+    components: {
+        BaseStateTag
+    },
     props: {
         useSlot: {
             type: Boolean,
