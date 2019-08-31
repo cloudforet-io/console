@@ -1,7 +1,7 @@
 <template>
   <div>
-    <base-notice-panel :notice-panel-data="selectedNoticePanelData" />
-    <base-panel :panels="panelData" />
+    <BaseNoticePanel :notice-panel-data="selectedNoticePanelData" />
+    <BasePanel :panels="panelData" />
   </div>
 </template>
 
@@ -28,8 +28,7 @@ export default {
         this.setInitData();
     },
     methods: {
-        setInitData(){
-            this.bindEnumToHtml('SERVER_STATE.MAINTENANCE');
+        setInitData () {
             const samplePanelData = [{ panelTitle: 'Base Information',
                 panelIcon: {
                     icon: 'fa-hashtag',

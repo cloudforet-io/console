@@ -243,13 +243,13 @@ export default {
         },
         getOperator (op) {
             switch (op) {
-            case this.ENUM.OPERATORS.CONTAIN_IN.sign: return this.ENUM.OPERATORS.CONTAIN_IN.string;
-            case this.ENUM.OPERATORS.IN.sign: return this.ENUM.OPERATORS.IN.string;
-            case this.ENUM.OPERATORS.GTE.sign: return this.ENUM.OPERATORS.GTE.string;
-            case this.ENUM.OPERATORS.LTE.sign: return this.ENUM.OPERATORS.LTE.string;
-            case this.ENUM.OPERATORS.NOT_IN.sign: return this.ENUM.OPERATORS.NOT_IN.string;
-            case this.ENUM.OPERATORS.REGEX_IN.sign: return this.ENUM.OPERATORS.REGEX_IN.string;
-            default: return this.ENUM.OPERATORS.CONTAIN_IN.string;
+            case this.$root.ENUM.OPERATORS.CONTAIN_IN.sign: return this.$root.ENUM.OPERATORS.CONTAIN_IN.string;
+            case this.$root.ENUM.OPERATORS.IN.sign: return this.$root.ENUM.OPERATORS.IN.string;
+            case this.$root.ENUM.OPERATORS.GTE.sign: return this.$root.ENUM.OPERATORS.GTE.string;
+            case this.$root.ENUM.OPERATORS.LTE.sign: return this.$root.ENUM.OPERATORS.LTE.string;
+            case this.$root.ENUM.OPERATORS.NOT_IN.sign: return this.$root.ENUM.OPERATORS.NOT_IN.string;
+            case this.$root.ENUM.OPERATORS.REGEX_IN.sign: return this.$root.ENUM.OPERATORS.REGEX_IN.string;
+            default: return this.$root.ENUM.OPERATORS.CONTAIN_IN.string;
             }
         },
         focusOnInput () {

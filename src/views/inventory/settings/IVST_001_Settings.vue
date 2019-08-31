@@ -170,7 +170,6 @@ export default {
              * TODO: set limit, skip, sort and search in the right format
              */
                 });
-                this.bindAdditionalKey(res.data, 'state', 'SERVER_STATE');
                 setTimeout(() => { // this is for test
                     this.servers = res.data;
                     this.isLoading = false;

@@ -7,7 +7,6 @@
                    :per-page="perPage"
                    :searchable="true"
                    :total-rows="totalCount"
-                   :field-id="'user_id'"
                    :search-context-data="searchQueryData"
                    :show-caption="true"
                    :busy="isLoading"
@@ -195,12 +194,10 @@ export default {
                     let memberUserIds =[];
                     response.data.results.forEach(function(current){
                         current.user_info['role'] = current.user_info.roles.join(', ');
-                        results.push(current.user_info)
+                        results.push(current.user_info);
                         memberUserIds.push(current.user_info.user_id);
                     });
                     this.memberUserIDs = memberUserIds;
-                    this.bindAdditionalKey(results, 'state', 'MEMBER_STATE');
-
                 }
                 this.members = results;
                 console.log(response.data.results);

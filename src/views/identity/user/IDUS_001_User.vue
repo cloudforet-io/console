@@ -13,7 +13,6 @@
                    :cardless="false" 
                    underlined
                    :height="height"
-                   field-id="user_id"
                    @rowSelected="rowSelected"
                    @onSelectAll="onAllRowSelected"
                    @list="listUsers"
@@ -261,7 +260,6 @@ export default {
                 });
                 this.users = res.data.results;
                 this.totalCount = res.data.total_count;
-                this.bindAdditionalKey(this.users, 'state', 'MEMBER_STATE');
                 this.isLoading = false;
             } catch (e) {
                 console.error(e);

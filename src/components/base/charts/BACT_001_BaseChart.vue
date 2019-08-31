@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-header">
       <template v-if="chartTitleData.isTitleIconUsed">
-        <span v-html="selectIconHtml(chartTitleData.TitleIconClass)" />&nbsp;
+        <i :class="selectIconHtml(chartTitleData.TitleIconClass, true)" />&nbsp;
       </template>
       {{ chartTitleData.cardTitle }}
       <template v-if="chartTitleData.isDropdownUsed">

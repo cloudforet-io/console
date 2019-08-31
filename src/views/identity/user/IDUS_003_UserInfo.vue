@@ -62,6 +62,7 @@ export default {
                 { title: this.tr('COL_NM.EMAIL'), contents: this.userData.email, copyFlag: true },
                 { title: this.tr('COL_NM.PHONE'), contents: this.userData.mobile, copyFlag: true },
                 { title: this.tr('COL_NM.GROUP'), contents: this.userData.group, copyFlag: true },
+                { title: this.tr('COL_NM.STATE'), state: this.userData.state, stateType: 'MEMBER_STATE', copyFlag: true },
                 { title: this.tr('COL_NM.LANGUAGE'), contents: this.userData.language, copyFlag: true },
                 { title: this.tr('COL_NM.DOMAIN_ID'), contents: this.userData.domain_id, copyFlag: true },
                 { title: this.tr('COL_NM.TIMEZONE'), contents: this.userData.timezone, copyFlag: true }

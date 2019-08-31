@@ -13,7 +13,6 @@
                    :cardless="false"
                    underlined
                    :height="height"
-                   field-id="server_id"
                    @rowSelected="rowSelected"
                    @onSelectAll="onAllRowSelected"
                    @list="listServers"
@@ -38,19 +37,19 @@
 
                 <b-dropdown-divider />
 
-                <b-dropdown-item>
+                <b-dropdown-item @click="onClickSetMaintenance">
                   <div class="item sm">
                     <i class="icon fal fa-traffic-cone" />
                     <span class="name">{{ tr('BTN_S_MANT') }}</span>
                   </div>
                 </b-dropdown-item>
-                <b-dropdown-item>
+                <b-dropdown-item @click="onClickSetInService">
                   <div class="item sm">
                     <i class="icon fal fa-play-circle" />
                     <span class="name">{{ tr('BTN_S_SERV') }}</span>
                   </div>
                 </b-dropdown-item>
-                <b-dropdown-item>
+                <b-dropdown-item @click="onClickSetClosed">
                   <div class="item sm">
                     <i class="icon fal fa-stop-circle" />
                     <span class="name">{{ tr('BTN_S_CLOSE') }}</span>
@@ -59,13 +58,13 @@
 
                 <b-dropdown-divider />
 
-                <b-dropdown-item>
+                <b-dropdown-item @click="onClickChangeProject">
                   <div class="item sm">
                     <i class="icon fal fa-layer-group" />
                     <span class="name">{{ tr('CHG_PRO') }}</span>
                   </div>
                 </b-dropdown-item>
-                <b-dropdown-item>
+                <b-dropdown-item @click="onClickChangePool">
                   <div class="item sm">
                     <i class="icon fal fa-map-pin" />
                     <span class="name">{{ tr('CHG_POOL') }}</span>
@@ -74,7 +73,7 @@
 
                 <b-dropdown-divider />
 
-                <b-dropdown-item>
+                <b-dropdown-item @click="onClickCollectInfo">
                   <div class="item sm">
                     <i class="icon fal fa-sync-alt" />
                     <span class="name">{{ tr('COL_INFO') }}</span>
@@ -267,12 +266,16 @@ export default {
                 res = await this.$axios.post('/identity/user/list', {
                     query: this.query
                 });
+                // res = await this.$axios.post('/inventory/server/list', {
+                //     query: this.query,
+                //     domain_id: sessionStorage.getItem('domainId')
+                // });
                 this.servers = res.data.results;
                 this.totalCount = res.data.total_count;
                 this.isLoading = false;
             } catch (e) {
                 console.error(e);
-                this.$alertify(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
+                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
                 this.isLoading = false;
             }
         },
@@ -292,6 +295,33 @@ export default {
                 params.servers.push(item.user_id);
             });
             return params;
+        },
+        async deleteServer (commitItems) {
+            await this.$axios.post('/identity/user/delete', this.getParams(commitItems));
+        },
+        onClickDelete () {
+            this.action = this.deleteServer;
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DELETE'), this.tr('SERVER')]);
+            this.actionCheckType = 'danger';
+            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DELETE'), this.tr('SERVER')]);
+        },
+        onClickSetMaintenance () {
+
+        },
+        onClickSetInService () {
+
+        },
+        onClickSetClosed () {
+
+        },
+        onClickChangeProject () {
+
+        },
+        onClickChangePool () {
+
+        },
+        onClickCollectInfo () {
+
         },
         showActionModal () {
             this.$refs.IDSV001_ActionCheckModal.showModal();
