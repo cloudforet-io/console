@@ -128,7 +128,7 @@
         </template>
 
         <template #state="data">
-          <div v-html="getServerStates(data.item.state)" />
+          <BaseStateTag :state="stateType" :data="data.item.state" />
         </template>
 
         <template #link="data">
@@ -143,6 +143,7 @@
 import BaseSearch from '@/components/base/search/BASR_001_BaseSearch.vue';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal.vue';
 import BaseCheckbox from '@/components/base/checkbox/BACB_001_BaseCheckbox.vue';
+import BaseStateTag from '@/components/base/tags/BATG_002_BaseStateTag';
 
 export default {
     name: 'BaseTable',
@@ -150,7 +151,8 @@ export default {
     components: {
         BaseSearch,
         BaseModal,
-        BaseCheckbox
+        BaseCheckbox,
+        BaseStateTag
     },
     inheritAttrs: false,
     props: {
@@ -225,10 +227,6 @@ export default {
             type: [Array, Object],
             default: () => []
         },
-        fieldId: {
-            type: String,
-            default: null
-        },
         perPage: {
             type: Number,
             default: 10
@@ -264,6 +262,10 @@ export default {
         headerless: {
             type: Boolean,
             default: false
+        },
+        stateType: {
+            type: String,
+            default: 'MEMBER_STATE'
         }
     },
     data() {
@@ -304,10 +306,6 @@ export default {
     },
     methods: {
         validateProperties () {
-            // if (this.selectable && this.selectMode === 'multi' && this.isEmpty(this.fieldId)) {
-            //     throw new Error('The required property was not provided.\n\
-            //  \'fieldId\' property is required when it is selectable with \'multi\' mode.');
-            // }
             if (this.selectable && this.selectMode === 'multi' && this.isEmpty(this.busy)) {
                 throw new Error('The required property was not provided.\n\
              \'busy\' property is required when it is selectable with \'multi\' mode for detecting refresh.');
@@ -315,9 +313,6 @@ export default {
         },
         capitalizeFirstLetter (s) {
             return s.hasOwnProperty('text') ? this.capitalize(s.text) : s.hasOwnProperty('flag') ? this.capitalize(s.flag) : '';
-        },
-        getServerStates (state) {
-            return this.bindEnumToHtml(state);
         },
         getVariantSize (size) {
             let variantFontSize = 3;
