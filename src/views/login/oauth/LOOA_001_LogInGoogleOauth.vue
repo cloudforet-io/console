@@ -82,13 +82,8 @@ export default {
         async login (oauth) {
             console.log('##############################################################');
             console.log('##############################################################');
-            const
-            await this.$store.dispatch('auth/login',
-                {
-                    userId: this.userId,
-                    password: this.password,
-                    domainId: sessionStorage.getItem('domainId')
-                }
+            const oauthObject = oauth
+            await this.$store.dispatch('auth/login', oauthObject
             ).then(() => {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
