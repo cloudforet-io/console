@@ -43,16 +43,15 @@ export default {
 
         async login ({ commit }, authObj) {
             try {
-
-                const res = await api.post('/identity/token/issue', {
-                    credentials:{
-                        // access_token: 'ya29.Glt0B1F9aOXkZLqKgjBGuMPKeDpinR7YW1s24YZFDKHzucw5t0KqNIb-COixm7kiSr9yqbw0FzD5xfvkJ8PrnZkrKDn6sJwW5llXAmqDID08aRkRektABovXWBHO'
-                        'user_id': authObj.userId,
-                        'password': authObj.password
-                    },
-                    'domain_id': authObj.domainId
-                    // 'domain_id': 'domain-2fba0c6a4a94'
-                });
+                let param = {
+                    domain_id: authObj.domainId
+                };
+                if (authObj.hasOwnProperty('access_token')){
+                    param['credentials'] = {access_token:authObj.access_token };
+                } else {
+                    param['credentials'] = {user_id: authObj.userId,password: authObj.password};
+                }
+                const res = await api.post('/identity/token/issue', param);
 
                 commit('setUserId', { userId: authObj.userId });
                 commit('login', { token: res.data.access_token });

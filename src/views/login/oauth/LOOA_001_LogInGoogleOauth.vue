@@ -80,9 +80,10 @@ export default {
             }
         },
         async login (oauth) {
-            console.log('##############################################################');
-            console.log('##############################################################');
-            const oauthObject = oauth
+            const oauthObject = {
+                domainId: sessionStorage.getItem('domainId'),
+                access_token: oauth.Zi.access_token
+            };
             await this.$store.dispatch('auth/login', oauthObject
             ).then(() => {
                 this.$router.push(this.nextPath);
