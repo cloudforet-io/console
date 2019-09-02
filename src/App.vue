@@ -30,7 +30,7 @@ export default {
             if (isLoaded) {
                 clearInterval(gapiInterval);
             }
-        }, 500);
+        }, 1000);
     }
 };
 
