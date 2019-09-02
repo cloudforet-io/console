@@ -71,9 +71,10 @@ export default {
     methods: {
         async setGoogleSignInButton(){
             let vm = this;
+            const clientId = this.$store.getters["auth/client_id"];
             gapi.load('auth2', function() {
                 let auth2 = gapi.auth2.init({
-                    client_id: this.$store.getters["auth/client_id"],
+                    client_id: clientId,
                     fetch_basic_profile: false,
                     scope: 'profile'
                 });
