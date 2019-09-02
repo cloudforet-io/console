@@ -106,7 +106,7 @@ export default {
                 });
             });
         },
-        onSignI(guObject){
+        onSignIn(guObject){
             debugger;
         },
         async login () {
