@@ -74,22 +74,16 @@ export default {
             try {
                 let GoogleUser = await this.$gAuth.signIn();
                 console.log('GoogleUser', GoogleUser);
-                debugger;
                 this.login(GoogleUser);
             } catch (e){
                 console.log(e);
             }
         },
         async login (oauth) {
-
-            debugger;
-            console.log(this.tr('MSG.LOG_IN'));
-            await this.$store.dispatch('auth/login',
-                {
-                    userId: this.userId,
-                    password: this.password,
-                    domainId: sessionStorage.getItem('domainId')
-                }
+            console.log('##############################################################');
+            console.log('##############################################################');
+            const oauthObject = oauth
+            await this.$store.dispatch('auth/login', oauthObject
             ).then(() => {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
