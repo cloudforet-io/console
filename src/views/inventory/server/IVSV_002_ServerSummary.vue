@@ -92,7 +92,7 @@ export default {
                 { title: this.tr('COL_NM.EMAIL'), contents: this.serverData.email, copyFlag: true },
                 { title: this.tr('COL_NM.PHONE'), contents: this.serverData.mobile, copyFlag: true },
                 { title: this.tr('COL_NM.GROUP'), contents: this.serverData.group, copyFlag: true },
-                { title: this.tr('COL_NM.STATE'), state: this.serverData.state, stateType: 'MEMBER_STATE', copyFlag: true },
+                { title: this.tr('COL_NM.STATE'), state: this.serverData.state, stateType: 'SERVER_STATE', copyFlag: true },
                 { title: this.tr('COL_NM.LANGUAGE'), contents: this.serverData.language, copyFlag: true },
                 { title: this.tr('COL_NM.DOMAIN_ID'), contents: this.serverData.domain_id, copyFlag: true },
                 { title: this.tr('COL_NM.TIMEZONE'), contents: this.serverData.timezone, copyFlag: true }
