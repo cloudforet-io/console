@@ -43,18 +43,28 @@
     </div>
   </b-row>
 </template>
-
 <script>
-/*function onSignIn(googleUser) {
+let vueSelfComponent = null;
+function onSignIn(googleUser) {
     console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
     console.log('ID token: ' + googleUser.getAuthResponse().id_token);
     console.log('Access token: ' + googleUser.getAuthResponse().access_token);
     let profile = googleUser.getBasicProfile();
     let message = `ID:   ${profile.getId()}  '\n' Name: ${profile.getName()}  '\n' Image URL:  ${profile.getImageUrl()} '\n'  Email:  ${profile.getEmail()} `;
-    debugger;
-    this.alertAbs();
-    //setProfileImage(profile.getImageUrl());
-}*/
+    console.log(message);
+
+    if (vueSelfComponent !==null) {
+        const param = {
+            scope: googleUser.getGrantedScopes(),
+            id_token: googleUser.getAuthResponse().id_token,
+            access_token: googleUser.getAuthResponse().access_token
+        };
+
+        vueSelfComponent.onSignIn(param);
+    }
+}
+
+
 import { mapGetters } from 'vuex';
 export default {
     components: {
@@ -78,8 +88,9 @@ export default {
     },
     methods: {
         setGoogleSignInButton(){
+            vueSelfComponent = this;
             gapi.load('auth2', function() {
-                let auth2 = gapi.auth2.init({
+                let  auth2 = gapi.auth2.init({
                     client_id: '150323145707-hp5i8q4hm1vcb2hpta23c1829167nl1h.apps.googleusercontent.com',
                     fetch_basic_profile: false,
                     scope: 'profile'
@@ -90,20 +101,13 @@ export default {
                     height: 50,
                     longtitle: false,
                     theme: 'dark',
-                    onsuccess: this.onSignIn(this),
+                    onsuccess: onSignIn,
                     onfailure: null
                 });
             });
         },
-        onSignIn(googleUser){
-            console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
-            console.log('ID token: ' + googleUser.getAuthResponse().id_token);
-            console.log('Access token: ' + googleUser.getAuthResponse().access_token);
-            let profile = googleUser.getBasicProfile();
-            let message = `ID:   ${profile.getId()}  '\n' Name: ${profile.getName()}  '\n' Image URL:  ${profile.getImageUrl()} '\n'  Email:  ${profile.getEmail()} `;
-            console.log(message);
+        onSignI(guObject){
             debugger;
-            this.alertAbs();
         },
         async login () {
             console.log(this.tr('MSG.LOG_IN'));
