@@ -52,7 +52,7 @@ const index = new Router({
         },
         {
             path: '/google-log-in',
-            name: 'logIn',
+            name: 'Google-Oauth-logIn',
             meta: { label: 'google_oauth2', requiresAuth: false, requiresDomainCheck: true },
             component: GoolgeLogIn
         },

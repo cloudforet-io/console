@@ -14,14 +14,17 @@ export default {
             default: process.env.NODE_ENV
         }
     },
-    beforeMount() {
+    async beforeMount() {
         let gapiScript = document.createElement('script');
-        gapiScript.setAttribute('src', 'https://apis.google.com/js/platform.js');
-        document.head.appendChild(gapiScript);
-
         let isLoaded = false;
+
+        await gapiScript.setAttribute('src', 'https://apis.google.com/js/platform.js');
+        gapiScript.async = true;
+        gapiScript.defer = true;
+        await document.head.appendChild(gapiScript);
+
         gapiScript.onload = (e) => {
-            isLoaded = true;
+          isLoaded = true;
         };
         let gapiInterval = setInterval(() => {
             if (isLoaded) {
