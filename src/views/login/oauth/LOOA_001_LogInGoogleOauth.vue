@@ -45,14 +45,14 @@
 </template>
 <script>
 let vueSelfComponent = null;
-function onSignIn(googleUser) {
+async function onSignIn(googleUser) {
     console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
     console.log('ID token: ' + googleUser.getAuthResponse().id_token);
     console.log('Access token: ' + googleUser.getAuthResponse().access_token);
     let profile = googleUser.getBasicProfile();
     let message = `ID:   ${profile.getId()}  '\n' Name: ${profile.getName()}  '\n' Image URL:  ${profile.getImageUrl()} '\n'  Email:  ${profile.getEmail()} `;
     console.log(message);
-
+    debugger;
     if (vueSelfComponent !==null) {
         console.log(vueSelfComponent);
         const param = {
@@ -84,11 +84,11 @@ export default {
         ])
     },
     mounted () {
-        this.setGoogleSignInButton();
+        this.setGoogleSignInButton(this);
     },
     methods: {
-        setGoogleSignInButton(){
-            vueSelfComponent = this;
+        setGoogleSignInButton(vueComponent){
+            vueSelfComponent = vueComponent;
             gapi.load('auth2', function() {
                 let  auth2 = gapi.auth2.init({
                     client_id: '150323145707-hp5i8q4hm1vcb2hpta23c1829167nl1h.apps.googleusercontent.com',
