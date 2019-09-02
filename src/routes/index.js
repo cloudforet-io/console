@@ -133,13 +133,13 @@ function baseRedirectChecker(rep){
     let response = rep.data;
     if (response.total_count > 0) {
         let result = response.results[0];
+        sessionStorage.setItem('domainId', result.domain_id);
         if (!result.plugin_info ||
             !result.plugin_info.options ||
             !result.plugin_info.options.auth_type ) {
-            sessionStorage.setItem('domainId', result.domain_id);
             return 1;
         } else {
-            sessionStorage.setItem('domainId', result.domain_id);
+            store.commit('auth/setClientId', result.plugin_info.options.client_id );
             LoginType = result.plugin_info.options.auth_type;
             return 2;
         }

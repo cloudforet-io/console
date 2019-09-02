@@ -25,7 +25,7 @@
                     <!--<b-button class="g-signin-button" variant="outline-primary" @click="setGoogleSignInButton">
                       Google Sign in
                     </b-button>-->
-                    <div id="g-signin-btn" />
+                    <div id="g-signin-btn" @click="login"/>
                   </b-input-group>
                 </b-form>
               </b-card-body>
@@ -47,7 +47,7 @@
   </b-row>
 </template>
 <script>
-import GAuth from 'vue-google-oauth2';
+import store from '@/store';
 import { mapGetters } from 'vuex';
 export default {
     components: {
@@ -55,11 +55,9 @@ export default {
     data () {
         return {
             isSignIn: null,
-            rememberStatus: false,
             seenGreet: true,
             seenError: false,
-            userId: 'admin',
-            password: 'admin'
+            pramObject: null
         };
     },
     computed: {
@@ -72,17 +70,10 @@ export default {
     },
     methods: {
         async setGoogleSignInButton(){
-           /* try {
-                let GoogleUser = await this.$gAuth.signIn();
-                console.log('GoogleUser', GoogleUser);
-                this.login(GoogleUser);
-            } catch (e){
-                console.log(e);
-            }*/
             let vm = this;
             gapi.load('auth2', function() {
                 let auth2 = gapi.auth2.init({
-                    client_id: '150323145707-hp5i8q4hm1vcb2hpta23c1829167nl1h.apps.googleusercontent.com',
+                    client_id: this.$store.getters["auth/client_id"],
                     fetch_basic_profile: false,
                     scope: 'profile'
                 });
@@ -101,15 +92,15 @@ export default {
             console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
             console.log('ID token: ' + googleUser.getAuthResponse().id_token);
             console.log('Access token: ' + googleUser.getAuthResponse().access_token);
+
             const profile = googleUser.getBasicProfile();
+            console.log('#####Oauth LogIn#####', googleUser);
             const param ={
                 userId: profile.getId(),
                 access_token: googleUser.getAuthResponse().access_token
             };
-            this.login(param);
         },
         async login (oauth) {
-            console.log('#####Oauth LogIn#####');
             console.log('authObj', oauth);
             await this.$store.dispatch('auth/login', oauth
             ).then(() => {

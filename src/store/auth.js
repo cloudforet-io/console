@@ -3,6 +3,7 @@ import { api } from '@/setup/api';
 export default {
     namespaced: true,
     state: {
+        client_id: null,
         isLoggedIn: false,
         loginErrorCode: null,
         nextPath: '/',
@@ -10,6 +11,9 @@ export default {
         token: null
     },
     mutations: {
+        setClientId (state,  ClientId) {
+            state.client_id = ClientId;
+        },
         login (state) {
             state.isLoggedIn = true;
         },
@@ -28,6 +32,7 @@ export default {
 
     },
     getters: {
+        client_id: state => state.client_id,
         isLoggedIn: state => state.isLoggedIn,
         nextPath: state => state.nextPath
     },
@@ -102,7 +107,6 @@ export default {
             commit('logout');
         },
         setNextPath ({ commit }, { nextPath }) {
-
             commit('setNextPath', { nextPath });
         }
     }
