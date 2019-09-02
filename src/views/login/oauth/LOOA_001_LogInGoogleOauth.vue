@@ -22,7 +22,9 @@
                     </p>
                   </transition>
                   <b-input-group class="mb-3">
-                    <b-button class="g-signin-button" variant="outline-primary" @click="setGoogleSignInButton"> Google Sign in</b-button>
+                    <b-button class="g-signin-button" variant="outline-primary" @click="setGoogleSignInButton">
+                      Google Sign in
+                    </b-button>
                   </b-input-group>
                 </b-form>
               </b-card-body>
@@ -51,6 +53,7 @@ export default {
     },
     data () {
         return {
+            isSignIn: null,
             rememberStatus: false,
             seenGreet: true,
             seenError: false,
@@ -76,16 +79,19 @@ export default {
                     // GoogleUser.getBasicProfile() : Get the user's basic profile information.
                     // GoogleUser.getAuthResponse() : Get the response object from the user's auth session. access_token and so on
                     this.isSignIn = this.$gAuth.isAuthorized;
+                    const oauthObj = {
+                        id: GoogleUser.getId(),
+                        profile: GoogleUser.getBasicProfile(),
+                        response : GoogleUser.getAuthResponse()
+                    };
+                    this.login(oauthObj);
                 })
                 .catch(error  => {
-                    //on fail do something
+                   alert('this is fucked'); //on fail do something
                 });
-
         },
-        onSignIn(guObject){
+        async login (oauth) {
             debugger;
-        },
-        async login () {
             console.log(this.tr('MSG.LOG_IN'));
             await this.$store.dispatch('auth/login',
                 {

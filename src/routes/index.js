@@ -74,8 +74,9 @@ const index = new Router({
 index.beforeEach(async (to, from, next) => {
     if (isFirstLogin === null) {
         try {
-            let domain_name = process.env.VUE_APP_API_DOMAIN_URL;
-            const response  = await api.post('/identity/domain/list', { name: domain_name });
+            const parsedObject = url.parse(window.location.href).host;
+            let domain_name = parsedObject.split('.');
+            const response  = await api.post('/identity/domain/list', { name: domain_name[0] });
             if (response.data.total_count === 1){
                 isFirstLogin = baseRedirectChecker(response);
             }
