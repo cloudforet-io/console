@@ -5,9 +5,7 @@
     <router-view />
   </div>
 </template>
-
 <script>
-console.log('STG, DEV', process.env.NODE_ENV);
 export default {
     name: 'App',
     props: {
@@ -15,6 +13,13 @@ export default {
             type: String,
             default: process.env.NODE_ENV
         }
+    },
+    beforeMount(){
+        let googleApis = document.createElement('script');
+        googleApis.setAttribute('src','https://apis.google.com/js/api:client.js');
+        googleApis.async = true;
+        googleApis.defer = true;
+        document.head.appendChild(googleApis);
     }
 };
 
