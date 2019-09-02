@@ -11,8 +11,17 @@
           </div>
           <div v-if="offCaption" class="searchbox-noCaption order-md-2 order-3">
             <div class="searchbox">
-              <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
-              <BaseSearch v-else-if="noContextSearchable" @search="onSearch" />
+              <BaseSearch v-if="searchable" 
+                          :context-data="searchContextData" 
+                          :is-empty-search="isEmptySearch"
+                          @search="onSearch"
+                          @empty="$emit('empty')"
+              />
+              <BaseSearch v-else-if="noContextSearchable" 
+                          :is-empty-search="isEmptySearch"
+                          @search="onSearch"
+                          @empty="$emit('empty')"
+              />
             </div>
           </div>
           <div v-else class="searchbox-container order-md-2 order-3">
@@ -147,7 +156,7 @@ import BaseStateTag from '@/components/base/tags/BATG_002_BaseStateTag';
 
 export default {
     name: 'BaseTable',
-    event: ['list', 'rowClicked', 'limitChanged', 'rowSelected', 'onSelectAll'],
+    event: ['list', 'rowClicked', 'limitChanged', 'rowSelected', 'onSelectAll', 'empty'],
     components: {
         BaseSearch,
         BaseModal,
@@ -171,6 +180,10 @@ export default {
         searchContextData: {
             type: Object,
             default: null
+        },
+        isEmptySearch: {
+            type: Boolean,
+            default: false
         },
         selectable: {
             type: Boolean,

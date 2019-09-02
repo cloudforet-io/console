@@ -65,7 +65,7 @@ const contextDataModel = {
 
 export default {
     name: 'BaseSearch',
-    event: ['search'],
+    event: ['search', 'empty'],
     directives: { focus: focus },
     components: { BaseInput, InputTag },
     props: {
@@ -83,6 +83,10 @@ export default {
         searchData: {
             type: Array,
             default: () => []
+        },
+        isEmptySearch: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -227,7 +231,11 @@ export default {
         },
         search () {
             this.removeEmptyValueFilterOrList();
-            this.$emit('search', this.filterList, this.filterOrList);
+            if (this.isEmptySearch && this.tagList.length === 0) {
+                this.$emit('empty');
+            } else {
+                this.$emit('search', this.filterList, this.filterOrList);
+            }
         },
         onClickSearch () {
             this.$refs.input.onEnter();
