@@ -41,24 +41,24 @@ export default {
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         },
 
-        async login ({ commit }, { userId, password, domainId }) {
+        async login ({ commit }, authObj) {
             try {
 
                 const res = await api.post('/identity/token/issue', {
                     credentials:{
                         // access_token: 'ya29.Glt0B1F9aOXkZLqKgjBGuMPKeDpinR7YW1s24YZFDKHzucw5t0KqNIb-COixm7kiSr9yqbw0FzD5xfvkJ8PrnZkrKDn6sJwW5llXAmqDID08aRkRektABovXWBHO'
-                        'user_id': userId,
-                        'password': password
+                        'user_id': authObj.userId,
+                        'password': authObj.password
                     },
-                    'domain_id': domainId
+                    'domain_id': authObj.domainId
                     // 'domain_id': 'domain-2fba0c6a4a94'
                 });
 
-                commit('setUserId', { userId: userId });
+                commit('setUserId', { userId: authObj.userId });
                 commit('login', { token: res.data.access_token });
 
                 sessionStorage.setItem('token', res.data.access_token);
-                sessionStorage.setItem('userId', userId);
+                sessionStorage.setItem('userId', authObj.userId);
                 api.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
 
             } catch (err) {

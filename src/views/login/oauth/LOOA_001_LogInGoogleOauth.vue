@@ -74,16 +74,15 @@ export default {
             try {
                 let GoogleUser = await this.$gAuth.signIn();
                 console.log('GoogleUser', GoogleUser);
-                debugger;
                 this.login(GoogleUser);
             } catch (e){
                 console.log(e);
             }
         },
         async login (oauth) {
-
-            debugger;
-            console.log(this.tr('MSG.LOG_IN'));
+            console.log('##############################################################');
+            console.log('##############################################################');
+            const
             await this.$store.dispatch('auth/login',
                 {
                     userId: this.userId,

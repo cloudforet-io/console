@@ -158,13 +158,12 @@ export default {
     methods: {
         async login () {
             console.log(this.tr('MSG.LOG_IN'));
-            await this.$store.dispatch('auth/login',
-                {
-                    userId: this.userId,
-                    password: this.password,
-                    domainId: sessionStorage.getItem('domainId')
-                }
-            ).then(() => {
+            const authObj = {
+                userId: this.userId,
+                password: this.password,
+                domainId: sessionStorage.getItem('domainId')
+            };
+            await this.$store.dispatch('auth/login',authObj).then(() => {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();
