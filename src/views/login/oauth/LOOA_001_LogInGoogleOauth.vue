@@ -54,12 +54,12 @@ function onSignIn(googleUser) {
     console.log(message);
 
     if (vueSelfComponent !==null) {
+        console.log(vueSelfComponent);
         const param = {
             scope: googleUser.getGrantedScopes(),
             id_token: googleUser.getAuthResponse().id_token,
             access_token: googleUser.getAuthResponse().access_token
         };
-
         vueSelfComponent.onSignIn(param);
     }
 }
