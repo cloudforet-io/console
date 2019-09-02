@@ -14,12 +14,20 @@ export default {
             default: process.env.NODE_ENV
         }
     },
-    beforeMount(){
-        let googleApis = document.createElement('script');
-        googleApis.setAttribute('src','https://apis.google.com/js/api:client.js');
-        googleApis.async = true;
-        googleApis.defer = true;
-        document.head.appendChild(googleApis);
+    beforeMount() {
+        let gapiScript = document.createElement('script');
+        gapiScript.setAttribute('src', 'https://apis.google.com/js/platform.js');
+        document.head.appendChild(gapiScript);
+
+        let isLoaded = false;
+        gapiScript.onload = (e) => {
+            isLoaded = true;
+        };
+        let gapiInterval = setInterval(() => {
+            if (isLoaded) {
+                clearInterval(gapiInterval);
+            }
+        }, 100);
     }
 };
 
