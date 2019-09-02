@@ -45,6 +45,9 @@ export const en = {
         FIND_CONT: 'Finding',
         GET_PAST: 'Got',
         GET_CONT: 'Getting',
+        CHG: 'Change',
+        CHG_PAST: 'Changed',
+        CHG_CONT: 'Changing',
         CHG_PRO: 'Change Project',
         IMPORT: 'Import',
         EXPORT: 'Export',
@@ -69,7 +72,8 @@ export const en = {
         INFO: 'INFO',
         TITLE: '{0} {1}',
         VM: 'VM',
-        COMPUTE: 'Compute'
+        COMPUTE: 'Compute',
+        UNSET: 'Unset'
     },
     TREE_TYPE: {
         PROJECT: 'Project',
@@ -181,7 +185,8 @@ export const en = {
     },
     ALERT: {
         SUCCESS: '{0} Successfully {1}.',
-        ERROR: 'ERROR OCCURED during {0} {1}.'
+        ERROR: 'ERROR OCCURED during {0} {1}.',
+        NO_PARAM: 'An item must be chosen.' 
     },
     TABLE: {
         SETTINGS: 'Table Settings',

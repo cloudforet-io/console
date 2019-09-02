@@ -31,7 +31,11 @@
       />
       <span v-if="!$slots.contents">{{ text }}</span>
 
-      <slot name="footer" />
+      <slot name="footer" 
+            :ok="clickOk" 
+            :cancel="clickCancel"
+            :hide="onHide"
+      />
       <template v-if="!$slots.footer" #modal-footer="{ ok, cancel, hide }">
         <b-button v-if="!okOnly" size="sm" 
                   variant="outline-secondary" 
@@ -141,7 +145,7 @@ export default {
                 e.preventDefault();
                 this.$emit('esc', e);
             } else {
-                this.$emit('hide', e);
+                this.hideModal();
             }
         }
     }

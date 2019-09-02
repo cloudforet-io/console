@@ -103,6 +103,9 @@
                :title="tr('PROJECT')"
                centered
                hide-footer
+               size="md"
+               interactive
+               @ok="changeProject"
     >
       <template #contents>
         <BaseSimpleTree ref="IDSV001_ProjectTree" 
@@ -110,6 +113,29 @@
                         @selected="selectProject"
                         @toggled="getNextLayerProject"
         />
+      </template>
+
+      <template #footer="{ cancel, ok }">
+        <div class="footer">
+          <b-button class="float-right ml-3 mb-1" 
+                    size="md" 
+                    type="button" 
+                    variant="primary"
+                    @click="ok"
+          >
+            {{ tr('TITLE', [tr('CHG'), tr('PROJECT')]) }}
+          </b-button>
+          <b-button class="float-right mb-1" size="md" 
+                    type="button" variant="outline-secondary"
+                    @click="onClickCancelChangeProject"
+          >
+            {{ tr('BTN_CANCEL') }}
+          </b-button>
+          <span class="float-left">
+            <BaseCheckbox v-model="unsetProject" class="unset-checkbox" /> 
+            <span class="unset-text">{{ tr('TITLE', [tr('UNSET'), tr('PROJECT')]) }}</span>
+          </span>
+        </div>
       </template>
     </BaseModal>
 
@@ -157,6 +183,7 @@ import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 const BaseSimpleTree = () => import('@/components/base/tree/BATR_002_BaseSimpleTree');
+const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox.vue');
 
 const ActionCheckModal = () => import('@/components/base/modal/BAMO_003_EXT_ActionCheckModal.vue');
 const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
@@ -174,6 +201,7 @@ export default {
         BaseTable,
         BaseModal,
         BaseSimpleTree,
+        BaseCheckbox,
         ActionCheckModal,
         BaseTabNav,
         BaseMultiPanel,
@@ -225,7 +253,8 @@ export default {
             actionCheckType: '',
             actionCheckText: '',
             treeData: [],
-            project: null
+            project: null,
+            unsetProject: false
         };
     },
     computed: {
@@ -423,23 +452,21 @@ export default {
                 console.error(e);
             }
         },
-        selectProject (project) {
-            this.project = project;
+        selectProject (nodeObj) {
+            this.project = nodeObj.node.data.id;
         },
         async getNextLayerProject (nodeObj) {
-            nodeObj.node.data.is_cached = true;
-
-            let param = {
-                item_type: 'PROJECT_GROUP',
-                item_id:this._.get(nodeObj.node, 'data.id'),
-                domain_id: sessionStorage.domainId
-            };
             try {
-                let res = await this.$axios.post('/identity/project/tree', param);
+                let res = await this.$axios.post('/identity/project/tree', {
+                    item_type: 'PROJECT_GROUP',
+                    item_id: this._.get(nodeObj.node, 'data.id'),
+                    domain_id: sessionStorage.domainId
+                });
+                nodeObj.node.data.is_cached = true;
                 let childrenNode = this.getSelectedNodeArr(res.data.items);
                 nodeObj.treeV.updateNode(nodeObj.node.path, { data: nodeObj.node.data });
-                if (!this.isEmpty(childrenNode)){
-                    childrenNode.forEach(curItem =>{
+                if (childrenNode){
+                    childrenNode.map((curItem) => {
                         nodeObj.treeV.insert({ node: nodeObj.node, placement: 'inside' }, curItem);
                     });
                 }
@@ -447,8 +474,22 @@ export default {
                 console.error(error);
             }
         },
-        async changeProject (commitItems) {
-            // await this.$axios.post('/inventory/server/change-pool', this.getParams(commitItems, null, ));
+        async changeProject () {
+            if (this.project || this.unsetProject) {
+                /**
+                 * TODO: UNSET PROJECT 인 경우 처리
+                 */
+                try {
+                    await this.$axios.post('/inventory/server/change-pool', this.getParams(this.selectedServers, null, this.project, null));
+                    this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('PROJECT'), this.tr('CHG_PAST')]));
+                    this.hideProjectModal();
+                } catch (e) {
+                    console.error(e);
+                    this.$$alertify.error(this.tr('ALERT.ERROR', [this.tr('CHG_CONT'), this.tr('PROJECT')]));
+                }
+            } else {
+                this.$alertify.error(this.tr('ALERT.NO_PARAM'));
+            }
         },
         async changePool (commitItems) {
             await this.$axios.post('/inventory/server/change-pool', this.getParams(commitItems, 'CLOSED'));
@@ -489,6 +530,11 @@ export default {
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('CHG_PRO'), this.tr('SERVER')]);
             this.showProjectModal();
         },
+        onClickCancelChangeProject () {
+            this.project = null;
+            this.unsetProject = false;
+            this.hideProjectModal();
+        },
         onClickChangePool () {
             this.action = this.changePool;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG_POOL'), this.tr('SERVER')]);
@@ -504,6 +550,9 @@ export default {
         },
         showProjectModal () {
             this.$refs.IDSV001_ProjectModal.showModal();
+        },
+        hideProjectModal () {
+            this.$refs.IDSV001_ProjectModal.hideModal();
         }
     }
 };
@@ -536,5 +585,15 @@ export default {
 }
 .icon {
     font-size: 1rem !important;
+}
+
+.footer {
+    margin-top: 20px;
+    .unset-checkbox {
+        vertical-align: middle;
+    }
+    .unset-text {
+        vertical-align: middle;
+    }
 }
 </style>

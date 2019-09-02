@@ -43,6 +43,9 @@ export const ko ={
         FIND_CONT: '찾는',
         GET_PAST: '가져왔습니다',
         GET_CONT: '가져오는',
+        CHG: '변경',
+        CHG_PAST: '변경하였습니다',
+        CHG_CONT: '변경하는',
         CHG_PRO: '프로젝트 변경하기',
         CHG_POOL: '풀 변경하기',
         IMPORT: '가져오기(Import)',
@@ -67,7 +70,8 @@ export const ko ={
         INFO: '상세 정보',
         TITLE: '{1} {0}',
         VM: 'VM',
-        COMPUTE: 'Compute'
+        COMPUTE: 'Compute',
+        UNSET: '설정 안함'
     },
     TREE_TYPE: {
         PROJECT: '프로젝트',
@@ -179,7 +183,8 @@ export const ko ={
     },
     ALERT: {
         SUCCESS: '{0}가(이) 성공적으로 {1}.',
-        ERROR: '{1}을(를) {0} 동안 오류가 발생했습니다.'
+        ERROR: '{1}을(를) {0} 동안 오류가 발생했습니다.',
+        NO_PARAM: '먼저 아이템을 선택해주세요.'
     },
     TABLE: {
         SETTINGS: '테이블 환경 설정',
