@@ -97,7 +97,6 @@ export default {
 
         },
         async login () {
-            console.log('authObj', this.oathSignParam);
             await this.$store.dispatch('auth/login', this.oathSignParam
             ).then(() => {
                 this.$router.push(this.nextPath);
