@@ -67,7 +67,9 @@ export const en = {
         USER: 'User',
         PROJECT: 'Project',
         INFO: 'INFO',
-        TITLE: '{0} {1}'
+        TITLE: '{0} {1}',
+        VM: 'VM',
+        COMPUTE: 'Compute'
     },
     TREE_TYPE: {
         PROJECT: 'Project',
@@ -103,6 +105,8 @@ export const en = {
         CREAT: 'Created at',
         FINISH: 'Finished at',
         UPDATE: 'Updated at',
+        CREATE: 'Created at',
+        DELETE: 'Deleted at',
         RESULT: 'Result',
         IP: 'IP',
         CORE: 'Core',
@@ -112,9 +116,25 @@ export const en = {
         POOL: 'Pool',
         SE_TYPE: 'Server Type',
         PLATFORM: 'Platform',
+        IMAGE: 'Image',
+        HOST: 'Host',
         PROJ: 'Project',
         DISK_SZ: 'Disk Size',
         DESC: 'Description',
+        PRI_IP: 'Primary IP',
+        FQDN: 'FQDN',
+        O_DETAIL: 'OS Details',
+        O_ARCH: 'OS Architecture',
+        KERNEL: 'Kernel',
+        LT_BOOT: 'Last Boot Time',
+        REGION: 'Region',
+        ZONE: 'Zone',
+        INST_ID: 'Instance ID',
+        KEY_PAIR: 'Keypair',
+        INST_TYPE: 'Instance Type',
+        CREATE_BY: 'Created By',
+        SEC_GROUP: 'Security Group',
+        C_COL_INFO: 'Collect Informaiton',
         EXECR: 'Executor',
         EVENT: 'Event',
         FAIL_REASON: 'Reason for Failure'
@@ -131,7 +151,9 @@ export const en = {
         TAG: 'Tags',
         INFO: 'Info',
         NO_ITEM: 'No {0}',
-        NO_SELECT: 'Select a {0} Above.'
+        NO_SELECT: 'Select a {0} Above.',
+        VM: 'VM',
+        COMPUTE: 'Compute'
     },
     FORM: {
         UNVALID: {

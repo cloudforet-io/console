@@ -33,24 +33,24 @@ export const GlobalEnum = {
         }),
     SERVER_STATE: Object.freeze(
         {
-            SERVICE: {
-                msg: 'In Progress', //primary
-                icon: 'fal fa-check',
-                color: 'primary'
+            INSERVICE: {
+                msg: 'In-Service', 
+                icon: 'fas fa-check-circle',
+                color: 'success'
             },
             MAINTENANCE: {
-                msg: '', //info
-                icon: 'fal fa-traffic-cone',
-                color: 'info'
+                msg: 'Maintenance', 
+                icon: 'fas fa-exclamation-triangle',
+                color: 'warning'
             },
             CLOSED: {
-                msg: 'Closed', //secondary
-                icon: 'fal fa-minus',
+                msg: 'Closed',
+                icon: 'fas fa-minus-circle',
                 color: 'secondary'
             },
             DELETED: {
-                msg: 'Deleted', //danger
-                icon: 'fal fa-trash',
+                msg: 'Deleted', 
+                icon: 'fas fa-times',
                 color: 'danger'
             }
         }),
