@@ -1,30 +1,64 @@
 <template>
-  <div>
-    <div id="g-signin-btn" />
-    <div><a href="#" @click="signOut">Sign out</a></div>
-    <div><a href="#" @click="disconnect">Disconnect</a></div>
-    <div><img id="profileImage" src=""></div>
-    <textarea id="message" cols="80" rows="10" />
-  </div>
+  <b-row align-v="center">
+    <div class="container fade-in">
+      <b-row class="justify-content-center">
+        <b-col md="8">
+          <b-card-group class="card-group">
+            <b-card no-body class="p-4">
+              <b-card-body>
+                <b-form>
+                  <h1>
+                    {{ $t('MSG.LOG_IN') }}
+                  </h1>
+                  <transition v-if="seenGreet" name="slide-fade">
+                    <p class="message">
+                      <b>{{ $t('MSG.SIGN_IN') }}</b>
+                    </p>
+                  </transition>
+                  <transition v-if="seenError" name="slide-fade">
+                    <p class="message" style="color: #B82E24">
+                      <b>{{ $t('MSG.SIGN_FAIL_TITLE') }}</b>
+                      <br> {{ $t('MSG.SIGN_FAIL_BODY') }}
+                    </p>
+                  </transition>
+                  <b-input-group class="mb-3">
+                    <div id="g-signin-btn" />
+                  </b-input-group>
+                </b-form>
+              </b-card-body>
+            </b-card>
+            <b-card no-body class="text-white bg-primary py-5 d-md-down-none" style="width:44%">
+              <b-card-body class="text-center">
+                <div>
+                  <br>
+                  <br>
+                  <p> {{ $t('MSG.SIGN_UP_MSG') }}</p>
+                </div>
+              </b-card-body>
+            </b-card>
+          </b-card-group>
+        </b-col>
+      </b-row>
+      </basesimplemodal>
+    </div>
+  </b-row>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 function onSignIn(googleUser) {
-    console.log("on sign in, granted scopes: " + googleUser.getGrantedScopes());
-    console.log("ID token: " + googleUser.getAuthResponse().id_token);
-    console.log("Access token: " + googleUser.getAuthResponse().access_token);
-    var profile = googleUser.getBasicProfile();
-    var message = 'ID: ' + profile.getId() + "\n"
-        + 'Name: ' + profile.getName() + "\n"
-        + 'Image URL: ' + profile.getImageUrl() + "\n"
-        + 'Email: ' + profile.getEmail();
-    document.getElementById("message").value = message;
-    setProfileImage(profile.getImageUrl());
+    console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
+    console.log('ID token: ' + googleUser.getAuthResponse().id_token);
+    console.log('Access token: ' + googleUser.getAuthResponse().access_token);
+    let profile = googleUser.getBasicProfile();
+    let message = `ID:   ${profile.getId()}  '\n' Name: ${profile.getName()}  '\n' Image URL:  ${profile.getImageUrl()} '\n'  Email:  ${profile.getEmail()} `;
+    this.alertAbs();
+    //setProfileImage(profile.getImageUrl());
 }
+import { mapGetters } from 'vuex';
 export default {
-    components: {},
-    data() {
+    components: {
+    },
+    data () {
         return {
             rememberStatus: false,
             seenGreet: true,
@@ -38,13 +72,12 @@ export default {
             'nextPath'
         ])
     },
-    beforeMount() {
-        this.init();
+    mounted () {
+        this.setGoogleSignInButton();
     },
     methods: {
-        init() {
-              console.log('150323145707-hp5i8q4hm1vcb2hpta23c1829167nl1h.apps.googleusercontent.com');
-              gapi.load('auth2', function () {
+        setGoogleSignInButton(){
+            gapi.load('auth2', function() {
                 let auth2 = gapi.auth2.init({
                     client_id: '150323145707-hp5i8q4hm1vcb2hpta23c1829167nl1h.apps.googleusercontent.com',
                     fetch_basic_profile: false,
@@ -61,100 +94,92 @@ export default {
                 });
             });
         },
-        onSignIn(googleUser) {
-            debugger;
-            console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
-            console.log('ID token: ' + googleUser.getAuthResponse().id_token);
-            console.log('Access token: ' + googleUser.getAuthResponse().access_token);
-            var profile = googleUser.getBasicProfile();
-            var message = 'ID: ' + profile.getId() + '\n'
-                    + 'Name: ' + profile.getName() + '\n'
-                    + 'Image URL: ' + profile.getImageUrl() + '\n'
-                    + 'Email: ' + profile.getEmail();
-            document.getElementById('message').value = message;
-            setProfileImage(profile.getImageUrl());
+        alertAbs(){
+            alert('ㅁ니아ㅓㄹ미나어ㅣㅁ나어린ㅁ아ㅓㄹ이ㅏㅁ너이라ㅓㅁ니ㅏㅇ러');
         },
-        signOut() {
-            debugger;
-            var auth2 = gapi.auth2.getAuthInstance();
-            auth2.signOut().then(function () {
-                console.log('on sign out');
-                setMessage('User signed out');
-                setProfileImage(null);
+        async login () {
+            console.log(this.tr('MSG.LOG_IN'));
+            await this.$store.dispatch('auth/login',
+                {
+                    userId: this.userId,
+                    password: this.password,
+                    domainId: sessionStorage.getItem('domainId')
+                }
+            ).then(() => {
+                this.$router.push(this.nextPath);
+                this.rememberMe();
+                this.setTimeZone();
+
+            }).catch(() => {
+                this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
             });
         },
-        disconnect() {
-            debugger;
-            console.log('on disconnect');
-            var auth2 = gapi.auth2.getAuthInstance();
-            if (!auth2.isSignedIn.get()) {
-                setMessage('Not signed in, cannot disconnect');
-                return;
-            }
-            auth2.disconnect();
-            setProfileImage(null);
-            setMessage('Disconnected');
+        showErorrMSG () {
+            this.seenGreet = false;
+            this.seenError = true;
         },
-        setMessage(message) {
-            document.getElementById('message').value = message;
+        showGreetMSG () {
+            this.seenGreet = true;
+            this.seenError = false;
         },
-        setProfileImage(srcUrl){
-            var element = document.getElementById('profileImage');
-            if (srcUrl == null) {
-                element.style.display = 'none';
-                element.src = '';
+        rememberMe () {
+            if (this.rememberStatus && !this.isEmpty(this.userId)) {
+                localStorage.userId = this.userId;
+                localStorage.checkbox = this.rememberStatus;
             } else {
-                element.style.display = 'block';
-                element.src = srcUrl;
+                localStorage.userId = '';
+                localStorage.checkbox = false;
             }
+        },
+        popSignUpInstruction () {
+            this.$refs.LogInSimpleModal.showModal();
+        },
+        async setTimeZone(){
+            await this.$axios.post('identity/user/get', {
+                user_id: this.userId,
+                domainId: sessionStorage.getItem('domainId')
+            }).then((response) => {
+                const timeZone = this.isEmpty(response.data.timezone) ? 'Etc/GMT' : response.data.timezone;
+                localStorage.timeZone = timeZone;
+
+            }).catch(() => {
+                this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
+            });
         }
     }
-}
-;
+};
 </script>
 
 <style lang="scss" scoped>
-    @import '../../../asset/style/css/slideShow.css';
+  @import '../../../asset/style/css/slideShow.css';
 
-    .login-check {
-        float: right;
-        padding: 0px 6px 6px 0px;
+  .login-check {
+    float: right;
+    padding: 0px 6px 6px 0px;
+  }
+
+  .container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .card-group {
+    @extend %sheet;
+    .input-group-text {
+      border: 0;
+      background: none;
     }
-
-    .container {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+    .form-control {
+      border: 1px solid $lightgray;
+      border-radius: 5px;
     }
-
-    .card-group {
-        @extend %sheet;
-
-        .input-group-text {
-            border: 0;
-            background: none;
-        }
-
-        .form-control {
-            border: 1px solid $lightgray;
-            border-radius: 5px;
-        }
-    }
-
-    .login-btn {
-        border: 0;
-        background: linear-gradient(to right, $blue, $violet);
-        box-shadow: 0 0 5px 1px rgba($navy, 0.3);
-        color: $white;
-    }
-
-    .btn-sign-in {
-        background: #fff;
-        font: 16px/22px Roboto;
-        padding: 4px 8px;
-        border: 1px solid #ccc;
-        display: inline-block;
-        cursor: pointer;
-    }
+  }
+  .login-btn {
+    border: 0;
+    background: linear-gradient(to right, $blue, $violet);
+    box-shadow: 0 0 5px 1px rgba($navy, 0.3);
+    color: $white;
+  }
 </style>
