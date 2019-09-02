@@ -71,26 +71,17 @@ export default {
     },
     methods: {
         async setGoogleSignInButton(){
-            await this.$gAuth.signIn()
-                .then(GoogleUser => {
-                    debugger;
-                    console.log('user', GoogleUser);
-                    // GoogleUser.getId() : Get the user's unique ID string.
-                    // GoogleUser.getBasicProfile() : Get the user's basic profile information.
-                    // GoogleUser.getAuthResponse() : Get the response object from the user's auth session. access_token and so on
-                    this.isSignIn = this.$gAuth.isAuthorized;
-                    const oauthObj = {
-                        id: GoogleUser.getId(),
-                        profile: GoogleUser.getBasicProfile(),
-                        response : GoogleUser.getAuthResponse()
-                    };
-                    this.login(oauthObj);
-                })
-                .catch(error  => {
-                   alert('this is fucked'); //on fail do something
-                });
+            try {
+                let GoogleUser = await this.$gAuth.signIn();
+                console.log('GoogleUser', GoogleUser);
+                debugger;
+                this.login(GoogleUser);
+            } catch (e){
+                console.log(e);
+            }
         },
         async login (oauth) {
+
             debugger;
             console.log(this.tr('MSG.LOG_IN'));
             await this.$store.dispatch('auth/login',
