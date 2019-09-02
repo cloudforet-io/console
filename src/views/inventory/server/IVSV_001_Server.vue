@@ -13,6 +13,7 @@
                    :cardless="false"
                    underlined
                    :height="height"
+                   state-type="SERVER_STATE"
                    @rowSelected="rowSelected"
                    @onSelectAll="onAllRowSelected"
                    @list="listServers"
@@ -263,13 +264,11 @@ export default {
             this.setQuery(limit, start, sort, filter, filterOr);
             let res = null;
             try {
-                res = await this.$axios.post('/identity/user/list', {
-                    query: this.query
+                res = await this.$axios.post('/inventory/server/list', {
+                    query: this.query,
+                    domain_id: sessionStorage.getItem('domainId')
                 });
-                // res = await this.$axios.post('/inventory/server/list', {
-                //     query: this.query,
-                //     domain_id: sessionStorage.getItem('domainId')
-                // });
+                console.log('server data', res.data.results);
                 this.servers = res.data.results;
                 this.totalCount = res.data.total_count;
                 this.isLoading = false;
