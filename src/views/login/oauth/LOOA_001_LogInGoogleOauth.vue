@@ -22,7 +22,9 @@
                     </p>
                   </transition>
                   <b-input-group class="mb-3">
-                    <b-button class="g-signin-button" variant="outline-primary" @click="setGoogleSignInButton"> Google Sign in</b-button>
+                    <b-button class="g-signin-button" variant="outline-primary" @click="setGoogleSignInButton">
+                      Google Sign in
+                    </b-button>
                   </b-input-group>
                 </b-form>
               </b-card-body>
@@ -51,6 +53,7 @@ export default {
     },
     data () {
         return {
+            isSignIn: null,
             rememberStatus: false,
             seenGreet: true,
             seenError: false,
@@ -68,24 +71,18 @@ export default {
     },
     methods: {
         async setGoogleSignInButton(){
-            await this.$gAuth.signIn()
-                .then(GoogleUser => {
-                    debugger;
-                    console.log('user', GoogleUser);
-                    // GoogleUser.getId() : Get the user's unique ID string.
-                    // GoogleUser.getBasicProfile() : Get the user's basic profile information.
-                    // GoogleUser.getAuthResponse() : Get the response object from the user's auth session. access_token and so on
-                    this.isSignIn = this.$gAuth.isAuthorized;
-                })
-                .catch(error  => {
-                    //on fail do something
-                });
+            try {
+                let GoogleUser = await this.$gAuth.signIn();
+                console.log('GoogleUser', GoogleUser);
+                debugger;
+                this.login(GoogleUser);
+            } catch (e){
+                console.log(e);
+            }
+        },
+        async login (oauth) {
 
-        },
-        onSignIn(guObject){
             debugger;
-        },
-        async login () {
             console.log(this.tr('MSG.LOG_IN'));
             await this.$store.dispatch('auth/login',
                 {
