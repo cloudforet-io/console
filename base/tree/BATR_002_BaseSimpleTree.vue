@@ -64,6 +64,10 @@ export default {
     },
     methods: {
         nodeClicked (node) {
+            if (!node.isLeaf) {
+                return;
+            }
+
             if (this.clickedNode) {
                 this.removeClickedClass(this.clickedNode);
             }
@@ -95,7 +99,7 @@ export default {
             } else {
                 hasNoClickedItem = true;
             }
-            
+
             if (!hasNoClickedItem) {
                 let addClassInterval = setInterval(() => {
                     if (this.addClickedClass(this.clickedNode)) {
@@ -129,7 +133,7 @@ export default {
   .main-tree-col {
       background-color: $skyblue;
     padding: 15px 8px;
-    height: 500px;
+    height: 400px;
     width: 100%;
     overflow: scroll;
     .leaf-space {
