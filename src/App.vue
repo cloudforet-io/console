@@ -24,7 +24,7 @@ export default {
         await document.head.appendChild(gapiScript);
 
         gapiScript.onload = (e) => {
-          isLoaded = true;
+            isLoaded = true;
         };
         let gapiInterval = setInterval(() => {
             if (isLoaded) {
