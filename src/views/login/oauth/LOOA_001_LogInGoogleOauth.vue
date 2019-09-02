@@ -90,10 +90,6 @@ export default {
                 });
             });
         },
-        signInChanged(googleUser){
-
-
-        },
         onSignIn(googleUser){
             const profile = googleUser.getBasicProfile();
             const param ={
