@@ -45,15 +45,16 @@
 </template>
 
 <script>
-function onSignIn(googleUser) {
+/*function onSignIn(googleUser) {
     console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
     console.log('ID token: ' + googleUser.getAuthResponse().id_token);
     console.log('Access token: ' + googleUser.getAuthResponse().access_token);
     let profile = googleUser.getBasicProfile();
     let message = `ID:   ${profile.getId()}  '\n' Name: ${profile.getName()}  '\n' Image URL:  ${profile.getImageUrl()} '\n'  Email:  ${profile.getEmail()} `;
+    debugger;
     this.alertAbs();
     //setProfileImage(profile.getImageUrl());
-}
+}*/
 import { mapGetters } from 'vuex';
 export default {
     components: {
@@ -89,13 +90,20 @@ export default {
                     height: 50,
                     longtitle: false,
                     theme: 'dark',
-                    onsuccess: onSignIn,
+                    onsuccess: this.onSignIn(this),
                     onfailure: null
                 });
             });
         },
-        alertAbs(){
-            alert('ㅁ니아ㅓㄹ미나어ㅣㅁ나어린ㅁ아ㅓㄹ이ㅏㅁ너이라ㅓㅁ니ㅏㅇ러');
+        onSignIn(googleUser){
+            console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
+            console.log('ID token: ' + googleUser.getAuthResponse().id_token);
+            console.log('Access token: ' + googleUser.getAuthResponse().access_token);
+            let profile = googleUser.getBasicProfile();
+            let message = `ID:   ${profile.getId()}  '\n' Name: ${profile.getName()}  '\n' Image URL:  ${profile.getImageUrl()} '\n'  Email:  ${profile.getEmail()} `;
+            console.log(message);
+            debugger;
+            this.alertAbs();
         },
         async login () {
             console.log(this.tr('MSG.LOG_IN'));
@@ -109,7 +117,6 @@ export default {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();
-
             }).catch(() => {
                 this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
             });

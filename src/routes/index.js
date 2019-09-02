@@ -76,6 +76,7 @@ index.beforeEach(async (to, from, next) => {
         try {
             let domain_name = process.env.VUE_APP_API_DOMAIN_URL;
             const response  = await api.post('/identity/domain/list', { name: domain_name });
+            debugger;
             if (response.data.total_count === 1){
                 isFirstLogin = baseRedirectChecker(response);
             }
