@@ -54,7 +54,7 @@ export default {
     },
     data () {
         return {
-            isSignIn: null,
+            oathSignParam: null,
             seenGreet: true,
             seenError: false,
             pramObject: null
@@ -96,14 +96,17 @@ export default {
 
             const profile = googleUser.getBasicProfile();
             console.log('#####Oauth LogIn#####', googleUser);
+            console.log('#####Oprofile#####', profile);
+
             const param ={
                 userId: profile.getId(),
                 access_token: googleUser.getAuthResponse().access_token
             };
+            this.oathSignParam = param;
         },
-        async login (oauth) {
-            console.log('authObj', oauth);
-            await this.$store.dispatch('auth/login', oauth
+        async login () {
+            console.log('authObj', this.oathSignParam);
+            await this.$store.dispatch('auth/login', this.oathSignParam
             ).then(() => {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
