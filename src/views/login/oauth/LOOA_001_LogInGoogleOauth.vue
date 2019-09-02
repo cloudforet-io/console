@@ -45,7 +45,7 @@ export default {
         init() {
             gapi.load('auth2', function () {
                 let auth2 = gapi.auth2.init({
-                    client_id: '150323145707-hp5i8q4hm1vcb2hpta23c1829167nl1h.apps.googleusercontent.com',
+                    client_id: '150323145707-gnuesem937pjv8c46jfer5ma2r746p54.apps.googleusercontent.com',
                     fetch_basic_profile: false,
                     scope: 'profile'
                 });
