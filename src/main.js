@@ -16,6 +16,7 @@ import { Mixin } from '@/setup/global_util';
 import VueLodash from 'vue-lodash';
 import url from 'url';
 import timezone from 'countries-and-timezones';
+import GSignInButton from 'vue-google-signin-button';
 
 //TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
 dotenv.config();
@@ -27,6 +28,7 @@ Vue.use(VueInputAutowidth);
 Vue.use(CountryFlag);
 Vue.use(Notifications, { velocity });
 Vue.use(VueLodash, { name: 'lodash' });
+Vue.use(GSignInButton);
 
 Vue.prototype.$axios = api;
 Vue.prototype.$velocity = velocity;
