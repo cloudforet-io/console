@@ -27,7 +27,7 @@ export default {
             if (isLoaded) {
                 clearInterval(gapiInterval);
             }
-        }, 100);
+        }, 500);
     }
 };
 
