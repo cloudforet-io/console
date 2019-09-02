@@ -44,7 +44,7 @@ export default {
         async login ({ commit }, authObj) {
             try {
                 let param = {
-                    domain_id: authObj.domainId
+                    domain_id: sessionStorage.getItem('domainId')
                 };
                 if (authObj.hasOwnProperty('access_token')){
                     param['credentials'] = { access_token:authObj.access_token };
