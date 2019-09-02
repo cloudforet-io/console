@@ -84,6 +84,7 @@ export default {
                 domainId: sessionStorage.getItem('domainId'),
                 access_token: oauth.Zi.access_token
             };
+            console.log('authObj', oauthObject);
             await this.$store.dispatch('auth/login', oauthObject
             ).then(() => {
                 this.$router.push(this.nextPath);
