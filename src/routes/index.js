@@ -139,6 +139,7 @@ function baseRedirectChecker(rep){
             sessionStorage.setItem('domainId', result.domain_id);
             return 1;
         } else {
+            sessionStorage.setItem('domainId', result.domain_id);
             LoginType = result.plugin_info.options.auth_type;
             return 2;
         }

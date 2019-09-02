@@ -80,6 +80,7 @@ export default {
             }
         },
         async login (oauth) {
+
             const oauthObject = {
                 domainId: sessionStorage.getItem('domainId'),
                 access_token: oauth.Zi.access_token
