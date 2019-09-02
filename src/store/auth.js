@@ -47,12 +47,12 @@ export default {
                     domain_id: authObj.domainId
                 };
                 if (authObj.hasOwnProperty('access_token')){
-                    param['credentials'] = {access_token:authObj.access_token };
+                    param['credentials'] = { access_token:authObj.access_token };
                 } else {
-                    param['credentials'] = {user_id: authObj.userId,password: authObj.password};
+                    param['credentials'] = { user_id: authObj.userId,password: authObj.password };
                 }
                 const res = await api.post('/identity/token/issue', param);
-
+                console.log('authObj', authObj);
                 commit('setUserId', { userId: authObj.userId });
                 commit('login', { token: res.data.access_token });
 
