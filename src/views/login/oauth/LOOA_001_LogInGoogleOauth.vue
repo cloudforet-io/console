@@ -22,10 +22,7 @@
                     </p>
                   </transition>
                   <b-input-group class="mb-3">
-                    <!--<b-button class="g-signin-button" variant="outline-primary" @click="setGoogleSignInButton">
-                      Google Sign in
-                    </b-button>-->
-                    <div id="g-signin-btn" @click="login"/>
+                    <div id="g-signin-btn" @click="login" />
                   </b-input-group>
                 </b-form>
               </b-card-body>
@@ -54,6 +51,7 @@ export default {
     },
     data () {
         return {
+            isSignedIn: false,
             oathSignParam: null,
             seenGreet: true,
             seenError: false,
@@ -71,13 +69,16 @@ export default {
     methods: {
         async setGoogleSignInButton(){
             let vm = this;
-            const clientId = this.$store.getters["auth/client_id"];
+            const clientId = this.$store.getters['auth/client_id'];
             gapi.load('auth2', function() {
                 let auth2 = gapi.auth2.init({
                     client_id: clientId,
                     fetch_basic_profile: false,
                     scope: 'profile'
                 });
+
+                this.isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
                     width: 200,
@@ -89,20 +90,22 @@ export default {
                 });
             });
         },
+        signInChanged(googleUser){
+
+
+        },
         onSignIn(googleUser){
-            console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
-            console.log('ID token: ' + googleUser.getAuthResponse().id_token);
-            console.log('Access token: ' + googleUser.getAuthResponse().access_token);
-
             const profile = googleUser.getBasicProfile();
-            console.log('#####Oauth LogIn#####', googleUser);
-            console.log('#####Oprofile#####', profile);
-
             const param ={
-                userId: profile.getId(),
+                userId: profile.getEmail(),
                 access_token: googleUser.getAuthResponse().access_token
             };
             this.oathSignParam = param;
+            if (!isSignedIn){
+                this.login();
+                isSignedIn = true;
+            }
+
         },
         async login () {
             console.log('authObj', this.oathSignParam);
