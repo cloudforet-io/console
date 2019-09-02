@@ -22,9 +22,10 @@
                     </p>
                   </transition>
                   <b-input-group class="mb-3">
-                    <b-button class="g-signin-button" variant="outline-primary" @click="setGoogleSignInButton">
+                    <!--<b-button class="g-signin-button" variant="outline-primary" @click="setGoogleSignInButton">
                       Google Sign in
-                    </b-button>
+                    </b-button>-->
+                    <div id="g-signin-btn" />
                   </b-input-group>
                 </b-form>
               </b-card-body>
@@ -67,26 +68,50 @@ export default {
         ])
     },
     mounted () {
-        //this.setGoogleSignInButton();
+        this.setGoogleSignInButton();
     },
     methods: {
         async setGoogleSignInButton(){
-            try {
+           /* try {
                 let GoogleUser = await this.$gAuth.signIn();
                 console.log('GoogleUser', GoogleUser);
                 this.login(GoogleUser);
             } catch (e){
                 console.log(e);
-            }
+            }*/
+            let vm = this;
+            gapi.load('auth2', function() {
+                let auth2 = gapi.auth2.init({
+                    client_id: '150323145707-hp5i8q4hm1vcb2hpta23c1829167nl1h.apps.googleusercontent.com',
+                    fetch_basic_profile: false,
+                    scope: 'profile'
+                });
+                gapi.signin2.render('g-signin-btn', {
+                    scope: 'email',
+                    width: 200,
+                    height: 50,
+                    longtitle: false,
+                    theme: 'dark',
+                    onsuccess: vm.onSignIn,
+                    onfailure: null
+                });
+            });
+        },
+        onSignIn(googleUser){
+            console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
+            console.log('ID token: ' + googleUser.getAuthResponse().id_token);
+            console.log('Access token: ' + googleUser.getAuthResponse().access_token);
+            const profile = googleUser.getBasicProfile();
+            const param ={
+                userId: profile.getId(),
+                access_token: googleUser.getAuthResponse().access_token
+            };
+            this.login(param);
         },
         async login (oauth) {
-
-            const oauthObject = {
-                domainId: sessionStorage.getItem('domainId'),
-                access_token: oauth.Zi.access_token
-            };
-            console.log('authObj', oauthObject);
-            await this.$store.dispatch('auth/login', oauthObject
+            console.log('#####Oauth LogIn#####');
+            console.log('authObj', oauth);
+            await this.$store.dispatch('auth/login', oauth
             ).then(() => {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
