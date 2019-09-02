@@ -15,12 +15,6 @@
                       <b>{{ $t('MSG.SIGN_IN') }}</b>
                     </p>
                   </transition>
-                  <transition v-if="seenError" name="slide-fade">
-                    <p class="message" style="color: #B82E24">
-                      <b>{{ $t('MSG.SIGN_FAIL_TITLE') }}</b>
-                      <br> {{ $t('MSG.SIGN_FAIL_BODY') }}
-                    </p>
-                  </transition>
                   <b-input-group class="mb-3">
                     <div id="g-signin-btn" @click="login" />
                   </b-input-group>
@@ -76,9 +70,7 @@ export default {
                     fetch_basic_profile: false,
                     scope: 'profile'
                 });
-
-                this.isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
-
+                vm.isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
                     width: 200,
@@ -91,15 +83,16 @@ export default {
             });
         },
         onSignIn(googleUser){
+            console.log(this.isSignedIn);
             const profile = googleUser.getBasicProfile();
             const param ={
                 userId: profile.getEmail(),
                 access_token: googleUser.getAuthResponse().access_token
             };
             this.oathSignParam = param;
-            if (!isSignedIn){
+            if (!this.isSignedIn){
                 this.login();
-                isSignedIn = true;
+                this.isSignedIn = true;
             }
 
         },
