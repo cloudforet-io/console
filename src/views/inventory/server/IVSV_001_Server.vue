@@ -94,51 +94,65 @@
                       :title="actionCheckTitle"
                       :type="actionCheckType"
                       :text="actionCheckText"
+                      :fail-message="actionFailMsg"
+                      :success-message="actionSuccessMsg"
                       primary-key="server_id"
                       @succeed="listServers"
                       @failed="listServers"
-    />
-
-    <BaseModal ref="IDSV001_ProjectModal"
-               :title="tr('PROJECT')"
-               centered
-               hide-footer
-               size="md"
-               interactive
-               @ok="changeProject"
     >
-      <template #contents>
-        <BaseSimpleTree ref="IDSV001_ProjectTree" 
-                        :tree-prop="treeData"
-                        @selected="selectProject"
-                        @toggled="getNextLayerProject"
+      <template v-if="actionCheckCase === 'tree'" #contents>
+        <BaseSimpleTree :list-url="treeUrl"
+                        @selected="onSelectItem"
         />
       </template>
+      <template v-else-if="actionCheckCase === 'collect'" #contents>
+        <b-row class="collect-contents">
+          <b-col cols="6">
+            <BaseTable class="collector-table"
+                       :table-data="selectedServers"
+                       :fields="multiInfoFields"
+                       :height="400"
+                       headerless
+                       underlined
+            />
+          </b-col>
+          <b-col cols="6">
+            <BaseTable class="server-table"
+                       :table-data="selectedServers"
+                       :fields="multiInfoFields"
+                       :height="400"
+                       headerless
+                       underlined
+            />
+          </b-col>
+        </b-row>
+      </template>
 
-      <template #footer="{ cancel, ok }">
+      <template v-if="actionCheckCase !== 'basic'" #footer="{ ok, cancel }">
         <div class="footer">
-          <b-button class="float-right ml-3 mb-1" 
-                    size="md" 
+          <b-button class="float-right ml-1 mb-1" 
+                    size="sm" 
                     type="button" 
                     variant="primary"
                     @click="ok"
           >
-            {{ tr('TITLE', [tr('CHG'), tr('PROJECT')]) }}
+            {{ customActionBtn }}
           </b-button>
-          <b-button class="float-right mb-1" size="md" 
-                    type="button" variant="outline-secondary"
-                    @click="onClickCancelChangeProject"
+          <b-button class="float-right mb-1" 
+                    size="sm" 
+                    type="button" 
+                    variant="outline-secondary"
+                    @click="cancel"
           >
             {{ tr('BTN_CANCEL') }}
           </b-button>
-          <span class="float-left">
-            <BaseCheckbox v-model="unsetProject" class="unset-checkbox" /> 
-            <span class="unset-text">{{ tr('TITLE', [tr('UNSET'), tr('PROJECT')]) }}</span>
+          <span v-if="actionCheckCase === 'tree'" class="float-left">
+            <BaseCheckbox v-model="isRelease" class="unset-checkbox" /> 
+            <span class="unset-text">{{ customReleaseBtn }}</span>
           </span>
         </div>
       </template>
-    </BaseModal>
-
+    </ActionCheckModal>
 
     <BaseTabNav v-if="hasSelectedServer" class="server-info"
                 :fill="false"
@@ -181,7 +195,6 @@ import contextData from './search_context/query.js';
 import BaseDragHorizontal from '@/components/base/drag/BADG_002_BaseDragHorizontal.vue';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 
-const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 const BaseSimpleTree = () => import('@/components/base/tree/BATR_002_BaseSimpleTree');
 const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox.vue');
 
@@ -199,7 +212,6 @@ export default {
     components: {
         BaseDragHorizontal,
         BaseTable,
-        BaseModal,
         BaseSimpleTree,
         BaseCheckbox,
         ActionCheckModal,
@@ -247,14 +259,19 @@ export default {
                 filter: [],
                 filter_or: []
             },
-            defaultFilterItem: { key: 'state', value: ['DELETED'], operator: 'not_in' }, 
+            defaultFilterItem: { key: 'state', value: 'DELETED', operator: 'not' }, 
             action: null,
             actionCheckTitle: '',
             actionCheckType: '',
             actionCheckText: '',
-            treeData: [],
-            project: null,
-            unsetProject: false
+            actionSuccessMsg: '',
+            actionFailMsg: '',
+            actionCheckCase: 'basic', // basic, tree, or collect
+            customActionBtn: '',
+            customReleaseBtn: '',
+            selected: null,
+            isRelease: false,
+            treeUrl: ''
         };
     },
     computed: {
@@ -264,7 +281,7 @@ export default {
                 { key: 'server_id', label: `${this.tr('SERVER')} ${this.tr('ID')}`, sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
                 { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '180px' }},
                 { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
-                { key: 'primary_ip_address', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true },
+                { key: 'primary_ip_address', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true, thStyle: { width: '190px' }},
                 { 
                     key: 'core', 
                     label: this.tr('COL_NM.CORE'), 
@@ -287,7 +304,7 @@ export default {
                     },
                     thStyle: { width: '100px' }
                 },
-                { key: 'os_type', label: this.tr('COL_NM.O_TYPE'), sortable: true, ajaxSortable: true },
+                { key: 'os_type', label: this.tr('COL_NM.O_TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '100px' }},
                 { 
                     key: 'os_distro', 
                     label: this.tr('COL_NM.O_DIS'),
@@ -300,9 +317,10 @@ export default {
                         } else {
                             return data.data.os.os_distro;
                         }
-                    } 
+                    } ,
+                    thStyle: { width: '130px' }
                 },
-                { key: 'server_type', label: this.tr('COL_NM.SE_TYPE'), sortable: true, ajaxSortable: true },
+                { key: 'server_type', label: this.tr('COL_NM.SE_TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '120px' }},
                 { 
                     key: 'platform_type', 
                     label: this.tr('COL_NM.PLATFORM'),
@@ -315,9 +333,10 @@ export default {
                         } else {
                             return data.data.vm.platform_type;
                         }
-                    } 
+                    } ,
+                    thStyle: { width: '100px' }
                 },
-                { key: 'project_id', label: this.tr('COL_NM.PROJ'), sortable: true, ajaxSortable: true },
+                { key: 'project_id', label: this.tr('COL_NM.PROJ'), sortable: true, ajaxSortable: true, thStyle: { width: '180px' }},
                 { 
                     key: 'pool_id', 
                     label: this.tr('COL_NM.POOL'),
@@ -330,7 +349,8 @@ export default {
                         } else {
                             return data.pool_info.pool_id;
                         }
-                    } 
+                    } ,
+                    thStyle: { width: '180px' }
                 },
                 {
                     key: 'updated_at', 
@@ -340,7 +360,8 @@ export default {
                     filterByFormatted: true,
                     formatter: (val) => {
                         return this.getDatefromTimeStamp(val.seconds, localStorage.getItem('timezone'));
-                    } 
+                    } ,
+                    thStyle: { width: '160px' }
                 }
             ];
         },
@@ -376,7 +397,8 @@ export default {
             this.query.page.limit = limit || 10;
             this.query.page.start = start || 0;
             this.query.sort = sort || {};
-            this.query.filter = filter || [this.defaultFilterItem];
+            this.query.filter = filter || [];
+            this.query.filter.push(this.defaultFilterItem);
             this.query.filter_or = filterOr || [];
         },
         async listServers (limit, start, sort, filter, filterOr) {
@@ -388,7 +410,6 @@ export default {
                     query: this.query,
                     domain_id: sessionStorage.getItem('domainId')
                 });
-                console.log('server data', res.data.results);
                 this.servers = res.data.results;
                 this.totalCount = res.data.total_count;
                 this.isLoading = false;
@@ -398,31 +419,25 @@ export default {
                 this.isLoading = false;
             }
         },
+        async listCollectors () {
+        },
         rowSelected (rows) {
             this.selectedItems = rows;
         },
         onAllRowSelected (isSelectedAll, rows) {
             this.selectedItems = rows;
         },
-        limitChanged(val) {
+        limitChanged (val) {
             this.query.page.limit = Number(val);
             this.listServers();
         },
         updateSelectedServerInfo (server) {
             this.selectedItems[0].data = server;
         },
-        getParams (items, state, project, pool) {
+        getParams (items, state) {
             let params = { servers: [], domain_id: sessionStorage.getItem('domainId') };
             if (state) {
                 params.state = state;
-            }
-            if (project) {
-                params.release_pool = true;
-                params.pool_id = project;
-            }
-            if (pool) {
-                params.release_pool = false;
-                params.pool_id = pool;
             }
             items.map((item) => {
                 params.servers.push(item.server_id);
@@ -441,118 +456,120 @@ export default {
         async setClosed (commitItems) {
             await this.$axios.post('/inventory/server/change-state', this.getParams(commitItems, 'CLOSED'));
         },
-        async listProject () {
-            try {
-                let res = await this.$axios.post('/identity/project/tree', {
-                    item_type: 'ROOT',
-                    sort: { key: 'name' }
-                });
-                this.treeData = this.treeDataHandler(res.data, { is_root: true });
-            } catch (e) {
-                console.error(e);
-            }
-        },
-        selectProject (nodeObj) {
-            this.project = nodeObj.node.data.id;
-        },
-        async getNextLayerProject (nodeObj) {
-            try {
-                let res = await this.$axios.post('/identity/project/tree', {
-                    item_type: 'PROJECT_GROUP',
-                    item_id: this._.get(nodeObj.node, 'data.id'),
-                    domain_id: sessionStorage.domainId
-                });
-                nodeObj.node.data.is_cached = true;
-                let childrenNode = this.getSelectedNodeArr(res.data.items);
-                nodeObj.treeV.updateNode(nodeObj.node.path, { data: nodeObj.node.data });
-                if (childrenNode){
-                    childrenNode.map((curItem) => {
-                        nodeObj.treeV.insert({ node: nodeObj.node, placement: 'inside' }, curItem);
-                    });
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        },
         async changeProject () {
-            if (this.project || this.unsetProject) {
-                /**
-                 * TODO: UNSET PROJECT 인 경우 처리
-                 */
-                try {
-                    await this.$axios.post('/inventory/server/change-pool', this.getParams(this.selectedServers, null, this.project, null));
-                    this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('PROJECT'), this.tr('CHG_PAST')]));
-                    this.hideProjectModal();
-                } catch (e) {
-                    console.error(e);
-                    this.$$alertify.error(this.tr('ALERT.ERROR', [this.tr('CHG_CONT'), this.tr('PROJECT')]));
-                }
-            } else {
+            if (!this.selected && !this.isRelease) {
                 this.$alertify.error(this.tr('ALERT.NO_PARAM'));
+                return { stop : true };
             }
+            let params = this.getParams(this.selectedServers);
+            params.release_project = this.isRelease;
+            params.project_id = this.selected;
+            await this.$axios.post('/inventory/server/change-project', params);
         },
-        async changePool (commitItems) {
-            await this.$axios.post('/inventory/server/change-pool', this.getParams(commitItems, 'CLOSED'));
+        async changePool () {
+            if (!this.selected && !this.isRelease) {
+                this.$alertify.error(this.tr('ALERT.NO_PARAM'));
+                return { stop : true };
+            }
+            let params = this.getParams(this.selectedServers);
+            params.release_pool = this.isRelease;
+            params.pool_id = this.selected;
+            await this.$axios.post('/inventory/server/change-pool', params);
+        },
+        async collectInfo () {
+
         },
         onClickDelete () {
+            this.actionCheckCase = 'basic';
             this.action = this.deleteServer;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DELETE'), this.tr('SERVER')]);
             this.actionCheckType = 'danger';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DELETE'), this.tr('SERVER')]);
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('SERVER'), this.tr('DELETE_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('DELETE_CONT'), this.tr('POOL')]);
+            
             this.showActionModal();
         },
         onClickSetMaintenance () {
+            this.actionCheckCase = 'basic';
             this.action = this.setMaintenance;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_MANT'), this.tr('SERVER')]);
             this.actionCheckType = 'warning';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_MANT'), this.tr('SERVER')]);
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
             this.showActionModal();
         },
         onClickSetInService () {
+            this.actionCheckCase = 'basic';
             this.action = this.setInService;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_SERV'), this.tr('SERVER')]);
             this.actionCheckType = 'warning';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_SERV'), this.tr('SERVER')]);
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
             this.showActionModal();
         },
         onClickSetClosed () {
+            this.actionCheckCase = 'basic';
             this.action = this.setClosed;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_CLOSE'), this.tr('SERVER')]);
             this.actionCheckType = 'warning';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_CLOSE'), this.tr('SERVER')]);
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
             this.showActionModal();
         },
         onClickChangeProject () {
-            this.listProject();
+            this.resetTreeOptions();
+            this.customActionBtn = this.tr('TITLE', [this.tr('CHG'), this.tr('PROJECT')]);
+            this.customReleaseBtn = this.tr('TITLE', [this.tr('RELEASE'), this.tr('PROJECT')]);
+            this.actionCheckCase = 'tree';
             this.action = this.changeProject;
-            this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG_PRO'), this.tr('SERVER')]);
-            this.actionCheckType = 'warning';
-            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('CHG_PRO'), this.tr('SERVER')]);
-            this.showProjectModal();
-        },
-        onClickCancelChangeProject () {
-            this.project = null;
-            this.unsetProject = false;
-            this.hideProjectModal();
-        },
-        onClickChangePool () {
-            this.action = this.changePool;
-            this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG_POOL'), this.tr('SERVER')]);
-            this.actionCheckType = 'warning';
-            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('CHG_POOL'), this.tr('SERVER')]);
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG'), this.tr('PROJECT')]);
+            this.actionCheckType = 'light';
+            this.treeUrl = '/identity/project/tree';
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('PROJECT'), this.tr('CHG_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('CHG_CONT'), this.tr('PROJECT')]);
             this.showActionModal();
         },
+        onClickChangePool () {
+            this.resetTreeOptions();
+            this.customActionBtn = this.tr('TITLE', [this.tr('CHG'), this.tr('POOL')]);
+            this.customReleaseBtn = this.tr('TITLE', [this.tr('RELEASE'), this.tr('POOL')]);
+            this.actionCheckCase = 'tree';
+            this.action = this.changePool;
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG'), this.tr('POOL')]);
+            this.actionCheckType = 'light';
+            this.treeUrl = '/inventory/data-center/tree';
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('POOL'), this.tr('CHG_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('CHG_CONT'), this.tr('POOL')]);
+            this.showActionModal();
+        },
+        onSelectItem (nodeObj) {
+            this.selected = nodeObj.node.data.id;
+        },
+        resetTreeOptions () {
+            this.selected = null;
+            this.isRelease = false;
+        },
+        onClickConfirmChange () {
+            this.action();
+        },
         onClickCollectInfo () {
-
+            this.listCollectors();
+            this.customActionBtn = this.tr('COLLECT');
+            this.actionCheckCase = 'collect';
+            this.action = this.collectInfo;
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('COLLECT'), `${this.tr('SERVER')} ${this.tr('INFO')}`]);
+            this.actionCheckType = 'light';
+            this.treeUrl = '/inventory/data-center/tree';
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('INFO')}`, this.tr('COLLECT_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('COLLECT_CONT'), `${this.tr('SERVER')} ${this.tr('INFO')}`]);
+            this.showActionModal();
         },
         showActionModal () {
             this.$refs.IDSV001_ActionCheckModal.showModal();
-        },
-        showProjectModal () {
-            this.$refs.IDSV001_ProjectModal.showModal();
-        },
-        hideProjectModal () {
-            this.$refs.IDSV001_ProjectModal.hideModal();
         }
     }
 };
@@ -588,12 +605,22 @@ export default {
 }
 
 .footer {
-    margin-top: 20px;
+    width: 100%;
     .unset-checkbox {
         vertical-align: middle;
     }
     .unset-text {
         vertical-align: middle;
+    }
+}
+
+.collect-contents {
+    .collector-table {
+        box-shadow: none;
+    }
+    .server-table {
+        margin: 0;
+        box-shadow: none;
     }
 }
 </style>

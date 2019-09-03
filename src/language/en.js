@@ -48,6 +48,9 @@ export const en = {
         CHG: 'Change',
         CHG_PAST: 'Changed',
         CHG_CONT: 'Changing',
+        COLLECT: 'Collect',
+        COLLECT_PAST: 'Collected',
+        COLLECT_CONT: 'Collectting',
         CHG_PRO: 'Change Project',
         IMPORT: 'Import',
         EXPORT: 'Export',
@@ -69,11 +72,16 @@ export const en = {
         IDENTITY: 'Identity',
         USER: 'User',
         PROJECT: 'Project',
-        INFO: 'INFO',
+        POOL: 'Pool',
+        INFO: 'Information',
         TITLE: '{0} {1}',
         VM: 'VM',
         COMPUTE: 'Compute',
-        UNSET: 'Unset'
+        RELEASE: 'Release',
+        STATE: 'State',
+        REPO: 'Repository',
+        LIST: 'List'
+        
     },
     TREE_TYPE: {
         PROJECT: 'Project',

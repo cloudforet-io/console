@@ -1,47 +1,45 @@
 <template>
-  <div class="row">
-    <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-      <b-card class="base summary border-top-0">
+  <b-row>
+    <b-col cols="6" lg="12">
+      <b-card class="base first-tab">
         <b-col cols="12">
-          <BaseTabNav
-            :tabs="true"
-            :pill="true"
-            :fill="false"
-            :nav-tabs="tabs"
-            :keep-alive="true"
-            :is-footer-visible="false"
-            :use-slot="true"
+          <BaseTabNav tabs
+                      pill
+                      keep-alive
+                      use-slot
+                      :fill="false"
+                      :nav-tabs="tabs"
+                      :is-footer-visible="false"
           >
             <template #DISK>
-              <data-disk />
+              <DataDisk />
             </template>
             <template #NIC>
-              <data-n-i-c />
+              <DataNIC />
             </template>
             <template #SECURITYGROUP>
-              <data-security-group />
+              <DataSecurityGroup />
             </template>
           </BaseTabNav>
         </b-col>
       </b-card>
     </b-col>
-  </div>
+  </b-row>
 </template>
 <script>
-import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
-import dataDisk from '@/views/inventory/server/inner_data_tabs/SVID_001_DataDisk.vue';
-import dataNIC from '@/views/inventory/server/inner_data_tabs/SVID_003_DataNIC.vue';
+const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 
-import dataSecurityGroup from '@/views/inventory/server/inner_data_tabs/SVID_010_DataSecurityGroup.vue';
-
+const DataDisk = () => import('@/views/inventory/server/inner_data_tabs/SVID_001_DataDisk');
+const DataNIC = () => import('@/views/inventory/server/inner_data_tabs/SVID_003_DataNIC');
+const DataSecurityGroup = () => import('@/views/inventory/server/inner_data_tabs/SVID_010_DataSecurityGroup');
 
 export default {
     name: 'ServerData',
     components: {
         BaseTabNav,
-        dataDisk,
-        dataNIC,
-        dataSecurityGroup
+        DataDisk,
+        DataNIC,
+        DataSecurityGroup
     },
     props: {
 

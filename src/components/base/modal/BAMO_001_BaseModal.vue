@@ -29,28 +29,33 @@
             :ok="clickOk"
             :cancel="clickCancel"
       />
-      <span v-if="!$slots.contents">{{ text }}</span>
+      <span v-if="!$slots.contents || !$scopedSlots.contents">{{ text }}</span>
 
-      <slot name="footer" 
-            :ok="clickOk" 
-            :cancel="clickCancel"
-            :hide="onHide"
-      />
-      <template v-if="!$slots.footer" #modal-footer="{ ok, cancel, hide }">
-        <b-button v-if="!okOnly" size="sm" 
-                  variant="outline-secondary" 
-                  @click="clickCancel"
-        >
-          <span v-if="useCustomMsg">{{ customYesOrNoMsg.NO }}</span>
-          <span v-else>{{ tr('BTN_CANCEL') }}</span>
-        </b-button>
-        <b-button size="sm" 
-                  :variant="`${type}`" 
-                  @click="clickOk"
-        >
-          <span v-if="useCustomMsg">{{ customYesOrNoMsg.YES }}</span>
-          <span v-else>{{ tr('BTN_CONFIRM') }}</span>
-        </b-button>
+      
+      <template #modal-footer="{ ok, cancel, hide }">
+        <slot v-if="$slots.footer || $scopedSlots.footer" name="footer" 
+              :ok="clickOk" 
+              :cancel="clickCancel"
+              :hide="onHide"
+        />
+
+        <template v-else>
+          <b-button v-if="!okOnly" size="sm" 
+                    variant="outline-secondary" 
+                    @click="clickCancel"
+          >
+            <span v-if="useCustomMsg">{{ customYesOrNoMsg.NO }}</span>
+            <span v-else>{{ tr('BTN_CANCEL') }}</span>
+          </b-button>
+          <b-button size="sm" 
+                    :variant="`${type}`" 
+                    @click="clickOk"
+          >
+            <span v-if="useCustomMsg">{{ customYesOrNoMsg.YES }}</span>
+            <span v-else>{{ tr('BTN_CONFIRM') }}</span>
+          </b-button>
+        </template>
+        
       </template>
     </b-modal>
   </span>
@@ -119,6 +124,8 @@ export default {
             modalShow: false,
             isModalShown: false
         };
+    },
+    created () {
     },
     methods: {
         showModal () {
