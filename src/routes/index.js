@@ -67,6 +67,8 @@ async function setApi () {
         api = getApi(res.data.VUE_APP_API.URL);
         Vue.prototype.$axios = api;
     } catch (err) {
+        api = getApi(process.env.VUE_APP_API_URL);
+        Vue.prototype.$axios = api;
         console.error(err);
     }
 }
