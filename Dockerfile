@@ -2,7 +2,6 @@ FROM node:10
 
 ENV BUILD_PATH /opt/cloudone/wconsole-client
 ENV ROOT_PATH /var/www
-ENV NODE_ENV production
 ARG FONT_AWESOME_API_KEY
 
 
