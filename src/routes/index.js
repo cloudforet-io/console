@@ -60,6 +60,14 @@ const index = new Router({
     ]
 });
 
+async function setOauth() {
+    let gapiScript = document.createElement('script');
+    await gapiScript.setAttribute('src', 'https://apis.google.com/js/platform.js');
+    gapiScript.async = true;
+    gapiScript.defer = true;
+    await document.head.appendChild(gapiScript);
+}
+
 async function setApi () {
     try {
         let res = await axios.get('/config/default.json');
@@ -67,10 +75,10 @@ async function setApi () {
         api = getApi(res.data.VUE_APP_API.URL);
         Vue.prototype.$axios = api;
     } catch (err) {
+        console.log(process.env.VUE_APP_API_URL);
         api = getApi(process.env.VUE_APP_API_URL);
         sessionStorage.setItem('baseURL', process.env.VUE_APP_API_URL);
         Vue.prototype.$axios = api;
-        console.log(process.env.VUE_APP_API_URL);
     }
 }
 
@@ -115,6 +123,7 @@ index.beforeEach(async (to, from, next) => {
                 });
             } else  if (isFirstLogin  === 2 ){
                 if (LoginType === 'google_oauth2'){
+                    await setOauth();
                     to.matched[i].meta.requiresDomainCheck = false;
                     next({
                         path: '/google-Log-in'
