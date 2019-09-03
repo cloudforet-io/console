@@ -63,8 +63,8 @@ const index = new Router({
 async function setOauth() {
     let gapiScript = document.createElement('script');
     await gapiScript.setAttribute('src', 'https://apis.google.com/js/platform.js');
-    gapiScript.async = true;
-    gapiScript.defer = true;
+    //gapiScript.async = true;
+    //gapiScript.defer = true;
     await document.head.appendChild(gapiScript);
 }
 
@@ -88,6 +88,7 @@ index.beforeEach(async (to, from, next) => {
     } else {
         await setApi();
     }
+
     if (isFirstLogin === null) {
         try {
             const parsedObject = url.parse(window.location.href).host;
@@ -95,7 +96,11 @@ index.beforeEach(async (to, from, next) => {
             const response  = await api.post('/identity/domain/list', { name: domain_name[0] });
             if (response.data.total_count === 1){
                 isFirstLogin = baseRedirectChecker(response);
+                if(isFirstLogin === 2){
+                    await setOauth;
+                }
             }
+
         } catch (error) {
             console.error('No valid Domain', error);
         }
@@ -123,7 +128,6 @@ index.beforeEach(async (to, from, next) => {
                 });
             } else  if (isFirstLogin  === 2 ){
                 if (LoginType === 'google_oauth2'){
-                    await setOauth();
                     to.matched[i].meta.requiresDomainCheck = false;
                     next({
                         path: '/google-Log-in'
