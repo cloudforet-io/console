@@ -1,35 +1,24 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import { api } from '@/setup/api';
+import { getApi } from '@/setup/api';
 import url from 'url';
-
-import { loadLanguageAsync } from '@/setup/i18n';
+import axios from 'axios';
 import store from '@/store';
 
 let isFirstLogin = null;
 let LoginType = null;
-// Services
+let api = null;
 import dashboardRoute from '@/routes/dashboard/dashboard_route';
 import identityRoute from '@/routes/identity/identity_route';
 import inventoryRoute from '@/routes/inventory/inventory_route';
 
 // Containers
 const DefaultContainer = () => import('@/containers/DefaultContainer');
-
 // Views
 const LogIn = () => import('@/views/login/local/LOLO_001_LogIn');
 const GoolgeLogIn = () => import('@/views/login/oauth/LOOA_001_LogInGoogleOauth');
 const Redirect404 = () => import('@/views/common/VICO_003_Redirect404');
 
-const attatchLangauge = (to, from, next) => {
-    if (!to.params.lang) {
-        next();
-        return;
-    }
-    const lang = to.params.lang;
-    loadLanguageAsync(lang).then(() => next());
-    next();
-};
 
 Vue.use(Router);
 
@@ -71,7 +60,23 @@ const index = new Router({
     ]
 });
 
+async function setApi () {
+    try {
+        let res = await axios.get('/config/default.json');
+        sessionStorage.setItem('baseURL', res.data.VUE_APP_API.URL);
+        api = getApi(res.data.VUE_APP_API.URL);
+        Vue.prototype.$axios = api;
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 index.beforeEach(async (to, from, next) => {
+    if (sessionStorage.getItem('baseURL')) {
+        api = api || getApi(sessionStorage.getItem('baseURL'));
+    } else {
+        await setApi();
+    }
     if (isFirstLogin === null) {
         try {
             const parsedObject = url.parse(window.location.href).host;

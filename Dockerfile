@@ -2,7 +2,9 @@ FROM node:10
 
 ENV BUILD_PATH /opt/cloudone/wconsole-client
 ENV ROOT_PATH /var/www
-ARG FONT_AWESOME_API_KEY 
+ENV NODE_ENV production
+ARG FONT_AWESOME_API_KEY
+
 
 RUN apt-get update && apt-get install -y nginx
 RUN mkdir -p ${BUILD_PATH}

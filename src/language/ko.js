@@ -2,7 +2,10 @@ export const ko ={
     MSG: {
         DR_SERV: '서비스',
         LOG_IN: '로그인',
+        LOG_IN_GREET: '클라우드 원 로그인하기',
         LOG_OUT: '로그아웃',
+        LOG_FAIL_TITLE: 'Wrong Password or Username.',
+        LOG_FAIL_BODY: 'Please confirm your Username or Password.',
         FORGPW: '비밀번호 찾기?',
         SIGN_UP: '회원가입',
         SIGN_UP_MSG: '모든 클라우드에서 간단하게 시작하십시오. 귀사의 성장과 함께 나아갑니다. 저희가 당신의 짐을 덜어드립니다.',
