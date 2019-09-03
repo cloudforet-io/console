@@ -1,7 +1,7 @@
 <template>
   <div class="row no-gutters">
     <sl-vue-tree ref="slVueTree"
-                 v-model="selectedTreeProp"
+                 v-model="treeData"
                  class="main-tree-col"
                  :allow-multiselect="false"
                  @nodeclick="nodeClicked"
@@ -33,34 +33,21 @@ export default {
         SlVueTree
     },
     props: {
-        treeProp: {
-            type: Array,
-            default: () => []
+        listUrl: {
+            type: String,
+            required: true
         }
     },
     data () {
         return {
             nodeKey: 0,
-            treeData: null,
+            treeData: [],
             hasSelected: false,
             clickedNode: null
         };
     },
-    computed: {
-        selectedTreeProp: {
-            get () {
-                let returnVal = this.treeProp;
-                if (this.isEmpty(returnVal)){
-                    returnVal = [{ title: '!Please, Right Click me',
-                        isLeaf: true,
-                        init: true }];
-                }
-                return returnVal;
-            },
-            set (value) {
-                this.treeData = value;
-            }
-        }
+    created() {
+        this.listRootItems();
     },
     methods: {
         nodeClicked (node) {
@@ -85,9 +72,39 @@ export default {
         nodeToggled (node) {
             if (!node.isExpanded ) {
                 this.setClickedNodeItem(node);
-                if (!node.data.is_cached){
-                    this.$emit('toggled', { node: node, treeV: this.$refs.slVueTree });
+                if (!node.data.is_cached) {
+                    this.listNextLayerItems(node);
                 }
+            }
+        },
+        async listRootItems () {
+            try {
+                let res = await this.$axios.post(this.listUrl, {
+                    item_type: 'ROOT',
+                    sort: { key: 'name' }
+                });
+                this.treeData = this.treeDataHandler(res.data, { is_root: true });
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        async listNextLayerItems (node) {
+            try {
+                let res = await this.$axios.post(this.listUrl, {
+                    item_type: node.data.item_type,
+                    item_id: node.data.id,
+                    domain_id: sessionStorage.domainId
+                });
+                node.data.is_cached = true;
+                let childrenNode = this.getSelectedNodeArr(res.data.items);
+                this.$refs.slVueTree.updateNode(node.path, { data: node.data });
+                if (childrenNode) {
+                    childrenNode.map((curItem) => {
+                        this.$refs.slVueTree.insert({ node: node, placement: 'inside' }, curItem);
+                    });
+                }
+            } catch (error) {
+                console.error(error);
             }
         },
         setClickedNodeItem (node) {
@@ -130,8 +147,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .main-tree-col {
-      background-color: $skyblue;
+.main-tree-col {
+    background-color: $lightgray;
     padding: 15px 8px;
     height: 400px;
     width: 100%;
@@ -149,16 +166,15 @@ export default {
         padding: 0px 3px 0px 10px;
         cursor: pointer;
     }
-  }
+}
 
-  .empty {
+.empty {
     text-align: left;
     margin-top: 20px;
     .msg {
-      color: $darkgray;
-      font-size: 1.3rem;
-      font-weight: 600;
+        color: $darkgray;
+        font-size: 1.3rem;
+        font-weight: 600;
     }
-
-  }
+}
 </style>
