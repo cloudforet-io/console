@@ -1,4 +1,4 @@
-import { api } from '@/setup/api';
+import { getApi } from '@/setup/api';
 
 export default {
     namespaced: true,
@@ -43,19 +43,26 @@ export default {
 
         setToken ({ commit }, { token }) {
             commit('setToken', { token });
+            let api = getApi(sessionStorage.getItem('baseURL'));
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         },
 
         async login ({ commit }, authObj) {
-            try {
-                let param = {
-                    domain_id: sessionStorage.getItem('domainId')
+            let api = getApi(sessionStorage.getItem('baseURL'));
+            let param = {
+                domain_id: sessionStorage.getItem('domainId')
+            };
+            if (authObj.hasOwnProperty('access_token')){
+                param['credentials'] = { access_token: authObj.access_token };
+            } else {
+                param['credentials'] = {
+                    user_id: authObj.userId,
+                    password: authObj.password
+                    //,user_type: 'DOMAIN_OWNER'
                 };
-                if (authObj.hasOwnProperty('access_token')){
-                    param['credentials'] = { access_token:authObj.access_token };
-                } else {
-                    param['credentials'] = { user_id: authObj.userId,password: authObj.password };
-                }
+            }
+            try {
+
                 const res = await api.post('/identity/token/issue', param);
                 console.log('authObj', authObj);
                 commit('setUserId', { userId: authObj.userId });

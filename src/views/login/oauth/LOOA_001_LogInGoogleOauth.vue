@@ -8,13 +8,11 @@
               <b-card-body>
                 <b-form>
                   <h1>
-                    {{ $t('MSG.LOG_IN') }}
+                    {{ tr('MSG.LOG_IN') }}
                   </h1>
-                  <transition v-if="seenGreet" name="slide-fade">
-                    <p class="message">
-                      <b>{{ $t('MSG.SIGN_IN') }}</b>
-                    </p>
-                  </transition>
+                  <p class="message">
+                    <b>{{ tr('MSG.SIGN_IN') }}</b>
+                  </p>
                   <b-input-group class="mb-3">
                     <div id="g-signin-btn" @click="login" />
                   </b-input-group>
@@ -81,6 +79,17 @@ export default {
                     onfailure: null
                 });
             });
+        },
+        async discoonect(){
+            console.log('on disconnect');
+            let auth2 = gapi.auth2.getAuthInstance();
+            if (!auth2.isSignedIn.get()) {
+                setMessage('Not signed in, cannot disconnect');
+                return;
+            }
+            auth2.disconnect();
+            setProfileImage(null);
+            setMessage('Disconnected');
         },
         onSignIn(googleUser){
             console.log(this.isSignedIn);

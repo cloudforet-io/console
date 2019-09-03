@@ -143,8 +143,8 @@ export default {
             rememberStatus: false,
             seenGreet: true,
             seenError: false,
-            userId: 'admin',
-            password: 'admin',
+            userId: 'cloudone',
+            password: 'cloudone'
         };
     },
     computed: {

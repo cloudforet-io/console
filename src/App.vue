@@ -11,26 +11,25 @@ export default {
     props: {
         processEnv: {
             type: String,
-            default: process.env.NODE_ENV
+            default: process.env.NODE_ENV,
+            apis: null,
         }
     },
     async beforeMount() {
         let gapiScript = document.createElement('script');
-        let isLoaded = false;
-
+        //let isLoaded = false;
         await gapiScript.setAttribute('src', 'https://apis.google.com/js/platform.js');
-        gapiScript.async = true;
-        gapiScript.defer = true;
+       /* gapiScript.async = true;
+        gapiScript.defer = true;*/
         await document.head.appendChild(gapiScript);
-
-        gapiScript.onload = (e) => {
+        /*gapiScript.onload = (e) => {
             isLoaded = true;
         };
         let gapiInterval = setInterval(() => {
             if (isLoaded) {
                 clearInterval(gapiInterval);
             }
-        }, 1000);
+        }, 1000);*/
     }
 };
 
