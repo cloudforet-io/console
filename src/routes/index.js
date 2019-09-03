@@ -68,8 +68,9 @@ async function setApi () {
         Vue.prototype.$axios = api;
     } catch (err) {
         api = getApi(process.env.VUE_APP_API_URL);
+        sessionStorage.setItem('baseURL', process.env.VUE_APP_API_URL);
         Vue.prototype.$axios = api;
-        console.error(err);
+        console.log(process.env.VUE_APP_API_URL);
     }
 }
 
