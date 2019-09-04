@@ -43,12 +43,10 @@ export default {
 
         setToken ({ commit }, { token }) {
             commit('setToken', { token });
-            let api = getApi(sessionStorage.getItem('baseURL'));
-            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            getApi().defaults.headers.common['Authorization'] = `Bearer ${token}`;
         },
 
         async login ({ commit }, authObj) {
-            let api = getApi(sessionStorage.getItem('baseURL'));
             let param = {
                 domain_id: sessionStorage.getItem('domainId')
             };
@@ -63,14 +61,14 @@ export default {
             }
             try {
 
-                const res = await api.post('/identity/token/issue', param);
+                const res = await getApi().post('/identity/token/issue', param);
                 console.log('authObj', authObj);
                 commit('setUserId', { userId: authObj.userId });
                 commit('login', { token: res.data.access_token });
 
                 sessionStorage.setItem('token', res.data.access_token);
                 sessionStorage.setItem('userId', authObj.userId);
-                api.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
+                getApi().defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
 
             } catch (err) {
                 /*
