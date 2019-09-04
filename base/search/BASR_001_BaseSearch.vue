@@ -2,8 +2,12 @@
   <div>
     <div class="search-container">
       <b-input-group class="row no-gutters">
-        <div class="input-container">
-          <div ref="inputBox" class="input-box" @click.self="focusOnInput">
+        <div class="input-container"
+             :class="{border: border}"
+        >
+          <div ref="inputBox" class="input-box" 
+               @click.self="focusOnInput"
+          >
             <InputTag v-for="(tag, idx) in tagList"
                       ref="tag"
                       :key="tag.id"
@@ -85,6 +89,10 @@ export default {
             default: () => []
         },
         isEmptySearch: {
+            type: Boolean,
+            default: false
+        },
+        border: {
             type: Boolean,
             default: false
         }
