@@ -16,7 +16,6 @@ import VueLodash from 'vue-lodash';
 import url from 'url';
 import timezone from 'countries-and-timezones';
 
-
 //TODO: Please get rid of items that won't be used in following environments: DEV, STG, PROD
 dotenv.config();
 Vue.mixin(Mixin);
