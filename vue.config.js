@@ -18,7 +18,6 @@ module.exports = {
     configureWebpack: {
         resolve: {
             alias: {
-
             }
         },
         devtool: 'source-map'

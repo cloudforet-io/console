@@ -1,34 +1,24 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import { api } from '@/setup/api';
+import { getApi } from '@/setup/api';
 import url from 'url';
-
-import { loadLanguageAsync } from '@/setup/i18n';
+import axios from 'axios';
 import store from '@/store';
 
 let isFirstLogin = null;
-
-// Services
+let LoginType = null;
+let api = null;
 import dashboardRoute from '@/routes/dashboard/dashboard_route';
 import identityRoute from '@/routes/identity/identity_route';
 import inventoryRoute from '@/routes/inventory/inventory_route';
 
 // Containers
 const DefaultContainer = () => import('@/containers/DefaultContainer');
-
 // Views
-const LogIn = () => import('@/views/common/VICO_002_LogIn');
+const LogIn = () => import('@/views/login/local/LOLO_001_LogIn');
+const GoolgeLogIn = () => import('@/views/login/oauth/LOOA_001_LogInGoogleOauth');
 const Redirect404 = () => import('@/views/common/VICO_003_Redirect404');
 
-const attatchLangauge = (to, from, next) => {
-    if (!to.params.lang) {
-        next();
-        return;
-    }
-    const lang = to.params.lang;
-    loadLanguageAsync(lang).then(() => next());
-    next();
-};
 
 Vue.use(Router);
 
@@ -50,6 +40,12 @@ const index = new Router({
             component: LogIn
         },
         {
+            path: '/google-log-in',
+            name: 'Google-Oauth-logIn',
+            meta: { label: 'google_oauth2', requiresAuth: false, requiresDomainCheck: true },
+            component: GoolgeLogIn
+        },
+        {
             path: '/',
             name: 'root',
             meta: { label: 'root', requiresDomainCheck: true },
@@ -64,15 +60,49 @@ const index = new Router({
     ]
 });
 
+async function setOauth() {
+    let gapiScript = document.createElement('script');
+    await gapiScript.setAttribute('src', 'https://apis.google.com/js/platform.js');
+    //gapiScript.async = true;
+    //gapiScript.defer = true;
+    await document.head.appendChild(gapiScript);
+}
 
+async function setApi () {
+    try {
+        let res = await axios.get('/config/default.json');
+        sessionStorage.setItem('baseURL', res.data.VUE_APP_API.URL);
+        api = getApi(res.data.VUE_APP_API.URL);
+        Vue.prototype.$axios = api;
+    } catch (err) {
+        console.log(process.env.VUE_APP_API_URL);
+        api = getApi(process.env.VUE_APP_API_URL);
+        sessionStorage.setItem('baseURL', process.env.VUE_APP_API_URL);
+        Vue.prototype.$axios = api;
+    }
+}
 
 index.beforeEach(async (to, from, next) => {
+    if (sessionStorage.getItem('baseURL')) {
+        api = api || getApi(sessionStorage.getItem('baseURL'));
+    } else {
+        await setApi();
+    }
+
     if (isFirstLogin === null) {
         try {
-            const response  = await api.post('/identity/domain/list', { name: 'megazone' });
-            isFirstLogin = baseRedirectChecker(response);
+            const parsedObject = url.parse(window.location.href).host;
+            let domain_name = parsedObject.split('.');
+            const response  = await api.post('/identity/domain/list', { name: domain_name[0] });
+            if (response.data.total_count === 1){
+                isFirstLogin = baseRedirectChecker(response);
+                if(isFirstLogin === 2){
+                    await setOauth;
+                }
+            }
+
         } catch (error) {
-            console.error('Data 없음', error);
+            console.error('No valid Domain', error);
         }
     }
 
@@ -97,10 +127,17 @@ index.beforeEach(async (to, from, next) => {
                     path: '/log-in'
                 });
             } else  if (isFirstLogin  === 2 ){
-                to.matched[i].meta.requiresDomainCheck = false;
-                next({
-                    path: '/log-in'
-                });
+                if (LoginType === 'google_oauth2'){
+                    to.matched[i].meta.requiresDomainCheck = false;
+                    next({
+                        path: '/google-Log-in'
+                    });
+                } else {
+                    to.matched[i].meta.requiresDomainCheck = false;
+                    next({
+                        path: '/error-page'
+                    });
+                }
             } else  if (isFirstLogin  === 3 ){
                 to.matched[i].meta.requiresDomainCheck = false;
                 next({
@@ -117,12 +154,14 @@ function baseRedirectChecker(rep){
     let response = rep.data;
     if (response.total_count > 0) {
         let result = response.results[0];
+        sessionStorage.setItem('domainId', result.domain_id);
         if (!result.plugin_info ||
             !result.plugin_info.options ||
             !result.plugin_info.options.auth_type ) {
-            sessionStorage.setItem('domainId', result.domain_id);
             return 1;
         } else {
+            store.commit('auth/setClientId', result.plugin_info.options.client_id );
+            LoginType = result.plugin_info.options.auth_type;
             return 2;
         }
     } else {

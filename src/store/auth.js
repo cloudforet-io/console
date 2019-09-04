@@ -1,8 +1,9 @@
-import { api } from '@/setup/api';
+import { getApi } from '@/setup/api';
 
 export default {
     namespaced: true,
     state: {
+        client_id: null,
         isLoggedIn: false,
         loginErrorCode: null,
         nextPath: '/',
@@ -10,6 +11,9 @@ export default {
         token: null
     },
     mutations: {
+        setClientId (state,  ClientId) {
+            state.client_id = ClientId;
+        },
         login (state) {
             state.isLoggedIn = true;
         },
@@ -28,6 +32,7 @@ export default {
 
     },
     getters: {
+        client_id: state => state.client_id,
         isLoggedIn: state => state.isLoggedIn,
         nextPath: state => state.nextPath
     },
@@ -38,27 +43,33 @@ export default {
 
         setToken ({ commit }, { token }) {
             commit('setToken', { token });
+            let api = getApi(sessionStorage.getItem('baseURL'));
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         },
 
-        async login ({ commit }, { userId, password, domainId }) {
+        async login ({ commit }, authObj) {
+            let api = getApi(sessionStorage.getItem('baseURL'));
+            let param = {
+                domain_id: sessionStorage.getItem('domainId')
+            };
+            if (authObj.hasOwnProperty('access_token')){
+                param['credentials'] = { access_token: authObj.access_token };
+            } else {
+                param['credentials'] = {
+                    user_id: authObj.userId,
+                    password: authObj.password
+                    //,user_type: 'DOMAIN_OWNER'
+                };
+            }
             try {
 
-                const res = await api.post('/identity/token/issue', {
-                    credentials:{
-                        // access_token: 'ya29.Glt0B1F9aOXkZLqKgjBGuMPKeDpinR7YW1s24YZFDKHzucw5t0KqNIb-COixm7kiSr9yqbw0FzD5xfvkJ8PrnZkrKDn6sJwW5llXAmqDID08aRkRektABovXWBHO'
-                        'user_id': userId,
-                        'password': password
-                    },
-                    'domain_id': domainId
-                    // 'domain_id': 'domain-2fba0c6a4a94'
-                });
-
-                commit('setUserId', { userId: userId });
+                const res = await api.post('/identity/token/issue', param);
+                console.log('authObj', authObj);
+                commit('setUserId', { userId: authObj.userId });
                 commit('login', { token: res.data.access_token });
 
                 sessionStorage.setItem('token', res.data.access_token);
-                sessionStorage.setItem('userId', userId);
+                sessionStorage.setItem('userId', authObj.userId);
                 api.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
 
             } catch (err) {
@@ -103,7 +114,6 @@ export default {
             commit('logout');
         },
         setNextPath ({ commit }, { nextPath }) {
-
             commit('setNextPath', { nextPath });
         }
     }

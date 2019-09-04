@@ -5,17 +5,16 @@
     <router-view />
   </div>
 </template>
-
 <script>
-console.log('STG, DEV', process.env.NODE_ENV);
 export default {
     name: 'App',
     props: {
         processEnv: {
             type: String,
-            default: process.env.NODE_ENV
+            default: process.env.NODE_ENV,
+            apis: null,
         }
-    }
+    },
 };
 
 </script>

@@ -54,13 +54,13 @@
                   </h1>
                   <transition v-if="seenGreet" name="slide-fade">
                     <p class="message">
-                      <b>{{ $t('MSG.SIGN_IN') }}</b>
+                      <b>{{ $t('MSG.LOG_IN_GREET') }}</b>
                     </p>
                   </transition>
                   <transition v-if="seenError" name="slide-fade">
                     <p class="message" style="color: #B82E24">
-                      <b>{{ $t('MSG.SIGN_FAIL_TITLE') }}</b>
-                      <br> {{ $t('MSG.SIGN_FAIL_BODY') }}
+                      <b>{{ $t('MSG.LOG_FAIL_TITLE') }}</b>
+                      <br> {{ $t('MSG.LOG_FAIL_BODY') }}
                     </p>
                   </transition>
                   <b-input-group class="mb-3">
@@ -144,7 +144,7 @@ export default {
             seenGreet: true,
             seenError: false,
             userId: 'admin',
-            password: 'admin'
+            password: 'admin',
         };
     },
     computed: {
@@ -158,13 +158,12 @@ export default {
     methods: {
         async login () {
             console.log(this.tr('MSG.LOG_IN'));
-            await this.$store.dispatch('auth/login',
-                {
-                    userId: this.userId,
-                    password: this.password,
-                    domainId: sessionStorage.getItem('domainId')
-                }
-            ).then(() => {
+            const authObj = {
+                userId: this.userId,
+                password: this.password,
+                domainId: sessionStorage.getItem('domainId')
+            };
+            await this.$store.dispatch('auth/login',authObj).then(() => {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();
@@ -220,7 +219,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    @import '../../asset/style/css/slideShow.css';
+    @import '../../../asset/style/css/slideShow.css';
 
     .login-check {
         float: right;
