@@ -5,13 +5,13 @@
         <BaseTable :table-data="members"
                    :fields="fields"
                    :per-page="perPage"
-                   :searchable="true"
+                   searchable
                    :total-rows="totalCount"
                    :search-context-data="searchQueryData"
-                   :show-caption="true"
+                   show-caption
                    :busy="isLoading"
                    :cardless="false"
-                   :underlined="true"
+                   underlined
                    @rowSelected="rowSelected"
                    @list="listMembers"
                    @limitChanged="limitChanged"
@@ -22,8 +22,8 @@
               <b-col cols="6">
                 <BaseModal ref="addMember"
                            title="Add Member"
-                           :centered="true"
-                           :hide-footer="true"
+                           centered
+                           hide-footer
                 >
                   <template #activator>
                     <b-button block variant="primary">
@@ -31,8 +31,8 @@
                     </b-button>
                   </template>
                   <template #contents>
-                    <MemberDetail :creatable="true"
-                                  :updatable="true"
+                    <MemberDetail creatable
+                                  updatable
                                   :memebers="memberUserIDs"
                                   :selected-data="anySelectedRow"
                                   @close="$refs.addMember.hideModal()"

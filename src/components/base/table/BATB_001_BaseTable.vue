@@ -5,59 +5,78 @@
             :style="{ height: `${height}px` }"
     >
       <template v-if="!headerless" #header>
-        <b-row align-v="center" align-h="between" class="header-container">
-          <div v-if="!offCaption" class="caption-container">
+        <b-row ref="headerContainer"
+               align-v="center"
+               align-h="between" 
+               class="header-container"
+               :style="{ 'padding-left': `${pad}px`, 'padding-right': `${pad}px` }"
+        >
+          <div ref="captionContainer"
+               class="caption-container"
+               :style="{ width: `${captionContainerWidth}px` }"
+          >
             <slot name="caption" />
           </div>
-          <div v-if="offCaption" class="searchbox-noCaption order-md-2 order-3">
-            <div class="searchbox">
-              <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
-              <BaseSearch v-else-if="noContextSearchable" @search="onSearch" />
+          <div ref="searchboxContainer"
+               class="searchbox-container"
+               :class="{ 'no-caption': noCaption }"
+               :style="{ width: searchContainerWidth }"
+          >
+            <div class="searchbox" :style="{ width: searchboxWidth }">
+              <BaseSearch v-if="searchable"
+                          :context-data="searchContextData"
+                          :is-empty-search="isEmptySearch"
+                          :border="!darkHeader"
+                          @search="onSearch"
+                          @empty="$emit('empty')"
+              />
+              <BaseSearch v-else-if="noContextSearchable"
+                          :is-empty-search="isEmptySearch"
+                          :border="!darkHeader"
+                          @search="onSearch" 
+                          @empty="$emit('empty')"
+              />
             </div>
           </div>
-          <div v-else class="searchbox-container order-md-2 order-3">
-            <div class="searchbox">
-              <BaseSearch v-if="searchable" :context-data="searchContextData" @search="onSearch" />
-              <BaseSearch v-else-if="noContextSearchable" @search="onSearch" />
+          <div ref="toolContainer"
+               class="tool-container mr-0"
+               :style="{ width: `${toolContainerWidth}px` }"
+          >
+            <div class="toolbox" :style="{ width: toolboxWidth }">
+              <b-row align-v="center" no-gutters align-h="end">
+                <b-col>
+                  <span class="prev-btn" @click.prevent="onPrev"><i class="fal fa-chevron-left" /></span>
+                </b-col>
+                <b-col>
+                  <span>{{ currentPage }} / {{ maxPage }}</span>
+                </b-col>
+                <b-col>
+                  <span class="next-btn" @click.prevent="onNext"><i class="fal fa-chevron-right" /></span>
+                </b-col>
+                <b-col>
+                  <BaseModal ref="modal" 
+                             :title="tr('TABLE.SETTINGS')"
+                             :centered="true" 
+                             :size="'md'" 
+                             @ok="limitChanged"
+                  >
+                    <template #activator>
+                      <span class="settings-btn"><i class="fal fa-cog" /></span>
+                    </template>
+                    <template #contents>
+                      <b-form-group :label="tr('TABLE.LIMIT_LABEL')" :label-cols="3">
+                        <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax"
+                                      @blur="filterLimit" @keydown.enter="onLimitInputEnter"
+                        />
+                      </b-form-group>
+                    </template>
+                  </BaseModal>
+                </b-col>
+                <b-col>
+                  <span class="refresh-btn" @click="onRefresh"><i class="fal fa-sync" /></span>
+                </b-col>
+              </b-row>
             </div>
-          </div>
-          <div class="tool-container mr-0 order-md-3 order-2">
-            <b-row align-v="center"
-                   no-gutters 
-                   align-h="end" 
-            >
-              <b-col>
-                <span class="prev-btn" @click.prevent="onPrev"><i class="fal fa-chevron-left" /></span>
-              </b-col>
-              <b-col>
-                <span>{{ currentPage }} / {{ maxPage }}</span>
-              </b-col>
-              <b-col>
-                <span class="next-btn" @click.prevent="onNext"><i class="fal fa-chevron-right" /></span>
-              </b-col>
-              <b-col>
-                <BaseModal ref="modal" 
-                           :title="tr('TABLE.SETTINGS')"
-                           :centered="true" 
-                           :size="'md'" 
-                           @ok="limitChanged"
-                >
-                  <template #activator>
-                    <span class="settings-btn"><i class="fal fa-cog" /></span>
-                  </template>
-                  <template #contents>
-                    <b-form-group :label="tr('TABLE.LIMIT_LABEL')" :label-cols="3">
-                      <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax"
-                                    @blur="filterLimit" @keydown.enter="onLimitInputEnter"
-                      />
-                    </b-form-group>
-                  </template>
-                </BaseModal>
-              </b-col>
-              <b-col>
-                <span class="refresh-btn" @click="onRefresh"><i class="fal fa-sync" /></span>
-              </b-col>
-            </b-row>
           </div>
         </b-row>
       </template>
@@ -140,14 +159,14 @@
 </template>
 
 <script>
-import BaseSearch from '@/components/base/search/BASR_001_BaseSearch.vue';
-import BaseModal from '@/components/base/modal/BAMO_001_BaseModal.vue';
-import BaseCheckbox from '@/components/base/checkbox/BACB_001_BaseCheckbox.vue';
-import BaseStateTag from '@/components/base/tags/BATG_002_BaseStateTag';
+const BaseSearch = () => import('@/components/base/search/BASR_001_BaseSearch.vue');
+const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
+const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox.vue');
+const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag');
 
 export default {
     name: 'BaseTable',
-    event: ['list', 'rowClicked', 'limitChanged', 'rowSelected', 'onSelectAll'],
+    event: ['list', 'rowClicked', 'limitChanged', 'rowSelected', 'onSelectAll', 'empty'],
     components: {
         BaseSearch,
         BaseModal,
@@ -160,10 +179,6 @@ export default {
             type: Boolean,
             default: false
         },
-        offCaption: {
-            type: Boolean,
-            default: false
-        },
         searchable: {
             type: Boolean,
             default: false
@@ -171,6 +186,10 @@ export default {
         searchContextData: {
             type: Object,
             default: null
+        },
+        isEmptySearch: {
+            type: Boolean,
+            default: false
         },
         selectable: {
             type: Boolean,
@@ -266,6 +285,18 @@ export default {
         stateType: {
             type: String,
             default: 'MEMBER_STATE'
+        },
+        toolWidth: {
+            type: Number,
+            default: 280
+        },
+        captionWidth: {
+            type: Number,
+            default: 240
+        },
+        searchWidth: {
+            type: Number,
+            default: null
         }
     },
     data() {
@@ -277,22 +308,66 @@ export default {
             filterOr: [],
             isLocalSort: true,
             limitInput: this.perPage,
-            isSelectedAll: false
+            isSelectedAll: false,
+            width: 0,
+            pad: 20
         };
     },
     computed: {
-        heads() {
+        heads () {
             return this.fields;
         },
-        limit() {
+        limit () {
             return this.perPage;
         },
-        start() {
+        start () {
             return (this.currentPage - 1) * this.limit;
         },
-        maxPage() {
+        maxPage () {
             return Math.ceil(this.totalRows / this.limit);
-        } 
+        },
+        noCaption () {
+            return !(this.$slots.caption || this.$scopedSlots.caption);
+        },
+        headerWidth () {
+            return this.width - (this.pad * 2);
+        },
+        captionContainerWidth () {
+            return this.captionWidth > this.width ? this.width : this.captionWidth;
+        },
+        toolContainerWidth () {
+            if (this.headerWidth < this.captionContainerWidth + this.toolWidth) {
+                return this.headerWidth;
+            }
+            return this.toolWidth > this.width ? this.width : this.toolWidth;
+        },
+        toolboxWidth () {
+            if (this.toolContainerWidth > this.toolWidth) {
+                return `${this.toolWidth}px`; 
+            }
+            return '100%';
+        },
+        searchContainerWidth () {
+            let calculatedWidth;
+            if (this.width < 768) {
+                calculatedWidth = this.headerWidth;
+            } else {
+                calculatedWidth = this.headerWidth - this.toolContainerWidth - (this.noCaption ? 0 : this.captionContainerWidth);
+            }
+
+            if (this.searchWidth && calculatedWidth < this.searchWidth) {
+                calculatedWidth = this.searchWidth;
+            }
+
+            return `${calculatedWidth}px`;
+        },
+        searchboxWidth () {
+            if (this.searchWidth) {
+                return `${this.searchWidth}px`; 
+            }
+            return '100%';
+        }
+        
     },
     watch: {
         busy (val) {
@@ -304,7 +379,24 @@ export default {
     created () {
         this.validateProperties();
     },
+    mounted () {
+        this.setWidth();
+        self.addEventListener('resize', this.setWidth);
+    },
+    destroyed () {
+        self.removeEventListener('resize', this.setWidth);
+    },
     methods: {
+        setWidth () {
+            this.width = this.$refs.headerContainer.clientWidth;
+            if (this.width < 768) {
+                this.$refs.headerContainer.removeChild(this.$refs.searchboxContainer);
+                this.$refs.headerContainer.appendChild(this.$refs.searchboxContainer);
+            } else {
+                this.$refs.headerContainer.removeChild(this.$refs.toolContainer);
+                this.$refs.headerContainer.appendChild(this.$refs.toolContainer);
+            }
+        },
         validateProperties () {
             if (this.selectable && this.selectMode === 'multi' && this.isEmpty(this.busy)) {
                 throw new Error('The required property was not provided.\n\
@@ -566,7 +658,7 @@ export default {
     }
     .card-header {
         padding-top: 15px;
-        padding-bottom: 15px;
+        padding-bottom: 0;
         border: 0;
         background-color: $whiteblue;
         border-radius: inherit;
@@ -583,42 +675,32 @@ export default {
         display: inline-table;
         margin: 0;
     }
-    $caption-min-width: 220px;
-    $caption-max-width: 240px;
-    $tool-min-width: 250px;
-    $tool-max-width: 340px;
-    $pad-side: 20px;
-    .header-container {
-        padding-left: $pad-side;
-        padding-right: $pad-side;
+
+    %container {
+        margin-bottom: 15px;
     }
     .caption-container {
-        min-width: $caption-min-width;
-        max-width: $caption-max-width;
+        @extend %container;
     }
     .searchbox-container {
-        width: calc(100% - #{$caption-max-width} - #{$tool-max-width});
+        @extend %container;
         text-align: right;
+        &.no-caption {
+            text-align: right;
+        }
         .searchbox {
             display: inline-block;
             text-align: left;
-            width: 100%;
         }
     }
-    .searchbox-noCaption {
-    width: calc(100% - #{$tool-max-width};
-    text-align: right;
-    .searchbox {
-      display: inline-block;
-      text-align: left;
-      width: 100%;
-    }
-  }
     .tool-container {
+        @extend %container;
         display: inline-block;
-        min-width: $tool-min-width;
-        max-width: $tool-max-width;
         text-align: right;
+        .toolbox {
+            display: inline-block;
+            text-align: right; 
+        }
     }
 }
 </style>

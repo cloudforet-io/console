@@ -3,31 +3,32 @@
     <b-col cols="12" class="base-tab-nav">
       <template v-if="pill">
         <b-nav pills :fill="fill">
-          <b-nav-item v-for="(curTab, idx) in navTabs" :id="curTab.tabTitle"
+          <b-nav-item v-for="(curTab, idx) in navTabs" :id="curTab.title"
                       :key="idx"
                       :lazy="false"
                       :class="{active: selectedTab.component === curTab.component}"
-                      :active="selectedTab.tabTitle === curTab.tabTitle"
+                      :active="selectedTab.title === curTab.title"
                       @click="tabSelected(curTab, idx)"
           >
-            {{ curTab.tabTitle }}
+            {{ curTab.title }}
           </b-nav-item>
         </b-nav>
       </template>
       <template v-else>
         <b-nav tabs :fill="fill">
-          <b-nav-item v-for="(curTab, idx) in navTabs" :id="curTab.tabTitle"
+          <b-nav-item v-for="(curTab, idx) in navTabs" :id="curTab.title"
                       :key="idx"
                       :lazy="false"
                       :class="{active: selectedTab.component === curTab.component}"
-                      :active="selectedTab.tabTitle === curTab.tabTitle"
+                      :active="selectedTab.title === curTab.title"
                       @click="tabSelected(curTab, idx)"
           >
-            {{ curTab.tabTitle }}
+            {{ curTab.title }}
           </b-nav-item>
         </b-nav>
       </template>
-      <slot v-if="useSlot" :name="setTabName(selectedTab)" />
+
+      <slot v-if="useSlot" :name="slotName" />
       <template v-else>
         <template v-if="keepAlive">
           <keep-alive>
@@ -74,7 +75,6 @@
   </b-row>
 </template>
 <script>
-// import { api } from '@/setup/api';
 let baseTabParams = {};
 export default {
     name: 'BaseTabNavs',
@@ -144,9 +144,13 @@ export default {
             isDelete: this.isDeletable
         };
     },
+    computed: {
+        slotName () {
+            return this.selectedTab.key || this.selectedTab.title;
+        }
+    },
     methods: {
-        tabSelected(selectedTab, index){
-            console.log('tab', this.selectedIndex);
+        tabSelected (selectedTab, index) {
             this.selectedIndex = index;
             this.selectedTab = selectedTab;
         },
@@ -155,10 +159,10 @@ export default {
                 this.tabContentData[key] = dataToSet[key];
             }
         },
-        displayFooter: () => {
+        displayFooter () {
             this.isFooterVisible = true;
         },
-        hideFooter: () => {
+        hideFooter () {
             this.isFooterVisible = false;
         },
         createNew () {
@@ -175,9 +179,6 @@ export default {
             baseTabParams = this.dataForTab;
             baseTabParams['tabContents'] = this.$refs.popupTab;
             this.$emit('delete', baseTabParams);
-        },
-        setTabName (selectedData) {
-            return (selectedData.hasOwnProperty('tabIdxTitle')) ? selectedData.tabIdxTitle : selectedData.tabTitle;
         }
     }
 };

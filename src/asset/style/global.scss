@@ -389,7 +389,7 @@ a {
   @extend %sheet;
   border: none;
   &.first-tab {
-    margin-top: 0;
+    margin-top: 0 !important;
     border-top-left-radius: 0px !important;
   }
   .card-header {
@@ -402,7 +402,6 @@ a {
 /* b-modal */
 .modal .modal-dialog {
   .modal-header {
-    margin-bottom: 20px;
     padding-top: 15px;
     padding-bottom: 10px;
     .close {
