@@ -1,89 +1,98 @@
 <template>
-  <b-row>
-    <b-col cols="6" lg="12">
-      <b-card class="base first-tab">
-        <b-col cols="12">
-          <BaseTabNav tabs
-                      pill
-                      keep-alive
-                      use-slot
-                      :fill="false"
-                      :nav-tabs="tabs"
-                      :is-footer-visible="false"
+  <b-card class="base first-tab">
+    <BaseTable :table-data="data" 
+               :fields="fields"
+               :selectable="false"
+               :dark-header="false"
+               :caption-width="500"
+               :search-width="300"
+               no-context-searchable
+               cardless
+               underlined
+    >
+      <template #caption>
+        <b-nav class="nav-container" pills>
+          <b-nav-item :active="activeNav === 'disk'" 
+                      @click="onClickDisk"
           >
-            <template #DISK>
-              <DataDisk />
-            </template>
-            <template #NIC>
-              <DataNIC />
-            </template>
-            <template #SECURITYGROUP>
-              <DataSecurityGroup />
-            </template>
-          </BaseTabNav>
-        </b-col>
-      </b-card>
-    </b-col>
-  </b-row>
+            {{ tr('COL_NM.C_DISK') }}
+          </b-nav-item>
+          <b-nav-item :active="activeNav === 'nic'"
+                      @click="onClickNic"
+          >
+            {{ tr('COL_NM.C_NIC') }}
+          </b-nav-item>
+          <b-nav-item :active="activeNav === 'securityGroup'"
+                      @click="onClickSecurityGroup"
+          >
+            {{ tr('COL_NM.C_SR_GROUP') }}
+          </b-nav-item>
+        </b-nav>
+      </template>
+    </BaseTable>
+  </b-card>
 </template>
-<script>
-const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 
-const DataDisk = () => import('@/views/inventory/server/inner_data_tabs/SVID_001_DataDisk');
-const DataNIC = () => import('@/views/inventory/server/inner_data_tabs/SVID_003_DataNIC');
-const DataSecurityGroup = () => import('@/views/inventory/server/inner_data_tabs/SVID_010_DataSecurityGroup');
+<script>
+const BaseTable = () => import('@/components/base/table/BATB_001_BaseTable');
 
 export default {
     name: 'ServerData',
     components: {
-        BaseTabNav,
-        DataDisk,
-        DataNIC,
-        DataSecurityGroup
+        BaseTable
     },
     props: {
 
     },
     data () {
         return {
-            tabs: [
-                {
-                    tabTitle: this.tr('COL_NM.C_DISK'),
-                    tabIdxTitle: 'DISK'
-                },
-                {
-                    tabTitle: this.tr('COL_NM.C_NIC'),
-                    tabIdxTitle: 'NIC'
-                },
-                {
-                    tabTitle: this.tr('COL_NM.C_SR_GROUP'),
-                    tabIdxTitle: 'SECURITYGROUP'
-                }
-            ],
-            data: [],
-            selectedData: null,
-            selectedDataIdx: null
+            activeNav: 'disk',
+            data: []
         };
     },
-
-    watch: {
-
+    computed: {
+        fields () {
+            return [];
+        }
     },
     methods: {
-        initTabs () {
-
+        onClickDisk () {
+            this.activeNav = 'disk';
+        },
+        onClickNic () {
+            this.activeNav = 'nic';
+        },
+        onClickSecurityGroup () {
+            this.activeNav = 'securityGroup';
         }
     }
 };
 </script>
 
+
 <style lang="scss" scoped>
-  .card.base {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    &.summary {
-      margin-top: 0;
-      border-top-left-radius: 0px !important;
+.data-container {
+    background-color: $white;
+}
+
+.nav-container.nav {
+    .nav-item {
+        margin-right: 5px;
+        .nav-link {
+            vertical-align: middle;
+            padding: 5px 10px 3px 10px;
+            border-radius: 3px;
+            background-color: $lightgray;
+            &.active {
+                background-color: $blue;
+            }
+            &:hover {
+                background-color: $gray;
+                &.active {
+                    background-color: darken($blue, 10%);
+                }
+            }
+        }
     }
-  }
+}
 </style>

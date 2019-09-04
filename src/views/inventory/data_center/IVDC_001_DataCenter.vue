@@ -164,21 +164,21 @@ const tabs = [
         name: 'summary',
         isSelected: true,
         tabIcon: 'icon-calculator',
-        tabTitle: 'SUMMARY',
+        title: 'SUMMARY',
         component: dataCenterSummary
     },
     {
         name: 'member',
         isSelected: false,
         tabIcon: 'icon-user',
-        tabTitle: 'MEMBER',
+        title: 'MEMBER',
         component: dataCenterAdmin
     },
     {
         name: 'audit',
         isSelected: false,
         tabIcon: 'icon-pie-charts',
-        tabTitle: 'AUDIT',
+        title: 'AUDIT',
         component: dataCenterAudit
     }
 ];
@@ -189,14 +189,14 @@ const dataCenterEditPopupTag = () => import('@/views/inventory/data_center/IVDC_
 const modalTab = [
     {
         tabIcon: 'icon-calculator',
-        tabTitle: 'DEFAULT',
+        title: 'DEFAULT',
         updatable: true,
         creatable: true,
         component: dataCenterEditPopupName
     },
     {
         tabIcon: 'icon-user',
-        tabTitle: 'TAGS',
+        title: 'TAGS',
         updatable: true,
         creatable: true,
         component: dataCenterEditPopupTag

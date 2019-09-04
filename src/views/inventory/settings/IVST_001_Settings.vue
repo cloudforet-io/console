@@ -113,16 +113,16 @@ export default {
             ],
             tabs: [
                 {
-                    tabTitle: 'SUMMARY',
-                    tabIdxTitle: 'SUMMARY'
+                    title: 'SUMMARY',
+                    key: 'SUMMARY'
                 },
                 {
-                    tabTitle: 'BACKEND',
-                    tabIdxTitle: 'BACKEND'
+                    title: 'BACKEND',
+                    key: 'BACKEND'
                 },
                 {
-                    tabTitle: 'JOB',
-                    tabIdxTitle: 'JOB'
+                    title: 'JOB',
+                    key: 'JOB'
                 }
             ],
             servers: [],

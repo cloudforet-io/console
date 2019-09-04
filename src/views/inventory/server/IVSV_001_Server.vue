@@ -154,14 +154,14 @@
       </template>
     </ActionCheckModal>
 
-    <BaseTabNav v-if="hasSelectedServer" class="server-info"
+    <BaseTabNav v-if="hasSelectedServer" 
+                class="server-info"
                 :fill="false"
                 :nav-tabs="tabs"
-                :keep-alive="true"
                 :is-footer-visible="false"
-                :use-slot="true"
+                use-slot
     >
-      <template #SUMMARY>
+      <template #summary>
         <b-card class="base first-tab">
           <BaseMultiPanel v-if="isMultiSelected" 
                           :data="selectedServers"
@@ -173,13 +173,15 @@
           />
         </b-card>
       </template>
-      <template #DATA>
+
+      <template #data>
         <ServerData />
       </template>
-      <template #RAWDATA>
+      
+      <template #rawData>
         <ServerRawData />
       </template>
-      <template #ADMIN>
+      <template #admin>
         <ServerAdmin />
       </template>
     </BaseTabNav>
@@ -226,20 +228,20 @@ export default {
         return {
             tabs: [
                 {
-                    tabTitle: this.tr('COL_NM.C_SUMMARY'),
-                    tabIdxTitle: 'SUMMARY'
+                    title: this.tr('COL_NM.C_SUMMARY'),
+                    key: 'summary'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.C_DT'),
-                    tabIdxTitle: 'DATA'
+                    title: this.tr('COL_NM.C_DT'),
+                    key: 'data'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.C_RAW_DT'),
-                    tabIdxTitle: 'RAWDATA'
+                    title: this.tr('COL_NM.C_RAW_DT'),
+                    key: 'rawData'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.C_ADMIN'),
-                    tabIdxTitle: 'ADMIN'
+                    title: this.tr('COL_NM.C_ADMIN'),
+                    key: 'admin'
                 }
             ],
             servers: [],

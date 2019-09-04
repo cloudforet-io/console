@@ -12,7 +12,6 @@
                    :busy="isLoading"
                    :cardless="false"
                    underlined
-                   off-caption
                    is-empty-search
                    @rowSelected="rowSelected"
                    @list="listMembersOnModal"

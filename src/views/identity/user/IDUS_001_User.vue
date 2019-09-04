@@ -155,8 +155,8 @@ export default {
         return {
             tabs: [
                 {
-                    tabTitle: this.tr('PANEL.INFO'),
-                    tabIdxTitle: this.tr('PANEL.INFO')
+                    title: this.tr('PANEL.INFO'),
+                    key: this.tr('PANEL.INFO')
                 }
             ],
             users: [],
