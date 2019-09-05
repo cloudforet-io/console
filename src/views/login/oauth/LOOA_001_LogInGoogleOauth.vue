@@ -104,10 +104,12 @@ export default {
                 access_token: googleUser.getAuthResponse().access_token
             };
             this.oathSignParam = param;
-            if (!this.isSignedIn) {
-                this.login();
+            this.login();
+            /*if (!this.isSignedIn) {
+              this.login();
                 this.isSignedIn = true;
-            }
+            }*/
+
 
         },
         async login() {
