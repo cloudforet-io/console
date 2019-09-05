@@ -15,7 +15,7 @@ export default {
         { label: 'test', key: 'name', ajax: {
             url: '/identity/user/list',
             method: 'post',
-            getList (res) {
+            filter (res) {
                 return res.data.results.map((user) => {
                     return user.name;
                 });

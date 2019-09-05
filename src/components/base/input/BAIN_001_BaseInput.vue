@@ -26,58 +26,30 @@
                @mousedown="onMousedownInput"
         >
 
-        <div v-if="isFocused && isKeyListShown && keyList.length > 0" 
-             ref="listContainer" 
-             class="list-container key"
-             :style="{
-               left: `${keyListPosX}px`, 
-               top: `${listPosY}px`,
-               height: `${listHeight}px`
-             }"
-        >
-          <b-list-group>
-            <b-list-group-item v-for="(key, idx) in keyList" 
-                               :key="`key:${idx}`"
-                               ref="list" 
-                               :class="{'hovered': idx === hoveredItemIdx}"
-                               @mousedown.prevent="onSelectKey(key, idx)"
-                               @mouseover="onMouseover(idx)" 
-                               @mouseout="onMouseout"
-            >
-              <b-row class="no-gutters justify-content-between">
-                <b-col class="col-8 key-label">{{ key.label }}</b-col>
-                <b-col v-if="key.values || key.ajax" class="col-4 caret">
-                  <i class="fal fa-caret-right" />
-                </b-col>
-                <b-col v-else-if="key.type" class="col-4 type-caption">{{ key.type }}</b-col>
-              </b-row>
-            </b-list-group-item>
-          </b-list-group>
-        </div>
+        <BaseQueryList ref="listContainer"
+                       class="list-container"
+                       :show="isFocused && isKeyListShown && keyList.length > 0"
+                       :queries="keyList" 
+                       :style="{
+                         left: `${keyListPosX}px`, 
+                         top: `${listPosY}px`,
+                         height: `${listHeight}px`
+                       }"
+                       @select="onSelectKey"
+        />
 
-        <div v-if="isFocused && isValueListShown && valueList.length > 0" 
-             ref="listContainer" 
-             class="list-container"
-             :style="{
-               left: `${valueListPosX}px`, 
-               top: `${listPosY}px`,
-               height: `${listHeight}px`
-             }"
-        >
-          <b-list-group>
-            <b-list-group-item v-for="(val, idx) in valueList"  
-                               ref="list" 
-                               :key="`val:${idx}`"
-                               :class="{'hovered': idx === hoveredItemIdx}"
-                               @mousedown.prevent="onSelectValue(val, idx)"
-                               @mouseover="onMouseover(idx)" 
-                               @mouseout="onMouseout"
-            >
-              {{ val }}
-            </b-list-group-item>
-          </b-list-group>
-        </div>
-
+        <BaseQueryList ref="listContainer" 
+                       class="list-container"
+                       :show="isFocused && isValueListShown && valueList.length > 0"
+                       :queries="valueList" 
+                       :style="{
+                         left: `${valueListPosX}px`, 
+                         top: `${listPosY}px`,
+                         height: `${listHeight}px`
+                       }"
+                       text-only 
+                       @select="onSelectValue"
+        />
       </span>
 
     </span>
@@ -86,7 +58,7 @@
 
 <script>
 import { focus } from 'vue-focus';
-import { mapGetters } from 'vuex';
+import BaseQueryList from '@/components/base/list/BALT_001_BaseQueryList';
 
 const contentsModel = {
     label: '',
@@ -102,6 +74,9 @@ const appendableOperators = ['=', '>', '<', '!', '$'];
 export default {
     name: 'BaseInput',
     event: ['add', 'update', 'delete', 'deleteLeft'],
+    components: {
+        BaseQueryList
+    },
     directives: { focus: focus },
     props: {
     /**
@@ -167,11 +142,6 @@ export default {
             selectionEnd: 0,
             isBlurWithoutCommit: false
         };
-    },
-    computed: {
-        ...mapGetters('layout', [
-            'headerHeight'
-        ])
     },
     created () {
         this.commitEventName = this.$listeners.update !== undefined ? 'update' : 'add';
@@ -289,7 +259,7 @@ export default {
                     res = await this.$axios[this.selectedKeyObj.ajax.method](this.selectedKeyObj.ajax.url,
                         this.selectedKeyObj.ajax.params || {});
 
-                    this.staticValueList = this.selectedKeyObj.ajax.getList(res);
+                    this.staticValueList = this.selectedKeyObj.ajax.filter(res);
                 } catch (e) {
                     console.error(e);
                 }
@@ -348,19 +318,13 @@ export default {
             this.selected = Object.assign({}, contentsModel);
         },
         onEnter () {
-      // when the list item is selected
-            if (this.hoveredItemIdx !== null) {
-                if (this.isKeyListShown && this.hoveredItemIdx < this.keyList.length) {
-                    this.onSelectKey(this.keyList[this.hoveredItemIdx], this.hoveredItemIdx);
-                    return;
-                } else if (this.isValueListShown && this.hoveredItemIdx < this.valueList.length) {
-                    this.onSelectValue(this.valueList[this.hoveredItemIdx], this.hoveredItemIdx);
-                    return;
-                }
+            if (this.$refs.listContainer && this.$refs.listContainer.hoveredItemIdx) {
+                this.$refs.listContainer.emitSelectEvent();
+            } else {
+                this.commit();
+                this.isEnterEmittedBlur = true;
             }
 
-            this.commit();
-            this.isEnterEmittedBlur = true;
         },
         commit () {
             let val = this.inputText.trim();
@@ -487,60 +451,10 @@ export default {
             }
         },
         onKeyDown () {
-            let arr = this.isKeyListShown ? this.keyList : this.valueList;
-            if (this.hoveredItemIdx === null || this.hoveredItemIdx >= arr.length - 1) {
-                this.hoveredItemIdx = 0;
-                if (this.$refs.listContainer) {
-                    this.$refs.listContainer.scrollTop = 0;
-                }
-                return;
-            } else {
-                this.hoveredItemIdx++;
-            }
-
-            if (this.isEmpty(this.$refs.listContainer) ||
-                this.isEmpty(this.$refs.list[this.hoveredItemIdx])) {
-                return;
-            }
-
-            let listContainerRect = this.$refs.listContainer.getBoundingClientRect();
-            let listItemRect = this.$refs.list[this.hoveredItemIdx].getBoundingClientRect();
-            let diff = listItemRect.bottom - listContainerRect.bottom;
-            let pad = 10;
-            if (diff > 0) {
-                this.$refs.listContainer.scrollTop += diff + pad;
-            }
+            this.$refs.listContainer.goDown();
         },
         onKeyUp () {
-            if (this.hoveredItemIdx === null || this.hoveredItemIdx <= 0) {
-                let arr = this.isKeyListShown ? this.keyList : this.valueList;
-                this.hoveredItemIdx = arr.length - 1;
-                if (this.$refs.listContainer) {
-                    this.$refs.listContainer.scrollTop = this.$refs.listContainer.scrollHeight;
-                }
-                return;
-            } else {
-                this.hoveredItemIdx--;
-            }
-
-            if (this.isEmpty(this.$refs.listContainer) ||
-                this.isEmpty(this.$refs.list[this.hoveredItemIdx])) {
-                return;
-            }
-
-            let listContainerRect = this.$refs.listContainer.getBoundingClientRect();
-            let listItemRect = this.$refs.list[this.hoveredItemIdx].getBoundingClientRect();
-            let diff = listItemRect.top - listContainerRect.top;
-            let pad = 10;
-            if (diff < 0) {
-                this.$refs.listContainer.scrollTop += diff - pad;
-            }
-        },
-        onMouseover (idx) {
-            this.hoveredItemIdx = idx; 
-        },
-        onMouseout () {
-            this.hoveredItemIdx = null; 
+            this.$refs.listContainer.goUp();
         },
         captureText () {
             if (!this.inputText) {
@@ -616,49 +530,7 @@ export default {
     }
     .list-container {
       position: absolute;
-      display: inline-block;
-      min-height: 100px;
-      overflow-y: scroll;
       z-index: 3;
-      left: 0;
-      width: auto;
-      min-width: 250px;
-      border-radius: 5px;
-      .list-group {
-        box-shadow: 0 0 4px 0 rgba($black, 0.4);
-        border-radius: 5px;
-        padding: 10px;
-        background-color: darken($navy, 2%);
-        width: auto;
-      }
-      .list-group-item {
-        cursor: pointer;
-        padding: 5px 8px;
-        color: $lightgray;
-        font-size: .9rem;
-        background-color: transparent;
-        border-radius: 5px;
-        width: auto;
-        white-space: nowrap;
-        &.hovered {
-          background-color: lighten($navy, 9%);
-        }
-        .key-label {
-        //   text-overflow: ellipsis;
-        //   overflow:hidden;
-          white-space:nowrap;
-          padding-right: 20px;
-        }
-        .caret {
-          text-align: right;
-          color: $darkgray;
-        }
-        .type-caption {
-          text-align: right;
-          font-weight: 300;
-          color: $darkgray;
-        }
-      }
     }
   }
 }
