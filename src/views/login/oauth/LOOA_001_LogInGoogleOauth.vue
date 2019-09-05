@@ -115,6 +115,11 @@ export default {
         async login() {
             await this.$store.dispatch('auth/login', this.oathSignParam
             ).then(() => {
+                let auth2 = gapi.auth2.getAuthInstance();
+                if (!auth2.isSignedIn.get()) {
+                    return;
+                }
+                auth2.disconnect();
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();
