@@ -160,7 +160,7 @@ export default {
         ]),
         getCurrentHostname (){
             let hostName = url.parse(window.location.href).host;
-            return hostName.substring(0, hostName.indexOf('.'));
+            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
         }
     },
     mounted () {
