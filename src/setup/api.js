@@ -5,7 +5,7 @@ import store from '@/store';
 let api = null;
 
 let config = {
-    baseURL: process.env.VUE_APP_API_URL,
+    baseURL: '',
     withCredentials: true,
     headers: {
         'Accept': 'application/json',
@@ -19,7 +19,7 @@ const getUrlInfo = async () => {
         return res.data.VUE_APP_API.URL;
     } catch (err) {
         console.error(err);
-        return config.baseURL;
+        return '';
     }
 };
 
