@@ -12,7 +12,6 @@ let config = {
         'Content-Type': 'application/json'
     }
 };
-
 const getUrlInfo = async () => {
     try {
         let res = await axios.get('/config/default.json');
@@ -52,11 +51,13 @@ const setResponseInterceptor = (api) => {
 
 export const setApi = async () => {
     config.baseURL = await getUrlInfo();
-    const _api = axios.create(config);
-    setRequestInterceptor(_api);
-    setResponseInterceptor(_api);
-    Vue.prototype.$axios = _api;
-    api = _api;
+    setTimeout(() => {
+        const _api = axios.create(config);
+        setRequestInterceptor(_api);
+        setResponseInterceptor(_api);
+        Vue.prototype.$axios = _api;
+        api = _api;
+    }, 1000);
 };
 
 export const getApi = () => {
