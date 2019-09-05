@@ -2,6 +2,13 @@ import url from 'url';
 import { setApi, getApi } from '@/setup/api';
 import store from '@/store';
 
+const loginTypeEnum = Object.freeze({
+    LOGOUT: null,
+    LOCAL_LOGIN: 1,
+    OAUTH_LOGIN: 2,
+    DOMAIN_NOT_FOUND: 3
+});
+
 let isFirstLogin = null;
 let LoginType = null;
 let isNoApi = true;
@@ -15,33 +22,38 @@ const setOauth = async () => {
     await document.head.appendChild(gapiScript);
 };
 
-const baseRedirectChecker = (rep) => {
-    let response = rep.data;
-    if (response.total_count > 0) {
-        let result = response.results[0];
-        sessionStorage.setItem('domainId', result.domain_id);
-        if (!result.plugin_info ||
-            !result.plugin_info.options ||
-            !result.plugin_info.options.auth_type ) {
-            return 1;
+const setDomainId = (domainId) => {
+    sessionStorage.setItem('domainId', domainId);
+};
+
+const setAuthType = (domainOptions) => {
+    store.commit('auth/setClientId', domainOptions.client_id );
+    LoginType = domainOptions.auth_type;
+};
+
+const baseRedirectChecker = (domain) => {
+    if (domain) {
+        setDomainId(domain.domain_id);
+        if (domain.plugin_info && domain.plugin_info.options && domain.plugin_info.options.auth_type) {
+            setAuthType(domain.plugin_info.options);
+            return loginTypeEnum.OAUTH_LOGIN;
         } else {
-            store.commit('auth/setClientId', result.plugin_info.options.client_id );
-            LoginType = result.plugin_info.options.auth_type;
-            return 2;
-        }
+            return loginTypeEnum.LOCAL_LOGIN;
+        } 
     } else {
-        return 3;
+        return loginTypeEnum.DOMAIN_NOT_FOUND;
     }
 };
+
 
 const getDomain = async () => {
     try {
         const parsedObject = url.parse(window.location.href).host;
         let domain_name = parsedObject.split('.');
-        const response  = await api.post('/identity/domain/list', { name: domain_name[0] });
+        const response = await api.post('/identity/domain/list', { name: domain_name[0] });
         if (response.data.total_count === 1) {
-            isFirstLogin = baseRedirectChecker(response);
-            if (isFirstLogin === 2){
+            isFirstLogin = baseRedirectChecker(response.data.results[0]);
+            if (isFirstLogin === loginTypeEnum.OAUTH_LOGIN) {
                 await setOauth;
             }
         }
@@ -50,7 +62,7 @@ const getDomain = async () => {
     }
 };
 
-const checkAuth = (to, from, next) => {
+const checkAccessToken = (to, from, next) => {
     if (sessionStorage.getItem('token')) {
         store.dispatch('auth/setUserId', { userId: sessionStorage.getItem('userId') });
         store.dispatch('auth/setToken', { token: sessionStorage.getItem('token') });
@@ -64,12 +76,12 @@ const checkAuth = (to, from, next) => {
 };
 
 const checkDomain = (to, from, next, meta) => {
-    if (isFirstLogin === 1) {
+    if (isFirstLogin === loginTypeEnum.LOCAL_LOGIN) {
         meta.requiresDomainCheck = false;
         next({
             path: '/log-in'
         });
-    } else  if (isFirstLogin  === 2 ) {
+    } else  if (isFirstLogin  === loginTypeEnum.OAUTH_LOGIN ) {
         if (LoginType === 'google_oauth2') {
             meta.requiresDomainCheck = false;
             next({
@@ -81,7 +93,7 @@ const checkDomain = (to, from, next, meta) => {
                 path: '/error-page'
             });
         }
-    } else  if (isFirstLogin  === 3 ) {
+    } else  if (isFirstLogin  === loginTypeEnum.DOMAIN_NOT_FOUND ) {
         meta.requiresDomainCheck = false;
         next({
             path: '/error-page'
@@ -95,16 +107,17 @@ export const beforeEach = async (to, from, next) => {
         api = getApi();
     }
 
-    if (isFirstLogin === null) {
+    if (isFirstLogin === loginTypeEnum.LOGOUT) {
         await getDomain();
     }
 
     for (let i = to.matched.length - 1; i > -1; i--) {
+        
         if (to.matched[i].meta.requiresAuth) {
-            checkAuth(to, from, next);
+            checkAccessToken(to, from, next);
             return;
         }
-        
+
         if (to.matched[i].meta.requiresDomainCheck) {
             checkDomain(to, from, next, to.matched[i].meta);
             return;
