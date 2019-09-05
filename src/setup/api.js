@@ -51,13 +51,11 @@ const setResponseInterceptor = (api) => {
 
 export const setApi = async () => {
     config.baseURL = await getUrlInfo();
-    setTimeout(() => {
-        const _api = axios.create(config);
-        setRequestInterceptor(_api);
-        setResponseInterceptor(_api);
-        Vue.prototype.$axios = _api;
-        api = _api;
-    }, 1000);
+    const _api = axios.create(config);
+    setRequestInterceptor(_api);
+    setResponseInterceptor(_api);
+    Vue.prototype.$axios = _api;
+    api = _api;
 };
 
 export const getApi = () => {
