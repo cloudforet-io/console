@@ -53,9 +53,9 @@ const getDomain = async () => {
         const response = await api.post('/identity/domain/list', { name: domain_name[0] });
         if (response.data.total_count === 1) {
             isFirstLogin = baseRedirectChecker(response.data.results[0]);
-            if (isFirstLogin === loginTypeEnum.OAUTH_LOGIN) {
+            /*if (isFirstLogin === loginTypeEnum.OAUTH_LOGIN) {
                 await setOauth;
-            }
+            }*/
         }
     } catch (error) {
         console.error('No valid Domain', error);
@@ -113,7 +113,6 @@ export const beforeEach = async (to, from, next) => {
     }
 
     for (let i = to.matched.length - 1; i > -1; i--) {
-        
         if (to.matched[i].meta.requiresAuth) {
             checkAccessToken(to, from, next);
             return;
@@ -124,5 +123,6 @@ export const beforeEach = async (to, from, next) => {
             return;
         }
     }
+
     next();
 };
