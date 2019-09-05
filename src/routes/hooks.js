@@ -105,6 +105,7 @@ export const beforeEach = async (to, from, next) => {
     if (isNoApi) {
         await setApi();
         api = getApi();
+        isNoApi = false;
     }
 
     if (isFirstLogin === loginTypeEnum.LOGOUT) {
