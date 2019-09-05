@@ -8,10 +8,10 @@
               <b-card-body>
                 <b-form>
                   <h1>
-                    {{ tr('MSG.LOG_IN') }}
+                    {{ tr('LOG_IN') }}
                   </h1>
                   <p class="message">
-                    <b>{{ tr('MSG.SIGN_IN') }}</b>
+                    <b>{{ tr('SIGN_IN') }}</b>
                   </p>
                   <b-input-group class="mb-3">
                     <div id="g-signin-btn" @click="login" />
