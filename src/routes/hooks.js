@@ -102,15 +102,19 @@ const checkDomain = (to, from, next, meta) => {
 };
 
 export const beforeEach = async (to, from, next) => {
+    console.log('beforeEach');
     if (isNoApi) {
+        console.log('await setApi();');
         await setApi();
+        console.log(' api = getApi();');
         api = getApi();
     }
-
+    console.log('isFirstLogin', isFirstLogin);
     if (isFirstLogin === loginTypeEnum.LOGOUT) {
         await getDomain();
     }
 
+    console.log('get to BeforeEach', isFirstLogin);
     for (let i = to.matched.length - 1; i > -1; i--) {
         
         if (to.matched[i].meta.requiresAuth) {
@@ -123,5 +127,6 @@ export const beforeEach = async (to, from, next) => {
             return;
         }
     }
+    console.log('before to BeforeEach', isFirstLogin);
     next();
 };
