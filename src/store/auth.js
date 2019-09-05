@@ -107,15 +107,7 @@ export default {
                 }
             }
         },
-        async logout ({ commit }, clientId) {
-            if (clientId !== undefined){
-                const gapi = window.gapi;
-                let auth2 = gapi.auth2.getAuthInstance();
-                if (!auth2.isSignedIn.get()) {
-                    return;
-                }
-                auth2.disconnect();
-            }
+        async logout ({ commit }) {
             sessionStorage.removeItem('userId');
             sessionStorage.removeItem('token');
             commit('logout');
