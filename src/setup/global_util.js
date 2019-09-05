@@ -228,7 +228,7 @@ export const Mixin = {
             if (this.$i18n.te(key)) {
                 return  this.isEmpty(a) ? this.$i18n.t(key) : this.$i18n.t(key, a);
             } else {
-                return  '';
+                return  'No Message';
             }
         },
         /**********************************************************************************
@@ -583,19 +583,19 @@ export const Mixin = {
             let returnVal = [];
             if (this.isEmpty(key)){
                 return returnVal;
-            };
+            }
 
             //means Array
             if (this.isSelectedType(key,'a')) {
                 key.forEach(function(curItem){
                     const index = ref_data.findIndex(x => x.$options.name === curItem);
-                    if(index > -1){
+                    if (index > -1){
                         returnVal.push(index);
                     }
                 });
             } else {
                 returnVal = ref_data.findIndex(x => x.$options.name === key);
-            };
+            }
 
             return returnVal;
         }
@@ -604,7 +604,7 @@ export const Mixin = {
         return {
             _: VueLodash,
             defaultFontSizeSet: [10, 12, 14, 16, 18, 24],
-            isFirstLogin: false,
+            isFirstLogin: 1,
             ENUM: GlobalEnum
         };
     }
