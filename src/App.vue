@@ -11,10 +11,9 @@ export default {
     props: {
         processEnv: {
             type: String,
-            default: process.env.NODE_ENV,
-            apis: null,
+            default: process.env.NODE_ENV
         }
-    },
+    }
 };
 
 </script>
