@@ -14,7 +14,12 @@
                     <b>{{ tr('MSG.SIGN_IN_MSG') }}</b>
                   </p>
                   <b-input-group class="mb-4">
-                    <div id="g-signin-btn" @click="login" />
+                    <div id="g-signin-btn" style="width: 70%;" @click="login" />
+                  </b-input-group>
+                  <b-input-group class="mb-4">
+                    <b-button block style="height:50px" variant="danger" @click="directToAdmin">
+                      {{ tr('MSG.ADMIN_USER') }}
+                    </b-button>
                   </b-input-group>
                 </b-form>
               </b-card-body>
@@ -22,7 +27,11 @@
             <b-card no-body class="text-white bg-primary py-5 d-md-down-none" style="width:44%">
               <b-card-body class="text-center">
                 <div>
-                  <p /><h1>{{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}</h1></p>
+                  <h1>
+                    <p>
+                      {{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}
+                    </p>
+                  </h1>
                   <p> {{ $t('MSG.SIGN_IN_DESC') }}</p>
                 </div>
               </b-card-body>
@@ -55,13 +64,17 @@ export default {
         ]),
         getCurrentHostname (){
             let hostName = url.parse(window.location.href).host;
-            return hostName.substring(0, hostName.indexOf('.'));
+            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
         }
     },
     async mounted() {
         await this.setGoogleSignInButton();
     },
     methods: {
+        async directToAdmin () {
+            this.$router.push({ name: 'Admin-logIn' });
+            this.$router.push({ path: '/admin-log-in' });
+        },
         async setGoogleSignInButton() {
             let vm = this;
             const clientId = this.$store.getters['auth/client_id'];
@@ -74,7 +87,7 @@ export default {
                 vm.isSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
-                    width: 250,
+                    width: 300,
                     height: 50,
                     longtitle: false,
                     theme: 'dark',
