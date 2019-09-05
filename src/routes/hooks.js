@@ -16,9 +16,9 @@ let api = null;
 
 const setOauth = async () => {
     let gapiScript = document.createElement('script');
+    gapiScript.async = true;
+    gapiScript.defer = true;
     await gapiScript.setAttribute('src', 'https://apis.google.com/js/platform.js');
-    //gapiScript.async = true;
-    //gapiScript.defer = true;
     await document.head.appendChild(gapiScript);
 };
 
