@@ -8,12 +8,12 @@
               <b-card-body>
                 <b-form>
                   <h1>
-                    {{ tr('LOG_IN') }}
+                    {{ tr('MSG.SIGN_IN') }}
                   </h1>
                   <p class="message">
-                    <b>{{ tr('SIGN_IN') }}</b>
+                    <b>{{ tr('MSG.SIGN_IN_MSG') }}</b>
                   </p>
-                  <b-input-group class="mb-3">
+                  <b-input-group class="mb-4">
                     <div id="g-signin-btn" @click="login" />
                   </b-input-group>
                 </b-form>
@@ -22,21 +22,20 @@
             <b-card no-body class="text-white bg-primary py-5 d-md-down-none" style="width:44%">
               <b-card-body class="text-center">
                 <div>
-                  <br>
-                  <br>
-                  <p> {{ $t('MSG.SIGN_UP_MSG') }}</p>
+                  <p /><h1>{{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}</h1></p>
+                  <p> {{ $t('MSG.SIGN_IN_DESC') }}</p>
                 </div>
               </b-card-body>
             </b-card>
           </b-card-group>
         </b-col>
       </b-row>
-      </basesimplemodal>
     </div>
   </b-row>
 </template>
 <script>
 import store from '@/store';
+import url from 'url';
 import { mapGetters } from 'vuex';
 const gapi = window.gapi;
 export default {
@@ -54,6 +53,10 @@ export default {
         ...mapGetters('auth', [
             'nextPath'
         ]),
+        getCurrentHostname (){
+            let hostName = url.parse(window.location.href).host;
+            return hostName.substring(0, hostName.indexOf('.'));
+        }
     },
     async mounted() {
         await this.setGoogleSignInButton();
@@ -62,8 +65,8 @@ export default {
         async setGoogleSignInButton() {
             let vm = this;
             const clientId = this.$store.getters['auth/client_id'];
-                gapi.load('auth2', function () {
-                let auth2 = window.gapi.auth2.init({
+            gapi.load('auth2', function () {
+                let auth2 = gapi.auth2.init({
                     client_id: clientId,
                     fetch_basic_profile: false,
                     scope: 'profile'
@@ -71,7 +74,7 @@ export default {
                 vm.isSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
-                    width: 200,
+                    width: 250,
                     height: 50,
                     longtitle: false,
                     theme: 'dark',
@@ -79,14 +82,6 @@ export default {
                     onfailure: null
                 });
             });
-        },
-        async discoonect() {
-            console.log('on disconnect');
-            let auth2 = gapi.auth2.getAuthInstance();
-            if (!auth2.isSignedIn.get()) {
-                return;
-            }
-            auth2.disconnect();
         },
         onSignIn(googleUser) {
             console.log(this.isSignedIn);

@@ -14,6 +14,7 @@ const DefaultContainer = () => import('@/containers/DefaultContainer');
 // Views
 const LogIn = () => import('@/views/login/local/LOLO_001_LogIn');
 const GoolgeLogIn = () => import('@/views/login/oauth/LOOA_001_LogInGoogleOauth');
+const AdminLogIn = () => import('@/views/login/only_admin/LOOA_001_AdminOnlyLogIn');
 const Redirect404 = () => import('@/views/common/VICO_003_Redirect404');
 
 
@@ -41,6 +42,12 @@ const index = new Router({
             name: 'Google-Oauth-logIn',
             meta: { label: 'google_oauth2', requiresAuth: false, requiresDomainCheck: true },
             component: GoolgeLogIn
+        },
+        {
+            path: '/admin-log-in',
+            name: 'Admin-logIn',
+            meta: { label: 'admin_login', requiresAuth: false, requiresDomainCheck: true },
+            component: AdminLogIn
         },
         {
             path: '/',
