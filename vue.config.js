@@ -2,7 +2,7 @@ module.exports = {
     lintOnSave: false,
     runtimeCompiler: true,
     devServer: {
-        host: 'mzc.console.dev.pyengine.net',
+        host: 'cloudone.console.dev.pyengine.net',
         port: 8080
     },
     css: {
