@@ -38,7 +38,7 @@
 <script>
 import store from '@/store';
 import { mapGetters } from 'vuex';
-
+const gapi = window.gapi;
 export default {
     components: {},
     data() {
@@ -53,32 +53,22 @@ export default {
     computed: {
         ...mapGetters('auth', [
             'nextPath'
-        ])
-    },
-    async beforeMount() {
-        await this.setInit();
+        ]),
     },
     async mounted() {
         await this.setGoogleSignInButton();
     },
     methods: {
-        async setInit() {
-            let gapiScript = document.createElement('script');
-            gapiScript.async = true;
-            gapiScript.defer = true;
-            await gapiScript.setAttribute('src', 'https://apis.google.com/js/platform.js');
-            await document.head.appendChild(gapiScript);
-        },
         async setGoogleSignInButton() {
             let vm = this;
             const clientId = this.$store.getters['auth/client_id'];
-            gapi.load('auth2', function () {
-                let auth2 = gapi.auth2.init({
+                gapi.load('auth2', function () {
+                let auth2 = window.gapi.auth2.init({
                     client_id: clientId,
                     fetch_basic_profile: false,
                     scope: 'profile'
                 });
-                vm.isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+                vm.isSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
                     width: 200,
@@ -94,12 +84,9 @@ export default {
             console.log('on disconnect');
             let auth2 = gapi.auth2.getAuthInstance();
             if (!auth2.isSignedIn.get()) {
-                setMessage('Not signed in, cannot disconnect');
                 return;
             }
             auth2.disconnect();
-            setProfileImage(null);
-            setMessage('Disconnected');
         },
         onSignIn(googleUser) {
             console.log(this.isSignedIn);
