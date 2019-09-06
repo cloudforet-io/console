@@ -5,6 +5,7 @@ ENV ROOT_PATH /var/www
 ARG FONT_AWESOME_API_KEY
 
 RUN apt-get update && apt-get install -y nginx
+RUN rm /etc/nginx/sites-enabled/default 
 RUN mkdir -p ${BUILD_PATH}
 
 COPY package.json ${BUILD_PATH}/package.json
