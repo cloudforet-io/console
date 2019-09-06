@@ -13,68 +13,42 @@
                      'slide-fade-out': !showMap }"
     >
 
-      <b-col cols="12" class="group">
-        <b-row>
-          <b-col cols="12" class="header clickable bordered">
+      <b-col cols="12" class="group bordered" @click="showMap = false">
+        <router-link to="/dashboard">
+          <span class="header">
             <span class="icon"><i class="fa fa-chart-line" /></span>
-            <span class="title" @click="showMap = false">
-              <router-link to="/dashboard">{{ tr('DASHBOARD') }}</router-link>
-            </span>
-          </b-col>
-        </b-row>
+            <span class="header-title">{{ tr('DASHBOARD') }}</span>
+          </span>
+        </router-link>
       </b-col>
       
       <b-col cols="6" class="group">
-        <b-row>
-          <b-col cols="12" class="header">
-            <span class="icon"><i class="fa fa-warehouse-alt" /></span>
-            <span class="title">{{ tr('INVENTORY') }}</span>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="11" offset="1" class="item">
-            <span class="title " @click="showMap = false">
-              <router-link to="/inventory/data-center">{{ tr('DATA_CENTER') }}</router-link>
-            </span>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="11" offset="1" class="item">
-            <span class="title " @click="showMap = false">
-              <router-link to="/inventory/server">{{ tr('SERVER') }}</router-link>
-            </span>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="11" offset="1" class="item">
-            <span class="title " @click="showMap = false">
-              <router-link to="/inventory/settings">{{ tr('SETTINGS') }}</router-link>
-            </span>
-          </b-col>
-        </b-row>
+        <span class="header">
+          <span class="icon"><i class="fa fa-warehouse-alt" /></span>
+          <span class="header-title">{{ tr('INVENTORY') }}</span>
+        </span>
+        <span class="item" @click="showMap = false">
+          <router-link to="/inventory/data-center">{{ tr('DATA_CENTER') }}</router-link>
+        </span>
+        <span class="item " @click="showMap = false">
+          <router-link to="/inventory/server">{{ tr('SERVER') }}</router-link>
+        </span>
+        <span class="item " @click="showMap = false">
+          <router-link to="/inventory/settings">{{ tr('SETTINGS') }}</router-link>
+        </span>
       </b-col>
 
       <b-col cols="6" class="group">
-        <b-row>
-          <b-col cols="12" class="header">
-            <span class="icon"><i class="fa fa-address-card" /></span>
-            <span class="title">{{ tr('IDENTITY') }}</span>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="11" offset="1" class="item">
-            <span class="title " @click="showMap = false">
-              <router-link to="/identity/user">{{ tr('USER') }}</router-link>
-            </span>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="11" offset="1" class="item">
-            <span class="title " @click="showMap = false">
-              <router-link to="/identity/project">{{ tr('PROJECT') }}</router-link>
-            </span>
-          </b-col>
-        </b-row>
+        <span class="header">
+          <span class="icon"><i class="fa fa-address-card" /></span>
+          <span class="header-title">{{ tr('IDENTITY') }}</span>
+        </span>
+        <span class="item " @click="showMap = false">
+          <router-link to="/identity/user">{{ tr('USER') }}</router-link>
+        </span>
+        <span class="item " @click="showMap = false">
+          <router-link to="/identity/project">{{ tr('PROJECT') }}</router-link>
+        </span>
       </b-col>
     </b-row>
   </span>
@@ -155,6 +129,8 @@ export default {
     transition: all .3s ease-out;
     opacity: 0;
   }
+}
+
 
   %click-item {
     cursor: pointer;
@@ -166,53 +142,64 @@ export default {
     }
   }
 
-  .group {
-    color: $black;
-    .header {
-      vertical-align: middle;
-      padding: 8px;
-      font-size: 1.2rem;
-    //   text-transform: uppercase;
-      letter-spacing: 0.04rem;
-      font-weight: 600;
-      cursor: default;
-      .title {
-        padding-left: 10px;
-        vertical-align: middle;
-      }
-      .icon {
-          display: inline-block;
-          width: 25px;
-          text-align: center;
-          vertical-align: baseline;
-      }
-      &.clickable {
-        @extend %click-item;
-      }
+@mixin clickable () {
+    cursor: pointer;
+    border-radius: 5px;
+    display: inline-block;
+    width: 100%;
+    &:hover {
+        background-color: rgba($blueviolet, 0.3);
+        font-weight: 600;
+        color: $navy;
     }
-    .item {
-      @extend %click-item;
-      vertical-align: middle;
-      padding: 3px;
-      padding-left: 18px;
-      font-size: 1.08rem;
-      letter-spacing: -0.01rem;
-      .title {
-        padding-left: 10px;
+    .header {
+        cursor: pointer;
+    }
+}
+
+.group {
+    color: $black;
+    cursor: default;
+    > a {
+        @include clickable();
+    }
+    .header {
         display: inline-block;
         width: 100%;
-        a {
-          display: inline-block;
-          width: 100%;
+        vertical-align: middle;
+        font-size: 1.2rem;
+        letter-spacing: 0.04rem;
+        font-weight: 600;
+        cursor: default;
+        .header-title {
+            display: inline-block;
+            padding: 5px 8px;
+            vertical-align: middle;
         }
-      }
+        .icon {
+            display: inline-block;
+            width: 25px;
+            text-align: center;
+            vertical-align: baseline;
+        }
     }
-  }
+    .item {
+        vertical-align: middle;
+        display: inline-block;
+        width: 100%;
+        > a {
+            @include clickable();
+            padding: 3px;
+            padding-left: 32px;
+            font-size: 1.08rem;
+            letter-spacing: -0.01rem;
+        }
+    }
+}
 
-    .bordered {
-        border-bottom: 1px solid $gray;
-        margin-bottom: 10px;
-    }
-  
+.bordered {
+    border-bottom: 1px solid $gray;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
 }
 </style>
