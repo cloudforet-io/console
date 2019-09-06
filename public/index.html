@@ -7,10 +7,6 @@
     <link rel='shortcut icon' type='image/x-icon' href="<%= BASE_URL %>favicon.ico">
     <title>CloudOne</title>
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-        }
         .spinner-container {
             position: fixed;
             width: 100vw;
@@ -25,9 +21,6 @@
             width: 60px;
             height: 60px;
             transform: translate(-50%, -50%);
-            font-size: 50px;
-            text-align: center;
-            overflow: hidden;
             animation: spin 2s linear infinite;
         }
         @keyframes spin {
@@ -42,8 +35,8 @@
       <strong>We're sorry but this app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app">
-        <div id="loading-spinner" class="spinner-container">
-            <span class="spinner"><img color="blue" src="<%= BASE_URL %>spinner.svg" /></span>
+        <div class="spinner-container">
+            <img class="spinner" src="<%= BASE_URL %>spinner.svg" />
         </div>
     </div>
     <script src="https://apis.google.com/js/platform.js?onload=init" async defer></script>
