@@ -49,19 +49,26 @@ export default {
             let param = {
                 domain_id: sessionStorage.getItem('domainId')
             };
+
             if (authObj.hasOwnProperty('access_token')){
                 param['credentials'] = { access_token: authObj.access_token };
+
             } else {
 
-                param['credentials'] = {
-                    user_id: authObj.userId,
-                    password: authObj.password
-                };
-
                 if (authObj.hasOwnProperty('user_type')){
-                    param['user_type'] = authObj['user_type'];
+                    param['credentials'] = {
+                        user_id: authObj.adminUserId,
+                        password: authObj.password,
+                        user_type: authObj.user_type
+                    };
+                } else {
+                    param['credentials'] = {
+                        user_id: authObj.userId,
+                        password: authObj.password,
+                    };
                 }
             }
+
             try {
 
                 const res = await getApi().post('/identity/token/issue', param);
