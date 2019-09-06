@@ -131,7 +131,6 @@ export default {
             keyList: this.listData,
             staticValueList: [],
             valueList: [],
-            hoveredItemIdx: null,
             commitEventName: 'add',
             isEnterEmittedBlur: false,
             keyListPosX: 0,
@@ -277,14 +276,12 @@ export default {
         },
         hideValueList () {
             this.isValueListShown = false;
-            this.hoveredItemIdx = null;
         },
         showKeyList () {
             this.isKeyListShown = true; 
         },
         hideKeyList () {
             this.isKeyListShown = false;
-            this.hoveredItemIdx = null;
         },
         onSelectValue (val) {
             this.setOperator(this.inputText.substring(this.inputText.indexOf(':')));
@@ -435,7 +432,6 @@ export default {
         },
         onBlur () {
             this.isFocused = false;
-            this.hoveredItemIdx = null;
 
             if (this.isBlurWithoutCommit) {
                 this.isBlurWithoutCommit = false;
