@@ -2,7 +2,8 @@ module.exports = {
     lintOnSave: false,
     runtimeCompiler: true,
     devServer: {
-        host: 'localhost'
+        host: 'localhost',
+        port: 8080
     },
     css: {
         loaderOptions: {
@@ -17,7 +18,6 @@ module.exports = {
     configureWebpack: {
         resolve: {
             alias: {
-
             }
         },
         devtool: 'source-map'

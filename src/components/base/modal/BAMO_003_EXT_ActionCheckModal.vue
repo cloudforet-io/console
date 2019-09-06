@@ -7,14 +7,27 @@
                @ok="onOk"
     >
       <template #contents>
-        <h4>{{ modalText }}</h4>
-        <br>
-        <BaseTable :table-data="data" 
-                   :fields="fields"
-                   :selectable="false"
-                   cardless
-                   headerless
-                   underlined
+        <div class="modal-contents">
+          <slot v-if="$scopedSlots.contents" name="contents" />
+          <template v-else>
+            <h4 class="modal-text">
+              {{ modalText }}
+            </h4>
+            <br>
+            <BaseTable :table-data="data" 
+                       :fields="fields"
+                       :selectable="false"
+                       cardless
+                       headerless
+                       underlined
+            />
+          </template>
+        </div>
+      </template>
+
+      <template v-if="$scopedSlots.footer" #footer="{ ok, hide, cancel }">
+        <slot name="footer" 
+              :ok="onOk" :hide="hide" :cancel="cancel"
         />
       </template>
     </BaseModal>
@@ -117,11 +130,7 @@ export default {
     },
     data() {
         return {
-            failedItemList: [],
-            modalTitle: this.title || this.tr('ACTION.TITLE_DEFAULT'),
-            modalText: this.text || this.tr('ACTION.CHECK_DEFAULT'),
-            modalFailMsg: this.failMessage || this.tr('ACTION.ERROR'),
-            modalsuccessMsg: this.successMessage || this.tr('ACTION.SUCCESS')
+            failedItemList: []
         };
     },
     computed: {
@@ -130,6 +139,18 @@ export default {
                 { key: this.primaryKey, label: this.primaryKey },
                 { key: 'reason', label: this.tr('COL_NM.FAIL_REASON') }
             ];
+        },
+        modalTitle () {
+            return this.title || this.tr('ACTION.TITLE_DEFAULT');
+        },
+        modalText () {
+            return this.text || this.tr('ACTION.CHECK_DEFAULT');
+        },
+        modalFailMsg () {
+            return this.failMessage || this.tr('ACTION.ERROR');
+        },
+        modalSuccessMsg () {
+            return this.successMessage || this.tr('ACTION.SUCCESS');
         }
     },
     created() {
@@ -157,9 +178,12 @@ export default {
         },
         async doActionSync () {
             try {
-                await this.action(this.data);
+                let res = await this.action(this.data);
+                if (res && res.stop) {
+                    return;
+                }
                 this.hideModal();
-                this.$alertify.success(this.modalsuccessMsg);
+                this.$alertify.success(this.modalSuccessMsg);
                 this.$emit('succeed');
             } catch (e) {
                 console.error(e);
@@ -204,5 +228,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.modal-contents {
+    height: 400px;
+    .modal-text {
+        padding: 15px 20px;
+    }
+}
 </style>

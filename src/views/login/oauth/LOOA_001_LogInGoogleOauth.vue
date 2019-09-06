@@ -8,21 +8,18 @@
               <b-card-body>
                 <b-form>
                   <h1>
-                    {{ $t('MSG.LOG_IN') }}
+                    {{ tr('MSG.SIGN_IN') }}
                   </h1>
-                  <transition v-if="seenGreet" name="slide-fade">
-                    <p class="message">
-                      <b>{{ $t('MSG.SIGN_IN') }}</b>
-                    </p>
-                  </transition>
-                  <transition v-if="seenError" name="slide-fade">
-                    <p class="message" style="color: #B82E24">
-                      <b>{{ $t('MSG.SIGN_FAIL_TITLE') }}</b>
-                      <br> {{ $t('MSG.SIGN_FAIL_BODY') }}
-                    </p>
-                  </transition>
-                  <b-input-group class="mb-3">
-                    <div id="g-signin-btn" />
+                  <p class="message">
+                    <b>{{ tr('MSG.SIGN_IN_MSG') }}</b>
+                  </p>
+                  <b-input-group class="mb-4">
+                    <div id="g-signin-btn" style="width: 70%;" @click="login" />
+                  </b-input-group>
+                  <b-input-group class="mb-4">
+                    <b-button block style="height:50px" variant="danger" @click="directToAdmin">
+                      {{ tr('MSG.ADMIN_USER') }}
+                    </b-button>
                   </b-input-group>
                 </b-form>
               </b-card-body>
@@ -30,99 +27,115 @@
             <b-card no-body class="text-white bg-primary py-5 d-md-down-none" style="width:44%">
               <b-card-body class="text-center">
                 <div>
-                  <br>
-                  <br>
-                  <p> {{ $t('MSG.SIGN_UP_MSG') }}</p>
+                  <h1>
+                    <p>
+                      {{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}
+                    </p>
+                  </h1>
+                  <p> {{ $t('MSG.SIGN_IN_DESC') }}</p>
                 </div>
               </b-card-body>
             </b-card>
           </b-card-group>
         </b-col>
       </b-row>
-      </basesimplemodal>
     </div>
   </b-row>
 </template>
-
 <script>
-function onSignIn(googleUser) {
-    console.log('on sign in, granted scopes: ' + googleUser.getGrantedScopes());
-    console.log('ID token: ' + googleUser.getAuthResponse().id_token);
-    console.log('Access token: ' + googleUser.getAuthResponse().access_token);
-    let profile = googleUser.getBasicProfile();
-    let message = `ID:   ${profile.getId()}  '\n' Name: ${profile.getName()}  '\n' Image URL:  ${profile.getImageUrl()} '\n'  Email:  ${profile.getEmail()} `;
-    this.alertAbs();
-    //setProfileImage(profile.getImageUrl());
-}
+import store from '@/store';
+import url from 'url';
 import { mapGetters } from 'vuex';
+const gapi = window.gapi;
 export default {
-    components: {
-    },
-    data () {
+    components: {},
+    data() {
         return {
-            rememberStatus: false,
+            isSignedIn: false,
+            oathSignParam: null,
             seenGreet: true,
             seenError: false,
-            userId: 'admin',
-            password: 'admin'
+            pramObject: null
         };
     },
     computed: {
         ...mapGetters('auth', [
             'nextPath'
-        ])
+        ]),
+        getCurrentHostname (){
+            let hostName = url.parse(window.location.href).host;
+            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
+        }
     },
-    mounted () {
-        this.setGoogleSignInButton();
+    async mounted() {
+        await this.setGoogleSignInButton();
     },
     methods: {
-        setGoogleSignInButton(){
-            gapi.load('auth2', function() {
+        async directToAdmin () {
+            this.$router.push({ name: 'Admin-logIn' });
+            this.$router.push({ path: '/admin-log-in' });
+        },
+        async setGoogleSignInButton() {
+            let vm = this;
+            const clientId = this.$store.getters['auth/client_id'];
+            gapi.load('auth2', function () {
                 let auth2 = gapi.auth2.init({
-                    client_id: '150323145707-hp5i8q4hm1vcb2hpta23c1829167nl1h.apps.googleusercontent.com',
+                    client_id: clientId,
                     fetch_basic_profile: false,
                     scope: 'profile'
                 });
+                vm.isSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
-                    width: 200,
+                    width: 300,
                     height: 50,
                     longtitle: false,
                     theme: 'dark',
-                    onsuccess: onSignIn,
+                    onsuccess: vm.onSignIn,
                     onfailure: null
                 });
             });
         },
-        alertAbs(){
-            alert('ㅁ니아ㅓㄹ미나어ㅣㅁ나어린ㅁ아ㅓㄹ이ㅏㅁ너이라ㅓㅁ니ㅏㅇ러');
+        onSignIn(googleUser) {
+            console.log(this.isSignedIn);
+            const profile = googleUser.getBasicProfile();
+            const param = {
+                userId: profile.getEmail(),
+                access_token: googleUser.getAuthResponse().access_token
+            };
+            this.oathSignParam = param;
+            this.login();
+            /*if (!this.isSignedIn) {
+              this.login();
+                this.isSignedIn = true;
+            }*/
+
+
         },
-        async login () {
-            console.log(this.tr('MSG.LOG_IN'));
-            await this.$store.dispatch('auth/login',
-                {
-                    userId: this.userId,
-                    password: this.password,
-                    domainId: sessionStorage.getItem('domainId')
-                }
+        async login() {
+            await this.$store.dispatch('auth/login', this.oathSignParam
             ).then(() => {
+                let auth2 = gapi.auth2.getAuthInstance();
+                if (!auth2.isSignedIn.get()) {
+                    return;
+                }
+                auth2.disconnect();
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();
-
             }).catch(() => {
                 this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
             });
         },
-        showErorrMSG () {
+        showErorrMSG() {
             this.seenGreet = false;
             this.seenError = true;
         },
-        showGreetMSG () {
+        showGreetMSG() {
             this.seenGreet = true;
             this.seenError = false;
         },
-        rememberMe () {
+        rememberMe() {
             if (this.rememberStatus && !this.isEmpty(this.userId)) {
                 localStorage.userId = this.userId;
                 localStorage.checkbox = this.rememberStatus;
@@ -131,55 +144,56 @@ export default {
                 localStorage.checkbox = false;
             }
         },
-        popSignUpInstruction () {
+        popSignUpInstruction() {
             this.$refs.LogInSimpleModal.showModal();
-        },
-        async setTimeZone(){
-            await this.$axios.post('identity/user/get', {
-                user_id: this.userId,
-                domainId: sessionStorage.getItem('domainId')
-            }).then((response) => {
-                const timeZone = this.isEmpty(response.data.timezone) ? 'Etc/GMT' : response.data.timezone;
-                localStorage.timeZone = timeZone;
-
-            }).catch(() => {
-                this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
-            });
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../asset/style/css/slideShow.css';
+    @import '../../../asset/style/css/slideShow.css';
 
-  .login-check {
-    float: right;
-    padding: 0px 6px 6px 0px;
-  }
-
-  .container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .card-group {
-    @extend %sheet;
-    .input-group-text {
-      border: 0;
-      background: none;
+    .login-check {
+        float: right;
+        padding: 0px 6px 6px 0px;
     }
-    .form-control {
-      border: 1px solid $lightgray;
-      border-radius: 5px;
+
+    .container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
-  }
-  .login-btn {
-    border: 0;
-    background: linear-gradient(to right, $blue, $violet);
-    box-shadow: 0 0 5px 1px rgba($navy, 0.3);
-    color: $white;
-  }
+
+    .card-group {
+        @extend %sheet;
+
+        .input-group-text {
+            border: 0;
+            background: none;
+        }
+
+        .form-control {
+            border: 1px solid $lightgray;
+            border-radius: 5px;
+        }
+    }
+
+    .login-btn {
+        border: 0;
+        background: linear-gradient(to right, $blue, $violet);
+        box-shadow: 0 0 5px 1px rgba($navy, 0.3);
+        color: $white;
+    }
+
+    .g-signin-button {
+        /* This is where you control how the button looks. Be creative! */
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 3px;
+        background-color: #3c82f7;
+        color: #fff;
+        box-shadow: 0 3px 0 #0f69ff;
+    }
 </style>

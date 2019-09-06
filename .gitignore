@@ -3,7 +3,10 @@ node_modules
 package-lock.json
 /dist
 /coverage
+/public/config/*
 
+#uncomment if nessacery
+vue.config.js
 /test/e2e/reports/
 selenium-debug.log
 

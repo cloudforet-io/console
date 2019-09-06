@@ -1,14 +1,9 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import { api } from '@/setup/api';
-import url from 'url';
 
-import { loadLanguageAsync } from '@/setup/i18n';
-import store from '@/store';
+import { beforeEach } from './hooks';
 
-let isFirstLogin = null;
-let LoginType = null;
-// Services
+// Routes
 import dashboardRoute from '@/routes/dashboard/dashboard_route';
 import identityRoute from '@/routes/identity/identity_route';
 import inventoryRoute from '@/routes/inventory/inventory_route';
@@ -19,17 +14,9 @@ const DefaultContainer = () => import('@/containers/DefaultContainer');
 // Views
 const LogIn = () => import('@/views/login/local/LOLO_001_LogIn');
 const GoolgeLogIn = () => import('@/views/login/oauth/LOOA_001_LogInGoogleOauth');
+const AdminLogIn = () => import('@/views/login/only_admin/LOOA_001_AdminOnlyLogIn');
 const Redirect404 = () => import('@/views/common/VICO_003_Redirect404');
 
-const attatchLangauge = (to, from, next) => {
-    if (!to.params.lang) {
-        next();
-        return;
-    }
-    const lang = to.params.lang;
-    loadLanguageAsync(lang).then(() => next());
-    next();
-};
 
 Vue.use(Router);
 
@@ -57,6 +44,12 @@ const index = new Router({
             component: GoolgeLogIn
         },
         {
+            path: '/admin-log-in',
+            name: 'Admin-logIn',
+            meta: { label: 'admin_login', requiresAuth: false, requiresDomainCheck: true },
+            component: AdminLogIn
+        },
+        {
             path: '/',
             name: 'root',
             meta: { label: 'root', requiresDomainCheck: true },
@@ -71,79 +64,7 @@ const index = new Router({
     ]
 });
 
-index.beforeEach(async (to, from, next) => {
-    if (isFirstLogin === null) {
-        try {
-            let domain_name = process.env.VUE_APP_API_DOMAIN_URL;
-            const response  = await api.post('/identity/domain/list', { name: domain_name });
-            if (response.data.total_count === 1){
-                isFirstLogin = baseRedirectChecker(response);
-            }
-        } catch (error) {
-            console.error('No valid Domain', error);
-        }
-    }
 
-    for (let i = to.matched.length - 1; i > -1; i--) {
-        if (to.matched[i].meta.requiresAuth) {
-            if (sessionStorage.getItem('token')) {
-                store.dispatch('auth/setUserId', { userId: sessionStorage.getItem('userId') });
-                store.dispatch('auth/setToken', { token: sessionStorage.getItem('token') });
-                next();
-            } else {
-                store.dispatch('auth/setNextPath', { nextPath: to.fullPath });
-                next({
-                    path: '/log-in'
-                });
-            }
-            return;
-        }
-        if (to.matched[i].meta.requiresDomainCheck) {
-            if (isFirstLogin === 1) {
-                to.matched[i].meta.requiresDomainCheck = false;
-                next({
-                    path: '/log-in'
-                });
-            } else  if (isFirstLogin  === 2 ){
-                if (LoginType === 'google_oauth2'){
-                    to.matched[i].meta.requiresDomainCheck = false;
-                    next({
-                        path: '/google-Log-in'
-                    });
-                } else {
-                    to.matched[i].meta.requiresDomainCheck = false;
-                    next({
-                        path: '/error-page'
-                    });
-                }
-            } else  if (isFirstLogin  === 3 ){
-                to.matched[i].meta.requiresDomainCheck = false;
-                next({
-                    path: '/error-page'
-                });
-            }
-            return;
-        }
-    }
-    next();
-});
-
-function baseRedirectChecker(rep){
-    let response = rep.data;
-    if (response.total_count > 0) {
-        let result = response.results[0];
-        if (!result.plugin_info ||
-            !result.plugin_info.options ||
-            !result.plugin_info.options.auth_type ) {
-            sessionStorage.setItem('domainId', result.domain_id);
-            return 1;
-        } else {
-            LoginType = result.plugin_info.options.auth_type;
-            return 2;
-        }
-    } else {
-        return 3;
-    }
-}
+index.beforeEach(beforeEach);
 
 export default index;

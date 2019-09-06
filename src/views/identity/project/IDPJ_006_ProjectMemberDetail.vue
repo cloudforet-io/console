@@ -5,18 +5,19 @@
         <BaseTable :table-data="projectMemberData.members"
                    :fields="fields"
                    :per-page="perPage"
-                   :searchable="true"
+                   searchable
                    :total-rows="totalCount"
                    :search-context-data="memberModalQueryData"
-                   :show-caption="true"
+                   show-caption
                    :busy="isLoading"
                    :cardless="false"
-                   :underlined="true"
-                   :off-caption="true"
+                   underlined
+                   is-empty-search
                    @rowSelected="rowSelected"
                    @list="listMembersOnModal"
                    @limitChanged="limitChanged"
                    @onSelectAll="rowAllSelected"
+                   @empty="projectMemberData.members = []"
         />
         <br>
         <b-card>
@@ -24,7 +25,7 @@
             <InputTag v-for="(tag, idx) in projectMemberData.tagList"
                       ref="tag"
                       :key="tag.id"
-                      :use-tag-only="true"
+                      use-tag-only
                       class="input-tag"
                       :tabindex="idx"
                       :idx="idx"

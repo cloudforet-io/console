@@ -1,6 +1,6 @@
 <template>
   <div>
-    <BaseNoticePanel :notice-panel-data="sampleNoticePanel" />
+    <!-- <BaseNoticePanel :notice-panel-data="sampleNoticePanel" /> -->
     <BasePanel :panels="panelData" 
                @edit="showTagEditModal"
     />
@@ -29,18 +29,8 @@ const BaseNoticePanel = () => import('@/components/base/panel/BAPA_001_BaseNotic
 const BasePanel = () => import('@/components/base/panel/BAPA_002_BasePanel');
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 const BaseTag = () => import('@/components/base/tags/BATG_001_BaseTag');
-const serverModel = {
-    user_id: null,
-    name: null,
-    password: null,
-    email: null,
-    mobile: null,
-    group: null,
-    domain_id: null,
-    language: null,
-    timezone: null,
-    tag: []
-};
+import serverModel from '@/views/inventory/server/serverModel';
+
 export default {
     name: 'ServerSummary',
     components: {
@@ -85,17 +75,75 @@ export default {
         };
     },
     computed: {
-        server () {
+        os () {
+            return this.serverData.data.os || {};
+        },
+        domain () {
+            return this.serverData.data.domain || {};
+        },
+        vm () {
+            return this.serverData.data.vm || {};
+        },
+        compute () {
+            return this.serverData.data.compute || {};
+        },
+        computeSecurityGroups () {
+            return this.compute.security_groups ? this.compute.security_groups.toString() : '';
+        },
+        poolInfo () {
+            return this.serverData.pool_info || {};
+        },
+        base () {
+            return this.serverData.data.base || {};
+        },
+        regionInfo () {
+            return this.serverData.region_info || {};
+        },
+        zoneInfo () {
+            return this.serverData.zone_info || {};
+        },
+        serverInfo () {
             return [
-                { title: this.tr('COL_NM.ID'), contents: this.serverData.user_id, copyFlag: true },
+                { title: `${this.tr('SERVER')} ${this.tr('ID')}`, contents: this.serverData.server_id, copyFlag: true },
                 { title: this.tr('COL_NM.NAME'), contents: this.serverData.name, copyFlag: true },
-                { title: this.tr('COL_NM.EMAIL'), contents: this.serverData.email, copyFlag: true },
-                { title: this.tr('COL_NM.PHONE'), contents: this.serverData.mobile, copyFlag: true },
-                { title: this.tr('COL_NM.GROUP'), contents: this.serverData.group, copyFlag: true },
                 { title: this.tr('COL_NM.STATE'), state: this.serverData.state, stateType: 'SERVER_STATE', copyFlag: true },
-                { title: this.tr('COL_NM.LANGUAGE'), contents: this.serverData.language, copyFlag: true },
-                { title: this.tr('COL_NM.DOMAIN_ID'), contents: this.serverData.domain_id, copyFlag: true },
-                { title: this.tr('COL_NM.TIMEZONE'), contents: this.serverData.timezone, copyFlag: true }
+                { title: this.tr('COL_NM.PRI_IP'), contents: this.serverData.primary_ip_address, copyFlag: true },
+                { title: this.tr('COL_NM.SE_TYPE'), contents: this.serverData.server_type, copyFlag: true },
+                { title: this.tr('COL_NM.CORE'), contents: this.base.core, copyFlag: true },
+                { title: this.tr('COL_NM.FQDN'), contents: this.domain.fqdn, copyFlag: true },
+                { title: this.tr('COL_NM.MEMORY'), contents: this.base.memory, copyFlag: true },
+                { title: this.tr('COL_NM.O_TYPE'), contents: this.serverData.os_type, copyFlag: true },
+                { title: this.tr('COL_NM.O_DIS'), contents: this.os.os_distro, copyFlag: true },
+                { title: this.tr('COL_NM.PROJ'), contents: this.serverData.project_id, copyFlag: true },
+                { title: this.tr('COL_NM.O_DETAIL'), contents: this.os.os_details, copyFlag: true },
+                { title: this.tr('COL_NM.REGION'), contents: this.regionInfo.region_id, copyFlag: true },
+                { title: this.tr('COL_NM.O_ARCH'), contents: this.os.os_arch, copyFlag: true },
+                { title: this.tr('COL_NM.ZONE'), contents: this.zoneInfo.zone_id, copyFlag: true },
+                { title: this.tr('COL_NM.KERNEL'), contents: this.base.kernel, copyFlag: true },
+                { title: this.tr('COL_NM.POOL'), contents: this.poolInfo.pool_id, copyFlag: true },
+                { title: this.tr('COL_NM.LT_BOOT'), contents: this.getDate(this.base.booted_at), copyFlag: true },
+                { title: this.tr('COL_NM.CREATE'), contents: this.getDate(this.base.created_at), copyFlag: true },
+                { title: this.tr('COL_NM.UPDATE'), contents: this.getDate(this.base.updated_at), copyFlag: true },
+                { title: this.tr('COL_NM.DELETE'), contents: this.getDate(this.base.deleted_at), copyFlag: true }
+            ];
+        },
+        vmInfo () {
+            return [
+                { title: `${this.tr('VM')} ${this.tr('ID')}`, contents: this.vm.vm_id, copyFlag: true },
+                { title: `${this.tr('VM')} ${this.tr('COL_NM.NAME')}`, contents: this.vm.vm_name, copyFlag: true },
+                { title: this.tr('COL_NM.PLATFORM'), contents: this.vm.platform_type, copyFlag: true },
+                { title: this.tr('COL_NM.HOST'), contents: this.vm.image, copyFlag: true },
+                { title: this.tr('COL_NM.PLATFORM'), contents: this.vm.platform_type, copyFlag: true },
+                { title: this.tr('COL_NM.CREATE'), contents: this.getDate(this.vm.created_at), copyFlag: true }
+            ];
+        },
+        computeInfo () {
+            return [
+                { title: this.tr('COL_NM.INST_ID'), contents: this.compute.instance_id, copyFlag: true },
+                { title: this.tr('COL_NM.KEY_PAIR'), contents: this.compute.keypair, copyFlag: true },
+                { title: this.tr('COL_NM.INST_TYPE'), contents: this.compute.instance_type, copyFlag: true },
+                { title: this.tr('COL_NM.CREATE_BY'), contents: this.compute.created_by_user_id, copyFlag: true },
+                { title: this.tr('COL_NM.SEC_GROUP'), contents: this.computeSecurityGroups, copyFlag: true }
             ];
         },
         tag () {
@@ -117,7 +165,17 @@ export default {
                 { 
                     panelTitle: this.tr('PANEL.BASE_INFO'),
                     panelIcon: { icon: 'fa-hashtag', type: 'l', size: 1, color: 'primary' },
-                    data: this.server
+                    data: this.serverInfo
+                },
+                { 
+                    panelTitle: this.tr('PANEL.VM'),
+                    panelIcon: { icon: 'fa-hashtag', type: 'l', size: 1, color: 'primary' },
+                    data: this.vmInfo
+                },
+                { 
+                    panelTitle: this.tr('PANEL.COMPUTE'),
+                    panelIcon: { icon: 'fa-hashtag', type: 'l', size: 1, color: 'primary' },
+                    data: this.computeInfo
                 },
                 {
                     panelTitle: this.tr('PANEL.TAG'),
@@ -133,8 +191,8 @@ export default {
             if (this.$refs.IVSV002_Tags.validate()) {
                 let res = null;
                 try {
-                    res = await this.$axios.post('/identity/user/update', {
-                        user_id: this.serverData.user_id,
+                    res = await this.$axios.post('/identity/server/update', {
+                        server_id: this.serverData.user_id,
                         tags: this.$refs.IVSV002_Tags.tags
                     });
                     this.hideTagEditModal();
@@ -143,6 +201,9 @@ export default {
                     console.error(e);
                 }
             }
+        },
+        getDate (timestampObj) {
+            return timestampObj ? this.getDatefromTimeStamp(timestampObj.seconds, localStorage.getItem('timezone')) : '';
         },
         showTagEditModal () {
             this.$refs.IVSV002_TagEditModal.showModal();

@@ -49,7 +49,9 @@
             <b-card no-body class="p-4">
               <b-card-body>
                 <b-form>
-                  <h1>{{ $t('MSG.LOG_IN') }}</h1>
+                  <h1>
+                    Admin {{ $t('MSG.LOG_IN') }}
+                  </h1>
                   <transition v-if="seenGreet" name="slide-fade">
                     <p class="message">
                       <b>{{ $t('MSG.LOG_IN_GREET') }}</b>
@@ -65,21 +67,21 @@
                     <b-input-group-prepend>
                       <b-input-group-text><i class="fal fa-user" /></b-input-group-text>
                     </b-input-group-prepend>
-                    <b-form-input v-model="userId" type="text" placeholder="User ID" @keyup.enter="login" />
+                    <b-form-input v-model="adminUserId" type="text" placeholder="User ID" />
                   </b-input-group>
                   <b-input-group class="mb-2">
                     <b-input-group-prepend>
                       <b-input-group-text><i class="fal fa-key" /></b-input-group-text>
                     </b-input-group-prepend>
                     <b-form-input v-model="password" type="password" placeholder="Password"
-                                  autocomplete="current-password" @keyup.enter="login"
+                                  autocomplete="current-password"
                     />
                   </b-input-group>
                   <b-row>
                     <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-10 col-xl-8">
                       <b-form-checkbox
                         id="LOGIN_checkbox"
-                        v-model="rememberStatus"
+                        v-model="adminRememberStatus"
                         name="LOGIN_checkbox"
                         :true-value="true"
                         :false-value="false"
@@ -98,15 +100,10 @@
                       </button>
                     </b-col>
                   </b-row>
-                  <!--<b-row class="row justify-content-end">
-                    <b-col md="4" class="p-3 bg-info"> <b-button  sm variant="danger" size="sm">Admin</b-button></b-col>
-                    <b-col class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-4">
-                    </b-col>
-                  </b-row>-->
                   <b-row class="mb-3">
                     <b-col md="4" class="col-xs-12 col-sm-12">
-                      <b-button type="button" variant="danger" @click="directToAdmin">
-                        {{ tr('MSG.ADMIN_USER') }}
+                      <b-button type="button" variant="primary" @click="directToCommonUser">
+                        {{ tr('MSG.COMMON_USER') }}
                       </b-button>
                     </b-col>
                     <b-col md="4" class="ml-auto col-xs-12 col-sm-12">
@@ -118,11 +115,11 @@
                 </b-form>
               </b-card-body>
             </b-card>
-            <b-card no-body class="text-white bg-primary py-5 d-md-down-none" style="width:44%">
+            <b-card no-body class="text-white bg-danger py-5 d-md-down-none" style="width:44%">
               <b-card-body class="text-center">
                 <div>
-                  <p><h1>{{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}</h1></p>
-                  <p> {{ $t('MSG.LOG_UP_DESC') }}</p>
+                  <p /><h2>{{ tr('MSG.WELCOME_MSG_P',[getCurrentHostname]) }} for Admin.</h2> </p>
+                  <p> {{ $t('MSG.SIGN_IN_DESC') }}</p>
                 </div>
               </b-card-body>
             </b-card>
@@ -135,8 +132,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import url from 'url';
 import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal.vue';
+import url from 'url';
 const signupContents = 'We apologize for inconvenience. \'Sign up\', \'Password retrieval\' feature currently unavailable due to our policies.' +
         ' Please, contact System Administrator for following contacts: ' + '<br>' +
         '● e-mail: admin@mz.co.kr';
@@ -147,11 +144,11 @@ export default {
     data () {
         return {
             instructionContents: signupContents,
-            rememberStatus: false,
+            adminRememberStatus: false,
             seenGreet: true,
             seenError: false,
-            userId: 'admin',
-            password: 'admin'
+            adminUserId: '',
+            password: ''
         };
     },
     computed: {
@@ -167,19 +164,22 @@ export default {
         this.isRemembered();
     },
     methods: {
-        async directToAdmin () {
-            this.$router.push({ name: 'Admin-logIn' });
-            this.$router.push({ path: '/admin-log-in' });
+        async directToCommonUser () {
+            const clientId = this.$store.getters['auth/client_id'];
+            if (this.isEmpty(clientId)){
+                this.$router.push({ path: '/log-in' });
+            } else {
+                this.$router.push({ path: '/google-Log-in' });
+            }
         },
         async login () {
-            console.log(this.tr('MSG.LOG_IN'));
             const authObj = {
-                userId: this.userId,
+                adminUserId: this.adminUserId,
                 password: this.password,
-                domainId: sessionStorage.getItem('domainId')
+                domainId: sessionStorage.getItem('domainId'),
+                user_type: 'DOMAIN_OWNER'
             };
             await this.$store.dispatch('auth/login',authObj).then(() => {
-                console.log(this.nextPath);
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();
@@ -198,20 +198,20 @@ export default {
         },
         isRemembered () {
             localStorage.checkbox = (localStorage.checkbox === 'true');
-            if (localStorage && !this.isEmpty(localStorage.userId)) {
-                this.rememberStatus = true;
-                this.userId = localStorage.userId;
+            if (localStorage && !this.isEmpty(localStorage.adminUserId)) {
+                this.adminRememberStatus = true;
+                this.adminUserId = localStorage.adminUserId;
             } else {
-                this.rememberStatus = false;
-                this.userId = '';
+                this.adminRememberStatus = false;
+                this.adminUserId = '';
             }
         },
         rememberMe () {
-            if (this.rememberStatus && !this.isEmpty(this.userId)) {
-                localStorage.userId = this.userId;
-                localStorage.checkbox = this.rememberStatus;
+            if (this.adminRememberStatus && !this.isEmpty(this.adminUserId)) {
+                localStorage.adminUserId = this.adminUserId;
+                localStorage.checkbox = this.adminRememberStatus;
             } else {
-                localStorage.userId = '';
+                localStorage.adminUserId = '';
                 localStorage.checkbox = false;
             }
         },
@@ -220,7 +220,7 @@ export default {
         },
         async setTimeZone(){
             await this.$axios.post('identity/user/get', {
-                user_id: this.userId,
+                user_id: this.adminUserId,
                 domainId: sessionStorage.getItem('domainId')
             }).then((response) => {
                 const timeZone = this.isEmpty(response.data.timezone) ? 'Etc/GMT' : response.data.timezone;

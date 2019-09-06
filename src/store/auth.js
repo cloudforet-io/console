@@ -1,8 +1,9 @@
-import { api } from '@/setup/api';
+import { getApi } from '@/setup/api';
 
 export default {
     namespaced: true,
     state: {
+        client_id: null,
         isLoggedIn: false,
         loginErrorCode: null,
         nextPath: '/',
@@ -10,6 +11,9 @@ export default {
         token: null
     },
     mutations: {
+        setClientId (state,  ClientId) {
+            state.client_id = ClientId;
+        },
         login (state) {
             state.isLoggedIn = true;
         },
@@ -28,6 +32,7 @@ export default {
 
     },
     getters: {
+        client_id: state => state.client_id,
         isLoggedIn: state => state.isLoggedIn,
         nextPath: state => state.nextPath
     },
@@ -35,31 +40,44 @@ export default {
         setUserId ({ commit }, { username }) {
             commit('setUserId', { userId: username });
         },
-
         setToken ({ commit }, { token }) {
             commit('setToken', { token });
-            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            getApi().defaults.headers.common['Authorization'] = `Bearer ${token}`;
         },
 
-        async login ({ commit }, { userId, password, domainId }) {
+        async login ({ commit }, authObj) {
+            let param = {
+                domain_id: sessionStorage.getItem('domainId')
+            };
+
+            if (authObj.hasOwnProperty('access_token')){
+                param['credentials'] = { access_token: authObj.access_token };
+
+            } else {
+
+                if (authObj.hasOwnProperty('user_type')){
+                    param['credentials'] = {
+                        user_id: authObj.adminUserId,
+                        password: authObj.password,
+                        user_type: authObj.user_type
+                    };
+                } else {
+                    param['credentials'] = {
+                        user_id: authObj.userId,
+                        password: authObj.password,
+                    };
+                }
+            }
+
             try {
 
-                const res = await api.post('/identity/token/issue', {
-                    credentials:{
-                        // access_token: 'ya29.Glt0B1F9aOXkZLqKgjBGuMPKeDpinR7YW1s24YZFDKHzucw5t0KqNIb-COixm7kiSr9yqbw0FzD5xfvkJ8PrnZkrKDn6sJwW5llXAmqDID08aRkRektABovXWBHO'
-                        'user_id': userId,
-                        'password': password
-                    },
-                    'domain_id': domainId
-                    // 'domain_id': 'domain-2fba0c6a4a94'
-                });
-
-                commit('setUserId', { userId: userId });
+                const res = await getApi().post('/identity/token/issue', param);
+                commit('setUserId', { userId: authObj.userId });
                 commit('login', { token: res.data.access_token });
 
                 sessionStorage.setItem('token', res.data.access_token);
-                sessionStorage.setItem('userId', userId);
-                api.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
+                sessionStorage.setItem('userId', authObj.userId);
+                getApi().defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
 
             } catch (err) {
                 /*
@@ -67,7 +85,6 @@ export default {
                  */
                 const errorCode = err.response.status;
                 const errorMsg = err.response.data.message;
-
                 const throwableErrorMsg = JSON.stringify({
                     error_code: errorCode,
                     error_msg: errorMsg
@@ -103,7 +120,6 @@ export default {
             commit('logout');
         },
         setNextPath ({ commit }, { nextPath }) {
-
             commit('setNextPath', { nextPath });
         }
     }

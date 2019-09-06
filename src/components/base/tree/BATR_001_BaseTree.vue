@@ -191,7 +191,6 @@ export default {
             return this.nodeKey;
         },
         getLeftTreeWidth()  {
-            console.log(this.selectedLeftWidth);
             const keyName = this.$parent.$options.name + '_treeWidth';
             return localStorage.hasOwnProperty(keyName) ? parseInt(localStorage[keyName]) : this.selectedLeftWidth;
         }
@@ -219,15 +218,20 @@ export default {
             if (!node.isExpanded ) {
                 this.setClickedNodeItem(node);
                 if (!node.data.is_cached){
-                    console.log('nodeToggled: ', node.data.is_cached);
                     this.$emit('toggled', { node: node, treeV: this.$refs.slVueTree });
                 }
             }
         },
-        setClickedNodeItem(node) {
-            let hasNoClickedItem = node.path.some((path, i) => {
-                return path !== this.clickedNode.path[i];
-            });
+        setClickedNodeItem (node) {
+            let hasNoClickedItem = false;
+            if (this.clickedNode) {
+                hasNoClickedItem = node.path.some((path, i) => {
+                    return path !== this.clickedNode.path[i];
+                });
+            } else {
+                hasNoClickedItem = true;
+            }
+
             if (!hasNoClickedItem) {
                 let addClassInterval = setInterval(() => {
                     if (this.addClickedClass(this.clickedNode)) {

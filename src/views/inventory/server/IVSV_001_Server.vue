@@ -89,35 +89,99 @@
 
     <ActionCheckModal ref="IDSV001_ActionCheckModal" 
                       :data="selectedServers" 
-                      :fields="multiActionFields"
+                      :fields="multiInfoFields"
                       :action="action"
                       :title="actionCheckTitle"
                       :type="actionCheckType"
                       :text="actionCheckText"
-                      primary-key="user_id"
+                      :fail-message="actionFailMsg"
+                      :success-message="actionSuccessMsg"
+                      primary-key="server_id"
                       @succeed="listServers"
                       @failed="listServers"
-    />
+    >
+      <template v-if="actionCheckCase === 'tree'" #contents>
+        <BaseSimpleTree :list-url="treeUrl"
+                        @selected="onSelectItem"
+        />
+      </template>
+      <template v-else-if="actionCheckCase === 'collect'" #contents>
+        <b-row class="collect-contents">
+          <b-col cols="6">
+            <BaseTable class="collector-table"
+                       :table-data="selectedServers"
+                       :fields="multiInfoFields"
+                       :height="400"
+                       headerless
+                       underlined
+            />
+          </b-col>
+          <b-col cols="6">
+            <BaseTable class="server-table"
+                       :table-data="selectedServers"
+                       :fields="multiInfoFields"
+                       :height="400"
+                       headerless
+                       underlined
+            />
+          </b-col>
+        </b-row>
+      </template>
 
-    <BaseTabNav v-if="hasSelectedServer" class="server-info"
+      <template v-if="actionCheckCase !== 'basic'" #footer="{ ok, cancel }">
+        <div class="footer">
+          <b-button class="float-right ml-1 mb-1" 
+                    size="sm" 
+                    type="button" 
+                    variant="primary"
+                    @click="ok"
+          >
+            {{ customActionBtn }}
+          </b-button>
+          <b-button class="float-right mb-1" 
+                    size="sm" 
+                    type="button" 
+                    variant="outline-secondary"
+                    @click="cancel"
+          >
+            {{ tr('BTN_CANCEL') }}
+          </b-button>
+          <span v-if="actionCheckCase === 'tree'" class="float-left">
+            <BaseCheckbox v-model="isRelease" class="unset-checkbox" /> 
+            <span class="unset-text">{{ customReleaseBtn }}</span>
+          </span>
+        </div>
+      </template>
+    </ActionCheckModal>
+
+    <BaseTabNav v-if="hasSelectedServer" 
+                class="server-info"
                 :fill="false"
                 :nav-tabs="tabs"
-                :keep-alive="true"
                 :is-footer-visible="false"
-                :use-slot="true"
+                use-slot
     >
-      <template #SUMMARY>
+      <template #summary>
         <b-card class="base first-tab">
-          <ServerSummary :server-data="selectedItems[0].data" />
+          <BaseMultiPanel v-if="isMultiSelected" 
+                          :data="selectedServers"
+                          :data-fields="multiInfoFields" 
+          />
+          <ServerSummary v-else 
+                         :server-data="selectedItems[0].data"
+                         @update="updateSelectedServerInfo"
+          />
         </b-card>
       </template>
-      <template #DATA>
+
+      <template #data>
         <ServerData />
       </template>
-      <template #RAWDATA>
+      
+      <template #rawData>
         <ServerRawData />
       </template>
-      <template #ADMIN>
+      <template #admin>
         <ServerAdmin />
       </template>
     </BaseTabNav>
@@ -133,9 +197,13 @@ import contextData from './search_context/query.js';
 import BaseDragHorizontal from '@/components/base/drag/BADG_002_BaseDragHorizontal.vue';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 
+const BaseSimpleTree = () => import('@/components/base/tree/BATR_002_BaseSimpleTree');
+const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox.vue');
+
 const ActionCheckModal = () => import('@/components/base/modal/BAMO_003_EXT_ActionCheckModal.vue');
 const BaseTabNav = () => import('@/components/base/tab/BATA_002_BaseTabNav');
 
+const BaseMultiPanel = () => import('@/components/base/panel/BAPA_005_BaseMultiPanel');
 const ServerSummary = () => import('@/views/inventory/server/IVSV_002_ServerSummary');
 const ServerData = () => import('@/views/inventory/server/IVSV_003_ServerData');
 const ServerRawData = () => import('@/views/inventory/server/IVSV_004_ServerRawData');
@@ -146,32 +214,34 @@ export default {
     components: {
         BaseDragHorizontal,
         BaseTable,
+        BaseSimpleTree,
+        BaseCheckbox,
         ActionCheckModal,
         BaseTabNav,
+        BaseMultiPanel,
         ServerSummary,
         ServerData,
         ServerRawData,
         ServerAdmin
-
     },
     data() {
         return {
             tabs: [
                 {
-                    tabTitle: this.tr('COL_NM.C_SUMMARY'),
-                    tabIdxTitle: 'SUMMARY'
+                    title: this.tr('COL_NM.C_SUMMARY'),
+                    key: 'summary'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.C_DT'),
-                    tabIdxTitle: 'DATA'
+                    title: this.tr('COL_NM.C_DT'),
+                    key: 'data'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.C_RAW_DT'),
-                    tabIdxTitle: 'RAWDATA'
+                    title: this.tr('COL_NM.C_RAW_DT'),
+                    key: 'rawData'
                 },
                 {
-                    tabTitle: this.tr('COL_NM.C_ADMIN'),
-                    tabIdxTitle: 'ADMIN'
+                    title: this.tr('COL_NM.C_ADMIN'),
+                    key: 'admin'
                 }
             ],
             servers: [],
@@ -191,44 +261,117 @@ export default {
                 filter: [],
                 filter_or: []
             },
+            defaultFilterItem: { key: 'state', value: 'DELETED', operator: 'not' }, 
             action: null,
             actionCheckTitle: '',
             actionCheckType: '',
-            actionCheckText: ''
+            actionCheckText: '',
+            actionSuccessMsg: '',
+            actionFailMsg: '',
+            actionCheckCase: 'basic', // basic, tree, or collect
+            customActionBtn: '',
+            customReleaseBtn: '',
+            selected: null,
+            isRelease: false,
+            treeUrl: ''
         };
     },
     computed: {
         fields () {
             return [
-                { key: 'selected' },
-                { key: 'user_id', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: false },
-                { key: 'name', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true },
-                { key: 'state', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true },
-                { key: 'password', label: this.tr('COL_NM.CORE'), sortable: true, ajaxSortable: false },
-                { key: 'user_first_name', label: this.tr('COL_NM.MEMORY'), sortable: true, ajaxSortable: false },
-                { key: 'user_last_name', label: this.tr('COL_NM.O_TYPE'), sortable: true, ajaxSortable: false },
-                { key: 'mobile', label: this.tr('COL_NM.O_DIS'), sortable: true, ajaxSortable: false },
-                { key: 'role_id', label: this.tr('COL_NM.SE_TYPE'), sortable: true, ajaxSortable: false },
-                { key: 'project_id', label: this.tr('COL_NM.PLATFORM'), sortable: true, ajaxSortable: true },
-                { key: 'pp', label: this.tr('COL_NM.PROJ'), sortable: true, ajaxSortable: false },
-                { key: 'pool', label: this.tr('COL_NM.POOL'), sortable: true, ajaxSortable: false },
-                { key: 'project_group_id', label: this.tr('COL_NM.UPDATE'), sortable: true, ajaxSortable: false },
-                { key: 'query', label: this.tr('COL_NM.DISK_SZ'), sortable: true, ajaxSortable: false }
+                { key: 'selected', thStyle: { width: '50px' }},
+                { key: 'server_id', label: `${this.tr('SERVER')} ${this.tr('ID')}`, sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
+                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '180px' }},
+                { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
+                { key: 'primary_ip_address', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true, thStyle: { width: '190px' }},
+                { 
+                    key: 'core', 
+                    label: this.tr('COL_NM.CORE'), 
+                    sortable: true, 
+                    ajaxSortable: false,
+                    filterByFormatted: true,
+                    formatter: (val, key, data) => {
+                        return data.data.base.core;
+                    },
+                    thStyle: { width: '100px' }
+                },
+                { 
+                    key: 'memory', 
+                    label: this.tr('COL_NM.MEMORY'), 
+                    sortable: true, 
+                    ajaxSortable: false,
+                    filterByFormatted: true,
+                    formatter: (val, key, data) => {
+                        return data.data.base.memory;
+                    },
+                    thStyle: { width: '100px' }
+                },
+                { key: 'os_type', label: this.tr('COL_NM.O_TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '100px' }},
+                { 
+                    key: 'os_distro', 
+                    label: this.tr('COL_NM.O_DIS'),
+                    sortable: true, 
+                    ajaxSortable: false,
+                    filterByFormatted: true,
+                    formatter: (val, key, data) => {
+                        if (this.isEmpty(data.data.os)) {
+                            return '';
+                        } else {
+                            return data.data.os.os_distro;
+                        }
+                    } ,
+                    thStyle: { width: '130px' }
+                },
+                { key: 'server_type', label: this.tr('COL_NM.SE_TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '120px' }},
+                { 
+                    key: 'platform_type', 
+                    label: this.tr('COL_NM.PLATFORM'),
+                    sortable: true, 
+                    ajaxSortable: false,
+                    filterByFormatted: true,
+                    formatter: (val, key, data) => {
+                        if (this.isEmpty(data.data.vm)) {
+                            return '';
+                        } else {
+                            return data.data.vm.platform_type;
+                        }
+                    } ,
+                    thStyle: { width: '100px' }
+                },
+                { key: 'project_id', label: this.tr('COL_NM.PROJ'), sortable: true, ajaxSortable: true, thStyle: { width: '180px' }},
+                { 
+                    key: 'pool_id', 
+                    label: this.tr('COL_NM.POOL'),
+                    sortable: true, 
+                    ajaxSortable: false,
+                    filterByFormatted: true,
+                    formatter: (val, key, data) => {
+                        if (this.isEmpty(data.pool_info)) {
+                            return '';
+                        } else {
+                            return data.pool_info.pool_id;
+                        }
+                    } ,
+                    thStyle: { width: '180px' }
+                },
+                {
+                    key: 'updated_at', 
+                    label: this.tr('COL_NM.UPDATE'), 
+                    sortable: true, 
+                    ajaxSortable: true,
+                    filterByFormatted: true,
+                    formatter: (val) => {
+                        return this.getDatefromTimeStamp(val.seconds, localStorage.getItem('timezone'));
+                    } ,
+                    thStyle: { width: '160px' }
+                }
             ];
         },
         multiInfoFields () {
             return [
-                { key: 'user_id',label: this.tr('COL_NM.ID') },
+                { key: 'server_id',label: this.tr('COL_NM.ID') },
                 { key: 'name', label: this.tr('COL_NM.NAME') },
-                { key: 'email', label: this.tr('COL_NM.EMAIL') },
-                { key: 'group', label: this.tr('COL_NM.GROUP') }
-            ];
-        },
-        multiActionFields () {
-            return [
-                { key: 'user_id',label: this.tr('COL_NM.ID') },
-                { key: 'name', label: this.tr('COL_NM.NAME') },
-                { key: 'email', label: this.tr('COL_NM.EMAIL') }
+                { key: 'primary_ip_address', label: this.tr('COL_NM.IP') }
             ];
         },
         isMultiSelected () {
@@ -257,6 +400,7 @@ export default {
             this.query.page.start = start || 0;
             this.query.sort = sort || {};
             this.query.filter = filter || [];
+            this.query.filter.push(this.defaultFilterItem);
             this.query.filter_or = filterOr || [];
         },
         async listServers (limit, start, sort, filter, filterOr) {
@@ -268,7 +412,6 @@ export default {
                     query: this.query,
                     domain_id: sessionStorage.getItem('domainId')
                 });
-                console.log('server data', res.data.results);
                 this.servers = res.data.results;
                 this.totalCount = res.data.total_count;
                 this.isLoading = false;
@@ -278,49 +421,154 @@ export default {
                 this.isLoading = false;
             }
         },
+        async listCollectors () {
+        },
         rowSelected (rows) {
             this.selectedItems = rows;
         },
         onAllRowSelected (isSelectedAll, rows) {
             this.selectedItems = rows;
         },
-        limitChanged(val) {
+        limitChanged (val) {
             this.query.page.limit = Number(val);
             this.listServers();
         },
-        getParams (items) {
-            let params = { servers: []};
+        updateSelectedServerInfo (server) {
+            this.selectedItems[0].data = server;
+        },
+        getParams (items, state) {
+            let params = { servers: [], domain_id: sessionStorage.getItem('domainId') };
+            if (state) {
+                params.state = state;
+            }
             items.map((item) => {
-                params.servers.push(item.user_id);
+                params.servers.push(item.server_id);
             });
             return params;
         },
         async deleteServer (commitItems) {
-            await this.$axios.post('/identity/user/delete', this.getParams(commitItems));
+            await this.$axios.post('/inventory/server/delete', this.getParams(commitItems));
+        },
+        async setMaintenance (commitItems) {
+            await this.$axios.post('/inventory/server/change-state', this.getParams(commitItems, 'MAINTENANCE'));
+        },
+        async setInService (commitItems) {
+            await this.$axios.post('/inventory/server/change-state', this.getParams(commitItems, 'INSERVICE'));
+        },
+        async setClosed (commitItems) {
+            await this.$axios.post('/inventory/server/change-state', this.getParams(commitItems, 'CLOSED'));
+        },
+        async changeProject () {
+            if (!this.selected && !this.isRelease) {
+                this.$alertify.error(this.tr('ALERT.NO_PARAM'));
+                return { stop : true };
+            }
+            let params = this.getParams(this.selectedServers);
+            params.release_project = this.isRelease;
+            params.project_id = this.selected;
+            await this.$axios.post('/inventory/server/change-project', params);
+        },
+        async changePool () {
+            if (!this.selected && !this.isRelease) {
+                this.$alertify.error(this.tr('ALERT.NO_PARAM'));
+                return { stop : true };
+            }
+            let params = this.getParams(this.selectedServers);
+            params.release_pool = this.isRelease;
+            params.pool_id = this.selected;
+            await this.$axios.post('/inventory/server/change-pool', params);
+        },
+        async collectInfo () {
+
         },
         onClickDelete () {
+            this.actionCheckCase = 'basic';
             this.action = this.deleteServer;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DELETE'), this.tr('SERVER')]);
             this.actionCheckType = 'danger';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DELETE'), this.tr('SERVER')]);
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('SERVER'), this.tr('DELETE_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('DELETE_CONT'), this.tr('POOL')]);
+            
+            this.showActionModal();
         },
         onClickSetMaintenance () {
-
+            this.actionCheckCase = 'basic';
+            this.action = this.setMaintenance;
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_MANT'), this.tr('SERVER')]);
+            this.actionCheckType = 'warning';
+            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_MANT'), this.tr('SERVER')]);
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
+            this.showActionModal();
         },
         onClickSetInService () {
-
+            this.actionCheckCase = 'basic';
+            this.action = this.setInService;
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_SERV'), this.tr('SERVER')]);
+            this.actionCheckType = 'warning';
+            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_SERV'), this.tr('SERVER')]);
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
+            this.showActionModal();
         },
         onClickSetClosed () {
-
+            this.actionCheckCase = 'basic';
+            this.action = this.setClosed;
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_CLOSE'), this.tr('SERVER')]);
+            this.actionCheckType = 'warning';
+            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_CLOSE'), this.tr('SERVER')]);
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
+            this.showActionModal();
         },
         onClickChangeProject () {
-
+            this.resetTreeOptions();
+            this.customActionBtn = this.tr('TITLE', [this.tr('CHG'), this.tr('PROJECT')]);
+            this.customReleaseBtn = this.tr('TITLE', [this.tr('RELEASE'), this.tr('PROJECT')]);
+            this.actionCheckCase = 'tree';
+            this.action = this.changeProject;
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG'), this.tr('PROJECT')]);
+            this.actionCheckType = 'light';
+            this.treeUrl = '/identity/project/tree';
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('PROJECT'), this.tr('CHG_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('CHG_CONT'), this.tr('PROJECT')]);
+            this.showActionModal();
         },
         onClickChangePool () {
-
+            this.resetTreeOptions();
+            this.customActionBtn = this.tr('TITLE', [this.tr('CHG'), this.tr('POOL')]);
+            this.customReleaseBtn = this.tr('TITLE', [this.tr('RELEASE'), this.tr('POOL')]);
+            this.actionCheckCase = 'tree';
+            this.action = this.changePool;
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG'), this.tr('POOL')]);
+            this.actionCheckType = 'light';
+            this.treeUrl = '/inventory/data-center/tree';
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('POOL'), this.tr('CHG_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('CHG_CONT'), this.tr('POOL')]);
+            this.showActionModal();
+        },
+        onSelectItem (nodeObj) {
+            this.selected = nodeObj.node.data.id;
+        },
+        resetTreeOptions () {
+            this.selected = null;
+            this.isRelease = false;
+        },
+        onClickConfirmChange () {
+            this.action();
         },
         onClickCollectInfo () {
-
+            this.listCollectors();
+            this.customActionBtn = this.tr('COLLECT');
+            this.actionCheckCase = 'collect';
+            this.action = this.collectInfo;
+            this.actionCheckTitle = this.tr('TITLE', [this.tr('COLLECT'), `${this.tr('SERVER')} ${this.tr('INFO')}`]);
+            this.actionCheckType = 'light';
+            this.treeUrl = '/inventory/data-center/tree';
+            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('INFO')}`, this.tr('COLLECT_PAST')]);
+            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('COLLECT_CONT'), `${this.tr('SERVER')} ${this.tr('INFO')}`]);
+            this.showActionModal();
         },
         showActionModal () {
             this.$refs.IDSV001_ActionCheckModal.showModal();
@@ -356,5 +604,25 @@ export default {
 }
 .icon {
     font-size: 1rem !important;
+}
+
+.footer {
+    width: 100%;
+    .unset-checkbox {
+        vertical-align: middle;
+    }
+    .unset-text {
+        vertical-align: middle;
+    }
+}
+
+.collect-contents {
+    .collector-table {
+        box-shadow: none;
+    }
+    .server-table {
+        margin: 0;
+        box-shadow: none;
+    }
 }
 </style>

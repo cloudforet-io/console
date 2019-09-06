@@ -8,7 +8,7 @@
       >
         <div v-if="!tab.icon" slot="title" name="tabHeader">
           <i class="tab-icon" :class="tab.tabIcon" />
-          {{ tab.tabTitle }}
+          {{ tab.title }}
         </div>
         <br>
         <slot name="tabsContentPanel">

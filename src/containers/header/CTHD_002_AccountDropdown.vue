@@ -39,8 +39,14 @@ export default {
     },
     methods: {
         async logout () {
-            await this.$store.dispatch('auth/logout');
-            this.$router.push({ path: '/log-in' });
+            const clientId = this.$store.getters['auth/client_id'];
+            if (this.isEmpty(clientId)){
+                await this.$store.dispatch('auth/logout');
+                this.$router.push({ path: '/log-in' });
+            } else {
+                await this.$store.dispatch('auth/logout', clientId);
+                this.$router.push({ path: '/google-Log-in' });
+            }
         },
         onClickProfile () {
             this.$refs.profileModal.showModal();

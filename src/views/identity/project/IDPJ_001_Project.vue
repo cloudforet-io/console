@@ -66,14 +66,14 @@ const tabs = [
         name: 'summary',
         isSelected: true,
         tabIcon: 'icon-calculator',
-        tabTitle: 'SUMMARY',
+        title: 'SUMMARY',
         component: projectSummary
     },
     {
         name: 'member',
         isSelected: false,
         tabIcon: 'icon-user',
-        tabTitle: 'MEMBER',
+        title: 'MEMBER',
         component: projectMember
     }
 ];
@@ -81,12 +81,12 @@ const tabs = [
 const modalTabs = [
     {
         tabIcon: 'icon-calculator',
-        tabTitle: 'DEFAULT',
+        title: 'DEFAULT',
         component: projectEditPopupName
     },
     {
         tabIcon: 'icon-user',
-        tabTitle: 'TAGS',
+        title: 'TAGS',
         component: projectEditPopupTag
     }
 ];
@@ -199,7 +199,7 @@ export default {
                 isTagValidated = true;
             }
 
-            if (this.$refs.IDPJ001_EditTab.selectedTab.tabTitle == 'DEFAULT'){
+            if (this.$refs.IDPJ001_EditTab.selectedTab.title == 'DEFAULT'){
                 if (isDefaultValidated && !isTagValidated){
                     this.$refs.IDPJ001_EditTab.selectedTab = this.modalTabs[1];
                 }

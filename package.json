@@ -46,7 +46,6 @@
     "vue-perfect-scrollbar": "^0.1.0",
     "vue-router": "^3.0.2",
     "vue-search-select": "^2.8.3",
-    "vue-google-oauth2": "^1.4.0",
     "vuex": "^3.1.1"
   },
   "devDependencies": {
@@ -60,7 +59,6 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
-    "dotenv": "^8.0.0",
     "eslint": "^5.16.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-html": "^5.0.5",
