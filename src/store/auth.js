@@ -40,7 +40,6 @@ export default {
         setUserId ({ commit }, { username }) {
             commit('setUserId', { userId: username });
         },
-
         setToken ({ commit }, { token }) {
             commit('setToken', { token });
             getApi().defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -50,19 +49,29 @@ export default {
             let param = {
                 domain_id: sessionStorage.getItem('domainId')
             };
+
             if (authObj.hasOwnProperty('access_token')){
                 param['credentials'] = { access_token: authObj.access_token };
+
             } else {
-                param['credentials'] = {
-                    user_id: authObj.userId,
-                    password: authObj.password
-                    //,user_type: 'DOMAIN_OWNER'
-                };
+
+                if (authObj.hasOwnProperty('user_type')){
+                    param['credentials'] = {
+                        user_id: authObj.adminUserId,
+                        password: authObj.password,
+                        user_type: authObj.user_type
+                    };
+                } else {
+                    param['credentials'] = {
+                        user_id: authObj.userId,
+                        password: authObj.password,
+                    };
+                }
             }
+
             try {
 
                 const res = await getApi().post('/identity/token/issue', param);
-                console.log('authObj', authObj);
                 commit('setUserId', { userId: authObj.userId });
                 commit('login', { token: res.data.access_token });
 
@@ -76,7 +85,6 @@ export default {
                  */
                 const errorCode = err.response.status;
                 const errorMsg = err.response.data.message;
-
                 const throwableErrorMsg = JSON.stringify({
                     error_code: errorCode,
                     error_msg: errorMsg

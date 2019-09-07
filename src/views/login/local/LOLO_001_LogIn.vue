@@ -49,9 +49,7 @@
             <b-card no-body class="p-4">
               <b-card-body>
                 <b-form>
-                  <h1>
-                    {{ $t('MSG.LOG_IN') }}
-                  </h1>
+                  <h1>{{ $t('MSG.LOG_IN') }}</h1>
                   <transition v-if="seenGreet" name="slide-fade">
                     <p class="message">
                       <b>{{ $t('MSG.LOG_IN_GREET') }}</b>
@@ -67,14 +65,14 @@
                     <b-input-group-prepend>
                       <b-input-group-text><i class="fal fa-user" /></b-input-group-text>
                     </b-input-group-prepend>
-                    <b-form-input v-model="userId" type="text" placeholder="User ID" />
+                    <b-form-input v-model="userId" type="text" placeholder="User ID" @keyup.enter="login" />
                   </b-input-group>
                   <b-input-group class="mb-2">
                     <b-input-group-prepend>
                       <b-input-group-text><i class="fal fa-key" /></b-input-group-text>
                     </b-input-group-prepend>
                     <b-form-input v-model="password" type="password" placeholder="Password"
-                                  autocomplete="current-password"
+                                  autocomplete="current-password" @keyup.enter="login"
                     />
                   </b-input-group>
                   <b-row>
@@ -100,8 +98,18 @@
                       </button>
                     </b-col>
                   </b-row>
-                  <b-row class="row justify-content-end">
+                  <!--<b-row class="row justify-content-end">
+                    <b-col md="4" class="p-3 bg-info"> <b-button  sm variant="danger" size="sm">Admin</b-button></b-col>
                     <b-col class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-4">
+                    </b-col>
+                  </b-row>-->
+                  <b-row class="mb-3">
+                    <b-col md="4" class="col-xs-12 col-sm-12">
+                      <b-button type="button" variant="danger" @click="directToAdmin">
+                        {{ tr('MSG.ADMIN_USER') }}
+                      </b-button>
+                    </b-col>
+                    <b-col md="4" class="ml-auto col-xs-12 col-sm-12">
                       <b-button type="button" block class="login-btn" @click="login">
                         {{ $t('MSG.LOG_IN') }}
                       </b-button>
@@ -113,22 +121,21 @@
             <b-card no-body class="text-white bg-primary py-5 d-md-down-none" style="width:44%">
               <b-card-body class="text-center">
                 <div>
-                  <br>
-                  <br>
-                  <p> {{ $t('MSG.SIGN_UP_MSG') }}</p>
+                  <p><h1>{{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}</h1></p>
+                  <p> {{ $t('MSG.LOG_UP_DESC') }}</p>
                 </div>
               </b-card-body>
             </b-card>
           </b-card-group>
         </b-col>
       </b-row>
-      </basesimplemodal>
     </div>
   </b-row>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import url from 'url';
 import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal.vue';
 const signupContents = 'We apologize for inconvenience. \'Sign up\', \'Password retrieval\' feature currently unavailable due to our policies.' +
         ' Please, contact System Administrator for following contacts: ' + '<br>' +
@@ -144,18 +151,26 @@ export default {
             seenGreet: true,
             seenError: false,
             userId: 'admin',
-            password: 'admin',
+            password: 'admin'
         };
     },
     computed: {
         ...mapGetters('auth', [
             'nextPath'
-        ])
+        ]),
+        getCurrentHostname (){
+            let hostName = url.parse(window.location.href).host;
+            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
+        }
     },
     mounted () {
         this.isRemembered();
     },
     methods: {
+        async directToAdmin () {
+            this.$router.push({ name: 'Admin-logIn' });
+            this.$router.push({ path: '/admin-log-in' });
+        },
         async login () {
             console.log(this.tr('MSG.LOG_IN'));
             const authObj = {
@@ -164,6 +179,7 @@ export default {
                 domainId: sessionStorage.getItem('domainId')
             };
             await this.$store.dispatch('auth/login',authObj).then(() => {
+                console.log(this.nextPath);
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();

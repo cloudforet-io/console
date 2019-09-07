@@ -106,7 +106,7 @@
                 :is-footer-visible="false"
                 :use-slot="true"
     >
-      <template #INFO>
+      <template #info>
         <b-card class="base first-tab">
           <BaseMultiPanel v-if="isMultiSelected" 
                           :data="selectedUsers"
@@ -156,7 +156,7 @@ export default {
             tabs: [
                 {
                     title: this.tr('PANEL.INFO'),
-                    key: this.tr('PANEL.INFO')
+                    key: 'info'
                 }
             ],
             users: [],

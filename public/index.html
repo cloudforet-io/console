@@ -6,12 +6,39 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel='shortcut icon' type='image/x-icon' href="<%= BASE_URL %>favicon.ico">
     <title>CloudOne</title>
+    <style>
+        .spinner-container {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .spinner-container .spinner {
+            position: absolute;
+            display: inline-block;
+            top: 50%;
+            left: 50%;
+            width: 60px;
+            height: 60px;
+            transform: translate(-50%, -50%);
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
   </head>
 
   <body>
     <noscript>
       <strong>We're sorry but this app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app"></div>
+    <div id="app">
+        <div class="spinner-container">
+            <img class="spinner" src="<%= BASE_URL %>spinner.svg" />
+        </div>
+    </div>
+    <script src="https://apis.google.com/js/platform.js?onload=init" async defer></script>
   </body>
 </html>

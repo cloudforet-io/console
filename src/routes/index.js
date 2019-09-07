@@ -14,6 +14,7 @@ const DefaultContainer = () => import('@/containers/DefaultContainer');
 // Views
 const LogIn = () => import('@/views/login/local/LOLO_001_LogIn');
 const GoolgeLogIn = () => import('@/views/login/oauth/LOOA_001_LogInGoogleOauth');
+const AdminLogIn = () => import('@/views/login/only_admin/LOOA_001_AdminOnlyLogIn');
 const Redirect404 = () => import('@/views/common/VICO_003_Redirect404');
 
 
@@ -21,6 +22,7 @@ Vue.use(Router);
 
 const index = new Router({
     mode: 'history',
+    hash: false,
     linkActiveClass: 'open active',
     scrollBehavior: () => ({ y: 0 }),
     routes: [
@@ -43,6 +45,12 @@ const index = new Router({
             component: GoolgeLogIn
         },
         {
+            path: '/admin-log-in',
+            name: 'Admin-logIn',
+            meta: { label: 'admin_login', requiresAuth: false, requiresDomainCheck: true },
+            component: AdminLogIn
+        },
+        {
             path: '/',
             name: 'root',
             meta: { label: 'root', requiresDomainCheck: true },
@@ -53,7 +61,8 @@ const index = new Router({
                 identityRoute,
                 inventoryRoute
             ]
-        }
+        },
+        { path: '*', component: Redirect404 }
     ]
 });
 

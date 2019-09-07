@@ -8,13 +8,18 @@
               <b-card-body>
                 <b-form>
                   <h1>
-                    {{ tr('LOG_IN') }}
+                    {{ tr('MSG.SIGN_IN') }}
                   </h1>
                   <p class="message">
-                    <b>{{ tr('SIGN_IN') }}</b>
+                    <b>{{ tr('MSG.SIGN_IN_MSG') }}</b>
                   </p>
-                  <b-input-group class="mb-3">
-                    <div id="g-signin-btn" @click="login" />
+                  <b-input-group class="mb-4">
+                    <div id="g-signin-btn" style="width: 70%;" @click="login" />
+                  </b-input-group>
+                  <b-input-group class="mb-4">
+                    <b-button block style="height:50px" variant="danger" @click="directToAdmin">
+                      {{ tr('MSG.ADMIN_USER') }}
+                    </b-button>
                   </b-input-group>
                 </b-form>
               </b-card-body>
@@ -22,23 +27,26 @@
             <b-card no-body class="text-white bg-primary py-5 d-md-down-none" style="width:44%">
               <b-card-body class="text-center">
                 <div>
-                  <br>
-                  <br>
-                  <p> {{ $t('MSG.SIGN_UP_MSG') }}</p>
+                  <h1>
+                    <p>
+                      {{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}
+                    </p>
+                  </h1>
+                  <p> {{ $t('MSG.SIGN_IN_DESC') }}</p>
                 </div>
               </b-card-body>
             </b-card>
           </b-card-group>
         </b-col>
       </b-row>
-      </basesimplemodal>
     </div>
   </b-row>
 </template>
 <script>
 import store from '@/store';
+import url from 'url';
 import { mapGetters } from 'vuex';
-
+const gapi = window.gapi;
 export default {
     components: {},
     data() {
@@ -53,21 +61,19 @@ export default {
     computed: {
         ...mapGetters('auth', [
             'nextPath'
-        ])
-    },
-    async beforeMount() {
-        await this.setInit();
+        ]),
+        getCurrentHostname (){
+            let hostName = url.parse(window.location.href).host;
+            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
+        }
     },
     async mounted() {
         await this.setGoogleSignInButton();
     },
     methods: {
-        async setInit() {
-            let gapiScript = document.createElement('script');
-            gapiScript.async = true;
-            gapiScript.defer = true;
-            await gapiScript.setAttribute('src', 'https://apis.google.com/js/platform.js');
-            await document.head.appendChild(gapiScript);
+        async directToAdmin () {
+            this.$router.push({ name: 'Admin-logIn' });
+            this.$router.push({ path: '/admin-log-in' });
         },
         async setGoogleSignInButton() {
             let vm = this;
@@ -78,10 +84,10 @@ export default {
                     fetch_basic_profile: false,
                     scope: 'profile'
                 });
-                vm.isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+                vm.isSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
-                    width: 200,
+                    width: 300,
                     height: 50,
                     longtitle: false,
                     theme: 'dark',
@@ -89,17 +95,6 @@ export default {
                     onfailure: null
                 });
             });
-        },
-        async discoonect() {
-            console.log('on disconnect');
-            let auth2 = gapi.auth2.getAuthInstance();
-            if (!auth2.isSignedIn.get()) {
-                setMessage('Not signed in, cannot disconnect');
-                return;
-            }
-            auth2.disconnect();
-            setProfileImage(null);
-            setMessage('Disconnected');
         },
         onSignIn(googleUser) {
             console.log(this.isSignedIn);
@@ -109,15 +104,22 @@ export default {
                 access_token: googleUser.getAuthResponse().access_token
             };
             this.oathSignParam = param;
-            if (!this.isSignedIn) {
-                this.login();
+            this.login();
+            /*if (!this.isSignedIn) {
+              this.login();
                 this.isSignedIn = true;
-            }
+            }*/
+
 
         },
         async login() {
             await this.$store.dispatch('auth/login', this.oathSignParam
             ).then(() => {
+                let auth2 = gapi.auth2.getAuthInstance();
+                if (!auth2.isSignedIn.get()) {
+                    return;
+                }
+                auth2.disconnect();
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();

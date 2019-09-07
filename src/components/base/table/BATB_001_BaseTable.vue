@@ -388,6 +388,9 @@ export default {
     },
     methods: {
         setWidth () {
+            if (this.headerless) {
+                return;
+            }
             this.width = this.$refs.headerContainer.clientWidth;
             if (this.width < 768) {
                 this.$refs.headerContainer.removeChild(this.$refs.searchboxContainer);
