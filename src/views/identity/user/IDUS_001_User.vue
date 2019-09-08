@@ -263,7 +263,7 @@ export default {
                 this.isLoading = false;
             } catch (e) {
                 console.error(e);
-                this.$alertify(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('USER')]));
+                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('USER')]));
                 this.isLoading = false;
             }
         },
