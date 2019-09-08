@@ -270,7 +270,7 @@ export default {
             }
         },
         focusOnInput () {
-            this.$refs.input.isFocused = true;
+            this.$refs.input.forceFocus();
         },
         moveFocusToLeft (idx) {
             if (--idx > 0) {
