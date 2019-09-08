@@ -1,6 +1,6 @@
-import visible from './module/visible';
+import focus from './module/focus';
 
 export default function (Vue) {
   // Register global custom directive
-    Vue.directive('visible', visible);
+    Vue.directive('focus', focus);
 }
