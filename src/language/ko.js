@@ -33,6 +33,7 @@ export const ko ={
         BTN_ENABLE: '활성화',
         BTN_DISABLE: '비활성화',
         BTN_CONFIRM: '확인',
+        BTN_OK: '확인',
         BTN_YES: '예',
         BTN_NO: '아니오',
         BTN_S_MANT: '작업중 상태로 변경',
@@ -90,7 +91,10 @@ export const ko ={
     },
     TREE_TYPE: {
         PROJECT: '프로젝트',
-        PROJECT_GROUP: '프로젝트 그룹'
+        PROJECT_GROUP: '프로젝트 그룹',
+        CREATE: '{0} 생성하기',
+        UPDATE: '{0} 업데이트',
+        DELETE: '{0} 삭제'
     },
     COL_NM: {
         C_COMMAND_ID: '커맨드 아이디',

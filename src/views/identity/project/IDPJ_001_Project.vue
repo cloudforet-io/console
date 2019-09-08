@@ -28,7 +28,9 @@
 
     <BaseTree ref="IDPJ001_ProjectTree"
               :tree-prop="treeData"
+              :tree-type="'PROJECT'"
               :context-init="isInitializing"
+              :con-text-obj="contextProp"
               @selected="NodeSelected"
               @edited="editSelected"
               @delete="deletedSelectedOnTree"
@@ -100,6 +102,21 @@ export default {
     },
     data() {
         return {
+            contextProp: {
+                Executor: ['RG','NG','ND','SN','RM'],
+                ContextVisible  :[false, true, true, true, true],
+                icons: ['fal fa-folder-minus'
+                    , 'fal fa-folder-minus'
+                    ,'fas fa-cube'
+                    ,'fal fa-pencil'
+                    ,'fal fa-trash'],
+                Msg: [['TREE_TYPE.CREATE', 'TREE_TYPE.PROJECT_GROUP'],
+                    ['TREE_TYPE.CREATE', 'TREE_TYPE.PROJECT_GROUP'],
+                    ['TREE_TYPE.CREATE', 'TREE_TYPE.PROJECT'],
+                    ['TREE_TYPE.UPDATE', 'TREE_TYPE.PROJECT'],
+                    ['TREE_TYPE.DELETE', 'TREE_TYPE.PROJECT']
+                ]
+            },
             tab: tabs[0].component,
             tabs: tabs,
             modalTab: modalTabs[0].component,
@@ -130,7 +147,7 @@ export default {
                     'key': 'name'
                 }
             }).then((response) => {
-                const responseData = this.treeDataHandler(response.data, { is_root: true });
+                const responseData = this.treeDataHandler(response.data, 'PROJECT');
                 this.treeData = responseData;
                 //Note: Initialize Project trees and then display only a context, This must be included as well.
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0],'data.init'))) {
@@ -226,12 +243,11 @@ export default {
             };
 
             await this.$axios.post(url, param).then((response) => {
-                childrenNode = this.getSelectedNodeArr(response.data.items);
+                childrenNode = this.getSelectedNodeArr(response.data.items, 'PROJECT');
                 nodeObj.treeV.updateNode(path, { data: dataParam });
                 if (!this.isEmpty(childrenNode)){
                     childrenNode.forEach(curItem =>{
                         nodeObj.treeV.insert({ node: selected, placement: 'inside' }, curItem);
-                        //nodeObj.treeV.insert({ node: nodeObj.node, placement: 'inside' }, curItem);
                     });
                 }
             }).catch((error) => {
@@ -263,7 +279,14 @@ export default {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
                         const placement = flag.charAt(0) === 'S' ? 'inside': 'after';
-                        const InitializedPG = { id: responseData.project_group_id, item_type:'PROJECT_GROUP', is_root: responseData.is_root, name: param.name };
+
+                        const InitializedPG = {
+                            id: responseData.project_group_id,
+                            item_type:'PROJECT_GROUP',
+                            is_root: responseData.is_root,
+                            name: param.name
+                        };
+
                         let newNode = this.getSelectedNode(InitializedPG);
 
                         if (flag === 'SNG') {

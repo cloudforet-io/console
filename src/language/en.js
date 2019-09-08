@@ -36,6 +36,7 @@ export const en = {
         BTN_ENABLE: 'Enable',
         BTN_DISABLE: 'Disable',
         BTN_CONFIRM: 'Confirm',
+        BTN_OK: 'OK',
         BTN_YES: 'Yes',
         BTN_NO: 'No',
         BTN_S_MANT: 'Set Maintenance',
@@ -94,7 +95,10 @@ export const en = {
     },
     TREE_TYPE: {
         PROJECT: 'Project',
-        PROJECT_GROUP: 'Project Group'
+        PROJECT_GROUP: 'Project Group',
+        CREATE: 'Create {0}',
+        UPDATE: 'UPDATE {0}',
+        DELETE: 'DELETE {0}'
     },
     COL_NM: {
         C_COMMAND_ID: 'COMMAND ID',
@@ -155,7 +159,7 @@ export const en = {
         INST_TYPE: 'Instance Type',
         CREATE_BY: 'Created By',
         SEC_GROUP: 'Security Group',
-        C_COL_INFO: 'Collect Informaiton',
+        C_COL_INFO: 'Collect Information',
         EXECR: 'Executor',
         EVENT: 'Event',
         FAIL_REASON: 'Reason for Failure'
@@ -164,8 +168,8 @@ export const en = {
         NOT_ALLOW: 'Action not allowed'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: ' \'{0}\' can not be located at Root position.',
-        LEAF_PUSHTO:  'Can\'t locate \'{0}\' into \'{1}\', Please Check your Action.'
+        LEAF_NOMOVE: ' {0} can not be located at Root position.',
+        LEAF_PUSHTO:  'Can\'t locate the {0} into {1}. Please, Check your Action.'
     },
     PANEL: {
         BASE_INFO: 'Base Information',

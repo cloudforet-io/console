@@ -28,7 +28,7 @@
                   :variant="`${type}`" 
                   @click="clickOk"
         >
-          <span>{{ tr('BTN_CONFIRM') }}</span>
+          <span>{{ tr('BTN_OK') }}</span>
         </b-button>
       </template>
     </b-modal>
