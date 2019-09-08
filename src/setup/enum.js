@@ -2,9 +2,35 @@ export const GlobalEnum = {
     TREE: Object.freeze({
         PROJECT: {
             PROJECT:{
+                type: 'PROJECT',
+                root_able: false,
+                accept: [],
                 isLeaf: true
             },
             PROJECT_GROUP:{
+                type: 'PROJECT_GROUP',
+                root_able: true,
+                accept: ['PROJECT_GROUP','PROJECT'],
+                isLeaf: false
+            }
+        },
+        DATA_CENTER: {
+            REGION:{
+                type: 'REGION',
+                root_able: false,
+                accept: ['ZONE'],
+                isLeaf: false
+            },
+            ZONE:{
+                type: 'ZONE',
+                root_able: false,
+                accept: ['POOL'],
+                isLeaf: false
+            },
+            POOL:{
+                type: 'POOL',
+                root_able: false,
+                accept: [],
                 isLeaf: false
             }
         }

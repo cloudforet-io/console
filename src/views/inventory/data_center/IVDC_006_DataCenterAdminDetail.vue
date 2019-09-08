@@ -52,7 +52,7 @@ import query from '@/views/identity/project/search_context/search_context';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
 
 export default {
-    name: 'ProjectMember',
+    name: 'DataCenterDetail',
     event: ['close'],
     components: {
         BaseTable
