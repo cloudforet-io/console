@@ -24,14 +24,14 @@
                       @deleteLeft="deleteLeftTag(idx - 1)"
             />
 
-            <BaseInput ref="input" 
-                       class="input"
-                       :list-data="contextData.queryList"
-                       add-only
-                       @add="addTagAndSearch" 
-                       @moveLeft="moveFocusToLeft(tagList.length - 1)"
-                       @moveRight="moveFocusToRight(tagList.length - 1)"
-                       @deleteLeft="deleteLeftTag(tagList.length - 1)"
+            <QueryInput ref="input" 
+                        class="input"
+                        :list-data="contextData.queryList"
+                        add-only
+                        @add="addTagAndSearch" 
+                        @moveLeft="moveFocusToLeft(tagList.length - 1)"
+                        @moveRight="moveFocusToRight(tagList.length - 1)"
+                        @deleteLeft="deleteLeftTag(tagList.length - 1)"
             />
           </div>
           <span class="input-delete-button" @click="deleteAll"><i class="fal fa-times" /></span>
@@ -48,8 +48,7 @@
 </template>
 
 <script>
-import { focus } from 'vue-focus';
-import BaseInput from '@/components/base/input/BAIN_001_BaseInput';
+import QueryInput from '@/components/base/input/BAIN_004_EXT_QueryInput';
 import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag';
 
 const testdata = [{
@@ -70,8 +69,10 @@ const contextDataModel = {
 export default {
     name: 'BaseSearch',
     event: ['search', 'empty'],
-    directives: { focus: focus },
-    components: { BaseInput, InputTag },
+    components: { 
+        QueryInput, 
+        InputTag 
+    },
     props: {
         contextData: {
             type: Object,
