@@ -1,7 +1,11 @@
 <template>
   <span class="input-tag-container">
-    <QueryInput v-if="isUpdateMode" :list-data="listData" :contents="contents"
-                :autofocus="true" :autoselect="true" @update="onUpdate"
+    <QueryInput v-if="isUpdateMode" 
+                :list-data="listData" 
+                :contents="contents"
+                autofocus 
+                autoselect
+                @update="onUpdate"
                 @delete="$emit('delete')"
                 @moveLeft="onMoveLeft"
                 @moveRight="onMoveRight"
