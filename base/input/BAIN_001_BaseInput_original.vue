@@ -5,24 +5,26 @@
       <span ref="fakeInput" class="fake" />
 
       <span class="relative-container">
-        <BaseSimpleInput ref="input" 
-                         v-model="inputText" 
-                         :autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
-                         autocomplete="off" 
-                         type="text"
-                         :placeholder="tr('SEARCH')"
-                         @focus="onFocus" 
-                         @blur="onBlur" 
-                         @input="onInput"
-                         @keyup.enter="onEnter"
-                         @keyup.down="onKeyDown"
-                         @keyup.up="onKeyUp" 
-                         @keyup.esc="onEsc"
-                         @keydown.left="onLeft"
-                         @keydown.right="onRight"
-                         @keydown.delete="onDelete"
-                         @mousedown="onMousedownInput"
-        />
+        <input ref="input" 
+               v-model="inputText" 
+               v-focus="isFocused"
+               v-autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
+               class="pl-2" 
+               autocomplete="off" 
+               type="text"
+               :placeholder="tr('SEARCH')"
+               @focus="onFocus" 
+               @blur="onBlur" 
+               @input="onInput"
+               @keyup.enter="onEnter"
+               @keyup.down="onKeyDown"
+               @keyup.up="onKeyUp" 
+               @keyup.esc="onEsc"
+               @keydown.left="onLeft"
+               @keydown.right="onRight"
+               @keydown.delete="onDelete"
+               @mousedown="onMousedownInput"
+        >
 
         <BaseQueryList ref="listContainer"
                        class="list-container"
@@ -57,7 +59,6 @@
 <script>
 import { focus } from 'vue-focus';
 import BaseQueryList from '@/components/base/list/BALT_001_BaseQueryList';
-import BaseSimpleInput from '@/components/base/input/BAIN_001_BaseSimpleInput';
 
 const contentsModel = {
     label: '',
@@ -74,7 +75,6 @@ export default {
     name: 'BaseInput',
     event: ['add', 'update', 'delete', 'deleteLeft'],
     components: {
-        BaseSimpleInput,
         BaseQueryList
     },
     directives: { focus: focus },
@@ -156,7 +156,7 @@ export default {
     },
     methods: {
         setListPosition () {
-            let inputRect = this.$refs.input.$el.getBoundingClientRect();
+            let inputRect = this.$refs.input.getBoundingClientRect();
             let paddingBottom = 60;
             this.listHeight = self.innerHeight - inputRect.bottom - paddingBottom;
             this.listPosY = inputRect.height;
@@ -430,7 +430,7 @@ export default {
                 this.captureText();
             }
         },
-        onBlur (e) {
+        onBlur () {
             this.isFocused = false;
 
             if (this.isBlurWithoutCommit) {
@@ -481,6 +481,7 @@ export default {
         },
         onLeft () {
             if (this.selectionStart > 0) {
+                console.log('ignore left');
                 return;
             }
             this.isBlurWithoutCommit = true;
