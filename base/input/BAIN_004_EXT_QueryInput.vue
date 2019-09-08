@@ -5,26 +5,24 @@
       <span ref="fakeInput" class="fake" />
 
       <span class="relative-container">
-        <input ref="input" 
-               v-model="inputText" 
-               v-focus="isFocused"
-               v-autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
-               class="pl-2" 
-               autocomplete="off" 
-               type="text"
-               :placeholder="tr('SEARCH')"
-               @focus="onFocus" 
-               @blur="onBlur" 
-               @input="onInput"
-               @keyup.enter="onEnter"
-               @keyup.down="onKeyDown"
-               @keyup.up="onKeyUp" 
-               @keyup.esc="onEsc"
-               @keydown.left="onLeft"
-               @keydown.right="onRight"
-               @keydown.delete="onDelete"
-               @mousedown="onMousedownInput"
-        >
+        <BaseInput ref="input" 
+                   v-model="inputText" 
+                   :autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
+                   autocomplete="off" 
+                   type="text"
+                   :placeholder="tr('SEARCH')"
+                   @focus="onFocus" 
+                   @blur="onBlur" 
+                   @input="onInput"
+                   @keyup.enter="onEnter"
+                   @keyup.down="onKeyDown"
+                   @keyup.up="onKeyUp" 
+                   @keyup.esc="onEsc"
+                   @keydown.left="onLeft"
+                   @keydown.right="onRight"
+                   @keydown.delete="onDelete"
+                   @mousedown="onMousedownInput"
+        />
 
         <BaseQueryList ref="listContainer"
                        class="list-container"
@@ -59,6 +57,7 @@
 <script>
 import { focus } from 'vue-focus';
 import BaseQueryList from '@/components/base/list/BALT_001_BaseQueryList';
+import BaseInput from '@/components/base/input/BAIN_001_BaseInput';
 
 const contentsModel = {
     label: '',
@@ -72,9 +71,10 @@ const contentsModel = {
 const appendableOperators = ['=', '>', '<', '!', '$'];
 
 export default {
-    name: 'BaseInput',
+    name: 'QueryInput',
     event: ['add', 'update', 'delete', 'deleteLeft'],
     components: {
+        BaseInput,
         BaseQueryList
     },
     directives: { focus: focus },
@@ -156,7 +156,7 @@ export default {
     },
     methods: {
         setListPosition () {
-            let inputRect = this.$refs.input.getBoundingClientRect();
+            let inputRect = this.$refs.input.$el.getBoundingClientRect();
             let paddingBottom = 60;
             this.listHeight = self.innerHeight - inputRect.bottom - paddingBottom;
             this.listPosY = inputRect.height;
@@ -315,7 +315,8 @@ export default {
             this.selected = Object.assign({}, contentsModel);
         },
         onEnter () {
-            if (this.$refs.listContainer && this.$refs.listContainer.hoveredItemIdx) {
+            if (this.$refs.listContainer && 
+                typeof this.$refs.listContainer.hoveredItemIdx === 'number') {
                 this.$refs.listContainer.emitSelectEvent();
             } else {
                 this.commit();
@@ -430,7 +431,7 @@ export default {
                 this.captureText();
             }
         },
-        onBlur () {
+        onBlur (e) {
             this.isFocused = false;
 
             if (this.isBlurWithoutCommit) {
@@ -481,7 +482,6 @@ export default {
         },
         onLeft () {
             if (this.selectionStart > 0) {
-                console.log('ignore left');
                 return;
             }
             this.isBlurWithoutCommit = true;
