@@ -18,10 +18,10 @@
         />
         <b-form-invalid-feedback v-if="!readOnly" :state="validateKey">
           <div v-if="!validateKeyNull">
-            {{ tr('FORM.UNVALID.MENDATORY') }}
+            {{ tr('FORM.INVALID.MANDATORY') }}
           </div>
           <div v-else-if="!validateKeyUnique">
-            {{ tr('FORM.UNVALID.UNIQUE') }}
+            {{ tr('FORM.INVALID.UNIQUE') }}
           </div>
         </b-form-invalid-feedback>
       </b-form-group>
@@ -38,7 +38,7 @@
                       :state="validateValue"
         />
         <b-form-invalid-feedback v-if="!readOnly" :state="validateValue">
-          {{ tr('FORM.UNVALID.MENDATORY') }}
+          {{ tr('FORM.INVALID.MANDATORY') }}
         </b-form-invalid-feedback>
       </b-form-group>
     </b-col>
