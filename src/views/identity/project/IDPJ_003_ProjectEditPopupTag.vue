@@ -74,7 +74,6 @@ export default {
         },
         rowAdded () {
             if (this.firstRow){
-                console.log('123123123');
                 this.$refs.IDPJ003_ProjectTag.addFirstRowWhenStart();
             }
         }

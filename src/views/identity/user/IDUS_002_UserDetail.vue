@@ -13,7 +13,7 @@
                      :placeholder="tr('USER.ID')"
                      autocomplete="off"
                      required
-                     :description="isLocalUser ? tr('FORM.UNVALID.LENGTH', [tr('USER.ID'), 5, 12]) : null"
+                     :description="isLocalUser ? tr('FORM.INVALID.LENGTH', [tr('USER.ID'), 5, 12]) : null"
                      :valid-message="tr('FORM.VALID.AVAIL')"
                      :invalid-message="getUserValidMessage()"
                      @input="changedUserId"
@@ -406,7 +406,7 @@ export default {
             }
             return result;
         },
-        resetUnvalidFields () {
+        resetInvalidFields () {
             if (this.creatable) {
                 this.userId = this.userId === null ? '' : this.userId;
                 this.password = this.password === null ? '' : this.password;
@@ -453,7 +453,7 @@ export default {
         },
         getUserValidMessage () {
             if (!this.validateUserIdLength) {
-                return this.tr('FORM.UNVALID.LENGTH', [this.tr('USER.ID'), 5, 12]);
+                return this.tr('FORM.INVALID.LENGTH', [this.tr('USER.ID'), 5, 12]);
             } else if (this.validateUserIdUnique === null) {
                 return this.tr('FORM.CHECK.AVAIL');
             } else if (!this.validateUserIdUnique) {

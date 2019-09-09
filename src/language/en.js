@@ -70,7 +70,17 @@ export const en = {
         PG_NM: 'Project Name',
         PG_GR: 'Project Group',
         PG: 'Project',
+        RG: 'Region',
+        ZE: 'Zone',
+        PL: 'Pool',
+        RG_ID: 'Region ID',
+        RG_NM: 'Region Name',
+        ZE_ID: 'Zone ID',
+        ZE_NM: 'Zone Name',
+        PL_ID: 'Pool ID',
+        PL_NM: 'Pool Name',
         DELETE_YN: 'Are you sure to delete those following members from selected {0}?',
+        DELETE_SUCC: 'The {0}: {1}  was successfully deleted.',
         DEL_MEM: 'Delete Member',
         SEARCH: 'Search',
         PROFILE: 'Profile',
@@ -96,9 +106,12 @@ export const en = {
     TREE_TYPE: {
         PROJECT: 'Project',
         PROJECT_GROUP: 'Project Group',
+        REGION: 'Region',
+        ZONE: 'Zone',
+        POOL: 'Pool',
         CREATE: 'Create {0}',
-        UPDATE: 'UPDATE {0}',
-        DELETE: 'DELETE {0}'
+        UPDATE: 'Update {0}',
+        DELETE: 'Delete Selected'
     },
     COL_NM: {
         C_COMMAND_ID: 'COMMAND ID',
@@ -181,8 +194,8 @@ export const en = {
         COMPUTE: 'Compute'
     },
     FORM: {
-        UNVALID: {
-            MENDATORY: 'This is a mendatory field.',
+        INVALID: {
+            MANDATORY: 'This is a mandatory field.',
             UNIQUE: 'This must be unique.',
             LENGTH: '{0} must be {1}~{2} characters long.'
         },

@@ -67,7 +67,17 @@ export const ko ={
         PG_NM: '프로젝트 명',
         PG_GR: '프로젝트 그룹',
         PG: '프로젝트',
+        RG: '리젼(Region)',
+        ZE: '존(Zone)',
+        PL: '풀(Pool)',
+        RG_ID: '리젼(Region) 아이디',
+        RG_NM: '리젼(Region) 명',
+        ZE_ID: '존(Zone) 아이디',
+        ZE_NM: '존(Zone) 명',
+        PL_ID: '풀(Pool) 아이디',
+        PL_NM: '풀(Pool) 명',
         DELETE_YN: '선택하신 {0} 의 아래에 멤버들을 삭제 하시겠습니까?',
+        DELETE_SUCC: ' {0}: {1} 을/를 성곡적으로 삭제 하였습니다.',
         DEL_MEM: '멤버 삭제',
         SEARCH: '검색',
         PROFILE: '프로필',
@@ -92,9 +102,12 @@ export const ko ={
     TREE_TYPE: {
         PROJECT: '프로젝트',
         PROJECT_GROUP: '프로젝트 그룹',
+        REGION: 'Region',
+        ZONE: 'Zone',
+        POOL: 'Pool',
         CREATE: '{0} 생성하기',
         UPDATE: '{0} 업데이트',
-        DELETE: '{0} 삭제'
+        DELETE: '삭제하기'
     },
     COL_NM: {
         C_COMMAND_ID: '커맨드 아이디',
@@ -177,8 +190,8 @@ export const ko ={
         COMPUTE: 'Compute'
     },
     FORM: {
-        UNVALID: {
-            MENDATORY: '필수 입력란입니다.',
+        INVALID: {
+            MANDATORY: '필수 입력란입니다.',
             UNIQUE: '유일한 값을 입력해주세요.',
             LENGTH: '{0}은(는) {1}~{2} 자 이내여야 합니다.'
         },

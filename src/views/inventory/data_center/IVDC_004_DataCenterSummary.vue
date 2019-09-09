@@ -149,18 +149,23 @@ export default {
         },
         async setInitData() {
             const selectedNode = this.$attrs['selected-data'].node;
+            const itemType = selectedNode.data.item_type;
             let url = null;
             let param = {};
-            if (selectedNode.data.item_type === 'PROJECT_GROUP'){
-                url = '/identity/project-group/get';
-                param['project_group_id'] = selectedNode.data.id;
+            if (itemType === 'REGION'){
+                url = '/inventory/region/get';
+                param['region_id'] = selectedNode.data.id;
+
+            } else if (itemType === 'ZONE'){
+                url = '/inventory/zone/get';
+                param['zone_id'] = selectedNode.data.id;
             } else {
-                url = '/identity/project/get';
-                param['project_id'] = selectedNode.data.id;
+                url = '/inventory/pool/get';
+                param['pool_id'] = selectedNode.data.id;
             }
             await this.$axios.post(url, param).then((response) => {
                 if (!this.isEmpty(response.data)){
-                    this.summaryData.id = response.data.hasOwnProperty('project_group_id') ? response.data.project_group_id : response.data.project_id;
+                    this.summaryData.id = response.data.hasOwnProperty('region_id') ? response.data.region_id : response.data.hasOwnProperty('zone_id') ?  response.data.zone_id : response.data.pool_id;
                     this.summaryData.title =  response.data.name;
                     this.summaryData.create = this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone);
                     this.summaryData.tags = response.data.tags;

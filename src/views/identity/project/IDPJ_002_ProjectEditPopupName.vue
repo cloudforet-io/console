@@ -4,7 +4,7 @@
       <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
         <b-card class="base first-tab summary">
           <b-container fluid class="mt-4">
-            <b-row v-if="currentState=='UPT'" class="my-1">
+            <b-row v-if="currentState=='UPDATE'" class="my-1">
               <b-col sm="3">
                 <label class="control-label">{{tr('PG_ID')}} :</label>
               </b-col>
@@ -12,7 +12,7 @@
                 {{ projectId }}
               </b-col>
             </b-row>
-            <b-row v-if="currentState=='CRT' && !isEmpty(projectGroup)" class="my-1">
+            <b-row v-if="currentState=='CREATE' && !isEmpty(projectGroup)" class="my-1">
               <b-col sm="3">
                 <label class="control-label">{{tr('PG_GR')}} :</label>
               </b-col>
@@ -88,11 +88,11 @@ export default {
         if (Object.keys(this.$attrs).length > 0) {
             this.treeDataSelected = selected;
             if (this.$attrs['is-creatable']) {
-                this.currentState = 'CRT';
+                this.currentState = 'CREATE';
                 this.projectId = null;
                 this.projectName = null;
             } else if (this.$attrs['is-updatable']) {
-                this.currentState = 'UPT';
+                this.currentState = 'UPDATE';
                 this.projectProp.projectId= selectedNode.data.id;
                 this.projectId = selectedNode.data.id;
                 this.projectName = selectedNode.title;
@@ -101,7 +101,7 @@ export default {
             }
         }
 
-        if (this.currentState === 'CRT' && this.$attrs['selected-data'].flag.charAt(0) == 'S') {
+        if (this.currentState === 'CREATE' && !this.$attrs['selected-data']['root_action']) {
             this.projectGroup = this.$attrs['selected-data'].tree.getSelected()[0].title;
         }
     },
