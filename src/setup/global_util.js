@@ -375,6 +375,7 @@ export const Mixin = {
          * Description:  return tree array of object which suits for BaseTree
          **********************************************************************************/
         getSelectedNode: function (o, type) {
+
             let selectedNode = {
                 title: '',
                 isLeaf: false,
@@ -386,6 +387,7 @@ export const Mixin = {
                 data: { visible: false }
             };
             if (!this.isEmpty(o)) {
+                const leafStatus = GlobalEnum['TREE'][type][o.item_type].isLeaf;
                 for (let [key, val] of Object.entries(o)) {
                     if (key==='name') {
                         selectedNode['title'] = val;
@@ -396,6 +398,9 @@ export const Mixin = {
                     } else {
                         selectedNode['data'][key] = val;
                     }
+                }
+                if(!this.isEmpty(leafStatus) && !('has_child' in o)){
+                    selectedNode['isLeaf'] = leafStatus;
                 }
                 selectedNode['data']['group'] = type;
             }

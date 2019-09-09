@@ -4,8 +4,8 @@
       <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
         <b-card class="base">
           <b-form-group label="Tags" :label-cols="3" :horizontal="true" class="ml-3 mt-4 ">
-            <b-col ref="IDPJ003_PopUpTag" cols="10" class="row-scroll p-0">
-              <BaseTag ref="IDPJ003_ProjectTag"
+            <b-col ref="IVDC003_PopUpTag" cols="10" class="row-scroll p-0">
+              <BaseTag ref="IVDC003_DataCenterTag"
                        :tag-data="tags"
                        :editable="true"
                        :show-first-tag-row="creatable ? true : false"
@@ -70,12 +70,11 @@ export default {
             }
         },
         onTagRowAdded () {
-            this.$refs.IDPJ003_PopUpTag.scrollTop = this.$refs.IDPJ003_PopUpTag.scrollHeight;
+            this.$refs.IVDC003_PopUpTag.scrollTop = this.$refs.IVDC003_PopUpTag.scrollHeight;
         },
         rowAdded () {
             if (this.firstRow){
-                console.log('123123123');
-                this.$refs.IDPJ003_ProjectTag.addFirstRowWhenStart();
+                this.$refs.IVDC003_DataCenterTag.addFirstRowWhenStart();
             }
         }
     }

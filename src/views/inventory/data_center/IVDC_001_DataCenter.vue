@@ -5,7 +5,8 @@
         <BaseModal ref="IVDC001_EditModal"
                    :title="dataCenterModalTitle"
                    :centered="true"
-                   :hide-footer="true">
+                   :hide-footer="true"
+        >
           <template #contents>
             <BaseTabNav
               ref="IVDC001_EditTab"
@@ -28,6 +29,8 @@
     <BaseTree ref="IVDC001_DataCenterTree"
               :tree-prop="treeData"
               :context-init="isInitializing"
+              :con-text-obj="contextProp"
+              :tree-type="'DATA_CENTER'"
               @selected="NodeSelected"
               @edited="editSelected"
               @delete="deletedSelectedOnTree"
@@ -100,6 +103,27 @@ export default {
     },
     data() {
         return {
+            contextProp: {
+                Executor: ['CRG', 'URG', 'CZN', 'UZN', 'CPL', 'UPL', 'RMS'],
+                ContextVisible  :[false, false, false, false, false, false],
+                icons: ['fal fa-globe-americas'
+                    ,'fal fa-globe-asia'
+                    ,'fas fa-clouds-sun'
+                    ,'fal fa-clouds-moon'
+                    ,'fas fa-server'
+                    ,'fad fa-server'
+                    ,'fal fa-trash'
+                ],
+                Msg: [
+                    ['TREE_TYPE.CREATE', 'TREE_TYPE.REGION'],
+                    ['TREE_TYPE.UPDATE', 'TREE_TYPE.REGION'],
+                    ['TREE_TYPE.CREATE', 'TREE_TYPE.ZONE'],
+                    ['TREE_TYPE.UPDATE', 'TREE_TYPE.ZONE'],
+                    ['TREE_TYPE.CREATE', 'TREE_TYPE.POOL'],
+                    ['TREE_TYPE.UPDATE', 'TREE_TYPE.POOL'],
+                    ['TREE_TYPE.DELETE', 'TREE_TYPE.PROJECT']
+                ]
+            },
             tab: tabs[0].component,
             tabs: tabs,
             modalTab: modalTabs[0].component,
@@ -143,41 +167,19 @@ export default {
             });
         },
         editSelected(item) {
-        /*******************************************
-         * TODO :: Please Add More Flags if needed.
-         *  CRT => Create
-         *  UPT => Update
-         *  DEL => Delete
-         ****CRT***********************************
-         *  NG => Node Group
-         *  SNG => Selected DataCenter Group
-         *  SND => Selected DataCenter
-         *  RNG => Root DataCenter Group
-         *  RND => Root DataCenter
-         ****UPT***********************************
-         *  SN => Selected Node Group or Node
-         */
-            if (['SN'].includes(item.flag)) {
-                this.selectedData = item;
-                this.manageTabButton('UPT', true);
-                this.selectedData = item;
-                this.$refs.IVDC001_EditModal.showModal();
+            this.selectedData = item;
+            if (['CRG', 'CZN', 'CPL'].includes(item.flag)) {
+                this.updateProcess = !true;
+                this.createProcess = true;
+                this.dataCenterModalTitle = item.flag === 'CRG' ? this.tr('TREE_TYPE.CREATE', [this.tr('TREE_TYPE.REGION')]) : item.flag === 'CZN' ?
+                    this.tr('TREE_TYPE.CREATE', [this.tr('TREE_TYPE.ZONE')]):this.tr('TREE_TYPE.CREATE', [this.tr('TREE_TYPE.POOL')]);
             } else {
-                const title = (item.flag.indexOf('NG') > -1);
-                this.selectedData = item;
-                this.manageTabButton('CRT', true, title);
-                this.$refs.IVDC001_EditModal.showModal();
+                this.createProcess = !true;
+                this.updateProcess = true;
+                this.dataCenterModalTitle = item.flag === 'URG' ? this.tr('TREE_TYPE.UPDATE', [this.tr('TREE_TYPE.REGION')]) : item.flag === 'UZN' ?
+                    this.tr('TREE_TYPE.UPDATE', [this.tr('TREE_TYPE.ZONE')]):this.tr('TREE_TYPE.UPDATE', [this.tr('TREE_TYPE.POOL')]);
             }
-        },
-        manageTabButton(flag, state, title) {
-            if (flag === 'CRT') {
-                this.dataCenterModaltitle = (title) ? 'Create a DataCenter Group' : 'Create a DataCenter';
-                this.updateProcess = !state;
-                this.createProcess = state;
-            } else if (flag === 'UPT') {
-                this.createProcess = !state;
-                this.updateProcess = state;
-            }
+            this.$refs.IVDC001_EditModal.showModal();
         },
         validateDataCenter (){
             let isDefaultValidated = false;
@@ -189,11 +191,11 @@ export default {
 
             if (tabChildren[childrenIdx[0]].validateDataCenter()){
                 isDefaultValidated = true;
-                params['name'] = tabChildren[childrenIdx[0]]._data.dataCenterName;
+                params['name'] = tabChildren[childrenIdx[0]]._data.rezeplName;
             }
             if (childrenIdx.length > 1){
-                if (tabChildren[childrenIdx[1]].$refs.IDPJ003_DataCenterTag.validate()) {
-                    params['tags'] = tabChildren[childrenIdx[1]].$refs.IDPJ003_DataCenterTag.tags;
+                if (tabChildren[childrenIdx[1]].$refs.IVDC003_DataCenterTag.validate()) {
+                    params['tags'] = tabChildren[childrenIdx[1]].$refs.IVDC003_DataCenterTag.tags;
                     isTagValidated = true;
                 }
             } else {
@@ -212,65 +214,53 @@ export default {
             return (isTagValidated && isDefaultValidated) ? params : null;
         },
         async getNextLayerOnTree (nodeObj){
-            this.consoleLogEnv('Getting a layer On Tree with Prop: ', nodeObj);
             let childrenNode = [];
-            let url = '/identity/dataCenter/tree';
             const selected = this.isEmpty(nodeObj.treeV.getSelected()[0]) ? nodeObj.node: nodeObj.treeV.getSelected()[0];
             const path = selected.path;
             const dataParam = nodeObj.node.data;
             dataParam['is_cached'] = true;
-
+            debugger;
             let param = {
-                item_type: 'PROJECT_GROUP',
-                item_id:this._.get(nodeObj.node, 'data.id'),
+                item_type: this._.get(nodeObj.node, 'data.item_type'),
+                item_id: this._.get(nodeObj.node, 'data.id'),
                 domain_id: sessionStorage.domainId
             };
 
-            await this.$axios.post(url, param).then((response) => {
-                childrenNode = this.getSelectedNodeArr(response.data.items, 'PROJECT');
+            await this.$axios.post('/inventory/data-center/tree', param).then((response) => {
+                childrenNode = this.getSelectedNodeArr(response.data.items, 'DATA_CENTER');
+
                 nodeObj.treeV.updateNode(path, { data: dataParam });
                 if (!this.isEmpty(childrenNode)){
                     childrenNode.forEach(curItem =>{
                         nodeObj.treeV.insert({ node: selected, placement: 'inside' }, curItem);
                     });
                 }
+                console.log('Tree Data', this.treeData);
             }).catch((error) => {
                 console.error(error);
             });
-            console.log('Tree Data', this.treeData);
+
         },
         async createProsProcess(item) {
             const flag = this.selectedData.flag;
             const treeV = this.isEmpty(item.tree) ? this.selectedData.tree : item.tree;
-            if (['NG','RNG','SNG'].includes(flag)) {
-                this.createDataCenterGroup(item, flag, treeV);
+            if ('CRG' === flag) {
+                this.createRegion(item, flag, treeV);
             } else {
-                this.createDataCenter(item, flag, treeV);
+                this.createZoneAndPool(item, flag, treeV);
             }
         },
-        async createDataCenterGroup(items, flag, tree) {
-            let url = '/identity/dataCenter-group/create';
+        async createRegion(items, flag, tree) {
             let param = this.validateDataCenter();
             if (param){
                 param['domain_id'] = sessionStorage.domainId;
-                const selected = tree.getSelected()[0];
-                if (flag === 'SNG') {
-                    param['parent_dataCenter_group_id'] = selected.data.id;
-                } else {
-                    param['is_root']= true;
-                }
-                await this.$axios.post(url, param).then((response) => {
+                param['is_root']= true;
+                await this.$axios.post('/inventory/region/create', param).then((response) => {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
-                        const placement = flag.charAt(0) === 'S' ? 'inside': 'after';
-                        const InitializedPG = { id: responseData.dataCenter_group_id, item_type:'PROJECT_GROUP', is_root: responseData.is_root, name: param.name };
-                        let newNode = this.getSelectedNode(InitializedPG);
-
-                        if (flag === 'SNG') {
-                            this.applyActionOnScreen(items, flag, tree,{ node: newNode, placement: placement });
-                        } else {
-                            tree.insert({ node: tree.getSelected()[0], placement: placement }, newNode);
-                        }
+                        const InitDTCenter = { id: responseData.region_id, item_type:'REGION', name: param.name };
+                        let newNode = this.getSelectedNode(InitDTCenter, 'DATA_CENTER');
+                        tree.insert({ node: tree.getSelected()[0], placement: 'after' }, newNode);
                         if (this.isInitializing){
                             tree.remove([tree.getFirstNode()].map(node => node.path));
                             this.isInitializing = false;
@@ -282,19 +272,22 @@ export default {
                 this.$refs.IVDC001_EditModal.hideModal();
             }
         },
-        async createDataCenter(items, flag, tree) {
-            let url = '/identity/dataCenter/create';
+        async createZoneAndPool(items, flag, tree) {
             let param = this.validateDataCenter();
             if (param){
                 const selected = tree.getSelected()[0];
+                const key = flag === 'CZN' ? 'region_id' : 'zone_id';
+                const url = flag === 'CZN' ? '/inventory/zone/create' : '/inventory/pool/create';
+                param[key] = selected.data.id;
                 param['domain_id'] = sessionStorage.domainId;
-                param['dataCenter_group_id'] = selected.data.id;
 
                 await this.$axios.post(url, param).then((response) => {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
-                        const InitializedPG = { id: responseData.dataCenter_id, item_type:'PROJECT', name: param.name };
-                        let newNode = this.getSelectedNode(InitializedPG);
+                        const InitDTCenter = { id: flag === 'CZN' ?  responseData.zone_id : responseData.pool_id,
+                            item_type: flag === 'CZN' ? 'ZONE' : 'POOL',
+                            name: param.name };
+                        let newNode = this.getSelectedNode(InitDTCenter, 'DATA_CENTER');
                         this.applyActionOnScreen(items, flag, tree,{ node: newNode, placement: 'inside' });
                     }
                 }).catch((error) => {
@@ -304,16 +297,16 @@ export default {
             }
         },
         async updateDataCenter(items) {
-            this.consoleLogEnv('Update DataCenter : ', items);
-            const itemType = items.tree.getSelected()[0].data.item_type;
-            const selectedId = items.tree.getSelected()[0].data.id;
-            const url = itemType === 'PROJECT_GROUP' ? '/identity/dataCenter-group/update': '/identity/dataCenter/update';
-            const key = itemType === 'PROJECT_GROUP' ? 'dataCenter_group_id': 'dataCenter_id';
+            const itemType = this._.get(items.tree.getSelected()[0],'data.item_type');
+            const itemId = this._.get(items.tree.getSelected()[0],'data.id');
+            const url = itemType === 'REGION' ? '/inventory/region/update': itemType === 'ZONE' ? '/inventory/zone/update' : '/inventory/pool/update';
+            const key = itemType === 'REGION' ? 'region_id': itemType === 'ZONE' ? 'zone_id' : 'pool_id';
             let param = this.validateDataCenter();
+
             if (!this.isEmpty(param)){
-                param[key] = selectedId;
+                param[key] = itemId;
                 await this.$axios.post(url, param).then((response) => {
-                    if (response.data[key] === selectedId) {
+                    if (response.data[key] === itemId) {
                         const treeV = items.tree;
                         const path = treeV.getSelected()[0].path;
                         const updateSummary = this.$refs.IVDC001_TreeSubPanel.$children;
@@ -328,19 +321,19 @@ export default {
             }
         },
         async deletedSelectedOnTree (pramTree){
-            const itemType = pramTree.tree.getSelected()[0].data.item_type;
-            const selectedId = pramTree.tree.getSelected()[0].data.id;
-            const url = itemType === 'PROJECT_GROUP' ? '/identity/dataCenter-group/delete': '/identity/dataCenter/delete';
-            const key = itemType === 'PROJECT_GROUP' ? 'dataCenter_group_id': 'dataCenter_id';
+            const itemType = this._.get(pramTree.tree.getSelected()[0],'data.item_type');
+            const itemId = this._.get(pramTree.tree.getSelected()[0],'data.id');
+            const url = itemType === 'REGION' ? '/inventory/region/delete': itemType === 'ZONE' ? '/inventory/zone/delete' : '/inventory/pool/delete';
+            const key = itemType === 'REGION' ? 'region_id': itemType === 'ZONE' ? 'zone_id' : 'pool_id';
             let passParam = { domain_id: sessionStorage.domainId };
-            passParam[key] = selectedId;
-
+            passParam[key] = itemId;
             await this.$axios.post(url, passParam).then((response) => {
                 const responseData = response.data;
                 console.log(responseData);
                 if (this.isEmpty(responseData)){
                     pramTree.tree.remove(pramTree.path);
-                    this.$alertify.success('Okay');
+                    this.$alertify.success('Selected Item is Succefully deleted.');
+                    this.tr('MSG.DELETE_SUCC',[this.tr(`TREE_TYPE.${itemType}`),itemId]);
                     if (this.treeData.length === 1) {
                         this.isInitializing = true;
                         this.treeData = [{ title: '! Please, Right Click me',
@@ -356,21 +349,6 @@ export default {
                     this.$alertify.error('Item has child, Please delete Child first.');
                 }
             });
-        },
-        async applyActionOnScreen(items, flag, tree, data) {
-            const selected = tree.getSelected()[0];
-            const path = selected.path;
-            if (!selected.isExpanded) {
-                if (selected.data.is_cached) {
-                    tree.insert({ node: tree.getSelected()[0], placement: data.placement }, data.node);
-                    tree.updateNode(path, { isExpanded: true });
-                } else {
-                    this.getNextLayerOnTree({ treeV: tree, node: selected });
-                    tree.updateNode(path, { isExpanded: true });
-                }
-            } else {
-                tree.insert({ node: tree.getSelected()[0], placement: data.placement }, data.node);
-            }
         },
         async moveDataCenter(items) {
             this.consoleLogEnv('Move Selected Items : ', items);
@@ -405,6 +383,21 @@ export default {
                 }
                 items.treeV.updateNode(items.position.node.path, { isExpanded: true });
                 this.getNextLayerOnTree({ treeV: items.treeV, node: items.position.node });
+            }
+        },
+        async applyActionOnScreen(items, flag, tree, data) {
+            const selected = tree.getSelected()[0];
+            const path = selected.path;
+            if (!selected.isExpanded) {
+                if (selected.data.is_cached) {
+                    tree.insert({ node: tree.getSelected()[0], placement: data.placement }, data.node);
+                    tree.updateNode(path, { isExpanded: true });
+                } else {
+                    this.getNextLayerOnTree({ treeV: tree, node: selected });
+                    tree.updateNode(path, { isExpanded: true });
+                }
+            } else {
+                tree.insert({ node: tree.getSelected()[0], placement: data.placement }, data.node);
             }
         },
         async closeSelected(){

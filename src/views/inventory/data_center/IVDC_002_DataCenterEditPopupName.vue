@@ -4,29 +4,29 @@
       <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
         <b-card class="base first-tab summary">
           <b-container fluid class="mt-4">
-            <b-row v-if="currentState=='UPT'" class="my-1">
+            <b-row v-if="currentState=='UPDATE'" class="my-1">
               <b-col sm="3">
-                <label class="control-label">{{ tr('PG_ID') }} :</label>
+                <label class="control-label">{{ this.labelMsg[0] }} :</label>
               </b-col>
               <b-col sm="9">
-                {{ projectId }}
+                {{ rezeplId }}
               </b-col>
             </b-row>
-            <b-row v-if="currentState=='CRT' && !isEmpty(projectGroup)" class="my-1">
+            <b-row v-if="currentState=='CREATE' && !isEmpty(rezeplGroup)" class="my-1">
               <b-col sm="3">
-                <label class="control-label">{{ tr('PG_GR') }} :</label>
+                <label class="control-label">{{ this.labelMsg[0] }} :</label>
               </b-col>
               <b-col sm="9">
-                {{ projectGroup }}
+                {{ rezeplGroup }}
               </b-col>
             </b-row>
             <b-row class="my-1">
               <b-col sm="3">
-                <label class="control-label">{{ tr('PG_NM') }} :</label>
+                <label class="control-label">{{ this.labelMsg[1] }} :</label>
               </b-col>
               <b-col sm="9">
                 <b-form-group>
-                  <b-form-input v-model="projectName" :placeholder="projectName" type="text" />
+                  <b-form-input v-model="rezeplName" :placeholder="rezeplName" type="text" />
                   <b-form-invalid-feedback :state="isValidated.isEmpty">
                     Project Name cannot be Empty.
                   </b-form-invalid-feedback>
@@ -44,18 +44,18 @@
 </template>
 <script>
 
-const project = {
-    projectId: null,
-    projectName: null
+const rezepl = {
+    rezeplId: null,
+    rezeplName: null
 };
 
 export default {
     name: 'DataCenterEditPopUpName',
     components: {},
     props: {
-        projectProp: {
+        rezeplProp: {
             type: Object,
-            default: () => (project)
+            default: () => (rezepl)
         }
     },
     data () {
@@ -63,9 +63,11 @@ export default {
             isInitialized: true,
             placeHolderId: null,
             placeHolderName: null,
-            projectGroup: null,
-            projectId: this.projectProp.projectId,
-            projectName: this.projectProp.projectName,
+            labelMsg: [],
+            warningMsg: [],
+            rezeplGroup: null,
+            rezeplId: this.rezeplProp.rezeplId,
+            rezeplName: this.rezeplProp.rezeplName,
             treeDataSelected: {},
             isValidated: {
                 isEmpty: true,
@@ -75,11 +77,11 @@ export default {
         };
     },
     watch: {
-        projectId: function (newProjectID) {
-            this.projectProp.projectId = newProjectID;
+        rezeplId: function (newProjectID) {
+            this.rezeplProp.rezeplId = newProjectID;
         },
-        projectName: function (newProjectName) {
-            this.projectProp.projectName = newProjectName;
+        rezeplName: function (newProjectName) {
+            this.rezeplProp.rezeplName = newProjectName;
         }
     },
     created () {
@@ -87,37 +89,51 @@ export default {
         const selectedNode = selected.hasOwnProperty('selectedItem') ? selected.selectedItem.tree.getSelected()[0] : selected.tree.getSelected()[0];
         if (Object.keys(this.$attrs).length > 0) {
             this.treeDataSelected = selected;
+            debugger;
             if (this.$attrs['is-creatable']) {
-                this.currentState = 'CRT';
-                this.projectId = null;
-                this.projectName = null;
+                this.currentState = 'CREATE';
+                this.labelMsg =this.switchLabel('CREATE', selectedNode.data.item_type);
+                this.rezeplId = null;
+                this.rezeplName = null;
             } else if (this.$attrs['is-updatable']) {
-                this.currentState = 'UPT';
-                this.projectProp.projectId= selectedNode.data.id;
-                this.projectId = selectedNode.data.id;
-                this.projectName = selectedNode.title;
+                this.currentState = 'UPDATE';
+                this.labelMsg =this.switchLabel('UPDATE', selectedNode.data.item_type);
+                this.rezeplProp.rezeplId= selectedNode.data.id;
+                this.rezeplId = selectedNode.data.id;
+                this.rezeplName = selectedNode.title;
             } else {
                 this.currentState = 'DEL';
             }
         }
 
-        if (this.currentState === 'CRT' && this.$attrs['selected-data'].flag.charAt(0) == 'S') {
-            this.projectGroup = this.$attrs['selected-data'].tree.getSelected()[0].title;
+        if (this.currentState === 'CREATE' && !this.$attrs['selected-data']['root_action']) {
+            this.rezeplGroup = this.$attrs['selected-data'].tree.getSelected()[0].title;
         }
     },
     methods: {
-        validateProject(){
+        switchLabel(flag, item_type){
+            let returnVal = [this.tr(''), this.tr('')];
+            if (item_type === 'REGION'){
+                returnVal = flag === 'CREATE' ? [this.tr('RG_ID'), this.tr('ZE_NM')] : [this.tr('RG'), this.tr('RG_NM')];
+            } else if (item_type === 'ZONE'){
+                returnVal = flag ==='CREATE'? [this.tr('ZE_ID'), this.tr('PL_NM')] : [this.tr('ZE'), this.tr('ZE_NM')];
+            } else {
+                returnVal = flag ==='CREATE'? [this.tr('PL_ID'), this.tr('PL_NM')] : [this.tr('PL'), this.tr('PL_NM')];
+            }
+            return returnVal;
+        },
+        validateDataCenter(){
             this.lengthOver();
             this.lengthZero();
             return (this.isValidated.isOverMaxLength && this.isValidated.isEmpty) ? true: false;
         },
         lengthZero () {
-            if (this.isEmpty(this.projectName)) {
+            if (this.isEmpty(this.rezeplName)) {
                 this.isValidated.isEmpty = false;
             }
         },
         lengthOver (){
-            if (this.projectName.length > 40) {
+            if (this.rezeplName.length > 40) {
                 this.isValidated.isOverMaxLength = false;
             }
         },
@@ -130,7 +146,7 @@ export default {
         },
         setProp (idx) {
             if (idx == 0 && this.currentState == 'UPT') {
-                return this.projectProp.projectId;
+                return this.rezeplProp.rezeplId;
             } else {
                 return false;
             }
