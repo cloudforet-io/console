@@ -30,12 +30,6 @@
                           @search="onSearch"
                           @empty="$emit('empty')"
               />
-              <BaseSearch v-else-if="noContextSearchable"
-                          :is-empty-search="isEmptySearch"
-                          :border="!darkHeader"
-                          @search="onSearch" 
-                          @empty="$emit('empty')"
-              />
             </div>
           </div>
           <div ref="toolContainer"
@@ -115,10 +109,17 @@
         </template>
 
         <template v-for="headerSlot in getCustomHeaderSlotNameList()" 
-                  :slot="headerSlot" 
+                  :slot="headerSlot.key" 
                   slot-scope="data"
         >
-          <slot :name="headerSlot" :field="data.field" />
+          <slot :name="headerSlot.name" :field="data.field" />
+        </template>
+
+        <template v-for="cellSlot in getCustomCellNameList()" 
+                  :slot="cellSlot.key" 
+                  slot-scope="data"
+        >
+          <slot :name="cellSlot.name" :field="data.field" :data="data" />
         </template>
 
 
@@ -175,17 +176,13 @@ export default {
     },
     inheritAttrs: false,
     props: {
-        noContextSearchable: {
-            type: Boolean,
-            default: false
-        },
         searchable: {
             type: Boolean,
             default: false
         },
         searchContextData: {
             type: Object,
-            default: null
+            default: undefined
         },
         isEmptySearch: {
             type: Boolean,
@@ -604,7 +601,16 @@ export default {
             let result = [];
             Object.keys(this.$scopedSlots).map((slot) => {
                 if (slot.startsWith('HEAD')) {
-                    result.push(slot);
+                    result.push({ key: slot, name: slot });
+                }
+            });
+            return result;
+        },
+        getCustomCellNameList () {
+            let result = [];
+            Object.keys(this.$scopedSlots).map((slot) => {
+                if (slot.startsWith('CELL')) {
+                    result.push({ key: slot.substring(5), name: slot });
                 }
             });
             return result;
