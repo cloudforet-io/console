@@ -29,7 +29,7 @@ export default {
     },
     computed: {
         tag () {
-            let states = this.$root.ENUM[this.state.toUpperCase()];
+            let states = this.$root.enums[this.state.toUpperCase()];
             if (this.isEmpty(states)) {
                 throw new Error('Wrong property value. \'state\' property must be one of the GLOBAL ENUM.');
             }
