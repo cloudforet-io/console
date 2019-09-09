@@ -169,7 +169,7 @@ export default {
             query: { 
                 sort: {}, 
                 page: {
-                    start: 0, 
+                    start: 1, 
                     limit: 10
                 }, 
                 filter: [],

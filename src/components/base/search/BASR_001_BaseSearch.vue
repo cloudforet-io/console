@@ -76,13 +76,16 @@ export default {
     props: {
         contextData: {
             type: Object,
-            default: () => Object.assign({}, contextDataModel),
+            default: Object.assign({}, contextDataModel),
             validator (obj) {
-        /**
-         * TODO: Add validation for queryList format
-         */
-                return obj.queryList !== undefined && obj.queryList !== null && obj.queryList instanceof Array &&
-              obj.autokeyList !== undefined && obj.autokeyList !== null && obj.autokeyList instanceof Array;
+                 /**
+             * TODO: Add validation for queryList format
+             */ 
+                return obj.queryList !== undefined && 
+                        obj.queryList !== null && 
+                        obj.queryList instanceof Array &&
+                    obj.autokeyList !== undefined && 
+                    obj.autokeyList !== null && obj.autokeyList instanceof Array;
             }
         },
         searchData: {
@@ -101,14 +104,22 @@ export default {
     data () {
         return {
             tagList: this.searchData.length > 0 ? this.searchData : [],
-            queryList: [],
             lastId: 0,
             focusInput: false,
             filterList: [],
             filterOrList: []
         };
     },
+    created () {
+        this.initContextData();
+    },
     methods: {
+        initContextData () {
+            if (this.contextData.queryList.length === 0 && this.contextData.autokeyList.length === 0) {
+                this.contextData.autokeyList[0] = 'keyword';
+            }
+            
+        },
         addTagAndSearch (items) {
             this.addTag(items);
             this.search();
@@ -137,7 +148,11 @@ export default {
             });
             obj.filterName = 'filterOr';
             obj.filterIdx = null;
-            obj.valueIdx = this.filterOrList[0].value.length - 1;
+            if (this.filterOrList.length === 0) {
+                obj.valueIdx = null;
+            } else {
+                obj.valueIdx = this.filterOrList[0].value.length - 1;
+            }
         },
         generateValueEmptyFilterOrList () {
             this.contextData.autokeyList.map((autokey) => {
