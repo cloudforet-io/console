@@ -259,14 +259,15 @@ export default {
             }, item);
         },
         getOperator (op) {
+            let operators = this.$root.enums.OPERATORS;
             switch (op) {
-            case this.$root.ENUM.OPERATORS.CONTAIN_IN.sign: return this.$root.ENUM.OPERATORS.CONTAIN_IN.string;
-            case this.$root.ENUM.OPERATORS.IN.sign: return this.$root.ENUM.OPERATORS.IN.string;
-            case this.$root.ENUM.OPERATORS.GTE.sign: return this.$root.ENUM.OPERATORS.GTE.string;
-            case this.$root.ENUM.OPERATORS.LTE.sign: return this.$root.ENUM.OPERATORS.LTE.string;
-            case this.$root.ENUM.OPERATORS.NOT_IN.sign: return this.$root.ENUM.OPERATORS.NOT_IN.string;
-            case this.$root.ENUM.OPERATORS.REGEX_IN.sign: return this.$root.ENUM.OPERATORS.REGEX_IN.string;
-            default: return this.$root.ENUM.OPERATORS.CONTAIN_IN.string;
+            case operators.CONTAIN_IN.sign: return operators.CONTAIN_IN.string;
+            case operators.IN.sign: return operators.IN.string;
+            case operators.GTE.sign: return operators.GTE.string;
+            case operators.LTE.sign: return operators.LTE.string;
+            case operators.NOT_IN.sign: return operators.NOT_IN.string;
+            case operators.REGEX_IN.sign: return operators.REGEX_IN.string;
+            default: return operators.CONTAIN_IN.string;
             }
         },
         focusOnInput () {
