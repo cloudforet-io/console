@@ -175,7 +175,7 @@
       </template>
 
       <template #data>
-        <ServerData />
+        <ServerData :server-data="selectedItems[0].data" />
       </template>
       
       <template #rawData>
@@ -226,24 +226,6 @@ export default {
     },
     data() {
         return {
-            tabs: [
-                {
-                    title: this.tr('COL_NM.C_SUMMARY'),
-                    key: 'summary'
-                },
-                {
-                    title: this.tr('COL_NM.C_DT'),
-                    key: 'data'
-                },
-                {
-                    title: this.tr('COL_NM.C_RAW_DT'),
-                    key: 'rawData'
-                },
-                {
-                    title: this.tr('COL_NM.C_ADMIN'),
-                    key: 'admin'
-                }
-            ],
             servers: [],
             selectedItems: [],
             selectedIdx: null,
@@ -255,7 +237,7 @@ export default {
             query: { 
                 sort: {}, 
                 page: {
-                    start: 0, 
+                    start: 1, 
                     limit: 10
                 }, 
                 filter: [],
@@ -277,6 +259,38 @@ export default {
         };
     },
     computed: {
+        tabs () {
+            if (this.isMultiSelected) {
+                return [
+                    {
+                        title: this.tr('COL_NM.C_SUMMARY'),
+                        key: 'summary'
+                    },
+                    {
+                        title: this.tr('COL_NM.C_ADMIN'),
+                        key: 'admin'
+                    }
+                ];
+            }
+            return [
+                {
+                    title: this.tr('COL_NM.C_SUMMARY'),
+                    key: 'summary'
+                },
+                {
+                    title: this.tr('COL_NM.C_DT'),
+                    key: 'data'
+                },
+                {
+                    title: this.tr('COL_NM.C_RAW_DT'),
+                    key: 'rawData'
+                },
+                {
+                    title: this.tr('COL_NM.C_ADMIN'),
+                    key: 'admin'
+                }
+            ];  
+        },
         fields () {
             return [
                 { key: 'selected', thStyle: { width: '50px' }},

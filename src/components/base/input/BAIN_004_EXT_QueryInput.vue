@@ -6,11 +6,12 @@
 
       <span class="relative-container">
         <BaseInput ref="input" 
-                   v-model="inputText" 
+                   v-model="inputText"
                    :autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
                    autocomplete="off" 
                    type="text"
                    :placeholder="tr('SEARCH')"
+                   v-bind="$props"
                    @focus="onFocus" 
                    @blur="onBlur" 
                    @input="onInput"
@@ -55,7 +56,6 @@
 </template>
 
 <script>
-import { focus } from 'vue-focus';
 import BaseQueryList from '@/components/base/list/BALT_001_BaseQueryList';
 import BaseInput from '@/components/base/input/BAIN_001_BaseInput';
 
@@ -72,12 +72,12 @@ const appendableOperators = ['=', '>', '<', '!', '$'];
 
 export default {
     name: 'QueryInput',
-    event: ['add', 'update', 'delete', 'deleteLeft'],
     components: {
         BaseInput,
         BaseQueryList
     },
     directives: { focus: focus },
+    event: ['add', 'update', 'delete', 'deleteLeft'],
     props: {
     /**
      * @description listData is array of query data object.
@@ -122,7 +122,6 @@ export default {
     data () {
         return {
             inputText: '',
-            isFocused: false,
             isKeyListShown: true,
             isValueListShown: false,
             selected: {},
@@ -142,14 +141,20 @@ export default {
             isBlurWithoutCommit: false
         };
     },
+    computed: {
+        isFocused () {
+            if (this.$refs.input) {
+                return this.$refs.input.isFocused;
+            } 
+            return false;
+        }
+    },
     created () {
         this.commitEventName = this.$listeners.update !== undefined ? 'update' : 'add';
 
         this.initSelectedData();
 
         this.inputText += this.selected.value;
-
-        this.isFocused = this.autofocus;
     },
     mounted () {
         this.setListPosition();
@@ -425,15 +430,11 @@ export default {
             return val;
         },
         onFocus () {
-            this.isFocused = true;
-
             if (this.autoselect) {
                 this.captureText();
             }
         },
         onBlur (e) {
-            this.isFocused = false;
-
             if (this.isBlurWithoutCommit) {
                 this.isBlurWithoutCommit = false;
                 return;
@@ -480,12 +481,18 @@ export default {
                 this.showValueList();
             }
         },
+        forceBlur () {
+            this.$refs.input.forceBlur();
+        },
+        forceFocus () {
+            this.$refs.input.forceFocus();
+        },
         onLeft () {
             if (this.selectionStart > 0) {
                 return;
             }
             this.isBlurWithoutCommit = true;
-            this.isFocused = false;
+            this.forceBlur();
             this.$emit('moveLeft');
         },
         onRight () {
@@ -493,7 +500,7 @@ export default {
                 return;
             }
             this.isBlurWithoutCommit = true;
-            this.isFocused = false;
+            this.forceBlur();
             this.$emit('moveRight');
         },
         onEsc () {

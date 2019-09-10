@@ -1,17 +1,16 @@
 <template>
   <div class="row">
     <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-        <BaseTable :show-caption="showCaption"
-                   :no-context-searchable="true"
-                   :cardless="true"
-                   :table-data="audits"
-                   :fields="fields"
-                   :per-page="3"
-                   :busy="isLoading"
-                   :row-clicked-fn="rowClicked"
-                   :total-rows="totalCount"
-                   @list="listAudits"
-        />
+      <BaseTable :show-caption="showCaption"
+                 :cardless="true"
+                 :table-data="audits"
+                 :fields="fields"
+                 :per-page="3"
+                 :busy="isLoading"
+                 :row-clicked-fn="rowClicked"
+                 :total-rows="totalCount"
+                 @list="listAudits"
+      />
     </b-col>
   </div>
 </template>

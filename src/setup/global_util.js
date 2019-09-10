@@ -556,7 +556,7 @@ export const Mixin = {
             _: VueLodash,
             defaultFontSizeSet: [10, 12, 14, 16, 18, 24],
             isFirstLogin: 1,
-            ENUM: GlobalEnum
+            enums: GlobalEnum
         };
     }
 };

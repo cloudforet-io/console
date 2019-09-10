@@ -46,8 +46,7 @@ export default {
     },
     data () {
         return {
-            isFocused: this.autofocus,
-            isEnterEmittedBlur: false
+            isFocused: this.autofocus
         };
     },
     computed: {
@@ -80,6 +79,12 @@ export default {
         onBlur (event) {
             this.isFocused = false;
             this.$emit('blur', event);
+        },
+        forceBlur () {
+            this.isFocused = false;
+        },
+        forceFocus () {
+            this.isFocused = true;
         }
     }
 };
@@ -90,5 +95,6 @@ input {
     border: 0;
     background-color: transparent;
     word-break: break-all;
+    display: inline-block;
 }
 </style>

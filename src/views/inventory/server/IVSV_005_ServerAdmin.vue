@@ -5,7 +5,6 @@
         <b-row>
           <b-col cols="12">
             <BaseTable :show-caption="showCaption"
-                       :no-context-searchable="true"
                        :cardless="true"
                        :table-data="audits"
                        :fields="fields"
