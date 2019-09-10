@@ -8,6 +8,8 @@ export default {
     },
 
     componentUpdated: function(el, binding) {
+        console.log('focus directive value: ', binding.value);
+        console.log('focus directive old value: ', binding.oldValue);
         if (binding.modifiers.lazy) {
             if (Boolean(binding.value) === Boolean(binding.oldValue)) {
                 return;

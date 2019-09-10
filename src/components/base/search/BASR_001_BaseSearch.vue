@@ -34,7 +34,7 @@
                         @deleteLeft="deleteLeftTag(tagList.length - 1)"
             />
           </div>
-          <span class="input-delete-button" @click="deleteAll"><i class="fal fa-times" /></span>
+          <span class="input-delete-button" @click="onDeleteAll"><i class="fal fa-times" /></span>
         </div>
 
         <b-input-group-append class="pl-0">
@@ -242,12 +242,15 @@ export default {
             obj.valueIdx = null;
             obj.filterName = '';
         },
-        deleteAll () {
+        onDeleteAll () {
             this.tagList = [];
             this.filterList = [];
             this.filterOrList = [];
             this.$refs.input.inputText = '';
             this.focusOnInput();
+            if (this.isEmptySearch) {
+                this.search();
+            }
         },
         search () {
             this.removeEmptyValueFilterOrList();
@@ -282,7 +285,7 @@ export default {
             }
         },
         focusOnInput () {
-            this.$refs.input.isFocused = true;
+            this.$refs.input.forceChangeFocus();
         },
         moveFocusToLeft (idx) {
             if (--idx > 0) {
