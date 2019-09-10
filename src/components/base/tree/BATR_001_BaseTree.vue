@@ -363,8 +363,8 @@ export default {
             const srcNode = node[0];
             const srcNodeDT = srcNode.data;
             const targetNodeDT = position.node.data;
-
             if (srcNodeDT.group === 'PROJECT'){
+
                 if (position.node.path.length  == 1 && position.placement !== 'inside' && srcNodeDT.item_type === 'PROJECT'){
                     cancel(true);
                     this.noticePanelMsg = this.tr('MODAL_MSG.LEAF_NOMOVE',[this.tr(`${trStringKey}.${srcNodeDT.item_type}`)]);

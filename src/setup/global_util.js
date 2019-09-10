@@ -324,9 +324,9 @@ export const Mixin = {
                     } else {
                         selectedNode['data'][key] = val;
                     }
+                    selectedNode['data']['group'] = type;
 
                     if (isFirstLoad){
-                        selectedNode['data']['group'] = type;
                         selectedNode['data']['is_cached '] = false;
                     }
                 }
