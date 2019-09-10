@@ -76,7 +76,7 @@ export default {
     props: {
         contextData: {
             type: Object,
-            default: Object.assign({}, contextDataModel),
+            default: () => (Object.assign({}, contextDataModel)),
             validator (obj) {
                  /**
              * TODO: Add validation for queryList format
@@ -113,6 +113,9 @@ export default {
     created () {
     },
     methods: {
+        initContextData () {
+            this.contextData.autokeyList.push('keyword');
+        },
         addTagAndSearch (items) {
             this.addTag(items);
             this.search();
