@@ -124,8 +124,9 @@ export default {
                 this.rememberMe();
                 this.setTimeZone();
             }).catch((err) => {
-                console.log('error', err);
-                this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
+                if (err.data.error.code.includes('AUTHENTICATED_WITHOUT_USER')) {
+                    this.$alertify.error('Invalid User. Please, Confirm your Account availability to Admin.');
+                }
             });
         },
         showErorrMSG() {
