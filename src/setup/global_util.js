@@ -335,7 +335,6 @@ export const Mixin = {
                     selectedNode['isLeaf'] = leafStatus;
                 }
             }
-            console.log('abs', selectedNode);
             return selectedNode;
         },
         /**********************************************************************************

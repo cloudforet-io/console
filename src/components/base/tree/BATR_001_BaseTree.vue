@@ -363,7 +363,6 @@ export default {
             const srcNode = node[0];
             const srcNodeDT = srcNode.data;
             const targetNodeDT = position.node.data;
-           debugger;
             if (srcNodeDT.group === 'PROJECT'){
 
                 if (position.node.path.length  == 1 && position.placement !== 'inside' && srcNodeDT.item_type === 'PROJECT'){
