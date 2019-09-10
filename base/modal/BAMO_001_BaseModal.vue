@@ -13,9 +13,10 @@
              :no-close-on-backdrop="backdropOff"
              :hide-footer="hideFooter"
              @ok="$emit('ok')"
-             @hidden="isModalShown = false"
+             @hidden="onHidden"
              @cancel="clickCancel"
              @hide="onHide"
+             @shown="onShown"
     >
       <template #modal-header>
         <h5 class="modal-title">{{ title }}</h5>
@@ -24,7 +25,8 @@
         </button>
       </template>
 
-      <slot name="contents"
+      <slot v-if="isReadyToRender" 
+            name="contents"
             :hide="onHide" 
             :ok="clickOk"
             :cancel="clickCancel"
@@ -122,7 +124,7 @@ export default {
     data() {
         return {
             modalShow: false,
-            isModalShown: false
+            isReadyToRender: false
         };
     },
     created () {
@@ -130,7 +132,6 @@ export default {
     methods: {
         showModal () {
             this.modalShow = true;
-            this.isModalShown = true;
         },
         hideModal () {
             this.modalShow = false;
@@ -154,6 +155,12 @@ export default {
             } else {
                 this.hideModal();
             }
+        },
+        onShown () {
+            this.isReadyToRender = true;
+        },
+        onHidden () {
+            this.isReadyToRender = false;
         }
     }
 };
