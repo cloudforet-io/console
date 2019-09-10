@@ -9,6 +9,7 @@
                :busy="isLoading"
                :per-page="query.page.limit"
                :total-rows="totalCount"
+               plain-search
                cardless
                underlined
                searchable
@@ -155,13 +156,21 @@ export default {
         this.listServerData();
     },
     methods: {
-        async listServerData (limit, start, sort, filter, filterOr) {
+        setQuery (limit, start, sort, keyword) {
+            this.query.page.limit = limit || 10;
+            this.query.page.start = start || 0;
+            this.query.sort = sort || {};
+            this.query.keyword = keyword || '';
+        },
+        async listServerData (limit, start, sort, keyword) {
+            this.reset();
+            this.setQuery(limit, start, sort, keyword);
             try {
                 let res = await this.$axios.post('/inventory/server/get-data', { 
                     domain_id: sessionStorage.getItem('domainId'),
                     server_id: this.serverData.server_id,
                     data_type: this.activeNav,
-                    query: this.query 
+                    query: this.query
                 });
                 this.tableData = res.data.results;
                 this.totalCount = res.data.total_count;
@@ -176,17 +185,14 @@ export default {
         },
         onClickDisk () {
             this.activeNav = this.serverDataKeyEnum.DISK;
-            this.reset();
             this.listServerData();
         },
         onClickNic () {
             this.activeNav = this.serverDataKeyEnum.NIC;
-            this.reset();
             this.listServerData();
         },
         onClickSecurityGroup () {
             this.activeNav = this.serverDataKeyEnum.SG;
-            this.reset();
             this.listServerData();
         },
         portRangeFormatter (val, key, data) {
