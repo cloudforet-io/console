@@ -297,8 +297,8 @@ export default {
         async updateDataCenter(items) {
             const itemType = this._.get(items.tree.getSelected()[0],'data.item_type');
             const itemId = this._.get(items.tree.getSelected()[0],'data.id');
-            const url = itemType === 'REGION' ? '/inventory/region/update': itemType === 'ZONE' ? '/inventory/zone/update' : '/inventory/pool/update';
-            const key = itemType === 'REGION' ? 'region_id': itemType === 'ZONE' ? 'zone_id' : 'pool_id';
+            const url = `/inventory/${itemType.toLowerCase()}/update`;
+            const key = `${itemType.toLowerCase()}_id`;
             let param = this.validateDataCenter();
 
             if (!this.isEmpty(param)){
@@ -321,8 +321,8 @@ export default {
         async deletedSelectedOnTree (pramTree){
             const itemType = this._.get(pramTree.tree.getSelected()[0],'data.item_type');
             const itemId = this._.get(pramTree.tree.getSelected()[0],'data.id');
-            const url = itemType === 'REGION' ? '/inventory/region/delete': itemType === 'ZONE' ? '/inventory/zone/delete' : '/inventory/pool/delete';
-            const key = itemType === 'REGION' ? 'region_id': itemType === 'ZONE' ? 'zone_id' : 'pool_id';
+            const url = `/inventory/${itemType.toLowerCase()}/delete`;
+            const key = `${itemType.toLowerCase()}_id`;
             let passParam = { domain_id: sessionStorage.domainId };
             passParam[key] = itemId;
             await this.$axios.post(url, passParam).then((response) => {
@@ -349,12 +349,11 @@ export default {
             });
         },
         async moveDataCenter(items) {
-
             const fromItem = items.nodes[0];
             const toItem = items.position.node;
             let param = {};
-            const url = `/inventory/${fromItem.data.item_type.toLowerCase()}/update`;
 
+            const url = `/inventory/${fromItem.data.item_type.toLowerCase()}/update`;
             const keySrouce = `${fromItem.data.item_type.toLowerCase()}_id`;
             const keyTo = `${toItem.data.item_type.toLowerCase()}_id`;
             param[keySrouce] = fromItem.data.id;

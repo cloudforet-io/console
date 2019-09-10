@@ -32,11 +32,8 @@
                       <i v-else class="fal fa-folder-minus" />
                     </span>
                     <span v-else-if="treeType == 'DATA_CENTER'" class="item-icon">
-                      <i v-if="node.data.item_type == 'REGION' && !node.isExpanded" class="fad fa-globe-asia" />
-                      <i v-else-if="node.data.item_type == 'REGION' && node.isExpanded" class="fal fa-globe-americas" />
-                      <i v-else-if="node.data.item_type == 'ZONE' && !node.isExpanded" class="fas fa-clouds-sun" />
-                      <i v-else-if="node.data.item_type == 'ZONE' && node.isExpanded" class="fal fa-clouds-moon" />
-                      <i v-else-if="node.data.item_type == 'ZONE' && node.isExpanded" class="fas fa-server" />
+                      <i v-if="node.data.item_type == 'REGION'" class="far fa-globe-americas" />
+                      <i v-else-if="node.data.item_type == 'ZONE'" class="fab fa-cloudversify" />
                       <i v-else class="fad fa-server" />
                     </span>
                     <span class="item-title">
