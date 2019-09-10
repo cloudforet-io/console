@@ -369,8 +369,6 @@ export default {
                 console.error(error);
             });
 
-            debugger;
-
             if (!items.position.node.data.is_cached){
                 if (items.isCanceled) {
                     items.position.node.path[items.position.node.path.length-1] = items.position.node.path[items.position.node.path.length-1]-1;

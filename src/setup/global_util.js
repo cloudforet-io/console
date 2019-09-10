@@ -282,6 +282,7 @@ export const Mixin = {
             let returnTree = [];
             if (d.hasOwnProperty('items') && d.items.length > 0) {
                 d.items.forEach((curItem) =>{
+                    this.consoleLogEnv('Tree each: ',curItem);
                     let treeItem = this.getSelectedNode(curItem, f, true);
                     returnTree.push(treeItem);
                 });
@@ -311,15 +312,12 @@ export const Mixin = {
                 isSelectable: true,
                 data: { visible: false }
             };
-
             if (!this.isEmpty(o)) {
                 const leafStatus = GlobalEnum['TREE'][type][o.item_type].isLeaf;
                 for (let [key, val] of Object.entries(o)) {
                     if (key==='name') {
                         selectedNode['title'] = val;
-                    } else if (key === 'has_child') {
-                        selectedNode['id'] = val;
-                    } else if (key === 'has_child') {
+                    }  else if (key === 'has_child') {
                         selectedNode['isLeaf'] = !val;
                     }  else if (key === 'domain_id') {
                         continue;
@@ -337,7 +335,6 @@ export const Mixin = {
                     selectedNode['isLeaf'] = leafStatus;
                 }
             }
-
             return selectedNode;
         },
         /**********************************************************************************
