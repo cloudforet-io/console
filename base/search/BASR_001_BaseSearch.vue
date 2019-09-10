@@ -285,7 +285,7 @@ export default {
             }
         },
         focusOnInput () {
-            this.$refs.input.forceChangeFocus();
+            this.$refs.input.forceFocus();
         },
         moveFocusToLeft (idx) {
             if (--idx > 0) {

@@ -1,3 +1,4 @@
+
 <template>
   <span>
     <span class="input-container">
@@ -53,7 +54,6 @@
     </span>
   </span>
 </template>
-
 <script>
 import BaseQueryList from '@/components/base/list/BALT_001_BaseQueryList';
 import BaseInput from '@/components/base/input/BAIN_001_BaseInput';
@@ -76,7 +76,6 @@ export default {
         BaseQueryList
     },
     directives: { focus: focus },
-    extends: BaseInput,
     event: ['add', 'update', 'delete', 'deleteLeft'],
     props: {
     /**
@@ -99,10 +98,6 @@ export default {
             default: () => (Object.assign({}, contentsModel))
         },
         autofocus: {
-            type: Boolean,
-            default: false
-        },
-        autoselect: {
             type: Boolean,
             default: false
         },
@@ -141,14 +136,12 @@ export default {
             isBlurWithoutCommit: false
         };
     },
-    created () {
+    created () { 
         this.commitEventName = this.$listeners.update !== undefined ? 'update' : 'add';
 
         this.initSelectedData();
 
         this.inputText += this.selected.value;
-
-        this.isFocused = this.autofocus;
     },
     mounted () {
         this.setListPosition();
@@ -424,16 +417,11 @@ export default {
             return val;
         },
         onFocus () {
-            console.log('onfocuse extended');
-            this.isFocused = true;
-
             if (this.autoselect) {
                 this.captureText();
             }
         },
         onBlur (e) {
-            this.isFocused = false;
-
             if (this.isBlurWithoutCommit) {
                 this.isBlurWithoutCommit = false;
                 return;
@@ -485,7 +473,7 @@ export default {
                 return;
             }
             this.isBlurWithoutCommit = true;
-            this.isFocused = false;
+            this.forceBlur();
             this.$emit('moveLeft');
         },
         onRight () {
@@ -493,7 +481,7 @@ export default {
                 return;
             }
             this.isBlurWithoutCommit = true;
-            this.isFocused = false;
+            this.forceBlur();
             this.$emit('moveRight');
         },
         onEsc () {
