@@ -123,7 +123,8 @@ export default {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();
-            }).catch(() => {
+            }).catch((err) => {
+                console.log('error', err);
                 this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
             });
         },
