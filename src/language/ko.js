@@ -79,6 +79,7 @@ export const ko ={
         DELETE_YN: '선택하신 {0} 의 아래에 멤버들을 삭제 하시겠습니까?',
         DELETE_SUCC: ' {0}: {1} 을/를 성곡적으로 삭제 하였습니다.',
         DEL_MEM: '멤버 삭제',
+        DEL_PARAM: '{0} 삭제',
         SEARCH: '검색',
         PROFILE: '프로필',
         DASHBOARD: 'Dashboard',

@@ -34,10 +34,10 @@
                     <span v-else-if="treeType == 'DATA_CENTER'" class="item-icon">
                       <i v-if="node.data.item_type == 'REGION' && !node.isExpanded" class="fad fa-globe-asia" />
                       <i v-else-if="node.data.item_type == 'REGION' && node.isExpanded" class="fal fa-globe-americas" />
-                      <i v-else-if="node.data.item_type == 'ZONE' && !node.isExpanded"   class="fas fa-clouds-sun" />
-                      <i v-else-if="node.data.item_type == 'ZONE' && node.isExpanded"   class="fal fa-clouds-moon" />
-                      <i v-else-if="node.data.item_type == 'ZONE' && node.isExpanded"   class="fas fa-server" />
-                      <i v-else  class="fad fa-server" />
+                      <i v-else-if="node.data.item_type == 'ZONE' && !node.isExpanded" class="fas fa-clouds-sun" />
+                      <i v-else-if="node.data.item_type == 'ZONE' && node.isExpanded" class="fal fa-clouds-moon" />
+                      <i v-else-if="node.data.item_type == 'ZONE' && node.isExpanded" class="fas fa-server" />
+                      <i v-else class="fad fa-server" />
                     </span>
                     <span class="item-title">
                       {{ node.title }}
@@ -371,6 +371,7 @@ export default {
                     this.$refs.BATR001_treeAlertNotice.showModal();
                     return;
                 }
+
                 const acceptable = GlobalEnum['TREE'][targetNodeDT.group][targetNodeDT.item_type].accept;
                 if (!acceptable.includes(srcNodeDT.item_type)){
                     cancel(true);
@@ -378,8 +379,14 @@ export default {
                     this.$refs.BATR001_treeAlertNotice.showModal();
                     return;
                 }
-            } else if (srcNodeDT.group === 'DATA_CENTER') {
 
+            } else if (srcNodeDT.group === 'DATA_CENTER') {
+                /*if (node[0].path.length-1 !== position.node.path.length){
+                    cancel(true);
+                    this.noticePanelMsg = this.tr('MODAL_MSG.LEAF_NOMOVE',[this.tr(`${trStringKey}.${srcNodeDT.item_type}`)]);
+                    this.$refs.BATR001_treeAlertNotice.showModal();
+                    return;
+                }*/
             }
 
             const treeV = this.$refs.slVueTree;

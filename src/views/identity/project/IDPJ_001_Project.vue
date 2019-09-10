@@ -268,7 +268,6 @@ export default {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
                         const placement = isRootAction ? 'after': 'inside';
-
                         const InitializedPG = {
                             id: responseData.project_group_id,
                             item_type:'PROJECT_GROUP',
@@ -276,7 +275,7 @@ export default {
                             name: param.name
                         };
 
-                        let newNode = this.getSelectedNode(InitializedPG);
+                        let newNode = this.getSelectedNode(InitializedPG, 'PROJECT');
 
                         if (!isRootAction) {
                             this.applyActionOnScreen(items, flag, tree,{ node: newNode, placement: placement });
@@ -301,7 +300,6 @@ export default {
                 const selected = tree.getSelected()[0];
                 param['domain_id'] = sessionStorage.domainId;
                 param['project_group_id'] = selected.data.id;
-
                 await this.$axios.post(url, param).then((response) => {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
@@ -368,7 +366,6 @@ export default {
                     this.$alertify.error('Item has child, Please delete Child first.');
                 }
             });
-            console.log('Game over');
         },
         async applyActionOnScreen(items, flag, tree, data) {
             const selected = tree.getSelected()[0];
