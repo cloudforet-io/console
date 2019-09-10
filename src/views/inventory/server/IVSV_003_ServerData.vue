@@ -156,7 +156,6 @@ export default {
     },
     methods: {
         async listServerData (limit, start, sort, filter, filterOr) {
-            debugger;
             try {
                 let res = await this.$axios.post('/inventory/server/get-data', { 
                     domain_id: sessionStorage.getItem('domainId'),

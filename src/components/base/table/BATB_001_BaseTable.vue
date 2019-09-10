@@ -6,8 +6,8 @@
     >
       <template v-if="!headerless" #header>
         <b-row ref="headerContainer"
-               align-v="center"
-               align-h="between" 
+               align-v="center" 
+               align-h="between"
                class="header-container"
                :style="{ 'padding-left': `${pad}px`, 'padding-right': `${pad}px` }"
         >
@@ -22,9 +22,8 @@
                :class="{ 'no-caption': noCaption }"
                :style="{ width: searchContainerWidth }"
           >
-            <div class="searchbox" :style="{ width: searchboxWidth }">
-              <BaseSearch v-if="searchable"
-                          :context-data="searchContextData"
+            <div v-if="searchable" class="searchbox" :style="{ width: searchboxWidth }">
+              <BaseSearch :context-data="searchContextData"
                           :is-empty-search="isEmptySearch"
                           :border="!darkHeader"
                           @search="onSearch"
