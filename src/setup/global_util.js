@@ -282,23 +282,8 @@ export const Mixin = {
             let returnTree = [];
             if (d.hasOwnProperty('items') && d.items.length > 0) {
                 d.items.forEach((curItem) =>{
-                    console.log(curItem);
-                    let obj = {};
-                    let dataObj = {
-                        id: curItem.id,
-                        item_type : curItem.item_type,
-                        is_cached : false,
-                        group: f
-                    };
-
-                    obj['data'] = dataObj;
-                    obj['title'] = curItem.name;
-                    obj['isLeaf'] = curItem.has_child ? false: true;
-                    obj['isExpanded'] = false;
-                    if (curItem.has_child){
-                        obj['children'] = [];
-                    }
-                    returnTree.push(obj);
+                    let treeItem = this.getSelectedNode(curItem, f, true);
+                    returnTree.push(treeItem);
                 });
             } else {
                 returnTree =  [{ title: 'Please, Right Click me',
@@ -308,6 +293,52 @@ export const Mixin = {
                     }}];
             }
             return returnTree;
+        },
+        /**********************************************************************************
+         * Name       : getSelectedNode
+         * Input   => (o: any data Object to bind                         =>  Object)
+         * Output  => Node
+         * Description:  return tree array of object which suits for BaseTree
+         **********************************************************************************/
+        getSelectedNode: function (o, type, isFirstLoad) {
+            let selectedNode = {
+                title: '',
+                isLeaf: false,
+                children: [],
+                isExpanded: false,
+                isSelected: false,
+                isDraggable: (type === 'DATA_CENTER') ? false : true,
+                isSelectable: true,
+                data: { visible: false }
+            };
+
+            if (!this.isEmpty(o)) {
+                const leafStatus = GlobalEnum['TREE'][type][o.item_type].isLeaf;
+                for (let [key, val] of Object.entries(o)) {
+                    if (key==='name') {
+                        selectedNode['title'] = val;
+                    } else if (key === 'has_child') {
+                        selectedNode['id'] = val;
+                    } else if (key === 'has_child') {
+                        selectedNode['isLeaf'] = !val;
+                    }  else if (key === 'domain_id') {
+                        continue;
+                    } else {
+                        selectedNode['data'][key] = val;
+                    }
+
+                    if (isFirstLoad){
+                        selectedNode['data']['group'] = type;
+                        selectedNode['data']['is_cached '] = false;
+                    }
+                }
+
+                if (!this.isEmpty(leafStatus) && !('has_child' in o)){
+                    selectedNode['isLeaf'] = leafStatus;
+                }
+            }
+
+            return selectedNode;
         },
         /**********************************************************************************
          * Name       : getAllTimezones
@@ -367,50 +398,6 @@ export const Mixin = {
          **********************************************************************************/
         getLanguage: function (value) {
             return GlobalEnum.LANGUAGES[value];
-        },
-        /**********************************************************************************
-         * Name       : getSelectedNode
-         * Input   => (o: any data Object to bind                         =>  Object)
-         * Output  => Node
-         * Description:  return tree array of object which suits for BaseTree
-         **********************************************************************************/
-        getSelectedNode: function (o, type) {
-            let selectedNode = {
-                title: '',
-                isLeaf: false,
-                children: [],
-                isExpanded: false,
-                isSelected: false,
-                isDraggable: true,
-                isSelectable: true,
-                data: { visible: false }
-            };
-
-            if (!this.isEmpty(o)) {
-                const leafStatus = GlobalEnum['TREE'][type][o.item_type].isLeaf;
-                for (let [key, val] of Object.entries(o)) {
-                    if (key==='name') {
-                        selectedNode['title'] = val;
-                    }  else if (key === 'has_child') {
-                        selectedNode['isLeaf'] = !val;
-                    }  else if (key === 'domain_id') {
-                        continue;
-                    } else {
-                        selectedNode['data'][key] = val;
-                    }
-                }
-
-                if (!this.isEmpty(leafStatus) && !('has_child' in o)){
-                    selectedNode['isLeaf'] = leafStatus;
-                }
-
-                if (type === 'DATA_CENTER'){
-                    selectedNode['isDraggable'] = false;
-                }
-
-                selectedNode['data']['group'] = type;
-            }
-            return selectedNode;
         },
         /**********************************************************************************
          * Name       : getSelectedNode

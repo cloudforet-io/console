@@ -155,9 +155,9 @@ export default {
                     'key': 'name'
                 }
             }).then((response) => {
-                const responseData = this.treeDataHandler(response.data, { is_root: true });
+                const responseData = this.treeDataHandler(response.data, 'DATA_CENTER');
                 this.treeData = responseData;
-          //Note: Initialize DataCenter trees and then display only a context, This must be included as well.
+
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0],'data.init'))) {
                     this.isInitializing = true;
                 }
