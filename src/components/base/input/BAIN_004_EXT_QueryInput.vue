@@ -1,4 +1,3 @@
-
 <template>
   <span>
     <span class="input-container">
@@ -12,6 +11,7 @@
                    autocomplete="off" 
                    type="text"
                    :placeholder="tr('SEARCH')"
+                   v-bind="$props"
                    @focus="onFocus" 
                    @blur="onBlur" 
                    @input="onInput"
@@ -54,6 +54,7 @@
     </span>
   </span>
 </template>
+
 <script>
 import BaseQueryList from '@/components/base/list/BALT_001_BaseQueryList';
 import BaseInput from '@/components/base/input/BAIN_001_BaseInput';
@@ -101,6 +102,10 @@ export default {
             type: Boolean,
             default: false
         },
+        autoselect: {
+            type: Boolean,
+            default: false
+        },
         addOnly: {
             type: Boolean,
             default: false
@@ -136,7 +141,15 @@ export default {
             isBlurWithoutCommit: false
         };
     },
-    created () { 
+    computed: {
+        isFocused () {
+            if (this.$refs.input) {
+                return this.$refs.input.isFocused;
+            } 
+            return false;
+        }
+    },
+    created () {
         this.commitEventName = this.$listeners.update !== undefined ? 'update' : 'add';
 
         this.initSelectedData();
@@ -467,6 +480,12 @@ export default {
             if (this.selected.key && this.getOperatorIdx() < e.target.selectionStart) {
                 this.showValueList();
             }
+        },
+        forceBlur () {
+            this.$refs.input.forceBlur();
+        },
+        forceFocus () {
+            this.$refs.input.forceFocus();
         },
         onLeft () {
             if (this.selectionStart > 0) {
