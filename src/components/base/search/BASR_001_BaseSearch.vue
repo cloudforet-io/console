@@ -111,15 +111,8 @@ export default {
         };
     },
     created () {
-        this.initContextData();
     },
     methods: {
-        initContextData () {
-            if (this.contextData.queryList.length === 0 && this.contextData.autokeyList.length === 0) {
-                this.contextData.autokeyList[0] = 'keyword';
-            }
-            
-        },
         addTagAndSearch (items) {
             this.addTag(items);
             this.search();
