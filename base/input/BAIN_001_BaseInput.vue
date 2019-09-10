@@ -80,6 +80,9 @@ export default {
         onBlur (event) {
             this.isFocused = false;
             this.$emit('blur', event);
+        },
+        forceChangeFocus () {
+            this.isFocused = !this.isFocused;
         }
     }
 };

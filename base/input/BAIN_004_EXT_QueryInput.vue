@@ -6,7 +6,7 @@
 
       <span class="relative-container">
         <BaseInput ref="input" 
-                   v-model="inputText" 
+                   v-model="inputText"
                    :autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
                    autocomplete="off" 
                    type="text"
@@ -55,7 +55,6 @@
 </template>
 
 <script>
-import { focus } from 'vue-focus';
 import BaseQueryList from '@/components/base/list/BALT_001_BaseQueryList';
 import BaseInput from '@/components/base/input/BAIN_001_BaseInput';
 
@@ -72,12 +71,13 @@ const appendableOperators = ['=', '>', '<', '!', '$'];
 
 export default {
     name: 'QueryInput',
-    event: ['add', 'update', 'delete', 'deleteLeft'],
     components: {
         BaseInput,
         BaseQueryList
     },
     directives: { focus: focus },
+    extends: BaseInput,
+    event: ['add', 'update', 'delete', 'deleteLeft'],
     props: {
     /**
      * @description listData is array of query data object.
@@ -122,7 +122,6 @@ export default {
     data () {
         return {
             inputText: '',
-            isFocused: false,
             isKeyListShown: true,
             isValueListShown: false,
             selected: {},
@@ -425,6 +424,7 @@ export default {
             return val;
         },
         onFocus () {
+            console.log('onfocuse extended');
             this.isFocused = true;
 
             if (this.autoselect) {
