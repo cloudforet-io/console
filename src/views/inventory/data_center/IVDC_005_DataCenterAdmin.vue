@@ -2,7 +2,7 @@
   <div class="animated fadeIn">
     <b-row>
       <b-col cols="12">
-        <BaseTable :table-data="members"
+        <BaseTable :table-data="admins"
                    :fields="fields"
                    :per-page="perPage"
                    searchable
@@ -13,7 +13,7 @@
                    :cardless="false"
                    underlined
                    @rowSelected="rowSelected"
-                   @list="listMembers"
+                   @list="listAdmins"
                    @limitChanged="limitChanged"
                    @onSelectAll="rowAllSelected"
         >
@@ -31,9 +31,9 @@
                     </b-button>
                   </template>
                   <template #contents>
-                    <MemberDetail creatable
+                    <AdminDetail creatable
                                   updatable
-                                  :memebers="memberUserIDs"
+                                  :admins="adminUserIDs"
                                   :selected-data="anySelectedRow"
                                   @close="$refs.addMember.hideModal()"
                     />
@@ -53,16 +53,16 @@
       </b-col>
     </b-row>
 
-    <ActionCheckModal ref="IDPJ005_DeleteUser"
+    <ActionCheckModal ref="IVDC005_DeleteUser"
                       primary-key="user_id"
-                      :data="selectedMembers"
+                      :data="selectedAdmins"
                       :fields="selectedFields"
                       :action="actionProcess"
                       :title="actionCommandData.title"
                       :type="actionCommandData.type"
                       :text="actionCommandData.text"
-                      @succeed="listMembers"
-                      @failed="listMembers"
+                      @succeed="listAdmins"
+                      @failed="listAdmins"
     />
   </div>
 </template>
@@ -72,20 +72,20 @@ import searchContext from '@/views/identity/project/search_context/search_contex
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 import ActionCheckModal from '@/components/base/modal/BAMO_003_EXT_ActionCheckModal';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
-import MemberDetail from '@/views/identity/project/IDPJ_006_ProjectMemberDetail';
+import AdminDetail from '@/views/inventory/data_center/IVDC_006_DataCenterAdminDetail';
 
 export default {
     name: 'DataCenterAdmin',
     components: {
         BaseTable,
         BaseModal,
-        MemberDetail,
+        AdminDetail,
         ActionCheckModal
     },
     data () {
         return {
-            members: [],
-            memberUserIDs: [],
+            admins: [],
+            adminUserIDs: [],
             selectedIdx: undefined,
             addModal: false,
             totalCount: 0,
@@ -130,7 +130,7 @@ export default {
         hasSelectedMember () {
             return this.selectedItems.length > 0;
         },
-        selectedMembers () {
+        selectedAdmins () {
             return this.selectedItems.map((item) => {
                 return item.data;
             });
@@ -141,10 +141,10 @@ export default {
     },
     methods: {
         init () {
-            this.listMembers(this.perPage, 0);
+            this.listAdmins(this.perPage, 0);
         },
         reset () {
-            this.members = [];
+            this.admins = [];
             this.selectedMember = null;
             this.isLoading = true;
         },
@@ -173,35 +173,31 @@ export default {
                 filter_or: filterOr
             };
         },
-        async listMembers (limit, start, sort, filter, filterOr) {
+        async listAdmins (limit, start, sort, filter, filterOr) {
             this.reset();
             this.saveMeta(limit, start, sort, filter, filterOr);
-            let url = null;
+
             let param = {
                 query: this.searchQuery
             };
 
-            if (this.$attrs['selected-data'].node.data.item_type === 'PROJECT_GROUP'){
-                url = '/identity/project-group/member/list';
-                param['project_group_id'] =  this.$attrs['selected-data'].node.data.id;
-            } else {
-                url = '/identity/project/member/list';
-                param['project_id'] =  this.$attrs['selected-data'].node.data.id;
-            }
-
-            console.log('Parameters', JSON.stringify(param));
+            const itemType = this.$attrs['selected-data'].node.data.item_type;
+            const url = `/inventory/${itemType.toLowerCase()}/admin/list`;
+            const key = `${itemType.toLowerCase()}_id`;
+            param[key] =  this.$attrs['selected-data'].node.data.id;
+            
             await this.$axios.post(url,param).then((response) => {
                 let results = [];
                 if (!this.isEmpty(response.data.results)){
-                    let memberUserIds =[];
+                    let adminUserIds =[];
                     response.data.results.forEach(function(current){
-                        current.user_info['role'] = current.user_info.roles.join(', ');
+                        //current.user_info['role'] = current.user_info.roles.join(', ');
                         results.push(current.user_info);
-                        memberUserIds.push(current.user_info.user_id);
+                        adminUserIds.push(current.user_info.user_id);
                     });
-                    this.memberUserIDs = memberUserIds;
+                    this.adminUserIDs = adminUserIds;
                 }
-                this.members = results;
+                this.admins = results;
                 console.log(response.data.results);
                 this.isLoading = false;
             }).catch((error) =>{
@@ -242,48 +238,31 @@ export default {
             }
         },
         async actionProcess () {
-            let url = null;
             let param = {};
-
-            if (this.selectedMembers.length > 0){
-                const membersIds = this.selectedMembers;
-                if (this.actionFlag ==='delete'){
-                    if (this.getSelectedInfo('item_type') === 'PROJECT_GROUP'){
-                        url = '/identity/project-group/member/remove';
-                        param['project_group_id'] =  this.getSelectedInfo('id');
-                        param['users'] =  this.getSelectedValArr(membersIds, 'user_id');
-                    } else {
-                        url = '/identity/project/member/remove';
-                        param['project_id'] =  this.getSelectedInfo('id');
-                        param['users'] =  this.getSelectedValArr(membersIds, 'user_id');
-                    }
-                }
+            let url = null;
+            if (this.selectedAdmins.length > 0){
+                const adminsIds = this.selectedAdmins;
+                const key = `${this.getSelectedInfo('item_type').toLowerCase()}_id`;
+                url =   `/inventory/${this.getSelectedInfo('item_type').toLowerCase()}/admin/remove`;
+                param[key] =  this.getSelectedInfo('id');
+                param['users'] =  this.getSelectedValArr(adminsIds, 'user_id');
             } else {
                 return;
             }
-
-
-            if (!this.isEmpty(url) && !this.isEmpty(url)) {
-                await this.$axios.post(url,param);
-          /*     .then((response) => {
-           if (this.isEmpty(response.data)){
-               console.log('success');
-           }
-       }).catch((error) =>{
-           console.log(error);
-       });*/
+            if (!this.isEmpty(url) && !this.isEmpty(param)) {
+                await this.$axios.post(url, param);
             }
         },
         actionCommand(){
-            let itemType = this.getSelectedInfo('item_type') === 'PROJECT_GROUP' ? this.tr('PG_GR') : this.tr('PG');
+            let itemType = this.getSelectedInfo('item_type') === 'REGION' ? this.tr('MSG.RG') : this.getSelectedInfo('item_type') === 'ZONE' ? this.tr('MSG.ZE'): this.tr('MSG.PL');
             if (this.actionFlag ==='delete'){
                 let obj = {};
-                obj['title'] = this.tr('DEL_MEM');
+                obj['title'] = this.tr('MSG.DEL_PARAM', [this.tr('MSG.ADMIN_USER')]);
                 obj['type'] = 'danger';
                 obj['text'] =  this.tr('DELETE_YN', [itemType]);
                 this.actionCommandData = obj;
             }
-            this.$refs.IDPJ005_DeleteUser.showModal();
+            this.$refs.IVDC005_DeleteUser.showModal();
         },
         deleteSelected () {
             this.actionFlag = 'delete';

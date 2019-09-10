@@ -219,13 +219,11 @@ export default {
             const path = selected.path;
             const dataParam = nodeObj.node.data;
             dataParam['is_cached'] = true;
-            debugger;
             let param = {
                 item_type: this._.get(nodeObj.node, 'data.item_type'),
                 item_id: this._.get(nodeObj.node, 'data.id'),
                 domain_id: sessionStorage.domainId
             };
-
             await this.$axios.post('/inventory/data-center/tree', param).then((response) => {
                 childrenNode = this.getSelectedNodeArr(response.data.items, 'DATA_CENTER');
 
@@ -351,31 +349,28 @@ export default {
             });
         },
         async moveDataCenter(items) {
-            this.consoleLogEnv('Move Selected Items : ', items);
+
             const fromItem = items.nodes[0];
             const toItem = items.position.node;
-            const url = fromItem.isLeaf ? '/identity/dataCenter/update' : '/identity/dataCenter-group/update';
             let param = {};
-            if (fromItem.isLeaf) {
-                param['dataCenter_id'] = fromItem.data.id;
-                param['dataCenter_group_id'] = toItem.data.id;
-            } else {
-                param['parent_dataCenter_group_id'] = toItem.data.id;
-                param['dataCenter_group_id'] = fromItem.data.id;
-                if (items.position.placement !== 'inside' && toItem.data.hasOwnProperty('is_root')){
-                    if (toItem.data.is_root) {
-                        param['release_parent_dataCenter_group'] = true;
-                    }
-                }
-            }
+            const url = `/inventory/${fromItem.data.item_type.toLowerCase()}/update`;
+
+            const keySrouce = `${fromItem.data.item_type.toLowerCase()}_id`;
+            const keyTo = `${toItem.data.item_type.toLowerCase()}_id`;
+            param[keySrouce] = fromItem.data.id;
+            param[keyTo] = toItem.data.id;
+
             await this.$axios.post(url, param).then((response) => {
                 const responseData = response.data;
                 if (!this.isEmpty(responseData)){
-                    console.log('Item successfully moved. ');
+                    console.log('Item successfully moved.', responseData);
                 }
             }).catch((error) => {
                 console.error(error);
             });
+
+            debugger;
+
             if (!items.position.node.data.is_cached){
                 if (items.isCanceled) {
                     items.position.node.path[items.position.node.path.length-1] = items.position.node.path[items.position.node.path.length-1]-1;

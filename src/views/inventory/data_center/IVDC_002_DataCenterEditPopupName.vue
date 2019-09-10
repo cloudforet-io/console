@@ -89,7 +89,6 @@ export default {
         const selectedNode = selected.hasOwnProperty('selectedItem') ? selected.selectedItem.tree.getSelected()[0] : selected.tree.getSelected()[0];
         if (Object.keys(this.$attrs).length > 0) {
             this.treeDataSelected = selected;
-            debugger;
             if (this.$attrs['is-creatable']) {
                 this.currentState = 'CREATE';
                 this.labelMsg =this.switchLabel('CREATE', selectedNode.data.item_type);
@@ -113,7 +112,9 @@ export default {
     methods: {
         switchLabel(flag, item_type){
             let returnVal = [this.tr(''), this.tr('')];
-            if (item_type === 'REGION'){
+            if (this.isEmpty(item_type) || this.$attrs['selected-data'].flag ==='CRG'){
+                returnVal = [this.tr('RG'), this.tr('RG_NM')];
+            } else if (item_type === 'REGION'){
                 returnVal = flag === 'CREATE' ? [this.tr('RG_ID'), this.tr('ZE_NM')] : [this.tr('RG'), this.tr('RG_NM')];
             } else if (item_type === 'ZONE'){
                 returnVal = flag ==='CREATE'? [this.tr('ZE_ID'), this.tr('PL_NM')] : [this.tr('ZE'), this.tr('ZE_NM')];

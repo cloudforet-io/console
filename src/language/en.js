@@ -82,6 +82,7 @@ export const en = {
         DELETE_YN: 'Are you sure to delete those following members from selected {0}?',
         DELETE_SUCC: 'The {0}: {1}  was successfully deleted.',
         DEL_MEM: 'Delete Member',
+        DEL_PARAM: 'Delete {0}',
         SEARCH: 'Search',
         PROFILE: 'Profile',
         DASHBOARD: 'Dashboard',
