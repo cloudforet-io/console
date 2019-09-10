@@ -317,8 +317,8 @@ export default {
             this.consoleLogEnv('Update Project : ', items);
             const itemType = items.tree.getSelected()[0].data.item_type;
             const selectedId = items.tree.getSelected()[0].data.id;
-            const url = itemType === 'PROJECT_GROUP' ? '/identity/project-group/update': '/identity/project/update';
-            const key = itemType === 'PROJECT_GROUP' ? 'project_group_id': 'project_id';
+            const url = `/inventory/${itemType.toLowerCase()}/update`;
+            const key = `${itemType.toLowerCase()}_id`;
             let param = this.validateProject();
             if (!this.isEmpty(param)){
                 param[key] = selectedId;
@@ -340,8 +340,8 @@ export default {
         async deletedSelectedOnTree (pramTree){
             const itemType = pramTree.tree.getSelected()[0].data.item_type;
             const selectedId = pramTree.tree.getSelected()[0].data.id;
-            const url = itemType === 'PROJECT_GROUP' ? '/identity/project-group/delete': '/identity/project/delete';
-            const key = itemType === 'PROJECT_GROUP' ? 'project_group_id': 'project_id';
+            const url = `/inventory/${itemType.toLowerCase()}/delete`;
+            const key = `${itemType.toLowerCase()}_id`;
             let passParam = { domain_id: sessionStorage.domainId };
             passParam[key] = selectedId;
             await this.$axios.post(url, passParam).then((response) => {
@@ -383,17 +383,21 @@ export default {
             }
         },
         async moveProject(items) {
-            this.consoleLogEnv('Move Selected Items : ', items);
             const fromItem = items.nodes[0];
             const toItem = items.position.node;
-            const url = fromItem.isLeaf ? '/identity/project/update' : '/identity/project-group/update';
+            const url = `/identity/${fromItem.data.item_type.toLowerCase()}/update`;
+            const keySrouce = `${fromItem.data.item_type.toLowerCase()}_id`;
+            const keyTo = `${toItem.data.item_type.toLowerCase()}_id`;
+            param[keySrouce] = fromItem.data.id;
+            param[keyTo] = toItem.data.id;
+
             let param = {};
             if (fromItem.isLeaf) {
                 param['project_id'] = fromItem.data.id;
                 param['project_group_id'] = toItem.data.id;
             } else {
-                param['parent_project_group_id'] = toItem.data.id;
                 param['project_group_id'] = fromItem.data.id;
+                param['parent_project_group_id'] = toItem.data.id;
                 if (items.position.placement !== 'inside' && toItem.data.hasOwnProperty('is_root')){
                     if (toItem.data.is_root) {
                         param['release_parent_project_group'] = true;
