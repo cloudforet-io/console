@@ -64,7 +64,7 @@ export default {
                 } else {
                     param['credentials'] = {
                         user_id: authObj.userId,
-                        password: authObj.password,
+                        password: authObj.password
                     };
                 }
             }
@@ -96,6 +96,19 @@ export default {
                  ************************************************************/
                 switch (errorCode) {
                 case 401: {
+                        /* Vue.notify({
+                          group: 'auth',
+                          title: 'Wrong User name or Password ',
+                          type: 'g-Error',
+                          duration: 1000,
+                          speed: 100,
+                          text: 'Please, confirm your <b> user Name </b> or <b> Password </b>.'
+                        }) */
+                    throw new Error(throwableErrorMsg);
+                }
+                case 500: {
+                        alert('throwableErrorMsg');
+                        console.log('throwableErrorMsg',throwableErrorMsg);
                         /* Vue.notify({
                           group: 'auth',
                           title: 'Wrong User name or Password ',
