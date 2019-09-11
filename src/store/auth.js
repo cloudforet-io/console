@@ -82,11 +82,11 @@ export default {
                  * TODO:: Please, create ERR_CODE charts or table to specify its msg and to map error code with msg.
                  */
                 console.log('Auth Error', err);
-                const errorCode = err.response.status ? err.response.status: err.status;
+                const errorCode = err.status ? err.status: 404;
                 console.log('errorCode', errorCode);
                 const errorDetailCode = err.data.error.code;
                 console.log('errorDetailCode', errorDetailCode);
-                const errorMsg = err.response.data.message ? err.response.data.message : err.data.error.message;
+                const errorMsg = err.data.error.message ? err.data.error.message : 'No Available';
                 console.log('errorMsg', errorMsg);
 
                 const throwableErrorMsg = JSON.stringify({
