@@ -78,9 +78,9 @@ export default {
                 getApi().defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
 
             } catch (err) {
-                console.log('##!!!!!!!!!!!!!!##############', err);
-                console.log('##!!!!!!!!!!!!!!##############', err.code);
-                console.log('##!!!!!!!!!!!!!!##############', err.message);
+                console.log('##!!!!!!!!!!!!!!##############', err.status);
+                console.log('##!!!!!!!!!!!!!!##############', err.data);
+                console.log('##!!!!!!!!!!!!!!##############', err.data.error);
                 /*
                  * TODO:: Please, create ERR_CODE charts or table to specify its msg and to map error code with msg.
                  */
@@ -90,8 +90,7 @@ export default {
                     error_code: errorCode,
                     error_msg: errorMsg
                 });
-                console.log('################');
-                console.log('err', err);
+
                 /************************************************************
                  * TODO:: Please, add each cases for error login author,
                  * if any difficulties to handle condition with its response code, Please put notice and update function.
