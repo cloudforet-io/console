@@ -81,13 +81,9 @@ export default {
                 /*
                  * TODO:: Please, create ERR_CODE charts or table to specify its msg and to map error code with msg.
                  */
-                console.log('Auth Error', err);
                 const errorCode = err.status ? err.status: 404;
-                console.log('errorCode', errorCode);
                 const errorDetailCode = err.data.error.code;
-                console.log('errorDetailCode', errorDetailCode);
                 const errorMsg = err.data.error.message ? err.data.error.message : 'No Available';
-                console.log('errorMsg', errorMsg);
 
                 const throwableErrorMsg = JSON.stringify({
                     error_code: errorCode,
@@ -95,39 +91,25 @@ export default {
                     error_msg: errorMsg,
                 });
 
-                console.log('throwableErrorMsg', throwableErrorMsg);
                 /************************************************************
                  * TODO:: Please, add each cases for error login author,
                  * if any difficulties to handle condition with its response code, Please put notice and update function.
                  ************************************************************/
                 switch (errorCode) {
                 case 401: {
-                        /* Vue.notify({
-                          group: 'auth',
-                          title: 'Wrong User name or Password ',
-                          type: 'g-Error',
-                          duration: 1000,
-                          speed: 100,
-                          text: 'Please, confirm your <b> user Name </b> or <b> Password </b>.'
-                        }) */
+
                     throw new Error(throwableErrorMsg);
                 }
                 case 500: {
-                    console.log('throwableErrorMsg',throwableErrorMsg);
-                        /* Vue.notify({
-                          group: 'auth',
-                          title: 'Wrong User name or Password ',
-                          type: 'g-Error',
-                          duration: 1000,
-                          speed: 100,
-                          text: 'Please, confirm your <b> user Name </b> or <b> Password </b>.'
-                        }) */
+
                     throw new Error(throwableErrorMsg);
                 }
                 case 403: {
+
                     throw new Error(throwableErrorMsg);
                 }
                 default: {
+
                     throw new Error(throwableErrorMsg);
                 }
                 }

@@ -121,7 +121,7 @@
             <b-card no-body class="text-white bg-primary py-5 d-md-down-none" style="width:44%">
               <b-card-body class="text-center">
                 <div>
-                  <p><h1>{{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}</h1></p>
+                  <p /><h1>{{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}</h1></p>
                   <p> {{ $t('MSG.LOG_UP_DESC') }}</p>
                 </div>
               </b-card-body>
@@ -178,14 +178,23 @@ export default {
                 password: this.password,
                 domainId: sessionStorage.getItem('domainId')
             };
-            await this.$store.dispatch('auth/login',authObj).then(() => {
+            await this.$store.dispatch('auth/login',authObj).then((response) => {
                 console.log(this.nextPath);
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();
 
-            }).catch(() => {
-                this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
+            }).catch((error) => {
+                if (!this.isEmpty(error.message)){
+                    const errorConfig = JSON.parse(error.message);
+                    const errorCode = errorConfig.error_code;
+                    const errorMSG = errorConfig.error_dt_code;
+                    if ('ERROR_NOT_FOUND' === errorMSG && errorCode === 400){
+                        this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
+                    }
+                } else {
+                    this.consoleLogEnv('error', error);
+                }
             });
         },
         showErorrMSG () {

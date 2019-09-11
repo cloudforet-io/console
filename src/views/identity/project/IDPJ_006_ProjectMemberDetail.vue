@@ -178,23 +178,17 @@ export default {
             this.$refs.IDPJ006_DeleteCheck.showModal();
         },
         async addUser() {
-            let url = null;
-
             const projectSelected = this.$attrs['selected-data'];
             const selected_id = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.id : projectSelected.nodes[0].data.id;
             const selected_type = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.item_type : projectSelected.nodes[0].data.item_type;
+            const url = `/identity/${selected_type.toLowerCase()}/member/add`;
+            const key = `${selected_type.toLowerCase()}_id`;
 
             let param = {
                 query: this.searchQuery
             };
 
-            if (selected_type === 'PROJECT_GROUP'){
-                url = '/identity/project-group/member/add';
-                param['project_group_id'] =  selected_id;
-            } else {
-                url = '/identity/project/member/add';
-                param['project_id'] =  selected_id;
-            }
+            param[key] =  selected_id;
 
             if (this.selectedModalItems.length > 0){
                 const currentUsers = this.projectMemberData.tagList;
