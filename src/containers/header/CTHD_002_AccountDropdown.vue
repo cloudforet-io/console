@@ -43,10 +43,10 @@ export default {
             if (this.isEmpty(clientId)){
                 await this.$store.dispatch('auth/logout');
                 this.$router.push({ path: '/log-in' });
-                this.oAuthSignOut();
             } else {
                 await this.$store.dispatch('auth/logout', clientId);
                 this.$router.push({ path: '/google-Log-in' });
+                this.oAuthSignOut();
             }
         },
         onClickProfile () {
