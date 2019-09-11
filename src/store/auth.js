@@ -81,6 +81,7 @@ export default {
                 /*
                  * TODO:: Please, create ERR_CODE charts or table to specify its msg and to map error code with msg.
                  */
+                console.log('Auth Error', err);
                 const errorCode = err.response.status ? err.response.status: err.status;
                 console.log('errorCode', errorCode);
                 const errorDetailCode = err.data.error.code;
