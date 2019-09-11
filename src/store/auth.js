@@ -82,8 +82,11 @@ export default {
                  * TODO:: Please, create ERR_CODE charts or table to specify its msg and to map error code with msg.
                  */
                 const errorCode = err.response.status ? err.response.status: err.status;
+                console.log('errorCode', errorCode);
                 const errorDetailCode = err.data.error.code;
+                console.log('errorDetailCode', errorDetailCode);
                 const errorMsg = err.response.data.message ? err.response.data.message : err.data.error.message;
+                console.log('errorMsg', errorMsg);
 
                 const throwableErrorMsg = JSON.stringify({
                     error_code: errorCode,
@@ -91,6 +94,7 @@ export default {
                     error_msg: errorMsg,
                 });
 
+                console.log('throwableErrorMsg', throwableErrorMsg);
                 /************************************************************
                  * TODO:: Please, add each cases for error login author,
                  * if any difficulties to handle condition with its response code, Please put notice and update function.

@@ -115,6 +115,7 @@ export default {
         async login() {
             await this.$store.dispatch('auth/login', this.oathSignParam
             ).then((response) => {
+                console.log('################This is DK ######################');
                 let auth2 = gapi.auth2.getAuthInstance();
                 if (!auth2.isSignedIn.get()) {
                     return;
