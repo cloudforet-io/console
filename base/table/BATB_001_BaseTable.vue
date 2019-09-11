@@ -23,8 +23,10 @@
                :style="{ width: searchContainerWidth }"
           >
             <div v-if="searchable" class="searchbox" :style="{ width: searchboxWidth }">
-              <BaseSearch :context-data="searchContextData"
+              <BaseSearch ref="search"
+                          :context-data="searchContextData"
                           :is-empty-search="isEmptySearch"
+                          :plain-search="plainSearch"
                           :border="!darkHeader"
                           @search="onSearch"
                           @empty="$emit('empty')"
@@ -183,6 +185,10 @@ export default {
             type: Object,
             default: undefined
         },
+        plainSearch: {
+            type: Boolean,
+            default: false
+        },
         isEmptySearch: {
             type: Boolean,
             default: false
@@ -302,6 +308,7 @@ export default {
             sort: undefined,
             filter: [],
             filterOr: [],
+            keyword: '',
             isLocalSort: true,
             limitInput: this.perPage,
             isSelectedAll: false,
@@ -525,7 +532,7 @@ export default {
             }
             this.currentPage--;
             this.reset();
-            this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
+            this.emitListEvent();
         },
         onNext () {
             if (this.currentPage >= this.maxPage) {
@@ -533,18 +540,29 @@ export default {
             }
             this.currentPage++;
             this.reset();
-            this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
+            this.emitListEvent();
         },
         onRefresh () {
             this.currentPage = 1;
             this.reset();
-            this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
+            this.emitListEvent();
         },
         onSearch (filter, filterOr) {
-            this.filter = filter;
-            this.filterOr = filterOr;
+            if (this.plainSearch) {
+                this.keyword = filter;
+            } else {
+                this.filter = filter;
+                this.filterOr = filterOr;
+            }
             this.reset();
-            this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
+            this.emitListEvent();
+        },
+        emitListEvent () {
+            if (this.searchContextData) {
+                this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
+            } else {
+                this.$emit('list', this.limit, this.start, this.sort, this.keyword);    
+            }
         },
         headClicked (key, item) {
             if (item.ajaxSortable) {
@@ -563,7 +581,7 @@ export default {
                 desc: ctx.sortDesc ? 1 : 0
             };
             this.reset();
-            this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
+            this.emitListEvent();
         },
         reset () {
             this.isSelectedAll = false;

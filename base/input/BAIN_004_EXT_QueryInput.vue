@@ -110,6 +110,10 @@ export default {
             type: Boolean,
             default: false
         },
+        noReset: {
+            type: Boolean,
+            default: false
+        },
         maxWidth: {
             type: String,
             default: '100%'
@@ -311,7 +315,9 @@ export default {
             this.selected.value = '';
         },
         resetAll () {
-            this.inputText = '';
+            if (!this.noReset) {
+                this.inputText = '';
+            }
             this.hideValueList();
             this.keyList = this.listData;
             this.showKeyList();

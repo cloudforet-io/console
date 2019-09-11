@@ -26,12 +26,10 @@
 </template>
 
 <script>
-import { focus } from 'vue-focus';
 import QueryInput from '@/components/base/input/BAIN_004_EXT_QueryInput';
 export default {
     name: 'InputTag',
     event: ['delete', 'update'],
-    directives: { focus: focus },
     components: { QueryInput },
     props: {
         listData: {
