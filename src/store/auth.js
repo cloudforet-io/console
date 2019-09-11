@@ -54,7 +54,6 @@ export default {
                 param['credentials'] = { access_token: authObj.access_token };
 
             } else {
-
                 if (authObj.hasOwnProperty('user_type')){
                     param['credentials'] = {
                         user_id: authObj.adminUserId,
@@ -70,7 +69,6 @@ export default {
             }
 
             try {
-
                 const res = await getApi().post('/identity/token/issue', param);
                 commit('setUserId', { userId: authObj.userId });
                 commit('login', { token: res.data.access_token });
@@ -80,6 +78,7 @@ export default {
                 getApi().defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
 
             } catch (err) {
+                console.log('##!!!!!!!!!!!!!!##############');
                 /*
                  * TODO:: Please, create ERR_CODE charts or table to specify its msg and to map error code with msg.
                  */
@@ -89,6 +88,7 @@ export default {
                     error_code: errorCode,
                     error_msg: errorMsg
                 });
+                console.log('################');
                 console.log('err', err);
                 /************************************************************
                  * TODO:: Please, add each cases for error login author,
