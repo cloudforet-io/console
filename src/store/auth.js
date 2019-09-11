@@ -89,6 +89,7 @@ export default {
                     error_code: errorCode,
                     error_msg: errorMsg
                 });
+                console.log('err', err);
                 /************************************************************
                  * TODO:: Please, add each cases for error login author,
                  * if any difficulties to handle condition with its response code, Please put notice and update function.
