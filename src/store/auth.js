@@ -78,17 +78,17 @@ export default {
                 getApi().defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
 
             } catch (err) {
-                console.log('##!!!!!!!!!!!!!!##############', err.status);
-                console.log('##!!!!!!!!!!!!!!##############', err.data);
-                console.log('##!!!!!!!!!!!!!!##############', err.data.error);
                 /*
                  * TODO:: Please, create ERR_CODE charts or table to specify its msg and to map error code with msg.
                  */
-                const errorCode = err.response.status;
-                const errorMsg = err.response.data.message;
+                const errorCode = err.response.status ? err.response.status: err.status;
+                const errorDetailCode = err.data.error.code;
+                const errorMsg = err.response.data.message ? err.response.data.message : err.data.error.message;
+
                 const throwableErrorMsg = JSON.stringify({
                     error_code: errorCode,
-                    error_msg: errorMsg
+                    error_dt_code: errorDetailCode,
+                    error_msg: errorMsg,
                 });
 
                 /************************************************************
@@ -108,8 +108,7 @@ export default {
                     throw new Error(throwableErrorMsg);
                 }
                 case 500: {
-                        alert('throwableErrorMsg');
-                        console.log('throwableErrorMsg',throwableErrorMsg);
+                    console.log('throwableErrorMsg',throwableErrorMsg);
                         /* Vue.notify({
                           group: 'auth',
                           title: 'Wrong User name or Password ',

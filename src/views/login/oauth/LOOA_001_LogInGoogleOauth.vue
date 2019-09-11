@@ -114,7 +114,7 @@ export default {
         },
         async login() {
             await this.$store.dispatch('auth/login', this.oathSignParam
-            ).then(() => {
+            ).then((response) => {
                 let auth2 = gapi.auth2.getAuthInstance();
                 if (!auth2.isSignedIn.get()) {
                     return;
@@ -123,7 +123,9 @@ export default {
                 this.$router.push(this.nextPath);
                 this.rememberMe();
                 this.setTimeZone();
+                console.log('response', response);
             }).catch((err) => {
+                console.log('error', err);
                 /*if (err.data.error.code.includes('AUTHENTICATED_WITHOUT_USER')) {
                     this.$alertify.error('Invalid User. Please, Confirm your Account availability to Admin.');
                 }*/
