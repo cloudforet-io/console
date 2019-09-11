@@ -5,13 +5,13 @@
         <BaseTable :table-data="projectMemberData.members"
                    :fields="fields"
                    :per-page="perPage"
-                   searchable
                    :total-rows="totalCount"
-                   :search-context-data="memberModalQueryData"
-                   show-caption
                    :busy="isLoading"
                    :cardless="false"
+                   searchable
+                   show-caption
                    underlined
+                   plain-search
                    is-empty-search
                    @rowSelected="rowSelected"
                    @list="listMembersOnModal"
@@ -76,7 +76,13 @@ export default {
             selectedIdx: undefined,
             isFooterVisible: true,
             memberModalQueryData: query,
-            memberModalQuery: {},
+            query: { 
+                page: {
+                    start: 1, 
+                    limit: 10
+                }, 
+                keyword: ''
+            },
             totalCount: 0,
             perPage: 10,
             isLoading: true,
@@ -119,39 +125,17 @@ export default {
             this.selectedModalMember = null;
             this.isLoading = true;
         },
-        saveMemberModalMeta (limit, start, sort, filter, filterOr) {
-            if (this.isEmpty(limit)) {
-                limit = 10;
-            }
-            if (this.isEmpty(start)) {
-                start = 0;
-            }
-            if (this.isEmpty(sort)) {
-                sort = {};
-            }
-            if (this.isEmpty(filter)) {
-                filter = [];
-            }
-            if (this.isEmpty(filterOr)) {
-                filterOr = [];
-            }
-            this.memberModalQuery = {
-                sort,
-                page: {
-                    start: start,
-                    limit
-                },
-                filter_or: filterOr,
-                filter: [
-                    { key: 'user_id' ,value: this.$attrs.memebers, operator: 'not_in' }
-                ]
-            };
+        setQuery (limit, start, sort, keyword) {
+            this.query.page.limit = limit || 10;
+            this.query.page.start = start || 0;
+            this.query.sort = sort || {};
+            this.query.keyword = keyword || '';
         },
-        async listMembersOnModal (limit, start, sort, filter, filterOr){
+        async listMembersOnModal (limit, start, sort, keyword){
             this.reset();
-            this.saveMemberModalMeta(limit, start, sort, filter, filterOr);
+            this.setQuery(limit, start, sort, keyword);
             await this.$axios.post('/identity/user/list',{
-                query: this.memberModalQuery
+                query: this.query
             }).then((response) => {
                 this.projectMemberData.members = response.data.results;
                 this.totalCount = response.data.total_count;
@@ -219,7 +203,7 @@ export default {
                 return;
             }
 
-            await this.$axios.post(url, param).then((response) => {
+            await this.$axios.post(url, param).then(() => {
                 this.$parent.$parent.$parent.$parent.$parent.listMembers();
                 this.$emit('close');
             }).catch((error) => {

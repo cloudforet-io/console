@@ -27,6 +27,7 @@
             <QueryInput ref="input" 
                         class="input"
                         :list-data="contextData.queryList"
+                        no-reset
                         add-only
                         @add="addTagAndSearch" 
                         @moveLeft="moveFocusToLeft(tagList.length - 1)"
@@ -99,6 +100,10 @@ export default {
         border: {
             type: Boolean,
             default: false
+        },
+        plainSearch: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -113,12 +118,13 @@ export default {
     created () {
     },
     methods: {
-        initContextData () {
-            this.contextData.autokeyList.push('keyword');
-        },
         addTagAndSearch (items) {
-            this.addTag(items);
-            this.search();
+            if (this.plainSearch) {
+                this.search(this.$refs.input.inputText);
+            } else {
+                this.addTag(items);
+                this.search();
+            }
         },
         addTag (tags) {
             tags.map((tag) => {
@@ -248,20 +254,30 @@ export default {
             this.filterOrList = [];
             this.$refs.input.inputText = '';
             this.focusOnInput();
-            if (this.isEmptySearch) {
-                this.search();
-            }
         },
-        search () {
-            this.removeEmptyValueFilterOrList();
-            if (this.isEmptySearch && this.tagList.length === 0) {
-                this.$emit('empty');
+        search (text) {
+            if (this.plainSearch) {
+                if (this.isEmptySearch && !text) {
+                    this.$emit('empty');
+                } else {
+                    this.$emit('search', text);
+                }
             } else {
-                this.$emit('search', this.filterList, this.filterOrList);
+                this.removeEmptyValueFilterOrList();
+                if (this.isEmptySearch && this.tagList.length === 0) {
+                    this.$emit('empty');
+                } else {
+                    this.$emit('search', this.filterList, this.filterOrList);
+                }
             }
+
         },
         onClickSearch () {
-            this.$refs.input.onEnter();
+            if (this.plainSearch) {
+                this.search(this.$refs.input.inputText);
+            } else {
+                this.$refs.input.onEnter();
+            }
         },
         getNewTag (item) {
             return Object.assign({ 
