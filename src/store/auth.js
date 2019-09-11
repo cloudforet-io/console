@@ -78,9 +78,9 @@ export default {
                 getApi().defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
 
             } catch (err) {
+                console.log('##!!!!!!!!!!!!!!##############', err);
                 console.log('##!!!!!!!!!!!!!!##############', err.code);
                 console.log('##!!!!!!!!!!!!!!##############', err.message);
-
                 /*
                  * TODO:: Please, create ERR_CODE charts or table to specify its msg and to map error code with msg.
                  */
