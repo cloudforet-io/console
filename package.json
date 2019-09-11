@@ -19,6 +19,7 @@
     "bootstrap-vue": "^2.0.0-rc.23",
     "bootstrap-vue-treeview": "^1.0.8",
     "chart.js": "^2.8.0",
+    "core-js": "^2.6.5",
     "countries-and-timezones": "^1.0.1",
     "flag-icon-css": "^3.3.0",
     "sl-vue-tree": "^1.8.4",
