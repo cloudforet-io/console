@@ -106,7 +106,7 @@
                 :is-footer-visible="false"
                 :use-slot="true"
     >
-      <template #INFO>
+      <template #info>
         <b-card class="base first-tab">
           <BaseMultiPanel v-if="isMultiSelected" 
                           :data="selectedUsers"
@@ -156,7 +156,7 @@ export default {
             tabs: [
                 {
                     title: this.tr('PANEL.INFO'),
-                    key: this.tr('PANEL.INFO')
+                    key: 'info'
                 }
             ],
             users: [],
@@ -169,7 +169,7 @@ export default {
             query: { 
                 sort: {}, 
                 page: {
-                    start: 0, 
+                    start: 1, 
                     limit: 10
                 }, 
                 filter: [],
@@ -263,7 +263,7 @@ export default {
                 this.isLoading = false;
             } catch (e) {
                 console.error(e);
-                this.$alertify(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('USER')]));
+                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('USER')]));
                 this.isLoading = false;
             }
         },

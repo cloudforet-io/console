@@ -36,6 +36,7 @@ export const en = {
         BTN_ENABLE: 'Enable',
         BTN_DISABLE: 'Disable',
         BTN_CONFIRM: 'Confirm',
+        BTN_OK: 'OK',
         BTN_YES: 'Yes',
         BTN_NO: 'No',
         BTN_S_MANT: 'Set Maintenance',
@@ -69,8 +70,19 @@ export const en = {
         PG_NM: 'Project Name',
         PG_GR: 'Project Group',
         PG: 'Project',
+        RG: 'Region',
+        ZE: 'Zone',
+        PL: 'Pool',
+        RG_ID: 'Region ID',
+        RG_NM: 'Region Name',
+        ZE_ID: 'Zone ID',
+        ZE_NM: 'Zone Name',
+        PL_ID: 'Pool ID',
+        PL_NM: 'Pool Name',
         DELETE_YN: 'Are you sure to delete those following members from selected {0}?',
+        DELETE_SUCC: 'The {0}: {1}  was successfully deleted.',
         DEL_MEM: 'Delete Member',
+        DEL_PARAM: 'Delete {0}',
         SEARCH: 'Search',
         PROFILE: 'Profile',
         DASHBOARD: 'Dashboard',
@@ -94,7 +106,13 @@ export const en = {
     },
     TREE_TYPE: {
         PROJECT: 'Project',
-        PROJECT_GROUP: 'Project Group'
+        PROJECT_GROUP: 'Project Group',
+        REGION: 'Region',
+        ZONE: 'Zone',
+        POOL: 'Pool',
+        CREATE: 'Create {0}',
+        UPDATE: 'Update {0}',
+        DELETE: 'Delete Selected'
     },
     COL_NM: {
         C_COMMAND_ID: 'COMMAND ID',
@@ -119,6 +137,9 @@ export const en = {
         LANGUAGE: 'Language',
         DOMAIN_ID: 'Domain ID',
         TIMEZONE: 'Timezone',
+        DEVICE: 'Device',
+        SIZE: 'Size',
+        TAG: 'Tag',
         TYPE: 'Type',
         ROLE: 'Role',
         STATE: 'State',
@@ -130,6 +151,15 @@ export const en = {
         DELETE: 'Deleted at',
         RESULT: 'Result',
         IP: 'IP',
+        CIDR: 'CIDR',
+        MAC: 'MAC',
+        NETWORK: 'Network',
+        DIRECTION: 'Direction',
+        PROTOCOL: 'Protocol',
+        PORT_RANGE: 'Port Range',
+        SRC_DEST: 'Source / Destination',
+        SG_NAME: 'SG Name',
+        SG_ID: 'SG ID',
         CORE: 'Core',
         MEMORY: 'Memory',
         O_TYPE: 'OS Type',
@@ -155,7 +185,7 @@ export const en = {
         INST_TYPE: 'Instance Type',
         CREATE_BY: 'Created By',
         SEC_GROUP: 'Security Group',
-        C_COL_INFO: 'Collect Informaiton',
+        C_COL_INFO: 'Collect Information',
         EXECR: 'Executor',
         EVENT: 'Event',
         FAIL_REASON: 'Reason for Failure'
@@ -164,8 +194,8 @@ export const en = {
         NOT_ALLOW: 'Action not allowed'
     },
     MODAL_MSG: {
-        LEAF_NOMOVE: ' \'{0}\' can not be located at Root position.',
-        LEAF_PUSHTO:  'Can\'t locate \'{0}\' into \'{1}\', Please Check your Action.'
+        LEAF_NOMOVE: ' {0} can not be located at Root position.',
+        LEAF_PUSHTO:  'Can\'t locate the {0} into {1}. Please, Check your Action.'
     },
     PANEL: {
         BASE_INFO: 'Base Information',
@@ -177,8 +207,8 @@ export const en = {
         COMPUTE: 'Compute'
     },
     FORM: {
-        UNVALID: {
-            MENDATORY: 'This is a mendatory field.',
+        INVALID: {
+            MANDATORY: 'This is a mandatory field.',
             UNIQUE: 'This must be unique.',
             LENGTH: '{0} must be {1}~{2} characters long.'
         },

@@ -43,6 +43,7 @@ export default {
             if (this.isEmpty(clientId)){
                 await this.$store.dispatch('auth/logout');
                 this.$router.push({ path: '/log-in' });
+                this.oAuthSignOut();
             } else {
                 await this.$store.dispatch('auth/logout', clientId);
                 this.$router.push({ path: '/google-Log-in' });
@@ -50,6 +51,12 @@ export default {
         },
         onClickProfile () {
             this.$refs.profileModal.showModal();
+        },
+        oAuthSignOut(){
+            let auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+                console.log('on sign out');
+            });
         }
     }
 };

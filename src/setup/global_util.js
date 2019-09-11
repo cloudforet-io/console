@@ -256,55 +256,6 @@ export const Mixin = {
             return fontSize;
         },
         /**********************************************************************************
-         * Name       : bindEnumToHtml
-         * Input   => (m: message   =>  String)
-         *            {type: type of font awesome ex: fal, fab,
-         *             icon: icon name,
-         *             size: size of icon ex: -1 ~ 10
-         *             color: variant color
-         *            }
-         * Output  => String translation Message
-         * Description:  translation of i18n
-         **********************************************************************************/
-        bindEnumToHtml: function (p) {
-            if (!this.isEmpty(this._.get(GlobalEnum,p.toUpperCase()))) {
-                const icon = this._.get(GlobalEnum,p.toUpperCase() + '.icon');
-                const color = this._.get(GlobalEnum,p.toUpperCase() + '.color');
-
-                const msg = this.isEmpty(this.tr('ENUM.' + p.toUpperCase())) ? this._.get(GlobalEnum,p.toUpperCase() +  '.msg') : this.tr('ENUM.' + p.toUpperCase());
-                console.log(this.tr('ENUM.' + p.toUpperCase()));
-                /***********
-                 msg: 'In Progress',
-                 icon: 'fal fa-check',
-                 color: 'primary'
-                 ************/
-                return `<span class="${color}"><i class="${icon}"> </i></span> &nbsp; ${msg}`;
-
-            } else {
-                return '';
-            }
-        },
-        /**********************************************************************************
-         * Name       : bindAdditionalKey
-         * Input   => (t: data                         =>  Array of data Object
-         *             k: key                          =>  String
-         *             v: additional value to attach   =>  String
-         *             l: location  =>  where to bind additional key at (b: back, or rest default: front)
-         * Output  => String translation Message
-         * Description:  translation of i18n
-         **********************************************************************************/
-        bindAdditionalKey: function (d, k, i, l) {
-            let returnVal = d;
-            if (this.isSelectedType(d,'a')){
-                for (let current of returnVal) {
-                    current[k] = (l === 'b') ? current[k] =   current[k] + '.' + i : current[k] = i +  '.' + current[k];
-                }
-            } else {
-                returnVal = (l === 'b') ? returnVal =   returnVal + '.' + i : returnVal = i + '.' +  returnVal;
-            }
-            return returnVal;
-        },
-        /**********************************************************************************
          * Name       : dictToKeyValueArray
          * Input   => (t: data                         =>  Array of data Object
          *             k: key                          =>  String
@@ -323,34 +274,17 @@ export const Mixin = {
         /**********************************************************************************
          * Name       : treeDataHandler
          * Input   => (d: data                         =>  Array of data Object
-         *             o: Object                         =>  Tree Type in Enum values)
+         *             f: flag                         =>  flag key in Enum variables
          * Output  => Object Array which
          * Description:  return tree array of object which suits for BaseTree
          **********************************************************************************/
-        treeDataHandler: function (d, o) {
+        treeDataHandler: function (d, f) {
             let returnTree = [];
             if (d.hasOwnProperty('items') && d.items.length > 0) {
                 d.items.forEach((curItem) =>{
-                    console.log(curItem);
-                    let obj = {};
-                    let dataObj = {
-                        id: curItem.id,
-                        item_type : curItem.item_type,
-                        is_cached : false
-                    };
-
-                    if (!this.isEmpty(o)){
-                        Object.assign(dataObj, o);
-                    }
-
-                    obj['data'] = dataObj;
-                    obj['title'] = curItem.name;
-                    obj['isLeaf'] = curItem.has_child ? false: true;
-                    obj['isExpanded'] = false;
-                    if (curItem.has_child){
-                        obj['children'] = [];
-                    }
-                    returnTree.push(obj);
+                    this.consoleLogEnv('Tree each: ',curItem);
+                    let treeItem = this.getSelectedNode(curItem, f, true);
+                    returnTree.push(treeItem);
                 });
             } else {
                 returnTree =  [{ title: 'Please, Right Click me',
@@ -360,6 +294,48 @@ export const Mixin = {
                     }}];
             }
             return returnTree;
+        },
+        /**********************************************************************************
+         * Name       : getSelectedNode
+         * Input   => (o: any data Object to bind                         =>  Object)
+         * Output  => Node
+         * Description:  return tree array of object which suits for BaseTree
+         **********************************************************************************/
+        getSelectedNode: function (o, type, isFirstLoad) {
+            let selectedNode = {
+                title: '',
+                isLeaf: false,
+                children: [],
+                isExpanded: false,
+                isSelected: false,
+                isDraggable: (type === 'DATA_CENTER') ? false : true,
+                isSelectable: true,
+                data: { visible: false }
+            };
+            if (!this.isEmpty(o)) {
+                const leafStatus = GlobalEnum['TREE'][type][o.item_type].isLeaf;
+                for (let [key, val] of Object.entries(o)) {
+                    if (key==='name') {
+                        selectedNode['title'] = val;
+                    }  else if (key === 'has_child') {
+                        selectedNode['isLeaf'] = !val;
+                    }  else if (key === 'domain_id') {
+                        continue;
+                    } else {
+                        selectedNode['data'][key] = val;
+                    }
+                    selectedNode['data']['group'] = type;
+
+                    if (isFirstLoad){
+                        selectedNode['data']['is_cached '] = false;
+                    }
+                }
+
+                if (!this.isEmpty(leafStatus) && !('has_child' in o)){
+                    selectedNode['isLeaf'] = leafStatus;
+                }
+            }
+            return selectedNode;
         },
         /**********************************************************************************
          * Name       : getAllTimezones
@@ -426,46 +402,11 @@ export const Mixin = {
          * Output  => Node
          * Description:  return tree array of object which suits for BaseTree
          **********************************************************************************/
-        getSelectedNode: function (o) {
-            const filterArr = ['PROJECT'];
-            let selectedNode = {
-                title: '',
-                isLeaf: false,
-                children: [],
-                isExpanded: false,
-                isSelected: false,
-                isDraggable: true,
-                isSelectable: true,
-                data: { visible: false }
-            };
-            if (!this.isEmpty(o)) {
-                for (let [key, val] of Object.entries(o)) {
-                    if (key==='name') {
-                        selectedNode['title'] = val;
-                    } else if (key === 'has_child') {
-                        selectedNode['isLeaf'] = !val;
-                    } else if (key === 'item_type' && filterArr.includes(val)) {
-                        selectedNode['isLeaf'] =  true;
-                    } else if (key === 'domain_id') {
-                        continue;
-                    } else {
-                        selectedNode['data'][key] = val;
-                    }
-                }
-            }
-            return selectedNode;
-        },
-        /**********************************************************************************
-         * Name       : getSelectedNode
-         * Input   => (o: any data Object to bind                         =>  Object)
-         * Output  => Node
-         * Description:  return tree array of object which suits for BaseTree
-         **********************************************************************************/
-        getSelectedNodeArr: function (dataArr) {
+        getSelectedNodeArr: function (dataArr, nodeType) {
             let NodeArray = [];
             if (dataArr.length > 0 ) {
                 dataArr.forEach(curItem =>{
-                    NodeArray.push(this.getSelectedNode(curItem));
+                    NodeArray.push(this.getSelectedNode(curItem, nodeType));
                 });
             }
             return NodeArray;
@@ -605,7 +546,7 @@ export const Mixin = {
             _: VueLodash,
             defaultFontSizeSet: [10, 12, 14, 16, 18, 24],
             isFirstLogin: 1,
-            ENUM: GlobalEnum
+            enums: GlobalEnum
         };
     }
 };

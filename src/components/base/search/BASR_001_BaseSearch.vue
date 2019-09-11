@@ -24,17 +24,17 @@
                       @deleteLeft="deleteLeftTag(idx - 1)"
             />
 
-            <BaseInput ref="input" 
-                       class="input"
-                       :list-data="contextData.queryList"
-                       add-only
-                       @add="addTagAndSearch" 
-                       @moveLeft="moveFocusToLeft(tagList.length - 1)"
-                       @moveRight="moveFocusToRight(tagList.length - 1)"
-                       @deleteLeft="deleteLeftTag(tagList.length - 1)"
+            <QueryInput ref="input" 
+                        class="input"
+                        :list-data="contextData.queryList"
+                        add-only
+                        @add="addTagAndSearch" 
+                        @moveLeft="moveFocusToLeft(tagList.length - 1)"
+                        @moveRight="moveFocusToRight(tagList.length - 1)"
+                        @deleteLeft="deleteLeftTag(tagList.length - 1)"
             />
           </div>
-          <span class="input-delete-button" @click="deleteAll"><i class="fal fa-times" /></span>
+          <span class="input-delete-button" @click="onDeleteAll"><i class="fal fa-times" /></span>
         </div>
 
         <b-input-group-append class="pl-0">
@@ -48,8 +48,7 @@
 </template>
 
 <script>
-import { focus } from 'vue-focus';
-import BaseInput from '@/components/base/input/BAIN_001_BaseInput';
+import QueryInput from '@/components/base/input/BAIN_004_EXT_QueryInput';
 import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag';
 
 const testdata = [{
@@ -70,18 +69,23 @@ const contextDataModel = {
 export default {
     name: 'BaseSearch',
     event: ['search', 'empty'],
-    directives: { focus: focus },
-    components: { BaseInput, InputTag },
+    components: { 
+        QueryInput, 
+        InputTag 
+    },
     props: {
         contextData: {
             type: Object,
-            default: () => Object.assign({}, contextDataModel),
+            default: () => (Object.assign({}, contextDataModel)),
             validator (obj) {
-        /**
-         * TODO: Add validation for queryList format
-         */
-                return obj.queryList !== undefined && obj.queryList !== null && obj.queryList instanceof Array &&
-              obj.autokeyList !== undefined && obj.autokeyList !== null && obj.autokeyList instanceof Array;
+                 /**
+             * TODO: Add validation for queryList format
+             */ 
+                return obj.queryList !== undefined && 
+                        obj.queryList !== null && 
+                        obj.queryList instanceof Array &&
+                    obj.autokeyList !== undefined && 
+                    obj.autokeyList !== null && obj.autokeyList instanceof Array;
             }
         },
         searchData: {
@@ -100,14 +104,18 @@ export default {
     data () {
         return {
             tagList: this.searchData.length > 0 ? this.searchData : [],
-            queryList: [],
             lastId: 0,
             focusInput: false,
             filterList: [],
             filterOrList: []
         };
     },
+    created () {
+    },
     methods: {
+        initContextData () {
+            this.contextData.autokeyList.push('keyword');
+        },
         addTagAndSearch (items) {
             this.addTag(items);
             this.search();
@@ -136,7 +144,11 @@ export default {
             });
             obj.filterName = 'filterOr';
             obj.filterIdx = null;
-            obj.valueIdx = this.filterOrList[0].value.length - 1;
+            if (this.filterOrList.length === 0) {
+                obj.valueIdx = null;
+            } else {
+                obj.valueIdx = this.filterOrList[0].value.length - 1;
+            }
         },
         generateValueEmptyFilterOrList () {
             this.contextData.autokeyList.map((autokey) => {
@@ -230,12 +242,15 @@ export default {
             obj.valueIdx = null;
             obj.filterName = '';
         },
-        deleteAll () {
+        onDeleteAll () {
             this.tagList = [];
             this.filterList = [];
             this.filterOrList = [];
             this.$refs.input.inputText = '';
             this.focusOnInput();
+            if (this.isEmptySearch) {
+                this.search();
+            }
         },
         search () {
             this.removeEmptyValueFilterOrList();
@@ -258,18 +273,19 @@ export default {
             }, item);
         },
         getOperator (op) {
+            let operators = this.$root.enums.OPERATORS;
             switch (op) {
-            case this.$root.ENUM.OPERATORS.CONTAIN_IN.sign: return this.$root.ENUM.OPERATORS.CONTAIN_IN.string;
-            case this.$root.ENUM.OPERATORS.IN.sign: return this.$root.ENUM.OPERATORS.IN.string;
-            case this.$root.ENUM.OPERATORS.GTE.sign: return this.$root.ENUM.OPERATORS.GTE.string;
-            case this.$root.ENUM.OPERATORS.LTE.sign: return this.$root.ENUM.OPERATORS.LTE.string;
-            case this.$root.ENUM.OPERATORS.NOT_IN.sign: return this.$root.ENUM.OPERATORS.NOT_IN.string;
-            case this.$root.ENUM.OPERATORS.REGEX_IN.sign: return this.$root.ENUM.OPERATORS.REGEX_IN.string;
-            default: return this.$root.ENUM.OPERATORS.CONTAIN_IN.string;
+            case operators.CONTAIN_IN.sign: return operators.CONTAIN_IN.string;
+            case operators.IN.sign: return operators.IN.string;
+            case operators.GTE.sign: return operators.GTE.string;
+            case operators.LTE.sign: return operators.LTE.string;
+            case operators.NOT_IN.sign: return operators.NOT_IN.string;
+            case operators.REGEX_IN.sign: return operators.REGEX_IN.string;
+            default: return operators.CONTAIN_IN.string;
             }
         },
         focusOnInput () {
-            this.$refs.input.isFocused = true;
+            this.$refs.input.forceFocus();
         },
         moveFocusToLeft (idx) {
             if (--idx > 0) {

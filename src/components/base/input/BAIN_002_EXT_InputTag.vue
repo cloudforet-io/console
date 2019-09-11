@@ -1,11 +1,15 @@
 <template>
   <span class="input-tag-container">
-    <BaseInput v-if="isUpdateMode" :list-data="listData" :contents="contents"
-               :autofocus="true" :autoselect="true" @update="onUpdate"
-               @delete="$emit('delete')"
-               @moveLeft="onMoveLeft"
-               @moveRight="onMoveRight"
-               @deleteLeft="$emit('deleteLeft')"
+    <QueryInput v-if="isUpdateMode" 
+                :list-data="listData" 
+                :contents="contents"
+                autofocus 
+                autoselect
+                @update="onUpdate"
+                @delete="$emit('delete')"
+                @moveLeft="onMoveLeft"
+                @moveRight="onMoveRight"
+                @deleteLeft="$emit('deleteLeft')"
     />
 
     <span v-else class="badge tag-badge">
@@ -23,12 +27,12 @@
 
 <script>
 import { focus } from 'vue-focus';
-import BaseInput from '@/components/base/input/BAIN_001_BaseInput';
+import QueryInput from '@/components/base/input/BAIN_004_EXT_QueryInput';
 export default {
     name: 'InputTag',
     event: ['delete', 'update'],
     directives: { focus: focus },
-    components: { BaseInput },
+    components: { QueryInput },
     props: {
         listData: {
             type: Array,

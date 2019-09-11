@@ -1,29 +1,25 @@
 <template>
-  <b-form @reset.prevent="onReset"
-          @submit.prevent="updatable && creatable ? onCreate() : onUpdate()"
-  >
-    <b-form-group label="Tags" :label-cols="3" :horizontal="true">
-      <BaseTag
-        :updatable="updatable"
-        :show-first-tag-row="true"
-        :tags-prop="updatable ? updatableTags : tags"
-      />
-    </b-form-group>
-  </b-form>
+  <div class="animated fadeIn">
+    <div class="row">
+      <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
+        <b-card class="base">
+          <b-form-group label="Tags" :label-cols="3" :horizontal="true" class="ml-3 mt-4 ">
+            <b-col ref="IVDC003_PopUpTag" cols="10" class="row-scroll p-0">
+              <BaseTag ref="IVDC003_DataCenterTag"
+                       :tag-data="tags"
+                       :editable="true"
+                       :show-first-tag-row="creatable ? true : false"
+                       @addedRow="onTagRowAdded"
+              />
+            </b-col>
+          </b-form-group>
+        </b-card>
+      </b-col>
+    </div>
+  </div>
 </template>
-
 <script>
 import BaseTag from '@/components/base/tags/BATG_001_BaseTag';
-import { api } from '@/setup/api';
-
-const dataCenterModel = {
-    name: null,
-    parent_dataCenter_group_id: null,
-    template_id: null,
-    domain_id: null,
-    user_id: null,
-    tags: []
-};
 
 export default {
     name: 'DataCenterEditPopUpTag',
@@ -31,54 +27,63 @@ export default {
         BaseTag
     },
     props: {
-        dataCenterProp: {
-            type: Object,
-            default: () => (dataCenterModel)
-        },
-        creatable: {
-            type: Boolean,
-            default: false
-        },
-        updatable: {
-            type: Boolean,
-            default: true
-        }
+
     },
     data () {
         return {
-            name: this.dataCenterProp.name,
-            parent_dataCenter_group_id: this.dataCenterProp.parent_dataCenter_group_id, // required
-            template_id: this.dataCenterProp.template_id,
-            domain_id: this.dataCenterProp.domain_id,
-            user_id: this.dataCenterProp.user_id,
-            updatableTags: this.updatable ? this.dataCenterProp.tags.slice(0) : []
+            selectedTag: [],
+            creatable: true,
+            firstRow: false
         };
     },
     computed: {
         tags () {
-            return this.updatable ? this.updatableTags : this.dataCenterProp.tags;
+            return this.dictToKeyValueArray(this.selectedTag);
         }
     },
-    watch: {
-        userProp (updatedUser) {
-            this.resetUserData(updatedUser);
+
+    async created (){
+        if (this.$attrs['is-updatable']){
+            this.creatable = false;
+            await this.onCreate();
+            await this.rowAdded();
+
         }
     },
     methods: {
-        onReset () {
-            if (this.creatable) {
-                this.resetDataCenterData(dataCenterModel);
-            } else {
-                this.resetDataCenterData(this.dataCenterProp);
+        async onCreate () {
+            const selected = this.$attrs['selected-data'].tree.getSelected()[0];
+            if (this.isEmpty(this._.get(selected,'data.init'))) {
+                const url = selected.data.item_type === 'PROJECT_GROUP' ? '/identity/project-group/get' : '/identity/project/get';
+                let param = selected.data.item_type === 'PROJECT_GROUP' ? { project_group_id: selected.data.id } : { project_id:selected.data.id };
+                await this.$axios.post(url, param).then((response) => {
+                    const selectedTags = response.data.tags;
+                    if (!this.isEmpty(selectedTags)){
+                        this.selectedTag = selectedTags;
+                        console.log('this.selectedTags', this.selectedTag);
+                    } else {
+                        this.firstRow = true;
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                });
             }
         },
-        resetDataCenterData (dataCenter) {
-            this.updatableTags = dataCenter.tags.slice(0);
+        onTagRowAdded () {
+            this.$refs.IVDC003_PopUpTag.scrollTop = this.$refs.IVDC003_PopUpTag.scrollHeight;
+        },
+        rowAdded () {
+            if (this.firstRow){
+                this.$refs.IVDC003_DataCenterTag.addFirstRowWhenStart();
+            }
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-
+  .row-scroll {
+    max-height: 150px;
+    overflow-y:scroll;
+  }
 </style>

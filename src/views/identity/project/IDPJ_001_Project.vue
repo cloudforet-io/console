@@ -28,7 +28,9 @@
 
     <BaseTree ref="IDPJ001_ProjectTree"
               :tree-prop="treeData"
+              :tree-type="'PROJECT'"
               :context-init="isInitializing"
+              :con-text-obj="contextProp"
               @selected="NodeSelected"
               @edited="editSelected"
               @delete="deletedSelectedOnTree"
@@ -100,6 +102,23 @@ export default {
     },
     data() {
         return {
+            contextProp: {
+                /* CPG: Create Project Group
+                 * CPR: Create Project
+                 * UPG: Update Project Group
+                 * UPR: Update Project
+                 * RMS: Remove Project Selected
+                 */
+                Executor: ['CPG','CPR','UPG','UPR','RMS'],
+                ContextVisible  :[false, false, false, false, false],
+                icons: ['fal fa-folder-minus', 'fas fa-cube','fal fa-pencil','fal fa-pencil','fal fa-trash'],
+                Msg: [['TREE_TYPE.CREATE', 'TREE_TYPE.PROJECT_GROUP'],
+                    ['TREE_TYPE.CREATE', 'TREE_TYPE.PROJECT'],
+                    ['TREE_TYPE.UPDATE', 'TREE_TYPE.PROJECT_GROUP'],
+                    ['TREE_TYPE.UPDATE', 'TREE_TYPE.PROJECT'],
+                    ['TREE_TYPE.DELETE', 'TREE_TYPE.PROJECT']
+                ]
+            },
             tab: tabs[0].component,
             tabs: tabs,
             modalTab: modalTabs[0].component,
@@ -109,7 +128,7 @@ export default {
             createProcess: false,
             updateProcess: false,
             treeData: [],
-            projectModalTitle: 'Edit a Project',
+            projectModalTitle: '',
             modalVisible: false,
             lastEvent: 'Right-Click to open context menus on tree.',
             isInitializing: false
@@ -130,7 +149,7 @@ export default {
                     'key': 'name'
                 }
             }).then((response) => {
-                const responseData = this.treeDataHandler(response.data, { is_root: true });
+                const responseData = this.treeDataHandler(response.data, 'PROJECT');
                 this.treeData = responseData;
                 //Note: Initialize Project trees and then display only a context, This must be included as well.
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0],'data.init'))) {
@@ -142,41 +161,25 @@ export default {
             });
         },
         editSelected(item) {
-                  /*******************************************
-                   * TODO :: Please Add More Flags if needed.
-                   *  CRT => Create
-                   *  UPT => Update
-                   *  DEL => Delete
-                   ****CRT***********************************
-                   *  NG => Node Group
-                   *  SNG => Selected Project Group
-                   *  SND => Selected Project
-                   *  RNG => Root Project Group
-                   *  RND => Root Project
-                   ****UPT***********************************
-                   *  SN => Selected Node Group or Node
-                   */
-            if (['SN'].includes(item.flag)) {
-                this.selectedData = item;
-                this.manageTabButton('UPT', true);
-                this.selectedData = item;
-                this.$refs.IDPJ001_EditModal.showModal();
+            /*********************
+             Flag:
+             CPG: Create Project Group
+             CPR: Create Project
+             UPG: Update Project Group
+             UPR: Update Project
+             RMS: Delete Selected
+             ***********************/
+            this.selectedData = item;
+            if (['CPG','CPR'].includes(item.flag)) {
+                this.updateProcess = !true;
+                this.createProcess = true;
+                this.projectModalTitle = item.flag === 'CPG' ? this.tr('TREE_TYPE.CREATE', [this.tr('TREE_TYPE.PROJECT_GROUP')]):this.tr('TREE_TYPE.CREATE', [this.tr('TREE_TYPE.PROJECT')]);
             } else {
-                const title = (item.flag.indexOf('NG') > -1);
-                this.selectedData = item;
-                this.manageTabButton('CRT', true, title);
-                this.$refs.IDPJ001_EditModal.showModal();
+                this.createProcess = !true;
+                this.updateProcess = true;
+                this.projectModalTitle = item.flag === 'UPG' ? this.tr('TREE_TYPE.UPDATE', [this.tr('TREE_TYPE.PROJECT_GROUP')]):this.tr('TREE_TYPE.UPDATE', [this.tr('TREE_TYPE.PROJECT')]);
             }
-        },
-        manageTabButton(flag, state, title) {
-            if (flag === 'CRT') {
-                this.projectModaltitle = (title) ? 'Create a Project Group' : 'Create a Project';
-                this.updateProcess = !state;
-                this.createProcess = state;
-            } else if (flag === 'UPT') {
-                this.createProcess = !state;
-                this.updateProcess = state;
-            }
+            this.$refs.IDPJ001_EditModal.showModal();
         },
         validateProject (){
             let isDefaultValidated = false;
@@ -190,6 +193,7 @@ export default {
                 isDefaultValidated = true;
                 params['name'] = tabChildren[childrenIdx[0]]._data.projectName;
             }
+
             if (childrenIdx.length > 1){
                 if (tabChildren[childrenIdx[1]].$refs.IDPJ003_ProjectTag.validate()) {
                     params['tags'] = tabChildren[childrenIdx[1]].$refs.IDPJ003_ProjectTag.tags;
@@ -226,12 +230,11 @@ export default {
             };
 
             await this.$axios.post(url, param).then((response) => {
-                childrenNode = this.getSelectedNodeArr(response.data.items);
+                childrenNode = this.getSelectedNodeArr(response.data.items, 'PROJECT');
                 nodeObj.treeV.updateNode(path, { data: dataParam });
                 if (!this.isEmpty(childrenNode)){
                     childrenNode.forEach(curItem =>{
                         nodeObj.treeV.insert({ node: selected, placement: 'inside' }, curItem);
-                        //nodeObj.treeV.insert({ node: nodeObj.node, placement: 'inside' }, curItem);
                     });
                 }
             }).catch((error) => {
@@ -242,7 +245,7 @@ export default {
         async createProsProcess(item) {
             const flag = this.selectedData.flag;
             const treeV = this.isEmpty(item.tree) ? this.selectedData.tree : item.tree;
-            if (['NG','RNG','SNG'].includes(flag)) {
+            if (['CPG'].includes(flag)) {
                 this.createProjectGroup(item, flag, treeV);
             } else {
                 this.createProject(item, flag, treeV);
@@ -254,19 +257,27 @@ export default {
             if (param){
                 param['domain_id'] = sessionStorage.domainId;
                 const selected = tree.getSelected()[0];
-                if (flag === 'SNG') {
-                    param['parent_project_group_id'] = selected.data.id;
-                } else {
+                const isRootAction = items.hasOwnProperty('root_action') ? items.root_action : false;
+                if (isRootAction) {
                     param['is_root']= true;
+                } else {
+                    param['parent_project_group_id'] = selected.data.id;
                 }
+
                 await this.$axios.post(url, param).then((response) => {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
-                        const placement = flag.charAt(0) === 'S' ? 'inside': 'after';
-                        const InitializedPG = { id: responseData.project_group_id, item_type:'PROJECT_GROUP', is_root: responseData.is_root, name: param.name };
-                        let newNode = this.getSelectedNode(InitializedPG);
+                        const placement = isRootAction ? 'after': 'inside';
+                        const InitializedPG = {
+                            id: responseData.project_group_id,
+                            item_type:'PROJECT_GROUP',
+                            is_root: responseData.is_root,
+                            name: param.name
+                        };
 
-                        if (flag === 'SNG') {
+                        let newNode = this.getSelectedNode(InitializedPG, 'PROJECT');
+
+                        if (!isRootAction) {
                             this.applyActionOnScreen(items, flag, tree,{ node: newNode, placement: placement });
                         } else {
                             tree.insert({ node: tree.getSelected()[0], placement: placement }, newNode);
@@ -289,12 +300,11 @@ export default {
                 const selected = tree.getSelected()[0];
                 param['domain_id'] = sessionStorage.domainId;
                 param['project_group_id'] = selected.data.id;
-
                 await this.$axios.post(url, param).then((response) => {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
                         const InitializedPG = { id: responseData.project_id, item_type:'PROJECT', name: param.name };
-                        let newNode = this.getSelectedNode(InitializedPG);
+                        let newNode = this.getSelectedNode(InitializedPG, 'PROJECT');
                         this.applyActionOnScreen(items, flag, tree,{ node: newNode, placement: 'inside' });
                     }
                 }).catch((error) => {
@@ -307,8 +317,8 @@ export default {
             this.consoleLogEnv('Update Project : ', items);
             const itemType = items.tree.getSelected()[0].data.item_type;
             const selectedId = items.tree.getSelected()[0].data.id;
-            const url = itemType === 'PROJECT_GROUP' ? '/identity/project-group/update': '/identity/project/update';
-            const key = itemType === 'PROJECT_GROUP' ? 'project_group_id': 'project_id';
+            const url = `/inventory/${itemType.toLowerCase()}/update`;
+            const key = `${itemType.toLowerCase()}_id`;
             let param = this.validateProject();
             if (!this.isEmpty(param)){
                 param[key] = selectedId;
@@ -330,19 +340,19 @@ export default {
         async deletedSelectedOnTree (pramTree){
             const itemType = pramTree.tree.getSelected()[0].data.item_type;
             const selectedId = pramTree.tree.getSelected()[0].data.id;
-            const url = itemType === 'PROJECT_GROUP' ? '/identity/project-group/delete': '/identity/project/delete';
-            const key = itemType === 'PROJECT_GROUP' ? 'project_group_id': 'project_id';
+            const url = `/inventory/${itemType.toLowerCase()}/delete`;
+            const key = `${itemType.toLowerCase()}_id`;
             let passParam = { domain_id: sessionStorage.domainId };
             passParam[key] = selectedId;
-
             await this.$axios.post(url, passParam).then((response) => {
                 const responseData = response.data;
-                console.log(responseData);
                 if (this.isEmpty(responseData)){
                     pramTree.tree.remove(pramTree.path);
-                    this.$alertify.success('Okay');
+                    this.$alertify.success('Selected item is successfully deleted.');
                     if (this.treeData.length === 1) {
+                        console.log('length1', this.treeData.length);
                         this.isInitializing = true;
+                        console.log('length2', this.treeData.length);
                         this.treeData = [{ title: '! Please, Right Click me',
                             isLeaf: true,
                             data: {
@@ -373,17 +383,21 @@ export default {
             }
         },
         async moveProject(items) {
-            this.consoleLogEnv('Move Selected Items : ', items);
             const fromItem = items.nodes[0];
             const toItem = items.position.node;
-            const url = fromItem.isLeaf ? '/identity/project/update' : '/identity/project-group/update';
+            const url = `/identity/${fromItem.data.item_type.toLowerCase()}/update`;
+            const keySrouce = `${fromItem.data.item_type.toLowerCase()}_id`;
+            const keyTo = `${toItem.data.item_type.toLowerCase()}_id`;
+            param[keySrouce] = fromItem.data.id;
+            param[keyTo] = toItem.data.id;
+
             let param = {};
             if (fromItem.isLeaf) {
                 param['project_id'] = fromItem.data.id;
                 param['project_group_id'] = toItem.data.id;
             } else {
-                param['parent_project_group_id'] = toItem.data.id;
                 param['project_group_id'] = fromItem.data.id;
+                param['parent_project_group_id'] = toItem.data.id;
                 if (items.position.placement !== 'inside' && toItem.data.hasOwnProperty('is_root')){
                     if (toItem.data.is_root) {
                         param['release_parent_project_group'] = true;

@@ -22,6 +22,7 @@ Vue.use(Router);
 
 const index = new Router({
     mode: 'history',
+    hash: false,
     linkActiveClass: 'open active',
     scrollBehavior: () => ({ y: 0 }),
     routes: [
@@ -60,7 +61,8 @@ const index = new Router({
                 identityRoute,
                 inventoryRoute
             ]
-        }
+        },
+        { path: '*', component: Redirect404 }
     ]
 });
 
