@@ -187,10 +187,12 @@ export const ko ={
         FAIL_REASON: '실패 원인'
     },
     MODAL_TITLE: {
-        NOT_ALLOW: '수행불가 작업'
+        NOT_ALLOW: '수행불가 작업',
+        NO_USER: '미확인 유저 아이디'
     },
     MODAL_MSG: {
         LEAF_NOMOVE: '\'{0}\' 는 Root 포지션에 위치할 수 없습니다.',
+        NO_USER_VALID: '유저 아이디 ({0}) 확인할 수 없습니다. 당당자에게 확인 후 로그인을 시도해 주십시오.',
         LEAF_PUSHTO: '\'{0}\' 는 \'{1}\' 으로 위치 시킬 수 없습니다.'
     },
     PANEL: {

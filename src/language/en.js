@@ -192,11 +192,11 @@ export const en = {
     },
     MODAL_TITLE: {
         NOT_ALLOW: 'Action not allowed',
-        NO_USER: 'Cannot find Uer name'
+        NO_USER: 'No Valid User'
     },
     MODAL_MSG: {
         LEAF_NOMOVE: ' {0} can not be located at Root position.',
-        NO_USER_VALID: 'No valid user ID ({0}) exists, Please confirm your accessibility with Administrator.',
+        NO_USER_VALID: 'User ID ({0}) is invalid. Please confirm your accessibility with Administrator.',
         LEAF_PUSHTO:  'Can\'t locate the {0} into {1}. Please, Check your Action.'
     },
     PANEL: {
