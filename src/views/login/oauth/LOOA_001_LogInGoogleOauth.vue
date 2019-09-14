@@ -7,8 +7,7 @@
               :title="tr('TR_NOTI')">
         <template #contents>
           <div>
-            We apologize for inconvenience. 'Sign up', 'Password retrieval' feature currently unavailable due to our policies.
-            <br>Please, contact System Administrator for following contacts:
+             {{tr('MODAL_MSG.NO_USER_VALID',[getCurrentHostname()])}}
             <br>
             <div>● e-mail:<a href="mailto:admin@mz.co.kr"> <b> admin@mz.co.kr</b></a></div>
             <div>● Phone: <a href="#">+82 (02)<b>1644-2243</b></a></div>
