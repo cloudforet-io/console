@@ -7,7 +7,7 @@
               :title="tr('TR_NOTI')">
         <template #contents>
           <div>
-             {{tr('MODAL_MSG.NO_USER_VALID',[getCurrentHostname()])}}
+             {{tr('MODAL_MSG.NO_USER_VALID',[getCurrentHostname])}}
             <br>
             <div>● e-mail:<a href="mailto:admin@mz.co.kr"> <b> admin@mz.co.kr</b></a></div>
             <div>● Phone: <a href="#">+82 (02)<b>1644-2243</b></a></div>
