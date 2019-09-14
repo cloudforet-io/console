@@ -136,7 +136,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import url from 'url';
-import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal.vue';
+import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal';
 const signupContents = 'We apologize for inconvenience. \'Sign up\', \'Password retrieval\' feature currently unavailable due to our policies.' +
         ' Please, contact System Administrator for following contacts: ' + '<br>' +
         '● e-mail: admin@mz.co.kr';
