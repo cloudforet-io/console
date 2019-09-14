@@ -1,6 +1,19 @@
 <template>
   <b-row align-v="center">
     <div class="container fade-in">
+      <BaseSimpleModal
+              ref="LOOA001_ErrorSimpleModal"
+              :type="'danger'"
+              :title="tr('TR_NOTI')">
+        <template #contents>
+          <div>
+             {{tr('MODAL_MSG.NO_USER_VALID',[getCurrentHostname()])}}
+            <br>
+            <div>● e-mail:<a href="mailto:admin@mz.co.kr"> <b> admin@mz.co.kr</b></a></div>
+            <div>● Phone: <a href="#">+82 (02)<b>1644-2243</b></a></div>
+          </div>
+        </template>
+      </BaseSimpleModal>
       <b-row class="justify-content-center">
         <b-col md="8">
           <b-card-group class="card-group">
@@ -129,7 +142,7 @@ export default {
                     const errorConfig = JSON.parse(error.message);
                     const errorMSG = errorConfig.error_dt_code;
                     if ('ERROR_AUTHENTICATED_WITHOUT_USER' === errorMSG){
-                        alert('Please, Create a valid User first.');
+                        this.$refs.LOOA001_ErrorSimpleModal.showModal();
                     }
                 } else {
                     this.consoleLogEnv('error', error);
