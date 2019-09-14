@@ -1,7 +1,7 @@
 <template>
   <span class="input-tag-container">
     <QueryInput v-if="isUpdateMode" 
-                :list-data="listData" 
+                :context-data="listData" 
                 :contents="contents"
                 autofocus 
                 autoselect
