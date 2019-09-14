@@ -26,7 +26,7 @@
 
             <QueryInput ref="input" 
                         class="input"
-                        :list-data="contextData.queryList"
+                        :context-data="contextData.queryList"
                         no-reset
                         add-only
                         @add="addTagAndSearch" 
