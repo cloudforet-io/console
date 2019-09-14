@@ -57,11 +57,13 @@
 </template>
 <script>
 import store from '@/store';
+import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal';
 import url from 'url';
 import { mapGetters } from 'vuex';
 const gapi = window.gapi;
 export default {
-    components: {},
+    components: {BaseSimpleModal
+    },
     data() {
         return {
             isSignedIn: false,
