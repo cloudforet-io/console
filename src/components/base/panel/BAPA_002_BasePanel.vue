@@ -58,7 +58,7 @@
                       <dd>{{ info.contents }}</dd>
                     </template>
 
-                    <span v-if="useCopyToSelect(info.copyFlag)"
+                    <span v-if="useCopyToSelect(info.copyFlag) && !isEmpty(info.contents)"
                           v-b-tooltip.hover
                           class="copy-clipboard"
                           title="Copy to Clipboard"

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import store from '@/store';
-
+import index from '@/routes';
 let api = null;
 
 let config = {
@@ -43,6 +43,7 @@ const setResponseInterceptor = (api) => {
             if (err.response.status === 403 || err.response.status === 401) {
                 console.log('Current Error Code: ', err.response.status);
                 store.dispatch('auth/logout');
+                index.push({ path: '/log-in' });
             }
             throw error;
         });

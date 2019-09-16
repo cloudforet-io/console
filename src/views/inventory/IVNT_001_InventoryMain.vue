@@ -12,7 +12,7 @@ export default {
                 headerList: [
                     { label: 'Data Center', link: '/inventory/data-center' },
                     { label: 'Server', link: '/inventory/server' },
-                    { label: 'Settings', link: '/inventory/settings' }
+                    { label: 'Collector', link: '/inventory/collector' }
                 ]
             });
         });

@@ -152,6 +152,10 @@
           <BaseStateTag :state="stateType" :data="data.item.state" />
         </template>
 
+        <template #plugin_info="data">
+          <div v-html="getResourceTypeInStr(data.item.plugin_info)" />
+        </template>
+
         <template #link="data">
           <a :href="data.item.link">{{ data.item.linkText }}</a>
         </template>
@@ -411,6 +415,20 @@ export default {
         },
         capitalizeFirstLetter (s) {
             return s.hasOwnProperty('text') ? this.capitalize(s.text) : s.hasOwnProperty('flag') ? this.capitalize(s.flag) : '';
+        },
+        getResourceTypeInStr (val) {
+            let returnVal = '';
+            const resourceInfoArry = val.options.supported_resource_type;
+            if (!this.isEmpty(resourceInfoArry) && resourceInfoArry.length > 0){
+                resourceInfoArry.forEach((curItem, idx) =>{
+                    if (idx == 0){
+                        returnVal +=  `${curItem}`;
+                    } else {
+                        returnVal +=  `<br>${curItem}`;
+                    }
+                });
+            }
+            return returnVal;
         },
         getVariantSize (size) {
             let variantFontSize = 3;

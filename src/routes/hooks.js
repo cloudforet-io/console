@@ -100,7 +100,6 @@ export const beforeEach = async (to, from, next) => {
     if (isFirstLogin === loginTypeEnum.LOGOUT) {
         await getDomain();
     }
-
     for (let i = to.matched.length - 1; i > -1; i--) {
 
         if (to.matched[i].meta.requiresAuth) {
