@@ -327,7 +327,8 @@ export default {
         },
         onClickAdd () {
             this.isCreateMode = true;
-            this.showCollectorDetail();
+            this.$router.push({path: '/inventory/collector/new-collector'});
+            //this.showCollectorDetail();
         },
         onClickUpdate () {
             this.isCreateMode = false;
