@@ -1,186 +1,63 @@
 <template>
   <div>
-    <b-form @reset.prevent="onReset"
-            @submit.prevent="onSubmit"
-    >
-      <b-row>
-        <b-col cols="6">
-          <BaseField v-model="collectorId"
-                     :plaintext="!creatable"
-                     :state="validateCollectorId"
-                     :label="`${tr('USER.ID')} : `"
-                     :label-cols="3"
-                     :placeholder="tr('USER.ID')"
-                     autocomplete="off"
-                     required
-                     :description="isLocalCollector ? tr('FORM.INVALID.LENGTH', [tr('USER.ID'), 5, 12]) : null"
-                     :valid-message="tr('FORM.VALID.AVAIL')"
-                     :invalid-message="getCollectorValidMessage()"
-                     @input="changedCollectorId"
-          >
-            <template v-if="creatable" #append>
-              <b-button v-if="isLocalCollector" variant="light"
-                        :disabled="!validateCollectorIdLength"
-                        @click="checkIdAvailability"
-              >
-                {{ tr('BTN_AVAIL') }}
-              </b-button>
-              <b-button v-else variant="light"
-                        @click="findCollector"
-              >
-                {{ tr('BTN_FIND') }}
-              </b-button>
-            </template>
-          </BaseField>
-
-          <BaseField v-if="creatable && isLocalCollector"
-                     v-model="password"
-                     :state="validatePassword"
-                     type="password"
-                     :label="`${tr('USER.PWD')} : `"
-                     :label-cols="3"
-                     :placeholder="tr('USER.PWD')"
-                     autocomplete="new-password"
-                     required
-                     description="Your Password must be 5-12 characters long."
-                     valid-message="This is Good."
-                     invalid-message="Your Password must be 5-12 characters long."
-          />
-
-          <BaseField v-if="creatable && isLocalCollector"
-                     v-model="passwordCheck"
-                     :label="`${tr('USER.PWD_CHECK')} : `"
-                     :label-cols="3"
-                     label-align="right"
-                     :placeholder="tr('USER.PWD_CHECK')"
-                     type="password"
-                     :state="validatePasswordCheck"
-                     invalid-message="Please check your Password again."
-          />
-
-          <BaseField v-model="name"
-                     :label="`${tr('USER.NAME')} : `"
-                     :label-cols="3"
-                     :placeholder="tr('USER.NAME')"
-          />
-
-          <BaseField v-model="email"
-                     :label="`${tr('USER.EMAIL')} : `"
-                     :label-cols="3"
-                     :placeholder="tr('USER.EMAIL')"
-          />
-
-          <BaseField v-model="mobile"
-                     :label="`${tr('USER.PHONE')} : `"
-                     :label-cols="3"
-                     :placeholder="tr('USER.PHONE')"
-          />
-
-          <BaseField v-model="group"
-                     :label="`${tr('USER.GROUP')} : `"
-                     :label-cols="3"
-                     :placeholder="tr('USER.GROUP')"
-          />
-
-          <BaseField v-if="!creatable || !isLocalCollector"
-                     v-model="language"
-                     :label="`${tr('USER.LANG')} : `"
-                     :label-cols="3"
-                     :field-cols="5"
-                     type="select"
-                     :options="languageList"
-                     :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
-          />
-
-
-          <BaseField v-if="!creatable || !isLocalCollector"
-                     v-model="timezone"
-                     :label="`${tr('USER.TIME')} : `"
-                     :label-cols="3"
-                     :field-cols="9"
-                     type="select"
-                     :options="timezoneList"
-                     :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
-          />
-        </b-col>
-        <b-col cols="6">
-          <BaseField v-if="creatable && isLocalCollector"
-                     v-model="language"
-                     :label="`${tr('USER.LANG')} : `"
-                     :label-cols="3"
-                     label-class="col-xl-2"
-                     :field-cols="5"
-                     type="select"
-                     :options="languageList"
-                     :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
-          />
-
-
-          <BaseField v-if="creatable && isLocalCollector"
-                     v-model="timezone"
-                     :label="`${tr('USER.TIME')} : `"
-                     :label-cols="3"
-                     label-class="col-xl-2"
-                     :field-cols="9"
-                     type="select"
-                     :options="timezoneList"
-                     :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
-          />
-
-          <b-form-group :label="`${tr('TAG')} : `"
-                        :label-cols="3" :label-cols-xl="2"
-                        label-align="right"
-                        class="mt-4"
-          >
-            <b-col ref="IDUS002_BaseTagContainer" cols="10" class="tag-container p-0">
-              <BaseTag ref="IDUS002_BaseTag"
-                       :tag-data="tags"
-                       :show-first-tag-row="creatable ? true : false"
-                       editable
-                       @addedRow="onTagRowAdded"
-              />
-            </b-col>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col class="btn-box mt-5">
-          <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="primary">
-            {{ creatable ? tr('BTN_CRT') : tr('BTN_UPT') }}
-          </b-button>
-          <b-button class="float-right mb-1" size="md"
-                    type="button" variant="outline-secondary"
-                    @click="onCancel"
-          >
-            {{ tr('BTN_CANCEL') }}
-          </b-button>
-          <b-button class="float-left mb-1"
-                    size="md"
-                    type="reset"
-                    variant="outline-secondary"
-          >
-            {{ tr('BTN_RESET') }}
-          </b-button>
-        </b-col>
-      </b-row>
-    </b-form>
-
-    <BaseSimpleModal
-      ref="IDUS002_CheckModal"
-      :title="noticeTitle"
-      :text="noticeText"
-      type="danger"
-      centered
-      sm
-      ok-only
-      @ok="onConfirmReset"
-    />
+    <b-row>
+      <b-col class="col-xs-12 col-sm-3 col-md-3">
+        <b-card class="left-container">
+          <b-row>
+            <div ref="IVCO002_SearchboxContainer"
+                 class="searchbox-container"
+                 :class="{ 'no-caption': noCaption }"
+                 style="width:100%"
+            >
+              <div class="searchbox" :style="{ width: searchboxWidth }">
+                <BaseSearch ref="search"
+                            :context-data="searchContextData"
+                            :is-empty-search="isEmptySearch"
+                            :plain-search="plainSearch"
+                            :border="!darkHeader"
+                            @search="onSearch"
+                            @empty="$emit('empty')"
+                />
+              </div>
+            </div>
+          </b-row>
+          <b-row>
+            <b-card class="left-le">
+                <b-form-checkbox size="default">Official</b-form-checkbox>
+                <b-form-checkbox size="default">Local</b-form-checkbox>
+            </b-card>
+          </b-row>
+          <b-row>
+            <b-card class="left-le">
+                  <b-form-checkbox size="default">ALL</b-form-checkbox>
+                  <br>
+                  <b-form-checkbox size="default">Server</b-form-checkbox>
+                  <br>
+                  <b-form-checkbox size="default">Network</b-form-checkbox>
+                  <br>
+                  <b-form-checkbox size="default">Subnet</b-form-checkbox>
+                  <br>
+                  <b-form-checkbox size="default">IP Address</b-form-checkbox>
+            </b-card>
+          </b-row>
+        </b-card>
+      </b-col>
+      <b-col class="col-xs-12 col-sm-9 col-md-9">
+        <b-card class="right-container">
+          <b-row />
+          <b-row>
+            Repository
+          </b-row>
+        </b-card>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
 <script>
 import BaseTag from '@/components/base/tags/BATG_001_BaseTag.vue';
 import BaseField from '@/components/base/form/BAFM_001_BaseField.vue';
+import BaseSearch  from '@/components/base/search/BASR_001_BaseSearch.vue';
 const BaseSimpleModal = () => import('@/components/base/modal/BAMO_002_BaseSimpleModal.vue');
 const collectorModel = {
     collector_id: null,
@@ -194,12 +71,13 @@ const collectorModel = {
 };
 
 export default {
-    name: 'CollectorDetail',
+    name: 'CollectorActions',
     event: ['create', 'update', 'cancel'],
     components: {
         BaseField,
         BaseTag,
-        BaseSimpleModal
+        BaseSimpleModal,
+        BaseSearch
     },
     props: {
         collectorProp: {
@@ -233,50 +111,63 @@ export default {
         };
     },
     computed: {
-        languageList () {
-            return this.getLanguageSelectList();
+        heads () {
+            return this.fields;
         },
-        timezoneList () {
-            return this.getTimezoneSelectList();
+        limit () {
+            return this.perPage;
         },
-        tags () {
-            return this.dictToKeyValueArray(this.collectorProp.tags);
+        start () {
+            return (this.currentPage - 1) * this.limit;
         },
-        validateCollectorIdLength () {
-            return this.validateLength(this.collectorId, this.showValidation, 5);
+        maxPage () {
+            return Math.ceil(this.totalRows / this.limit);
         },
-        validateCollectorIdUnique () {
-            return this.collectorIdUnique;
+        noCaption () {
+            return !(this.$slots.caption || this.$scopedSlots.caption);
         },
-        validateCollectorId () {
-            if (!this.isLocalCollector) {
-                return null;
+        headerWidth () {
+            return this.width - (this.pad * 2);
+        },
+        captionContainerWidth () {
+            return this.captionWidth > this.width ? this.width : this.captionWidth;
+        },
+        toolContainerWidth () {
+            if (this.headerWidth < this.captionContainerWidth + this.toolWidth) {
+                return this.headerWidth;
             }
-            if (this.validateCollectorIdLength === null) {
-                return null;
-            }
-            return  !!(this.validateCollectorIdLength && this.validateCollectorIdUnique);
+            return this.toolWidth > this.width ? this.width : this.toolWidth;
         },
-        validatePassword () {
-            if (!this.creatable) {
-                return true;
+        toolboxWidth () {
+            if (this.toolContainerWidth > this.toolWidth) {
+                return `${this.toolWidth}px`;
             }
-            return this.validateLength(this.password, this.showValidation, 5);
+            return '100%';
         },
-        validatePasswordCheck () {
-            if (!this.creatable) {
-                return true;
+        searchContainerWidth () {
+            let calculatedWidth;
+            debugger;
+            if (this.width < 768) {
+                calculatedWidth = this.headerWidth;
+            } else {
+                calculatedWidth = this.headerWidth - this.toolContainerWidth - (this.noCaption ? 0 : this.captionContainerWidth);
             }
-            return this.validateSameness(this.password, this.showValidation, this.passwordCheck);
+
+            if (this.searchWidth && calculatedWidth < this.searchWidth) {
+                calculatedWidth = this.searchWidth;
+            }
+
+            return `${calculatedWidth}px`;
         },
-        validated () {
-            return !!(this.validateCollectorId &&
-                this.validatePassword &&
-                this.validatePasswordCheck);
+        searchboxWidth () {
+            if (this.searchWidth) {
+                return `${this.searchWidth}px`;
+            }
+            return '100%';
         }
+
     },
     created() {
-        this.init();
     },
     methods: {
         init () {
@@ -468,26 +359,30 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .input-group {
-    .form-control {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-    .input-group-append {
-      .btn {
-        border-radius:  0 5px 5px 0;
-        border: 1px solid darken($lightgray, 5%);
-        &:hover, &:focus {
-          box-shadow: 0 0 10px 1px rgba($blue, 0.5);
-        }
-      }
-    }
+  .left-le {
+    width: 100%;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    margin-right:5px;
   }
-  .required {
-    color: $violet;
+  .left-container {
+    min-height: calc(100vh - #{$total-header-height} - 10px);
+    margin: 5px -5px 5px 10px;
   }
-  .tag-container {
-    height: 260px;
-    overflow-y: scroll;
+  .right-container {
+    min-height: calc(100vh - #{$total-header-height} - 10px);
+    margin: 5px 10px 5px -5px;
+  }
+
+  .searchbox-container {
+    text-align: right;
+    margin: 5px 5px 5px 5px;
+    &.no-caption {
+      text-align: right;
+    }
+    .searchbox {
+      display: inline-block;
+      text-align: left;
+    }
   }
 </style>
