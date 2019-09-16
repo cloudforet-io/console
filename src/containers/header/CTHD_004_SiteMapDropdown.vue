@@ -34,7 +34,7 @@
           <router-link to="/inventory/server">{{ tr('SERVER') }}</router-link>
         </span>
         <span class="item " @click="showMap = false">
-          <router-link to="/inventory/settings">{{ tr('SETTINGS') }}</router-link>
+          <router-link to="/inventory/collector">{{ tr('COLLECTOR') }}</router-link>
         </span>
       </b-col>
 

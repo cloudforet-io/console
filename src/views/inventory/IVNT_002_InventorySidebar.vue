@@ -31,7 +31,7 @@ export default {
                     icon: 'icon-puzzle'
                 },
                 {
-                    name: 'Settings(Admin)',
+                    name: 'Collector(Admin)',
                     url: '/inventory/collector-plugin',
                     icon: 'icon-puzzle'
                 }

@@ -1,11 +1,9 @@
 // const BaseHeader = () => import('@/containers/header/CTHD_001_Header');
 import BaseHeader from '@/containers/header/CTHD_001_Header';
-
 const InventoryMain = () => import('@/views/inventory/IVNT_001_InventoryMain');
-
 const DataCenter = () => import('@/views/inventory/data_center/IVDC_001_DataCenter');
 const Server = () => import('@/views/inventory/server/IVSV_001_Server');
-const Settings = () => import('@/views/inventory/settings/IVST_001_Settings');
+const Collector = () => import('@/views/inventory/collector/IVCO_001_Collector');
 
 export default {
     path: 'inventory',
@@ -30,10 +28,10 @@ export default {
             component: Server
         },
         {
-            path: 'settings',
-            name: 'settings',
-            meta: { label: 'Settings', requiresAuth: true },
-            component: Settings
+            path: 'collector',
+            name: 'collector',
+            meta: { label: 'Collector', requiresAuth: true },
+            component: Collector
         }
     ]
 };

@@ -7,7 +7,7 @@
               :title="tr('TR_NOTI')">
         <template #contents>
           <div>
-             {{tr('MODAL_MSG.NO_USER_VALID',[getCurrentHostname])}}
+             {{tr('MODAL_MSG.NO_USER_VALID',[loginId])}}
             <br>
             <div>● e-mail:<a href="mailto:admin@mz.co.kr"> <b> admin@mz.co.kr</b></a></div>
             <div>● Phone: <a href="#">+82 (02)<b>1644-2243</b></a></div>
@@ -67,6 +67,7 @@ export default {
     data() {
         return {
             isSignedIn: false,
+            loginId: null,
             oathSignParam: null,
             seenGreet: true,
             seenError: false,
@@ -114,6 +115,7 @@ export default {
         onSignIn(googleUser) {
             console.log(this.isSignedIn);
             const profile = googleUser.getBasicProfile();
+            this.loginId = profile.getEmail();
             const param = {
                 userId: profile.getEmail(),
                 access_token: googleUser.getAuthResponse().access_token
