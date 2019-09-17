@@ -139,7 +139,7 @@ const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 const CollectorAction = () => import('@/views/inventory/collector/IVCO_002_CollectorAction');
 const CollectorDetails = () => import('@/views/inventory/collector/IVCO_003_CollectorDetailsSingle');
 const CollectorCredentials = () => import('@/views/inventory/collector/IVCO_005_CollectorCredentials');
-const CollectorJobs = () => import('@/views/inventory/collector/IVCO_006_CollectorJobs');
+const CollectorJobs = () => import('@/views/inventory/collector/IVCO_007_CollectorJobs');
 const ActionCheckModal = () => import('@/components/base/modal/BAMO_003_EXT_ActionCheckModal.vue');
 
 export default {
@@ -160,7 +160,7 @@ export default {
         return {
             tabs: [
                 {
-                    title: this.tr('PANEL.INFO'),
+                    title: this.tr('PANEL.DETAILS'),
                     key: 'info'
                 },
                 {
