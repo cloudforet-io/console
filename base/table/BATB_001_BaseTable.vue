@@ -595,7 +595,7 @@ export default {
             }
 
             this.sort = {
-                key: ctx.sort,
+                key: ctx.sortBy,
                 desc: ctx.sortDesc ? 1 : 0
             };
             this.reset();
