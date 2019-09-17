@@ -263,7 +263,7 @@ export default {
             if (this.isMultiSelected) {
                 return [
                     {
-                        title: this.tr('COL_NM.C_SUMMARY'),
+                        title: this.tr('PANEL.DETAILS'),
                         key: 'summary'
                     },
                     {
@@ -274,7 +274,7 @@ export default {
             }
             return [
                 {
-                    title: this.tr('COL_NM.C_SUMMARY'),
+                    title: this.tr('PANEL.DETAILS'),
                     key: 'summary'
                 },
                 {

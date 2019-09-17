@@ -217,6 +217,7 @@ export const en = {
     },
     PANEL: {
         BASE_INFO: 'Base Information',
+        DETAILS: 'Details',
         TAG: 'Tags',
         INFO: 'Info',
         CREDENTIAL: 'Credentials',

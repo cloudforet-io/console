@@ -16,7 +16,7 @@ export const ko ={
         SIGN_FAIL_TITLE: '아이디나 패스워드가 에러.',
         SIGN_FAIL_BODY: '아이디나 패스워드를 다시 한번 확인해 주세요.',
         COMMON_USER: '일반 유저',
-        ADMIN_USER: '어드민',
+        ADMIN_USER: '관리자',
         REGISTER: 'Register Now!',
         REMEMBER: '자동 로그인',
         TR_NOTI: '아이디·비번 찾기',
@@ -213,6 +213,7 @@ export const ko ={
     },
     PANEL: {
         BASE_INFO: '기본 정보',
+        DETAILS: '세부 항목',
         TAG: '태그',
         INFO: '정보',
         CREDENTIAL: '크레덴셜(Credentials)',
