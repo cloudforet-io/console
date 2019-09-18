@@ -109,11 +109,11 @@ export const Mixin = {
          * Output  => (String): with upper case of First letter
          * Description:  Select badges variant by given val
          **********************************************************************************/
-        capitalize: (s) => {
-            if (typeof s !== 'string') {
+        capitalize: function (s)  {
+            if (typeof s !== 'string' || this.isEmpty(s)) {
                 return '';
             }
-            return s.charAt(0).toUpperCase() + s.slice(1);
+            return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
         },
         /**********************************************************************************
          * Name       : consoleLogEnv

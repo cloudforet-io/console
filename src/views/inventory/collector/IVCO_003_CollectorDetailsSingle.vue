@@ -58,7 +58,7 @@ const collectorModel = {
 };
 
 export default {
-    name: 'CollectorInfo',
+    name: 'CollectorDetailsSingle',
     components: {
         BasePanel,
         BaseModal,
@@ -154,8 +154,8 @@ export default {
             if (this.$refs.IVCO003_Tags.validate()) {
                 let res = null;
                 try {
-                    res = await this.$axios.post('/identity/user/update', {
-                        user_id: this.collectorData.user_id,
+                    res = await this.$axios.post('/inventory/collector/update', {
+                        collector_id: this.collectorData.collector_id,
                         tags: this.$refs.IVCO003_Tags.tags
                     });
                     this.hideTagEditModal();

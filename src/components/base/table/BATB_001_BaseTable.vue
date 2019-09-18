@@ -152,8 +152,32 @@
           <BaseStateTag :state="stateType" :data="data.item.state" />
         </template>
 
-        <template #plugin_info="data">
+       <template #plugin_info="data">
           <div v-html="getResourceTypeInStr(data.item.plugin_info)" />
+        </template>
+
+        <template #name="data">
+          <div v-if="data.item.hasOwnProperty('collector_id')">
+            <template v-if="selectIconType(data.item.tags)">
+              <img class="row-icons" :src="require(`@/asset/icons/${data.item.tags.icon}.svg`)"
+                   height="36vh"
+                   width="36vh"
+              > {{ data.item.name }}
+            </template>
+            <template v-else>
+                <span>
+                  <i class="fas fa-cogs row-icons"
+                     height="36vh"
+                     width="36vh" ></i>
+                </span> &nbsp;
+                <span class="text" >
+                  {{ data.item.name }}
+                </span>
+            </template>
+          </div>
+          <div v-else>
+            {{ data.item.name }}
+          </div>
         </template>
 
         <template #link="data">
@@ -165,6 +189,7 @@
 </template>
 
 <script>
+import { GlobalEnum } from '@/setup/enum';
 const BaseSearch = () => import('@/components/base/search/BASR_001_BaseSearch.vue');
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
 const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox.vue');
@@ -416,15 +441,30 @@ export default {
         capitalizeFirstLetter (s) {
             return s.hasOwnProperty('text') ? this.capitalize(s.text) : s.hasOwnProperty('flag') ? this.capitalize(s.flag) : '';
         },
+        selectIconType (tag) {
+            let returnVal = false;
+            if (!this.isEmpty(tag) && tag.hasOwnProperty('icon')){
+                let iconVal = tag.icon;
+                if (!this.isEmpty(iconVal)){
+                    returnVal = this.isEmpty(this._.get(GlobalEnum,`COLLECTOR.${iconVal}`))? false : true;
+                }
+            }
+            return returnVal;
+        },
+        getCollectorIcons (tag) {
+            const iconVal = tag.icon;
+            const  abs =this._.get(GlobalEnum,`COLLECTOR.${iconVal}.src`);
+            return abs;
+        },
         getResourceTypeInStr (val) {
             let returnVal = '';
             const resourceInfoArry = val.options.supported_resource_type;
             if (!this.isEmpty(resourceInfoArry) && resourceInfoArry.length > 0){
                 resourceInfoArry.forEach((curItem, idx) =>{
                     if (idx == 0){
-                        returnVal +=  `${curItem}`;
+                        returnVal +=  `${this.capitalize(curItem)}`;
                     } else {
-                        returnVal +=  `<br>${curItem}`;
+                        returnVal +=  `<br>${this.capitalize(curItem)}`;
                     }
                 });
             }
@@ -745,6 +785,9 @@ export default {
             display: inline-block;
             text-align: right; 
         }
+    }
+    .row-icons {
+      padding: 5px 5px 5px 5px;
     }
 }
 </style>
