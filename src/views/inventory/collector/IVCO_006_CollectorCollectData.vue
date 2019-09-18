@@ -1,34 +1,38 @@
 <template>
-  <b-card class="base first-tab">
-    <BaseTable :table-data="tableData"
-               :fields="fields"
-               :dark-header="false"
-               :caption-width="500"
-               :search-width="300"
-               :busy="isLoading"
-               :per-page="query.page.limit"
-               :total-rows="totalCount"
-               plain-search
-               cardless
-               underlined
-               searchable
-               @limitChanged="limitChanged"
-               @list="listCredentialsData"
-    >
-      <template #caption>
-        <b-button class="btn mr-4" variant="primary" @click="onClickCollectData">
-          {{ tr('COL_NM.COL_DATA') }}
-        </b-button>
-        <b-button class="btn mr-4" variant="secondary" @click="onClickVerify">
-          {{ tr('COL_NM.VERIFY') }}
-        </b-button>
-      </template>
-    </BaseTable>
-  </b-card>
-</template>
+  <div>
+    <b-row>
+      <b-col class="col-xs-12 col-sm-3 col-md-3">
+        <b-card class="s-card ">
 
+
+        </b-card>
+        <b-card class="s-card">
+
+
+        </b-card>
+      </b-col>
+      <b-col class="col-xs-12 col-sm-9 col-md-9">
+        <b-card class="m-card">
+
+        </b-card>
+      </b-col>
+    </b-row>
+  </div>
+</template>
 <script>
 const BaseTable = () => import('@/components/base/table/BATB_001_BaseTable');
+const collectorModel = {
+    collector_id: null,
+    name: null,
+    state: null,
+    email: null,
+    priority: null,
+    resource_type: null,
+    default_collect_state: null,
+    last_collected_at: null,
+    created_at: null,
+    tags: []
+};
 export default {
     name: 'CredentialsData',
     components: {
@@ -37,7 +41,8 @@ export default {
     props: {
         collectorData: {
             type: Object,
-            default: () => ({}),
+            default: () => (collectorModel),
+            required: true
         }
     },
     data () {
@@ -117,7 +122,7 @@ export default {
 
             this.reset();
             this.setQuery(limit, start, sort, keyword);
-
+            debugger;
             const credential_group_id = this.collectorData.plugin_info.credential_group_id;
             const credential_id = this.collectorData.plugin_info.credential_id;
             let mergeGroup = [];
@@ -186,28 +191,12 @@ export default {
 
 
 <style lang="scss" scoped>
-  .data-container {
-    background-color: $white;
+  .s-card {
+    min-height: 30vh;
+    margin: 5px -5px 5px 10px;
   }
-
-  .nav-container.nav {
-    .nav-item {
-      margin-right: 5px;
-      .nav-link {
-        vertical-align: middle;
-        padding: 5px 10px 3px 10px;
-        border-radius: 3px;
-        background-color: $lightgray;
-        &.active {
-          background-color: $blue;
-        }
-        &:hover {
-          background-color: $gray;
-          &.active {
-            background-color: darken($blue, 10%);
-          }
-        }
-      }
-    }
+  .m-card {
+    min-height: 60vh;
+    margin: 5px 10px 5px -5px;
   }
 </style>

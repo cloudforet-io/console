@@ -39,6 +39,10 @@ export const GlobalEnum = {
         en: { value: 'en', text: 'English' , nation: 'US', icon: 'flag-icon flag-icon-us' },
         ko: { value: 'ko', text: '한국어', nation: 'KR', icon: 'flag-icon flag-icon-kr' }
     }),
+    COLLECTOR: Object.freeze({
+        EC2: { src: 'EC2.svg', text: 'EC2' },
+        VPC: { src: 'VPC.svg', text: 'VPC' }
+    }),
     MEMBER_STATE: Object.freeze(
         {
             ENABLED: {
