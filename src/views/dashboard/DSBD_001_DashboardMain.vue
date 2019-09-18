@@ -1,29 +1,31 @@
 <template>
   <div class="animated fadeIn dashboard-container">
-    <b-row>
-      <b-col cols="12">
-        <p class="board-title">
-          Summary
-        </p>
-        <Summary />
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col cols="12">
-        <p class="board-title">
-          Collection State
-        </p>
-        <CollectionState />
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col cols="12">
-        <p class="board-title">
-          Server State
-        </p>
-        <ServerState />
-      </b-col>
-    </b-row>
+    <main>
+      <b-row>
+        <b-col cols="12">
+          <p class="board-title">
+            Summary
+          </p>
+          <Summary />
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col cols="12">
+          <p class="board-title">
+            Collection State
+          </p>
+          <CollectionState />
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col cols="12">
+          <p class="board-title">
+            Server State
+          </p>
+          <ServerState />
+        </b-col>
+      </b-row>
+    </main>
   </div>
 </template>
 
@@ -62,12 +64,20 @@ export default {
 
 <style lang="scss" scoped>
 .dashboard-container {
-    padding: 40px 15px;
-    .row {
-        margin: 0;
-    }
-    .board-title {
-
+    text-align: center;
+    main {
+        display: inline-block;
+        width: 100%;
+        max-width: 1080px;
+        padding: 40px 15px;
+        text-align: left;
+        .row {
+            margin: 0 0 60px 0;
+        }
+        .board-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
     }
 }
 </style>

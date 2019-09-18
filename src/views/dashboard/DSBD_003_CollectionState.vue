@@ -1,45 +1,80 @@
 <template>
-  <b-row>
-    <b-col cols="6">
-      <b-row>
-        <b-col cols="6" class="card-container">
+  <div class="pr-3 pl-2">
+    <b-row align-h="end" class="m-0 pb-3">
+      <div class="dropdown-container">
+        <b-dropdown no-caret right
+                    variant="outline-secondary"
+                    class="no-selected"
+        >
+          <template #button-content>
+            <span>Server</span> &nbsp;
+            <i class="fal fa-angle-down" />
+          </template>
+          <b-dropdown-item>
+            <div class="item sm">
+              <span class="name">Server</span>
+            </div>
+        </b-dropdown>
+      </div>
+    </b-row>
+    <b-row>
+      <b-col cols="6">
+        <div class="card-container">
           <div class="card">
             <p class="card-title">
               New
             </p>
+            <b-row class="card-item" align-v="center">
+              <b-col cols="8" class="item-title">
+                Server
+              </b-col>
+              <b-col cols="4" class="item-count">
+                12
+              </b-col>
+            </b-row>
+            <b-row class="card-item" align-v="center">
+              <b-col cols="8" class="item-title">
+                Server
+              </b-col>
+              <b-col cols="4" class="item-count">
+                12
+              </b-col>
+            </b-row>
+            <b-row class="card-item" align-v="center">
+              <b-col cols="8" class="item-title">
+                Server
+              </b-col>
+              <b-col cols="4" class="item-count">
+                12
+              </b-col>
+            </b-row>
           </div>
-        </b-col>
-        <b-col cols="6" class="card-container">
           <div class="card">
             <p class="card-title">
               Active
             </p>
           </div>
-        </b-col>
-        <b-col cols="6" class="card-container">
           <div class="card">
             <p class="card-title">
               Duplicated
             </p>
           </div>
-        </b-col>
-        <b-col cols="6" class="card-container">
           <div class="card">
             <p class="card-title">
               Disconnected
             </p>
           </div>
-        </b-col>
-      </b-row>
-    </b-col>
-    <b-col cols="6">
-      <div class="chart-container">
-        <div class="chart">
-          <canvas ref="chart" />
         </div>
-      </div>
-    </b-col>
-  </b-row>
+      </b-col>
+      <b-col cols="6">
+        <div class="chart-container">
+          <div class="chart">
+            <canvas ref="chart" width="450" height="350" />
+          </div>
+        </div>
+      </b-col>
+    </b-row>
+  </div>
 </template>
 
 <script>
@@ -48,6 +83,11 @@ export default {
     name: 'CollectionState',
     data () {
         return {
+            cardData: [{
+                stateName: 'New',
+                datasets: {
+                }
+            }],
             chart: null,
             chartType: 'doughnut',
             chartData: {
@@ -80,14 +120,24 @@ export default {
                         top: 0,
                         bottom: 0
                     }
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 10,
+                        padding: 20
+                    }
                 }
-                // scales: {
-                //     yAxes: [{
-                //         ticks: {
-                //             beginAtZero: true
-                //         }
-                //     }]
-                // }
+            },
+            chartPlugins: [{
+                beforeDraw: this.beforeDraw,
+                beforeInit: this.beforeChartInit
+            }],
+            chartCenterText: {
+                display: true,
+                text: 'Total'
             },
             chartExternals: { moment: 'moment' }
         };
@@ -102,37 +152,36 @@ export default {
                 type: this.chartType,
                 data: this.chartData,
                 options: this.chartOptions,
-                externals: this.chartExternals,
-                plugins: [{
-                    beforeDraw: this.beforeDraw
-                }],
-                centerText: {
-                    display: true,
-                    text: '280'
-                }
+                plugins: this.chartPlugins,
+                centerText: this.chartCenterText,
+                externals: this.chartExternals
             });
         },
         beforeDraw (chart) {
-            if (chart.config.centerText.display !== null &&
-                    typeof chart.config.centerText.display !== 'undefined' &&
-                    chart.config.centerText.display) {
-                this.drawTotals(chart);
+            if (chart.config.centerText.display) {
+                this.drawCenterText(chart);
             }
         },
-        drawTotals (chart) {
-            debugger;
-            var width = chart.chart.width,
-                height = chart.chart.height,
-                ctx = chart.chart.ctx;
+        beforeChartInit (chart, options) {
+            chart.legend.afterFit = function() {
+                this.height = this.height + 50;
+            };
+        },
+        drawCenterText (chart) {
+            let top = chart.chartArea.top;
+            let bottom = chart.chartArea.bottom;
+            let right = chart.chartArea.right;
+            let left = chart.chartArea.left;
+            let ctx = chart.ctx;
  
             ctx.restore();
-            var fontSize = (height / 114).toFixed(2);
+            var fontSize = (bottom / 200).toFixed(2);
             ctx.font = fontSize + 'em sans-serif';
             ctx.textBaseline = 'middle';
  
             var text = chart.config.centerText.text,
-                textX = Math.round((width - ctx.measureText(text).width) / 2),
-                textY = height / 2;
+                textX = Math.round((left + right - ctx.measureText(text).width) / 2),
+                textY = (bottom + top) / 2;
  
             ctx.fillText(text, textX, textY);
             ctx.save();
@@ -142,26 +191,55 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.dropdown-container {
+    margin-top: -40px;
+    button.dropdown-toggle {
+        background-color: transparent;
+    }
+}
+
 .card-container {
-    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    height: 100%;
     .card {
         padding: 10px;
+        margin: 10px 10px 10px 10px;
+        width: 200px;
+        height: 170px;
+        border: 0;
+        box-shadow: $box-shadow;
         .card-title {
+            padding: 5px;
             text-align: center;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        .card-item {
+            padding: 5px 20px;
+            .item-title {
+                text-align: left;
+            }
+            .item-count {
+                text-align: right;
+                font-size: 1.1em;
+                font-weight: 600;
+            }
         }
     }
 }
 
 .chart-container {
+    @extend %sheet;
     position: relative;
-    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: $white;
     .chart {
         position: absolute;
-        border: 1px solid red;
-        canvas {
-            width: 600px;
-            height: 600px;
-        }
     }
 }
 </style>

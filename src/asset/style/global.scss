@@ -62,14 +62,18 @@ a {
   .nav-item {
     max-height: 100%;
     button.dropdown-toggle {
-      background-color: transparent;
-      border-color: transparent;
+      background-color: transparent !important;
+      border-color: transparent !important;
+      color: $white !important;
       font-size: 1rem;
       font-weight: 400;
-      color: darken($darkgray, 20%);
-      color: $white;
       &:active, &.active, &[aria-expanded="true"] {
-        background-color: transparent;
+        background-color: transparent !important;
+        border-color: transparent !important;
+        outline: none !important;
+      }
+      &:focus {
+        box-shadow: none !important;  
       }
     }
   }
