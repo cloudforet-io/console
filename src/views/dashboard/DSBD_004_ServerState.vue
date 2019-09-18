@@ -2,7 +2,7 @@
   <div class="board-container">
     <div v-for="c in [1, 2, 3]" :key="c" class="board">
       <div class="chart">
-        <canvas ref="chart" height="100" width="100" />
+        <canvas ref="chart" height="80" width="80" />
       </div>
       <div class="info">
         <span class="count">6</span>
@@ -22,38 +22,37 @@ export default {
         return {
             chartType: 'doughnut',
             chartData: {
+                labels: ['In-Service'],
                 datasets: [{
-                    data: [12, 19, 3, 5],
+                    data: [12, 20],
                     backgroundColor: [
-                        'rgba(152,58,195,1.0)'
+                        'rgba(44,104,249,1.0)'
+//                         $blue: #2C68F9;
+// $violet: #8a2be2;
+// $blueviolet: #4856f2;
                     ],
-                    borderWidth: 0,
-                    hoverBorderColor: [
-                        'rgba(152,58,195,0.5)'
-                    ],
-                    hoverBorderWidth: 10
+                    borderWidth: 0
+                    // hoverBorderColor: [
+                    //     'rgba(44,104,249,0.5)'
+                    // ],
                 }]
             },
             chartOptions: {
-                cutoutPercentage: 70,
-                layout: {
-                    padding: {
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        bottom: 0
-                    }
-                },
+                cutoutPercentage: 80,
                 legend: {
                     display: false
-                }
+                },
+                tooltips: { enabled: false },
+                hover: { mode: null }
             },
             chartPlugins: [{
                 beforeDraw: this.beforeDraw
             }],
             chartCenterText: {
                 display: true,
-                text: 'Total'
+                text: '30%',
+                fontSize: 16,
+                fontWeight: 500
             },
             chartExternals: { moment: 'moment' }
         };
@@ -63,16 +62,21 @@ export default {
     },
     methods: {
         drawChart () {
-            let ctxs = this.$refs.chart;
-            ctxs.map((ctx) => {
-                new Chart(ctx, {
-                    type: this.chartType,
-                    data: this.chartData,
-                    options: this.chartOptions,
-                    plugins: this.chartPlugins,
-                    centerText: this.chartCenterText,
-                    externals: this.chartExternals
-                });
+            let canvases = this.$refs.chart;
+            canvases.map((canvas) => {
+                let ctx = canvas.getContext('2d');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: this.chartType,
+                        data: this.chartData,
+                        options: this.chartOptions,
+                        plugins: this.chartPlugins,
+                        centerText: this.chartCenterText,
+                        externals: this.chartExternals
+                    });
+                } else {
+                    throw new Error('Browser does not support canvas.');
+                }
             });
         },
         beforeDraw (chart) {
@@ -88,8 +92,8 @@ export default {
             let ctx = chart.ctx;
  
             ctx.restore();
-            var fontSize = (bottom / 100).toFixed(2);
-            ctx.font = fontSize + 'em sans-serif';
+            var fontSize = chart.config.centerText.fontSize;
+            ctx.font = fontSize + 'px sans-serif';
             ctx.textBaseline = 'middle';
  
             var text = chart.config.centerText.text,
@@ -117,19 +121,22 @@ export default {
         background-color: $white;
         .chart {
             position: absolute;
-            left: 20px;
-            top: 10px;
+            left: 40px;
+            top: 20px;
         }
         .info {
             display: inline-block;
             position: absolute;
             left: 120px;
-            padding: 35px 45px;
+            padding: 30px 45px;
+            color: $black;
             .count {
-                font-size: 1.3em;
+                font-size: 1.5em;
                 font-weight: 800;
+                padding: 5px;
             }
             .state {
+                font-size: 1.1em;
                 font-weight: 500;
             }
         }

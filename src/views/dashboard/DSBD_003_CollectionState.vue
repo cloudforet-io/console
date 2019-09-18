@@ -14,6 +14,7 @@
             <div class="item sm">
               <span class="name">Server</span>
             </div>
+          </b-dropdown-item>
         </b-dropdown>
       </div>
     </b-row>

@@ -179,10 +179,10 @@
       </template>
       
       <template #rawData>
-        <ServerRawData />
+        <ServerRawData :server-data="selectedItems[0].data" />
       </template>
       <template #admin>
-        <ServerAdmin />
+        <ServerAdmin :server-data="selectedItems[0].data" />
       </template>
     </BaseTabNav>
     <div v-else class="empty">

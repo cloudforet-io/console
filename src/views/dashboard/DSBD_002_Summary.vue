@@ -38,6 +38,7 @@ export default {
         }
         .count {
             color: $navy;
+            padding: 0 7px;
             font-size: 1.75em;
             font-weight: 900;
         }

@@ -1,167 +1,217 @@
 <template>
-  <div class="row">
-    <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-      <b-card class="base border-top-0">
-        <b-row>
-          <b-col cols="12">
-            <BaseTable :show-caption="showCaption"
-                       :cardless="true"
-                       :table-data="audits"
-                       :fields="fields"
-                       :per-page="3"
-                       :searchable="false"
-                       :busy="isLoading"
-                       :row-clicked-fn="rowClicked"
-                       :total-rows="totalCount"
-                       @list="listAudits"
-            />
-          </b-col>
-        </b-row>
-      </b-card>
-    </b-col>
-  </div>
+  <b-card class="base first-tab">
+    <BaseTable :table-data="tableData" 
+               :fields="fields"
+               :selectable="false"
+               :dark-header="false"
+               :caption-width="500"
+               :search-width="300"
+               :busy="isLoading"
+               :per-page="query.page.limit"
+               :total-rows="totalCount"
+               plain-search
+               cardless
+               underlined
+               searchable
+               @limitChanged="limitChanged"
+               @list="listServerAdmin"
+    >
+      <template #caption />
+    </BaseTable>
+  </b-card>
 </template>
 
 <script>
-import BaseTable from '@/components/base/table/BATB_001_BaseTable.vue';
-const thisTestData = [{
-    eventName: 'UpdateProjectGroup',
-    status: {
-        flag: 'fail',
-        variantSize: 3,
-        text: 'Success'
-    } ,
-    Description: '정보가 변경되었습니다.',
-    Executor: 'Name',
-    Created: '2019-10-16',
-    linkText: 'update Group',
-    link: 'www.google.com'
-},
-{
-    eventName: 'UpdateProjectGroup',
-    status: {
-        flag: 'Success',
-        variantSize: 3,
-        text: 'Success'
-
-    },
-    Description: '정보가 변경되었습니다.',
-    Executor: 'Name',
-    Created: '2019-10-16',
-    linkText: 'update Group',
-    link: 'www.google.com'
-},
-{
-    eventName: 'UpdateProjectGroup',
-    status: {
-        flag: 'fail',
-        variantSize: 2,
-        text: 'fail'
-    },
-    Description: '정보가 변경되었습니다.',
-    Created: '2019-10-16',
-    Executor: 'Name',
-    linkText: 'update Group',
-    link: 'www.google.com'
-},
-{
-    eventName: 'UpdateProjectGroup',
-    status: {
-        flag: 'fail',
-        variantSize: 3,
-        text: 'fail'
-    },
-    Description: '정보가 변경되었습니다.',
-    Created: '2019-10-16',
-    Executor: 'Name',
-    linkText: 'update Group',
-    link: 'www.google.com'
-},
-{
-    eventName: 'UpdateProjectGroup',
-    status: {
-        flag: 'fail',
-        variantSize: 2,
-        text: 'fail'
-    },
-    Description: '정보가 변경되었습니다.',
-    Created: '2019-10-16',
-    Executor: 'Name',
-    linkText: 'update Group',
-    link: 'www.google.com'
-}
-
-];
+const BaseTable = () => import('@/components/base/table/BATB_001_BaseTable');
 
 export default {
-    name: 'ServerAudit',
+    name: 'ServerAdmin',
     components: {
         BaseTable
     },
-    props: {},
+    props: {
+        serverData: {
+            type: Object,
+            default: () => ({})
+        }
+    },
     data () {
         return {
+            serverDataKeyEnum: Object.freeze({
+                DISK: 'disk',
+                NIC: 'nic',
+                SG: 'security_group'
+            }),
+            activeNav: '',
+            tableData: [],
+            query: { 
+                page: {
+                    start: 1, 
+                    limit: 10
+                }, 
+                keyword: ''
+            },
             isLoading: true,
-            showCaption: false,
-            fields: [
-                { key: 'comm', label: 'Command ID', sortable: true },
-                { key: 'status', label: 'State', sortable: true },
-                { key: 'Description', label: 'Status', sortable: true },
-                { key: 'Executor', label: 'Created', sortable: true },
-                { key: 'Created', label: 'Finished', sortable: true },
-                { key: 'Result', label: 'Result', sortable: true }
-            ],
-            audits: [],
-            selectedAudit: null,
-            addModal: false,
-            totalCount: 17
+            totalCount: 0
         };
     },
-    created () {
+    computed: {
+        diskFields () {
+            return [
+                { key: 'device_index', label: '#', sortable: true, thStyle: { width: '50px' }},
+                { key: 'device', label: this.tr('COL_NM.DEVICE'), sortable: true, thStyle: { width: '150px' }},
+                { key: 'device_type', label: this.tr('COL_NM.TYPE'), sortable: true, thStyle: { width: '150px' }},
+                { key: 'size', label: this.tr('COL_NM.SIZE'), sortable: true, thStyle: { width: '150px' }},
+                { 
+                    key: 'tags', 
+                    label: this.tr('COL_NM.TAG'), 
+                    sortable: true, 
+                    formatter: this.tagFormatter,
+                    thStyle: { width: '150px' }
+                }
+            ];
+        },
+        nicFields () {
+            return [
+                { key: 'device_index', label: '#', sortable: true, thStyle: { width: '50px' }},
+                { key: 'device', label: this.tr('COL_NM.DEVICE'), sortable: true, thStyle: { width: '150px' }},
+                { key: 'ip_address', label: this.tr('COL_NM.IP'), thStyle: { width: '150px' }},
+                { key: 'cidr', label: this.tr('COL_NM.CIDR'), thStyle: { width: '150px' }},
+                { key: 'subnet_id', label: this.tr('COL_NM.NETWORK'), thStyle: { width: '150px' }},
+                { key: 'mac_address', label: this.tr('COL_NM.MAC'), sortable: true, thStyle: { width: '150px' }},
+                { 
+                    key: 'tags', 
+                    label: this.tr('COL_NM.TAG'), 
+                    sortable: true, 
+                    formatter: this.tagFormatter,
+                    thStyle: { width: '150px' }
+                }
+            ];
+        },
+        securityGroupFields () {
+            return [
+                { key: 'direction', label: this.tr('COL_NM.DIRECTION'), sortable: true, thStyle: { width: '50px' }},
+                { key: 'protocol', label: this.tr('COL_NM.PROTOCOL'), sortable: true, thStyle: { width: '150px' }},
+                { key: 'port_range', label: this.tr('COL_NM.PORT_RANGE'), formatter: this.portRangeFormatter, thStyle: { width: '150px' }},
+                { key: 'remote_cidr', label: this.tr('COL_NM.SRC_DEST'), thStyle: { width: '150px' }},
+                { key: 'security_group_name', label: this.tr('COL_NM.SG_NAME'), thStyle: { width: '150px' }},
+                { key: 'security_group_id', label: this.tr('COL_NM.SG_ID'), sortable: true, thStyle: { width: '150px' }}
+            ];
+        },
+        fields () {
+            if (this.activeNav === this.serverDataKeyEnum.DISK) {
+                return this.diskFields;
+            } else if (this.activeNav === this.serverDataKeyEnum.NIC) {
+                return this.nicFields;
+            } else {
+                return this.securityGroupFields;
+            }
+        },
+        customSlotNames () {
+            if (this.activeNav === this.serverDataKeyEnum.NIC) {
+                return ['cidr', 'ip_address', 'subnet_id'];
+            } else {
+                return [];
+            }
+        }
     },
-    mounted () {
-        this.listAudits(3, 0);
+    watch: {
+        serverData () {
+            this.reset();
+            this.listServerAdmin();
+        }
+    },
+    created () {
+        this.activeNav = this.serverDataKeyEnum.DISK;
+        this.listServerAdmin();
     },
     methods: {
-        async listAudits (limit, skip, sort, search) {
-            if (this.isEmpty(limit)) {
-                limit = 10;
-            }
-            if (this.isEmpty(skip)) {
-                skip = 0;
-            }
-            if (this.isEmpty(sort)) {
-                sort = '-created_date';
-            }
-            if (this.isEmpty(search)) {
-                search = {};
-            }
-
-            let res;
-        /* try {
-        res = await this.$http.get(`/identity/users`, {
-          params: { limit, skip, sort, search }
-        })
-      } catch (e) {
-        console.error(e)
-      } */
-            this.audits = thisTestData;
-            this.selectedAudit = null;
-            this.isLoading = false;
-        /**
-         * TODO: set totalCount with data from server
-         */
+        setQuery (limit, start, sort, keyword) {
+            this.query.page.limit = limit || 10;
+            this.query.page.start = start || 0;
+            this.query.sort = sort || {};
+            this.query.keyword = keyword || '';
         },
-        rowClicked (item, idx) {
-            this.selectedAudit = item;
+        async listServerAdmin (limit, start, sort, keyword) {
+            this.reset();
+            this.setQuery(limit, start, sort, keyword);
+            try {
+                let res = await this.$axios.post('/inventory/server/get-data', { 
+                    domain_id: sessionStorage.getItem('domainId'),
+                    server_id: this.serverData.server_id,
+                    data_type: this.activeNav,
+                    query: this.query
+                });
+                this.tableData = res.data.results;
+                this.totalCount = res.data.total_count;
+            } catch (err) {
+                this.alertError(err);
+            }
+            this.isLoading = false;
+        },
+        reset () {
+            this.isLoading = true;
+            this.tableData = [];
+        },
+        onClickDisk () {
+            this.activeNav = this.serverDataKeyEnum.DISK;
+            this.listServerAdmin();
+        },
+        onClickNic () {
+            this.activeNav = this.serverDataKeyEnum.NIC;
+            this.listServerAdmin();
+        },
+        onClickSecurityGroup () {
+            this.activeNav = this.serverDataKeyEnum.SG;
+            this.listServerAdmin();
+        },
+        portRangeFormatter (val, key, data) {
+            return `${data.port_range_min} - ${data.port_range_max}`;
+        },
+        tagFormatter (tags) {
+            let keys = Object.keys(tags);
+            let results = '';
+            keys.map((key) => {
+                results += ` ${key}: ${tags[key]}`;
+            });
+            return results;
+        },
+        alertError (err) {
+            console.error(err);
+            this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
+        },
+        limitChanged (val) {
+            this.query.page.limit = val;
+            this.listServerAdmin();
         }
     }
 };
 </script>
 
+
 <style lang="scss" scoped>
-  .up-corner-no-radius {
-    border-top-left-radius: 0px !important;
-    border-top-right-radius: 0px !important;;
-  }
+.data-container {
+    background-color: $white;
+}
+
+.nav-container.nav {
+    .nav-item {
+        margin-right: 5px;
+        .nav-link {
+            vertical-align: middle;
+            padding: 5px 10px 3px 10px;
+            border-radius: 3px;
+            background-color: $lightgray;
+            &.active {
+                background-color: $blue;
+            }
+            &:hover {
+                background-color: $gray;
+                &.active {
+                    background-color: darken($blue, 10%);
+                }
+            }
+        }
+    }
+}
 </style>
