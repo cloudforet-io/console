@@ -1,31 +1,111 @@
 <template>
   <div>
     <b-row>
-      <b-col class="col-xs-12 col-sm-3 col-md-3">
+      <b-col class="col-xs-12 col-sm-12 col-md-4">
         <b-card class="s-card ">
-
-
+          <div>
+            <b-row class="justify-content-md-center">
+              <b-col v-if="getSelectedDataIcon" class="sel-collector" cols="12" md="auto">
+                <b-card-img :src="require(`@/asset/icons/${collectorData.tags.icon}.svg`)"
+                            style="padding-top: 5%"
+                            height="150vh"
+                            width="150vh"
+                />
+                <b-card style="border: none">
+                  {{ collectorData.name }}
+                </b-card>
+              </b-col>
+              <b-col v-else class="sel-collector" cols="12" md="auto">
+                <b-card-img :src="require(`@/asset/icons/GEAR.svg`)"
+                            style="padding-top: 15%"
+                            height="150vh"
+                            width="150vh"
+                />
+                <b-card style="border: none">
+                  {{ collectorData.name }}
+                </b-card>
+              </b-col>
+            </b-row>
+          </div>
         </b-card>
         <b-card class="s-card">
+          <div>
+            <b-form @reset.prevent="onReset"
+                    @submit.prevent="onSubmit"
+            >
+              <b-row>
+                <b-col cols="12" style="padding-top: 8%">
+                  <BaseField v-model="collector_id"
+                             :plaintext="!creatable"
+                             :label="`${tr('COL_NM.COL_ID')} : `"
+                             :label-cols="4"
+                  />
+                  <BaseField v-model="plugin_info.version"
+                             :plaintext="!creatable"
+                             :label="`${tr('COL_NM.VERSION')} : `"
+                             :label-cols="4"
+                  />
 
+                  <BaseField
+                    v-model="credential"
+                    :label="`${tr('CREDENTIAL')} : `"
+                    :label-cols="4"
+                    type="select"
+                    :options="CollectModeList"
+                    :placeholder="tr('FORM.SELECT', [tr('CREDENTIAL')])"
+                  />
 
+                  <BaseField
+                    v-model="collect_mode"
+                    :label="`${tr('COL_NM.COL_MODE')} : `"
+                    :label-cols="4"
+                    type="select"
+                    :options="CollectModeList"
+                    :placeholder="tr('FORM.SELECT', [tr('COL_NM.COL_MODE')])"
+                  />
+                </b-col>
+              </b-row>
+            </b-form>
+          </div>
         </b-card>
       </b-col>
-      <b-col class="col-xs-12 col-sm-9 col-md-9">
+      <b-col class="col-xs-12 col-sm-12 col-md-8">
         <b-card class="m-card">
-
+          <div v-for="(item) in filterFormat">
+            <BaseField v-model="filterObject.filterInput[item.key]"
+                       :label="`${item.key} (${item.type}) : `"
+                       :state="filterObject.filterValidation[item.key]"
+                       :label-cols="3"
+                       :placeholder="tr('FORM.SELECT', [item.name])"
+                       :invalid-message="tr('ALERT.ALT_CHECK_TYPE', [tr(`FORM.TYPE.${item.type.toUpperCase()}`)])"
+            />
+          </div>
         </b-card>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col class="btn-box mt-2 mr-3">
+        <b-button class="float-right ml-3 mb-1" size="md" variant="primary" @click="onDataCollect">
+          {{ creatable ? tr('BTN_CRT') : tr('BTN_COL_DATA') }}
+        </b-button>
+        <b-button class="float-right mb-1" size="md"
+                  type="button" variant="outline-secondary"
+                  @click="onCancel"
+        >
+          {{ tr('BTN_CANCEL') }}
+        </b-button>
       </b-col>
     </b-row>
   </div>
 </template>
 <script>
-const BaseTable = () => import('@/components/base/table/BATB_001_BaseTable');
+import BaseField from '@/components/base/form/BAFM_001_BaseField.vue';
+
 const collectorModel = {
     collector_id: null,
     name: null,
     state: null,
-    email: null,
+    plugin_info: null,
     priority: null,
     resource_type: null,
     default_collect_state: null,
@@ -33,157 +113,155 @@ const collectorModel = {
     created_at: null,
     tags: []
 };
+
 export default {
-    name: 'CredentialsData',
+    name: 'CollectorCollectData',
     components: {
-        BaseTable
+        BaseField
     },
     props: {
         collectorData: {
             type: Object,
             default: () => (collectorModel),
             required: true
+        },
+        filterFormatData: {
+            type: Array,
+            default: () => ([])
+        },
+        creatable: {
+            type: Boolean,
+            default: false
         }
     },
-    data () {
+    data() {
         return {
-            collectorDataKeyEnum: Object.freeze({
-                DISK: 'disk',
-                NIC: 'nic',
-                SG: 'security_group'
-            }),
-            activeNav: '',
-            tableData: [],
-            query: {
-                page: {
-                    start: 1,
-                    limit: 10
-                },
-                keyword: ''
+            filterObject: {
+                filterInput: null,
+                filterValidation: null,
+                filterType: null
             },
+            filterFormat: this.collectorData.plugin_info.options.filter_format,
+            collector_id: this.collectorData.collector_id,
+            name: this.collectorData.name,
+            state: this.collectorData.state,
+            plugin_info: this.collectorData.plugin_info,
+            priority: this.collectorData.priority,
+            default_collect_state: this.collectorData.default_collect_state,
+            last_collected_at: this.collectorData.last_collected_at,
+            created_at: this.collectorData.created_at,
+            tags: this.collectorData.tags,
+            credential: null,
+            tableData: [],
+            showValidation: false,
+            collect_mode: 'ALL',
             isLoading: true,
             totalCount: 0
         };
     },
     computed: {
-        fields () {
-            return [
-                { key: 'selected', thStyle: { width: '50px' }},
-                { key: 'credential_id', label: this.tr('COL_NM.ID'), sortable: true, ajaxSortable: true, thStyle: { width: '120px' }},
-                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
-                { key: 'project', label: this.tr('COL_NM.PROJ'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
-                {
-                    key: 'created_at',
-                    label: this.tr('COL_NM.CREATED'),
-                    sortable: true,
-                    ajaxSortable: true,
-                    filterByFormatted: true,
-                    formatter: (val) => {
-                        return this.getComputedTime(val, localStorage.getItem('timezone'));
-                    } ,
-                    thStyle: { width: '160px' }
-                },
-                { key: 'verified', label: this.tr('COL_NM.VERIFIED'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }}
-            ];
+        CollectModeList () {
+            return this.getCollectModeSelectList();
+        },
+        getSelectedDataIcon() {
+            return this.selectIconType(this.collectorData.tags);
         }
     },
-    watch: {
-        collectorData () {
-            this.reset();
-            this.listCredentialsData();
-        }
-    },
-    created () {
-        this.listCredentialsData();
+    async created() {
+        await this.setFilterFormatObject();
     },
     methods: {
-        setQuery (limit, start, sort, keyword) {
+        validateFilters (){
+            let validated = true;
+            for (let [key, val] of Object.entries(this.filterObject.filterInput)) {
+                if (!this.isEmpty(this.filterObject.filterInput[key])){
+                    if (!this.isSelectedType(this.filterObject.filterInput[key], this.filterObject.filterType[key])){
+                        this.filterObject.filterValidation[key] = false;
+                        validated = false;
+                    }
+                }
+            }
+            return validated;
+        },
+        setFilterFormatObject (){
+            let filterInput = {};
+            let filterValidation = {};
+            let filterType = {};
+
+            this.filterFormat.forEach((curItem) =>{
+                filterInput[curItem.key] = null;
+                filterValidation[curItem.key] = true;
+                filterType[curItem.key] = curItem.type;
+            });
+
+            this.filterObject =  {
+                filterInput: filterInput,
+                filterValidation: filterValidation,
+                filterType: filterType
+            };
+        },
+        setQuery(limit, start, sort, keyword) {
             this.query.page.limit = limit || 10;
             this.query.page.start = start || 0;
             this.query.sort = sort || {};
             this.query.keyword = keyword || '';
         },
-        getComputedTime (selectedTimeStamp) {
-            return !this.isEmpty(selectedTimeStamp) ? this.getDatefromTimeStamp(selectedTimeStamp.seconds, localStorage.getItem('timezone')) : '';
-        },
-        async getCredentials(selectedId, key) {
-            let paramObj = { domain_id: sessionStorage.domainId };
-            let keyId = `${key.replace(/-/gi,'_')}_id`;
-            paramObj[keyId] = selectedId;
-
-            try {
-                return await this.$axios.post(`/secret/${key}/list`, paramObj);
-            } catch (err) {
-                this.alertError(err);
-
-            }
-        },
-        async listCredentialsData (limit, start, sort, keyword) {
+        async listCredentialsData(limit, start, sort, keyword) {
 
             this.reset();
             this.setQuery(limit, start, sort, keyword);
-            debugger;
-            const credential_group_id = this.collectorData.plugin_info.credential_group_id;
-            const credential_id = this.collectorData.plugin_info.credential_id;
-            let mergeGroup = [];
-            let merge = (a, b, p) => a.filter(aa => ! b.find ( bb => aa[p] === bb[p])).concat(b);
 
-            try {
+                /*const credential_group_id = this.collectorData.plugin_info.credential_group_id;
+                const credential_id = this.collectorData.plugin_info.credential_id;
+                let mergeGroup = [];
+                let merge = (a, b, p) => a.filter(aa => ! b.find ( bb => aa[p] === bb[p])).concat(b);
 
-                if (!this.isEmpty(credential_group_id)) {
-                    let response = await this.getCredentials(credential_group_id, 'credential-group');
-                    if (!this.isEmpty(response.data)){
-                        const credentails = response.data.results[0].credentials;
-                        mergeGroup = credentails;
+                try {
+
+                    if (!this.isEmpty(credential_group_id)) {
+                        let response = await this.getCredentials(credential_group_id, 'credential-group');
+                        if (!this.isEmpty(response.data)){
+                            const credentails = response.data.results[0].credentials;
+                            mergeGroup = credentails;
+                        }
                     }
-                }
 
-                if (!this.isEmpty(credential_id)) {
-                    let response = await this.getCredentials(credential_id, 'credential');
-                    if (!this.isEmpty(response.data)){
-                        this.tableData = this.isEmpty(mergeGroup) ? response.data.results : merge(mergeGroup, response.data.results, 'credential_id');
+                    if (!this.isEmpty(credential_id)) {
+                        let response = await this.getCredentials(credential_id, 'credential');
+                        if (!this.isEmpty(response.data)){
+                            this.tableData = this.isEmpty(mergeGroup) ? response.data.results : merge(mergeGroup, response.data.results, 'credential_id');
+                        }
                     }
-                }
 
-                this.totalCount = this.tableData.length;
+                    this.totalCount = this.tableData.length;
 
-            } catch (err) {
-                this.alertError(err);
-            }
+                } catch (err) {
+                    this.alertError(err);
+                }*/
             this.isLoading = false;
         },
-        reset () {
+        reset() {
             this.isLoading = true;
             this.tableData = [];
         },
-        onClickCollectData () {
-            alert(1);
+        async onDataCollect() {
+            if (this.validateFilters()){
+                await this.$axios.post('/inventory/collector/collect', {
+                    collector_id: this.collector_id,
+                    domain_id:  sessionStorage.getItem('domainId'),
+                    filter: this.filterObject.filterInput,
+                    collect_mode: this.collect_mode
+                }).then((response) => {
+                    this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('BTN_COL_DATA'), this.tr('PROCESSED')]));
+                    this.$emit('cancel');
+                }).catch((error) => {
+                    console.error(e);
+                    this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('BTN_COL_DATA'), this.tr('COLLECTOR')]));
+                });
+            }
         },
-        onClickVerify () {
-            alert(2);
-        },
-        onClickSecurityGroup () {
-            this.activeNav = this.collectorDataKeyEnum.SG;
-            this.listCredentialsData();
-        },
-        portRangeFormatter (val, key, data) {
-            return `${data.port_range_min} - ${data.port_range_max}`;
-        },
-        tagFormatter (tags) {
-            let keys = Object.keys(tags);
-            let results = '';
-            keys.map((key) => {
-                results += ` ${key}: ${tags[key]}`;
-            });
-            return results;
-        },
-        alertError (err) {
-            console.error(err);
-            this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
-        },
-        limitChanged (val) {
-            this.query.page.limit = val;
-            this.listCredentialsData();
+        onCancel() {
+            this.$emit('cancel');
         }
     }
 };
@@ -191,12 +269,18 @@ export default {
 
 
 <style lang="scss" scoped>
-  .s-card {
-    min-height: 30vh;
-    margin: 5px -5px 5px 10px;
-  }
-  .m-card {
-    min-height: 60vh;
-    margin: 5px 10px 5px -5px;
-  }
+    .sel-collector {
+        text-align: center;
+        margin-top: 10%;
+    }
+
+    .s-card {
+        min-height: 30vh;
+        margin: 5px -5px 5px 10px;
+    }
+
+    .m-card {
+        min-height: calc(60vh + 5px);
+        margin: 5px 10px -5px -5px;
+    }
 </style>

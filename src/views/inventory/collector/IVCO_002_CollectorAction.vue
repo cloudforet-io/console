@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <b-row>
-      <b-col class="col-xs-12 col-sm-3 col-md-3">
-        <b-card class="left-container">
-          <b-row>
+    <div>
+        <b-row>
+            <b-col class="col-xs-12 col-sm-3 col-md-3">
+                <b-card class="left-container">
+                    <b-row><!--
             <div ref="IVCO002_SearchboxContainer"
                  class="searchbox-container"
                  :class="{ 'no-caption': noCaption }"
@@ -19,39 +19,105 @@
                             @empty="$emit('empty')"
                 />
               </div>
-            </div>
-          </b-row>
-          <b-row>
-            <b-card class="left-le">
-                <b-form-checkbox size="default">Official</b-form-checkbox>
-                <b-form-checkbox size="default">Local</b-form-checkbox>
-            </b-card>
-          </b-row>
-          <b-row>
-            <b-card class="left-le">
-                  <b-form-checkbox size="default">ALL</b-form-checkbox>
-                  <br>
-                  <b-form-checkbox size="default">Server</b-form-checkbox>
-                  <br>
-                  <b-form-checkbox size="default">Network</b-form-checkbox>
-                  <br>
-                  <b-form-checkbox size="default">Subnet</b-form-checkbox>
-                  <br>
-                  <b-form-checkbox size="default">IP Address</b-form-checkbox>
-            </b-card>
-          </b-row>
-        </b-card>
-      </b-col>
-      <b-col class="col-xs-12 col-sm-9 col-md-9">
-        <b-card class="right-container">
-          <b-row />
-          <b-row>
-            Repository
-          </b-row>
-        </b-card>
-      </b-col>
-    </b-row>
-  </div>
+            </div>-->
+                    </b-row>
+                    <b-row>
+                        <b-card class="left-le"
+                                align="left"
+                                header="Repository"
+                                header-bg-variant="primary"
+                                header-text-variant="white"
+                        >
+                            <b-form-radio name="radio-size" size="lg">Official</b-form-radio>
+                            <b-form-radio name="radio-size" size="lg">Public</b-form-radio>
+                        </b-card>
+                    </b-row>
+                    <b-row>
+                        <b-card class="left-le"
+                                align="left"
+                                header="Resource Type"
+                                header-bg-variant="primary"
+                                header-text-variant="white">
+                            <b-form-checkbox size="default">ALL</b-form-checkbox>
+                            <br>
+                            <b-form-checkbox size="default">Server</b-form-checkbox>
+                            <br>
+                            <b-form-checkbox size="default">Network</b-form-checkbox>
+                            <br>
+                            <b-form-checkbox size="default">Subnet</b-form-checkbox>
+                            <br>
+                            <b-form-checkbox size="default">IP Address</b-form-checkbox>
+                        </b-card>
+                    </b-row>
+                </b-card>
+            </b-col>
+            <b-col class="col-xs-12 col-sm-9 col-md-9">
+                <b-card class="right-container">
+                    <b-row>
+                        <b-col class="btn-box mt-2 mr-3">
+                            <b-button class="float-left mb-3"
+                                      size="md"
+                                      type="reset"
+                                      variant="primary"
+                            >
+                                {{ tr('BTN_CRT') }}
+                            </b-button>
+                            <b-button class="float-left ml-3"
+                                      size="md"
+                                      type="reset"
+                                      variant="outline-secondary"
+                            >
+                                {{ tr('BTN_CANCEL') }}
+                            </b-button>
+                        </b-col>
+                    </b-row>
+                    <b-row>
+                        <b-col class="col-xs-12 col-sm-12 col-md-4">
+                            <b-card class="s-card">
+                                <b-col class="sel-collector" cols="12" md="auto">
+                                    <img  class="row-gears" src="@/asset/icons/GEAR.svg"
+                                          height="42vh"
+                                          width="42vh"
+                                    >
+                                    <b-card style="border: none">
+                                        2
+                                    </b-card>
+                                </b-col>
+                            </b-card>
+                        </b-col>
+                        <b-col class="col-xs-12 col-sm-12 col-md-4">
+                            <b-card class="s-card">
+                                <b-col class="sel-collector" cols="12" md="auto">
+                                    <b-card-img src="@/asset/images/brand/dcos.png"
+                                                style="padding-top: 15%"
+                                                height="150vh"
+                                                width="150vh"
+                                    />
+                                    <b-card style="border: none">
+                                        2
+                                    </b-card>
+                                </b-col>
+                            </b-card>
+                        </b-col>
+                        <b-col class="col-xs-12 col-sm-12 col-md-4">
+                            <b-card class="s-card">
+                                <b-col class="sel-collector" cols="12" md="auto">
+                                    <b-card-img src="@/asset/icons/GEAR.svg"
+                                                style="padding-top: 15%"
+                                                height="150vh"
+                                                width="150vh"
+                                    />
+                                    <b-card style="border: none">
+                                        2
+                                    </b-card>
+                                </b-col>
+                            </b-card>
+                        </b-col>
+                    </b-row>
+                </b-card>
+            </b-col>
+        </b-row>
+    </div>
 </template>
 
 <script>
@@ -95,6 +161,7 @@ export default {
     },
     data () {
         return {
+            picked: null,
             collectorId: this.collectorProp.collector_id, // required
             password: this.collectorProp.password, // required
             passwordCheck: null, // required
@@ -359,11 +426,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+   .sel-collector {
+        text-align: center;
+        margin-top: 10%;
+   }
+
   .left-le {
     width: 100%;
     margin-bottom: 5px;
     margin-left: 5px;
     margin-right:5px;
+    min-height: 40vh
   }
   .left-container {
     min-height: calc(100vh - #{$total-header-height} - 10px);

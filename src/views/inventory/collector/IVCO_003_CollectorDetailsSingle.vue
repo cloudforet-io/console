@@ -3,6 +3,17 @@
     <BasePanel :panels="panelData"
                @edit="showTagEditModal"
     />
+     <b-card no-body class="filter-formatter">
+      <b-row class="page-header m-t-0" align-h="between">
+        <b-col>
+          <h5>
+            <i :class="selectIconHtml({ icon: 'fa-filter', type: 'l', size: 1, color: 'warning' }, true)" />
+            &nbsp;&nbsp;Filter Formatter
+          </h5>
+        </b-col>
+      </b-row>
+       <hr>
+    </b-card>
     <BaseTable class="user-table"
                :table-data="filterFormat"
                :dark-header="false"
@@ -48,7 +59,7 @@ const collectorModel = {
     collector_id: null,
     name: null,
     state: null,
-    email: null,
+    plugin_info: null,
     priority: null,
     resource_type: null,
     default_collect_state: null,
@@ -181,5 +192,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.filter-formatter{
+  border-style:none;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  padding-bottom: 0px !important
+}
 </style>
