@@ -1,5 +1,6 @@
 export const ko ={
     MSG: {
+        PROCESSED: '수행되었습니다',
         DR_SERV: '서비스',
         LOG_IN: '로그인',
         LOG_IN_GREET: '클라우드 원 로그인하기',
@@ -99,6 +100,8 @@ export const ko ={
         COMPUTE: 'Compute',
         RELEASE: '해제',
         STATE: '상태',
+        CREDENTIAL:'암호',
+        CREDENTIALS:'암호',
         REPO: 'Repository',
         LIST: '목록'
     },
@@ -192,11 +195,13 @@ export const ko ={
         CREATED: '생성일',
         COLLECTOR: '수집기',
         DEF_COL_STATE: '기본 수집 상태',
-        COL_DATA: 'Collect Data',
+        COL_DATA: '데이터 수집',
         VERIFY: '검증',
         VERIFIED: '검증완료',
         JOB_ID: '잡(Job) 아이디',
         COL_MODE: '수집 모드',
+        COL_ID: '컬렉터 아이디',
+        VERSION: '버젼 정보',
         CRT_COUNT: '생성 카운트',
         UPT_COUNT: '업데이트 카운트',
         FINISHED: '완료일',
@@ -225,6 +230,10 @@ export const ko ={
         COMPUTE: 'Compute'
     },
     FORM: {
+        TYPE: {
+            STR: '스트링',
+            LIST: '리스트'
+        },
         INVALID: {
             MANDATORY: '필수 입력란입니다.',
             UNIQUE: '유일한 값을 입력해주세요.',
@@ -249,6 +258,7 @@ export const ko ={
         SUCCESS: '성공적으로 완료하였습니다.'
     },
     ALERT: {
+        ALT_CHECK_TYPE: '현재 ({0}) type 의 Input 값이 아닙니다. 다시한번 확인해 주시기 바랍니다.',
         SUCCESS: '{0}가(이) 성공적으로 {1}.',
         ERROR: '{1}을(를) {0} 동안 오류가 발생했습니다.',
         NO_PARAM: '먼저 아이템을 선택해주세요.'

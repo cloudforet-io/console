@@ -156,7 +156,10 @@ export const Mixin = {
                 return (!isNaN(parseFloat(d)));
             } else if (t.toUpperCase() ==='B') {
                 return  ['1', '0', 1, 0, true, false].includes(d);
-            } else if (t.toUpperCase() ==='S') {
+            } else if (t.toUpperCase() ==='LIST') {
+                let splitString = d.split(',');
+                return  !splitString.includes('');
+            } else if (t.toUpperCase() ==='S' || t.toUpperCase() ==='STR') {
                 return  (typeof d === 'string' || d instanceof String);
             } else if (t.toUpperCase() ==='O') {
                 return (typeof d === 'object' && d !== null && !Array.isArray(d));
@@ -539,7 +542,34 @@ export const Mixin = {
             }
 
             return returnVal;
-        }
+        },
+        /**********************************************************************************
+         * Name       : selectIconType
+         * Input   => (value                           =>  String
+         *             boolOnly                        =>  Bolean
+         *             checkValue                      =>  String)
+         * Output  => Boolean true or false
+         * Description:  return the result of validation
+         **********************************************************************************/
+        selectIconType (tag) {
+            let returnVal = false;
+            if (!this.isEmpty(tag) && tag.hasOwnProperty('icon')){
+                let iconVal = tag.icon;
+                if (!this.isEmpty(iconVal)){
+                    returnVal = this.isEmpty(this._.get(GlobalEnum,`COLLECTOR.${iconVal}`))? false : true;
+                }
+            }
+            return returnVal;
+        },
+        /**********************************************************************************
+         * Name       : getCollectModeSelectList
+         *
+         * Output  => Array
+         * Description:  return Array of language select list.
+         **********************************************************************************/
+        getCollectModeSelectList: function () {
+            return Object.values(GlobalEnum.COLLECT_MODE);
+        },
     },
     data: function () {
         return {

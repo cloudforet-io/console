@@ -69,24 +69,29 @@
     </BaseDragHorizontal>
 
     <BaseModal ref="IVCO001_CollectorDataModal"
-               :title="tr('TITLE', [isCreateMode ? tr('BTN_COL_DATA') : tr('BTN_EDIT'), tr('COLLECTOR')])"
+               :title="tr('TITLE', [isCreateMode ? tr('BTN_COL_DATA') : tr('BTN_COL_DATA'), tr('COLLECTOR')])"
                centered
+               :use-custom-msg="true"
                backdrop-off
                prevent-esc-close
                size="xl"
                interactive
+               hide-footer
+               :type="'primary'"
+               :custom-yes-or-no-msg="popMsgButton"
                @esc="hideCollectorDataModal"
                @cancel="hideCollectorDataModal"
     >
       <template #contents>
         <CollectorCollectData ref="IVCO001_CollectorData"
-                         :collector-data="isCreateMode ? undefined : selectedItems[0].data"
-                         :creatable="isCreateMode ? true : false"
-                         :is-local-user="isLocalMode"
-                         size="xl"
-                         @create="createCollector"
-                         @update="updateCollector"
-                         @cancel="hideCollectorDataModal"
+                              :filter-format-data="isCreateMode ? undefined : isEmpty(selectedItems[0].data) ? undefined :selectedItems[0].data.plugin_info.options.filter_format"
+                              :collector-data="isCreateMode ? undefined : selectedItems[0].data"
+                              :creatable="isCreateMode ? true : false"
+                              :is-local-user="isLocalMode"
+                              size="xl"
+                              @create="createCollector"
+                              @update="updateCollector"
+                              @cancel="hideCollectorDataModal"
         />
       </template>
     </BaseModal>
@@ -164,6 +169,7 @@ export default {
     },
     data () {
         return {
+            popMsgButton: { NO: this.tr('BTN_CANCEL'), YES: this.tr('BTN_OK') },
             collectors: [],
             selectedItems: [],
             addModal: false,
@@ -296,12 +302,12 @@ export default {
                 this.collectors = res.data.results;
                 console.log('collectors',this.collectors);
                 this.totalCount = res.data.total_count;
+                this.isLoading = false;
             } catch (e) {
                 console.error(e);
                 this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('COLLECTOR')]));
-
+                this.isLoading = false;
             }
-            this.isLoading = false;
         },
         rowSelected (rows) {
             this.selectedItems = rows;
@@ -352,9 +358,6 @@ export default {
             this.isCreateMode = true;
             this.$router.push({ path: '/inventory/collector/new-collector' });
         },
-        onCollectData () {
-            this.showCollectorDataModal();
-        },
         onClickUpdate () {
             this.isCreateMode = false;
             this.showCollectorDataModal();
@@ -388,6 +391,11 @@ export default {
         },
         showActionModal () {
             this.$refs.IVCO001_ActionCheckModal.showModal();
+        },
+        onCollectData () {
+            this.popMsgButton = { NO: this.tr('BTN_CANCEL'), YES: this.tr('BTN_COL_DATA') };
+            this.isCreateMode = false;
+            this.showCollectorDataModal();
         }
     }
 };

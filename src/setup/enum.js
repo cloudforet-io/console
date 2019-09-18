@@ -35,6 +35,11 @@ export const GlobalEnum = {
             }
         }
     }),
+    COLLECT_MODE: Object.freeze({
+        ALL: { value: 'ALL', text: 'All' },
+        CREATE: { value: 'CREATE', text: 'Create' },
+        UPDATE: { value: 'UPDATE', text: 'Update' }
+    }),
     LANGUAGES: Object.freeze({
         en: { value: 'en', text: 'English' , nation: 'US', icon: 'flag-icon flag-icon-us' },
         ko: { value: 'ko', text: '한국어', nation: 'KR', icon: 'flag-icon flag-icon-kr' }

@@ -160,19 +160,15 @@
           <div v-if="data.item.hasOwnProperty('collector_id')">
             <template v-if="selectIconType(data.item.tags)">
               <img class="row-icons" :src="require(`@/asset/icons/${data.item.tags.icon}.svg`)"
-                   height="36vh"
-                   width="36vh"
+                   height="42vh"
+                   width="42vh"
               > {{ data.item.name }}
             </template>
             <template v-else>
-                <span>
-                  <i class="fas fa-cogs row-icons"
-                     height="36vh"
-                     width="36vh" ></i>
-                </span> &nbsp;
-                <span class="text" >
-                  {{ data.item.name }}
-                </span>
+              <img  class="row-gears" src="@/asset/icons/GEAR.svg"
+                   height="42vh"
+                   width="42vh"
+              > {{ data.item.name }}
             </template>
           </div>
           <div v-else>
@@ -189,7 +185,6 @@
 </template>
 
 <script>
-import { GlobalEnum } from '@/setup/enum';
 const BaseSearch = () => import('@/components/base/search/BASR_001_BaseSearch.vue');
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
 const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox.vue');
@@ -440,21 +435,6 @@ export default {
         },
         capitalizeFirstLetter (s) {
             return s.hasOwnProperty('text') ? this.capitalize(s.text) : s.hasOwnProperty('flag') ? this.capitalize(s.flag) : '';
-        },
-        selectIconType (tag) {
-            let returnVal = false;
-            if (!this.isEmpty(tag) && tag.hasOwnProperty('icon')){
-                let iconVal = tag.icon;
-                if (!this.isEmpty(iconVal)){
-                    returnVal = this.isEmpty(this._.get(GlobalEnum,`COLLECTOR.${iconVal}`))? false : true;
-                }
-            }
-            return returnVal;
-        },
-        getCollectorIcons (tag) {
-            const iconVal = tag.icon;
-            const  abs =this._.get(GlobalEnum,`COLLECTOR.${iconVal}.src`);
-            return abs;
         },
         getResourceTypeInStr (val) {
             let returnVal = '';
@@ -787,6 +767,9 @@ export default {
         }
     }
     .row-icons {
+      padding: 5px 5px 5px 5px;
+    }
+    .row-gears {
       padding: 5px 5px 5px 5px;
     }
 }
