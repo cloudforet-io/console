@@ -1,9 +1,15 @@
 <template>
-  <span class="state-tag d-flex justify-contents-center align-items-center">
-    <span class="icon" :class="tag.color">
+  <span class="state-tag justify-contents-center align-items-center"
+        :class="inline ? 'd-inline' : 'd-flex'"
+  >
+    <span :class="{icon: !inherit,
+                   [tag.color]: !inherit}"
+    >
       <i :class="tag.icon" />
     </span> &nbsp; 
-    <span class="text" :class="tag.color">
+    <span :class="{icon: !inherit,
+                   [tag.color]: !inherit}"
+    >
       {{ tag.msg }}
     </span>
   </span>
@@ -25,6 +31,14 @@ export default {
         data: {
             type: String,
             required: true
+        },
+        inherit: {
+            type: Boolean,
+            default: false
+        },
+        inline: {
+            type: Boolean,
+            default: false
         }
     },
     computed: {
