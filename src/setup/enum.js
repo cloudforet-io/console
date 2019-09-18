@@ -84,27 +84,27 @@ export const GlobalEnum = {
         {
             NEW: {
                 msg:  'New', //info
-                icon: 'fal fa-lightbulb-on',
+                icon: 'fas fa-lightbulb-on',
                 color: 'info'
             },
             ACTIVE: {
                 msg: 'Active', //primary
-                icon: 'fal fa-check-circle',
+                icon: 'fas fa-check-circle',
                 color: 'primary'
             },
             DISCONNECTED: {
                 msg: 'Disconnected', //danger
-                icon: 'fal fa-plug',
+                icon: 'fas fa-plug',
                 color: 'danger'
             },
             DUPLICATED: {
                 msg: 'Duplicated', // warning
-                icon: 'fal fa-lightbulb-exclamation',
+                icon: 'fas fa-exclamation-triangle',
                 color: 'warning'
             },
             UNMANAGED: {
                 msg: 'Unmanaged', // secondary
-                icon: 'fal fa-question-circle',
+                icon: 'fas fa-question-circle',
                 color: 'secondary'
             }
         }),

@@ -21,49 +21,30 @@
     <b-row>
       <b-col cols="6">
         <div class="card-container">
-          <div class="card">
+          <div v-for="collection in cardData" 
+               :key="collection.state" 
+               class="card"
+               :class="collection.state"
+          >
             <p class="card-title">
-              New
+              <BaseStateTag state="COLLECT_STATE" 
+                            :data="collection.state"
+                            inherit
+                            inline
+              />
             </p>
-            <b-row class="card-item" align-v="center">
+            <b-row v-for="item in collection.datasets" :key="item.key"
+                   class="card-item" 
+                   align-v="center"
+                   :class="{active: item.key === selectedItem}"
+            >
               <b-col cols="8" class="item-title">
-                Server
+                {{ item.title }}
               </b-col>
               <b-col cols="4" class="item-count">
-                12
+                {{ item.count }}
               </b-col>
             </b-row>
-            <b-row class="card-item" align-v="center">
-              <b-col cols="8" class="item-title">
-                Server
-              </b-col>
-              <b-col cols="4" class="item-count">
-                12
-              </b-col>
-            </b-row>
-            <b-row class="card-item" align-v="center">
-              <b-col cols="8" class="item-title">
-                Server
-              </b-col>
-              <b-col cols="4" class="item-count">
-                12
-              </b-col>
-            </b-row>
-          </div>
-          <div class="card">
-            <p class="card-title">
-              Active
-            </p>
-          </div>
-          <div class="card">
-            <p class="card-title">
-              Duplicated
-            </p>
-          </div>
-          <div class="card">
-            <p class="card-title">
-              Disconnected
-            </p>
           </div>
         </div>
       </b-col>
@@ -79,15 +60,92 @@
 </template>
 
 <script>
+const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag');
 import Chart from 'chart.js';
 export default {
     name: 'CollectionState',
+    components: {
+        BaseStateTag
+    },
     data () {
         return {
+            selectedItem: 'server',
             cardData: [{
+                state: 'new',
                 stateName: 'New',
-                datasets: {
-                }
+                icon: 'fal fa-',
+                datasets: [{
+                    key: 'server',
+                    title: 'Server',
+                    count: 12
+                },
+                {
+                    key: 'network',
+                    title: 'Network',
+                    count: 12
+                },
+                {
+                    key: 'ip_address',
+                    title: 'IP Address',
+                    count: 12
+                }]
+            },
+            {
+                state: 'active',
+                stateName: 'Active',
+                datasets: [{
+                    key: 'server',
+                    title: 'Server',
+                    count: 12
+                },
+                {
+                    key: 'network',
+                    title: 'Network',
+                    count: 12
+                },
+                {
+                    key: 'ip_address',
+                    title: 'IP Address',
+                    count: 12
+                }]
+            },
+            {
+                state: 'duplicated',
+                stateName: 'Duplicated',
+                datasets: [{
+                    key: 'server',
+                    title: 'Server',
+                    count: 12
+                },
+                {
+                    key: 'network',
+                    title: 'Network',
+                    count: 12
+                },
+                {
+                    key: 'ip_address',
+                    title: 'IP Address',
+                    count: 12
+                }]
+            },
+            {
+                state: 'disconnected',
+                stateName: 'Disconnected',
+                datasets: [{
+                    key: 'server',
+                    title: 'Server',
+                    count: 12
+                },
+                {
+                    key: 'network',
+                    title: 'Network',
+                    count: 12
+                },
+                {
+                    key: 'ip_address',
+                    title: 'IP Address',
+                    count: 12
+                }]
             }],
             chart: null,
             chartType: 'doughnut',
@@ -97,17 +155,17 @@ export default {
                     label: '# of Votes',
                     data: [12, 19, 3, 5],
                     backgroundColor: [
-                        'rgba(152,58,195,1.0)',
-                        'rgba(41,161,232,1.0)',
-                        'rgba(238,148,60,1.0)',
-                        'rgba(144,197,79,1.0)'
+                        'rgba(72,86,242,1.0)',
+                        'rgba(45,158,110,1.0)',
+                        'rgba(255,174,8,1.0)',
+                        'rgba(217,0,57,1.0)'
                     ],
                     borderWidth: 0,
                     hoverBorderColor: [
-                        'rgba(152,58,195,0.5)',
-                        'rgba(41,161,232,0.5)',
-                        'rgba(238,148,60,0.5)',
-                        'rgba(144,197,79,0.5)'
+                        'rgba(72,86,242,0.5)',
+                        'rgba(45,158,110,0.5)',
+                        'rgba(255,174,8,0.5)',
+                        'rgba(217,0,57,0.5)'
                     ],
                     hoverBorderWidth: 10
                 }]
@@ -206,27 +264,47 @@ export default {
     height: 100%;
     .card {
         padding: 10px;
-        margin: 10px 10px 10px 10px;
+        margin: 10px 15px 10px 15px;
         width: 200px;
         height: 170px;
         border: 0;
         box-shadow: $box-shadow;
+        color: $white;
         .card-title {
             padding: 5px;
+            margin-bottom: 5px;
             text-align: center;
-            font-size: 1.1em;
+            font-size: 1.2em;
             font-weight: 500;
         }
         .card-item {
-            padding: 5px 20px;
+            padding: 3px 20px;
+            border-radius: 3px;
+            background-color: rgba($white, 0.3);
             .item-title {
+                font-size: 1.1em;
                 text-align: left;
             }
             .item-count {
                 text-align: right;
-                font-size: 1.1em;
+                font-size: 1.2em;
                 font-weight: 600;
             }
+            &.active {
+              background-color: rgba($black, 0.3);
+            }
+        }
+        &.new {
+          background-color: $info;
+        }
+        &.active {
+          background-color: $success;
+        }
+        &.duplicated {
+          background-color: $warning;
+        }
+        &.disconnected {
+          background-color: $danger;
         }
     }
 }

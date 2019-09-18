@@ -27,14 +27,8 @@ export default {
                     data: [12, 20],
                     backgroundColor: [
                         'rgba(44,104,249,1.0)'
-//                         $blue: #2C68F9;
-// $violet: #8a2be2;
-// $blueviolet: #4856f2;
                     ],
                     borderWidth: 0
-                    // hoverBorderColor: [
-                    //     'rgba(44,104,249,0.5)'
-                    // ],
                 }]
             },
             chartOptions: {
