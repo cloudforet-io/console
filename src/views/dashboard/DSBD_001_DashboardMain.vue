@@ -25,6 +25,22 @@
           <ServerState />
         </b-col>
       </b-row>
+      <b-row>
+        <b-col cols="12">
+          <p class="board-title">
+            Items by Region
+          </p>
+          <ItemsByRegion />
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col cols="12">
+          <p class="board-title">
+            Servers by Type
+          </p>
+          <ServersByType />
+        </b-col>
+      </b-row>
     </main>
   </div>
 </template>
@@ -33,6 +49,8 @@
 import Summary from '@/views/dashboard/DSBD_002_Summary';
 import CollectionState from '@/views/dashboard/DSBD_003_CollectionState';
 import ServerState from '@/views/dashboard/DSBD_004_ServerState';
+import ItemsByRegion from '@/views/dashboard/DSBD_005_ItemsByRegion';
+import ServersByType from '@/views/dashboard/DSBD_006_ServersByType';
 
 
 export default {
@@ -40,7 +58,9 @@ export default {
     components: {
         Summary,
         CollectionState,
-        ServerState
+        ServerState,
+        ItemsByRegion,
+        ServersByType
     },
     data: function () {
         return {
@@ -68,11 +88,11 @@ export default {
     main {
         display: inline-block;
         width: 100%;
-        max-width: 1080px;
+        max-width: 1400px;
         padding: 40px 15px;
         text-align: left;
         .row {
-            margin: 0 0 60px 0;
+            margin: 0 0 40px 0;
         }
         .board-title {
             font-size: 1.2rem;

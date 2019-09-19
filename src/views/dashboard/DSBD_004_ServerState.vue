@@ -1,13 +1,24 @@
 <template>
   <div class="board-container">
-    <div v-for="c in [1, 2, 3]" :key="c" class="board">
+    <div v-for="(count, state) in serverStateCards" 
+         :key="state"
+         class="board"
+         :class="state.toLowerCase()"
+    >
       <div class="chart">
-        <canvas ref="chart" height="80" width="80" />
+        <BaseChart ref="chart"
+                   :data="getChartDataConfig(count)"
+                   :options="getChartOptions(count)"
+                   :width="80" :height="80"
+        />
       </div>
       <div class="info">
-        <span class="count">6</span>
+        <span class="count">{{ count }}</span>
         <p class="state">
-          In-Service
+          <BaseStateTag state="SERVER_STATE" 
+                        :data="state"
+                        inline
+          />
         </p>
       </div>
     </div>
@@ -15,87 +26,53 @@
 </template>
 
 <script>
-import Chart from 'chart.js';
+import BaseChart from '@/components/base/charts/BACT_009_BaseChart';
+const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag');
+
 export default {
     name: 'ServerState',
+    components: {
+        BaseChart,
+        BaseStateTag
+    },
     data() {
         return {
-            chartType: 'doughnut',
-            chartData: {
-                labels: ['In-Service'],
+            serverStateCards: {
+                INSERVICE: 17,
+                MAINTENANCE: 6,
+                CLOSED: 2
+            }
+        };
+    },
+    computed: {
+        totalServerStateCount () {
+            return this._.sum(Object.values(this.serverStateCards));
+        }
+    },
+    methods: {
+        getChartDataConfig (count) {
+            return {
                 datasets: [{
-                    data: [12, 20],
+                    data: [count, 22],
                     backgroundColor: [
                         'rgba(44,104,249,1.0)'
                     ],
                     borderWidth: 0
                 }]
-            },
-            chartOptions: {
+            };
+        },
+        getChartOptions (count) {
+            return {
                 cutoutPercentage: 80,
-                legend: {
-                    display: false
-                },
+                legend: { display: false },
                 tooltips: { enabled: false },
-                hover: { mode: null }
-            },
-            chartPlugins: [{
-                beforeDraw: this.beforeDraw
-            }],
-            chartCenterText: {
-                display: true,
-                text: '30%',
-                fontSize: 16,
-                fontWeight: 500
-            },
-            chartExternals: { moment: 'moment' }
-        };
-    },
-    mounted () {
-        this.drawChart();
-    },
-    methods: {
-        drawChart () {
-            let canvases = this.$refs.chart;
-            canvases.map((canvas) => {
-                let ctx = canvas.getContext('2d');
-                if (ctx) {
-                    new Chart(ctx, {
-                        type: this.chartType,
-                        data: this.chartData,
-                        options: this.chartOptions,
-                        plugins: this.chartPlugins,
-                        centerText: this.chartCenterText,
-                        externals: this.chartExternals
-                    });
-                } else {
-                    throw new Error('Browser does not support canvas.');
+                hover: { mode: null },
+                centerText: {
+                    display: true,
+                    text: `${count / this.totalServerStateCount * 100}%`,
+                    fontSize: 16
                 }
-            });
-        },
-        beforeDraw (chart) {
-            if (chart.config.centerText.display) {
-                this.drawCenterText(chart);
-            }
-        },
-        drawCenterText (chart) {
-            let top = chart.chartArea.top;
-            let bottom = chart.chartArea.bottom;
-            let right = chart.chartArea.right;
-            let left = chart.chartArea.left;
-            let ctx = chart.ctx;
- 
-            ctx.restore();
-            var fontSize = chart.config.centerText.fontSize;
-            ctx.font = fontSize + 'px sans-serif';
-            ctx.textBaseline = 'middle';
- 
-            var text = chart.config.centerText.text,
-                textX = Math.round((left + right - ctx.measureText(text).width) / 2),
-                textY = (bottom + top) / 2;
- 
-            ctx.fillText(text, textX, textY);
-            ctx.save();
+            };
         }
     }
 };
@@ -107,12 +84,13 @@ export default {
     display: flex;
     flex-wrap: wrap;
     .board {
-        @extend %sheet;
+        background-color: $white;
         position: relative;
         height: 120px;
         width: 300px;
         margin-right: 25px;
-        background-color: $white;
+        @extend %sheet;
+        border-radius: 3px;
         .chart {
             position: absolute;
             left: 40px;
@@ -122,16 +100,32 @@ export default {
             display: inline-block;
             position: absolute;
             left: 120px;
-            padding: 30px 45px;
+            padding-top: 30px;
+            padding-left: 45px;
             color: $black;
+            text-align: center;
             .count {
                 font-size: 1.5em;
                 font-weight: 800;
-                padding: 5px;
             }
             .state {
-                font-size: 1.1em;
+                font-size: 1em;
                 font-weight: 500;
+            }
+        }
+        &.inservice {
+            .count {
+                color: $success;
+            }
+        }
+        &.maintenance {
+            .count {
+                color: $warning;
+            }
+        }
+        &.closed {
+            .count{
+                color: $dark;
             }
         }
     }

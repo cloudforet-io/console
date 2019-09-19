@@ -7,12 +7,15 @@
                     class="no-selected"
         >
           <template #button-content>
-            <span>Server</span> &nbsp;
+            <span>{{ dropdownItems[selectedDropdownItem] }}</span> &nbsp;
             <i class="fal fa-angle-down" />
           </template>
-          <b-dropdown-item>
+          <b-dropdown-item v-for="(label, key) in dropdownItems" 
+                           :key="key" 
+                           @click="onSelectDropdownItem(key)"
+          >
             <div class="item sm">
-              <span class="name">Server</span>
+              <span class="name">{{ label }}</span>
             </div>
           </b-dropdown-item>
         </b-dropdown>
@@ -21,22 +24,22 @@
     <b-row>
       <b-col cols="6">
         <div class="card-container">
-          <div v-for="collection in cardData" 
-               :key="collection.state" 
+          <div v-for="(datasets, state) in cardData" 
+               :key="state" 
                class="card"
-               :class="collection.state"
+               :class="state"
           >
             <p class="card-title">
               <BaseStateTag state="COLLECT_STATE" 
-                            :data="collection.state"
+                            :data="state"
                             inherit
                             inline
               />
             </p>
-            <b-row v-for="item in collection.datasets" :key="item.key"
+            <b-row v-for="(item, key) in datasets" :key="item.key"
                    class="card-item" 
                    align-v="center"
-                   :class="{active: item.key === selectedItem}"
+                   :class="{active: key === selectedDropdownItem}"
             >
               <b-col cols="8" class="item-title">
                 {{ item.title }}
@@ -51,7 +54,11 @@
       <b-col cols="6">
         <div class="chart-container">
           <div class="chart">
-            <canvas ref="chart" width="450" height="350" />
+            <BaseChart ref="chart"
+                       :data="chartDataConfig"
+                       :options="chartOptions"
+                       :width="400" :height="300"
+            />
           </div>
         </div>
       </b-col>
@@ -60,100 +67,95 @@
 </template>
 
 <script>
+import BaseChart from '@/components/base/charts/BACT_009_BaseChart';
 const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag');
-import Chart from 'chart.js';
 export default {
     name: 'CollectionState',
     components: {
+        BaseChart,
         BaseStateTag
     },
     data () {
         return {
-            selectedItem: 'server',
-            cardData: [{
-                state: 'new',
-                stateName: 'New',
-                icon: 'fal fa-',
-                datasets: [{
-                    key: 'server',
-                    title: 'Server',
-                    count: 12
-                },
-                {
-                    key: 'network',
-                    title: 'Network',
-                    count: 12
-                },
-                {
-                    key: 'ip_address',
-                    title: 'IP Address',
-                    count: 12
-                }]
+            dropdownItems: {
+                server: 'Server',
+                network: 'Network',
+                ipAddress: 'IP Address'
             },
-            {
-                state: 'active',
-                stateName: 'Active',
-                datasets: [{
-                    key: 'server',
-                    title: 'Server',
-                    count: 12
+            selectedDropdownItem: 'server',
+            cardData: {
+                new: {
+                    server: {
+                        title: 'Server',
+                        count: 1
+                    },
+                    network: {
+                        title: 'Network',
+                        count: 12
+                    },
+                    ipAddress: {
+                        title: 'IP Address',
+                        count: 12
+                    }
                 },
-                {
-                    key: 'network',
-                    title: 'Network',
-                    count: 12
+                active: {
+                    server: {
+                        title: 'Server',
+                        count: 30
+                    },
+                    network: {
+                        title: 'Network',
+                        count: 12
+                    },
+                    ipAddress: {
+                        title: 'IP Address',
+                        count: 12
+                    }
                 },
-                {
-                    key: 'ip_address',
-                    title: 'IP Address',
-                    count: 12
-                }]
+                duplicated: {
+                    server: {
+                        title: 'Server',
+                        count: 1
+                    },
+                    network: {
+                        title: 'Network',
+                        count: 12
+                    },
+                    ipAddress: {
+                        title: 'IP Address',
+                        count: 12
+                    }
+                },
+                disconnected: {
+                    server: {
+                        title: 'Server',
+                        count: 0
+                    },
+                    network: {
+                        title: 'Network',
+                        count: 12
+                    },
+                    ipAddress: {
+                        title: 'IP Address',
+                        count: 1
+                    }
+                }
             },
-            {
-                state: 'duplicated',
-                stateName: 'Duplicated',
-                datasets: [{
-                    key: 'server',
-                    title: 'Server',
-                    count: 12
+            chartOptions: {
+                cutoutPercentage: 70,
+                centerText: {
+                    display: true,
+                    text: 'SERVER',
+                    fontSize: 20
                 },
-                {
-                    key: 'network',
-                    title: 'Network',
-                    count: 12
-                },
-                {
-                    key: 'ip_address',
-                    title: 'IP Address',
-                    count: 12
-                }]
+                legendPad: {
+                    bottom: 50
+                }
             },
-            {
-                state: 'disconnected',
-                stateName: 'Disconnected',
+            chartDataConfig: {
+                labels: [],
                 datasets: [{
-                    key: 'server',
-                    title: 'Server',
-                    count: 12
-                },
-                {
-                    key: 'network',
-                    title: 'Network',
-                    count: 12
-                },
-                {
-                    key: 'ip_address',
-                    title: 'IP Address',
-                    count: 12
-                }]
-            }],
-            chart: null,
-            chartType: 'doughnut',
-            chartData: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green'],
-                datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5],
+                    data: [],
                     backgroundColor: [
                         'rgba(72,86,242,1.0)',
                         'rgba(45,158,110,1.0)',
@@ -169,81 +171,35 @@ export default {
                     ],
                     hoverBorderWidth: 10
                 }]
-            },
-            chartOptions: {
-                cutoutPercentage: 70,
-                layout: {
-                    padding: {
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        bottom: 0
-                    }
-                },
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        boxWidth: 10,
-                        padding: 20
-                    }
-                }
-            },
-            chartPlugins: [{
-                beforeDraw: this.beforeDraw,
-                beforeInit: this.beforeChartInit
-            }],
-            chartCenterText: {
-                display: true,
-                text: 'Total'
-            },
-            chartExternals: { moment: 'moment' }
+            }
         };
     },
-    mounted () {
-        this.drawChart();
+    computed: {
+    },
+    created () {
+        this.initChart();
     },
     methods: {
-        drawChart () {
-            let ctx = this.$refs.chart;
-            this.chart = new Chart(ctx, {
-                type: this.chartType,
-                data: this.chartData,
-                options: this.chartOptions,
-                plugins: this.chartPlugins,
-                centerText: this.chartCenterText,
-                externals: this.chartExternals
-            });
+        initChart () {
+            this.setChartLabels();
+            this.setChartData();
         },
-        beforeDraw (chart) {
-            if (chart.config.centerText.display) {
-                this.drawCenterText(chart);
-            }
+        setChartLabels () {
+            this.chartDataConfig.labels = Object.keys(this.cardData).map(key => (key.toUpperCase()));
         },
-        beforeChartInit (chart, options) {
-            chart.legend.afterFit = function() {
-                this.height = this.height + 50;
-            };
+        setChartData () {
+            this.chartDataConfig.datasets[0].data = Object.values(this.cardData).map(item => (item[this.selectedDropdownItem].count));
         },
-        drawCenterText (chart) {
-            let top = chart.chartArea.top;
-            let bottom = chart.chartArea.bottom;
-            let right = chart.chartArea.right;
-            let left = chart.chartArea.left;
-            let ctx = chart.ctx;
- 
-            ctx.restore();
-            var fontSize = (bottom / 200).toFixed(2);
-            ctx.font = fontSize + 'em sans-serif';
-            ctx.textBaseline = 'middle';
- 
-            var text = chart.config.centerText.text,
-                textX = Math.round((left + right - ctx.measureText(text).width) / 2),
-                textY = (bottom + top) / 2;
- 
-            ctx.fillText(text, textX, textY);
-            ctx.save();
+        updateChart () {
+            let chart = this.$refs.chart.chart;
+            chart.options.centerText.text = this.dropdownItems[this.selectedDropdownItem].toUpperCase();
+            this.setChartData();
+            chart.data = this.chartDataConfig;
+            chart.update();
+        },
+        onSelectDropdownItem (key) {
+            this.selectedDropdownItem = key;
+            this.updateChart();
         }
     }
 };
@@ -261,10 +217,11 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     height: 100%;
     .card {
         padding: 10px;
-        margin: 10px 15px 10px 15px;
+        margin: 10px 15px;
         width: 200px;
         height: 170px;
         border: 0;
@@ -274,13 +231,13 @@ export default {
             padding: 5px;
             margin-bottom: 5px;
             text-align: center;
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: 500;
         }
         .card-item {
-            padding: 3px 20px;
+            margin: 0;
+            padding: 3px 5px;
             border-radius: 3px;
-            background-color: rgba($white, 0.3);
             .item-title {
                 font-size: 1.1em;
                 text-align: left;
@@ -291,34 +248,40 @@ export default {
                 font-weight: 600;
             }
             &.active {
-              background-color: rgba($black, 0.3);
+                background-color: rgba($white, 0.35);
+                color: black;
             }
         }
         &.new {
           background-color: $info;
+          margin-top: 0;
         }
         &.active {
           background-color: $success;
+          margin-top: 0;
         }
         &.duplicated {
           background-color: $warning;
+          margin-bottom: 0;
         }
         &.disconnected {
           background-color: $danger;
+          margin-bottom: 0;
         }
     }
 }
 
 .chart-container {
     @extend %sheet;
-    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
     background-color: $white;
     .chart {
-        position: absolute;
+        height: 100%;
+        padding-top: 20px;
+        padding-bottom: 20px;
     }
 }
 </style>

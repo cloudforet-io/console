@@ -72,7 +72,7 @@ export const GlobalEnum = {
             CLOSED: {
                 msg: 'Closed',
                 icon: 'fas fa-minus-circle',
-                color: 'secondary'
+                color: 'dark'
             },
             DELETED: {
                 msg: 'Deleted', 

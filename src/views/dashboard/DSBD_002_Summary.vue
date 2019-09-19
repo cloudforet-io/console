@@ -1,11 +1,11 @@
 <template>
   <div class="board-container">
-    <div v-for="count in [12, 10, 5]" :key="count" class="board">
+    <div v-for="(item, idx) in boardData" :key="idx" class="board">
       <p class="title">
-        Servers
+        {{ item.title }}
       </p>
       <span class="count">
-        {{ count }}
+        {{ item.count }}
       </span>
     </div>
   </div>
@@ -14,6 +14,22 @@
 <script>
 export default {
     name: 'Summary',
+    data () {
+        return {
+            boardData: [{
+                title: 'Servers',
+                count: 14
+            },
+            {
+                title: 'Projects',
+                count: 28
+            },
+            {
+                title: 'Networks',
+                count: 6
+            }]
+        };
+    },
     methods: {
         
     }
