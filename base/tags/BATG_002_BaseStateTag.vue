@@ -7,7 +7,7 @@
     >
       <i :class="tag.icon" />
     </span> &nbsp; 
-    <span :class="{icon: !inherit,
+    <span :class="{text: !inherit,
                    [tag.color]: !inherit}"
     >
       {{ tag.msg }}
