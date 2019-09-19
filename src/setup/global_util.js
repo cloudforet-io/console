@@ -575,7 +575,7 @@ export const Mixin = {
             let returnVal = false;
             let allowedIcon = null;
 
-           if (!this.isEmpty(tag)){
+            if (!this.isEmpty(tag)){
                 const iconVal = tag.hasOwnProperty('icon') ? tag.icon : this.isSelectedType(tag, 's') ? tag : '';
                 const key = tag.hasOwnProperty('icon') ? 'src' : this.isSelectedType(tag, 's') ? 'file_name' : '';
 
@@ -585,17 +585,6 @@ export const Mixin = {
             }
 
             return returnVal;
-        },
-        /**********************************************************************************
-         * Name       : getIconUrl
-         * Input   => (value                           =>  String
-         * Output  => Boolean true or false
-         * Description:  return the result of validation
-         **********************************************************************************/
-         getIconUrl (v) {
-
-
-            return v;
         },
         /**********************************************************************************
          * Name       : getCollectModeSelectList

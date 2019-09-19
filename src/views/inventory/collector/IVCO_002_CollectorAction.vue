@@ -61,17 +61,22 @@
                                       size="md"
                                       type="reset"
                                       variant="outline-secondary"
+                                      @click="onCancel"
                             >
                                 {{ tr('BTN_CANCEL') }}
                             </b-button>
                         </b-col>
                     </b-row>
                     <b-row >
-                        <b-col class="col-xs-12 col-sm-12 col-md-4" v-for="(plugIn, idx) in getPlugInList" v-if="getPlugInList.length > 0">
-                            <b-card class="s-card">
+                        <b-col class="col-xs-12 col-sm-12 col-md-4" v-for="(plugIn, idx) in getPlugInList">
+                            <b-card class="s-card card-selected"
+                                    :header="`${plugIn.name.substring(0, plugIn.name.indexOf('-')).toUpperCase()}`"
+                                    component-type="'plug_in'"
+                                    header-bg-variant="warning"
+                                    header-text-variant="white">
                                 <b-col class="sel-collector" cols="12" md="auto">
                                     <b-card-img  class="row-gears"
-                                          :src="require(`${getImageURL(plugIn.image)}`)"
+                                          :src="require(`@/asset/icons/${getCollectorIcon(plugIn.image)}`)"
                                           height="100vh"
                                           width="100vh"
                                     />
@@ -127,7 +132,7 @@ export default {
         return {
             plugInList:{
                 plugInData: [],
-                plugInRowCount: 0,
+                plugInRowCount: 0
             },
             repositoryData: {
                 selectedRepo: 'OFFICIAL',
@@ -158,6 +163,13 @@ export default {
         this.listCollectPlugin();
     },
     methods: {
+        getCollectorIcon (v) {
+            let imageAdd = v;
+            if (imageAdd.includes('/')){
+                imageAdd = v.substring(v.indexOf('/')+1, v.length);
+            }
+            return imageAdd.includes('.svg') ? imageAdd : imageAdd + '.svg';
+        },
         init () {
             this.showValidation = false;
             this.resetCollectorData(this.collectorProp);
@@ -173,13 +185,6 @@ export default {
         },
         showCheckModal () {
             this.$refs.IDUS002_CheckModal.showModal();
-        },
-        getImageURL (pluginImg) {
-            let returnVal = `@/asset/icons/common-gear.svg`;
-            if (!this.isEmpty(pluginImg)) {
-                pluginImg
-            }
-            return returnVal;
         },
         reSetDatalist () {
             this.plugInList.plugInData = [];
@@ -357,27 +362,26 @@ export default {
                 this.$refs.IDUS002_BaseTag.resetRows();
             }
         },
-        getCollectorValidMessage () {
-            if (!this.validateCollectorIdLength) {
-                return this.tr('FORM.INVALID.LENGTH', [this.tr('USER.ID'), 5, 12]);
-            } else if (this.validateCollectorIdUnique === null) {
-                return this.tr('FORM.CHECK.AVAIL');
-            } else if (!this.validateCollectorIdUnique) {
-                return this.tr('USER.ID_DUPL');
-            }
-            return '';
-        },
         onCancel () {
-            this.$emit('cancel');
+            this.$router.push({ path: '/inventory/collector' });
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
+    .s-card {
+        cursor: pointer;
+
+    }
+
    .sel-collector {
+
         text-align: center;
         margin-top: 10%;
+   }
+   .card-selected:focus {
+       background:olive;
    }
 
   .left-le {

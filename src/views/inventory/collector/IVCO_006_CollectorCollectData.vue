@@ -6,7 +6,7 @@
           <div>
             <b-row class="justify-content-md-center">
               <b-col v-if="getSelectedDataIcon" class="sel-collector" cols="12" md="auto">
-                <b-card-img :src="require(`@/asset/icons/${collectorData.tags.icon}`)"
+                <b-card-img :src="require(`@/asset/icons/${getCollectorIcon(collectorData.tags.icon)}`)"
                             style="padding-top: 5%"
                             height="150vh"
                             width="150vh"
@@ -171,6 +171,9 @@ export default {
         await this.setFilterFormatObject();
     },
     methods: {
+        getCollectorIcon(str){
+            return str.includes('svg') ?  str : str + '.svg';
+        },
         validateFilters (){
             let validated = true;
             for (let [key, val] of Object.entries(this.filterObject.filterInput)) {
