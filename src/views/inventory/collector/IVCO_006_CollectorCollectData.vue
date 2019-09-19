@@ -6,7 +6,7 @@
           <div>
             <b-row class="justify-content-md-center">
               <b-col v-if="getSelectedDataIcon" class="sel-collector" cols="12" md="auto">
-                <b-card-img :src="require(`@/asset/icons/${collectorData.tags.icon}.svg`)"
+                <b-card-img :src="require(`@/asset/icons/${collectorData.tags.icon}`)"
                             style="padding-top: 5%"
                             height="150vh"
                             width="150vh"
@@ -16,7 +16,7 @@
                 </b-card>
               </b-col>
               <b-col v-else class="sel-collector" cols="12" md="auto">
-                <b-card-img :src="require(`@/asset/icons/GEAR.svg`)"
+                <b-card-img :src="require(`@/asset/icons/common-gear.svg`)"
                             style="padding-top: 15%"
                             height="150vh"
                             width="150vh"
