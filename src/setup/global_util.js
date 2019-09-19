@@ -595,7 +595,7 @@ export const Mixin = {
          getIconUrl (v) {
 
 
-            return returnVal;
+            return v;
         },
         /**********************************************************************************
          * Name       : getCollectModeSelectList
