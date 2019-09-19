@@ -88,6 +88,9 @@ export default {
   &:active, &.active, &[aria-expanded="true"] {
     background-color: transparent;
   }
+  &:focus {
+      box-shadow: none;
+  }
 }
 
 .fade-enter-active, .fade-leave-active {
@@ -131,17 +134,6 @@ export default {
   }
 }
 
-
-  %click-item {
-    cursor: pointer;
-    border-radius: 5px;
-    &:hover {
-      background-color: rgba($blueviolet, 0.3);
-      font-weight: 600;
-      color: $navy;
-    }
-  }
-
 @mixin clickable () {
     cursor: pointer;
     border-radius: 5px;
@@ -149,7 +141,6 @@ export default {
     width: 100%;
     &:hover {
         background-color: rgba($blueviolet, 0.3);
-        font-weight: 600;
         color: $navy;
     }
     .header {

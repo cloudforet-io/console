@@ -1,22 +1,22 @@
 <template>
   <div class="example-box">
     <vue-json-pretty
-            v-if="renderOK"
-            :data="json"
-            :path="path"
-            :deep="deep"
-            :show-double-quotes="showDoubleQuotes"
-            :highlight-mouseover-node="highlightMouseoverNode"
-            :highlight-selected-node="highlightSelectedNode"
-            :show-length="showLength"
-            :show-line="showLine"
+      v-if="renderOK"
+      :data="json"
+      :path="path"
+      :deep="deep"
+      :show-double-quotes="showDoubleQuotes"
+      :highlight-mouseover-node="highlightMouseoverNode"
+      :highlight-selected-node="highlightSelectedNode"
+      :show-length="showLength"
+      :show-line="showLine"
+      v-model="value"
             :select-on-click-node="selectOnClickNode"
-            v-model="value"
-            :path-selectable="((path, data) => typeof data !== 'number')"
-            :selectable-type="selectableType"
-            :show-select-controller="showSelectController"
-            @click="handleClick(...arguments, 'complexTree')"
-            @change="handleChange"
+      :path-selectable="((path, data) => typeof data !== 'number')"
+      :selectable-type="selectableType"
+      :show-select-controller="showSelectController"
+      @click="handleClick(...arguments, 'complexTree')"
+      @change="handleChange"
     />
   </div>
 </template>
@@ -74,8 +74,6 @@ export default {
     data() {
         return {
             renderOK: true,
-            val: '',
-            selectedData: this.jsonData,
             value: 'res.error',
             selectableType: 'single',
             path: 'res',
@@ -84,13 +82,14 @@ export default {
         };
     },
     computed: {
-        json() {
-            try {
-                this.cache = JSON.parse(this.val);
-                return this.cache;
-            } catch (err) {
-                return this.cache || this.selectedData;
-            }
+        json () {
+            return this.jsonData;
+            // try {
+            //     this.cache = JSON.parse(this.jsonData);
+            //     return this.cache;
+            // } catch (err) {
+            //     return this.cache || this.jsonData;
+            // }
         }
     },
     watch: {
@@ -105,9 +104,6 @@ export default {
                 this.renderOK = true;
             });
         }
-    },
-    created() {
-        this.val = JSON.stringify(this.selectedData);
     },
     methods: {
         handleClick(path, data, treeName = '') {

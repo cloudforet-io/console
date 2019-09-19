@@ -179,10 +179,10 @@
       </template>
       
       <template #rawData>
-        <ServerRawData />
+        <ServerRawData :server-data="selectedItems[0].data" />
       </template>
       <template #admin>
-        <ServerAdmin />
+        <ServerAdmin :server-data="selectedItems[0].data" />
       </template>
     </BaseTabNav>
     <div v-else class="empty">
@@ -295,9 +295,9 @@ export default {
             return [
                 { key: 'selected', thStyle: { width: '50px' }},
                 { key: 'server_id', label: `${this.tr('SERVER')} ${this.tr('COL_NM.ID')}`, sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
-                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '180px' }},
+                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '300px' }},
                 { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
-                { key: 'primary_ip_address', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true, thStyle: { width: '190px' }},
+                { key: 'primary_ip_address', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true, thStyle: { width: '130px' }},
                 { 
                     key: 'core', 
                     label: this.tr('COL_NM.CORE'), 
