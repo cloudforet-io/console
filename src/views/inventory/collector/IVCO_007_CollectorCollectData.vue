@@ -30,9 +30,7 @@
         </b-card>
         <b-card class="s-card">
           <div>
-            <b-form @reset.prevent="onReset"
-                    @submit.prevent="onSubmit"
-            >
+            <b-form>
               <b-row>
                 <b-col cols="12" style="padding-top: 8%">
                   <BaseField v-model="collector_id"
@@ -71,8 +69,9 @@
       </b-col>
       <b-col class="col-xs-12 col-sm-12 col-md-8">
         <b-card class="m-card">
-          <div v-for="(item) in filterFormat">
-            <BaseField v-model="filterObject.filterInput[item.key]"
+          <div v-for="(item, idx) in filterFormat">
+            <BaseField :key="idx"
+                        v-model="filterObject.filterInput[item.key]"
                        :label="`${item.key} (${item.type}) : `"
                        :state="filterObject.filterValidation[item.key]"
                        :label-cols="3"

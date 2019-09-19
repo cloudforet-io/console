@@ -578,12 +578,9 @@ export const Mixin = {
             if (!this.isEmpty(tag)){
                 const iconVal = tag.hasOwnProperty('icon') ? tag.icon : this.isSelectedType(tag, 's') ? tag : '';
                 const key = tag.hasOwnProperty('icon') ? 'src' : this.isSelectedType(tag, 's') ? 'file_name' : '';
-
                 allowedIcon = iconVal.toUpperCase().includes('AWS') ? this._.get(GlobalEnum,'COLLECTOR.AWS') : allowedIcon;
                 returnVal = !this.isEmpty(allowedIcon) ? allowedIcon.some(icon => icon[key] === iconVal):   returnVal;
-
             }
-
             return returnVal;
         },
         /**********************************************************************************
@@ -594,6 +591,15 @@ export const Mixin = {
          **********************************************************************************/
         getCollectModeSelectList: function () {
             return Object.values(GlobalEnum.COLLECT_MODE);
+        },
+        /**********************************************************************************
+         * Name       : replaceAll
+         *
+         * Output  => Array
+         * Description:  return Array of language select list.
+         **********************************************************************************/
+        replaceAll (str, find, replace) {
+            return str.replace(new RegExp(find, 'g'), replace);
         }
     },
     data: function () {

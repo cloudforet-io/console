@@ -146,11 +146,11 @@ import contextData from './search_context/query.js';
 import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
 import BaseMultiPanel from '@/components/base/panel/BAPA_005_BaseMultiPanel';
 import BaseModal  from '@/components/base/modal/BAMO_001_BaseModal';
-import CollectorAction  from '@/views/inventory/collector/IVCO_002_CollectorAction';
-import CollectorDetails  from '@/views/inventory/collector/IVCO_003_CollectorDetailsSingle';
-import CollectorCredentials  from '@/views/inventory/collector/IVCO_005_CollectorCredentials';
-import CollectorCollectData  from '@/views/inventory/collector/IVCO_006_CollectorCollectData';
-import CollectorJobs  from '@/views/inventory/collector/IVCO_007_CollectorJobs';
+
+import CollectorDetails  from '@/views/inventory/collector/IVCO_004_CollectorDetailsSingle';
+import CollectorCredentials  from '@/views/inventory/collector/IVCO_006_CollectorCredentials';
+import CollectorCollectData  from '@/views/inventory/collector/IVCO_007_CollectorCollectData';
+import CollectorJobs  from '@/views/inventory/collector/IVCO_008_CollectorJobs';
 import ActionCheckModal  from '@/components/base/modal/BAMO_003_EXT_ActionCheckModal.vue';
 
 export default {
@@ -427,10 +427,5 @@ export default {
     }
 
   }
-  // .delete-user {
-  //     vertical-align: middle;
-  // }
-  // .user-name {
-  //     font-size: 1.2rem;
-  // }
+
 </style>
