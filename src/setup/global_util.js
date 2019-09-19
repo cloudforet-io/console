@@ -516,6 +516,26 @@ export const Mixin = {
             return returnArray;
         },
         /**********************************************************************************
+         * Name       : isImageUrlValid
+         * Input   => (url                            =>   String
+         * Output  => Boolean
+         * Description:  return image url is valid
+         **********************************************************************************/
+        async isImageUrlValid (url) {
+            async function  checkImage(imageSrc, good, bad) {
+                let img = new Image();
+                img.onload = await good;
+                img.onerror = await bad;
+                img.src = imageSrc;
+            }
+            let returnVal = await checkImage(url, function(){
+                return true;
+            }, function(){
+                return false;
+            });
+            return returnVal;
+        },
+        /**********************************************************************************
          * Name       : validateSameness
          * Input   => (value                           =>  String
          *             boolOnly                        =>  Bolean
@@ -553,13 +573,29 @@ export const Mixin = {
          **********************************************************************************/
         selectIconType (tag) {
             let returnVal = false;
-            if (!this.isEmpty(tag) && tag.hasOwnProperty('icon')){
-                let iconVal = tag.icon;
-                if (!this.isEmpty(iconVal)){
-                    returnVal = this.isEmpty(this._.get(GlobalEnum,`COLLECTOR.${iconVal}`))? false : true;
-                }
+            let allowedIcon = null;
+
+           if (!this.isEmpty(tag)){
+                const iconVal = tag.hasOwnProperty('icon') ? tag.icon : this.isSelectedType(tag, 's') ? tag : '';
+                const key = tag.hasOwnProperty('icon') ? 'src' : this.isSelectedType(tag, 's') ? 'file_name' : '';
+
+                allowedIcon = iconVal.toUpperCase().includes('AWS') ? this._.get(GlobalEnum,'COLLECTOR.AWS') : allowedIcon;
+                returnVal = !this.isEmpty(allowedIcon) ? allowedIcon.some(icon => icon[key] === iconVal):   returnVal;
+
             }
+
             return returnVal;
+        },
+        /**********************************************************************************
+         * Name       : getIconUrl
+         * Input   => (value                           =>  String
+         * Output  => Boolean true or false
+         * Description:  return the result of validation
+         **********************************************************************************/
+         getIconUrl (v) {
+
+
+            return v;
         },
         /**********************************************************************************
          * Name       : getCollectModeSelectList
@@ -569,7 +605,7 @@ export const Mixin = {
          **********************************************************************************/
         getCollectModeSelectList: function () {
             return Object.values(GlobalEnum.COLLECT_MODE);
-        },
+        }
     },
     data: function () {
         return {

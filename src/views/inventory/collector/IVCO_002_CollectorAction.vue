@@ -22,14 +22,9 @@
             </div>-->
                     </b-row>
                     <b-row>
-                        <b-card class="left-le"
-                                align="left"
-                                header="Repository"
-                                header-bg-variant="primary"
-                                header-text-variant="white"
-                        >
-                            <b-form-radio name="radio-size" size="lg">Official</b-form-radio>
-                            <b-form-radio name="radio-size" size="lg">Public</b-form-radio>
+                        <b-card class="left-le" align="left" header="Repository" header-bg-variant="primary" header-text-variant="white">
+                            <b-form-radio  v-model="repositoryData.selectedRepo" name="radio-size" size="lg" value="OFFICIAL" @change="listCollectPlugin">{{tr('PANEL.OFFICIAL')}}</b-form-radio>
+                            <b-form-radio  v-model="repositoryData.selectedRepo" name="radio-size" size="lg" value="LOCAL" @change="listCollectPlugin">{{tr('PANEL.LOCAL')}}</b-form-radio>
                         </b-card>
                     </b-row>
                     <b-row>
@@ -71,48 +66,22 @@
                             </b-button>
                         </b-col>
                     </b-row>
-                    <b-row>
-                        <b-col class="col-xs-12 col-sm-12 col-md-4">
+                    <b-row >
+                        <b-col class="col-xs-12 col-sm-12 col-md-4" v-for="(plugIn, idx) in getPlugInList" v-if="getPlugInList.length > 0">
                             <b-card class="s-card">
                                 <b-col class="sel-collector" cols="12" md="auto">
-                                    <img  class="row-gears" src="@/asset/icons/GEAR.svg"
-                                          height="42vh"
-                                          width="42vh"
-                                    >
-                                    <b-card style="border: none">
-                                        2
-                                    </b-card>
-                                </b-col>
-                            </b-card>
-                        </b-col>
-                        <b-col class="col-xs-12 col-sm-12 col-md-4">
-                            <b-card class="s-card">
-                                <b-col class="sel-collector" cols="12" md="auto">
-                                    <b-card-img src="@/asset/images/brand/dcos.png"
-                                                style="padding-top: 15%"
-                                                height="150vh"
-                                                width="150vh"
+                                    <b-card-img  class="row-gears"
+                                          :src="require(`${getImageURL(plugIn.image)}`)"
+                                          height="100vh"
+                                          width="100vh"
                                     />
                                     <b-card style="border: none">
-                                        2
+                                        {{plugIn.name}}
                                     </b-card>
                                 </b-col>
                             </b-card>
                         </b-col>
-                        <b-col class="col-xs-12 col-sm-12 col-md-4">
-                            <b-card class="s-card">
-                                <b-col class="sel-collector" cols="12" md="auto">
-                                    <b-card-img src="@/asset/icons/GEAR.svg"
-                                                style="padding-top: 15%"
-                                                height="150vh"
-                                                width="150vh"
-                                    />
-                                    <b-card style="border: none">
-                                        2
-                                    </b-card>
-                                </b-col>
-                            </b-card>
-                        </b-col>
+
                     </b-row>
                 </b-card>
             </b-col>
@@ -138,12 +107,7 @@ const collectorModel = {
 
 export default {
     name: 'CollectorActions',
-    event: ['create', 'update', 'cancel'],
     components: {
-        BaseField,
-        BaseTag,
-        BaseSimpleModal,
-        BaseSearch
     },
     props: {
         collectorProp: {
@@ -161,7 +125,14 @@ export default {
     },
     data () {
         return {
-            picked: null,
+            plugInList:{
+                plugInData: [],
+                plugInRowCount: 0,
+            },
+            repositoryData: {
+                selectedRepo: 'OFFICIAL',
+                selectedRepoCollector: 'abs'
+            },
             collectorId: this.collectorProp.collector_id, // required
             password: this.collectorProp.password, // required
             passwordCheck: null, // required
@@ -178,63 +149,13 @@ export default {
         };
     },
     computed: {
-        heads () {
-            return this.fields;
-        },
-        limit () {
-            return this.perPage;
-        },
-        start () {
-            return (this.currentPage - 1) * this.limit;
-        },
-        maxPage () {
-            return Math.ceil(this.totalRows / this.limit);
-        },
-        noCaption () {
-            return !(this.$slots.caption || this.$scopedSlots.caption);
-        },
-        headerWidth () {
-            return this.width - (this.pad * 2);
-        },
-        captionContainerWidth () {
-            return this.captionWidth > this.width ? this.width : this.captionWidth;
-        },
-        toolContainerWidth () {
-            if (this.headerWidth < this.captionContainerWidth + this.toolWidth) {
-                return this.headerWidth;
-            }
-            return this.toolWidth > this.width ? this.width : this.toolWidth;
-        },
-        toolboxWidth () {
-            if (this.toolContainerWidth > this.toolWidth) {
-                return `${this.toolWidth}px`;
-            }
-            return '100%';
-        },
-        searchContainerWidth () {
-            let calculatedWidth;
-            debugger;
-            if (this.width < 768) {
-                calculatedWidth = this.headerWidth;
-            } else {
-                calculatedWidth = this.headerWidth - this.toolContainerWidth - (this.noCaption ? 0 : this.captionContainerWidth);
-            }
-
-            if (this.searchWidth && calculatedWidth < this.searchWidth) {
-                calculatedWidth = this.searchWidth;
-            }
-
-            return `${calculatedWidth}px`;
-        },
-        searchboxWidth () {
-            if (this.searchWidth) {
-                return `${this.searchWidth}px`;
-            }
-            return '100%';
+        getPlugInList () {
+            return this.plugInList.plugInData;
         }
 
     },
     created() {
+        this.listCollectPlugin();
     },
     methods: {
         init () {
@@ -253,15 +174,43 @@ export default {
         showCheckModal () {
             this.$refs.IDUS002_CheckModal.showModal();
         },
-        async createCollector () {
-            let res = null;
+        getImageURL (pluginImg) {
+            let returnVal = `@/asset/icons/common-gear.svg`;
+            if (!this.isEmpty(pluginImg)) {
+                pluginImg
+            }
+            return returnVal;
+        },
+        reSetDatalist () {
+            this.plugInList.plugInData = [];
+            this.plugInList.plugInRowCount = 0;
+        },
+        async listCollectPlugin (selectedVal) {
+            let remoteRepo = null;
             try {
-                res = await this.$axios.post('/identity/collector/create', this.getCollectorData());
-                this.$emit('create', res.data);
-                this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('USER'), this.tr('CRT_PAST')]));
+
+                this.reSetDatalist();
+                if (this.isEmpty(selectedVal) || selectedVal === 'OFFICIAL' ){
+
+                    remoteRepo = await this.$axios.post('/repository/remote-repository/list', {
+                        domain_id: sessionStorage.getItem('domainId')
+                    });
+
+                    if (remoteRepo.data.total_count > 0){
+                        const repository_remote_id = remoteRepo.data.results[0].remote_repository_id;
+                        let gotPlugInList = await this.$axios.post('/repository/plugin/list', {
+                            domain_id: sessionStorage.getItem('domainId'),
+                            repository_id: repository_remote_id,
+                            service_type: 'inventory.collector'
+                        });
+                        this.plugInList.plugInData = this.isEmpty(gotPlugInList.data.results) ? [] : gotPlugInList.data.results;
+                        this.plugInList.plugInRowCount = Math.ceil(gotPlugInList.data.total_count/3);
+                    }
+                }
+
             } catch (e) {
                 console.error(e);
-                this.$alertify.error(this.tr('ALERT.SUCCESS', [this.tr('CRT_CONT'), this.tr('USER')]));
+                this.$alertify.error(this.tr('ALERT.SUCCESS', [this.tr('UPT_CONT'), this.tr('USER')]));
             }
         },
         async updateCollector () {
@@ -458,4 +407,7 @@ export default {
       text-align: left;
     }
   }
+   .row-gears {
+       padding: 5px 5px 5px 5px;
+   }
 </style>

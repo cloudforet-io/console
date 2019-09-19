@@ -230,7 +230,9 @@ export const en = {
         NO_ITEM: 'No {0}',
         NO_SELECT: 'Select a {0} Above.',
         VM: 'VM',
-        COMPUTE: 'Compute'
+        COMPUTE: 'Compute',
+        LOCAL: 'Local',
+        OFFICIAL: 'OFFICIAL'
     },
     FORM: {
         TYPE: {

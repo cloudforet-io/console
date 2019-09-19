@@ -227,7 +227,9 @@ export const ko ={
         NO_ITEM: '{0} 없음',
         NO_SELECT: '위에서 {0} 을(를) 선택하세요.',
         VM: 'VM',
-        COMPUTE: 'Compute'
+        COMPUTE: 'Compute',
+        LOCAL: 'Local',
+        OFFICIAL: 'Official'
     },
     FORM: {
         TYPE: {

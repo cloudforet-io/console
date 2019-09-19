@@ -45,8 +45,7 @@ export const GlobalEnum = {
         ko: { value: 'ko', text: '한국어', nation: 'KR', icon: 'flag-icon flag-icon-kr' }
     }),
     COLLECTOR: Object.freeze({
-        EC2: { src: 'EC2.svg', text: 'EC2' },
-        VPC: { src: 'VPC.svg', text: 'VPC' }
+        AWS:[{ file_name: 'aws-ec2' ,src: 'aws-ec2.svg', text: 'EC2' }, { file_name: 'aws-network', src: 'aws-network.svg', text: 'Network' }]
     }),
     MEMBER_STATE: Object.freeze(
         {

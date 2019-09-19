@@ -159,13 +159,13 @@
         <template #name="data">
           <div v-if="data.item.hasOwnProperty('collector_id')">
             <template v-if="selectIconType(data.item.tags)">
-              <img class="row-icons" :src="require(`@/asset/icons/${data.item.tags.icon}.svg`)"
+             <img class="row-icons" :src="require(`@/asset/icons/${data.item.tags.icon}`)"
                    height="42vh"
                    width="42vh"
               > {{ data.item.name }}
             </template>
             <template v-else>
-              <img  class="row-gears" src="@/asset/icons/GEAR.svg"
+              <img  class="row-gears" src="@/asset/icons/common-gear.svg"
                    height="42vh"
                    width="42vh"
               > {{ data.item.name }}
