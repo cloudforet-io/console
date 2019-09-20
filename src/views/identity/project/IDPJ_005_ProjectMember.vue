@@ -19,7 +19,7 @@
         >
           <template #caption>
             <b-row align-v="center" align-h="center">
-              <b-col cols="6">
+              <b-col  class="pr-1" cols="5" >
                 <BaseModal ref="addMember"
                            title="Add Member"
                            centered
@@ -40,13 +40,14 @@
                   </template>
                 </BaseModal>
               </b-col>
-              <b-col cols="6">
+              <b-col  class="pl-1" cols="5" >
                 <template v-if="hasSelectedMember">
                   <b-button block variant="danger" @click="deleteSelected">
                     {{ $t('MSG.BTN_DELETE') }}
                   </b-button>
                 </template>
               </b-col>
+              <b-col class="pr-0" cols="2" />
             </b-row>
           </template>
         </BaseTable>

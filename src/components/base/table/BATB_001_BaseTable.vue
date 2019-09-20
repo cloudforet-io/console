@@ -156,10 +156,10 @@
           <template v-if="isValidToRun(data.item.plugin_info.options.supported_resource_type)">
             <template v-for="(item, index) in data.item.plugin_info.options.supported_resource_type">
               <template v-if="index==0">
-                {{capitalize(item)}}
+                {{ capitalize(item) }}
               </template>
               <template v-else>
-                <br>{{capitalize(item)}}
+                <br>{{ capitalize(item) }}
               </template>
             </template>
           </template>
@@ -168,13 +168,13 @@
         <template #name="data">
           <div v-if="data.item.hasOwnProperty('collector_id')">
             <template v-if="selectIconType(data.item.tags)">
-             <img class="row-icons" :src="require(`@/asset/icons/${data.item.tags.icon}`)"
+              <img class="row-icons" :src="require(`@/asset/icons/${getCollectorIcon(data.item.tags.icon)}`)"
                    height="42vh"
                    width="42vh"
               > {{ data.item.name }}
             </template>
             <template v-else>
-              <img  class="row-gears" src="@/asset/icons/common-gear.svg"
+              <img class="row-gears" src="@/asset/icons/common-gear.svg"
                    height="42vh"
                    width="42vh"
               > {{ data.item.name }}
@@ -424,7 +424,7 @@ export default {
     },
     methods: {
         isValidToRun (v){
-          return !this.isEmpty(v);
+            return !this.isEmpty(v);
         },
         setWidth () {
             if (this.headerless) {
@@ -448,19 +448,8 @@ export default {
         capitalizeFirstLetter (s) {
             return s.hasOwnProperty('text') ? this.capitalize(s.text) : s.hasOwnProperty('flag') ? this.capitalize(s.flag) : '';
         },
-        getResourceTypeInStr (val) {
-            let returnVal = '';
-            const resourceInfoArry = val.options.supported_resource_type;
-            if (!this.isEmpty(resourceInfoArry) && resourceInfoArry.length > 0){
-                resourceInfoArry.forEach((curItem, idx) =>{
-                    if (idx == 0){
-                        returnVal +=  `${this.capitalize(curItem)}`;
-                    } else {
-                        returnVal +=  `<br>${this.capitalize(curItem)}`;
-                    }
-                });
-            }
-            return returnVal;
+        getCollectorIcon(str){
+          return str.includes('svg') ?  str : str + '.svg';
         },
         getVariantSize (size) {
             let variantFontSize = 3;
@@ -687,6 +676,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 %btn {
     cursor: pointer;
     padding: 5px;

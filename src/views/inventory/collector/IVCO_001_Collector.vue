@@ -21,7 +21,7 @@
           <template #caption>
             <div>
               <b-button class="btn mr-4" variant="primary" @click="onClickAdd">
-                {{ tr('BTN_ADD') }}
+                {{ tr('BTN_CRT') }}
               </b-button>
               <b-dropdown v-if="hasSelectedCollector" no-caret
                           variant="outline-info"
