@@ -118,11 +118,13 @@
                 </b-form>
               </b-card-body>
             </b-card>
-            <b-card no-body class="text-white bg-primary" style="width:44%">
-              <b-card-body class="text-center">
-                <div>
-                  <p style="margin-bottom: 0px"><img src="@/asset/images/brand/dcos.png" width="100vh" height="100vh"> <h1>{{ getCurrentHostname}}</h1></p>
-                  <p> {{ $t('MSG.LOG_UP_DESC') }}</p>
+            <b-card no-body class="text-white bg-primary" style="width:44%;">
+              <b-card-body class="right-info-card-body ">
+                <div class="text-center">
+                  <p style="margin-bottom: 10px">
+                    <img src="@/asset/images/brand/dcos.png" width="100vh" height="100vh">
+                  </p><h1>{{ getCurrentHostname }}</h1></p>
+                  <p>{{ getGreetMessage }} </p>
                 </div>
               </b-card-body>
             </b-card>
@@ -158,6 +160,10 @@ export default {
         ...mapGetters('auth', [
             'nextPath'
         ]),
+        getGreetMessage (){
+            const GreetingMsg = this.$store.getters['auth/greetDesc'];
+            return !this.isEmpty(GreetingMsg) ? GreetingMsg : '';
+        },
         getCurrentHostname (){
             let hostName = url.parse(window.location.href).host;
             return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
@@ -245,6 +251,12 @@ export default {
 
 <style lang="scss" scoped>
     @import '../../../asset/style/css/slideShow.css';
+    .right-info-card-body {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
 
     .login-check {
         float: right;
