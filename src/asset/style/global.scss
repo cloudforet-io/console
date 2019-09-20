@@ -152,6 +152,10 @@ a {
   }
 }
 
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
 .table.b-table[aria-busy='true'] {// Busy table styling
   opacity: 1;
   .b-table-busy-slot {

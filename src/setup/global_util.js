@@ -576,8 +576,13 @@ export const Mixin = {
             let allowedIcon = null;
 
             if (!this.isEmpty(tag)){
+                let key = '';
                 const iconVal = tag.hasOwnProperty('icon') ? tag.icon : this.isSelectedType(tag, 's') ? tag : '';
-                const key = tag.hasOwnProperty('icon') ? 'src' : this.isSelectedType(tag, 's') ? 'file_name' : '';
+                if (tag.hasOwnProperty('icon')){
+                    key = tag.icon.includes('svg') ? 'src': 'file_name';
+                } else if (this.isSelectedType(tag, 's')){
+                    key = 'file_name';
+                }
                 allowedIcon = iconVal.toUpperCase().includes('AWS') ? this._.get(GlobalEnum,'COLLECTOR.AWS') : allowedIcon;
                 returnVal = !this.isEmpty(allowedIcon) ? allowedIcon.some(icon => icon[key] === iconVal):   returnVal;
             }
