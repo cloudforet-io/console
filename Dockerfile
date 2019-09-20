@@ -13,7 +13,6 @@ WORKDIR ${BUILD_PATH}
 
 RUN npm config set @fortawesome:registry ${FONT_AWESOME_API_KEY}
 RUN npm install es6-object-assign
-RUN npm install @babel/runtime-corejs2
 RUN npm install
 
 COPY ./ ${BUILD_PATH}
