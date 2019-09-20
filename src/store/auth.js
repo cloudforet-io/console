@@ -3,6 +3,7 @@ import { getApi } from '@/setup/api';
 export default {
     namespaced: true,
     state: {
+        greetDesc: null,
         client_id: null,
         isLoggedIn: false,
         loginErrorCode: null,
@@ -11,6 +12,9 @@ export default {
         token: null
     },
     mutations: {
+        setGreetDesc (state,  description) {
+            state.greetDesc = description;
+        },
         setClientId (state,  ClientId) {
             state.client_id = ClientId;
         },
@@ -32,6 +36,7 @@ export default {
 
     },
     getters: {
+        greetDesc: state => state.greetDesc,
         client_id: state => state.client_id,
         isLoggedIn: state => state.isLoggedIn,
         nextPath: state => state.nextPath
