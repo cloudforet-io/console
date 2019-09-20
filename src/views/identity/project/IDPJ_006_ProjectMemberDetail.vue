@@ -181,13 +181,13 @@ export default {
             const projectSelected = this.$attrs['selected-data'];
             const selected_id = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.id : projectSelected.nodes[0].data.id;
             const selected_type = projectSelected.hasOwnProperty('node') ? projectSelected.node.data.item_type : projectSelected.nodes[0].data.item_type;
-            const url = `/identity/${selected_type.toLowerCase()}/member/add`;
+            const url = `/identity/${this.replaceAll(selected_type.toLowerCase(), '_', '-')}/member/add`;
             const key = `${selected_type.toLowerCase()}_id`;
 
             let param = {
                 query: this.searchQuery
             };
-
+            debugger;
             param[key] =  selected_id;
 
             if (this.selectedModalItems.length > 0){

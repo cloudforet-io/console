@@ -1,5 +1,31 @@
 <template>
   <b-row align-v="center">
+    <ul class="cb-slideshow">
+      <li>
+        <span />
+        <div><h3>Clo·ud San·d·box</h3></div>
+      </li>
+      <li>
+        <span />
+        <div><h3>com·po·sure</h3></div>
+      </li>
+      <li>
+        <span />
+        <div><h3>e·qua·nim·i·ty</h3></div>
+      </li>
+      <li>
+        <span />
+        <div><h3>bal·an·ce</h3></div>
+      </li>
+      <li>
+        <span />
+        <div><h3>qui·e·tude</h3></div>
+      </li>
+      <li>
+        <span />
+        <div><h3>Ma·inf·rame compu·ter</h3></div>
+      </li>
+    </ul>
     <div class="container fade-in">
       <BaseSimpleModal
               ref="LOOA001_ErrorSimpleModal"
@@ -29,11 +55,11 @@
                   <b-input-group class="mb-4">
                     <div id="g-signin-btn" style="width: 70%;" @click="login" />
                   </b-input-group>
-                  <b-input-group class="mb-4">
+                  <!--<b-input-group class="mb-4">
                     <b-button block style="height:50px" variant="danger" @click="directToAdmin">
                       {{ tr('MSG.ADMIN_USER') }}
                     </b-button>
-                  </b-input-group>
+                  </b-input-group>-->
                 </b-form>
               </b-card-body>
             </b-card>
@@ -42,7 +68,7 @@
                 <div>
                   <h1>
                     <p>
-                      {{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}
+                      {{getCurrentHostname}}
                     </p>
                   </h1>
                   <p> {{ $t('MSG.SIGN_IN_DESC') }}</p>
