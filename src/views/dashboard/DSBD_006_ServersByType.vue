@@ -1,33 +1,30 @@
 <template>
-  <div class="pr-3 pl-2">
-    <b-row class="pt-3">
-      <b-col cols="4">
-        <div class="type-chart-container">
-          <div class="chart">
-            <BaseChart type="pie" 
-                       :data="typeChartDataConfig"
-                       :options="typeChartOptions"
-                       :width="450" :height="500"
-            />
-          </div>
+  <b-row>
+    <b-col cols="5">
+      <div class="type-chart-container">
+        <div class="chart">
+          <BaseChart :data="typeChartDataConfig"
+                     :options="typeChartOptions"
+                     :width="200" :height="400"
+          />
         </div>
-      </b-col>
-      <b-col cols="8">
-        <div class="subtype-chart-container">
-          <div v-for="(subtype, idx) in subtypeData" :key="idx" class="chart">
-            <p class="title">
-              {{ subtype.name }}
-            </p>
-            <BaseChart type="horizontalBar"
-                       :data="getSubtypeChartDataConfig(idx)"
-                       :options="subtypeChartOptions"
-                       :width="300" :height="subtype.data.length * 25"
-            />
-          </div>
-        </div>
-      </b-col>
-    </b-row>
-  </div>
+      </div>
+    </b-col>
+    <b-col cols="7">
+      <b-row align-v="center" class="subtype-chart-container">
+        <b-col v-for="(subtype, idx) in subtypeData" :key="idx" class="chart">
+          <p class="title">
+            {{ subtype.name }}
+          </p>
+          <BaseChart type="horizontalBar"
+                     :data="getSubtypeChartDataConfig(idx)"
+                     :options="subtypeChartOptions"
+                     :width="300" :height="subtype.data.length * 25"
+          />
+        </b-col>
+      </b-row>
+    </b-col>
+  </b-row>
 </template>
 
 <script>
@@ -84,16 +81,21 @@ export default {
                 }
             ],
             typeChartOptions: {
+                cutoutPercentage: 70,
+                centerText: {
+                    display: true,
+                    text: 'SERVER TYPE',
+                    fontSize: 20
+                },
                 legendPad: {
                     bottom: 60
                 },
                 legend: {
                     position: 'bottom',
                     labels: {
-                        usePointStyle: false,
-                        fontSize: 16,
-                        padding: 50,
-                        generateLabels: this.generateLabels
+                        usePointStyle: true,
+                        padding: 15
+                        // generateLabels: this.generateLabels
                     }
                 }
             },
@@ -127,6 +129,14 @@ export default {
                 legend: {
                     display: false
                 }
+                // scales: {
+                //     xAxes: [{
+                //         stacked: true
+                //     }],
+                //     yAxes: [{
+                //         stacked: true
+                //     }]
+                // }
             }
         };
     },
@@ -176,27 +186,6 @@ export default {
 
 <style lang="scss" scoped>
 
-.card-container {
-    padding-top: 40px;
-    .card {
-        @extend %sheet;
-        display: inline-block;
-        width: 240px;
-        margin: 10px;
-        border: 0;
-        border-left: 5px solid;
-        padding: 10px 15px;
-        .title {
-            margin-bottom: 5px;
-        }
-        .count {
-            font-weight: 700;
-            font-size: 1.2em;
-        }
-    }
-
-}
-
 .type-chart-container {
     @extend %sheet;
     display: flex;
@@ -207,21 +196,13 @@ export default {
     position: relative;
     .chart {
         height: 100%;
-        padding-top: 60px;
-        padding-bottom: 0px;
+        padding-top: 40px;
     }
 }
 
 .subtype-chart-container {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
     .chart {
-        width: 90%;
-        margin-bottom: 20px;
+        padding: 20px 0;
         .title {
             font-weight: 700;
             font-size: 1.2em;

@@ -4,7 +4,7 @@
                :fields="fields"
                :selectable="false"
                :dark-header="false"
-               :caption-width="500"
+               :caption-width="900"
                :search-width="300"
                :busy="isLoading"
                :per-page="query.page.limit"
@@ -33,6 +33,14 @@
           >
             {{ tr('COL_NM.C_SR_GROUP') }}
           </b-nav-item>
+          <b-nav-item>MOUNT</b-nav-item>
+          <b-nav-item>ROUTE</b-nav-item>
+          <b-nav-item>PORT</b-nav-item>
+          <b-nav-item>PCI</b-nav-item>
+          <b-nav-item>SOFTWARE</b-nav-item>
+          <b-nav-item>SERVICE</b-nav-item>
+          <b-nav-item>WIN UPDATE</b-nav-item>
+          <b-nav-item>SHARE</b-nav-item>
         </b-nav>
       </template>
 

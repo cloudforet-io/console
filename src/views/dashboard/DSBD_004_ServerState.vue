@@ -1,8 +1,8 @@
 <template>
   <div class="board-container">
-    <div v-for="(count, state) in serverStateCards" 
+    <div v-for="(count, state) in serverStates" 
          :key="state"
-         class="board"
+         class="card"
          :class="state.toLowerCase()"
     >
       <div class="chart">
@@ -22,6 +22,11 @@
         </p>
       </div>
     </div>
+    <!-- <BaseChart type="horizontalBar"
+               :data="getChartDataConfig(count)"
+               :options="getChartOptions(count)"
+               :width="300" :height="subtype.data.length * 25"
+    /> -->
   </div>
 </template>
 
@@ -37,19 +42,39 @@ export default {
     },
     data() {
         return {
-            serverStateCards: {
-                INSERVICE: 17,
-                MAINTENANCE: 6,
-                CLOSED: 2
+            serverStates: {
+                INSERVICE: 0,
+                MAINTENANCE: 0,
+                CLOSED: 0
             }
         };
     },
     computed: {
         totalServerStateCount () {
-            return this._.sum(Object.values(this.serverStateCards));
+            return this._.sum(this._.values(this.serverStates));
         }
     },
+    created () {
+        this.init();
+    },
     methods: {
+        async init () {
+            await this.listServerStates();
+            // this.updateCharts();
+        },
+        async listServerStates () {
+            try {
+                let res = await this.$axios.post('/statistics/server-state');
+                this.serverStates = res.data;
+            } catch (err) {
+                console.error(err);
+            }
+        },
+        updateCharts () {
+            this.$refs.chart.map((chart) => {
+                chart.update();
+            });
+        },
         getChartDataConfig (count) {
             return {
                 datasets: [{
@@ -83,25 +108,20 @@ export default {
     padding: 15px;
     display: flex;
     flex-wrap: wrap;
-    .board {
+    .card {
         background-color: $white;
-        position: relative;
-        height: 120px;
-        width: 300px;
+        width: 150px;
         margin-right: 25px;
         @extend %sheet;
         border-radius: 3px;
+        border: 0;
         .chart {
-            position: absolute;
-            left: 40px;
-            top: 20px;
+            padding: 20px;
         }
         .info {
             display: inline-block;
-            position: absolute;
-            left: 120px;
-            padding-top: 30px;
-            padding-left: 45px;
+            width: 100%;
+            padding: 10px;
             color: $black;
             text-align: center;
             .count {

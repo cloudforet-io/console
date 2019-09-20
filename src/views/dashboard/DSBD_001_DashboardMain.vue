@@ -2,43 +2,53 @@
   <div class="animated fadeIn dashboard-container">
     <main>
       <b-row>
-        <b-col cols="12">
-          <p class="board-title">
-            Summary
-          </p>
-          <Summary />
+        <b-col cols="5">
+          <b-row align-h="start">
+            <b-col class="board" cols="12">
+              <p class="board-title">
+                Summary
+              </p>
+              <Summary />
+            </b-col>
+            <b-col class="board" cols="12">
+              <p class="board-title">
+                Server State
+              </p>
+              <ServerState />
+            </b-col>
+          </b-row>
+        </b-col>
+        <b-col cols="7">
+          <b-row align-h="end">
+            <b-col class="board" cols="12">
+              <p class="board-title">
+                Collection State
+              </p>
+              <CollectionState />
+            </b-col>
+          </b-row>
         </b-col>
       </b-row>
       <b-row>
-        <b-col cols="12">
-          <p class="board-title">
-            Collection State
-          </p>
-          <CollectionState />
+        <b-col cols="5">
+          <b-row>
+            <b-col class="board" cols="12">
+              <p class="board-title">
+                Items by Region
+              </p>
+              <ItemsByRegion />
+            </b-col>
+          </b-row>
         </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12">
-          <p class="board-title">
-            Server State
-          </p>
-          <ServerState />
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12">
-          <p class="board-title">
-            Items by Region
-          </p>
-          <ItemsByRegion />
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12">
-          <p class="board-title">
-            Servers by Type
-          </p>
-          <ServersByType />
+        <b-col cols="7">
+          <b-row align-h="end">
+            <b-col class="board" cols="12">
+              <p class="board-title">
+                Servers by Type
+              </p>
+              <ServersByType />
+            </b-col>
+          </b-row>
         </b-col>
       </b-row>
     </main>
@@ -85,18 +95,22 @@ export default {
 <style lang="scss" scoped>
 .dashboard-container {
     text-align: center;
+    padding-left: 20px;
+    padding-right: 20px;
     main {
         display: inline-block;
         width: 100%;
-        max-width: 1400px;
         padding: 40px 15px;
         text-align: left;
-        .row {
+        .board {
             margin: 0 0 40px 0;
+            max-width: 100%;
         }
         .board-title {
             font-size: 1.2rem;
             font-weight: 600;
+            border-bottom: 1px solid lightgray;
+            padding-bottom: 10px;
         }
     }
 }

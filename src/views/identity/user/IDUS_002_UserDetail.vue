@@ -179,6 +179,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import BaseTag from '@/components/base/tags/BATG_001_BaseTag.vue';
 import BaseField from '@/components/base/form/BAFM_001_BaseField.vue';
 const BaseSimpleModal = () => import('@/components/base/modal/BAMO_002_BaseSimpleModal.vue');
@@ -210,10 +211,6 @@ export default {
         creatable: {
             type: Boolean,
             default: false
-        },
-        isLocalUser: {
-            type: Boolean,
-            default: false
         }
     },
     data () {
@@ -234,6 +231,10 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('auth', ['client_id']),
+        isLocalUser () {
+            return !(this.client_id);
+        },
         languageList () {
             return this.getLanguageSelectList();
         },
@@ -335,7 +336,6 @@ export default {
             }
         },
         async findUser () {
-            console.log('find user');
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/find', {

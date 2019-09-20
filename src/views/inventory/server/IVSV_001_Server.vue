@@ -182,7 +182,7 @@
         <ServerRawData :server-data="selectedItems[0].data" />
       </template>
       <template #admin>
-        <ServerAdmin :server-data="selectedItems[0].data" />
+        <ServerAdmin :server-id="selectedItems[0].data.server_id" />
       </template>
     </BaseTabNav>
     <div v-else class="empty">
@@ -232,7 +232,6 @@ export default {
             addModal: false,
             totalCount: 0,
             isReadyForSearch: false,
-            isLoading: true,
             contextData: contextData,
             query: { 
                 sort: {}, 
@@ -255,7 +254,13 @@ export default {
             customReleaseBtn: '',
             selected: null,
             isRelease: false,
-            treeUrl: ''
+            treeUrl: '',
+            projects: [],
+            loadingState: {
+                server: true,
+                project: true
+            },
+            isLoading: true
         };
     },
     computed: {
@@ -294,7 +299,7 @@ export default {
         fields () {
             return [
                 { key: 'selected', thStyle: { width: '50px' }},
-                { key: 'server_id', label: `${this.tr('SERVER')} ${this.tr('COL_NM.ID')}`, sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
+                // { key: 'server_id', label: `${this.tr('SERVER')} ${this.tr('COL_NM.ID')}`, sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
                 { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '300px' }},
                 { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
                 { key: 'primary_ip_address', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true, thStyle: { width: '130px' }},
@@ -341,33 +346,18 @@ export default {
                     key: 'platform_type', 
                     label: this.tr('COL_NM.PLATFORM'),
                     sortable: true, 
-                    ajaxSortable: false,
                     filterByFormatted: true,
                     formatter: (val, key, data) => {
-                        if (this.isEmpty(data.data.vm)) {
-                            return '';
-                        } else {
+                        if (data.data.vm) {
                             return data.data.vm.platform_type;
+                        } else {
+                            return '';
                         }
                     } ,
                     thStyle: { width: '100px' }
                 },
-                { key: 'project_id', label: this.tr('COL_NM.PROJ'), sortable: true, ajaxSortable: true, thStyle: { width: '180px' }},
-                { 
-                    key: 'pool_id', 
-                    label: this.tr('COL_NM.POOL'),
-                    sortable: true, 
-                    ajaxSortable: false,
-                    filterByFormatted: true,
-                    formatter: (val, key, data) => {
-                        if (this.isEmpty(data.pool_info)) {
-                            return '';
-                        } else {
-                            return data.pool_info.pool_id;
-                        }
-                    } ,
-                    thStyle: { width: '180px' }
-                },
+                { key: 'project', label: this.tr('COL_NM.PROJ'), sortable: true, formatter: this.projectFormatter, thStyle: { width: '180px' }},
+                { key: 'pool', label: this.tr('COL_NM.POOL'),sortable: true, filterByFormatted: true, formatter: this.poolFormatter, thStyle: { width: '180px' }},
                 {
                     key: 'updated_at', 
                     label: this.tr('COL_NM.UPDATE'), 
@@ -400,14 +390,28 @@ export default {
             });
         }
     },
+    watch: {
+        loadingState: {
+            deep: true,
+            handler () {
+                if (this.loadingState.server || this.loadingState.project) {
+                    this.isLoading = true;
+                } else {
+                    this.isLoading = false;
+                }
+            }
+        }
+    },
     mounted() {
+        this.listProjects();
         this.listServers();
     },
     methods: {
         reset() {
             this.servers = [];
             this.selectedItems = [];
-            this.isLoading = true;
+            this.$set(this.loadingState, 'project', true);
+            this.$set(this.loadingState, 'server', true);
         },
         setQuery (limit, start, sort, filter, filterOr) {
             this.query.page.limit = limit || 10;
@@ -416,6 +420,25 @@ export default {
             this.query.filter = filter || [];
             this.query.filter.push(this.defaultFilterItem);
             this.query.filter_or = filterOr || [];
+        },
+        setProjects (projects) {
+            this.projects = {};
+            projects.map((project) => {
+                this.projects[project.project_id] = `${project.project_group_info.name} ${project.name}`;
+            });
+        },
+        async listProjects () {
+            try {
+                let res = await this.$axios.post('/identity/project/list', {
+                    domain_id: sessionStorage.getItem('domainId')
+                });
+                this.setProjects(res.data.results);
+                this.$set(this.loadingState, 'project', false);
+            } catch (e) {
+                console.error(e);
+                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
+                this.$set(this.loadingState, 'project', false);
+            }
         },
         async listServers (limit, start, sort, filter, filterOr) {
             this.reset();
@@ -427,12 +450,13 @@ export default {
                     domain_id: sessionStorage.getItem('domainId')
                 });
                 this.servers = res.data.results;
+                this.servers[0].project_id = 'project-c06a33191f2c';
                 this.totalCount = res.data.total_count;
-                this.isLoading = false;
+                this.$set(this.loadingState, 'server', false);
             } catch (e) {
                 console.error(e);
                 this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
-                this.isLoading = false;
+                this.$set(this.loadingState, 'server', false);
             }
         },
         async listCollectors () {
@@ -586,6 +610,21 @@ export default {
         },
         showActionModal () {
             this.$refs.IDSV001_ActionCheckModal.showModal();
+        },
+        projectFormatter (val, key, data) {
+            let result = '';
+            if (data.project_id) {
+                result = this.projects[data.project_id];
+            }
+            return result;
+                
+        },
+        poolFormatter (val, key, data) {
+            let result = '';
+            if (data.pool_info && data.pool_info.name) {
+                result = data.pool_info.name;
+            } 
+            return result;
         }
     }
 };

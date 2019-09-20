@@ -1,7 +1,13 @@
 <template>
-  <div class="pr-3 pl-2">
-    <b-row align-h="end" class="m-0 pb-3">
+  <div>
+    <b-row align-h="end" class="m-0">
       <div class="dropdown-container">
+        <b-button variant="outline-light" 
+                  class="refresh-btn" 
+                  @click="updateChart"
+        >
+          <i class="fa fa-redo-alt" />
+        </b-button>
         <b-dropdown no-caret right
                     variant="outline-secondary"
                     class="no-selected"
@@ -22,34 +28,34 @@
       </div>
     </b-row>
     <b-row>
-      <b-col cols="7">
+      <b-col cols="12">
         <div class="chart-container">
-          <b-button variant="outline-light" class="refresh-btn" @click="updateChart">
-            <i class="fa fa-redo-alt" />
-          </b-button>
           <div class="chart">
             <BaseChart ref="chart"
                        type="bubble"
                        :data="chartDataConfig"
                        :options="chartOptions"
-                       :width="600" :height="400"
+                       :width="500" :height="300"
             />
           </div>
         </div>
       </b-col>
-      <b-col cols="5">
-        <div class="card-container">
-          <div v-for="(region, idx) in regionData"
-               :key="idx" 
-               class="card"
-               :style="{ borderColor: colorSets[idx].hoverBackgroundColor }"
+      <b-col cols="12">
+        <b-row class="label-card-container">
+          <b-col v-for="(region, idx) in regionData"
+                 :key="idx" 
+                 cols="4"
           >
-            <p class="title">
-              {{ region.name }}
-            </p>
-            <span class="count">{{ region.count }}</span>
-          </div>
-        </div>
+            <div class="label-card"
+                 :style="{ borderColor: colorSets[idx].hoverBackgroundColor }"
+            >
+              <p class="title">
+                {{ region.name }}
+              </p>
+              <span class="count">{{ region.count }}</span>
+            </div>
+          </b-col>
+        </b-row>
       </b-col>
     </b-row>
   </div>
@@ -94,7 +100,7 @@ export default {
                         },
                         ticks: {
                             min: 1,
-                            max: 400,
+                            max: 300,
                             display: false
                         }
                     }],
@@ -104,7 +110,7 @@ export default {
                         },
                         ticks: {
                             min: 1,
-                            max: 600,
+                            max: 500,
                             display: false
                         }
                     }]
@@ -214,33 +220,14 @@ export default {
 
 <style lang="scss" scoped>
 .dropdown-container {
-    margin-top: -40px;
+    margin-top: -55px;
     button.dropdown-toggle {
         background-color: transparent;
     }
-}
-
-.card-container {
-    padding-top: 40px;
-    .card {
-        @extend %sheet;
-        display: inline-block;
-        width: 240px;
-        margin: 10px;
-        border: 0;
-        border-left: 5px solid;
-        padding: 10px 15px;
-        .title {
-            margin-bottom: 5px;
-        }
-        .count {
-            font-weight: 700;
-            font-size: 1.2em;
-        }
+    .refresh-btn {
+        margin-right: 10px;
     }
-
 }
-
 .chart-container {
     @extend %sheet;
     display: flex;
@@ -248,25 +235,29 @@ export default {
     align-items: center;
     height: 100%;
     background-color: $white;
-    position: relative;
     .chart {
         height: 100%;
         padding-top: 20px;
         padding-bottom: 20px;
     }
-    .refresh-btn {
-        position: absolute;
-        height: 30px;
-        width: 30px;
-        padding: 0;
-        top: 25px;
-        left: 30px;
-        font-size: 20px;
-        color: $navy;
-        cursor: pointer;
-        box-shadow: 0 0 5px 0 rgba($black, 0.1);
-        border-radius: 3px;
+}
 
+
+.label-card-container {
+    padding-top: 20px;
+    .label-card {
+        @extend %sheet;
+        background-color: $white;
+        border: 0;
+        border-left: 5px solid;
+        padding: 7px 15px;
+        .title {
+            margin-bottom: 5px;
+        }
+        .count {
+            font-weight: 700;
+            font-size: 1.2em;
+        }
     }
 }
 </style>
