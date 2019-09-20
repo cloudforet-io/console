@@ -152,8 +152,17 @@
           <BaseStateTag :state="stateType" :data="data.item.state" />
         </template>
 
-       <template #plugin_info="data">
-          <div v-html="getResourceTypeInStr(data.item.plugin_info)" />
+        <template #plugin_info="data">
+          <template v-if="isValidToRun(data.item.plugin_info.options.supported_resource_type)">
+            <template v-for="(item, index) in data.item.plugin_info.options.supported_resource_type">
+              <template v-if="index==0">
+                {{capitalize(item)}}
+              </template>
+              <template v-else>
+                <br>{{capitalize(item)}}
+              </template>
+            </template>
+          </template>
         </template>
 
         <template #name="data">
@@ -414,6 +423,9 @@ export default {
         self.removeEventListener('resize', this.setWidth);
     },
     methods: {
+        isValidToRun (v){
+          return !this.isEmpty(v);
+        },
         setWidth () {
             if (this.headerless) {
                 return;
