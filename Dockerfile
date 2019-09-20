@@ -9,6 +9,7 @@ RUN rm /etc/nginx/sites-enabled/default
 RUN mkdir -p ${BUILD_PATH}
 
 COPY package.json ${BUILD_PATH}/package.json
+COPY package-lock.json ${BUILD_PATH}/package-lock.json
 WORKDIR ${BUILD_PATH}
 
 RUN npm config set @fortawesome:registry ${FONT_AWESOME_API_KEY}
