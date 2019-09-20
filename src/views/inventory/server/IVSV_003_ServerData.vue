@@ -131,7 +131,7 @@ export default {
                 { key: 'direction', label: this.tr('COL_NM.DIRECTION'), sortable: true, thStyle: { width: '50px' }},
                 { key: 'protocol', label: this.tr('COL_NM.PROTOCOL'), sortable: true, thStyle: { width: '150px' }},
                 { key: 'port_range', label: this.tr('COL_NM.PORT_RANGE'), formatter: this.portRangeFormatter, thStyle: { width: '150px' }},
-                { key: 'remote_cidr', label: this.tr('COL_NM.SRC_DEST'), thStyle: { width: '150px' }},
+                { key: 'remote_cidr', label: this.tr('COL_NM.SRC_DEST'), formatter: this.remoteFormatter, thStyle: { width: '150px' }},
                 { key: 'security_group_name', label: this.tr('COL_NM.SG_NAME'), thStyle: { width: '150px' }},
                 { key: 'security_group_id', label: this.tr('COL_NM.SG_ID'), sortable: true, thStyle: { width: '150px' }}
             ];
@@ -205,6 +205,9 @@ export default {
         },
         portRangeFormatter (val, key, data) {
             return `${data.port_range_min} - ${data.port_range_max}`;
+        },
+        remoteFormatter (val, key, data) {
+            return data.remote_cidr || data.remote_group_id;
         },
         tagFormatter (tags) {
             let keys = Object.keys(tags);
