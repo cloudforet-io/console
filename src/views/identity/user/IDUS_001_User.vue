@@ -154,7 +154,7 @@ export default {
         return {
             tabs: [
                 {
-                    title: this.tr('PANEL.INFO'),
+                    title: this.tr('PANEL.DETAILS'),
                     key: 'info'
                 }
             ],

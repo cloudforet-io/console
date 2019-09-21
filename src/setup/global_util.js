@@ -109,11 +109,11 @@ export const Mixin = {
          * Output  => (String): with upper case of First letter
          * Description:  Select badges variant by given val
          **********************************************************************************/
-        capitalize: (s) => {
-            if (typeof s !== 'string') {
+        capitalize: function (s)  {
+            if (typeof s !== 'string' || this.isEmpty(s)) {
                 return '';
             }
-            return s.charAt(0).toUpperCase() + s.slice(1);
+            return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
         },
         /**********************************************************************************
          * Name       : consoleLogEnv
@@ -156,7 +156,10 @@ export const Mixin = {
                 return (!isNaN(parseFloat(d)));
             } else if (t.toUpperCase() ==='B') {
                 return  ['1', '0', 1, 0, true, false].includes(d);
-            } else if (t.toUpperCase() ==='S') {
+            } else if (t.toUpperCase() ==='LIST') {
+                let splitString = d.split(',');
+                return  !splitString.includes('');
+            } else if (t.toUpperCase() ==='S' || t.toUpperCase() ==='STR') {
                 return  (typeof d === 'string' || d instanceof String);
             } else if (t.toUpperCase() ==='O') {
                 return (typeof d === 'object' && d !== null && !Array.isArray(d));
@@ -513,6 +516,26 @@ export const Mixin = {
             return returnArray;
         },
         /**********************************************************************************
+         * Name       : isImageUrlValid
+         * Input   => (url                            =>   String
+         * Output  => Boolean
+         * Description:  return image url is valid
+         **********************************************************************************/
+        async isImageUrlValid (url) {
+            async function  checkImage(imageSrc, good, bad) {
+                let img = new Image();
+                img.onload = await good;
+                img.onerror = await bad;
+                img.src = imageSrc;
+            }
+            let returnVal = await checkImage(url, function(){
+                return true;
+            }, function(){
+                return false;
+            });
+            return returnVal;
+        },
+        /**********************************************************************************
          * Name       : validateSameness
          * Input   => (value                           =>  String
          *             boolOnly                        =>  Bolean
@@ -539,6 +562,49 @@ export const Mixin = {
             }
 
             return returnVal;
+        },
+        /**********************************************************************************
+         * Name       : selectIconType
+         * Input   => (value                           =>  String
+         *             boolOnly                        =>  Bolean
+         *             checkValue                      =>  String)
+         * Output  => Boolean true or false
+         * Description:  return the result of validation
+         **********************************************************************************/
+        selectIconType (tag) {
+            let returnVal = false;
+            let allowedIcon = null;
+
+            if (!this.isEmpty(tag)){
+                let key = '';
+                const iconVal = tag.hasOwnProperty('icon') ? tag.icon : this.isSelectedType(tag, 's') ? tag : '';
+                if (tag.hasOwnProperty('icon')){
+                    key = tag.icon.includes('svg') ? 'src': 'file_name';
+                } else if (this.isSelectedType(tag, 's')){
+                    key = 'file_name';
+                }
+                allowedIcon = iconVal.toUpperCase().includes('AWS') ? this._.get(GlobalEnum,'COLLECTOR.AWS') : allowedIcon;
+                returnVal = !this.isEmpty(allowedIcon) ? allowedIcon.some(icon => icon[key] === iconVal):   returnVal;
+            }
+            return returnVal;
+        },
+        /**********************************************************************************
+         * Name       : getCollectModeSelectList
+         *
+         * Output  => Array
+         * Description:  return Array of language select list.
+         **********************************************************************************/
+        getCollectModeSelectList: function () {
+            return Object.values(GlobalEnum.COLLECT_MODE);
+        },
+        /**********************************************************************************
+         * Name       : replaceAll
+         *
+         * Output  => Array
+         * Description:  return Array of language select list.
+         **********************************************************************************/
+        replaceAll (str, find, replace) {
+            return str.replace(new RegExp(find, 'g'), replace);
         }
     },
     data: function () {

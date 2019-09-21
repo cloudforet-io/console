@@ -19,7 +19,7 @@
         >
           <template #caption>
             <b-row align-v="center" align-h="center">
-              <b-col cols="6">
+              <b-col  class="pr-1" cols="5" >
                 <BaseModal ref="addMember"
                            title="Add Member"
                            centered
@@ -40,13 +40,14 @@
                   </template>
                 </BaseModal>
               </b-col>
-              <b-col cols="6">
+              <b-col  class="pl-1" cols="5" >
                 <template v-if="hasSelectedMember">
-                  <b-button block variant="danger" @click="deleteSelected">
+                  <b-button class="mr-5" block variant="danger" @click="deleteSelected">
                     {{ $t('MSG.BTN_DELETE') }}
                   </b-button>
                 </template>
               </b-col>
+              <b-col  cols="2" />
             </b-row>
           </template>
         </BaseTable>
@@ -273,6 +274,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+
+  .col-left-gap-measure {
+    padding-left: 5px;
+  }
+
+  .col-right-gap-measure {
+    padding-left: 0px;
+    padding-right: 25px;
+  }
   .base-table {
     @extend %sheet;
   }

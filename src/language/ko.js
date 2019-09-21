@@ -1,5 +1,6 @@
 export const ko ={
     MSG: {
+        PROCESSED: '수행되었습니다',
         DR_SERV: '서비스',
         LOG_IN: '로그인',
         LOG_IN_GREET: '클라우드 원 로그인하기',
@@ -16,7 +17,7 @@ export const ko ={
         SIGN_FAIL_TITLE: '아이디나 패스워드가 에러.',
         SIGN_FAIL_BODY: '아이디나 패스워드를 다시 한번 확인해 주세요.',
         COMMON_USER: '일반 유저',
-        ADMIN_USER: '어드민',
+        ADMIN_USER: '관리자',
         REGISTER: 'Register Now!',
         REMEMBER: '자동 로그인',
         TR_NOTI: '아이디·비번 찾기',
@@ -41,7 +42,8 @@ export const ko ={
         BTN_S_CLOSE: '종료 상태로 변경',
         BTN_ACTION: '작업',
         BTN_AVAIL: '사용 가능 여부 확인',
-        BTN_FIND: '찾기',
+        BTN_FIND: '검색',
+        BTN_COL_DATA: '데이터 수집',
         CRT_PAST: '생성되었습니다',
         CRT_CONT: '생성하는',
         UPT_PAST: '변경되었습니다',
@@ -98,6 +100,8 @@ export const ko ={
         COMPUTE: 'Compute',
         RELEASE: '해제',
         STATE: '상태',
+        CREDENTIAL:'암호',
+        CREDENTIALS:'암호',
         REPO: 'Repository',
         LIST: '목록'
     },
@@ -191,11 +195,13 @@ export const ko ={
         CREATED: '생성일',
         COLLECTOR: '수집기',
         DEF_COL_STATE: '기본 수집 상태',
-        COL_DATA: 'Collect Data',
+        COL_DATA: '데이터 수집',
         VERIFY: '검증',
         VERIFIED: '검증완료',
         JOB_ID: '잡(Job) 아이디',
         COL_MODE: '수집 모드',
+        COL_ID: '컬렉터 아이디',
+        VERSION: '버젼 정보',
         CRT_COUNT: '생성 카운트',
         UPT_COUNT: '업데이트 카운트',
         FINISHED: '완료일',
@@ -213,6 +219,7 @@ export const ko ={
     },
     PANEL: {
         BASE_INFO: '기본 정보',
+        DETAILS: '세부 항목',
         TAG: '태그',
         INFO: '정보',
         CREDENTIAL: '크레덴셜(Credentials)',
@@ -220,9 +227,15 @@ export const ko ={
         NO_ITEM: '{0} 없음',
         NO_SELECT: '위에서 {0} 을(를) 선택하세요.',
         VM: 'VM',
-        COMPUTE: 'Compute'
+        COMPUTE: 'Compute',
+        LOCAL: 'Local',
+        OFFICIAL: 'Official'
     },
     FORM: {
+        TYPE: {
+            STR: '스트링',
+            LIST: '리스트'
+        },
         INVALID: {
             MANDATORY: '필수 입력란입니다.',
             UNIQUE: '유일한 값을 입력해주세요.',
@@ -247,6 +260,7 @@ export const ko ={
         SUCCESS: '성공적으로 완료하였습니다.'
     },
     ALERT: {
+        ALT_CHECK_TYPE: '현재 ({0}) type 의 Input 값이 아닙니다. 다시한번 확인해 주시기 바랍니다.',
         SUCCESS: '{0}가(이) 성공적으로 {1}.',
         ERROR: '{1}을(를) {0} 동안 오류가 발생했습니다.',
         NO_PARAM: '먼저 아이템을 선택해주세요.'

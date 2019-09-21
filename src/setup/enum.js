@@ -35,9 +35,17 @@ export const GlobalEnum = {
             }
         }
     }),
+    COLLECT_MODE: Object.freeze({
+        ALL: { value: 'ALL', text: 'All' },
+        CREATE: { value: 'CREATE', text: 'Create' },
+        UPDATE: { value: 'UPDATE', text: 'Update' }
+    }),
     LANGUAGES: Object.freeze({
         en: { value: 'en', text: 'English' , nation: 'US', icon: 'flag-icon flag-icon-us' },
         ko: { value: 'ko', text: '한국어', nation: 'KR', icon: 'flag-icon flag-icon-kr' }
+    }),
+    COLLECTOR: Object.freeze({
+        AWS:[{ file_name: 'aws-ec2' ,src: 'aws-ec2.svg', text: 'EC2' }, { file_name: 'aws-network', src: 'aws-network.svg', text: 'Network' }]
     }),
     MEMBER_STATE: Object.freeze(
         {

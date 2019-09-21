@@ -104,11 +104,11 @@
                     </b-col>
                   </b-row>-->
                   <b-row class="mb-3">
-                    <b-col md="4" class="col-xs-12 col-sm-12">
+                    <!--<b-col md="4" class="col-xs-12 col-sm-12">
                       <b-button type="button" variant="danger" @click="directToAdmin">
                         {{ tr('MSG.ADMIN_USER') }}
                       </b-button>
-                    </b-col>
+                    </b-col>-->
                     <b-col md="4" class="ml-auto col-xs-12 col-sm-12">
                       <b-button type="button" block class="login-btn" @click="login">
                         {{ $t('MSG.LOG_IN') }}
@@ -118,11 +118,13 @@
                 </b-form>
               </b-card-body>
             </b-card>
-            <b-card no-body class="text-white bg-primary py-5 d-md-down-none" style="width:44%">
-              <b-card-body class="text-center">
-                <div>
-                  <p /><h1>{{ tr('MSG.WELCOME_MSG',[getCurrentHostname]) }}</h1></p>
-                  <p> {{ $t('MSG.LOG_UP_DESC') }}</p>
+            <b-card no-body class="text-white bg-primary" style="width:44%;">
+              <b-card-body class="right-info-card-body ">
+                <div class="text-center">
+                  <p style="margin-bottom: 10px">
+                    <img src="@/asset/images/brand/dcos.png" width="100vh" height="100vh">
+                  </p><h1>{{ getCurrentHostname }}</h1></p>
+                  <p>{{ getGreetMessage }} </p>
                 </div>
               </b-card-body>
             </b-card>
@@ -158,6 +160,10 @@ export default {
         ...mapGetters('auth', [
             'nextPath'
         ]),
+        getGreetMessage (){
+            const GreetingMsg = this.$store.getters['auth/greetDesc'];
+            return !this.isEmpty(GreetingMsg) ? GreetingMsg : '';
+        },
         getCurrentHostname (){
             let hostName = url.parse(window.location.href).host;
             return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
@@ -245,6 +251,12 @@ export default {
 
 <style lang="scss" scoped>
     @import '../../../asset/style/css/slideShow.css';
+    .right-info-card-body {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
 
     .login-check {
         float: right;

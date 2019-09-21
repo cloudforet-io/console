@@ -21,7 +21,7 @@
           <template #caption>
             <div>
               <b-button class="btn mr-4" variant="primary" @click="onClickAdd">
-                {{ tr('BTN_ADD') }}
+                {{ tr('BTN_CRT') }}
               </b-button>
               <b-dropdown v-if="hasSelectedCollector" no-caret
                           variant="outline-info"
@@ -55,6 +55,12 @@
                     <span class="name">{{ tr('BTN_DISABLE') }}</span>
                   </div>
                 </b-dropdown-item>
+                <b-dropdown-item v-if="!isMultiSelected" @click="onCollectData">
+                  <div class="item sm">
+                    <i class="icon fal fa-cloud-download-alt" />
+                    <span class="name">{{ tr('BTN_COL_DATA') }}</span>
+                  </div>
+                </b-dropdown-item>
               </b-dropdown>
             </div>
           </template>
@@ -62,26 +68,30 @@
       </template>
     </BaseDragHorizontal>
 
-    <BaseModal ref="IVCO001_CollectorDetailModal"
-               :title="tr('TITLE', [isCreateMode ? tr('BTN_ADD') : tr('BTN_EDIT'), tr('USER')])"
+    <BaseModal ref="IVCO001_CollectorDataModal"
+               :title="tr('TITLE', [isCreateMode ? tr('BTN_COL_DATA') : tr('BTN_COL_DATA'), tr('COLLECTOR')])"
                centered
-               hide-footer
+               :use-custom-msg="true"
                backdrop-off
                prevent-esc-close
                size="xl"
                interactive
-               @esc="hideCollectorDetail"
-               @cancel="hideCollectorDetail"
+               hide-footer
+               :type="'primary'"
+               :custom-yes-or-no-msg="popMsgButton"
+               @esc="hideCollectorDataModal"
+               @cancel="hideCollectorDataModal"
     >
       <template #contents>
-        <CollectorAction ref="IVCO001_CollectorDetail"
-                         :user-prop="isCreateMode ? undefined : selectedItems[0].data"
-                         :creatable="isCreateMode ? true : false"
-                         :is-local-user="isLocalMode"
-                         size="xl"
-                         @create="createCollector"
-                         @update="updateCollector"
-                         @cancel="hideCollectorDetail"
+        <CollectorCollectData ref="IVCO001_CollectorData"
+                              :filter-format-data="isCreateMode ? undefined : isEmpty(selectedItems[0].data) ? undefined :selectedItems[0].data.plugin_info.options.filter_format"
+                              :collector-data="isCreateMode ? undefined : selectedItems[0].data"
+                              :creatable="isCreateMode ? true : false"
+                              :is-local-user="isLocalMode"
+                              size="xl"
+                              @create="createCollector"
+                              @update="updateCollector"
+                              @cancel="hideCollectorDataModal"
         />
       </template>
     </BaseModal>
@@ -134,13 +144,14 @@ import BaseDragHorizontal from '@/components/base/drag/BADG_002_BaseDragHorizont
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 import contextData from './search_context/query.js';
 import BaseTabNav from '@/components/base/tab/BATA_002_BaseTabNav';
-const BaseMultiPanel = () => import('@/components/base/panel/BAPA_005_BaseMultiPanel');
-const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
-const CollectorAction = () => import('@/views/inventory/collector/IVCO_002_CollectorAction');
-const CollectorDetails = () => import('@/views/inventory/collector/IVCO_003_CollectorDetailsSingle');
-const CollectorCredentials = () => import('@/views/inventory/collector/IVCO_005_CollectorCredentials');
-const CollectorJobs = () => import('@/views/inventory/collector/IVCO_006_CollectorJobs');
-const ActionCheckModal = () => import('@/components/base/modal/BAMO_003_EXT_ActionCheckModal.vue');
+import BaseMultiPanel from '@/components/base/panel/BAPA_005_BaseMultiPanel';
+import BaseModal  from '@/components/base/modal/BAMO_001_BaseModal';
+
+import CollectorDetails  from '@/views/inventory/collector/IVCO_004_CollectorDetailsSingle';
+import CollectorCredentials  from '@/views/inventory/collector/IVCO_006_CollectorCredentials';
+import CollectorCollectData  from '@/views/inventory/collector/IVCO_007_CollectorCollectData';
+import CollectorJobs  from '@/views/inventory/collector/IVCO_008_CollectorJobs';
+import ActionCheckModal  from '@/components/base/modal/BAMO_003_EXT_ActionCheckModal.vue';
 
 export default {
     name: 'Collector',
@@ -151,27 +162,14 @@ export default {
         CollectorDetails,
         BaseMultiPanel,
         BaseModal,
-        CollectorAction,
+        CollectorCollectData,
         CollectorCredentials,
         CollectorJobs,
         ActionCheckModal
     },
     data () {
         return {
-            tabs: [
-                {
-                    title: this.tr('PANEL.INFO'),
-                    key: 'info'
-                },
-                {
-                    title: this.tr('PANEL.CREDENTIAL'),
-                    key: 'credentials'
-                },
-                {
-                    title: this.tr('PANEL.JOBS'),
-                    key: 'jobs'
-                }
-            ],
+            popMsgButton: { NO: this.tr('BTN_CANCEL'), YES: this.tr('BTN_OK') },
             collectors: [],
             selectedItems: [],
             addModal: false,
@@ -197,6 +195,30 @@ export default {
         };
     },
     computed: {
+        tabs () {
+            if (this.isMultiSelected) {
+                return [
+                    {
+                        title: this.tr('PANEL.DETAILS'),
+                        key: 'info'
+                    }
+                ];
+            }
+            return [
+                {
+                    title: this.tr('PANEL.DETAILS'),
+                    key: 'info'
+                },
+                {
+                    title: this.tr('PANEL.CREDENTIAL'),
+                    key: 'credentials'
+                },
+                {
+                    title: this.tr('PANEL.JOBS'),
+                    key: 'jobs'
+                }
+            ];
+        },
         fields () {
             return [
                 { key: 'selected', thStyle: { width: '50px' }},
@@ -204,7 +226,10 @@ export default {
                 { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
                 { key: 'priority', label: this.tr('COL_NM.PRIORITY'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
                 { key: 'plugin_info', label: this.tr('COL_NM.RESOURCE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
-                { key: 'last_collected_at', label: this.tr('COL_NM.LAST_COL'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
+                { key: 'last_collected_at', label: this.tr('COL_NM.LAST_COL'), sortable: true, ajaxSortable: true, filterByFormatted: true,
+                    formatter: (val) => {
+                        return this.getComputedTime(val);
+                    }, thStyle: { width: '200px' }},
                 {
                     key: 'created_at',
                     label: this.tr('COL_NM.CREATED'),
@@ -212,8 +237,8 @@ export default {
                     ajaxSortable: true,
                     filterByFormatted: true,
                     formatter: (val) => {
-                        return this.getDatefromTimeStamp(val.seconds, localStorage.getItem('timezone'));
-                    } ,
+                        return this.getComputedTime(val);
+                    },
                     thStyle: { width: '160px' }
                 }
             ];
@@ -223,7 +248,8 @@ export default {
                 { key: 'collector_id',label: this.tr('COL_NM.ID') },
                 { key: 'name', label: this.tr('COL_NM.NAME') },
                 { key: 'state', label: this.tr('COL_NM.STATE') },
-                { key: 'group', label: this.tr('COL_NM.GROUP') }
+                { key: 'priority', label: this.tr('COL_NM.PRIORITY') },
+                { key: 'plugin_info', label: this.tr('COL_NM.RESOURCE') }
             ];
         },
         multiActionFields () {
@@ -233,7 +259,7 @@ export default {
                 { key: 'state', label: this.tr('COL_NM.STATE') },
                 { key: 'created_at', label: this.tr('COL_NM.CREATED'), filterByFormatted: true,
                     formatter: (val) => {
-                        return this.getDatefromTimeStamp(val.seconds, localStorage.getItem('timezone'));
+                        return this.getComputedTime(val);
                     } }
             ];
         },
@@ -276,12 +302,12 @@ export default {
                 this.collectors = res.data.results;
                 console.log('collectors',this.collectors);
                 this.totalCount = res.data.total_count;
+                this.isLoading = false;
             } catch (e) {
                 console.error(e);
-                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('USER')]));
-
+                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('COLLECTOR')]));
+                this.isLoading = false;
             }
-            this.isLoading = false;
         },
         rowSelected (rows) {
             this.selectedItems = rows;
@@ -297,13 +323,13 @@ export default {
             this.selectedItems[0].data = user;
         },
         updateCollector (user) {
-            this.hideCollectorDetail();
+            this.hideCollectorDataModal();
             user.selected = true;
             this.selectedItems[0].data = user;
             this.$set(this.collectors, this.selectedItems[0].idx, user);
         },
         createCollector () {
-            this.hideCollectorDetail();
+            this.hideCollectorDataModal();
             this.listCollectors();
         },
         getParams (items) {
@@ -316,6 +342,9 @@ export default {
             });
             return params;
         },
+        getComputedTime (selectedTimeStamp) {
+            return !this.isEmpty(selectedTimeStamp) ? this.getDatefromTimeStamp(selectedTimeStamp.seconds, localStorage.getItem('timezone')) : '';
+        },
         async deleteCollector (commitItems) {
             await this.$axios.post('/inventory/collector/delete', this.getParams(commitItems));
         },
@@ -327,12 +356,11 @@ export default {
         },
         onClickAdd () {
             this.isCreateMode = true;
-            this.$router.push({path: '/inventory/collector/new-collector'});
-            //this.showCollectorDetail();
+            this.$router.push({ path: '/inventory/collector/new-collector' });
         },
         onClickUpdate () {
             this.isCreateMode = false;
-            this.showCollectorDetail();
+            this.showCollectorDataModal();
         },
         onClickDelete () {
             this.action = this.deleteCollector;
@@ -355,14 +383,19 @@ export default {
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DISABLE'), this.tr('COLLECTOR')]);
             this.showActionModal();
         },
-        showCollectorDetail () {
-            this.$refs.IVCO001_CollectorDetailModal.showModal();
+        showCollectorDataModal () {
+            this.$refs.IVCO001_CollectorDataModal.showModal();
         },
-        hideCollectorDetail () {
-            this.$refs.IVCO001_CollectorDetailModal.hideModal();
+        hideCollectorDataModal () {
+            this.$refs.IVCO001_CollectorDataModal.hideModal();
         },
         showActionModal () {
             this.$refs.IVCO001_ActionCheckModal.showModal();
+        },
+        onCollectData () {
+            this.popMsgButton = { NO: this.tr('BTN_CANCEL'), YES: this.tr('BTN_COL_DATA') };
+            this.isCreateMode = false;
+            this.showCollectorDataModal();
         }
     }
 };
@@ -394,10 +427,5 @@ export default {
     }
 
   }
-  // .delete-user {
-  //     vertical-align: middle;
-  // }
-  // .user-name {
-  //     font-size: 1.2rem;
-  // }
+
 </style>

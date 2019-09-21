@@ -1,20 +1,39 @@
 <template>
   <div>
+    <BaseModal ref="IVCO002_CollectorActionModal"
+               :title="tr('TITLE', [isCreateMode ? tr('BTN_ADD') : tr('BTN_EDIT'), tr('COLLECTOR')])"
+               centered
+               :use-custom-msg="true"
+               backdrop-off
+               prevent-esc-close
+               size="xl"
+               interactive
+               hide-footer
+               :type="'primary'"
+               @esc="hideCollectorActionPopupModal"
+               @cancel="hideCollectorActionPopupModal"
+    >
+      <template #contents>
+        <CollectorActionsPopup ref="IVCO001_CollectorData"
+                               :creatable="isCreateMode ? true : false"
+                               size="xl"
+        />
+      </template>
+    </BaseModal>
     <b-row>
       <b-col class="col-xs-12 col-sm-3 col-md-3">
         <b-card class="left-container">
           <b-row>
             <div ref="IVCO002_SearchboxContainer"
                  class="searchbox-container"
-                 :class="{ 'no-caption': noCaption }"
                  style="width:100%"
             >
               <div class="searchbox" :style="{ width: searchboxWidth }">
                 <BaseSearch ref="search"
-                            :context-data="searchContextData"
-                            :is-empty-search="isEmptySearch"
-                            :plain-search="plainSearch"
-                            :border="!darkHeader"
+                            :context-data="contextData"
+                            :is-empty-search="true"
+                            :plain-search="false"
+                            :border="true"
                             @search="onSearch"
                             @empty="$emit('empty')"
                 />
@@ -22,31 +41,108 @@
             </div>
           </b-row>
           <b-row>
-            <b-card class="left-le">
-                <b-form-checkbox size="default">Official</b-form-checkbox>
-                <b-form-checkbox size="default">Local</b-form-checkbox>
+            <b-card class="left-le" align="left" header="Repository" header-bg-variant="primary"
+                    header-text-variant="white"
+            >
+              <b-form-radio v-model="repositoryData.selectedRepo" name="radio-size" size="lg"
+                            value="OFFICIAL" @change="listCollectPlugin"
+              >
+                {{ tr('PANEL.OFFICIAL') }}
+              </b-form-radio>
+              <b-form-radio v-model="repositoryData.selectedRepo" name="radio-size" size="lg"
+                            value="LOCAL" @change="listCollectPlugin"
+              >
+                {{ tr('PANEL.LOCAL') }}
+              </b-form-radio>
             </b-card>
           </b-row>
           <b-row>
-            <b-card class="left-le">
-                  <b-form-checkbox size="default">ALL</b-form-checkbox>
-                  <br>
-                  <b-form-checkbox size="default">Server</b-form-checkbox>
-                  <br>
-                  <b-form-checkbox size="default">Network</b-form-checkbox>
-                  <br>
-                  <b-form-checkbox size="default">Subnet</b-form-checkbox>
-                  <br>
-                  <b-form-checkbox size="default">IP Address</b-form-checkbox>
+            <b-card class="left-le"
+                    header="Resource Type"
+                    header-bg-variant="primary"
+                    header-text-variant="white"
+            >
+              <b-form-checkbox size="default">
+                ALL
+              </b-form-checkbox>
+              <br>
+              <b-form-checkbox size="default">
+                Server
+              </b-form-checkbox>
+              <br>
+              <b-form-checkbox size="default">
+                Network
+              </b-form-checkbox>
+              <br>
+              <b-form-checkbox size="default">
+                Subnet
+              </b-form-checkbox>
+              <br>
+              <b-form-checkbox size="default">
+                IP Address
+              </b-form-checkbox>
             </b-card>
           </b-row>
         </b-card>
       </b-col>
       <b-col class="col-xs-12 col-sm-9 col-md-9">
         <b-card class="right-container">
-          <b-row />
           <b-row>
-            Repository
+            <b-col class="btn-box mt-2 mr-3">
+              <b-button class="float-left mb-3"
+                        size="md"
+                        type="reset"
+                        variant="primary"
+                        @click="onCreatePlugIn"
+              >
+                {{ tr('BTN_CRT') }}
+              </b-button>
+              <b-button class="float-left ml-3"
+                        size="md"
+                        type="reset"
+                        variant="outline-secondary"
+                        @click="onCancel"
+              >
+                {{ tr('BTN_CANCEL') }}
+              </b-button>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col v-for="(plugIn, idx) in getPlugInList" class="col-xs-12 col-sm-12 col-md-4">
+              <b-card style="cursor: pointer"
+                      :class="{ active: plugInList.plugInDataSelected.selected_id == plugIn.plugin_id }"
+                      :header="`${plugIn.name.substring(0, plugIn.name.indexOf('-')).toUpperCase()}`"
+                      component-type="'plug_in'"
+                      header-bg-variant="warning"
+                      header-text-variant="white"
+                      @click="selectPlugIn(plugIn.plugin_id, idx)"
+              >
+                <b-col class="sel-collector" cols="12" md="auto">
+                  <b-card-img :key="idx"
+                              class="p-raido mb-3"
+                              :value="plugIn.plugin_id"
+                              :src="require(`@/asset/icons/${getCollectorIcon(plugIn.image)}`)"
+                              height="100vh"
+                              width="100vh"
+                  />
+                  <b-form>
+                    <b-form-radio v-model="plugInList.plugInDataSelected.selected_id"
+                                  class="mb-3"
+                                  :value="plugIn.plugin_id"
+                    >
+                      {{ plugIn.name }}
+                    </b-form-radio>
+                    <BaseField v-model="plugInList.plugInDataSelected.selected_version[replaceAll(plugIn.plugin_id, '-', '_')]"
+                               :label="`${tr('COL_NM.VERSION')} : `"
+                               :label-cols="3"
+                               type="select"
+                               :options="getPlugInDropDown(idx)"
+                               :placeholder="tr('FORM.SELECT', [tr('COL_NM.COL_MODE')])"
+                    />
+                  </b-form>
+                </b-col>
+              </b-card>
+            </b-col>
           </b-row>
         </b-card>
       </b-col>
@@ -58,7 +154,10 @@
 import BaseTag from '@/components/base/tags/BATG_001_BaseTag.vue';
 import BaseField from '@/components/base/form/BAFM_001_BaseField.vue';
 import BaseSearch  from '@/components/base/search/BASR_001_BaseSearch.vue';
-const BaseSimpleModal = () => import('@/components/base/modal/BAMO_002_BaseSimpleModal.vue');
+import BaseModal  from '@/components/base/modal/BAMO_001_BaseModal';
+import CollectorActionsPopup  from '@/views/inventory/collector/IVCO_003_CollectorActionPopup';
+import contextData from './search_context/query.js';
+
 const collectorModel = {
     collector_id: null,
     priority: null,
@@ -72,12 +171,13 @@ const collectorModel = {
 
 export default {
     name: 'CollectorActions',
-    event: ['create', 'update', 'cancel'],
     components: {
-        BaseField,
         BaseTag,
-        BaseSimpleModal,
-        BaseSearch
+        BaseField,
+        BaseSearch,
+        contextData,
+        CollectorActionsPopup,
+        BaseModal
     },
     props: {
         collectorProp: {
@@ -95,69 +195,33 @@ export default {
     },
     data () {
         return {
+            isCreateMode: true,
+            plugInList:{
+                plugInData: [],
+                plugInDataSelected: {
+                    selected_id: null,
+                    selected_version: {}
+                }
+            },
+            repositoryData: {
+                selectedRepo: 'OFFICIAL',
+                selectedRepoCollector: 'abs'
+            },
+            contextData: contextData,
             collectorId: this.collectorProp.collector_id, // required
-            password: this.collectorProp.password, // required
-            passwordCheck: null, // required
             name: this.collectorProp.name,
-            email: this.collectorProp.email,
-            mobile: this.collectorProp.mobile,
-            group: this.collectorProp.group,
-            language: this.collectorProp.language || this.$i18n.locale,
-            timezone: this.collectorProp.timezone || sessionStorage.getItem('timezone'),
             collectorIdUnique: null,
-            showValidation: false,
-            noticeTitle: '',
-            noticeText: ''
+            showValidation: false
         };
     },
     computed: {
-        heads () {
-            return this.fields;
+        getPlugInList () {
+            return this.plugInList.plugInData;
         },
-        limit () {
-            return this.perPage;
-        },
-        start () {
-            return (this.currentPage - 1) * this.limit;
-        },
-        maxPage () {
-            return Math.ceil(this.totalRows / this.limit);
-        },
-        noCaption () {
-            return !(this.$slots.caption || this.$scopedSlots.caption);
-        },
-        headerWidth () {
-            return this.width - (this.pad * 2);
-        },
-        captionContainerWidth () {
-            return this.captionWidth > this.width ? this.width : this.captionWidth;
-        },
-        toolContainerWidth () {
-            if (this.headerWidth < this.captionContainerWidth + this.toolWidth) {
-                return this.headerWidth;
-            }
-            return this.toolWidth > this.width ? this.width : this.toolWidth;
-        },
-        toolboxWidth () {
-            if (this.toolContainerWidth > this.toolWidth) {
-                return `${this.toolWidth}px`;
-            }
-            return '100%';
-        },
-        searchContainerWidth () {
-            let calculatedWidth;
-            debugger;
-            if (this.width < 768) {
-                calculatedWidth = this.headerWidth;
-            } else {
-                calculatedWidth = this.headerWidth - this.toolContainerWidth - (this.noCaption ? 0 : this.captionContainerWidth);
-            }
-
-            if (this.searchWidth && calculatedWidth < this.searchWidth) {
-                calculatedWidth = this.searchWidth;
-            }
-
-            return `${calculatedWidth}px`;
+        getPlugInDropDown () {
+            return (index) => {
+                return this.plugInList.plugInData[index]['plugin_ver'];
+            };
         },
         searchboxWidth () {
             if (this.searchWidth) {
@@ -165,224 +229,145 @@ export default {
             }
             return '100%';
         }
-
     },
     created() {
+        this.listCollectPlugin();
     },
     methods: {
-        init () {
-            this.showValidation = false;
-            this.resetCollectorData(this.collectorProp);
+        selectPlugIn(plugin_id){
+            console.log(plugin_id);
+            console.log('plugin_id', this.plugInList.plugInDataSelected.selected_version[this.replaceAll(plugin_id, '-', '_')]);
+            this.plugInList.plugInDataSelected.selected_id = plugin_id;
         },
-        onSubmit () {
-            if (this.validate()) {
-                if (this.creatable) {
-                    this.createCollector();
-                } else {
-                    this.updateCollector();
+        getCollectorIcon (v) {
+            let imageAdd = v;
+            if (imageAdd.includes('/')){
+                imageAdd = v.substring(v.indexOf('/')+1, v.length);
+            }
+            return imageAdd.includes('.svg') ? imageAdd : imageAdd + '.svg';
+        },
+        reSetDatalist () {
+            this.plugInList.plugInData = [];
+            this.plugInList.plugInRowCount = 0;
+        },
+        async listCollectPlugin (selectedVal) {
+            let remoteRepo = null;
+            try {
+
+                this.reSetDatalist();
+                if (this.isEmpty(selectedVal) || selectedVal === 'OFFICIAL' ){
+                    remoteRepo = await this.$axios.post('/repository/remote-repository/list', {
+                        domain_id: sessionStorage.getItem('domainId')
+                    });
+
+                    if (remoteRepo.data.total_count > 0){
+                        const repository_remote_id = remoteRepo.data.results[0].remote_repository_id;
+                        let gotPlugInList = await this.$axios.post('/repository/plugin/list', {
+                            domain_id: sessionStorage.getItem('domainId'),
+                            repository_id: repository_remote_id,
+                            service_type: 'inventory.collector'
+                        });
+
+                        if (!this.isEmpty(gotPlugInList.data.results)){
+                            const plugInArr = gotPlugInList.data.results;
+
+                            for (const [index, curItem] of plugInArr.entries()) {
+                                const newKey = this.replaceAll(curItem.plugin_id, '-', '_');
+                                let versionInfo  = await this.$axios.post('/repository/plugin/get-versions', {
+                                    domain_id: sessionStorage.getItem('domainId'),
+                                    plugin_id: curItem.plugin_id
+                                });
+
+                                if (!this.isEmpty(versionInfo.data.version)) {
+                                    this.plugInList.plugInDataSelected.selected_version[newKey] = versionInfo.data.version[0];
+                                    gotPlugInList.data.results[index]['plugin_versions'] = versionInfo.data.version;
+                                    gotPlugInList.data.results[index]['plugin_version_count'] = versionInfo.data.total_count;
+                                    gotPlugInList.data.results[index]['plugin_ver'] = this.createComboBox(versionInfo.data.version);
+                                }
+                            }
+                            this.plugInList.plugInData = gotPlugInList.data.results;
+                        }
+
+                    }
                 }
-            }
-        },
-        showCheckModal () {
-            this.$refs.IDUS002_CheckModal.showModal();
-        },
-        async createCollector () {
-            let res = null;
-            try {
-                res = await this.$axios.post('/identity/collector/create', this.getCollectorData());
-                this.$emit('create', res.data);
-                this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('USER'), this.tr('CRT_PAST')]));
-            } catch (e) {
-                console.error(e);
-                this.$alertify.error(this.tr('ALERT.SUCCESS', [this.tr('CRT_CONT'), this.tr('USER')]));
-            }
-        },
-        async updateCollector () {
-            let res = null;
-            try {
-                res = await this.$axios.post('/identity/collector/update', this.getCollectorData());
-                this.$emit('update', res.data);
-                this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('USER'), this.tr('UPT_PAST')]));
+
             } catch (e) {
                 console.error(e);
                 this.$alertify.error(this.tr('ALERT.SUCCESS', [this.tr('UPT_CONT'), this.tr('USER')]));
             }
+
         },
-        async checkIdAvailability () {
-            let res = null;
-            try {
-                res = await this.$axios.post('/identity/collector/list', {
-                    collector_id: this.collectorId
+        createComboBox (versionArr){
+            let returnVal = [];
+            if (versionArr.length > 0) {
+                const arr = versionArr.map(Number);
+                const indexOfMaxValue = arr.indexOf(Math.max(...arr));
+                versionArr.forEach(function(curItem, index){
+                    returnVal.push ({
+                        value :  curItem,
+                        text:  (index == indexOfMaxValue) ? `Latest version: ${curItem}` : curItem
+                    });
                 });
+            }
+            return returnVal;
+        },
+        hideCollectorActionPopupModal () {
+            this.$refs.IVCO002_CollectorActionModal.hideModal();
+        },
+        showCollectorActionPopupModal () {
+            this.$refs.IVCO002_CollectorActionModal.showModal();
+        },
+        onCreatePlugIn () {
+            this.isCreateMode = true;
+            this.showCollectorActionPopupModal();
+        },
+        onSearch (){
 
-                if (res.data.results.length === 0) {
-                    this.collectorIdUnique = true;
-                } else {
-                    this.collectorIdUnique = false;
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        },
-        async findCollector () {
-            console.log('find collector');
-            let res = null;
-            try {
-                res = await this.$axios.post('/identity/collector/find', {
-                    keyword: this.collectorId
-                });
-                if (res.data.results[0].state === 'UNIDENTIFIED') {
-                    this.onFailFindCollector();
-                } else {
-                    this.resetCollectorData(res.data.results[0]);
-                }
-            } catch (e) {
-                console.error(e);
-                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('FIND_CONT'), this.tr('USER')]));
-            }
-        },
-        onFailFindCollector () {
-            this.noticeTitle = this.tr('USER.FIND.FAILED.TITLE');
-            this.noticeText = this.tr('USER.FIND.FAILED.MISSING');
-            this.showCheckModal();
-        },
-        onReset () {
-            this.noticeTitle = this.tr('BTN_RESET');
-            this.noticeText = this.tr('FORM.CHECK.RESET');
-            this.showCheckModal();
-        },
-        onConfirmReset () {
-            this.reset();
-        },
-        reset () {
-            this.showValidation = false;
-            if (this.creatable) {
-                this.resetCollectorData(collectorModel);
-            } else {
-                this.resetCollectorData(this.collectorProp);
-            }
-        },
-        validate () {
-            this.showValidation = true;
-
-            let result = true;
-            if (!this.$refs.IDUS002_BaseTag.validate()) {
-                result = false;
-            }
-
-            if (this.creatable && !this.validateCollectorId) {
-                if (this.creatable) {
-                    this.collectorId = this.collectorId === null ? '' : this.collectorId;
-                }
-                result = false;
-            }
-
-            if (!this.validatePassword) {
-                if (this.creatable) {
-                    this.password = this.password === null ? '' : this.password;
-                } else {
-                    this.password = this.collectorProp.password;
-                }
-                result = false;
-            }
-
-            if (!this.validatePasswordCheck) {
-                if (this.creatable) {
-                    this.passwordCheck = this.passwordCheck === null ? '' : this.passwordCheck;
-                } else {
-                    this.passwordCheck = '';
-                }
-                result = false;
-            }
-            return result;
-        },
-        resetInvalidFields () {
-            if (this.creatable) {
-                this.collectorId = this.collectorId === null ? '' : this.collectorId;
-                this.password = this.password === null ? '' : this.password;
-                this.passwordCheck = this.passwordCheck === null ? '' : this.passwordCheck;
-            } else {
-                this.collectorId = this.collectorProp.collector_id;
-                this.password = this.collectorProp.password;
-                this.passwordCheck = '';
-            }
-        },
-        onTagRowAdded () {
-            this.$refs.IDUS002_BaseTagContainer.scrollTop = this.$refs.IDUS002_BaseTagContainer.scrollHeight;
-        },
-        changedCollectorId () {
-            this.collectorIdUnique = null;
-        },
-        getCollectorData () {
-            return {
-                collector_id: this.collectorId,
-                password: this.password,
-                name: this.name,
-                state: this.state,
-                email: this.email,
-                mobile: this.mobile,
-                group: this.group,
-                language: this.language,
-                timezone: this.timezone,
-                tags: this.$refs.IDUS002_BaseTag.tags
-            };
-        },
-        resetCollectorData (collector) {
-            this.collectorId = collector.collector_id;
-            this.password = collector.password;
-            this.passwordCheck = null;
-            this.name = collector.name;
-            this.email = collector.email;
-            this.mobile = collector.mobile;
-            this.group = collector.group;
-            this.language = collector.language || this.$i18n.locale;
-            this.timezone = collector.timezone || sessionStorage.getItem('timezone');
-            if (this.$refs.IDUS002_BaseTag) {
-                this.$refs.IDUS002_BaseTag.resetRows();
-            }
-        },
-        getCollectorValidMessage () {
-            if (!this.validateCollectorIdLength) {
-                return this.tr('FORM.INVALID.LENGTH', [this.tr('USER.ID'), 5, 12]);
-            } else if (this.validateCollectorIdUnique === null) {
-                return this.tr('FORM.CHECK.AVAIL');
-            } else if (!this.validateCollectorIdUnique) {
-                return this.tr('USER.ID_DUPL');
-            }
-            return '';
         },
         onCancel () {
-            this.$emit('cancel');
+            this.$router.push({ path: '/inventory/collector' });
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-  .left-le {
-    width: 100%;
-    margin-bottom: 5px;
-    margin-left: 5px;
-    margin-right:5px;
-  }
-  .left-container {
-    min-height: calc(100vh - #{$total-header-height} - 10px);
-    margin: 5px -5px 5px 10px;
-  }
-  .right-container {
-    min-height: calc(100vh - #{$total-header-height} - 10px);
-    margin: 5px 10px 5px -5px;
-  }
+    .p-raido {
+      margin: 0px 5px 5px 5px;
+    }
 
-  .searchbox-container {
-    text-align: right;
-    margin: 5px 5px 5px 5px;
-    &.no-caption {
-      text-align: right;
+    .sel-collector {
+        text-align: center;
     }
-    .searchbox {
-      display: inline-block;
-      text-align: left;
+
+    .left-le {
+        width: 100%;
+        margin: 5px 5px 5px 5px;
+        height: 39vh
     }
-  }
+    .left-container {
+        min-height: calc(100vh - #{$total-header-height} - 10px);
+        margin: 5px -5px 5px 10px;
+    }
+    .right-container {
+        min-height: calc(100vh - #{$total-header-height} - 10px);
+        margin: 5px 10px 5px -5px;
+    }
+
+    .searchbox-container {
+        margin: 5px 5px 5px 5px;
+        &.no-caption {
+            text-align: right;
+        }
+        .searchbox {
+            display: inline-block;
+        }
+    }
+    .row-gears {
+
+    }
+    .active {
+        background: linear-gradient(  to top, #ffbeac, #FFAE08);
+        color: white;
+    }
 </style>

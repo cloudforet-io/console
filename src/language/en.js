@@ -1,5 +1,6 @@
 export const en = {
     MSG: {
+        PROCESSED: 'processed',
         DR_SERV: 'Services',
         LOG_IN: 'Log In',
         LOG_IN_GREET: 'Log in to your Account.',
@@ -43,7 +44,8 @@ export const en = {
         BTN_S_SERV: 'Set In-Service',
         BTN_S_CLOSE: 'Set Closed',
         BTN_ACTION: 'Actions',
-        BTN_AVAIL: 'Check Availiability',
+        BTN_AVAIL: 'Check Availability',
+        BTN_COL_DATA: 'Collect Data',
         BTN_FIND: 'Find',
         CRT_PAST: 'Created',
         CRT_CONT: 'Creating',
@@ -54,7 +56,6 @@ export const en = {
         FIND_PAST: 'Found',
         FIND_CONT: 'Finding',
         GET_PAST: 'Got',
-        GET_CONT: 'Getting',
         CHG: 'Change',
         CHG_PAST: 'Changed',
         CHG_CONT: 'Changing',
@@ -102,6 +103,8 @@ export const en = {
         RELEASE: 'Release',
         STATE: 'State',
         REPO: 'Repository',
+        CREDENTIAL:'Credential',
+        CREDENTIALS:'Credentials',
         LIST: 'List'
         
     },
@@ -194,12 +197,14 @@ export const en = {
         LAST_COL: 'Last Collected',
         CREATED: 'Created',
         COLLECTOR: 'Collector',
-        COL_DATA: 'Collect Data',
         VERIFY: 'Verify',
         VERIFIED: 'Verified',
         DEF_COL_STATE: 'Default Collect State',
         JOB_ID: 'Job ID',
         COL_MODE: 'Collect mode',
+        COL_DATA: 'Collect Data',
+        COL_ID: 'Collector ID',
+        VERSION: 'Version',
         CRT_COUNT: 'Created Count',
         UPT_COUNT: 'Updated Count',
         FINISHED: 'Finished',
@@ -217,6 +222,7 @@ export const en = {
     },
     PANEL: {
         BASE_INFO: 'Base Information',
+        DETAILS: 'Details',
         TAG: 'Tags',
         INFO: 'Info',
         CREDENTIAL: 'Credentials',
@@ -224,9 +230,15 @@ export const en = {
         NO_ITEM: 'No {0}',
         NO_SELECT: 'Select a {0} Above.',
         VM: 'VM',
-        COMPUTE: 'Compute'
+        COMPUTE: 'Compute',
+        LOCAL: 'Local',
+        OFFICIAL: 'OFFICIAL'
     },
     FORM: {
+        TYPE: {
+            STR: 'String',
+            LIST: 'List'
+        },
         INVALID: {
             MANDATORY: 'This is a mandatory field.',
             UNIQUE: 'This must be unique.',
@@ -251,6 +263,7 @@ export const en = {
         SUCCESS: 'SUCCEED'
     },
     ALERT: {
+        ALT_CHECK_TYPE: 'Please, check your input type ({0}) is valid.',
         SUCCESS: '{0} Successfully {1}.',
         ERROR: 'ERROR OCCURED during {0} {1}.',
         NO_PARAM: 'An item must be chosen.' 
