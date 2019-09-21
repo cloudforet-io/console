@@ -605,6 +605,38 @@ export const Mixin = {
          **********************************************************************************/
         replaceAll (str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
+        },
+        /**********************************************************************************
+         * Name       : replaceFilterFormat
+         * str : String
+         * int : Integer
+         * bool: Boolean
+         * float: Float
+         * list: List (seperate by comma)
+         * Output  => Array
+         * Description:  return appropriate type by its key.
+         **********************************************************************************/
+        replaceFilterFormat (str, placeHolder) {
+
+            let returnVal = '';
+
+            const filterFormatArr = {
+                str   : 'String',
+                int   : 'Integer',
+                bool  : 'Boolean',
+                float : 'Float',
+                list  : 'List'
+            };
+
+            const holderAdditional = {
+                list: '(seperate by comma)'
+            };
+
+            if (filterFormatArr.hasOwnProperty(str)) {
+                returnVal = (placeHolder && holderAdditional.hasOwnProperty(str)) ? `${filterFormatArr[str]} ${holderAdditional[str]}` : filterFormatArr[str];
+            }
+
+            return returnVal;
         }
     },
     data: function () {
