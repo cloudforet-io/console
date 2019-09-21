@@ -71,13 +71,27 @@ export const GlobalEnum = {
             },
             CLOSED: {
                 msg: 'Closed',
-                icon: 'fas fa-minus-circle',
-                color: 'dark'
+                icon: 'fas fa-times-circle',
+                color: 'danger'
             },
             DELETED: {
                 msg: 'Deleted', 
-                icon: 'fas fa-times',
-                color: 'danger'
+                icon: 'fas fa-minus-circle',
+                color: 'dark'
+            }
+        }),
+    SERVER_TYPE: Object.freeze(
+        {
+            VM: {
+                msg: 'VM', 
+                color: 'success'
+            }
+        }),
+    PLATFORM_TYPE: Object.freeze(
+        {
+            AWS: {
+                msg: 'AWS', 
+                color: 'warning'
             }
         }),
     COLLECT_STATE: Object.freeze(

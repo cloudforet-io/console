@@ -52,10 +52,28 @@
 
                     <template v-else-if="!isEmpty(info.state)">
                       <dd>
-                        <BaseStateTag :state="info.stateType" :data="info.state" />
+                        <BaseStateTag :state="info.stateType" 
+                                      :data="info.state" 
+                                      inline
+                        />
                       </dd>
                     </template>
 
+                    <template v-else-if="!isEmpty(info.badge)">
+                      <dd>
+                        <BaseBadgeTag :enum-key="info.badgeType" 
+                                      :data="info.badge" 
+                                      inline
+                        />
+                      </dd>
+                    </template>
+
+                    <template v-else-if="info.contents instanceof Array">
+                      <dd><div v-for="(contents, i) in info.contents" :key="i">
+                        {{ contents }}
+                      </div>
+                      </dd>
+                    </template>
                     <template v-else>
                       <dd>{{ info.contents }}</dd>
                     </template>
@@ -85,11 +103,13 @@
 
 <script>
 const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag');
+const BaseBadgeTag = () => import('@/components/base/tags/BATG_003_BaseBadgeTag');
 export default {
     name: 'BasePanel',
     event: ['edit'],
     components: {
-        BaseStateTag
+        BaseStateTag,
+        BaseBadgeTag
     },
     props: {
         useSlot: {

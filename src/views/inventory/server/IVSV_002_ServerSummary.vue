@@ -87,9 +87,9 @@ export default {
         compute () {
             return this.serverData.data.compute || {};
         },
-        computeSecurityGroups () {
-            return this.compute.security_groups ? this.compute.security_groups.toString() : '';
-        },
+        // computeSecurityGroups () {
+        //     return this.compute.security_groups ? this.compute.security_groups.toString() : '';
+        // },
         poolInfo () {
             return this.serverData.pool_info || {};
         },
@@ -108,7 +108,7 @@ export default {
                 { title: this.tr('COL_NM.NAME'), contents: this.serverData.name, copyFlag: true },
                 { title: this.tr('COL_NM.STATE'), state: this.serverData.state, stateType: 'SERVER_STATE', copyFlag: true },
                 { title: this.tr('COL_NM.PRI_IP'), contents: this.serverData.primary_ip_address, copyFlag: true },
-                { title: this.tr('COL_NM.SE_TYPE'), contents: this.serverData.server_type, copyFlag: true },
+                { title: this.tr('COL_NM.SE_TYPE'), badge: this.serverData.server_type, badgeType: 'SERVER_TYPE', copyFlag: true },
                 { title: this.tr('COL_NM.CORE'), contents: this.base.core, copyFlag: true },
                 { title: this.tr('COL_NM.FQDN'), contents: this.domain.fqdn, copyFlag: true },
                 { title: this.tr('COL_NM.MEMORY'), contents: this.base.memory, copyFlag: true },
@@ -131,9 +131,8 @@ export default {
             return [
                 { title: `${this.tr('VM')} ${this.tr('ID')}`, contents: this.vm.vm_id, copyFlag: true },
                 { title: `${this.tr('VM')} ${this.tr('COL_NM.NAME')}`, contents: this.vm.vm_name, copyFlag: true },
-                { title: this.tr('COL_NM.PLATFORM'), contents: this.vm.platform_type, copyFlag: true },
+                { title: this.tr('COL_NM.PLATFORM'), badge: this.vm.platform_type, badgeType: 'PLATFORM_TYPE',copyFlag: true },
                 { title: this.tr('COL_NM.HOST'), contents: this.vm.image, copyFlag: true },
-                { title: this.tr('COL_NM.PLATFORM'), contents: this.vm.platform_type, copyFlag: true },
                 { title: this.tr('COL_NM.CREATE'), contents: this.getDate(this.vm.created_at), copyFlag: true }
             ];
         },
@@ -143,7 +142,7 @@ export default {
                 { title: this.tr('COL_NM.KEY_PAIR'), contents: this.compute.keypair, copyFlag: true },
                 { title: this.tr('COL_NM.INST_TYPE'), contents: this.compute.instance_type, copyFlag: true },
                 { title: this.tr('COL_NM.CREATE_BY'), contents: this.compute.created_by_user_id, copyFlag: true },
-                { title: this.tr('COL_NM.SEC_GROUP'), contents: this.computeSecurityGroups, copyFlag: true }
+                { title: this.tr('COL_NM.SEC_GROUP'), contents: this.compute.security_groups, copyFlag: true }
             ];
         },
         tag () {
