@@ -57,7 +57,7 @@
             <BaseChart ref="chart"
                        :data="chartDataConfig"
                        :options="chartOptions"
-                       :width="400" :height="300"
+                       :width="380" :height="300"
             />
           </div>
         </div>
@@ -82,28 +82,28 @@ export default {
                 server: {
                     title: 'Server',
                     data: {
-                        new: 0,
-                        active: 0,
-                        duplicated: 0,
-                        disconnected: 0
+                        NEW: 0,
+                        ACTIVE: 0,
+                        DUPLICATED: 0,
+                        DISCONNECTED: 0
                     }
                 },
                 network: {
                     title: 'Network',
                     data: {
-                        new: 0,
-                        active: 0,
-                        duplicated: 0,
-                        disconnected: 0
+                        NEW: 0,
+                        ACTIVE: 0,
+                        DUPLICATED: 0,
+                        DISCONNECTED: 0
                     }
                 },
                 ip_address: {
                     title: 'IP Address',
                     data: {
-                        new: 0,
-                        active: 0,
-                        duplicated: 0,
-                        disconnected: 0
+                        NEW: 0,
+                        ACTIVE: 0,
+                        DUPLICATED: 0,
+                        DISCONNECTED: 0
                     }
                 }
             },
@@ -115,7 +115,7 @@ export default {
                     fontSize: 20
                 },
                 legendPad: {
-                    bottom: 50
+                    bottom: 30
                 }
             },
             chartDataConfig: {
@@ -143,25 +143,25 @@ export default {
     computed: {
         cardData () {
             return {
-                new: {
-                    server: this.collectionStates.server.data.new,
-                    network: this.collectionStates.network.data.new,
-                    ip_address: this.collectionStates.ip_address.data.new
+                NEW: {
+                    server: this.collectionStates.server.data.NEW,
+                    network: this.collectionStates.network.data.NEW,
+                    ip_address: this.collectionStates.ip_address.data.NEW
                 },
-                active: {
-                    server: this.collectionStates.server.data.active,
-                    network: this.collectionStates.network.data.active,
-                    ip_address: this.collectionStates.ip_address.data.active
+                ACTIVE: {
+                    server: this.collectionStates.server.data.ACTIVE,
+                    network: this.collectionStates.network.data.ACTIVE,
+                    ip_address: this.collectionStates.ip_address.data.ACTIVE
                 },
-                duplicated: {
-                    server: this.collectionStates.server.data.duplicated,
-                    network: this.collectionStates.network.data.duplicated,
-                    ip_address: this.collectionStates.ip_address.data.duplicated
+                DUPLICATED: {
+                    server: this.collectionStates.server.data.DUPLICATED,
+                    network: this.collectionStates.network.data.DUPLICATED,
+                    ip_address: this.collectionStates.ip_address.data.DUPLICATED
                 },
-                disconnected: {
-                    server: this.collectionStates.server.data.disconnected,
-                    network: this.collectionStates.network.data.disconnected,
-                    ip_address: this.collectionStates.ip_address.data.disconnected
+                DISCONNECTED: {
+                    server: this.collectionStates.server.data.DISCONNECTED,
+                    network: this.collectionStates.network.data.DISCONNECTED,
+                    ip_address: this.collectionStates.ip_address.data.DISCONNECTED
                 }
             };
         }
@@ -265,20 +265,20 @@ export default {
                 color: black;
             }
         }
-        &.new {
+        &.NEW {
           background-color: $info;
           margin-top: 0;
         }
-        &.active {
+        &.ACTIVE {
           background-color: $success;
           margin-top: 0;
           margin-right: 0;
         }
-        &.duplicated {
+        &.DUPLICATED {
           background-color: $warning;
           margin-bottom: 0;
         }
-        &.disconnected {
+        &.DISCONNECTED {
           background-color: $danger;
           margin-bottom: 0;
           margin-right: 0;
@@ -295,8 +295,7 @@ export default {
     background-color: $white;
     .chart {
         height: 100%;
-        padding-top: 20px;
-        padding-bottom: 20px;
+        padding: 20px;
     }
 }
 </style>

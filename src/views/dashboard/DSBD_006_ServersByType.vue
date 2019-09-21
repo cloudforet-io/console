@@ -1,26 +1,38 @@
 <template>
   <b-row>
-    <b-col cols="5">
-      <div class="type-chart-container">
-        <div class="chart">
-          <BaseChart :data="typeChartDataConfig"
-                     :options="typeChartOptions"
-                     :width="200" :height="400"
-          />
-        </div>
-      </div>
-    </b-col>
-    <b-col cols="7">
-      <b-row align-v="center" class="subtype-chart-container">
-        <b-col v-for="(subtype, idx) in subtypeData" :key="idx" class="chart">
-          <p class="title">
-            {{ subtype.name }}
-          </p>
-          <BaseChart type="horizontalBar"
-                     :data="getSubtypeChartDataConfig(idx)"
-                     :options="subtypeChartOptions"
-                     :width="300" :height="subtype.data.length * 25"
-          />
+    <b-col v-for="(data, type) in chartDataList" 
+           :key="type" 
+           cols="6"
+    >
+      <b-row>
+        <b-col cols="12">
+          <div class="chart-container">
+            <div class="chart">
+              <BaseChart ref="chart"
+                         :key="type"
+                         :data="getChartDataConfig(type)"
+                         :options="getChartOptions(type)"
+                         :width="200" :height="200"
+              />
+            </div>
+          </div>
+        </b-col>
+        <b-col cols="12">
+          <div class="legend-container">
+            <div v-for="(count, label, idx) in data" 
+                 :key="label"
+                 cols="4"
+                 class="legend"
+            >
+              <span class="indicator"
+                    :style="{ color: colorSets[idx] }"
+              >
+                <i class="fas fa-square" />
+              </span>
+              <span class="title">{{ label }}</span>
+              <span class="count">{{ count }}</span>
+            </div>
+          </div>
         </b-col>
       </b-row>
     </b-col>
@@ -36,148 +48,144 @@ export default {
     },
     data () {
         return {
-            serverTypeData: [{
-                name: 'Baremetal',
-                count: 0
-            },
-            {
-                name: 'Hypervisor',
-                count: 0
-            },
-            {
-                name: 'VM',
-                count: 21
-            },
-            {
-                name: 'Unknown',
-                count: 2
-            }],
-            subtypeData: [
-                {
-                    name: 'VM',
-                    data: [{
-                        name: 'Hyper-V',
-                        count: 10
-                    },
-                    {
-                        name: 'AWS',
-                        count: 8
-                    },
-                    {
-                        name: 'OpenStack',
-                        count: 5
-                    }]
-                },
-                {
-                    name: 'OS',
-                    data: [{
-                        name: 'Linux',
-                        count: 15
-                    },
-                    {
-                        name: 'Windows',
-                        count: 8
-                    }]
-                }
-            ],
-            typeChartOptions: {
-                cutoutPercentage: 70,
-                centerText: {
-                    display: true,
-                    text: 'SERVER TYPE',
-                    fontSize: 20
-                },
-                legendPad: {
-                    bottom: 60
-                },
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 15
-                        // generateLabels: this.generateLabels
-                    }
-                }
-            },
-            typeChartDataConfig: {
-                labels: [],
-                datasets: [{
-                    data: [],
-                    backgroundColor: [
-                        'rgba(72,86,242,1.0)',
-                        'rgba(45,158,110,1.0)',
-                        'rgba(255,174,8,1.0)',
-                        'rgba(217,0,57,1.0)'
-                    ],
-                    borderWidth: 0,
-                    hoverBorderColor: [
-                        'rgba(72,86,242,0.5)',
-                        'rgba(45,158,110,0.5)',
-                        'rgba(255,174,8,0.5)',
-                        'rgba(217,0,57,0.5)'
-                    ],
-                    hoverBorderWidth: 10
-                }]
-            },
             colorSets: [
                 'rgba(72,86,242,1.0)',
                 'rgba(45,158,110,1.0)',
                 'rgba(255,174,8,1.0)',
-                'rgba(217,0,57,1.0)'
+                'rgba(217,0,57,1.0)',
+                'rgba(0,0,0,1.0)'
             ],
-            subtypeChartOptions: {
-                legend: {
-                    display: false
-                }
-                // scales: {
-                //     xAxes: [{
-                //         stacked: true
-                //     }],
-                //     yAxes: [{
-                //         stacked: true
-                //     }]
-                // }
-            }
+            vmData: {
+                AWS: 0,
+                AZURE: 0,
+                GCP: 0,
+                OPENSTACK: 0,
+                VMWARE: 0
+            },
+            osData: {
+                WINDOWS: 0,
+                LINUX: 0
+            },
+            loadingState: {
+                vm: true,
+                os: true
+            },
+            isLoading: true
         };
     },
     computed: {
+        chartDataList () {
+            return  {
+                'vm_type': this.vmData,
+                'os_type': this.osData
+            };
+        },
+        chartTypes () {
+            return this._.keys(this.chartDataList);
+        }
+    },
+    watch: {
+        loadingState: {
+            deep: true,
+            handler () {
+                if (this.loadingState.vm || this.loadingState.os) {
+                    this.isLoading = true;
+                } else {
+                    this.isLoading = false;
+                }
+            }
+        },
+        isLoading (val) {
+            if (!val) {
+                this.updateChart();
+            }
+        }
     },
     created () {
-        this.initChart();
+        this.init();
     },
     methods: {
-        initChart () {
-            this.setTypeChartLabels();
-            this.setTypeChartData();
+        init () {
+            this.chartTypes.map((item) => {
+                this.listData(item);
+            });
         },
-        setTypeChartLabels () {
-            this.typeChartDataConfig.labels = this.serverTypeData.map(type => (type.name));
+        async listData (itemType) {
+            try {
+                let res = await this.$axios.post('/statistics/server-type', {
+                    domain_id: sessionStorage.getItem('domainId'),
+                    item_type: itemType
+                });
+                this.setData(itemType, res.data);
+            } catch (err) {
+                console.error(err);
+            }
         },
-        setTypeChartData () {
-            this.typeChartDataConfig.datasets[0].data = this.serverTypeData.map(type => (type.count));
+        setData (itemType, data) {
+            if (itemType === 'vm_type') {
+                this.setVMData(data);
+            } else if (itemType === 'os_type') {
+                this.setOSData(data);
+            }
         },
-        getSubtypeChartLabels (idx) {
-            return this.subtypeData[idx].data.map(subtype => (subtype.name));
+        setVMData (data) {
+            this._.forIn(data, (val, key) => {
+                this.vmData[key] = data[key];
+            });
+            this.loadingState.vm = false;
         },
-        getSubtypeChartData (idx) {
-            return this.subtypeData[idx].data.map(subtype => (subtype.count));
+        setOSData (data) {
+            this._.forIn(data, (val, key) => {
+                this.osData[key] = data[key];
+            });
+            this.loadingState.os = false;
         },
-        getSubtypeChartDataConfig (idx) {
+        getCenterText (key) {
+            return key.split('_')[0].toUpperCase();
+        },
+        getChartOptions (key) {
+            return  {
+                cutoutPercentage: 70,
+                centerText: {
+                    display: true,
+                    text: this.getCenterText(key),
+                    fontSize: 20
+                },
+                legend: {
+                    display: false
+                }
+            };
+        },
+        getChartLabels (key) {
+            return this._.keys(this.chartDataList[key]);
+        },
+        getChartData (key) {
+            return this._.values(this.chartDataList[key]);
+        },
+        getChartDataConfig (key) {
             return {
-                labels: this.getSubtypeChartLabels(idx),
+                labels: this.getChartLabels(key),
                 datasets: [{
-                    data: this.getSubtypeChartData(idx),
-                    backgroundColor: this.colorSets[idx]
+                    data: this.getChartData(key),
+                    backgroundColor: this.colorSets,
+                    borderWidth: 0,
+                    hoverBorderColor: this.colorSets,
+                    hoverBorderWidth: 10
                 }]
             };
         },
-        generateLabels (chart) {
-            return chart.data.labels.map((label, idx) => {
-                return {
-                    text: label,
-                    fillStyle: chart.data.datasets[0].backgroundColor[idx],
-                    strokeStyle: chart.data.datasets[0].backgroundColor[idx]
-                };
+        updateChartDataConfig (chart, key) {
+            chart.data.labels = this.getChartLabels(key);
+            chart.data.datasets[0].data = this.getChartData(key);
+        },
+        updateChartOptions (chart, key) {
+            chart.options.centerText.text = this.getCenterText(key);
+        },
+        updateChart () {
+            this.$refs.chart.map((ref) => {
+                this.updateChartDataConfig(ref.chart, ref.$vnode.key);
+                this.updateChartOptions(ref.chart, ref.$vnode.key);
+                ref.chart.update();
             });
         }
     }
@@ -186,7 +194,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.type-chart-container {
+.chart-container {
     @extend %sheet;
     display: flex;
     justify-content: center;
@@ -194,20 +202,32 @@ export default {
     height: 100%;
     background-color: $white;
     position: relative;
+    padding: 50px;
     .chart {
         height: 100%;
-        padding-top: 40px;
     }
 }
 
-.subtype-chart-container {
-    .chart {
-        padding: 20px 0;
+.legend-container {
+    padding-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    height: 150px;
+    .legend {
+        margin-bottom: 10px;
+        vertical-align: middle;
+        .indicator {
+            margin-right: 5px;
+        }
         .title {
-            font-weight: 700;
-            font-size: 1.2em;
-            color: $navy;
+            margin-right: 5px;
+        }
+        .count {
+            font-weight: 800;
+            font-size: 1.1em;
         }
     }
 }
+
 </style>

@@ -1,32 +1,30 @@
 <template>
-  <div class="board-container">
-    <div v-for="(count, state) in serverStates" 
-         :key="state"
-         class="card"
-         :class="state.toLowerCase()"
-    >
-      <div class="chart">
-        <BaseChart ref="chart"
-                   :data="getChartDataConfig(count)"
-                   :options="getChartOptions(count)"
-                   :width="80" :height="80"
-        />
-      </div>
-      <div class="info">
-        <span class="count">{{ count }}</span>
-        <p class="state">
-          <BaseStateTag state="SERVER_STATE" 
-                        :data="state"
-                        inline
-          />
-        </p>
-      </div>
+  <div>
+    <div class="chart">
+      <BaseChart ref="chart" 
+                 type="horizontalBar"
+                 :data="chartDataConfig"
+                 :options="chartOptions"
+                 :width="500" :height="70"
+      />
     </div>
-    <!-- <BaseChart type="horizontalBar"
-               :data="getChartDataConfig(count)"
-               :options="getChartOptions(count)"
-               :width="300" :height="subtype.data.length * 25"
-    /> -->
+    <b-row align-h="between" class="legend-container">
+      <b-col v-for="(count, state) in serverStates"
+             :key="state" 
+             cols="4"
+      >
+        <div class="legend-card">
+          <p class="title">
+            <BaseStateTag 
+              state="SERVER_STATE" 
+              :data="state"
+              inline
+            />
+          </p>
+          <span class="count">{{ count }}</span>
+        </div>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -46,10 +44,53 @@ export default {
                 INSERVICE: 0,
                 MAINTENANCE: 0,
                 CLOSED: 0
+            },
+            colorSets: {
+                INSERVICE: {
+                    backgroundColor: 'rgba(45,158,110,1.0)',
+                    hoverBorderColor: 'rgba(45,158,110,0.5)'
+                },
+                MAINTENANCE: {
+                    backgroundColor: 'rgba(255,174,8,1.0)',
+                    hoverBorderColor: 'rgba(255,174,8,0.5)'
+                },
+                CLOSED: {
+                    backgroundColor: 'rgba(217,0,57,1.0)',
+                    hoverBorderColor: 'rgba(217,0,57,0.5)'
+                }
+            },
+            chartOptions: {
+                scales: {
+                    xAxes: [{
+                        display: false,
+                        stacked: true,
+                        scaleLabel: { display: false }
+                    }],
+                    yAxes: [{
+                        display: false,
+                        stacked: true,
+                        scaleLabel: { display: false }
+                    }]
+                },
+                legend: { display: false }
             }
         };
     },
     computed: {
+        chartDataConfig () {
+            return {
+                labels: this._.keys(this.serverStates),
+                datasets: this._.map(this.serverStates, (val, key) => {
+                    return {
+                        data: [val],
+                        backgroundColor: this.colorSets[key].backgroundColor,
+                        hoverBorderColor: this.colorSets[key].hoverBorderColor,
+                        borderWidth: 0,
+                        hoverBorderWidth: 10
+                    };
+                })
+            };
+        },
         totalServerStateCount () {
             return this._.sum(this._.values(this.serverStates));
         }
@@ -60,93 +101,52 @@ export default {
     methods: {
         async init () {
             await this.listServerStates();
-            // this.updateCharts();
+            this.updateCharts();
         },
         async listServerStates () {
             try {
                 let res = await this.$axios.post('/statistics/server-state');
-                this.serverStates = res.data;
+                // this.serverStates = res.data;
+                this.serverStates = {
+                    INSERVICE: 6,
+                    MAINTENANCE: 5,
+                    CLOSED: 1
+                };
             } catch (err) {
                 console.error(err);
             }
         },
         updateCharts () {
-            this.$refs.chart.map((chart) => {
-                chart.update();
+            let chart = this.$refs.chart.chart;
+            this.updateChartDataConfig(chart);
+            chart.update();
+        },
+        updateChartDataConfig (chart) {
+            chart.data.labels = this.chartDataConfig.labels;
+            this.chartDataConfig.datasets.map((dataset, idx) => {
+                chart.data.datasets[idx].data = dataset.data;
             });
-        },
-        getChartDataConfig (count) {
-            return {
-                datasets: [{
-                    data: [count, 22],
-                    backgroundColor: [
-                        'rgba(44,104,249,1.0)'
-                    ],
-                    borderWidth: 0
-                }]
-            };
-        },
-        getChartOptions (count) {
-            return {
-                cutoutPercentage: 80,
-                legend: { display: false },
-                tooltips: { enabled: false },
-                hover: { mode: null },
-                centerText: {
-                    display: true,
-                    text: `${count / this.totalServerStateCount * 100}%`,
-                    fontSize: 16
-                }
-            };
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-.board-container {
-    padding: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    .card {
-        background-color: $white;
-        width: 150px;
-        margin-right: 25px;
+
+.legend-container {
+    .legend-card {
         @extend %sheet;
-        border-radius: 3px;
-        border: 0;
-        .chart {
-            padding: 20px;
+        padding: 5px 10px;
+        text-align: center;
+        vertical-align: middle;
+        .title {
+            font-size: 1.2em;
+            margin-bottom: 5px;
         }
-        .info {
-            display: inline-block;
-            width: 100%;
-            padding: 10px;
-            color: $black;
-            text-align: center;
-            .count {
-                font-size: 1.5em;
-                font-weight: 800;
-            }
-            .state {
-                font-size: 1em;
-                font-weight: 500;
-            }
-        }
-        &.inservice {
-            .count {
-                color: $success;
-            }
-        }
-        &.maintenance {
-            .count {
-                color: $warning;
-            }
-        }
-        &.closed {
-            .count{
-                color: $dark;
-            }
+        .count {
+            padding: 5px;
+            font-weight: 700;
+            font-size: 1.4em;
         }
     }
 }
