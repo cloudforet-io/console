@@ -3,7 +3,7 @@
     <BasePanel :panels="panelData"
                @edit="showTagEditModal"
     />
-     <b-card no-body class="filter-formatter">
+    <b-card no-body class="filter-formatter">
       <b-row class="page-header m-t-0" align-h="between">
         <b-col>
           <h5>
@@ -12,7 +12,7 @@
           </h5>
         </b-col>
       </b-row>
-       <hr>
+      <hr>
     </b-card>
     <BaseTable class="user-table"
                :table-data="filterFormat"
@@ -105,7 +105,10 @@ export default {
             return [
                 { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
                 { key: 'key', label: this.tr('COL_NM.KEY'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
-                { key: 'type', label: this.tr('COL_NM.TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
+                { key: 'type', label: this.tr('COL_NM.TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' } ,filterByFormatted: true,
+                    formatter: (val) => {
+                        return this.replaceFilterFormat(val);
+                    } },
                 { key: 'resource_type', label: this.tr('COL_NM.RESOURCE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }}
             ];
         },

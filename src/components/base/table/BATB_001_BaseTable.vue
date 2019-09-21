@@ -153,16 +153,7 @@
         </template>
 
         <template #plugin_info="data">
-          <template v-if="isValidToRun(data.item.plugin_info.options.supported_resource_type)">
-            <template v-for="(item, index) in data.item.plugin_info.options.supported_resource_type">
-              <template v-if="index==0">
-                {{ capitalize(item) }}
-              </template>
-              <template v-else>
-                <br>{{ capitalize(item) }}
-              </template>
-            </template>
-          </template>
+          <div v-html="getResourceTypeInStr(data.item.plugin_info)" />
         </template>
 
         <template #name="data">
@@ -448,8 +439,22 @@ export default {
         capitalizeFirstLetter (s) {
             return s.hasOwnProperty('text') ? this.capitalize(s.text) : s.hasOwnProperty('flag') ? this.capitalize(s.flag) : '';
         },
+        getResourceTypeInStr (val) {
+            let returnVal = '';
+            const resourceInfoArry = val.options.supported_resource_type;
+            if (!this.isEmpty(resourceInfoArry) && resourceInfoArry.length > 0){
+                resourceInfoArry.forEach((curItem, idx) =>{
+                    if (idx == 0){
+                        returnVal +=  `${this.capitalize(curItem)}`;
+                    } else {
+                        returnVal +=  `<br>${this.capitalize(curItem)}`;
+                    }
+                });
+            }
+            return returnVal;
+        },
         getCollectorIcon(str){
-          return str.includes('svg') ?  str : str + '.svg';
+            return str.includes('svg') ?  str : str + '.svg';
         },
         getVariantSize (size) {
             let variantFontSize = 3;

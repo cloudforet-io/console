@@ -2,18 +2,31 @@
   <div>
     <b-row>
       <b-col class="col-xs-12 col-sm-12 col-md-4">
-        <b-card class="s-card ">
-          <div>
+        <div>
+          <b-card class="s-card" style="border:none;">
             <b-row class="justify-content-md-center">
               <b-col v-if="getSelectedDataIcon" class="sel-collector" cols="12" md="auto">
                 <b-card-img :src="require(`@/asset/icons/${getCollectorIcon(collectorData.tags.icon)}`)"
-                            style="padding-top: 5%"
-                            height="150vh"
-                            width="150vh"
+                            style="padding-top:0%;"
+                            height="200vh"
+                            width="200vh"
                 />
-                <b-card style="border: none">
-                  {{ collectorData.name }}
+                <b-card style="border: none;">
+                  <b-row>
+                    <b-col cols="4" md="auto" style="text-align: right">
+                      Name:
+                      <br>
+                      Version:
+                    </b-col>
+                    <b-col cols="8" md="auto" style="text-align: left">
+                      <B>{{ collectorData.name }}</B>
+                      <br>
+                      <B> {{ collectorData.plugin_info.version }} </B>
+                    </b-col>
+                  </b-row>
+
                 </b-card>
+
               </b-col>
               <b-col v-else class="sel-collector" cols="12" md="auto">
                 <b-card-img :src="require(`@/asset/icons/common-gear.svg`)"
@@ -23,63 +36,66 @@
                 />
                 <b-card style="border: none">
                   {{ collectorData.name }}
+
                 </b-card>
               </b-col>
             </b-row>
-          </div>
-        </b-card>
-        <b-card class="s-card">
-          <div>
-            <b-form>
-              <b-row>
-                <b-col cols="12" style="padding-top: 8%">
-                  <BaseField v-model="collector_id"
-                             :plaintext="!creatable"
-                             :label="`${tr('COL_NM.COL_ID')} : `"
-                             :label-cols="4"
-                  />
-                  <BaseField v-model="plugin_info.version"
-                             :plaintext="!creatable"
-                             :label="`${tr('COL_NM.VERSION')} : `"
-                             :label-cols="4"
-                  />
+          </b-card>
+          <b-card class="s-card"
+                  header="Collector Options"
+                  header-bg-variant="primary"
+                  header-text-variant="white">
+            <div>
+              <b-form>
+                <b-row>
+                  <b-col cols="12" >
+                    <BaseField v-model="collector_id"
+                               :plaintext="!creatable"
+                               :label="`${tr('COL_NM.COL_ID')} : `"
+                               :label-cols="5"
+                    />
 
-                  <BaseField
-                    v-model="credential"
-                    :label="`${tr('CREDENTIAL')} : `"
-                    :label-cols="4"
-                    type="select"
-                    :options="CollectModeList"
-                    :placeholder="tr('FORM.SELECT', [tr('CREDENTIAL')])"
-                  />
+                    <BaseField
+                            v-model="credential"
+                            :label="`${tr('CREDENTIAL')} : `"
+                            :label-cols="5"
+                            type="input"
+                            :options="CollectModeList"
+                            :placeholder="tr('FORM.SELECT', [tr('CREDENTIAL')])"
+                    />
 
-                  <BaseField
-                    v-model="collect_mode"
-                    :label="`${tr('COL_NM.COL_MODE')} : `"
-                    :label-cols="4"
-                    type="select"
-                    :options="CollectModeList"
-                    :placeholder="tr('FORM.SELECT', [tr('COL_NM.COL_MODE')])"
-                  />
-                </b-col>
-              </b-row>
-            </b-form>
-          </div>
-        </b-card>
+                    <BaseField
+                            v-model="collect_mode"
+                            :label="`${tr('COL_NM.COL_MODE')} : `"
+                            :label-cols="5"
+                            type="select"
+                            :options="CollectModeList"
+                            :placeholder="tr('FORM.SELECT', [tr('COL_NM.COL_MODE')])"
+                    />
+                  </b-col>
+                </b-row>
+              </b-form>
+            </div>
+          </b-card>
+        </div>
       </b-col>
       <b-col class="col-xs-12 col-sm-12 col-md-8">
-        <b-card class="m-card">
-          <div v-for="(item, idx) in filterFormat">
-            <BaseField :key="idx"
-                        v-model="filterObject.filterInput[item.key]"
-                       :label="`${item.key} (${item.type}) : `"
-                       :state="filterObject.filterValidation[item.key]"
-                       :label-cols="3"
-                       :placeholder="tr('FORM.SELECT', [item.name])"
-                       :invalid-message="tr('ALERT.ALT_CHECK_TYPE', [tr(`FORM.TYPE.${item.type.toUpperCase()}`)])"
-            />
-          </div>
-        </b-card>
+        <div>
+          <b-card class="m-card" header="Filters"
+                  header-bg-variant="primary"
+                  header-text-variant="white">
+            <div v-for="(item, idx) in filterFormat">
+              <BaseField :key="idx"
+                         v-model="filterObject.filterInput[item.key]"
+                         :label="`${item.name}  : `"
+                         :state="filterObject.filterValidation[item.key]"
+                         :label-cols="3"
+                         :placeholder="replaceFilterFormat(item.type, true)"
+                         :invalid-message="tr('ALERT.ALT_CHECK_TYPE', [tr(`FORM.TYPE.${item.type.toUpperCase()}`)])"
+              />
+            </div>
+          </b-card>
+        </div>
       </b-col>
     </b-row>
     <b-row>
@@ -150,7 +166,7 @@ export default {
             last_collected_at: this.collectorData.last_collected_at,
             created_at: this.collectorData.created_at,
             tags: this.collectorData.tags,
-            credential: null,
+            credential: 'All',
             tableData: [],
             showValidation: false,
             collect_mode: 'ALL',
@@ -271,18 +287,18 @@ export default {
 
 
 <style lang="scss" scoped>
+    $left-card-height: calc((60vh)/2);
     .sel-collector {
         text-align: center;
-        margin-top: 10%;
     }
 
     .s-card {
-        min-height: 30vh;
+        min-height: calc(#{left-card-height});
         margin: 5px -5px 5px 10px;
     }
 
     .m-card {
-        min-height: calc(60vh + 5px);
+        min-height:  calc(60vh - 30px);
         margin: 5px 10px -5px -5px;
     }
 </style>
