@@ -33,7 +33,9 @@
               <dl class="dl-horizontal mb-0 row">
                 <div v-for="(info, idx) in item.data" :key="idx" class="col-sm-12 col-md-6 summary">
                   <template v-if="indexChecker(item.data.length, idx) === 1">
-                    <dt>{{ info.title }}</dt>
+                    <dt class="title">
+                      {{ info.title }}
+                    </dt>
                     <template v-if="!isEmpty(info.link)">
                       <dd>
                         <b><a :href="info.link" target="_blank" class="ddlink"> {{ info.contents }}</a></b>
@@ -145,7 +147,7 @@ export default {
       text-decoration: underline;
     }
   }
-  .summary > dt {
+  .summary > .title {
     float: left;
     width: 160px;
     overflow: hidden;
@@ -155,7 +157,6 @@ export default {
     white-space: nowrap;
     min-height: 20px;
     font-weight: 900;
-    color: $gray;
   }
 
   .summary > dd {
