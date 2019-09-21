@@ -1,37 +1,63 @@
 <template>
   <div class="board-container">
-    <div v-for="(item, idx) in boardData" :key="idx" class="board">
-      <p class="title">
-        {{ item.title }}
-      </p>
-      <span class="count">
-        {{ item.count }}
-      </span>
-    </div>
+    <Spinner v-model="isLoading" />
+    <template v-if="!isLoading">
+      <div v-for="(item, key) in summaryData" :key="key" class="board">
+        <p class="title">
+          {{ item.title }}
+        </p>
+        <span class="count">
+          {{ item.count }}
+        </span>
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
+import Spinner from '@/components/base/spinner/BASP_001_BaseSpinner';
 export default {
     name: 'Summary',
+    components: {
+        Spinner
+    },
     data () {
         return {
-            boardData: [{
-                title: 'Servers',
-                count: 14
-            },
-            {
-                title: 'Projects',
-                count: 28
-            },
-            {
-                title: 'Networks',
-                count: 6
-            }]
-        };
+            isLoading: true,
+            summaryData : {
+                server: {
+                    title: 'Server',
+                    count: 0
+                },
+                project: {
+                    title: 'Project',
+                    count: 0
+                },
+                network: {
+                    title: 'Network',
+                    count: 0
+                }
+            }
+        }; 
+    },
+    created () {
+        this.listSummary();
     },
     methods: {
-        
+        async listSummary () {
+            try {
+                let res = await this.$axios.post('/statistics/summary');
+                this.setSummaryData(res.data);
+                this.isLoading = false;
+            } catch (err) {
+                console.error(err);
+            }
+        },
+        setSummaryData (data) {
+            this._.forIn(data, (val, key) => {
+                this.summaryData[key].count = data[key];
+            });
+        }
     }
 };
 </script>

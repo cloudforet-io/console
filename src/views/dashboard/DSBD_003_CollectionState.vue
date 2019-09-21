@@ -1,21 +1,21 @@
 <template>
-  <div class="pr-3 pl-2">
-    <b-row align-h="end" class="m-0 pb-3">
+  <div class="">
+    <b-row align-h="end" class="m-0">
       <div class="dropdown-container">
         <b-dropdown no-caret right
                     variant="outline-secondary"
                     class="no-selected"
         >
           <template #button-content>
-            <span>{{ dropdownItems[selectedDropdownItem] }}</span> &nbsp;
+            <span>{{ collectionStates[selectedItem].title }}</span> &nbsp;
             <i class="fal fa-angle-down" />
           </template>
-          <b-dropdown-item v-for="(label, key) in dropdownItems" 
+          <b-dropdown-item v-for="(datasets, key) in collectionStates" 
                            :key="key" 
                            @click="onSelectDropdownItem(key)"
           >
             <div class="item sm">
-              <span class="name">{{ label }}</span>
+              <span class="name">{{ datasets.title }}</span>
             </div>
           </b-dropdown-item>
         </b-dropdown>
@@ -36,16 +36,16 @@
                             inline
               />
             </p>
-            <b-row v-for="(item, key) in datasets" :key="item.key"
+            <b-row v-for="(count, key) in datasets" :key="key"
                    class="card-item" 
                    align-v="center"
-                   :class="{active: key === selectedDropdownItem}"
+                   :class="{active: key === selectedItem}"
             >
               <b-col cols="8" class="item-title">
-                {{ item.title }}
+                {{ collectionStates[key].title }}
               </b-col>
               <b-col cols="4" class="item-count">
-                {{ item.count }}
+                {{ count }}
               </b-col>
             </b-row>
           </div>
@@ -57,7 +57,7 @@
             <BaseChart ref="chart"
                        :data="chartDataConfig"
                        :options="chartOptions"
-                       :width="400" :height="300"
+                       :width="380" :height="300"
             />
           </div>
         </div>
@@ -77,67 +77,33 @@ export default {
     },
     data () {
         return {
-            dropdownItems: {
-                server: 'Server',
-                network: 'Network',
-                ipAddress: 'IP Address'
-            },
-            selectedDropdownItem: 'server',
-            cardData: {
-                new: {
-                    server: {
-                        title: 'Server',
-                        count: 1
-                    },
-                    network: {
-                        title: 'Network',
-                        count: 12
-                    },
-                    ipAddress: {
-                        title: 'IP Address',
-                        count: 12
+            selectedItem: 'server',
+            collectionStates: {
+                server: {
+                    title: 'Server',
+                    data: {
+                        NEW: 0,
+                        ACTIVE: 0,
+                        DUPLICATED: 0,
+                        DISCONNECTED: 0
                     }
                 },
-                active: {
-                    server: {
-                        title: 'Server',
-                        count: 30
-                    },
-                    network: {
-                        title: 'Network',
-                        count: 12
-                    },
-                    ipAddress: {
-                        title: 'IP Address',
-                        count: 12
+                network: {
+                    title: 'Network',
+                    data: {
+                        NEW: 0,
+                        ACTIVE: 0,
+                        DUPLICATED: 0,
+                        DISCONNECTED: 0
                     }
                 },
-                duplicated: {
-                    server: {
-                        title: 'Server',
-                        count: 1
-                    },
-                    network: {
-                        title: 'Network',
-                        count: 12
-                    },
-                    ipAddress: {
-                        title: 'IP Address',
-                        count: 12
-                    }
-                },
-                disconnected: {
-                    server: {
-                        title: 'Server',
-                        count: 0
-                    },
-                    network: {
-                        title: 'Network',
-                        count: 12
-                    },
-                    ipAddress: {
-                        title: 'IP Address',
-                        count: 1
+                ip_address: {
+                    title: 'IP Address',
+                    data: {
+                        NEW: 0,
+                        ACTIVE: 0,
+                        DUPLICATED: 0,
+                        DISCONNECTED: 0
                     }
                 }
             },
@@ -149,7 +115,7 @@ export default {
                     fontSize: 20
                 },
                 legendPad: {
-                    bottom: 50
+                    bottom: 30
                 }
             },
             chartDataConfig: {
@@ -175,30 +141,75 @@ export default {
         };
     },
     computed: {
+        cardData () {
+            return {
+                NEW: {
+                    server: this.collectionStates.server.data.NEW,
+                    network: this.collectionStates.network.data.NEW,
+                    ip_address: this.collectionStates.ip_address.data.NEW
+                },
+                ACTIVE: {
+                    server: this.collectionStates.server.data.ACTIVE,
+                    network: this.collectionStates.network.data.ACTIVE,
+                    ip_address: this.collectionStates.ip_address.data.ACTIVE
+                },
+                DUPLICATED: {
+                    server: this.collectionStates.server.data.DUPLICATED,
+                    network: this.collectionStates.network.data.DUPLICATED,
+                    ip_address: this.collectionStates.ip_address.data.DUPLICATED
+                },
+                DISCONNECTED: {
+                    server: this.collectionStates.server.data.DISCONNECTED,
+                    network: this.collectionStates.network.data.DISCONNECTED,
+                    ip_address: this.collectionStates.ip_address.data.DISCONNECTED
+                }
+            };
+        }
     },
     created () {
-        this.initChart();
+        this.init();
     },
     methods: {
-        initChart () {
-            this.setChartLabels();
-            this.setChartData();
+        async listCollectionStates () {
+            try {
+                let res = await this.$axios.post('/statistics/collection-state');
+                this.setCollectionStates(res.data);
+            } catch (err) {
+                console.error(err);
+            }
+        },
+        setCollectionStates (data) {
+            this._.forIn(data, (val, key) => {
+                this.collectionStates[key].data = data[key];
+            });
+        },
+        async init () {
+            await this.listCollectionStates();
+            this.updateChart();
         },
         setChartLabels () {
-            this.chartDataConfig.labels = Object.keys(this.cardData).map(key => (key.toUpperCase()));
+            this.chartDataConfig.labels = this._.keys(this.cardData);
+        },
+        setChartCenterText (chart) {
+            chart.options.centerText.text = this.collectionStates[this.selectedItem].title.toUpperCase();
         },
         setChartData () {
-            this.chartDataConfig.datasets[0].data = Object.values(this.cardData).map(item => (item[this.selectedDropdownItem].count));
+            let dataSets = this.collectionStates[this.selectedItem].data;
+            this.chartDataConfig.datasets[0].data = this._.values(dataSets);
+        },
+        updateChartDataConfig (chart) {
+            this.setChartCenterText(chart);
+            this.setChartLabels();
+            this.setChartData();
+            chart.data = this.chartDataConfig;
         },
         updateChart () {
             let chart = this.$refs.chart.chart;
-            chart.options.centerText.text = this.dropdownItems[this.selectedDropdownItem].toUpperCase();
-            this.setChartData();
-            chart.data = this.chartDataConfig;
+            this.updateChartDataConfig(chart);
             chart.update();
         },
         onSelectDropdownItem (key) {
-            this.selectedDropdownItem = key;
+            this.selectedItem = key;
             this.updateChart();
         }
     }
@@ -207,7 +218,7 @@ export default {
 
 <style lang="scss" scoped>
 .dropdown-container {
-    margin-top: -40px;
+    margin-top: -55px;
     button.dropdown-toggle {
         background-color: transparent;
     }
@@ -217,14 +228,14 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
     height: 100%;
     .card {
         padding: 10px;
-        margin: 10px 15px;
-        width: 200px;
+        margin: 10px 10px 0 0;
+        width: 47%;
         height: 170px;
         border: 0;
+        padding: 10px;
         box-shadow: $box-shadow;
         color: $white;
         .card-title {
@@ -241,32 +252,36 @@ export default {
             .item-title {
                 font-size: 1.1em;
                 text-align: left;
+                padding: 0 3px;
             }
             .item-count {
                 text-align: right;
                 font-size: 1.2em;
                 font-weight: 600;
+                padding: 0 3px;
             }
             &.active {
                 background-color: rgba($white, 0.35);
                 color: black;
             }
         }
-        &.new {
+        &.NEW {
           background-color: $info;
           margin-top: 0;
         }
-        &.active {
+        &.ACTIVE {
           background-color: $success;
           margin-top: 0;
+          margin-right: 0;
         }
-        &.duplicated {
+        &.DUPLICATED {
           background-color: $warning;
           margin-bottom: 0;
         }
-        &.disconnected {
+        &.DISCONNECTED {
           background-color: $danger;
           margin-bottom: 0;
+          margin-right: 0;
         }
     }
 }
@@ -280,8 +295,7 @@ export default {
     background-color: $white;
     .chart {
         height: 100%;
-        padding-top: 20px;
-        padding-bottom: 20px;
+        padding: 20px;
     }
 }
 </style>

@@ -77,7 +77,6 @@
         <UserDetail ref="IDUS001_UserDetail"
                     :user-prop="isCreateMode ? undefined : selectedItems[0].data" 
                     :creatable="isCreateMode ? true : false"
-                    :is-local-user="isLocalMode"
                     size="xl"
                     @create="createUser"
                     @update="updateUser"
@@ -176,7 +175,6 @@ export default {
                 filter_or: []
             },
             isCreateMode: true,
-            isLocalMode: false,
             action: null,
             actionCheckTitle: '',
             actionCheckType: '',

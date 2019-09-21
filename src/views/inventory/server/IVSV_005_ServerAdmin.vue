@@ -30,19 +30,13 @@ export default {
         BaseTable
     },
     props: {
-        serverData: {
-            type: Object,
-            default: () => ({})
+        serverId: {
+            type: String,
+            default: ''
         }
     },
     data () {
         return {
-            serverDataKeyEnum: Object.freeze({
-                DISK: 'disk',
-                NIC: 'nic',
-                SG: 'security_group'
-            }),
-            activeNav: '',
             tableData: [],
             query: { 
                 page: {
@@ -56,73 +50,23 @@ export default {
         };
     },
     computed: {
-        diskFields () {
-            return [
-                { key: 'device_index', label: '#', sortable: true, thStyle: { width: '50px' }},
-                { key: 'device', label: this.tr('COL_NM.DEVICE'), sortable: true, thStyle: { width: '150px' }},
-                { key: 'device_type', label: this.tr('COL_NM.TYPE'), sortable: true, thStyle: { width: '150px' }},
-                { key: 'size', label: this.tr('COL_NM.SIZE'), sortable: true, thStyle: { width: '150px' }},
-                { 
-                    key: 'tags', 
-                    label: this.tr('COL_NM.TAG'), 
-                    sortable: true, 
-                    formatter: this.tagFormatter,
-                    thStyle: { width: '150px' }
-                }
-            ];
-        },
-        nicFields () {
-            return [
-                { key: 'device_index', label: '#', sortable: true, thStyle: { width: '50px' }},
-                { key: 'device', label: this.tr('COL_NM.DEVICE'), sortable: true, thStyle: { width: '150px' }},
-                { key: 'ip_address', label: this.tr('COL_NM.IP'), thStyle: { width: '150px' }},
-                { key: 'cidr', label: this.tr('COL_NM.CIDR'), thStyle: { width: '150px' }},
-                { key: 'subnet_id', label: this.tr('COL_NM.NETWORK'), thStyle: { width: '150px' }},
-                { key: 'mac_address', label: this.tr('COL_NM.MAC'), sortable: true, thStyle: { width: '150px' }},
-                { 
-                    key: 'tags', 
-                    label: this.tr('COL_NM.TAG'), 
-                    sortable: true, 
-                    formatter: this.tagFormatter,
-                    thStyle: { width: '150px' }
-                }
-            ];
-        },
-        securityGroupFields () {
-            return [
-                { key: 'direction', label: this.tr('COL_NM.DIRECTION'), sortable: true, thStyle: { width: '50px' }},
-                { key: 'protocol', label: this.tr('COL_NM.PROTOCOL'), sortable: true, thStyle: { width: '150px' }},
-                { key: 'port_range', label: this.tr('COL_NM.PORT_RANGE'), formatter: this.portRangeFormatter, thStyle: { width: '150px' }},
-                { key: 'remote_cidr', label: this.tr('COL_NM.SRC_DEST'), thStyle: { width: '150px' }},
-                { key: 'security_group_name', label: this.tr('COL_NM.SG_NAME'), thStyle: { width: '150px' }},
-                { key: 'security_group_id', label: this.tr('COL_NM.SG_ID'), sortable: true, thStyle: { width: '150px' }}
-            ];
-        },
         fields () {
-            if (this.activeNav === this.serverDataKeyEnum.DISK) {
-                return this.diskFields;
-            } else if (this.activeNav === this.serverDataKeyEnum.NIC) {
-                return this.nicFields;
-            } else {
-                return this.securityGroupFields;
-            }
-        },
-        customSlotNames () {
-            if (this.activeNav === this.serverDataKeyEnum.NIC) {
-                return ['cidr', 'ip_address', 'subnet_id'];
-            } else {
-                return [];
-            }
+            return [
+                { key: 'user_id', label: this.tr('COL_NM.ID'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '150px' }},
+                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '300px' }},
+                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '150px' }},
+                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '130px' }},
+                { key: 'tags', label: this.tr('COL_NM.TAG'), sortable: true, formatter: this.userTagFormatter, thStyle: { width: '130px' }}
+            ];
         }
     },
     watch: {
-        serverData () {
+        serverId () {
             this.reset();
             this.listServerAdmin();
         }
     },
     created () {
-        this.activeNav = this.serverDataKeyEnum.DISK;
         this.listServerAdmin();
     },
     methods: {
@@ -136,10 +80,9 @@ export default {
             this.reset();
             this.setQuery(limit, start, sort, keyword);
             try {
-                let res = await this.$axios.post('/inventory/server/get-data', { 
+                let res = await this.$axios.post('/inventory/server/admin/list', { 
                     domain_id: sessionStorage.getItem('domainId'),
-                    server_id: this.serverData.server_id,
-                    data_type: this.activeNav,
+                    server_id: this.serverId,
                     query: this.query
                 });
                 this.tableData = res.data.results;
@@ -153,29 +96,6 @@ export default {
             this.isLoading = true;
             this.tableData = [];
         },
-        onClickDisk () {
-            this.activeNav = this.serverDataKeyEnum.DISK;
-            this.listServerAdmin();
-        },
-        onClickNic () {
-            this.activeNav = this.serverDataKeyEnum.NIC;
-            this.listServerAdmin();
-        },
-        onClickSecurityGroup () {
-            this.activeNav = this.serverDataKeyEnum.SG;
-            this.listServerAdmin();
-        },
-        portRangeFormatter (val, key, data) {
-            return `${data.port_range_min} - ${data.port_range_max}`;
-        },
-        tagFormatter (tags) {
-            let keys = Object.keys(tags);
-            let results = '';
-            keys.map((key) => {
-                results += ` ${key}: ${tags[key]}`;
-            });
-            return results;
-        },
         alertError (err) {
             console.error(err);
             this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
@@ -183,6 +103,17 @@ export default {
         limitChanged (val) {
             this.query.page.limit = val;
             this.listServerAdmin();
+        },
+        userInfoFormatter (val, key, data) {
+            return data.user_info ? data.user_info[key] : '';
+        },
+        userTagFormatter (val, key, data) {
+            let keys = Object.keys(data.user_info.tags);
+            let results = '';
+            keys.map((key) => {
+                results += ` ${key}: ${data.user_info[key]}`;
+            });
+            return results;
         }
     }
 };
