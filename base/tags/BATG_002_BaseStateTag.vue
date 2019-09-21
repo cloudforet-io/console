@@ -8,7 +8,9 @@
       <i :class="tag.icon" />
     </span> &nbsp; 
     <span :class="{text: !inherit,
-                   [tag.color]: !inherit}"
+                   [tag.color]: !inherit,
+                   'align-bottom': inline
+    }"
     >
       {{ tag.msg }}
     </span>
