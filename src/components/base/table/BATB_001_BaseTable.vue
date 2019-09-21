@@ -374,6 +374,9 @@ export default {
         toolContainerWidth () {
             if (this.headerWidth < this.captionContainerWidth + this.toolWidth) {
                 return this.headerWidth;
+            } else if (this.searchWidth && 
+                        this.headerWidth < this.searchWidth + this.captionContainerWidth + this.toolWidth) {
+                return this.headerWidth;
             }
             return this.toolWidth > this.width ? this.width : this.toolWidth;
         },

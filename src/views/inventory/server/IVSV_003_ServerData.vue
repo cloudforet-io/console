@@ -98,7 +98,7 @@ export default {
             return [
                 { key: 'device_index', label: '#', sortable: true, thStyle: { width: '50px' }},
                 { key: 'device', label: this.tr('COL_NM.DEVICE'), sortable: true, thStyle: { width: '150px' }},
-                { key: 'device_type', label: this.tr('COL_NM.TYPE'), sortable: true, thStyle: { width: '150px' }},
+                { key: 'disk_type', label: this.tr('COL_NM.TYPE'), sortable: true, thStyle: { width: '150px' }},
                 { key: 'size', label: this.tr('COL_NM.SIZE'), sortable: true, thStyle: { width: '150px' }},
                 { 
                     key: 'tags', 

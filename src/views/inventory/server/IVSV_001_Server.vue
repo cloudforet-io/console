@@ -20,7 +20,12 @@
                    @limitChanged="limitChanged"
         >
           <template #caption>
-            <div>
+            <b-button class="d-inline-block mr-3" 
+                      variant="outline-primary"
+            >
+              Register
+            </b-button>
+            <div class="d-inline-block">
               <b-dropdown v-if="hasSelectedServer" no-caret
                           variant="outline-info"
                           class="no-selected"
@@ -40,19 +45,25 @@
 
                 <b-dropdown-item @click="onClickSetMaintenance">
                   <div class="item sm">
-                    <i class="icon fal fa-traffic-cone" />
+                    <i class="icon" 
+                       :class="$root.enums['SERVER_STATE']['MAINTENANCE'].icon"
+                    />
                     <span class="name">{{ tr('BTN_S_MANT') }}</span>
                   </div>
                 </b-dropdown-item>
                 <b-dropdown-item @click="onClickSetInService">
                   <div class="item sm">
-                    <i class="icon fal fa-play-circle" />
+                    <i class="icon"
+                       :class="$root.enums['SERVER_STATE']['INSERVICE'].icon"
+                    />
                     <span class="name">{{ tr('BTN_S_SERV') }}</span>
                   </div>
                 </b-dropdown-item>
                 <b-dropdown-item @click="onClickSetClosed">
                   <div class="item sm">
-                    <i class="icon fal fa-stop-circle" />
+                    <i class="icon"
+                       :class="$root.enums['SERVER_STATE']['CLOSED'].icon"
+                    />
                     <span class="name">{{ tr('BTN_S_CLOSE') }}</span>
                   </div>
                 </b-dropdown-item>
@@ -82,6 +93,13 @@
                 </b-dropdown-item>
               </b-dropdown>
             </div>
+          </template>
+
+          <template #CELL_server_type="{ data }">
+            <BaseBadgeTag enum-key="SERVER_TYPE" :data="data.item.server_type" />
+          </template>
+          <template #CELL_platform_type="{ data }">
+            <BaseBadgeTag enum-key="PLATFORM_TYPE" :data="vmFormatter(undefined, 'platform_type', data.item)" />
           </template>
         </BaseTable>
       </template>
@@ -196,6 +214,7 @@ import contextData from './search_context/query.js';
 
 import BaseDragHorizontal from '@/components/base/drag/BADG_002_BaseDragHorizontal.vue';
 import BaseTable from '@/components/base/table/BATB_001_BaseTable';
+import BaseBadgeTag from '@/components/base/tags/BATG_003_BaseBadgeTag';
 
 const BaseSimpleTree = () => import('@/components/base/tree/BATR_002_BaseSimpleTree');
 const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox.vue');
@@ -214,6 +233,7 @@ export default {
     components: {
         BaseDragHorizontal,
         BaseTable,
+        BaseBadgeTag,
         BaseSimpleTree,
         BaseCheckbox,
         ActionCheckModal,
@@ -267,108 +287,36 @@ export default {
         tabs () {
             if (this.isMultiSelected) {
                 return [
-                    {
-                        title: this.tr('PANEL.DETAILS'),
-                        key: 'summary'
-                    },
-                    {
-                        title: this.tr('COL_NM.C_ADMIN'),
-                        key: 'admin'
-                    }
+                    { key: 'summary', title: this.tr('COL_NM.C_SUMMARY') },
+                    { key: 'admin', title: this.tr('COL_NM.C_ADMIN') }
                 ];
             }
             return [
-                {
-                    title: this.tr('PANEL.DETAILS'),
-                    key: 'summary'
-                },
-                {
-                    title: this.tr('COL_NM.C_DT'),
-                    key: 'data'
-                },
-                {
-                    title: this.tr('COL_NM.C_RAW_DT'),
-                    key: 'rawData'
-                },
-                {
-                    title: this.tr('COL_NM.C_ADMIN'),
-                    key: 'admin'
-                }
+                { key: 'summary', title: this.tr('COL_NM.C_SUMMARY')  },
+                { key: 'data', title: this.tr('COL_NM.C_DT') },
+                { key: 'rawData', title: this.tr('COL_NM.C_RAW_DT') },
+                { key: 'admin', title: this.tr('COL_NM.C_ADMIN') }
             ];  
         },
         fields () {
             return [
                 { key: 'selected', thStyle: { width: '50px' }},
-                // { key: 'server_id', label: `${this.tr('SERVER')} ${this.tr('COL_NM.ID')}`, sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
                 { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '300px' }},
                 { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
                 { key: 'primary_ip_address', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true, thStyle: { width: '130px' }},
-                { 
-                    key: 'core', 
-                    label: this.tr('COL_NM.CORE'), 
-                    sortable: true, 
-                    ajaxSortable: false,
-                    filterByFormatted: true,
-                    formatter: (val, key, data) => {
-                        return data.data.base.core;
-                    },
-                    thStyle: { width: '100px' }
-                },
-                { 
-                    key: 'memory', 
-                    label: this.tr('COL_NM.MEMORY'), 
-                    sortable: true, 
-                    ajaxSortable: false,
-                    filterByFormatted: true,
-                    formatter: (val, key, data) => {
-                        return data.data.base.memory;
-                    },
-                    thStyle: { width: '100px' }
-                },
+                { key: 'core', label: this.tr('COL_NM.CORE'), sortable: true, formatter: this.baseFormatter,thStyle: { width: '100px' }},
+                { key: 'memory', label: this.tr('COL_NM.MEMORY'), sortable: true, formatter: this.baseFormatter, thStyle: { width: '100px' }},
                 { key: 'os_type', label: this.tr('COL_NM.O_TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '100px' }},
-                { 
-                    key: 'os_distro', 
-                    label: this.tr('COL_NM.O_DIS'),
-                    sortable: true, 
-                    ajaxSortable: false,
-                    filterByFormatted: true,
-                    formatter: (val, key, data) => {
-                        if (this.isEmpty(data.data.os)) {
-                            return '';
-                        } else {
-                            return data.data.os.os_distro;
-                        }
-                    } ,
-                    thStyle: { width: '130px' }
-                },
+                { key: 'os_distro', label: this.tr('COL_NM.O_DIS'), sortable: true, formatter: this.osFormatter, thStyle: { width: '130px' }},
                 { key: 'server_type', label: this.tr('COL_NM.SE_TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '120px' }},
-                { 
-                    key: 'platform_type', 
-                    label: this.tr('COL_NM.PLATFORM'),
-                    sortable: true, 
-                    filterByFormatted: true,
-                    formatter: (val, key, data) => {
-                        if (data.data.vm) {
-                            return data.data.vm.platform_type;
-                        } else {
-                            return '';
-                        }
-                    } ,
-                    thStyle: { width: '100px' }
-                },
+                { key: 'platform_type', label: this.tr('COL_NM.PLATFORM'), sortable: true, formatter: this.vmFormatter, thStyle: { width: '100px' }},
                 { key: 'project', label: this.tr('COL_NM.PROJ'), sortable: true, formatter: this.projectFormatter, thStyle: { width: '180px' }},
-                { key: 'pool', label: this.tr('COL_NM.POOL'),sortable: true, filterByFormatted: true, formatter: this.poolFormatter, thStyle: { width: '180px' }},
-                {
-                    key: 'updated_at', 
-                    label: this.tr('COL_NM.UPDATE'), 
-                    sortable: true, 
-                    ajaxSortable: true,
-                    filterByFormatted: true,
+                { key: 'pool', label: this.tr('COL_NM.POOL'),sortable: true, formatter: this.poolFormatter, thStyle: { width: '180px' }},
+                { key: 'updated_at', label: this.tr('COL_NM.UPDATE'), sortable: true, ajaxSortable: true,
                     formatter: (val) => {
                         return this.getDatefromTimeStamp(val.seconds, localStorage.getItem('timezone'));
                     } ,
-                    thStyle: { width: '160px' }
-                }
+                    thStyle: { width: '160px' }}
             ];
         },
         multiInfoFields () {
@@ -403,14 +351,16 @@ export default {
         }
     },
     mounted() {
-        this.listProjects();
-        this.listServers();
+        this.init();
     },
     methods: {
-        reset() {
+        init () {
+            this.listProjects();
+            this.listServers();
+        },
+        reset () {
             this.servers = [];
             this.selectedItems = [];
-            this.$set(this.loadingState, 'project', true);
             this.$set(this.loadingState, 'server', true);
         },
         setQuery (limit, start, sort, filter, filterOr) {
@@ -594,7 +544,7 @@ export default {
             this.isRelease = false;
         },
         onClickConfirmChange () {
-            this.action();
+            this.action(); 
         },
         onClickCollectInfo () {
             this.listCollectors();
@@ -625,6 +575,15 @@ export default {
                 result = data.pool_info.name;
             } 
             return result;
+        },
+        osFormatter (val, key, data) {
+            return data.data.os ? data.data.os[key] : '';
+        },
+        baseFormatter (val, key, data) {
+            return data.data.base[key];
+        },
+        vmFormatter (val, key, data) {
+            return data.data.vm ? data.data.vm[key] : '';
         }
     }
 };

@@ -53,10 +53,9 @@ export default {
         fields () {
             return [
                 { key: 'user_id', label: this.tr('COL_NM.ID'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '150px' }},
-                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '300px' }},
-                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '150px' }},
-                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '130px' }},
-                { key: 'tags', label: this.tr('COL_NM.TAG'), sortable: true, formatter: this.userTagFormatter, thStyle: { width: '130px' }}
+                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '150px' }},
+                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '180px' }},
+                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '130px' }}
             ];
         }
     },
@@ -106,14 +105,6 @@ export default {
         },
         userInfoFormatter (val, key, data) {
             return data.user_info ? data.user_info[key] : '';
-        },
-        userTagFormatter (val, key, data) {
-            let keys = Object.keys(data.user_info.tags);
-            let results = '';
-            keys.map((key) => {
-                results += ` ${key}: ${data.user_info[key]}`;
-            });
-            return results;
         }
     }
 };
