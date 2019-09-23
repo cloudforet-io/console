@@ -192,7 +192,7 @@ export default {
             &.active {
                 border-top-left-radius: 5px;
                 border-top-right-radius: 5px;
-                box-shadow: 0px -7px 7px -1px rgba($black, 0.1);
+                // box-shadow: 0px -7px 7px -1px rgba($black, 0.1);
             }
             .nav-link {
                 border-bottom-left-radius: 0;
@@ -205,7 +205,7 @@ export default {
                     background-color: $white;
                 }
                 &:hover{
-                    font-weight: bold;
+                    background-color: $darkgray;
                 }
             }
         }
