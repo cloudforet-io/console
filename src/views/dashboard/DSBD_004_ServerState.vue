@@ -44,8 +44,7 @@ export default {
     props: {
         drawBy: {
             type: Object,
-            // default: null
-            default: () => ({ 'region_id': 'region-2a8873d89c8c' })
+            default: null
         },
         showTitle: {
             type: Boolean,
@@ -180,7 +179,7 @@ export default {
 .legend-container {
     .legend-card {
         @extend %sheet;
-        padding: 5px 10px;
+        padding: 5px;
         text-align: center;
         vertical-align: middle;
         background-color: $white;
