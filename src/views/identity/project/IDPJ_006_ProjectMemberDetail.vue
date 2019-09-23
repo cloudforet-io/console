@@ -9,7 +9,7 @@
                    :busy="isLoading"
                    :cardless="false"
                    searchable
-                   show-caption
+                   no-caption
                    underlined
                    plain-search
                    is-empty-search
@@ -187,7 +187,6 @@ export default {
             let param = {
                 query: this.searchQuery
             };
-            debugger;
             param[key] =  selected_id;
 
             if (this.selectedModalItems.length > 0){

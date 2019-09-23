@@ -54,8 +54,10 @@ export default {
         async onCreate () {
             const selected = this.$attrs['selected-data'].tree.getSelected()[0];
             if (this.isEmpty(this._.get(selected,'data.init'))) {
-                const url = selected.data.item_type === 'PROJECT_GROUP' ? '/identity/project-group/get' : '/identity/project/get';
-                let param = selected.data.item_type === 'PROJECT_GROUP' ? { project_group_id: selected.data.id } : { project_id:selected.data.id };
+                let param ={};
+                const url = `/inventory/${selected.data.item_type.toLowerCase()}/get`;
+                const key = `${selected.data.item_type.toLowerCase()}_id`;
+                param[key] = selected.data.id;
                 await this.$axios.post(url, param).then((response) => {
                     const selectedTags = response.data.tags;
                     if (!this.isEmpty(selectedTags)){
