@@ -200,6 +200,8 @@ export const ko ={
         VERIFIED: '검증완료',
         JOB_ID: '잡(Job) 아이디',
         COL_MODE: '수집 모드',
+        LAST_SCHEDULED: '최종 스케줄 실행일',
+        SCHEDULE: '스케줄',
         COL_ID: '컬렉터 아이디',
         VERSION: '버젼 정보',
         CRT_COUNT: '생성 카운트',

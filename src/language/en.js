@@ -202,6 +202,8 @@ export const en = {
         DEF_COL_STATE: 'Default Collect State',
         JOB_ID: 'Job ID',
         COL_MODE: 'Collect mode',
+        LAST_SCHEDULED: 'Last Scheduled',
+        SCHEDULE: 'Schedule',
         COL_DATA: 'Collect Data',
         COL_ID: 'Collector ID',
         VERSION: 'Version',

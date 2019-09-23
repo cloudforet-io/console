@@ -56,33 +56,11 @@ export default {
         fields () {
             return [
                 { key: 'selected', thStyle: { width: '50px' }},
-                { key: 'job_id', label: this.tr('COL_NM.JOB_ID'), sortable: true, ajaxSortable: true, thStyle: { width: '120px' }},
-                { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '120px' }},
+                { key: 'job_id', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '120px' }},
+                { key: 'state', label: this.tr('COL_NM.SCHEDULE'), sortable: true, ajaxSortable: true, thStyle: { width: '120px' }},
                 { key: 'collect_mode', label: this.tr('COL_NM.COL_MODE'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
-                { key: 'created_count', label: this.tr('COL_NM.CRT_COUNT'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
-                { key: 'updated_count', label: this.tr('COL_NM.UPT_COUNT'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
-                {
-                    key: 'created_at',
-                    label: this.tr('COL_NM.CREATED'),
-                    sortable: true,
-                    ajaxSortable: true,
-                    filterByFormatted: true,
-                    formatter: (val) => {
-                        return this.getComputedTime(val, localStorage.getItem('timezone'));
-                    } ,
-                    thStyle: { width: '160px' }
-                },
-                {
-                    key: 'finished_at',
-                    label: this.tr('COL_NM.FINISHED'),
-                    sortable: true,
-                    ajaxSortable: true,
-                    filterByFormatted: true,
-                    formatter: (val) => {
-                        return this.getComputedTime(val, localStorage.getItem('timezone'));
-                    } ,
-                    thStyle: { width: '160px' }
-                }
+                { key: 'updated_count', label: this.tr('COL_NM.LAST_SCHEDULED'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
+                { key: 'name', label: this.tr('COL_NM.CREATED'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
             ];
         }
     },
