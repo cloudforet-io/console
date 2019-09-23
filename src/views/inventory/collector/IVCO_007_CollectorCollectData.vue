@@ -61,7 +61,7 @@
                             :label-cols="5"
                             type="input"
                             :options="CollectModeList"
-                            :placeholder="tr('FORM.SELECT', [tr('CREDENTIAL')])"
+                            :placeholder="'All'"
                     />
 
                     <BaseField
@@ -166,7 +166,7 @@ export default {
             last_collected_at: this.collectorData.last_collected_at,
             created_at: this.collectorData.created_at,
             tags: this.collectorData.tags,
-            credential: 'All',
+            credential: null,
             tableData: [],
             showValidation: false,
             collect_mode: 'ALL',
@@ -287,13 +287,11 @@ export default {
 
 
 <style lang="scss" scoped>
-    $left-card-height: calc((60vh)/2);
     .sel-collector {
         text-align: center;
     }
 
     .s-card {
-        min-height: calc(#{left-card-height});
         margin: 5px -5px 5px 10px;
     }
 
