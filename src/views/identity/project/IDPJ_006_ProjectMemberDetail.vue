@@ -81,7 +81,10 @@ export default {
                     start: 1, 
                     limit: 10
                 }, 
-                keyword: ''
+                keyword: '',
+                filter: [
+                    { key: 'user_id' ,value: this.$attrs.memebers, operator: 'not_in' }
+                ]
             },
             totalCount: 0,
             perPage: 10,
