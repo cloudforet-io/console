@@ -142,7 +142,7 @@ export default {
                     editable: false
                 }
             ];
-        },
+        }, 
         drawBy () {
             let id = this.summaryData.id;
             if (id) {
