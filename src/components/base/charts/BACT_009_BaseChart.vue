@@ -71,7 +71,6 @@ export default {
             return { ...DefaultExternals, ...this.externals };
         },
         chartOptions () {
-            console.log('chart option computed');
             return { ...DefaultOptions, ...this.options };
         },
         chartPlugins () {
