@@ -38,7 +38,7 @@
                        type="bubble"
                        :data="chartDataConfig"
                        :options="chartOptions"
-                       :width="500" :height="300"
+                       :width="450" :height="300"
             />
           </div>
         </div>

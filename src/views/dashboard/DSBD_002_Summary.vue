@@ -36,12 +36,12 @@ export default {
         return {
             isLoading: true,
             summaryData : {
-                server: {
-                    title: 'Server',
-                    count: 0
-                },
                 project: {
                     title: 'Project',
+                    count: 0
+                },
+                server: {
+                    title: 'Server',
                     count: 0
                 },
                 network: {

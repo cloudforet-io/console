@@ -179,7 +179,7 @@ export default {
 .legend-container {
     .legend-card {
         @extend %sheet;
-        padding: 5px 10px;
+        padding: 5px;
         text-align: center;
         vertical-align: middle;
         background-color: $white;
