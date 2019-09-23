@@ -215,23 +215,23 @@ export default {
                     key: 'info'
                 },
                 {
-                title: this.tr('PANEL.JOBS'),
-                key: 'jobs'
+                    title: this.tr('PANEL.JOBS'),
+                    key: 'jobs'
                 },
                 {
                     title: this.tr('PANEL.CREDENTIAL'),
                     key: 'credentials'
                 },
                 {
-                  title: this.tr('PANEL.SCHEDULE'),
-                  key: 'jobs'
+                    title: this.tr('PANEL.SCHEDULE'),
+                    key: 'jobs'
                 }
             ];
         },
         fields () {
             return [
                 { key: 'selected', thStyle: { width: '50px' }},
-                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
+                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '250px' }},
                 { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
                 { key: 'priority', label: this.tr('COL_NM.PRIORITY'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
                 { key: 'plugin_info', label: this.tr('COL_NM.RESOURCE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
