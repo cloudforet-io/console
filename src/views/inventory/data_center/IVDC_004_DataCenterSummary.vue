@@ -9,7 +9,7 @@
       <ServersByType :draw-by="drawBy" />
     </b-col>
     <b-col cols="6" class="pl-2 mt-3 mb-3">
-      <ItemsByRegion :draw-by="drawBy" />
+      <ItemsByRegion :draw-by="drawBy" :title="itemsByTitle" />
     </b-col>
   </b-row>
 </template>
@@ -120,6 +120,17 @@ export default {
                     return { region_id: id };
                 } else if (id.startsWith('zone')) {
                     return { zone_id: id };
+                }
+            } 
+            return null;
+        },
+        itemsByTitle () {
+            let id = this.summaryData.id;
+            if (id) {
+                if (id.startsWith('region')) {
+                    return 'Items by Region';
+                } else if (id.startsWith('zone')) {
+                    return 'Items by Zone';
                 }
             } 
             return null;
