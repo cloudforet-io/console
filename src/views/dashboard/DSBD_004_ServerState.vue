@@ -38,6 +38,13 @@ export default {
         BaseChart,
         BaseStateTag
     },
+    props: {
+        drawBy: {
+            type: Object,
+            // default: null
+            default: () => ({ 'region_id': 'region-2a8873d89c8c' })
+        }
+    },
     data() {
         return {
             serverStates: {
@@ -105,11 +112,20 @@ export default {
         },
         async listServerStates () {
             try {
-                let res = await this.$axios.post('/statistics/server-state');
+                let res = await this.$axios.post('/statistics/server-state', this.getParams());
                 this.serverStates = res.data;
             } catch (err) {
                 console.error(err);
             }
+        },
+        getParams () {
+            let params = {
+                domain_id: sessionStorage.getItem('domainId')
+            };
+            if (this.drawBy) {
+                this._.assignIn(params, this.drawBy);
+            }
+            return params;
         },
         updateCharts () {
             let chart = this.$refs.chart.chart;
@@ -118,9 +134,7 @@ export default {
         },
         updateChartDataConfig (chart) {
             chart.data.labels = this.chartDataConfig.labels;
-            this.chartDataConfig.datasets.map((dataset, idx) => {
-                chart.data.datasets[idx].data = dataset.data;
-            });
+            chart.data.datasets = this.chartDataConfig.datasets;
         }
     }
 };

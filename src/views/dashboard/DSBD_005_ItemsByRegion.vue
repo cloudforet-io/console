@@ -68,6 +68,13 @@ export default {
     components: {
         BaseChart
     },
+    props: {
+        drawBy: {
+            type: Object,
+            default: null
+            // default: () => ({ 'region_id': 'region-2a8873d89c8c' })
+        }
+    },
     data () {
         return {
             dropdownItems: {
@@ -170,15 +177,22 @@ export default {
         async listItems () {
             this.isLoading = true;
             try {
-                let res = await this.$axios.post('/statistics/datacenter-items', {
-                    item_type: this.selectedDropdownItem,
-                    domain_id: sessionStorage.getItem('domainId')
-                });
+                let res = await this.$axios.post('/statistics/datacenter-items', this.getParams());
                 this.items = res.data;
                 this.isLoading = false;
             } catch (err) {
                 console.error(err);
             }
+        },
+        getParams () {
+            let params = {
+                item_type: this.selectedDropdownItem,
+                domain_id: sessionStorage.getItem('domainId')
+            };
+            if (this.drawBy) {
+                this._.assignIn(params, this.drawBy);
+            }
+            return params;
         },
         initChart () {
             this.setChartDataConfig();
