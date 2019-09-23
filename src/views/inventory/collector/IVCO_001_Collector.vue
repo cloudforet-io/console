@@ -224,7 +224,7 @@ export default {
                 },
                 {
                     title: this.tr('PANEL.SCHEDULE'),
-                    key: 'jobs'
+                    key: 'schedule'
                 }
             ];
         },
