@@ -84,6 +84,6 @@ export default {
 <style lang="scss" scoped>
   .row-scroll {
     max-height: 150px;
-    overflow-y:scroll;
+    overflow-y: auto;
   }
 </style>
