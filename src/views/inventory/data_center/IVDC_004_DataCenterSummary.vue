@@ -1,10 +1,18 @@
 <template>
   <b-row no-gutters class="animated fadeIn mb-3 pb-5">
     <b-col cols="12" class="p-0">
-      <base-panel :panels="selectedSummaryData" />
+      <b-card class="base first-tab summary">
+        <base-panel :panels="selectedSummaryData" />
+      </b-card>
     </b-col>
-    <b-col cols="12" class="p-0 mt-2 mb-3">
+    <b-col cols="6" class="pr-2 mt-3 mb-3">
       <ItemsByRegion :draw-by="drawBy" />
+    </b-col>
+    <b-col cols="6" class="pl-2 mt-3 mb-3">
+      <ServersByType :draw-by="drawBy" />
+    </b-col>
+    <b-col cols="12" class="pl-2 mt-3 mb-3">
+      <ServerState :draw-by="drawBy" />
     </b-col>
     <!-- <b-row align-h="center">
       <b-col xs="10" lg="9" xl="6">
@@ -40,7 +48,9 @@
 import BaseTabs from '@/components/base/tab/BATA_001_BaseTab';
 import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import BaseTree from '@/components/base/tree/BATR_001_BaseTree';
+import ServerState from '@/views/dashboard/DSBD_004_ServerState';
 import ItemsByRegion from '@/views/dashboard/DSBD_005_ItemsByRegion';
+import ServersByType from '@/views/dashboard/DSBD_006_ServersByType';
 
 import { api } from '@/setup/api';
 const BasePanel = () => import('@/components/base/panel/BAPA_002_BasePanel');
@@ -61,7 +71,9 @@ export default {
         BaseChart,
         BasePanel,
         BasePanelCard,
-        ItemsByRegion
+        ServerState,
+        ItemsByRegion,
+        ServersByType
     },
     props: {
         summaryData: {
