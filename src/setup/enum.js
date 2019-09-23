@@ -47,6 +47,44 @@ export const GlobalEnum = {
     COLLECTOR: Object.freeze({
         AWS:[{ file_name: 'aws-ec2' ,src: 'aws-ec2.svg', text: 'EC2' }, { file_name: 'aws-network', src: 'aws-network.svg', text: 'Network' }]
     }),
+    JOB_STATE: Object.freeze(
+        {
+            PENDING: {
+                msg: 'Pending',
+                icon: 'fal fa-minus',
+                color: 'primary'
+            },
+            INPROGRESS: {
+                msg:  'In progress',
+                icon: 'fal fa-minus',
+                color: 'info'
+            },
+            SUCCESS: {
+                msg:  'Success',
+                icon: 'fal fa-check',
+                color: 'primary'
+            },
+            CREATED: {
+                msg: 'Created',
+                icon:  'fal fa-minus-circle',
+                color: 'warning'
+            },
+            FAILURE: {
+                msg: 'Failure',
+                icon:  'fal fa-traffic-cone',
+                color: 'danger'
+            },
+            TIMEOUT: {
+                msg: 'Time out',
+                icon:  'fal fa-traffic-cone',
+                color: 'secondary'
+            },
+            IDLE: {
+                msg: 'Idle',
+                icon:  'fal fa-traffic-cone',
+                color: 'secondary'
+            }
+        }),
     MEMBER_STATE: Object.freeze(
         {
             ENABLED: {
