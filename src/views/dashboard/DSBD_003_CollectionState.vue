@@ -1,5 +1,8 @@
 <template>
   <div class="">
+    <p v-if="showTitle" class="board-title">
+      Collection State
+    </p>
     <b-row align-h="end" class="m-0">
       <div class="dropdown-container">
         <b-dropdown no-caret right
@@ -74,6 +77,12 @@ export default {
     components: {
         BaseChart,
         BaseStateTag
+    },
+    props: {
+        showTitle: {
+            type: Boolean,
+            default: true
+        }
     },
     data () {
         return {

@@ -5,15 +5,9 @@
         <b-col cols="5">
           <b-row align-h="start">
             <b-col class="board" cols="12">
-              <p class="board-title">
-                Summary
-              </p>
-              <Summary />
+              <Summary title="Summary" />
             </b-col>
             <b-col class="board" cols="12">
-              <p class="board-title">
-                Server State
-              </p>
               <ServerState />
             </b-col>
           </b-row>
@@ -21,9 +15,6 @@
         <b-col cols="7">
           <b-row align-h="end">
             <b-col class="board" cols="12">
-              <p class="board-title">
-                Collection State
-              </p>
               <CollectionState />
             </b-col>
           </b-row>
@@ -33,9 +24,6 @@
         <b-col cols="5">
           <b-row>
             <b-col class="board" cols="12">
-              <p class="board-title">
-                Items by Region
-              </p>
               <ItemsByRegion />
             </b-col>
           </b-row>
@@ -43,9 +31,6 @@
         <b-col cols="7">
           <b-row align-h="end">
             <b-col class="board" cols="12">
-              <p class="board-title">
-                Servers by Type
-              </p>
               <ServersByType />
             </b-col>
           </b-row>
@@ -105,12 +90,6 @@ export default {
         .board {
             margin: 0 0 40px 0;
             max-width: 100%;
-        }
-        .board-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-bottom: 1px solid lightgray;
-            padding-bottom: 10px;
         }
     }
 }

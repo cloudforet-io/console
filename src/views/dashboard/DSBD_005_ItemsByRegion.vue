@@ -1,5 +1,8 @@
 <template>
   <div>
+    <p v-if="showTitle" class="board-title">
+      Items by Region
+    </p>
     <b-row align-h="end" class="m-0">
       <div class="dropdown-container">
         <b-button variant="outline-light" 
@@ -73,6 +76,10 @@ export default {
             type: Object,
             default: null
             // default: () => ({ 'region_id': 'region-2a8873d89c8c' })
+        },
+        showTitle: {
+            type: Boolean,
+            default: true
         }
     },
     data () {
@@ -159,7 +166,16 @@ export default {
     watch: {
         isReadyToDrawChart (val) {
             if (val) {
-                this.updateChart();
+                if (this.drawBy) {
+                    this.updateDataAndChart();
+                } else {
+                    this.updateChart();
+                }
+            }
+        },
+        drawBy (obj) {
+            if (obj) {
+                this.isLoading = true;
             }
         }
     },
@@ -175,7 +191,6 @@ export default {
             this.initChart();
         },
         async listItems () {
-            this.isLoading = true;
             try {
                 let res = await this.$axios.post('/statistics/datacenter-items', this.getParams());
                 this.items = res.data;
@@ -250,6 +265,10 @@ export default {
             chart.options.scales.yAxes[0].ticks.max = this.maxY + pad;
             chart.options.scales.xAxes[0].ticks.min = this.minX - pad;
             chart.options.scales.xAxes[0].ticks.max = this.maxX + pad;
+        },
+        async updateDataAndChart () {
+            await this.listItems();
+            this.updateChart();
         },
         updateChart () {
             let chart = this.$refs.chart.chart;
