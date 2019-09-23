@@ -106,12 +106,7 @@ export default {
         async listServerStates () {
             try {
                 let res = await this.$axios.post('/statistics/server-state');
-                // this.serverStates = res.data;
-                this.serverStates = {
-                    INSERVICE: 6,
-                    MAINTENANCE: 5,
-                    CLOSED: 1
-                };
+                this.serverStates = res.data;
             } catch (err) {
                 console.error(err);
             }

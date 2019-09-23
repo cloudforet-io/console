@@ -265,5 +265,8 @@ export default {
         background: linear-gradient(to right, $blue, $violet);
         box-shadow: 0 0 5px 1px rgba($navy, 0.3);
         color: $white;
+        &:hover {
+            color: $white;
+        }
     }
 </style>

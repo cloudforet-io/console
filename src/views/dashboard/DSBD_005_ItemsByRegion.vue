@@ -74,21 +74,6 @@ export default {
                 server: 'Server'
             },
             selectedDropdownItem: 'server',
-            regionData: [{
-                id: 'aws_seoul',
-                name: 'AWS Seoul',
-                count: 21
-            },
-            {
-                id: 'aws_hk',
-                name: 'AWS HongKong',
-                count: 4
-            },
-            {
-                id: 'aws_sp',
-                name: 'AWS Singapore',
-                count: 7
-            }],
             chartOptions: {
                 legendPad: {
                     bottom: 20
@@ -138,6 +123,10 @@ export default {
             {
                 backgroundColor:'rgba(226,0,79,0.8)',
                 hoverBackgroundColor: 'rgba(226,0,79,1.0)'
+            },
+            {
+                backgroundColor:'rgba(251,78,22,0.8)',
+                hoverBackgroundColor: 'rgba(251,78,22,1.0)'
             }],
             minX: 1,
             maxX: 600,
@@ -146,15 +135,51 @@ export default {
             radius: 3,
             minRegionCount: 0,
             maxRegionCount: 0,
-            chartDataConfig: null
+            chartDataConfig: {},
+            items: {},
+            isLoading: true,
+            isMounted: false
         };
     },
     computed: {
+        regionData () {
+            return this._.values(this.items);
+        },
+        isReadyToDrawChart () {
+            return !this.isLoading && this.isMounted;
+        }
+    },
+    watch: {
+        isReadyToDrawChart (val) {
+            if (val) {
+                this.updateChart();
+            }
+        }
     },
     created () {
-        this.initChart();
+        this.init();
+    },
+    mounted () {
+        this.isMounted = true;
     },
     methods: {
+        async init () {
+            await this.listItems();
+            this.initChart();
+        },
+        async listItems () {
+            this.isLoading = true;
+            try {
+                let res = await this.$axios.post('/statistics/datacenter-items', {
+                    item_type: this.selectedDropdownItem,
+                    domain_id: sessionStorage.getItem('domainId')
+                });
+                this.items = res.data;
+                this.isLoading = false;
+            } catch (err) {
+                console.error(err);
+            }
+        },
         initChart () {
             this.setChartDataConfig();
             this.setChartOptions();  
@@ -205,9 +230,17 @@ export default {
             this.chartOptions.scales.xAxes[0].ticks.min = this.minX - pad;
             this.chartOptions.scales.xAxes[0].ticks.max = this.maxX + pad;
         },
+        updateChartOptions (chart) {
+            let pad = 100;
+            chart.options.scales.yAxes[0].ticks.min = this.minY - pad;
+            chart.options.scales.yAxes[0].ticks.max = this.maxY + pad;
+            chart.options.scales.xAxes[0].ticks.min = this.minX - pad;
+            chart.options.scales.xAxes[0].ticks.max = this.maxX + pad;
+        },
         updateChart () {
             let chart = this.$refs.chart.chart;
             chart.data.datasets = this.getDatasets();
+            this.updateChartOptions(chart);
             chart.update();
         },
         onSelectDropdownItem (key) {
@@ -251,6 +284,7 @@ export default {
         border: 0;
         border-left: 5px solid;
         padding: 7px 15px;
+        margin-bottom: 10px;
         .title {
             margin-bottom: 5px;
         }
