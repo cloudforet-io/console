@@ -44,8 +44,7 @@ export default {
     props: {
         drawBy: {
             type: Object,
-            // default: null
-            default: () => ({ 'region_id': 'region-2a8873d89c8c' })
+            default: null
         },
         showTitle: {
             type: Boolean,
