@@ -2,6 +2,10 @@
   <div>
     <b-row>
       <b-col class="col-xs-12 col-sm-12 col-md-4">
+        <loading :active.sync="modalLoading"
+                 :can-cancel="true"
+                 :on-cancel="onCancel"
+                 :is-full-page="fullPage"></loading>
         <div>
           <b-card class="s-card" style="border:none;">
             <b-row class="justify-content-md-center">
@@ -59,7 +63,6 @@
                             v-model="credential"
                             :label="`${tr('CREDENTIAL')} : `"
                             :label-cols="5"
-                            type="input"
                             :options="CollectModeList"
                             :placeholder="'All'"
                     />
@@ -115,7 +118,9 @@
 </template>
 <script>
 import BaseField from '@/components/base/form/BAFM_001_BaseField.vue';
+import Loading from 'vue-loading-overlay';
 
+import 'vue-loading-overlay/dist/vue-loading.css';
 const collectorModel = {
     collector_id: null,
     name: null,
@@ -132,7 +137,8 @@ const collectorModel = {
 export default {
     name: 'CollectorCollectData',
     components: {
-        BaseField
+        BaseField,
+        Loading
     },
     props: {
         collectorData: {
@@ -156,6 +162,8 @@ export default {
                 filterValidation: null,
                 filterType: null
             },
+            modalLoading: false,
+            fullPage: true,
             filterFormat: this.collectorData.plugin_info.options.filter_format,
             collector_id: this.collectorData.collector_id,
             name: this.collectorData.name,
@@ -264,16 +272,19 @@ export default {
         },
         async onDataCollect() {
             if (this.validateFilters()){
+                this.modalLoading = true;
                 await this.$axios.post('/inventory/collector/collect', {
                     collector_id: this.collector_id,
                     domain_id:  sessionStorage.getItem('domainId'),
                     filter: this.filterObject.filterInput,
                     collect_mode: this.collect_mode
                 }).then((response) => {
+                    this.modalLoading = false;
                     this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('BTN_COL_DATA'), this.tr('PROCESSED')]));
                     this.$emit('cancel');
                 }).catch((error) => {
                     console.error(e);
+                    this.modalLoading = false;
                     this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('BTN_COL_DATA'), this.tr('COLLECTOR')]));
                 });
             }

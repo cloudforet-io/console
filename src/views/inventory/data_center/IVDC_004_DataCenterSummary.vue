@@ -114,25 +114,25 @@ export default {
             ];
         }, 
         drawBy () {
-            let id = this.summaryData.id;
-            if (id) {
-                if (id.startsWith('region')) {
-                    return { region_id: id };
-                } else if (id.startsWith('zone')) {
-                    return { zone_id: id };
-                }
-            } 
-            return null;
+
+            let param = {};
+            let id = this.$attrs["selected-data"].node.data.id;
+            const key = `${this.$attrs["selected-data"].node.data.item_type.toLowerCase()}_id`;
+            param[key] = id;
+
+            return param;
+
         },
         itemsByTitle () {
-            let id = this.summaryData.id;
-            if (id) {
-                if (id.startsWith('region')) {
-                    return 'Items by Region';
-                } else if (id.startsWith('zone')) {
+            const group = this.$attrs["selected-data"].node.data.item_type;
+            console.log(group);
+            if (group) {
+                if (group == 'REGION') {
                     return 'Items by Zone';
+                } else if (group == 'ZONE') {
+                    return 'Items by Pool';
                 }
-            } 
+            }
             return null;
         }
     },

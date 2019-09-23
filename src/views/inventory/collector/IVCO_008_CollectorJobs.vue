@@ -6,6 +6,7 @@
                :caption-width="500"
                :search-width="300"
                :busy="isLoading"
+               state-type="JOB_STATE"
                :per-page="query.page.limit"
                :total-rows="totalCount"
                plain-search
@@ -152,30 +153,18 @@ export default {
 
             this.reset();
             this.setQuery(limit, start, sort, keyword);
-            debugger;
-            try {
 
-                if (!this.isEmpty(credential_group_id)) {
-                    let response = await this.getJobs(credential_group_id, 'credential-group');
-                    if (!this.isEmpty(response.data)) {
-                        const credentails = response.data.results[0].credentials;
-                        mergeGroup = credentails;
-                    }
-                }
-
-                if (!this.isEmpty(credential_id)) {
-                    let response = await this.getJobs(credential_id, 'credential');
-                    if (!this.isEmpty(response.data)) {
-                        this.tableData = this.isEmpty(mergeGroup) ? response.data.results : merge(mergeGroup, response.data.results, 'credential_id');
-                    }
-                }
-
-                this.totalCount = this.tableData.length;
-
-            } catch (err) {
-                this.alertError(err);
-            }
-            this.isLoading = false;
+            let param = { query: this.query,
+                domain_id: sessionStorage.domainId,
+                collector_id: this.isEmpty(this.collectorData.collector_id)? '': this.collectorData.collector_id };
+            await this.$axios.post('/inventory/job/list', param).then((response) => {
+                this.tableData = response.data.results;
+                this.totalCount = response.data.total_count;
+                this.isLoading = false;
+            }).catch((error) => {
+                this.isLoading = false;
+                console.error(error);
+            });
         },
         reset() {
             this.isLoading = true;

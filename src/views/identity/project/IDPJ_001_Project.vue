@@ -314,7 +314,6 @@ export default {
             }
         },
         async updateProject(items) {
-            debugger;
             this.consoleLogEnv('Update Project : ', items);
             const itemType = items.tree.getSelected()[0].data.item_type;
             const selectedId = items.tree.getSelected()[0].data.id;
