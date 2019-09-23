@@ -158,8 +158,15 @@ export default {
     },
     watch: {
         isReadyToDrawChart (val) {
+            console.log('isReadyToDrawChart watched', val);
             if (val) {
                 this.updateChart();
+            }
+        },
+        drawBy (obj) {
+            console.log('drawby watched', obj);
+            if (obj) {
+                this.listItems();
             }
         }
     },

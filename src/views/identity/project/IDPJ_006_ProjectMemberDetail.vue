@@ -9,7 +9,7 @@
                    :busy="isLoading"
                    :cardless="false"
                    searchable
-                   show-caption
+                   no-caption
                    underlined
                    plain-search
                    is-empty-search
