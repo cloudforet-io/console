@@ -83,7 +83,7 @@ export default {
         },
         title: {
             type: String,
-            default: ''
+            default: 'Items by Region'
         }
     },
     data () {
