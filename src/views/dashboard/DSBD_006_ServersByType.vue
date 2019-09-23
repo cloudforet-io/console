@@ -46,6 +46,13 @@ export default {
     components: {
         BaseChart
     },
+    props: {
+        drawBy: {
+            type: Object,
+            default: null
+            // default: () => ({ 'region_id': 'region-2a8873d89c8c' })
+        }
+    },
     data () {
         return {
             colorSets: [
@@ -112,14 +119,21 @@ export default {
         },
         async listData (itemType) {
             try {
-                let res = await this.$axios.post('/statistics/server-type', {
-                    domain_id: sessionStorage.getItem('domainId'),
-                    item_type: itemType
-                });
+                let res = await this.$axios.post('/statistics/server-type', this.getParams(itemType));
                 this.setData(itemType, res.data);
             } catch (err) {
                 console.error(err);
             }
+        },
+        getParams (itemType) {
+            let params = {
+                domain_id: sessionStorage.getItem('domainId'),
+                item_type: itemType
+            };
+            if (this.drawBy) {
+                this._.assignIn(params, this.drawBy);
+            }
+            return params;
         },
         setData (itemType, data) {
             if (itemType === 'vm_type') {

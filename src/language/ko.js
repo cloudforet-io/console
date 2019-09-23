@@ -132,6 +132,7 @@ export const ko ={
         ID: '아이디',
         UID: '유저 아이디',
         NAME: '이름',
+        IMAGE: '이미지',
         EMAIL: '이메일',
         PHONE: '전화번호',
         GROUP: '그룹',
@@ -220,6 +221,9 @@ export const ko ={
     PANEL: {
         BASE_INFO: '기본 정보',
         DETAILS: '세부 항목',
+        DATA: '데이터',
+        RAWDATA: 'Raw Data',
+        ADMIN: '관리자',
         TAG: '태그',
         INFO: '정보',
         CREDENTIAL: '크레덴셜(Credentials)',

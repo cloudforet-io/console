@@ -129,8 +129,8 @@ export default {
         },
         vmInfo () {
             return [
-                { title: `${this.tr('VM')} ${this.tr('ID')}`, contents: this.vm.vm_id, copyFlag: true },
-                { title: `${this.tr('VM')} ${this.tr('COL_NM.NAME')}`, contents: this.vm.vm_name, copyFlag: true },
+                { title: `${this.tr('VM')} ${this.tr('COL_NM.ID')}`, contents: this.vm.vm_id, copyFlag: true },
+                { title: `${this.tr('VM')} ${this.tr('COL_NM.IMAGE')}`, contents: this.vm.vm_name, copyFlag: true },
                 { title: this.tr('COL_NM.PLATFORM'), badge: this.vm.platform_type, badgeType: 'PLATFORM_TYPE',copyFlag: true },
                 { title: this.tr('COL_NM.HOST'), contents: this.vm.image, copyFlag: true },
                 { title: this.tr('COL_NM.CREATE'), contents: this.getDate(this.vm.created_at), copyFlag: true }

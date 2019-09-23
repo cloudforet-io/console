@@ -179,7 +179,7 @@
                 :is-footer-visible="false"
                 use-slot
     >
-      <template #summary>
+      <template #details>
         <b-card class="base first-tab">
           <BaseMultiPanel v-if="isMultiSelected" 
                           :data="selectedServers"
@@ -287,15 +287,15 @@ export default {
         tabs () {
             if (this.isMultiSelected) {
                 return [
-                    { key: 'summary', title: this.tr('COL_NM.C_SUMMARY') },
-                    { key: 'admin', title: this.tr('COL_NM.C_ADMIN') }
+                    { key: 'details', title: this.tr('PANEL.DETAILS') },
+                    { key: 'admin', title: this.tr('PANEL.ADMIN') }
                 ];
             }
             return [
-                { key: 'summary', title: this.tr('COL_NM.C_SUMMARY')  },
-                { key: 'data', title: this.tr('COL_NM.C_DT') },
-                { key: 'rawData', title: this.tr('COL_NM.C_RAW_DT') },
-                { key: 'admin', title: this.tr('COL_NM.C_ADMIN') }
+                { key: 'details', title: this.tr('PANEL.DETAILS')  },
+                { key: 'data', title: this.tr('PANEL.DATA') },
+                { key: 'rawData', title: this.tr('PANEL.RAWDATA') },
+                { key: 'admin', title: this.tr('PANEL.ADMIN') }
             ];  
         },
         fields () {
