@@ -7,7 +7,7 @@
       <ServersByType :draw-by="drawBy" />
     </b-col>
     <b-col cols="6" class="pl-2 mt-3 mb-3">
-      <ItemsByRegion :draw-by="drawBy" />
+      <ItemsByRegion :draw-by="drawBy" title="Items by Region" />
     </b-col>
   </b-row>
 </template>
@@ -112,15 +112,7 @@ export default {
             ];
         },
         drawBy () {
-            let id = this.summaryData.id;
-            if (id) {
-                if (id.startsWith('region')) {
-                    return { region_id: id };
-                } else if (id.startsWith('zone')) {
-                    return { zone_id: id };
-                }
-            } 
-            return null;
+            return { project_id: this.summaryData.id };
         }
     },
     created: function () {

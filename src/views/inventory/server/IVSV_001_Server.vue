@@ -400,7 +400,6 @@ export default {
                     domain_id: sessionStorage.getItem('domainId')
                 });
                 this.servers = res.data.results;
-                this.servers[0].project_id = 'project-c06a33191f2c';
                 this.totalCount = res.data.total_count;
                 this.$set(this.loadingState, 'server', false);
             } catch (e) {
