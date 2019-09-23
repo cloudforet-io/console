@@ -360,6 +360,9 @@ export default {
             return this.width - (this.pad * 2);
         },
         captionContainerWidth () {
+            if (this.noCaption) {
+                return 0;
+            }
             return this.captionWidth > this.width ? this.width : this.captionWidth;
         },
         toolContainerWidth () {
