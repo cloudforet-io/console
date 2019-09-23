@@ -225,6 +225,7 @@ export const ko ={
         CREDENTIAL: '크레덴셜(Credentials)',
         JOBS: '잡(Jobs)',
         NO_ITEM: '{0} 없음',
+        SCHEDULE: '스케줄',
         NO_SELECT: '위에서 {0} 을(를) 선택하세요.',
         VM: 'VM',
         COMPUTE: 'Compute',

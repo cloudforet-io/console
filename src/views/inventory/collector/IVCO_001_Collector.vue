@@ -132,6 +132,9 @@
       <template #jobs>
         <CollectorJobs :collector-data="selectedItems[0].data" />
       </template>
+      <template #schedule>
+        <CollectorSchedule :collector-data="selectedItems[0].data" />
+      </template>
     </BaseTabNav>
     <div v-else class="empty">
       <span class="msg"> {{ tr('PANEL.NO_SELECT', [tr('COLLECTOR')]) }} </span>
@@ -152,6 +155,7 @@ import CollectorCredentials  from '@/views/inventory/collector/IVCO_006_Collecto
 import CollectorCollectData  from '@/views/inventory/collector/IVCO_007_CollectorCollectData';
 import CollectorJobs  from '@/views/inventory/collector/IVCO_008_CollectorJobs';
 import ActionCheckModal  from '@/components/base/modal/BAMO_003_EXT_ActionCheckModal.vue';
+import CollectorSchedule from '@/views/inventory/collector/IVCO_009_CollectorSchedule';
 
 export default {
     name: 'Collector',
@@ -164,6 +168,7 @@ export default {
         BaseModal,
         CollectorCollectData,
         CollectorCredentials,
+        CollectorSchedule,
         CollectorJobs,
         ActionCheckModal
     },
@@ -210,12 +215,16 @@ export default {
                     key: 'info'
                 },
                 {
+                title: this.tr('PANEL.JOBS'),
+                key: 'jobs'
+                },
+                {
                     title: this.tr('PANEL.CREDENTIAL'),
                     key: 'credentials'
                 },
                 {
-                    title: this.tr('PANEL.JOBS'),
-                    key: 'jobs'
+                  title: this.tr('PANEL.SCHEDULE'),
+                  key: 'jobs'
                 }
             ];
         },
