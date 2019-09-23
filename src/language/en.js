@@ -230,6 +230,7 @@ export const en = {
         INFO: 'Info',
         CREDENTIAL: 'Credentials',
         JOBS: 'Jobs',
+        SCHEDULE: 'Schedules',
         NO_ITEM: 'No {0}',
         NO_SELECT: 'Select a {0} Above.',
         VM: 'VM',

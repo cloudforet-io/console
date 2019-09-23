@@ -314,10 +314,11 @@ export default {
             }
         },
         async updateProject(items) {
+            debugger;
             this.consoleLogEnv('Update Project : ', items);
             const itemType = items.tree.getSelected()[0].data.item_type;
             const selectedId = items.tree.getSelected()[0].data.id;
-            const url = `/inventory/${itemType.toLowerCase()}/update`;
+            const url = `/identity/${this.replaceAll(itemType,'_','-').toLowerCase()}/update`;
             const key = `${itemType.toLowerCase()}_id`;
             let param = this.validateProject();
             if (!this.isEmpty(param)){
@@ -340,7 +341,7 @@ export default {
         async deletedSelectedOnTree (pramTree){
             const itemType = pramTree.tree.getSelected()[0].data.item_type;
             const selectedId = pramTree.tree.getSelected()[0].data.id;
-            const url = `/inventory/${itemType.toLowerCase()}/delete`;
+            const url = `/identity/${this.replaceAll(itemType,'_','-').toLowerCase()}/delete`;
             const key = `${itemType.toLowerCase()}_id`;
             let passParam = { domain_id: sessionStorage.domainId };
             passParam[key] = selectedId;
