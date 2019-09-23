@@ -1,11 +1,14 @@
 <template>
   <div>
+    <p v-if="showTitle" class="board-title">
+      Server State
+    </p>
     <div class="chart">
       <BaseChart ref="chart" 
                  type="horizontalBar"
                  :data="chartDataConfig"
                  :options="chartOptions"
-                 :width="500" :height="70"
+                 :width="550" :height="50"
       />
     </div>
     <b-row align-h="between" class="legend-container">
@@ -43,6 +46,10 @@ export default {
             type: Object,
             // default: null
             default: () => ({ 'region_id': 'region-2a8873d89c8c' })
+        },
+        showTitle: {
+            type: Boolean,
+            default: true
         }
     },
     data() {
@@ -80,10 +87,15 @@ export default {
                     }]
                 },
                 legend: { display: false }
-            }
+            },
+            isMounted: false,
+            isLoading: true
         };
     },
     computed: {
+        isReadyToDrawChart () {
+            return !this.isLoading && this.isMounted;
+        },
         chartDataConfig () {
             return {
                 labels: this._.keys(this.serverStates),
@@ -102,18 +114,37 @@ export default {
             return this._.sum(this._.values(this.serverStates));
         }
     },
+    watch: {
+        isReadyToDrawChart (val) {
+            if (val) {
+                if (this.drawBy) {
+                    this.updateDataAndChart();
+                } else {
+                    this.updateCharts();
+                }
+            }
+        },
+        drawBy (obj) {
+            if (obj) {
+                this.isLoading = true;
+            }
+        }
+    },
     created () {
         this.init();
+    },
+    mounted () {
+        this.isMounted = true;
     },
     methods: {
         async init () {
             await this.listServerStates();
-            this.updateCharts();
         },
         async listServerStates () {
             try {
                 let res = await this.$axios.post('/statistics/server-state', this.getParams());
                 this.serverStates = res.data;
+                this.isLoading = false;
             } catch (err) {
                 console.error(err);
             }
@@ -135,6 +166,10 @@ export default {
         updateChartDataConfig (chart) {
             chart.data.labels = this.chartDataConfig.labels;
             chart.data.datasets = this.chartDataConfig.datasets;
+        },
+        async updateDataAndChart () {
+            await this.listServerStates();
+            this.updateCharts();
         }
     }
 };
@@ -148,6 +183,7 @@ export default {
         padding: 5px 10px;
         text-align: center;
         vertical-align: middle;
+        background-color: $white;
         .title {
             font-size: 1.2em;
             margin-bottom: 5px;

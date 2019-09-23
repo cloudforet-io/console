@@ -1,42 +1,47 @@
 <template>
-  <b-row>
-    <b-col v-for="(data, type) in chartDataList" 
-           :key="type" 
-           cols="6"
-    >
-      <b-row>
-        <b-col cols="12">
-          <div class="chart-container">
-            <div class="chart">
-              <BaseChart ref="chart"
-                         :key="type"
-                         :data="getChartDataConfig(type)"
-                         :options="getChartOptions(type)"
-                         :width="200" :height="200"
-              />
+  <div>
+    <p v-if="showTitle" class="board-title">
+      Servers by Type
+    </p>
+    <b-row>
+      <b-col v-for="(data, type) in chartDataList" 
+             :key="type" 
+             cols="6"
+      >
+        <b-row>
+          <b-col cols="12">
+            <div class="chart-container">
+              <div class="chart">
+                <BaseChart ref="chart"
+                           :key="type"
+                           :data="getChartDataConfig(type)"
+                           :options="getChartOptions(type)"
+                           :width="200" :height="200"
+                />
+              </div>
             </div>
-          </div>
-        </b-col>
-        <b-col cols="12">
-          <div class="legend-container">
-            <div v-for="(count, label, idx) in data" 
-                 :key="label"
-                 cols="4"
-                 class="legend"
-            >
-              <span class="indicator"
-                    :style="{ color: colorSets[idx] }"
+          </b-col>
+          <b-col cols="12">
+            <div class="legend-container">
+              <div v-for="(count, label, idx) in data" 
+                   :key="label"
+                   cols="4"
+                   class="legend"
               >
-                <i class="fas fa-square" />
-              </span>
-              <span class="title">{{ label }}</span>
-              <span class="count">{{ count }}</span>
+                <span class="indicator"
+                      :style="{ color: colorSets[idx] }"
+                >
+                  <i class="fas fa-square" />
+                </span>
+                <span class="title">{{ label }}</span>
+                <span class="count">{{ count }}</span>
+              </div>
             </div>
-          </div>
-        </b-col>
-      </b-row>
-    </b-col>
-  </b-row>
+          </b-col>
+        </b-row>
+      </b-col>
+    </b-row>
+  </div>
 </template>
 
 <script>
@@ -51,6 +56,10 @@ export default {
             type: Object,
             default: null
             // default: () => ({ 'region_id': 'region-2a8873d89c8c' })
+        },
+        showTitle: {
+            type: Boolean,
+            default: true
         }
     },
     data () {
@@ -77,11 +86,13 @@ export default {
                 vm: true,
                 os: true
             },
-            isLoading: true
+            isLoading: true,
+            isMounted: false
         };
     },
     computed: {
         chartDataList () {
+            console.log('data computed');
             return  {
                 'vm_type': this.vmData,
                 'os_type': this.osData
@@ -89,6 +100,9 @@ export default {
         },
         chartTypes () {
             return this._.keys(this.chartDataList);
+        },
+        isReadyToDrawChart () {
+            return !this.isLoading && this.isMounted;
         }
     },
     watch: {
@@ -102,14 +116,28 @@ export default {
                 }
             }
         },
-        isLoading (val) {
-            if (!val) {
-                this.updateChart();
+        drawBy (obj) {
+            if (obj) {
+                this.resetLoadingState();
+                this.init();
+            }
+        },
+        isReadyToDrawChart (val) {
+            if (val) {
+                if (this.drawBy) {
+                    this.updateDataAndChart();
+                } else {
+                    this.updateChart();
+                }
+                
             }
         }
     },
     created () {
         this.init();
+    },
+    mounted() {
+        this.isMounted = true;
     },
     methods: {
         init () {
@@ -154,6 +182,13 @@ export default {
             });
             this.loadingState.os = false;
         },
+        resetLoadingState () {
+            this.loadingState = {
+                vm: true,
+                os: true
+            };
+            this.isLoading = true;
+        },
         getCenterText (key) {
             return key.split('_')[0].toUpperCase();
         },
@@ -197,6 +232,15 @@ export default {
         },
         updateChart () {
             this.$refs.chart.map((ref) => {
+                this.updateChartDataConfig(ref.chart, ref.$vnode.key);
+                this.updateChartOptions(ref.chart, ref.$vnode.key);
+                ref.chart.update();
+            });
+        },
+        async updateDataAndChart () {
+            await this.chartTypes.map(async (item, idx) => {
+                await this.listData(item);
+                let ref = this.$refs.chart[idx];
                 this.updateChartDataConfig(ref.chart, ref.$vnode.key);
                 this.updateChartOptions(ref.chart, ref.$vnode.key);
                 ref.chart.update();

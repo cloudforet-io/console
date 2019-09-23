@@ -1,16 +1,21 @@
 <template>
-  <div class="board-container">
-    <Spinner v-model="isLoading" />
-    <template v-if="!isLoading">
-      <div v-for="(item, key) in summaryData" :key="key" class="board">
-        <p class="title">
-          {{ item.title }}
-        </p>
-        <span class="count">
-          {{ item.count }}
-        </span>
-      </div>
-    </template>
+  <div>
+    <p v-if="showTitle" class="board-title">
+      Summary
+    </p>
+    <div class="board-container">
+      <Spinner v-model="isLoading" />
+      <template v-if="!isLoading">
+        <div v-for="(item, key) in summaryData" :key="key" class="board">
+          <p class="title">
+            {{ item.title }}
+          </p>
+          <span class="count">
+            {{ item.count }}
+          </span>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -20,6 +25,12 @@ export default {
     name: 'Summary',
     components: {
         Spinner
+    },
+    props: {
+        showTitle: {
+            type: Boolean,
+            default: true
+        }
     },
     data () {
         return {
