@@ -1,7 +1,7 @@
 <template>
   <div>
     <p v-if="showTitle" class="board-title">
-      Items by Region
+      {{ title }}
     </p>
     <b-row align-h="end" class="m-0">
       <div class="dropdown-container">
@@ -80,6 +80,10 @@ export default {
         showTitle: {
             type: Boolean,
             default: true
+        },
+        title: {
+            type: String,
+            default: ''
         }
     },
     data () {
