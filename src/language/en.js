@@ -172,7 +172,6 @@ export const en = {
         POOL: 'Pool',
         SE_TYPE: 'Server Type',
         PLATFORM: 'Platform',
-        IMAGE: 'Image',
         HOST: 'Host',
         PROJ: 'Project',
         DISK_SZ: 'Disk Size',

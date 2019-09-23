@@ -169,7 +169,6 @@ export const ko ={
         POOL: '풀(Pool)',
         SE_TYPE: '서버 타입',
         PLATFORM: '플랫폼',
-        IMAGE: '이미지',
         HOST: '호스트',
         PROJ: '프로젝트',
         DISK_SZ: '디스크 사이즈',
