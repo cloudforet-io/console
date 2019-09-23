@@ -3,45 +3,12 @@
     <b-col cols="12" class="p-0">
       <base-panel :panels="selectedSummaryData" />
     </b-col>
-    <!-- <b-col cols="12" class="p-0 mt-2 mb-3">
-      <base-panel-card :panel-card="panelCardData" />
-    </b-col> -->
     <b-col cols="6" class="pr-2 mt-3 mb-3">
-      <ItemsByRegion :draw-by="drawBy" />
-    </b-col>
-    <b-col cols="6" class="pl-2 mt-3 mb-3">
       <ServersByType :draw-by="drawBy" />
     </b-col>
-    <b-col cols="12" class="pl-2 mt-3 mb-3">
-      <ServerState :draw-by="drawBy" />
+    <b-col cols="6" class="pl-2 mt-3 mb-3">
+      <ItemsByRegion :draw-by="drawBy" />
     </b-col>
-    <!-- <b-row align-h="center">
-      <b-col xs="10" lg="9" xl="6">
-        <BaseChart
-          :chart-type="'Line'"
-          :chart-title-data="sampleTitleData1"
-          :chart-data="chartDataAndOption1.data"
-          :col-default-sizer="selectedChartCol"
-          :legend-option="1"
-          :options="chartDataAndOption2.option"
-          :sample-use-y-n="true"
-        />
-      </b-col>
-      <b-col xs="10" lg="9" xl="6">
-        <BaseChart
-          :chart-data="chartDataAndOption2.data"
-          :chart-title-data="sampleTitleData2"
-          :chart-title-down-data="sampleDropData2"
-          :chart-type="'else'"
-          :legend-option="1"
-          :options="chartDataAndOption2.option"
-          :sample-use-y-n="false"
-          @displayAll="displayAll"
-          @displayVM="displayVM"
-          @displayOS="displayOS"
-        />
-      </b-col>
-    </b-row> -->
   </b-row>
 </template>
 
