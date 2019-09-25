@@ -292,6 +292,8 @@ export default {
                 } else {
                     this.updateUser();
                 }
+            } else {
+                this.$alertify.error('Validation Failed');
             }
         },
         showCheckModal () {
