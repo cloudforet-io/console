@@ -103,11 +103,14 @@ export default {
         getChartConfig () {
             return {
                 type: this.type,
-                data: this.data,
+                data: this.getChartData(),
                 options: this.chartOptions,
                 plugins: this.chartPlugins,
                 externals: this.chartExternals
             };
+        },
+        getChartData () {
+            return this.data;
         },
         beforeDraw (chart) {
             let options = chart.options;
