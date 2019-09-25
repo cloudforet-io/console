@@ -252,7 +252,7 @@ export default {
         },
         validateUserId () {
             if (!this.isLocalUser) {
-                return true;
+                return null;
             }
             if (this.validateUserIdLength === null) {
                 return null;
@@ -382,7 +382,7 @@ export default {
                 result = false;
             }
 
-            if (this.creatable && !this.validateUserId) {
+            if (this.isLocalUser && this.creatable && !this.validateUserId) {
                 if (this.creatable) {
                     this.userId = this.userId === null ? '' : this.userId;
                 } 
