@@ -252,7 +252,7 @@ export default {
         },
         validateUserId () {
             if (!this.isLocalUser) {
-                return null;
+                return true;
             }
             if (this.validateUserIdLength === null) {
                 return null;
@@ -389,7 +389,7 @@ export default {
                 result = false;  
             }
 
-            if (!this.validatePassword) {
+            if (this.isLocalUser && !this.validatePassword) {
                 if (this.creatable) {
                     this.password = this.password === null ? '' : this.password;
                 } else {
@@ -398,7 +398,7 @@ export default {
                 result = false;
             }
 
-            if (!this.validatePasswordCheck) {
+            if (this.isLocalUser && !this.validatePasswordCheck) {
                 if (this.creatable) {
                     this.passwordCheck = this.passwordCheck === null ? '' : this.passwordCheck;
                 } else {
