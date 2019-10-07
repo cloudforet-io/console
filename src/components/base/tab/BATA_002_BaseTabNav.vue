@@ -78,7 +78,7 @@
 let baseTabParams = {};
 export default {
     name: 'BaseTabNavs',
-    event: ['close'],
+    events: ['close'],
     props: {
         navTabs: {
             type: Array,

@@ -48,7 +48,7 @@
 <script>
 export default {
     name: 'KeyValueInput',
-    event: ['delete', 'mounted'],
+    events: ['delete', 'mounted'],
     props: {
         data: {
             type: Object,

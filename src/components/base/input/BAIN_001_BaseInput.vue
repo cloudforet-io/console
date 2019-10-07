@@ -17,7 +17,7 @@ export default {
     name: 'BaseInput',
     model: {
         props: 'value',
-        event: 'inputText'
+        events: 'inputText'
     },
     props: {
         value: {

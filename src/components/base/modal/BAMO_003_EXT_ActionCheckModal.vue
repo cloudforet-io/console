@@ -62,7 +62,7 @@ import BaseTable from '@/components/base/table/BATB_001_BaseTable';
 
 export default {
     name: 'ActionCheckModal',
-    event: ['commit', 'failed', 'succeed'],
+    events: ['commit', 'failed', 'succeed'],
     components: {
         BaseModal,
         BaseTable

@@ -53,7 +53,7 @@
 import KeyValueInput from '@/components/base/input/BAIN_003_KeyValueInput';
 export default {
     name: 'BaseTag',
-    event: ['addedRow'],
+    events: ['addedRow'],
     components: { KeyValueInput },
     props: {
         tagData: {

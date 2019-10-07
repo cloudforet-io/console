@@ -192,7 +192,7 @@ const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag'
 
 export default {
     name: 'BaseTable',
-    event: ['list', 'rowClicked', 'limitChanged', 'rowSelected', 'onSelectAll', 'empty'],
+    events: ['list', 'rowClicked', 'limitChanged', 'rowSelected', 'onSelectAll', 'empty'],
     components: {
         BaseSearch,
         BaseModal,
