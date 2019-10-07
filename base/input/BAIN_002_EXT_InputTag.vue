@@ -29,7 +29,7 @@
 import QueryInput from '@/components/base/input/BAIN_004_EXT_QueryInput';
 export default {
     name: 'InputTag',
-    event: ['delete', 'update'],
+    events: ['delete', 'update'],
     components: { QueryInput },
     props: {
         listData: {

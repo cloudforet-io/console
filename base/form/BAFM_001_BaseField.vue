@@ -56,12 +56,13 @@ import { ModelSelect } from 'vue-search-select';
 
 export default {
     name: 'BaseField',
+    events: ['input'],
     components: {
         ModelSelect
     },
     model: {
         prop: 'value',
-        event: 'input'
+        events: 'input'
     },
     props: {
         value: {
@@ -136,11 +137,6 @@ export default {
             type: String,
             default: ''
         }
-    },
-    data () {
-        return {
-            select: this.value
-        };
     },
     methods: {
         onInput (val, e) {

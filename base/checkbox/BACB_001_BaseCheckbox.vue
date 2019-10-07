@@ -12,10 +12,10 @@
 <script>
 export default {
     name: 'BaseCheckbox',
-    event: ['change', 'input'],
+    events: ['change', 'input'],
     model: {
         prop: 'selected',
-        event: 'input'
+        events: 'input'
     },
     props: {
         selected: {

@@ -77,7 +77,7 @@ export default {
         BaseQueryList
     },
     directives: { focus: focus },
-    event: ['add', 'update', 'delete', 'deleteLeft'],
+    events: ['add', 'update', 'delete', 'deleteLeft'],
     props: {
         contextData: {
             type: Array,

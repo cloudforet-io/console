@@ -77,7 +77,7 @@ export default {
         BaseQueryList
     },
     directives: { focus: focus },
-    event: ['add', 'update', 'delete', 'deleteLeft'],
+    events: ['add', 'update', 'delete', 'deleteLeft'],
     props: {
     /**
      * @description listData is array of query data object.

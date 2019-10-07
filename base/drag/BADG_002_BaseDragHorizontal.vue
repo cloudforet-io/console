@@ -28,10 +28,6 @@
 export default {
     name: 'BaseDragHorizontal',
     props: {
-        isCustom: {
-            type: Boolean,
-            default: false
-        },
         line: {
             type: Boolean,
             default: true

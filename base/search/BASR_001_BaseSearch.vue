@@ -69,7 +69,7 @@ const contextDataModel = {
 
 export default {
     name: 'BaseSearch',
-    event: ['search', 'empty'],
+    events: ['search', 'empty'],
     components: { 
         QueryInput, 
         InputTag 

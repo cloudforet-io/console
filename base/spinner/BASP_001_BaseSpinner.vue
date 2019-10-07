@@ -11,7 +11,7 @@ export default {
     name: 'BaseSpinner',
     model: {
         prop: 'value',
-        event: 'input'
+        events: 'input'
     },
     props: {
         value: {

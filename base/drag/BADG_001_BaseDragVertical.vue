@@ -68,10 +68,6 @@ export default {
         totalWidth: {
             type: String,
             default: '100vw'
-        },
-        rightWidth: {
-            type: Number,
-            default: 0
         }
     },
     data () {
