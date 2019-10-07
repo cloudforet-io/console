@@ -66,7 +66,7 @@
 <script>
 export default {
     name: 'BaseModal',
-    events: ['ok', 'cancel'],
+    events: ['ok', 'cancel', 'esc'],
     props: {
         type: {
             type: String,
