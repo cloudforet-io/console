@@ -16,22 +16,17 @@
                       :idx="idx"
                       :list-data="contextData.queryList" 
                       :contents="tag"
-                      :class="{focused: tag.focused}"
                       @delete="deleteTagAndSearch(idx)"
                       @update="upsertTagAndSearch"
-                      @moveLeft="moveFocusToLeft(idx)"
-                      @moveRight="moveFocusToRight(idx)"
                       @deleteLeft="deleteLeftTag(idx - 1)"
             />
 
             <QueryInput ref="input" 
                         class="input"
                         :context-data="contextData.queryList"
-                        no-reset
+                        :no-reset="plainSearch"
                         add-only
                         @add="addTagAndSearch" 
-                        @moveLeft="moveFocusToLeft(tagList.length - 1)"
-                        @moveRight="moveFocusToRight(tagList.length - 1)"
                         @deleteLeft="deleteLeftTag(tagList.length - 1)"
             />
           </div>
@@ -284,8 +279,7 @@ export default {
                 id: ++this.lastId, 
                 filterName: '', 
                 filterIdx: null,
-                valueIdx: null,
-                focused: false
+                valueIdx: null
             }, item);
         },
         getOperator (op) {
@@ -302,27 +296,6 @@ export default {
         },
         focusOnInput () {
             this.$refs.input.forceFocus();
-        },
-        moveFocusToLeft (idx) {
-            if (--idx > 0) {
-                return;
-            }
-            // console.log('move focus to LEFT', idx);
-            if (this.tagList[idx + 1]) {
-                this.tagList[idx + 1].focused = false;
-            }
-            this.tagList[idx].focused = true;
-            this.$refs.tag[idx].$el.focus();
-        },
-        moveFocusToRight (idx) {
-            if (++idx < this.tagList.length) {
-                return;
-            }
-            // console.log('move focus to RIGHT', idx);
-            if (this.tagList[idx - 1]) {
-                this.tagList[idx - 1].focused = false;
-            }
-            this.tagList[idx].focused = true;
         },
         deleteLeftTag (idx) {
             if (idx >= 0) {

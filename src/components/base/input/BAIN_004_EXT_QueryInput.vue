@@ -9,6 +9,7 @@
                    v-model="inputText"
                    :autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
                    autocomplete="off" 
+                   :autoselect="autoselectOption"
                    type="text"
                    :placeholder="tr('SEARCH')"
                    v-bind="$props"
@@ -19,15 +20,13 @@
                    @keyup.down="onKeyDown"
                    @keyup.up="onKeyUp" 
                    @keyup.esc="onEsc"
-                   @keydown.left="onLeft"
-                   @keydown.right="onRight"
                    @keydown.delete="onDelete"
                    @mousedown="onMousedownInput"
         />
 
         <BaseQueryList ref="listContainer"
                        class="list-container"
-                       :show="isFocused && isKeyListShown && keyList.length > 0"
+                       :show="isListShown && isKeyListShown && keyList.length > 0"
                        :queries="keyList" 
                        :style="{
                          left: `${keyListPosX}px`, 
@@ -39,7 +38,7 @@
 
         <BaseQueryList ref="listContainer" 
                        class="list-container"
-                       :show="isFocused && isValueListShown && valueList.length > 0"
+                       :show="isListShown && isValueListShown && valueList.length > 0"
                        :queries="valueList" 
                        :style="{
                          left: `${valueListPosX}px`, 
@@ -70,6 +69,8 @@ const contentsModel = {
 
 const appendableOperators = ['=', '>', '<', '!', '$'];
 
+const LIST_PAD = 60;
+
 export default {
     name: 'QueryInput',
     components: {
@@ -85,10 +86,6 @@ export default {
         contents: {
             type: Object,
             default: () => (Object.assign({}, contentsModel))
-        },
-        autofocus: {
-            type: Boolean,
-            default: false
         },
         autoselect: {
             type: Boolean,
@@ -114,6 +111,7 @@ export default {
     data () {
         return {
             inputText: '',
+            isListShown: false,
             isKeyListShown: true,
             isValueListShown: false,
             selected: {},
@@ -128,37 +126,41 @@ export default {
             valueListPosX: 0,
             listPosY: 0,
             listHeight: 0,
-            selectionStart: 0,
-            selectionEnd: 0,
             isBlurWithoutCommit: false,
-            isFocused: false
+            autoselectOption: { start: 0, end: 0 }
         };
     },
     created () {
         this.commitEventName = this.$listeners.update !== undefined ? 'update' : 'add';
-
         this.initSelectedData();
-
         this.inputText += this.selected.value;
     },
     mounted () {
         this.setListPosition();
+        if (this.$attrs.autofocus) {
+            this.forceFocus();
+        }
     },
     methods: {
         setListPosition () {
             let inputRect = this.$refs.input.$el.getBoundingClientRect();
-            let paddingBottom = 60;
+            let paddingBottom = LIST_PAD;
             this.listHeight = self.innerHeight - inputRect.bottom - paddingBottom;
             this.listPosY = inputRect.height;
         },
         initSelectedData () {
+            this.setSelectedDataWithContents();
+            this.setInputTextWithSelectedKey();
+        },
+        setSelectedDataWithContents () {
             this.selected.label = this.contents.label || '';
             this.selected.key = this.contents.key || '';
             this.selected.value = this.contents.value || '';
             this.selected.operator = this.contents.operator || ':';
             this.selected.type = this.contents.type || 'String';
             this.selected.subKey = this.contents.subKey || '';
-
+        },
+        setInputTextWithSelectedKey () {
             if (this.selected.key) {
                 this.selectedKeyObj = this.findKeyObjFromKeyList(this.selected.label);
                 if (this.selected.subKey) {
@@ -169,9 +171,6 @@ export default {
             }
         },
         onInput (e) {
-            this.selectionStart = e.target.selectionStart;
-            this.selectionEnd = e.target.selectionEnd;
-
             if (this.selected.key) { // to detect the case of editting key section
                 let operatorIdx = this.getOperatorIdx();
 
@@ -417,13 +416,13 @@ export default {
             return val;
         },
         onFocus () {
-            this.isFocused = true;
+            this.isListShown = true;
             if (this.autoselect) {
                 this.captureText();
             }
         },
         onBlur () {
-            this.isFocused = false;
+            this.isListShown = false;
 
             if (this.isBlurWithoutCommit) {
                 this.isBlurWithoutCommit = false;
@@ -452,21 +451,18 @@ export default {
       // set text selection
             if (this.selected.key !== null && this.selected.value !== null) {
                 let start = this.inputText.indexOf(':') + this.selected.operator.length;
-                this.$refs.input.setSelectionRange(start, this.inputText.length);
+                this.autoselectOption = { start, end: this.inputText.length };
                 this.hideKeyList();
                 this.setValueListByKeyObj();
                 this.refreshValueList(this.inputText.substring(start));
                 this.showValueList();
             } else {
-                this.$refs.input.setSelectionRange(0, this.inputText.length);
+                this.autoselectOption = { start: 0, end: this.inputText.length };
                 this.hideValueList();
                 this.showKeyList();
             }
         },
         onMousedownInput (e) {
-            this.selectionStart = e.target.selectionStart;
-            this.selectionEnd = e.target.selectionEnd;
-
             if (this.selected.key && this.getOperatorIdx() < e.target.selectionStart) {
                 this.showValueList();
             }
@@ -476,22 +472,6 @@ export default {
         },
         forceFocus () {
             this.$refs.input.forceFocus();
-        },
-        onLeft () {
-            if (this.selectionStart > 0) {
-                return;
-            }
-            this.isBlurWithoutCommit = true;
-            this.forceBlur();
-            this.$emit('moveLeft');
-        },
-        onRight () {
-            if (this.addOnly || this.selectionStart < this.inputText.length) {
-                return;
-            }
-            this.isBlurWithoutCommit = true;
-            this.forceBlur();
-            this.$emit('moveRight');
         },
         onEsc () {
             this.hideKeyList();

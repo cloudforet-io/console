@@ -3,11 +3,10 @@
     <QueryInput v-if="isUpdateMode" 
                 :context-data="listData" 
                 :contents="contents"
+                :autofocus="true"
                 autoselect
                 @update="onUpdate"
                 @delete="$emit('delete')"
-                @moveLeft="onMoveLeft"
-                @moveRight="onMoveRight"
                 @deleteLeft="$emit('deleteLeft')"
     />
 
@@ -80,14 +79,6 @@ export default {
         onUpdate (items) {
             this.$emit('update', items, this.idx);
             this.isUpdateMode = false;
-        },
-        onMoveLeft () {
-            this.isUpdateMode = false;
-            this.$emit('moveLeft');
-        },
-        onMoveRight () {
-            this.isUpdateMode = false;
-            this.$emit('moveRight');
         }
     }
 };
