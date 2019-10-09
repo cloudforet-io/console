@@ -280,10 +280,6 @@ export default {
             type: Number,
             default: 20
         },
-        showCaption: {
-            type: Boolean,
-            default: false
-        },
         dark: {
             type: Boolean,
             default: false
@@ -382,11 +378,6 @@ export default {
         },
         searchContainerWidth () {
             let calculatedWidth;
-            // if (this.width < 768) {
-            //     calculatedWidth = this.headerWidth;
-            // } else {
-            //     calculatedWidth = this.headerWidth - this.toolContainerWidth - (this.noCaption ? 0 : this.captionContainerWidth);
-            // }
             calculatedWidth = this.headerWidth - this.toolContainerWidth - (this.noCaption ? 0 : this.captionContainerWidth);
 
             if (this.searchWidth && calculatedWidth < this.searchWidth) {
@@ -429,13 +420,6 @@ export default {
                 return;
             }
             this.width = this.$refs.headerContainer.clientWidth;
-            // if (this.width < 768) {
-            //     this.$refs.headerContainer.removeChild(this.$refs.searchboxContainer);
-            //     this.$refs.headerContainer.appendChild(this.$refs.searchboxContainer);
-            // } else {
-            //     this.$refs.headerContainer.removeChild(this.$refs.toolContainer);
-            //     this.$refs.headerContainer.appendChild(this.$refs.toolContainer);
-            // }
         },
         validateProperties () {
             if (this.selectable && this.selectMode === 'multi' && this.isEmpty(this.busy)) {
