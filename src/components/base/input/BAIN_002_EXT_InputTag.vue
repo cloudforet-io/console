@@ -3,7 +3,6 @@
     <QueryInput v-if="isUpdateMode" 
                 :context-data="listData" 
                 :contents="contents"
-                autofocus 
                 autoselect
                 @update="onUpdate"
                 @delete="$emit('delete')"

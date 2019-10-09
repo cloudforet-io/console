@@ -29,6 +29,7 @@
 import SlVueTree from 'sl-vue-tree';
 export default {
     name: 'BaseSimpleTree',
+    events: ['selected'],
     components: {
         SlVueTree
     },

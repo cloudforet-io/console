@@ -62,7 +62,7 @@ export default {
     },
     model: {
         prop: 'value',
-        events: 'input'
+        event: 'input'
     },
     props: {
         value: {
