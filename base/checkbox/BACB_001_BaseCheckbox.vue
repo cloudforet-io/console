@@ -15,7 +15,7 @@ export default {
     events: ['change', 'input'],
     model: {
         prop: 'selected',
-        events: 'input'
+        event: 'input'
     },
     props: {
         selected: {

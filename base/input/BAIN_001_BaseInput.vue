@@ -16,8 +16,8 @@
 export default {
     name: 'BaseInput',
     model: {
-        props: 'value',
-        events: 'inputText'
+        prop: 'value',
+        event: 'inputText'
     },
     props: {
         value: {
@@ -85,7 +85,7 @@ export default {
         },
         forceFocus () {
             this.isFocused = true;
-        }
+        },
     }
 };
 </script>
