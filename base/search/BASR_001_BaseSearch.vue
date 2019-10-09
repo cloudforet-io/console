@@ -25,8 +25,7 @@
                         class="input"
                         :context-data="contextData.queryList"
                         :no-reset="plainSearch"
-                        add-only
-                        @add="addTagAndSearch" 
+                        @commit="addTagAndSearch" 
                         @deleteLeft="deleteLeftTag(tagList.length - 1)"
             />
           </div>
@@ -165,6 +164,11 @@ export default {
                 return filter.value.length === 0;
             });
         },
+        removeEmptyValueFilterList () {
+            this._.remove(this.filterList, (filter) => {
+                return filter.value.length === 0;
+            });
+        },
         addQueryToFilterList (obj) {
             let idx = 0;
             let isExist = this.filterList.some((item, i) => {
@@ -259,6 +263,7 @@ export default {
                 }
             } else {
                 this.removeEmptyValueFilterOrList();
+                this.removeEmptyValueFilterList();
                 if (this.isEmptySearch && this.tagList.length === 0) {
                     this.$emit('empty');
                 } else {
@@ -271,7 +276,7 @@ export default {
             if (this.plainSearch) {
                 this.search(this.$refs.input.inputText);
             } else {
-                this.$refs.input.onEnter();
+                this.$refs.input.commit();
             }
         },
         getNewTag (item) {
