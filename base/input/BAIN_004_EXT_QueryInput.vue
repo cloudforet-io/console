@@ -111,6 +111,7 @@ export default {
     data () {
         return {
             inputText: '',
+            operatorIdx: -1,
             isListShown: false,
             isKeyListShown: true,
             isValueListShown: false,
@@ -171,34 +172,47 @@ export default {
             }
         },
         onInput (e) {
-            if (this.selected.key) { // to detect the case of editting key section
-                let operatorIdx = this.getOperatorIdx();
-
-                if (operatorIdx < 0 && 
-                (!this.selected.type === 'SubKey' ||
-                !this.inputText.trim().startsWith(this.selected.label))) {
+            if (this.selected.key) {
+                this.operatorIdx = this.getOperatorIdx();
+                if (this.isKeyResetCase()) {
                     this.resetKey();
-                    return;
-                }
-
-                if (e.target.selectionStart <= operatorIdx) { // editting key section
-                    let keyStr = this.inputText.substring(0, operatorIdx).trim();
-                    if (this.selected.type === 'SubKey') {
-                    /**
-                     * TODO: detect editting key or subkey
-                     */
-                    } else {
-                        this.resetKey(keyStr);
-                    }
-                } else { // editting value section
-                    let valStr = this.inputText.substring(operatorIdx);
-                    this.setOperator(valStr);
-                    this.refreshValueList(valStr.substring(this.selected.operator.length));
-                    this.showValueList();
+                } else {
+                    this.editSelectedData(e);
                 }
             } else {
                 this.resetKey(this.inputText.trim());
             }
+        },
+        editSelectedData (event) {
+            if (event.target.selectionStart <= this.operatorIdx) {
+                this.editKeySection();
+            } else {
+                this.editValueSection();
+            }
+        },
+        editKeySection () {
+            let keyStr = this.inputText.substring(0, this.operatorIdx).trim();
+            if (this.selected.type === 'SubKey') {
+                this.editSubKey();
+            } else {
+                this.resetKey(keyStr);
+            }
+        },
+        editValueSection () {
+            let valStr = this.inputText.substring(this.operatorIdx);
+            this.setOperator(valStr);
+            this.refreshValueList(valStr.substring(this.selected.operator.length));
+            this.showValueList();
+        },
+        isKeyResetCase () {
+            return this.operatorIdx < 0 && 
+                   (!this.selected.type === 'SubKey' || 
+                    !this.inputText.trim().startsWith(this.selected.label));
+        },
+        editSubKey () {
+            /**
+             * TODO: detect editting key or subkey
+             */
         },
         getOperatorIdx () {
             return this.inputText.indexOf(':');
