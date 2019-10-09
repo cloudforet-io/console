@@ -77,7 +77,7 @@ export default {
         BaseInput,
         BaseQueryList
     },
-    events: ['add', 'update', 'delete', 'deleteLeft'],
+    events: ['commit', 'empty', 'deleteLeft'],
     props: {
         contextData: {
             type: Array,
@@ -88,10 +88,6 @@ export default {
             default: () => (Object.assign({}, contentsModel))
         },
         autoselect: {
-            type: Boolean,
-            default: false
-        },
-        addOnly: {
             type: Boolean,
             default: false
         },
@@ -121,7 +117,6 @@ export default {
             keyList: this.contextData,
             staticValueList: [],
             valueList: [],
-            commitEventName: 'add',
             isEnterEmittedBlur: false,
             keyListPosX: 0,
             valueListPosX: 0,
@@ -132,7 +127,6 @@ export default {
         };
     },
     created () {
-        this.commitEventName = this.$listeners.update !== undefined ? 'update' : 'add';
         this.initSelectedData();
         this.inputText += this.selected.value;
     },
@@ -239,36 +233,41 @@ export default {
         },
         async onSelectKey (item) {
             this.setKey(item);
+            this.setInputTextKey();
+            this.hideKeyList();
+            await this.setValueListByKeyObj();
+            this.showValueList();
+        },
+        setInputTextKey () {
             if (this.selected.type === 'SubKey') {
                 this.inputText = `${this.selected.label}.`;
             } else {
                 this.inputText = `${this.selected.label} ${this.selected.operator}`;
             }
-            this.hideKeyList();
-            await this.setValueListByKeyObj();
-            this.showValueList();
         },
         async setValueListByKeyObj () {
             if (!this.selectedKeyObj) {
                 return;
             }
-
+            this.staticValueList = [];
             if (this.selectedKeyObj.values) {
                 this.staticValueList = this.selectedKeyObj.values;
             } else if (this.selectedKeyObj.ajax) {
-                let res = null;
-                try {
-                    res = await this.$axios[this.selectedKeyObj.ajax.method](this.selectedKeyObj.ajax.url,
-                        this.selectedKeyObj.ajax.params || {});
-
-                    this.staticValueList = this.selectedKeyObj.ajax.filter(res);
-                } catch (e) {
-                    console.error(e);
-                }
-            } else {
-                this.staticValueList = [];
+                await this.setStaticValueListByAjax();
             }
             this.valueList = this.staticValueList;
+        },
+        async setStaticValueListByAjax () {
+            try {
+                let res = await this.$axios[this.selectedKeyObj.ajax.method](
+                    this.selectedKeyObj.ajax.url,
+                    this.selectedKeyObj.ajax.params || {}
+                );
+                this.staticValueList = this.selectedKeyObj.ajax.filter(res);
+
+            } catch (e) {
+                console.error(e);
+            }
         },
         showValueList () {
             this.isValueListShown = true;
@@ -327,21 +326,18 @@ export default {
                 this.commit();
                 this.isEnterEmittedBlur = true;
             }
-
         },
         commit () {
             let val = this.inputText.trim();
-            if (this.commitEventName === 'update' && val === '') {
-                this.$emit('delete');
-            }
             if (val === '') {
+                this.$emit('empty');
                 return;
             }
             this.setSelectedData(val);
             if (this.selectedList.length === 0) {
                 this.selectedList.push(this.selected);
             }
-            this.$emit(this.commitEventName, this.selectedList);
+            this.$emit('commit', this.selectedList);
 
             this.resetAll();
             this.setListPosition();
@@ -462,7 +458,7 @@ export default {
                 return;
             }
 
-      // set text selection
+            // set text selection
             if (this.selected.key !== null && this.selected.value !== null) {
                 let start = this.inputText.indexOf(':') + this.selected.operator.length;
                 this.autoselectOption = { start, end: this.inputText.length };

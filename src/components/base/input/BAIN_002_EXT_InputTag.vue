@@ -5,8 +5,8 @@
                 :contents="contents"
                 :autofocus="true"
                 autoselect
-                @update="onUpdate"
-                @delete="$emit('delete')"
+                @commit="onUpdate"
+                @empty="$emit('delete')"
                 @deleteLeft="$emit('deleteLeft')"
     />
 
