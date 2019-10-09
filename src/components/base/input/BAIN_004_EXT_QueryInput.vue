@@ -169,37 +169,37 @@ export default {
             }
         },
         onInput (e) {
-            // this.selectionStart = e.target.selectionStart;
-            // this.selectionEnd = e.target.selectionEnd;
+            this.selectionStart = e.target.selectionStart;
+            this.selectionEnd = e.target.selectionEnd;
 
-            // if (this.selected.key) { // to detect the case of editting key section
-            //     let operatorIdx = this.getOperatorIdx();
+            if (this.selected.key) { // to detect the case of editting key section
+                let operatorIdx = this.getOperatorIdx();
 
-            //     if (operatorIdx < 0 && 
-            //     (!this.selected.type === 'SubKey' ||
-            //     !this.inputText.trim().startsWith(this.selected.label))) {
-            //         this.resetKey();
-            //         return;
-            //     }
+                if (operatorIdx < 0 && 
+                (!this.selected.type === 'SubKey' ||
+                !this.inputText.trim().startsWith(this.selected.label))) {
+                    this.resetKey();
+                    return;
+                }
 
-            //     if (e.target.selectionStart <= operatorIdx) { // editting key section
-            //         let keyStr = this.inputText.substring(0, operatorIdx).trim();
-            //         if (this.selected.type === 'SubKey') {
-            //         /**
-            //          * TODO: detect editting key or subkey
-            //          */
-            //         } else {
-            //             this.resetKey(keyStr);
-            //         }
-            //     } else { // editting value section
-            //         let valStr = this.inputText.substring(operatorIdx);
-            //         this.setOperator(valStr);
-            //         this.refreshValueList(valStr.substring(this.selected.operator.length));
-            //         this.showValueList();
-            //     }
-            // } else {
-            //     this.resetKey(this.inputText.trim());
-            // }
+                if (e.target.selectionStart <= operatorIdx) { // editting key section
+                    let keyStr = this.inputText.substring(0, operatorIdx).trim();
+                    if (this.selected.type === 'SubKey') {
+                    /**
+                     * TODO: detect editting key or subkey
+                     */
+                    } else {
+                        this.resetKey(keyStr);
+                    }
+                } else { // editting value section
+                    let valStr = this.inputText.substring(operatorIdx);
+                    this.setOperator(valStr);
+                    this.refreshValueList(valStr.substring(this.selected.operator.length));
+                    this.showValueList();
+                }
+            } else {
+                this.resetKey(this.inputText.trim());
+            }
         },
         getOperatorIdx () {
             return this.inputText.indexOf(':');

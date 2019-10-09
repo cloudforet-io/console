@@ -85,7 +85,7 @@ export default {
         },
         forceFocus () {
             this.isFocused = true;
-        },
+        }
     }
 };
 </script>
