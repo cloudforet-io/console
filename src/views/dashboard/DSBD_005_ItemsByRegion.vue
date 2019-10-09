@@ -145,6 +145,10 @@ export default {
             {
                 backgroundColor:'rgba(251,78,22,0.8)',
                 hoverBackgroundColor: 'rgba(251,78,22,1.0)'
+            },
+            {
+                backgroundColor:'rgba(201,200,80,0.8)',
+                hoverBackgroundColor: 'rgba(201,200,80,1.0)'
             }],
             minX: 1,
             maxX: 600,
