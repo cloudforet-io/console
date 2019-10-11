@@ -16,22 +16,16 @@
                       :idx="idx"
                       :list-data="contextData.queryList" 
                       :contents="tag"
-                      :class="{focused: tag.focused}"
                       @delete="deleteTagAndSearch(idx)"
                       @update="upsertTagAndSearch"
-                      @moveLeft="moveFocusToLeft(idx)"
-                      @moveRight="moveFocusToRight(idx)"
                       @deleteLeft="deleteLeftTag(idx - 1)"
             />
 
             <QueryInput ref="input" 
                         class="input"
                         :context-data="contextData.queryList"
-                        no-reset
-                        add-only
-                        @add="addTagAndSearch" 
-                        @moveLeft="moveFocusToLeft(tagList.length - 1)"
-                        @moveRight="moveFocusToRight(tagList.length - 1)"
+                        :no-reset="plainSearch"
+                        @commit="addTagAndSearch" 
                         @deleteLeft="deleteLeftTag(tagList.length - 1)"
             />
           </div>
@@ -170,6 +164,11 @@ export default {
                 return filter.value.length === 0;
             });
         },
+        removeEmptyValueFilterList () {
+            this._.remove(this.filterList, (filter) => {
+                return filter.value.length === 0;
+            });
+        },
         addQueryToFilterList (obj) {
             let idx = 0;
             let isExist = this.filterList.some((item, i) => {
@@ -264,6 +263,7 @@ export default {
                 }
             } else {
                 this.removeEmptyValueFilterOrList();
+                this.removeEmptyValueFilterList();
                 if (this.isEmptySearch && this.tagList.length === 0) {
                     this.$emit('empty');
                 } else {
@@ -276,7 +276,7 @@ export default {
             if (this.plainSearch) {
                 this.search(this.$refs.input.inputText);
             } else {
-                this.$refs.input.onEnter();
+                this.$refs.input.commit();
             }
         },
         getNewTag (item) {
@@ -284,8 +284,7 @@ export default {
                 id: ++this.lastId, 
                 filterName: '', 
                 filterIdx: null,
-                valueIdx: null,
-                focused: false
+                valueIdx: null
             }, item);
         },
         getOperator (op) {
@@ -302,27 +301,6 @@ export default {
         },
         focusOnInput () {
             this.$refs.input.forceFocus();
-        },
-        moveFocusToLeft (idx) {
-            if (--idx > 0) {
-                return;
-            }
-            // console.log('move focus to LEFT', idx);
-            if (this.tagList[idx + 1]) {
-                this.tagList[idx + 1].focused = false;
-            }
-            this.tagList[idx].focused = true;
-            this.$refs.tag[idx].$el.focus();
-        },
-        moveFocusToRight (idx) {
-            if (++idx < this.tagList.length) {
-                return;
-            }
-            // console.log('move focus to RIGHT', idx);
-            if (this.tagList[idx - 1]) {
-                this.tagList[idx - 1].focused = false;
-            }
-            this.tagList[idx].focused = true;
         },
         deleteLeftTag (idx) {
             if (idx >= 0) {

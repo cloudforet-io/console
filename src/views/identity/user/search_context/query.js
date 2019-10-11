@@ -11,17 +11,17 @@ export default {
         { 
             label: 'Timezone', key: 'timezone', 
             values: Mixin.methods.getAllTimezones()
-        },
-        { label: 'test', key: 'name', ajax: {
-            url: '/identity/user/list',
-            method: 'post',
-            filter (res) {
-                return res.data.results.map((user) => {
-                    return user.name;
-                });
-            }
+        }
+        // { label: 'test', key: 'name', ajax: {
+        //     url: '/identity/user/list',
+        //     method: 'post',
+        //     filter (res) {
+        //         return res.data.results.map((user) => {
+        //             return user.name;
+        //         });
+        //     }
 
-        }}
+        // }}
     ],
     autokeyList: ['user_id', 'name', 'email']
 };

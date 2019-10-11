@@ -16,8 +16,8 @@
 export default {
     name: 'BaseInput',
     model: {
-        props: 'value',
-        events: 'inputText'
+        prop: 'value',
+        event: 'inputText'
     },
     props: {
         value: {
@@ -60,19 +60,28 @@ export default {
             );
         }
     },
+    watch: {
+        autoselect () {
+            this.applyAutoSelection();
+        }
+    },
     created () {
     },
     methods: {
         setSelectionRange (selectionStart, selectionEnd) {
             this.$refs.input.setSelectionRange(selectionStart, selectionEnd);
         },
+        applyAutoSelection () {
+            if (typeof this.autoselect === 'boolean') {
+                this.setSelectionRange(this.autoselect.start, this.value.length);
+            } else {
+                this.setSelectionRange(this.autoselect.start || 0, this.autoselect.end || this.value.length);
+            }
+        },
         onFocus (event) {
             this.isFocused = true;
             if (this.autoselect) {
-                this.setSelectionRange(
-                    this.autoselect.start || 0, 
-                    this.autoselect.end || this.value.length
-                );
+                this.applyAutoSelection();
             }
             this.$emit('focus', event);
         },
