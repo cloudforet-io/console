@@ -9,6 +9,7 @@
                    v-model="inputText"
                    :autowidth="{maxWidth: maxWidth, minWidth: minWidth, comfortZone: 1}"
                    autocomplete="off" 
+                   :autoselect="autoselectOption"
                    type="text"
                    :placeholder="tr('SEARCH')"
                    v-bind="$props"
@@ -19,15 +20,13 @@
                    @keyup.down="onKeyDown"
                    @keyup.up="onKeyUp" 
                    @keyup.esc="onEsc"
-                   @keydown.left="onLeft"
-                   @keydown.right="onRight"
                    @keydown.delete="onDelete"
                    @mousedown="onMousedownInput"
         />
 
         <BaseQueryList ref="listContainer"
                        class="list-container"
-                       :show="isFocused && isKeyListShown && keyList.length > 0"
+                       :show="isListShown && isKeyListShown && keyList.length > 0"
                        :queries="keyList" 
                        :style="{
                          left: `${keyListPosX}px`, 
@@ -39,7 +38,7 @@
 
         <BaseQueryList ref="listContainer" 
                        class="list-container"
-                       :show="isFocused && isValueListShown && valueList.length > 0"
+                       :show="isListShown && isValueListShown && valueList.length > 0"
                        :queries="valueList" 
                        :style="{
                          left: `${valueListPosX}px`, 
@@ -70,14 +69,15 @@ const contentsModel = {
 
 const appendableOperators = ['=', '>', '<', '!', '$'];
 
+const LIST_PAD = 60;
+
 export default {
     name: 'QueryInput',
     components: {
         BaseInput,
         BaseQueryList
     },
-    directives: { focus: focus },
-    event: ['add', 'update', 'delete', 'deleteLeft'],
+    events: ['commit', 'empty', 'deleteLeft'],
     props: {
         contextData: {
             type: Array,
@@ -87,15 +87,7 @@ export default {
             type: Object,
             default: () => (Object.assign({}, contentsModel))
         },
-        autofocus: {
-            type: Boolean,
-            default: false
-        },
         autoselect: {
-            type: Boolean,
-            default: false
-        },
-        addOnly: {
             type: Boolean,
             default: false
         },
@@ -115,6 +107,8 @@ export default {
     data () {
         return {
             inputText: '',
+            operatorIdx: -1,
+            isListShown: false,
             isKeyListShown: true,
             isValueListShown: false,
             selected: {},
@@ -123,43 +117,45 @@ export default {
             keyList: this.contextData,
             staticValueList: [],
             valueList: [],
-            commitEventName: 'add',
             isEnterEmittedBlur: false,
             keyListPosX: 0,
             valueListPosX: 0,
             listPosY: 0,
             listHeight: 0,
-            selectionStart: 0,
-            selectionEnd: 0,
             isBlurWithoutCommit: false,
-            isFocused: false
+            autoselectOption: { start: 0, end: 0 }
         };
     },
     created () {
-        this.commitEventName = this.$listeners.update !== undefined ? 'update' : 'add';
-
         this.initSelectedData();
-
         this.inputText += this.selected.value;
     },
     mounted () {
         this.setListPosition();
+        if (this.$attrs.autofocus) {
+            this.forceFocus();
+        }
     },
     methods: {
         setListPosition () {
             let inputRect = this.$refs.input.$el.getBoundingClientRect();
-            let paddingBottom = 60;
+            let paddingBottom = LIST_PAD;
             this.listHeight = self.innerHeight - inputRect.bottom - paddingBottom;
             this.listPosY = inputRect.height;
         },
         initSelectedData () {
+            this.setSelectedDataWithContents();
+            this.setInputTextWithSelectedKey();
+        },
+        setSelectedDataWithContents () {
             this.selected.label = this.contents.label || '';
             this.selected.key = this.contents.key || '';
             this.selected.value = this.contents.value || '';
             this.selected.operator = this.contents.operator || ':';
             this.selected.type = this.contents.type || 'String';
             this.selected.subKey = this.contents.subKey || '';
-
+        },
+        setInputTextWithSelectedKey () {
             if (this.selected.key) {
                 this.selectedKeyObj = this.findKeyObjFromKeyList(this.selected.label);
                 if (this.selected.subKey) {
@@ -170,37 +166,47 @@ export default {
             }
         },
         onInput (e) {
-            this.selectionStart = e.target.selectionStart;
-            this.selectionEnd = e.target.selectionEnd;
-
-            if (this.selected.key) { // to detect the case of editting key section
-                let operatorIdx = this.getOperatorIdx();
-
-                if (operatorIdx < 0 && 
-                (!this.selected.type === 'SubKey' ||
-                !this.inputText.trim().startsWith(this.selected.label))) {
+            if (this.selected.key) {
+                this.operatorIdx = this.getOperatorIdx();
+                if (this.isKeyResetCase()) {
                     this.resetKey();
-                    return;
-                }
-
-                if (e.target.selectionStart <= operatorIdx) { // editting key section
-                    let keyStr = this.inputText.substring(0, operatorIdx).trim();
-                    if (this.selected.type === 'SubKey') {
-                    /**
-                     * TODO: detect editting key or subkey
-                     */
-                    } else {
-                        this.resetKey(keyStr);
-                    }
-                } else { // editting value section
-                    let valStr = this.inputText.substring(operatorIdx);
-                    this.setOperator(valStr);
-                    this.refreshValueList(valStr.substring(this.selected.operator.length));
-                    this.showValueList();
+                } else {
+                    this.editSelectedData(e);
                 }
             } else {
                 this.resetKey(this.inputText.trim());
             }
+        },
+        editSelectedData (event) {
+            if (event.target.selectionStart <= this.operatorIdx) {
+                this.editKeySection();
+            } else {
+                this.editValueSection();
+            }
+        },
+        editKeySection () {
+            let keyStr = this.inputText.substring(0, this.operatorIdx).trim();
+            if (this.selected.type === 'SubKey') {
+                this.editSubKey();
+            } else {
+                this.resetKey(keyStr);
+            }
+        },
+        editValueSection () {
+            let valStr = this.inputText.substring(this.operatorIdx);
+            this.setOperator(valStr);
+            this.refreshValueList(valStr.substring(this.selected.operator.length));
+            this.showValueList();
+        },
+        isKeyResetCase () {
+            return this.operatorIdx < 0 && 
+                   (!this.selected.type === 'SubKey' || 
+                    !this.inputText.trim().startsWith(this.selected.label));
+        },
+        editSubKey () {
+            /**
+             * TODO: detect editting key or subkey
+             */
         },
         getOperatorIdx () {
             return this.inputText.indexOf(':');
@@ -227,36 +233,41 @@ export default {
         },
         async onSelectKey (item) {
             this.setKey(item);
+            this.setInputTextKey();
+            this.hideKeyList();
+            await this.setValueListByKeyObj();
+            this.showValueList();
+        },
+        setInputTextKey () {
             if (this.selected.type === 'SubKey') {
                 this.inputText = `${this.selected.label}.`;
             } else {
                 this.inputText = `${this.selected.label} ${this.selected.operator}`;
             }
-            this.hideKeyList();
-            await this.setValueListByKeyObj();
-            this.showValueList();
         },
         async setValueListByKeyObj () {
             if (!this.selectedKeyObj) {
                 return;
             }
-
+            this.staticValueList = [];
             if (this.selectedKeyObj.values) {
                 this.staticValueList = this.selectedKeyObj.values;
             } else if (this.selectedKeyObj.ajax) {
-                let res = null;
-                try {
-                    res = await this.$axios[this.selectedKeyObj.ajax.method](this.selectedKeyObj.ajax.url,
-                        this.selectedKeyObj.ajax.params || {});
-
-                    this.staticValueList = this.selectedKeyObj.ajax.filter(res);
-                } catch (e) {
-                    console.error(e);
-                }
-            } else {
-                this.staticValueList = [];
+                await this.setStaticValueListByAjax();
             }
             this.valueList = this.staticValueList;
+        },
+        async setStaticValueListByAjax () {
+            try {
+                let res = await this.$axios[this.selectedKeyObj.ajax.method](
+                    this.selectedKeyObj.ajax.url,
+                    this.selectedKeyObj.ajax.params || {}
+                );
+                this.staticValueList = this.selectedKeyObj.ajax.filter(res);
+
+            } catch (e) {
+                console.error(e);
+            }
         },
         showValueList () {
             this.isValueListShown = true;
@@ -315,21 +326,18 @@ export default {
                 this.commit();
                 this.isEnterEmittedBlur = true;
             }
-
         },
         commit () {
             let val = this.inputText.trim();
-            if (this.commitEventName === 'update' && val === '') {
-                this.$emit('delete');
-            }
             if (val === '') {
+                this.$emit('empty');
                 return;
             }
             this.setSelectedData(val);
             if (this.selectedList.length === 0) {
                 this.selectedList.push(this.selected);
             }
-            this.$emit(this.commitEventName, this.selectedList);
+            this.$emit('commit', this.selectedList);
 
             this.resetAll();
             this.setListPosition();
@@ -418,13 +426,13 @@ export default {
             return val;
         },
         onFocus () {
-            this.isFocused = true;
+            this.isListShown = true;
             if (this.autoselect) {
                 this.captureText();
             }
         },
         onBlur () {
-            this.isFocused = false;
+            this.isListShown = false;
 
             if (this.isBlurWithoutCommit) {
                 this.isBlurWithoutCommit = false;
@@ -450,24 +458,21 @@ export default {
                 return;
             }
 
-      // set text selection
+            // set text selection
             if (this.selected.key !== null && this.selected.value !== null) {
                 let start = this.inputText.indexOf(':') + this.selected.operator.length;
-                this.$refs.input.setSelectionRange(start, this.inputText.length);
+                this.autoselectOption = { start, end: this.inputText.length };
                 this.hideKeyList();
                 this.setValueListByKeyObj();
                 this.refreshValueList(this.inputText.substring(start));
                 this.showValueList();
             } else {
-                this.$refs.input.setSelectionRange(0, this.inputText.length);
+                this.autoselectOption = { start: 0, end: this.inputText.length };
                 this.hideValueList();
                 this.showKeyList();
             }
         },
         onMousedownInput (e) {
-            this.selectionStart = e.target.selectionStart;
-            this.selectionEnd = e.target.selectionEnd;
-
             if (this.selected.key && this.getOperatorIdx() < e.target.selectionStart) {
                 this.showValueList();
             }
@@ -477,22 +482,6 @@ export default {
         },
         forceFocus () {
             this.$refs.input.forceFocus();
-        },
-        onLeft () {
-            if (this.selectionStart > 0) {
-                return;
-            }
-            this.isBlurWithoutCommit = true;
-            this.forceBlur();
-            this.$emit('moveLeft');
-        },
-        onRight () {
-            if (this.addOnly || this.selectionStart < this.inputText.length) {
-                return;
-            }
-            this.isBlurWithoutCommit = true;
-            this.forceBlur();
-            this.$emit('moveRight');
         },
         onEsc () {
             this.hideKeyList();

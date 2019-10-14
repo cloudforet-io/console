@@ -32,7 +32,7 @@
 <script>
 export default {
     name: 'BaseQueryList',
-    event: ['select'],
+    events: ['select'],
     props: {
         show: {
             type: Boolean,

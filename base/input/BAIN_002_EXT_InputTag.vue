@@ -3,12 +3,10 @@
     <QueryInput v-if="isUpdateMode" 
                 :context-data="listData" 
                 :contents="contents"
-                autofocus 
+                :autofocus="true"
                 autoselect
-                @update="onUpdate"
-                @delete="$emit('delete')"
-                @moveLeft="onMoveLeft"
-                @moveRight="onMoveRight"
+                @commit="onUpdate"
+                @empty="$emit('delete')"
                 @deleteLeft="$emit('deleteLeft')"
     />
 
@@ -29,7 +27,7 @@
 import QueryInput from '@/components/base/input/BAIN_004_EXT_QueryInput';
 export default {
     name: 'InputTag',
-    event: ['delete', 'update'],
+    events: ['delete', 'update', 'deleteLeft'],
     components: { QueryInput },
     props: {
         listData: {
@@ -81,14 +79,6 @@ export default {
         onUpdate (items) {
             this.$emit('update', items, this.idx);
             this.isUpdateMode = false;
-        },
-        onMoveLeft () {
-            this.isUpdateMode = false;
-            this.$emit('moveLeft');
-        },
-        onMoveRight () {
-            this.isUpdateMode = false;
-            this.$emit('moveRight');
         }
     }
 };
