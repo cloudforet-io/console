@@ -3,8 +3,7 @@
     <b-card class="base border-top-0">
       <b-row>
         <b-col cols="12">
-          <BaseTable :show-caption="showCaption"
-                     :cardless="true"
+          <BaseTable :cardless="true"
                      :table-data="audits"
                      :fields="fields"
                      :per-page="3"
@@ -95,7 +94,6 @@ export default {
     data () {
         return {
             isLoading: true,
-            showCaption: false,
             fields: [
                 { key: 'eventName', label: 'Event', sortable: true },
                 { key: 'status', label: 'State', sortable: true },

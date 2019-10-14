@@ -50,7 +50,7 @@ import { api } from '@/setup/api';
 let baseTabParams = {};
 export default {
     name: 'BaseTabs',
-    event: ['close'],
+    events: ['close'],
     props: {
         fill: {
             type: Boolean,

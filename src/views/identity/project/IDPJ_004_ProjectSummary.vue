@@ -22,8 +22,6 @@ import ServersByType from '@/views/dashboard/DSBD_006_ServersByType';
 
 import { api } from '@/setup/api';
 const BasePanel = () => import('@/components/base/panel/BAPA_002_BasePanel');
-const BasePanelCard = () => import('@/components/base/panel/BAPA_003_BasePanelCard');
-const BaseChart = () => import('@/components/base/charts/BACT_001_BaseChart');
 
 const SummaryModel = {
     id: null,
@@ -36,9 +34,7 @@ const SummaryModel = {
 export default {
     name: 'ProjectSummary',
     components: {
-        BaseChart,
         BasePanel,
-        BasePanelCard,
         ServerState,
         ItemsByRegion,
         ServersByType

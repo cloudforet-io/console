@@ -62,7 +62,7 @@ import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag';
 
 export default {
     name: 'ProjectMember',
-    event: ['close'],
+    events: ['close'],
     components: {
         BaseTable,
         InputTag
