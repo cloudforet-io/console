@@ -15,7 +15,9 @@ module.exports = async ({ config, mode }) => {
                     options: {
                         data: `
                         @import "~@/asset/style/_variables.scss";
-                        @import "~@/asset/style/_font.scss";`,
+                        @import "~@/asset/style/_font.scss";
+                        `
+
                     }
                 },
             ],
@@ -26,5 +28,10 @@ module.exports = async ({ config, mode }) => {
         'vue': 'vue/dist/vue.common.js',
         '@': path.resolve(__dirname, '../src'),
     };
+    config.module.rules.push({
+        test: /\.vue$/,
+        loader: 'storybook-addon-vue-info/loader',
+        enforce: 'post'
+    })
     return config;
 };
