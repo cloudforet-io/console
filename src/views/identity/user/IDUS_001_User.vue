@@ -3,15 +3,15 @@
     <BaseDragHorizontal>
       <template #container="{ height }">
         <BaseTable class="user-table" 
-                   :table-data="users" 
+                   :table-data="users"
                    :fields="fields" 
                    :per-page="query.page.limit"
-                   searchable
-                   :total-rows="totalCount" 
+                   :searchable="true"
+                   :total-rows="totalCount"
                    :search-context-data="contextData"
                    :busy="isLoading" 
                    :cardless="false" 
-                   underlined
+                   :underlined="true"
                    :height="height"
                    @rowSelected="rowSelected"
                    @onSelectAll="onAllRowSelected"
