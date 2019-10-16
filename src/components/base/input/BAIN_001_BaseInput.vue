@@ -1,10 +1,10 @@
 <template>
   <span>
-    <input ref="input" 
-           v-focus.lazy="isFocused" 
+    <input ref="input"
+           v-focus.lazy="isFocused"
            v-autowidth="autowidth"
            :value="value"
-           class="pl-2" 
+           class="pl-2"
            v-bind="$attrs"
            v-on="inputListeners"
            @input="$emit('inputText', $event.target.value)"
@@ -28,6 +28,9 @@ export default {
             type: Boolean,
             default: false
         },
+        /**
+         * autoselect = {maxWidth: '960px', minWidth: '20px', comfortZone: 0}
+         */
         autowidth: {
             type: Object,
             default: () => {}
@@ -83,10 +86,20 @@ export default {
             if (this.autoselect) {
                 this.applyAutoSelection();
             }
+          /**
+           * input focus event
+           * @event focus
+           * @type {object}
+           */
             this.$emit('focus', event);
         },
         onBlur (event) {
             this.isFocused = false;
+          /**
+           * input blur event
+           * @event blur
+           * @type {object}
+           */
             this.$emit('blur', event);
         },
         forceBlur () {
