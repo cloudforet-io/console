@@ -1,6 +1,7 @@
 import { withKnobs, text, boolean, number, object } from '@storybook/addon-knobs/vue';
 import BaseInput from './BAIN_001_BaseInput';
 import { action } from '@storybook/addon-actions';
+import { autoProps } from '../../../setup/storybook_util';
 
 export default {
     title: 'base/Input',
@@ -36,23 +37,13 @@ const actions = {
     }
 };
 
-const props = {
-    value: {
-        default: text('value', 'input value')
-    },
-    autofocus: {
-        default: boolean('autofocus', false)
-    },
-    autowidth: {
-        default: object('autowidth', { maxWidth: '960px', minWidth: '10px', comfortZone: 0 })
-    },
-};
-
 export const simple = () => ({
     components: { BaseInput },
     template: `<BaseInput id="guid" :value="value"  @focus="onFocus" @blur="onBlur"></BaseInput>`,
     props: {
-        ...props
+        ...autoProps(BaseInput, [
+            { name: 'value', default: 'typing here!' }
+        ])
     },
     computed: {
         ...actions

@@ -87,7 +87,7 @@ export default {
     mounted () {
         this.lineHeight = (this.containerHeight / 2) - this.draggerHeight;
         this.draggerWidth = this.$refs.dragger.clientWidth + this.$refs.dragger.offsetWidth;
-        this.consoleLogEnv('This is a height', this.height);
+        // this.consoleLogEnv('This is a height', this.height);
     },
     methods: {
         onMousedown () {
