@@ -10,9 +10,14 @@
 </template>
 
 <script>
-export default {
+import {BFormCheckbox} from 'bootstrap-vue';
+
+  export default {
     name: 'BaseCheckbox',
-    events: ['change', 'input'],
+    components: {
+    'b-check': BFormCheckbox
+  },
+    event: ['change', 'input'],
     model: {
         prop: 'selected',
         event: 'input'
