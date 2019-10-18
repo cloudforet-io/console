@@ -64,9 +64,8 @@ export const autoProps = (comp, props = []) => {
     const propsValue = comp.props;
 
     Object.keys(docProps).forEach((key) => {
-        let defaultValue = eval(propsValue[key].default);
+        let defaultValue = propsValue[key].default;
         if (props.length) {
-            console.log((props))
             let info = (props.find(o => o.name === key));
             if (!info) {
                 return;
@@ -74,7 +73,6 @@ export const autoProps = (comp, props = []) => {
                 defaultValue = info.default;
             }
         }
-        console.log(docProps[key], defaultValue)
         let knob = makeKnobProp(docProps[key], defaultValue);
         if (knob) {
             mapping[key] = knob;
