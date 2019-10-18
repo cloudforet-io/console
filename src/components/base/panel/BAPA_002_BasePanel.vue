@@ -106,7 +106,7 @@ const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag'
 const BaseBadgeTag = () => import('@/components/base/tags/BATG_003_BaseBadgeTag');
 export default {
     name: 'BasePanel',
-    event: ['edit'],
+    events: ['edit'],
     components: {
         BaseStateTag,
         BaseBadgeTag

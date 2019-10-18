@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- <BaseNoticePanel :notice-panel-data="sampleNoticePanel" /> -->
     <BasePanel :panels="panelData" 
                @edit="showTagEditModal"
     />
@@ -25,7 +24,6 @@
 </template>
 
 <script>
-const BaseNoticePanel = () => import('@/components/base/panel/BAPA_001_BaseNoticePanel');
 const BasePanel = () => import('@/components/base/panel/BAPA_002_BasePanel');
 const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
 const BaseTag = () => import('@/components/base/tags/BATG_001_BaseTag');
@@ -34,7 +32,6 @@ import serverModel from '@/views/inventory/server/serverModel';
 export default {
     name: 'ServerSummary',
     components: {
-        BaseNoticePanel,
         BasePanel,
         BaseModal,
         BaseTag

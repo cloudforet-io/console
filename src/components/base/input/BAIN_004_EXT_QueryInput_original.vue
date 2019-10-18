@@ -77,20 +77,9 @@ export default {
         BaseQueryList
     },
     directives: { focus: focus },
-    event: ['add', 'update', 'delete', 'deleteLeft'],
+    events: ['add', 'update', 'delete', 'deleteLeft'],
     props: {
-    /**
-     * @description listData is array of query data object.
-     *              Query data object's format: { label, (values || ajax) }
-     *              Query data object's property description:
-     *                - label: {String}
-     *                - values: {Array<String>}
-     *                - ajax: {Object: { url: {String}, method: {String}, params: {Object} }}
-     *              Examples:
-     *                - { label: 'name', values: ['John', 'Sam', 'Json', ...] }
-     *                - { label: 'name', ajax: { url: '/users', method: 'get', params: { limit: 10 } } }
-     */
-        listData: {
+        contextData: {
             type: Array,
             default: () => []
         },
@@ -131,7 +120,7 @@ export default {
             selected: {},
             selectedList: [],
             selectedKeyObj: null,
-            keyList: this.listData,
+            keyList: this.contextData,
             staticValueList: [],
             valueList: [],
             commitEventName: 'add',
@@ -142,16 +131,9 @@ export default {
             listHeight: 0,
             selectionStart: 0,
             selectionEnd: 0,
-            isBlurWithoutCommit: false
+            isBlurWithoutCommit: false,
+            isFocused: false
         };
-    },
-    computed: {
-        isFocused () {
-            if (this.$refs.input) {
-                return this.$refs.input.isFocused;
-            } 
-            return false;
-        }
     },
     created () {
         this.commitEventName = this.$listeners.update !== undefined ? 'update' : 'add';
@@ -226,7 +208,7 @@ export default {
         refreshKeyList (val) {
             val = val.trim().toLowerCase();
             let temp = [];
-            this.listData.map((item) => {
+            this.contextData.map((item) => {
                 if (item.label.toLowerCase().indexOf(val) !== -1) {
                     temp.push(item);
                 }
@@ -319,7 +301,7 @@ export default {
                 this.inputText = '';
             }
             this.hideValueList();
-            this.keyList = this.listData;
+            this.keyList = this.contextData;
             this.showKeyList();
             this.selectedKeyObj = null;
             this.selectedList = [];
@@ -436,11 +418,14 @@ export default {
             return val;
         },
         onFocus () {
+            this.isFocused = true;
             if (this.autoselect) {
                 this.captureText();
             }
         },
-        onBlur (e) {
+        onBlur () {
+            this.isFocused = false;
+
             if (this.isBlurWithoutCommit) {
                 this.isBlurWithoutCommit = false;
                 return;

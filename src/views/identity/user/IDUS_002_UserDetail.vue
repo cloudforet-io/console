@@ -197,7 +197,7 @@ const userModel = {
 
 export default {
     name: 'UserDetail',
-    event: ['create', 'update', 'cancel'],
+    events: ['create', 'update', 'cancel'],
     components: {
         BaseField,
         BaseTag,

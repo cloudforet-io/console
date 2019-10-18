@@ -1,10 +1,10 @@
 <template>
   <span>
-    <input ref="input" 
-           v-focus.lazy="isFocused" 
+    <input ref="input"
+           v-focus.lazy="isFocused"
            v-autowidth="autowidth"
            :value="value"
-           class="pl-2" 
+           class="pl-2"
            v-bind="$attrs"
            v-on="inputListeners"
            @input="$emit('inputText', $event.target.value)"
@@ -16,7 +16,7 @@
 export default {
     name: 'BaseInput',
     model: {
-        props: 'value',
+        prop: 'value',
         event: 'inputText'
     },
     props: {
@@ -28,6 +28,9 @@ export default {
             type: Boolean,
             default: false
         },
+        /**
+         * autoselect = {maxWidth: '960px', minWidth: '20px', comfortZone: 0}
+         */
         autowidth: {
             type: Object,
             default: () => {}
@@ -60,24 +63,43 @@ export default {
             );
         }
     },
+    watch: {
+        autoselect () {
+            this.applyAutoSelection();
+        }
+    },
     created () {
     },
     methods: {
         setSelectionRange (selectionStart, selectionEnd) {
             this.$refs.input.setSelectionRange(selectionStart, selectionEnd);
         },
+        applyAutoSelection () {
+            if (typeof this.autoselect === 'boolean') {
+                this.setSelectionRange(this.autoselect.start, this.value.length);
+            } else {
+                this.setSelectionRange(this.autoselect.start || 0, this.autoselect.end || this.value.length);
+            }
+        },
         onFocus (event) {
             this.isFocused = true;
             if (this.autoselect) {
-                this.setSelectionRange(
-                    this.autoselect.start || 0, 
-                    this.autoselect.end || this.value.length
-                );
+                this.applyAutoSelection();
             }
+          /**
+           * input focus event
+           * @event focus
+           * @type {object}
+           */
             this.$emit('focus', event);
         },
         onBlur (event) {
             this.isFocused = false;
+          /**
+           * input blur event
+           * @event blur
+           * @type {object}
+           */
             this.$emit('blur', event);
         },
         forceBlur () {
