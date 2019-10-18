@@ -1,12 +1,12 @@
-import { withKnobs, number, boolean } from '@storybook/addon-knobs/vue';
+import { withKnobs, number } from '@storybook/addon-knobs/vue';
 import BaseChart from './BACT_009_BaseChart.vue';
 
 export default {
     title: 'Base/BaseChart',
     component: BaseChart,
-    decorators: [withKnobs],
+    decorators: [withKnobs]
 };
-var dataset ={
+let dataset = {
     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
     datasets: [{
         label: '# of Votes',
@@ -33,53 +33,53 @@ var dataset ={
 
 export const chart = () => ({
     components: { BaseChart },
-    props:{
-      width:{
-          default:number('width',500)
-      }
+    props: {
+        width: {
+            default: number('width', 500)
+        }
     },
-    template: `<BaseChart ref="chart" :width="width" :height="height" :data="chartData" v-if="reload"></BaseChart>`,
+    template: '<BaseChart ref="chart" :width="width" :height="height" :data="chartData" v-if="reload"></BaseChart>',
     data() {
         return {
-            height:300,
+            height: 300,
             chartData: dataset,
-            reload:true,
+            reload: true
         };
-    },
+    }
 });
 
 export const line = () => ({
     components: { BaseChart },
-    template: `<BaseChart ref="chart" type="line" :width="width" :height="height" :data="chartData"></BaseChart>`,
+    template: '<BaseChart ref="chart" type="line" :width="width" :height="height" :data="chartData"></BaseChart>',
     data() {
         return {
-            width:500,
-            height:300,
+            width: 500,
+            height: 300,
             chartData: dataset
         };
-    },
+    }
 });
 
 export const bar = () => ({
     components: { BaseChart },
-    template: `<BaseChart ref="chart" type="bar" :width="width" :height="height" :data="chartData"></BaseChart>`,
+    template: '<BaseChart ref="chart" type="bar" :width="width" :height="height" :data="chartData"></BaseChart>',
     data() {
         return {
-            width:500,
-            height:300,
+            width: 500,
+            height: 300,
             chartData: dataset
         };
-    },
+    }
 });
 
 export const radar = () => ({
     components: { BaseChart },
-    template: `<BaseChart ref="chart" type="radar" :width="width" :height="height" :data="chartData"></BaseChart>`,
+    template: '<BaseChart ref="chart" type="radar" :width="width" :height="height" :data="chartData"></BaseChart>',
     data() {
         return {
-            width:500,
-            height:300,
+            width: 500,
+            height: 300,
             chartData: dataset
         };
-    },
+    }
 });
