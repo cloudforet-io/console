@@ -35,7 +35,7 @@ export const base = () => ({
 </BaseModal>
 `,
     i18n,
-    mounted(){
+    mounted() {
         this.$refs.modal.showModal();
     },
     data() {
@@ -45,9 +45,6 @@ export const base = () => ({
     },
     props: {
         ...autoProps(BaseModal),
-        onModal: {
-            default: boolean('modal', true)
-        }
     },
     methods: {
         ...actions
@@ -57,7 +54,7 @@ export const base = () => ({
 export const okOnly = () => ({
     components: { BaseModal },
     template: `
-<BaseModal ref="modal" @ok="ok" @cancel="cancel" @esc="esc">
+<BaseModal ref="modal" @ok="ok" @cancel="cancel" @esc="esc" :title="title" :text="text" :okOnly="true">
     <template v-slot:activator>
         <button>모달 확인</button>
     </template>
@@ -67,7 +64,7 @@ export const okOnly = () => ({
 </BaseModal>
 `,
     i18n,
-    mounted(){
+    mounted() {
         this.$refs.modal.showModal();
     },
     data() {
@@ -76,10 +73,10 @@ export const okOnly = () => ({
         };
     },
     props: {
-        ...autoProps(BaseModal),
-        onModal: {
-            default: boolean('modal', true)
-        }
+        ...autoProps(BaseModal, [
+            { name: 'title' },
+            { name: 'text' }
+        ])
     },
     methods: {
         ...actions
