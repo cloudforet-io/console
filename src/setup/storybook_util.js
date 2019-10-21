@@ -23,6 +23,7 @@ function makeKnobProp(prop, value) {
  * @property {string} name - prop name
  * @property {any} default - prop default value optional
  */
+
 /**
  * custom props
  * @typedef {propInfo} props
@@ -58,15 +59,14 @@ function makeKnobProp(prop, value) {
  *              ...autoProps(BaseInput,[{name:'value',default:'typing here!!'}])
  *      });,
  */
-export const autoProps = (comp, props = []) => {
+function autoProps(comp, props = []) {
     let mapping = {};
-    const docProps = comp.__docgenInfo.props;
-    const propsValue = comp.props;
+    let docProps = comp.__docgenInfo.props;
+    let propsValue = comp.props;
 
     Object.keys(docProps).forEach((key) => {
-        let defaultValue = eval(propsValue[key].default);
+        let defaultValue = propsValue[key].default;
         if (props.length) {
-            console.log((props))
             let info = (props.find(o => o.name === key));
             if (!info) {
                 return;
@@ -74,11 +74,13 @@ export const autoProps = (comp, props = []) => {
                 defaultValue = info.default;
             }
         }
-        console.log(docProps[key], defaultValue)
         let knob = makeKnobProp(docProps[key], defaultValue);
         if (knob) {
             mapping[key] = knob;
         }
     });
+    console.log(mapping);
     return mapping;
-};
+}
+
+export { autoProps };
