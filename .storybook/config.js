@@ -15,10 +15,12 @@ import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
 import { Mixin } from '@/setup/global_util';
 import VueLodash from 'vue-lodash';
+import VueI18n from 'vue-i18n';
 
 Vue.mixin(Mixin);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
+Vue.use(VueI18n);
 Vue.use(VueInputAutowidth);
 Vue.use(VueLodash, { name: 'lodash' });
 
