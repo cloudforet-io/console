@@ -1,30 +1,18 @@
-.DS_Store
-node_modules
-package-lock.json
-/dist
-/coverage
-/public/config/*
+# Config
+public/config/environment.json
 
-#uncomment if nessacery
-vue.config.js
-/test/e2e/reports/
-selenium-debug.log
-
-# local env files
-.env.*.local
-
-# Log files
+# Logs
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# Editor directories and files
-.idea
+# NPM
+node_modules/
+
+# Transpiled code
+dist
+
+# Dev tools
+.DS_Store
 .vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw*
-
-
+.idea
+*.swp
+*.bak

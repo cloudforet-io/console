@@ -5,6 +5,7 @@
   "author": "CloudOne",
   "scripts": {
     "serve": "vue-cli-service serve",
+    "serve:docker": "docker build",
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src"
   },

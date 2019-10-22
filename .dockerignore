@@ -3,8 +3,6 @@
 .git
 .gitignore
 .dockerignore
-package-lock.json
 node_modules
-
+.eslintrc.js
 test
-.idea
