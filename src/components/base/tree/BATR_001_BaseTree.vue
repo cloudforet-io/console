@@ -106,9 +106,9 @@
 </template>
 <script>
 import SlVueTree from 'sl-vue-tree';
-import BaseDragVertical from '@/components/base/drag/BaseDragVertical';
-import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
-import BaseModal from '@/components/base/modal/BaseModal';
+import BaseDragVertical from '@/components/base/drag/BADG_001_BaseDragVertical';
+import BaseSimpleModal from '@/components/base/modal/BAMO_002_BaseSimpleModal';
+import BaseModal from '@/components/base/modal/BAMO_001_BaseModal';
 import { GlobalEnum } from '@/setup/enum';
 import { mapGetters } from 'vuex';
 export default {
