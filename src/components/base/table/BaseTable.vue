@@ -159,13 +159,13 @@
         <template #name="data">
           <div v-if="data.item.hasOwnProperty('collector_id')">
             <template v-if="selectIconType(data.item.tags)">
-              <img class="row-icons" :src="require(`@/asset/icons/${getCollectorIcon(data.item.tags.icon)}`)"
+              <img class="row-icons" :src="require(`@/assets/icons/${getCollectorIcon(data.item.tags.icon)}`)"
                    height="42vh"
                    width="42vh"
               > {{ data.item.name }}
             </template>
             <template v-else>
-              <img class="row-gears" src="@/asset/icons/common-gear.svg"
+              <img class="row-gears" src="@/assets/icons/common-gear.svg"
                    height="42vh"
                    width="42vh"
               > {{ data.item.name }}
@@ -185,9 +185,9 @@
 </template>
 
 <script>
-const BaseSearch = () => import('@/components/base/search/BASR_001_BaseSearch.vue');
-const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal.vue');
-const BaseCheckbox = () => import('@/components/base/checkbox/BACB_001_BaseCheckbox.vue');
+const BaseSearch = () => import('@/components/base/search/BaseSearch.vue');
+const BaseModal = () => import('@/components/base/modal/BaseModal.vue');
+const BaseCheckbox = () => import('@/components/base/checkbox/BaseCheckbox.vue');
 const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag');
 
 export default {
