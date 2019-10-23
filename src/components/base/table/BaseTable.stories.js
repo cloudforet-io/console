@@ -1,5 +1,5 @@
-import BaseTable from './BATB_001_BaseTable';
-import { autoProps } from '../../../setup/storybook_util';
+import BaseTable from './BaseTable';
+import { autoProps } from '../../../setup/storybook-util';
 import { action } from '@storybook/addon-actions';
 
 export default {

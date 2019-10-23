@@ -188,7 +188,7 @@
 const BaseSearch = () => import('@/components/base/search/BaseSearch.vue');
 const BaseModal = () => import('@/components/base/modal/BaseModal.vue');
 const BaseCheckbox = () => import('@/components/base/checkbox/BaseCheckbox.vue');
-const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag');
+const BaseStateTag = () => import('@/components/base/tags/BaseStateTag.vue');
 
 export default {
     name: 'BaseTable',

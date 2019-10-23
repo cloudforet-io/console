@@ -14,8 +14,7 @@ module.exports = async ({ config, mode }) => {
                     loader: 'sass-loader',
                     options: {
                         data: `
-                        @import "~@/asset/style/_variables.scss";
-                        @import "~@/asset/style/_font.scss";
+                        @import "~@/assets/style/_variables.scss";
                         `
 
                     }
