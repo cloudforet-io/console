@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import BaseTable from '@/components/base/table/BATB_001_BaseTable';
+import BaseTable from '@/components/base/table/BaseTable';
 
 export default {
     name: 'BaseMutiPanel',

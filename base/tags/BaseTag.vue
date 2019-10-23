@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import KeyValueInput from '@/components/base/input/BAIN_003_KeyValueInput';
+import KeyValueInput from '@/components/base/input/KeyValueInput';
 export default {
     name: 'BaseTag',
     events: ['addedRow'],
