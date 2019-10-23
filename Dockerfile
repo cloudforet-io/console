@@ -26,4 +26,4 @@ WORKDIR ${ROOT_PATH}
 
 EXPOSE ${PORT}
 
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
