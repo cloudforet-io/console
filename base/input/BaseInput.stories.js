@@ -1,7 +1,7 @@
 import { withKnobs, text, boolean, number, object } from '@storybook/addon-knobs/vue';
-import BaseInput from './BAIN_001_BaseInput';
+import BaseInput from './BaseInput';
 import { action } from '@storybook/addon-actions';
-import { autoProps } from '../../../setup/storybook_util';
+import { autoProps } from '../../../setup/storybook-util';
 
 export default {
     title: 'base/Input',

@@ -1,5 +1,5 @@
 import { withKnobs, text, boolean, number } from '@storybook/addon-knobs/vue';
-import BaseDragVertical from './BADG_001_BaseDragVertical';
+import BaseDragVertical from './BaseDragVertical';
 import { action } from '@storybook/addon-actions';
 
 export default {

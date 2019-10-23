@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import QueryInput from '@/components/base/input/BAIN_004_EXT_QueryInput';
+import QueryInput from '@/components/base/input/QueryInput';
 export default {
     name: 'InputTag',
     events: ['delete', 'update', 'deleteLeft'],

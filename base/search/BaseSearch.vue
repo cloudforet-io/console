@@ -43,8 +43,8 @@
 </template>
 
 <script>
-import QueryInput from '@/components/base/input/BAIN_004_EXT_QueryInput';
-import InputTag from '@/components/base/input/BAIN_002_EXT_InputTag';
+import QueryInput from '@/components/base/input/QueryInput';
+import InputTag from '@/components/base/input/InputTag';
 
 const testdata = [{
     id: 0,

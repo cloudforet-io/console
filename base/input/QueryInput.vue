@@ -55,8 +55,8 @@
 </template>
 
 <script>
-import BaseQueryList from '@/components/base/list/BALT_001_BaseQueryList';
-import BaseInput from '@/components/base/input/BAIN_001_BaseInput';
+import BaseQueryList from '@/components/base/list/BaseQueryList';
+import BaseInput from '@/components/base/input/BaseInput';
 
 const contentsModel = {
     label: '',

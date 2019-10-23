@@ -1,5 +1,5 @@
 import { withKnobs  } from '@storybook/addon-knobs/vue';
-import BaseCheckbox from './BACB_001_BaseCheckbox';
+import BaseCheckbox from './BaseCheckbox';
 import { action } from '@storybook/addon-actions';
 
 export default {
