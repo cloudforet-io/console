@@ -7,8 +7,8 @@ import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
-import { i18n } from '@/setup/i18n';
-import { Mixin } from '@/setup/global_util';
+import { i18n } from '@/translations';
+import { Mixin } from '@/mixins/global-util';
 import VueLodash from 'vue-lodash';
 
 Vue.mixin(Mixin);

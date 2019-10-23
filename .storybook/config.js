@@ -4,7 +4,7 @@ import {withA11y} from '@storybook/addon-a11y';
 import centered from '@storybook/addon-centered/vue';
 import { withCssResources } from '@storybook/addon-cssresources';
 import '@storybook/addon-console';
-import "@/asset/style/style.scss";
+import "@/assets/style/style.scss";
 import { withInfo } from 'storybook-addon-vue-info'
 // main.js
 import Vue from 'vue';
@@ -13,7 +13,7 @@ import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
-import { Mixin } from '@/setup/global_util';
+import { Mixin } from '@/mixins/global-util';
 import VueLodash from 'vue-lodash';
 import VueI18n from 'vue-i18n';
 import { withKnobs } from '@storybook/addon-knobs';
