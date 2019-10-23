@@ -1,8 +1,8 @@
 import { withKnobs, boolean } from '@storybook/addon-knobs/vue';
-import BaseModal from './BAMO_001_BaseModal';
+import BaseModal from './BaseModal';
 import { action } from '@storybook/addon-actions';
-import { autoProps } from '../../../setup/storybook_util';
-import { i18n } from '../../../setup/i18n';
+import { autoProps } from '../../../setup/storybook-util';
+import { i18n } from '../../../translations';
 
 export default {
     title: 'base/Modal',
@@ -44,7 +44,7 @@ export const base = () => ({
         };
     },
     props: {
-        ...autoProps(BaseModal),
+        ...autoProps(BaseModal)
     },
     methods: {
         ...actions

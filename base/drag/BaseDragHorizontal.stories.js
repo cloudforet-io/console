@@ -1,5 +1,5 @@
 import { withKnobs } from '@storybook/addon-knobs/vue';
-import BaseDragHorizontal from './BADG_002_BaseDragHorizontal';
+import BaseDragHorizontal from './BaseDragHorizontal';
 
 export default {
     title: 'Base/Drag/BaseDragHorizontal',

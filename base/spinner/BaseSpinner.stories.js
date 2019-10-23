@@ -1,6 +1,6 @@
 import { withKnobs, } from '@storybook/addon-knobs/vue';
-import BaseSpinner from './BASP_001_BaseSpinner.vue';
-import { autoProps } from '../../../setup/storybook_util';
+import BaseSpinner from './BaseSpinner.vue';
+import { autoProps } from '../../../setup/storybook-util';
 
 export default {
     title: 'Base/spinner',
