@@ -10,18 +10,22 @@ export default {
     name: 'p-button',
     events:['click'],
     props: {
+        /** @type {string} */
         href: {
             type:String,
             default: null
         },
+        /** @type {boolean} */
         disabled: {
             type: Boolean,
             default: false
         },
+        /** @type {boolean} */
         outline:{
             type: Boolean,
             default: false
         },
+        /** @type {string} */
         styleType:{
             type: String,
             default: null,
@@ -39,14 +43,17 @@ export default {
                 ].indexOf(value) !== -1;
             }
         },
+        /** @type {boolean} */
         link:{
             type: Boolean,
             default: false
         },
+        /** @type {boolean} */
         block:{
             type: Boolean,
             default: false
         },
+        /** @type {string} */
         size:{
             type: String,
             default: null,
