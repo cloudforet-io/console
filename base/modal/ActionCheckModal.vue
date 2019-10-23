@@ -57,8 +57,8 @@
 </template>
 
 <script>
-const BaseModal = () => import('@/components/base/modal/BAMO_001_BaseModal');
-import BaseTable from '@/components/base/table/BATB_001_BaseTable';
+const BaseModal = () => import('@/components/base/modal/BaseModal');
+import BaseTable from '@/components/base/table/BaseTable';
 
 export default {
     name: 'ActionCheckModal',

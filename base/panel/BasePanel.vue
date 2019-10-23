@@ -102,8 +102,8 @@
 </template>
 
 <script>
-const BaseStateTag = () => import('@/components/base/tags/BATG_002_BaseStateTag');
-const BaseBadgeTag = () => import('@/components/base/tags/BATG_003_BaseBadgeTag');
+const BaseStateTag = () => import('@/components/base/tags/BaseStateTag');
+const BaseBadgeTag = () => import('@/components/base/tags/BaseBadgeTag');
 export default {
     name: 'BasePanel',
     events: ['edit'],

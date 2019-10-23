@@ -1,5 +1,5 @@
 import { withKnobs, number } from '@storybook/addon-knobs/vue';
-import BaseChart from './BACT_009_BaseChart.vue';
+import BaseChart from './BaseChart.vue';
 
 export default {
     title: 'Base/BaseChart',
