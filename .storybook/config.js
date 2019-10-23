@@ -16,6 +16,7 @@ import velocity from 'velocity-animate';
 import { Mixin } from '@/setup/global_util';
 import VueLodash from 'vue-lodash';
 import VueI18n from 'vue-i18n';
+import { withKnobs } from '@storybook/addon-knobs';
 
 Vue.mixin(Mixin);
 Vue.use(BootstrapVue);
@@ -39,6 +40,7 @@ configure(require.context('../src', true, /\.stories\.js$/), module);
 configure(require.context('../stories', true, /\.stories\.js$/), module);
 addDecorator(withInfo);
 addDecorator(withA11y);
+addDecorator(withKnobs);
 addDecorator(centered);
 addDecorator(withCssResources);
 addParameters({
