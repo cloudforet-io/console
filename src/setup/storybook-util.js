@@ -1,4 +1,4 @@
-import { text, boolean, number, object, array, } from '@storybook/addon-knobs/vue';
+import { text, boolean, number, object, array, select } from '@storybook/addon-knobs/vue';
 
 const propsTypeMapping = {
     'string': text,
@@ -6,6 +6,7 @@ const propsTypeMapping = {
     'number': number,
     'object': object,
     'array': array,
+    'select': select
 };
 
 function makeKnobProp(prop, value) {
@@ -79,7 +80,6 @@ function autoProps(comp, props = []) {
             mapping[key] = knob;
         }
     });
-    console.log(mapping);
     return mapping;
 }
 
