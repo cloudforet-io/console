@@ -35,7 +35,7 @@ Vue.prototype.$velocity = velocity;
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
 
-// automatically import all files ending in *.stories.js
+// automatically import all files ending in *stories.js
 configure(require.context('../src', true, /\.stories\.js$/), module);
 configure(require.context('../stories', true, /\.stories\.js$/), module);
 addDecorator(withInfo);
