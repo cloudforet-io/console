@@ -7,7 +7,7 @@ import faker from 'faker';
 import { size_mapping } from '../../molecules/modals/ModalMapping';
 
 export default {
-    title: 'organism/content-modal',
+    title: 'organisms/content-modal',
     component: PContentModal,
     parameters: {
         info: {
