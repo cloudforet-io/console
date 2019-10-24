@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { size_mapping } from './modal_mapping';
+import { size_mapping } from './ModalMapping';
 export default {
     name: 'p-modal',
     model: {

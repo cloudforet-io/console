@@ -1,6 +1,6 @@
 import FI from './FI';
 import { select, text } from '@storybook/addon-knobs/vue';
-import { icon_style_mapping, size_mapping, animation_mapping, rotating_mapping, flip_mapping } from './fi_mapping';
+import { icon_style_mapping, size_mapping, animation_mapping, rotating_mapping, flip_mapping } from './FiMapping';
 
 export default {
     title: 'atoms/icon/f-i',
