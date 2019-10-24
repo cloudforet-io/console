@@ -1,13 +1,7 @@
 <template>
     <p-modal
-            :visible="visible"
-            @change="onChange"
-            :fade="fade"
-            :scrollable="scrollable"
-            :size="size"
-            :centered="centered"
-
-    >
+           v-model="visible"
+            v-bind="$props">
         <div class="modal-header">
             <slot name="header"></slot>
         </div>
@@ -25,12 +19,8 @@ import PModal from '../../molecules/modals/Modal';
 export default {
     name: 'p-content-modal',
     mixins:[PModal],
-    components:{ PModal },
-    methods:{
-        onChange(event){
-            this.$emit('change',event);
-        }
-    }
+    components:{ PModal }
+
 };
 </script>
 
