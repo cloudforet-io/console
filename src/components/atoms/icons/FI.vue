@@ -4,7 +4,7 @@
 
 
 <script>
-import { icon_style_mapping, size_mapping, animation_mapping, rotating_mapping, flip_mapping } from './fi_mapping';
+import { icon_style_mapping, size_mapping, animation_mapping, rotating_mapping, flip_mapping } from './FiMapping';
 
 export default {
     name: 'f-i',

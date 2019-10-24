@@ -1,26 +1,25 @@
-import PModal from './modal';
-import { number } from '@storybook/addon-knobs/vue';
+import PModal from './Modal';
+import { size_mapping } from './ModalMapping';
+import { number, select } from '@storybook/addon-knobs/vue';
 import { autoProps } from '../../../setup/storybook-util';
-import { action } from '@storybook/addon-actions';
-import  faker from 'faker';
+import faker from 'faker';
+
 export default {
-    title: 'molecules/modal',
+    title: 'molecules/modals',
     component: PModal,
     parameters: {
         info: {
             summary: '',
             components: { PModal }
         },
-        knobs:{
-            escapeHTML:false
+        knobs: {
+            escapeHTML: false
         }
     }
 };
-const actions = {
-    change:action('change')
-};
+
 const data = {
-    visible:true
+    visible: true
 };
 
 export const modal = () => ({
@@ -31,6 +30,7 @@ export const modal = () => ({
     v-model="visible" 
     :scrollable="scrollable" 
     :centered="centered"
+    :size="size"
     >
     <p style="min-width: 300px;min-height: 200px;">{{lorem}}</p>
 </p-modal>
@@ -41,28 +41,22 @@ export const modal = () => ({
         };
     },
     props: {
-        loremLength:{
-            default:number('loremLength',10, { range:true,min:1,max:80,step:10 })
+        loremLength: {
+            default: number('loremLength', 10, { range: true, min: 1, max: 80, step: 10 })
+        },
+        size: {
+            default: select('size', [null, ...Object.keys(size_mapping)])
         },
         ...autoProps(PModal, [
             { name: 'scrollable' },
             { name: 'centered' }
         ]),
     },
-    computed:{
-        lorem(){
+    computed: {
+        lorem() {
             return faker.lorem.lines(this.loremLength);
         }
     },
-    methods: {
-        ...actions,
-        click(event){
-            console.log(this.visible);
-            if (!this.visible){
-                this.$refs.modal.show();
-            }
-        }
-    }
 });
 
 
