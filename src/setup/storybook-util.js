@@ -80,7 +80,6 @@ function autoProps(comp, props = []) {
             mapping[key] = knob;
         }
     });
-    console.log(mapping);
     return mapping;
 }
 

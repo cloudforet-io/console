@@ -1,6 +1,6 @@
 import PModal from './Modal';
 import { size_mapping } from './ModalMapping';
-import { number, select } from '@storybook/addon-knobs/vue';
+import { number, select,button } from '@storybook/addon-knobs/vue';
 import { autoProps } from '../../../setup/storybook-util';
 import faker from 'faker';
 
@@ -26,7 +26,7 @@ export const modal = () => ({
     components: { PModal },
     template: `
 <p-modal
-    ref="modal"
+    ref="Nmodal"
     v-model="visible" 
     :scrollable="scrollable" 
     :centered="centered"
@@ -40,6 +40,9 @@ export const modal = () => ({
             ...data
         };
     },
+    mounted(){
+        button('show',()=>this.showAction());
+    },
     props: {
         loremLength: {
             default: number('loremLength', 10, { range: true, min: 1, max: 80, step: 10 })
@@ -51,12 +54,20 @@ export const modal = () => ({
             { name: 'scrollable' },
             { name: 'centered' }
         ]),
+        // showBtn:{
+        //     default:button('show',()=>this.showAction())
+        // }
     },
     computed: {
         lorem() {
             return faker.lorem.lines(this.loremLength);
         }
     },
+    methods:{
+        showAction(){
+            this.$refs.Nmodal.show();
+        }
+    }
 });
 
 
