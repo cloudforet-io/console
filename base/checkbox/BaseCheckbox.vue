@@ -1,49 +1,49 @@
 <template>
-  <span>
-    <b-check :checked="selected"
-             :inline="inline"
-             :class="type"
-             @input="onInput"
-             @change="onChange"
-    />
-  </span>
+    <span>
+        <b-check :checked="selected"
+                 :inline="inline"
+                 :class="type"
+                 @input="onInput"
+                 @change="onChange"
+        />
+    </span>
 </template>
 
 <script>
-import {BFormCheckbox} from 'bootstrap-vue';
+import { BFormCheckbox } from 'bootstrap-vue';
 
-  export default {
+export default {
     name: 'BaseCheckbox',
     components: {
-    'b-check': BFormCheckbox
-  },
+        'b-check': BFormCheckbox,
+    },
     event: ['change', 'input'],
     model: {
         prop: 'selected',
-        event: 'input'
+        event: 'input',
     },
     props: {
         selected: {
             type: Boolean,
-            default: false
+            default: false,
         },
         inline: {
             type: Boolean,
-            default: true
+            default: true,
         },
         type: {
             type: String,
-            default: 'primary'
-        }
+            default: 'primary',
+        },
     },
     methods: {
-        onChange (val) {
+        onChange(val) {
             this.$emit('change', val, this.$vnode.key);
         },
-        onInput (val) {
+        onInput(val) {
             this.$emit('input', val, this.$vnode.key);
-        }
-    }
+        },
+    },
 };
 </script>
 

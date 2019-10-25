@@ -1,11 +1,11 @@
-import { withKnobs  } from '@storybook/addon-knobs/vue';
-import BaseCheckbox from './BaseCheckbox';
+import { withKnobs } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
+import BaseCheckbox from './BaseCheckbox';
 
 export default {
     title: 'base/BaseCheckBox',
     component: BaseCheckbox,
-    decorators: [withKnobs]
+    decorators: [withKnobs],
 };
 
 export const checkbox = () => ({
@@ -17,7 +17,5 @@ export const checkbox = () => ({
             change: action('change'),
             input: action('input'),
         };
-    }
+    },
 });
-
-

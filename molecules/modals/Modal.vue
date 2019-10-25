@@ -2,7 +2,7 @@
     <div  ref="modal" class="modal" :class="classObject"  tabindex="-1"  role="dialog">
         <div class="modal-dialog" :class="dialogClassObject" role="document">
             <div class="modal-content">
-            <slot></slot>
+                <slot></slot>
             </div>
         </div>
     </div>
@@ -11,35 +11,36 @@
 <script>
 import $ from 'jquery';
 import { size_mapping } from './ModalMapping';
+
 export default {
     name: 'p-modal',
     model: {
         prop: 'visible',
-        event: 'change'
+        event: 'change',
     },
     events: ['beforeClose'],
     props: {
         visible: {
             type: Boolean,
-            default: false
+            default: false,
         },
         fade: {
             type: Boolean,
-            default: false
+            default: false,
         },
         scrollable: {
             type: Boolean,
-            default: true
+            default: true,
         },
         size: {
             type: String,
             default: null,
-            validator: (value) => size_mapping.hasOwnProperty(value)
+            validator: value => size_mapping.hasOwnProperty(value),
         },
         centered: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
     computed: {
         classObject() {
@@ -50,26 +51,26 @@ export default {
         dialogClassObject() {
             return [
                 { 'modal-dialog-scrollable': this.scrollable },
-                { 'modal-dialog-centered' : this.centered },
-                size_mapping[this.size]
+                { 'modal-dialog-centered': this.centered },
+                size_mapping[this.size],
             ];
-        }
+        },
     },
-    watch:{
-        // visible(){
-        //     /**
-        //      * @description modal visible change
-        //      * @event change
-        //      * @type {boolean}
-        //      */
-        //     this.$emit('change', this.visible);
-        //     if (this.visible){
-        //         this.$refs.modal.modal('show');
-        //     } else {
-        //         this.$refs.modal.modal('hide');
-        //     }
-        //
-        // }
+    watch: {
+    // visible(){
+    //     /**
+    //      * @description modal visible change
+    //      * @event change
+    //      * @type {boolean}
+    //      */
+    //     this.$emit('change', this.visible);
+    //     if (this.visible){
+    //         this.$refs.modal.modal('show');
+    //     } else {
+    //         this.$refs.modal.modal('hide');
+    //     }
+    //
+    // }
     },
     methods: {
         show() {
@@ -77,11 +78,9 @@ export default {
             //     this.visible.set(true);
             // }
 
-            let element = this.$refs.modal.$el;
+            const element = this.$refs.modal.$el;
             $('.modal').modal('show');
             debugger;
-
-
         },
         hide() {
             if (this.visible) {
@@ -90,8 +89,8 @@ export default {
         },
         toggle() {
             this.visible = !this.visible;
-        }
-    }
+        },
+    },
 };
 </script>
 

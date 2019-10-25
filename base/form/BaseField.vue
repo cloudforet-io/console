@@ -1,54 +1,54 @@
 <template>
-  <fieldset class="form-group">
-    <b-row class="form-row">
-      <legend v-if="!isEmpty(label)" class="col-form-label text-right"
-              :class="`col-${labelCols} ${labelClass}`"
-      >
-        <span v-if="!plaintext && required" class="required">*</span> 
-        {{ label }}
-      </legend>
-      <b-input-group :class="`col-${fieldCols ? fieldCols : 12 - labelCols}
+    <fieldset class="form-group">
+        <b-row class="form-row">
+            <legend v-if="!isEmpty(label)" class="col-form-label text-right"
+                    :class="`col-${labelCols} ${labelClass}`"
+            >
+                <span v-if="!plaintext && required" class="required">*</span>
+                {{ label }}
+            </legend>
+            <b-input-group :class="`col-${fieldCols ? fieldCols : 12 - labelCols}
                      ${fieldClass}`"
-      >
-        <b-form-input v-if="type !== 'select'" 
-                      :class="{append: $scopedSlots.append}"
-                      :value="value"
-                      :type="type" 
-                      :plaintext="plaintext" 
-                      :state="state"
-                      :placeholder="placeholder"
-                      :required="browserRequired"
-                      :autocomplete="autocomplete"
-                      :tabindex="tabindex"
-                      @input="onInput"
-        />
-        <ModelSelect v-else
-                     :value="value"
-                     :options="options"
-                     :placeholder="placeholder"
-                     @input="onSelect"
-        />
-        <b-input-group-append v-if="$scopedSlots.append">
-          <slot name="append" />
-        </b-input-group-append>
-      </b-input-group>
-    </b-row>
-    <b-row v-if="!plaintext" align-h="end" class="form-row">
-      <b-col :class="`col-${fieldCols ? fieldCols : 12 - labelCols} ${fieldClass}`">
-        <b-form-invalid-feedback :state="state">
-          {{ invalidMessage }}
-        </b-form-invalid-feedback>
-        <b-form-valid-feedback :state="state">
-          {{ validMessage }}
-        </b-form-valid-feedback>
-        <small v-if="state === null"
-               tabindex="-1" class="form-text text-muted"
-        >
-          {{ description }}
-        </small>
-      </b-col>
-    </b-row>
-  </fieldset>
+            >
+                <b-form-input v-if="type !== 'select'"
+                              :class="{append: $scopedSlots.append}"
+                              :value="value"
+                              :type="type"
+                              :plaintext="plaintext"
+                              :state="state"
+                              :placeholder="placeholder"
+                              :required="browserRequired"
+                              :autocomplete="autocomplete"
+                              :tabindex="tabindex"
+                              @input="onInput"
+                />
+                <ModelSelect v-else
+                             :value="value"
+                             :options="options"
+                             :placeholder="placeholder"
+                             @input="onSelect"
+                />
+                <b-input-group-append v-if="$scopedSlots.append">
+                    <slot name="append" />
+                </b-input-group-append>
+            </b-input-group>
+        </b-row>
+        <b-row v-if="!plaintext" align-h="end" class="form-row">
+            <b-col :class="`col-${fieldCols ? fieldCols : 12 - labelCols} ${fieldClass}`">
+                <b-form-invalid-feedback :state="state">
+                    {{ invalidMessage }}
+                </b-form-invalid-feedback>
+                <b-form-valid-feedback :state="state">
+                    {{ validMessage }}
+                </b-form-valid-feedback>
+                <small v-if="state === null"
+                       tabindex="-1" class="form-text text-muted"
+                >
+                    {{ description }}
+                </small>
+            </b-col>
+        </b-row>
+    </fieldset>
 </template>
 
 <script>
@@ -58,94 +58,94 @@ export default {
     name: 'BaseField',
     events: ['input'],
     components: {
-        ModelSelect
+        ModelSelect,
     },
     model: {
         prop: 'value',
-        event: 'input'
+        event: 'input',
     },
     props: {
         value: {
             type: String,
-            default: null
+            default: null,
         },
         type: {
             type: String,
-            default: 'text'
+            default: 'text',
         },
         plaintext: {
             type: Boolean,
-            default: false
+            default: false,
         },
         placeholder: {
             type: String,
-            default: ''
+            default: '',
         },
         autocomplete: {
             type: String,
-            default: 'off'
+            default: 'off',
         },
         tabindex: {
             type: String,
-            default: '0'
+            default: '0',
         },
         label: {
             type: String,
-            default: ''
+            default: '',
         },
         labelCols: {
             type: Number,
-            default: 3
+            default: 3,
         },
         labelClass: {
             type: String,
-            default: ''
+            default: '',
         },
         fieldCols: {
             type: Number,
-            default: 0
+            default: 0,
         },
         fieldClass: {
             type: String,
-            default: ''
+            default: '',
         },
         options: {
             type: [Array, Object],
-            default: () => []
+            default: () => [],
         },
         required: {
             type: Boolean,
-            default: false
+            default: false,
         },
         browserRequired: {
             type: Boolean,
-            default: false
+            default: false,
         },
         state: {
             type: Boolean,
-            default: null
+            default: null,
         },
         validMessage: {
             type: String,
-            default: ''
+            default: '',
         },
         invalidMessage: {
             type: String,
-            default: ''
+            default: '',
         },
         description: {
             type: String,
-            default: ''
-        }
+            default: '',
+        },
     },
     methods: {
-        onInput (val, e) {
+        onInput(val, e) {
             this.$emit('input', val, e);
         },
-        onSelect (val) {
+        onSelect(val) {
             this.$emit('input', val);
-        }
-    }
+        },
+    },
 };
 </script>
 
