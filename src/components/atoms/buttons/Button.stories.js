@@ -1,7 +1,7 @@
-import PButton from './Button';
 import { select, text } from '@storybook/addon-knobs/vue';
-import { autoProps } from '../../../setup/storybook-util';
 import { action } from '@storybook/addon-actions';
+import PButton from './Button.vue';
+import { autoProps } from '../../../setup/storybook-util';
 
 export default {
     title: 'atoms/buttons/button',
@@ -9,12 +9,12 @@ export default {
     parameters: {
         info: {
             summary: '',
-            components: { PButton }
-        }
-    }
+            components: { PButton },
+        },
+    },
 };
 const actions = {
-    click: action('click')
+    click: action('click'),
 };
 const data = {};
 
@@ -34,31 +34,31 @@ export const base = () => ({
 </p-button>`,
     data() {
         return {
-            ...data
+            ...data,
         };
     },
     props: {
         styleType: {
             default: select('styleType', [
-                null, 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'
-            ], null)
+                null, 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark',
+            ], null),
         },
         size: {
-            default: select('size', [null, 'sm', 'lg'], null)
+            default: select('size', [null, 'sm', 'lg'], null),
         },
         defaultSlot: {
-            default: text('default slot', 'button', 'slot')
+            default: text('default slot', 'button', 'slot'),
         },
         ...autoProps(PButton, [
             { name: 'href' },
             { name: 'disabled' },
             { name: 'outline' },
             { name: 'link' },
-        ])
+        ]),
     },
     methods: {
-        ...actions
-    }
+        ...actions,
+    },
 });
 
 
@@ -81,31 +81,30 @@ export const block = () => ({
 </div>`,
     data() {
         return {
-            ...data
+            ...data,
         };
     },
     props: {
         styleType: {
             default: select('styleType', [
-                null, 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'
-            ], 'primary')
+                null, 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark',
+            ], 'primary'),
         },
         size: {
-            default: select('size', [null, 'sm', 'lg'], null)
+            default: select('size', [null, 'sm', 'lg'], null),
         },
         defaultSlot: {
-            default: text('default slot', 'button', 'slot')
+            default: text('default slot', 'button', 'slot'),
         },
         ...autoProps(PButton, [
             { name: 'href' },
             { name: 'disabled' },
             { name: 'outline' },
             { name: 'link' },
-            { name: 'block', default:true }
-        ])
+            { name: 'block', default: true },
+        ]),
     },
     methods: {
-        ...actions
-    }
+        ...actions,
+    },
 });
-
