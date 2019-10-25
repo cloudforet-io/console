@@ -4,7 +4,7 @@
             <slot name="header"></slot>
         </div>
         <div class="modal-body" v-if="bodyVisible" :class="bodyClass">
-            <slot></slot>
+            <slot name="body"></slot>
         </div>
         <div class="modal-footer" v-if="footerVisible" :class="footerClass">
             <slot name="footer"></slot>
@@ -14,43 +14,43 @@
 
 <script>
 import 'bootstrap';
-import PModal from 'src/components/molecules/modals/Modal.vue';
+import PModal from '../../molecules/modals/Modal.vue';
 
 export default {
-  name: 'p-content-modal',
-  mixins: [PModal],
-  components: { PModal },
-  props: {
-    headerClass: {
-      type: Array,
-      default: null,
+    name: 'p-content-modal',
+    mixins: [PModal],
+    components: { PModal },
+    props: {
+        headerClass: {
+            type: Array,
+            default: null,
+        },
+        bodyClass: {
+            type: Array,
+            default: null,
+        },
+        footerClass: {
+            type: Array,
+            default: null,
+        },
+        headerVisible: {
+            type: Boolean,
+            default: true,
+        },
+        bodyVisible: {
+            type: Boolean,
+            default: true,
+        },
+        footerVisible: {
+            type: Boolean,
+            default: true,
+        },
     },
-    bodyClass: {
-      type: Array,
-      default: null,
+    computed: {
+        modalElement() {
+            return this.$refs.modal.$el;
+        },
     },
-    footerClass: {
-      type: Array,
-      default: null,
-    },
-    headerVisible: {
-      type: Boolean,
-      default: true,
-    },
-    bodyVisible: {
-      type: Boolean,
-      default: true,
-    },
-    footerVisible: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  computed: {
-    modalElement() {
-      return this.$refs.modal.$el;
-    },
-  },
 };
 </script>
 

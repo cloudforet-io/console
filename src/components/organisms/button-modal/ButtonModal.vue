@@ -17,9 +17,9 @@
         <template #footer>
             <slot name="footer"></slot>
             <p-button
-                    v-if="footerCancelButtonVisible"
-                    v-bind="footerCancelButtonBind"
-                    @click="onCancelClick"
+                v-if="footerCancelButtonVisible"
+                v-bind="footerCancelButtonBind"
+                @click="onCancelClick"
             >
                 <slot name="close-button">close</slot>
             </p-button>
@@ -35,69 +35,69 @@
 
 <script>
 import 'bootstrap';
-import PButton from 'src/components/atoms/buttons/Button.vue';
-import PContentModal from 'src/components/organisms/content-modal/ContentModal.vue';
+import PButton from '../../atoms/buttons/Button.vue';
+import PContentModal from '../content-modal/ContentModal.vue';
 
 export default {
-  name: 'p-button-modal',
-  mixins: [PContentModal],
-  components: { PContentModal, PButton },
-  events: ['close', 'cancel', 'confirm'],
-  computed: {
-    modalElement() {
-      return this.$refs.modal.$children[0].$el;
+    name: 'p-button-modal',
+    mixins: [PContentModal],
+    components: { PContentModal, PButton },
+    events: ['close', 'cancel', 'confirm'],
+    computed: {
+        modalElement() {
+            return this.$refs.modal.$children[0].$el;
+        },
     },
-  },
-  props: {
-    headerTitle: {
-      type: String,
-      default: '',
-    },
-    headerCloseButtonVisible: {
-      type: Boolean,
-      default: true,
-    },
-    footerCancelButtonVisible: {
-      type: Boolean,
-      default: true,
-    },
-    footerConfirmButtonVisible: {
-      type: Boolean,
-      default: true,
-    },
-    footerCancelButtonBind: {
-      type: Object,
-      default: () => ({
-        styleType: 'danger',
-      }),
-    },
-    footerConfirmButtonBind: {
-      type: Object,
-      default: () => ({
-        styleType: 'primary',
-      }),
-    },
-    hideOnCancel: {
-      type: Boolean,
-      default: true,
-    },
+    props: {
+        headerTitle: {
+            type: String,
+            default: '',
+        },
+        headerCloseButtonVisible: {
+            type: Boolean,
+            default: true,
+        },
+        footerCancelButtonVisible: {
+            type: Boolean,
+            default: true,
+        },
+        footerConfirmButtonVisible: {
+            type: Boolean,
+            default: true,
+        },
+        footerCancelButtonBind: {
+            type: Object,
+            default: () => ({
+                styleType: 'danger',
+            }),
+        },
+        footerConfirmButtonBind: {
+            type: Object,
+            default: () => ({
+                styleType: 'primary',
+            }),
+        },
+        hideOnCancel: {
+            type: Boolean,
+            default: true,
+        },
 
-  },
-  methods: {
-    onCloseClick() {
-      this.$emit('close');
-      this.hide();
     },
-    onCancelClick() {
-      this.$emit('cancel');
-      if (this.hideOnCancel) {
-        this.hide();
-      }
+    methods: {
+        onCloseClick() {
+            this.$emit('close');
+            this.hide();
+        },
+        onCancelClick() {
+            this.$emit('cancel');
+            if (this.hideOnCancel) {
+                this.hide();
+            }
+        },
+        onConfirmClick() {
+            this.$emit('confirm');
+        },
     },
-    onConfirmClick() {
-      this.$emit('confirm');
-    },
-  },
 };
 </script>
 
