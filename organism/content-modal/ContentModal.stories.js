@@ -77,7 +77,7 @@ export const modal = () => ({
     size: {
       default: select('size', [null, ...Object.keys(sizeMapping)]),
     },
-    ...autoProps(PContentModal,[
+    ...autoProps(PContentModal, [
       { name: 'headerVisible' },
       { name: 'bodyVisible' },
       { name: 'footerVisible' },
@@ -130,7 +130,7 @@ export const fade = () => ({
     size: {
       default: select('size', [null, ...Object.keys(sizeMapping)]),
     },
-    ...autoProps(PContentModal,[
+    ...autoProps(PContentModal, [
       { name: 'headerVisible' },
       { name: 'bodyVisible' },
       { name: 'footerVisible' },
@@ -138,6 +138,9 @@ export const fade = () => ({
     ...autoProps(PModal, [
       { name: 'scrollable' },
       { name: 'centered' },
+      { name: 'backdrop' },
+      { name: 'fade' },
+      { name: 'keyboard' },
     ]),
   },
   computed: {

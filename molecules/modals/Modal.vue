@@ -127,16 +127,19 @@ export default {
         this.show();
       }
     },
-    onShown(e) {
+    onShown() {
       this.is_shown = true;
       this.is_hidden = false;
-      this.$emit('shown', e);
+      this.$emit('shown');
     },
-    onHidden(e) {
+    onHidden() {
       this.is_shown = false;
       this.is_hidden = true;
-      this.$emit('hidden', e);
+      this.$emit('hidden');
     },
+  },
+  beforeDestroy() {
+    $(this.modalElement).modal('dispose');
   },
 };
 </script>
