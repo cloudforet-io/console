@@ -1,6 +1,8 @@
-import { withKnobs, text, boolean, number } from '@storybook/addon-knobs/vue';
-import BaseDragVertical from './BaseDragVertical';
+import {
+    withKnobs, text, boolean, number,
+} from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
+import BaseDragVertical from './BaseDragVertical';
 
 export default {
     title: 'base/drag/vertical',
@@ -8,10 +10,10 @@ export default {
     decorators: [withKnobs],
     parameters: {
         info: {
-            summary: ``,
-            components: { BaseDragVertical }
-        }
-    }
+            summary: '',
+            components: { BaseDragVertical },
+        },
+    },
 };
 
 export const drag = () => ({
@@ -19,7 +21,7 @@ export const drag = () => ({
     template: '<BaseDragVertical ></BaseDragVertical>',
     data() {
         return {};
-    }
+    },
 });
 // todo: BaseDragVertical에서 사용한 this.consoleLogEnv() (글로벌 유틸)에서 최상위 vue의 env 정보를 참조하는 이슈
 
@@ -47,6 +49,5 @@ export const example = () => ({
 </BaseDragVertical>`,
     data() {
         return {};
-    }
+    },
 });
-

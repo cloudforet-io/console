@@ -1,36 +1,35 @@
 <template>
-  <div class="box-container"
-       :style="{'width': totalWidth,
-                'height': `${containerHeight}px`}"
-  >
-    <div class="content-container left">
-      <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
-    </div>
-
-    <div ref="dragger" class="dragger-container"
-         :class="{ line: line }"
-         :style="{
-           'height': `${containerHeight}px`,
-           'left': `${leftContainerWidth}px`
-         }"
-    >
-      <span class="dragger"
-            :style="draggerStyle"
-            @mousedown="onMousedown"
-      >
-        <slot name="dragger" />
-        <i v-if="!$slots.dragger" class="fal fa-grip-lines-vertical" />
-      </span>
-    </div>
-
-    <div class="content-container right"
-         :style="{'width': `calc(100vw - ${leftContainerWidth + draggerWidth}px)`,
-                  'left': `${leftContainerWidth + draggerWidth}px`,
+    <div class="box-container"
+         :style="{'width': totalWidth,
                   'height': `${containerHeight}px`}"
     >
-      <slot name="rightContainer" :width="`calc(100vw - ${leftContainerWidth + draggerWidth}px)`" />
+        <div class="content-container left">
+            <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
+        </div>
+
+        <div ref="dragger" class="dragger-container"
+             :class="{ line: line }"
+             :style="{
+                 'height': `${containerHeight}px`,
+                 'left': `${leftContainerWidth}px`
+             }"
+        >
+            <span class="dragger"
+                  :style="draggerStyle"
+                  @mousedown="onMousedown"
+            >
+                <slot name="dragger" />
+                <i v-if="!$slots.dragger" class="fal fa-grip-lines-vertical" />
+            </span>
+        </div>
+
+        <div class="content-container right"
+             :style="{'width': `calc(100vw - ${leftContainerWidth + draggerWidth}px)`,
+                      'left': `${leftContainerWidth + draggerWidth}px`,
+                      'height': `${containerHeight}px`}">
+            <slot name="rightContainer" :width="`calc(100vw - ${leftContainerWidth + draggerWidth}px)`" />
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -39,89 +38,89 @@ export default {
     props: {
         height: {
             type: Number,
-            default: self.innerHeight
+            default: self.innerHeight,
         },
         line: {
             type: Boolean,
-            default: true
+            default: true,
         },
         draggerSize: {
             type: String,
-            default: '1.5rem'
+            default: '1.5rem',
         },
         draggerHeight: {
             type: Number,
-            default: 30
+            default: 30,
         },
         leftWidth: {
             type: Number,
-            default: 200
+            default: 200,
         },
         minLeftWidth: {
             type: Number,
-            default: 150
+            default: 150,
         },
         maxLeftWidth: {
             type: Number,
-            default: 600
+            default: 600,
         },
         totalWidth: {
             type: String,
-            default: '100vw'
-        }
+            default: '100vw',
+        },
     },
-    data () {
+    data() {
         return {
             draggerStyle: {
                 'font-size': this.draggerSize,
-                'height': `${this.draggerHeight}px`
+                height: `${this.draggerHeight}px`,
             },
             leftContainerWidth: parseInt(this.leftWidth),
             containerHeight: this.height,
             lineHeight: (this.containerHeight / 2) - this.draggerHeight,
             draggerWidth: 30,
             dragging: false,
-            pageX: null
+            pageX: null,
         };
     },
-    mounted () {
+    mounted() {
         this.lineHeight = (this.containerHeight / 2) - this.draggerHeight;
         this.draggerWidth = this.$refs.dragger.clientWidth + this.$refs.dragger.offsetWidth;
         // this.consoleLogEnv('This is a height', this.height);
     },
     methods: {
-        onMousedown () {
+        onMousedown() {
             this.dragging = true;
             self.document.addEventListener('mousemove', this.onMousemove);
             self.document.addEventListener('mouseup', this.onMouseup);
         },
-        onMousemove (e) {
+        onMousemove(e) {
             if (this.dragging) {
                 if (this.pageX === null) {
                     this.pageX = e.pageX;
                     return;
                 }
-                let diff = this.pageX - e.pageX;
-                let newWidth = this.leftContainerWidth - diff;
+                const diff = this.pageX - e.pageX;
+                const newWidth = this.leftContainerWidth - diff;
                 if (newWidth < this.minLeftWidth || newWidth > this.maxLeftWidth) {
                     return;
                 }
 
                 this.leftContainerWidth = newWidth;
-                const widthKey = this.$parent.$parent.$options.name + '_treeWidth';
+                const widthKey = `${this.$parent.$parent.$options.name}_treeWidth`;
                 localStorage[widthKey] = this.leftContainerWidth;
                 this.pageX = e.pageX;
             }
         },
-        onMouseup () {
+        onMouseup() {
             if (this.dragging) {
                 this.dragging = false;
                 this.pageX = null;
                 self.document.removeEventListener('mousemove', this.onMousemove);
                 self.document.removeEventListener('mouseup', this.onMouseup);
             }
-        }
-    }
+        },
+    },
 };
 </script>
 

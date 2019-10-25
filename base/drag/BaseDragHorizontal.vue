@@ -1,27 +1,27 @@
 <template>
-  <div>
-    <slot name="container" :height="containerHeight" />
+    <div>
+        <slot name="container" :height="containerHeight" />
 
-    <div class="dragger-container">
-      <div class="line left"
-           :class="{'colored': line}"
-           :style="lineStyle"
-      />
+        <div class="dragger-container">
+            <div class="line left"
+                 :class="{'colored': line}"
+                 :style="lineStyle"
+            />
 
-      <span class="dragger"
-            :style="draggerStyle"
-            @mousedown="onMousedown"
-      >
-        <slot name="dragger" />
-        <i v-if="!$slots.dragger" class="fal fa-grip-lines" />
-      </span>
+            <span class="dragger"
+                  :style="draggerStyle"
+                  @mousedown="onMousedown"
+            >
+                <slot name="dragger" />
+                <i v-if="!$slots.dragger" class="fal fa-grip-lines" />
+            </span>
 
-      <div class="line right"
-           :class="{ 'colored': line }"
-           :style="lineStyle"
-      />
+            <div class="line right"
+                 :class="{ 'colored': line }"
+                 :style="lineStyle"
+            />
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -30,57 +30,57 @@ export default {
     props: {
         line: {
             type: Boolean,
-            default: true
+            default: true,
         },
         draggerSize: {
             type: String,
-            default: '1.5rem'
+            default: '1.5rem',
         },
         draggerWidth: {
             type: Number,
-            default: 30
+            default: 30,
         },
         height: {
             type: Number,
-            default: 400
+            default: 400,
         },
         minHeight: {
             type: Number,
-            default: 200
+            default: 200,
         },
         maxHeight: {
             type: Number,
-            default: 1000
-        }
+            default: 1000,
+        },
     },
-    data () {
+    data() {
         return {
             lineStyle: {
-                'width': `calc(50% - ${this.width}px)`
+                width: `calc(50% - ${this.width}px)`,
             },
             draggerStyle: {
                 'font-size': this.draggerSize,
-                'width': `${this.draggerWidth}px`
+                width: `${this.draggerWidth}px`,
             },
             containerHeight: this.height,
             dragging: false,
-            pageY: null
+            pageY: null,
         };
     },
     methods: {
-        onMousedown () {
+        onMousedown() {
             this.dragging = true;
             self.document.addEventListener('mousemove', this.onMousemove);
             self.document.addEventListener('mouseup', this.onMouseup);
         },
-        onMousemove (e) {
+        onMousemove(e) {
             if (this.dragging) {
                 if (this.pageY === null) {
                     this.pageY = e.pageY;
                     return;
                 }
 
-                let newHeight = this.containerHeight - (this.pageY - e.pageY);
+                const newHeight = this.containerHeight - (this.pageY - e.pageY);
                 if (newHeight < this.minHeight || newHeight > this.maxHeight) {
                     return;
                 }
@@ -88,15 +88,15 @@ export default {
                 this.pageY = e.pageY;
             }
         },
-        onMouseup () {
+        onMouseup() {
             if (this.dragging) {
                 this.dragging = false;
                 this.pageY = null;
                 self.document.removeEventListener('mousemove', this.onMousemove);
                 self.document.removeEventListener('mouseup', this.onMouseup);
             }
-        }
-    }
+        },
+    },
 };
 </script>
 
