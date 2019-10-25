@@ -4,18 +4,16 @@ import Router from 'vue-router';
 import { beforeEach } from './hooks';
 
 // Routes
-import dashboardRoute from '@/routes/dashboard/dashboard_route';
-import identityRoute from '@/routes/identity/identity_route';
-import inventoryRoute from '@/routes/inventory/inventory_route';
+import dashboardRoute from '@/routes/dashboard/dashboard-route';
+import identityRoute from '@/routes/identity/identity-route';
+import inventoryRoute from '@/routes/inventory/inventory-route';
 
-// Containers
-const DefaultContainer = () => import('@/containers/DefaultContainer');
-
+import DefaultContainer from '@/containers/DefaultContainer';
 // Views
-const LogIn = () => import('@/views/login/local/LOLO_001_LogIn');
-const GoolgeLogIn = () => import('@/views/login/oauth/LOOA_001_LogInGoogleOauth');
-const AdminLogIn = () => import('@/views/login/only_admin/LOOA_001_AdminOnlyLogIn');
-const Redirect404 = () => import('@/views/common/VICO_003_Redirect404');
+import SignIn from '@/views/sign-in/local/Local';
+import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth';
+import Admin from '@/views/sign-in/admin/Admin';
+import Redirect404 from '@/views/common/404/Redirect404';
 
 
 Vue.use(Router);
@@ -30,25 +28,25 @@ const index = new Router({
             path: '/error-page',
             name: 'error',
             meta: { label: '', requiresAuth: false, requiresDomainCheck: true },
-            component: Redirect404
+            component: Redirect404,
         },
         {
-            path: '/log-in',
-            name: 'logIn',
-            meta: { label: 'Log In', requiresAuth: false, requiresDomainCheck: true },
-            component: LogIn
+            path: '/sign-in',
+            name: 'signinn',
+            meta: { label: 'Sign In', requiresAuth: false, requiresDomainCheck: true },
+            component: SignIn,
         },
         {
-            path: '/google-log-in',
-            name: 'Google-Oauth-logIn',
+            path: '/google-sign-in',
+            name: 'Google-Oauth-signin',
             meta: { label: 'google_oauth2', requiresAuth: false, requiresDomainCheck: true },
-            component: GoolgeLogIn
+            component: GoolgeSignIn,
         },
         {
-            path: '/admin-log-in',
-            name: 'Admin-logIn',
-            meta: { label: 'admin_login', requiresAuth: false, requiresDomainCheck: true },
-            component: AdminLogIn
+            path: '/admin-sign-in',
+            name: 'Admin-SignIn',
+            meta: { label: 'admin_sign', requiresAuth: false, requiresDomainCheck: true },
+            component: Admin,
         },
         {
             path: '/',
@@ -59,11 +57,11 @@ const index = new Router({
             children: [
                 dashboardRoute,
                 identityRoute,
-                inventoryRoute
-            ]
+                inventoryRoute,
+            ],
         },
-        { path: '*', component: Redirect404 }
-    ]
+        { path: '*', component: Redirect404 },
+    ],
 });
 
 

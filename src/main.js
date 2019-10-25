@@ -6,19 +6,15 @@ import store from './store';
 import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
-import Notifications from 'vue-notification';
 import velocity from 'velocity-animate';
-import CountryFlag from 'vue-country-flag';
-import { i18n } from '@/setup/i18n';
-import { Mixin } from '@/setup/global_util';
+import { i18n } from '@/translations';
+import { Mixin } from '@/mixins/global-util';
 import VueLodash from 'vue-lodash';
 
 Vue.mixin(Mixin);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
-Vue.use(CountryFlag);
-Vue.use(Notifications, { velocity });
 Vue.use(VueLodash, { name: 'lodash' });
 
 Vue.prototype.$velocity = velocity;

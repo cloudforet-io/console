@@ -35,10 +35,56 @@ export const GlobalEnum = {
             }
         }
     }),
+    COLLECT_MODE: Object.freeze({
+        ALL: { value: 'ALL', text: 'All' },
+        CREATE: { value: 'CREATE', text: 'Create' },
+        UPDATE: { value: 'UPDATE', text: 'Update' }
+    }),
     LANGUAGES: Object.freeze({
         en: { value: 'en', text: 'English' , nation: 'US', icon: 'flag-icon flag-icon-us' },
         ko: { value: 'ko', text: '한국어', nation: 'KR', icon: 'flag-icon flag-icon-kr' }
     }),
+    COLLECTOR: Object.freeze({
+        AWS:[{ file_name: 'aws-ec2' ,src: 'aws-ec2.svg', text: 'EC2' }, { file_name: 'aws-network', src: 'aws-network.svg', text: 'Network' }]
+    }),
+    JOB_STATE: Object.freeze(
+        {
+            PENDING: {
+                msg: 'Pending',
+                icon: 'fal fa-minus',
+                color: 'primary'
+            },
+            INPROGRESS: {
+                msg:  'In progress',
+                icon: 'fal fa-minus',
+                color: 'info'
+            },
+            SUCCESS: {
+                msg:  'Success',
+                icon: 'fal fa-check',
+                color: 'primary'
+            },
+            CREATED: {
+                msg: 'Created',
+                icon:  'fal fa-minus-circle',
+                color: 'warning'
+            },
+            FAILURE: {
+                msg: 'Failure',
+                icon:  'fal fa-traffic-cone',
+                color: 'danger'
+            },
+            TIMEOUT: {
+                msg: 'Time out',
+                icon:  'fal fa-traffic-cone',
+                color: 'secondary'
+            },
+            IDLE: {
+                msg: 'Idle',
+                icon:  'fal fa-traffic-cone',
+                color: 'secondary'
+            }
+        }),
     MEMBER_STATE: Object.freeze(
         {
             ENABLED: {
@@ -71,40 +117,54 @@ export const GlobalEnum = {
             },
             CLOSED: {
                 msg: 'Closed',
-                icon: 'fas fa-minus-circle',
-                color: 'secondary'
+                icon: 'fas fa-times-circle',
+                color: 'danger'
             },
             DELETED: {
                 msg: 'Deleted', 
-                icon: 'fas fa-times',
-                color: 'danger'
+                icon: 'fas fa-minus-circle',
+                color: 'dark'
+            }
+        }),
+    SERVER_TYPE: Object.freeze(
+        {
+            VM: {
+                msg: 'VM', 
+                color: 'success'
+            }
+        }),
+    PLATFORM_TYPE: Object.freeze(
+        {
+            AWS: {
+                msg: 'AWS', 
+                color: 'warning'
             }
         }),
     COLLECT_STATE: Object.freeze(
         {
             NEW: {
                 msg:  'New', //info
-                icon: 'fal fa-lightbulb-on',
+                icon: 'fas fa-lightbulb-on',
                 color: 'info'
             },
             ACTIVE: {
                 msg: 'Active', //primary
-                icon: 'fal fa-check-circle',
+                icon: 'fas fa-check-circle',
                 color: 'primary'
             },
             DISCONNECTED: {
                 msg: 'Disconnected', //danger
-                icon: 'fal fa-plug',
+                icon: 'fas fa-plug',
                 color: 'danger'
             },
             DUPLICATED: {
                 msg: 'Duplicated', // warning
-                icon: 'fal fa-lightbulb-exclamation',
+                icon: 'fas fa-exclamation-triangle',
                 color: 'warning'
             },
             UNMANAGED: {
                 msg: 'Unmanaged', // secondary
-                icon: 'fal fa-question-circle',
+                icon: 'fas fa-question-circle',
                 color: 'secondary'
             }
         }),
