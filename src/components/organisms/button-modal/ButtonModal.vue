@@ -35,8 +35,8 @@
 
 <script>
 import 'bootstrap';
-import PButton from '../../atoms/buttons/Button.vue';
-import PContentModal from '../content-modal/ContentModal.vue';
+import PButton from 'src/components/atoms/buttons/Button.vue';
+import PContentModal from 'src/components/organisms/content-modal/ContentModal.vue';
 
 export default {
   name: 'p-button-modal',
