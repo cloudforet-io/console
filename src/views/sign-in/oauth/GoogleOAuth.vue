@@ -63,7 +63,7 @@
                                         <div id="g-signin-btn" style="width: 70%;" @click="login" />
                                     </b-input-group>
                                     <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
-                                        <div @click="directToAdmin"><a class="root-sign" href="#">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</a>
+                                        <div style="text-align: left" @click="directToAdmin"><a class="root-sign" href="#">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</a>
                                         </div>
                                     </b-col>
                                 </b-form>
