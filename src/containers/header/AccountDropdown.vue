@@ -37,7 +37,7 @@ export default {
         };
     },
     created() {
-        this.userId = sessionStorage.getItem('userId');
+        this.userId = localStorage.getItem('userId');
     },
     methods: {
         async logout() {
