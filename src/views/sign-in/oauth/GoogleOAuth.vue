@@ -90,7 +90,7 @@ import url from 'url';
 import { mapGetters } from 'vuex';
 import store from '@/store';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
-
+/* global gapi */
 const { gapi } = window;
 export default {
     components: { BaseSimpleModal },
@@ -128,6 +128,7 @@ export default {
         async setGoogleSignInButton() {
             const vm = this;
             const clientId = this.$store.getters['auth/client_id'];
+
             gapi.load('auth2', () => {
                 const auth2 = gapi.auth2.init({
                     client_id: clientId,
@@ -168,10 +169,10 @@ export default {
                 this.setTimeZone();
                 console.log('response', response);
             }).catch((error) => {
-                auth2.disconnect();
                 if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
                     const errorMSG = errorConfig.error_dt_code;
+                    auth2.disconnect();
                     if (errorMSG === 'ERROR_AUTHENTICATED_WITHOUT_USER') {
                         this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
                     }
