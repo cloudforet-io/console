@@ -13,7 +13,7 @@ export default {
             values: Mixin.methods.getAllTimezones()
         },
         { label: 'test', key: 'name', ajax: {
-            url: '/identity/user/list',
+            url: '/identity/user/list-items',
             method: 'post',
             filter (res) {
                 return res.data.results.map((user) => {

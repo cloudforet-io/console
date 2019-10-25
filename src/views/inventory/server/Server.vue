@@ -379,7 +379,7 @@ export default {
         },
         async listProjects () {
             try {
-                let res = await this.$axios.post('/identity/project/list', {
+                let res = await this.$axios.post('/identity/project/list-items', {
                     domain_id: sessionStorage.getItem('domainId')
                 });
                 this.setProjects(res.data.results);
@@ -395,7 +395,7 @@ export default {
             this.setQuery(limit, start, sort, filter, filterOr);
             let res = null;
             try {
-                res = await this.$axios.post('/inventory/server/list', {
+                res = await this.$axios.post('/inventory/server/list-items', {
                     query: this.query,
                     domain_id: sessionStorage.getItem('domainId')
                 });

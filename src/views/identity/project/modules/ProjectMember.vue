@@ -183,10 +183,10 @@ export default {
             };
 
             if (this.$attrs['selected-data'].node.data.item_type === 'PROJECT_GROUP'){
-                url = '/identity/project-group/member/list';
+                url = '/identity/project-group/member/list-items';
                 param['project_group_id'] =  this.$attrs['selected-data'].node.data.id;
             } else {
-                url = '/identity/project/member/list';
+                url = '/identity/project/member/list-items';
                 param['project_id'] =  this.$attrs['selected-data'].node.data.id;
             }
 

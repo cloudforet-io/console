@@ -272,7 +272,7 @@ export default {
         showValueList () {
             this.isValueListShown = true;
 
-            // set list position X
+            // set list-items position X
             this.$refs.fakeInput.textContent = `${this.selected.label} ${this.selected.operator} `;
             this.valueListPosX = this.keyListPosX + this.$refs.fakeInput.clientWidth;
         },

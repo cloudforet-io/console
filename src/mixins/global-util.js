@@ -370,7 +370,7 @@ export const Mixin = {
          * Name       : getLanguageSelectList
          *             
          * Output  => Array
-         * Description:  return Array of language select list.
+         * Description:  return Array of language select list-items.
          **********************************************************************************/
         getLanguageSelectList: function () {
             return Object.values(GlobalEnum.LANGUAGES);
@@ -592,7 +592,7 @@ export const Mixin = {
          * Name       : getCollectModeSelectList
          *
          * Output  => Array
-         * Description:  return Array of language select list.
+         * Description:  return Array of language select list-items.
          **********************************************************************************/
         getCollectModeSelectList: function () {
             return Object.values(GlobalEnum.COLLECT_MODE);
@@ -601,7 +601,7 @@ export const Mixin = {
          * Name       : replaceAll
          *
          * Output  => Array
-         * Description:  return Array of language select list.
+         * Description:  return Array of language select list-items.
          **********************************************************************************/
         replaceAll (str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
@@ -612,7 +612,7 @@ export const Mixin = {
          * int : Integer
          * bool: Boolean
          * float: Float
-         * list: List (seperate by comma)
+         * list-items: List (seperate by comma)
          * Output  => Array
          * Description:  return appropriate type by its key.
          **********************************************************************************/

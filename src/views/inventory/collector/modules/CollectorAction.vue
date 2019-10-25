@@ -256,13 +256,13 @@ export default {
 
                 this.reSetDatalist();
                 if (this.isEmpty(selectedVal) || selectedVal === 'OFFICIAL' ){
-                    remoteRepo = await this.$axios.post('/repository/remote-repository/list', {
+                    remoteRepo = await this.$axios.post('/repository/remote-repository/list-items', {
                         domain_id: sessionStorage.getItem('domainId')
                     });
 
                     if (remoteRepo.data.total_count > 0){
                         const repository_remote_id = remoteRepo.data.results[0].remote_repository_id;
-                        let gotPlugInList = await this.$axios.post('/repository/plugin/list', {
+                        let gotPlugInList = await this.$axios.post('/repository/plugin/list-items', {
                             domain_id: sessionStorage.getItem('domainId'),
                             repository_id: repository_remote_id,
                             service_type: 'inventory.collector'

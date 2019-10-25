@@ -157,7 +157,7 @@ export default {
             let param = { query: this.query,
                 domain_id: sessionStorage.domainId,
                 collector_id: this.isEmpty(this.collectorData.collector_id)? '': this.collectorData.collector_id };
-            await this.$axios.post('/inventory/job/list', param).then((response) => {
+            await this.$axios.post('/inventory/job/list-items', param).then((response) => {
                 this.tableData = response.data.results;
                 this.totalCount = response.data.total_count;
                 this.isLoading = false;
