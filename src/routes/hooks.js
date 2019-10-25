@@ -6,7 +6,7 @@ const loginTypeEnum = Object.freeze({
     LOGOUT: null,
     LOCAL_LOGIN: 1,
     OAUTH_LOGIN: 2,
-    DOMAIN_NOT_FOUND: 3
+    DOMAIN_NOT_FOUND: 3,
 });
 
 let isFirstLogin = null;
@@ -19,7 +19,7 @@ const setDomainId = (domainId) => {
 };
 
 const setAuthType = (domainOptions) => {
-    store.commit('auth/setClientId', domainOptions.client_id );
+    store.commit('auth/setClientId', domainOptions.client_id);
     LoginType = domainOptions.auth_type;
 };
 
@@ -29,24 +29,22 @@ const baseRedirectChecker = (domain) => {
         if (domain.plugin_info && domain.plugin_info.options && domain.plugin_info.options.auth_type) {
             setAuthType(domain.plugin_info.options);
             return loginTypeEnum.OAUTH_LOGIN;
-        } else {
-            return loginTypeEnum.LOCAL_LOGIN;
-        } 
-    } else {
-        return loginTypeEnum.DOMAIN_NOT_FOUND;
+        }
+        return loginTypeEnum.LOCAL_LOGIN;
     }
+    return loginTypeEnum.DOMAIN_NOT_FOUND;
 };
 
 
 const getDomain = async () => {
     try {
         const parsedObject = url.parse(window.location.href).host;
-        let domain_name = parsedObject.split('.');
+        const domain_name = parsedObject.split('.');
         const response = await api.post('/identity/domain/list', { name: domain_name[0] });
         if (response.data.total_count === 1) {
             const domainItems = response.data.results[0];
             isFirstLogin = baseRedirectChecker(domainItems);
-            if (domainItems.tags.hasOwnProperty('description')){
+            if (domainItems.tags.hasOwnProperty('description')) {
                 store.commit('auth/setGreetDesc', domainItems.tags.description);
             }
         }
@@ -63,7 +61,7 @@ const checkAccessToken = (to, from, next) => {
     } else {
         store.dispatch('auth/setNextPath', { nextPath: to.fullPath });
         next({
-            path: '/log-in'
+            path: '/sign-in',
         });
     }
 };
@@ -72,24 +70,24 @@ const checkDomain = (to, from, next, meta) => {
     if (isFirstLogin === loginTypeEnum.LOCAL_LOGIN) {
         meta.requiresDomainCheck = false;
         next({
-            path: '/log-in'
+            path: '/sign-in',
         });
-    } else  if (isFirstLogin  === loginTypeEnum.OAUTH_LOGIN ) {
+    } else if (isFirstLogin === loginTypeEnum.OAUTH_LOGIN) {
         if (LoginType === 'google_oauth2') {
             meta.requiresDomainCheck = false;
             next({
-                path: '/google-Log-in'
+                path: '/google-sign-in',
             });
         } else {
             meta.requiresDomainCheck = false;
             next({
-                path: '/error-page'
+                path: '/error-page',
             });
         }
-    } else  if (isFirstLogin  === loginTypeEnum.DOMAIN_NOT_FOUND ) {
+    } else if (isFirstLogin === loginTypeEnum.DOMAIN_NOT_FOUND) {
         meta.requiresDomainCheck = false;
         next({
-            path: '/error-page'
+            path: '/error-page',
         });
     }
 };
@@ -105,7 +103,6 @@ export const beforeEach = async (to, from, next) => {
         await getDomain();
     }
     for (let i = to.matched.length - 1; i > -1; i--) {
-
         if (to.matched[i].meta.requiresAuth) {
             checkAccessToken(to, from, next);
             return;

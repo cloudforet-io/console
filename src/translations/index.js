@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
 import axios from 'axios';
-import { en } from '@/translations/en.js';
-import { ko } from '@/translations/ko.js';
+import { en } from '@/translations/language-pack/en.js';
+import { ko } from '@/translations/language-pack/ko.js';
 
 Vue.use(VueI18n);
 

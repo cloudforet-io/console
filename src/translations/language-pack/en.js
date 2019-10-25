@@ -1,22 +1,14 @@
 export const en = {
-    MSG: {
-        PROCESSED: 'processed',
-        DR_SERV: 'Services',
-        LOG_IN: 'Log In',
-        LOG_IN_GREET: 'Log in to your Account.',
-        LOG_OUT: 'Log Out',
-        LOG_UP_DESC: 'We make it simple to launch in any clouds and scale up as your company grow - whether you’re running any of cloud machine ; We can handle it.',
-        LOG_FAIL_TITLE: 'Log In Error',
-        LOG_FAIL_BODY: 'Please confirm your Username or Password.',
-        FORGPW: 'Forgot password?',
+    COMMON: {
         WELCOME_MSG: 'Welcome to {0} Portal.',
         WELCOME_MSG_P: 'Welcome to {0} Portal',
         SIGN_UP: 'Sign up',
-        SIGN_IN_DESC: 'We make it simple to launch in any clouds and scale up as your company grow - whether you’re running any of cloud machine ; We can handle it.',
+        SIGN_IN: 'Sign In',
         SIGN_IN_MSG: 'Sign in to your Account.',
-        SIGN_IN: 'Sign in',
-        SIGN_FAIL_TITLE: 'Wrong Password or Username.',
         SIGN_FAIL_BODY: 'Please confirm your Username or Password.',
+        SIGN_FAIL_TITLE: 'Wrong Password or Username.',
+        PROCESSED: 'processed',
+        DR_SERV: 'Services',
         COMMON_USER: 'User',
         ADMIN_USER: 'Admin',
         REGISTER: 'Register Now!',
@@ -106,6 +98,18 @@ export const en = {
         CREDENTIAL:'Credential',
         CREDENTIALS:'Credentials',
         LIST: 'List'
+    },
+    SIGNIN: {
+        ROOT_CREDENTIALS: 'Sign-in using root account credentials',
+    },
+    IDENTITY: {
+
+    },
+    INVENTORY: {
+
+    },
+    MSG: {
+
         
     },
     TREE_TYPE: {
@@ -272,7 +276,7 @@ export const en = {
         ALT_CHECK_TYPE: 'Please, check your input type ({0}) is valid.',
         SUCCESS: '{0} Successfully {1}.',
         ERROR: 'ERROR OCCURED during {0} {1}.',
-        NO_PARAM: 'An item must be chosen.' 
+        NO_PARAM: 'An item must be chosen.'
     },
     TABLE: {
         SETTINGS: 'Table Settings',

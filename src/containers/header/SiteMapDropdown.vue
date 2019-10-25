@@ -1,57 +1,57 @@
 <template>
-  <span class="site-map-component">
-    <b-button class="btn toggle" @click.stop="toggleShow">
-      <span>{{ tr('DR_SERV') }}</span> &nbsp;
-      <i v-if="showMap" class="fal fa-angle-up" />
-      <i v-else class="fal fa-angle-down" />
-    </b-button>
-    <transition name="fade">
-      <div v-if="showMap" class="backdrop" @click="showMap = false" />
-    </transition>
-    <b-row class="map-container" 
-           :class="{ 'slide-fade-in': showMap,
-                     'slide-fade-out': !showMap }"
-    >
+    <span class="site-map-component">
+        <b-button class="btn toggle" @click.stop="toggleShow">
+            <span>{{ tr('DR_SERV') }}</span> &nbsp;
+            <i v-if="showMap" class="fal fa-angle-up" />
+            <i v-else class="fal fa-angle-down" />
+        </b-button>
+        <transition name="fade">
+            <div v-if="showMap" class="backdrop" @click="showMap = false" />
+        </transition>
+        <b-row class="map-container"
+               :class="{ 'slide-fade-in': showMap,
+                         'slide-fade-out': !showMap }"
+        >
 
-      <b-col cols="12" class="group bordered" @click="showMap = false">
-        <router-link to="/dashboard">
-          <span class="header">
-            <span class="icon"><i class="fa fa-chart-line" /></span>
-            <span class="header-title">{{ tr('DASHBOARD') }}</span>
-          </span>
-        </router-link>
-      </b-col>
-      
-      <b-col cols="6" class="group">
-        <span class="header">
-          <span class="icon"><i class="fa fa-warehouse-alt" /></span>
-          <span class="header-title">{{ tr('INVENTORY') }}</span>
-        </span>
-        <span class="item" @click="showMap = false">
-          <router-link to="/inventory/data-center">{{ tr('DATA_CENTER') }}</router-link>
-        </span>
-        <span class="item " @click="showMap = false">
-          <router-link to="/inventory/server">{{ tr('SERVER') }}</router-link>
-        </span>
-        <span class="item " @click="showMap = false">
-          <router-link to="/inventory/collector">{{ tr('COLLECTOR') }}</router-link>
-        </span>
-      </b-col>
+            <b-col cols="12" class="group bordered" @click="showMap = false">
+                <router-link to="/dashboard">
+                    <span class="header">
+                        <span class="icon"><i class="fa fa-chart-line" /></span>
+                        <span class="header-title">{{ tr('DASHBOARD') }}</span>
+                    </span>
+                </router-link>
+            </b-col>
 
-      <b-col cols="6" class="group">
-        <span class="header">
-          <span class="icon"><i class="fa fa-address-card" /></span>
-          <span class="header-title">{{ tr('IDENTITY') }}</span>
-        </span>
-        <span class="item " @click="showMap = false">
-          <router-link to="/identity/user">{{ tr('USER') }}</router-link>
-        </span>
-        <span class="item " @click="showMap = false">
-          <router-link to="/identity/project">{{ tr('PROJECT') }}</router-link>
-        </span>
-      </b-col>
-    </b-row>
-  </span>
+            <b-col cols="6" class="group">
+                <span class="header">
+                    <span class="icon"><i class="fa fa-warehouse-alt" /></span>
+                    <span class="header-title">{{ tr('INVENTORY') }}</span>
+                </span>
+                <span class="item" @click="showMap = false">
+                    <router-link to="/inventory/data-center">{{ tr('DATA_CENTER') }}</router-link>
+                </span>
+                <span class="item " @click="showMap = false">
+                    <router-link to="/inventory/server">{{ tr('SERVER') }}</router-link>
+                </span>
+                <span class="item " @click="showMap = false">
+                    <router-link to="/inventory/collector">{{ tr('COLLECTOR') }}</router-link>
+                </span>
+            </b-col>
+
+            <b-col cols="6" class="group">
+                <span class="header">
+                    <span class="icon"><i class="fa fa-address-card" /></span>
+                    <span class="header-title">{{ tr('IDENTITY') }}</span>
+                </span>
+                <span class="item " @click="showMap = false">
+                    <router-link to="/identity/user">{{ tr('USER') }}</router-link>
+                </span>
+                <span class="item " @click="showMap = false">
+                    <router-link to="/identity/project">{{ tr('PROJECT') }}</router-link>
+                </span>
+            </b-col>
+        </b-row>
+    </span>
 </template>
 
 <script>
@@ -62,19 +62,19 @@ export default {
     props: {
         onClick: {
             type: Function,
-            default: () => {}
-        }
+            default: () => {},
+        },
     },
-    data: function () {
+    data() {
         return {
-            showMap: false
+            showMap: false,
         };
     },
     methods: {
-        toggleShow () {
+        toggleShow() {
             this.showMap = !this.showMap;
-        }
-    }
+        },
+    },
 };
 </script>
 <style lang="scss" scoped>
