@@ -56,9 +56,9 @@ const getDomain = async () => {
 };
 
 const checkAccessToken = (to, from, next) => {
-    if (sessionStorage.getItem('token')) {
-        store.dispatch('auth/setUserId', { userId: sessionStorage.getItem('userId') });
-        store.dispatch('auth/setToken', { token: sessionStorage.getItem('token') });
+    if (localStorage.getItem('token')) {
+        store.dispatch('auth/setUserId', { userId: localStorage.getItem('userId') });
+        store.dispatch('auth/setToken', { token: localStorage.getItem('token') });
         next();
     } else {
         store.dispatch('auth/setNextPath', { nextPath: to.fullPath });
