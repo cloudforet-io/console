@@ -156,23 +156,19 @@ export default {
             };
             this.oathSignParam = param;
             this.login();
-            /* if (!this.isSignedIn) {
-              this.login();
-                this.isSignedIn = true;
-            } */
         },
         async login() {
+            const auth2 = gapi.auth2.getAuthInstance();
             await this.$store.dispatch('auth/login', this.oathSignParam).then((response) => {
-                const auth2 = gapi.auth2.getAuthInstance();
                 if (!auth2.isSignedIn.get()) {
                     return;
                 }
                 auth2.disconnect();
                 this.$router.push(this.nextPath);
-                this.rememberMe();
                 this.setTimeZone();
                 console.log('response', response);
             }).catch((error) => {
+                auth2.disconnect();
                 if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
                     const errorMSG = errorConfig.error_dt_code;
@@ -191,15 +187,6 @@ export default {
         showGreetMSG() {
             this.seenGreet = true;
             this.seenError = false;
-        },
-        rememberMe() {
-            if (this.rememberStatus && !this.isEmpty(this.userId)) {
-                localStorage.userId = this.userId;
-                localStorage.checkbox = this.rememberStatus;
-            } else {
-                localStorage.userId = '';
-                localStorage.checkbox = false;
-            }
         },
         popSignUpInstruction() {
             this.$refs.LogInSimpleModal.showModal();
