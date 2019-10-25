@@ -3,7 +3,7 @@
 .git
 .gitignore
 .dockerignore
+.eslintrc.js
 node_modules
-
 test
-.idea
+dist

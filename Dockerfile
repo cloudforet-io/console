@@ -1,31 +1,28 @@
 FROM node:10
 
-ENV BUILD_PATH /opt/cloudone/wconsole-client
+ENV PORT 80
+ENV BUILD_PATH /tmp/cloudone/build
 ENV ROOT_PATH /var/www
-ARG FONT_AWESOME_API_KEY
+ENV LOG_PATH /var/log/cloudone
+ENV NGINX_CONF_PATH /etc/nginx/conf.d
 
-RUN apt-get update && apt-get install -y nginx
-RUN rm /etc/nginx/sites-enabled/default 
 RUN mkdir -p ${BUILD_PATH}
-
-COPY package.json ${BUILD_PATH}/package.json
-COPY package-lock.json ${BUILD_PATH}/package-lock.json
 WORKDIR ${BUILD_PATH}
 
-RUN npm config set @fortawesome:registry ${FONT_AWESOME_API_KEY}
-RUN npm install es6-object-assign
+RUN apt-get update && apt-get install -y nginx \
+    && rm -f /etc/nginx/sites-enabled/default \
+    && mkdir -p ${BUILD_PATH} && mkdir -p ${LOG_PATH}/nginx
+COPY pkg/nginx.conf ${NGINX_CONF_PATH}/cloudone-wconsole-client.conf
+
+COPY package.json package-lock.json .npmrc *.js ${BUILD_PATH}/
 RUN npm install
 
-COPY ./ ${BUILD_PATH}
-WORKDIR ${BUILD_PATH}
+COPY public ${BUILD_PATH}/public
+COPY src ${BUILD_PATH}/src
 
-RUN npm run build
-RUN cp -ar ${BUILD_PATH}/dist/* ${ROOT_PATH}
-RUN rm -rf ${BUILD_PATH}
-
-# Define working directory.
+RUN npm run build && cp -ar ${BUILD_PATH}/dist/* ${ROOT_PATH}/ && rm -rf ${BUILD_PATH}
 WORKDIR ${ROOT_PATH}
 
-EXPOSE 80
+EXPOSE ${PORT}
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
