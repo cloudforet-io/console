@@ -5,6 +5,7 @@
   "author": "CloudOne",
   "scripts": {
     "serve": "vue-cli-service serve",
+    "serve:docker": "docker build --tag wconsole-client . && docker run -p 80:80 wconsole-client",
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src",
     "storybook": "start-storybook -p 6006 -s ./public,./src/asset",

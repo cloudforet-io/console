@@ -3,22 +3,22 @@ module.exports = {
     runtimeCompiler: true,
     devServer: {
         disableHostCheck: true,
-        port: 8080
+        port: 8080,
     },
     css: {
         loaderOptions: {
             sass: {
                 data: `
                 @import "~@/assets/style/_variables.scss";
-                `
-            }
-        }
+                `,
+            },
+        },
     },
     configureWebpack: {
         resolve: {
             alias: {
-            }
+            },
         },
-        devtool: 'source-map'
-    }
+        devtool: 'source-map',
+    },
 };

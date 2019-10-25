@@ -16,7 +16,6 @@ COPY pkg/nginx.conf ${NGINX_CONF_PATH}/cloudone-wconsole-client.conf
 
 COPY package.json package-lock.json .npmrc *.js ${BUILD_PATH}/
 RUN npm install
-#RUN npm install es6-object-assign
 
 COPY public ${BUILD_PATH}/public
 COPY src ${BUILD_PATH}/src
