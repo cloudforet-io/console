@@ -177,7 +177,7 @@ export default {
                     const errorConfig = JSON.parse(error.message);
                     const errorMSG = errorConfig.error_dt_code;
                     if (errorMSG === 'ERROR_AUTHENTICATED_WITHOUT_USER') {
-                        this.$refs.LOOA001_ErrorSimpleModal.showModal();
+                        this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
                     }
                 } else {
                     this.consoleLogEnv('error', error);
