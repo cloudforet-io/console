@@ -2,7 +2,7 @@ import { number, select } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PContentModal from './ButtonModal.vue';
+import PContentModal from '../content-modal/ContentModal.vue';
 import PModal from '../../molecules/modals/Modal.vue';
 import PButton from '../../atoms/buttons/Button.vue';
 import PButtonModal from './ButtonModal.vue';
@@ -80,7 +80,7 @@ export const modal = () => ({
     @close="close"
     @confirm="confirm"
     >
-    <template v-slot="body">
+    <template #body>
         <p>{{lorem}}</p> 
     </template>  
     
