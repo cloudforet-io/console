@@ -1,7 +1,7 @@
 <template>
     <span class="site-map-component">
         <b-button class="btn toggle" @click.stop="toggleShow">
-            <span>{{ tr('DR_SERV') }}</span> &nbsp;
+            <span>{{ tr('COMMON.DR_SERV') }}</span> &nbsp;
             <i v-if="showMap" class="fal fa-angle-up" />
             <i v-else class="fal fa-angle-down" />
         </b-button>
@@ -17,7 +17,7 @@
                 <router-link to="/dashboard">
                     <span class="header">
                         <span class="icon"><i class="fa fa-chart-line" /></span>
-                        <span class="header-title">{{ tr('DASHBOARD') }}</span>
+                        <span class="header-title">{{ tr('COMMON.DASHBOARD') }}</span>
                     </span>
                 </router-link>
             </b-col>
@@ -25,29 +25,29 @@
             <b-col cols="6" class="group">
                 <span class="header">
                     <span class="icon"><i class="fa fa-warehouse-alt" /></span>
-                    <span class="header-title">{{ tr('INVENTORY') }}</span>
+                    <span class="header-title">{{ tr('COMMON.INVENTORY') }}</span>
                 </span>
                 <span class="item" @click="showMap = false">
-                    <router-link to="/inventory/data-center">{{ tr('DATA_CENTER') }}</router-link>
+                    <router-link to="/inventory/data-center">{{ tr('COMMON.DATA_CENTER') }}</router-link>
                 </span>
                 <span class="item " @click="showMap = false">
-                    <router-link to="/inventory/server">{{ tr('SERVER') }}</router-link>
+                    <router-link to="/inventory/server">{{ tr('COMMON.SERVER') }}</router-link>
                 </span>
                 <span class="item " @click="showMap = false">
-                    <router-link to="/inventory/collector">{{ tr('COLLECTOR') }}</router-link>
+                    <router-link to="/inventory/collector">{{ tr('COMMON.COLLECTOR') }}</router-link>
                 </span>
             </b-col>
 
             <b-col cols="6" class="group">
                 <span class="header">
                     <span class="icon"><i class="fa fa-address-card" /></span>
-                    <span class="header-title">{{ tr('IDENTITY') }}</span>
+                    <span class="header-title">{{ tr('COMMON.IDENTITY') }}</span>
                 </span>
                 <span class="item " @click="showMap = false">
-                    <router-link to="/identity/user">{{ tr('USER') }}</router-link>
+                    <router-link to="/identity/user">{{ tr('COMMON.USER') }}</router-link>
                 </span>
                 <span class="item " @click="showMap = false">
-                    <router-link to="/identity/project">{{ tr('PROJECT') }}</router-link>
+                    <router-link to="/identity/project">{{ tr('COMMON.PROJECT') }}</router-link>
                 </span>
             </b-col>
         </b-row>
