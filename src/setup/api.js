@@ -33,7 +33,7 @@ const setRequestInterceptor = (api) => {
 const setResponseInterceptor = (api) => {
     api.interceptors.response.use((response) => {
         if (response.headers.hasOwnProperty('access-token')) {
-            sessionStorage.setItem('token', response.headers['access-token']);
+            localStorage.setItem('token', response.headers['access-token']);
             api.defaults.headers.common['Authorization'] = `Bearer ${response.headers['access-token']}`;
         }
         return response;
