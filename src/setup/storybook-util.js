@@ -68,7 +68,11 @@ function autoProps(comp, props = []) {
   const propsValue = comp.props;
   Object.keys(docProps).forEach((key) => {
     try {
+      if (!propsValue[key]) {
+        return;
+      }
       let defaultValue = propsValue[key].default;
+
       if (props.length) {
         const info = (props.find(o => o.name === key));
         if (!info) {
