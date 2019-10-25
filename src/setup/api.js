@@ -43,7 +43,7 @@ const setResponseInterceptor = (api) => {
             if (err.response.status === 403 || err.response.status === 401) {
                 console.log('Current Error Code: ', err.response.status);
                 store.dispatch('auth/logout');
-                index.push({ path: '/log-in' });
+                index.push({ path: '/sign-in' });
             }
             throw error;
         });
