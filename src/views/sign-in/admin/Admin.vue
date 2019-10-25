@@ -2,27 +2,27 @@
     <b-row align-v="center">
         <ul class="cb-slideshow">
             <li>
-                <span />
+                <span/>
                 <div><h3>Clo·ud San·d·box</h3></div>
             </li>
             <li>
-                <span />
+                <span/>
                 <div><h3>com·po·sure</h3></div>
             </li>
             <li>
-                <span />
+                <span/>
                 <div><h3>e·qua·nim·i·ty</h3></div>
             </li>
             <li>
-                <span />
+                <span/>
                 <div><h3>bal·an·ce</h3></div>
             </li>
             <li>
-                <span />
+                <span/>
                 <div><h3>qui·e·tude</h3></div>
             </li>
             <li>
-                <span />
+                <span/>
                 <div><h3>Ma·inf·rame compu·ter</h3></div>
             </li>
         </ul>
@@ -65,13 +65,13 @@
                                     </transition>
                                     <b-input-group class="mb-3">
                                         <b-input-group-prepend>
-                                            <b-input-group-text><i class="fal fa-user" /></b-input-group-text>
+                                            <b-input-group-text><i class="fal fa-user"/></b-input-group-text>
                                         </b-input-group-prepend>
-                                        <b-form-input v-model="adminUserId" type="text" placeholder="User ID" />
+                                        <b-form-input v-model="adminUserId" type="text" placeholder="User ID"/>
                                     </b-input-group>
                                     <b-input-group class="mb-3">
                                         <b-input-group-prepend>
-                                            <b-input-group-text><i class="fal fa-key" /></b-input-group-text>
+                                            <b-input-group-text><i class="fal fa-key"/></b-input-group-text>
                                         </b-input-group-prepend>
                                         <b-form-input v-model="password" type="password" placeholder="Password"
                                                       autocomplete="current-password"
@@ -90,7 +90,8 @@
                         <b-card no-body class="text-white bg-danger py-5 d-md-down-none" style="width:44%">
                             <b-card-body class="text-center">
                                 <div>
-                                    <p /><h2>{{ tr('MSG.WELCOME_MSG_P',[getCurrentHostname]) }} for Admin.</h2> </p>
+                                    <p/>
+                                    <h2>{{ tr('MSG.WELCOME_MSG_P',[getCurrentHostname]) }} for Admin.</h2> </p>
                                     <p> {{ $t('MSG.SIGN_IN_DESC') }}</p>
                                 </div>
                             </b-card-body>
@@ -154,7 +155,6 @@ export default {
             };
             await this.$store.dispatch('auth/login', authObj).then(() => {
                 this.$router.push(this.nextPath);
-                this.rememberMe();
                 this.setTimeZone();
             }).catch(() => {
                 this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
@@ -222,20 +222,24 @@ export default {
 
     .card-group {
         @extend %sheet;
+
         .input-group-text {
             border: 0;
             background: none;
         }
+
         .form-control {
             border: 1px solid $lightgray;
             border-radius: 5px;
         }
     }
+
     .login-btn {
         border: 0;
         background: linear-gradient(to right, $blue, $violet);
         box-shadow: 0 0 5px 1px rgba($navy, 0.3);
         color: $white;
+
         &:hover {
             color: $white;
         }

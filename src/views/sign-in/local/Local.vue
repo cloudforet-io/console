@@ -182,7 +182,6 @@ export default {
             await this.$store.dispatch('auth/login', authObj).then((response) => {
                 console.log(this.nextPath);
                 this.$router.push(this.nextPath);
-                this.rememberMe();
                 this.setTimeZone();
             }).catch((error) => {
                 if (!this.isEmpty(error.message)) {
