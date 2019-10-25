@@ -8,9 +8,9 @@ export default {
     parameters: {
         info: {
             summary: '',
-            components: { BaseDragHorizontal }
-        }
-    }
+            components: { BaseDragHorizontal },
+        },
+    },
 };
 
 export const drag = () => ({
@@ -19,7 +19,5 @@ export const drag = () => ({
     template: '<BaseDragHorizontal ></BaseDragHorizontal>',
     data() {
         return {};
-    }
+    },
 });
-
-

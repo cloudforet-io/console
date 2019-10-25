@@ -1,7 +1,7 @@
 <template>
     <p-modal
-           v-model="visible"
-            v-bind="$props">
+        v-model="visible"
+        v-bind="$props">
         <div class="modal-header">
             <slot name="header"></slot>
         </div>
@@ -16,11 +16,11 @@
 
 <script>
 import PModal from '../../molecules/modals/Modal';
+
 export default {
     name: 'p-content-modal',
-    mixins:[PModal],
-    components:{ PModal }
-
+    mixins: [PModal],
+    components: { PModal },
 };
 </script>
 
