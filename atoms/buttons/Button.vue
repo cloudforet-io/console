@@ -1,5 +1,9 @@
 <template>
-    <button type="button" :class="classObject" @click="onClick">
+    <button
+        type="button"
+        :class="classObject"
+        @click="onClick"
+    >
         <slot>button</slot>
     </button>
 </template>
@@ -7,29 +11,29 @@
 <script>
 
 export default {
-    name: 'p-button',
-    events:['click'],
+    name: 'PButton',
+    events: ['click'],
     props: {
         /** @type {string} */
         href: {
-            type:String,
-            default: null
+            type: String,
+            default: null,
         },
         /** @type {boolean} */
         disabled: {
             type: Boolean,
-            default: false
+            default: false,
         },
         /** @type {boolean} */
-        outline:{
+        outline: {
             type: Boolean,
-            default: false
+            default: false,
         },
         /** @type {string} */
-        styleType:{
+        styleType: {
             type: String,
             default: null,
-            validator(value){
+            validator(value) {
                 return [
                     null,
                     'primary',
@@ -39,77 +43,90 @@ export default {
                     'warning',
                     'info',
                     'light',
-                    'dark'
+                    'dark',
                 ].indexOf(value) !== -1;
-            }
+            },
         },
         /** @type {boolean} */
-        link:{
+        link: {
             type: Boolean,
-            default: false
+            default: false,
         },
         /** @type {boolean} */
-        block:{
+        block: {
             type: Boolean,
-            default: false
+            default: false,
         },
         /** @type {string} */
-        size:{
+        size: {
             type: String,
             default: null,
-            validator(value){
+            validator(value) {
                 return [
                     null,
                     'sm',
-                    'lg'
+                    'lg',
                 ].indexOf(value) !== -1;
-            }
-        }
+            },
+        },
+        /** @type {string} */
+        shape: {
+            type: String,
+            default: null,
+            validator(value) {
+                return [
+                    null,
+                    'circle',
+                ].indexOf(value) !== -1;
+            },
+        },
     },
-    computed:{
-        classObject(){
-            let obj = ['btn'];
+    computed: {
+        classObject() {
+            const obj = ['btn'];
             obj.push({
-                'disabled':this.disabled,
-                'btn-block':this.block
+                disabled: this.disabled,
+                'btn-block': this.block,
             });
-            if (this.style_class != null){
+            if (this.style_class != null) {
                 obj.push(this.style_class);
             }
-            if (this.size){
-                obj.push('btn-'+this.size);
+            if (this.size) {
+                obj.push(`btn-${this.size}`);
             }
             return obj;
         },
-        style_class(){
-            if (this.link){
+        style_class() {
+            if (this.link) {
                 return 'btn-link';
-            } else if (this.styleType){
+            } if (this.styleType) {
                 let prefix = 'btn-';
-                if (this.outline){
+                if (this.outline) {
                     prefix += 'outline-';
                 }
-                return prefix+this.styleType;
-            } else {
-                return null;
+                return prefix + this.styleType;
             }
-        }
+            return null;
+        },
     },
-    methods:{
-        onClick(event){
-            if (!this.disabled){
-                if (this.href!=null&&this.href.trim()){
-                    location.href=this.href;
+    methods: {
+        onClick(event) {
+            if (!this.disabled) {
+                if (this.href != null && this.href.trim()) {
+                    /**
+                     * TODO: Change it to use Vue outer
+                     * */
+                    this.self.location.href = this.href;
                 }
                 /**
                  * button click event, only emit when disabled value is false
                  * @event click
                  * @type {MouseEvent}
                  */
-                this.$emit('click',event);
+                this.$emit('click', event);
             }
-        }
-    }
+        },
+    },
 };
 </script>
 
