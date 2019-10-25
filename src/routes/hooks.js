@@ -41,12 +41,14 @@ const getDomain = async () => {
         const parsedObject = url.parse(window.location.href).host;
         const domain_name = parsedObject.split('.');
         const response = await api.post('/identity/domain/list', { name: domain_name[0] });
-        if (response.data.total_count === 1) {
+        if (response.data.total_count > 0) {
             const domainItems = response.data.results[0];
             isFirstLogin = baseRedirectChecker(domainItems);
             if (domainItems.tags.hasOwnProperty('description')) {
                 store.commit('auth/setGreetDesc', domainItems.tags.description);
             }
+        } else {
+            isFirstLogin = loginTypeEnum.DOMAIN_NOT_FOUND;
         }
     } catch (error) {
         console.error('No valid Domain', error);

@@ -28,25 +28,25 @@ const index = new Router({
             path: '/error-page',
             name: 'error',
             meta: { label: '', requiresAuth: false, requiresDomainCheck: true },
-            component: Redirect404
+            component: Redirect404,
         },
         {
             path: '/sign-in',
             name: 'signinn',
             meta: { label: 'Sign In', requiresAuth: false, requiresDomainCheck: true },
-            component: SignIn
+            component: SignIn,
         },
         {
             path: '/google-sign-in',
             name: 'Google-Oauth-signin',
             meta: { label: 'google_oauth2', requiresAuth: false, requiresDomainCheck: true },
-            component: GoolgeSignIn
+            component: GoolgeSignIn,
         },
         {
             path: '/admin-sign-in',
             name: 'Admin-SignIn',
             meta: { label: 'admin_sign', requiresAuth: false, requiresDomainCheck: true },
-            component: Admin
+            component: Admin,
         },
         {
             path: '/',
@@ -57,11 +57,11 @@ const index = new Router({
             children: [
                 dashboardRoute,
                 identityRoute,
-                inventoryRoute
-            ]
+                inventoryRoute,
+            ],
         },
-        { path: '*', component: Redirect404 }
-    ]
+        { path: '*', component: Redirect404 },
+    ],
 });
 
 
