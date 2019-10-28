@@ -1,6 +1,8 @@
-import { withKnobs, text, boolean, number, object } from '@storybook/addon-knobs/vue';
-import BaseInput from './BaseInput';
+import {
+    withKnobs, text, boolean, number, object,
+} from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
+import BaseInput from './BaseInput';
 import { autoProps } from '../../../setup/storybook-util';
 
 export default {
@@ -9,8 +11,8 @@ export default {
     decorators: [withKnobs],
     parameters: {
         info: {
-            summary: ``,
-            components: { BaseInput }
+            summary: '',
+            components: { BaseInput },
         },
         cssresources: [{
             id: 'guid',
@@ -26,26 +28,27 @@ export default {
                 `,
         },
         ],
-    }
+    },
 };
+
 const actions = {
     onFocus() {
         return action('focus');
     },
     onBlur() {
         return action('blur');
-    }
+    },
 };
 
 export const simple = () => ({
     components: { BaseInput },
-    template: `<BaseInput id="guid" :value="value"  @focus="onFocus" @blur="onBlur"></BaseInput>`,
+    template: '<BaseInput id="guid" :value="value"  @focus="onFocus" @blur="onBlur"></BaseInput>',
     props: {
         ...autoProps(BaseInput, [
-            { name: 'value', default: 'typing here!' }
-        ])
+            { name: 'value', default: 'typing here!' },
+        ]),
     },
     computed: {
-        ...actions
+        ...actions,
     },
 });

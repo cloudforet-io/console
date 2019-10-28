@@ -4,40 +4,42 @@
 
 
 <script>
-import { icon_style_mapping, size_mapping, animation_mapping, rotating_mapping, flip_mapping } from './FiMapping';
+import {
+    icon_style_mapping, size_mapping, animation_mapping, rotating_mapping, flip_mapping,
+} from './FiMapping';
 
 export default {
     name: 'f-i',
     props: {
         icon: {
             type: String,
-            required: true
+            required: true,
         },
         iconStyle: {
             type: String,
             default: 'solid',
-            validator: (value) => icon_style_mapping.hasOwnProperty(value)
+            validator: value => value in icon_style_mapping,
         },
         size: {
             type: String,
             default: null,
-            validator: (value) => size_mapping.hasOwnProperty(value)
+            validator: value => value in size_mapping,
         },
         animation: {
             type: String,
             default: null,
-            validator: (value) => animation_mapping.hasOwnProperty(value)
+            validator: value => value in animation_mapping,
         },
         rotating: {
             type: String,
             default: null,
-            validator: (value) => rotating_mapping.hasOwnProperty(value)
+            validator: value => value in rotating_mapping,
         },
         flip: {
             type: String,
             default: null,
-            validator: (value) => flip_mapping.hasOwnProperty(value)
-        }
+            validator: value => value in flip_mapping,
+        },
     },
     computed: {
         classObject() {
@@ -46,10 +48,10 @@ export default {
                 this.icon,
                 size_mapping[this.size],
                 animation_mapping[this.animation],
-                flip_mapping[this.flip]||rotating_mapping[this.rotating],
+                flip_mapping[this.flip] || rotating_mapping[this.rotating],
             ];
-        }
-    }
+        },
+    },
 };
 </script>
 
