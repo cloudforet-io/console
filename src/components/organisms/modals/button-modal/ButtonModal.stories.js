@@ -3,11 +3,11 @@ import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import PContentModal from '../content-modal/ContentModal.vue';
-import PModal from '../../molecules/modals/Modal.vue';
-import PButton from '../../atoms/buttons/Button.vue';
+import PModal from '../../../molecules/modals/Modal.vue';
+import PButton from '../../../atoms/buttons/Button.vue';
 import PButtonModal from './ButtonModal.vue';
-import { autoProps } from '../../../setup/storybook-util';
-import { sizeMapping } from '../../molecules/modals/ModalMapping';
+import { autoProps } from '../../../../setup/storybook-util';
+import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 
 export default {
     title: 'organisms/button-modal',
