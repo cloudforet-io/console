@@ -74,7 +74,7 @@
                                             <b-input-group-text><i class="fal fa-key"/></b-input-group-text>
                                         </b-input-group-prepend>
                                         <b-form-input v-model="password" type="password" placeholder="Password"
-                                                      autocomplete="current-password"
+                                                      autocomplete="current-password" @keyup.enter="login"
                                         />
                                     </b-input-group>
                                     <b-row class="mb-3">

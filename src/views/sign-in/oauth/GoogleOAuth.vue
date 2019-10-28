@@ -165,9 +165,11 @@ export default {
                     return;
                 }
                 auth2.disconnect();
+                console.log('response', this.$router);
                 this.$router.push(this.nextPath);
+                console.log('response', this.nextPath);
                 this.setTimeZone();
-                console.log('response', response);
+
             }).catch((error) => {
                 if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
