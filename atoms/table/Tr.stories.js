@@ -1,5 +1,5 @@
 import Tr from '@/components/atoms/table/Tr.vue';
-import { autoProps } from '@/setup/storybook_util';
+import { autoProps } from '../../../setup/storybook-util';
 
 export default {
     title: 'atoms/table/tr',
