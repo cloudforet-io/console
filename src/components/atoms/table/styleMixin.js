@@ -21,7 +21,7 @@ export default {
             if (this.styleType) {
                 return [`table-${this.styleType}`];
             } if (this.background) {
-                return [`table-${this.background}`];
+                return [`bg-${this.background}`];
             }
             return [];
         },
