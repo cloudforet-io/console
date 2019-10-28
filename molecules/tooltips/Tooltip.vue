@@ -1,29 +1,16 @@
 <template>
-    <div class="p-tooltip">
-        <div
-            ref="target"
-            class="target"
-            @mouseover="show"
-            @mouseout="hide"
-        >
-            <slot name="target" />
-        </div>
-        <div
-            v-if="visible"
-            ref="contents"
-            class="tooltip-container"
-            :style="computedStyle"
-        >
-            <slot name="contents">
-                {{ contents }}
-            </slot>
-        </div>
-    </div>
+    <span v-tooltip="tooltipOptions">
+        <slot name="target" />
+    </span>
 </template>
 
 <script>
+import { VTooltip } from 'v-tooltip';
+import TooltipOptions from './Tooltip.map';
+
 export default {
     name: 'PTooltip',
+    directives: { tooltip: VTooltip },
     props: {
         contents: {
             type: String,
@@ -31,81 +18,150 @@ export default {
         },
         position: {
             type: String,
-            default: 'right',
-            validator(val) {
-                return ['right', 'left', 'top', 'bottom'].includes(val);
-            },
+            default: 'auto',
+        },
+        options: {
+            type: Object,
+            default: () => ({}),
         },
     },
     data() {
         return {
-            isMounted: false,
-            visible: false,
+            tooltipOptions: new TooltipOptions({
+                content: this.contents,
+                placement: this.position,
+                classes: ['p-tooltip'],
+                targetClasses: 'p-tooltip-target',
+                ...this.options,
+            }),
         };
     },
-    computed: {
-        targetElement() {
-            return this.isMounted ? this.$refs.target : null;
+    watch: {
+        contents(val) {
+            this.tooltipOptions.content = val;
         },
-        targetWidth() {
-            return this.targetElement ? this.targetElement.clientWidth : 0;
+        position(val) {
+            console.log('position changed: ', val);
+            this.tooltipOptions.placement = val;
         },
-        targetHeight() {
-            return this.targetElement ? this.targetElement.clientHeight : 0;
-        },
-        contentsElement() {
-            return this.isMounted ? this.$refs.contents : null;
-        },
-        contentsWidth() {
-            return this.contentsElement ? this.contentsElement.clientWidth : 0;
-        },
-        contentsHeight() {
-            return this.contentsElement ? this.contentsElement.clientHeight : 0;
-        },
-        computedStyle() {
-            if (this.position === 'right') {
-                return { left: `${this.targetWidth}px`, top: 0 };
-            }
-            if (this.position === 'left') {
-                console.log(this.contentsWidth);
-                return { left: `${-this.contentsWidth}px`, top: 0 };
-            }
-            if (this.position === 'bottom') {
-                return { left: 'unset', top: `${this.targetHeight}px` };
-            }
-            if (this.position === 'top') {
-                return { left: 'unset', top: 0 };
-            }
-            return {};
-        },
-    },
-    mounted() {
-        this.isMounted = true;
-    },
-    updated() {
-        console.log('upadted')
     },
     methods: {
         show() {
-            if (this.targetElement) {
-                this.visible = true;
-            }
         },
         hide() {
-            this.visible = false;
         },
     },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     .p-tooltip {
-        position: relative;
-    }
-    .target {
-        position: relative;
-    }
-    .tooltip-container {
-        position: absolute;
+        display: block !important;
+        z-index: 10000;
+
+        .tooltip-inner {
+            background: black;
+            color: white;
+            border-radius: 16px;
+            padding: 5px 10px 4px;
+        }
+
+        .tooltip-arrow {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            position: absolute;
+            margin: 5px;
+            border-color: black;
+            z-index: 1;
+        }
+
+        &[x-placement^="top"] {
+            margin-bottom: 5px;
+
+            .tooltip-arrow {
+                border-width: 5px 5px 0 5px;
+                border-left-color: transparent !important;
+                border-right-color: transparent !important;
+                border-bottom-color: transparent !important;
+                bottom: -5px;
+                left: calc(50% - 5px);
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+        }
+
+        &[x-placement^="bottom"] {
+            margin-top: 5px;
+
+            .tooltip-arrow {
+                border-width: 0 5px 5px 5px;
+                border-left-color: transparent !important;
+                border-right-color: transparent !important;
+                border-top-color: transparent !important;
+                top: -5px;
+                left: calc(50% - 5px);
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+        }
+
+        &[x-placement^="right"] {
+            margin-left: 5px;
+
+            .tooltip-arrow {
+                border-width: 5px 5px 5px 0;
+                border-left-color: transparent !important;
+                border-top-color: transparent !important;
+                border-bottom-color: transparent !important;
+                left: -5px;
+                top: calc(50% - 5px);
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+
+        &[x-placement^="left"] {
+            margin-right: 5px;
+
+            .tooltip-arrow {
+                border-width: 5px 0 5px 5px;
+                border-top-color: transparent !important;
+                border-right-color: transparent !important;
+                border-bottom-color: transparent !important;
+                right: -5px;
+                top: calc(50% - 5px);
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+
+        &.popover {
+            $color: #f9f9f9;
+
+            .popover-inner {
+                background: $color;
+                color: black;
+                padding: 24px;
+                border-radius: 5px;
+                box-shadow: 0 5px 30px rgba(black, .1);
+            }
+
+            .popover-arrow {
+                border-color: $color;
+            }
+        }
+
+        &[aria-hidden='true'] {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity .15s, visibility .15s;
+        }
+
+        &[aria-hidden='false'] {
+            visibility: visible;
+            opacity: 1;
+            transition: opacity .15s;
+        }
     }
 </style>

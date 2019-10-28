@@ -1,13 +1,24 @@
 <template>
-    <div class="circle-button">
-        <p-button shape="circle">
-            <template>
-                <slot name="contents">
-                    <f-i :icon="icon"/>
-                </slot>
+    <div>
+        <p-tooltip
+            :contents="tooltip"
+            position="right"
+        >
+            <template #target>
+                <p-button
+                    class="menu-btn"
+                    shape="circle"
+                    size="lg"
+                    v-on="$listeners"
+                >
+                    <template>
+                        <slot>
+                            <f-i :icon="icon" />
+                        </slot>
+                    </template>
+                </p-button>
             </template>
-        </p-button>
-        <p-tooltip :contents="tooltip" />
+        </p-tooltip>
     </div>
 </template>
 
@@ -18,6 +29,7 @@ import FI from '@/components/atoms/icons/FI.vue';
 
 export default {
     name: 'MenuButton',
+    events: ['click'],
     components: {
         PTooltip: Tooltip,
         PButton: Button,
@@ -37,5 +49,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
+    .menu-btn {
+    }
 </style>

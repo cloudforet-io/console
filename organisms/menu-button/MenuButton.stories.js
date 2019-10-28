@@ -1,5 +1,6 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { text } from '@storybook/addon-knobs/vue';
 import MenuButton from './MenuButton.vue';
-import { autoProps } from '../../../setup/storybook-util';
 
 export default {
     title: 'Organisms/menu-button',
@@ -9,7 +10,12 @@ export default {
 export const defaultCase = () => ({
     components: { MenuButton },
     props: {
-        ...autoProps(MenuButton),
+        icon: {
+            default: text('icon', 'fa-smile-wink'),
+        },
+        tooltip: {
+            default: text('tooltip', 'tooltip contents'),
+        },
     },
     template: '<menu-button :icon="icon" :tooltip="tooltip"/>',
 });
