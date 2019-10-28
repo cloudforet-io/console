@@ -174,11 +174,20 @@ export default {
         },
         async login() {
             console.log(this.tr('MSG.LOG_IN'));
+
+            this.showGreetMSG();
+
             const authObj = {
                 userId: this.userId,
                 password: this.password,
                 domainId: sessionStorage.getItem('domainId'),
             };
+
+            if (this.isEmpty(authObj.userId) || this.isEmpty(authObj.password)) {
+                this.showErorrMSG();
+                return;
+            }
+
             await this.$store.dispatch('auth/login', authObj).then((response) => {
                 console.log(this.nextPath);
                 this.$router.push(this.nextPath);
@@ -189,7 +198,7 @@ export default {
                     const errorCode = errorConfig.error_code;
                     const errorMSG = errorConfig.error_dt_code;
                     if (errorMSG === 'ERROR_NOT_FOUND' && errorCode === 400) {
-                        this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
+                        this.showErorrMSG();
                     }
                 } else {
                     this.consoleLogEnv('error', error);
@@ -243,6 +252,9 @@ export default {
 
 <style lang="scss" scoped>
     @import '../../../assets/style/css/slideShow.css';
+    a.root-sign:hover {
+        text-decoration: underline;
+    }
     .root-sign {
         font-size: 14px;
         font-family: "Helvetica Neue",Roboto,Arial,sans-serif;

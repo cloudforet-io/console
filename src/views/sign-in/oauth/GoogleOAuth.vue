@@ -198,6 +198,10 @@ export default {
 
 <style lang="scss" scoped>
     @import '../../../assets/style/css/slideShow.css';
+    a.root-sign:hover {
+        text-decoration: underline;
+    }
+
     .root-sign {
         text-align: left;
         font-size: 14px;
