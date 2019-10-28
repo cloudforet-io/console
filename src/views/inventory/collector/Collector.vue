@@ -305,7 +305,7 @@ export default {
             this.setQuery(limit, start, sort, filter, filterOr);
             let res = null;
             try {
-                res = await this.$axios.post('/inventory/collector/list-items', {
+                res = await this.$axios.post('/inventory/collector/list', {
                     query: this.query
                 });
                 this.collectors = res.data.results;

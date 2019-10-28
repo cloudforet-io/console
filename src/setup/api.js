@@ -33,7 +33,7 @@ const setRequestInterceptor = (api) => {
 const setResponseInterceptor = (api) => {
     api.interceptors.response.use((response) => {
         if (response.headers.hasOwnProperty('access-token')) {
-            sessionStorage.setItem('token', response.headers['access-token']);
+            localStorage.setItem('token', response.headers['access-token']);
             api.defaults.headers.common['Authorization'] = `Bearer ${response.headers['access-token']}`;
         }
         return response;
@@ -43,7 +43,7 @@ const setResponseInterceptor = (api) => {
             if (err.response.status === 403 || err.response.status === 401) {
                 console.log('Current Error Code: ', err.response.status);
                 store.dispatch('auth/logout');
-                index.push({ path: '/log-in' });
+                index.push({ path: '/sign-in' });
             }
             throw error;
         });

@@ -5,6 +5,7 @@
   "author": "CloudOne",
   "scripts": {
     "serve": "vue-cli-service serve",
+    "serve:docker": "docker build --tag wconsole-client . && docker run -p 80:80 wconsole-client",
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src",
     "storybook": "start-storybook -p 6006 -s ./public,./src/asset",
@@ -15,6 +16,7 @@
     "@coreui/coreui-plugin-chartjs-custom-tooltips": "^1.2.0",
     "@coreui/icons": "0.3.0",
     "@coreui/vue": "^2.1.2",
+    "@johmun/vue-tags-input": "^2.1.0",
     "axios": "^0.18.0",
     "babel-preset-vue": "^2.0.2",
     "bootstrap": "^4.3.1",

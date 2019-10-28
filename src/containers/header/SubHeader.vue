@@ -1,36 +1,36 @@
 <template>
-  <b-row class="sub-header" no-gutters>
-    <b-col cols="1" class="header-group">
-      <span class="label">
-        <i :class="subHeaderGroup.icon" />&nbsp;&nbsp;
-        <span>{{ subHeaderGroup.label }}</span>
-      </span>
-    </b-col>
-    <b-col cols="10" class="row ">
-      <span v-for="nav in subHeaderList" :key="nav.label">
-        <div class="item" :class="{ 'active': $route.meta.label === nav.label }">
-          <span class="label">
-            <router-link :to="nav.link">
-              {{ nav.label }}
-            </router-link>
-          </span>
-        </div>
-      </span>
-    </b-col>
-  </b-row>
+    <b-row class="sub-header" no-gutters>
+        <b-col cols="1" class="header-group">
+            <span class="label">
+                <i :class="subHeaderGroup.icon" />&nbsp;&nbsp;
+                <span>{{ subHeaderGroup.label }}</span>
+            </span>
+        </b-col>
+        <b-col cols="10" class="row ">
+            <span v-for="nav in subHeaderList" :key="nav.label">
+                <div class="item" :class="{ 'active': $route.meta.label === nav.label }">
+                    <span class="label">
+                        <router-link :to="nav.link">
+                            {{ nav.label }}
+                        </router-link>
+                    </span>
+                </div>
+            </span>
+        </b-col>
+    </b-row>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 
 export default {
-    name:'SubHeader',
+    name: 'SubHeader',
     computed: {
         ...mapGetters('header', [
             'subHeaderGroup',
-            'subHeaderList'
-        ])
-    }
+            'subHeaderList',
+        ]),
+    },
 };
 </script>
 
@@ -64,7 +64,7 @@ $shape-color: darken($skyblue, 1%);
   font-weight: 500;
   font-family: $font-big;
   box-shadow: 0px 0 5px 0px rgba($black, 0.3);
-  
+
   .header-group {
     @extend %item;
     height: $sub-header-height;
@@ -103,7 +103,7 @@ $shape-color: darken($skyblue, 1%);
         color: darken($blue, 10%);
         background-color: lighten($shape-color, 3%);
         background: linear-gradient(to right, transparent, $lightgray, transparent);
-        
+
         border-image: linear-gradient(to right, lighten($blue, 5%), darken($blue, 15%));
         border-image-slice: 1;
         border-image-width: 0 0 2px 0;
@@ -113,7 +113,7 @@ $shape-color: darken($skyblue, 1%);
       font-weight: 600;
       color: darken($darkgray, 20%);
       background: linear-gradient(to right, transparent, $lightgray, transparent);
-      
+
       border-image: linear-gradient(to right, $lightgray, $gray, $lightgray);
       border-image-slice: 1;
       border-image-width: 0 0 2px 0;

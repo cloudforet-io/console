@@ -1,17 +1,18 @@
 import { hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
-import { GlobalEnum } from '@/setup/enum';
 import VueLodash from 'vue-lodash';
 import timezone from 'countries-and-timezones';
+import { GlobalEnum } from '@/setup/enum';
+
 export const Mixin = {
     methods: {
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getGraphColor
          * Input      : => (o: opacity,   => Boolean,
          *                  r: random,    => Boolean,
          *                  l: length     => Number)
          * Output     : => (String || Array of String contains Hex color)
          * Description:    generate random color HEX digits.
-         **********************************************************************************/
+         ********************************************************************************* */
         getGraphColor: (o, r, l) => {
             const colorListWithOpacity = [
                 hexToRgba('#2C68F9', 70),
@@ -21,108 +22,107 @@ export const Mixin = {
                 hexToRgba('#0F2965', 70),
                 hexToRgba('#4856f2', 70),
                 hexToRgba('#FFAE08', 70),
-                hexToRgba('#2D9E6E', 70)
+                hexToRgba('#2D9E6E', 70),
             ];
-            const colorListWithOutOpacity = ['#2C68F9', '#e81d2a', '#8a2be2', '#1a1f3e', '#4856f2', '#FFAE08', '#2D9E6E' ];
+            const colorListWithOutOpacity = ['#2C68F9', '#e81d2a', '#8a2be2', '#1a1f3e', '#4856f2', '#FFAE08', '#2D9E6E'];
 
-            let selectedColor = (o) ? colorListWithOpacity: colorListWithOutOpacity;
-            let returnColorVal =  l == 0 ? (r) ? selectedColor[Math.floor(Math.random() * selectedColor.length)] : selectedColor[0]: [];
+            const selectedColor = (o) ? colorListWithOpacity : colorListWithOutOpacity;
+            const returnColorVal = l == 0 ? (r) ? selectedColor[Math.floor(Math.random() * selectedColor.length)] : selectedColor[0] : [];
             let idx = 0;
 
             for (let i = 0; i < l; i++) {
                 if (r) {
                     returnColorVal.push(selectedColor[Math.floor(Math.random() * selectedColor.length)]);
                 } else {
-                    idx = i >= selectedColor.length ? l%selectedColor.length : i;
+                    idx = i >= selectedColor.length ? l % selectedColor.length : i;
                     returnColorVal.push(selectedColor[idx]);
                 }
             }
             return returnColorVal;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Input        => (v:value: => Any)
          * Output       => (Boolean)
          * Description:    Check whether given value is empty.
-         **********************************************************************************/
-        isEmpty: function (v) {
-            return (v === '' || v === null || v === undefined || (v !== null && typeof v === 'object' && !Object.keys(v).length)) ? true : false;
+         ********************************************************************************* */
+        isEmpty(v) {
+            return !!((v === '' || v === null || v === undefined || (v !== null && typeof v === 'object' && !Object.keys(v).length)));
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : cssStyler
          * Input        => (c:css Object      => type of Object,
          *                  i:use 'Style' YN  => Boolean
          *                  t:use  Trim   YN  => Boolean )
          * Output       => (String): All trimmed css String by condition;
          * Description:    Generate full String of css given Object c by condition of i, t
-         **********************************************************************************/
-        cssStyler: function (c, i, t) {
+         ********************************************************************************* */
+        cssStyler(c, i, t) {
             let style = '';
             Object.entries(c).forEach(([key, val]) => {
                 if (t) {
-                    return style += key.trim() + ':' + val.trim() + (val.indexOf(';') > 0) ? '' : ';';
-                } else {
-                    return style += key + ':' + val + ';';
+                    return style += `${key.trim()}:${val.trim()}${val.indexOf(';') > 0}` ? '' : ';';
                 }
+                return style += `${key}:${val};`;
             });
             return (i) ? `style="${style}"` : style;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : selectToCopyToClipboard
          * Input   => (t:text            =>  String)
          * Output  => (Empty):
          * Description:  copy given text to clipboard
-         **********************************************************************************/
-        selectToCopyToClipboard: function (t) {
-            let textArea = document.createElement('textarea');
+         ********************************************************************************* */
+        selectToCopyToClipboard(t) {
+            const textArea = document.createElement('textarea');
             textArea.value = t;
             document.body.appendChild(textArea);
             textArea.select();
-            let successFailCondition = document.execCommand('Copy');
+            const successFailCondition = document.execCommand('Copy');
             textArea.remove();
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : selectBadges
          * Input   => (s:badges flag String  => String)
          * Output  => (String): variant value
          * Description:  Select badges variant by given val
-         **********************************************************************************/
-        selectBadges: function (s) {
-            const successFlag = ['active', 'success','vm'];
+         ********************************************************************************* */
+        selectBadges(s) {
+            const successFlag = ['active', 'success', 'vm'];
             const secondaryFlag = ['inactive'];
             const dangerFlag = ['banned', 'failure', 'fail'];
-            const warningFlag = ['pending','aws'];
+            const warningFlag = ['pending', 'aws'];
             const infoFlag = [];
             const lightFlag = [];
             const darkFlag = [];
             return successFlag.includes(s.toLowerCase()) ? 'success'
                 : secondaryFlag.includes(s.toLowerCase()) ? 'secondary'
-                : dangerFlag.includes(s.toLowerCase()) ? 'danger'
-                : warningFlag.includes(s.toLowerCase()) ? 'warning'
-                : infoFlag.includes(s.toLowerCase()) ? 'info'
-                : lightFlag.includes(s.toLowerCase()) ? 'light'
-                : darkFlag.includes(s.toLowerCase()) ? 'dark'
-                : 'primary';
+                    : dangerFlag.includes(s.toLowerCase()) ? 'danger'
+                        : warningFlag.includes(s.toLowerCase()) ? 'warning'
+                            : infoFlag.includes(s.toLowerCase()) ? 'info'
+                                : lightFlag.includes(s.toLowerCase()) ? 'light'
+                                    : darkFlag.includes(s.toLowerCase()) ? 'dark'
+                                        : 'primary';
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : capitalize
          * Input   => (s: any String   => String)
          * Output  => (String): with upper case of First letter
          * Description:  Select badges variant by given val
-         **********************************************************************************/
-        capitalize: function (s)  {
+         ********************************************************************************* */
+        capitalize(s) {
             if (typeof s !== 'string' || this.isEmpty(s)) {
                 return '';
             }
             return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : consoleLogEnv
          * Input   => (s: any String   => String)
          *             o: any object   => Object)
          * Output  => print out on console.log
          * Description:  Console.log if only when it's not in production.
-         **********************************************************************************/
-        consoleLogEnv: function (s, o) {
+         ********************************************************************************* */
+        consoleLogEnv(s, o) {
             const processEnv = this.$root.$options.components.App.props.processEnv.default;
             if (!this.isEmpty(processEnv) && processEnv != 'production') {
                 if (!this.isEmpty(o)) {
@@ -132,44 +132,43 @@ export const Mixin = {
                 }
             }
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : colSelector
          * Input   => (l: length of data   => Number)
          * Output  => (String): with First letter
          * Description:  return String with selected col size
-         **********************************************************************************/
-        colSelector: function (l) {
+         ********************************************************************************* */
+        colSelector(l) {
             const colNumber = Math.round(12 / l);
-            return 'col-xs-6 col-sm-6 col-md-6 col-lg-' + colNumber + ' col';
+            return `col-xs-6 col-sm-6 col-md-6 col-lg-${colNumber} col`;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : isSelectedType
          * Input   => (t: type to check  =>  n: Number, s:String, b:Boolean, o:Object, a:Arr
          *             d: data to check  => Any)
          * Output  => boolean whether it's checked type
          * Description:  Console.log if only when it's not in production.
-         **********************************************************************************/
-        isSelectedType: function (d, t) {
-            if (t.toUpperCase() ==='N') {
+         ********************************************************************************* */
+        isSelectedType(d, t) {
+            if (t.toUpperCase() === 'N') {
                 return (Number.isInteger(d) && !isNaN(d));
-            } else if (t.toUpperCase() ==='D' || t.toUpperCase() ==='F') {
+            } if (t.toUpperCase() === 'D' || t.toUpperCase() === 'F') {
                 return (!isNaN(parseFloat(d)));
-            } else if (t.toUpperCase() ==='B') {
-                return  ['1', '0', 1, 0, true, false].includes(d);
-            } else if (t.toUpperCase() ==='LIST') {
-                let splitString = d.split(',');
-                return  !splitString.includes('');
-            } else if (t.toUpperCase() ==='S' || t.toUpperCase() ==='STR') {
-                return  (typeof d === 'string' || d instanceof String);
-            } else if (t.toUpperCase() ==='O') {
+            } if (t.toUpperCase() === 'B') {
+                return ['1', '0', 1, 0, true, false].includes(d);
+            } if (t.toUpperCase() === 'LIST') {
+                const splitString = d.split(',');
+                return !splitString.includes('');
+            } if (t.toUpperCase() === 'S' || t.toUpperCase() === 'STR') {
+                return (typeof d === 'string' || d instanceof String);
+            } if (t.toUpperCase() === 'O') {
                 return (typeof d === 'object' && d !== null && !Array.isArray(d));
-            } else if (t.toUpperCase() ==='A') {
+            } if (t.toUpperCase() === 'A') {
                 return Array.isArray(d);
-            } else {
-                throw 'Please, Check data type';
             }
+            throw 'Please, Check data type';
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : selectIconHtml
          * Input   => (o: icon object   =>  Object, c: class)
          *            {type: type of font awesome ex: fal, fab,
@@ -179,17 +178,17 @@ export const Mixin = {
          *            }
          * Output  => boolean whether it's checked type
          * Description:  Create a string of <i/> Dom tag with given option
-         **********************************************************************************/
-        selectIconHtml: function (o, c) {
-            /******************************************************************
+         ********************************************************************************* */
+        selectIconHtml(o, c) {
+            /** ****************************************************************
              * Note:: Please add a new type letter when New font Type has added.
              * ****************************************************************
              */
-            const fontAwesome = ['l','b','d','s'];
+            const fontAwesome = ['l', 'b', 'd', 's'];
             let returnHtml = '';
             let defaultClass = 'fal ';
             if (o.hasOwnProperty('type') && fontAwesome.includes(o.type)) {
-                defaultClass = 'fa' + o.type + ' ';
+                defaultClass = `fa${o.type} `;
             }
             if (o.hasOwnProperty('icon')) {
                 defaultClass += o.icon;
@@ -197,44 +196,36 @@ export const Mixin = {
                 defaultClass += 'fa-hashtag';
             }
             if (o.hasOwnProperty('size') && o.size > -2 && o.size <= 10) {
-                if (o.size === -1){
+                if (o.size === -1) {
                     defaultClass += ' fa-xs';
-                } else if (o.size === 0){
+                } else if (o.size === 0) {
                     defaultClass += ' fa-sm';
-                } else if (o.size === 1){
+                } else if (o.size === 1) {
                     defaultClass += ' fa-lg';
                 } else {
-                    defaultClass += ' fa-'+ o.size +'x';
+                    defaultClass += ` fa-${o.size}x`;
                 }
             }
             if (o.hasOwnProperty('color')) {
-                defaultClass += ' ' + o.color;
+                defaultClass += ` ${o.color}`;
             }
-            returnHtml =`<i class="${defaultClass}"> </i>`;
+            returnHtml = `<i class="${defaultClass}"> </i>`;
             return c ? defaultClass : returnHtml;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : tr
          * Input   => (m: message   =>  String
          *             a: argument  =>  String or  Array)
          * Output  => String translation Message
          * Description:  translation of i18n
-         **********************************************************************************/
-        tr: function (m, a) {
-            let path = m.split('.');
-            let key = 'MSG';
-            if (path[0] !== 'MSG' && path.length < 2) {
-                key += '.'+m;
-            } else {
-                key = m;
+         ********************************************************************************* */
+        tr(m, a) {
+            if (this.$i18n.te(m)) {
+                return this.isEmpty(m) ? this.$i18n.t(m) : this.$i18n.t(m, a);
             }
-            if (this.$i18n.te(key)) {
-                return  this.isEmpty(a) ? this.$i18n.t(key) : this.$i18n.t(key, a);
-            } else {
-                return  'No Message';
-            }
+            return 'No Message';
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : setFontSize
          * Input   => (m: message   =>  String)
          *            {type: type of font awesome ex: fal, fab,
@@ -244,21 +235,21 @@ export const Mixin = {
          *            }
          * Output  => String translation Message
          * Description:  return string with font-size with for h1,h2,h3,h4,h5,h6 and personal set data.
-         **********************************************************************************/
-        setFontSize: function (f) {
+         ********************************************************************************* */
+        setFontSize(f) {
             let fontSize = 'font-size:';
-            let defaultSet = this.defaultFontSizeSet;
-            let length = defaultSet.length;
-            if (this.isSelectedType(f,'s') && f.include('px')) {
+            const defaultSet = this.defaultFontSizeSet;
+            const { length } = defaultSet;
+            if (this.isSelectedType(f, 's') && f.include('px')) {
                 fontSize += f;
-            } else if ( f > 0 && f < 7 ) {
-                fontSize += defaultSet[length-f] + 'px';
+            } else if (f > 0 && f < 7) {
+                fontSize += `${defaultSet[length - f]}px`;
             } else {
-                fontSize += defaultSet[length-3] + 'px';
+                fontSize += `${defaultSet[length - 3]}px`;
             }
             return fontSize;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : dictToKeyValueArray
          * Input   => (t: data                         =>  Array of data Object
          *             k: key                          =>  String
@@ -266,191 +257,192 @@ export const Mixin = {
          *             l: location  =>  where to bind additional key at (b: back, or rest default: front)
          * Output  => String translation Message
          * Description:  translation of i18n
-         **********************************************************************************/
-        dictToKeyValueArray: function (obj) {
-            let arr = [];
-            for (let key in obj) {
+         ********************************************************************************* */
+        dictToKeyValueArray(obj) {
+            const arr = [];
+            for (const key in obj) {
                 arr.push({ [key]: obj[key] });
             }
             return arr;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : treeDataHandler
          * Input   => (d: data                         =>  Array of data Object
          *             f: flag                         =>  flag key in Enum variables
          * Output  => Object Array which
          * Description:  return tree array of object which suits for BaseTree
-         **********************************************************************************/
-        treeDataHandler: function (d, f) {
+         ********************************************************************************* */
+        treeDataHandler(d, f) {
             let returnTree = [];
             if (d.hasOwnProperty('items') && d.items.length > 0) {
-                d.items.forEach((curItem) =>{
-                    this.consoleLogEnv('Tree each: ',curItem);
-                    let treeItem = this.getSelectedNode(curItem, f, true);
+                d.items.forEach((curItem) => {
+                    this.consoleLogEnv('Tree each: ', curItem);
+                    const treeItem = this.getSelectedNode(curItem, f, true);
                     returnTree.push(treeItem);
                 });
             } else {
-                returnTree =  [{ title: 'Please, Right Click me',
+                returnTree = [{
+                    title: 'Please, Right Click me',
                     isLeaf: true,
                     data: {
-                        init: true
-                    }}];
+                        init: true,
+                    },
+                }];
             }
             return returnTree;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getSelectedNode
          * Input   => (o: any data Object to bind                         =>  Object)
          * Output  => Node
          * Description:  return tree array of object which suits for BaseTree
-         **********************************************************************************/
-        getSelectedNode: function (o, type, isFirstLoad) {
-            let selectedNode = {
+         ********************************************************************************* */
+        getSelectedNode(o, type, isFirstLoad) {
+            const selectedNode = {
                 title: '',
                 isLeaf: false,
                 children: [],
                 isExpanded: false,
                 isSelected: false,
-                isDraggable: (type === 'DATA_CENTER') ? false : true,
+                isDraggable: type !== 'DATA_CENTER',
                 isSelectable: true,
-                data: { visible: false }
+                data: { visible: false },
             };
             if (!this.isEmpty(o)) {
-                const leafStatus = GlobalEnum['TREE'][type][o.item_type].isLeaf;
-                for (let [key, val] of Object.entries(o)) {
-                    if (key==='name') {
-                        selectedNode['title'] = val;
-                    }  else if (key === 'has_child') {
-                        selectedNode['isLeaf'] = !val;
-                    }  else if (key === 'domain_id') {
+                const leafStatus = GlobalEnum.TREE[type][o.item_type].isLeaf;
+                for (const [key, val] of Object.entries(o)) {
+                    if (key === 'name') {
+                        selectedNode.title = val;
+                    } else if (key === 'has_child') {
+                        selectedNode.isLeaf = !val;
+                    } else if (key === 'domain_id') {
                         continue;
                     } else {
-                        selectedNode['data'][key] = val;
+                        selectedNode.data[key] = val;
                     }
-                    selectedNode['data']['group'] = type;
+                    selectedNode.data.group = type;
 
-                    if (isFirstLoad){
-                        selectedNode['data']['is_cached '] = false;
+                    if (isFirstLoad) {
+                        selectedNode.data['is_cached '] = false;
                     }
                 }
 
-                if (!this.isEmpty(leafStatus) && !('has_child' in o)){
-                    selectedNode['isLeaf'] = leafStatus;
+                if (!this.isEmpty(leafStatus) && !('has_child' in o)) {
+                    selectedNode.isLeaf = leafStatus;
                 }
             }
             return selectedNode;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getAllTimezones
          *
          * Output  => Array
          * Description:  return Array of timezone String.
-         **********************************************************************************/
-        getAllTimezones: function () {
+         ********************************************************************************* */
+        getAllTimezones() {
             return Object.keys(timezone.getAllTimezones());
         },
-         /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getAllTimezones
-         *             
+         *
          * Output  => Array
          * Description:  return Array of timezone String.
-         **********************************************************************************/
-        getTimezoneSelectList: function () {
-            let results = [];
-            let timezones = timezone.getAllTimezones();
-            for (var tz in timezones) {
+         ********************************************************************************* */
+        getTimezoneSelectList() {
+            const results = [];
+            const timezones = timezone.getAllTimezones();
+            for (const tz in timezones) {
                 results.push({
                     value: tz,
-                    text: `${tz} ${timezones[tz].offsetStr}`
+                    text: `${tz} ${timezones[tz].offsetStr}`,
                 });
             }
             return results;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getLanguageSelectList
-         *             
+         *
          * Output  => Array
-         * Description:  return Array of language select list-items.
-         **********************************************************************************/
-        getLanguageSelectList: function () {
+         * Description:  return Array of language select list.
+         ********************************************************************************* */
+        getLanguageSelectList() {
             return Object.values(GlobalEnum.LANGUAGES);
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getLanguageName
          * Input   => (lang                         =>  String)
-         *             
+         *
          * Output  => String
          * Description:  return String of language name.
-         **********************************************************************************/
-        getLanguageName: function (lang) {
-            let langObj = GlobalEnum.LANGUAGES[lang];
+         ********************************************************************************* */
+        getLanguageName(lang) {
+            const langObj = GlobalEnum.LANGUAGES[lang];
             if (!langObj) {
                 return null;
             }
             return langObj.text;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getLanguage
          * Input   => (value                         =>  String)
-         *             
+         *
          * Output  => Object
          * Description:  return Object of language.
-         **********************************************************************************/
-        getLanguage: function (value) {
+         ********************************************************************************* */
+        getLanguage(value) {
             return GlobalEnum.LANGUAGES[value];
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getSelectedNode
          * Input   => (o: any data Object to bind                         =>  Object)
          * Output  => Node
          * Description:  return tree array of object which suits for BaseTree
-         **********************************************************************************/
-        getSelectedNodeArr: function (dataArr, nodeType) {
-            let NodeArray = [];
-            if (dataArr.length > 0 ) {
-                dataArr.forEach(curItem =>{
+         ********************************************************************************* */
+        getSelectedNodeArr(dataArr, nodeType) {
+            const NodeArray = [];
+            if (dataArr.length > 0) {
+                dataArr.forEach((curItem) => {
                     NodeArray.push(this.getSelectedNode(curItem, nodeType));
                 });
             }
             return NodeArray;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getDatefromTimeStamp
          * Input   => (f: flag                         =>  String)
          * Output  => Node
          * Description:  return tree array of object which suits for BaseTree
-         **********************************************************************************/
-        getDatefromTimeStamp: function (ts, tz, tzr) {
+         ********************************************************************************* */
+        getDatefromTimeStamp(ts, tz, tzr) {
             const mxTimezones = timezone.getAllTimezones();
             const options = {
-                timeZone : 'UTC',
+                timeZone: 'UTC',
                 hour12: false,
                 timeZoneName: 'long',
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
                 hour: '2-digit',
-                minute:'2-digit',
-                second: '2-digit'
+                minute: '2-digit',
+                second: '2-digit',
             };
 
-            if (!this.isEmpty(mxTimezones[tz])){
-                options['timeZone'] = tz;
+            if (!this.isEmpty(mxTimezones[tz])) {
+                options.timeZone = tz;
             }
-            const DateTime = this.isEmpty(tzr) ? new Date(ts * 1000).toLocaleString('sq-AL', options).substring(0,19) : new Date(ts * 1000).toLocaleString('sq-AL', options);
+            const DateTime = this.isEmpty(tzr) ? new Date(ts * 1000).toLocaleString('sq-AL', options).substring(0, 19) : new Date(ts * 1000).toLocaleString('sq-AL', options);
             return DateTime;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getDatefromTimeStamp
          * Input   => (f: flag                         =>  String)
          * Output  => Node
          * Description:  return tree array of object which suits for BaseTree
-         **********************************************************************************/
-        getTimeStampfromDate: function () {
-
+         ********************************************************************************* */
+        getTimeStampfromDate() {
             return 'a';
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : validateLength
          * Input   => (value                           =>  String
          *             boolOnly                        =>  Bolean
@@ -458,14 +450,13 @@ export const Mixin = {
          *             maxLength                       =>  Number)
          * Output  => Boolean or Null
          * Description:  return the result of validation
-         **********************************************************************************/
-        validateLength: function (value, boolOnly, minLength, maxLength) {
+         ********************************************************************************* */
+        validateLength(value, boolOnly, minLength, maxLength) {
             if (this.isEmpty(value)) {
                 if (boolOnly) {
                     return false;
-                } else {
-                    return null;
                 }
+                return null;
             }
             if (value.length < minLength) {
                 return false;
@@ -475,85 +466,80 @@ export const Mixin = {
             }
             return true;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : validateSameness
          * Input   => (value                           =>  String
          *             boolOnly                        =>  Bolean
          *             checkValue                      =>  String)
          * Output  => Boolean or Null
          * Description:  return the result of validation
-         **********************************************************************************/
-        validateSameness: function (value, boolOnly, checkValue) {
+         ********************************************************************************* */
+        validateSameness(value, boolOnly, checkValue) {
             if (this.isEmpty(value) || this.isEmpty(checkValue)) {
                 if (boolOnly) {
                     return false;
-                } else {
-                    return null;
                 }
+                return null;
             }
             if (value !== checkValue) {
-                return false; 
-            } 
+                return false;
+            }
             return true;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : validateSameness
          * Input   => (value                           =>  String
          *             boolOnly                        =>  Bolean
          *             checkValue                      =>  String)
          * Output  => Boolean or Null
          * Description:  return the result of validation
-         **********************************************************************************/
-        getSelectedValArr: function (data, path) {
-            let returnArray = [];
-            if (data.length > 0){
-                data.forEach((currentItem, index) =>{
-                    if (!this.isEmpty(this._.get(currentItem, path))){
+         ********************************************************************************* */
+        getSelectedValArr(data, path) {
+            const returnArray = [];
+            if (data.length > 0) {
+                data.forEach((currentItem, index) => {
+                    if (!this.isEmpty(this._.get(currentItem, path))) {
                         returnArray.push(this._.get(currentItem, path));
                     }
                 });
             }
             return returnArray;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : isImageUrlValid
          * Input   => (url                            =>   String
          * Output  => Boolean
          * Description:  return image url is valid
-         **********************************************************************************/
-        async isImageUrlValid (url) {
-            async function  checkImage(imageSrc, good, bad) {
-                let img = new Image();
+         ********************************************************************************* */
+        async isImageUrlValid(url) {
+            async function checkImage(imageSrc, good, bad) {
+                const img = new Image();
                 img.onload = await good;
                 img.onerror = await bad;
                 img.src = imageSrc;
             }
-            let returnVal = await checkImage(url, function(){
-                return true;
-            }, function(){
-                return false;
-            });
+            const returnVal = await checkImage(url, () => true, () => false);
             return returnVal;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : validateSameness
          * Input   => (value                           =>  String
          *             boolOnly                        =>  Bolean
          *             checkValue                      =>  String)
          * Output  => Boolean or Null
          * Description:  return the result of validation
-         **********************************************************************************/
-        getRightChildrenIndex(ref_data, key){
+         ********************************************************************************* */
+        getRightChildrenIndex(ref_data, key) {
             let returnVal = [];
-            if (this.isEmpty(key)){
+            if (this.isEmpty(key)) {
                 return returnVal;
             }
 
-            //means Array
-            if (this.isSelectedType(key,'a')) {
-                key.forEach(function(curItem){
+            // means Array
+            if (this.isSelectedType(key, 'a')) {
+                key.forEach((curItem) => {
                     const index = ref_data.findIndex(x => x.$options.name === curItem);
-                    if (index > -1){
+                    if (index > -1) {
                         returnVal.push(index);
                     }
                 });
@@ -563,73 +549,72 @@ export const Mixin = {
 
             return returnVal;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : selectIconType
          * Input   => (value                           =>  String
          *             boolOnly                        =>  Bolean
          *             checkValue                      =>  String)
          * Output  => Boolean true or false
          * Description:  return the result of validation
-         **********************************************************************************/
-        selectIconType (tag) {
+         ********************************************************************************* */
+        selectIconType(tag) {
             let returnVal = false;
             let allowedIcon = null;
 
-            if (!this.isEmpty(tag)){
+            if (!this.isEmpty(tag)) {
                 let key = '';
                 const iconVal = tag.hasOwnProperty('icon') ? tag.icon : this.isSelectedType(tag, 's') ? tag : '';
-                if (tag.hasOwnProperty('icon')){
-                    key = tag.icon.includes('svg') ? 'src': 'file_name';
-                } else if (this.isSelectedType(tag, 's')){
+                if (tag.hasOwnProperty('icon')) {
+                    key = tag.icon.includes('svg') ? 'src' : 'file_name';
+                } else if (this.isSelectedType(tag, 's')) {
                     key = 'file_name';
                 }
-                allowedIcon = iconVal.toUpperCase().includes('AWS') ? this._.get(GlobalEnum,'COLLECTOR.AWS') : allowedIcon;
-                returnVal = !this.isEmpty(allowedIcon) ? allowedIcon.some(icon => icon[key] === iconVal):   returnVal;
+                allowedIcon = iconVal.toUpperCase().includes('AWS') ? this._.get(GlobalEnum, 'COLLECTOR.AWS') : allowedIcon;
+                returnVal = !this.isEmpty(allowedIcon) ? allowedIcon.some(icon => icon[key] === iconVal) : returnVal;
             }
             return returnVal;
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : getCollectModeSelectList
          *
          * Output  => Array
-         * Description:  return Array of language select list-items.
-         **********************************************************************************/
-        getCollectModeSelectList: function () {
+         * Description:  return Array of language select list.
+         ********************************************************************************* */
+        getCollectModeSelectList() {
             return Object.values(GlobalEnum.COLLECT_MODE);
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : replaceAll
          *
          * Output  => Array
-         * Description:  return Array of language select list-items.
-         **********************************************************************************/
-        replaceAll (str, find, replace) {
+         * Description:  return Array of language select list.
+         ********************************************************************************* */
+        replaceAll(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         },
-        /**********************************************************************************
+        /** ********************************************************************************
          * Name       : replaceFilterFormat
          * str : String
          * int : Integer
          * bool: Boolean
          * float: Float
-         * list-items: List (seperate by comma)
+         * list: List (seperate by comma)
          * Output  => Array
          * Description:  return appropriate type by its key.
-         **********************************************************************************/
-        replaceFilterFormat (str, placeHolder) {
-
+         ********************************************************************************* */
+        replaceFilterFormat(str, placeHolder) {
             let returnVal = '';
 
             const filterFormatArr = {
-                str   : 'String',
-                int   : 'Integer',
-                bool  : 'Boolean',
-                float : 'Float',
-                list  : 'List'
+                str: 'String',
+                int: 'Integer',
+                bool: 'Boolean',
+                float: 'Float',
+                list: 'List',
             };
 
             const holderAdditional = {
-                list: '(seperate by comma)'
+                list: '(seperate by comma)',
             };
 
             if (filterFormatArr.hasOwnProperty(str)) {
@@ -637,14 +622,14 @@ export const Mixin = {
             }
 
             return returnVal;
-        }
+        },
     },
-    data: function () {
+    data() {
         return {
             _: VueLodash,
             defaultFontSizeSet: [10, 12, 14, 16, 18, 24],
             isFirstLogin: 1,
-            enums: GlobalEnum
+            enums: GlobalEnum,
         };
-    }
+    },
 };

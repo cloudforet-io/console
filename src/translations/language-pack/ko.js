@@ -1,21 +1,15 @@
 export const ko ={
-    MSG: {
-        PROCESSED: '수행되었습니다',
-        DR_SERV: '서비스',
-        LOG_IN: '로그인',
-        LOG_IN_GREET: '클라우드 원 로그인하기',
-        LOG_OUT: '로그아웃',
-        LOG_FAIL_TITLE: '로그인 에러',
-        LOG_FAIL_BODY: '유저네임 혹은 패스워드를 확인해 주세요.',
-        FORGPW: '비밀번호 찾기?',
+    COMMON: {
         WELCOME_MSG: 'Welcome to {0} Portal.',
         WELCOME_MSG_P: 'Welcome to {0} Portal',
         SIGN_UP: '회원가입',
-        SIGN_IN_DESC: 'We make it simple to launch in any clouds and scale up as your company grow - whether you’re running any of cloud machine ; We can handle it.',
         SIGN_IN_MSG: '어카운트 로그인 하기',
         SIGN_IN: '로그 인',
         SIGN_FAIL_TITLE: '아이디나 패스워드가 에러.',
         SIGN_FAIL_BODY: '아이디나 패스워드를 다시 한번 확인해 주세요.',
+        PROCESSED: '수행되었습니다',
+        DR_SERV: '서비스',
+        FORGPW: '비밀번호 찾기?',
         COMMON_USER: '일반 유저',
         ADMIN_USER: '관리자',
         REGISTER: 'Register Now!',
@@ -104,6 +98,12 @@ export const ko ={
         CREDENTIALS:'암호',
         REPO: 'Repository',
         LIST: '목록'
+    },
+    IDENTITY: {
+
+    },
+    INVENTORY: {
+
     },
     TREE_TYPE: {
         PROJECT: '프로젝트',

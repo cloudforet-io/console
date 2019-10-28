@@ -324,7 +324,7 @@ export default {
         async checkIdAvailability () {
             let res = null;
             try {
-                res = await this.$axios.post('/identity/user/list-items', {
+                res = await this.$axios.post('/identity/user/list', {
                     user_id: this.userId
                 });
 

@@ -150,7 +150,7 @@ export default {
         async listAdminsOnModal (limit, start, sort, filter, filterOr){
             this.reset();
             this.saveMemberModalMeta(limit, start, sort, filter, filterOr);
-            await this.$axios.post('/identity/user/list-items',{
+            await this.$axios.post('/identity/user/list',{
                 query: this.memberModalQuery
             }).then((response) => {
                 this.dataCenterAdminData.members = response.data.results;

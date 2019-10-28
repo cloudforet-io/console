@@ -137,7 +137,7 @@ export default {
         async listMembersOnModal (limit, start, sort, keyword){
             this.reset();
             this.setQuery(limit, start, sort, keyword);
-            await this.$axios.post('/identity/user/list-items',{
+            await this.$axios.post('/identity/user/list',{
                 query: this.query
             }).then((response) => {
                 this.projectMemberData.members = response.data.results;

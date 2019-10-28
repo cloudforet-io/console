@@ -253,7 +253,7 @@ export default {
             this.setQuery(limit, start, sort, filter, filterOr);
             let res = null;
             try {
-                res = await this.$axios.post('/identity/user/list-items', {
+                res = await this.$axios.post('/identity/user/list', {
                     query: this.query
                 });
                 this.users = res.data.results;

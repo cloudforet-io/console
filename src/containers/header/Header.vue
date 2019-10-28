@@ -1,33 +1,33 @@
 <template>
-  <transition name="slide-fade">
-    <div v-if="show" class="header-container">
-      <b-row align-h="between" no-gutters class="main-header">
-        <b-col cols="12" class="row no-gutters">
-          <b-navbar class="header">
-            <b-navbar-nav>
-              <b-nav-item>
-                <b-link class="nav brand" to="/" @click="hideSiteMapDropdown">
-                  <img src="@/assets/images/brand/dcos.png">
-                </b-link>
-              </b-nav-item>
-            </b-navbar-nav>
-            <b-navbar-nav>
-              <b-nav-item><SiteMapDropdown ref="siteMap" class="nav" /></b-nav-item>
-            </b-navbar-nav>
+    <transition name="slide-fade">
+        <div v-if="show" class="header-container">
+            <b-row align-h="between" no-gutters class="main-header">
+                <b-col cols="12" class="row no-gutters">
+                    <b-navbar class="header">
+                        <b-navbar-nav>
+                            <b-nav-item>
+                                <b-link class="nav brand" to="/" @click="hideSiteMapDropdown">
+                                    <img src="@/assets/images/brand/dcos.png">
+                                </b-link>
+                            </b-nav-item>
+                        </b-navbar-nav>
+                        <b-navbar-nav>
+                            <b-nav-item><SiteMapDropdown ref="siteMap" class="nav" /></b-nav-item>
+                        </b-navbar-nav>
 
-            <b-navbar-nav class="ml-auto">
-              <b-nav-item><LanguageDropdown class="nav" /></b-nav-item>
-            </b-navbar-nav>
-            <b-navbar-nav>
-              <b-nav-item><AccountDropdown class="nav" /></b-nav-item>
-            </b-navbar-nav>
-          </b-navbar>
-        </b-col>
-      </b-row>
+                        <b-navbar-nav class="ml-auto">
+                            <b-nav-item><LanguageDropdown class="nav" /></b-nav-item>
+                        </b-navbar-nav>
+                        <b-navbar-nav>
+                            <b-nav-item><AccountDropdown class="nav" /></b-nav-item>
+                        </b-navbar-nav>
+                    </b-navbar>
+                </b-col>
+            </b-row>
 
-      <SubHeader />
-    </div>
-  </transition>
+            <SubHeader />
+        </div>
+    </transition>
 </template>
 
 <script>
@@ -42,23 +42,23 @@ export default {
         LanguageDropdown,
         SiteMapDropdown,
         AccountDropdown,
-        SubHeader
+        SubHeader,
     },
-    data () {
+    data() {
         return {
-            show: false
+            show: false,
         };
     },
-    mounted () {
+    mounted() {
         this.show = true;
     },
     methods: {
-        hideSiteMapDropdown () {
+        hideSiteMapDropdown() {
             if (this.$refs.siteMap.showMap) {
                 this.$refs.siteMap.toggleShow();
             }
-        }
-    }
+        },
+    },
 };
 </script>
 

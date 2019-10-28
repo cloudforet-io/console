@@ -1,19 +1,18 @@
 <template>
-    <button
-        type="button"
-        :class="classObject"
-        @click="onClick"
-    >
-        <slot>button</slot>
+    <button type="button" :class="classObject" @click="onClick">
+        <slot></slot>
     </button>
 </template>
 
 <script>
-
 export default {
-    name: 'PButton',
+    name: 'p-button',
     events: ['click'],
     props: {
+        forceClass: {
+            type: Array,
+            default: null,
+        },
         /** @type {string} */
         href: {
             type: String,
@@ -83,18 +82,21 @@ export default {
     },
     computed: {
         classObject() {
-            const obj = ['btn'];
-            obj.push({
-                disabled: this.disabled,
-                'btn-block': this.block,
-            });
-            if (this.style_class != null) {
-                obj.push(this.style_class);
+            if (!this.forceClass) {
+                const obj = ['btn'];
+                obj.push({
+                    disabled: this.disabled,
+                    'btn-block': this.block,
+                });
+                if (this.style_class != null) {
+                    obj.push(this.style_class);
+                }
+                if (this.size) {
+                    obj.push(`btn-${this.size}`);
+                }
+                return obj;
             }
-            if (this.size) {
-                obj.push(`btn-${this.size}`);
-            }
-            return obj;
+            return this.forceClass;
         },
         style_class() {
             if (this.link) {

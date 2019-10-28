@@ -79,7 +79,7 @@ export default {
             this.reset();
             this.setQuery(limit, start, sort, keyword);
             try {
-                let res = await this.$axios.post('/inventory/server/admin/list-items', {
+                let res = await this.$axios.post('/inventory/server/admin/list', {
                     domain_id: sessionStorage.getItem('domainId'),
                     server_id: this.serverId,
                     query: this.query

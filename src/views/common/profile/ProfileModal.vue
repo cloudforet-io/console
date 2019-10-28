@@ -1,90 +1,91 @@
 <template>
-  <span>
-    <BaseModal ref="VICO004_ProfileModal"
-               :title="tr('PROFILE')"
-               centered
-               hide-footer
-               backdrop-off
-               size="md"
-    >
-      <template #contents>
-        <b-form @submit.prevent="onUpdate">
-          <b-row>
-            <b-col cols="12">
-              <BaseField :value="userId" 
-                         plaintext 
-                         :label="`${tr('USER.ID')} : `"
-                         :label-cols="3"
-                         :placeholder="tr('USER.ID')"
-                         tabindex="-1"
-              />
+    <span>
+        <BaseModal ref="VICO004_ProfileModal"
+                   :title="tr('PROFILE')"
+                   centered
+                   hide-footer
+                   backdrop-off
+                   size="md"
+        >
+            <template #contents>
+                <b-form @submit.prevent="onUpdate">
+                    <b-row>
+                        <b-col cols="12">
+                            <BaseField :value="userId"
+                                       plaintext
+                                       :label="`${tr('USER.ID')} : `"
+                                       :label-cols="3"
+                                       :placeholder="tr('USER.ID')"
+                                       tabindex="-1"
+                            />
 
-              <BaseField v-model="name" 
-                         :label="`${tr('USER.NAME')} : `"
-                         :label-cols="3" 
-                         :placeholder="tr('USER.NAME')"
-              />
+                            <BaseField v-model="name"
+                                       :label="`${tr('USER.NAME')} : `"
+                                       :label-cols="3"
+                                       :placeholder="tr('USER.NAME')"
+                            />
 
-              <BaseField v-model="email" 
-                         :label="`${tr('USER.EMAIL')} : `"
-                         :label-cols="3"
-                         :placeholder="tr('USER.EMAIL')"
-              />
+                            <BaseField v-model="email"
+                                       :label="`${tr('USER.EMAIL')} : `"
+                                       :label-cols="3"
+                                       :placeholder="tr('USER.EMAIL')"
+                            />
 
-              <BaseField v-model="mobile" 
-                         :label="`${tr('USER.PHONE')} : `"
-                         :label-cols="3"
-                         :placeholder="tr('USER.PHONE')"
-              />
+                            <BaseField v-model="mobile"
+                                       :label="`${tr('USER.PHONE')} : `"
+                                       :label-cols="3"
+                                       :placeholder="tr('USER.PHONE')"
+                            />
 
-              <BaseField v-model="group" 
-                         :label="`${tr('USER.GROUP')} : `"
-                         :label-cols="3" 
-                         :placeholder="tr('USER.GROUP')"
-              />
+                            <BaseField v-model="group"
+                                       :label="`${tr('USER.GROUP')} : `"
+                                       :label-cols="3"
+                                       :placeholder="tr('USER.GROUP')"
+                            />
 
-              <BaseField v-model="language" 
-                         :label="`${tr('USER.LANG')} : `"
-                         :label-cols="3"
-                         :field-cols="5"
-                         type="select"
-                         :options="languageList"
-                         :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
-              />
+                            <BaseField v-model="language"
+                                       :label="`${tr('USER.LANG')} : `"
+                                       :label-cols="3"
+                                       :field-cols="5"
+                                       type="select"
+                                       :options="languageList"
+                                       :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
+                            />
 
-              <BaseField v-model="timezone" 
-                         :label="`${tr('USER.TIME')} : `"
-                         :label-cols="3"
-                         :field-cols="9"
-                         type="select"
-                         :options="timezoneList"
-                         :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
-              />
+                            <BaseField v-model="timezone"
+                                       :label="`${tr('USER.TIME')} : `"
+                                       :label-cols="3"
+                                       :field-cols="9"
+                                       type="select"
+                                       :options="timezoneList"
+                                       :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
+                            />
 
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col class="btn-box mt-5">
-              <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="primary">
-                {{ tr('BTN_UPT') }}
-              </b-button>
-              <b-button class="float-right mb-1" size="md" 
-                        type="button" variant="outline-secondary"
-                        @click="hideModal"
-              >
-                {{ tr('BTN_CANCEL') }}
-              </b-button>
-            </b-col>
-          </b-row>
-        </b-form>
-      </template>
-    </BaseModal>
-  </span>
+                        </b-col>
+                    </b-row>
+                    <b-row>
+                        <b-col class="btn-box mt-5">
+                            <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="primary">
+                                {{ tr('BTN_UPT') }}
+                            </b-button>
+                            <b-button class="float-right mb-1" size="md"
+                                      type="button" variant="outline-secondary"
+                                      @click="hideModal"
+                            >
+                                {{ tr('BTN_CANCEL') }}
+                            </b-button>
+                        </b-col>
+                    </b-row>
+                </b-form>
+            </template>
+        </BaseModal>
+    </span>
 </template>
 
 <script>
 import BaseModal from '@/components/base/modal/BaseModal';
 import BaseField from '@/components/base/form/BaseField.vue';
+
 const userModel = {
     user_id: null,
     name: null,
@@ -93,18 +94,18 @@ const userModel = {
     mobile: null,
     group: null,
     language: null,
-    timezone: null
+    timezone: null,
 };
 export default {
     name: 'ProfileModal',
     components: {
         BaseModal,
-        BaseField
+        BaseField,
     },
     data() {
         return {
             userData: null,
-            userId: sessionStorage.getItem('userId'),
+            userId: localStorage.getItem('userId'),
             password: null,
             passwordCheck: null,
             name: userModel.name,
@@ -117,36 +118,36 @@ export default {
             /**
              * TODO: check whether this user is 'localUser' or not.
              */
-            showValidation: false
+            showValidation: false,
         };
     },
     computed: {
-        languageList () {
+        languageList() {
             return this.getLanguageSelectList();
         },
-        timezoneList () {
+        timezoneList() {
             return this.getTimezoneSelectList();
-        }
+        },
     },
     methods: {
-        showModal () {
+        showModal() {
             this.init();
             this.$refs.VICO004_ProfileModal.showModal();
         },
-        hideModal () {
+        hideModal() {
             this.$refs.VICO004_ProfileModal.hideModal();
             this.reset();
         },
-        reset () {
+        reset() {
             this.showValidation = false;
             this.resetPassword();
             this.setUser(this.userData);
         },
-        onUpdate () {
+        onUpdate() {
             this.showValidation = true;
             this.updateUser();
         },
-        async updateUser () {
+        async updateUser() {
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/update', this.getUserForUpdate());
@@ -156,18 +157,18 @@ export default {
             } catch (e) {
                 console.error(e);
                 this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), this.tr('PROFILE')]));
-            } 
+            }
         },
-        async init () {
+        async init() {
             this.showValidation = false;
             await this.getUser();
             this.setUser(this.userData);
         },
-        async getUser () {
+        async getUser() {
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/get', {
-                    user_id: this.userId
+                    user_id: this.userId,
                 });
                 this.userData = res.data;
             } catch (e) {
@@ -175,7 +176,7 @@ export default {
                 this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('PROFILE')]));
             }
         },
-        setUser (user) {
+        setUser(user) {
             this.name = user.name;
             this.email = user.email;
             this.mobile = user.mobile;
@@ -183,27 +184,27 @@ export default {
             this.language = user.language;
             this.timezone = user.timezone;
         },
-        resetPassword () {
+        resetPassword() {
             this.password = null;
             this.passwordCheck = null;
         },
-        getUserForUpdate () {
-            let user = {
+        getUserForUpdate() {
+            const user = {
                 user_id: this.userId,
                 name: this.name,
                 email: this.email,
                 mobile: this.mobile,
                 group: this.group,
                 language: this.language,
-                timezone: this.timezone
+                timezone: this.timezone,
             };
 
             if (this.isLocalUser) {
                 user.password = this.password;
             }
             return user;
-        }
-    }
+        },
+    },
 };
 </script>
 

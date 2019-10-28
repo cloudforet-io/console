@@ -78,8 +78,8 @@ export default {
                 commit('setUserId', { userId: authObj.userId });
                 commit('login', { token: res.data.access_token });
 
-                sessionStorage.setItem('token', res.data.access_token);
-                sessionStorage.setItem('userId', authObj.userId);
+                localStorage.setItem('token', res.data.access_token);
+                localStorage.setItem('userId', authObj.userId);
                 getApi().defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`;
 
             } catch (err) {
@@ -121,8 +121,8 @@ export default {
             }
         },
         async logout ({ commit }) {
-            sessionStorage.removeItem('userId');
-            sessionStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('token');
             commit('logout');
         },
         setNextPath ({ commit }, { nextPath }) {
