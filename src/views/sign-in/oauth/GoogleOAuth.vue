@@ -183,6 +183,17 @@ export default {
                 }
             });
         },
+        async setTimeZone() {
+            await this.$axios.post('identity/user/get', {
+                user_id: this.loginId,
+                domainId: sessionStorage.getItem('domainId'),
+            }).then((response) => {
+                const timeZone = this.isEmpty(response.data.timezone) ? 'Etc/GMT' : response.data.timezone;
+                localStorage.timeZone = timeZone;
+            }).catch(() => {
+                this.showErorrMSG();
+            });
+        },
         showErorrMSG() {
             this.seenGreet = false;
             this.seenError = true;
