@@ -33,6 +33,7 @@
     "sl-vue-tree": "^1.8.4",
     "timezones.json": "^1.5.0",
     "url": "^0.11.0",
+    "v-tooltip": "^2.0.2",
     "velocity-animate": "^1.5.2",
     "vue": "^2.6.10",
     "vue-alertify": "^1.1.0",
