@@ -104,7 +104,7 @@ export default {
     data() {
         return {
             userData: null,
-            userId: sessionStorage.getItem('userId'),
+            userId: localStorage.getItem('userId'),
             password: null,
             passwordCheck: null,
             name: userModel.name,
