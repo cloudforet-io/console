@@ -42,7 +42,7 @@ const getDomain = async () => {
     try {
         const parsedObject = url.parse(window.location.href).host;
         let domain_name = parsedObject.split('.');
-        const response = await api.post('/identity/domain/list-items', { name: domain_name[0] });
+        const response = await api.post('/identity/domain/list', { name: domain_name[0] });
         if (response.data.total_count === 1) {
             const domainItems = response.data.results[0];
             isFirstLogin = baseRedirectChecker(domainItems);
