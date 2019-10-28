@@ -1,187 +1,187 @@
 <template>
-  <div class="base-table">
-    <b-card :class="{ 'no-card': cardless,
-                      dark: darkHeader }"
-            :style="{ height: `${height}px` }"
-    >
-      <template v-if="!headerless" #header>
-        <b-row ref="headerContainer"
-               align-v="center" 
-               align-h="between"
-               class="header-container"
-               :style="{ 'padding-left': `${pad}px`, 'padding-right': `${pad}px` }"
+    <div class="base-table">
+        <b-card :class="{ 'no-card': cardless,
+                          dark: darkHeader }"
+                :style="{ height: `${height}px` }"
         >
-          <div ref="captionContainer"
-               class="caption-container"
-               :style="{ width: `${captionContainerWidth}px` }"
-          >
-            <slot name="caption" />
-          </div>
-          <div ref="searchboxContainer"
-               class="searchbox-container"
-               :class="{ 'no-caption': noCaption }"
-               :style="{ width: searchContainerWidth }"
-          >
-            <div v-if="searchable" class="searchbox" :style="{ width: searchboxWidth }">
-              <BaseSearch ref="search"
-                          :context-data="searchContextData"
-                          :is-empty-search="isEmptySearch"
-                          :plain-search="plainSearch"
-                          :border="!darkHeader"
-                          @search="onSearch"
-                          @empty="$emit('empty')"
-              />
-            </div>
-          </div>
-          <div ref="toolContainer"
-               class="tool-container mr-0"
-               :style="{ width: `${toolContainerWidth}px` }"
-          >
-            <div class="toolbox" :style="{ width: toolboxWidth }">
-              <b-row align-v="center" no-gutters align-h="end">
-                <b-col>
-                  <span class="prev-btn" @click.prevent="onPrev"><i class="fal fa-chevron-left" /></span>
-                </b-col>
-                <b-col>
-                  <span>{{ currentPage }} / {{ maxPage }}</span>
-                </b-col>
-                <b-col>
-                  <span class="next-btn" @click.prevent="onNext"><i class="fal fa-chevron-right" /></span>
-                </b-col>
-                <b-col>
-                  <BaseModal ref="modal" 
-                             :title="tr('TABLE.SETTINGS')"
-                             :centered="true" 
-                             :size="'md'" 
-                             @ok="limitChanged"
-                  >
-                    <template #activator>
-                      <span class="settings-btn"><i class="fal fa-cog" /></span>
-                    </template>
-                    <template #contents>
-                      <b-form-group :label="tr('TABLE.LIMIT_LABEL')" :label-cols="3">
-                        <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax"
-                                      @blur="filterLimit" @keydown.enter="onLimitInputEnter"
+            <template v-if="!headerless" #header>
+                <b-row ref="headerContainer"
+                       align-v="center"
+                       align-h="between"
+                       class="header-container"
+                       :style="{ 'padding-left': `${pad}px`, 'padding-right': `${pad}px` }"
+                >
+                    <div ref="captionContainer"
+                         class="caption-container"
+                         :style="{ width: `${captionContainerWidth}px` }"
+                    >
+                        <slot name="caption" />
+                    </div>
+                    <div ref="searchboxContainer"
+                         class="searchbox-container"
+                         :class="{ 'no-caption': noCaption }"
+                         :style="{ width: searchContainerWidth }"
+                    >
+                        <div v-if="searchable" class="searchbox" :style="{ width: searchboxWidth }">
+                            <BaseSearch ref="search"
+                                        :context-data="searchContextData"
+                                        :is-empty-search="isEmptySearch"
+                                        :plain-search="plainSearch"
+                                        :border="!darkHeader"
+                                        @search="onSearch"
+                                        @empty="$emit('empty')"
+                            />
+                        </div>
+                    </div>
+                    <div ref="toolContainer"
+                         class="tool-container mr-0"
+                         :style="{ width: `${toolContainerWidth}px` }"
+                    >
+                        <div class="toolbox" :style="{ width: toolboxWidth }">
+                            <b-row align-v="center" no-gutters align-h="end">
+                                <b-col>
+                                    <span class="prev-btn" @click.prevent="onPrev"><i class="fal fa-chevron-left" /></span>
+                                </b-col>
+                                <b-col>
+                                    <span>{{ currentPage }} / {{ maxPage }}</span>
+                                </b-col>
+                                <b-col>
+                                    <span class="next-btn" @click.prevent="onNext"><i class="fal fa-chevron-right" /></span>
+                                </b-col>
+                                <b-col>
+                                    <BaseModal ref="modal"
+                                               :title="tr('TABLE.SETTINGS')"
+                                               :centered="true"
+                                               :size="'md'"
+                                               @ok="limitChanged"
+                                    >
+                                        <template #activator>
+                                            <span class="settings-btn"><i class="fal fa-cog" /></span>
+                                        </template>
+                                        <template #contents>
+                                            <b-form-group :label="tr('TABLE.LIMIT_LABEL')" :label-cols="3">
+                                                <b-form-input v-model="limitInput" type="number" min="1" :max="perPageMax"
+                                                              @blur="filterLimit" @keydown.enter="onLimitInputEnter"
+                                                />
+                                            </b-form-group>
+                                        </template>
+                                    </BaseModal>
+                                </b-col>
+                                <b-col>
+                                    <span class="refresh-btn" @click="onRefresh"><i class="fal fa-sync" /></span>
+                                </b-col>
+                            </b-row>
+                        </div>
+                    </div>
+                </b-row>
+            </template>
+
+            <b-table class="b-table"
+                     show-empty
+                     sticky-header
+                     :borderless="true"
+                     :items="tableData"
+                     :fields="heads"
+                     :striped="striped"
+                     :bordered="bordered"
+                     :dark="dark" :hover="hover"
+                     :small="small"
+                     :fixed="fixed"
+                     :responsive="responsive"
+                     :stacked="stacked"
+                     :no-local-sorting="!isLocalSort"
+                     :tbody-tr-class="rowClass"
+                     :busy="busy"
+                     @head-clicked="headClicked"
+                     @row-clicked="rowClicked"
+                     @sort-changed="sortingChanged"
+                     @context-changed="contextChanged"
+            >
+                <template #table-busy>
+                    <b-row align-h="center">
+                        <i class="fad fa-spinner fa-pulse"
+                           :style="{'margin-top': `${10}px`}"
                         />
-                      </b-form-group>
-                    </template>
-                  </BaseModal>
-                </b-col>
-                <b-col>
-                  <span class="refresh-btn" @click="onRefresh"><i class="fal fa-sync" /></span>
-                </b-col>
-              </b-row>
-            </div>
-          </div>
-        </b-row>
-      </template>
+                    </b-row>
+                </template>
 
-      <b-table class="b-table"
-               show-empty
-               sticky-header
-               :borderless="true"
-               :items="tableData"
-               :fields="heads"
-               :striped="striped"
-               :bordered="bordered" 
-               :dark="dark" :hover="hover"
-               :small="small"
-               :fixed="fixed"
-               :responsive="responsive"
-               :stacked="stacked"
-               :no-local-sorting="!isLocalSort"
-               :tbody-tr-class="rowClass"
-               :busy="busy"
-               @head-clicked="headClicked"
-               @row-clicked="rowClicked"
-               @sort-changed="sortingChanged"
-               @context-changed="contextChanged"
-      >
-        <template #table-busy>
-          <b-row align-h="center">
-            <i class="fad fa-spinner fa-pulse"
-               :style="{'margin-top': `${10}px`}"
-            />
-          </b-row>
-        </template>
+                <template #emptyfiltered="scope">
+                    <h4>{{ scope.emptyFilteredText }}</h4>
+                </template>
 
-        <template #emptyfiltered="scope">
-          <h4>{{ scope.emptyFilteredText }}</h4>
-        </template>
+                <template v-for="headerSlot in getCustomHeaderSlotNameList()"
+                          :slot="headerSlot.key"
+                          slot-scope="data"
+                >
+                    <slot :name="headerSlot.name" :field="data.field" />
+                </template>
 
-        <template v-for="headerSlot in getCustomHeaderSlotNameList()" 
-                  :slot="headerSlot.key" 
-                  slot-scope="data"
-        >
-          <slot :name="headerSlot.name" :field="data.field" />
-        </template>
-
-        <template v-for="cellSlot in getCustomCellNameList()" 
-                  :slot="cellSlot.key" 
-                  slot-scope="data"
-        >
-          <slot :name="cellSlot.name" :field="data.field" :data="data" />
-        </template>
+                <template v-for="cellSlot in getCustomCellNameList()"
+                          :slot="cellSlot.key"
+                          slot-scope="data"
+                >
+                    <slot :name="cellSlot.name" :field="data.field" :data="data" />
+                </template>
 
 
-        <template v-if="selectable" #HEAD_selected>
-          <BaseCheckbox :selected="isSelectedAll"
-                        class="select-all-checkbox"
-                        @change="onSelectAll"
-          />
-        </template>
+                <template v-if="selectable" #HEAD_selected>
+                    <BaseCheckbox :selected="isSelectedAll"
+                                  class="select-all-checkbox"
+                                  @change="onSelectAll"
+                    />
+                </template>
 
-        <template v-if="selectable" #selected="data">
-          <BaseCheckbox :key="data.index"
-                        v-model="data.item.selected"
-                        class="select-checkbox"
-                        @change="checkboxClicked"
-          />
-        </template>
+                <template v-if="selectable" #selected="data">
+                    <BaseCheckbox :key="data.index"
+                                  v-model="data.item.selected"
+                                  class="select-checkbox"
+                                  @change="checkboxClicked"
+                    />
+                </template>
 
 
-        <template #status="data">
-          <div :style="getVariantSize(data.item.status)">
-            <b-badge :variant="getBadge(data.item.status)">
-              {{ capitalizeFirstLetter(data.item.status) }}
-            </b-badge>
-          </div>
-        </template>
+                <template #status="data">
+                    <div :style="getVariantSize(data.item.status)">
+                        <b-badge :variant="getBadge(data.item.status)">
+                            {{ capitalizeFirstLetter(data.item.status) }}
+                        </b-badge>
+                    </div>
+                </template>
 
-        <template #state="data">
-          <BaseStateTag :state="stateType" :data="data.item.state" />
-        </template>
+                <template #state="data">
+                    <BaseStateTag :state="stateType" :data="data.item.state" />
+                </template>
 
-        <template #plugin_info="data">
-          <div v-html="getResourceTypeInStr(data.item.plugin_info)" />
-        </template>
+                <template #plugin_info="data">
+                    <div v-html="getResourceTypeInStr(data.item.plugin_info)" />
+                </template>
 
-        <template #name="data">
-          <div v-if="data.item.hasOwnProperty('collector_id')">
-            <template v-if="selectIconType(data.item.tags)">
-              <img class="row-icons" :src="require(`@/assets/icons/${getCollectorIcon(data.item.tags.icon)}`)"
-                   height="42vh"
-                   width="42vh"
-              > {{ data.item.name }}
-            </template>
-            <template v-else>
-              <img class="row-gears" src="@/assets/icons/common-gear.svg"
-                   height="42vh"
-                   width="42vh"
-              > {{ data.item.name }}
-            </template>
-          </div>
-          <div v-else>
-            {{ data.item.name }}
-          </div>
-        </template>
+                <template #name="data">
+                    <div v-if="data.item.hasOwnProperty('collector_id')">
+                        <template v-if="selectIconType(data.item.tags)">
+                            <img class="row-icons" :src="require(`@/assets/icons/${getCollectorIcon(data.item.tags.icon)}`)"
+                                 height="42vh"
+                                 width="42vh"
+                            > {{ data.item.name }}
+                        </template>
+                        <template v-else>
+                            <img class="row-gears" src="@/assets/icons/common-gear.svg"
+                                 height="42vh"
+                                 width="42vh"
+                            > {{ data.item.name }}
+                        </template>
+                    </div>
+                    <div v-else>
+                        {{ data.item.name }}
+                    </div>
+                </template>
 
-        <template #link="data">
-          <a :href="data.item.link">{{ data.item.linkText }}</a>
-        </template>
-      </b-table>
-    </b-card>
-  </div>
+                <template #link="data">
+                    <a :href="data.item.link">{{ data.item.linkText }}</a>
+                </template>
+            </b-table>
+        </b-card>
+    </div>
 </template>
 
 <script>
@@ -197,129 +197,129 @@ export default {
         BaseSearch,
         BaseModal,
         BaseCheckbox,
-        BaseStateTag
+        BaseStateTag,
     },
     inheritAttrs: false,
     props: {
         searchable: {
             type: Boolean,
-            default: false
+            default: false,
         },
         searchContextData: {
             type: Object,
-            default: undefined
+            default: undefined,
         },
         plainSearch: {
             type: Boolean,
-            default: false
+            default: false,
         },
         isEmptySearch: {
             type: Boolean,
-            default: false
+            default: false,
         },
         selectable: {
             type: Boolean,
-            default: true
+            default: true,
         },
         selectMode: {
             type: String,
             default: 'multi',
             validator(str) {
                 return str === 'multi' || str === 'single';
-            }
+            },
         },
         hover: {
             type: Boolean,
-            default: true
+            default: true,
         },
         striped: {
             type: Boolean,
-            default: true
+            default: true,
         },
         underlined: {
             type: Boolean,
-            default: true
+            default: true,
         },
         bordered: {
             type: Boolean,
-            default: false
+            default: false,
         },
         cardless: {
             type: Boolean,
-            default: false
+            default: false,
         },
         small: {
             type: Boolean,
-            default: false
+            default: false,
         },
         fixed: {
             type: Boolean,
-            default: true
+            default: true,
         },
         responsive: {
             type: String,
-            default: 'true'
+            default: 'true',
         },
         stacked: {
             type: String,
-            default: 'false'
+            default: 'false',
         },
         tableData: {
             type: Array,
-            default: () => []
+            default: () => [],
         },
         fields: {
             type: [Array, Object],
-            default: () => []
+            default: () => [],
         },
         perPage: {
             type: Number,
-            default: 10
+            default: 10,
         },
         perPageMax: {
             type: Number,
-            default: 20
+            default: 20,
         },
         dark: {
             type: Boolean,
-            default: false
+            default: false,
         },
         totalRows: {
             type: Number,
-            default: null
+            default: null,
         },
         busy: {
             type: Boolean,
-            default: false
+            default: false,
         },
         height: {
             type: Number,
-            default: 500
+            default: 500,
         },
         darkHeader: {
             type: Boolean,
-            default: true
+            default: true,
         },
         headerless: {
             type: Boolean,
-            default: false
+            default: false,
         },
         stateType: {
             type: String,
-            default: 'MEMBER_STATE'
+            default: 'MEMBER_STATE',
         },
         toolWidth: {
             type: Number,
-            default: 280
+            default: 280,
         },
         captionWidth: {
             type: Number,
-            default: 240
+            default: 240,
         },
         searchWidth: {
             type: Number,
-            default: null
-        }
+            default: null,
+        },
     },
     data() {
         return {
@@ -333,50 +333,50 @@ export default {
             limitInput: this.perPage,
             isSelectedAll: false,
             width: 0,
-            pad: 20
+            pad: 20,
         };
     },
     computed: {
-        heads () {
+        heads() {
             return this.fields;
         },
-        limit () {
+        limit() {
             return this.perPage;
         },
-        start () {
+        start() {
             return (this.currentPage - 1) * this.limit;
         },
-        maxPage () {
+        maxPage() {
             return Math.ceil(this.totalRows / this.limit);
         },
-        noCaption () {
+        noCaption() {
             return !(this.$slots.caption || this.$scopedSlots.caption);
         },
-        headerWidth () {
+        headerWidth() {
             return this.width - (this.pad * 2);
         },
-        captionContainerWidth () {
+        captionContainerWidth() {
             if (this.noCaption) {
                 return 0;
             }
             return this.captionWidth > this.width ? this.width : this.captionWidth;
         },
-        toolContainerWidth () {
+        toolContainerWidth() {
             if (this.headerWidth < this.captionContainerWidth + this.toolWidth) {
                 return this.headerWidth;
-            } else if (this.searchWidth && 
-                        this.headerWidth < this.searchWidth + this.captionContainerWidth + this.toolWidth) {
+            } if (this.searchWidth
+                        && this.headerWidth < this.searchWidth + this.captionContainerWidth + this.toolWidth) {
                 return this.headerWidth;
             }
             return this.toolWidth > this.width ? this.width : this.toolWidth;
         },
-        toolboxWidth () {
+        toolboxWidth() {
             if (this.toolContainerWidth > this.toolWidth) {
-                return `${this.toolWidth}px`; 
+                return `${this.toolWidth}px`;
             }
             return '100%';
         },
-        searchContainerWidth () {
+        searchContainerWidth() {
             let calculatedWidth;
             calculatedWidth = this.headerWidth - this.toolContainerWidth - (this.noCaption ? 0 : this.captionContainerWidth);
 
@@ -386,91 +386,91 @@ export default {
 
             return `${calculatedWidth}px`;
         },
-        searchboxWidth () {
+        searchboxWidth() {
             if (this.searchWidth) {
-                return `${this.searchWidth}px`; 
+                return `${this.searchWidth}px`;
             }
             return '100%';
-        }
-        
+        },
+
     },
     watch: {
-        busy (val) {
+        busy(val) {
             if (!val) {
                 this.resetSelectedRows();
             }
-        }
+        },
     },
-    created () {
+    created() {
         this.validateProperties();
     },
-    mounted () {
+    mounted() {
         this.setWidth();
         self.addEventListener('resize', this.setWidth);
     },
-    destroyed () {
+    destroyed() {
         self.removeEventListener('resize', this.setWidth);
     },
     methods: {
-        isValidToRun (v){
+        isValidToRun(v) {
             return !this.isEmpty(v);
         },
-        setWidth () {
+        setWidth() {
             if (this.headerless) {
                 return;
             }
             this.width = this.$refs.headerContainer.clientWidth;
         },
-        validateProperties () {
+        validateProperties() {
             if (this.selectable && this.selectMode === 'multi' && this.isEmpty(this.busy)) {
                 throw new Error('The required property was not provided.\n\
              \'busy\' property is required when it is selectable with \'multi\' mode for detecting refresh.');
             }
         },
-        capitalizeFirstLetter (s) {
+        capitalizeFirstLetter(s) {
             return s.hasOwnProperty('text') ? this.capitalize(s.text) : s.hasOwnProperty('flag') ? this.capitalize(s.flag) : '';
         },
-        getResourceTypeInStr (val) {
+        getResourceTypeInStr(val) {
             let returnVal = '';
             const resourceInfoArry = val.options.supported_resource_type;
-            if (!this.isEmpty(resourceInfoArry) && resourceInfoArry.length > 0){
-                resourceInfoArry.forEach((curItem, idx) =>{
-                    if (idx == 0){
-                        returnVal +=  `${this.capitalize(curItem)}`;
+            if (!this.isEmpty(resourceInfoArry) && resourceInfoArry.length > 0) {
+                resourceInfoArry.forEach((curItem, idx) => {
+                    if (idx == 0) {
+                        returnVal += `${this.capitalize(curItem)}`;
                     } else {
-                        returnVal +=  `<br>${this.capitalize(curItem)}`;
+                        returnVal += `<br>${this.capitalize(curItem)}`;
                     }
                 });
             }
             return returnVal;
         },
-        getCollectorIcon(str){
-            return str.includes('svg') ?  str : str + '.svg';
+        getCollectorIcon(str) {
+            return str.includes('svg') ? str : `${str}.svg`;
         },
-        getVariantSize (size) {
+        getVariantSize(size) {
             let variantFontSize = 3;
-            if (size.hasOwnProperty('variantSize')){
+            if (size.hasOwnProperty('variantSize')) {
                 variantFontSize = size.variantSize;
             }
             return this.setFontSize(variantFontSize);
         },
-        getBadge (status) {
+        getBadge(status) {
             let badge = '';
-            if (this.isEmpty(status)){
+            if (this.isEmpty(status)) {
                 status = badge;
-            } else if (status.hasOwnProperty('flag')){
+            } else if (status.hasOwnProperty('flag')) {
                 badge = status.flag;
             }
             return this.selectBadges(badge);
         },
-        filterLimit () {
+        filterLimit() {
             if (this.limitInput < 1) {
                 this.limitInput = 1;
             } else if (this.limitInput > this.perPageMax) {
                 this.limitInput = this.perPageMax;
             }
         },
-        rowClicked (item, idx, e) {
+        rowClicked(item, idx, e) {
             if (this.selectable) {
                 this.rowSelected(item, idx, e);
             }
@@ -481,19 +481,19 @@ export default {
          * @param idx
          * @param e
          */
-        rowSelected (item, idx) {
+        rowSelected(item, idx) {
             this.selectedRows.map((row) => {
                 this.updateTableDataSelectedValue(row.idx, false);
             });
             this.resetSelectedRows();
 
             this.updateTableDataSelectedValue(idx, true);
-            this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
+            this.selectedRows.push({ idx, data: this.tableData[idx] });
 
             this.setIsSelectAll();
             this.$emit('rowSelected', this.selectedRows, true);
         },
-        checkboxClicked (val, key) {
+        checkboxClicked(val, key) {
             switch (this.selectMode) {
             case 'single':
                 this.setSelectedRowsWithSingleMode(key, val);
@@ -505,20 +505,20 @@ export default {
             this.setIsSelectAll();
             this.$emit('rowSelected', this.selectedRows, val);
         },
-        setSelectedRowsWithSingleMode (idx, val) {
+        setSelectedRowsWithSingleMode(idx, val) {
             if (val) {
                 this.selectedRows.map((row) => {
                     this.updateTableDataSelectedValue(row.idx, false);
                 });
                 this.resetSelectedRows();
-                this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
+                this.selectedRows.push({ idx, data: this.tableData[idx] });
             } else {
                 this.selectedRows.pop();
             }
         },
-        setSelectedRowsWithMultiMode (idx, val) {
+        setSelectedRowsWithMultiMode(idx, val) {
             if (val) {
-                this.selectedRows.push({ idx: idx, data: this.tableData[idx] });
+                this.selectedRows.push({ idx, data: this.tableData[idx] });
             } else {
                 this.selectedRows.some((row, i) => {
                     if (idx === row.idx) {
@@ -528,22 +528,22 @@ export default {
                 });
             }
         },
-        resetSelectedRows () {
+        resetSelectedRows() {
             this.selectedRows = [];
         },
-        setIsSelectAll () {
+        setIsSelectAll() {
             if (this.selectedRows.length === this.tableData.length) {
                 this.isSelectedAll = true;
             } else {
                 this.isSelectedAll = false;
             }
         },
-        onSelectAll (val) {
+        onSelectAll(val) {
             if (val) {
                 this.resetSelectedRows();
                 this.tableData.map((data, i) => {
                     this.updateTableDataSelectedValue(i, val);
-                    this.selectedRows.push({ data: data, idx: i });
+                    this.selectedRows.push({ data, idx: i });
                 });
             } else {
                 this.selectedRows.map((row) => {
@@ -554,14 +554,14 @@ export default {
             this.setIsSelectAll();
             this.$emit('onSelectAll', this.isSelectedAll, this.selectedRows);
         },
-        updateTableDataSelectedValue (idx, value) {
+        updateTableDataSelectedValue(idx, value) {
             if (this.isEmpty(idx)) {
                 idx = 0;
             }
             this.tableData[idx].selected = value;
             this.$set(this.tableData, idx, Object.assign({}, this.tableData[idx]));
         },
-        onPrev () {
+        onPrev() {
             if (this.currentPage <= 1) {
                 return;
             }
@@ -569,7 +569,7 @@ export default {
             this.reset();
             this.emitListEvent();
         },
-        onNext () {
+        onNext() {
             if (this.currentPage >= this.maxPage) {
                 return;
             }
@@ -577,12 +577,12 @@ export default {
             this.reset();
             this.emitListEvent();
         },
-        onRefresh () {
+        onRefresh() {
             this.currentPage = 1;
             this.reset();
             this.emitListEvent();
         },
-        onSearch (filter, filterOr) {
+        onSearch(filter, filterOr) {
             if (this.plainSearch) {
                 this.keyword = filter;
             } else {
@@ -592,39 +592,39 @@ export default {
             this.reset();
             this.emitListEvent();
         },
-        emitListEvent () {
+        emitListEvent() {
             if (this.searchContextData) {
                 this.$emit('list', this.limit, this.start, this.sort, this.filter, this.filterOr);
             } else {
-                this.$emit('list', this.limit, this.start, this.sort, this.keyword);    
+                this.$emit('list', this.limit, this.start, this.sort, this.keyword);
             }
         },
-        headClicked (key, item) {
+        headClicked(key, item) {
             if (item.ajaxSortable) {
                 this.isLocalSort = false;
             } else {
                 this.isLocalSort = true;
             }
         },
-        sortingChanged (ctx) {
+        sortingChanged(ctx) {
             if (this.isLocalSort) {
                 return;
             }
 
             this.sort = {
                 key: ctx.sortBy,
-                desc: ctx.sortDesc ? 1 : 0
+                desc: ctx.sortDesc ? 1 : 0,
             };
             this.reset();
             this.emitListEvent();
         },
-        reset () {
+        reset() {
             this.isSelectedAll = false;
         },
-        contextChanged (ctx) {
+        contextChanged(ctx) {
             this.$emit('changed', ctx);
         },
-        rowClass (item) { // custom global style
+        rowClass(item) { // custom global style
             let className = 'tbody-tr-default';
             if (this.selectable) {
                 className += ' tbody-tr-selectable';
@@ -637,20 +637,20 @@ export default {
             }
             return className;
         },
-        limitChanged () {
+        limitChanged() {
             this.filterLimit();
-            let currentPageLastRowIdx = this.currentPage * this.limitInput;
+            const currentPageLastRowIdx = this.currentPage * this.limitInput;
             if (currentPageLastRowIdx > this.totalRows) {
                 this.currentPage = Math.ceil(this.totalRows / this.limitInput);
             }
             this.$emit('limitChanged', this.limitInput);
         },
-        onLimitInputEnter () {
+        onLimitInputEnter() {
             this.$refs.modal.hideModal();
             this.$refs.modal.$emit('ok');
         },
-        getCustomHeaderSlotNameList () {
-            let result = [];
+        getCustomHeaderSlotNameList() {
+            const result = [];
             Object.keys(this.$scopedSlots).map((slot) => {
                 if (slot.startsWith('HEAD')) {
                     result.push({ key: slot, name: slot });
@@ -658,16 +658,16 @@ export default {
             });
             return result;
         },
-        getCustomCellNameList () {
-            let result = [];
+        getCustomCellNameList() {
+            const result = [];
             Object.keys(this.$scopedSlots).map((slot) => {
                 if (slot.startsWith('CELL')) {
                     result.push({ key: slot.substring(5), name: slot });
                 }
             });
             return result;
-        }
-    }
+        },
+    },
 };
 </script>
 
@@ -761,7 +761,7 @@ export default {
         text-align: right;
         .toolbox {
             display: inline-block;
-            text-align: right; 
+            text-align: right;
         }
     }
     .row-icons {

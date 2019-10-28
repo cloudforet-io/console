@@ -1,11 +1,11 @@
 import { number, select } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
-import PButton from '../../atoms/buttons/Button.vue';
-import { autoProps } from '../../../setup/storybook-util';
-import { sizeMapping } from '../../molecules/modals/ModalMapping';
+import PButton from '../../../atoms/buttons/Button.vue';
+import { autoProps } from '../../../../setup/storybook-util';
+import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 import PContentModal from './ContentModal.vue';
-import PModal from '../../molecules/modals/Modal.vue';
+import PModal from '../../../molecules/modals/Modal.vue';
 
 export default {
     title: 'organisms/content-modal',
