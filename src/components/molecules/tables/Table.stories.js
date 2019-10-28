@@ -4,7 +4,7 @@ import faker from 'faker';
 import PTr from '../../atoms/table/Tr.vue';
 import PTd from '../../atoms/table/Td.vue';
 import PTh from '../../atoms/table/Th.vue';
-import PTable from './table.vue';
+import PTable from './Table.vue';
 import { autoProps } from '../../../setup/storybook-util';
 
 export default {
