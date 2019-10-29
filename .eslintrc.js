@@ -18,10 +18,6 @@ module.exports = {
     'no-prototype-builtins': "error",
     'import/extensions': ['error', 'always', {
       js: 'never',
-      mjs: 'never',
-      jsx: 'never',
-      ts: 'never',
-      tsx: 'never',
       vue: 'never'
     }]
   },
