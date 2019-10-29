@@ -46,10 +46,8 @@ export default {
         value(val) {
             this.$emit('change', val);
             if (val) {
-                this.show();
                 this.$emit('show');
             } else {
-                this.hide();
                 this.$emit('hide');
             }
         },
@@ -61,6 +59,9 @@ export default {
         hide() {
             this.value = false;
         },
+        test() {
+            console.log('test')
+        }
     },
 };
 </script>
