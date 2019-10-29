@@ -1,4 +1,4 @@
-export const ko ={
+export const ko = {
     COMMON: {
         WELCOME_MSG: 'Welcome to {0} Portal.',
         WELCOME_MSG_P: 'Welcome to {0} Portal',
@@ -94,10 +94,25 @@ export const ko ={
         COMPUTE: 'Compute',
         RELEASE: '해제',
         STATE: '상태',
-        CREDENTIAL:'암호',
-        CREDENTIALS:'암호',
+        CREDENTIAL: '암호',
+        CREDENTIALS: '암호',
+        CREATE_NODE: '노드 생성',
+        CREATE_LEAF: '객체 생성',
+        UPDATE_SEL: '선택객체 갱신',
+        DELETE_SEL: '선택객체 삭제',
         REPO: 'Repository',
-        LIST: '목록'
+        LIST: '목록',
+    },
+    ATOM: {
+
+    },
+    MOLECULES: {
+
+    },
+    ORGANISMS: {
+        CREATE_ARG: '{0} 생성',
+        UPDATE_ARG: '{0} 갱신',
+        DELETE_ARG: '{0} 삭제',
     },
     IDENTITY: {
 
@@ -113,7 +128,7 @@ export const ko ={
         POOL: 'Pool',
         CREATE: '{0} 생성하기',
         UPDATE: '{0} 업데이트',
-        DELETE: '삭제하기'
+        DELETE: '삭제하기',
     },
     COL_NM: {
         C_COMMAND_ID: '커맨드 아이디',
@@ -208,16 +223,16 @@ export const ko ={
         UPT_COUNT: '업데이트 카운트',
         FINISHED: '완료일',
         KEY: '키(Key)',
-        FAIL_REASON: '실패 원인'
+        FAIL_REASON: '실패 원인',
     },
     MODAL_TITLE: {
         NOT_ALLOW: '수행불가 작업',
-        NO_USER: '미확인 유저 아이디'
+        NO_USER: '미확인 유저 아이디',
     },
     MODAL_MSG: {
         LEAF_NOMOVE: '\'{0}\' 는 Root 포지션에 위치할 수 없습니다.',
         NO_USER_VALID: '유저 아이디 ({0}) 확인할 수 없습니다. 당당자에게 확인 후 로그인을 시도해 주십시오.',
-        LEAF_PUSHTO: '\'{0}\' 는 \'{1}\' 으로 위치 시킬 수 없습니다.'
+        LEAF_PUSHTO: '\'{0}\' 는 \'{1}\' 으로 위치 시킬 수 없습니다.',
     },
     PANEL: {
         BASE_INFO: '기본 정보',
@@ -235,26 +250,26 @@ export const ko ={
         VM: 'VM',
         COMPUTE: 'Compute',
         LOCAL: 'Local',
-        OFFICIAL: 'Official'
+        OFFICIAL: 'Official',
     },
     FORM: {
         TYPE: {
             STR: '스트링',
-            LIST: '리스트'
+            LIST: '리스트',
         },
         INVALID: {
             MANDATORY: '필수 입력란입니다.',
             UNIQUE: '유일한 값을 입력해주세요.',
-            LENGTH: '{0}은(는) {1}~{2} 자 이내여야 합니다.'
+            LENGTH: '{0}은(는) {1}~{2} 자 이내여야 합니다.',
         },
         VALID: {
-            AVAIL: '사용 가능합니다.'
+            AVAIL: '사용 가능합니다.',
         },
         CHECK: {
             RESET: '작성하신 모든 내용이 사라집니다. 정말 초기화 하시겠습니까?',
-            AVAIL: '사용 가능 여부를 확인하세요.'
+            AVAIL: '사용 가능 여부를 확인하세요.',
         },
-        SELECT: '{0} 선택'
+        SELECT: '{0} 선택',
     },
     ACTION: {
         TITLE_DEFAULT: '작업',
@@ -263,17 +278,17 @@ export const ko ={
         CHECK: '아래의 {1}에 대하여 {0} 작업을 진행하시겠습니까?',
         CHECK_DEFAULT: '아래 항목에 대하여 작업을 진행하시겠습니까?',
         ERROR: '오류가 발생하였습니다.',
-        SUCCESS: '성공적으로 완료하였습니다.'
+        SUCCESS: '성공적으로 완료하였습니다.',
     },
     ALERT: {
         ALT_CHECK_TYPE: '현재 ({0}) type 의 Input 값이 아닙니다. 다시한번 확인해 주시기 바랍니다.',
         SUCCESS: '{0}가(이) 성공적으로 {1}.',
         ERROR: '{1}을(를) {0} 동안 오류가 발생했습니다.',
-        NO_PARAM: '먼저 아이템을 선택해주세요.'
+        NO_PARAM: '먼저 아이템을 선택해주세요.',
     },
     TABLE: {
         SETTINGS: '테이블 환경 설정',
-        LIMIT_LABEL: '줄 수: '
+        LIMIT_LABEL: '줄 수: ',
     },
     USER: {
         ID: '유저 아이디',
@@ -289,27 +304,27 @@ export const ko ={
         FIND: {
             FAILED: {
                 TITLE: '유저 찾기 실패',
-                MISSING: '일치하는 유저가 존재하지 않습니다. 확인 후 재시도 해주세요.'
-            }
+                MISSING: '일치하는 유저가 존재하지 않습니다. 확인 후 재시도 해주세요.',
+            },
         },
-        ID_DUPL: '이미 사용중인 아이디입니다. 다른 아이디를 사용해주세요.'
+        ID_DUPL: '이미 사용중인 아이디입니다. 다른 아이디를 사용해주세요.',
     },
     ENUM: {
         SERVER_STATE: {
             SERVICE: '서비스 중',
             MAINTENANCE: '유지 관리',
             CLOSED: '닫힘',
-            DELETED: '삭제됨'
+            DELETED: '삭제됨',
         },
         COLLECT_STATE: {
-            NEW:   '신규',
-            ACTIVE:  '활성화',
+            NEW: '신규',
+            ACTIVE: '활성화',
             DISCONNECTED: '연결 끈김',
             DUPLICATED: '중복 됨',
-            UNMANAGED: '관리 되지 않음'
-        }
+            UNMANAGED: '관리 되지 않음',
+        },
     },
     ERR_CODE: {
-        ERR_LOG_001: '로그인 에러'
-    }
+        ERR_LOG_001: '로그인 에러',
+    },
 };

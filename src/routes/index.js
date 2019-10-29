@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-
 import { beforeEach } from './hooks';
 
 // Routes
@@ -10,6 +9,7 @@ import inventoryRoute from '@/routes/inventory/inventory-route';
 
 import DefaultContainer from '@/containers/DefaultContainer';
 // Views
+// eslint-disable-next-line import/extensions
 import SignIn from '@/views/sign-in/local/Local';
 import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth';
 import Admin from '@/views/sign-in/admin/Admin';

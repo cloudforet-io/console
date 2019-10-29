@@ -95,9 +95,24 @@ export const en = {
         RELEASE: 'Release',
         STATE: 'State',
         REPO: 'Repository',
-        CREDENTIAL:'Credential',
-        CREDENTIALS:'Credentials',
+        CREDENTIAL: 'Credential',
+        CREDENTIALS: 'Credentials',
+        CREATE_NODE: 'Create Node',
+        CREATE_LEAF: 'Create Leaf',
+        UPDATE_SELECT: 'Update Selected',
+        DELETE_SELECT: 'Delete Selected',
         LIST: 'List'
+    },
+    ATOM: {
+
+    },
+    MOLECULES: {
+
+    },
+    ORGANISMS: {
+        CREATE_ARG: 'Create {0}',
+        UPDATE_ARG: 'Update {0}',
+        DELETE_ARG: 'Delete {0}',
     },
     SIGNIN: {
         ROOT_CREDENTIALS: 'Sign-in using root account credentials',
@@ -110,7 +125,6 @@ export const en = {
     },
     MSG: {
 
-        
     },
     TREE_TYPE: {
         PROJECT: 'Project',
