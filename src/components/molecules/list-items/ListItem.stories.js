@@ -13,7 +13,7 @@ export const defaultCase = () => ({
         ...autoProps(ListItem),
     },
     template: `<div>
-                    <p-list-item :icon="icon" :contents="contents"/>
+                    <p-list-item :icon="icon" :contents="contents" :indent="indent"/>
                     <br><br>
                     <p>sample icon</p>
                     <ul>
