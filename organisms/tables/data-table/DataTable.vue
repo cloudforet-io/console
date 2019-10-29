@@ -15,7 +15,7 @@
         <template #head>
             <slot name="head" :fields="fieldsData">
                 <p-tr>
-                    <p-th v-if="selectable"><input type="checkbox" ></p-th>
+                    <p-th v-if="selectable"><input type="checkbox" v-model="allState" :true-value="true" :false-value="false" @change.stop="selectAllToggle"></p-th>
                     <p-th v-for="(field,index) in fieldsData" :key="index" @click.native="theadClick(field,index,$event)">
                         {{field.name}}
                         <template v-if="sortable">
@@ -39,7 +39,7 @@
                             @mouseout.native="rowMouseOut(item,index, $event)"
                             v-bind="item.hasOwnProperty('vbind') ? item.vbind : null"
                             :key="index">
-                            <p-td v-if="selectable"><input type="checkbox" :value="index" @click.stop @input="inputSelect(index)"></p-td>
+                            <p-td v-if="selectable"><input type="checkbox" v-model="selectIndex" :value="index" @change.stop></p-td>
                             <template v-for="field in fieldsName">
                                 <slot :name="'col-'+field" :item="item" :value="item[field]" :index="index" :field="field">
                                     <p-td >{{item[field]}}</p-td>
@@ -69,6 +69,11 @@ export default {
         PTable, PTd, PTh, PTr, FI,
     },
     mixins: [PTable],
+    data() {
+        return {
+            allState: false,
+        };
+    },
     props: {
         fields: Array,
         items: Array,
@@ -81,8 +86,8 @@ export default {
             default: false,
         },
         selectIndex: {
-            type: Set,
-            default: () => new Set(),
+            type: Array,
+            default: () => [],
         },
         sortBy: {
             type: String,
@@ -119,18 +124,12 @@ export default {
             }
             return 'fa-sort-up';
         },
-        isSelected() {
-            return index => this.selectIndex.has(index);
-        },
     },
-
-
     methods: {
         rowLeftClick(item, index, event) {
             this.$emit('rowLeftClick', item, index, event);
             if (this.selectable) {
-                // this.$refs[`checkbox-${index}`].$el.value = !this.selectIndex.has(index);
-                this.inputSelect(index);
+                this.checkboxToggle(index);
             }
         },
         rowRightClick(item, index, event) {
@@ -156,24 +155,38 @@ export default {
             }
             this.$emit('theadClick', field, index, event);
         },
-        // checkboxInput(index) {
-        //     if (this.$refs[`checkbox-${index}`].$el.localValue) {
-        //
-        //     }
-        //
-        // },
-        inputSelect(index) {
-            const newSelect = new Set(this.selectIndex);
-            if (this.selectIndex.has(index)) {
-                newSelect.delete(index);
+
+        isSelected(index) {
+            return this.selectIndex.indexOf(index) !== -1;
+        },
+        checkboxToggle(index) {
+            const newSelected = [...this.selectIndex];
+            if (this.isSelected(index)) {
+                const idx = newSelected.indexOf(index);
+                newSelected.splice(idx, 1);
+                this.allState = false;
             } else {
-                newSelect.add(index);
+                newSelected.push(index);
             }
-            this.$emit('update:selectIndex', newSelect);
-            console.log(this.checkboxData);
+            this.$emit('update:selectIndex', newSelected);
+        },
+        selectAllToggle() {
+            if (this.allState) {
+                this.$emit('update:selectIndex', Array.from(new Array(this.items.length).keys()));
+            } else {
+                this.$emit('update:selectIndex', []);
+            }
+        },
+        getSelectItem() {
+            const selectItem = [];
+            this.selectIndex.forEach((index) => {
+                selectItem.push(this.items[index]);
+            });
+            return selectItem;
         },
     },
 };
+
 </script>
 
 <style scoped>

@@ -1,5 +1,6 @@
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
+import possibleConstructorReturn from '@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn';
 import PDataTable from './DataTable.vue';
 import PTr from '../../../atoms/table/Tr.vue';
 import PTd from '../../../atoms/table/Td.vue';
@@ -107,7 +108,7 @@ export const sortTable = () => ({
 });
 
 export const selectTable = () => ({
-    components: { PDataTable },
+    components: { PDataTable, PButton },
     mixins: [mockupMixin],
     template: `
 <div>
@@ -120,19 +121,23 @@ export const selectTable = () => ({
     :selectIndex.sync="selectIndex"
 >
 </PDataTable>
-<p>select count: {{selectIndex.size}} </p><br>
-<p>select index: {{[...selectIndex]}} </p>
-<p>{{check}}</p>
+<p>select index: {{selectIndex}} </p>
+<p-button @click="getData" styleType="primary" >선택한 데이터 가져오기</p-button>
+<p>{{selected}}</p> 
 </div>
 `,
     data() {
         return {
             ...data,
-            selectIndex: new Set(),
+            selectIndex: [],
+            selected: [],
         };
     },
     methods: {
         ...actions,
+        getData() {
+            this.selected = this.$refs.table.getSelectItem();
+        },
     },
 });
 
