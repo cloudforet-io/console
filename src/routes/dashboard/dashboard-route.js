@@ -1,5 +1,5 @@
-const BaseHeader = () => import('@/containers/header/Header');
-const Dashboard = () => import('@/views/dashboard/Dashboard');
+import BaseHeader from '@/containers/header/Header';
+import Dashboard from '@/views/dashboard/Dashboard';
 
 export default {
     path: 'dashboard',
@@ -7,6 +7,6 @@ export default {
     meta: { label: 'Dashboard', requiresAuth: true },
     components: {
         header: BaseHeader,
-        main: Dashboard
-    }
+        main: Dashboard,
+    },
 };
