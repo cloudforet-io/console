@@ -1,11 +1,18 @@
 <template>
     <div class="list-item">
+        <pre class="indent-text">{{ indentText }}</pre>
         <slot>
-            <span v-if="icon" class="icon-box">
-                <f-i icon-style="light" :icon="icon"/>
+            <span
+                v-if="icon"
+                class="icon-box"
+            >
+                <f-i
+                    icon-style="light"
+                    :icon="icon"
+                />
             </span>
             <span>
-                {{contents}}
+                {{ contents }}
             </span>
         </slot>
     </div>
@@ -15,7 +22,7 @@
 import FI from '@/components/atoms/icons/FI.vue';
 
 export default {
-    name: 'p-list-item',
+    name: 'PListItem',
     components: { FI },
     props: {
         contents: {
@@ -26,8 +33,15 @@ export default {
             type: String,
             default: '',
         },
+        indent: {
+            type: Number,
+            default: 0,
+        },
     },
     computed: {
+        indentText() {
+            return ' '.repeat(this.indent);
+        },
     },
 };
 </script>
@@ -35,9 +49,14 @@ export default {
 <style lang="scss" scoped>
     .list-item {
         border: 1px solid red;
-    }
-    icon-box {
-        margin-right: 5px;
-        border: 1px solid blue;
+        .indent-text {
+            display: inline;
+            margin: 0;
+            font-size: 1rem;
+        }
+        .icon-box {
+            margin-right: 5px;
+            border: 1px solid blue;
+        }
     }
 </style>
