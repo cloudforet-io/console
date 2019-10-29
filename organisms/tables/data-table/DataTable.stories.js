@@ -1,11 +1,10 @@
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
-import { boolean } from '@storybook/addon-knobs';
-import PDataTable from 'src/components/organisms/tables/data-table/DataTable.vue';
-import PTr from 'src/components/atoms/table/Tr.vue';
-import PTd from 'src/components/atoms/table/Td.vue';
-import PTh from 'src/components/atoms/table/Th.vue';
-import PButton from 'src/components/atoms/buttons/Button.vue';
+import PDataTable from './DataTable.vue';
+import PTr from '../../../atoms/table/Tr.vue';
+import PTd from '../../../atoms/table/Td.vue';
+import PTh from '../../../atoms/table/Th.vue';
+import PButton from '../../../atoms/buttons/Button.vue';
 
 export default {
     title: 'organisms/tables/datatable',
@@ -107,6 +106,37 @@ export const sortTable = () => ({
     },
 });
 
+export const selectTable = () => ({
+    components: { PDataTable },
+    mixins: [mockupMixin],
+    template: `
+<div>
+<PDataTable 
+    ref="table"
+    :items="items" 
+    :fields="fields"
+    @rowLeftClick="rowLeftClick"
+    :selectable="true"
+    :selectIndex.sync="selectIndex"
+>
+</PDataTable>
+<p>select count: {{selectIndex.size}} </p><br>
+<p>select index: {{[...selectIndex]}} </p>
+<p>{{check}}</p>
+</div>
+`,
+    data() {
+        return {
+            ...data,
+            selectIndex: new Set(),
+        };
+    },
+    methods: {
+        ...actions,
+    },
+});
+
+
 export const rowVBind = () => ({
     components: { PDataTable },
     mixins: [mockupMixin],
@@ -205,7 +235,7 @@ export const customColSlot = () => ({
 >
 <template slot="col-email"  slot-scope="data">
     <p-td style="color: #0f69ff;" >
-        <p-button styleType="primary" @click="sendEmail">send email</p-button>
+        <p-button styleType="primary" @click.stop="sendEmail(data.item,data.index,$event)">send email</p-button>
     </p-td>
 </template>
 </p-tr>
@@ -218,5 +248,6 @@ export const customColSlot = () => ({
     },
     methods: {
         ...actions,
+        sendEmail: action('send_email'),
     },
 });
