@@ -11,43 +11,19 @@
         @nodecontextmenu="nodecontextmenu"
     >
         <template #title="{ node }">
-            <span
-                v-if="node.data.init"
-                class="fas fa-exclamation-triangle"
-            />
-            <slot
-                name="icon"
-                v-bind="node"
-            >
-                <span
-                    v-if="!node.data.init"
-                    class="item-icon"
-                >
-                    <i
-                        v-if="node.isLeaf"
-                        class="fas fa-cube"
-                    />
-                    <i
-                        v-else-if="node.isExpanded"
-                        class="fal fa-folder-open"
-                    />
-                    <i
-                        v-else
-                        class="fal fa-folder-minus"
-                    />
+            <span v-if="node.data.init" class="fas fa-exclamation-triangle"/>
+            <slot name="icon" v-bind="node">
+                <span v-if="!node.data.init" class="item-icon">
+                    <i v-if="node.isLeaf" class="fas fa-cube"/>
+                    <i v-else-if="node.isExpanded" class="fal fa-folder-open"/>
+                    <i v-else class="fal fa-folder-minus"/>
                 </span>
             </slot>
             <span class="item-title">{{ node.title }}</span>
         </template>
         <template #toggle="{ node }">
-            <i
-                v-if="node.isExpanded"
-                class="fal fa-angle-down"
-            />
-            <i
-                v-else
-                class="fal fa-angle-right"
-            />
+            <i v-if="node.isExpanded" class="fal fa-angle-down"/>
+            <i v-else class="fal fa-angle-right"/>
         </template>
     </sl-vue-tree>
 </template>
