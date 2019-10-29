@@ -2,15 +2,6 @@
     <div class="list-item">
         <pre class="indent-text">{{ indentText }}</pre>
         <slot>
-            <span
-                v-if="icon"
-                class="icon-box"
-            >
-                <f-i
-                    icon-style="light"
-                    :icon="icon"
-                />
-            </span>
             <span>
                 {{ contents }}
             </span>
@@ -19,17 +10,11 @@
 </template>
 
 <script>
-import FI from '@/components/atoms/icons/FI.vue';
 
 export default {
     name: 'PListItem',
-    components: { FI },
     props: {
         contents: {
-            type: String,
-            default: '',
-        },
-        icon: {
             type: String,
             default: '',
         },
