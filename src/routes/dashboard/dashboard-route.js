@@ -1,4 +1,3 @@
-const BaseHeader = () => import('@/containers/header/Header');
 const Dashboard = () => import('@/views/dashboard/Dashboard');
 
 export default {
@@ -6,7 +5,8 @@ export default {
     name: 'dashboard',
     meta: { label: 'Dashboard', requiresAuth: true },
     components: {
-        header: BaseHeader,
-        main: Dashboard
-    }
+        // IN CASE OF SEPARATING GNB PER EACH SERVICE
+        // gnb: GNB,
+        main: Dashboard,
+    },
 };

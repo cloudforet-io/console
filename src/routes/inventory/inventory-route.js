@@ -1,5 +1,5 @@
-// const BaseHeader = () => import('@/containers/header/Header');
-import BaseHeader from '@/containers/header/Header';
+const LNB = () => import('@/views/containers/lnb/LNB.template.vue');
+
 const Inventory = () => import('@/views/inventory/Inventory');
 const DataCenter = () => import('@/views/inventory/data-center/DataCenter');
 const Server = () => import('@/views/inventory/server/Server');
@@ -11,8 +11,8 @@ export default {
     redirect: 'inventory/data-center',
     meta: { label: 'Inventory', requiresAuth: true },
     components: {
-        header: BaseHeader,
-        main: Inventory
+        lnb: LNB,
+        main: Inventory,
     },
     children: [
         {

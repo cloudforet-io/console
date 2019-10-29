@@ -8,7 +8,7 @@ import dashboardRoute from '@/routes/dashboard/dashboard-route';
 import identityRoute from '@/routes/identity/identity-route';
 import inventoryRoute from '@/routes/inventory/inventory-route';
 
-import DefaultContainer from '@/containers/DefaultContainer';
+import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 // Views
 import SignIn from '@/views/sign-in/local/Local';
 import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth';
@@ -32,19 +32,19 @@ const index = new Router({
         },
         {
             path: '/sign-in',
-            name: 'signinn',
+            name: 'signIn',
             meta: { label: 'Sign In', requiresAuth: false, requiresDomainCheck: true },
             component: SignIn,
         },
         {
             path: '/google-sign-in',
-            name: 'Google-Oauth-signin',
+            name: 'googleOAuthSignIn',
             meta: { label: 'google_oauth2', requiresAuth: false, requiresDomainCheck: true },
             component: GoolgeSignIn,
         },
         {
             path: '/admin-sign-in',
-            name: 'Admin-SignIn',
+            name: 'adminSignIn',
             meta: { label: 'admin_sign', requiresAuth: false, requiresDomainCheck: true },
             component: Admin,
         },
