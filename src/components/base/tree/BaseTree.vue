@@ -106,7 +106,7 @@
 </template>
 <script>
 import SlVueTree from 'sl-vue-tree';
-import { mapGetters } from 'vuex';
+import style from '@/assets/style/_variables.scss';
 import BaseDragVertical from '@/components/base/drag/BaseDragVertical';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
 import BaseModal from '@/components/base/modal/BaseModal';
@@ -165,11 +165,8 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('layout', [
-            'headerHeight',
-        ]),
         dragHeight() {
-            return self.innerHeight - this.headerHeight;
+            return self.innerHeight - style.lnbHeight;
         },
         selectedTreeProp: {
             get() {
@@ -310,7 +307,7 @@ export default {
             const coordinateY = event.clientY;
             this.$refs.slVueTree.select(node.path);
             $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
-            $contextMenu.style.top = `${coordinateY - this.headerHeight}px`;
+            $contextMenu.style.top = `${coordinateY - style.lnbHeight}px`;
         },
         contextExecutor(flag, action) {
             /** *******************

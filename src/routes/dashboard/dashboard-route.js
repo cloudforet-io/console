@@ -1,4 +1,4 @@
-const Dashboard = () => import('@/views/dashboard/Dashboard');
+const Dashboard = () => import('@/views/dashboard/Dashboard.vue');
 
 export default {
     path: 'dashboard',
@@ -7,6 +7,7 @@ export default {
     components: {
         // IN CASE OF SEPARATING GNB PER EACH SERVICE
         // gnb: GNB,
+        // fnb: FNB,
         main: Dashboard,
     },
 };
