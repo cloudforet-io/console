@@ -5,7 +5,7 @@
             :disabled="thisPage === 1"
             @click="update(thisPage-1)"
         />
-        {{ thisPage }}/{{ allPage }}
+        <span class="text-pagenation">{{ thisPage }}/{{ allPage }}</span>
         <p-icon-button
             icon="fa-angle-right"
             :disabled="thisPage === allPage"
@@ -42,6 +42,11 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    .text-pagenation{
+        display:inline-block;
+        min-width: 64px;
+        text-align: center;
+    }
 
 </style>
