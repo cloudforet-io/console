@@ -16,7 +16,8 @@ module.exports = {
     'prefer-destructuring': ["error", {"object": false, "array": false}],
     'radix': ["error", "as-needed"],
     'no-prototype-builtins': "error",
-    'import/extensions': ['error', 'always', {
+    'no-empty': ["error", { "allowEmptyCatch": true }],
+     'import/extensions': ['error', 'always', {
       js: 'never',
       vue: 'never'
     }]
