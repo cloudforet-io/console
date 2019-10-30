@@ -1,6 +1,8 @@
-import FI from './FI';
 import { select, text } from '@storybook/addon-knobs/vue';
-import { icon_style_mapping, size_mapping, animation_mapping, rotating_mapping, flip_mapping } from './FiMapping';
+import FI from './FI';
+import {
+    iconStyleMapping, sizeMapping, animationMapping, rotatingMapping, flipMapping,
+} from './FiMapping';
 
 export default {
     title: 'atoms/icon/f-i',
@@ -8,9 +10,9 @@ export default {
     parameters: {
         info: {
             summary: '',
-            components: { FI }
-        }
-    }
+            components: { FI },
+        },
+    },
 };
 
 
@@ -33,22 +35,22 @@ export const icon = () => ({
 `,
     props: {
         icon: {
-            default: text('icon', 'fa-smile-wink')
+            default: text('icon', 'fa-smile-wink'),
         },
         iconStyle: {
-            default: select('icon_style', [...Object.keys(icon_style_mapping)] , 'solid')
+            default: select('icon_style', [...Object.keys(iconStyleMapping)], 'solid'),
         },
         size: {
-            default: select('size', [null,...Object.keys(size_mapping)], null)
+            default: select('size', [null, ...Object.keys(sizeMapping)], null),
         },
         animation: {
-            default: select('animation', [null,...Object.keys(animation_mapping)], null)
+            default: select('animation', [null, ...Object.keys(animationMapping)], null),
         },
         rotating: {
-            default: select('rotating', [null,...Object.keys(rotating_mapping)], null)
+            default: select('rotating', [null, ...Object.keys(rotatingMapping)], null),
         },
         flip: {
-            default: select('flip', [null,...Object.keys(flip_mapping)], null)
-        }
-    }
+            default: select('flip', [null, ...Object.keys(flipMapping)], null),
+        },
+    },
 });
