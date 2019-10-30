@@ -1,10 +1,9 @@
 <template>
     <select
-        v-model="value"
+        v-model="proxySelected"
         :class="classObject"
         :size="optionSize"
         :multiple="multiple"
-        @input="onChange"
     >
         <template v-for="option in options">
             <slot
@@ -55,12 +54,6 @@ export default {
             default: null,
         },
     },
-    data() {
-        console.log('init', this.selected);
-        return {
-            value: this.selected,
-        };
-    },
     computed: {
         classObject() {
             const obj = [
@@ -71,19 +64,17 @@ export default {
             }
             return obj;
         },
-    },
-    watch: {
-        selected() {
-            console.log('watch', this.selected, this.value);
-            if (this.selected !== this.value) {
-                this.value = this.selected;
-            }
+        proxySelected: {
+            get() {
+                return this.selected;
+            },
+            set(value) {
+                this.$emit('update:selected', value);
+            },
         },
     },
     methods: {
         onChange(event) {
-            console.log(this.options);
-            console.log('change', this.value, event.target.value);
             this.$emit('update:selected', event.target.value);
         },
     },
