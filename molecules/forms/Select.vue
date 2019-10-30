@@ -56,12 +56,8 @@ export default {
     },
     computed: {
         classObject() {
-            const obj = [
-                { custom_select: this.customStyle },
-            ];
-            if (this.selectSize) {
-                obj.push(selectSize[this.selectSize]);
-            }
+            const obj = { 'custom-select': this.customStyle };
+            obj[selectSize[this.selectSize]] = !!this.selectSize;
             return obj;
         },
         proxySelected: {
