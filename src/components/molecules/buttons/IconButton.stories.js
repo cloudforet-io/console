@@ -4,10 +4,10 @@ import PIconButton from './IconButton.vue';
 
 import { autoProps } from '../../../setup/storybook-util';
 import {
-    animation_mapping, flip_mapping,
-    icon_style_mapping,
-    rotating_mapping,
-    size_mapping,
+    animationMapping, flipMapping,
+    iconStyleMapping,
+    rotatingMapping,
+    sizeMapping,
 } from '../../atoms/icons/FiMapping';
 
 export default {
@@ -45,19 +45,19 @@ export const button = () => ({
             default: text('icon', 'fa-cog'),
         },
         iconStyle: {
-            default: select('icon_style', [...Object.keys(icon_style_mapping)], 'solid'),
+            default: select('icon_style', [...Object.keys(iconStyleMapping)], 'solid'),
         },
         size: {
-            default: select('size', [null, ...Object.keys(size_mapping)], null),
+            default: select('size', [null, ...Object.keys(sizeMapping)], null),
         },
         animation: {
-            default: select('animation', [null, ...Object.keys(animation_mapping)], null),
+            default: select('animation', [null, ...Object.keys(animationMapping)], null),
         },
         rotating: {
-            default: select('rotating', [null, ...Object.keys(rotating_mapping)], null),
+            default: select('rotating', [null, ...Object.keys(rotatingMapping)], null),
         },
         flip: {
-            default: select('flip', [null, ...Object.keys(flip_mapping)], null),
+            default: select('flip', [null, ...Object.keys(flipMapping)], null),
         },
         ...autoProps(PIconButton),
     },
