@@ -1,7 +1,16 @@
+<template>
+    <button
+        type="button"
+        :class="classObject"
+        @click="onClick"
+    >
+        <slot />
+    </button>
+</template>
+
 <script>
 export default {
     name: 'PButton',
-    functional: true,
     events: ['click'],
     props: {
         forceClass: {
@@ -75,39 +84,54 @@ export default {
             },
         },
     },
-    render(h, { props, listeners, children }) {
-        function getClass() {
-            if (!props.forceClass) {
-                const cls = {
-                    btn: true,
-                    disabled: props.disabled,
-                    'btn-block': props.block,
-                    'btn-link': props.link,
-                };
-                if (props.size) {
-                    cls[`btn-${props.size}`] = true;
+    computed: {
+        classObject() {
+            if (!this.forceClass) {
+                const obj = ['btn'];
+                obj.push({
+                    disabled: this.disabled,
+                    'btn-block': this.block,
+                });
+                if (this.style_class != null) {
+                    obj.push(this.style_class);
                 }
-                if (!props.link && props.styleType) {
-                    cls[`btn${props.outline ? '-outline' : ''}-${props.styleType}`] = true;
+                if (this.size) {
+                    obj.push(`btn-${this.size}`);
                 }
-                return cls;
+                return obj;
             }
-            return props.forceClass;
-        }
-        return h('button', {
-            class: getClass(),
-            on: {
-                click: (event) => {
-                    if (!props.disabled) {
-                        if (props.href != null && props.href.trim()) {
-                            window.open(props.href);
-                        }
-                        listeners.click(event);
-                    }
-                },
-            },
+            return this.forceClass;
         },
-        children);
+        style_class() {
+            if (this.link) {
+                return 'btn-link';
+            } if (this.styleType) {
+                let prefix = 'btn-';
+                if (this.outline) {
+                    prefix += 'outline-';
+                }
+                return prefix + this.styleType;
+            }
+            return null;
+        },
+    },
+    methods: {
+        onClick(event) {
+            if (!this.disabled) {
+                if (this.href != null && this.href.trim()) {
+                    /**
+                         * TODO: Change it to use Vue outer
+                         * */
+                    this.self.location.href = this.href;
+                }
+                /**
+                     * button click event, only emit when disabled value is false
+                     * @event click
+                     * @type {MouseEvent}
+                     */
+                this.$emit('click', event);
+            }
+        },
     },
 };
 </script>
