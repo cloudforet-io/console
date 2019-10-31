@@ -1,6 +1,8 @@
 <template>
     <p-button
         class="icon-button"
+        :class="{'as':true, 'cd':false}"
+        style="color: #0F2965;"
         :disabled="disabled"
         :style-type="dark? 'dark': null"
         @click="$emit('click',$event)"
@@ -19,11 +21,12 @@
 <script>
 import FI from '@/components/atoms/icons/FI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import FIMixin from '@/components/atoms/icons/FIMixin';
 
 export default {
     name: 'PIconButton',
     components: { PButton, FI },
-    mixins: [FI],
+    mixins: [FIMixin],
     props: {
         dark: {
             type: Boolean,
@@ -37,7 +40,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     .icon-button{
         border-radius: 2px;
         padding: 8px;
