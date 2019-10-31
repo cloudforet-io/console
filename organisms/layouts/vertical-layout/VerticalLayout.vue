@@ -1,23 +1,21 @@
 <template>
     <div
         class="box-container"
-        :style="{'width': totalWidth,
-                 'height': containerHeight}"
+        :style="{height: height}"
     >
-        <div class="content-container left">
+        <div class="content-container">
             <slot
                 name="leftContainer"
-                :width="containerHeight"
+                :width="`${leftContainerWidth}px`"
             />
         </div>
 
         <div
-            ref="dragger"
             class="dragger-container"
             :class="{ line: line }"
             :style="{
-                'height': containerHeight,
-                'left': `${leftContainerWidth}px`
+                height: height,
+                width: `${draggerWidth}px`,
             }"
         >
             <span
@@ -35,25 +33,26 @@
 
         <div
             class="content-container right"
-            :style="{'width': rightContainerWidth,
-                     'left': `${leftContainerWidth + draggerWidth}px`,
-                     'height': containerHeight}"
+            :style="{
+                height: height,
+                width: rightContainerWidth
+            }"
         >
-            <slot
-                name="rightContainer"
-                :width="rightContainerWidth"
-            />
+            <slot name="rightContainer" />
+            <FNB class="fnb" />
         </div>
     </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
 import styles from '@/assets/style/_variables.scss';
-import FI from '@/components/atoms/icons/FI.vue';
+import FI from '@/components/atoms/icons/FI';
+import FNB from '@/views/containers/fnb/FNB';
 
 export default {
     name: 'VerticalLayout',
-    components: { FI },
+    components: { FI, FNB },
     events: ['start', 'move', 'stop'],
     props: {
         height: {
@@ -80,28 +79,42 @@ export default {
             type: String,
             default: `calc(100vw -${styles.gnbWidth})`,
         },
+        hideFNB: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
             draggerHeight: 30,
-            leftContainerWidth: parseInt(this.leftWidth, 10),
-            draggerWidth: 30,
+            leftContainerWidth: parseFloat(this.leftWidth),
+            draggerWidth: 15,
             dragging: false,
             pageX: null,
         };
     },
     computed: {
-        containerHeight() {
-            return this.height;
+        ...mapGetters('layout', [
+            'defaultFNB',
+        ]),
+        rightContainerPosX() {
+            return `${this.leftContainerWidth + this.draggerWidth}px`;
         },
         rightContainerWidth() {
-            return `calc(100vw - ${this.leftContainerWidth + this.draggerWidth}px)`;
+            return `calc(100vw - ${styles.gnbWidth} - ${this.rightContainerPosX})`;
         },
     },
-    mounted() {
-        this.draggerWidth = this.$refs.dragger.clientWidth + this.$refs.dragger.offsetWidth;
+    created() {
+        this.hideDefaultFNB();
+    },
+    beforeDestroy() {
+        this.showDefaultFNB();
     },
     methods: {
+        ...mapActions('layout', [
+            'showDefaultFNB',
+            'hideDefaultFNB',
+        ]),
         onMousedown() {
             this.dragging = true;
             this.$emit('stop', this.leftContainerWidth);
@@ -146,20 +159,17 @@ export default {
 
 <style lang="scss" scoped>
     .box-container {
-        position: relative;
+        display: flex;
     }
     .content-container {
-        display: inline-block;
-        position: absolute;
-        top: 0;
         overflow: scroll;
-        &.left {
-            left: 0;
+        &.right {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
     }
     .dragger-container {
-        position: absolute;
-        top: 0;
         display: flex;
         align-items: center;
         justify-content: center;
