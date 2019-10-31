@@ -1,6 +1,8 @@
 <template>
     <p-button
         class="icon-button"
+        :class="{'as':true, 'cd':false}"
+        style="color: #0F2965;"
         :disabled="disabled"
         :style-type="dark? 'dark': null"
         @click="$emit('click',$event)"
