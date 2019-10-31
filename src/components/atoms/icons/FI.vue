@@ -1,8 +1,3 @@
-<template>
-    <i :class="classObject" />
-</template>
-
-
 <script>
 import {
     iconStyleMapping, sizeMapping, animationMapping, rotatingMapping, flipMapping,
@@ -10,6 +5,7 @@ import {
 
 export default {
     name: 'FI',
+    functional: true,
     props: {
         icon: {
             type: String,
@@ -41,16 +37,25 @@ export default {
             validator: value => value in flipMapping,
         },
     },
-    computed: {
-        classObject() {
-            return [
-                iconStyleMapping[this.iconStyle],
-                this.icon,
-                sizeMapping[this.size],
-                animationMapping[this.animation],
-                flipMapping[this.flip] || rotatingMapping[this.rotating],
-            ];
-        },
+    render(h, { props }) {
+        function getClass() {
+            const cls = {};
+            cls[iconStyleMapping[props.iconStyle]] = true;
+            cls[props.icon] = true;
+            if (props.size) {
+                cls[sizeMapping[props.size]] = true;
+            }
+            if (props.animation) {
+                cls[animationMapping[props.animation]] = true;
+            }
+            if (props.flip || props.rotating) {
+                cls[flipMapping[props.flip] || rotatingMapping[props.rotating]] = true;
+            }
+            return cls;
+        }
+        return h('i', {
+            class: getClass(),
+        });
     },
 };
 </script>
