@@ -1,38 +1,30 @@
 <template>
-    <sl-vue-tree ref="p-tree"
-                 v-model="computedTreeData"
-                 class="main-tree-col"
-                 :allow-multiselect="useMultiSelect"
-                 :style="{ width: initialTreeWidth }"
-                 @nodeclick="nodeclick"
-                 @beforedrop="beforedrop"
-                 @toggle="toggle"
-                 @nodecontextmenu="nodecontextmenu">
-
+    <sl-vue-tree
+        ref="slVueTree"
+        v-model="computedTreeData"
+        class="main-tree-col"
+        :allow-multiselect="useMultiSelect"
+        :style="{ width: initialTreeWidth }"
+        @nodeclick="nodeclick"
+        @beforedrop="beforedrop"
+        @toggle="toggle"
+        @nodecontextmenu="nodecontextmenu"
+    >
         <template #title="{ node }">
-            <span v-if="node.data.init" class="fas fa-exclamation-triangle" />
-            <slot v-if="useDefaultTreeIcon">
+            <span v-if="node.data.init" class="fas fa-exclamation-triangle"/>
+            <slot name="icon" v-bind="node">
                 <span v-if="!node.data.init" class="item-icon">
-                    <i v-if="node.isLeaf" class="fas fa-cube" />
-                    <i v-else-if="node.isExpanded" class="fal fa-folder-open" />
-                    <i v-else class="fal fa-folder-minus" />
+                    <i v-if="node.isLeaf" class="fas fa-cube"/>
+                    <i v-else-if="node.isExpanded" class="fal fa-folder-open"/>
+                    <i v-else class="fal fa-folder-minus"/>
                 </span>
             </slot>
-            <slot name="other" else>
-
-            </slot>
-
-            <span class="item-title">
-                {{ node.title }}
-            </span>
-
+            <span class="item-title">{{ node.title }}</span>
         </template>
-
         <template #toggle="{ node }">
-            <i v-if="node.isExpanded" class="fal fa-angle-down" />
-            <i v-else class="fal fa-angle-right" />
+            <i v-if="node.isExpanded" class="fal fa-angle-down"/>
+            <i v-else class="fal fa-angle-right"/>
         </template>
-
     </sl-vue-tree>
 </template>
 
@@ -41,28 +33,45 @@
 import SlVueTree from 'sl-vue-tree';
 
 export default {
-    name: 'p-tree',
+    name: 'PTree',
     events: [],
     components: {
         SlVueTree,
     },
     props: {
+        /**
+         *  Tree Node Data
+         */
         treeData: {
             type: Array,
             default: () => [],
         },
+        /**
+         *  Initial Tree panel Width
+         */
         initialTreeWidth: {
             type: String,
             default: '300px',
         },
+        /**
+         *  Allow select multiple Nodes
+         */
         useMultiSelect: {
             type: Boolean,
             default: true,
         },
+        /**
+         * Ues Y/N to user default Node icon on Tree
+         */
         useDefaultTreeIcon: {
             type: Boolean,
             default: true,
         },
+    },
+    data() {
+        return {
+            currentTreeData: null,
+        };
     },
     computed: {
         computedTreeData: {
@@ -82,11 +91,6 @@ export default {
             },
         },
     },
-    data() {
-        return {
-            currentTreeData: null,
-        };
-    },
     watch: {
 
     },
@@ -98,7 +102,12 @@ export default {
             this.$emit('beforedrop', node, position, cancel);
         },
         toggle(node) {
-            this.$emit('toggle', node);
+            if (!node.isExpanded) {
+                this.setClickedNodeItem(node);
+                if (!node.data.is_cached) {
+                    this.$emit('toggle', { node, treeV: this.$refs.slVueTree });
+                }
+            }
         },
 
         nodecontextmenu(node, event, hasClicked) {
