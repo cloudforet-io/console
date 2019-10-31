@@ -2,12 +2,12 @@
     <div
         class="box-container"
         :style="{'width': totalWidth,
-                 'height': `${containerHeight}px`}"
+                 'height': containerHeight}"
     >
         <div class="content-container left">
             <slot
                 name="leftContainer"
-                :width="`${leftContainerWidth}px`"
+                :width="containerHeight"
             />
         </div>
 
@@ -16,7 +16,7 @@
             class="dragger-container"
             :class="{ line: line }"
             :style="{
-                'height': `${containerHeight}px`,
+                'height': containerHeight,
                 'left': `${leftContainerWidth}px`
             }"
         >
@@ -37,7 +37,7 @@
             class="content-container right"
             :style="{'width': rightContainerWidth,
                      'left': `${leftContainerWidth + draggerWidth}px`,
-                     'height': `${containerHeight}px`}"
+                     'height': containerHeight}"
         >
             <slot
                 name="rightContainer"
@@ -58,7 +58,7 @@ export default {
     props: {
         height: {
             type: String,
-            default: `calc(100vh - ${styles.lnbHeight}px)`,
+            default: `calc(100vh - ${styles.lnbHeight})`,
         },
         line: {
             type: Boolean,
@@ -78,7 +78,7 @@ export default {
         },
         totalWidth: {
             type: String,
-            default: `calc(100vw -${styles.gnbWidth}px)`,
+            default: `calc(100vw -${styles.gnbWidth})`,
         },
     },
     data() {
