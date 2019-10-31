@@ -1,45 +1,20 @@
 <script>
 import {
     iconStyleMapping, sizeMapping, animationMapping, rotatingMapping, flipMapping,
-} from './FiMapping';
+} from '@/components/atoms/icons/FiMapping';
+import FIMixin from '@/components/atoms/icons/FIMixin';
 
 export default {
     name: 'FI',
     functional: true,
-    props: {
-        icon: {
-            type: String,
-            required: true,
-        },
-        iconStyle: {
-            type: String,
-            default: 'solid',
-            validator: value => value in iconStyleMapping,
-        },
-        size: {
-            type: String,
-            default: null,
-            validator: value => value in sizeMapping,
-        },
-        animation: {
-            type: String,
-            default: null,
-            validator: value => value in animationMapping,
-        },
-        rotating: {
-            type: String,
-            default: null,
-            validator: value => value in rotatingMapping,
-        },
-        flip: {
-            type: String,
-            default: null,
-            validator: value => value in flipMapping,
-        },
-    },
-    render(h, { props }) {
+    mixins: [FIMixin],
+    render(h, {
+        props, data,
+    }) {
         function getClass() {
-            const cls = {};
+            const cls = {
+                ...data.class,
+            };
             cls[iconStyleMapping[props.iconStyle]] = true;
             cls[props.icon] = true;
             if (props.size) {
@@ -55,6 +30,10 @@ export default {
         }
         return h('i', {
             class: getClass(),
+            staticClass: data.staticClass,
+            staticStyle: data.staticStyle,
+            attrs: data.attrs,
+            style: data.style,
         });
     },
 };

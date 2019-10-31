@@ -1,81 +1,13 @@
 <script>
+import ButtonMixin from '@/components/atoms/buttons/ButtonMixin';
+
 export default {
     name: 'PButton',
     functional: true,
-    events: ['click'],
-    props: {
-        forceClass: {
-            type: Array,
-            default: null,
-        },
-        /** @type {string} */
-        href: {
-            type: String,
-            default: null,
-        },
-        /** @type {boolean} */
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        /** @type {boolean} */
-        outline: {
-            type: Boolean,
-            default: false,
-        },
-        /** @type {string} */
-        styleType: {
-            type: String,
-            default: null,
-            validator(value) {
-                return [
-                    null,
-                    'primary',
-                    'secondary',
-                    'success',
-                    'danger',
-                    'warning',
-                    'info',
-                    'light',
-                    'dark',
-                ].indexOf(value) !== -1;
-            },
-        },
-        /** @type {boolean} */
-        link: {
-            type: Boolean,
-            default: false,
-        },
-        /** @type {boolean} */
-        block: {
-            type: Boolean,
-            default: false,
-        },
-        /** @type {string} */
-        size: {
-            type: String,
-            default: null,
-            validator(value) {
-                return [
-                    null,
-                    'sm',
-                    'lg',
-                ].indexOf(value) !== -1;
-            },
-        },
-        /** @type {string} */
-        shape: {
-            type: String,
-            default: null,
-            validator(value) {
-                return [
-                    null,
-                    'circle',
-                ].indexOf(value) !== -1;
-            },
-        },
-    },
-    render(h, { props, listeners, children }) {
+    mixins: [ButtonMixin],
+    render(h, {
+        props, listeners, children, data,
+    }) {
         function getClass() {
             if (!props.forceClass) {
                 const cls = {
@@ -83,6 +15,7 @@ export default {
                     disabled: props.disabled,
                     'btn-block': props.block,
                     'btn-link': props.link,
+                    ...data.class,
                 };
                 if (props.size) {
                     cls[`btn-${props.size}`] = true;
@@ -96,6 +29,10 @@ export default {
         }
         return h('button', {
             class: getClass(),
+            staticClass: data.staticClass,
+            staticStyle: data.staticStyle,
+            attrs: data.attrs,
+            style: data.style,
             on: {
                 click: (event) => {
                     if (!props.disabled) {
