@@ -1,8 +1,8 @@
-const Identity = () => import('@/views/identity/Identity.vue');
-const IdentityNavBar = () => import('@/views/identity/IdentityNavBar.vue');
+const Identity = () => import('@/views/identity/Identity');
+const IdentityNavBar = () => import('@/views/identity/IdentityNavBar');
 
-const User = () => import('@/views/identity/user/User.vue');
-const Project = () => import('@//views/identity/project/Project.vue');
+const User = () => import('@/views/identity/user/User');
+const Project = () => import('@//views/identity/project/Project');
 
 export default {
     path: 'identity',
@@ -10,14 +10,14 @@ export default {
     redirect: '/identity/project',
     meta: { label: 'Identity', requiresAuth: true },
     components: {
-        lnb: IdentityNavBar,
         main: Identity,
+        lnb: IdentityNavBar,
     },
     children: [
         {
             path: 'project',
             name: 'project',
-            meta: { label: 'Project', requiresAuth: true, requireFNB: true },
+            meta: { label: 'Project', requiresAuth: true },
             component: Project,
         },
         {

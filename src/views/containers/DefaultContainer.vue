@@ -7,19 +7,43 @@
                 <router-view name="lnb" />
             </div>
 
-            <main class="main">
+            <main
+                class="main"
+                :style="{height: mainMinHeight}"
+            >
                 <router-view name="main" />
             </main>
+
+            <div
+                v-if="defaultFNB"
+                class="fnb"
+            >
+                <FNB />
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-import GNB from '@/views/containers/gnb/GNB.vue';
+import { mapGetters } from 'vuex';
+import styles from '@/assets/style/_variables.scss';
+import GNB from '@/views/containers/gnb/GNB';
+import FNB from '@/views/containers/fnb/FNB';
 
 export default {
     name: 'DefaultContainer',
-    components: { GNB },
+    components: { GNB, FNB },
+    computed: {
+        ...mapGetters('layout', [
+            'defaultFNB',
+        ]),
+        mainMinHeight() {
+            if (this.defaultFNB) {
+                return `calc(100vh - ${styles.lnbHeight} - ${styles.fnbHeight})`;
+            }
+            return `calc(100vh - ${styles.lnbHeight})`;
+        },
+    },
 };
 </script>
 
@@ -45,7 +69,8 @@ export default {
         }
         .main {
             margin: 0;
-            min-height: calc(100vh - #{$lnb-height});
+            width: calc(100vw - #{$gnb-width});
+            overflow-x: hidden;
             border: 1px solid orange;
         }
     }

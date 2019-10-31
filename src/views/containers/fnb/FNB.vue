@@ -1,21 +1,20 @@
 <template>
-    <div class="fnb">
-        <span
-            class="copyright"
-            :style="copyrightStyle"
-        >@2019 Megazone Cloud Inc.</span>
+    <div
+        class="fnb"
+        :style="{width: width}"
+    >
+        <span class="copyright">@2019 Megazone Cloud Inc.</span>
     </div>
 </template>
 
 <script>
-import styleVariables from '@/assets/style/_variables.scss';
-
 export default {
     name: 'FNB',
-    data() {
-        return {
-            copyrightStyle: { color: styleVariables.primary },
-        };
+    props: {
+        width: {
+            type: String,
+            default: '100%',
+        },
     },
 };
 </script>

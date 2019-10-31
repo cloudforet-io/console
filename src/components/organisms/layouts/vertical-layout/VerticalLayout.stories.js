@@ -1,4 +1,4 @@
-import PVerticalLayout from './VerticalLayout.vue';
+import PVerticalLayout from './VerticalLayout';
 import { action } from '@storybook/addon-actions';
 import { autoProps } from '@/setup/storybook-util';
 
@@ -19,6 +19,7 @@ export const defaultCase = () => ({
                                       :min-left-width="minLeftWidth"
                                       :max-left-width="maxLeftWidth"
                                       :total-width="totalWidth"
+                                      :hide-f-n-b="hideFNB"
                                       @start="start" 
                                       @move="move" 
                                       @stop="stop" />

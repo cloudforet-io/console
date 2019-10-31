@@ -7,11 +7,7 @@
                         @enter="enter"
             >
                 <div v-if="showTree">
-                    <BaseDragVertical
-                        :total-width="'100vw'"
-                        :left-width="getLeftTreeWidth"
-                        :height="dragHeight"
-                    >
+                    <vertical-layout :left-width="getLeftTreeWidth">
                         <template #leftContainer="{ width }">
                             <div @click.right="isBackPanelHasClciked">
                                 <sl-vue-tree ref="slVueTree"
@@ -53,12 +49,11 @@
                             </div>
                         </template>
 
-                        <template #rightContainer="{ width }">
+                        <template #rightContainer>
                             <transition name="panel-trans">
                                 <div v-if="hasSelected"
                                      :key="getNodekeyComputed"
                                      class="panel"
-                                     :style="{ width: width }"
                                 >
                                     <slot name="treeSubPanel" />
                                 </div>
@@ -67,7 +62,7 @@
                                 </div>
                             </transition>
                         </template>
-                    </BaseDragVertical>
+                    </vertical-layout>
 
                     <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
                         <template v-if="treeType=='DATA_CENTER'">
@@ -107,18 +102,18 @@
 <script>
 import SlVueTree from 'sl-vue-tree';
 import style from '@/assets/style/_variables.scss';
-import BaseDragVertical from '@/components/base/drag/BaseDragVertical';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
 import BaseModal from '@/components/base/modal/BaseModal';
 import { GlobalEnum } from '@/setup/enum';
+import VerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
 
 export default {
     name: 'BaseTree',
     components: {
-        BaseDragVertical,
         SlVueTree,
         BaseModal,
         BaseSimpleModal,
+        VerticalLayout,
     },
     props: {
         treeProp: {
@@ -165,9 +160,6 @@ export default {
         };
     },
     computed: {
-        dragHeight() {
-            return self.innerHeight - style.lnbHeight;
-        },
         selectedTreeProp: {
             get() {
                 let returnVal = this.treeProp;
@@ -307,7 +299,7 @@ export default {
             const coordinateY = event.clientY;
             this.$refs.slVueTree.select(node.path);
             $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
-            $contextMenu.style.top = `${coordinateY - style.lnbHeight}px`;
+            $contextMenu.style.top = `${coordinateY - style.lnbHeight}`;
         },
         contextExecutor(flag, action) {
             /** *******************
@@ -441,7 +433,7 @@ export default {
     opacity: 0;
   }
 
-  $main-height: calc(100vh - #{$header-height} - 30px);
+  $main-height: calc(100vh - #{$lnb-height});
 
   .main-tree-col {
     @extend %sheet;
