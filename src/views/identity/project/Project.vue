@@ -35,8 +35,7 @@
                   @edited="editSelected"
                   @delete="deletedSelectedOnTree"
                   @noCacheDrop="moveProject"
-                  @toggled="getNextLayerOnTree"
-        >
+                  @toggled="getNextLayerOnTree">
             <template #treeSubPanel>
                 <BaseTabNav
                     ref="IDPJ001_TreeSubPanel"
