@@ -21,6 +21,12 @@ export default {
             component: Project,
         },
         {
+            path: 'sample-project',
+            name: 'sample-project',
+            meta: { label: 'sample-project', requiresAuth: true },
+            component: Project1,
+        },
+        {
             path: 'user',
             name: 'user',
             meta: { label: 'User', requiresAuth: true },

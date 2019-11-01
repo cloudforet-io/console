@@ -27,7 +27,7 @@
              :style="{'width': `calc(100vw - ${leftContainerWidth + draggerWidth}px)`,
                       'left': `${leftContainerWidth + draggerWidth}px`,
                       'height': `${containerHeight}px`}">
-            <slot name="rightContainer" :width="`calc(100vw - ${leftContainerWidth + draggerWidth}px)`" />
+            <slot name="rightContainer" :width="`calc(100vw - ${leftContainerWidth + draggerWidth}px)`"  />
         </div>
     </div>
 </template>

@@ -292,7 +292,7 @@ export default {
                     this.contextIndividualVisible = [false, false, false, false, false, true, true];
                 }
             }
-
+1
             this.contextMenuIsVisible = true;
             const $contextMenu = this.$refs.contextmenu;
             const coordinateX = event.clientX;
