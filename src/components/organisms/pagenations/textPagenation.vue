@@ -1,11 +1,11 @@
 <template>
-    <nav>
+    <nav class="text-pagenation">
         <p-icon-button
             icon="fa-angle-left"
             :disabled="thisPage === 1"
             @click="update(thisPage-1)"
         />
-        <span class="text-pagenation">{{ thisPage }}/{{ allPage }}</span>
+        <span class="page-number">{{ thisPage }}/{{ allPage }}</span>
         <p-icon-button
             icon="fa-angle-right"
             :disabled="thisPage === allPage"
@@ -44,9 +44,15 @@ export default {
 
 <style lang="scss" scoped>
     .text-pagenation{
-        display:inline-block;
+        display: inline-flex;
+        justify-content: space-between;
+        align-self: center;
+        flex-wrap:nowrap;
         min-width: 64px;
+    }
+    .page-number{
         text-align: center;
+        vertical-align: middle;
     }
 
 </style>

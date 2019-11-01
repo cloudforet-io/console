@@ -16,7 +16,7 @@
             <slot name="head" :fields="fieldsData">
                 <p-tr>
                     <p-th v-if="selectable"><input type="checkbox" v-model="allState" :true-value="true" :false-value="false" @change.stop="selectAllToggle"></p-th>
-                    <p-th v-for="(field,index) in fieldsData" :key="index" @click.native="theadClick(field,index,$event)">
+                    <p-th v-for="(field,index) in fieldsData" :key="index" @click="theadClick(field,index,$event)">
                         {{field.name}}
                         <template v-if="sortable">
                             <f-i v-if="sortable&&field.name==sortBy" iconStyle="duotone" :icon="sortIcon" ></f-i>
