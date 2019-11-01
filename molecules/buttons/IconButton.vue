@@ -19,11 +19,12 @@
 <script>
 import FI from '@/components/atoms/icons/FI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import FIMixin from '@/components/atoms/icons/FIMixin';
 
 export default {
     name: 'PIconButton',
     components: { PButton, FI },
-    mixins: [FI],
+    mixins: [FIMixin],
     props: {
         dark: {
             type: Boolean,
