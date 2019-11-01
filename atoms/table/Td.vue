@@ -1,22 +1,30 @@
-<template>
-    <td :class="classObject" :colspan="colspan"><slot></slot></td>
-</template>
-
 <script>
-import styleMixin from '@/components/atoms/table/styleMixin';
+import { mixin, getClass } from '@/components/atoms/table/styleMixin';
 
 export default {
-    name: 'p-td',
-    mixins: [styleMixin],
+    name: 'PTd',
+    functional: true,
+    mixins: [mixin],
     props: {
         colspan: {
             type: Number,
             default: null,
         },
     },
+    render(h, {
+        props, listeners, data, children,
+    }) {
+        const newData = {
+            ...data,
+            class: {
+                ...data.class,
+                ...getClass(props),
+            },
+        };
+        if (props.colspan) {
+            newData.attrs.colspan = props.colspan;
+        }
+        return h('td', newData, children);
+    },
 };
 </script>
-
-<style scoped>
-
-</style>
