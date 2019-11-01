@@ -1,15 +1,7 @@
 <template>
     <div>
-        <div
-            class="row no-gutters"
-            @click="contextMenuIsVisible=false"
-        >
-            <transition
-                name="tree-trans"
-                appear
-                @before-enter="beforeEnter"
-                @enter="enter"
-            >
+        <div class="row no-gutters"  @click="contextMenuIsVisible=false">
+            <transition name="tree-trans" appear @before-enter="beforeEnter" @enter="enter">
                 <div v-if="showTree">
                     <BaseDragVertical :total-width="'100vw'" :left-width="getLeftTreeWidth" :height="dragHeight">
                         <template #leftContainer="{ width }">
@@ -60,7 +52,8 @@
     </div>
 </template>
 <script>
-import style from '@/styles/_variables.scss';
+import SlVueTree from 'sl-vue-tree';
+import { mapGetters } from 'vuex';
 import PTree from '@/components/molecules/tree/Tree';
 import BaseDragVertical from '@/components/base/drag/BaseDragVertical';
 
@@ -111,8 +104,11 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('layout', [
+            'headerHeight',
+        ]),
         dragHeight() {
-            return self.innerHeight - style.lnbHeight;
+            return self.innerHeight - this.headerHeight;
         },
         getNodekeyComputed() {
             return this.nodeKey;
@@ -205,7 +201,7 @@ export default {
             const coordinateY = event.clientY;
             this.$refs.slVueTree.select(node.path);
             $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
-            $contextMenu.style.top = `${coordinateY - style.lnbHeight}px`;
+            $contextMenu.style.top = `${coordinateY - this.headerHeight}px`;
         },
         beforeNodeDropped(node, position, cancel) {
             this.emit('beforeNodeDropped', node, position, cancel);
@@ -238,7 +234,7 @@ export default {
         opacity: 0;
     }
 
-    $main-height: calc(100vh - #{$lnb-height} - 30px);
+    $main-height: calc(100vh - #{$header-height} - 30px);
 
     .main-tree-col {
         @extend %sheet;
