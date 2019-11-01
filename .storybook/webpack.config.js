@@ -24,6 +24,7 @@ module.exports = async ({ config, mode }) => {
         }
     );
     config.resolve.alias = {
+        node_modules: path.resolve('./node_modules'),
         'vue': 'vue/dist/vue.common.js',
         '@': path.resolve(__dirname, '../src'),
     };

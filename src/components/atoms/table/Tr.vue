@@ -1,16 +1,21 @@
-<template>
-    <tr :class="classObject"><slot></slot></tr>
-</template>
-
 <script>
-import styleMixin from '@/components/atoms/table/styleMixin';
+import { mixin, getClass } from '@/components/atoms/table/styleMixin';
 
 export default {
-    name: 'p-tr',
-    mixins: [styleMixin],
+    name: 'PTr',
+    functional: true,
+    mixins: [mixin],
+    render(h, {
+        props, data, children,
+    }) {
+        const newData = {
+            ...data,
+            class: {
+                ...data.class,
+                ...getClass(props),
+            },
+        };
+        return h('tr', newData, children);
+    },
 };
 </script>
-
-<style scoped>
-
-</style>

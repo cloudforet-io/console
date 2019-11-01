@@ -22,6 +22,7 @@ const actions = {
     rowMouseOut: action('rowMouseOut'),
     changePageSize: action('changePageSize'),
     changePageNumber: action('changePageNumber'),
+    theadClick:action('theadClick'),
     clickSetting: action('clickSetting'),
     clickRefresh: action('clickRefresh'),
 };
@@ -68,8 +69,8 @@ export const table = () => ({
     :fields="fields"
     :selectable="selectable"
     :sortable="sortable"
-    :sortBy="sortBy"
-    :sortDesc="sortDesc"
+    :sortBy.sync="sortBy"
+    :sortDesc.sync="sortDesc"
     :allPage="allPage"
     :thisPage.sync="thisPage"
     :selectIndex.sync="selectIndex"
@@ -80,6 +81,7 @@ export const table = () => ({
     @changePageNumber="changePageNumber"
     @clickSetting="clickSetting"
     @clickRefresh="clickRefresh"
+    @theadClick="theadClick"
 ></ToolboxTable>
 <div>
 <h5>data</h5>

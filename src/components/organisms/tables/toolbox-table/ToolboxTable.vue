@@ -9,28 +9,32 @@
             </div>
             <div class="toolbox right">
                 <slot name="toolbox-right" />
-                <p-text-pagenation
-                    v-if="pagenationVisible"
-                    class="tool"
-                    :this-page.sync="proxyThisPage"
-                    :all-page="allPage"
-                    @pageChange="changePageNumber"
-                />
-                <p-select
-                    class="tool"
-                    :options="pageSizeOptions"
-                    :selected.sync="proxyPageSize"
-                />
-                <p-icon-button
-                    class="tool"
-                    icon="fa-cog"
-                    @click="$emit('clickSetting',$event)"
-                />
-                <p-icon-button
-                    class="tool"
-                    icon="fa-sync-alt"
-                    @click="$emit('clickRefresh',$event)"
-                />
+                <div class="tool">
+                    <p-text-pagenation
+                        v-if="pagenationVisible"
+                        :this-page.sync="proxyThisPage"
+                        :all-page="allPage"
+                        @pageChange="changePageNumber"
+                    />
+                </div>
+                <div class="tool">
+                    <p-select
+                        :options="pageSizeOptions"
+                        :selected.sync="proxyPageSize"
+                    />
+                </div>
+                <div class="tool">
+                    <p-icon-button
+                        icon="fa-cog"
+                        @click="$emit('clickSetting',$event)"
+                    />
+                </div>
+                <div class="tool">
+                    <p-icon-button
+                        icon="fa-sync-alt"
+                        @click="$emit('clickRefresh',$event)"
+                    />
+                </div>
             </div>
         </div>
         <p-data-table
@@ -103,7 +107,6 @@ export default {
                 return this.pageSize;
             },
             set(value) {
-                console.log(value);
                 this.$emit('update:pageSize', value);
             },
         },
@@ -162,27 +165,28 @@ export default {
         flex-wrap:nowrap;
         align-items: center;
     }
-    .toolbox > div{
-        display: inline-flex;
-        border: #0f69ff dashed 1px;
-        flex-wrap:nowrap;
-    }
-    .toolbox > div > div{
-        border: #8a2be2 dashed 1px;
-        align-items: center;
-    }
     .toolbox .left{
+        display: inline-flex;
+        flex-wrap:nowrap;
+        width: auto;
         justify-content: flex-start;
     }
     .toolbox .center{
+        display: inline-flex;
+        flex-wrap:nowrap;
+        width: auto;
         justify-content: center;
 
     }
     .toolbox .right{
+        display: inline-flex;
+        flex-wrap:nowrap;
+        width: auto;
         justify-content: flex-end;
     }
     .tool {
         margin-left: 8px;
         margin-right: 8px;
+        display: inline;
     }
 </style>

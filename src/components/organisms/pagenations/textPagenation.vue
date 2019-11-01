@@ -5,7 +5,10 @@
             :disabled="thisPage === 1"
             @click="update(thisPage-1)"
         />
-        <span class="page-number">{{ thisPage }}/{{ allPage }}</span>
+        <div class="page-number">
+            <div>{{ thisPage }}/{{ allPage }}</div>
+        </div>
+
         <p-icon-button
             icon="fa-angle-right"
             :disabled="thisPage === allPage"
@@ -46,13 +49,18 @@ export default {
     .text-pagenation{
         display: inline-flex;
         justify-content: space-between;
-        align-self: center;
+        /*align-self: center;*/
         flex-wrap:nowrap;
         min-width: 64px;
     }
     .page-number{
         text-align: center;
-        vertical-align: middle;
+        min-width: 64px;
+        line-height: 64px;
+        align-content: center;
+    }
+    .page-number > div{
+        text-align: center;
     }
 
 </style>

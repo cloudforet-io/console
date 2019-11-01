@@ -32,11 +32,11 @@
                 <template v-for="(item,index) in items">
                     <slot name="row" :fields="fieldsName" :item="item" :index="index">
                         <p-tr
-                            @click.left.native="rowLeftClick( item, index, $event )"
-                            @click.right.native="rowRightClick( item, index, $event )"
-                            @click.middle.native="rowMiddleClick( item, index, $event )"
-                            @mouseover.native="rowMouseOver(item,index, $event)"
-                            @mouseout.native="rowMouseOut(item,index, $event)"
+                            @click.left="rowLeftClick( item, index, $event )"
+                            @click.right="rowRightClick( item, index, $event )"
+                            @click.middle="rowMiddleClick( item, index, $event )"
+                            @mouseover="rowMouseOver(item,index, $event)"
+                            @mouseout="rowMouseOut(item,index, $event)"
                             v-bind="item.hasOwnProperty('vbind') ? item.vbind : null"
                             :key="index">
                             <p-td v-if="selectable"><input type="checkbox" v-model="selectIndex" :value="index" @change.stop></p-td>
@@ -127,6 +127,7 @@ export default {
     },
     methods: {
         rowLeftClick(item, index, event) {
+            debugger;
             this.$emit('rowLeftClick', item, index, event);
             if (this.selectable) {
                 this.checkboxToggle(index);
