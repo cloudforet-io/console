@@ -38,14 +38,16 @@
                 width: rightContainerWidth
             }"
         >
-            <slot name="rightContainer" />
-            <FNB class="fnb" />
+            <div>
+                <slot name="rightContainer" />
+            </div>
+            <FNB v-if="!hideFNB" class="fnb" />
         </div>
     </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
 import styles from '@/assets/style/_variables.scss';
 import FI from '@/components/atoms/icons/FI';
 import FNB from '@/views/containers/fnb/FNB';
@@ -97,11 +99,8 @@ export default {
         ...mapGetters('layout', [
             'defaultFNB',
         ]),
-        rightContainerPosX() {
-            return `${this.leftContainerWidth + this.draggerWidth}px`;
-        },
         rightContainerWidth() {
-            return `calc(100vw - ${styles.gnbWidth} - ${this.rightContainerPosX})`;
+            return `calc(100vw - ${styles.gnbWidth} - ${this.leftContainerWidth + this.draggerWidth}px)`;
         },
     },
     created() {
@@ -115,9 +114,12 @@ export default {
             'showDefaultFNB',
             'hideDefaultFNB',
         ]),
+        ...mapMutations('layout', [
+            'setVerticalLeftWidth',
+        ]),
         onMousedown() {
             this.dragging = true;
-            this.$emit('stop', this.leftContainerWidth);
+            this.$emit('start', this.leftContainerWidth);
             window.document.addEventListener('mousemove', this.onMousemove);
             window.document.addEventListener('mouseup', this.onMouseup);
         },
@@ -140,8 +142,9 @@ export default {
                  * TODO: Delete codes below to remove dependencies between tree component and this.
                  *       For the logic below, please use the event 'move'.
                  */
-                const widthKey = `${this.$parent.$parent.$options.name}_treeWidth`;
-                localStorage[widthKey] = this.leftContainerWidth;
+                this.$store.commit('setVerticalLeftWidth', this.leftContainerWidth);
+                // const widthKey = `${this.$parent.$parent.$options.name}_treeWidth`;
+                // localStorage[widthKey] = this.leftContainerWidth;
             }
         },
         onMouseup() {
@@ -164,9 +167,13 @@ export default {
     .content-container {
         overflow: scroll;
         &.right {
-            display: flex;
+            display: inline-flex;
             flex-direction: column;
             justify-content: space-between;
+            .fnb {
+                min-height: $fnb-height;
+                max-height: $fnb-height;
+            }
         }
     }
     .dragger-container {
