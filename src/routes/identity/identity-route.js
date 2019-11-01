@@ -1,7 +1,8 @@
-import BaseHeader from '@/containers/header/Header';
-import Identity from '@/views/identity/Identity';
-import User from '@/views/identity/user/User';
-import Project from '@//views/identity/project/Project';
+const Identity = () => import('@/views/identity/Identity');
+const IdentityNavBar = () => import('@/views/identity/IdentityNavBar');
+
+const User = () => import('@/views/identity/user/User');
+const Project = () => import('@//views/identity/project/Project');
 
 export default {
     path: 'identity',
@@ -9,8 +10,8 @@ export default {
     redirect: '/identity/project',
     meta: { label: 'Identity', requiresAuth: true },
     components: {
-        header: BaseHeader,
         main: Identity,
+        lnb: IdentityNavBar,
     },
     children: [
         {

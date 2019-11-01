@@ -1,5 +1,7 @@
 import { getApi } from '@/setup/api';
 
+
+
 export default {
     namespaced: true,
     state: {

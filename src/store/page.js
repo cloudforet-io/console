@@ -1,7 +1,7 @@
 export default {
     namespaced: true,
     state: {
-        loadingState: true
+        test: true
     },
     mutations: {
         setLoadingState (state, value) {

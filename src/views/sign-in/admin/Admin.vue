@@ -214,7 +214,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    @import '../../../assets/style/css/slideShow.css';
+    @import '../../../styles/css/slideShow.css';
 
     .login-check {
         float: right;
