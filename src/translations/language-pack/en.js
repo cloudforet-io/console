@@ -113,6 +113,7 @@ export const en = {
         CREATE_ARG: 'Create {0}',
         UPDATE_ARG: 'Update {0}',
         DELETE_ARG: 'Delete {0}',
+        CLICK_RIGHT: 'Please, Click a item from left tree Panel.'
     },
     SIGNIN: {
         ROOT_CREDENTIALS: 'Sign-in using root account credentials',

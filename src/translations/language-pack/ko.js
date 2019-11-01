@@ -113,6 +113,7 @@ export const ko = {
         CREATE_ARG: '{0} 생성',
         UPDATE_ARG: '{0} 갱신',
         DELETE_ARG: '{0} 삭제',
+        CLICK_RIGHT: '좌측 패널의 아이템을 클릭해 주세요.'
     },
     IDENTITY: {
 

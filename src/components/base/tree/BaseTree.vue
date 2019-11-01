@@ -146,6 +146,7 @@ export default {
     },
     data() {
         return {
+            tree: this.$refs.slVueTree,
             customBtn: { NO: 'No', YES: 'Yes' },
             selectedLeftWidth: 300,
             rootAction: false,
@@ -170,6 +171,9 @@ export default {
         ]),
         dragHeight() {
             return self.innerHeight - this.headerHeight;
+        },
+        getVueTree (){
+          return this.$refs.slVueTree;
         },
         selectedTreeProp: {
             get() {
@@ -199,12 +203,15 @@ export default {
         this.showTree = true;
     },
     methods: {
+        getTree (){
+            return this.$refs.slVueTree;
+        },
         getDataLength(objOrArr, key) {
             return this.isEmpty(key) ? objOrArr.length : objOrArr[key].length;
         },
         isBackPanelHasClciked(e) {
             if (!this.contextMenuIsVisible) {
-                const treeV = this.$refs.slVueTree;
+                const treeV = this.getTree();
                 let selectedNode = treeV.getSelected();
                 if (this.isEmpty(selectedNode)) {
                     const lastNode = treeV.getLastNode();
