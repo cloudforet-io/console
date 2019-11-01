@@ -1,23 +1,23 @@
 import {
-  text, boolean, number, object, array, select,
+    text, boolean, number, object, array, select,
 } from '@storybook/addon-knobs/vue';
 
 const propsTypeMapping = {
-  string: text,
-  boolean,
-  number,
-  object,
-  array,
-  select,
+    string: text,
+    boolean,
+    number,
+    object,
+    array,
+    select,
 };
 
 function makeKnobProp(prop, value) {
-  const typeName = prop.type.name;
-  const knobsType = propsTypeMapping[typeName];
-  if (knobsType) {
+    const typeName = prop.type.name;
+    const knobsType = propsTypeMapping[typeName];
+    if (knobsType) {
     // let defaultValue = prop.defaultValue.func ? eval(prop.defaultValue.value)() : eval(prop.defaultValue.value) ;
-    return { default: knobsType(prop.name, value) };
-  }
+        return { default: knobsType(prop.name, value) };
+    }
 }
 
 /**
@@ -63,34 +63,34 @@ function makeKnobProp(prop, value) {
  *      });,
  */
 function autoProps(comp, props = []) {
-  const mapping = {};
-  const docProps = comp.__docgenInfo.props;
-  const propsValue = comp.props;
-  Object.keys(docProps).forEach((key) => {
-    try {
-      if (!propsValue[key]) {
-        return;
-      }
-      let defaultValue = propsValue[key].default;
+    const mapping = {};
+    const docProps = comp.__docgenInfo.props;
+    const propsValue = comp.props;
+    Object.keys(docProps).forEach((key) => {
+        try {
+            if (!propsValue[key]) {
+                return;
+            }
+            let defaultValue = propsValue[key].default;
 
-      if (props.length) {
-        const info = (props.find(o => o.name === key));
-        if (!info) {
-          return;
-        } if ('default' in info) {
-          defaultValue = info.default;
+            if (props.length) {
+                const info = (props.find(o => o.name === key));
+                if (!info) {
+                    return;
+                } if ('default' in info) {
+                    defaultValue = info.default;
+                }
+            }
+            const knob = makeKnobProp(docProps[key], defaultValue);
+            if (knob) {
+                mapping[key] = knob;
+            }
+        } catch (e) {
+            console.log(e);
         }
-      }
-      const knob = makeKnobProp(docProps[key], defaultValue);
-      if (knob) {
-        mapping[key] = knob;
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  });
+    });
 
-  return mapping;
+    return mapping;
 }
 
 export { autoProps };

@@ -1,22 +1,22 @@
 export default {
     namespaced: true,
     state: {
-        loadingState: true
+        loadingState: true,
     },
     mutations: {
-        setLoadingState (state, value) {
+        setLoadingState(state, value) {
             state.loadingState = value;
-        }
+        },
     },
     getters: {
-        isLoading: state => state.loadingState
+        isLoading: state => state.loadingState,
     },
     actions: {
-        endLoading ({ commit }) {
+        endLoading({ commit }) {
             commit('setLoadingState', false);
         },
-        startLoading ({ commit }) {
+        startLoading({ commit }) {
             commit('setLoadingState', true);
-        }
-    }
+        },
+    },
 };

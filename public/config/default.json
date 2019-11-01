@@ -1,5 +1,5 @@
 {
-    "VUE_APP_API": {
-        "URL": "http://console-api.dev.pyengine.net"
-      }
+  "VUE_APP_API": {
+    "URL": "http://console-api.dev.pyengine.net"
+  }
 }

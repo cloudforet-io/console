@@ -1,5 +1,6 @@
 # Config
-public/config/environment.json
+public/config/production.json
+public/config/development.json
 
 # Logs
 npm-debug.log*

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Router from 'vue-router';
+import VueRouter from 'vue-router';
 
 import { beforeEach } from './hooks';
 
@@ -16,9 +16,9 @@ import Admin from '@/views/sign-in/admin/Admin';
 import Redirect404 from '@/views/common/404/Redirect404';
 
 
-Vue.use(Router);
+Vue.use(VueRouter);
 
-const index = new Router({
+const router = new VueRouter({
     mode: 'history',
     hash: false,
     linkActiveClass: 'open active',
@@ -64,7 +64,6 @@ const index = new Router({
     ],
 });
 
+router.beforeEach(beforeEach);
 
-index.beforeEach(beforeEach);
-
-export default index;
+export default router;
