@@ -29,6 +29,7 @@ export const base = () => ({
         :disabled="disabled"
         :outline="outline"
         :link="link"
+        :shpae="shape"
         >
        {{defaultSlot}} 
 </p-button>`,
@@ -45,6 +46,9 @@ export const base = () => ({
         },
         size: {
             default: select('size', [null, 'sm', 'lg'], null),
+        },
+        shape: {
+            default: select('shape', [null, 'circle'], null),
         },
         defaultSlot: {
             default: text('default slot', 'button', 'slot'),
@@ -75,6 +79,7 @@ export const block = () => ({
         :outline="outline"
         :link="link"
         :block="block"
+        :shpae="shape"
         >
        {{defaultSlot}} 
 </p-button>
@@ -92,6 +97,9 @@ export const block = () => ({
         },
         size: {
             default: select('size', [null, 'sm', 'lg'], null),
+        },
+        shape: {
+            default: select('shape', [null, 'circle'], null),
         },
         defaultSlot: {
             default: text('default slot', 'button', 'slot'),

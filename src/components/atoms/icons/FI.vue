@@ -1,15 +1,15 @@
 <template>
-    <i :class="classObject"></i>
+    <i :class="classObject" />
 </template>
 
 
 <script>
 import {
-    icon_style_mapping, size_mapping, animation_mapping, rotating_mapping, flip_mapping,
+    iconStyleMapping, sizeMapping, animationMapping, rotatingMapping, flipMapping,
 } from './FiMapping';
 
 export default {
-    name: 'f-i',
+    name: 'FI',
     props: {
         icon: {
             type: String,
@@ -18,37 +18,37 @@ export default {
         iconStyle: {
             type: String,
             default: 'solid',
-            validator: value => value in icon_style_mapping,
+            validator: value => value in iconStyleMapping,
         },
         size: {
             type: String,
             default: null,
-            validator: value => value in size_mapping,
+            validator: value => value in sizeMapping,
         },
         animation: {
             type: String,
             default: null,
-            validator: value => value in animation_mapping,
+            validator: value => value in animationMapping,
         },
         rotating: {
             type: String,
             default: null,
-            validator: value => value in rotating_mapping,
+            validator: value => value in rotatingMapping,
         },
         flip: {
             type: String,
             default: null,
-            validator: value => value in flip_mapping,
+            validator: value => value in flipMapping,
         },
     },
     computed: {
         classObject() {
             return [
-                icon_style_mapping[this.iconStyle],
+                iconStyleMapping[this.iconStyle],
                 this.icon,
-                size_mapping[this.size],
-                animation_mapping[this.animation],
-                flip_mapping[this.flip] || rotating_mapping[this.rotating],
+                sizeMapping[this.size],
+                animationMapping[this.animation],
+                flipMapping[this.flip] || rotatingMapping[this.rotating],
             ];
         },
     },

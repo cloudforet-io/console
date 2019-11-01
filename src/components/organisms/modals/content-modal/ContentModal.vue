@@ -14,7 +14,7 @@
 
 <script>
 import 'bootstrap';
-import PModal from '../../molecules/modals/Modal.vue';
+import PModal from '../../../molecules/modals/Modal.vue';
 
 export default {
     name: 'p-content-modal',

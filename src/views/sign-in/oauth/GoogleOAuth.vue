@@ -63,7 +63,7 @@
                                         <div id="g-signin-btn" style="width: 70%;" @click="login" />
                                     </b-input-group>
                                     <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
-                                        <div style="text-align: left" @click="directToAdmin"><a class="root-sign" href="#">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</a>
+                                        <div style="text-align: left" @click="directToAdmin"><span class="root-sign" href="#">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
                                         </div>
                                     </b-col>
                                 </b-form>
@@ -165,9 +165,11 @@ export default {
                     return;
                 }
                 auth2.disconnect();
+                console.log('response', this.$router);
                 this.$router.push(this.nextPath);
+                console.log('response', this.nextPath);
                 this.setTimeZone();
-                console.log('response', response);
+
             }).catch((error) => {
                 if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
@@ -179,6 +181,17 @@ export default {
                 } else {
                     this.consoleLogEnv('error', error);
                 }
+            });
+        },
+        async setTimeZone() {
+            await this.$axios.post('identity/user/get', {
+                user_id: this.loginId,
+                domainId: sessionStorage.getItem('domainId'),
+            }).then((response) => {
+                const timeZone = this.isEmpty(response.data.timezone) ? 'Etc/GMT' : response.data.timezone;
+                localStorage.timeZone = timeZone;
+            }).catch(() => {
+                this.showErorrMSG();
             });
         },
         showErorrMSG() {
@@ -198,6 +211,11 @@ export default {
 
 <style lang="scss" scoped>
     @import '../../../assets/style/css/slideShow.css';
+    span.root-sign:hover {
+        text-decoration: underline;
+        cursor: pointer
+    }
+
     .root-sign {
         text-align: left;
         font-size: 14px;

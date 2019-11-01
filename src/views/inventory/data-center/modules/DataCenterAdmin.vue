@@ -186,7 +186,7 @@ export default {
             const url = `/inventory/${itemType.toLowerCase()}/admin/list`;
             const key = `${itemType.toLowerCase()}_id`;
             param[key] =  this.$attrs['selected-data'].node.data.id;
-            
+
             await this.$axios.post(url,param).then((response) => {
                 let results = [];
                 if (!this.isEmpty(response.data.results)){

@@ -1,52 +1,53 @@
 <template>
-  <b-col xs="12" lg="12">
-    <b-tabs :fill="fill">
-      <b-tab v-for="(tab, idx) in tabs"
-             :key="idx"
-             :lazy="true"
-             @click="setCurrentTab(tab)"
-      >
-        <div v-if="!tab.icon" slot="title" name="tabHeader">
-          <i class="tab-icon" :class="tab.tabIcon" />
-          {{ tab.title }}
-        </div>
-        <br>
-        <slot name="tabsContentPanel">
-          <component :is="currentTab.component"
-                     ref="popupTab"
-                     :selected-data="dataForTab"
-                     :is-creatable="isCreate"
-                     :is-updatable="isUpdate"
-                     :is-deletable="isDelete"
-                     class="tab"
-          />
-        </slot>
-      </b-tab>
-    </b-tabs>
-    <b-row>
-      <slot name="footerArea">
-        <div class="col-md-12">
-          <div v-show="isFooterVisible" class="modal-footer" style="border-top:none; padding-right: 0px">
-            <b-button v-show="isCreatable" size="md" variant="outline-primary" @click="createNew">
-              {{ tr('BTN_CRT') }}
-            </b-button>
-            <b-button v-show="isUpdatable" size="md" variant="outline-success" @click="updateSelect">
-              {{ tr('BTN_UPT') }}
-            </b-button>
-            <b-button v-show="isDeletable" size="md" variant="outline-danger" @click="deleteSelect">
-              {{ tr('BTN_DELETE') }}
-            </b-button>
-            <b-button size="md" variant="outline-secondary" @click="closeWindow">
-              {{ tr('BTN_CANCEL') }}
-            </b-button>
-          </div>
-        </div>
-      </slot>
-    </b-row>
-  </b-col>
+    <b-col xs="12" lg="12">
+        <b-tabs :fill="fill">
+            <b-tab v-for="(tab, idx) in tabs"
+                   :key="idx"
+                   :lazy="true"
+                   @click="setCurrentTab(tab)"
+            >
+                <div v-if="!tab.icon" slot="title" name="tabHeader">
+                    <i class="tab-icon" :class="tab.tabIcon" />
+                    {{ tab.title }}
+                </div>
+                <br>
+                <slot name="tabsContentPanel">
+                    <component :is="currentTab.component"
+                               ref="popupTab"
+                               :selected-data="dataForTab"
+                               :is-creatable="isCreate"
+                               :is-updatable="isUpdate"
+                               :is-deletable="isDelete"
+                               class="tab"
+                    />
+                </slot>
+            </b-tab>
+        </b-tabs>
+        <b-row>
+            <slot name="footerArea">
+                <div class="col-md-12">
+                    <div v-show="isFooterVisible" class="modal-footer" style="border-top:none; padding-right: 0px">
+                        <b-button v-show="isCreatable" size="md" variant="outline-primary" @click="createNew">
+                            {{ tr('BTN_CRT') }}
+                        </b-button>
+                        <b-button v-show="isUpdatable" size="md" variant="outline-success" @click="updateSelect">
+                            {{ tr('BTN_UPT') }}
+                        </b-button>
+                        <b-button v-show="isDeletable" size="md" variant="outline-danger" @click="deleteSelect">
+                            {{ tr('BTN_DELETE') }}
+                        </b-button>
+                        <b-button size="md" variant="outline-secondary" @click="closeWindow">
+                            {{ tr('BTN_CANCEL') }}
+                        </b-button>
+                    </div>
+                </div>
+            </slot>
+        </b-row>
+    </b-col>
 </template>
 <script>
 import { api } from '@/setup/api';
+
 let baseTabParams = {};
 export default {
     name: 'BaseTabs',
@@ -54,38 +55,38 @@ export default {
     props: {
         fill: {
             type: Boolean,
-            default: false
+            default: false,
         },
         tabs: {
             type: Array,
-            default: () => []
+            default: () => [],
         },
         tabIndex: {
             type: Array,
-            default: () => []
+            default: () => [],
         },
         isCreatable: {
             type: Boolean,
-            default: false
+            default: false,
         },
         isUpdatable: {
             type: Boolean,
-            default: false
+            default: false,
         },
         isDeletable: {
             type: Boolean,
-            default: false
+            default: false,
         },
         isFooterVisible: {
             type: Boolean,
-            default: false
+            default: false,
         },
         selectedData: {
             type: Object,
-            default: () => {}
-        }
+            default: () => {},
+        },
     },
-    data () {
+    data() {
         return {
             prosData: {},
             currentTab: this.tabs[0],
@@ -93,24 +94,24 @@ export default {
             tabContentData: {},
             isCreate: this.isCreatable,
             isUpdate: this.isUpdatable,
-            isDelete: this.isDeletable
+            isDelete: this.isDeletable,
         };
     },
-    created () {
+    created() {
         this.$bus.$on('setTabData', this.setTabData);
     },
-    mounted () {
+    mounted() {
     },
-    beforeDestroy: function () {
+    beforeDestroy() {
         this.$bus.$off('setTabData');
     },
     methods: {
-        setTabData (dataToSet) {
-            for (let key in dataToSet) {
+        setTabData(dataToSet) {
+            for (const key in dataToSet) {
                 this.tabContentData[key] = dataToSet[key];
             }
         },
-        setCurrentTab (tab) {
+        setCurrentTab(tab) {
             if (!tab.isSelected) {
                 tab.isSelected = true;
             }
@@ -122,25 +123,25 @@ export default {
         hideFooter: () => {
             this.isFooterVisible = false;
         },
-        createNew () {
+        createNew() {
             baseTabParams = this.dataForTab;
-            baseTabParams['tabContents'] = this.$refs.popupTab;
+            baseTabParams.tabContents = this.$refs.popupTab;
             this.$emit('create', baseTabParams);
         },
-        updateSelect () {
+        updateSelect() {
             baseTabParams = this.dataForTab;
-            baseTabParams['tabContents'] = this.$refs.popupTab;
+            baseTabParams.tabContents = this.$refs.popupTab;
             this.$emit('update', baseTabParams);
         },
         deleteSelect: () => {
             baseTabParams = this.dataForTab;
-            baseTabParams['tabContents'] = this.$refs.popupTab;
+            baseTabParams.tabContents = this.$refs.popupTab;
             this.$emit('delete', baseTabParams);
         },
-        closeWindow (e) {
+        closeWindow(e) {
             this.$emit('close');
-        }
-    }
+        },
+    },
 };
 </script>
 

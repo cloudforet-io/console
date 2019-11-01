@@ -1,4 +1,4 @@
-export const icon_style_mapping = {
+export const iconStyleMapping = {
     solid: 'fas',
     regular: 'far',
     light: 'fal',
@@ -6,7 +6,7 @@ export const icon_style_mapping = {
     brands: 'fab',
 };
 
-export const size_mapping = {
+export const sizeMapping = {
     xs: 'fa-xs',
     sm: 'fa-sm',
     lg: 'fa-lg',
@@ -21,18 +21,18 @@ export const size_mapping = {
     '10x': 'fa-10x',
 };
 
-export const animation_mapping = {
+export const animationMapping = {
     spin: 'fa-spin',
     pulse: 'fa-pulse',
 };
 
-export const rotating_mapping = {
+export const rotatingMapping = {
     90: 'fa-rotate-90',
     180: 'fa-rotate-180',
     270: 'fa-rotate-270',
 };
 
-export const flip_mapping = {
+export const flipMapping = {
     horizontal: 'fa-flip-horizontal',
     vertical: 'fa-flip-vertical',
     both: 'fa-flip-both',

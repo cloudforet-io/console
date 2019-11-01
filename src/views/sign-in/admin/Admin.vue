@@ -74,7 +74,7 @@
                                             <b-input-group-text><i class="fal fa-key"/></b-input-group-text>
                                         </b-input-group-prepend>
                                         <b-form-input v-model="password" type="password" placeholder="Password"
-                                                      autocomplete="current-password"
+                                                      autocomplete="current-password" @keyup.enter="login"
                                         />
                                     </b-input-group>
                                     <b-row class="mb-3">
@@ -147,17 +147,25 @@ export default {
             }
         },
         async login() {
+            this.showGreetMSG();
+
             const authObj = {
                 adminUserId: this.adminUserId,
                 password: this.password,
                 domainId: sessionStorage.getItem('domainId'),
                 user_type: 'DOMAIN_OWNER',
             };
+
+            if (this.isEmpty(authObj.adminUserId) || this.isEmpty(authObj.password)) {
+                this.showErorrMSG();
+                return;
+            }
+
             await this.$store.dispatch('auth/login', authObj).then(() => {
                 this.$router.push(this.nextPath);
                 this.setTimeZone();
             }).catch(() => {
-                this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
+                this.showErorrMSG();
             });
         },
         showErorrMSG() {

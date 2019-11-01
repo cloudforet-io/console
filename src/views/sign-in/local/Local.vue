@@ -77,7 +77,7 @@
                                     </b-input-group>
                                     <b-row>
                                         <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
-                                            <div @click="directToAdmin"><a class="root-sign" href="#">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</a>
+                                            <div @click="directToAdmin"><span class="root-sign" >{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
                                             </div>
                                         </b-col>
                                         <b-col class="col-1 col-xs-1 col-sm-1 col-md-1 col-lg-4 col-xl-4 login-check">
@@ -169,16 +169,25 @@ export default {
     },
     methods: {
         async directToAdmin() {
-            this.$router.push({ name: 'Admin-SignIn' });
+            this.$router.push({ name: 'Admin-SignIn'});
             this.$router.push({ path: '/admin-sign-in' });
         },
         async login() {
             console.log(this.tr('MSG.LOG_IN'));
+
+            this.showGreetMSG();
+
             const authObj = {
                 userId: this.userId,
                 password: this.password,
                 domainId: sessionStorage.getItem('domainId'),
             };
+
+            if (this.isEmpty(authObj.userId) || this.isEmpty(authObj.password)) {
+                this.showErorrMSG();
+                return;
+            }
+
             await this.$store.dispatch('auth/login', authObj).then((response) => {
                 console.log(this.nextPath);
                 this.$router.push(this.nextPath);
@@ -189,7 +198,7 @@ export default {
                     const errorCode = errorConfig.error_code;
                     const errorMSG = errorConfig.error_dt_code;
                     if (errorMSG === 'ERROR_NOT_FOUND' && errorCode === 400) {
-                        this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
+                        this.showErorrMSG();
                     }
                 } else {
                     this.consoleLogEnv('error', error);
@@ -243,6 +252,10 @@ export default {
 
 <style lang="scss" scoped>
     @import '../../../assets/style/css/slideShow.css';
+    span.root-sign:hover {
+        text-decoration: underline;
+        cursor: pointer
+    }
     .root-sign {
         font-size: 14px;
         font-family: "Helvetica Neue",Roboto,Arial,sans-serif;
