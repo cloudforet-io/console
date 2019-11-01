@@ -3,9 +3,7 @@
         <GNB class="gnb" />
 
         <div class="app-body">
-            <div class="lnb">
-                <router-view name="lnb" />
-            </div>
+            <router-view name="lnb" />
 
             <main
                 class="main"
@@ -64,9 +62,6 @@ export default {
         width: calc(100vw - #{$gnb-width});
         border: 1px solid blue;
         min-height: 100vh;
-        .lnb {
-            height: $lnb-height;
-        }
         .main {
             margin: 0;
             width: calc(100vw - #{$gnb-width});

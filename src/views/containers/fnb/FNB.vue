@@ -21,7 +21,8 @@ export default {
 
 <style lang="scss" scoped>
     .fnb {
-        height: $fnb-height;
+        //height: $fnb-height;
+        height: 300px;
         border: 1px solid aqua;
     }
 </style>
