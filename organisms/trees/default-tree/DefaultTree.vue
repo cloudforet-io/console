@@ -60,7 +60,7 @@
     </div>
 </template>
 <script>
-import style from '@/assets/style/_variables.scss';
+import style from '@/styles/_variables.scss';
 import PTree from '@/components/molecules/tree/Tree';
 import BaseDragVertical from '@/components/base/drag/BaseDragVertical';
 
