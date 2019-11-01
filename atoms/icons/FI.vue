@@ -1,5 +1,5 @@
 <template>
-    <i :class="classObject"></i>
+    <i :class="classObject" />
 </template>
 
 
@@ -9,7 +9,7 @@ import {
 } from './FiMapping';
 
 export default {
-    name: 'f-i',
+    name: 'FI',
     props: {
         icon: {
             type: String,
