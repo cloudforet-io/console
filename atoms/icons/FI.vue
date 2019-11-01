@@ -1,60 +1,40 @@
-<template>
-    <i :class="classObject" />
-</template>
-
-
 <script>
 import {
     iconStyleMapping, sizeMapping, animationMapping, rotatingMapping, flipMapping,
-} from './FiMapping';
+} from '@/components/atoms/icons/FiMapping';
+import FIMixin from '@/components/atoms/icons/FIMixin';
 
 export default {
     name: 'FI',
-    props: {
-        icon: {
-            type: String,
-            required: true,
-        },
-        iconStyle: {
-            type: String,
-            default: 'solid',
-            validator: value => value in iconStyleMapping,
-        },
-        size: {
-            type: String,
-            default: null,
-            validator: value => value in sizeMapping,
-        },
-        animation: {
-            type: String,
-            default: null,
-            validator: value => value in animationMapping,
-        },
-        rotating: {
-            type: String,
-            default: null,
-            validator: value => value in rotatingMapping,
-        },
-        flip: {
-            type: String,
-            default: null,
-            validator: value => value in flipMapping,
-        },
-    },
-    computed: {
-        classObject() {
-            return [
-                iconStyleMapping[this.iconStyle],
-                this.icon,
-                sizeMapping[this.size],
-                animationMapping[this.animation],
-                flipMapping[this.flip] || rotatingMapping[this.rotating],
-            ];
-        },
+    functional: true,
+    mixins: [FIMixin],
+    render(h, {
+        props, data,
+    }) {
+        function getClass() {
+            const cls = {
+                ...data.class,
+            };
+            cls[iconStyleMapping[props.iconStyle]] = true;
+            cls[props.icon] = true;
+            if (props.size) {
+                cls[sizeMapping[props.size]] = true;
+            }
+            if (props.animation) {
+                cls[animationMapping[props.animation]] = true;
+            }
+            if (props.flip || props.rotating) {
+                cls[flipMapping[props.flip] || rotatingMapping[props.rotating]] = true;
+            }
+            return cls;
+        }
+        return h('i', {
+            class: getClass(),
+            staticClass: data.staticClass,
+            staticStyle: data.staticStyle,
+            attrs: data.attrs,
+            style: data.style,
+        });
     },
 };
 </script>
-
-<style scoped>
-
-</style>
