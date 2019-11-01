@@ -2,16 +2,15 @@
     <div>
         <div class="row no-gutters"  @click="contextMenuIsVisible=false">
             <transition name="tree-trans" appear @before-enter="beforeEnter" @enter="enter">
-                <div>
+                <div v-if="showTree">
                     <BaseDragVertical :total-width="'100vw'" :left-width="getLeftTreeWidth" :height="dragHeight">
                         <template #leftContainer="{ width }">
-                            <div  v-show="showTree"
-                                  @click.right="isRootClicked">
+                            <div @click.right="isRootClicked">
                                 <PTree ref="primeTree" :tree-data="treeData" :initial-tree-width="width"
-                                       @nodeClick="nodeClicked"
-                                       @beforeDrop="beforeDropped"
-                                       @nodeToggle="nodeToggled"
-                                       @nodeContextMenu="showContextMenu">
+                                       @nodeclick="nodeclick"
+                                       @beforedrop="beforedrop"
+                                       @toggle="toggle"
+                                       @nodecontextmenu="nodecontextmenu">
                                     <template slot="icon" slot-scope="node">
                                         <slot name="icon" v-bind="node"/>
                                     </template>
@@ -20,20 +19,29 @@
                         </template>
                         <template #rightContainer="{ width }">
                             <transition name="panel-trans">
-                                <div v-if="hasSelected" :key="getNodekeyComputed" class="panel" :style="{ width: width }">
+                                <div v-if="hasSelected" :key="getNodekeyComputed" class="panel"
+
+                                    :style="{ width: width }"
+                                >
                                     <slot name="treeSubPanel" />
                                 </div>
-                                <div v-else class="empty">
-                                    <span class="msg"> {{tr('ORGANISMS.CLICK_RIGHT')}} </span>
+                                <div
+                                    v-else
+                                    class="empty"
+                                >
+                                    <span class="msg">Please, Click a item from left tree Panel.</span>
                                 </div>
                             </transition>
                         </template>
                     </BaseDragVertical>
 
-                    <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
+                    <div
+                        v-show="contextMenuIsVisible"
+                        ref="contextmenu"
+                        class="contextmenu"
+                    >
                         <slot name="contextMenu" />
                     </div>
-
                 </div>
             </transition>
         </div>
@@ -44,6 +52,7 @@
     </div>
 </template>
 <script>
+import SlVueTree from 'sl-vue-tree';
 import { mapGetters } from 'vuex';
 import PTree from '@/components/molecules/tree/Tree';
 import BaseDragVertical from '@/components/base/drag/BaseDragVertical';
@@ -57,10 +66,6 @@ export default {
     },
     mixins: [PTree],
     props: {
-        showTree: {
-            type: Boolean,
-            default: false,
-        },
         useDefaultContext: {
             type: Boolean,
             default: false,
@@ -93,6 +98,7 @@ export default {
             nodeKey: 0,
             hasSelected: false,
             contextMenuIsVisible: false,
+            showTree: false,
             noticePanelMsg: '',
             clickedNode: null,
         };
@@ -112,38 +118,93 @@ export default {
             return localStorage.hasOwnProperty(keyName) ? parseInt(localStorage[keyName]) : this.selectedLeftWidth;
         },
     },
+    mounted() {
+        this.showTree = true;
+    },
     methods: {
         getTree() {
-            return this.$refs.primeTree.$refs.slVueTree;
-        },
-        getNodeEl(node) {
-            return this.$refs.primeTree.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
+            return this.$refs.slVueTree;
         },
         isRootClicked(e) {
-            const actionObj = {
+            const actionObject = {
                 tree: this.getTree(),
                 menuVisible: this.contextMenuIsVisible,
                 event: e,
             };
-            this.$emit('DTisRootClicked', actionObj);
+            this.$emit('isRootAreaClicked', actionObject);
         },
         nodeClicked(node) {
-            this.$emit('DTNodeClicked', node, this.getTree());
+            if (this.clickedNode) {
+                this.removeClickedClass(this.clickedNode);
+            }
+            this.clickedNode = node;
+            this.addClickedClass(node);
+
+            if (!node.data.hasOwnProperty('init')) {
+                this.nodeKey = (this.nodeKey !== node.data.id) ? node.data.id : this.nodeKey;
+                this.hasSelected = true;
+                this.$emit('nodeClicked', { node, treeV: this.$refs.slVueTree });
+            } else {
+                this.hasSelected = false;
+            }
         },
         nodeToggled(node) {
-            this.$emit('DTNodeToggled',node, this.getTree());
+            if (!node.isExpanded) {
+                this.setClickedNodeItem(node);
+                if (!node.data.is_cached) {
+                    this.$emit('nodeToggled', { node, treeV: this.$refs.slVueTree });
+                }
+            }
         },
-        beforeDropped(node, position, cancel){
-            this.$emit('DTBeforeDropped', node, position, cancel, this.getTree());
+        setClickedNodeItem(node) {
+            let hasNoClickedItem = false;
+
+            if (this.clickedNode) {
+                hasNoClickedItem = node.path.some((path, i) => path !== this.clickedNode.path[i]);
+            } else {
+                hasNoClickedItem = true;
+            }
+
+            if (!hasNoClickedItem) {
+                const addClassInterval = setInterval(() => {
+                    if (this.addClickedClass(this.clickedNode)) {
+                        clearInterval(addClassInterval);
+                    }
+                }, 10);
+            }
         },
-        showContextMenu(node, event, hasClicked) {
-            this.$emit('DTContextVisible', node, event, hasClicked, this.getTree());
+        getNodeEl(node) {
+            return this.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
+        },
+        addClickedClass(node) {
+            const elem = this.getNodeEl(node);
+            if (elem) {
+                elem.classList.add('sl-vue-node-clicked');
+                return true;
+            }
+            return false;
         },
         removeClickedClass(node) {
             const elem = this.getNodeEl(node);
             if (elem) {
                 elem.classList.remove('sl-vue-node-clicked');
             }
+        },
+        showContextMenu(node, event, hasClicked) {
+            if (!hasClicked) {
+                event.preventDefault();
+            }
+            this.emit('showContextMenu', node, event, hasClicked);
+            this.contextMenuIsVisible = true;
+            const $contextMenu = this.$refs.contextmenu;
+            const coordinateX = event.clientX;
+            const coordinateY = event.clientY;
+            this.$refs.slVueTree.select(node.path);
+            $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
+            $contextMenu.style.top = `${coordinateY - this.headerHeight}px`;
+        },
+        beforeNodeDropped(node, position, cancel) {
+            this.emit('beforeNodeDropped', node, position, cancel);
         },
         beforeEnter(el) {
             this.$velocity(el, {

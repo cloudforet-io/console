@@ -44,6 +44,10 @@ $header-height: 50px;
 $sub-header-height: 35px;
 $total-header-height: calc(#{$header-height} + #{$sub-header-height});
 
+$gnb-width: 56px;
+$lnb-height: 40px;
+$fnb-height: 40px;
+
 $side-pad: 15px;
 $top-pad: 15px;
 $bottom-pad: 10px;
@@ -63,4 +67,11 @@ $box-shadow: 0px 0 10px 0px rgba($black, 0.1);
 %sheet {
   @extend %box-shadow;
   @extend %border-radius;
+}
+
+:export {
+  primary: $primary;
+  lnbHeight: $lnb-height;
+  gnbWidth: $gnb-width;
+  fnbHeight: $fnb-height;
 }

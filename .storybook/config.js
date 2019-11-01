@@ -4,7 +4,7 @@ import {withA11y} from '@storybook/addon-a11y';
 import centered from '@storybook/addon-centered/vue';
 import { withCssResources } from '@storybook/addon-cssresources';
 import '@storybook/addon-console';
-import "@/assets/style/style.scss";
+import "@/styles/style.scss";
 import { withInfo } from 'storybook-addon-vue-info'
 // main.js
 import Vue from 'vue';

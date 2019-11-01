@@ -7,11 +7,7 @@
                         @enter="enter"
             >
                 <div v-if="showTree">
-                    <BaseDragVertical
-                        :total-width="'100vw'"
-                        :left-width="getLeftTreeWidth"
-                        :height="dragHeight"
-                    >
+                    <vertical-layout :left-width="getLeftTreeWidth">
                         <template #leftContainer="{ width }">
                             <div @click.right="isBackPanelHasClciked">
                                 <sl-vue-tree ref="slVueTree"
@@ -53,12 +49,11 @@
                             </div>
                         </template>
 
-                        <template #rightContainer="{ width }">
+                        <template #rightContainer>
                             <transition name="panel-trans">
                                 <div v-if="hasSelected"
                                      :key="getNodekeyComputed"
                                      class="panel"
-                                     :style="{ width: width }"
                                 >
                                     <slot name="treeSubPanel" />
                                 </div>
@@ -67,7 +62,7 @@
                                 </div>
                             </transition>
                         </template>
-                    </BaseDragVertical>
+                    </vertical-layout>
 
                     <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
                         <template v-if="treeType=='DATA_CENTER'">
@@ -106,19 +101,19 @@
 </template>
 <script>
 import SlVueTree from 'sl-vue-tree';
-import { mapGetters } from 'vuex';
-import BaseDragVertical from '@/components/base/drag/BaseDragVertical';
+import styles from '@/styles/_variables.scss';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
 import BaseModal from '@/components/base/modal/BaseModal';
 import { GlobalEnum } from '@/setup/enum';
+import VerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
 
 export default {
     name: 'BaseTree',
     components: {
-        BaseDragVertical,
         SlVueTree,
         BaseModal,
         BaseSimpleModal,
+        VerticalLayout,
     },
     props: {
         treeProp: {
@@ -146,7 +141,6 @@ export default {
     },
     data() {
         return {
-            tree: this.$refs.slVueTree,
             customBtn: { NO: 'No', YES: 'Yes' },
             selectedLeftWidth: 300,
             rootAction: false,
@@ -166,15 +160,6 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('layout', [
-            'headerHeight',
-        ]),
-        dragHeight() {
-            return self.innerHeight - this.headerHeight;
-        },
-        getVueTree (){
-          return this.$refs.slVueTree;
-        },
         selectedTreeProp: {
             get() {
                 let returnVal = this.treeProp;
@@ -203,15 +188,12 @@ export default {
         this.showTree = true;
     },
     methods: {
-        getTree (){
-            return this.$refs.slVueTree;
-        },
         getDataLength(objOrArr, key) {
             return this.isEmpty(key) ? objOrArr.length : objOrArr[key].length;
         },
         isBackPanelHasClciked(e) {
             if (!this.contextMenuIsVisible) {
-                const treeV = this.getTree();
+                const treeV = this.$refs.slVueTree;
                 let selectedNode = treeV.getSelected();
                 if (this.isEmpty(selectedNode)) {
                     const lastNode = treeV.getLastNode();
@@ -310,14 +292,14 @@ export default {
                     this.contextIndividualVisible = [false, false, false, false, false, true, true];
                 }
             }
-
+1
             this.contextMenuIsVisible = true;
             const $contextMenu = this.$refs.contextmenu;
             const coordinateX = event.clientX;
             const coordinateY = event.clientY;
             this.$refs.slVueTree.select(node.path);
             $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
-            $contextMenu.style.top = `${coordinateY - this.headerHeight}px`;
+            $contextMenu.style.top = `${coordinateY - styles.lnbHeight}`;
         },
         contextExecutor(flag, action) {
             /** *******************
@@ -451,7 +433,7 @@ export default {
     opacity: 0;
   }
 
-  $main-height: calc(100vh - #{$header-height} - 30px);
+  $main-height: calc(100vh - #{$lnb-height});
 
   .main-tree-col {
     @extend %sheet;

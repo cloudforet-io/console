@@ -1,13 +1,13 @@
 <template>
-    <router-view />
+    <div>gnb</div>
 </template>
 
 <script>
 export default {
-    name: 'Inventory',
+    name: 'GlobalNavBar',
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 </style>
