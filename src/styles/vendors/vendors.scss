@@ -4,7 +4,6 @@
 
 /* FontAwesome Pro */
 @import "node_modules/@fortawesome/fontawesome-pro/scss/fontawesome";
-//$fa-font-path: "./assets/fonts/fontawesome-pro";
 $fa-font-path: "~@/assets/fonts/fontawesome-pro";
 @import "node_modules/@fortawesome/fontawesome-pro/scss/light.scss";
 @import "node_modules/@fortawesome/fontawesome-pro/scss/brands.scss";
@@ -13,7 +12,7 @@ $fa-font-path: "~@/assets/fonts/fontawesome-pro";
 @import "node_modules/@fortawesome/fontawesome-pro/scss/regular.scss";
 
 /* CoreUI Icons */
-@import './coreui';
+@import 'coreui';
 
-@import './notice';
-@import '~@/assets/style/css/sl-vue-tree-ecessntial.css';
+@import 'notice';
+@import '~@/styles/css/sl-vue-tree-ecessntial.css';

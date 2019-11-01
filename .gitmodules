@@ -1,3 +1,0 @@
-[submodule "cloudone/console-assets"]
-	path = src/assets
-	url = https://github.com/googleapis/googleapis.git

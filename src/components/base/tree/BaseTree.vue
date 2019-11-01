@@ -101,7 +101,7 @@
 </template>
 <script>
 import SlVueTree from 'sl-vue-tree';
-import style from '@/assets/style/_variables.scss';
+import styles from '@/styles/_variables.scss';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
 import BaseModal from '@/components/base/modal/BaseModal';
 import { GlobalEnum } from '@/setup/enum';
@@ -299,7 +299,7 @@ export default {
             const coordinateY = event.clientY;
             this.$refs.slVueTree.select(node.path);
             $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
-            $contextMenu.style.top = `${coordinateY - style.lnbHeight}`;
+            $contextMenu.style.top = `${coordinateY - styles.lnbHeight}`;
         },
         contextExecutor(flag, action) {
             /** *******************

@@ -1,8 +1,5 @@
 <template>
-    <div
-        class="fnb"
-        :style="{width: width}"
-    >
+    <div class="fnb">
         <span class="copyright">@2019 Megazone Cloud Inc.</span>
     </div>
 </template>
@@ -21,8 +18,7 @@ export default {
 
 <style lang="scss" scoped>
     .fnb {
-        //height: $fnb-height;
-        height: 300px;
+        height: $fnb-height;
         border: 1px solid aqua;
     }
 </style>

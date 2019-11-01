@@ -24,7 +24,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import styles from '@/assets/style/_variables.scss';
+import styles from '@/styles/_variables.scss';
 import GNB from '@/views/containers/gnb/GNB';
 import FNB from '@/views/containers/fnb/FNB';
 
