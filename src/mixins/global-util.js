@@ -323,7 +323,7 @@ export const Mixin = {
                     selectedNode.data.group = type;
 
                     if (isFirstLoad) {
-                        selectedNode.data['is_cached '] = false;
+                        selectedNode.data['is_cached'] = false;
                     }
                 }
 
