@@ -38,7 +38,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     .icon-button{
         border-radius: 2px;
         padding: 8px;
