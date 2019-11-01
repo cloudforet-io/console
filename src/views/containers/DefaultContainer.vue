@@ -7,7 +7,7 @@
 
             <main
                 class="main"
-                :style="{height: mainMinHeight}"
+                :style="{minHeight: mainMinHeight}"
             >
                 <router-view name="main" />
             </main>
