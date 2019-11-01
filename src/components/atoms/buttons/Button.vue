@@ -1,12 +1,16 @@
 <template>
-    <button type="button" :class="classObject" @click="onClick">
-        <slot></slot>
+    <button
+        type="button"
+        :class="classObject"
+        @click="onClick"
+    >
+        <slot />
     </button>
 </template>
 
 <script>
 export default {
-    name: 'p-button',
+    name: 'PButton',
     events: ['click'],
     props: {
         forceClass: {
@@ -116,15 +120,15 @@ export default {
             if (!this.disabled) {
                 if (this.href != null && this.href.trim()) {
                     /**
-                     * TODO: Change it to use Vue outer
-                     * */
+                         * TODO: Change it to use Vue outer
+                         * */
                     this.self.location.href = this.href;
                 }
                 /**
-                 * button click event, only emit when disabled value is false
-                 * @event click
-                 * @type {MouseEvent}
-                 */
+                     * button click event, only emit when disabled value is false
+                     * @event click
+                     * @type {MouseEvent}
+                     */
                 this.$emit('click', event);
             }
         },

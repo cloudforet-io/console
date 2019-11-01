@@ -77,7 +77,7 @@
                                     </b-input-group>
                                     <b-row>
                                         <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
-                                            <div @click="directToAdmin"><a class="root-sign" href="#">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</a>
+                                            <div @click="directToAdmin"><span class="root-sign" >{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
                                             </div>
                                         </b-col>
                                         <b-col class="col-1 col-xs-1 col-sm-1 col-md-1 col-lg-4 col-xl-4 login-check">
@@ -169,7 +169,7 @@ export default {
     },
     methods: {
         async directToAdmin() {
-            this.$router.push({ name: 'Admin-SignIn' });
+            this.$router.push({ name: 'Admin-SignIn'});
             this.$router.push({ path: '/admin-sign-in' });
         },
         async login() {
@@ -252,8 +252,9 @@ export default {
 
 <style lang="scss" scoped>
     @import '../../../assets/style/css/slideShow.css';
-    a.root-sign:hover {
+    span.root-sign:hover {
         text-decoration: underline;
+        cursor: pointer
     }
     .root-sign {
         font-size: 14px;
