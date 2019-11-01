@@ -41,13 +41,16 @@
             <div>
                 <slot name="rightContainer" />
             </div>
-            <FNB v-if="!hideFNB" class="fnb" />
+            <FNB
+                v-if="!hideFNB"
+                class="fnb"
+            />
         </div>
     </div>
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import styles from '@/styles/_variables.scss';
 import FI from '@/components/atoms/icons/FI';
 import FNB from '@/views/containers/fnb/FNB';
@@ -85,6 +88,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        autosaveLeftWidth: {
+            type: Boolean,
+            default: true,
+        },
     },
     data() {
         return {
@@ -98,25 +105,46 @@ export default {
     computed: {
         ...mapGetters('layout', [
             'defaultFNB',
+            'verticalLeftWidth',
         ]),
         rightContainerWidth() {
             return `calc(100vw - ${styles.gnbWidth} - ${this.leftContainerWidth + this.draggerWidth}px)`;
         },
     },
     created() {
-        this.hideDefaultFNB();
+        this.initFNB();
+        this.initDefaultLeftWidth();
     },
     beforeDestroy() {
-        this.showDefaultFNB();
+        this.finalizeFNB();
+        this.finalizeDefaultLeftWidth();
     },
     methods: {
         ...mapActions('layout', [
             'showDefaultFNB',
             'hideDefaultFNB',
-        ]),
-        ...mapMutations('layout', [
             'setVerticalLeftWidth',
         ]),
+        initFNB() {
+            if (!this.hideFNB) {
+                this.hideDefaultFNB();
+            }
+        },
+        initDefaultLeftWidth() {
+            if (this.autosaveLeftWidth) {
+                this.leftContainerWidth = parseFloat(this.verticalLeftWidth) || parseFloat(this.leftWidth);
+            }
+        },
+        finalizeFNB() {
+            if (!this.hideFNB) {
+                this.showDefaultFNB();
+            }
+        },
+        finalizeDefaultLeftWidth() {
+            if (this.autosaveLeftWidth) {
+                this.setVerticalLeftWidth(`${this.leftContainerWidth}px`);
+            }
+        },
         onMousedown() {
             this.dragging = true;
             this.$emit('start', this.leftContainerWidth);
@@ -134,17 +162,9 @@ export default {
                 if (newWidth < this.minLeftWidth || newWidth > this.maxLeftWidth) {
                     return;
                 }
-
                 this.leftContainerWidth = newWidth;
                 this.pageX = e.pageX;
                 this.$emit('move', this.leftContainerWidth, e);
-                /**
-                 * TODO: Delete codes below to remove dependencies between tree component and this.
-                 *       For the logic below, please use the event 'move'.
-                 */
-                this.$store.commit('setVerticalLeftWidth', this.leftContainerWidth);
-                // const widthKey = `${this.$parent.$parent.$options.name}_treeWidth`;
-                // localStorage[widthKey] = this.leftContainerWidth;
             }
         },
         onMouseup() {
