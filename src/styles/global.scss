@@ -4,23 +4,30 @@
 
 /* INIT */
 html, body {
-  font-family: $font-basic;
-  background-color: $whiteblue;
-  font-size: 15px;
-  font-weight: 400;
-  color: $black;
-  width: 100vw;
-  height: 100vh;
-  word-wrap: break-word;
-  word-break: keep-all;
+    font-family: $font-basic;
+    background-color: $primary4;
+    font-size: 16px;
+    font-weight: 400;
+    width: 100vw;
+    height: 100vh;
+    word-wrap: break-word;
+    word-break: keep-all;
+    overflow: hidden;
 }
 
 body {
-  overflow-x: hidden;
-  overflow-y: auto;
+    font-size: 14px; //0.875rem
+    line-height: 16.8px; //120%, 1.2
+    color: $dark;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
-i, span, div, input, textarea, article, main {
+ul, li {
+    all: unset;
+}
+
+i, span, div, input, textarea, article, main, ul, li {
   font-size: inherit;
   font-weight: inherit;
   color: inherit;
@@ -264,6 +271,7 @@ a {
   border-radius: 50px;
   padding: 3px 15px 1px 15px;
   font-size: 1.02em;
+    color: inherit;
 }
 .btn:focus {
   outline: none;

@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import ListItem from '@/components/molecules/list-items/ListItem.vue';
+import ListItem from '@/components/molecules/list-items/ListItem';
 import { LIST_ITEM_PROPERTIES } from './MenuList.map';
 
 export default {
