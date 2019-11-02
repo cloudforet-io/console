@@ -1,10 +1,8 @@
 <template>
-    <div class="list-item">
+    <div class="list-item" v-on="$listeners">
         <pre class="indent-text">{{ indentText }}</pre>
         <slot>
-            <span>
-                {{ contents }}
-            </span>
+            <span>{{ contents }}</span>
         </slot>
     </div>
 </template>
@@ -33,7 +31,19 @@ export default {
 
 <style lang="scss" scoped>
     .list-item {
-        border: 1px solid red;
+        text-align: left;
+        border: 1px solid $primary-dark;
+        padding: .5rem 1rem;
+        font-size: .875rem;
+        min-width: 137px;
+        color: $primary;
+        margin-top: -1px;
+        cursor: pointer;
+        &:hover {
+            background-color: $primary-dark;
+            color: $primary4;
+        }
+
         .indent-text {
             display: inline;
             margin: 0;
