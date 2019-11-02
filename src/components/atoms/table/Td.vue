@@ -1,5 +1,5 @@
 <script>
-import { mixin, getClass } from '@/components/atoms/table/styleMixin';
+import { mixin, getClass, getBindClass } from '@/components/atoms/table/styleMixin';
 
 export default {
     name: 'PTd',
@@ -12,12 +12,12 @@ export default {
         },
     },
     render(h, {
-        props, listeners, data, children,
+        props, data, children,
     }) {
         const newData = {
             ...data,
             class: {
-                ...data.class,
+                ...getBindClass(data.class),
                 ...getClass(props),
             },
         };

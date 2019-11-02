@@ -1,5 +1,5 @@
 <script>
-import { mixin, getClass } from '@/components/atoms/table/styleMixin';
+import { mixin, getClass,getBindClass } from '@/components/atoms/table/styleMixin';
 
 export default {
     name: 'PTh',
@@ -15,7 +15,7 @@ export default {
         const newData = {
             ...data,
             class: {
-                ...data.class,
+                ...getBindClass(data.class),
                 ...getClass(props),
             },
         };
