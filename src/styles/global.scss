@@ -259,67 +259,6 @@ a {
 }
 
 
-/* b-button */
-.btn {
-  border-radius: 50px;
-  padding: 3px 15px 1px 15px;
-  font-size: 1.02em;
-}
-.btn:focus {
-  outline: none;
-}
-
-.btn-sm, .btn-group-sm > .btn {
-}
-
-@mixin btn-color($theme, $color, $oposite-color) {
-    &.btn-#{$theme} {
-        background-color: $color;
-        border-color: $color;
-        &:not(:disabled):not(.disabled):active {
-            color: $oposite-color;
-            background-color: darken($color, 10%);
-            border-color: darken($color, 10%);
-            &:focus {
-                box-shadow: 0 0 5px 1px rgba($color, .5);
-            }
-        }
-        &:hover {
-            color: $oposite-color;
-            background-color: darken($color, 10%);
-            border-color: darken($color, 10%);
-        }
-    }
-    &.btn-outline-#{$theme} {
-        color: $color;
-        border-color: $color;
-        background-color: transparent;
-        &:not(:disabled):not(.disabled):active {
-            color: $oposite-color;
-            background-color: $color;
-            border-color: $color;
-            &:focus {
-                box-shadow: 0 0 5px 1px rgba($color, .5);
-            }
-        }
-        &:hover {
-            color: $oposite-color;
-            background-color: $color;
-            border-color: $color;
-        }
-    }
-}
-
-.btn { 
-    @include btn-color('primary', $primary, $white);
-    @include btn-color('secondary', $secondary, darken($secondary, 30%)); 
-    @include btn-color('light', $light, $black);
-    @include btn-color('danger', $danger, $white); 
-    @include btn-color('success', $success, $white);
-    @include btn-color('warning', $warning, $white);
-    @include btn-color('dark', $dark, $white);
-    @include btn-color('info', $info, $white);
-}
 
 /* sl-vue-tree */
 @mixin node-item-background($bg-color) {
