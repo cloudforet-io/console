@@ -7,7 +7,7 @@
                         @enter="enter"
             >
                 <div v-if="showTree">
-                    <vertical-layout :left-width="getLeftTreeWidth">
+                    <vertical-layout >
                         <template #leftContainer="{ width }">
                             <div @click.right="isBackPanelHasClciked">
                                 <sl-vue-tree ref="slVueTree"
@@ -178,10 +178,6 @@ export default {
         },
         getNodekeyComputed() {
             return this.nodeKey;
-        },
-        getLeftTreeWidth() {
-            const keyName = `${this.$parent.$options.name}_treeWidth`;
-            return localStorage.hasOwnProperty(keyName) ? parseInt(localStorage[keyName]) : this.selectedLeftWidth;
         },
     },
     mounted() {

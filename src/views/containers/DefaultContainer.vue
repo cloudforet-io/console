@@ -54,19 +54,16 @@ export default {
         position: fixed;
         height: 100vh;
         width: $gnb-width;
-        border: 1px solid red;
         z-index: 100;
     }
     .app-body {
         margin-left: $gnb-width;
         width: calc(100vw - #{$gnb-width});
-        border: 1px solid blue;
         min-height: 100vh;
         .main {
             margin: 0;
             width: calc(100vw - #{$gnb-width});
             overflow-x: hidden;
-            border: 1px solid orange;
         }
     }
 }

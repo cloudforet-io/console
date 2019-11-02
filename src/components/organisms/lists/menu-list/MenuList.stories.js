@@ -1,6 +1,6 @@
 import { object, select } from '@storybook/addon-knobs/vue';
-import MenuList from './MenuList.vue';
 import { action } from '@storybook/addon-actions';
+import MenuList from './MenuList';
 
 export default {
     title: 'Organisms/menu-list',
@@ -18,7 +18,7 @@ export const defaultCase = () => ({
             ]),
         },
         value: {
-            default: select('v-model', [true, false], false),
+            default: select('v-model', [true, false], true),
         },
     },
     template: '<p-menu-list v-model="value" :list-items="listItems"  @show="show" @hide="hide" @change="change" />',

@@ -20,7 +20,15 @@ module.exports = {
      'import/extensions': ['error', 'always', {
       js: 'never',
       vue: 'never'
-    }]
+    }],
+    'camelcase': ["error", { "properties": "always" }],
+    'vue/max-attributes-per-line': ["error", {
+    'singleline': 3,
+    'multiline': {
+      "max": 3,
+      "allowFirstLine": true
+    }
+  }]
   },
   parserOptions: {
     parser: 'babel-eslint',

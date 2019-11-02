@@ -2,7 +2,7 @@ export default {
     namespaced: true,
     state: {
         FNBVisible: true,
-        verticalLeftWidth: 200,
+        verticalLeftWidth: localStorage.verticalLeftWidth,
     },
     mutations: {
         setFNBVisible(state, value) {
@@ -22,6 +22,10 @@ export default {
         },
         hideDefaultFNB({ commit }) {
             commit('setFNBVisible', false);
+        },
+        setVerticalLeftWidth({ commit }, value) {
+            commit('setVerticalLeftWidth', value);
+            localStorage.verticalLeftWidth = value;
         },
     },
 };
