@@ -65,7 +65,7 @@ export default {
         display: inline-block;
         padding: 0;
         border-radius: 2px;
-        width: 32px;
+        min-width: 32px;
         height: 32px;
         color: $primary4;
         &:hover, &.active {
