@@ -18,13 +18,14 @@
 </template>
 
 <script>
+import FIMixin from '@/components/atoms/icons/FIMixin';
 import FI from '@/components/atoms/icons/FI';
 import PLabel from '@/components/atoms/labels/Label';
 
 export default {
     name: 'p-status',
     components: { FI, PLabel },
-    mixins: [FI],
+    mixins: [FIMixin],
     props: {
         text: {
             type: String,
@@ -45,7 +46,6 @@ export default {
         fiStyle() {
             return this.iconColor ? { color: this.iconColor } : null;
         },
-
     },
 };
 </script>
