@@ -3,7 +3,6 @@
         <li>
             <p-tooltip contents="Dashboard"
                        :options="{offset: '8px'}"
-                       @click.stop="show"
             >
                 <template #target>
                     <router-link class="logo" to="/dashboard">
