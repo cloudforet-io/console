@@ -56,7 +56,7 @@ export default {
                         if (props.href != null && props.href.trim()) {
                             window.open(props.href);
                         }
-                        listeners.click(event);
+                        if (listeners.click) listeners.click(event);
                     }
                 },
             },

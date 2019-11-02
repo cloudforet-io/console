@@ -1,10 +1,17 @@
 <template>
     <div class="sitemap-container">
-        <p-button class="activator" @click="show">
-            <template>
-                <f-i icon="fa-archive" />
+        <p-tooltip contents="Services"
+                   :options="{offset: '12px'}"
+                   @click.stop="show"
+        >
+            <template #target>
+                <p-button class="activator" :class="{active: visible}" @click="show">
+                    <template>
+                        <f-i icon="fa-archive" />
+                    </template>
+                </p-button>
             </template>
-        </p-button>
+        </p-tooltip>
 
         <div v-if="visible" class="sitemap">
             <div class="title">
@@ -76,6 +83,7 @@
 </template>
 
 <script>
+import PTooltip from '@/components/molecules/tooltips/Tooltip';
 import PButton from '@/components/atoms/buttons/Button';
 import FI from '@/components/atoms/icons/FI';
 
@@ -84,6 +92,7 @@ export default {
     components: {
         PButton,
         FI,
+        PTooltip,
     },
     data() {
         return {
@@ -104,7 +113,6 @@ export default {
 <style lang="scss" scoped>
     $sitemap-width: 260px;
 .sitemap-container {
-    text-align: center;
     .activator {
         display: inline-block;
         padding: 0;
@@ -112,7 +120,7 @@ export default {
         width: 32px;
         height: 32px;
         color: $primary4;
-        &:hover {
+        &:hover, &.active {
             background-color: $primary-dark;
         }
     }
@@ -127,6 +135,7 @@ export default {
         overflow: hidden;
         box-shadow: 4px 0 8px rgba($dark, 0.32);
         color: $dark;
+        text-align: left;
         .title {
             font-size: 1rem;
             padding: 1rem 1.75rem;
