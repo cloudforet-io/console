@@ -16,20 +16,27 @@ export const mixin = {
             },
         },
     },
-    computed: {
-        classObject() {
-            if (this.styleType) {
-                return [`table-${this.styleType}`];
-            } if (this.background) {
-                return [`bg-${this.background}`];
+};
+export const getBindClass = (cls) => {
+    let bindClass = {};
+    if (Array.isArray(cls)) {
+        cls.forEach((value) => {
+            if (typeof value === 'object') {
+                for (const key of value.keys()) {
+                    bindClass[key] = value[key];
+                }
+            } else {
+                bindClass[value] = true;
             }
-            return [];
-        },
-    },
+        });
+    } else {
+        bindClass = cls;
+    }
+    return bindClass;
 };
 
 export const getClass = (props) => {
-    const data = {}
+    const data = {};
     if (props.styleType) {
         data.class[`table-${props.styleType}`] = true;
     } if (props.background) {

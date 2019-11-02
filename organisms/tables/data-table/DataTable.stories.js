@@ -58,6 +58,7 @@ export const datatable = () => ({
 <PDataTable 
     :items="items" 
     :fields="fields"
+    :hover="true"
     @rowLeftClick="rowLeftClick"
     @rowRightClick="rowRightClick"
     @rowMiddleClick="rowMiddleClick"
@@ -84,6 +85,7 @@ export const sortTable = () => ({
 <PDataTable 
     :items="items" 
     :fields="fields"
+    :hover="true"
     @rowLeftClick="rowLeftClick"
     @rowRightClick="rowRightClick"
     @rowMiddleClick="rowMiddleClick"
@@ -116,6 +118,7 @@ export const selectTable = () => ({
     ref="table"
     :items="items" 
     :fields="fields"
+    :hover="true"
     @rowLeftClick="rowLeftClick"
     :selectable="true"
     :selectIndex.sync="selectIndex"
@@ -149,6 +152,7 @@ export const rowVBind = () => ({
 <PDataTable 
     :items="items" 
     :fields="fields"
+    :hover="true"
     @rowLeftClick="rowLeftClick"
     @rowRightClick="rowRightClick"
     @rowMiddleClick="rowMiddleClick"
@@ -196,6 +200,7 @@ export const customRowSlot = () => ({
 <PDataTable 
     :items="items" 
     :fields="fields"
+    :hover="true"
     @rowLeftClick="rowLeftClick"
     @rowRightClick="rowRightClick"
     @rowMiddleClick="rowMiddleClick"

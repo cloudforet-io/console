@@ -51,24 +51,27 @@ export default {
         border-radius: 2px;
         padding: 8px;
         min-width: 32px;
+        max-width: 32px;
         min-height: 32px;
+        max-height: 32px;
         vertical-align:text-top;
-        &:not(:disabled):not(.disabled):hover{
-            background-color: #0080FB;
-            border-color: #0080FB;
-            color: #FFFFFF;
-            opacity: 1;
-        }
         &.disabled{
-            color: #A7A9B2;
+            color: $gray1;
+            background-color: $gray2;
+            border: 1px solid $gray2;
         }
         &.white{
-            background-color: #FFFFFF;
-            border-color: #DCDDE2;
+            background-color: $white;
+            border-color: $gray2;
         }
         &.dark{
-            background-color: #222532;
-            color: #FFFFFF;
+            background-color: $dark;
+            color:$white;
+        }
+        &:not(:disabled):not(.disabled):hover{
+            background-color: $secondary;
+            border-color: $secondary;
+            color: $white;
         }
         &.transparent{
             &.disabled{

@@ -105,21 +105,21 @@ export default {
     font: Regular 14px/16px Arial;
     letter-spacing: 0;
 
-    @include btn-color('primary', #3C2C84, $white);
-    @include btn-color('secondary', #0080FB,$white);
+    @include btn-color('primary', $primary, $white);
+    @include btn-color('secondary', $secondary,$white);
     @include btn-color('light', $light, $white);
-    @include btn-color('danger', #EF3817, $white);
-    @include btn-color('success', #60B731, $white);
+    @include btn-color('danger', $danger, $white);
+    @include btn-color('success', $success, $white);
     @include btn-color('warning', $warning, $white);
-    @include btn-color('dark', #222532, $white);
+    @include btn-color('dark', $dark, $white);
     @include btn-color('info', $info, $white);
 
     &.disabled{
-        background-color: #DCDDE2;
+        background-color: $gray2;
         background-repeat: no-repeat;
         background-clip: padding-box;
-        border: 1px solid #F2F2F2;
-        color: #A7A9B2;}
+        border: 1px solid $gray3;
+        color: $gray1;}
 }
 .btn-lg{
     min-width: 120px;
