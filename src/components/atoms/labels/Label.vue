@@ -1,13 +1,9 @@
-<template>
-    <label><slot /></label>
-</template>
-
 <script>
 export default {
-    name: 'p-label',
+    name: 'PLabel',
+    functional: true,
+    render(h, { data, children }) {
+        return h('label', data, children);
+    },
 };
 </script>
-
-<style scoped>
-
-</style>

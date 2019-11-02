@@ -1,4 +1,4 @@
-import { select, text } from '@storybook/addon-knobs/vue';
+import { select, text, boolean } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
 import PButton from './Button.vue';
 import { autoProps } from '../../../setup/storybook-util';
@@ -53,12 +53,18 @@ export const base = () => ({
         defaultSlot: {
             default: text('default slot', 'button', 'slot'),
         },
-        ...autoProps(PButton, [
-            { name: 'href' },
-            { name: 'disabled' },
-            { name: 'outline' },
-            { name: 'link' },
-        ]),
+        href: {
+            default: text('href', ''),
+        },
+        disabled: {
+            default: boolean('disabled', false),
+        },
+        outline: {
+            default: boolean('outline', false),
+        },
+        link: {
+            default: boolean('link', false),
+        },
     },
     methods: {
         ...actions,
@@ -104,13 +110,21 @@ export const block = () => ({
         defaultSlot: {
             default: text('default slot', 'button', 'slot'),
         },
-        ...autoProps(PButton, [
-            { name: 'href' },
-            { name: 'disabled' },
-            { name: 'outline' },
-            { name: 'link' },
-            { name: 'block', default: true },
-        ]),
+        href: {
+            default: text('href', ''),
+        },
+        disabled: {
+            default: boolean('disabled', false),
+        },
+        outline: {
+            default: boolean('outline', false),
+        },
+        link: {
+            default: boolean('link', false),
+        },
+        block: {
+            default: boolean('block', false),
+        },
     },
     methods: {
         ...actions,
