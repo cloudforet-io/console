@@ -127,7 +127,6 @@ export default {
     },
     methods: {
         rowLeftClick(item, index, event) {
-            debugger;
             this.$emit('rowLeftClick', item, index, event);
             if (this.selectable) {
                 this.checkboxToggle(index);

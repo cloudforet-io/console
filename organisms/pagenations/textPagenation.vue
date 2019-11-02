@@ -49,18 +49,16 @@ export default {
     .text-pagenation{
         display: inline-flex;
         justify-content: space-between;
-        /*align-self: center;*/
+        align-items: center;
         flex-wrap:nowrap;
         min-width: 64px;
     }
     .page-number{
-        text-align: center;
+        display: inline-flex;
+        justify-content: center;
         min-width: 64px;
-        line-height: 64px;
-        align-content: center;
-    }
-    .page-number > div{
-        text-align: center;
+        min-height: 32px;
+        align-items: center;
     }
 
 </style>
