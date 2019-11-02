@@ -1,11 +1,11 @@
 <template>
-    <span class="p-tooltip-target" v-tooltip="{
+    <span v-tooltip="{
               content: contents,
               placement: position,
               classes: ['p-tooltip'],
-              show: visible,
               ...options,
           }"
+          class="p-tooltip-target"
           v-on="$listeners"
     >
         <slot name="target" />

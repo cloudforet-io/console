@@ -117,7 +117,7 @@ export default {
         display: inline-block;
         padding: 0;
         border-radius: 2px;
-        width: 32px;
+        min-width: 32px;
         height: 32px;
         color: $primary4;
         &:hover, &.active {
@@ -149,7 +149,7 @@ export default {
                 padding: 0;
                 vertical-align: unset;
                 height: 24px;
-                width: 24px;
+                min-width: 24px;
                 border-radius: 2px;
                 &:hover {
                     background-color: $primary3;
