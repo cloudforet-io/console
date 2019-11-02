@@ -5,13 +5,13 @@
             :class="classObject"
         >
             <thead :class="theadClassObject">
-                <slot name="head"></slot>
+                <slot name="head" />
             </thead>
             <tbody :class="theadClassObject">
-                <slot name="body"></slot>
+                <slot name="body" />
             </tbody>
             <tfoot :class="theadClassObject">
-                <slot name="foot"></slot>
+                <slot name="foot" />
             </tfoot>
         </table>
     </div>
@@ -20,7 +20,7 @@
 <script>
 const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
 export default {
-    name: 'p-table',
+    name: 'PTable',
     props: {
         tableStyleType: {
             type: String,
@@ -112,6 +112,55 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    %row {
+        background-color: $white;
+    }
+    %hover{
+        background-color: $secondary2;
+    }
+    %striped-row {
+        background-color: $primary4;
+    }
+    %striped-hovered-row {
+        background-color: $secondary2;
+    }
+    .table{
+        thead{
+            background-color: $gray3 ;
+            tr{
+                border-top: 2px solid $gray2;
+                border-bottom: 2px solid $gray2;
+                th{
+                    text-align: left;
+                    font: Bold 14px/16px Arial;
+                    letter-spacing: 0;
+                    color: $gray1;
+                    height: 32px;
+                }
+            }
+        }
+        &.table-hover{
+            tbody tr:hover {
+                @extend %hover
+            }
+        }
+        tbody{
+            tr{
+                @extend %row;
+                td{
+                    vertical-align: middle;
+                }
+            }
+        }
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        @extend %striped-row;
+        &:hover {
+            @extend %striped-row;
+        }
+    }
+
 
 </style>

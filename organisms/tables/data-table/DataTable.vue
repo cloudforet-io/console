@@ -1,7 +1,7 @@
 <template>
     <p-table
-        :tableStyleType="tableStyleType"
-        :theadStyleType="theadStyleType"
+        :table-style-type="tableStyleType"
+        :thead-style-type="theadStyleType"
         :striped="striped"
         :bord="bord"
         :hover="hover"
@@ -10,39 +10,86 @@
         :responsive="responsive"
     >
         <template #caption>
-            <slot name="caption"></slot>
+            <slot name="caption" />
         </template>
         <template #head>
-            <slot name="head" :fields="fieldsData">
+            <slot
+                name="head"
+                :fields="fieldsData"
+            >
                 <p-tr>
-                    <p-th v-if="selectable"><input type="checkbox" v-model="allState" :true-value="true" :false-value="false" @change.stop="selectAllToggle"></p-th>
-                    <p-th v-for="(field,index) in fieldsData" :key="index" @click.native="theadClick(field,index,$event)">
-                        {{field.name}}
+                    <p-th v-if="selectable">
+                        <input
+                            v-model="allState"
+                            type="checkbox"
+                            :true-value="true"
+                            :false-value="false"
+                            @change.stop="selectAllToggle"
+                        >
+                    </p-th>
+                    <p-th
+                        v-for="(field,index) in fieldsData"
+                        :key="index"
+                        @click="theadClick(field,index,$event)"
+                    >
+                        {{ field.name }}
                         <template v-if="sortable">
-                            <f-i v-if="sortable&&field.name==sortBy" iconStyle="duotone" :icon="sortIcon" ></f-i>
-                            <f-i v-else iconStyle="light" icon="fa-sort" ></f-i>
+                            <f-i
+                                v-if="sortable&&field.name==sortBy"
+                                icon-style="solid"
+                                :icon="sortIcon"
+                                class="sort-icon"
+                            />
+                            <f-i
+                                v-else
+                                icon-style="solid"
+                                icon="fa-sort"
+                                class="sort-icon"
+                            />
                         </template>
-
                     </p-th>
                 </p-tr>
             </slot>
         </template>
         <template #body>
-            <slot name="body" :items="items">
+            <slot
+                name="body"
+                :items="items"
+            >
                 <template v-for="(item,index) in items">
-                    <slot name="row" :fields="fieldsName" :item="item" :index="index">
+                    <slot
+                        name="row"
+                        :fields="fieldsName"
+                        :item="item"
+                        :index="index"
+                    >
                         <p-tr
-                            @click.left.native="rowLeftClick( item, index, $event )"
-                            @click.right.native="rowRightClick( item, index, $event )"
-                            @click.middle.native="rowMiddleClick( item, index, $event )"
-                            @mouseover.native="rowMouseOver(item,index, $event)"
-                            @mouseout.native="rowMouseOut(item,index, $event)"
+                            :key="index"
+                            :class="{'tr-selected': isSelected(index)} "
                             v-bind="item.hasOwnProperty('vbind') ? item.vbind : null"
-                            :key="index">
-                            <p-td v-if="selectable"><input type="checkbox" v-model="selectIndex" :value="index" @change.stop></p-td>
+                            @click.left="rowLeftClick( item, index, $event )"
+                            @click.right="rowRightClick( item, index, $event )"
+                            @click.middle="rowMiddleClick( item, index, $event )"
+                            @mouseover="rowMouseOver(item,index, $event)"
+                            @mouseout="rowMouseOut(item,index, $event)"
+                        >
+                            <p-td v-if="selectable">
+                                <input
+                                    v-model="selectIndex"
+                                    type="checkbox"
+                                    :value="index"
+                                    @change.stop
+                                >
+                            </p-td>
                             <template v-for="field in fieldsName">
-                                <slot :name="'col-'+field" :item="item" :value="item[field]" :index="index" :field="field">
-                                    <p-td >{{item[field]}}</p-td>
+                                <slot
+                                    :name="'col-'+field"
+                                    :item="item"
+                                    :value="item[field]"
+                                    :index="index"
+                                    :field="field"
+                                >
+                                    <p-td>{{ item[field] }}</p-td>
                                 </slot>
                             </template>
                         </p-tr>
@@ -51,29 +98,24 @@
             </slot>
         </template>
         <template #foot>
-            <slot name="foot"></slot>
+            <slot name="foot" />
         </template>
     </p-table>
 </template>
 
 <script>
-import PTable from '@/components/molecules/tables/Table.vue';
-import PTr from '@/components/atoms/table/Tr.vue';
-import PTd from '@/components/atoms/table/Td.vue';
-import PTh from '@/components/atoms/table/Th.vue';
-import FI from '@/components/atoms/icons/FI.vue';
+import PTable from '@/components/molecules/tables/Table';
+import PTr from '@/components/atoms/table/Tr';
+import PTd from '@/components/atoms/table/Td';
+import PTh from '@/components/atoms/table/Th';
+import FI from '@/components/atoms/icons/FI';
 
 export default {
-    name: 'p-data-table',
+    name: 'PDataTable',
     components: {
         PTable, PTd, PTh, PTr, FI,
     },
     mixins: [PTable],
-    data() {
-        return {
-            allState: false,
-        };
-    },
     props: {
         fields: Array,
         items: Array,
@@ -98,6 +140,11 @@ export default {
             default: true,
         },
 
+    },
+    data() {
+        return {
+            allState: false,
+        };
     },
     computed: {
         fieldsData() {
@@ -189,6 +236,32 @@ export default {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    %selected-row {
+        background-color: $secondary2;
+        td {
+            color: $secondary;
+        }
+    }
+    tbody{
+        tr{
+            &.tr-selected {
+                @extend %selected-row;
+            }
+            td{
+                vertical-align: middle;
+            }
+        }
+    }
+    thead{
+        tr{
+            th{
+                .sort-icon{
+                    float: right;
+                    color: $gray2;
+                }
+            }
+        }
+    }
 
 </style>
