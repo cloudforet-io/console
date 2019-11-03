@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import PListItem from '@/components/molecules/list-items/ListItem';
 import PTooltip from '@/components/molecules/tooltips/Tooltip';
 import { LIST_ITEM_PROPERTIES } from './MenuList.map';
