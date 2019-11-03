@@ -1,17 +1,14 @@
 <template>
     <div class="sitemap-container">
-        <p-tooltip contents="Services"
-                   :options="{offset: '12px'}"
-                   @click.stop="show"
+        <p-tooltip-button tooltip="Services"
+                          :tooltip-options="{offset: '12px'}"
+                          :active="visible"
+                          @click="show"
         >
-            <template #target>
-                <p-button class="activator" :class="{active: visible}" @click="show">
-                    <template>
-                        <f-i icon="fa-archive" />
-                    </template>
-                </p-button>
+            <template #buttonContents>
+                <f-i icon="fa-archive" />
             </template>
-        </p-tooltip>
+        </p-tooltip-button>
 
         <div v-if="visible" class="sitemap">
             <div class="title">
@@ -84,6 +81,7 @@
 
 <script>
 import PTooltip from '@/components/molecules/tooltips/Tooltip';
+import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton';
 import PButton from '@/components/atoms/buttons/Button';
 import FI from '@/components/atoms/icons/FI';
 
@@ -93,6 +91,7 @@ export default {
         PButton,
         FI,
         PTooltip,
+        PTooltipButton,
     },
     data() {
         return {

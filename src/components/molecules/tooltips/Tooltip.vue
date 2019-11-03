@@ -28,10 +28,6 @@ export default {
             type: String,
             default: 'right',
         },
-        visible: {
-            type: Boolean,
-            default: false,
-        },
         options: {
             type: Object,
             default: () => ({}),
@@ -43,13 +39,8 @@ export default {
             },
         },
     },
-    methods: {
-        show() {
-        },
-        hide() {
-        },
-    },
 };
+
 </script>
 
 <style lang="scss">

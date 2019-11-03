@@ -1,17 +1,22 @@
 <template>
     <div ref="container" class="p-menu-list">
-        <p-tooltip :contents="tooltip"
-                   :options="{offset: '12px'}"
-                   @click.stop="show"
+        <p-tooltip-button :tooltip="tooltip"
+                          :tooltip-options="tooltipOptions"
+                          :active="visible"
+                          @click.stop="show"
         >
-            <template #target>
-                <span class="activator">
+            <template #button>
+                <span class="activator" @click="show">
                     <slot name="activator" :active="visible">
-                        <!-- TODO: DEFAULT BUTTON STYLE -->
+                        <p-button class="activator-btn" :class="{active: visible}">
+                            <slot name="contents">
+                                {{contents}}
+                            </slot>
+                        </p-button>
                     </slot>
                 </span>
             </template>
-        </p-tooltip>
+        </p-tooltip-button>
 
         <transition name="fade-in">
             <div v-if="visible"
@@ -33,15 +38,16 @@
 
 <script>
 import PListItem from '@/components/molecules/list-items/ListItem';
-import PTooltip from '@/components/molecules/tooltips/Tooltip';
+import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton';
 import { LIST_ITEM_PROPERTIES } from './MenuList.map';
+import PButton from '@/components/atoms/buttons/Button';
 
 const ACTIVATOR_MENU_SPACE = -8;
 
 export default {
     name: 'PMenuList',
     events: ['change', 'show', 'hide', 'select'],
-    components: { PListItem, PTooltip },
+    components: { PListItem, PTooltipButton, PButton },
     props: {
         listItems: {
             type: Array,
@@ -53,9 +59,17 @@ export default {
                 });
             },
         },
+        contents: {
+            type: String,
+            default: '',
+        },
         tooltip: {
             type: String,
             default: '',
+        },
+        tooltipOptions: {
+            type: Object,
+            default: () => ({ offset: '12px' }),
         },
     },
     data() {
@@ -74,7 +88,6 @@ export default {
     created() {
         document.addEventListener('click', this.hide, true);
         document.addEventListener('click', this.hide, false);
-        // document.createElement('span')
     },
     destroyed() {
         document.removeEventListener('click', this.hide, true);
@@ -100,26 +113,38 @@ export default {
     position: relative;
     .activator {
         display: inline-block;
+        .activator-btn {
+            display: inline-block;
+            padding: 0;
+            border-radius: 2px;
+            min-width: 32px;
+            height: 32px;
+            color: $primary4;
+            &:hover, &.active {
+                background-color: $primary-dark;
+            }
+        }
     }
     .menu-container {
         position: absolute;
         bottom: 0;
         background-color: $white;
         box-shadow: 4px 0px 8px rgba($dark, 0.52);
+        &.fade-in-enter-active {
+            transition: opacity .15s, visibility .15s;
+        }
+        &.fade-in-leave-active {
+            transition: opacity .15s, visibility .15s;
+        }
+        &.fade-in-enter, &.fade-in-leave-to {
+            visibility: hidden;
+            opacity: 0;
+        }
+        &.fade-in-leave, &.fade-in-enter-to {
+            visibility: visible;
+            opacity: 1;
+        }
     }
-    &.fade-in-enter-active {
-        transition: opacity .15s, visibility .15s;
-    }
-    &.fade-in-leave-active {
-        transition: opacity .15s, visibility .15s;
-    }
-    &.fade-in-enter, &.fade-in-leave-to {
-        visibility: hidden;
-        opacity: 0;
-    }
-    .fade-in-leave, &.fade-in-enter-to {
-        visibility: visible;
-        opacity: 1;
-    }
+
 }
 </style>

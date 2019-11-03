@@ -4,12 +4,8 @@
                      :tooltip="tooltip"
                      @select="changeLanguage"
         >
-            <template #activator="{ active }">
-                <p-button class="lang-btn" :class="{active: active}">
-                    <template>
-                        <f-i icon="fa-archive" />
-                    </template>
-                </p-button>
+            <template #contents>
+                <f-i icon="fa-archive" />
             </template>
         </p-menu-list>
     </div>
@@ -17,7 +13,6 @@
 
 <script>
 import { mapMutations, mapGetters } from 'vuex';
-import PButton from '@/components/atoms/buttons/Button';
 import FI from '@/components/atoms/icons/FI';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList';
 import { LANGUAGES } from '@/mixins/global-enums';
@@ -25,7 +20,6 @@ import { LANGUAGES } from '@/mixins/global-enums';
 export default {
     name: 'LanguageMenu',
     components: {
-        PButton,
         FI,
         PMenuList,
     },
@@ -61,15 +55,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .lang-btn {
-        display: inline-block;
-        padding: 0;
-        border-radius: 2px;
-        min-width: 32px;
-        height: 32px;
-        color: $primary4;
-        &:hover, &.active {
-            background-color: $primary-dark;
-        }
-    }
 </style>
