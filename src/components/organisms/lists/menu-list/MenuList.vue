@@ -15,7 +15,6 @@
 
         <transition name="fade-in">
             <div v-if="visible"
-                 ref="menuContainer"
                  class="menu-container"
                  :style="{left: position}"
             >
@@ -75,6 +74,7 @@ export default {
     created() {
         document.addEventListener('click', this.hide, true);
         document.addEventListener('click', this.hide, false);
+        // document.createElement('span')
     },
     destroyed() {
         document.removeEventListener('click', this.hide, true);
