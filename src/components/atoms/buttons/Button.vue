@@ -51,6 +51,7 @@ export default {
             attrs: data.attrs,
             style: data.style,
             on: {
+                ...listeners,
                 click: (event) => {
                     if (!props.disabled) {
                         if (props.href != null && props.href.trim()) {
@@ -101,7 +102,7 @@ export default {
     min-width: 96px;
     height: 32px;
     text-align: center;
-    font: Regular 14px/16px Arial;
+    font: 14px/16px Arial;
     letter-spacing: 0;
 
     @include btn-color('primary', $primary, $white);
