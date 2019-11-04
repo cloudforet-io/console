@@ -17,6 +17,7 @@ import { Mixin } from '@/mixins/global-util';
 import VueLodash from 'vue-lodash';
 import VueI18n from 'vue-i18n';
 import { withKnobs } from '@storybook/addon-knobs';
+import SvgIcon from 'vue-svgicon';
 
 Vue.mixin(Mixin);
 Vue.use(BootstrapVue);
@@ -24,6 +25,10 @@ Vue.use(VueAlertify);
 Vue.use(VueI18n);
 Vue.use(VueInputAutowidth);
 Vue.use(VueLodash, { name: 'lodash' });
+Vue.use(SvgIcon, {
+    tagName: 'svgicon',
+    classPrefix: 'p-i'
+})
 
 Vue.prototype.$velocity = velocity;
 

@@ -4,6 +4,7 @@ import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
 import VueLodash from 'vue-lodash';
+import SvgIcon from 'vue-svgicon';
 import App from './App';
 import router from '@/routes/index';
 import store from './store';
@@ -16,6 +17,10 @@ Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
 Vue.use(VueLodash, { name: 'lodash' });
+Vue.use(SvgIcon, {
+    tagName: 'svgicon',
+    classPrefix: 'p-i',
+});
 
 Vue.prototype.$velocity = velocity;
 
