@@ -1,15 +1,15 @@
 import { action } from '@storybook/addon-actions';
 import faker from 'faker';
-import ToolboxTable from './ToolboxTable';
+import PToolboxTable from './ToolboxTable';
 import { autoProps } from '../../../../setup/storybook-util';
 
 export default {
     title: 'organisms/tables/toolbox-table',
-    component: ToolboxTable,
+    component: PToolboxTable,
     parameters: {
         info: {
             summary: '',
-            components: { ToolboxTable },
+            components: { PToolboxTable },
         },
         // centered: { disable: true },
     },
@@ -22,7 +22,7 @@ const actions = {
     rowMouseOut: action('rowMouseOut'),
     changePageSize: action('changePageSize'),
     changePageNumber: action('changePageNumber'),
-    theadClick:action('theadClick'),
+    theadClick: action('theadClick'),
     clickSetting: action('clickSetting'),
     clickRefresh: action('clickRefresh'),
 };
@@ -60,11 +60,11 @@ const mockupMixin = {
 };
 
 export const table = () => ({
-    components: { ToolboxTable },
+    components: { PToolboxTable },
     mixins: [mockupMixin],
     template: `
 <div style="width: 80vw">
-<ToolboxTable
+<p-toolbox-table
     :items="items" 
     :fields="fields"
     :selectable="selectable"
@@ -82,13 +82,104 @@ export const table = () => ({
     @clickSetting="clickSetting"
     @clickRefresh="clickRefresh"
     @theadClick="theadClick"
-></ToolboxTable>
+></p-toolbox-table>
 <div>
 <h5>data</h5>
 <p> sortBy : {{sortBy}} / sortDesc : {{sortDesc}} / thisPage : {{thisPage}} / allPage : {{allPage}} / pageSize: {{pageSize}}</p>
 <p>{{selectIndex}}</p>
 
 </div>
+</div>
+`,
+    data() {
+        return {
+            ...data,
+        };
+    },
+    methods: {
+        ...actions,
+    },
+});
+
+export const rowSlot = () => ({
+    components: { PToolboxTable },
+    mixins: [mockupMixin],
+    template: `
+<div style="width: 80vw">
+    <p-toolbox-table
+        :items="items" 
+        :fields="fields"
+        :selectable="selectable"
+        :sortable="sortable"
+        :sortBy.sync="sortBy"
+        :sortDesc.sync="sortDesc"
+        :allPage="allPage"
+        :thisPage.sync="thisPage"
+        :selectIndex.sync="selectIndex"
+        :pageSize.sync="pageSize"
+        @rowLeftClick="rowLeftClick"
+        @rowRightClick="rowRightClick"
+        @changePageSize="changePageSize"
+        @changePageNumber="changePageNumber"
+        @clickSetting="clickSetting"
+        @clickRefresh="clickRefresh"
+        @theadClick="theadClick"
+    >
+        <template #row="scope">
+            <div>custom row </div>
+        </template>
+    </p-toolbox-table>
+    <div>
+        <h5>data</h5>
+        <p> sortBy : {{sortBy}} / sortDesc : {{sortDesc}} / thisPage : {{thisPage}} / allPage : {{allPage}} / pageSize: {{pageSize}}</p>
+        <p>{{selectIndex}}</p>
+    </div>
+</div>
+`,
+    data() {
+        return {
+            ...data,
+        };
+    },
+    methods: {
+        ...actions,
+    },
+});
+
+
+export const colSlot = () => ({
+    components: { PToolboxTable },
+    mixins: [mockupMixin],
+    template: `
+<div style="width: 80vw">
+    <p-toolbox-table
+        :items="items" 
+        :fields="fields"
+        :selectable="selectable"
+        :sortable="sortable"
+        :sortBy.sync="sortBy"
+        :sortDesc.sync="sortDesc"
+        :allPage="allPage"
+        :thisPage.sync="thisPage"
+        :selectIndex.sync="selectIndex"
+        :pageSize.sync="pageSize"
+        @rowLeftClick="rowLeftClick"
+        @rowRightClick="rowRightClick"
+        @changePageSize="changePageSize"
+        @changePageNumber="changePageNumber"
+        @clickSetting="clickSetting"
+        @clickRefresh="clickRefresh"
+        @theadClick="theadClick"
+    >
+        <template #col-name="scope">
+            <td>hi {{scope.value}} </td>
+        </template>
+    </p-toolbox-table>
+    <div>
+        <h5>data</h5>
+        <p> sortBy : {{sortBy}} / sortDesc : {{sortDesc}} / thisPage : {{thisPage}} / allPage : {{allPage}} / pageSize: {{pageSize}}</p>
+        <p>{{selectIndex}}</p>
+    </div>
 </div>
 `,
     data() {
