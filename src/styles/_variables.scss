@@ -23,7 +23,7 @@ $dark-gradient: linear-gradient(135deg, darken($blue, 10%) 30%, $violet);
 
 /* COLOR THEME */
 $black: #000000;
-$white: #fff;
+$white: #FFFFFF;
 
 $primary: #5541B0;
 $primary-dark: #3C2C84;
@@ -41,7 +41,6 @@ $gray: #858895;
 $gray1: #A7A9B2;
 $gray2: #DCDDE2;
 $gray3: #F2F2F2;
-$white: #FFFFFF;
 
 $alert: #EF3817;
 $safe: #60B731;
@@ -50,6 +49,7 @@ $other1: #FF7750;
 $other2: #FFCE02;
 $other3: #C2E01E;
 $other4: #3F7B1A;
+
 
 /* ----- TEMPORARY VARIABLES ----- */
 $success: $safe;
