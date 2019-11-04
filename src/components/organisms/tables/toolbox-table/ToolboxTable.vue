@@ -1,13 +1,13 @@
 <template>
-    <div>
+    <div class="toolbox-table">
         <div class="toolbox">
-            <div class="toolbox left">
+            <div class="left">
                 <slot name="toolbox-left" />
             </div>
-            <div class="toolbox center">
+            <div class="center">
                 <slot name="toolbox-center" />
             </div>
-            <div class="toolbox right">
+            <div class="right">
                 <slot name="toolbox-right" />
                 <div class="tool">
                     <p-text-pagenation
@@ -45,8 +45,25 @@
             :select-index.sync="proxySelectIndex"
             :sort-by.sync="proxySortBy"
             :sort-desc.sync="proxySortDesc"
+            :table-style-type="tableStyleType"
+            :thead-style-type="theadStyleType"
+            :responsive-style="responsiveStyle"
+            :table-style="tableStyle"
+            :tbody-style="tbodyStyle"
+            :thead-style="theadStyle"
+            :tfoot-style="tfootStyle"
+            :striped="striped"
+            :bord="bord"
+            :hover="hover"
+            :small="small"
+            :background="background"
+            :responsive="responsive"
             v-on="$listeners"
-        />
+        >
+            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                <slot :name="slot" v-bind="scope" />
+            </template>
+        </p-data-table>
     </div>
 </template>
 
@@ -57,7 +74,7 @@ import PIconButton from '@/components/molecules/buttons/IconButton';
 import PSelect from '@/components/molecules/forms/Select';
 
 export default {
-    name: 'ToolboxTable',
+    name: 'PToolboxTable',
     components: {
         PDataTable, PTextPagenation, PIconButton, PSelect,
     },
@@ -142,6 +159,13 @@ export default {
                 this.$emit('update:sortDesc', value);
             },
         },
+        slotFieldsName() {
+            const slotNames = [];
+            this.fieldsName.forEach((value) => {
+                slotNames.push(`col-${value}`);
+            });
+            return slotNames;
+        },
     },
     methods: {
         changePageSize(size) {
@@ -156,37 +180,44 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .toolbox{
-        padding-bottom: 8px;
-        padding-top: 8px;
-        margin-bottom: 8px;
-        display: flex;
-        justify-content: space-between;
-        flex-wrap:nowrap;
-        align-items: center;
+    .toolbox-table {
+        background-color: $white;
+        padding: 1rem;
+        box-shadow: 0px 0px 8px #4D49B614;
+        border: 1px solid #F2F2F2;
+        .toolbox {
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            align-items: center;
+
+        }
     }
-    .toolbox .left{
+
+    .left{
         display: inline-flex;
         flex-wrap:nowrap;
         width: auto;
         justify-content: flex-start;
     }
-    .toolbox .center{
+    .center{
         display: inline-flex;
         flex-wrap:nowrap;
         width: auto;
         justify-content: center;
 
     }
-    .toolbox .right{
+    .right{
         display: inline-flex;
         flex-wrap:nowrap;
         width: auto;
         justify-content: flex-end;
     }
-    .tool {
-        margin-left: 8px;
-        margin-right: 8px;
+    .tool{
+        margin-left: 1rem;
         display: inline;
     }
+
 </style>
