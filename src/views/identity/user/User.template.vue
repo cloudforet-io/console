@@ -14,6 +14,7 @@
                     :select-index.sync="selectIndex"
                     :page-size.sync="pageSize"
                     :responsive-style="{'height': `${height}px`, 'overflow-y':'auto'}"
+                    :settingVisible="false"
                     @changePageSize="changePageSize"
                     @changePageNumber="changePageNumber"
                     @clickRefresh="clickRefresh"

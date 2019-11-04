@@ -9,29 +9,28 @@
             </div>
             <div class="right">
                 <slot name="toolbox-right" />
-                <div class="tool">
+                <div class="tool" v-if="pagenationVisible">
                     <p-text-pagenation
-                        v-if="pagenationVisible"
                         :this-page.sync="proxyThisPage"
                         :all-page="allPage"
                         @pageChange="changePageNumber"
                     />
                 </div>
-                <div class="tool">
+                <div class="tool" v-if="pageSizeVisible">
                     <p-select
                         :options="pageSizeOptions"
                         :selected.sync="proxyPageSize"
                     />
                 </div>
-                <div class="tool">
+                <div class="tool" v-if="settingVisible">
                     <p-icon-button
-                        icon="fa-cog"
+                        name="ic_setting"
                         @click="$emit('clickSetting',$event)"
                     />
                 </div>
-                <div class="tool">
+                <div class="tool" v-if="refreshVisible">
                     <p-icon-button
-                        icon="fa-sync-alt"
+                        name="ic_refresh"
                         @click="$emit('clickRefresh',$event)"
                     />
                 </div>
