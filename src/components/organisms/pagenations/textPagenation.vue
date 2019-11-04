@@ -3,6 +3,7 @@
         <p-icon-button
             name="ic_arrow_left"
             :disabled="thisPage === 1"
+            color="transparent inherit"
             @click="update(thisPage-1)"
         />
         <div class="page-number">
@@ -12,17 +13,17 @@
         <p-icon-button
             name="ic_arrow_right"
             :disabled="thisPage === allPage"
+            color="transparent inherit"
             @click="update(thisPage+1)"
         />
     </nav>
 </template>
 <script>
 import PIconButton from '@/components/molecules/buttons/IconButton';
-import PI from '@/components/atoms/icons/PI';
 
 export default {
     name: 'PTextButton',
-    components: { PIconButton, PI },
+    components: { PIconButton,  },
     props: {
         thisPage: {
             type: Number,

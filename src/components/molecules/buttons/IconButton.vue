@@ -3,7 +3,7 @@
         class="icon-button"
         :class="classObject"
         :disabled="disabled"
-        @click="$emit('click',$event)"
+        v-on="$listeners"
     >
         <slot>
             <p-i
@@ -43,7 +43,6 @@ export default {
     },
     computed: {
         classObject() {
-            console.log(this.buttonStyle);
             return [this.buttonStyle];
         },
     },
@@ -58,7 +57,6 @@ export default {
         max-width: 32px;
         min-height: 32px;
         max-height: 32px;
-        vertical-align:text-top;
         &.disabled{
             color: $gray1;
             background-color: $gray2;

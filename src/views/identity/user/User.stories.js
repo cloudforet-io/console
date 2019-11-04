@@ -5,6 +5,7 @@ import PStatus from '@/components/molecules/status/Status';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
+
 export default {
     title: 'page/identity/user',
     component: User,
@@ -21,13 +22,15 @@ const actions = {
     rowMiddleClick: action('rowMiddleClick'),
     rowMouseOver: action('rowMouseOver'),
     rowMouseOut: action('rowMouseOut'),
+    clickRefresh() {
+        return action('clickRefresh')
+    },
 };
 
 
 export const template = () => ({
     template: `
-<div style="width: 1128px">
-       <div class="animated fadeIn">
+    <div class="animated fadeIn">
         <BaseDragHorizontal>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -41,6 +44,8 @@ export const template = () => ({
                     :this-page.sync="thisPage"
                     :select-index.sync="selectIndex"
                     :page-size.sync="pageSize"
+                    :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
+                    :setting-visible="false"
                     @changePageSize="changePageSize"
                     @changePageNumber="changePageNumber"
                     @clickRefresh="clickRefresh"
@@ -50,34 +55,47 @@ export const template = () => ({
                             style-type="primary"
                             @click="clickAdd"
                         >
-                            add
+                            <p-i name="ic_plus" color="transparent white" :fill="true" /> Create
                         </p-button>
+                        <p-dropdown
+                            :menu="dropdown"
+                            @click-update="clickUpdate"
+                            @click-delete="clickDelete"
+                            @click-activated="clickActivated"
+                            @click-deactivated="clickDeactivated"
+                        >
+                            Actions
+                        </p-dropdown>
                     </template>
                     <template slot="col-state" slot-scope="data">
-                        <p-status
-                            v-if="data.state=='ENABLED'"
-                            icon="fa-circle"
-                            icon-style="solid"
-                            size="xs"
-                            text="enabled"
-                            icon-color="#60B731"
-                        />
-                        <p-status
-                            v-else
-                            icon="fa-circle"
-                            icon-style="solid"
-                            size="xs"
-                            text="disabled"
-                            icon-color="#EA390F"
-                            text-color="#EA390F"
-                        />
+                        <p-td>
+                            {{ data.state }}
+                            <p-status
+                                v-if="data.state==='ENABLED'"
+                                icon="fa-circle"
+                                icon-style="solid"
+                                size="xs"
+                                text="enabled"
+                                icon-color="#60B731"
+                            />
+                            <p-status
+                                v-else
+                                icon="fa-circle"
+                                icon-style="solid"
+                                size="xs"
+                                text="disabled"
+                                icon-color="#EA390F"
+                                text-color="#EA390F"
+                            />
+                        </p-td>
                     </template>
                 </p-toolbox-table>
             </template>
         </BaseDragHorizontal>
-        <div><p>this is emty</p></div>
-    </div>
-</div>`,
+        <div>
+            this is empty
+        </div>
+    </div>`,
     components: {
         PStatus,
         BaseDragHorizontal,
