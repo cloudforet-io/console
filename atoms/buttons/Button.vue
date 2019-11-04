@@ -101,7 +101,6 @@ export default {
     min-width: 96px;
     height: 32px;
     text-align: center;
-    font-size: 14px/16px;
     font: Regular 14px/16px Arial;
     letter-spacing: 0;
 
