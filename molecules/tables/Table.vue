@@ -1,16 +1,17 @@
 <template>
-    <div :class="responsiveClassObject">
+    <div :class="responsiveClassObject" :style="responsiveStyle">
         <table
             class="table"
             :class="classObject"
+            :style="tableStyle"
         >
-            <thead :class="theadClassObject">
+            <thead :class="theadClassObject" :style="theadStyle">
                 <slot name="head" />
             </thead>
-            <tbody :class="theadClassObject">
+            <tbody :class="theadClassObject" :style="tbodyStyle">
                 <slot name="body" />
             </tbody>
-            <tfoot :class="theadClassObject">
+            <tfoot :class="theadClassObject" :style="tfootStyle">
                 <slot name="foot" />
             </tfoot>
         </table>
@@ -35,6 +36,26 @@ export default {
             validator(value) {
                 return [null, 'light', 'dark'].indexOf(value) !== -1;
             },
+        },
+        responsiveStyle: {
+            type: Object,
+            default: null,
+        },
+        tableStyle: {
+            type: Object,
+            default: null,
+        },
+        theadStyle: {
+            type: Object,
+            default: null,
+        },
+        tbodyStyle: {
+            type: Object,
+            default: null,
+        },
+        tfootStyle: {
+            type: Object,
+            default: null,
         },
         striped: {
             type: Boolean,
@@ -127,11 +148,13 @@ export default {
     }
     .table{
         thead{
-            background-color: $gray3 ;
             tr{
-                border-top: 2px solid $gray2;
-                border-bottom: 2px solid $gray2;
                 th{
+                    /*position: sticky;*/
+                    /*top: 0;*/
+                    background-color: $gray3 ;
+                    border-top: 2px solid $gray2;
+                    border-bottom: 2px solid $gray2;
                     text-align: left;
                     font: Bold 14px/16px Arial;
                     letter-spacing: 0;
