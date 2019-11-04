@@ -1,7 +1,7 @@
 <template>
     <nav class="text-pagenation">
         <p-icon-button
-            icon="fa-angle-left"
+            name="ic_arrow_left"
             :disabled="thisPage === 1"
             @click="update(thisPage-1)"
         />
@@ -10,7 +10,7 @@
         </div>
 
         <p-icon-button
-            icon="fa-angle-right"
+            name="ic_arrow_right"
             :disabled="thisPage === allPage"
             @click="update(thisPage+1)"
         />
@@ -18,10 +18,11 @@
 </template>
 <script>
 import PIconButton from '@/components/molecules/buttons/IconButton';
+import PI from '@/components/atoms/icons/PI';
 
 export default {
     name: 'PTextButton',
-    components: { PIconButton },
+    components: { PIconButton, PI },
     props: {
         thisPage: {
             type: Number,

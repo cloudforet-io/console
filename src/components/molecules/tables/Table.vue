@@ -147,11 +147,13 @@ export default {
         background-color: $secondary2;
     }
     .table{
+        border-collapse: separate;
+        border-spacing: 0;
         thead{
             tr{
                 th{
-                    /*position: sticky;*/
-                    /*top: 0;*/
+                    position: sticky;
+                    top: 0;
                     background-color: $gray3 ;
                     border-top: 2px solid $gray2;
                     border-bottom: 2px solid $gray2;
