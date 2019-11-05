@@ -62,6 +62,9 @@ export default {
 
 <style lang="scss" scoped>
 .nav-tabs{
+    > li {
+        cursor: pointer;
+    }
     .nav-item{
         .nav-link{
             border: 1px solid $gray3;
