@@ -2,8 +2,8 @@
     <p-dl class="row">
         <div v-for="(def, idx) in definitionList" :key="idx" class="col-sm-12 col-md-6 content-list">
             <slot name="details">
-                <p-dt>{{ def.header }}</p-dt>
-                <p-dd>{{ def.content }}</p-dd>
+                <p-dt class="col-sm-12 col-md-6">{{ def.header }}</p-dt>
+                <p-dd class="col-sm-12 col-md-6">{{ def.content }}</p-dd>
             </slot>
         </div>
     </p-dl>
@@ -15,7 +15,7 @@ import PDl from '@/components/atoms/definition/dl/Dl';
 import PDd from '@/components/atoms/definition/dd/Dd';
 
 export default {
-    name: 'PanelContents',
+    name: 'PanelContent',
     components: {
         PDt,
         PDl,
@@ -43,23 +43,17 @@ export default {
             text-overflow: ellipsis;
             white-space: nowrap;
             min-height: 20px;
-
+            padding: 0rem 1rem 0rem 1rem;
             text-align: left;
             font: Bold 14px/32px Arial;
             letter-spacing: 0;
             color: $gray1;
-
         }
         > dd {
-            margin-left: 180px;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
             min-height: 20px;
-
             text-align: left;
             font: 14px/32px Arial;
-            letter-spacing: 0;
             color: #222532;
             opacity: 1;
 

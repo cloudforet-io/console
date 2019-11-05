@@ -1,26 +1,22 @@
 import faker from 'faker';
-import PanelContents from './PanelContents.vue';
+import PanelContent from './PanelContent.vue';
 import { autoProps } from '../../../../setup/storybook-util';
 
 export default {
-    title: 'molecules/panel/panel-contents',
-    component: PanelContents,
+    title: 'molecules/panel/panel-content',
+    component: PanelContent,
     parameters: {
         info: {
             summary: '',
-            components: { PanelContents },
+            components: { PanelContent },
         },
     },
 };
-const actions = {
-
-};
-
 export const panelContents = () => ({
-    components: { PanelContents },
-    template: '<div style="width: 80vw;"><panel-contents :definitionList="renderData"></panel-contents></div>',
+    components: { PanelContent },
+    template: '<div style="width: 80vw;"><panel-content :definitionList="renderData"></panel-content></div>',
     props: {
-        ...autoProps(PanelContents),
+        ...autoProps(PanelContent),
     },
     data() {
         return {
