@@ -24,7 +24,10 @@
                             style-type="primary"
                             @click="clickAdd"
                         >
-                            <p-i name="ic_plus" color="transparent white" :fill="true" /> Create
+                            <p-i name="ic_plus" color="transparent white"
+                                 width="1.3rem" height="1.3rem" :fill="true"
+                            />
+                            Create
                         </p-button>
                         <p-dropdown
                             id="user-dropdown-btn"
@@ -62,8 +65,8 @@
                 </p-toolbox-table>
             </template>
         </BaseDragHorizontal>
-        <div>
-            this is empty
+        <div id="empty-space">
+            Select a user above for details.
         </div>
     </div>
 </template>
@@ -137,7 +140,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    #user-dropdown-btn{
+    #user-dropdown-btn {
         margin-left: 1rem;
+    }
+    #empty-space{
+        text-align: center;
+        margin-bottom: 0.5rem;
+        color: $primary2;
+        font: 24px/32px Arial;
     }
 </style>
