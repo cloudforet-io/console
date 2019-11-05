@@ -170,7 +170,6 @@ a {
 //}
 
 
-
 /* sl-vue-tree */
 @mixin node-item-background($bg-color) {
     > .sl-vue-tree-node-item {
@@ -183,6 +182,7 @@ a {
         }
     }
 }
+
 .sl-vue-tree.sl-vue-tree-root {
     background-color: transparent;
     border: none;
@@ -202,13 +202,13 @@ a {
                     font-weight: 500;
                 }
                 &.sl-vue-node-clicked {
-                    color: darken($blue, 7%);
+                    color: $primary4;
                     font-weight: 500;
-                    background-color: rgba($blue, 0.1);
+                    background-color: $primary2;
                     &:hover {
-                        color: darken($blue, 10%);
+                        color: $primary4;
                         font-weight: 500;
-                        background-color: rgba($blue, 0.2);
+                        background-color: $primary2;
                     }
                 }
                 &.sl-vue-tree-node-is-leaf {
