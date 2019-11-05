@@ -1,22 +1,22 @@
 <template>
-  <div class="animated fadeIn">
-    <b-card class="base border-top-0">
-      <b-row>
-        <b-col cols="12">
-          <BaseTable :cardless="true"
-                     :table-data="audits"
-                     :fields="fields"
-                     :per-page="3"
-                     :searchable="false"
-                     :busy="isLoading"
-                     :row-clicked-fn="rowClicked"
-                     :total-rows="totalCount"
-                     @list="listAudits"
-          />
-        </b-col>
-      </b-row>
-    </b-card>
-  </div>
+    <div class="animated fadeIn">
+        <b-card class="base border-top-0">
+            <b-row>
+                <b-col cols="12">
+                    <BaseTable :cardless="true"
+                               :table-data="audits"
+                               :fields="fields"
+                               :per-page="3"
+                               :searchable="false"
+                               :busy="isLoading"
+                               :row-clicked-fn="rowClicked"
+                               :total-rows="totalCount"
+                               @list="listAudits"
+                    />
+                </b-col>
+            </b-row>
+        </b-card>
+    </div>
 </template>
 
 <script>
@@ -26,72 +26,72 @@ const thisTestData = [{
     eventName: 'UpdateProjectGroup',
     status: {
         flag: 'fail',
-        variantSize: 3
-    } ,
+        variantSize: 3,
+    },
     Description: '정보가 변경되었습니다.',
     Executor: 'Name',
     Created: '2019-10-16',
     linkText: 'update Group',
-    link: 'www.google.com'
+    link: 'www.google.com',
 },
 {
     eventName: 'UpdateProjectGroup',
     status: {
         flag: 'Success',
-        variantSize: 3
+        variantSize: 3,
     },
     Description: '정보가 변경되었습니다.',
     Executor: 'Name',
     Created: '2019-10-16',
     linkText: 'update Group',
-    link: 'www.google.com'
+    link: 'www.google.com',
 },
 {
     eventName: 'UpdateProjectGroup',
     status: {
         flag: 'fail',
-        variantSize: 2
+        variantSize: 2,
     },
     Description: '정보가 변경되었습니다.',
     Created: '2019-10-16',
     Executor: 'Name',
     linkText: 'update Group',
-    link: 'www.google.com'
+    link: 'www.google.com',
 },
 {
     eventName: 'UpdateProjectGroup',
     status: {
         flag: 'fail',
-        variantSize: 3
+        variantSize: 3,
     },
     Description: '정보가 변경되었습니다.',
     Created: '2019-10-16',
     Executor: 'Name',
     linkText: 'update Group',
-    link: 'www.google.com'
+    link: 'www.google.com',
 },
 {
     eventName: 'UpdateProjectGroup',
     status: {
         flag: 'fail',
-        variantSize: 2
+        variantSize: 2,
     },
     Description: '정보가 변경되었습니다.',
     Created: '2019-10-16',
     Executor: 'Name',
     linkText: 'update Group',
-    link: 'www.google.com'
-}
+    link: 'www.google.com',
+},
 
 ];
 
 export default {
     name: 'ProjectAudit',
     components: {
-        BaseTable
+        BaseTable,
     },
     props: {},
-    data () {
+    data() {
         return {
             isLoading: true,
             fields: [
@@ -100,32 +100,32 @@ export default {
                 { key: 'Description', label: 'Description', sortable: true },
                 { key: 'Executor', label: 'Excutor', sortable: true },
                 { key: 'Created', label: 'Created', sortable: true },
-                { key: 'link', label: '', sortable: true }
+                { key: 'link', label: '', sortable: true },
             ],
             audits: [],
             selectedAudit: null,
             addModal: false,
-            totalCount: 17
+            totalCount: 17,
         };
     },
-    created () {
+    created() {
     },
-    mounted () {
+    mounted() {
         this.listAudits(3, 0);
     },
     methods: {
-        async listAudits (limit, skip, sort, search) {
+        async listAudits(limit, skip, sort, search) {
             if (limit === undefined) {
-                limit = 10; 
+                limit = 10;
             }
             if (skip === undefined) {
-                skip = 0; 
+                skip = 0;
             }
             if (sort === undefined) {
-                sort = '-created_date'; 
+                sort = '-created_date';
             }
             if (search === undefined) {
-                search = {}; 
+                search = {};
             }
 
             let res;
@@ -139,14 +139,14 @@ export default {
             this.audits = thisTestData;
             this.selectedAudit = null;
             this.isLoading = false;
-          /**
+            /**
            * TODO: set totalCount with data from server
            */
         },
-        rowClicked (item, idx) {
+        rowClicked(item, idx) {
             this.selectedAudit = item;
-        }
-    }
+        },
+    },
 };
 </script>
 

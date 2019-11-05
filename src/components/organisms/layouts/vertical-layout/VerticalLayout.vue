@@ -1,50 +1,32 @@
 <template>
-    <div
-        class="box-container"
-        :style="{height: height}"
-    >
+    <div class="box-container" :style="{height: height}">
         <div class="content-container">
-            <slot
-                name="leftContainer"
-                :width="`${leftContainerWidth}px`"
-            />
+            <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
         </div>
 
-        <div
-            class="dragger-container"
-            :class="{ line: line }"
-            :style="{
-                height: height,
-                width: `${draggerWidth}px`,
-            }"
+        <div class="dragger-container" :class="{ line: line }"
+             :style="{
+                 height: height,
+                 width: `${draggerWidth}px`,
+             }"
         >
-            <span
-                class="dragger"
-                @mousedown="onMousedown"
-            >
+            <span class="dragger" @mousedown="onMousedown">
                 <slot name="dragger">
-                    <f-i
-                        icon="fa-grip-lines-vertical"
-                        icon-style="light"
-                    />
+                    <f-i icon="fa-grip-lines-vertical" icon-style="light" />
                 </slot>
             </span>
         </div>
 
-        <div
-            class="content-container right"
-            :style="{
-                height: height,
-                width: rightContainerWidth
-            }"
+        <div class="content-container right"
+             :style="{
+                 height: height,
+                 width: rightContainerWidth
+             }"
         >
             <div>
                 <slot name="rightContainer" />
             </div>
-            <FNB
-                v-if="!hideFNB"
-                class="fnb"
-            />
+            <FNB v-if="!hideFNB" class="fnb" />
         </div>
     </div>
 </template>
