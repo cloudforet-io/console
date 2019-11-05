@@ -14,14 +14,17 @@
             <slot name="icon" v-bind="node">
                 <span v-if="!node.data.init" class="item-icon">
                     <p-i v-if="node.isLeaf"
+                         :color="'transparent inherit'"
                          :width="'1rem'"
                          :height="'1rem'"
                          :name="'ic_inventory'" />
                     <p-i v-else-if="node.isExpanded"
+                         :color="'transparent inherit'"
                          :width="'1rem'"
                          :height="'1rem'"
                          :name="'ic_tree_folder--opened'" />
                     <p-i v-else
+                         :color="'transparent inherit'"
                          :width="'1rem'"
                          :height="'1rem'"
                          :name="'ic_tree_folder'" />
@@ -31,10 +34,12 @@
         </template>
         <template #toggle="{ node }">
             <p-i v-if="node.isExpanded"
+                 :color="'transparent inherit'"
                  :width="'1rem'"
                  :height="'1rem'"
                  :name="'ic_tree_arrow--opened'" />
             <p-i v-else
+                 :color="'transparent inherit'"
                  :width="'1rem'"
                  :height="'1rem'"
                  :name="'ic_tree_arrow'" />
