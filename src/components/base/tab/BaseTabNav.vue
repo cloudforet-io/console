@@ -27,7 +27,6 @@
           </b-nav-item>
         </b-nav>
       </template>
-
       <slot v-if="useSlot" :name="slotName" />
       <template v-else>
         <template v-if="keepAlive">

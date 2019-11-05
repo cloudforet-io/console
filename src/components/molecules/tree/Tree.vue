@@ -10,59 +10,66 @@
         @toggle="nodeToggle"
         @nodecontextmenu="nodeContextMenu">
         <template #title="{ node }">
-            <span v-if="node.data.init" class="fas fa-exclamation-triangle"/>
+            <span v-if="node.data.init" class="fas fa-exclamation-triangle" />
             <slot name="icon" v-bind="node">
                 <span v-if="!node.data.init" class="item-icon">
-                     <f-i v-if="node.isLeaf" :icon="'fas fa-cube'"/>
-                     <f-i v-else-if="node.isExpanded" :icon="'fal fa-folder-open'"/>
-                     <f-i v-else :icon="'fal fa-folder-minus'"/>
+                    <p-i v-if="node.isLeaf"
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_inventory'" />
+                    <p-i v-else-if="node.isExpanded"
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_tree_folder--opened'" />
+                    <p-i v-else
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_tree_folder'" />
                 </span>
             </slot>
             <span class="item-title">{{ node.title }}</span>
         </template>
         <template #toggle="{ node }">
-                <f-i v-if="node.isExpanded" :icon="'fal fa-angle-down'"/>
-                <f-i v-else :icon="'fal fa-angle-right'" />
+            <p-i v-if="node.isExpanded"
+                 :width="'1rem'"
+                 :height="'1rem'"
+                 :name="'ic_tree_arrow--opened'" />
+            <p-i v-else
+                 :width="'1rem'"
+                 :height="'1rem'"
+                 :name="'ic_tree_arrow'" />
         </template>
     </sl-vue-tree>
 </template>
 
 <script>
-
 import SlVueTree from 'sl-vue-tree';
-import FI from '@/components/atoms/icons/FI';
+import PI from '@/components/atoms/icons/PI';
+
 export default {
     name: 'PTree',
     events: [],
     components: {
-        FI,
+        PI,
         SlVueTree,
     },
     props: {
-        /**
-         *  Tree Node Data
-         */
+        /** Tree Node Data */
         treeData: {
             type: Array,
             default: () => [],
         },
-        /**
-         *  Initial Tree panel Width
-         */
+        /** Initial Tree panel Width */
         initialTreeWidth: {
             type: String,
             default: '300px',
         },
-        /**
-         *  Allow select multiple Nodes
-         */
+        /** Allow select multiple Nodes */
         useMultiSelect: {
             type: Boolean,
             default: true,
         },
-        /**
-         * Ues Y/N to user default Node icon on Tree
-         */
+        /** Ues Y/N to user default Node icon on Tree */
         useDefaultTreeIcon: {
             type: Boolean,
             default: true,
@@ -94,6 +101,13 @@ export default {
     },
     methods: {
         nodeClick(node) {
+            if (this.clickedNode) {
+                this.removeClickedClass(this.clickedNode);
+            }
+
+            this.clickedNode = node;
+            this.addClickedClass(node);
+
             this.$emit('nodeClick', node);
         },
         beforeDrop(node, position, cancel) {
@@ -103,7 +117,7 @@ export default {
             if (!node.isExpanded) {
                 this.setClickedNodeItem(node);
                 if (!node.data.is_cached) {
-                    this.$emit('nodeToggle', {node, treeV: this.$refs.slVueTree});
+                    this.$emit('nodeToggle', node);
                 }
             }
         },
@@ -125,6 +139,9 @@ export default {
                 }, 10);
             }
         },
+        getNodeEl(node) {
+            return this.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
+        },
         addClickedClass(node) {
             const elem = this.getNodeEl(node);
             if (elem) {
@@ -133,17 +150,17 @@ export default {
             }
             return false;
         },
+        removeClickedClass(node) {
+            const elem = this.getNodeEl(node);
+            if (elem) {
+                elem.classList.remove('sl-vue-node-clicked');
+            }
+        },
     },
 };
 </script>
 
 <style lang="scss" scoped>
-    .panel-trans-enter-active {
-        transition: all .4s ease-in-out;
-    }
-    .panel-trans-enter {
-        opacity: 0;
-    }
 
     $main-height: calc(100vh - #{$header-height} - 30px);
 
@@ -151,7 +168,7 @@ export default {
     @extend %sheet;
         border-radius: 0;
         padding: 15px 8px;
-        background-color: $white;
+        background-color: $primary4;
         height: $main-height;
         overflow: scroll;
     .leaf-space {
@@ -169,36 +186,4 @@ export default {
     }
     }
 
-
-    .contextmenu {
-        position: absolute;
-        background-color: $navy;
-        color: $lightgray;
-        cursor: pointer;
-        z-index: 99999;
-        border-radius: 5px;
-        box-shadow: 0 0 4px 0 rgba($black, 0.4);
-    > div {
-        padding: 6px 10px;
-        margin: 5px;
-        border-radius: 5px;
-    &:hover {
-         background-color: rgba($whiteblue, 0.15);
-     }
-    }
-    }
-
-    .panel {
-        padding: 50px $side-pad $bottom-pad $side-pad;
-    }
-    .empty {
-        text-align: left;
-        margin-top: 20px;
-    .msg {
-        color: $darkgray;
-        font-size: 1.3rem;
-        font-weight: 600;
-    }
-
-    }
 </style>
