@@ -1,6 +1,6 @@
 <script>
 import ButtonMixin from '@/components/atoms/buttons/ButtonMixin';
-
+import { getBindClass } from '@/components/atoms/utils/functional';
 export default {
     name: 'PButton',
     functional: true,
@@ -8,23 +8,6 @@ export default {
     render(h, {
         props, listeners, children, data,
     }) {
-        function getBindClass(cls) {
-            let bindClass = {};
-            if (Array.isArray(cls)) {
-                cls.forEach((value) => {
-                    if (typeof value === 'object') {
-                        for (const key of value.keys()) {
-                            bindClass[key] = value[key];
-                        }
-                    } else {
-                        bindClass[value] = true;
-                    }
-                });
-            } else {
-                bindClass = cls;
-            }
-            return bindClass;
-        }
         function getClass() {
             if (!props.forceClass) {
                 const cls = {
