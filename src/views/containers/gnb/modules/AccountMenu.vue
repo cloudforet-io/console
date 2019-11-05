@@ -5,7 +5,9 @@
                      @select="doAction"
         >
             <template #contents>
-                <f-i icon="fa-archive" />
+                <p-i name="ic_gnb_profile" width="32px" height="32px"
+                     :color="`transparent ${iconColor}`"
+                />
             </template>
         </p-menu-list>
 
@@ -15,14 +17,15 @@
 
 <script>
 import { mapActions, mapMutations, mapGetters } from 'vuex';
-import FI from '@/components/atoms/icons/FI';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList';
 import ProfileModal from '@/views/common/profile/ProfileModal';
+import PI from '@/components/atoms/icons/PI';
+import styles from '@/styles/_variables.scss';
 
 export default {
     name: 'AccountMenu',
     components: {
-        FI,
+        PI,
         PMenuList,
         ProfileModal,
     },
@@ -33,6 +36,7 @@ export default {
                 { key: 'profile', contents: 'Profile' },
                 { key: 'signout', contents: 'Sign Out' },
             ],
+            iconColor: styles.primary4,
         };
     },
     computed: {

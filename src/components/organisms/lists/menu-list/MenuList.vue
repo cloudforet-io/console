@@ -117,8 +117,8 @@ export default {
             display: inline-block;
             padding: 0;
             border-radius: 2px;
+            border: 0px;
             min-width: 32px;
-            height: 32px;
             color: $primary4;
             &:hover, &.active {
                 background-color: $primary-dark;

@@ -101,7 +101,36 @@ $box-shadow: 0px 0 10px 0px rgba($black, 0.1);
 
 
 :export {
+  /* COLORS */
+  black: $black;
+  white: $white;
+
   primary: $primary;
+  primaryDark: $primary-dark;
+  primary1: $primary1;
+  primary2: $primary2;
+  primary3: $primary3;
+  primary4: $primary4;
+
+  secondary: $secondary;
+  secondary1: $secondary1;
+  secondary2: $secondary2;
+
+  dark: $dark;
+  gray: $gray;
+  gray1: $gray1;
+  gray2: $gray2;
+  gray3: $gray3;
+
+  alert: $alert;
+  safe: $safe;
+
+  other1: $other1;
+  other2: $other2;
+  other3: $other3;
+  other4: $other4;
+
+  /* SIZE */
   lnbHeight: $lnb-height;
   gnbWidth: $gnb-width;
   fnbHeight: $fnb-height;
