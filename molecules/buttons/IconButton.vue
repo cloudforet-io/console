@@ -3,29 +3,33 @@
         class="icon-button"
         :class="classObject"
         :disabled="disabled"
-        @click="$emit('click',$event)"
+        v-on="$listeners"
     >
-        <f-i
-            :icon="icon"
-            :icon-style="iconStyle"
-            :size="size"
-            :animation="animation"
-            :rotating="rotating"
-            :flip="flip"
-        />
+        <slot>
+            <p-i
+                :name="name"
+                :dir="dir"
+                :fill="fill"
+                :width="width"
+                :height="height"
+                :scale="scale"
+                :color="color"
+                :original="original"
+                :title="title"
+            />
+        </slot>
     </p-button>
 </template>
 
 <script>
-import FI from '@/components/atoms/icons/FI.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
-import FIMixin from '@/components/atoms/icons/FIMixin';
+import PI from '@/components/atoms/icons/PI';
+import PButton from '@/components/atoms/buttons/Button';
 
 
 export default {
     name: 'PIconButton',
-    components: { PButton, FI },
-    mixins: [FIMixin],
+    components: { PButton, PI },
+    mixins: [PI],
     props: {
         buttonStyle: {
             type: String,
@@ -39,7 +43,6 @@ export default {
     },
     computed: {
         classObject() {
-            console.log(this.buttonStyle);
             return [this.buttonStyle];
         },
     },
@@ -49,12 +52,11 @@ export default {
 <style lang="scss" scoped>
     .icon-button{
         border-radius: 2px;
-        padding: 8px;
+        padding: 0px;
         min-width: 32px;
         max-width: 32px;
         min-height: 32px;
         max-height: 32px;
-        vertical-align:text-top;
         &.disabled{
             color: $gray1;
             background-color: $gray2;
