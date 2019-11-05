@@ -7,9 +7,9 @@
                         @enter="enter"
             >
                 <div v-if="showTree">
-                    <vertical-layout >
+                    <vertical-layout>
                         <template #leftContainer="{ width }">
-                            <div @click.right="isBackPanelHasClciked">
+                            <div @click.right.capture="isBackPanelHasClciked">
                                 <sl-vue-tree ref="slVueTree"
                                              v-model="selectedTreeProp"
                                              class="main-tree-col"
@@ -260,6 +260,7 @@ export default {
             }
         },
         showContextMenu(node, event, hasClicked) {
+            console.log('hasClicked', hasClicked);
             if (!hasClicked) {
                 event.preventDefault();
             }
@@ -288,14 +289,16 @@ export default {
                     this.contextIndividualVisible = [false, false, false, false, false, true, true];
                 }
             }
-1
+            1;
             this.contextMenuIsVisible = true;
             const $contextMenu = this.$refs.contextmenu;
             const coordinateX = event.clientX;
             const coordinateY = event.clientY;
             this.$refs.slVueTree.select(node.path);
-            $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
-            $contextMenu.style.top = `${coordinateY - styles.lnbHeight}`;
+            // $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
+
+            $contextMenu.style.left = `${coordinateX - parseFloat(styles.gnbWidth)}px`;
+            $contextMenu.style.top = `${coordinateY - parseFloat(styles.lnbHeight)}px`;
         },
         contextExecutor(flag, action) {
             /** *******************
