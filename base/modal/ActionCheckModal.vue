@@ -1,157 +1,158 @@
 <template>
-  <div>
-    <BaseModal ref="BAMO003_ActionCheckModal"
-               :title="modalTitle"
-               :type="type"
-               :centered="centered"
-               @ok="onOk"
-    >
-      <template #contents>
-        <div class="modal-contents">
-          <slot v-if="$scopedSlots.contents" name="contents" />
-          <template v-else>
-            <h4 class="modal-text">
-              {{ modalText }}
-            </h4>
-            <br>
-            <BaseTable :table-data="data" 
-                       :fields="fields"
-                       :selectable="false"
-                       cardless
-                       headerless
-                       underlined
-            />
-          </template>
-        </div>
-      </template>
+    <div>
+        <BaseModal ref="BAMO003_ActionCheckModal"
+                   :title="modalTitle"
+                   :type="type"
+                   :centered="centered"
+                   @ok="onOk"
+        >
+            <template #contents>
+                <div class="modal-contents">
+                    <slot v-if="$scopedSlots.contents" name="contents" />
+                    <template v-else>
+                        <h4 class="modal-text">
+                            {{ modalText }}
+                        </h4>
+                        <br>
+                        <BaseTable :table-data="data"
+                                   :fields="fields"
+                                   :selectable="false"
+                                   cardless
+                                   headerless
+                                   underlined
+                        />
+                    </template>
+                </div>
+            </template>
 
-      <template v-if="$scopedSlots.footer" #footer="{ ok, hide, cancel }">
-        <slot name="footer" 
-              :ok="onOk" :hide="hide" :cancel="cancel"
-        />
-      </template>
-    </BaseModal>
+            <template v-if="$scopedSlots.footer" #footer="{ ok, hide, cancel }">
+                <slot name="footer"
+                      :ok="onOk" :hide="hide" :cancel="cancel"
+                />
+            </template>
+        </BaseModal>
 
-    <BaseModal ref="BAMO003_ActionResultModal"
-               :title="tr('ACTION.TITLE_FAILED')"
-               type="danger"
-               :centered="centered"
-               ok-only
-               @ok="hideResultModal"
-    >
-      <template #contents>
-        <h4>{{ tr('ACTION.FAILED') }}</h4>
-        <br>
-        <div>
-          <BaseTable :table-data="failedItemList" 
-                     :fields="failedItemFields" 
-                     :selectable="false"
-                     cardless
-                     headerless
-                     underlined
-          />
-        </div>
-      </template>
-    </BaseModal>
-  </div>
+        <BaseModal ref="BAMO003_ActionResultModal"
+                   :title="tr('ACTION.TITLE_FAILED')"
+                   type="danger"
+                   :centered="centered"
+                   ok-only
+                   @ok="hideResultModal"
+        >
+            <template #contents>
+                <h4>{{ tr('ACTION.FAILED') }}</h4>
+                <br>
+                <div>
+                    <BaseTable :table-data="failedItemList"
+                               :fields="failedItemFields"
+                               :selectable="false"
+                               cardless
+                               headerless
+                               underlined
+                    />
+                </div>
+            </template>
+        </BaseModal>
+    </div>
 </template>
 
 <script>
-const BaseModal = () => import('@/components/base/modal/BaseModal');
 import BaseTable from '@/components/base/table/BaseTable';
+
+const BaseModal = () => import('@/components/base/modal/BaseModal');
 
 export default {
     name: 'ActionCheckModal',
     events: ['commit', 'failed', 'succeed'],
     components: {
         BaseModal,
-        BaseTable
+        BaseTable,
     },
     props: {
         title: {
             type: String,
-            default: null
+            default: null,
         },
         type: {
             type: String,
-            default: 'danger'
+            default: 'danger',
         },
         centered: {
             type: Boolean,
-            default: true
+            default: true,
         },
         text: {
             type: String,
-            default: null
+            default: null,
         },
         data: {
             type: Array,
             default: () => [],
-            required: true
+            required: true,
         },
         fields: {
             type: Array,
             default: () => [],
-            required: true
+            required: true,
         },
         action: {
             type: Function,
-            default: null
+            default: null,
         },
         /**
-         * It works only when action property is defined. 
+         * It works only when action property is defined.
          */
-        runAsSync: { 
+        runAsSync: {
             type: Boolean,
-            default: true
+            default: true,
         },
         /**
-         * It works only when runAsSync property is true. 
+         * It works only when runAsSync property is true.
          */
         showFailResult: {
             type: Boolean,
-            default: true
+            default: true,
         },
         failMessage: {
             type: String,
-            default: null
+            default: null,
         },
         successMessage: {
             type: String,
-            default: null
+            default: null,
         },
         /**
-         * It is used when getting failed items. 
+         * It is used when getting failed items.
          */
         primaryKey: {
             type: String,
-            default: null
-        }
+            default: null,
+        },
     },
     data() {
         return {
-            failedItemList: []
+            failedItemList: [],
         };
     },
     computed: {
-        failedItemFields () {
+        failedItemFields() {
             return [
                 { key: this.primaryKey, label: this.primaryKey },
-                { key: 'reason', label: this.tr('COL_NM.FAIL_REASON') }
+                { key: 'reason', label: this.tr('COL_NM.FAIL_REASON') },
             ];
         },
-        modalTitle () {
+        modalTitle() {
             return this.title || this.tr('ACTION.TITLE_DEFAULT');
         },
-        modalText () {
+        modalText() {
             return this.text || this.tr('ACTION.CHECK_DEFAULT');
         },
-        modalFailMsg () {
+        modalFailMsg() {
             return this.failMessage || this.tr('ACTION.ERROR');
         },
-        modalSuccessMsg () {
+        modalSuccessMsg() {
             return this.successMessage || this.tr('ACTION.SUCCESS');
-        }
+        },
     },
     created() {
         if (this.showFailResult && this.isEmpty(this.primaryKey)) {
@@ -160,7 +161,7 @@ export default {
         }
     },
     methods: {
-        onOk () {
+        onOk() {
             if (this.action) {
                 if (this.runAsSync) {
                     this.doActionSync();
@@ -173,12 +174,12 @@ export default {
                 this.hideModal();
             }
         },
-        doAction () {
-            this.action(this.data);  
+        doAction() {
+            this.action(this.data);
         },
-        async doActionSync () {
+        async doActionSync() {
             try {
-                let res = await this.action(this.data);
+                const res = await this.action(this.data);
                 if (res && res.stop) {
                     return;
                 }
@@ -197,33 +198,33 @@ export default {
                 }
             }
         },
-        setFailList (items) {
+        setFailList(items) {
             if (items) {
                 this._.forIn(items, (value, key) => {
                     this.failedItemList.push({
                         [this.primaryKey]: key,
-                        reason: value
+                        reason: value,
                     });
                 });
             }
         },
-        showModal () {
+        showModal() {
             this.$refs.BAMO003_ActionCheckModal.showModal();
         },
-        hideModal () {
+        hideModal() {
             this.$refs.BAMO003_ActionCheckModal.hideModal();
         },
-        showResultModal () {
+        showResultModal() {
             this.$refs.BAMO003_ActionResultModal.showModal();
         },
-        hideResultModal () {
+        hideResultModal() {
             this.$refs.BAMO003_ActionResultModal.hideModal();
             this.$emit('failed');
         },
-        reset () {
+        reset() {
             this.failedItemList = [];
-        }
-    }
+        },
+    },
 };
 </script>
 
