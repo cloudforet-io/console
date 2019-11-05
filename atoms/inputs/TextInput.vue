@@ -12,8 +12,6 @@ export default {
         },
     },
     render(h, { data, props, listeners }) {
-        console.log('attrs', data.attrs);
-        console.log('props', props);
         return h('input', {
             ...data,
             class: {
