@@ -6,8 +6,14 @@ export default {
     functional: true,
     props: {
         value: String,
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     render(h, { data, props, listeners }) {
+        console.log('attrs', data.attrs);
+        console.log('props', props);
         return h('input', {
             ...data,
             class: {
@@ -16,6 +22,7 @@ export default {
             },
             attrs: {
                 ...data.attrs,
+                disabled: props.disabled,
                 type: 'text',
             },
             domProps: {
@@ -33,7 +40,7 @@ export default {
 </script>
 
 <style lang="scss">
-input.p-text-input{
+input[type="text"].p-text-input{
     min-height: 2rem;
 
     padding-left: 1rem;
@@ -50,6 +57,10 @@ input.p-text-input{
     &:focus{
         border-color:$dark;
         color: $dark;
+    }
+    &:disabled{
+        border-color:$gray2;
+        background-color: $gray2;
     }
 }
 </style>
