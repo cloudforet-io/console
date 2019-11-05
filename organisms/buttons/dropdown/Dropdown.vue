@@ -114,6 +114,7 @@ export default {
     methods: {
         menuClick(eventName, event) {
             this.$emit(`click-${eventName}`, event);
+            this.$emit('clickMenu', eventName);
             this.popup = false;
         },
         onClick() {
@@ -160,6 +161,7 @@ export default {
 }
 .menu-btn{
     min-width: 6.5rem;
+    width: auto;
     padding-left: 1rem;
     padding-right: 1rem;
     border-radius: 2px 0px 0px 2px;

@@ -9,26 +9,29 @@
             </div>
             <div class="right">
                 <slot name="toolbox-right" />
-                <div class="tool" v-if="pagenationVisible">
+                <div v-if="pagenationVisible" class="tool">
                     <p-text-pagenation
                         :this-page.sync="proxyThisPage"
                         :all-page="allPage"
                         @pageChange="changePageNumber"
                     />
                 </div>
-                <div class="tool" v-if="pageSizeVisible">
-                    <p-select
-                        :options="pageSizeOptions"
-                        :selected.sync="proxyPageSize"
-                    />
+                <div v-if="pageSizeVisible" class="tool">
+                    <p-dropdown
+                        class="page-size-dropdown"
+                        :menu="pageSizeOptions"
+                        @clickMenu="changePageSize"
+                    >
+                        {{ pageSize }}
+                    </p-dropdown>
                 </div>
-                <div class="tool" v-if="settingVisible">
+                <div v-if="settingVisible" class="tool">
                     <p-icon-button
                         name="ic_setting"
                         @click="$emit('clickSetting',$event)"
                     />
                 </div>
-                <div class="tool" v-if="refreshVisible">
+                <div v-if="refreshVisible" class="tool">
                     <p-icon-button
                         name="ic_refresh"
                         @click="$emit('clickRefresh',$event)"
@@ -70,12 +73,12 @@
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation';
 import PIconButton from '@/components/molecules/buttons/IconButton';
-import PSelect from '@/components/molecules/forms/Select';
+import PDropdown from '@/components/organisms/buttons/dropdown/Dropdown';
 
 export default {
     name: 'PToolboxTable',
     components: {
-        PDataTable, PTextPagenation, PIconButton, PSelect,
+        PDataTable, PTextPagenation, PIconButton, PDropdown,
     },
     mixins: [PDataTable],
     props: {
@@ -114,7 +117,11 @@ export default {
     },
     data() {
         return {
-            pageSizeOptions: [{ value: 15 }, { value: 30 }, { value: 45 }],
+            pageSizeOptions: [
+                { type: 'item', text: 15, event: 15 },
+                { type: 'item', text: 30, event: 30 },
+                { type: 'item', text: 45, event: 45 },
+            ],
         };
     },
     computed: {
@@ -168,7 +175,11 @@ export default {
     },
     methods: {
         changePageSize(size) {
-            this.$emit('changePageSize', size);
+            const sizeNum = Number(size);
+            if (this.pageSize !== sizeNum) {
+                this.$emit('update:pageSize', sizeNum);
+                this.$emit('changePageSize', sizeNum);
+            }
         },
         changePageNumber(page) {
             this.$emit('changePageNumber', page);
@@ -218,5 +229,9 @@ export default {
         margin-left: 1rem;
         display: inline;
     }
-
+    .page-size-dropdown{
+        &::v-deep .menu-btn{
+            min-width: 4rem;
+        }
+    }
 </style>
