@@ -1,21 +1,20 @@
 <template>
     <div>
         <div class="row no-gutters" @click="contextMenuIsVisible=false">
-            <transition appear name="tree-trans" @before-enter="beforeEnter"
-                        @enter="enter"
-            >
+            <transition appear name="tree-trans" @before-enter="beforeEnter" @enter="enter">
                 <div v-if="showTree">
                     <vertical-layout>
                         <template #leftContainer="{ width }">
-                            <div class="left-tree-panel"
-                                 id="rootPanel" @click.right.stop="isRootClicked">
+                            <div id="rootPanel"
+                                 @click.right.stop="isRootClicked">
                                 <PTree ref="primeTree"
                                        :tree-data="treeData"
                                        :initial-tree-width="width"
                                        @nodeClick="nodeClicked"
                                        @beforeDrop="beforeDropped"
                                        @nodeToggle="nodeToggled"
-                                       @nodeContextMenu="showContextMenu">
+                                       @nodeContextMenu="showContextMenu"
+                                >
                                     <template slot="icon" slot-scope="node">
                                         <slot name="icon" v-bind="node" />
                                     </template>
@@ -28,7 +27,9 @@
                                     <slot name="treeSubPanel" />
                                 </div>
                                 <div v-else class="empty">
-                                    <span class="msg">Please, Click a item from left tree Panel.</span>
+                                    <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'"/>
+                                    <div class="msg">{{ getNoSelectMSG[0] }}</div><br>
+                                    <div class="dt">{{ getNoSelectMSG[1] }}</div>
                                 </div>
                             </transition>
                         </template>
@@ -44,6 +45,7 @@
 <script>
 import _ from 'lodash';
 import PTree from '@/components/molecules/tree/Tree';
+import PI from '@/components/atoms/icons/PI';
 import styles from '@/styles/_variables.scss';
 
 import VerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
@@ -53,9 +55,14 @@ export default {
     components: {
         PTree,
         VerticalLayout,
+        PI,
     },
     mixins: [PTree],
     props: {
+        noSelectMSG: {
+            type: Array,
+            default: () => [],
+        },
         vueTree: {
             type: Object,
             default: () => {},
@@ -94,6 +101,11 @@ export default {
         };
     },
     computed: {
+        getNoSelectMSG() {
+            console.log(this.noSelectMSG[0]);
+            console.log(this.noSelectMSG[1]);
+            return [this.tr(this.noSelectMSG[0]), this.tr(this.noSelectMSG[1])];
+        },
         getCurrentNode() {
             const node = this.getTree();
             return this.isEmpty(node) ? null : node;
@@ -216,10 +228,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .left-tree-panel{
-        background: red !important;
-        background-color: red !important;
-    }
     .panel-trans-enter-active {
         transition: all .4s ease-in-out;
     }
@@ -241,16 +249,24 @@ export default {
     }
 
     .panel {
-        padding: 50px $side-pad $bottom-pad $side-pad;
+        padding: 20px $side-pad $bottom-pad $side-pad;
     }
     .empty {
-        text-align: left;
-        margin-top: 20px;
+        text-align: center;
+        margin-top: 5%;
         .msg {
-            color: $darkgray;
-            font-size: 1.3rem;
-            font-weight: 600;
+            letter-spacing: 0;
+            font: Bold 24px/32px Arial;
+            color: #A5ACCE;
+            opacity: 1;
+        }
+        .dt {
+            letter-spacing: 0;
+            font: 24px/32px Arial;
+            color: #A5ACCE;
+            opacity: 1;
         }
 
     }
+
 </style>
