@@ -1,127 +1,127 @@
 <template>
-  <div class="animated fadeIn">
-    <BaseDragHorizontal>
-      <template #container="{ height }">
-        <BaseTable class="user-table" 
-                   :table-data="users"
-                   :fields="fields" 
-                   :per-page="query.page.limit"
-                   :searchable="true"
-                   :total-rows="totalCount"
-                   :search-context-data="contextData"
-                   :busy="isLoading" 
-                   :cardless="false" 
-                   :underlined="true"
-                   :height="height"
-                   @rowSelected="rowSelected"
-                   @onSelectAll="onAllRowSelected"
-                   @list="listUsers"
-                   @limitChanged="limitChanged"
+    <div class="animated fadeIn">
+        <BaseDragHorizontal>
+            <template #container="{ height }">
+                <BaseTable class="user-table"
+                           :table-data="users"
+                           :fields="fields"
+                           :per-page="query.page.limit"
+                           :searchable="true"
+                           :total-rows="totalCount"
+                           :search-context-data="contextData"
+                           :busy="isLoading"
+                           :cardless="false"
+                           :underlined="true"
+                           :height="height"
+                           @rowSelected="rowSelected"
+                           @onSelectAll="onAllRowSelected"
+                           @list="listUsers"
+                           @limitChanged="limitChanged"
+                >
+                    <template #caption>
+                        <div>
+                            <b-button class="btn mr-4" variant="primary" @click="onClickAdd">
+                                {{ tr('BTN_ADD') }}
+                            </b-button>
+                            <b-dropdown v-if="hasSelectedUser" no-caret
+                                        variant="outline-info"
+                                        class="no-selected"
+                            >
+                                <template #button-content>
+                                    <span>{{ tr('BTN_ACTION') }}</span> &nbsp;
+                                    <i class="fal fa-angle-down" />
+                                </template>
+                                <b-dropdown-item v-if="!isMultiSelected" @click="onClickUpdate">
+                                    <div class="item sm">
+                                        <i class="icon fal fa-pencil-alt" />
+                                        <span class="name">{{ tr('BTN_UPT') }}</span>
+                                    </div>
+                                </b-dropdown-item>
+                                <b-dropdown-item @click="onClickDelete">
+                                    <div class="item sm">
+                                        <i class="icon fal fa-trash-alt" />
+                                        <span class="name">{{ tr('BTN_DELETE') }}</span>
+                                    </div>
+                                </b-dropdown-item>
+                                <b-dropdown-item @click="onClickEnable">
+                                    <div class="item sm">
+                                        <i class="icon fal fa-check-circle" />
+                                        <span class="name">{{ tr('BTN_ENABLE') }}</span>
+                                    </div>
+                                </b-dropdown-item>
+                                <b-dropdown-item @click="onClickDisable">
+                                    <div class="item sm">
+                                        <i class="icon fal fa-ban" />
+                                        <span class="name">{{ tr('BTN_DISABLE') }}</span>
+                                    </div>
+                                </b-dropdown-item>
+                            </b-dropdown>
+                        </div>
+                    </template>
+                </BaseTable>
+            </template>
+        </BaseDragHorizontal>
+
+        <BaseModal ref="IDUS001_UserDetailModal"
+                   :title="tr('TITLE', [isCreateMode ? tr('BTN_ADD') : tr('BTN_EDIT'), tr('USER')])"
+                   centered
+                   hide-footer
+                   backdrop-off
+                   prevent-esc-close
+                   size="xl"
+                   interactive
+                   @esc="hideUserDetail"
+                   @cancel="hideUserDetail"
         >
-          <template #caption>
-            <div>
-              <b-button class="btn mr-4" variant="primary" @click="onClickAdd">
-                {{ tr('BTN_ADD') }}
-              </b-button>
-              <b-dropdown v-if="hasSelectedUser" no-caret
-                          variant="outline-info"
-                          class="no-selected"
-              >
-                <template #button-content>
-                  <span>{{ tr('BTN_ACTION') }}</span> &nbsp;
-                  <i class="fal fa-angle-down" />
-                </template>
-                <b-dropdown-item v-if="!isMultiSelected" @click="onClickUpdate">
-                  <div class="item sm">
-                    <i class="icon fal fa-pencil-alt" />
-                    <span class="name">{{ tr('BTN_UPT') }}</span>
-                  </div>
-                </b-dropdown-item>
-                <b-dropdown-item @click="onClickDelete">
-                  <div class="item sm">
-                    <i class="icon fal fa-trash-alt" />
-                    <span class="name">{{ tr('BTN_DELETE') }}</span>
-                  </div>
-                </b-dropdown-item>
-                <b-dropdown-item @click="onClickEnable">
-                  <div class="item sm">
-                    <i class="icon fal fa-check-circle" />
-                    <span class="name">{{ tr('BTN_ENABLE') }}</span>
-                  </div>
-                </b-dropdown-item>
-                <b-dropdown-item @click="onClickDisable">
-                  <div class="item sm">
-                    <i class="icon fal fa-ban" />
-                    <span class="name">{{ tr('BTN_DISABLE') }}</span>
-                  </div>
-                </b-dropdown-item>
-              </b-dropdown>
-            </div>
-          </template>
-        </BaseTable>
-      </template>
-    </BaseDragHorizontal>
+            <template #contents>
+                <UserDetail ref="IDUS001_UserDetail"
+                            :user-prop="isCreateMode ? undefined : selectedItems[0].data"
+                            :creatable="isCreateMode ? true : false"
+                            size="xl"
+                            @create="createUser"
+                            @update="updateUser"
+                            @cancel="hideUserDetail"
+                />
+            </template>
+        </BaseModal>
 
-    <BaseModal ref="IDUS001_UserDetailModal"
-               :title="tr('TITLE', [isCreateMode ? tr('BTN_ADD') : tr('BTN_EDIT'), tr('USER')])"
-               centered
-               hide-footer
-               backdrop-off
-               prevent-esc-close
-               size="xl"
-               interactive
-               @esc="hideUserDetail"
-               @cancel="hideUserDetail"
-    >
-      <template #contents>
-        <UserDetail ref="IDUS001_UserDetail"
-                    :user-prop="isCreateMode ? undefined : selectedItems[0].data" 
-                    :creatable="isCreateMode ? true : false"
-                    size="xl"
-                    @create="createUser"
-                    @update="updateUser"
-                    @cancel="hideUserDetail"
-        />
-      </template>
-    </BaseModal>
-
-    <ActionCheckModal ref="IDUS001_ActionCheckModal" 
-                      :data="selectedUsers" 
-                      :fields="multiActionFields"
-                      :action="action"
-                      :title="actionCheckTitle"
-                      :type="actionCheckType"
-                      :text="actionCheckText"
-                      primary-key="user_id"
-                      @succeed="listUsers"
-                      @failed="listUsers"
-    />
-    
-              
-    <BaseTabNav v-if="hasSelectedUser" class="user-info"
-                :fill="false"
-                :nav-tabs="tabs"
-                :keep-alive="true"
-                :is-footer-visible="false"
-                :use-slot="true"
-    >
-      <template #info>
-        <b-card class="base first-tab">
-          <BaseMultiPanel v-if="isMultiSelected" 
+        <ActionCheckModal ref="IDUS001_ActionCheckModal"
                           :data="selectedUsers"
-                          :data-fields="multiInfoFields" 
-          />
-          <UserInfo v-else 
-                    :user-data="selectedItems[0].data"
-                    @update="updateSelectedUserInfo"
-          />
-        </b-card>
-      </template>
-    </BaseTabNav>
-    <div v-else class="empty">
-      <span class="msg">{{ tr('PANEL.NO_SELECT', [tr('USER')]) }}</span>
+                          :fields="multiActionFields"
+                          :action="action"
+                          :title="actionCheckTitle"
+                          :type="actionCheckType"
+                          :text="actionCheckText"
+                          primary-key="user_id"
+                          @succeed="listUsers"
+                          @failed="listUsers"
+        />
+
+
+        <BaseTabNav v-if="hasSelectedUser" class="user-info"
+                    :fill="false"
+                    :nav-tabs="tabs"
+                    :keep-alive="true"
+                    :is-footer-visible="false"
+                    :use-slot="true"
+        >
+            <template #info>
+                <b-card class="base first-tab">
+                    <BaseMultiPanel v-if="isMultiSelected"
+                                    :data="selectedUsers"
+                                    :data-fields="multiInfoFields"
+                    />
+                    <UserInfo v-else
+                              :user-data="selectedItems[0].data"
+                              @update="updateSelectedUserInfo"
+                    />
+                </b-card>
+            </template>
+        </BaseTabNav>
+        <div v-else class="empty">
+            <span class="msg">{{ tr('PANEL.NO_SELECT', [tr('USER')]) }}</span>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -148,15 +148,15 @@ export default {
         BaseMultiPanel,
         BaseModal,
         UserDetail,
-        ActionCheckModal
+        ActionCheckModal,
     },
-    data () {
+    data() {
         return {
             tabs: [
                 {
                     title: this.tr('PANEL.DETAILS'),
-                    key: 'info'
-                }
+                    key: 'info',
+                },
             ],
             users: [],
             selectedItems: [],
@@ -164,97 +164,107 @@ export default {
             totalCount: 0,
             isReadyForSearch: false,
             isLoading: true,
-            contextData: contextData,
-            query: { 
-                sort: {}, 
+            contextData,
+            query: {
+                sort: {},
                 page: {
-                    start: 1, 
-                    limit: 10
-                }, 
+                    start: 1,
+                    limit: 10,
+                },
                 filter: [],
-                filter_or: []
+                filter_or: [],
             },
             isCreateMode: true,
             action: null,
             actionCheckTitle: '',
             actionCheckType: '',
-            actionCheckText: ''
+            actionCheckText: '',
         };
     },
     computed: {
-        fields () {
+        fields() {
             return [
-                { key: 'selected', thStyle: { width: '50px' }},
-                { key: 'user_id', label: this.tr('COL_NM.ID'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
-                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
-                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
-                { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
-                { key: 'mobile', label: this.tr('COL_NM.PHONE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
-                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }},
-                { 
-                    key: 'language', 
-                    label: this.tr('COL_NM.LANGUAGE'), 
-                    sortable: true, 
-                    ajaxSortable: true , 
+                { key: 'selected', thStyle: { width: '50px' } },
+                {
+                    key: 'user_id', label: this.tr('COL_NM.ID'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' },
+                },
+                {
+                    key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' },
+                },
+                {
+                    key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' },
+                },
+                {
+                    key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' },
+                },
+                {
+                    key: 'mobile', label: this.tr('COL_NM.PHONE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' },
+                },
+                {
+                    key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' },
+                },
+                {
+                    key: 'language',
+                    label: this.tr('COL_NM.LANGUAGE'),
+                    sortable: true,
+                    ajaxSortable: true,
                     thStyle: { width: '200px' },
                     filterByFormatted: true,
-                    formatter: (val) => {
-                        return this.getLanguageName(val);
-                    }
+                    formatter: val => this.getLanguageName(val),
                 },
-                { key: 'timezone', label: this.tr('COL_NM.TIMEZONE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' }}
+                {
+                    key: 'timezone', label: this.tr('COL_NM.TIMEZONE'), sortable: true, ajaxSortable: true, thStyle: { width: '200px' },
+                },
             ];
         },
-        multiInfoFields () {
+        multiInfoFields() {
             return [
-                { key: 'user_id',label: this.tr('COL_NM.ID') },
+                { key: 'user_id', label: this.tr('COL_NM.ID') },
                 { key: 'name', label: this.tr('COL_NM.NAME') },
                 { key: 'email', label: this.tr('COL_NM.EMAIL') },
-                { key: 'group', label: this.tr('COL_NM.GROUP') }
+                { key: 'group', label: this.tr('COL_NM.GROUP') },
             ];
         },
-        multiActionFields () {
+        multiActionFields() {
             return [
-                { key: 'user_id',label: this.tr('COL_NM.ID') },
+                { key: 'user_id', label: this.tr('COL_NM.ID') },
                 { key: 'name', label: this.tr('COL_NM.NAME') },
-                { key: 'email', label: this.tr('COL_NM.EMAIL') }
+                { key: 'email', label: this.tr('COL_NM.EMAIL') },
             ];
         },
-        isMultiSelected () {
+        isMultiSelected() {
             return this.selectedItems.length > 1;
         },
-        hasSelectedUser () {
+        hasSelectedUser() {
             return this.selectedItems.length > 0;
         },
-        selectedUsers () {
-            return this.selectedItems.map((item) => {
-                return item.data;
-            });
-        }
+        selectedUsers() {
+            return this.selectedItems.map(item => item.data);
+        },
     },
-    mounted () {
+    mounted() {
         this.listUsers();
     },
     methods: {
-        reset () {
+        reset() {
             this.users = [];
             this.selectedItems = [];
             this.isLoading = true;
         },
-        setQuery (limit, start, sort, filter, filterOr) {
+        setQuery(limit, start, sort, filter, filterOr) {
             this.query.page.limit = limit || 10;
             this.query.page.start = start || 0;
             this.query.sort = sort || {};
             this.query.filter = filter || [];
             this.query.filter_or = filterOr || [];
         },
-        async listUsers (limit, start, sort, filter, filterOr) {
+        async listUsers(limit, start, sort, filter, filterOr) {
             this.reset();
             this.setQuery(limit, start, sort, filter, filterOr);
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/list', {
-                    query: this.query
+                    query: this.query,
                 });
                 this.users = res.data.results;
                 this.totalCount = res.data.total_count;
@@ -265,84 +275,84 @@ export default {
                 this.isLoading = false;
             }
         },
-        rowSelected (rows) {
+        rowSelected(rows) {
             this.selectedItems = rows;
         },
-        onAllRowSelected (isSelectedAll, rows) {
+        onAllRowSelected(isSelectedAll, rows) {
             this.selectedItems = rows;
         },
-        limitChanged (val) {
+        limitChanged(val) {
             this.query.page.limit = Number(val);
             this.listUsers();
         },
-        updateSelectedUserInfo (user) {
+        updateSelectedUserInfo(user) {
             this.selectedItems[0].data = user;
         },
-        updateUser (user) {
+        updateUser(user) {
             this.hideUserDetail();
             user.selected = true;
             this.selectedItems[0].data = user;
             this.$set(this.users, this.selectedItems[0].idx, user);
         },
-        createUser () {
+        createUser() {
             this.hideUserDetail();
             this.listUsers();
         },
-        getParams (items) {
-            let params = { users: []};
+        getParams(items) {
+            const params = { users: [] };
             items.map((item) => {
                 params.users.push(item.user_id);
             });
             return params;
         },
-        async deleteUser (commitItems) {
+        async deleteUser(commitItems) {
             await this.$axios.post('/identity/user/delete', this.getParams(commitItems));
         },
-        async enableUser (commitItems) {
+        async enableUser(commitItems) {
             await this.$axios.post('/identity/user/enable', this.getParams(commitItems));
         },
-        async disableUser (commitItems) {
+        async disableUser(commitItems) {
             await this.$axios.post('/identity/user/disable', this.getParams(commitItems));
         },
-        onClickAdd () {
+        onClickAdd() {
             this.isCreateMode = true;
             this.showUserDetail();
         },
-        onClickUpdate () {
+        onClickUpdate() {
             this.isCreateMode = false;
             this.showUserDetail();
         },
-        onClickDelete () {
+        onClickDelete() {
             this.action = this.deleteUser;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DELETE'), this.tr('USER')]);
             this.actionCheckType = 'danger';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DELETE'), this.tr('USER')]);
             this.showActionModal();
         },
-        onClickEnable () {
+        onClickEnable() {
             this.action = this.enableUser;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_ENABLE'), this.tr('USER')]);
             this.actionCheckType = 'warning';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_ENABLE'), this.tr('USER')]);
             this.showActionModal();
         },
-        onClickDisable () {
+        onClickDisable() {
             this.action = this.disableUser;
             this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DISABLE'), this.tr('USER')]);
             this.actionCheckType = 'warning';
             this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DISABLE'), this.tr('USER')]);
             this.showActionModal();
         },
-        showUserDetail () {
+        showUserDetail() {
             this.$refs.IDUS001_UserDetailModal.showModal();
         },
-        hideUserDetail () {
+        hideUserDetail() {
             this.$refs.IDUS001_UserDetailModal.hideModal();
         },
-        showActionModal () {
+        showActionModal() {
             this.$refs.IDUS001_ActionCheckModal.showModal();
-        }
-    }
+        },
+    },
 };
 </script>
 

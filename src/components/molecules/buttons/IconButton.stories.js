@@ -29,7 +29,7 @@ export const button = () => ({
     template: `
 <p-icon-button 
     @click="click"
-    :icon="icon"
+    name="ic_refresh"
     :dark="dark"
     :disabled="disabled"
     :iconStyle="iconStyle"

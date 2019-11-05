@@ -2,6 +2,11 @@
     <p-table
         :table-style-type="tableStyleType"
         :thead-style-type="theadStyleType"
+        :responsiveStyle="responsiveStyle"
+        :tableStyle="tableStyle"
+        :tbodyStyle="tbodyStyle"
+        :theadStyle="theadStyle"
+        :tfootStyle="tfootStyle"
         :striped="striped"
         :bord="bord"
         :hover="hover"
@@ -32,7 +37,7 @@
                         :key="index"
                         @click="theadClick(field,index,$event)"
                     >
-                        {{ field.name }}
+                        {{ field.label ? field.label : field.name }}
                         <template v-if="sortable">
                             <f-i
                                 v-if="sortable&&field.name==sortBy"
@@ -244,6 +249,7 @@ export default {
         }
     }
     tbody{
+        display: block;
         tr{
             &.tr-selected {
                 @extend %selected-row;
