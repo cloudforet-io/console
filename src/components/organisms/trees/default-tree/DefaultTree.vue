@@ -1,74 +1,64 @@
 <template>
     <div>
-        <div class="row no-gutters"  @click="contextMenuIsVisible=false">
-            <transition name="tree-trans" appear @before-enter="beforeEnter" @enter="enter">
+        <div class="row no-gutters" @click="contextMenuIsVisible=false">
+            <transition appear name="tree-trans" @before-enter="beforeEnter"
+                        @enter="enter"
+            >
                 <div v-if="showTree">
-                    <BaseDragVertical :total-width="'100vw'" :left-width="getLeftTreeWidth" :height="dragHeight">
+                    <vertical-layout>
                         <template #leftContainer="{ width }">
-                            <div @click.right="isRootClicked">
-                                <PTree ref="primeTree" :tree-data="treeData" :initial-tree-width="width"
-                                       @nodeclick="nodeclick"
-                                       @beforedrop="beforedrop"
-                                       @toggle="toggle"
-                                       @nodecontextmenu="nodecontextmenu">
+                            <div class="left-tree-panel"
+                                 id="rootPanel" @click.right.stop="isRootClicked">
+                                <PTree ref="primeTree"
+                                       :tree-data="treeData"
+                                       :initial-tree-width="width"
+                                       @nodeClick="nodeClicked"
+                                       @beforeDrop="beforeDropped"
+                                       @nodeToggle="nodeToggled"
+                                       @nodeContextMenu="showContextMenu">
                                     <template slot="icon" slot-scope="node">
-                                        <slot name="icon" v-bind="node"/>
+                                        <slot name="icon" v-bind="node" />
                                     </template>
                                 </PTree>
                             </div>
                         </template>
-                        <template #rightContainer="{ width }">
+                        <template #rightContainer>
                             <transition name="panel-trans">
-                                <div v-if="hasSelected" :key="getNodekeyComputed" class="panel"
-
-                                    :style="{ width: width }"
-                                >
+                                <div v-if="hasSelected" :key="getNodekeyComputed" class="panel">
                                     <slot name="treeSubPanel" />
                                 </div>
-                                <div
-                                    v-else
-                                    class="empty"
-                                >
+                                <div v-else class="empty">
                                     <span class="msg">Please, Click a item from left tree Panel.</span>
                                 </div>
                             </transition>
                         </template>
-                    </BaseDragVertical>
-
-                    <div
-                        v-show="contextMenuIsVisible"
-                        ref="contextmenu"
-                        class="contextmenu"
-                    >
-                        <slot name="contextMenu" />
+                    </vertical-layout>
+                    <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
+                        <slot name="context" v-bind="getCurrentNode" />
                     </div>
                 </div>
             </transition>
         </div>
-        <slot
-            v-if="useModalInAction"
-            name="modal"
-        />
     </div>
 </template>
 <script>
-import SlVueTree from 'sl-vue-tree';
-import { mapGetters } from 'vuex';
+import _ from 'lodash';
 import PTree from '@/components/molecules/tree/Tree';
-import BaseDragVertical from '@/components/base/drag/BaseDragVertical';
+import styles from '@/styles/_variables.scss';
 
+import VerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
 
 export default {
     name: 'DefaultTree',
     components: {
-        BaseDragVertical,
         PTree,
+        VerticalLayout,
     },
     mixins: [PTree],
     props: {
-        useDefaultContext: {
-            type: Boolean,
-            default: false,
+        vueTree: {
+            type: Object,
+            default: () => {},
         },
         useDefaultContextMSG: {
             type: Boolean,
@@ -90,10 +80,10 @@ export default {
             type: Number,
             default: 250,
         },
-
     },
     data() {
         return {
+            showContextFirst: false,
             selectedLeftWidth: 300,
             nodeKey: 0,
             hasSelected: false,
@@ -104,18 +94,23 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('layout', [
-            'headerHeight',
-        ]),
-        dragHeight() {
-            return self.innerHeight - this.headerHeight;
+        getCurrentNode() {
+            const node = this.getTree();
+            return this.isEmpty(node) ? null : node;
+        },
+        selectedTreeProp() {
+            let returnVal = this.treeProp;
+            if (this.isEmpty(returnVal)) {
+                returnVal = [{
+                    title: '!Please, Right Click me',
+                    isLeaf: true,
+                    init: true,
+                }];
+            }
+            return returnVal;
         },
         getNodekeyComputed() {
             return this.nodeKey;
-        },
-        getLeftTreeWidth() {
-            const keyName = `${this.$parent.$options.name}_treeWidth`;
-            return localStorage.hasOwnProperty(keyName) ? parseInt(localStorage[keyName]) : this.selectedLeftWidth;
         },
     },
     mounted() {
@@ -123,88 +118,74 @@ export default {
     },
     methods: {
         getTree() {
-            return this.$refs.slVueTree;
+            return this.isEmpty(this) ? null : _.get(this, '$refs.primeTree.$refs.slVueTree');
+        },
+        getNodeEl(node) {
+            return this.$refs.primeTree.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
         },
         isRootClicked(e) {
-            const actionObject = {
-                tree: this.getTree(),
+            this.preventEvent(e);
+            const treeV = this.getTree();
+            let selectedNode = treeV.getSelected();
+
+            this.contextMenuIsVisible = false;
+            if (!this.contextMenuIsVisible) {
+                if (this.isEmpty(selectedNode)) {
+                    const lastNode = treeV.getLastNode();
+                    treeV.select(lastNode.path, { addToSelection: false });
+                    selectedNode = treeV.getSelected()[0];
+                } else {
+                    selectedNode = selectedNode[0];
+                }
+                selectedNode.data.back_panel_click = true;
+            }
+
+            this.showContextMenu(selectedNode, e);
+            const actionObj = {
+                tree: treeV,
                 menuVisible: this.contextMenuIsVisible,
                 event: e,
             };
-            this.$emit('isRootAreaClicked', actionObject);
+            this.$emit('DTIsRootClicked', actionObj);
         },
         nodeClicked(node) {
-            if (this.clickedNode) {
-                this.removeClickedClass(this.clickedNode);
-            }
-            this.clickedNode = node;
-            this.addClickedClass(node);
-
             if (!node.data.hasOwnProperty('init')) {
                 this.nodeKey = (this.nodeKey !== node.data.id) ? node.data.id : this.nodeKey;
                 this.hasSelected = true;
-                this.$emit('nodeClicked', { node, treeV: this.$refs.slVueTree });
+                this.$emit('DTNodeClicked', node, this.getTree());
             } else {
                 this.hasSelected = false;
             }
         },
         nodeToggled(node) {
-            if (!node.isExpanded) {
-                this.setClickedNodeItem(node);
-                if (!node.data.is_cached) {
-                    this.$emit('nodeToggled', { node, treeV: this.$refs.slVueTree });
-                }
-            }
+            this.$emit('DTNodeToggled', node, this.getTree());
         },
-        setClickedNodeItem(node) {
-            let hasNoClickedItem = false;
-
-            if (this.clickedNode) {
-                hasNoClickedItem = node.path.some((path, i) => path !== this.clickedNode.path[i]);
-            } else {
-                hasNoClickedItem = true;
-            }
-
-            if (!hasNoClickedItem) {
-                const addClassInterval = setInterval(() => {
-                    if (this.addClickedClass(this.clickedNode)) {
-                        clearInterval(addClassInterval);
-                    }
-                }, 10);
-            }
-        },
-        getNodeEl(node) {
-            return this.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
-        },
-        addClickedClass(node) {
-            const elem = this.getNodeEl(node);
-            if (elem) {
-                elem.classList.add('sl-vue-node-clicked');
-                return true;
-            }
-            return false;
-        },
-        removeClickedClass(node) {
-            const elem = this.getNodeEl(node);
-            if (elem) {
-                elem.classList.remove('sl-vue-node-clicked');
-            }
+        beforeDropped(node, position, cancel) {
+            this.$emit('DTBeforeDropped', node, position, cancel, this.getTree());
         },
         showContextMenu(node, event, hasClicked) {
+            if (event.currentTarget.id !== 'rootPanel') {
+                node.data.back_panel_click = false;
+            }
+
             if (!hasClicked) {
                 event.preventDefault();
             }
-            this.emit('showContextMenu', node, event, hasClicked);
+            event.stopPropagation();
+
+            if (this.contextMenuIsVisible) {
+                this.contextMenuIsVisible = false;
+            }
+
+            this.$emit('DTContextVisible', node, event, hasClicked, this.getTree());
             this.contextMenuIsVisible = true;
             const $contextMenu = this.$refs.contextmenu;
             const coordinateX = event.clientX;
             const coordinateY = event.clientY;
-            this.$refs.slVueTree.select(node.path);
-            $contextMenu.style.left = (hasClicked) ? `${coordinateX - 128}px` : `${coordinateX}px`;
-            $contextMenu.style.top = `${coordinateY - this.headerHeight}px`;
-        },
-        beforeNodeDropped(node, position, cancel) {
-            this.emit('beforeNodeDropped', node, position, cancel);
+            this.getTree().select(node.path);
+
+            $contextMenu.style.left = `${coordinateX - parseFloat(styles.gnbWidth)}px`;
+            $contextMenu.style.top = `${coordinateY - parseFloat(styles.lnbHeight)}px`;
         },
         beforeEnter(el) {
             this.$velocity(el, {
@@ -222,11 +203,23 @@ export default {
                 });
             done();
         },
+        preventEvent(e, flag) {
+            if (this.isEmpty(flag)) {
+                e.stopPropagation();
+                e.preventDefault();
+            } else {
+                e.preventDefault();
+            }
+        },
     },
 };
 </script>
 
 <style lang="scss" scoped>
+    .left-tree-panel{
+        background: red !important;
+        background-color: red !important;
+    }
     .panel-trans-enter-active {
         transition: all .4s ease-in-out;
     }
@@ -234,47 +227,17 @@ export default {
         opacity: 0;
     }
 
-    $main-height: calc(100vh - #{$header-height} - 30px);
-
+    $main-height: calc(100vh - #{$lnb-height});
     .main-tree-col {
-        @extend %sheet;
-        border-radius: 0;
-        padding: 15px 8px;
-        background-color: $white;
         height: $main-height;
-        overflow: scroll;
-        .leaf-space {
-            display: inline-block;
-            width: 20px;
-        }
-        .item-icon {
-            display: inline-block;
-            text-align: center;
-            width: 20px;
-        }
-        .ellipsis {
-            padding: 0px 3px 0px 10px;
-            cursor: pointer;
-        }
     }
-
 
     .contextmenu {
         position: absolute;
-        background-color: $navy;
+        background-color: $secondary2;
         color: $lightgray;
         cursor: pointer;
         z-index: 99999;
-        border-radius: 5px;
-        box-shadow: 0 0 4px 0 rgba($black, 0.4);
-        > div {
-            padding: 6px 10px;
-            margin: 5px;
-            border-radius: 5px;
-            &:hover {
-                background-color: rgba($whiteblue, 0.15);
-            }
-        }
     }
 
     .panel {
