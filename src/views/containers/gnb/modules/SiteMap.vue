@@ -6,7 +6,9 @@
                           @click="show"
         >
             <template #buttonContents>
-                <f-i icon="fa-archive" />
+                <p-i name="ic_gnb_services" width="32px" height="32px"
+                     :color="`transparent ${iconColor}`"
+                />
             </template>
         </p-tooltip-button>
 
@@ -14,7 +16,7 @@
             <div class="title">
                 <p-button class="back-btn" @click="hide">
                     <template>
-                        <i class="p-icon p-i-ic_back" />
+                        <p-i name="ic_back" width="24px" height="24px" />
                     </template>
                 </p-button>
                 <span class="name">Services</span>
@@ -23,14 +25,22 @@
             <ul @click="hide">
                 <li>
                     <router-link class="group" to="/dashboard">
-                        <span class="icon"><i class="p-icon p-i-ic_dashboard" /></span>
+                        <span class="icon">
+                            <p-i name="ic_dashboard" width="24px" height="24px"
+                                 color="transparent inherit"
+                            />
+                        </span>
                         <span class="name">Dashboard</span>
                     </router-link>
                 </li>
 
                 <li>
                     <router-link class="group" to="/inventory">
-                        <span class="icon"><f-i icon="fa-archive" /></span>
+                        <span class="icon">
+                            <p-i name="ic_inventory" width="24px" height="24px"
+                                 color="transparent inherit"
+                            />
+                        </span>
                         <span class="name">Inventory</span>
                     </router-link>
                 </li>
@@ -54,7 +64,11 @@
 
                 <li>
                     <router-link class="group" to="/identity">
-                        <span class="icon"><f-i icon="fa-archive" /></span>
+                        <span class="icon">
+                            <p-i name="ic_identity" width="24px" height="24px"
+                                 color="transparent inherit"
+                            />
+                        </span>
                         <span class="name">Identity</span>
                     </router-link>
                 </li>
@@ -80,22 +94,22 @@
 </template>
 
 <script>
-import PTooltip from '@/components/molecules/tooltips/Tooltip';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton';
 import PButton from '@/components/atoms/buttons/Button';
-import FI from '@/components/atoms/icons/FI';
+import PI from '@/components/atoms/icons/PI';
+import styles from '@/styles/_variables.scss';
 
 export default {
     name: 'SiteMap',
     components: {
         PButton,
-        FI,
-        PTooltip,
+        PI,
         PTooltipButton,
     },
     data() {
         return {
             visible: false,
+            iconColor: styles.primary4,
         };
     },
     methods: {
@@ -147,9 +161,10 @@ export default {
             .back-btn {
                 padding: 0;
                 vertical-align: unset;
-                height: 24px;
                 min-width: 24px;
+                height: 24px;
                 border-radius: 2px;
+                border: 0px;
                 &:hover {
                     background-color: $primary3;
                 }
@@ -160,6 +175,9 @@ export default {
             cursor: pointer;
             &:hover {
                 background: $primary3;
+                .icon {
+                    color: $primary;
+                }
             }
             a {
                 display: block;
@@ -171,6 +189,7 @@ export default {
             padding: 1rem 1.75rem;
             font-size: 1rem;
             font-weight: bold;
+            vertical-align: middle;
             .name {
                 padding-left: 0.43rem;
             }

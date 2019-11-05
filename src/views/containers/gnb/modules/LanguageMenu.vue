@@ -5,7 +5,9 @@
                      @select="changeLanguage"
         >
             <template #contents>
-                <f-i icon="fa-archive" />
+                <p-i name="ic_gnb_language" width="32px" height="32px"
+                     :color="`transparent ${iconColor}`"
+                />
             </template>
         </p-menu-list>
     </div>
@@ -13,20 +15,22 @@
 
 <script>
 import { mapMutations, mapGetters } from 'vuex';
-import FI from '@/components/atoms/icons/FI';
+import PI from '@/components/atoms/icons/PI';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList';
 import { LANGUAGES } from '@/mixins/global-enums';
+import styles from '@/styles/_variables.scss';
 
 export default {
     name: 'LanguageMenu',
     components: {
-        FI,
+        PI,
         PMenuList,
     },
     data() {
         return {
             visible: false,
             languages: this.$i18n.availableLocales.map(lang => ({ key: lang, contents: LANGUAGES[lang] })),
+            iconColor: styles.primary4,
         };
     },
     computed: {

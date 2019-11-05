@@ -3,8 +3,8 @@
         <span class="menu service-group">
             {{ serviceGroup }}
         </span>
-        <span class="menu" >
-            <f-i icon="fa-chevron-right" icon-style="light"  />
+        <span v-if="services.length > 0" class="menu">
+            <f-i icon="fa-chevron-right" icon-style="light" />
         </span>
         <span
             v-for="service in services"

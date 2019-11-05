@@ -3,6 +3,7 @@ export default {
     state: {
         userId: localStorage.userId || null,
         locale: localStorage.locale || null,
+        domainId: sessionStorage.domainId || null,
     },
     mutations: {
         setUserId(state, value) {
@@ -13,9 +14,14 @@ export default {
             state.locale = value;
             localStorage.locale = value;
         },
+        setDomainId(state, value) {
+            state.locale = value;
+            sessionStorage.domainId = value;
+        },
     },
     getters: {
         userId: state => state.userId,
         locale: state => state.locale,
+        domainId: state => state.domainId,
     },
 };

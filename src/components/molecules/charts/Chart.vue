@@ -1,9 +1,66 @@
 <template>
-    <canvas ref="chart" :height="height" :width="width" />
+    <div class="chart-container"
+         :style="{
+             height: height,
+             width: width,
+         }"
+    >
+        <canvas ref="chart" class="canvas"
+                :style="{visibility: chart ? 'visible' : 'hidden'}"
+        />
+        <Spinner v-model="isLoading"
+                 :backdrop="true"
+                 class="loading-spinner"
+                 :style="{
+                     height: height,
+                     width: width,
+                 }"
+        />
+    </div>
 </template>
 
 <script>
+/**
+ * TODO:
+ * <CHILD COMPONENTS>
+ *
+ * 1. horizontal stacked bar (Servers by Type)
+ *      1) value(%) overlay
+ *      2) labels custom
+ *      3) height fix
+ * 2. horizontal bar (Servers by Type - sub categories)
+ *      1) border radius
+ *      2) label custom
+ *          a. label position
+ *          b. value position
+ * 3. donut chart (Server State)
+ *      1) label custom
+ *      2) center text
+ * 4. bubble chart (Resources by Region)
+ *      1) background
+ *      2) bubble position by data, by background
+ *      3) label custom
+ *          a. hovered label active
+ *          b. label position
+ *
+ */
+
+/**
+ * TODO:
+ * <COMPONENT'S FUNCTION>
+ *
+ *--- 1. lazy data loading with spinner
+ *
+ *--- 2. options, externals, plugins deep merge
+ *
+ *--- 3. auto update
+ *---      1) deeply update
+ *
+ */
+
+
 import Chart from 'chart.js';
+import Spinner from '@/components/base/spinner/BaseSpinner';
 
 const DefaultExternals = {
     moment: 'moment',
@@ -30,8 +87,15 @@ const DefaultOptions = {
 };
 
 export default {
-    name: 'BaseChart',
+    name: 'PChart',
+    components: {
+        Spinner,
+    },
     props: {
+        loading: {
+            type: Boolean,
+            default: true,
+        },
         type: {
             type: String,
             default: 'doughnut',
@@ -49,114 +113,92 @@ export default {
             default: () => ({}),
         },
         plugins: {
-            type: Array,
-            default: () => ([{}]),
+            type: Object,
+            default: () => ({}),
         },
         height: {
-            type: Number,
-            default: 100,
+            type: String,
+            default: '100%',
         },
         width: {
-            type: Number,
-            default: 150,
+            type: String,
+            default: '100%',
         },
     },
     data() {
         return {
             chart: null,
+            isMounted: false,
+            isLoading: this.loading,
         };
     },
     computed: {
+        ctx() {
+            return this.$refs.chart ? this.$refs.chart.getContext('2d') : null;
+        },
         chartExternals() {
-            return { ...DefaultExternals, ...this.externals };
+            return this._.merge({}, DefaultExternals, this.externals);
         },
         chartOptions() {
-            return { ...DefaultOptions, ...this.options };
+            return this._.merge({}, DefaultOptions, this.options);
         },
         chartPlugins() {
-            return [{
-                beforeDraw: this.beforeDraw,
-                beforeInit: this.beforeChartInit,
-            }, ...this.plugins];
+            return [this.plugins];
         },
-    },
-    mounted() {
-        this.drawChart();
-    },
-    methods: {
-        mergeChartOptions() {
-            return { ...DefaultOptions, ...this.options };
-        },
-        drawChart() {
-            const canvas = this.$refs.chart;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-                this.chart = new Chart(ctx, this.getChartConfig());
-            } else {
-                throw new Error('Browser does not support canvas.');
-            }
-        },
-        updateChart() {
-            Object.assign(this.chart, this.getChartConfig());
-            this.chart.update();
-        },
-        getChartConfig() {
+        chartConfig() {
             return {
                 type: this.type,
-                data: this.getChartData(),
+                data: this.data,
                 options: this.chartOptions,
                 plugins: this.chartPlugins,
                 externals: this.chartExternals,
             };
         },
-        getChartData() {
-            return this.data;
+    },
+    watch: {
+        loading(val) {
+            if (!val && this.isMounted) this.isLoading = false;
+            else this.isLoading = true;
         },
-        beforeDraw(chart) {
-            const { options } = chart;
-            if (options.centerText && options.centerText.display) {
-                this.drawCenterText(chart);
+        isMounted(val) {
+            if (val && !this.loading) this.isLoading = false;
+            else this.isLoading = true;
+        },
+        isLoading(val) {
+            if (!val) this.drawChart();
+        },
+    },
+    mounted() {
+        this.isMounted = true;
+    },
+    methods: {
+        drawChart() {
+            if (this.chart) this.$nextTick(() => this.updateChart());
+            else this.$nextTick(() => this.createChart());
+        },
+        createChart() {
+            if (this.ctx) {
+                this.chart = new Chart(this.ctx, this.chartConfig);
+            } else {
+                throw new Error('Browser does not support canvas.');
             }
         },
-        beforeChartInit(chart) {
-            const { options } = chart;
-            if (options.legendPad) {
-                this.setLegendPad(chart, options.legendPad);
-            }
-        },
-        setLegendPad(chart, padOptions) {
-            chart.legend.afterFit = function () {
-                this.height = this.height + (padOptions.bottom || 0);
-            };
-        },
-        drawCenterText(chart) {
-            const { ctx } = chart;
-            ctx.restore();
-            this.setCenterTextFont(ctx, chart);
-            this.setCenterTextLocation(ctx, chart);
-            ctx.save();
-        },
-        setCenterTextFont(ctx, chart) {
-            const fontSize = chart.options.centerText.fontSize || 16;
-            ctx.font = `${fontSize}px sans-serif`;
-            ctx.textBaseline = 'middle';
-        },
-        setCenterTextLocation(ctx, chart) {
-            const { top } = chart.chartArea;
-            const { bottom } = chart.chartArea;
-            const { right } = chart.chartArea;
-            const { left } = chart.chartArea;
-
-            const { text } = chart.options.centerText;
-            const textX = Math.round((left + right - ctx.measureText(text).width) / 2);
-            const textY = (bottom + top) / 2;
-
-            ctx.fillText(text, textX, textY);
+        updateChart() {
+            this.chart.data = this.data;
+            this.chart.options = this.chartOptions;
+            this.chart.update();
         },
     },
 };
 </script>
 
 <style lang="scss" scoped>
-
+    .chart-container {
+        position: relative;
+        .loading-spinner {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    }
 </style>

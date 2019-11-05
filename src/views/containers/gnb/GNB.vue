@@ -1,18 +1,19 @@
 <template>
     <ul class="menu-container">
-        <li>
+        <li class="logo">
             <p-tooltip contents="Dashboard"
                        :options="{offset: '8px'}"
+                       @click="hideSitemap"
             >
                 <template #target>
-                    <router-link class="logo" to="/dashboard">
-                        MZC
+                    <router-link to="/dashboard">
+                        <p-i name="btn_gnb_top-logo" width="56px" height="56px" />
                     </router-link>
                 </template>
             </p-tooltip>
         </li>
         <li>
-            <site-map />
+            <site-map ref="sitemap" />
         </li>
         <li class="menu-3">
             <language-menu />
@@ -25,6 +26,7 @@
 
 <script>
 import PTooltip from '@/components/molecules/tooltips/Tooltip';
+import PI from '@/components/atoms/icons/PI';
 import SiteMap from './modules/SiteMap';
 import LanguageMenu from './modules/LanguageMenu';
 import AccountMenu from './modules/AccountMenu';
@@ -32,7 +34,14 @@ import AccountMenu from './modules/AccountMenu';
 export default {
     name: 'GNB',
     components: {
-        PTooltip, SiteMap, LanguageMenu, AccountMenu,
+        PI, PTooltip, SiteMap, LanguageMenu, AccountMenu,
+    },
+    methods: {
+        hideSitemap() {
+            if (this.$refs.sitemap && this.$refs.sitemap.visible) {
+                this.$refs.sitemap.hide();
+            }
+        },
     },
 };
 </script>
@@ -57,19 +66,6 @@ export default {
         }
         &.menu-3 {
             flex-grow: 0;
-        }
-        .logo {
-            display: inline-block;
-            line-height: 40px;
-            text-align: center;
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            border-radius: 50%;
-            background-color: $white;
-            color: $primary;
-            font-size: 0.875rem;
-            font-weight: bold;
         }
     }
 }
