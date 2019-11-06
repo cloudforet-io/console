@@ -1,20 +1,25 @@
 <template>
-    <div class="form-row p-tag-input">
-        <p-input-text
-            class="tag-input tag-key-input"
-            :value="tagKey"
-            :disabled="disabled"
-            :placeholder="tagKeyPlaceholder"
-            @input="$emit('update:tagKey',$event)"
-        />
+    <div class="p-tag-input">
+        <div class="tag-input-box tag-key-input">
+            <p-input-text
+                class="tag-input"
+                :value="name"
+                :disabled="disabled"
+                :placeholder="tagKeyPlaceholder"
+                @input="$emit('update:name',$event)"
+            />
+        </div>
+
         <span class="tag-input-split">:</span>
-        <p-input-text
-            class="tag-input tag-value-input"
-            :value="tagValue"
-            :disabled="disabled"
-            :placeholder="tagValuePlaceholder"
-            @input="$emit('update:tagValue',$event)"
-        />
+        <div class="tag-input-box tag-value-input">
+            <p-input-text
+                class="tag-input"
+                :value="value"
+                :disabled="disabled"
+                :placeholder="tagValuePlaceholder"
+                @input="$emit('update:value',$event)"
+            />
+        </div>
     </div>
 </template>
 
@@ -25,8 +30,8 @@ export default {
     name: 'PTagInput',
     components: { PInputText },
     props: {
-        tagKey: String,
-        tagValue: String,
+        name: String,
+        value: String,
         tagKeyPlaceholder: String,
         tagValuePlaceholder: String,
         disabled: Boolean,
@@ -35,18 +40,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .p-tag-input{
+        display: inline-flex;
+    }
     .tag-input-split{
         font: 14px/28px Arial;
         padding-left: 0.125rem;
         padding-right: 0.125rem;
+        flex: none;
     }
-    .tag-input{
-
+    .tag-input-box{
+        background-color: #0f69ff;
+        border-color: #0f69ff;
         &.tag-key-input{
-            width: 7.5rem;
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: 7.5rem;
         }
         &.tag-value-input{
-            width: 15rem;
+            flex-grow: 2;
+            flex-shrink: 1;
+            flex-basis: 15rem;
         }
+    }
+    .tag-input{
+        width: 100%;
+        box-sizing: border-box;
     }
 </style>
