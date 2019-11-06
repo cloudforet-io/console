@@ -1,5 +1,5 @@
-import { action } from '@storybook/addon-actions';
 import _ from 'lodash';
+import { boolean } from '@storybook/addon-knobs/vue';
 import PTagInputGroup from './TagInputGroup';
 
 export default {
@@ -28,9 +28,10 @@ export const tagInputGroup = () => ({
 <div style="width: 80vw;">
 
 
-<PTagInputGroup :tags.sync="tags" >
+<PTagInputGroup :tags.sync="tags" :editMode="editMode" >
 
 </PTagInputGroup>
+<h6>tag binding</h6>
 <p>
 {{destructTags}}
 </p>
@@ -43,6 +44,43 @@ export const tagInputGroup = () => ({
     },
     methods: {
         ...actions,
+    },
+    props: {
+        editMode: {
+            default: boolean('editMode', false),
+        },
+    },
+    computed: {
+        destructTags() {
+            return _.toPairsIn(this.tags);
+        },
+    },
+});
+
+export const editMode = () => ({
+    components: { PTagInputGroup },
+    template: `
+<div style="width: 80vw;">
+<PTagInputGroup :tags.sync="tags" :editMode="editMode" >
+</PTagInputGroup>
+<h6>tag binding</h6>
+<p>
+{{destructTags}}
+</p>
+</div>
+`,
+    data() {
+        return {
+            ...data,
+        };
+    },
+    methods: {
+        ...actions,
+    },
+    props: {
+        editMode: {
+            default: boolean('editMode', true),
+        },
     },
     computed: {
         destructTags() {

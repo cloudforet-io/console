@@ -1,19 +1,30 @@
 <template>
     <div class="p-tag-input-group">
-        <form v-for="(tag,index) in destructTags" :key="index" class="form-inline">
-            <p-icon-button v-if="editMode" name="ic_delete" />
+        <div v-for="(tag,index) in destructTags" :key="index" class="tag-input-form change-form">
+            <p-icon-button v-if="editMode" class="delete-btn" name="ic_delete" />
+
             <p-tag-input
-                :tag-key="tag.key"
-                :tag-value="tag.value"
-                @upate:tag-key="updateTag(index,'key',$event )"
-                @update:tag-value="updateTag(index, 'value',$event)"
+                :name="tag.key"
+                :value="tag.value"
+                :disabled="!editMode"
+                @update:name="updateTag(index,'key',$event )"
+                @update:value="updateTag(index, 'value',$event)"
             />
-        </form>
-        <form class="form-inline">
-            <p-icon-button v-if="editMode" name="ic_delete" />
+        </div>
+        <div v-if="editMode" class="tag-input-form new-form">
+            <p-icon-button
+                class="delete-btn"
+                name="ic_delete"
+                @click="newTagReset"
+            />
             <p-tag-input tag-key="" />
-            <p-icon-button v-if="editMode" name="ic_pluse" />
-        </form>
+            <p-icon-button
+                class="add-btn"
+                button-style="dark"
+                name="ic_pluse"
+                @click="newTag"
+            />
+        </div>
     </div>
 </template>
 
@@ -48,17 +59,8 @@ export default {
             destructTags: destruct(this.tags),
         };
     },
-    // computed: {
-    //     get(index, position) {
-    //         return this.destructTags[index][position];
-    //     },
-    //     set() {
-    //
-    //     },
-    // },
     watch: {
         tags() {
-            debugger;
             if (this.tags !== mergeTags(this.destructTags)) {
                 this.destructTags = destruct(this.tags);
             }
@@ -66,32 +68,47 @@ export default {
     },
     methods: {
         updateTag(index, position, value) {
-            debugger;
             this.destructTags[index][position] = value;
             this.$emit('update:tags', mergeTags(this.destructTags));
         },
+        resetNewTag() {
+
+        },
     },
-    // watch: {
-    //     destructTags: {
-    //         handler(value) {
-    //             console.log(this.beforeTags, value);
-    //             if (this.beforeTags !== value) {
-    //                 this.$emit('update:tags', mergeTags(value));
-    //             }
-    //             this.beforeTags = value;
-    //         },
-    //     },
-    //     tags() {
-    //         this.destructTags = destruct(this.tags);
-    //     },
-    // },
 };
 </script>
 
 <style lang="scss" scoped>
-    .p-tag-input-group{
-        display: flex;
-        flex-wrap:  wrap;
-
-    }
+.p-tag-input-group{
+    display: flex;
+    flex-wrap:  wrap;
+    justify-content: space-between;
+}
+.form-row.p-tag-input{
+    display: inline-flex;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+.btn{
+    flex: none;
+}
+.add-btn{
+    margin-left: 0.5rem;
+}
+.p-tag-input{
+   flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+}
+.new-tag-input-form{
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+.tag-input-form{
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    flex-shrink: 1;
+    margin-bottom: 0.5rem;
+    margin-right: 2.5rem;
+}
 </style>
