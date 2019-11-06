@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { mapGetters } from 'vuex';
+import VueCookies from 'vue-cookies';
 import BootstrapVue from 'bootstrap-vue';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
@@ -11,8 +11,11 @@ import store from './store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
 import { Mixin } from '@/mixins/global-util';
+import config from '@/lib/config';
+import api from '@/lib/api';
 
 Vue.mixin(Mixin);
+Vue.use(VueCookies);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
@@ -34,13 +37,40 @@ new Vue({
     i18n,
     store,
     async created() {
-        await store.dispatch('loadConfig');
+        await config.init();
+        api.init(config.get('VUE_APP_API.ENDPOINT'), {
+            authError: (error) => {
+                store.dispatch('auth2/signOut');
+                // TODO: show popup (re-sign-in)
+                // router.push({ path: '/sign-in' }); -> before logic
+            },
+        });
+        Vue.prototype.$http = api.instance;
+        Vue.prototype.$axios = api.instance;
+
         store.dispatch('domain/sync');
         if (!store.getters['domain/id']) {
-            await store.dispatch('domain/load');
+            try {
+                await store.dispatch('domain/load');
+            } catch (e) {
+                // TODO: this.$router.push('/error-page');
+                // status : e.status
+                // message : e.message
+            }
         }
 
-        const next = window.location.pathname + window.location.search;
+        store.dispatch('auth2/sync');
+
+        // TODO: sign in process
+        // try {
+        //     await store.dispatch('auth2/signIn', {
+        //         user_id: 'admin',
+        //         password: 'admin',
+        //     });
+        // } catch (e) {
+        //     show notification (e.message)
+        //     store.dispatch('auth2/signOut');
+        // }
     },
     components: {
         App,

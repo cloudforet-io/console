@@ -36,6 +36,7 @@
     "v-tooltip": "^2.0.2",
     "velocity-animate": "^1.5.2",
     "lodash": "^4.17.15",
+    "jsonwebtoken": "^8.5.1",
     "vue": "^2.6.10",
     "vue-alertify": "^1.1.0",
     "vue-chartjs": "^3.4.2",
@@ -46,6 +47,7 @@
     "vue-lodash": "^2.0.2",
     "vue-router": "^3.0.2",
     "vue-search-select": "^2.8.3",
+    "vue-cookies": "^1.5.13",
     "vuex": "^3.1.1"
   },
   "devDependencies": {

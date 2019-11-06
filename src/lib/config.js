@@ -1,21 +1,12 @@
-import _ from 'lodash';
 import axios from 'axios';
+import _ from 'lodash';
 
 class Config {
     constructor() {
-        this.config = undefined;
+        this.config = null;
     }
 
-    async loadConfig(url) {
-        try {
-            const response = await this.axios.get(url);
-            return response.data;
-        } catch (e) {
-            return {};
-        }
-    }
-
-    async load() {
+    createAxiosInstance() {
         const axiosConfig = {
             baseURL: '/config',
             headers: {
@@ -23,26 +14,30 @@ class Config {
             },
         };
 
-        this.axios = axios.create(axiosConfig);
+        this.axiosInstance = axios.create(axiosConfig);
+    }
 
-        this.config = await this.loadConfig('/default.json');
-        _.merge(this.config, await this.loadConfig(`/${process.env.NODE_ENV}.json`));
+    async load(url) {
+        try {
+            const response = await this.axiosInstance.get(url);
+            this.config = { ...this.config, ...response.data };
+        } catch (e) {}
     }
 
     async init() {
         if (!this.config) {
-            console.log('==== init config ====');
-            await this.load();
-            console.log('==== async done ====');
+            this.createAxiosInstance();
+            this.config = {};
+            await this.load('/default.json');
+            await this.load(`/${process.env.NODE_ENV}.json`);
         }
     }
 
     get(key) {
-        const config = this.config || {};
         if (key) {
-            return _.get(config, key);
+            return _.get(this.config, key);
         } else {
-            return config;
+            return this.config;
         }
     }
 }

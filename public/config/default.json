@@ -1,4 +1,8 @@
 {
+  "SIGN_IN_URL": {
+    "default": "/sign-in",
+    "google_oauth2": "/google-sign-in"
+  },
   "VUE_APP_API": {
     "URL": "http://console-api.dev.pyengine.net"
   }

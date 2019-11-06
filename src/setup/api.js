@@ -6,7 +6,6 @@ let api = null;
 
 let config = {
     baseURL: '',
-    withCredentials: true,
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'

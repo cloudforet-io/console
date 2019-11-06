@@ -1,7 +1,7 @@
 import url from 'url';
 import { setApi, getApi } from '@/setup/api';
 import store from '@/store';
-import config from '@/lib/config';
+import api2 from '@/lib/api';
 
 const loginTypeEnum = Object.freeze({
     LOGOUT: null,
@@ -96,28 +96,28 @@ const checkDomain = (to, from, next, meta) => {
 };
 
 export const beforeEach = async (to, from, next) => {
-    if (store.getters['domain/id']) {
-        console.log(store.getters.config);
+    if (to.meta.excludeAuth !== true && !api2.checkAccessToken()) {
+        store.dispatch('auth2/signOut');
+    }
 
-        if (isNoApi) {
-            await setApi();
-            api = getApi();
-            isNoApi = false;
+    if (isNoApi) {
+        await setApi();
+        api = getApi();
+        isNoApi = false;
+    }
+
+    if (isFirstLogin === loginTypeEnum.LOGOUT) {
+        await getDomain();
+    }
+    for (let i = to.matched.length - 1; i > -1; i--) {
+        if (to.matched[i].meta.requiresAuth) {
+            checkAccessToken(to, from, next);
+            return;
         }
 
-        if (isFirstLogin === loginTypeEnum.LOGOUT) {
-            await getDomain();
-        }
-        for (let i = to.matched.length - 1; i > -1; i--) {
-            if (to.matched[i].meta.requiresAuth) {
-                checkAccessToken(to, from, next);
-                return;
-            }
-
-            if (to.matched[i].meta.requiresDomainCheck) {
-                checkDomain(to, from, next, to.matched[i].meta);
-                return;
-            }
+        if (to.matched[i].meta.requiresDomainCheck) {
+            checkDomain(to, from, next, to.matched[i].meta);
+            return;
         }
     }
 

@@ -27,31 +27,31 @@ const router = new VueRouter({
         {
             path: '/error-page',
             name: 'error',
-            meta: { label: '', requiresAuth: false, requiresDomainCheck: true },
+            meta: { label: '', excludeAuth: true },
             component: Redirect404,
         },
         {
             path: '/sign-in',
             name: 'signinn',
-            meta: { label: 'Sign In', requiresAuth: false, requiresDomainCheck: true },
+            meta: { label: 'Sign In', excludeAuth: true },
             component: SignIn,
         },
         {
             path: '/google-sign-in',
             name: 'Google-Oauth-signin',
-            meta: { label: 'google_oauth2', requiresAuth: false, requiresDomainCheck: true },
+            meta: { label: 'google_oauth2', excludeAuth: true },
             component: GoolgeSignIn,
         },
         {
             path: '/admin-sign-in',
             name: 'Admin-SignIn',
-            meta: { label: 'admin_sign', requiresAuth: false, requiresDomainCheck: true },
+            meta: { label: 'admin_sign', excludeAuth: true },
             component: Admin,
         },
         {
             path: '/',
             name: 'root',
-            meta: { label: 'root', requiresDomainCheck: true },
+            meta: { label: 'root' },
             redirect: '/dashboard',
             component: DefaultContainer,
             children: [
