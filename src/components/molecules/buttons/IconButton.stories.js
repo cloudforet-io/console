@@ -29,10 +29,11 @@ export const button = () => ({
     template: `
 <p-icon-button 
     @click="click"
-    :icon="icon"
+    name="ic_refresh"
     :dark="dark"
     :disabled="disabled"
     :iconStyle="iconStyle"
+    :buttonStyle="buttonStyle"
     :size="size"
     :animation="animation"
     :rotating="rotating"
@@ -41,6 +42,7 @@ export const button = () => ({
 
 </p-icon-button>`,
     props: {
+        ...autoProps(PIconButton),
         icon: {
             default: text('icon', 'fa-cog'),
         },
@@ -59,7 +61,9 @@ export const button = () => ({
         flip: {
             default: select('flip', [null, ...Object.keys(flipMapping)], null),
         },
-        ...autoProps(PIconButton),
+        buttonStyle: {
+            default: select('style', ['white', 'transparent', 'dark'], 'white'),
+        },
     },
     methods: {
         ...actions,

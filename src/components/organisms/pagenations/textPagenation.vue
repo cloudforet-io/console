@@ -1,14 +1,19 @@
 <template>
-    <nav>
+    <nav class="text-pagenation">
         <p-icon-button
-            icon="fa-angle-left"
+            name="ic_arrow_left"
             :disabled="thisPage === 1"
+            color="transparent inherit"
             @click="update(thisPage-1)"
         />
-        <span class="text-pagenation">{{ thisPage }}/{{ allPage }}</span>
+        <div class="page-number">
+            <div>{{ thisPage }}/{{ allPage }}</div>
+        </div>
+
         <p-icon-button
-            icon="fa-angle-right"
+            name="ic_arrow_right"
             :disabled="thisPage === allPage"
+            color="transparent inherit"
             @click="update(thisPage+1)"
         />
     </nav>
@@ -18,7 +23,7 @@ import PIconButton from '@/components/molecules/buttons/IconButton';
 
 export default {
     name: 'PTextButton',
-    components: { PIconButton },
+    components: { PIconButton,  },
     props: {
         thisPage: {
             type: Number,
@@ -44,9 +49,18 @@ export default {
 
 <style lang="scss" scoped>
     .text-pagenation{
-        display:inline-block;
+        display: inline-flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap:nowrap;
         min-width: 64px;
-        text-align: center;
+    }
+    .page-number{
+        display: inline-flex;
+        justify-content: center;
+        min-width: 64px;
+        min-height: 32px;
+        align-items: center;
     }
 
 </style>

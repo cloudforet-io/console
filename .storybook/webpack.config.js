@@ -14,7 +14,7 @@ module.exports = async ({ config, mode }) => {
                     loader: 'sass-loader',
                     options: {
                         data: `
-                        @import "~@/assets/style/_variables.scss";
+                        @import "~@/styles/_variables.scss";
                         `
 
                     }
@@ -24,8 +24,10 @@ module.exports = async ({ config, mode }) => {
         }
     );
     config.resolve.alias = {
+        node_modules: path.resolve('./node_modules'),
         'vue': 'vue/dist/vue.common.js',
         '@': path.resolve(__dirname, '../src'),
+        node_modules: path.resolve('./node_modules'),
     };
     config.module.rules.push({
         test: /\.vue$/,

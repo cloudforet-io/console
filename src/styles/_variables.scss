@@ -1,0 +1,137 @@
+/* ----- TEMPORARY VARIABLES ----- */
+$red: #d90039;
+$green: #2D9E6E;
+$orange: #FFAE08;
+
+$lightgray: #EEF0F3;
+$gray: #C9CFE0;
+$darkgray: #959BAf;
+
+$white: #fff;
+$whiteblue: lighten(#E7EAF3, 5%);
+$skyblue: #ECF1FE;
+$blue: #2C68F9;
+$violet: #8a2be2;
+$blueviolet: #4856f2;
+
+$navy: #0F2965;
+
+
+$gradient: linear-gradient(45deg, darken($blue, 15%) 10%, $blue 40%, $violet);
+$dark-gradient: linear-gradient(135deg, darken($blue, 10%) 30%, $violet);
+/* ------------------------------- */
+
+/* COLOR THEME */
+$black: #000000;
+$white: #FFFFFF;
+
+$primary: #5541B0;
+$primary-dark: #3C2C84;
+$primary1: #8185D1;
+$primary2: #A5ACCE;
+$primary3: #EBEAF6;
+$primary4: #F8F8FC;
+
+$secondary: #0080FB;
+$secondary1: #43BEFF;
+$secondary2: #F5F9FD;
+
+$dark: #222532;
+$gray: #858895;
+$gray1: #A7A9B2;
+$gray2: #DCDDE2;
+$gray3: #F2F2F2;
+
+$alert: #EF3817;
+$safe: #60B731;
+
+$other1: #FF7750;
+$other2: #FFCE02;
+$other3: #C2E01E;
+$other4: #3F7B1A;
+
+
+/* ----- TEMPORARY VARIABLES ----- */
+$success: $safe;
+$danger: $alert;
+$warning: $other2;
+$light: $gray1;
+$info: $primary-dark;
+/* ------------------------------- */
+
+/* FONT */
+$font-basic: arial, sans-serif;
+
+/* ----- TEMPORARY VARIABLES ----- */
+$font-big: sans-serif;
+/* ------------------------------- */
+
+/* SIZE */
+$gnb-width: 56px;
+$lnb-height: 40px;
+$fnb-height: 40px;
+
+/* ----- TEMPORARY VARIABLES ----- */
+$header-height: 50px;
+$sub-header-height: 35px;
+$total-header-height: calc(#{$header-height} + #{$sub-header-height});
+
+$side-pad: 15px;
+$top-pad: 15px;
+$bottom-pad: 10px;
+
+$border-radius: 7px;
+$box-shadow: 0px 0 10px 0px rgba($black, 0.1);
+/* ------------------------------- */
+
+/* STYLE */
+/* ----- TEMPORARY VARIABLES ----- */
+%box-shadow {
+  box-shadow: 0px 0 10px 0px rgba($black, 0.1);
+}
+%border-radius {
+  border-radius: 7px;
+}
+%sheet {
+  @extend %box-shadow;
+  @extend %border-radius;
+}
+/* ------------------------------- */
+
+
+
+:export {
+  /* COLORS */
+  black: $black;
+  white: $white;
+
+  primary: $primary;
+  primaryDark: $primary-dark;
+  primary1: $primary1;
+  primary2: $primary2;
+  primary3: $primary3;
+  primary4: $primary4;
+
+  secondary: $secondary;
+  secondary1: $secondary1;
+  secondary2: $secondary2;
+
+  dark: $dark;
+  gray: $gray;
+  gray1: $gray1;
+  gray2: $gray2;
+  gray3: $gray3;
+
+  alert: $alert;
+  safe: $safe;
+
+  other1: $other1;
+  other2: $other2;
+  other3: $other3;
+  other4: $other4;
+
+  /* SIZE */
+  lnbHeight: $lnb-height;
+  gnbWidth: $gnb-width;
+  fnbHeight: $fnb-height;
+}

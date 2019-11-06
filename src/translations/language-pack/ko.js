@@ -101,6 +101,17 @@ export const ko = {
         UPDATE_SEL: '선택객체 갱신',
         DELETE_SEL: '선택객체 삭제',
         REPO: 'Repository',
+        BASE_INFO: '기본 정보',
+        DETAILS: '세부 항목',
+        DATA: '데이터',
+        RAWDATA: 'Raw Data',
+        ADMIN: '관리자',
+        JOBS: '잡(Jobs)',
+        NO_ITEM: '{0} 없음',
+        SCHEDULE: '스케줄',
+        NO_SELECT: '위에서 {0} 을(를) 선택하세요.',
+        LOCAL: 'Local',
+        OFFICIAL: 'Official',
         LIST: '목록',
     },
     ATOM: {
@@ -113,9 +124,11 @@ export const ko = {
         CREATE_ARG: '{0} 생성',
         UPDATE_ARG: '{0} 갱신',
         DELETE_ARG: '{0} 삭제',
+        CLICK_RIGHT: '좌측 패널의 아이템을 클릭해 주세요.'
     },
     IDENTITY: {
-
+        NO_PROJECT_SEL: '프로젝트를 선택해주십시오.',
+        NO_PROJECT_SEL_DT: '왼쪽 트리 패널의 아이템을 클릭 하세요.',
     },
     INVENTORY: {
 

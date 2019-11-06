@@ -1,187 +1,190 @@
 <template>
-  <div>
-    <b-form @reset.prevent="onReset" 
-            @submit.prevent="onSubmit"
-    >
-      <b-row>
-        <b-col cols="6">
-          <BaseField v-model="userId" 
-                     :plaintext="!creatable" 
-                     :state="validateUserId"
-                     :label="`${tr('USER.ID')} : `"
-                     :label-cols="3"
-                     :placeholder="tr('USER.ID')"
-                     autocomplete="off"
-                     required
-                     :description="isLocalUser ? tr('FORM.INVALID.LENGTH', [tr('USER.ID'), 5, 12]) : null"
-                     :valid-message="tr('FORM.VALID.AVAIL')"
-                     :invalid-message="getUserValidMessage()"
-                     @input="changedUserId"
-          >
-            <template v-if="creatable" #append>
-              <b-button v-if="isLocalUser" variant="light"
-                        :disabled="!validateUserIdLength"
-                        @click="checkIdAvailability"
-              >
-                {{ tr('BTN_AVAIL') }}
-              </b-button>
-              <b-button v-else variant="light"
-                        @click="findUser"
-              >
-                {{ tr('BTN_FIND') }}
-              </b-button>
-            </template>
-          </BaseField>
+    <div>
+        <b-form @reset.prevent="onReset"
+                @submit.prevent="onSubmit"
+        >
+            <b-row>
+                <b-col cols="6">
+                    <BaseField v-model="userId"
+                               :plaintext="!creatable"
+                               :state="validateUserId"
+                               :label="`${tr('USER.ID')} : `"
+                               :label-cols="3"
+                               :placeholder="tr('USER.ID')"
+                               autocomplete="off"
+                               required
+                               :description="isLocalUser ? tr('FORM.INVALID.LENGTH', [tr('USER.ID'), 5, 12]) : null"
+                               :valid-message="tr('FORM.VALID.AVAIL')"
+                               :invalid-message="getUserValidMessage()"
+                               @input="changedUserId"
+                    >
+                        <template v-if="creatable" #append>
+                            <b-button v-if="isLocalUser" variant="light"
+                                      :disabled="!validateUserIdLength"
+                                      @click="checkIdAvailability"
+                            >
+                                {{ tr('BTN_AVAIL') }}
+                            </b-button>
+                            <b-button v-else variant="light"
+                                      @click="findUser"
+                            >
+                                {{ tr('BTN_FIND') }}
+                            </b-button>
+                        </template>
+                    </BaseField>
 
-          <BaseField v-if="creatable && isLocalUser" 
-                     v-model="password" 
-                     :state="validatePassword"
-                     type="password"
-                     :label="`${tr('USER.PWD')} : `"
-                     :label-cols="3"
-                     :placeholder="tr('USER.PWD')"
-                     autocomplete="new-password"
-                     required
-                     description="Your Password must be 5-12 characters long."
-                     valid-message="This is Good."
-                     invalid-message="Your Password must be 5-12 characters long."
-          />
+                    <BaseField v-if="creatable && isLocalUser"
+                               v-model="password"
+                               :state="validatePassword"
+                               type="password"
+                               :label="`${tr('USER.PWD')} : `"
+                               :label-cols="3"
+                               :placeholder="tr('USER.PWD')"
+                               autocomplete="new-password"
+                               required
+                               description="Your Password must be 5-12 characters long."
+                               valid-message="This is Good."
+                               invalid-message="Your Password must be 5-12 characters long."
+                    />
 
-          <BaseField v-if="creatable && isLocalUser" 
-                     v-model="passwordCheck" 
-                     :label="`${tr('USER.PWD_CHECK')} : `"
-                     :label-cols="3" 
-                     label-align="right"
-                     :placeholder="tr('USER.PWD_CHECK')"
-                     type="password"
-                     :state="validatePasswordCheck"
-                     invalid-message="Please check your Password again."
-          />
+                    <BaseField v-if="creatable && isLocalUser"
+                               v-model="passwordCheck"
+                               :label="`${tr('USER.PWD_CHECK')} : `"
+                               :label-cols="3"
+                               label-align="right"
+                               :placeholder="tr('USER.PWD_CHECK')"
+                               type="password"
+                               :state="validatePasswordCheck"
+                               invalid-message="Please check your Password again."
+                    />
 
-          <BaseField v-model="name" 
-                     :label="`${tr('USER.NAME')} : `"
-                     :label-cols="3" 
-                     :placeholder="tr('USER.NAME')"
-          />
+                    <BaseField v-model="name"
+                               :label="`${tr('USER.NAME')} : `"
+                               :label-cols="3"
+                               :placeholder="tr('USER.NAME')"
+                    />
 
-          <BaseField v-model="email" 
-                     :label="`${tr('USER.EMAIL')} : `"
-                     :label-cols="3"
-                     :placeholder="tr('USER.EMAIL')"
-          />
+                    <BaseField v-model="email"
+                               :label="`${tr('USER.EMAIL')} : `"
+                               :label-cols="3"
+                               :placeholder="tr('USER.EMAIL')"
+                    />
 
-          <BaseField v-model="mobile" 
-                     :label="`${tr('USER.PHONE')} : `"
-                     :label-cols="3"
-                     :placeholder="tr('USER.PHONE')"
-          />
+                    <BaseField v-model="mobile"
+                               :label="`${tr('USER.PHONE')} : `"
+                               :label-cols="3"
+                               :placeholder="tr('USER.PHONE')"
+                    />
 
-          <BaseField v-model="group" 
-                     :label="`${tr('USER.GROUP')} : `"
-                     :label-cols="3" 
-                     :placeholder="tr('USER.GROUP')"
-          />
+                    <BaseField v-model="group"
+                               :label="`${tr('USER.GROUP')} : `"
+                               :label-cols="3"
+                               :placeholder="tr('USER.GROUP')"
+                    />
 
-          <BaseField v-if="!creatable || !isLocalUser" 
-                     v-model="language" 
-                     :label="`${tr('USER.LANG')} : `"
-                     :label-cols="3"
-                     :field-cols="5"
-                     type="select"
-                     :options="languageList"
-                     :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
-          />
-    
+                    <BaseField v-if="!creatable || !isLocalUser"
+                               v-model="language"
+                               :label="`${tr('USER.LANG')} : `"
+                               :label-cols="3"
+                               :field-cols="5"
+                               type="select"
+                               :options="languageList"
+                               :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
+                    />
 
-          <BaseField v-if="!creatable || !isLocalUser" 
-                     v-model="timezone" 
-                     :label="`${tr('USER.TIME')} : `"
-                     :label-cols="3"
-                     :field-cols="9"
-                     type="select"
-                     :options="timezoneList"
-                     :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
-          />
-        </b-col>
-        <b-col cols="6">
-          <BaseField v-if="creatable && isLocalUser" 
-                     v-model="language" 
-                     :label="`${tr('USER.LANG')} : `"
-                     :label-cols="3"
-                     label-class="col-xl-2"
-                     :field-cols="5"
-                     type="select"
-                     :options="languageList"
-                     :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
-          />
-    
 
-          <BaseField v-if="creatable && isLocalUser" 
-                     v-model="timezone" 
-                     :label="`${tr('USER.TIME')} : `"
-                     :label-cols="3"
-                     label-class="col-xl-2"
-                     :field-cols="9"
-                     type="select"
-                     :options="timezoneList"
-                     :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
-          />
-          
-          <b-form-group :label="`${tr('TAG')} : `"
-                        :label-cols="3" :label-cols-xl="2"
-                        label-align="right"
-                        class="mt-4"
-          >
-            <b-col ref="IDUS002_BaseTagContainer" cols="10" class="tag-container p-0">
-              <BaseTag ref="IDUS002_BaseTag" 
-                       :tag-data="tags" 
-                       :show-first-tag-row="creatable ? true : false"
-                       editable
-                       @addedRow="onTagRowAdded"
-              />
-            </b-col>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col class="btn-box mt-5">
-          <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="primary">
-            {{ creatable ? tr('BTN_CRT') : tr('BTN_UPT') }}
-          </b-button>
-          <b-button class="float-right mb-1" size="md" 
-                    type="button" variant="outline-secondary"
-                    @click="onCancel"
-          >
-            {{ tr('BTN_CANCEL') }}
-          </b-button>
-          <b-button class="float-left mb-1" 
-                    size="md" 
-                    type="reset"
-                    variant="outline-secondary"
-          >
-            {{ tr('BTN_RESET') }}
-          </b-button>
-        </b-col>
-      </b-row>
-    </b-form>
+                    <BaseField v-if="!creatable || !isLocalUser"
+                               v-model="timezone"
+                               :label="`${tr('USER.TIME')} : `"
+                               :label-cols="3"
+                               :field-cols="9"
+                               type="select"
+                               :options="timezoneList"
+                               :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
+                    />
+                </b-col>
+                <b-col cols="6">
+                    <BaseField v-if="creatable && isLocalUser"
+                               v-model="language"
+                               :label="`${tr('USER.LANG')} : `"
+                               :label-cols="3"
+                               label-class="col-xl-2"
+                               :field-cols="5"
+                               type="select"
+                               :options="languageList"
+                               :placeholder="tr('FORM.SELECT', [tr('USER.LANG')])"
+                    />
 
-    <BaseSimpleModal
-      ref="IDUS002_CheckModal"
-      :title="noticeTitle"
-      :text="noticeText"
-      type="danger"
-      centered
-      sm
-      ok-only
-      @ok="onConfirmReset"
-    />
-  </div>
+
+                    <BaseField v-if="creatable && isLocalUser"
+                               v-model="timezone"
+                               :label="`${tr('USER.TIME')} : `"
+                               :label-cols="3"
+                               label-class="col-xl-2"
+                               :field-cols="9"
+                               type="select"
+                               :options="timezoneList"
+                               :placeholder="tr('FORM.SELECT', [tr('USER.TIME')])"
+                    />
+
+                    <b-form-group :label="`${tr('TAG')} : `"
+                                  :label-cols="3" :label-cols-xl="2"
+                                  label-align="right"
+                                  class="mt-4"
+                    >
+                        <b-col ref="IDUS002_BaseTagContainer" cols="10" class="tag-container p-0">
+                            <BaseTag ref="IDUS002_BaseTag"
+                                     :tag-data="tags"
+                                     :show-first-tag-row="creatable ? true : false"
+                                     editable
+                                     @addedRow="onTagRowAdded"
+                            />
+                        </b-col>
+                    </b-form-group>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col class="btn-box mt-5">
+                    <b-button class="float-right ml-3 mb-1" size="md" type="submit"
+                              variant="primary"
+                    >
+                        {{ creatable ? tr('BTN_CRT') : tr('BTN_UPT') }}
+                    </b-button>
+                    <b-button class="float-right mb-1" size="md"
+                              type="button" variant="outline-secondary"
+                              @click="onCancel"
+                    >
+                        {{ tr('BTN_CANCEL') }}
+                    </b-button>
+                    <b-button class="float-left mb-1"
+                              size="md"
+                              type="reset"
+                              variant="outline-secondary"
+                    >
+                        {{ tr('BTN_RESET') }}
+                    </b-button>
+                </b-col>
+            </b-row>
+        </b-form>
+
+        <BaseSimpleModal
+            ref="IDUS002_CheckModal"
+            :title="noticeTitle"
+            :text="noticeText"
+            type="danger"
+            centered
+            sm
+            ok-only
+            @ok="onConfirmReset"
+        />
+    </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import BaseTag from '@/components/base/tags/BaseTag.vue';
 import BaseField from '@/components/base/form/BaseField.vue';
+
 const BaseSimpleModal = () => import('@/components/base/modal/BaseSimpleModal.vue');
 const userModel = {
     user_id: null,
@@ -192,7 +195,7 @@ const userModel = {
     group: null,
     language: null,
     timezone: null,
-    tags: {}
+    tags: {},
 };
 
 export default {
@@ -201,19 +204,19 @@ export default {
     components: {
         BaseField,
         BaseTag,
-        BaseSimpleModal
+        BaseSimpleModal,
     },
     props: {
         userProp: {
             type: Object,
-            default: () => (userModel)
+            default: () => (userModel),
         },
         creatable: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
-    data () {
+    data() {
         return {
             userId: this.userProp.user_id, // required
             password: this.userProp.password, // required
@@ -227,65 +230,65 @@ export default {
             userIdUnique: null,
             showValidation: false,
             noticeTitle: '',
-            noticeText: ''
+            noticeText: '',
         };
     },
     computed: {
         ...mapGetters('auth', ['client_id']),
-        isLocalUser () {
+        isLocalUser() {
             return !(this.client_id);
         },
-        languageList () {
+        languageList() {
             return this.getLanguageSelectList();
         },
-        timezoneList () {
+        timezoneList() {
             return this.getTimezoneSelectList();
         },
-        tags () {
+        tags() {
             return this.dictToKeyValueArray(this.userProp.tags);
         },
-        validateUserIdLength () {
+        validateUserIdLength() {
             return this.validateLength(this.userId, this.showValidation, 5);
         },
-        validateUserIdUnique () {
+        validateUserIdUnique() {
             return this.userIdUnique;
         },
-        validateUserId () {
+        validateUserId() {
             if (!this.isLocalUser) {
                 return null;
             }
             if (this.validateUserIdLength === null) {
                 return null;
             }
-            return  !!(this.validateUserIdLength && this.validateUserIdUnique);
+            return !!(this.validateUserIdLength && this.validateUserIdUnique);
         },
-        validatePassword () {
+        validatePassword() {
             if (!this.creatable) {
                 return true;
             }
             return this.validateLength(this.password, this.showValidation, 5);
         },
-        validatePasswordCheck () {
+        validatePasswordCheck() {
             if (!this.creatable) {
                 return true;
             }
             return this.validateSameness(this.password, this.showValidation, this.passwordCheck);
         },
-        validated () {
-            return !!(this.validateUserId && 
-                        this.validatePassword && 
-                        this.validatePasswordCheck);
-        }
+        validated() {
+            return !!(this.validateUserId
+                        && this.validatePassword
+                        && this.validatePasswordCheck);
+        },
     },
     created() {
         this.init();
     },
     methods: {
-        init () {
+        init() {
             this.showValidation = false;
             this.resetUserData(this.userProp);
         },
-        onSubmit () {
+        onSubmit() {
             if (this.validate()) {
                 if (this.creatable) {
                     this.createUser();
@@ -296,10 +299,10 @@ export default {
                 this.$alertify.error('Validation Failed');
             }
         },
-        showCheckModal () {
+        showCheckModal() {
             this.$refs.IDUS002_CheckModal.showModal();
         },
-        async createUser () {
+        async createUser() {
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/create', this.getUserData());
@@ -310,7 +313,7 @@ export default {
                 this.$alertify.error(this.tr('ALERT.SUCCESS', [this.tr('CRT_CONT'), this.tr('USER')]));
             }
         },
-        async updateUser () {
+        async updateUser() {
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/update', this.getUserData());
@@ -321,11 +324,11 @@ export default {
                 this.$alertify.error(this.tr('ALERT.SUCCESS', [this.tr('UPT_CONT'), this.tr('USER')]));
             }
         },
-        async checkIdAvailability () {
+        async checkIdAvailability() {
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/list', {
-                    user_id: this.userId
+                    user_id: this.userId,
                 });
 
                 if (res.data.results.length === 0) {
@@ -337,11 +340,11 @@ export default {
                 console.error(e);
             }
         },
-        async findUser () {
+        async findUser() {
             let res = null;
             try {
                 res = await this.$axios.post('/identity/user/find', {
-                    keyword: this.userId
+                    keyword: this.userId,
                 });
                 if (res.data.results[0].state === 'UNIDENTIFIED') {
                     this.onFailFindUser();
@@ -353,30 +356,30 @@ export default {
                 this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('FIND_CONT'), this.tr('USER')]));
             }
         },
-        onFailFindUser () {
+        onFailFindUser() {
             this.noticeTitle = this.tr('USER.FIND.FAILED.TITLE');
             this.noticeText = this.tr('USER.FIND.FAILED.MISSING');
             this.showCheckModal();
         },
-        onReset () {
+        onReset() {
             this.noticeTitle = this.tr('BTN_RESET');
             this.noticeText = this.tr('FORM.CHECK.RESET');
             this.showCheckModal();
         },
-        onConfirmReset () {
+        onConfirmReset() {
             this.reset();
         },
-        reset () {
+        reset() {
             this.showValidation = false;
-            if (this.creatable) { 
-                this.resetUserData(userModel); 
-            } else { 
-                this.resetUserData(this.userProp); 
+            if (this.creatable) {
+                this.resetUserData(userModel);
+            } else {
+                this.resetUserData(this.userProp);
             }
         },
-        validate () {
+        validate() {
             this.showValidation = true;
-            
+
             let result = true;
             if (!this.$refs.IDUS002_BaseTag.validate()) {
                 result = false;
@@ -385,8 +388,8 @@ export default {
             if (this.isLocalUser && this.creatable && !this.validateUserId) {
                 if (this.creatable) {
                     this.userId = this.userId === null ? '' : this.userId;
-                } 
-                result = false;  
+                }
+                result = false;
             }
 
             if (this.isLocalUser && !this.validatePassword) {
@@ -394,7 +397,7 @@ export default {
                     this.password = this.password === null ? '' : this.password;
                 } else {
                     this.password = this.userProp.password;
-                } 
+                }
                 result = false;
             }
 
@@ -403,12 +406,12 @@ export default {
                     this.passwordCheck = this.passwordCheck === null ? '' : this.passwordCheck;
                 } else {
                     this.passwordCheck = '';
-                } 
+                }
                 result = false;
             }
             return result;
         },
-        resetInvalidFields () {
+        resetInvalidFields() {
             if (this.creatable) {
                 this.userId = this.userId === null ? '' : this.userId;
                 this.password = this.password === null ? '' : this.password;
@@ -419,13 +422,13 @@ export default {
                 this.passwordCheck = '';
             }
         },
-        onTagRowAdded () {
+        onTagRowAdded() {
             this.$refs.IDUS002_BaseTagContainer.scrollTop = this.$refs.IDUS002_BaseTagContainer.scrollHeight;
         },
-        changedUserId () {
+        changedUserId() {
             this.userIdUnique = null;
         },
-        getUserData () {
+        getUserData() {
             return {
                 user_id: this.userId,
                 password: this.password,
@@ -436,10 +439,10 @@ export default {
                 group: this.group,
                 language: this.language,
                 timezone: this.timezone,
-                tags: this.$refs.IDUS002_BaseTag.tags
+                tags: this.$refs.IDUS002_BaseTag.tags,
             };
         },
-        resetUserData (user) {
+        resetUserData(user) {
             this.userId = user.user_id;
             this.password = user.password;
             this.passwordCheck = null;
@@ -453,20 +456,20 @@ export default {
                 this.$refs.IDUS002_BaseTag.resetRows();
             }
         },
-        getUserValidMessage () {
+        getUserValidMessage() {
             if (!this.validateUserIdLength) {
                 return this.tr('FORM.INVALID.LENGTH', [this.tr('USER.ID'), 5, 12]);
-            } else if (this.validateUserIdUnique === null) {
+            } if (this.validateUserIdUnique === null) {
                 return this.tr('FORM.CHECK.AVAIL');
-            } else if (!this.validateUserIdUnique) {
+            } if (!this.validateUserIdUnique) {
                 return this.tr('USER.ID_DUPL');
             }
             return '';
         },
-        onCancel () {
+        onCancel() {
             this.$emit('cancel');
-        }
-    }
+        },
+    },
 };
 </script>
 
@@ -482,7 +485,7 @@ export default {
             border: 1px solid darken($lightgray, 5%);
             &:hover, &:focus {
                 box-shadow: 0 0 10px 1px rgba($blue, 0.5);
-            } 
+            }
         }
     }
 }

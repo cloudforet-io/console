@@ -1,0 +1,44 @@
+import { action } from '@storybook/addon-actions';
+import PTabBar from './TabBar';
+
+export default {
+    title: 'molecules/tabs/tabBar',
+    component: PTabBar,
+    parameters: {
+        info: {
+            summary: '',
+            components: { PTabBar },
+        },
+    },
+};
+const actions = {
+    changeTab: action('changeTab'),
+};
+const data = {
+    tabs: [
+        { name: 'detail', label: '디테일' },
+        { name: 'info', label: '정보' },
+        { name: 'tags', label: '태그' },
+    ],
+    activeTab: 'detail',
+};
+
+export const tabbar = () => ({
+    components: { PTabBar },
+    template: `
+<p-tab-bar 
+    :tabs="tabs" 
+    :activeTab.sync="activeTab"
+    @changeTab="changeTab"
+ /> 
+`,
+    data() {
+        return {
+            ...data,
+        };
+    },
+
+    methods: {
+        ...actions,
+    },
+});

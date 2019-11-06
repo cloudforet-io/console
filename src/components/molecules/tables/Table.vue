@@ -1,17 +1,18 @@
 <template>
-    <div :class="responsiveClassObject">
+    <div :class="responsiveClassObject" :style="responsiveStyle">
         <table
             class="table"
             :class="classObject"
+            :style="tableStyle"
         >
-            <thead :class="theadClassObject">
-                <slot name="head"></slot>
+            <thead :class="theadClassObject" :style="theadStyle">
+                <slot name="head" />
             </thead>
-            <tbody :class="theadClassObject">
-                <slot name="body"></slot>
+            <tbody :class="theadClassObject" :style="tbodyStyle">
+                <slot name="body" />
             </tbody>
-            <tfoot :class="theadClassObject">
-                <slot name="foot"></slot>
+            <tfoot :class="theadClassObject" :style="tfootStyle">
+                <slot name="foot" />
             </tfoot>
         </table>
     </div>
@@ -20,7 +21,7 @@
 <script>
 const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
 export default {
-    name: 'p-table',
+    name: 'PTable',
     props: {
         tableStyleType: {
             type: String,
@@ -35,6 +36,26 @@ export default {
             validator(value) {
                 return [null, 'light', 'dark'].indexOf(value) !== -1;
             },
+        },
+        responsiveStyle: {
+            type: Object,
+            default: null,
+        },
+        tableStyle: {
+            type: Object,
+            default: null,
+        },
+        theadStyle: {
+            type: Object,
+            default: null,
+        },
+        tbodyStyle: {
+            type: Object,
+            default: null,
+        },
+        tfootStyle: {
+            type: Object,
+            default: null,
         },
         striped: {
             type: Boolean,
@@ -112,6 +133,59 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    %row {
+        background-color: $white;
+    }
+    %hover{
+        background-color: $secondary2;
+    }
+    %striped-row {
+        background-color: $primary4;
+    }
+    %striped-hovered-row {
+        background-color: $secondary2;
+    }
+    .table{
+        border-collapse: separate;
+        border-spacing: 0;
+        thead{
+            tr{
+                th{
+                    position: sticky;
+                    top: 0;
+                    background-color: $gray3 ;
+                    border-top: 2px solid $gray2;
+                    border-bottom: 2px solid $gray2;
+                    text-align: left;
+                    font: Bold 14px/16px Arial;
+                    letter-spacing: 0;
+                    color: $gray1;
+                    height: 32px;
+                }
+            }
+        }
+        &.table-hover{
+            tbody tr:hover {
+                @extend %hover
+            }
+        }
+        tbody{
+            tr{
+                @extend %row;
+                td{
+                    vertical-align: middle;
+                }
+            }
+        }
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        @extend %striped-row;
+        &:hover {
+            @extend %striped-row;
+        }
+    }
+
 
 </style>

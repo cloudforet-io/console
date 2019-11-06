@@ -1,12 +1,20 @@
 <template>
-    <span v-tooltip="tooltipOptions">
+    <span v-tooltip="{
+              content: contents,
+              placement: position,
+              classes: ['p-tooltip'],
+              ...options,
+          }"
+          class="p-tooltip-target"
+          v-on="$listeners"
+    >
         <slot name="target" />
     </span>
 </template>
 
 <script>
 import { VTooltip } from 'v-tooltip';
-import TooltipOptions from './Tooltip.map';
+import TooltipMap from './Tooltip.map';
 
 export default {
     name: 'PTooltip',
@@ -18,52 +26,38 @@ export default {
         },
         position: {
             type: String,
-            default: 'auto',
+            default: 'right',
         },
         options: {
             type: Object,
             default: () => ({}),
-        },
-    },
-    data() {
-        return {
-            tooltipOptions: new TooltipOptions({
-                content: this.contents,
-                placement: this.position,
-                classes: ['p-tooltip'],
-                targetClasses: 'p-tooltip-target',
-                ...this.options,
-            }),
-        };
-    },
-    watch: {
-        contents(val) {
-            this.tooltipOptions.content = val;
-        },
-        position(val) {
-            console.log('position changed: ', val);
-            this.tooltipOptions.placement = val;
-        },
-    },
-    methods: {
-        show() {
-        },
-        hide() {
+            validator() {
+                /**
+                 * TODO: ADD VALIDATOR FUNCTION TO TOOLTIPMAP AND USE THAT HERE.
+                 */
+                return true;
+            },
         },
     },
 };
+
 </script>
 
 <style lang="scss">
+    $space: 8px;
+    .p-tooltip-target {
+        display: inline-block;
+    }
     .p-tooltip {
         display: block !important;
         z-index: 10000;
+        font-size: 0.75rem;
 
         .tooltip-inner {
             background: black;
             color: white;
-            border-radius: 16px;
-            padding: 5px 10px 4px;
+            border-radius: 0;
+            padding: 5px 8px;
         }
 
         .tooltip-arrow {
@@ -77,14 +71,14 @@ export default {
         }
 
         &[x-placement^="top"] {
-            margin-bottom: 5px;
+            margin-bottom: calc(#{$space} + 9px);
 
             .tooltip-arrow {
-                border-width: 5px 5px 0 5px;
+                border-width: 11px 7.5px 0 7.5px;
                 border-left-color: transparent !important;
                 border-right-color: transparent !important;
                 border-bottom-color: transparent !important;
-                bottom: -5px;
+                bottom: -9px;
                 left: calc(50% - 5px);
                 margin-top: 0;
                 margin-bottom: 0;
@@ -92,14 +86,14 @@ export default {
         }
 
         &[x-placement^="bottom"] {
-            margin-top: 5px;
+            margin-top: calc(#{$space} + 9px);
 
             .tooltip-arrow {
-                border-width: 0 5px 5px 5px;
+                border-width: 0 7.5px 11px 7.5px;
                 border-left-color: transparent !important;
                 border-right-color: transparent !important;
                 border-top-color: transparent !important;
-                top: -5px;
+                top: -9px;
                 left: calc(50% - 5px);
                 margin-top: 0;
                 margin-bottom: 0;
@@ -107,14 +101,14 @@ export default {
         }
 
         &[x-placement^="right"] {
-            margin-left: 5px;
+            margin-left: calc(#{$space} + 9px);
 
             .tooltip-arrow {
-                border-width: 5px 5px 5px 0;
+                border-width: 7.5px 11px 7.5px 0px;
                 border-left-color: transparent !important;
                 border-top-color: transparent !important;
                 border-bottom-color: transparent !important;
-                left: -5px;
+                left: -9px;
                 top: calc(50% - 5px);
                 margin-left: 0;
                 margin-right: 0;
@@ -122,14 +116,14 @@ export default {
         }
 
         &[x-placement^="left"] {
-            margin-right: 5px;
+            margin-right: calc(#{$space} + 9px);
 
             .tooltip-arrow {
-                border-width: 5px 0 5px 5px;
+                border-width: 11px 0 7.5px 7.5px;
                 border-top-color: transparent !important;
                 border-right-color: transparent !important;
                 border-bottom-color: transparent !important;
-                right: -5px;
+                right: -9px;
                 top: calc(50% - 5px);
                 margin-left: 0;
                 margin-right: 0;
@@ -137,11 +131,11 @@ export default {
         }
 
         &.popover {
-            $color: #f9f9f9;
+            $color: $dark;
 
             .popover-inner {
                 background: $color;
-                color: black;
+                color: $color;
                 padding: 24px;
                 border-radius: 5px;
                 box-shadow: 0 5px 30px rgba(black, .1);

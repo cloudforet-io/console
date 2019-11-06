@@ -101,6 +101,17 @@ export const en = {
         CREATE_LEAF: 'Create Leaf',
         UPDATE_SELECT: 'Update Selected',
         DELETE_SELECT: 'Delete Selected',
+        BASE_INFO: 'Base Information',
+        DETAILS: 'Details',
+        DATA: 'Data',
+        RAWDATA: 'Raw Data',
+        ADMIN: 'Admin',
+        JOBS: 'Jobs',
+        SCHEDULE: 'Schedules',
+        NO_ITEM: 'No {0}',
+        NO_SELECT: 'Select a {0} Above.',
+        LOCAL: 'Local',
+        OFFICIAL: 'OFFICIAL',
         LIST: 'List'
     },
     ATOM: {
@@ -113,12 +124,14 @@ export const en = {
         CREATE_ARG: 'Create {0}',
         UPDATE_ARG: 'Update {0}',
         DELETE_ARG: 'Delete {0}',
+        CLICK_RIGHT: 'Please, Click a item from left tree Panel.'
     },
     SIGNIN: {
         ROOT_CREDENTIALS: 'Sign-in using root account credentials',
     },
     IDENTITY: {
-
+        NO_PROJECT_SEL: 'No Selected Project',
+        NO_PROJECT_SEL_DT: 'Please, Click an item from left tree Panel.',
     },
     INVENTORY: {
 

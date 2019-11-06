@@ -1,5 +1,5 @@
 const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
-export default {
+export const mixin = {
     props: {
         styleType: {
             type: String,
@@ -16,14 +16,14 @@ export default {
             },
         },
     },
-    computed: {
-        classObject() {
-            if (this.styleType) {
-                return [`table-${this.styleType}`];
-            } if (this.background) {
-                return [`bg-${this.background}`];
-            }
-            return [];
-        },
-    },
+};
+
+export const getClass = (props) => {
+    const data = {};
+    if (props.styleType) {
+        data.class[`table-${props.styleType}`] = true;
+    } if (props.background) {
+        data.class[`bg-${props.background}`] = true;
+    }
+    return data;
 };

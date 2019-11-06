@@ -1,17 +1,17 @@
-import ListItem from './ListItem.vue';
+import PListItem from './ListItem';
 import { autoProps } from '@/setup/storybook-util';
 
 
 export default {
     title: 'Molecules/list-items',
-    component: ListItem,
+    component: PListItem,
 };
 
 
 export const defaultCase = () => ({
-    components: { 'p-list-item': ListItem },
+    components: { PListItem },
     props: {
-        ...autoProps(ListItem),
+        ...autoProps(PListItem),
     },
     template: '<p-list-item :contents="contents" :indent="indent"/>',
 });

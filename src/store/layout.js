@@ -1,19 +1,31 @@
 export default {
     namespaced: true,
     state: {
-        headerHeight: 50 + 35,
+        FNBVisible: true,
+        verticalLeftWidth: localStorage.verticalLeftWidth,
     },
     mutations: {
-        setHeaderHeight(state, { headerHeight }) {
-            state.headerHeight = headerHeight;
+        setFNBVisible(state, value) {
+            state.FNBVisible = value;
+        },
+        setVerticalLeftWidth(state, value) {
+            state.verticalLeftWidth = value;
         },
     },
     getters: {
-        headerHeight: state => state.headerHeight,
+        defaultFNB: state => state.FNBVisible,
+        verticalLeftWidth: state => state.verticalLeftWidth,
     },
     actions: {
-        setHeaderHeight({ commit }, { headerHeight }) {
-            commit('setHeaderHeight', { headerHeight });
+        showDefaultFNB({ commit }) {
+            commit('setFNBVisible', true);
+        },
+        hideDefaultFNB({ commit }) {
+            commit('setFNBVisible', false);
+        },
+        setVerticalLeftWidth({ commit }, value) {
+            commit('setVerticalLeftWidth', value);
+            localStorage.verticalLeftWidth = value;
         },
     },
 };

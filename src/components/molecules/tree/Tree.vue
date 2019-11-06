@@ -5,64 +5,76 @@
         class="main-tree-col"
         :allow-multiselect="useMultiSelect"
         :style="{ width: initialTreeWidth }"
-        @nodeclick="nodeclick"
-        @beforedrop="beforedrop"
-        @toggle="toggle"
-        @nodecontextmenu="nodecontextmenu"
-    >
+        @nodeclick="nodeClick"
+        @beforedrop="beforeDrop"
+        @toggle="nodeToggle"
+        @nodecontextmenu="nodeContextMenu">
         <template #title="{ node }">
-            <span v-if="node.data.init" class="fas fa-exclamation-triangle"/>
+            <span v-if="node.data.init" class="fas fa-exclamation-triangle" />
             <slot name="icon" v-bind="node">
                 <span v-if="!node.data.init" class="item-icon">
-                    <i v-if="node.isLeaf" class="fas fa-cube"/>
-                    <i v-else-if="node.isExpanded" class="fal fa-folder-open"/>
-                    <i v-else class="fal fa-folder-minus"/>
+                    <p-i v-if="node.isLeaf"
+                         :color="'transparent inherit'"
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_inventory'" />
+                    <p-i v-else-if="node.isExpanded"
+                         :color="'transparent inherit'"
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_tree_folder--opened'" />
+                    <p-i v-else
+                         :color="'transparent inherit'"
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_tree_folder'" />
                 </span>
             </slot>
             <span class="item-title">{{ node.title }}</span>
         </template>
         <template #toggle="{ node }">
-            <i v-if="node.isExpanded" class="fal fa-angle-down"/>
-            <i v-else class="fal fa-angle-right"/>
+            <p-i v-if="node.isExpanded"
+                 :color="'transparent inherit'"
+                 :width="'1rem'"
+                 :height="'1rem'"
+                 :name="'ic_tree_arrow--opened'" />
+            <p-i v-else
+                 :color="'transparent inherit'"
+                 :width="'1rem'"
+                 :height="'1rem'"
+                 :name="'ic_tree_arrow'" />
         </template>
     </sl-vue-tree>
 </template>
 
 <script>
-
 import SlVueTree from 'sl-vue-tree';
+import PI from '@/components/atoms/icons/PI';
 
 export default {
     name: 'PTree',
     events: [],
     components: {
+        PI,
         SlVueTree,
     },
     props: {
-        /**
-         *  Tree Node Data
-         */
+        /** Tree Node Data */
         treeData: {
             type: Array,
             default: () => [],
         },
-        /**
-         *  Initial Tree panel Width
-         */
+        /** Initial Tree panel Width */
         initialTreeWidth: {
             type: String,
             default: '300px',
         },
-        /**
-         *  Allow select multiple Nodes
-         */
+        /** Allow select multiple Nodes */
         useMultiSelect: {
             type: Boolean,
             default: true,
         },
-        /**
-         * Ues Y/N to user default Node icon on Tree
-         */
+        /** Ues Y/N to user default Node icon on Tree */
         useDefaultTreeIcon: {
             type: Boolean,
             default: true,
@@ -71,6 +83,7 @@ export default {
     data() {
         return {
             currentTreeData: null,
+            clickedNode: null,
         };
     },
     computed: {
@@ -91,39 +104,68 @@ export default {
             },
         },
     },
-    watch: {
-
-    },
     methods: {
-        nodeclick(node) {
-            this.$emit('nodeclick', node);
+        nodeClick(node) {
+            if (this.clickedNode) {
+                this.removeClickedClass(this.clickedNode);
+            }
+
+            this.clickedNode = node;
+            this.addClickedClass(node);
+
+            this.$emit('nodeClick', node);
         },
-        beforedrop(node, position, cancel) {
-            this.$emit('beforedrop', node, position, cancel);
+        beforeDrop(node, position, cancel) {
+            this.$emit('beforeDrop', node, position, cancel);
         },
-        toggle(node) {
+        nodeToggle(node) {
             if (!node.isExpanded) {
                 this.setClickedNodeItem(node);
                 if (!node.data.is_cached) {
-                    this.$emit('toggle', { node, treeV: this.$refs.slVueTree });
+                    this.$emit('nodeToggle', node);
                 }
             }
         },
-
-        nodecontextmenu(node, event, hasClicked) {
-            this.$emit('nodecontextmenu', node, event, hasClicked);
+        nodeContextMenu(node, event, hasClicked) {
+            this.$emit('nodeContextMenu', node, event, hasClicked);
+        },
+        setClickedNodeItem(node) {
+            let hasNoClickedItem = false;
+            if (this.clickedNode) {
+                hasNoClickedItem = node.path.some((path, i) => path !== this.clickedNode.path[i]);
+            } else {
+                hasNoClickedItem = true;
+            }
+            if (!hasNoClickedItem) {
+                const addClassInterval = setInterval(() => {
+                    if (this.addClickedClass(this.clickedNode)) {
+                        clearInterval(addClassInterval);
+                    }
+                }, 10);
+            }
+        },
+        getNodeEl(node) {
+            return this.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
+        },
+        addClickedClass(node) {
+            const elem = this.getNodeEl(node);
+            if (elem) {
+                elem.classList.add('sl-vue-node-clicked');
+                return true;
+            }
+            return false;
+        },
+        removeClickedClass(node) {
+            const elem = this.getNodeEl(node);
+            if (elem) {
+                elem.classList.remove('sl-vue-node-clicked');
+            }
         },
     },
 };
 </script>
 
 <style lang="scss" scoped>
-    .panel-trans-enter-active {
-        transition: all .4s ease-in-out;
-    }
-    .panel-trans-enter {
-        opacity: 0;
-    }
 
     $main-height: calc(100vh - #{$header-height} - 30px);
 
@@ -131,7 +173,7 @@ export default {
     @extend %sheet;
         border-radius: 0;
         padding: 15px 8px;
-        background-color: $white;
+        background-color: $primary4;
         height: $main-height;
         overflow: scroll;
     .leaf-space {
@@ -149,36 +191,4 @@ export default {
     }
     }
 
-
-    .contextmenu {
-        position: absolute;
-        background-color: $navy;
-        color: $lightgray;
-        cursor: pointer;
-        z-index: 99999;
-        border-radius: 5px;
-        box-shadow: 0 0 4px 0 rgba($black, 0.4);
-    > div {
-        padding: 6px 10px;
-        margin: 5px;
-        border-radius: 5px;
-    &:hover {
-         background-color: rgba($whiteblue, 0.15);
-     }
-    }
-    }
-
-    .panel {
-        padding: 50px $side-pad $bottom-pad $side-pad;
-    }
-    .empty {
-        text-align: left;
-        margin-top: 20px;
-    .msg {
-        color: $darkgray;
-        font-size: 1.3rem;
-        font-weight: 600;
-    }
-
-    }
 </style>

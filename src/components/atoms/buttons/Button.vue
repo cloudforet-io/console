@@ -1,141 +1,122 @@
-<template>
-    <button
-        type="button"
-        :class="classObject"
-        @click="onClick"
-    >
-        <slot />
-    </button>
-</template>
-
 <script>
+import ButtonMixin from '@/components/atoms/buttons/ButtonMixin';
+import { getBindClass } from '@/components/atoms/utils/functional';
 export default {
     name: 'PButton',
-    events: ['click'],
-    props: {
-        forceClass: {
-            type: Array,
-            default: null,
-        },
-        /** @type {string} */
-        href: {
-            type: String,
-            default: null,
-        },
-        /** @type {boolean} */
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        /** @type {boolean} */
-        outline: {
-            type: Boolean,
-            default: false,
-        },
-        /** @type {string} */
-        styleType: {
-            type: String,
-            default: null,
-            validator(value) {
-                return [
-                    null,
-                    'primary',
-                    'secondary',
-                    'success',
-                    'danger',
-                    'warning',
-                    'info',
-                    'light',
-                    'dark',
-                ].indexOf(value) !== -1;
+    functional: true,
+    mixins: [ButtonMixin],
+    render(h, {
+        props, listeners, children, data,
+    }) {
+        function getClass() {
+            if (!props.forceClass) {
+                const cls = {
+                    btn: true,
+                    disabled: props.disabled,
+                    'btn-block': props.block,
+                    'btn-link': props.link,
+                    ...getBindClass(data.class),
+                };
+                if (props.size) {
+                    cls[`btn-${props.size}`] = true;
+                }
+                if (!props.link && props.styleType) {
+                    cls[`btn${props.outline ? '-outline' : ''}-${props.styleType}`] = true;
+                }
+                return cls;
+            }
+            return props.forceClass;
+        }
+        return h('button', {
+            class: getClass(),
+            staticClass: data.staticClass,
+            staticStyle: data.staticStyle,
+            attrs: data.attrs,
+            style: data.style,
+            on: {
+                ...listeners,
+                click: (event) => {
+                    if (!props.disabled) {
+                        if (props.href != null && props.href.trim()) {
+                            window.open(props.href);
+                        }
+                        if (listeners.click) listeners.click(event);
+                    }
+                },
             },
         },
-        /** @type {boolean} */
-        link: {
-            type: Boolean,
-            default: false,
-        },
-        /** @type {boolean} */
-        block: {
-            type: Boolean,
-            default: false,
-        },
-        /** @type {string} */
-        size: {
-            type: String,
-            default: null,
-            validator(value) {
-                return [
-                    null,
-                    'sm',
-                    'lg',
-                ].indexOf(value) !== -1;
-            },
-        },
-        /** @type {string} */
-        shape: {
-            type: String,
-            default: null,
-            validator(value) {
-                return [
-                    null,
-                    'circle',
-                ].indexOf(value) !== -1;
-            },
-        },
-    },
-    computed: {
-        classObject() {
-            if (!this.forceClass) {
-                const obj = ['btn'];
-                obj.push({
-                    disabled: this.disabled,
-                    'btn-block': this.block,
-                });
-                if (this.style_class != null) {
-                    obj.push(this.style_class);
-                }
-                if (this.size) {
-                    obj.push(`btn-${this.size}`);
-                }
-                return obj;
-            }
-            return this.forceClass;
-        },
-        style_class() {
-            if (this.link) {
-                return 'btn-link';
-            } if (this.styleType) {
-                let prefix = 'btn-';
-                if (this.outline) {
-                    prefix += 'outline-';
-                }
-                return prefix + this.styleType;
-            }
-            return null;
-        },
-    },
-    methods: {
-        onClick(event) {
-            if (!this.disabled) {
-                if (this.href != null && this.href.trim()) {
-                    /**
-                         * TODO: Change it to use Vue outer
-                         * */
-                    this.self.location.href = this.href;
-                }
-                /**
-                     * button click event, only emit when disabled value is false
-                     * @event click
-                     * @type {MouseEvent}
-                     */
-                this.$emit('click', event);
-            }
-        },
+        children);
     },
 };
 </script>
 
-<style scoped>
+<style lang="scss">
 
+@mixin btn-color($theme, $color, $oposite-color) {
+    &.btn-#{$theme} {
+        background-color: $color;
+        background-repeat: no-repeat;
+        background-clip: padding-box;
+        border: 1px solid $color;
+        color: $oposite-color;
+        &:not(:disabled):not(.disabled):hover {
+            text-decoration: underline;
+            font-weight: bold;
+        }
+    }
+    &.btn-outline-#{$theme} {
+        border: 1px solid $color;
+        color: $color;
+        background-color: transparent;
+        &:not(:disabled):not(.disabled):hover {
+            background-color: $color;
+            background-repeat: no-repeat;
+            background-clip: padding-box;
+            font-weight: bold;
+            color: $oposite-color;
+            text-decoration: underline;
+        }
+    }
+}
+
+.btn{
+    border-radius: 2px;
+    opacity: 1;
+    min-width: 96px;
+    height: 32px;
+    text-align: center;
+    font: 14px/16px Arial;
+    letter-spacing: 0;
+
+    @include btn-color('primary', $primary, $white);
+    @include btn-color('secondary', $secondary,$white);
+    @include btn-color('light', $light, $white);
+    @include btn-color('danger', $danger, $white);
+    @include btn-color('success', $success, $white);
+    @include btn-color('warning', $warning, $white);
+    @include btn-color('dark', $dark, $white);
+    @include btn-color('info', $info, $white);
+
+    &.disabled{
+        background-color: $gray2;
+        background-repeat: no-repeat;
+        background-clip: padding-box;
+        border: 1px solid $gray3;
+        color: $gray1;}
+}
+.btn-lg{
+    min-width: 120px;
+    height: 40px;
+    text-align: center;
+    font-size: 16px/18px;
+}
+.btn-sm{
+    min-width: 52px;
+    height: 24px;
+    text-align: center;
+    font-size: 112px/14px;
+}
+.btn-block {
+    width: 100%;
+}
 </style>
