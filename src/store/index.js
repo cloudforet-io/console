@@ -5,11 +5,9 @@ import Vuex from 'vuex';
 import domain from './domain';
 import auth2 from './auth2';
 import auth from './auth';
-import header from './header';
-import layout from './layout';
-import page from './page';
 import layout from './layout';
 import user from './user';
+import page from './page';
 
 Vue.use(Vuex);
 const debug = process.env.NODE_ENV !== 'production';
@@ -19,11 +17,9 @@ export default new Vuex.Store({
         domain,
         auth,
         auth2,
-        header,
         layout,
         user,
         page,
     },
-    strict: debug
-
+    strict: debug,
 });
