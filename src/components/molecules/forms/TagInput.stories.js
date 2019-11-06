@@ -19,8 +19,9 @@ const data = {
 export const tagInput = () => ({
     components: { PTagInput },
     template: `
-<div>
-<p-tag-input 
+<div class="row" style="width: 80vw">
+<p-tag-input
+style="width: 100%" 
     :tagKey.sync="key" 
     :tagValue.sync="value" 
     :disabled="disabled"
@@ -28,6 +29,7 @@ export const tagInput = () => ({
     :tagValuePlaceholder="tagValuePlaceholder"
 ></p-tag-input>
 <p>{{key}} : {{value}}</p>
+
 </div>
 `,
     props: {
