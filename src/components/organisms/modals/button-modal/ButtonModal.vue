@@ -43,12 +43,12 @@
 import 'bootstrap';
 import PButton from '../../../atoms/buttons/Button';
 import PContentModal from '../content-modal/ContentModal';
-import methodsMixin from './ButtonModal.mixins';
+import buttonActionMixin from './ButtonModal.mixins';
 
 export default {
     name: 'PButtonModal',
     components: { PContentModal, PButton },
-    mixins: [PContentModal, methodsMixin],
+    mixins: [PContentModal, buttonActionMixin],
     events: ['close', 'cancel', 'confirm'],
     props: {
         headerTitle: {
@@ -79,10 +79,7 @@ export default {
                 styleType: 'primary',
             }),
         },
-        hideOnCancel: {
-            type: Boolean,
-            default: true,
-        },
+
 
     },
     computed: {

@@ -29,16 +29,20 @@
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
 import PModal from '@/components/molecules/modals/Modal';
-import { methodsMixin } from '@/components/organisms/modals/button-modal/ButtonModal.mixins';
+import buttonActionMixin from '@/components/organisms/modals/button-modal/ButtonModal.mixins';
 
 export default {
     name: 'PTableCheckModal',
     components: { PButtonModal, PDataTable },
-    mixins: [PModal, methodsMixin],
+    mixins: [PModal, buttonActionMixin],
     props: {
         themeColor: {
             type: String,
             default: 'primary',
+        },
+        hideOnCancel: {
+            type: Boolean,
+            default: true,
         },
         headerTitle: String,
         subTitle: String,
