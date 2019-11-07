@@ -1,4 +1,10 @@
-export const methodsMixin = {
+export default {
+    props: {
+        hideOnCancel: {
+            type: Boolean,
+            default: true,
+        },
+    },
     methods: {
         onCloseClick() {
             this.$emit('close');
