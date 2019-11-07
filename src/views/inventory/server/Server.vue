@@ -37,7 +37,7 @@
                 <b-dropdown-item @click="onClickDelete">
                   <div class="item sm">
                     <i class="icon fal fa-trash-alt" />
-                    <span class="name">{{ tr('BTN_DELETE') }}</span>
+                    <span class="name">{{ tr('COMMON.BTN_DELETE') }}</span>
                   </div>
                 </b-dropdown-item>
 
@@ -48,7 +48,7 @@
                     <i class="icon" 
                        :class="$root.enums['SERVER_STATE']['MAINTENANCE'].icon"
                     />
-                    <span class="name">{{ tr('BTN_S_MANT') }}</span>
+                    <span class="name">{{ tr('COMMON.BTN_S_MANT') }}</span>
                   </div>
                 </b-dropdown-item>
                 <b-dropdown-item @click="onClickSetInService">
@@ -56,7 +56,7 @@
                     <i class="icon"
                        :class="$root.enums['SERVER_STATE']['INSERVICE'].icon"
                     />
-                    <span class="name">{{ tr('BTN_S_SERV') }}</span>
+                    <span class="name">{{ tr('COMMON.BTN_S_SERV') }}</span>
                   </div>
                 </b-dropdown-item>
                 <b-dropdown-item @click="onClickSetClosed">
@@ -64,7 +64,7 @@
                     <i class="icon"
                        :class="$root.enums['SERVER_STATE']['CLOSED'].icon"
                     />
-                    <span class="name">{{ tr('BTN_S_CLOSE') }}</span>
+                    <span class="name">{{ tr('COMMON.BTN_S_CLOSE') }}</span>
                   </div>
                 </b-dropdown-item>
 
@@ -73,13 +73,13 @@
                 <b-dropdown-item @click="onClickChangeProject">
                   <div class="item sm">
                     <i class="icon fal fa-layer-group" />
-                    <span class="name">{{ tr('CHG_PRO') }}</span>
+                    <span class="name">{{ tr('COMMON.CHG_PRO') }}</span>
                   </div>
                 </b-dropdown-item>
                 <b-dropdown-item @click="onClickChangePool">
                   <div class="item sm">
                     <i class="icon fal fa-map-pin" />
-                    <span class="name">{{ tr('CHG_POOL') }}</span>
+                    <span class="name">{{ tr('COMMON.CHG_POOL') }}</span>
                   </div>
                 </b-dropdown-item>
 
@@ -88,7 +88,7 @@
                 <b-dropdown-item @click="onClickCollectInfo">
                   <div class="item sm">
                     <i class="icon fal fa-sync-alt" />
-                    <span class="name">{{ tr('COL_INFO') }}</span>
+                    <span class="name">{{ tr('COMMON.COL_INFO') }}</span>
                   </div>
                 </b-dropdown-item>
               </b-dropdown>
