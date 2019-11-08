@@ -32,7 +32,7 @@ const actions = {
 
 export const template = () => ({
     template: `
-    <div class="animated fadeIn">
+        <div class="animated fadeIn">
         <BaseDragHorizontal>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -57,9 +57,13 @@ export const template = () => ({
                             style-type="primary"
                             @click="clickAdd"
                         >
-                            <p-i name="ic_plus" color="transparent white" :fill="true" /> Create
+                            <p-i name="ic_plus" color="transparent white"
+                                 width="1.3rem" height="1.3rem" :fill="true"
+                            />
+                            Create
                         </p-button>
                         <p-dropdown
+                            id="user-dropdown-btn"
                             :menu="dropdown"
                             @click-update="clickUpdate"
                             @click-delete="clickDelete"
@@ -69,33 +73,16 @@ export const template = () => ({
                             Actions
                         </p-dropdown>
                     </template>
-                    <template slot="col-state" slot-scope="data">
+                    <template slot="col-state" slot-scope="{value}">
                         <p-td>
-                            {{ data.state }}
-                            <p-status
-                                v-if="data.state==='ENABLED'"
-                                icon="fa-circle"
-                                icon-style="solid"
-                                size="xs"
-                                text="enabled"
-                                icon-color="#60B731"
-                            />
-                            <p-status
-                                v-else
-                                icon="fa-circle"
-                                icon-style="solid"
-                                size="xs"
-                                text="disabled"
-                                icon-color="#EA390F"
-                                text-color="#EA390F"
-                            />
+                            <p-status v-bind="stateBind(value)" />
                         </p-td>
                     </template>
                 </p-toolbox-table>
             </template>
         </BaseDragHorizontal>
-        <div>
-            this is empty
+        <div id="empty-space">
+            Select a user above for details.
         </div>
     </div>`,
     components: {

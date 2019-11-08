@@ -40,26 +40,9 @@
                             Actions
                         </p-dropdown>
                     </template>
-                    <template slot="col-state" slot-scope="data">
+                    <template slot="col-state" slot-scope="{value}">
                         <p-td>
-                            <p-status
-                                    v-bind="stateBind(data.state)"
-                                v-if="data.state==='ENABLED'"
-                                icon="fa-circle"
-                                icon-style="solid"
-                                size="xs"
-                                text="enabled"
-                                icon-color="#60B731"
-                            />
-                            <p-status
-                                v-else
-                                icon="fa-circle"
-                                icon-style="solid"
-                                size="xs"
-                                text="disabled"
-                                icon-color="#EA390F"
-                                text-color="#EA390F"
-                            />
+                            <p-status v-bind="stateBind(value)" />
                         </p-td>
                     </template>
                 </p-toolbox-table>
@@ -79,6 +62,7 @@ import PButton from '@/components/atoms/buttons/Button';
 import PTd from '@/components/atoms/table/Td';
 import PI from '@/components/atoms/icons/PI';
 import PDropdown from '@/components/organisms/buttons/dropdown/Dropdown';
+import { safe, alert } from '@/styles/_variables.scss';
 
 export default {
     name: 'User',
@@ -144,11 +128,11 @@ export default {
             };
             if (state === 'ENABLED') {
                 obj.text = 'enabled';
-                obj.iconColor = '#60B731';
+                obj.iconColor = safe;
             } else {
                 obj.text = 'disabled';
-                obj.iconColor = '#60B731';
-                obj.iconColor = '#60B731';
+                obj.iconColor = alert;
+                obj.textColor = alert;
             }
             return obj;
         },
