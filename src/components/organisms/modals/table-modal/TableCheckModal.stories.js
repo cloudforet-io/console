@@ -1,28 +1,30 @@
-import { number, select } from '@storybook/addon-knobs/vue';
+import { number, select, text } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PContentModal from '../content-modal/ContentModal.vue';
-import PModal from '../../../molecules/modals/Modal.vue';
-import PButton from '../../../atoms/buttons/Button.vue';
-import PButtonModal from './ButtonModal.vue';
+import PModal from '../../../molecules/modals/Modal';
+import PButton from '../../../atoms/buttons/Button';
+import PTableCheckModel from './TableCheckModal';
 import { autoProps } from '../../../../setup/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 
 export default {
-    title: 'organisms/modals/button-modal',
-    component: PButtonModal,
+    title: 'organisms/modals/table-check-modal',
+    component: PTableCheckModel,
     parameters: {
         info: {
             summary: '',
-            components: { PButtonModal },
+            components: { PTableCheckModel },
         },
         centered: { disable: true },
     },
 };
 
 const data = {
-    visible: true,
+    fields: ['name', 'phone', 'email'],
+    sortable: true,
+    sortBy: null,
+    sortDesc: true,
 };
 
 const actions = {
@@ -34,18 +36,11 @@ const actions = {
 
 };
 
-const pbmProps = [
+const ptcmProps = [
     { name: 'headerTitle', default: 'this is title' },
-    { name: 'headerCloseButtonVisible' },
-    { name: 'footerCancelButtonVisible' },
-    { name: 'footerConfirmButtonVisible' },
-    { name: 'hideOnCancel' },
+    { name: 'subTitle', default: 'this is sub title' },
 ];
-const pcmProps = [
-    { name: 'headerVisible' },
-    { name: 'bodyVisible' },
-    { name: 'footerVisible' },
-];
+
 const pmProps = [
     { name: 'scrollable' },
     { name: 'centered' },
@@ -53,12 +48,34 @@ const pmProps = [
     { name: 'fade' },
     { name: 'keyboard' },
 ];
+
+const mockupMixin = {
+    methods: {
+        getUser() {
+            return {
+                name: faker.name.firstName(),
+                phone: faker.phone.phoneNumberFormat(),
+                email: faker.internet.email(),
+            };
+        },
+    },
+    computed: {
+        items() {
+            const data = [];
+            for (let step = 0; step < 5; step++) {
+                data.push(this.getUser());
+            }
+            return data;
+        },
+    },
+};
+
 export const modal = () => ({
-    components: { PButtonModal, PButton },
+    components: { PTableCheckModel, PButton },
     template: `
 <div>
 <p-button styleType="primary" @click="click">모달 띄우기</p-button>
-<p-button-modal
+<PTableCheckModel
     ref="modal"
     :scrollable="scrollable" 
     :centered="centered"
@@ -67,13 +84,10 @@ export const modal = () => ({
     :keyboard="keyboard"
     :backdrop="backdrop"
     :headerTitle="headerTitle"
-    :headerVisible="headerVisible"
-    :bodyVisible="bodyVisible"
-    :footerVisible="footerVisible"
-    :headerCloseButtonVisible="headerCloseButtonVisible"
-    :footerCancelButtonVisible="footerCancelButtonVisible"
-    :footerConfirmButtonVisible="footerConfirmButtonVisible"
-    :footerConfirmButtonBind="ConfirmButtonBind"
+    :subTitle="subTitle"
+    :fields="fields"
+    :items="items"
+    
     @shown="shown"
     @hidden="hidden"
     @cancel="cancel"
@@ -84,14 +98,13 @@ export const modal = () => ({
         <p>{{lorem}}</p> 
     </template>  
     
-</p-button-modal>
+</PTableCheckModel>
 </div>`,
     data() {
         return {
             ...data,
         };
     },
-
     props: {
         loremLength: {
             default: number('loremLength', 10, {
@@ -104,8 +117,12 @@ export const modal = () => ({
         okDisabled: {
             default: boolean('ok disabled', false),
         },
-        ...autoProps(PButtonModal, pbmProps),
-        ...autoProps(PContentModal, pcmProps),
+        headerTitle: {
+            default: text('header', 'this is header'),
+        },
+        subTitle: {
+            default: text('sub', 'sub Title'),
+        },
         ...autoProps(PModal, pmProps),
     },
     computed: {

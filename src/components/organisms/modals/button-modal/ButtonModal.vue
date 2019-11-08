@@ -1,33 +1,39 @@
 <template>
-    <p-content-modal v-bind="$props" @shown="onShown" @hidden="onHidden" ref="modal">
+    <p-content-modal ref="modal" v-bind="$props" @shown="onShown"
+                     @hidden="onHidden"
+    >
         <template #header>
             <slot name="header">
-                {{headerTitle}}
+                {{ headerTitle }}
             </slot>
-            <p-button :forceClass="['close']"
+            <p-button v-if="headerCloseButtonVisible"
+                      :force-class="['close']"
                       @click="onCloseClick"
-                      v-if="headerCloseButtonVisible">
+            >
                 <span aria-hidden="true">&times;</span>
             </p-button>
-
         </template>
         <template #body>
-            <slot name="body"></slot>
+            <slot name="body" />
         </template>
         <template #footer>
-            <slot name="footer"></slot>
+            <slot name="footer" />
             <p-button
                 v-if="footerCancelButtonVisible"
                 v-bind="footerCancelButtonBind"
                 @click="onCancelClick"
             >
-                <slot name="close-button">close</slot>
+                <slot name="close-button">
+                    close
+                </slot>
             </p-button>
             <p-button v-if="footerConfirmButtonVisible"
                       v-bind="footerConfirmButtonBind"
                       @click="onConfirmClick"
             >
-                <slot name="confirm-button">confirm</slot>
+                <slot name="confirm-button">
+                    confirm
+                </slot>
             </p-button>
         </template>
     </p-content-modal>
@@ -35,19 +41,15 @@
 
 <script>
 import 'bootstrap';
-import PButton from '../../../atoms/buttons/Button.vue';
-import PContentModal from '../content-modal/ContentModal.vue';
+import PButton from '../../../atoms/buttons/Button';
+import PContentModal from '../content-modal/ContentModal';
+import buttonActionMixin from './ButtonModal.mixins';
 
 export default {
-    name: 'p-button-modal',
-    mixins: [PContentModal],
+    name: 'PButtonModal',
     components: { PContentModal, PButton },
+    mixins: [PContentModal, buttonActionMixin],
     events: ['close', 'cancel', 'confirm'],
-    computed: {
-        modalElement() {
-            return this.$refs.modal.$children[0].$el;
-        },
-    },
     props: {
         headerTitle: {
             type: String,
@@ -77,27 +79,15 @@ export default {
                 styleType: 'primary',
             }),
         },
-        hideOnCancel: {
-            type: Boolean,
-            default: true,
-        },
+
 
     },
-    methods: {
-        onCloseClick() {
-            this.$emit('close');
-            this.hide();
-        },
-        onCancelClick() {
-            this.$emit('cancel');
-            if (this.hideOnCancel) {
-                this.hide();
-            }
-        },
-        onConfirmClick() {
-            this.$emit('confirm');
+    computed: {
+        modalElement() {
+            return this.$refs.modal.$children[0].$el;
         },
     },
+
 };
 </script>
 
