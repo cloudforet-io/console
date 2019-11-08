@@ -129,7 +129,7 @@ export default {
             const vm = this;
             const clientId = this.$store.getters['auth/client_id'];
 
-            gapi.load('auth2', () => {
+            gapi.load('auth', () => {
                 const auth2 = gapi.auth2.init({
                     client_id: clientId,
                     fetch_basic_profile: false,
@@ -184,7 +184,7 @@ export default {
             });
         },
         async setTimeZone() {
-            await this.$axios.post('identity/user/get', {
+            await this.$http.post('identity/user/get', {
                 user_id: this.loginId,
                 domainId: sessionStorage.getItem('domainId'),
             }).then((response) => {

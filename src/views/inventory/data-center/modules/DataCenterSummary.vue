@@ -165,7 +165,7 @@ export default {
                 url = '/inventory/pool/get';
                 param['pool_id'] = selectedNode.data.id;
             }
-            await this.$axios.post(url, param).then((response) => {
+            await this.$http.post(url, param).then((response) => {
                 if (!this.isEmpty(response.data)){
                     this.summaryData.id = response.data.hasOwnProperty('region_id') ? response.data.region_id : response.data.hasOwnProperty('zone_id') ?  response.data.zone_id : response.data.pool_id;
                     this.summaryData.title =  response.data.name;

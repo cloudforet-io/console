@@ -1,20 +1,19 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-
 import { beforeEach } from './hooks';
 
 // Routes
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
 import identityRoute from '@/routes/identity/identity-route';
 import inventoryRoute from '@/routes/inventory/inventory-route';
+import DefaultContainer from '@/views/containers/DefaultContainer';
 
-import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 // Views
 import SignIn from '@/views/sign-in/local/Local';
 import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth';
 import Admin from '@/views/sign-in/admin/Admin';
 import Redirect404 from '@/views/common/404/Redirect404';
-
+import Init from '@/views/common/init/Init';
 
 Vue.use(VueRouter);
 
@@ -22,8 +21,14 @@ const router = new VueRouter({
     mode: 'history',
     hash: false,
     linkActiveClass: 'open active',
-    scrollBehavior: () => ({ y: 0 }),
+    //scrollBehavior: () => ({ y: 0 }),
     routes: [
+        {
+            path: '/init',
+            name: 'Init',
+            meta: { excludeAuth: true },
+            component: Init,
+        },
         {
             path: '/error-page',
             name: 'error',

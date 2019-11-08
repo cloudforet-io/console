@@ -287,13 +287,13 @@ export default {
             try {
                 this.reSetDatalist();
                 if (this.isEmpty(selectedVal) || selectedVal === 'OFFICIAL') {
-                    remoteRepo = await this.$axios.post('/repository/remote-repository/list', {
+                    remoteRepo = await this.$http.post('/repository/remote-repository/list', {
                         domain_id: sessionStorage.getItem('domainId'),
                     });
 
                     if (remoteRepo.data.total_count > 0) {
                         const repository_remote_id = remoteRepo.data.results[0].remote_repository_id;
-                        const gotPlugInList = await this.$axios.post('/repository/plugin/list', {
+                        const gotPlugInList = await this.$http.post('/repository/plugin/list', {
                             domain_id: sessionStorage.getItem('domainId'),
                             repository_id: repository_remote_id,
                             service_type: 'inventory.collector',
@@ -304,7 +304,7 @@ export default {
 
                             for (const [index, curItem] of plugInArr.entries()) {
                                 const newKey = this.replaceAll(curItem.plugin_id, '-', '_');
-                                const versionInfo = await this.$axios.post('/repository/plugin/get-versions', {
+                                const versionInfo = await this.$http.post('/repository/plugin/get-versions', {
                                     domain_id: sessionStorage.getItem('domainId'),
                                     plugin_id: curItem.plugin_id,
                                 });

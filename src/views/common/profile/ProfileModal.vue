@@ -150,7 +150,7 @@ export default {
         async updateUser() {
             let res = null;
             try {
-                res = await this.$axios.post('/identity/user/update', this.getUserForUpdate());
+                res = await this.$http.post('/identity/user/update', this.getUserForUpdate());
                 this.userData = res.data;
                 this.hideModal();
                 this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('PROFILE'), this.tr('UPT_PAST')]));
@@ -167,7 +167,7 @@ export default {
         async getUser() {
             let res = null;
             try {
-                res = await this.$axios.post('/identity/user/get', {
+                res = await this.$http.post('/identity/user/get', {
                     user_id: this.userId,
                 });
                 this.userData = res.data;

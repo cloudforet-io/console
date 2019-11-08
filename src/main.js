@@ -22,7 +22,7 @@ Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
 Vue.use(VueLodash, { name: 'lodash' });
 Vue.use(SvgIcon, {
-    tagName: 'svgicon',
+tagName: 'svgicon',
     classPrefix: 'p-i',
 });
 
@@ -41,44 +41,9 @@ new Vue({
     router,
     i18n,
     store,
-    async created() {
-        await config.init();
-        api.init(config.get('VUE_APP_API.ENDPOINT'), {
-            authError: (error) => {
-                store.dispatch('auth2/signOut');
-                // TODO: show popup (re-sign-in)
-                // router.push({ path: '/sign-in' }); -> before logic
-            },
-        });
-        Vue.prototype.$http = api.instance;
-        Vue.prototype.$axios = api.instance;
-
-        store.dispatch('domain/sync');
-        if (!store.getters['domain/id']) {
-            try {
-                await store.dispatch('domain/load');
-            } catch (e) {
-                // TODO: this.$router.push('/error-page');
-                // status : e.status
-                // message : e.message
-            }
-        }
-
-        store.dispatch('auth2/sync');
-
-        // TODO: sign in process
-        // try {
-        //     await store.dispatch('auth2/signIn', {
-        //         user_id: 'admin',
-        //         password: 'admin',
-        //     });
-        // } catch (e) {
-        //     show notification (e.message)
-        //     store.dispatch('auth2/signOut');
-        // }
-    },
     components: {
         App,
     },
     template: '<App/>',
 });
+export default Vue;

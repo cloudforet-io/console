@@ -259,7 +259,7 @@ export default {
         },
         async setStaticValueListByAjax () {
             try {
-                let res = await this.$axios[this.selectedKeyObj.ajax.method](
+                let res = await this.$http[this.selectedKeyObj.ajax.method](
                     this.selectedKeyObj.ajax.url,
                     this.selectedKeyObj.ajax.params || {}
                 );

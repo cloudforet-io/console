@@ -305,7 +305,7 @@ export default {
         async createUser() {
             let res = null;
             try {
-                res = await this.$axios.post('/identity/user/create', this.getUserData());
+                res = await this.$http.post('/identity/user/create', this.getUserData());
                 this.$emit('create', res.data);
                 this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('USER'), this.tr('CRT_PAST')]));
             } catch (e) {
@@ -316,7 +316,7 @@ export default {
         async updateUser() {
             let res = null;
             try {
-                res = await this.$axios.post('/identity/user/update', this.getUserData());
+                res = await this.$http.post('/identity/user/update', this.getUserData());
                 this.$emit('update', res.data);
                 this.$alertify.success(this.tr('ALERT.SUCCESS', [this.tr('USER'), this.tr('UPT_PAST')]));
             } catch (e) {
@@ -327,7 +327,7 @@ export default {
         async checkIdAvailability() {
             let res = null;
             try {
-                res = await this.$axios.post('/identity/user/list', {
+                res = await this.$http.post('/identity/user/list', {
                     user_id: this.userId,
                 });
 
@@ -343,7 +343,7 @@ export default {
         async findUser() {
             let res = null;
             try {
-                res = await this.$axios.post('/identity/user/find', {
+                res = await this.$http.post('/identity/user/find', {
                     keyword: this.userId,
                 });
                 if (res.data.results[0].state === 'UNIDENTIFIED') {
