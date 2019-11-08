@@ -1,0 +1,9 @@
+*.swp
+*.bak
+.git
+.gitignore
+.dockerignore
+.eslintrc.js
+node_modules
+test
+dist

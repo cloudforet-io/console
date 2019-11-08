@@ -1,0 +1,18 @@
+# Config
+public/config/environment.json
+
+# Logs
+npm-debug.log*
+
+# NPM
+node_modules/
+
+# Transpiled code
+dist
+
+# Dev tools
+.DS_Store
+.vscode
+.idea
+*.swp
+*.bak
