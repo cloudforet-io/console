@@ -168,7 +168,7 @@ export default {
             if (this.$refs.IVCO003_Tags.validate()) {
                 let res = null;
                 try {
-                    res = await this.$axios.post('/inventory/collector/update', {
+                    res = await this.$http.post('/inventory/collector/update', {
                         collector_id: this.collectorData.collector_id,
                         tags: this.$refs.IVCO003_Tags.tags
                     });

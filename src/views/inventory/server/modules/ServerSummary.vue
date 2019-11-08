@@ -187,7 +187,7 @@ export default {
             if (this.$refs.IVSV002_Tags.validate()) {
                 let res = null;
                 try {
-                    res = await this.$axios.post('/identity/server/update', {
+                    res = await this.$http.post('/identity/server/update', {
                         server_id: this.serverData.user_id,
                         tags: this.$refs.IVSV002_Tags.tags
                     });

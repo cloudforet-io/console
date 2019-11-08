@@ -305,7 +305,7 @@ export default {
             this.setQuery(limit, start, sort, filter, filterOr);
             let res = null;
             try {
-                res = await this.$axios.post('/inventory/collector/list', {
+                res = await this.$http.post('/inventory/collector/list', {
                     query: this.query
                 });
                 this.collectors = res.data.results;
@@ -355,13 +355,13 @@ export default {
             return !this.isEmpty(selectedTimeStamp) ? this.getDatefromTimeStamp(selectedTimeStamp.seconds, localStorage.getItem('timezone')) : '';
         },
         async deleteCollector (commitItems) {
-            await this.$axios.post('/inventory/collector/delete', this.getParams(commitItems));
+            await this.$http.post('/inventory/collector/delete', this.getParams(commitItems));
         },
         async enableCollector (commitItems) {
-            await this.$axios.post('/inventory/collector/enable', this.getParams(commitItems));
+            await this.$http.post('/inventory/collector/enable', this.getParams(commitItems));
         },
         async disableCollector (commitItems) {
-            await this.$axios.post('/inventory/collector/disable', this.getParams(commitItems));
+            await this.$http.post('/inventory/collector/disable', this.getParams(commitItems));
         },
         onClickAdd () {
             this.isCreateMode = true;

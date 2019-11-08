@@ -148,7 +148,7 @@ export default {
             this.selectedData = item;
         },
         async listDataCenter() {
-            await this.$axios.post('/inventory/data-center/tree', {
+            await this.$http.post('/inventory/data-center/tree', {
                 domain_id: sessionStorage.domainId,
                 item_type: 'ROOT',
                 sort: {
@@ -224,7 +224,7 @@ export default {
                 item_id: this._.get(nodeObj.node, 'data.id'),
                 domain_id: sessionStorage.domainId
             };
-            await this.$axios.post('/inventory/data-center/tree', param).then((response) => {
+            await this.$http.post('/inventory/data-center/tree', param).then((response) => {
                 childrenNode = this.getSelectedNodeArr(response.data.items, 'DATA_CENTER');
 
                 nodeObj.treeV.updateNode(path, { data: dataParam });
@@ -253,7 +253,7 @@ export default {
             if (param){
                 param['domain_id'] = sessionStorage.domainId;
                 param['is_root']= true;
-                await this.$axios.post('/inventory/region/create', param).then((response) => {
+                await this.$http.post('/inventory/region/create', param).then((response) => {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
                         const InitDTCenter = { id: responseData.region_id, item_type:'REGION', name: param.name };
@@ -279,7 +279,7 @@ export default {
                 param[key] = selected.data.id;
                 param['domain_id'] = sessionStorage.domainId;
 
-                await this.$axios.post(url, param).then((response) => {
+                await this.$http.post(url, param).then((response) => {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)){
                         const InitDTCenter = { id: flag === 'CZN' ?  responseData.zone_id : responseData.pool_id,
@@ -303,7 +303,7 @@ export default {
 
             if (!this.isEmpty(param)){
                 param[key] = itemId;
-                await this.$axios.post(url, param).then((response) => {
+                await this.$http.post(url, param).then((response) => {
                     if (response.data[key] === itemId) {
                         const treeV = items.tree;
                         const path = treeV.getSelected()[0].path;
@@ -325,7 +325,7 @@ export default {
             const key = `${itemType.toLowerCase()}_id`;
             let passParam = { domain_id: sessionStorage.domainId };
             passParam[key] = itemId;
-            await this.$axios.post(url, passParam).then((response) => {
+            await this.$http.post(url, passParam).then((response) => {
                 const responseData = response.data;
                 console.log(responseData);
                 if (this.isEmpty(responseData)){
@@ -359,7 +359,7 @@ export default {
             param[keySrouce] = fromItem.data.id;
             param[keyTo] = toItem.data.id;
 
-            await this.$axios.post(url, param).then((response) => {
+            await this.$http.post(url, param).then((response) => {
                 const responseData = response.data;
                 if (!this.isEmpty(responseData)){
                     console.log('Item successfully moved.', responseData);

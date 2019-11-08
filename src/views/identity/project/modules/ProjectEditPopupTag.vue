@@ -57,7 +57,7 @@ export default {
             if (this.isEmpty(this._.get(selected, 'data.init'))) {
                 const url = selected.data.item_type === 'PROJECT_GROUP' ? '/identity/project-group/get' : '/identity/project/get';
                 const param = selected.data.item_type === 'PROJECT_GROUP' ? { project_group_id: selected.data.id } : { project_id: selected.data.id };
-                await this.$axios.post(url, param).then((response) => {
+                await this.$http.post(url, param).then((response) => {
                     const selectedTags = response.data.tags;
                     if (!this.isEmpty(selectedTags)) {
                         this.selectedTag = selectedTags;

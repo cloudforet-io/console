@@ -58,7 +58,7 @@ export default {
                 const url = `/inventory/${selected.data.item_type.toLowerCase()}/get`;
                 const key = `${selected.data.item_type.toLowerCase()}_id`;
                 param[key] = selected.data.id;
-                await this.$axios.post(url, param).then((response) => {
+                await this.$http.post(url, param).then((response) => {
                     const selectedTags = response.data.tags;
                     if (!this.isEmpty(selectedTags)){
                         this.selectedTag = selectedTags;

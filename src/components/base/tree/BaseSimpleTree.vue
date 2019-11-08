@@ -81,7 +81,7 @@ export default {
         },
         async listRootItems() {
             try {
-                const res = await this.$axios.post(this.listUrl, {
+                const res = await this.$http.post(this.listUrl, {
                     item_type: 'ROOT',
                     sort: { key: 'name' },
                 });
@@ -92,7 +92,7 @@ export default {
         },
         async listNextLayerItems(node) {
             try {
-                const res = await this.$axios.post(this.listUrl, {
+                const res = await this.$http.post(this.listUrl, {
                     item_type: node.data.item_type,
                     item_id: node.data.id,
                     domain_id: sessionStorage.domainId,

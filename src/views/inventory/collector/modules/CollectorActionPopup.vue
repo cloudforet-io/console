@@ -213,7 +213,7 @@ export default {
         },
         async onDataCollect() {
             if (this.validateFilters()){
-                await this.$axios.post('/inventory/collector/collect', {
+                await this.$http.post('/inventory/collector/collect', {
                     collector_id: this.collector_id,
                     domain_id:  sessionStorage.getItem('domainId'),
                     filter: this.filterObject.filterInput,

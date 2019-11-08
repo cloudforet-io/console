@@ -2,9 +2,10 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+
 import domain from './domain';
-import auth2 from './auth2';
 import auth from './auth';
+import authOld from './authOld';
 import layout from './layout';
 import user from './user';
 import page from './page';
@@ -16,7 +17,7 @@ export default new Vuex.Store({
     modules: {
         domain,
         auth,
-        auth2,
+        authOld,
         layout,
         user,
         page,
