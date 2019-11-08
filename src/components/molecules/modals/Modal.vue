@@ -144,6 +144,11 @@ export default {
 };
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.modal-content{
+    border-radius: 2px;
+    background: $white 0% 0% no-repeat padding-box;
+    box-shadow: 0px 0px 16px #22253252;
+    border: 1px solid $gray3;
+}
 </style>

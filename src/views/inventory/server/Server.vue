@@ -20,7 +20,7 @@
                    @limitChanged="limitChanged"
         >
           <template #caption>
-            <b-button class="d-inline-block mr-3" 
+            <b-button class="d-inline-block mr-3"
                       variant="outline-primary"
             >
               Register
@@ -37,7 +37,7 @@
                 <b-dropdown-item @click="onClickDelete">
                   <div class="item sm">
                     <i class="icon fal fa-trash-alt" />
-                    <span class="name">{{ tr('BTN_DELETE') }}</span>
+                    <span class="name">{{ tr('COMMON.BTN_DELETE') }}</span>
                   </div>
                 </b-dropdown-item>
 
@@ -45,10 +45,10 @@
 
                 <b-dropdown-item @click="onClickSetMaintenance">
                   <div class="item sm">
-                    <i class="icon" 
+                    <i class="icon"
                        :class="$root.enums['SERVER_STATE']['MAINTENANCE'].icon"
                     />
-                    <span class="name">{{ tr('BTN_S_MANT') }}</span>
+                    <span class="name">{{ tr('COMMON.BTN_S_MANT') }}</span>
                   </div>
                 </b-dropdown-item>
                 <b-dropdown-item @click="onClickSetInService">
@@ -56,7 +56,7 @@
                     <i class="icon"
                        :class="$root.enums['SERVER_STATE']['INSERVICE'].icon"
                     />
-                    <span class="name">{{ tr('BTN_S_SERV') }}</span>
+                    <span class="name">{{ tr('COMMON.BTN_S_SERV') }}</span>
                   </div>
                 </b-dropdown-item>
                 <b-dropdown-item @click="onClickSetClosed">
@@ -64,7 +64,7 @@
                     <i class="icon"
                        :class="$root.enums['SERVER_STATE']['CLOSED'].icon"
                     />
-                    <span class="name">{{ tr('BTN_S_CLOSE') }}</span>
+                    <span class="name">{{ tr('COMMON.BTN_S_CLOSE') }}</span>
                   </div>
                 </b-dropdown-item>
 
@@ -73,13 +73,13 @@
                 <b-dropdown-item @click="onClickChangeProject">
                   <div class="item sm">
                     <i class="icon fal fa-layer-group" />
-                    <span class="name">{{ tr('CHG_PRO') }}</span>
+                    <span class="name">{{ tr('COMMON.CHG_PRO') }}</span>
                   </div>
                 </b-dropdown-item>
                 <b-dropdown-item @click="onClickChangePool">
                   <div class="item sm">
                     <i class="icon fal fa-map-pin" />
-                    <span class="name">{{ tr('CHG_POOL') }}</span>
+                    <span class="name">{{ tr('COMMON.CHG_POOL') }}</span>
                   </div>
                 </b-dropdown-item>
 
@@ -88,7 +88,7 @@
                 <b-dropdown-item @click="onClickCollectInfo">
                   <div class="item sm">
                     <i class="icon fal fa-sync-alt" />
-                    <span class="name">{{ tr('COL_INFO') }}</span>
+                    <span class="name">{{ tr('COMMON.COL_INFO') }}</span>
                   </div>
                 </b-dropdown-item>
               </b-dropdown>
@@ -105,8 +105,8 @@
       </template>
     </BaseDragHorizontal>
 
-    <ActionCheckModal ref="IDSV001_ActionCheckModal" 
-                      :data="selectedServers" 
+    <ActionCheckModal ref="IDSV001_ActionCheckModal"
+                      :data="selectedServers"
                       :fields="multiInfoFields"
                       :action="action"
                       :title="actionCheckTitle"
@@ -148,17 +148,17 @@
 
       <template v-if="actionCheckCase !== 'basic'" #footer="{ ok, cancel }">
         <div class="footer">
-          <b-button class="float-right ml-1 mb-1" 
-                    size="sm" 
-                    type="button" 
+          <b-button class="float-right ml-1 mb-1"
+                    size="sm"
+                    type="button"
                     variant="primary"
                     @click="ok"
           >
             {{ customActionBtn }}
           </b-button>
-          <b-button class="float-right mb-1" 
-                    size="sm" 
-                    type="button" 
+          <b-button class="float-right mb-1"
+                    size="sm"
+                    type="button"
                     variant="outline-secondary"
                     @click="cancel"
           >
@@ -172,7 +172,7 @@
       </template>
     </ActionCheckModal>
 
-    <BaseTabNav v-if="hasSelectedServer" 
+    <BaseTabNav v-if="hasSelectedServer"
                 class="server-info"
                 :fill="false"
                 :nav-tabs="tabs"
@@ -181,11 +181,11 @@
     >
       <template #details>
         <b-card class="base first-tab">
-          <BaseMultiPanel v-if="isMultiSelected" 
+          <BaseMultiPanel v-if="isMultiSelected"
                           :data="selectedServers"
-                          :data-fields="multiInfoFields" 
+                          :data-fields="multiInfoFields"
           />
-          <ServerSummary v-else 
+          <ServerSummary v-else
                          :server-data="selectedItems[0].data"
                          @update="updateSelectedServerInfo"
           />
@@ -195,7 +195,7 @@
       <template #data>
         <ServerData :server-data="selectedItems[0].data" />
       </template>
-      
+
       <template #rawData>
         <ServerRawData :server-data="selectedItems[0].data" />
       </template>
@@ -210,430 +210,430 @@
 </template>
 
 <script>
-import contextData from '@/views/inventory/server/search-context/query.js';
+  import contextData from '@/views/inventory/server/search-context/query.js';
 
-import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal.vue';
-import BaseTable from '@/components/base/table/BaseTable';
-import BaseBadgeTag from '@/components/base/tags/BaseBadgeTag';
+  import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal.vue';
+  import BaseTable from '@/components/base/table/BaseTable';
+  import BaseBadgeTag from '@/components/base/tags/BaseBadgeTag';
 
-const BaseSimpleTree = () => import('@/components/base/tree/BaseSimpleTree');
-const BaseCheckbox = () => import('@/components/base/checkbox/BaseCheckbox.vue');
+  const BaseSimpleTree = () => import('@/components/base/tree/BaseSimpleTree');
+  const BaseCheckbox = () => import('@/components/base/checkbox/BaseCheckbox.vue');
 
-const ActionCheckModal = () => import('@/components/base/modal/ActionCheckModal.vue');
-const BaseTabNav = () => import('@/components/base/tab/BaseTabNav');
+  const ActionCheckModal = () => import('@/components/base/modal/ActionCheckModal.vue');
+  const BaseTabNav = () => import('@/components/base/tab/BaseTabNav');
 
-const BaseMultiPanel = () => import('@/components/base/panel/BaseMultiPanel');
-const ServerSummary = () => import('@/views/inventory/server/modules/ServerSummary');
-const ServerData = () => import('@/views/inventory/server/modules/ServerData');
-const ServerRawData = () => import('@/views/inventory/server/modules/ServerRawData');
-const ServerAdmin = () => import('@/views/inventory/server/modules/ServerAdmin');
+  const BaseMultiPanel = () => import('@/components/base/panel/BaseMultiPanel');
+  const ServerSummary = () => import('@/views/inventory/server/modules/ServerSummary');
+  const ServerData = () => import('@/views/inventory/server/modules/ServerData');
+  const ServerRawData = () => import('@/views/inventory/server/modules/ServerRawData');
+  const ServerAdmin = () => import('@/views/inventory/server/modules/ServerAdmin');
 
-export default {
+  export default {
     name: 'Server',
     components: {
-        BaseDragHorizontal,
-        BaseTable,
-        BaseBadgeTag,
-        BaseSimpleTree,
-        BaseCheckbox,
-        ActionCheckModal,
-        BaseTabNav,
-        BaseMultiPanel,
-        ServerSummary,
-        ServerData,
-        ServerRawData,
-        ServerAdmin
+      BaseDragHorizontal,
+      BaseTable,
+      BaseBadgeTag,
+      BaseSimpleTree,
+      BaseCheckbox,
+      ActionCheckModal,
+      BaseTabNav,
+      BaseMultiPanel,
+      ServerSummary,
+      ServerData,
+      ServerRawData,
+      ServerAdmin
     },
     data() {
-        return {
-            servers: [],
-            selectedItems: [],
-            selectedIdx: null,
-            addModal: false,
-            totalCount: 0,
-            isReadyForSearch: false,
-            contextData: contextData,
-            query: { 
-                sort: {}, 
-                page: {
-                    start: 1, 
-                    limit: 10
-                }, 
-                filter: [],
-                filter_or: []
-            },
-            defaultFilterItem: { key: 'state', value: 'DELETED', operator: 'not' }, 
-            action: null,
-            actionCheckTitle: '',
-            actionCheckType: '',
-            actionCheckText: '',
-            actionSuccessMsg: '',
-            actionFailMsg: '',
-            actionCheckCase: 'basic', // basic, tree, or collect
-            customActionBtn: '',
-            customReleaseBtn: '',
-            selected: null,
-            isRelease: false,
-            treeUrl: '',
-            projects: [],
-            loadingState: {
-                server: true,
-                project: true
-            },
-            isLoading: true
-        };
+      return {
+        servers: [],
+        selectedItems: [],
+        selectedIdx: null,
+        addModal: false,
+        totalCount: 0,
+        isReadyForSearch: false,
+        contextData: contextData,
+        query: {
+          sort: {},
+          page: {
+            start: 1,
+            limit: 10
+          },
+          filter: [],
+          filter_or: []
+        },
+        defaultFilterItem: { key: 'state', value: 'DELETED', operator: 'not' },
+        action: null,
+        actionCheckTitle: '',
+        actionCheckType: '',
+        actionCheckText: '',
+        actionSuccessMsg: '',
+        actionFailMsg: '',
+        actionCheckCase: 'basic', // basic, tree, or collect
+        customActionBtn: '',
+        customReleaseBtn: '',
+        selected: null,
+        isRelease: false,
+        treeUrl: '',
+        projects: [],
+        loadingState: {
+          server: true,
+          project: true
+        },
+        isLoading: true
+      };
     },
     computed: {
-        tabs () {
-            if (this.isMultiSelected) {
-                return [
-                    { key: 'details', title: this.tr('PANEL.DETAILS') },
-                    { key: 'admin', title: this.tr('PANEL.ADMIN') }
-                ];
-            }
-            return [
-                { key: 'details', title: this.tr('PANEL.DETAILS')  },
-                { key: 'data', title: this.tr('PANEL.DATA') },
-                { key: 'rawData', title: this.tr('PANEL.RAWDATA') },
-                { key: 'admin', title: this.tr('PANEL.ADMIN') }
-            ];  
-        },
-        fields () {
-            return [
-                { key: 'selected', thStyle: { width: '50px' }},
-                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '300px' }},
-                { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
-                { key: 'primary_ip_address', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true, thStyle: { width: '130px' }},
-                { key: 'core', label: this.tr('COL_NM.CORE'), sortable: true, formatter: this.baseFormatter,thStyle: { width: '100px' }},
-                { key: 'memory', label: this.tr('COL_NM.MEMORY'), sortable: true, formatter: this.baseFormatter, thStyle: { width: '100px' }},
-                { key: 'os_type', label: this.tr('COL_NM.O_TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '100px' }},
-                { key: 'os_distro', label: this.tr('COL_NM.O_DIS'), sortable: true, formatter: this.osFormatter, thStyle: { width: '130px' }},
-                { key: 'server_type', label: this.tr('COL_NM.SE_TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '120px' }},
-                { key: 'platform_type', label: this.tr('COL_NM.PLATFORM'), sortable: true, formatter: this.vmFormatter, thStyle: { width: '100px' }},
-                { key: 'project', label: this.tr('COL_NM.PROJ'), sortable: true, formatter: this.projectFormatter, thStyle: { width: '180px' }},
-                { key: 'pool', label: this.tr('COL_NM.POOL'),sortable: true, formatter: this.poolFormatter, thStyle: { width: '180px' }},
-                { key: 'updated_at', label: this.tr('COL_NM.UPDATE'), sortable: true, ajaxSortable: true,
-                    formatter: (val) => {
-                        return this.getDatefromTimeStamp(val.seconds, localStorage.getItem('timezone'));
-                    } ,
-                    thStyle: { width: '160px' }}
-            ];
-        },
-        multiInfoFields () {
-            return [
-                { key: 'server_id',label: this.tr('COL_NM.ID') },
-                { key: 'name', label: this.tr('COL_NM.NAME') },
-                { key: 'primary_ip_address', label: this.tr('COL_NM.IP') }
-            ];
-        },
-        isMultiSelected () {
-            return this.selectedItems.length > 1;
-        },
-        hasSelectedServer () {
-            return this.selectedItems.length > 0;
-        },
-        selectedServers () {
-            return this.selectedItems.map((item) => {
-                return item.data;
-            });
+      tabs () {
+        if (this.isMultiSelected) {
+          return [
+            { key: 'details', title: this.tr('PANEL.DETAILS') },
+            { key: 'admin', title: this.tr('PANEL.ADMIN') }
+          ];
         }
+        return [
+          { key: 'details', title: this.tr('PANEL.DETAILS')  },
+          { key: 'data', title: this.tr('PANEL.DATA') },
+          { key: 'rawData', title: this.tr('PANEL.RAWDATA') },
+          { key: 'admin', title: this.tr('PANEL.ADMIN') }
+        ];
+      },
+      fields () {
+        return [
+          { key: 'selected', thStyle: { width: '50px' }},
+          { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '300px' }},
+          { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: true, thStyle: { width: '150px' }},
+          { key: 'primary_ip_address', label: this.tr('COL_NM.IP'), sortable: true, ajaxSortable: true, thStyle: { width: '130px' }},
+          { key: 'core', label: this.tr('COL_NM.CORE'), sortable: true, formatter: this.baseFormatter,thStyle: { width: '100px' }},
+          { key: 'memory', label: this.tr('COL_NM.MEMORY'), sortable: true, formatter: this.baseFormatter, thStyle: { width: '100px' }},
+          { key: 'os_type', label: this.tr('COL_NM.O_TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '100px' }},
+          { key: 'os_distro', label: this.tr('COL_NM.O_DIS'), sortable: true, formatter: this.osFormatter, thStyle: { width: '130px' }},
+          { key: 'server_type', label: this.tr('COL_NM.SE_TYPE'), sortable: true, ajaxSortable: true, thStyle: { width: '120px' }},
+          { key: 'platform_type', label: this.tr('COL_NM.PLATFORM'), sortable: true, formatter: this.vmFormatter, thStyle: { width: '100px' }},
+          { key: 'project', label: this.tr('COL_NM.PROJ'), sortable: true, formatter: this.projectFormatter, thStyle: { width: '180px' }},
+          { key: 'pool', label: this.tr('COL_NM.POOL'),sortable: true, formatter: this.poolFormatter, thStyle: { width: '180px' }},
+          { key: 'updated_at', label: this.tr('COL_NM.UPDATE'), sortable: true, ajaxSortable: true,
+            formatter: (val) => {
+              return this.getDatefromTimeStamp(val.seconds, localStorage.getItem('timezone'));
+            } ,
+            thStyle: { width: '160px' }}
+        ];
+      },
+      multiInfoFields () {
+        return [
+          { key: 'server_id',label: this.tr('COL_NM.ID') },
+          { key: 'name', label: this.tr('COL_NM.NAME') },
+          { key: 'primary_ip_address', label: this.tr('COL_NM.IP') }
+        ];
+      },
+      isMultiSelected () {
+        return this.selectedItems.length > 1;
+      },
+      hasSelectedServer () {
+        return this.selectedItems.length > 0;
+      },
+      selectedServers () {
+        return this.selectedItems.map((item) => {
+          return item.data;
+        });
+      }
     },
     watch: {
-        loadingState: {
-            deep: true,
-            handler () {
-                if (this.loadingState.server || this.loadingState.project) {
-                    this.isLoading = true;
-                } else {
-                    this.isLoading = false;
-                }
-            }
+      loadingState: {
+        deep: true,
+        handler () {
+          if (this.loadingState.server || this.loadingState.project) {
+            this.isLoading = true;
+          } else {
+            this.isLoading = false;
+          }
         }
+      }
     },
     mounted() {
-        this.init();
+      this.init();
     },
     methods: {
-        init () {
-            this.listProjects();
-            this.listServers();
-        },
-        reset () {
-            this.servers = [];
-            this.selectedItems = [];
-            this.$set(this.loadingState, 'server', true);
-        },
-        setQuery (limit, start, sort, filter, filterOr) {
-            this.query.page.limit = limit || 10;
-            this.query.page.start = start || 0;
-            this.query.sort = sort || {};
-            this.query.filter = filter || [];
-            this.query.filter.push(this.defaultFilterItem);
-            this.query.filter_or = filterOr || [];
-        },
-        setProjects (projects) {
-            this.projects = {};
-            projects.map((project) => {
-                this.projects[project.project_id] = `${project.project_group_info.name} ${project.name}`;
-            });
-        },
-        async listProjects () {
-            try {
-                let res = await this.$axios.post('/identity/project/list', {
-                    domain_id: sessionStorage.getItem('domainId')
-                });
-                this.setProjects(res.data.results);
-                this.$set(this.loadingState, 'project', false);
-            } catch (e) {
-                console.error(e);
-                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
-                this.$set(this.loadingState, 'project', false);
-            }
-        },
-        async listServers (limit, start, sort, filter, filterOr) {
-            this.reset();
-            this.setQuery(limit, start, sort, filter, filterOr);
-            let res = null;
-            try {
-                res = await this.$axios.post('/inventory/server/list', {
-                    query: this.query,
-                    domain_id: sessionStorage.getItem('domainId')
-                });
-                this.servers = res.data.results;
-                this.totalCount = res.data.total_count;
-                this.$set(this.loadingState, 'server', false);
-            } catch (e) {
-                console.error(e);
-                this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
-                this.$set(this.loadingState, 'server', false);
-            }
-        },
-        async listCollectors () {
-        },
-        rowSelected (rows) {
-            this.selectedItems = rows;
-        },
-        onAllRowSelected (isSelectedAll, rows) {
-            this.selectedItems = rows;
-        },
-        limitChanged (val) {
-            this.query.page.limit = Number(val);
-            this.listServers();
-        },
-        updateSelectedServerInfo (server) {
-            this.selectedItems[0].data = server;
-        },
-        getParams (items, state) {
-            let params = { servers: [], domain_id: sessionStorage.getItem('domainId') };
-            if (state) {
-                params.state = state;
-            }
-            items.map((item) => {
-                params.servers.push(item.server_id);
-            });
-            return params;
-        },
-        async deleteServer (commitItems) {
-            await this.$axios.post('/inventory/server/delete', this.getParams(commitItems));
-        },
-        async setMaintenance (commitItems) {
-            await this.$axios.post('/inventory/server/change-state', this.getParams(commitItems, 'MAINTENANCE'));
-        },
-        async setInService (commitItems) {
-            await this.$axios.post('/inventory/server/change-state', this.getParams(commitItems, 'INSERVICE'));
-        },
-        async setClosed (commitItems) {
-            await this.$axios.post('/inventory/server/change-state', this.getParams(commitItems, 'CLOSED'));
-        },
-        async changeProject () {
-            if (!this.selected && !this.isRelease) {
-                this.$alertify.error(this.tr('ALERT.NO_PARAM'));
-                return { stop : true };
-            }
-            let params = this.getParams(this.selectedServers);
-            params.release_project = this.isRelease;
-            params.project_id = this.selected;
-            await this.$axios.post('/inventory/server/change-project', params);
-        },
-        async changePool () {
-            if (!this.selected && !this.isRelease) {
-                this.$alertify.error(this.tr('ALERT.NO_PARAM'));
-                return { stop : true };
-            }
-            let params = this.getParams(this.selectedServers);
-            params.release_pool = this.isRelease;
-            params.pool_id = this.selected;
-            await this.$axios.post('/inventory/server/change-pool', params);
-        },
-        async collectInfo () {
-
-        },
-        onClickDelete () {
-            this.actionCheckCase = 'basic';
-            this.action = this.deleteServer;
-            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DELETE'), this.tr('SERVER')]);
-            this.actionCheckType = 'danger';
-            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DELETE'), this.tr('SERVER')]);
-            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('SERVER'), this.tr('DELETE_PAST')]);
-            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('DELETE_CONT'), this.tr('POOL')]);
-            
-            this.showActionModal();
-        },
-        onClickSetMaintenance () {
-            this.actionCheckCase = 'basic';
-            this.action = this.setMaintenance;
-            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_MANT'), this.tr('SERVER')]);
-            this.actionCheckType = 'warning';
-            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_MANT'), this.tr('SERVER')]);
-            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
-            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
-            this.showActionModal();
-        },
-        onClickSetInService () {
-            this.actionCheckCase = 'basic';
-            this.action = this.setInService;
-            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_SERV'), this.tr('SERVER')]);
-            this.actionCheckType = 'warning';
-            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_SERV'), this.tr('SERVER')]);
-            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
-            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
-            this.showActionModal();
-        },
-        onClickSetClosed () {
-            this.actionCheckCase = 'basic';
-            this.action = this.setClosed;
-            this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_CLOSE'), this.tr('SERVER')]);
-            this.actionCheckType = 'warning';
-            this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_CLOSE'), this.tr('SERVER')]);
-            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
-            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
-            this.showActionModal();
-        },
-        onClickChangeProject () {
-            this.resetTreeOptions();
-            this.customActionBtn = this.tr('TITLE', [this.tr('CHG'), this.tr('PROJECT')]);
-            this.customReleaseBtn = this.tr('TITLE', [this.tr('RELEASE'), this.tr('PROJECT')]);
-            this.actionCheckCase = 'tree';
-            this.action = this.changeProject;
-            this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG'), this.tr('PROJECT')]);
-            this.actionCheckType = 'light';
-            this.treeUrl = '/identity/project/tree';
-            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('PROJECT'), this.tr('CHG_PAST')]);
-            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('CHG_CONT'), this.tr('PROJECT')]);
-            this.showActionModal();
-        },
-        onClickChangePool () {
-            this.resetTreeOptions();
-            this.customActionBtn = this.tr('TITLE', [this.tr('CHG'), this.tr('POOL')]);
-            this.customReleaseBtn = this.tr('TITLE', [this.tr('RELEASE'), this.tr('POOL')]);
-            this.actionCheckCase = 'tree';
-            this.action = this.changePool;
-            this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG'), this.tr('POOL')]);
-            this.actionCheckType = 'light';
-            this.treeUrl = '/inventory/data-center/tree';
-            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('POOL'), this.tr('CHG_PAST')]);
-            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('CHG_CONT'), this.tr('POOL')]);
-            this.showActionModal();
-        },
-        onSelectItem (nodeObj) {
-            this.selected = nodeObj.node.data.id;
-        },
-        resetTreeOptions () {
-            this.selected = null;
-            this.isRelease = false;
-        },
-        onClickConfirmChange () {
-            this.action(); 
-        },
-        onClickCollectInfo () {
-            this.listCollectors();
-            this.customActionBtn = this.tr('COLLECT');
-            this.actionCheckCase = 'collect';
-            this.action = this.collectInfo;
-            this.actionCheckTitle = this.tr('TITLE', [this.tr('COLLECT'), `${this.tr('SERVER')} ${this.tr('INFO')}`]);
-            this.actionCheckType = 'light';
-            this.treeUrl = '/inventory/data-center/tree';
-            this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('INFO')}`, this.tr('COLLECT_PAST')]);
-            this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('COLLECT_CONT'), `${this.tr('SERVER')} ${this.tr('INFO')}`]);
-            this.showActionModal();
-        },
-        showActionModal () {
-            this.$refs.IDSV001_ActionCheckModal.showModal();
-        },
-        projectFormatter (val, key, data) {
-            let result = '';
-            if (data.project_id) {
-                result = this.projects[data.project_id];
-            }
-            return result;
-                
-        },
-        poolFormatter (val, key, data) {
-            let result = '';
-            if (data.pool_info && data.pool_info.name) {
-                result = data.pool_info.name;
-            } 
-            return result;
-        },
-        osFormatter (val, key, data) {
-            return data.data.os ? data.data.os[key] : '';
-        },
-        baseFormatter (val, key, data) {
-            return data.data.base[key];
-        },
-        vmFormatter (val, key, data) {
-            return data.data.vm ? data.data.vm[key] : '';
+      init () {
+        this.listProjects();
+        this.listServers();
+      },
+      reset () {
+        this.servers = [];
+        this.selectedItems = [];
+        this.$set(this.loadingState, 'server', true);
+      },
+      setQuery (limit, start, sort, filter, filterOr) {
+        this.query.page.limit = limit || 10;
+        this.query.page.start = start || 0;
+        this.query.sort = sort || {};
+        this.query.filter = filter || [];
+        this.query.filter.push(this.defaultFilterItem);
+        this.query.filter_or = filterOr || [];
+      },
+      setProjects (projects) {
+        this.projects = {};
+        projects.map((project) => {
+          this.projects[project.project_id] = `${project.project_group_info.name} ${project.name}`;
+        });
+      },
+      async listProjects () {
+        try {
+          let res = await this.$axios.post('/identity/project/list', {
+            domain_id: sessionStorage.getItem('domainId')
+          });
+          this.setProjects(res.data.results);
+          this.$set(this.loadingState, 'project', false);
+        } catch (e) {
+          console.error(e);
+          this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
+          this.$set(this.loadingState, 'project', false);
         }
+      },
+      async listServers (limit, start, sort, filter, filterOr) {
+        this.reset();
+        this.setQuery(limit, start, sort, filter, filterOr);
+        let res = null;
+        try {
+          res = await this.$axios.post('/inventory/server/list', {
+            query: this.query,
+            domain_id: sessionStorage.getItem('domainId')
+          });
+          this.servers = res.data.results;
+          this.totalCount = res.data.total_count;
+          this.$set(this.loadingState, 'server', false);
+        } catch (e) {
+          console.error(e);
+          this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
+          this.$set(this.loadingState, 'server', false);
+        }
+      },
+      async listCollectors () {
+      },
+      rowSelected (rows) {
+        this.selectedItems = rows;
+      },
+      onAllRowSelected (isSelectedAll, rows) {
+        this.selectedItems = rows;
+      },
+      limitChanged (val) {
+        this.query.page.limit = Number(val);
+        this.listServers();
+      },
+      updateSelectedServerInfo (server) {
+        this.selectedItems[0].data = server;
+      },
+      getParams (items, state) {
+        let params = { servers: [], domain_id: sessionStorage.getItem('domainId') };
+        if (state) {
+          params.state = state;
+        }
+        items.map((item) => {
+          params.servers.push(item.server_id);
+        });
+        return params;
+      },
+      async deleteServer (commitItems) {
+        await this.$axios.post('/inventory/server/delete', this.getParams(commitItems));
+      },
+      async setMaintenance (commitItems) {
+        await this.$axios.post('/inventory/server/change-state', this.getParams(commitItems, 'MAINTENANCE'));
+      },
+      async setInService (commitItems) {
+        await this.$axios.post('/inventory/server/change-state', this.getParams(commitItems, 'INSERVICE'));
+      },
+      async setClosed (commitItems) {
+        await this.$axios.post('/inventory/server/change-state', this.getParams(commitItems, 'CLOSED'));
+      },
+      async changeProject () {
+        if (!this.selected && !this.isRelease) {
+          this.$alertify.error(this.tr('ALERT.NO_PARAM'));
+          return { stop : true };
+        }
+        let params = this.getParams(this.selectedServers);
+        params.release_project = this.isRelease;
+        params.project_id = this.selected;
+        await this.$axios.post('/inventory/server/change-project', params);
+      },
+      async changePool () {
+        if (!this.selected && !this.isRelease) {
+          this.$alertify.error(this.tr('ALERT.NO_PARAM'));
+          return { stop : true };
+        }
+        let params = this.getParams(this.selectedServers);
+        params.release_pool = this.isRelease;
+        params.pool_id = this.selected;
+        await this.$axios.post('/inventory/server/change-pool', params);
+      },
+      async collectInfo () {
+
+      },
+      onClickDelete () {
+        this.actionCheckCase = 'basic';
+        this.action = this.deleteServer;
+        this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_DELETE'), this.tr('SERVER')]);
+        this.actionCheckType = 'danger';
+        this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_DELETE'), this.tr('SERVER')]);
+        this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('SERVER'), this.tr('DELETE_PAST')]);
+        this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('DELETE_CONT'), this.tr('POOL')]);
+
+        this.showActionModal();
+      },
+      onClickSetMaintenance () {
+        this.actionCheckCase = 'basic';
+        this.action = this.setMaintenance;
+        this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_MANT'), this.tr('SERVER')]);
+        this.actionCheckType = 'warning';
+        this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_MANT'), this.tr('SERVER')]);
+        this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
+        this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
+        this.showActionModal();
+      },
+      onClickSetInService () {
+        this.actionCheckCase = 'basic';
+        this.action = this.setInService;
+        this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_SERV'), this.tr('SERVER')]);
+        this.actionCheckType = 'warning';
+        this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_SERV'), this.tr('SERVER')]);
+        this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
+        this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
+        this.showActionModal();
+      },
+      onClickSetClosed () {
+        this.actionCheckCase = 'basic';
+        this.action = this.setClosed;
+        this.actionCheckTitle = this.tr('TITLE', [this.tr('BTN_S_CLOSE'), this.tr('SERVER')]);
+        this.actionCheckType = 'warning';
+        this.actionCheckText = this.tr('ACTION.CHECK', [this.tr('BTN_S_CLOSE'), this.tr('SERVER')]);
+        this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('STATE')}`, this.tr('UPT_PAST')]);
+        this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('UPT_CONT'), `${this.tr('SERVER')} ${this.tr('STATE')}`]);
+        this.showActionModal();
+      },
+      onClickChangeProject () {
+        this.resetTreeOptions();
+        this.customActionBtn = this.tr('TITLE', [this.tr('CHG'), this.tr('PROJECT')]);
+        this.customReleaseBtn = this.tr('TITLE', [this.tr('RELEASE'), this.tr('PROJECT')]);
+        this.actionCheckCase = 'tree';
+        this.action = this.changeProject;
+        this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG'), this.tr('PROJECT')]);
+        this.actionCheckType = 'light';
+        this.treeUrl = '/identity/project/tree';
+        this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('PROJECT'), this.tr('CHG_PAST')]);
+        this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('CHG_CONT'), this.tr('PROJECT')]);
+        this.showActionModal();
+      },
+      onClickChangePool () {
+        this.resetTreeOptions();
+        this.customActionBtn = this.tr('TITLE', [this.tr('CHG'), this.tr('POOL')]);
+        this.customReleaseBtn = this.tr('TITLE', [this.tr('RELEASE'), this.tr('POOL')]);
+        this.actionCheckCase = 'tree';
+        this.action = this.changePool;
+        this.actionCheckTitle = this.tr('TITLE', [this.tr('CHG'), this.tr('POOL')]);
+        this.actionCheckType = 'light';
+        this.treeUrl = '/inventory/data-center/tree';
+        this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [this.tr('POOL'), this.tr('CHG_PAST')]);
+        this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('CHG_CONT'), this.tr('POOL')]);
+        this.showActionModal();
+      },
+      onSelectItem (nodeObj) {
+        this.selected = nodeObj.node.data.id;
+      },
+      resetTreeOptions () {
+        this.selected = null;
+        this.isRelease = false;
+      },
+      onClickConfirmChange () {
+        this.action();
+      },
+      onClickCollectInfo () {
+        this.listCollectors();
+        this.customActionBtn = this.tr('COLLECT');
+        this.actionCheckCase = 'collect';
+        this.action = this.collectInfo;
+        this.actionCheckTitle = this.tr('TITLE', [this.tr('COLLECT'), `${this.tr('SERVER')} ${this.tr('INFO')}`]);
+        this.actionCheckType = 'light';
+        this.treeUrl = '/inventory/data-center/tree';
+        this.actionSuccessMsg = this.tr('ALERT.SUCCESS', [`${this.tr('SERVER')} ${this.tr('INFO')}`, this.tr('COLLECT_PAST')]);
+        this.actionFailMsg = this.tr('ALERT.ERROR', [this.tr('COLLECT_CONT'), `${this.tr('SERVER')} ${this.tr('INFO')}`]);
+        this.showActionModal();
+      },
+      showActionModal () {
+        this.$refs.IDSV001_ActionCheckModal.showModal();
+      },
+      projectFormatter (val, key, data) {
+        let result = '';
+        if (data.project_id) {
+          result = this.projects[data.project_id];
+        }
+        return result;
+
+      },
+      poolFormatter (val, key, data) {
+        let result = '';
+        if (data.pool_info && data.pool_info.name) {
+          result = data.pool_info.name;
+        }
+        return result;
+      },
+      osFormatter (val, key, data) {
+        return data.data.os ? data.data.os[key] : '';
+      },
+      baseFormatter (val, key, data) {
+        return data.data.base[key];
+      },
+      vmFormatter (val, key, data) {
+        return data.data.vm ? data.data.vm[key] : '';
+      }
     }
-};
+  };
 </script>
 
 <style lang="scss" scoped>
-.animated.fadeIn {
+  .animated.fadeIn {
     padding: $top-pad $side-pad $bottom-pad $side-pad;
-}
-.base-table {
+  }
+  .base-table {
     @extend %sheet;
-}
-.btn {
+  }
+  .btn {
     margin: 0 5px;
-}
-.server-table {
+  }
+  .server-table {
     margin-top: 20px;
-}
-.server-info {
-  margin-bottom: 20px;
-}
-.empty {
+  }
+  .server-info {
+    margin-bottom: 20px;
+  }
+  .empty {
     text-align: center;
     margin-top: 40px;
     .msg {
-        color: $darkgray;
-        font-size: 1.3rem;
-        font-weight: 600;
+      color: $darkgray;
+      font-size: 1.3rem;
+      font-weight: 600;
     }
-}
-.icon {
+  }
+  .icon {
     font-size: 1rem !important;
-}
+  }
 
-.footer {
+  .footer {
     width: 100%;
     .unset-checkbox {
-        vertical-align: middle;
+      vertical-align: middle;
     }
     .unset-text {
-        vertical-align: middle;
+      vertical-align: middle;
     }
-}
+  }
 
-.collect-contents {
+  .collect-contents {
     .collector-table {
-        box-shadow: none;
+      box-shadow: none;
     }
     .server-table {
-        margin: 0;
-        box-shadow: none;
+      margin: 0;
+      box-shadow: none;
     }
-}
+  }
 </style>

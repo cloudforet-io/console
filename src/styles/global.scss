@@ -257,39 +257,6 @@ a {
   }
 }
 
-/* b-modal */
-.modal .modal-dialog {
-  .modal-header {
-    padding-top: 15px;
-    padding-bottom: 10px;
-    .close {
-      padding-top: 18px;
-    }
-  }
-  .modal-content {
-      @extend %sheet;
-      border: 0;
-  }
-}
-
-@mixin modal-color($color) {
-    .modal-header {
-        background-color: rgba($color, 0.1);
-        color: darken($color, 20%);
-        .close {
-            color: darken($color, 20%);
-        }
-    }
-}
-  
-.modal-primary { @include modal-color($primary); }
-.modal-secondary { @include modal-color($secondary); }
-.modal-danger { @include modal-color($danger); }
-.modal-dark { @include modal-color($dark); }
-.modal-info { @include modal-color($info); }
-.modal-warning { @include modal-color($warning); }
-.modal-light { @include modal-color($light); }
-.modal-success { @include modal-color($success); }
 
 
 /* b-form */

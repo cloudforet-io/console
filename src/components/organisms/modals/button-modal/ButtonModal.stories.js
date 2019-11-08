@@ -10,7 +10,7 @@ import { autoProps } from '../../../../setup/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 
 export default {
-    title: 'organisms/button-modal',
+    title: 'organisms/modals/button-modal',
     component: PButtonModal,
     parameters: {
         info: {
