@@ -1,5 +1,5 @@
 <template>
-    <div class="col-sm-12">
+    <div class="col-sm-12" :style="panelTitleStyle">
         <div class="card panel-card">
             <div class="panel-header">
                 {{ panelTitle }}
@@ -18,6 +18,10 @@ export default {
         panelTitle: {
             type: String,
             default: 'NoTitle',
+        },
+        panelTitleStyle: {
+            type: Object,
+            default: null,
         },
     },
     methods: {
