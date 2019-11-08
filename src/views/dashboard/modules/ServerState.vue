@@ -142,7 +142,7 @@ export default {
         // },
         async listServerStates() {
             try {
-                const res = await this.$axios.post('/statistics/server-state', this.params);
+                const res = await this.$http.post('/statistics/server-state', this.params);
                 this.serverStates = res.data;
                 this.isLoading = false;
             } catch (err) {

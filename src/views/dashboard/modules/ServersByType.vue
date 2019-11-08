@@ -147,7 +147,7 @@ export default {
         },
         async listData (itemType) {
             try {
-                let res = await this.$axios.post('/statistics/server-type', this.getParams(itemType));
+                let res = await this.$http.post('/statistics/server-type', this.getParams(itemType));
                 this.setData(itemType, res.data);
             } catch (err) {
                 console.error(err);

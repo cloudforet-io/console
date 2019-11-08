@@ -1,5 +1,5 @@
 <template>
-    <panel-top :panel-title="infoTitle">
+    <panel-top :panel-title="infoTitle" :panel-title-style="infoTitleStyle">
         <template #body>
             <panel-content :definition-list="contentData" />
         </template>
@@ -19,6 +19,10 @@ export default {
         infoTitle: {
             type: String,
             default: 'NoTitle',
+        },
+        infoTitleStyle: {
+            type: Object,
+            default: null,
         },
         contentData: {
             type: String,

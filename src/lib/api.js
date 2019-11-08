@@ -49,7 +49,6 @@ class API {
         };
 
         this.instance = axios.create(axiosConfig);
-
         const accessToken = VueCookies.get('accessToken');
         if (accessToken) {
             this.instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
@@ -107,3 +106,4 @@ class API {
 }
 
 export default new API();
+

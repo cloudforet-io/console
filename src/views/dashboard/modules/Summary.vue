@@ -58,7 +58,7 @@ export default {
     methods: {
         async listSummary() {
             try {
-                const res = await this.$axios.post('/statistics/summary');
+                const res = await this.$http.post('/statistics/summary');
                 this.setSummaryData(res.data);
                 this.isLoading = false;
             } catch (err) {

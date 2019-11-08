@@ -52,19 +52,19 @@ export default {
             'setUserId',
         ]),
         ...mapActions('auth', [
-            'logout',
+            'signOut',
         ]),
         doAction(item) {
-            if (item.key === 'signout') this.signOut();
+            if (item.key === 'signout') this.signOutAction();
             else if (item.key === 'profile') this.openProfile();
         },
-        async signOut() {
+        async signOutAction() {
             if (this.client_id) {
-                await this.logout(this.client_id);
+                await this.signOut(this.client_id);
                 this.$router.push({ path: '/google-sign-in' });
                 this.oAuthSignOut();
             } else {
-                await this.logout();
+                await this.signOut();
                 this.$router.push({ path: '/sign-in' });
             }
         },
@@ -72,9 +72,8 @@ export default {
             this.$refs.profileModal.showModal();
         },
         oAuthSignOut() {
-            // eslint-disable-next-line no-undef
-            const auth2 = gapi.auth2.getAuthInstance();
-            auth2.signOut();
+            const auth = gapi.auth.getAuthInstance();
+            auth.signOut();
         },
     },
 };

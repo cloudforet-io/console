@@ -89,7 +89,7 @@ export default {
             paramObj[keyId] = selectedId;
 
             try {
-                return await this.$axios.post(`/secret/${key}/list`, paramObj);
+                return await this.$http.post(`/secret/${key}/list`, paramObj);
             } catch (err) {
                 this.alertError(err);
 

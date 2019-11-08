@@ -33,11 +33,12 @@ export default {
         },
         async load({ commit, dispatch, getters }) {
             dispatch('parseHostname');
+
             const response = await api.instance.post('/identity/domain/list', {
                 name: getters.name,
             });
 
-            if (response.data.total_count === 2) {
+            if (response.data.total_count === 1) {
                 const domainInfo = response.data.results[0];
 
                 commit('setDomainInfo', {

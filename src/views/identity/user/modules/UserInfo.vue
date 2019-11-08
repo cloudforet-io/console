@@ -109,7 +109,7 @@ export default {
             if (this.$refs.IDUS003_Tags.validate()) {
                 let res = null;
                 try {
-                    res = await this.$axios.post('/identity/user/update', {
+                    res = await this.$http.post('/identity/user/update', {
                         user_id: this.userData.user_id,
                         tags: this.$refs.IDUS003_Tags.tags,
                     });

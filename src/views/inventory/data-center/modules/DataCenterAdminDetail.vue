@@ -150,7 +150,7 @@ export default {
         async listAdminsOnModal (limit, start, sort, filter, filterOr){
             this.reset();
             this.saveMemberModalMeta(limit, start, sort, filter, filterOr);
-            await this.$axios.post('/identity/user/list',{
+            await this.$http.post('/identity/user/list',{
                 query: this.memberModalQuery
             }).then((response) => {
                 this.dataCenterAdminData.members = response.data.results;
@@ -214,7 +214,7 @@ export default {
                 return;
             }
 
-            await this.$axios.post(url, param).then((response) => {
+            await this.$http.post(url, param).then((response) => {
                 this.$parent.$parent.$parent.$parent.$parent.listAdmins();
                 this.$emit('close');
             }).catch((error) => {

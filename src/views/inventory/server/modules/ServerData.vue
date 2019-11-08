@@ -174,7 +174,7 @@ export default {
             this.reset();
             this.setQuery(limit, start, sort, keyword);
             try {
-                let res = await this.$axios.post('/inventory/server/get-data', { 
+                let res = await this.$http.post('/inventory/server/get-data', {
                     domain_id: sessionStorage.getItem('domainId'),
                     server_id: this.serverData.server_id,
                     data_type: this.activeNav,

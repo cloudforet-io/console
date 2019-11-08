@@ -262,8 +262,12 @@ export default {
             this.reset();
             this.setQuery(limit, start, sort, filter, filterOr);
             let res = null;
+            if(this.isEmpty(this.$http)){
+                alert(1);
+            }
             try {
-                res = await this.$axios.post('/identity/user/list', {
+                console.log('GET User List from http');
+                res = await this.$http.post('/identity/user/list', {
                     query: this.query,
                 });
                 this.users = res.data.results;
@@ -306,13 +310,13 @@ export default {
             return params;
         },
         async deleteUser(commitItems) {
-            await this.$axios.post('/identity/user/delete', this.getParams(commitItems));
+            await this.$http.post('/identity/user/delete', this.getParams(commitItems));
         },
         async enableUser(commitItems) {
-            await this.$axios.post('/identity/user/enable', this.getParams(commitItems));
+            await this.$http.post('/identity/user/enable', this.getParams(commitItems));
         },
         async disableUser(commitItems) {
-            await this.$axios.post('/identity/user/disable', this.getParams(commitItems));
+            await this.$http.post('/identity/user/disable', this.getParams(commitItems));
         },
         onClickAdd() {
             this.isCreateMode = true;

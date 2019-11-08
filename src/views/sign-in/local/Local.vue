@@ -65,14 +65,14 @@
                                         <b-input-group-prepend>
                                             <b-input-group-text><i class="fal fa-user" /></b-input-group-text>
                                         </b-input-group-prepend>
-                                        <b-form-input v-model="userId" type="text" placeholder="User ID" @keyup.enter="login" />
+                                        <b-form-input v-model="userId" type="text" placeholder="User ID" @keyup.enter="signIn" />
                                     </b-input-group>
                                     <b-input-group class="mb-2">
                                         <b-input-group-prepend>
                                             <b-input-group-text><i class="fal fa-key" /></b-input-group-text>
                                         </b-input-group-prepend>
                                         <b-form-input v-model="password" type="password" placeholder="Password"
-                                                      autocomplete="current-password" @keyup.enter="login"
+                                                      autocomplete="current-password" @keyup.enter="signIn"
                                         />
                                     </b-input-group>
                                     <b-row>
@@ -80,10 +80,10 @@
                                             <div @click="directToAdmin"><span class="root-sign" >{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
                                             </div>
                                         </b-col>
-                                        <b-col class="col-1 col-xs-1 col-sm-1 col-md-1 col-lg-4 col-xl-4 login-check">
+                                        <b-col class="col-1 col-xs-1 col-sm-1 col-md-1 col-lg-4 col-xl-4 signIn-check">
                                             <button v-b-tooltip.hover
                                                     type="button"
-                                                    class="btn btn-link login-check"
+                                                    class="btn btn-link signIn-check"
                                                     title="Trouble to Log In?"
                                                     @click="popSignUpInstruction"
                                             >
@@ -103,7 +103,7 @@
                       </b-button>
                     </b-col>-->
                                         <b-col md="4" class="ml-auto col-xs-12 col-sm-12">
-                                            <b-button type="button" block class="login-btn" @click="login">
+                                            <b-button type="button" block class="signIn-btn" @click="signIn">
                                                 {{ $t('COMMON.SIGN_IN') }}
                                             </b-button>
                                         </b-col>
@@ -172,26 +172,20 @@ export default {
             this.$router.push({ name: 'Admin-SignIn'});
             this.$router.push({ path: '/admin-sign-in' });
         },
-        async login() {
-            console.log(this.tr('MSG.LOG_IN'));
-
+        async signIn() {
             this.showGreetMSG();
-
-            const authObj = {
-                userId: this.userId,
+            const credentials = {
+                user_id: this.userId,
                 password: this.password,
-                domainId: sessionStorage.getItem('domainId'),
             };
 
-            if (this.isEmpty(authObj.userId) || this.isEmpty(authObj.password)) {
+            if (this.isEmpty(credentials.user_id) || this.isEmpty(credentials.password)) {
                 this.showErorrMSG();
                 return;
             }
 
-            await this.$store.dispatch('auth/login', authObj).then((response) => {
-                console.log(this.nextPath);
-                this.$router.push(this.nextPath);
-                this.setTimeZone();
+            await this.$store.dispatch('auth/signIn', credentials).then((response) => {
+                this.$router.push('/');
             }).catch((error) => {
                 if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
@@ -236,7 +230,7 @@ export default {
             this.$refs.LogInSimpleModal.showModal();
         },
         async setTimeZone() {
-            await this.$axios.post('identity/user/get', {
+            await this.$http.post('identity/user/get', {
                 user_id: this.userId,
                 domainId: sessionStorage.getItem('domainId'),
             }).then((response) => {
@@ -270,7 +264,7 @@ export default {
       justify-content: center;
     }
 
-    .login-check {
+    .signIn-check {
         float: right;
         padding: 0px 6px 6px 0px;
     }
@@ -293,7 +287,7 @@ export default {
             border-radius: 5px;
         }
     }
-    .login-btn {
+    .signIn-btn {
         border: 0;
         background: linear-gradient(to right, $blue, $violet);
         box-shadow: 0 0 5px 1px rgba($navy, 0.3);

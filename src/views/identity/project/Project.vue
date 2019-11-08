@@ -53,7 +53,7 @@
 
 <script>
 
-import projectSummary from './modules/ProjectSummary.vue';
+import projectSummary from './modules/ProjectSummaryTop.vue';
 import projectMember from './modules/ProjectMember.vue';
 import projectEditPopupName from '@/views/identity/project/modules/ProjectEditPopupName';
 import projectEditPopupTag from '@/views/identity/project/modules/ProjectEditPopupTag';
@@ -142,7 +142,7 @@ export default {
             this.selectedData = item;
         },
         async listProject() {
-            await this.$axios.post('/identity/project/tree', {
+            await this.$http.post('/identity/project/tree', {
                 item_type: 'ROOT',
                 sort: {
                     key: 'name',
@@ -226,7 +226,7 @@ export default {
                 domain_id: sessionStorage.domainId,
             };
 
-            await this.$axios.post(url, param).then((response) => {
+            await this.$http.post(url, param).then((response) => {
                 childrenNode = this.getSelectedNodeArr(response.data.items, 'PROJECT');
                 nodeObj.treeV.updateNode(path, { data: dataParam });
                 if (!this.isEmpty(childrenNode)) {
@@ -261,7 +261,7 @@ export default {
                     param.parent_project_group_id = selected.data.id;
                 }
 
-                await this.$axios.post(url, param).then((response) => {
+                await this.$http.post(url, param).then((response) => {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)) {
                         const placement = isRootAction ? 'after' : 'inside';
@@ -297,7 +297,7 @@ export default {
                 const selected = tree.getSelected()[0];
                 param.domain_id = sessionStorage.domainId;
                 param.project_group_id = selected.data.id;
-                await this.$axios.post(url, param).then((response) => {
+                await this.$http.post(url, param).then((response) => {
                     const responseData = !this.isEmpty(response.data) ? response.data : {};
                     if (!this.isEmpty(responseData)) {
                         const InitializedPG = { id: responseData.project_id, item_type: 'PROJECT', name: param.name };
@@ -319,7 +319,7 @@ export default {
             const param = this.validateProject();
             if (!this.isEmpty(param)) {
                 param[key] = selectedId;
-                await this.$axios.post(url, param).then((response) => {
+                await this.$http.post(url, param).then((response) => {
                     if (response.data[key] === selectedId) {
                         const treeV = items.tree;
                         const { path } = treeV.getSelected()[0];
@@ -341,7 +341,7 @@ export default {
             const key = `${itemType.toLowerCase()}_id`;
             const passParam = { domain_id: sessionStorage.domainId };
             passParam[key] = selectedId;
-            await this.$axios.post(url, passParam).then((response) => {
+            await this.$http.post(url, passParam).then((response) => {
                 const responseData = response.data;
                 if (this.isEmpty(responseData)) {
                     pramTree.tree.remove(pramTree.path);
@@ -403,7 +403,7 @@ export default {
                     }
                 }
             }
-            await this.$axios.post(url, param).then((response) => {
+            await this.$http.post(url, param).then((response) => {
                 const responseData = response.data;
                 if (!this.isEmpty(responseData)) {
                     console.log('Item successfully moved. ');

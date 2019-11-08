@@ -199,7 +199,7 @@ export default {
             this.$refs.LogInSimpleModal.showModal();
         },
         async setTimeZone() {
-            await this.$axios.post('identity/user/get', {
+            await this.$http.post('identity/user/get', {
                 user_id: this.adminUserId,
                 domainId: sessionStorage.getItem('domainId'),
             }).then((response) => {
