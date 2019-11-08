@@ -8,7 +8,7 @@ import PContentModal from './ContentModal.vue';
 import PModal from '../../../molecules/modals/Modal.vue';
 
 export default {
-    title: 'organisms/content-modal',
+    title: 'organisms/modals/content-modal',
     component: PContentModal,
     parameters: {
         info: {
