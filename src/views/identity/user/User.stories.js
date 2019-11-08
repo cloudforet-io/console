@@ -1,10 +1,12 @@
 import { action } from '@storybook/addon-actions';
 import User from './User.template';
-import { mockUserList } from '@/views/identity/user/models/user-model';
+import casual from '@/views/identity/user/models/user-model';
 import PStatus from '@/components/molecules/status/Status';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
+import { arrayOf } from '@/lib/casual';
+
 
 export default {
     title: 'page/identity/user',
@@ -23,7 +25,7 @@ const actions = {
     rowMouseOver: action('rowMouseOver'),
     rowMouseOut: action('rowMouseOut'),
     clickRefresh() {
-        return action('clickRefresh')
+        return action('clickRefresh');
     },
 };
 
@@ -103,9 +105,9 @@ export const template = () => ({
         PButton,
     },
     mixins: [User],
-    data() {
-        return {
-            items: mockUserList(15),
-        };
+    computed: {
+        items() {
+            return arrayOf(this.pageSize, casual._user);
+        },
     },
 });

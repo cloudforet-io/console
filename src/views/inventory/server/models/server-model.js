@@ -1,123 +1,105 @@
-export default {
-    server_id: '',
-    name: '',
-    state: '',
-    primary_ip_address: '',
-    ip_addresses: [],
-    server_type: '',
-    os_type: '',
-    data: {
-        os: {
-            os_distro: '',
-            os_details: ''
-        },
-        base: {
-            core: 0, // null or Number
-            memory: 0, // null or Number
-            kernel: '',
-            booted_at: {
-                seconds: '',
-                nanos: 0
-            }
-        },
-        compute: {
-            instance_id: ''
-        },
-        vm: {
-            vm_name: '',
-            platform_type: '',
-            vm_id: ''
-        },
-        domain: {
-            domain_name: '',
-            fqdn: ''
-        }
+import { casual, arrayOf } from '@/lib/casual';
+
+casual.define('security_group_rule', () => ({
+    port_range_min: casual.integer(0, 1000),
+    port_range_max: casual.integer(28200, 65535),
+    security_group_id: casual.make_id('sg'),
+    direction: casual.random_element(['inbound', 'outbound']),
+    remote_cidr: casual.cidr,
+    protocol: casual.random_element(['tcp', 'udp', 'all']),
+    remote_group_id: null,
+    security_group_name: casual.security_group_name,
+}));
+
+casual.define('serverData', () => ({
+    os: {
+        os_distro: 'amazonlinux',
+        os_arch: 'x86_64',
     },
-    nics: [
-        {
-            mac_address: '',
-            device_index: 0,
-            device: '',
-            nic_type: '',
-            tags: {},
-            ip_addresses: [
-                {
-                    cidr: '',
-                    ip_address: '',
-                    subnet_id: ''
-                }
-            ]
-        },
-        {
-            mac_address: '',
-            device_index: 0,
-            device: '',
-            nic_type: '',
-            tags: {},
-            ip_addresses: [
-                {
-                    subnet_id: '',
-                    cidr: '',
-                    ip_address: ''
-                }
-            ]
-        },
-        {
-            mac_address: '',
-            device_index: 0,
-            device: '',
-            nic_type: '',
-            tags: {},
-            ip_addresses: [
-                {
-                    ip_address: '',
-                    subnet_id: '',
-                    cidr: ''
-                }
-            ]
-        }
-    ],
-    disks: [
-        {
-            device: '',
-            storage_id: '',
-            size: 0,
-            tags: {},
-            disk_type: '',
-            volume_id: '',
-            disk_id: ''
-        }
-    ],
+    base: {
+        memory: 0,
+        core: 2,
+    },
+    compute: {
+        created_by_user_id: casual._uuid().slice(-12),
+        instance_id: casual.make_id('i'),
+        keypair: 'cloudone-dev-kubectl-ec2-key',
+        instance_name: 'cloudone-dev-eks-cluster_kubectl-test',
+        static_nat: arrayOf(casual.integer(1, 3), casual._ip),
+        security_groups: arrayOf(casual.integer(1, 6), casual._security_group_name),
+        security_group_rules: arrayOf(casual.integer(1, 6), casual._security_group_rule),
+        instance_type: 'unknown',
+        image: 'amzn2-ami-hvm-2.0.20190823.1-x86_64-gp2',
+    },
+    vm: {
+        host: '',
+        image: 'amzn2-ami-hvm-2.0.20190823.1-x86_64-gp2',
+        host_vm_id: casual.make_id('i'),
+        vm_id: casual.make_id('i'),
+        vm_name: 'cloudone-dev-eks-cluster_kubectl-test',
+        platform_type: 'AWS',
+    },
+}));
+
+
+casual.define('nic', () => ({
+    mac_address: 'aa:1f:va:v3:ad:fa:b3',
+    device_index: 0,
+    device: '',
+    nic_type: 'PHYSICAL',
+    tags: {},
+    ip_addresses: arrayOf(casual.integer(1, 5), casual._ipAddress),
+}));
+
+casual.define('disk', () => ({
+    device_index: 0,
+    disk_id: '',
+    device: 'xvda',
+    storage_id: '',
+    size: 8,
+    tags: {},
+    disk_type: 'Ebs',
+    volume_id: casual.make_id('vol'),
+}));
+
+casual.define('zoneInfo', () => ({
+    zone_id: casual.make_id('zone'),
+    name: casual.name,
+    state: casual.random_element(['ACTIVE', 'DEACTIVE']),
+    tags: {},
+    region_info: null,
+    domain_id: casual.make_id('domain'),
+    created_at: casual.timestamp,
+    deleted_at: casual.timestamp,
+}));
+
+casual.define('collectInfo', () => ({
+    state: 'NEW',
+    collectors: arrayOf(casual.integer(1, 3), casual.make_id, 'collector'),
+    data_version: {},
+}));
+casual.define('server', () => ({
+    server_id: casual.make_id('server'),
+    name: casual._name(),
+    state: casual.random_element(['INSERVICE', 'clock', 'table']),
+    primary_ip_address: casual.ip,
+    ip_addresses: casual.ip_list,
+    server_type: casual.random_element(['VM', 'BARE METAL']),
+    os_type: casual.random_element(['LINUX', 'WINDOW']),
+    data: casual.data,
+    nics: arrayOf(casual.integer(2, 5), casual._nic),
+    disks: arrayOf(casual.integer(2, 5), casual._disk),
     template_data: {},
-    pool_info: {
-        pool_id: '',
-        name: ''
-    }, // or null
-    zone_info: {
-        zone_id: '',
-        name: ''
-    }, // or null (but it cannot be null)
-    region_info: {
-        region_id: '',
-        name: ''
-    }, // or null (but it cannot be null)
-    project_id: '',
-    domain_id: '',
-    tags: {
-        aa: ''
-    },
-    collect_info: {
-        state: '',
-        collectors: [],
-        data_version: {}
-    },
-    created_at: {
-        seconds: '',
-        nanos: 0
-    },
-    updated_at: {
-        seconds: '',
-        nanos: 0
-    },
-    deleted_at: null
-};
+    pool_info: null,
+    zone_info: casual.zoneInfo,
+    project_id: casual.make_id('project'),
+    domain_id: casual.make_id('domain'),
+    tags: {},
+    collect_info: casual.collectInfo,
+    created_at: casual.timestamp,
+    updated_at: casual.timestamp,
+    deleted_at: null,
+}));
+
+export const server = () => casual.server;
+export const serverList = count => arrayOf(count, casual._server);

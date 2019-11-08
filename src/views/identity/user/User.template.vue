@@ -42,8 +42,8 @@
                     </template>
                     <template slot="col-state" slot-scope="data">
                         <p-td>
-                            {{ data.state }}
                             <p-status
+                                    v-bind="stateBind(data.state)"
                                 v-if="data.state==='ENABLED'"
                                 icon="fa-circle"
                                 icon-style="solid"
@@ -100,7 +100,6 @@ export default {
             pageSize: 15,
             selectIndex: [],
             fields: [{ name: 'user_id', label: 'id' }, 'name', 'email', 'state', 'mobile', 'group', 'language', 'timezone'],
-            items: [],
             dropdown: [
                 {
                     type: 'item', text: 'update', event: 'update', disabled: false,
@@ -117,6 +116,11 @@ export default {
             ],
         };
     },
+    computed: {
+        items() {
+            return [];
+        },
+    },
     methods: {
         clickAdd() {
             console.log('add');
@@ -132,6 +136,22 @@ export default {
         clickDelete() {},
         clickActivated() {},
         clickDeactivated() {},
+        stateBind(state) {
+            const obj = {
+                icon: 'fa-circle',
+                iconStyle: 'solid',
+                size: 'xs',
+            };
+            if (state === 'ENABLED') {
+                obj.text = 'enabled';
+                obj.iconColor = '#60B731';
+            } else {
+                obj.text = 'disabled';
+                obj.iconColor = '#60B731';
+                obj.iconColor = '#60B731';
+            }
+            return obj;
+        },
     },
 
 };
