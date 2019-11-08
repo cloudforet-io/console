@@ -129,6 +129,9 @@ export default {
         ...mapGetters('auth', [
             'nextPath',
         ]),
+        ...mapGetters('domain', [
+            'authType',
+        ]),
         getCurrentHostname() {
             const hostName = url.parse(window.location.href).host;
             return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
@@ -139,8 +142,7 @@ export default {
     },
     methods: {
         async directToCommonUser() {
-            const clientId = this.$store.getters['auth/client_id'];
-            if (this.isEmpty(clientId)) {
+            if (this.authType === 'local') {
                 this.$router.push({ path: '/sign-in' });
             } else {
                 this.$router.push({ path: '/google-sign-in' });
@@ -149,20 +151,19 @@ export default {
         async login() {
             this.showGreetMSG();
 
-            const authObj = {
-                adminUserId: this.adminUserId,
+            const credentials = {
+                user_id: this.adminUserId,
                 password: this.password,
-                domainId: sessionStorage.getItem('domainId'),
                 user_type: 'DOMAIN_OWNER',
             };
 
-            if (this.isEmpty(authObj.adminUserId) || this.isEmpty(authObj.password)) {
+            if (this.isEmpty(credentials.user_id) || this.isEmpty(credentials.password)) {
                 this.showErorrMSG();
                 return;
             }
 
-            await this.$store.dispatch('auth/login', authObj).then(() => {
-                this.$router.push(this.nextPath);
+            await this.$store.dispatch('auth/signIn', credentials).then(() => {
+                this.$router.push({ path: '/' });
                 this.setTimeZone();
             }).catch(() => {
                 this.showErorrMSG();

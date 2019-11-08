@@ -1,131 +1,105 @@
 <template>
-    <b-row align-v="center">
-        <ul class="cb-slideshow">
-            <li>
-                <span />
-                <div><h3>Clo·ud San·d·box</h3></div>
-            </li>
-            <li>
-                <span />
-                <div><h3>com·po·sure</h3></div>
-            </li>
-            <li>
-                <span />
-                <div><h3>e·qua·nim·i·ty</h3></div>
-            </li>
-            <li>
-                <span />
-                <div><h3>bal·an·ce</h3></div>
-            </li>
-            <li>
-                <span />
-                <div><h3>qui·e·tude</h3></div>
-            </li>
-            <li>
-                <span />
-                <div><h3>Ma·inf·rame compu·ter</h3></div>
-            </li>
-        </ul>
-
-        <div class="container fade-in">
-            <!--<BaseSimpleModal
-                ref="LogInSimpleModal"
-                :title="tr('TR_NOTI')"
-            >
-                <template #contents>
-                    <div>
-                        We apologize for inconvenience. 'Sign up', 'Password retrieval' feature currently unavailable due to our policies.
-                        <br>Please, contact System Administrator for following contacts:
-                        <br>
-                        <div>● e-mail:<a href="mailto:admin@mz.co.kr"> <b> admin@mz.co.kr</b></a></div>
-                        <div>● Phone: <a href="#">+82 (02)<b>1644-2243</b></a></div>
-                    </div>
-                </template>
-            </BaseSimpleModal>-->
-
-            <b-row class="justify-content-center">
-                <b-col md="8">
-                    <b-card-group class="card-group">
-                        <b-card no-body class="p-4">
-                            <b-card-body>
-                                <b-form>
-                                    <h1>{{ $t('COMMON.SIGN_IN') }}</h1>
-                                    <transition v-if="seenGreet" name="slide-fade">
-                                        <p class="message">
-                                            <b>{{ $t('COMMON.SIGN_IN_MSG') }}</b>
-                                        </p>
-                                    </transition>
-                                    <transition v-if="seenError" name="slide-fade">
-                                        <p class="message" style="color: #B82E24">
-                                            <b>{{ $t('COMMON.SIGN_FAIL_TITLE') }}</b>
-                                            <br> {{ $t('COMMON.SIGN_FAIL_BODY') }}
-                                        </p>
-                                    </transition>
-                                    <b-input-group class="mb-3">
-                                        <b-input-group-prepend>
-                                            <b-input-group-text><i class="fal fa-user" /></b-input-group-text>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model="userId" type="text" placeholder="User ID" @keyup.enter="signIn" />
-                                    </b-input-group>
-                                    <b-input-group class="mb-2">
-                                        <b-input-group-prepend>
-                                            <b-input-group-text><i class="fal fa-key" /></b-input-group-text>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model="password" type="password" placeholder="Password"
-                                                      autocomplete="current-password" @keyup.enter="signIn"
-                                        />
-                                    </b-input-group>
-                                    <b-row>
-                                        <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
-                                            <div @click="directToAdmin"><span class="root-sign" >{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
-                                            </div>
-                                        </b-col>
-                                        <b-col class="col-1 col-xs-1 col-sm-1 col-md-1 col-lg-4 col-xl-4 signIn-check">
-                                            <button v-b-tooltip.hover
-                                                    type="button"
-                                                    class="btn btn-link signIn-check"
-                                                    title="Trouble to Log In?"
-                                                    @click="popSignUpInstruction"
-                                            >
-
-                                            </button>
-                                        </b-col>
-                                    </b-row>
-                                    <!--<b-row class="row justify-content-end">
-                    <b-col md="4" class="p-3 bg-info"> <b-button  sm variant="danger" size="sm">Admin</b-button></b-col>
-                    <b-col class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-4">
-                    </b-col>
-                  </b-row>-->
-                                    <b-row class="mb-3">
-                                        <!--<b-col md="4" class="col-xs-12 col-sm-12">
-                      <b-button type="button" variant="danger" @click="directToAdmin">
-                        {{ tr('MSG.ADMIN_USER') }}
-                      </b-button>
-                    </b-col>-->
-                                        <b-col md="4" class="ml-auto col-xs-12 col-sm-12">
-                                            <b-button type="button" block class="signIn-btn" @click="signIn">
-                                                {{ $t('COMMON.SIGN_IN') }}
-                                            </b-button>
-                                        </b-col>
-                                    </b-row>
-                                </b-form>
-                            </b-card-body>
-                        </b-card>
-                        <b-card no-body class="text-white bg-primary" style="width:44%;">
-                            <b-card-body class="right-info-card-body ">
-                                <div class="text-center">
-                                    <p style="margin-bottom: 10px">
-                                        <img src="@/assets/images/brand/dcos.png" width="100vh" height="100vh">
-                                    </p><h1>{{ getCurrentHostname }}</h1></p>
-                                    <p>{{ getGreetMessage }} </p>
+    <div class="background-cover">
+        <div class="row">
+            <div class="container fade-in">
+                <b-row class="justify-content-center">
+                    <b-col md="8">
+                        <b-card-group class="card-group">
+                            <b-card no-body class="p-4">
+                                <b-card-body>
+                                    <b-form>
+                                        <h1>{{ $t('COMMON.SIGN_IN') }}</h1>
+                                        <transition v-if="seenGreet" name="slide-fade">
+                                            <p class="message">
+                                                <b>{{ $t('COMMON.SIGN_IN_MSG') }}</b>
+                                            </p>
+                                        </transition>
+                                        <transition v-if="seenError" name="slide-fade">
+                                            <p class="message" style="color: #B82E24">
+                                                <b>{{ $t('COMMON.SIGN_FAIL_TITLE') }}</b>
+                                                <br> {{ $t('COMMON.SIGN_FAIL_BODY') }}
+                                            </p>
+                                        </transition>
+                                        <b-input-group class="mb-3">
+                                            <b-input-group-prepend>
+                                                <b-input-group-text><i class="fal fa-user" /></b-input-group-text>
+                                            </b-input-group-prepend>
+                                            <b-form-input v-model="userId" type="text" placeholder="User ID"
+                                                          @keyup.enter="signIn"
+                                            />
+                                        </b-input-group>
+                                        <b-input-group class="mb-2">
+                                            <b-input-group-prepend>
+                                                <b-input-group-text><i class="fal fa-key" /></b-input-group-text>
+                                            </b-input-group-prepend>
+                                            <b-form-input v-model="password" type="password" placeholder="Password"
+                                                          autocomplete="current-password" @keyup.enter="signIn"
+                                            />
+                                        </b-input-group>
+                                        <b-row>
+                                            <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
+                                                <div @click="directToAdmin">
+                                                    <span class="root-sign">{{ tr('SIGNIN.ROOT_CREDENTIALS')  }}</span>
+                                                </div>
+                                            </b-col>
+                                            <b-col class="col-1 col-xs-1 col-sm-1 col-md-1 col-lg-4 col-xl-4 signIn-check">
+                                                <button v-b-tooltip.hover
+                                                        type="button"
+                                                        class="btn btn-link signIn-check"
+                                                        title="Trouble to Log In?"
+                                                        @click="popSignUpInstruction"
+                                                />
+                                            </b-col>
+                                        </b-row>
+                                        <!--<b-row class="row justify-content-end">
+                            <b-col md="4" class="p-3 bg-info"> <b-button  sm variant="danger" size="sm">Admin</b-button></b-col>
+                            <b-col class="col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-4">
+                            </b-col>
+                          </b-row>-->
+                                        <b-row class="mb-3">
+                                            <!--<b-col md="4" class="col-xs-12 col-sm-12">
+                              <b-button type="button" variant="danger" @click="directToAdmin">
+                                {{ tr('MSG.ADMIN_USER') }}
+                              </b-button>
+                            </b-col>-->
+                                            <b-col md="4" class="ml-auto col-xs-12 col-sm-12">
+                                                <b-button type="button" block class="signIn-btn"
+                                                          @click="signIn"
+                                                >
+                                                    {{ $t('COMMON.SIGN_IN') }}
+                                                </b-button>
+                                            </b-col>
+                                        </b-row>
+                                    </b-form>
+                                </b-card-body>
+                            </b-card>
+                            <div class="card text-white card-right-container">
+                                <img src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg">
+                                <div class="card-img-overlay">
+                                    <div class="text-center">
+                                        <p style="margin-bottom: 10px">
+                                            <img src="@/assets/images/brand/dcos.png" width="100vh" height="100vh">
+                                        </p><h1>{{ getCurrentHostname }}</h1></p>
+                                        <p>{{ getGreetMessage }} </p>
+                                    </div>
                                 </div>
-                            </b-card-body>
-                        </b-card>
-                    </b-card-group>
-                </b-col>
-            </b-row>
+                            </div>
+                            <!--<b-card class="background-info"
+                                    overlay
+                                    :img-src="require('../../../assets/images/landing/cloudone_console_sign-in_bg&#45;&#45;sm.svg')">
+                                <b-card-body class="right-info-card-body">
+
+                                </b-card-body>
+                            </b-card>-->
+                            <!--<b-card no-body class="text-white bg-primary" style="width:44%;">
+
+                            </b-card>-->
+                        </b-card-group>
+                    </b-col>
+                </b-row>
+            </div>
         </div>
-    </b-row>
+    </div>
 </template>
 
 <script>
@@ -169,7 +143,7 @@ export default {
     },
     methods: {
         async directToAdmin() {
-            this.$router.push({ name: 'Admin-SignIn'});
+            this.$router.push({ name: 'Admin-SignIn' });
             this.$router.push({ path: '/admin-sign-in' });
         },
         async signIn() {
@@ -185,7 +159,7 @@ export default {
             }
 
             await this.$store.dispatch('auth/signIn', credentials).then((response) => {
-                this.$router.push('/');
+                this.$router.push({ path: localStorage.getItem('common.nextPath') });
             }).catch((error) => {
                 if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
@@ -246,6 +220,23 @@ export default {
 
 <style lang="scss" scoped>
     @import '../../../styles/css/slideShow.css';
+
+    .background-cover {
+        height: 100vh;
+        width: 100vw;
+        background-position: center bottom;
+        background-size: cover;
+        background-image: url("../../../assets/images/landing/cloudone_console_sign-in_bg.jpg");
+    }
+
+    .card-right-container {
+        border: none;
+        > img {
+            border-top-right-radius: 7px;
+            border-bottom-right-radius: 7px;
+        }
+    }
+
     span.root-sign:hover {
         text-decoration: underline;
         cursor: pointer
