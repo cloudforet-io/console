@@ -1,96 +1,58 @@
 <template>
-    <b-row align-v="center">
-        <ul class="cb-slideshow">
-            <li>
-                <span />
-                <div><h3>Clo·ud San·d·box</h3></div>
-            </li>
-            <li>
-                <span />
-                <div><h3>com·po·sure</h3></div>
-            </li>
-            <li>
-                <span />
-                <div><h3>e·qua·nim·i·ty</h3></div>
-            </li>
-            <li>
-                <span />
-                <div><h3>bal·an·ce</h3></div>
-            </li>
-            <li>
-                <span />
-                <div><h3>qui·e·tude</h3></div>
-            </li>
-            <li>
-                <span />
-                <div><h3>Ma·inf·rame compu·ter</h3></div>
-            </li>
-        </ul>
-        <div class="container fade-in">
-            <BaseSimpleModal
-                ref="LOOA001_ErrorSimpleModal"
-                :type="'danger'"
-                :title="tr('TR_NOTI')"
-            >
-                <template #contents>
-                    <div>
-                        {{ tr('MODAL_MSG.NO_USER_VALID',[loginId]) }}
-                        <br>
-                        <div>● e-mail:<a href="mailto:admin@mz.co.kr"> <b> admin@mz.co.kr</b></a></div>
-                        <div>● Phone: <a href="#">+82 (02)<b>1644-2243</b></a></div>
-                    </div>
-                </template>
-            </BaseSimpleModal>
-            <b-row class="justify-content-center">
-                <b-col md="8">
-                    <b-card-group class="card-group">
-                        <b-card no-body class="p-4" style="min-height: 35vh">
-                            <b-card-body>
-                                <b-form>
-                                    <h1>{{ $t('COMMON.SIGN_IN') }}</h1>
-                                    <transition v-if="seenGreet" name="slide-fade">
-                                        <p class="message">
-                                            <b>{{ $t('COMMON.SIGN_IN_MSG') }}</b>
-                                        </p>
-                                    </transition>
-                                    <transition v-if="seenError" name="slide-fade">
-                                        <p class="message" style="color: #B82E24">
-                                            <b>{{ $t('COMMON.SIGN_FAIL_TITLE') }}</b>
-                                            <br> {{ $t('COMMON.SIGN_FAIL_BODY') }}
-                                        </p>
-                                    </transition>
-                                    <b-input-group class="mb-4" >
-                                        <div id="g-signin-btn" style="width: 70%;" @click="login" />
-                                    </b-input-group>
-                                    <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
-                                        <div style="text-align: left" @click="directToAdmin"><span class="root-sign" href="#">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
-                                        </div>
-                                    </b-col>
-                                </b-form>
-                            </b-card-body>
-                        </b-card>
-                        <b-card no-body class="text-white bg-primary" style="width:44%;">
-                            <b-card-body class="right-info-card-body ">
-                                <div class="text-center">
-                                    <p style="margin-bottom: 10px">
-                                        <img src="@/assets/images/brand/dcos.png" width="100vh" height="100vh">
-                                    </p><h1>{{ getCurrentHostname }}</h1></p>
-                                    <p>{{ getGreetMessage }} </p>
+    <div class="background-cover">
+        <div class="row">
+            <div class="container fade-in">
+                <b-row class="justify-content-center">
+                    <b-col md="8">
+                        <b-card-group class="card-group">
+                            <b-card no-body class="p-4" style="min-height: 35vh">
+                                <b-card-body>
+                                    <b-form>
+                                        <h1>{{ $t('COMMON.SIGN_IN') }}</h1>
+                                        <transition v-if="seenGreet" name="slide-fade">
+                                            <p class="message">
+                                                <b>{{ $t('COMMON.SIGN_IN_MSG') }}</b>
+                                            </p>
+                                        </transition>
+                                        <transition v-if="seenError" name="slide-fade">
+                                            <p class="message" style="color: #B82E24">
+                                                <b>{{ $t('COMMON.SIGN_FAIL_TITLE') }}</b>
+                                                <br> {{ $t('COMMON.SIGN_FAIL_BODY') }}
+                                            </p>
+                                        </transition>
+                                        <b-input-group class="mb-4">
+                                            <div id="g-signin-btn" style="width: 70%;" @click="login" />
+                                        </b-input-group>
+                                        <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
+                                            <div style="text-align: left" @click="directToAdmin">
+                                                <span class="root-sign" href="#">{{ tr('SIGNIN.ROOT_CREDENTIALS') }}</span>
+                                            </div>
+                                        </b-col>
+                                    </b-form>
+                                </b-card-body>
+                            </b-card>
+                            <div class="card text-white card-right-container">
+                                <img src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg">
+                                <div class="card-img-overlay">
+                                    <div class="text-center">
+                                        <p style="margin-bottom: 10px">
+                                            <img src="@/assets/images/brand/dcos.png" width="100vh" height="100vh">
+                                        </p><h1>{{ getCurrentHostname }}</h1></p>
+                                        <p>{{ getGreetMessage }} </p>
+                                    </div>
                                 </div>
-                            </b-card-body>
-                        </b-card>
-                    </b-card-group>
-                </b-col>
-            </b-row>
+                            </div>
+                        </b-card-group>
+                    </b-col>
+                </b-row>
+            </div>
         </div>
-    </b-row>
+    </div>
 </template>
 <script>
 import url from 'url';
 import { mapGetters } from 'vuex';
-import store from '@/store';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
-/* global gapi */
 const { gapi } = window;
 export default {
     components: { BaseSimpleModal },
@@ -127,8 +89,7 @@ export default {
         },
         async setGoogleSignInButton() {
             const vm = this;
-            const clientId = this.$store.getters['auth/client_id'];
-
+            const clientId = this.$store.getters['auth/clientId'];
             gapi.load('auth', () => {
                 const auth2 = gapi.auth2.init({
                     client_id: clientId,
@@ -148,7 +109,6 @@ export default {
             });
         },
         onSignIn(googleUser) {
-            console.log(this.isSignedIn);
             const profile = googleUser.getBasicProfile();
             this.loginId = profile.getEmail();
             const param = {
@@ -160,16 +120,14 @@ export default {
         },
         async login() {
             const auth2 = gapi.auth2.getAuthInstance();
-            await this.$store.dispatch('auth/login', this.oathSignParam).then((response) => {
+            await this.$store.dispatch('auth/signIn', this.oathSignParam).then((response) => {
                 if (!auth2.isSignedIn.get()) {
                     return;
                 }
-                auth2.disconnect();
-                console.log('response', this.$router);
-                this.$router.push(this.nextPath);
-                console.log('response', this.nextPath);
-                this.setTimeZone();
 
+                auth2.disconnect();
+                this.$router.push({ path: localStorage.getItem('common.nextPath') });
+                this.setTimeZone();
             }).catch((error) => {
                 if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
@@ -216,6 +174,21 @@ export default {
         cursor: pointer
     }
 
+    .background-cover {
+        height: 100vh;
+        width: 100vw;
+        background-position: center bottom;
+        background-size: cover;
+        background-image: url("../../../assets/images/landing/cloudone_console_sign-in_bg.jpg");
+    }
+
+    .card-right-container {
+        border: none;
+        > img {
+            border-top-right-radius: 7px;
+            border-bottom-right-radius: 7px;
+        }
+    }
     .root-sign {
         text-align: left;
         font-size: 14px;

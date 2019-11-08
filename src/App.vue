@@ -1,8 +1,10 @@
 <template>
-    <div id="app" v-if="isInit">
-        <router-view  />
+    <div v-if="isInit" id="app">
+        <router-view />
     </div>
-    <div v-else> This is Loading Page </div>
+    <div v-else>
+        This is Loading Page
+    </div>
 </template>
 <script>
 import Vue from '@/main.js';
@@ -28,6 +30,9 @@ export default {
     methods: {
         async initialize() {
             await this.preparationTo();
+            if (this.isInit === true) {
+                this.redirectTo();
+            }
         },
         async preparationTo() {
             await config.init();
@@ -39,11 +44,15 @@ export default {
             });
 
             Vue.prototype.$http = api.instance;
-            this.$store.dispatch('domain/sync');
 
+            this.$store.dispatch('domain/sync');
+            debugger;
             if (!this.$store.getters['domain/id']) {
                 try {
                     await this.$store.dispatch('domain/load');
+
+                    console.log('in APP.vue', localStorage.getItem('common.authType'));
+
                 } catch (e) {
                     console.log(e);
                     this.$router.push({ path: '/error-page' });
@@ -51,6 +60,10 @@ export default {
             }
             await this.$store.dispatch('auth/sync');
             this.isInit = true;
+        },
+        redirectTo() {
+            const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in'}: { path: '/google-sign-in' };
+            this.$router.push(nextPath);
         },
     },
 };

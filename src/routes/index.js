@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import { beforeEach } from './hooks';
 
 // Routes
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
@@ -14,6 +13,8 @@ import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth';
 import Admin from '@/views/sign-in/admin/Admin';
 import Redirect404 from '@/views/common/404/Redirect404';
 import Init from '@/views/common/init/Init';
+import api from '@/lib/api';
+import store from '@/store';
 
 Vue.use(VueRouter);
 
@@ -21,7 +22,6 @@ const router = new VueRouter({
     mode: 'history',
     hash: false,
     linkActiveClass: 'open active',
-    //scrollBehavior: () => ({ y: 0 }),
     routes: [
         {
             path: '/init',
@@ -37,13 +37,13 @@ const router = new VueRouter({
         },
         {
             path: '/sign-in',
-            name: 'signinn',
+            name: 'SignIn',
             meta: { label: 'Sign In', excludeAuth: true },
             component: SignIn,
         },
         {
             path: '/google-sign-in',
-            name: 'Google-Oauth-signin',
+            name: 'GoogleOauthSignIn',
             meta: { label: 'google_oauth2', excludeAuth: true },
             component: GoolgeSignIn,
         },
@@ -69,6 +69,11 @@ const router = new VueRouter({
     ],
 });
 
-router.beforeEach(beforeEach);
+router.beforeEach(async (to, from, next) => {
+    if (to.meta && to.meta.excludeAuth !== true && !api.checkAccessToken()) {
+        localStorage.setItem('common.nextPath', to.path);
+        await store.dispatch('auth/signOut');
+    } else next();
+})
 
 export default router;

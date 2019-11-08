@@ -46,6 +46,9 @@ export default {
         ...mapGetters('auth', [
             'client_id',
         ]),
+        ...mapGetters('domain', [
+            'authType',
+        ]),
     },
     methods: {
         ...mapMutations('user', [
@@ -59,13 +62,13 @@ export default {
             else if (item.key === 'profile') this.openProfile();
         },
         async signOutAction() {
-            if (this.client_id) {
-                await this.signOut(this.client_id);
-                this.$router.push({ path: '/google-sign-in' });
-                this.oAuthSignOut();
-            } else {
+            if (this.authType === 'local') {
                 await this.signOut();
                 this.$router.push({ path: '/sign-in' });
+            } else {
+                await this.signOut();
+                this.$router.push({ path: '/google-sign-in' });
+                this.oAuthSignOut();
             }
         },
         openProfile() {

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import api from '@/lib/api';
 
 export default {
@@ -75,7 +76,9 @@ export default {
             });
 
             api.setAccessToken(response.data.access_token);
-            await dispatch('getUser', response.data.user_id);
+            if (_.get(credentials, 'user_type') !== 'DOMAIN_OWNER' ) {
+                await dispatch('getUser', response.data.user_id);
+            }
         },
 
         signOut({ commit }) {
@@ -84,7 +87,6 @@ export default {
             localStorage.removeItem('userId');
             localStorage.removeItem('language');
             localStorage.removeItem('timezone');
-
         },
 
         sync({ commit, dispatch, getters }) {
