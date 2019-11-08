@@ -7,9 +7,7 @@
              maxHeight: maxHeight ? `${maxHeight}px` : null,
          }"
     >
-        <svg ref="svg"
-             :style="{visibility: svg ? 'visible' : 'hidden' }"
-        />
+        <svg ref="svg" />
 
         <Spinner v-model="isLoading"
                  :backdrop="true"
@@ -19,63 +17,57 @@
                      minWidth: `${minWidth}px`,
                  }"
         />
-        <!--        <p-tooltip contents="contents" :show="true">-->
-        <!--            <template #target>-->
-        <!--                <button>trigger</button>-->
-        <!--            </template>-->
-        <!--        </p-tooltip>-->
     </div>
 </template>
 
 <script>
 /**
- * TODO:
- * <CHILD COMPONENTS>
- *
- * 1. horizontal stacked bar (Servers by Type)
- *---      1) value(%) overlay
- *      2) labels custom
- *---      3) height fix
- * 2. horizontal bar (Servers by Type - sub categories)
- *---      1) border radius
- *---      2) label custom
- *---          a. label position
- *---        b. value position
- * 3. donut chart (Server State)
- *      1) label custom
- *      2) center text
- * 4. bubble chart (Resources by Region)
- *      1) background
- *      2) bubble position by data, by background
- *      3) label custom
- *          a. hovered label active
- *          b. label position
- *
- */
+     * TODO:
+     * <CHILD COMPONENTS>
+     *
+     * 1. horizontal stacked bar (Servers by Type)
+     *---      1) value(%) overlay
+     *      2) labels custom
+     *---      3) height fix
+     * 2. horizontal bar (Servers by Type - sub categories)
+     *---      1) border radius
+     *---      2) label custom
+     *---          a. label position
+     *---        b. value position
+     * 3. donut chart (Server State)
+     *      1) label custom
+     *      2) center text
+     * 4. bubble chart (Resources by Region)
+     *      1) background
+     *      2) bubble position by data, by background
+     *      3) label custom
+     *          a. hovered label active
+     *          b. label position
+     *
+     */
 
 /**
- * TODO:
- * <COMPONENT'S FUNCTION>
- *
- *--- 1. lazy data loading with spinner
- *
- *--- 2. options, externals, plugins deep merge
- *
- *--- 3. auto update
- *---      1) deeply update
- *
- */
+     * TODO:
+     * <COMPONENT'S FUNCTION>
+     *
+     *--- 1. lazy data loading with spinner
+     *
+     *--- 2. options, externals, plugins deep merge
+     *
+     *--- 3. auto update
+     *---      1) deeply update
+     *
+     */
 
 
 import * as d3 from 'd3';
+import Tooltip from 'tooltip.js';
 import Spinner from '@/components/base/spinner/BaseSpinner';
-import { DEFAULT_OPTIONS } from './ChartD3.map';
-import PTooltip from '@/components/molecules/tooltips/Tooltip';
+import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from './ChartD3.map';
 
 export default {
     name: 'PChartD3',
     components: {
-        PTooltip,
         Spinner,
     },
     props: {
@@ -110,6 +102,10 @@ export default {
             type: Number,
             default: null,
         },
+        noDraw: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -123,6 +119,8 @@ export default {
             xScaleWidth: this.minWidth,
             windowWidth: 0,
             widthDiff: 0,
+            tooltipEls: {},
+            colorset: PRIMARY_COLORSET,
         };
     },
     computed: {
@@ -153,21 +151,62 @@ export default {
             if (!val) this.drawChart();
         },
         yScaleHeight() {
-            if (this.responsiveWidthOnly) this.setSvgViewBox();
+            this.setSvgViewBox();
         },
     },
     mounted() {
         this.isMounted = true;
     },
     destroyed() {
+        this._.forIn(this.tooltipEls, tooltip => tooltip.dispose());
         if (this.responsiveWidthOnly) window.removeEventListener('resize', this.resizeSvg);
     },
     methods: {
         drawChart() {
+            if (this.noDraw) return;
+            this.initTooltips();
             this.initSvg();
             this.initXScale(); // MUST IMPLEMENT IN CHILD COMPONENT
             this.initYScale(); // MUST IMPLEMENT IN CHILD COMPONENT
             this.appendChartElements(); // MUST IMPLEMENT IN CHILD COMPONENT
+        },
+        initTooltips() {
+            this._.forIn(this.tooltipEls, tooltip => tooltip.dispose());
+            this.tooltipEls = {};
+        },
+        /**
+             * @name appendTooltips
+             * @param el            target element. essential.
+             * @param contents      tooltip contents. essential.
+             * @param key           unique data for target element. essential.
+             * @param options       tooltip.js options. optional.
+             */
+        appendTooltips(data, idx, els, options) {
+            if (this.tooltipEls[data.key]) return;
+            // eslint-disable-next-line no-param-reassign
+            if (!options) options = {};
+
+            this.tooltipEls[data.key] = new Tooltip(els[idx], this._.merge({
+                title: this.generateTooltipTitle(data, idx, options.color),
+                container: this.svgContainerRef,
+            }, this.chartOptions.tooltips, options));
+        },
+        generateTooltipTitle(data, idx, color) {
+            const title = document.createElement('div');
+            title.classList.add('tooltip-title');
+
+            const circle = document.createElement('span');
+            circle.classList.add('circle');
+            circle.style.backgroundColor = color || PRIMARY_COLORSET[idx];
+
+            const text = document.createElement('span');
+            text.classList.add('text');
+            text.innerText = `${data.key}: ${data.value}`;
+
+            title.appendChild(circle);
+            title.appendChild(text);
+
+            return title;
         },
         initSvg() {
             if (!this.svgEl) {
@@ -175,8 +214,9 @@ export default {
                 this.setSvgResponsive();
             } else {
                 this.svg.remove();
-                this.svg = this.svgEl.append('g');
+                console.log('removed g', this.$parent);
             }
+            console.log('appended g', this.$parent);
             this.svg = this.svgEl.append('g');
         },
         setSvgResponsive() {
@@ -239,6 +279,21 @@ export default {
             z-index: 99;
             width: 100%;
             height: 100%;
+        }
+        .tooltip-title {
+            display: flex;
+            align-items: center;
+            .circle {
+                display: inline-block;
+                height: 12px;
+                width: 12px;
+                border-radius: 50%;
+            }
+            .text {
+                padding-left: 4px;
+                font-size: 14px;
+                color: $white;
+            }
         }
     }
 </style>

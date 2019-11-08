@@ -2,7 +2,7 @@
     <div class="hs-chart-container">
         <p-chart-d3 ref="chart" v-bind="$props"
                     :data="[]"
-                    :options="chartOptions"
+                    :no-draw="true"
                     :min-height="yScaleHeight"
                     :max-height="yScaleHeight"
         />
@@ -49,8 +49,8 @@ export default {
     data() {
         return {
             barGroup: null,
-            keyGroup: null,
-            barRects: null,
+            rectGroup: null,
+            rects: null,
             labels: null,
             colorset: PRIMARY_COLORSET,
         };
@@ -115,34 +115,46 @@ export default {
                 .style('fill', (d, i) => colors(i));
         },
         appendBars() {
-            this.keyGroup = this.barGroup.selectAll('g').data(d => d).enter();
+            this.rectGroup = this.barGroup.selectAll('g').data(d => d).enter().append('g')
+                .on('mouseover', this.onMouseover)
+                .on('mouseout', this.onMouseout);
 
-            this.barRects = this.keyGroup.append('rect')
+            this.rects = this.rectGroup.append('rect')
                 .attr('x', d => this.xScale(d[0]))
                 .attr('y', (d, i) => this.yScale(i))
                 .attr('width', d => this.xScale(d[1] - d[0]))
                 .attr('height', this.chartOptions.bars.thickness)
-                .attr('class', 'bar');
+                .attr('class', 'bar')
+                .attr('data-idx', (d, i) => i);
         },
         appendLabels() {
-            this.labels = this.keyGroup.append('text')
+            this.labels = this.rectGroup.append('text')
                 .attr('class', 'percent-label')
                 .text((d, i) => `${Math.round(d.data[d.key] / this.sumList[i] * 100)}%`)
                 .attr('x', d => this.xScale((d[0] + d[1]) / 2))
                 .attr('y', (d, i) => this.yScale(i + 0.5))
                 .attr('dominant-baseline', 'middle')
                 .attr('text-anchor', 'middle')
-                .style('display', (d, i, el) => (el[i].getBBox().width < this.xScale(d[1] - d[0]) ? 'block' : 'none'));
+                .style('visibility', (d, i, el) => (el[i].getBBox().width < this.xScale(d[1] - d[0]) ? 'visible' : 'hidden'));
+        },
+        onMouseover(data, idx, bars) {
+            this.rectGroup.classed('hover-group', true);
+            d3.select(bars[idx]).classed('hover', true);
+        },
+        onMouseout(data, idx, bars) {
+            this.rectGroup.classed('hover-group', false);
+            d3.select(bars[idx]).classed('hover', false);
         },
         /**
          * @override
          */
         resizeElements() {
             this.initXScale();
-            this.barRects.attr('width', d => this.xScale(d[1] - d[0]))
+
+            this.rects.attr('width', d => this.xScale(d[1] - d[0]))
                 .attr('x', d => this.xScale(d[0]));
             this.labels.attr('x', d => this.xScale((d[0] + d[1]) / 2))
-                .style('display', (d, i, el) => (el[i].getBBox().width < this.xScale(d[1] - d[0]) ? 'block' : 'none'));
+                .style('visibility', (d, i, el) => (el[i].getBBox().width < this.xScale(d[1] - d[0]) ? 'visible' : 'hidden'));
         },
     },
 };
@@ -150,6 +162,12 @@ export default {
 
 <style lang="scss">
     .horizontal-stack-bar-g {
+        .hover-group {
+            opacity: 0.3;
+        }
+        .hover {
+            opacity: 1.0;
+        }
         .percent-label {
             font-size: 14px;
             fill: $white;

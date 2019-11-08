@@ -1,7 +1,7 @@
 <script>
 import * as d3 from 'd3';
 import PChartD3 from '@/components/molecules/charts/ChartD3';
-import { DEFAULT_OPTIONS } from '@/components/molecules/charts/ChartD3.map';
+import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from '@/components/molecules/charts/ChartD3.map';
 import { HORIZONTAL_OPTIONS } from './HorizontalBarChartD3.map';
 
 export default {
@@ -115,6 +115,7 @@ export default {
         },
         onMouseover(data, idx, bars) {
             d3.select(bars[idx].parentElement).classed('hover', true);
+            // this.appendTooltips(data, idx, bars, { color: PRIMARY_COLORSET[9] });
         },
         onMouseout(data, idx, bars) {
             d3.select(bars[idx].parentElement).classed('hover', false);

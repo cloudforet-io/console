@@ -11,10 +11,8 @@ export const DEFAULT_SIZE = Object.freeze({
 export const DEFAULT_OPTIONS = Object.freeze({
     scales: {
         display: false,
-        y: {
-        },
-        x: {
-        },
+        y: {},
+        x: {},
     },
     responsive: {
         width: true,
@@ -23,6 +21,20 @@ export const DEFAULT_OPTIONS = Object.freeze({
             align: 'xMinYMin',
             meetOrSlice: 'meet',
         },
+    },
+    tooltips: {
+        placement: 'top',
+        trigger: 'hover',
+        template: `<div class="tooltip p-tooltip" role="tooltip">
+                        <div class="tooltip-arrow"></div>
+                        <div class="tooltip-inner"></div>
+                    </div>`,
+        html: true,
+        // popperOptions: {
+        //     offset: {
+        //         offset: '0 -50%',
+        //     },
+        // },
     },
 });
 
