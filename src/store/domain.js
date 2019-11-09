@@ -42,7 +42,6 @@ export default {
             const response = await api.instance.post('/identity/domain/list', {
                 name: getters.name,
             });
-            debugger;
             if (response.data.total_count === 1) {
 
                 const domainInfo = response.data.results[0];

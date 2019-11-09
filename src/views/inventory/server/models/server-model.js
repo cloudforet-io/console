@@ -1,4 +1,5 @@
-import { casual, arrayOf } from '@/lib/casual';
+import casual from '@/lib/casual';
+import { arrayOf } from '@/lib/casual';
 
 casual.define('security_group_rule', () => ({
     port_range_min: casual.integer(0, 1000),

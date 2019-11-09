@@ -46,7 +46,6 @@ export default {
             Vue.prototype.$http = api.instance;
 
             this.$store.dispatch('domain/sync');
-            debugger;
             if (!this.$store.getters['domain/id']) {
                 try {
                     await this.$store.dispatch('domain/load');
