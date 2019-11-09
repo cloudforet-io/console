@@ -58,7 +58,6 @@ export default {
     computed: {
         modalElement() {
             console.log('asf');
-            debugger;
             return this.$refs.modal.$children[0].$children[0].$el;
         },
         sortedItems() {
