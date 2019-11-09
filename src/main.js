@@ -22,7 +22,7 @@ Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
 Vue.use(VueLodash, { name: 'lodash' });
 Vue.use(SvgIcon, {
-tagName: 'svgicon',
+    tagName: 'svgicon',
     classPrefix: 'p-i',
 });
 

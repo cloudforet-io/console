@@ -200,7 +200,7 @@ export default {
         },
         async listItems () {
             try {
-                let res = await this.$http.post('/statistics/datacenter-items', this.getParams());
+                let res = await this.$axios.post('/statistics/datacenter-items', this.getParams());
                 this.items = res.data;
                 this.isLoading = false;
             } catch (err) {

@@ -11,6 +11,10 @@ node_modules/
 # Transpiled code
 dist
 
+
+# Git submodule
+src/assets
+
 # Dev tools
 .DS_Store
 .vscode

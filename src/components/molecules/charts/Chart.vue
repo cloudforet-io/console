@@ -5,7 +5,7 @@
              width: width,
          }"
     >
-        <canvas ref="chart" class="canvas"
+        <canvas ref="chart" class="canvas" :class="$vnode.tag"
                 :style="{visibility: chart ? 'visible' : 'hidden'}"
         />
         <Spinner v-model="isLoading"
@@ -26,10 +26,10 @@
  *
  * 1. horizontal stacked bar (Servers by Type)
  *      1) value(%) overlay
- *      2) labels custom
- *      3) height fix
+ *---      2) height fix
  * 2. horizontal bar (Servers by Type - sub categories)
- *      1) border radius
+ *---      1) border radius
+ *XXX      2) background bar
  *      2) label custom
  *          a. label position
  *          b. value position
@@ -56,35 +56,27 @@
  *--- 3. auto update
  *---      1) deeply update
  *
+ * 4. hover tooltip customize
+ *
+ * 5. hover overal background color & hovered item color customize
  */
 
 
 import Chart from 'chart.js';
 import Spinner from '@/components/base/spinner/BaseSpinner';
+import {
+    DEFAULT_OPTIONS, PRIMARY_COLORSET, initRectangleDraw, initHover,
+} from './Chart.map';
+
+initHover(Chart);
+initRectangleDraw(Chart);
+Chart.defaults.global.responsive = true;
+Chart.defaults.global.maintainAspectRatio = false;
 
 const DefaultExternals = {
     moment: 'moment',
 };
 
-const DefaultOptions = {
-    layout: {
-        padding: {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-        },
-    },
-    legend: {
-        display: true,
-        position: 'top',
-        labels: {
-            usePointStyle: true,
-            boxWidth: 10,
-            padding: 20,
-        },
-    },
-};
 
 export default {
     name: 'PChart',
@@ -139,16 +131,35 @@ export default {
         chartExternals() {
             return this._.merge({}, DefaultExternals, this.externals);
         },
+        interactiveOptions() {
+            return {
+                onHover: this.onHover,
+                onClick: this.onClick,
+            };
+        },
         chartOptions() {
-            return this._.merge({}, DefaultOptions, this.options);
+            return this._.merge({},
+                DEFAULT_OPTIONS,
+                this.interactiveOptions,
+                this.options);
         },
         chartPlugins() {
             return [this.plugins];
         },
+        chartData() {
+            return this._.merge({
+                labels: [],
+                datasets: this.data.datasets.map(() => ({
+                    backgroundColor: PRIMARY_COLORSET,
+                    borderColor: PRIMARY_COLORSET,
+                })),
+            },
+            this.data);
+        },
         chartConfig() {
             return {
                 type: this.type,
-                data: this.data,
+                data: this.chartData,
                 options: this.chartOptions,
                 plugins: this.chartPlugins,
                 externals: this.chartExternals,
@@ -184,9 +195,17 @@ export default {
             }
         },
         updateChart() {
-            this.chart.data = this.data;
+            this.chart.data = this.chartData;
             this.chart.options = this.chartOptions;
+            this.chart.plugins = this.chartPlugins;
+            this.chart.externals = this.chartExternals;
             this.chart.update();
+        },
+        onHover() {
+            console.log('hovered');
+        },
+        onClick() {
+            console.log('clicked');
         },
     },
 };
@@ -199,6 +218,7 @@ export default {
             position: absolute;
             left: 0;
             top: 0;
+            z-index: 99;
         }
     }
 </style>
