@@ -1,5 +1,6 @@
 import { withKnobs, number } from '@storybook/addon-knobs/vue';
-import PChart from './Chart.vue';
+import PChart from './Chart';
+import { autoProps } from '@/setup/storybook-util';
 
 export default {
     title: 'Molecules/Chart',
@@ -34,16 +35,12 @@ const dataset = {
 export const chart = () => ({
     components: { PChart },
     props: {
-        width: {
-            default: number('width', 500),
-        },
+        ...autoProps(PChart),
     },
-    template: '<p-chart ref="chart" :width="width" :height="height" :data="chartData" v-if="reload"></p-chart>',
+    template: `<p-chart ref="chart" v-bind="$props">
+                </p-chart>`,
     data() {
         return {
-            height: 300,
-            chartData: dataset,
-            reload: true,
         };
     },
 });
