@@ -17,45 +17,20 @@
 </template>
 
 <script>
+import {
+    tabBarProps, isOne, tabData, tabClick, isActive,
+} from '@/components/molecules/tabs/tab-bar/TabBar.mixins';
+
 export default {
     name: 'PTabBar',
-    props: {
-        tabs: {
-            type: Array,
-            default: () => [],
-        },
-        activeTab: {
-            type: String,
-        },
-    },
-    computed: {
-        tabData() {
-            const tab = [];
-            this.tabs.forEach((value) => {
-                if (typeof value === 'string') {
-                    tab.push({
-                        name: value,
-                        label: value,
-                    });
-                } else if (!value.hasOwnProperty('label')) {
-                    value.label = value.name;
-                } else {
-                    tab.push(value);
-                }
-            });
-            return tab;
-        },
-        isOne() {
-            return this.tabs.length === 1;
-        },
-    },
-    methods: {
-        tabClick(name) {
-            if (this.activeTab !== name) {
-                this.$emit('update:activeTab', name);
-                this.$emit('changeTab', name);
-            }
-        },
+    mixins: [tabBarProps],
+    setup(props, { emit }) {
+        return {
+            tabData: tabData(props),
+            isOne: isOne(props),
+            tabClick: tabClick(props, emit),
+            isActive: isActive(props),
+        };
     },
 };
 </script>

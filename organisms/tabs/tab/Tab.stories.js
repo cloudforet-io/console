@@ -42,6 +42,7 @@ export const tab = () => ({
     </template>
 
     </PTab>
+    <p>{{activeTab}}</p>
 </div>`,
     data() {
         return {
