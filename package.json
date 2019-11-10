@@ -18,6 +18,7 @@
     "@coreui/icons": "0.3.0",
     "@coreui/vue": "^2.1.2",
     "@johmun/vue-tags-input": "^2.1.0",
+    "@vue/composition-api": "^0.3.2",
     "axios": "^0.18.0",
     "babel-preset-vue": "^2.0.2",
     "bootstrap": "^4.3.1",

@@ -12,6 +12,8 @@ import store from './store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
 import { Mixin } from '@/mixins/global-util';
+import VueCompositionApi from '@vue/composition-api';
+
 import config from '@/lib/config';
 import api from '@/lib/api';
 
@@ -20,6 +22,7 @@ Vue.use(VueCookies);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
+Vue.use(VueCompositionApi);
 Vue.use(VueLodash, { name: 'lodash' });
 Vue.use(SvgIcon, {
     tagName: 'svgicon',
