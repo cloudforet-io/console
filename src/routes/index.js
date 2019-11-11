@@ -73,8 +73,7 @@ router.beforeEach(async (to, from, next) => {
     if (!to.meta.excludeAuth && !api.checkAccessToken()) {
         localStorage.setItem('common.nextPath', to.path);
         await store.dispatch('auth/signOut');
-    }
-    next();
-})
+    } else next();
+});
 
 export default router;
