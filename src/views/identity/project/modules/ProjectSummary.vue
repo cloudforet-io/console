@@ -139,7 +139,7 @@ export default {
                 url = '/identity/project/get';
                 param['project_id'] = selectedNode.data.id;
             }
-            await this.$axios.post(url, param).then((response) => {
+            await this.$http.post(url, param).then((response) => {
                 if (!this.isEmpty(response.data)){
                     this.summaryData.id = response.data.hasOwnProperty('project_group_id') ? response.data.project_group_id : response.data.project_id;
                     this.summaryData.title =  response.data.name;

@@ -223,7 +223,7 @@ export default {
         async listCollectionStates() {
             this.loading = true;
             try {
-                const res = await this.$axios.post('/statistics/collection-state');
+                const res = await this.$http.post('/statistics/collection-state');
                 this.setCollectionStates(res.data);
                 this.updateChartDataConfig();
                 this.loading = false;

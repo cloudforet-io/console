@@ -114,7 +114,7 @@ export default {
         async listData(itemType) {
             this.isLoading[itemType] = true;
             try {
-                const res = await this.$axios.post('/statistics/server-type', this.getParams(itemType));
+                const res = await this.$http.post('/statistics/server-type', this.getParams(itemType));
                 this.setData(itemType, res.data);
                 this.isLoading[itemType] = false;
             } catch (err) {

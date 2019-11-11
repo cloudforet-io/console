@@ -3,7 +3,7 @@ import VueLodash from 'vue-lodash';
 import timezone from 'countries-and-timezones';
 import { GlobalEnum } from '@/setup/enum';
 
-export const Mixin = {
+export const Util = {
     methods: {
         /** ********************************************************************************
          * Name       : getGraphColor

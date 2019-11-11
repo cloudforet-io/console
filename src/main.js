@@ -11,9 +11,9 @@ import router from '@/routes/index';
 import store from './store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
-import { Mixin } from '@/mixins/global-util';
+import { Util } from '@/lib/global-util';
 
-Vue.mixin(Mixin);
+Vue.mixin(Util);
 Vue.use(VueCookies);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
@@ -34,7 +34,6 @@ Vue.prototype.$velocity = velocity;
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
 
-// eslint-disable-next-line no-new
 new Vue({
     el: '#app',
     router,
@@ -45,3 +44,4 @@ new Vue({
     },
     template: '<App/>',
 });
+export default Vue;

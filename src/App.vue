@@ -7,7 +7,7 @@
     </div>
 </template>
 <script>
-import Vue from 'vue';
+import Vue from '@/main.js';
 import api from '@/lib/api';
 import config from '@/lib/config';
 
@@ -29,44 +29,52 @@ export default {
     },
     methods: {
         async initialize() {
-            await config.init();
-            await this.prepareApi();
-            await this.prepareDomain();
-            await this.$store.dispatch('auth/sync');
-            this.$router.push(localStorage.getItem('common.nextPath'));
-            this.isInit = true;
+            await this.preparationTo();
+            if (this.isInit === true) {
+                this.redirectTo();
+            }
         },
-        async prepareApi() {
+        async preparationTo() {
+            await config.init();
             await api.init(config.get('VUE_APP_API.ENDPOINT'), {
-                authError: () => {
+                authError: (error) => {
                     this.$store.dispatch('auth/signOut');
                     // TODO: show popup (re-sign-in)
                 },
             });
 
             Vue.prototype.$http = api.instance;
-        },
-        async prepareDomain() {
+
             this.$store.dispatch('domain/sync');
             if (!this.$store.getters['domain/id']) {
                 try {
                     await this.$store.dispatch('domain/load');
+
+                    console.log('in APP.vue', localStorage.getItem('common.authType'));
                 } catch (e) {
-                    console.error(e);
+                    console.log(e);
                     this.$router.push({ path: '/error-page' });
                 }
             }
+            await this.$store.dispatch('auth/sync');
+            this.isInit = true;
         },
-        // redirectTo() {
-        //     const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
-        //     this.$router.push(nextPath);
-        // },
+        redirectTo() {
+            const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
+            if (!api.checkAccessToken()) {
+                this.$router.push(nextPath);
+            } else {
+                console.log('next Path', localStorage.getItem('common.nextPath'));
+                this.$router.push({ path: localStorage.getItem('common.nextPath') });
+            }
+        },
     },
 };
 
 </script>
 
 <style lang="scss">
-  @import 'styles/style';
-  //test
+    @import 'styles/style';
+    //test
 </style>
+f
