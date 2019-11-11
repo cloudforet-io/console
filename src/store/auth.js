@@ -77,6 +77,7 @@ export default {
             });
 
             api.setAccessToken(response.data.access_token);
+
             if (_.get(credentials, 'user_type') !== 'DOMAIN_OWNER' || _.get(VueCookies.get('domainInfo'), 'clientId') !== null ) {
                 await dispatch('getUser', response.data.user_id);
             }

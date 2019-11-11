@@ -7,6 +7,7 @@
     </div>
 </template>
 <script>
+import _ from 'lodash';
 import Vue from '@/main.js';
 import api from '@/lib/api';
 import config from '@/lib/config';
@@ -24,17 +25,29 @@ export default {
             isInit: false,
         };
     },
-    async created() {
-        await this.initialize();
+    created() {
+        this.preparationTo();
     },
     methods: {
-        async initialize() {
-            await this.preparationTo();
-            if (this.isInit === true) {
-                this.redirectTo();
+        isInitialized() {
+            if (this.isEmpty($cookies.get('domainInfo')) || this.isEmpty(_.get(Vue, 'prototype.$http'))) {
+                return false;
             }
+            this.isInit = true;
+            return true;
         },
         async preparationTo() {
+            if (this.isInitialized()) {
+                this.redirectTo();
+                return;
+            }
+            await this.configInit();
+            await this.syncStores('auth');
+            await this.domainInit();
+            await this.syncStores('domain');
+            this.preparationTo();
+        },
+        async configInit() {
             await config.init();
             await api.init(config.get('VUE_APP_API.ENDPOINT'), {
                 authError: (error) => {
@@ -44,8 +57,8 @@ export default {
             });
 
             Vue.prototype.$http = api.instance;
-
-            this.$store.dispatch('domain/sync');
+        },
+        async domainInit() {
             if (!this.$store.getters['domain/id']) {
                 try {
                     await this.$store.dispatch('domain/load');
@@ -56,15 +69,15 @@ export default {
                     this.$router.push({ path: '/error-page' });
                 }
             }
-            await this.$store.dispatch('auth/sync');
-            this.isInit = true;
+        },
+        async syncStores(storeName) {
+            await this.$store.dispatch(`${storeName}/sync`);
         },
         redirectTo() {
             const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
             if (!api.checkAccessToken()) {
                 this.$router.push(nextPath);
             } else {
-                console.log('next Path', localStorage.getItem('common.nextPath'));
                 this.$router.push({ path: localStorage.getItem('common.nextPath') });
             }
         },
