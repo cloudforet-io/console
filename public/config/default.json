@@ -4,6 +4,6 @@
     "google_oauth2": "/google-sign-in"
   },
   "VUE_APP_API": {
-    "URL": "http://console-api.dev.pyengine.net"
+    "ENDPOINT": "http://console-api.dev.pyengine.net"
   }
 }

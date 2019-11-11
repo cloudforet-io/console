@@ -39,7 +39,7 @@
                                         <b-row>
                                             <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
                                                 <div @click="directToAdmin">
-                                                    <span class="root-sign">{{ tr('SIGNIN.ROOT_CREDENTIALS')  }}</span>
+                                                    <span class="root-sign">{{ tr('SIGNIN.ROOT_CREDENTIALS') }}</span>
                                                 </div>
                                             </b-col>
                                             <b-col class="col-1 col-xs-1 col-sm-1 col-md-1 col-lg-4 col-xl-4 signIn-check">
@@ -161,12 +161,16 @@ export default {
             await this.$store.dispatch('auth/signIn', credentials).then((response) => {
                 this.$router.push({ path: localStorage.getItem('common.nextPath') });
             }).catch((error) => {
-                if (!this.isEmpty(error.message)) {
-                    const errorConfig = JSON.parse(error.message);
-                    const errorCode = errorConfig.error_code;
-                    const errorMSG = errorConfig.error_dt_code;
-                    if (errorMSG === 'ERROR_NOT_FOUND' && errorCode === 400) {
-                        this.showErorrMSG();
+                if (error.message) {
+                    try {
+                        const errorConfig = JSON.parse(error.message);
+                        const errorCode = errorConfig.error_code;
+                        const errorMSG = errorConfig.error_dt_code;
+                        if (errorMSG === 'ERROR_NOT_FOUND' && errorCode === 400) {
+                            this.showErorrMSG();
+                        }
+                    } catch (e) {
+                        return false;
                     }
                 } else {
                     this.consoleLogEnv('error', error);
