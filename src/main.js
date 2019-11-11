@@ -6,6 +6,7 @@ import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
 import VueLodash from 'vue-lodash';
 import SvgIcon from 'vue-svgicon';
+import VueCompositionApi from '@vue/composition-api';
 import App from './App';
 import router from '@/routes/index';
 import store from './store';
@@ -15,6 +16,7 @@ import { Util } from '@/lib/global-util';
 
 Vue.mixin(Util);
 Vue.use(VueCookies);
+Vue.use(VueCompositionApi);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
