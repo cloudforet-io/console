@@ -144,6 +144,41 @@ export const selectTable = () => ({
     },
 });
 
+export const rowClickMultiSelectMode = () => ({
+    components: { PDataTable, PButton },
+    mixins: [mockupMixin],
+    template: `
+<div>
+<PDataTable 
+    ref="table"
+    :items="items" 
+    :fields="fields"
+    :hover="true"
+    :rowClickMultiSelectMode="true"
+    @rowLeftClick="rowLeftClick"
+    :selectable="true"
+    :selectIndex.sync="selectIndex"
+>
+</PDataTable>
+<p>select index: {{selectIndex}} </p>
+<p-button @click="getData" styleType="primary" >선택한 데이터 가져오기</p-button>
+<p>{{selected}}</p> 
+</div>
+`,
+    data() {
+        return {
+            ...data,
+            selectIndex: [],
+            selected: [],
+        };
+    },
+    methods: {
+        ...actions,
+        getData() {
+            this.selected = this.$refs.table.getSelectItem();
+        },
+    },
+});
 
 export const rowVBind = () => ({
     components: { PDataTable },
