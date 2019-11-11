@@ -52,12 +52,12 @@ export default {
                     clientId: _.get(domainInfo, 'plugin_info.options.client_id', null),
                 });
 
-
                 VueCookies.set('domainInfo', {
                     id: getters.id,
                     name: getters.name,
                     description: getters.description,
                     authType: getters.authType,
+                    clientId: getters.clientId,
                 });
             } else {
                 throw new Error(`Domain not found. (${window.location.hostname})`);
