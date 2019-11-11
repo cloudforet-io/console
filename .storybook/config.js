@@ -13,7 +13,7 @@ import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
-import { Mixin } from '@/mixins/global-util';
+import { Util } from '@/lib/global-util';
 import VueLodash from 'vue-lodash';
 import VueI18n from 'vue-i18n';
 import { withKnobs } from '@storybook/addon-knobs';

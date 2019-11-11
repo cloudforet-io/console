@@ -1,4 +1,4 @@
-import { Mixin } from '@/mixins/global-util';
+import { Util } from '@/lib/global-util';
 import { GlobalEnum } from '@/setup/enum';
 export default {
     queryList: [
@@ -10,7 +10,7 @@ export default {
         { label: 'Language', key: 'language', values: Object.keys(GlobalEnum.LANGUAGES) },
         { 
             label: 'Timezone', key: 'timezone', 
-            values: Mixin.methods.getAllTimezones()
+            values: Util.methods.getAllTimezones()
         },
         { label: 'test', key: 'name', ajax: {
             url: '/identity/user/list',

@@ -1,4 +1,4 @@
-import { Mixin } from '@/mixins/global-util';
+import { Util } from '@/lib/global-util';
 import { GlobalEnum } from '@/setup/enum';
 export default {
     queryList: [],

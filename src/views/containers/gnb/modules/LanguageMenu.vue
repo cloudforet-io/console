@@ -17,7 +17,7 @@
 import { mapMutations, mapGetters } from 'vuex';
 import PI from '@/components/atoms/icons/PI';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList';
-import { LANGUAGES } from '@/mixins/global-enums';
+import { LANGUAGES } from '@/lib/global-enums';
 import styles from '@/styles/_variables.scss';
 
 export default {

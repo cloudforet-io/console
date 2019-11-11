@@ -29,7 +29,7 @@
                             <template #details="{tabName}">
                                 <keep-alive>
                                     <project-summary-top
-                                      :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
+                                        :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
                                     />
                                 </keep-alive>
                             </template>
@@ -41,7 +41,7 @@
                 </BaseDragHorizontal>
                 <div>
                     <template v-if="tabsData.activeTab === 'details'">
-                        <project-summary-bottom></project-summary-bottom>
+                        <project-summary-bottom />
                     </template>
                     <template v-else>
                         2
@@ -58,6 +58,7 @@ import ProjectContext from '@/views/identity/project/modules/ProjectContext';
 import DefaultTree from '@/components/organisms/trees/area-tree/AreaTree';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
+
 const projectSummaryTop = () => import('@/views/identity/project/modules/ProjectSummaryTop');
 const projectSummaryBottom = () => import('@/views/identity/project/modules/ProjectSummaryBottom');
 const projectMember = () => import('@/views/identity/project/modules/ProjectMember');
