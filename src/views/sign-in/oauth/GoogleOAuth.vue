@@ -89,14 +89,17 @@ export default {
         },
         async setGoogleSignInButton() {
             const vm = this;
-            const clientId = this.$store.getters['auth/clientId'];
+            const clientId = this.isEmpty(this.$store.getters['domain/clientId']) ? $cookies.get('domainInfo').clientId : this.$store.getters['domain/clientId'];
+
             gapi.load('auth', () => {
                 const auth2 = gapi.auth2.init({
                     client_id: clientId,
                     fetch_basic_profile: false,
                     scope: 'profile',
                 });
+
                 vm.isSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
+
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
                     width: 300,
