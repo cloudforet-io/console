@@ -19,7 +19,7 @@ import VueI18n from 'vue-i18n';
 import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 
-Vue.mixin(Mixin);
+Vue.mixin(Util);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueI18n);
