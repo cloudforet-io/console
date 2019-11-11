@@ -87,7 +87,17 @@
                                     :index="index"
                                     :field="field"
                                 >
-                                    <p-td>{{ item[field] }}</p-td>
+                                    <p-td>
+                                        <slot
+                                            :name="'col-'+field+'-format'"
+                                            :item="item"
+                                            :value="item[field]"
+                                            :index="index"
+                                            :field="field"
+                                        >
+                                            {{ item[field] }}
+                                        </slot>
+                                    </p-td>
                                 </slot>
                             </template>
                         </p-tr>
