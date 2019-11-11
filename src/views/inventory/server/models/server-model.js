@@ -1,5 +1,4 @@
-import casual from '@/lib/casual';
-import { arrayOf } from '@/lib/casual';
+import casual, { arrayOf } from '@/lib/casual';
 
 casual.define('security_group_rule', () => ({
     port_range_min: casual.integer(0, 1000),
@@ -82,12 +81,12 @@ casual.define('collectInfo', () => ({
 casual.define('server', () => ({
     server_id: casual.make_id('server'),
     name: casual._name(),
-    state: casual.random_element(['INSERVICE', 'clock', 'table']),
+    state: casual.random_element(['INSERVICE', 'PENDING', 'MAINTENANCE', 'CLOSED', 'DELETED']),
     primary_ip_address: casual.ip,
     ip_addresses: casual.ip_list,
     server_type: casual.random_element(['VM', 'BARE METAL']),
     os_type: casual.random_element(['LINUX', 'WINDOW']),
-    data: casual.data,
+    data: casual.serverData,
     nics: arrayOf(casual.integer(2, 5), casual._nic),
     disks: arrayOf(casual.integer(2, 5), casual._disk),
     template_data: {},
@@ -101,6 +100,4 @@ casual.define('server', () => ({
     updated_at: casual.timestamp,
     deleted_at: null,
 }));
-
-export const server = () => casual.server;
-export const serverList = count => arrayOf(count, casual._server);
+export default casual;
