@@ -43,7 +43,6 @@ export default {
                 name: getters.name,
             });
             if (response.data.total_count === 1) {
-
                 const domainInfo = response.data.results[0];
 
                 commit('setDomainInfo', {

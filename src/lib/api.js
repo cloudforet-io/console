@@ -92,9 +92,8 @@ class API {
         const accessToken = VueCookies.get('accessToken');
         if (accessToken) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     init(baseURL, handlers = {}) {
@@ -106,4 +105,3 @@ class API {
 }
 
 export default new API();
-

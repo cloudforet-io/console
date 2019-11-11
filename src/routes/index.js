@@ -70,10 +70,11 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-    if (to.meta && to.meta.excludeAuth !== true && !api.checkAccessToken()) {
+    if (!to.meta.excludeAuth && !api.checkAccessToken()) {
         localStorage.setItem('common.nextPath', to.path);
         await store.dispatch('auth/signOut');
-    } else next();
+    }
+    next();
 })
 
 export default router;
