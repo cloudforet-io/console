@@ -1,4 +1,4 @@
-export const statusColorBindFactory = (statusColorMapping, textFnc) => value => ({
+export const statusBindFactory = (statusColorMapping, textFnc) => value => ({
     text: textFnc(value),
     ...statusColorMapping[value],
 });
