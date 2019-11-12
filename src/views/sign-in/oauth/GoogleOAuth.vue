@@ -136,12 +136,13 @@ export default {
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
                 this.setTimeZone();
             }).catch((error) => {
+                auth2.disconnect();
                 this.showErorrMSG();
                 console.log(error);
                 /* if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
                     const errorMSG = errorConfig.error_dt_code;
-                    auth2.disconnect();
+
                 } else {
                     this.consoleLogEnv('error', error);
                 } */
