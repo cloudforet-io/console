@@ -39,7 +39,7 @@
                                         <b-row>
                                             <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
                                                 <div @click="directToAdmin">
-                                                    <span class="root-sign">{{ tr('SIGNIN.ROOT_CREDENTIALS') }}</span>
+                                                    <span class="root-sign">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
                                                 </div>
                                             </b-col>
                                             <b-col class="col-1 col-xs-1 col-sm-1 col-md-1 col-lg-4 col-xl-4 signIn-check">
@@ -138,9 +138,6 @@ export default {
             return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
         },
     },
-    mounted() {
-        this.isRemembered();
-    },
     methods: {
         async directToAdmin() {
             this.$router.push({ name: 'Admin-SignIn' });
@@ -159,10 +156,12 @@ export default {
             }
 
             await this.$store.dispatch('auth/signIn', credentials).then((response) => {
-                if (localStorage.getItem('common.nextPath') === '/sign-in') {
-                    localStorage.setItem('common.nextPath', '/');
+                console.log(localStorage.getItem('common.toNextPath'));
+                if (localStorage.getItem('common.toNextPath') === '/sign-in' || localStorage.getItem('common.toNextPath') === null) {
+                    localStorage.setItem('common.toNextPath', '/');
                 }
-                this.$router.push({ path: localStorage.getItem('common.nextPath') });
+
+                this.$router.push({ path: localStorage.getItem('common.toNextPath') });
             }).catch((error) => {
                 if (error.message) {
                     try {

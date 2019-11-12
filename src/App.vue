@@ -30,19 +30,27 @@ export default {
     },
     methods: {
         async preparationTo() {
-
             try {
-
                 await this.configInit();
                 await this.syncStores('auth');
                 await this.domainInit();
                 await this.syncStores('domain');
+
                 this.isInit = true;
+                const excludeAuth = this.getMeta();
 
                 if (!api.checkAccessToken()) {
-                    this.redirectTo();
-                }
 
+                    if (this.checkMatchedPath(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
+                        const nextPath = this.$store.getters['domain/authType'] === 'local' ? '/sign-in' : '/google-sign-in';
+                        localStorage.setItem('common.toNextPath', nextPath);
+                        this.$router.push({ path: nextPath });
+                    }
+
+                    if (excludeAuth !== true) {
+                        this.redirectTo();
+                    }
+                }
             } catch (e) {
                 console.log(e);
             }
@@ -62,8 +70,6 @@ export default {
             if (!this.$store.getters['domain/id']) {
                 try {
                     await this.$store.dispatch('domain/load');
-
-                    console.log('in APP.vue', localStorage.getItem('common.authType'));
                 } catch (e) {
                     console.log(e);
                     this.$router.push({ path: '/error-page' });
@@ -75,7 +81,14 @@ export default {
         },
         redirectTo() {
             const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
+
             this.$router.push(nextPath);
+        },
+        getMeta() {
+            return this.isEmpty(localStorage.getItem('common.toMeta')) ? null : _.get(JSON.parse(localStorage.getItem('common.toMeta')), 'excludeAuth', null);
+        },
+        checkMatchedPath(type, path) {
+            return (path === '/sign-in' && type !== 'local' || path === '/google-sign-in' && type !== 'google_oauth2');
         },
     },
 };

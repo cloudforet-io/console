@@ -71,14 +71,17 @@ const router = new VueRouter({
 
 
 router.beforeEach(async (to, from, next) => {
-    if (to.meta && to.meta.excludeAuth !== true && !api.checkAccessToken()) {
-        await store.dispatch('auth/signOut');
-        localStorage.setItem('common.nextPath', to.path);
-        if (store.getters['domain/id']) {
-            const nextPath = store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
-            next(nextPath);
-        }
-    } else next();
+    if (store.getters['domain/id']) {
+        const nextPath = store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
+        if (to.meta && to.meta.excludeAuth !== true && !api.checkAccessToken()) {
+            await store.dispatch('auth/signOut');
+            await next(nextPath);
+        } else next();
+    } else {
+        localStorage.setItem('common.toMeta', JSON.stringify(to.meta));
+        localStorage.setItem('common.toNextPath', to.path);
+        next();
+    }
 });
 
 export default router;
