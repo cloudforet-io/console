@@ -37,17 +37,20 @@ export default {
             return true;
         },
         async preparationTo() {
+
+            await this.configInit();
+            await this.syncStores('auth');
+            await this.domainInit();
+            await this.syncStores('domain');
+
             if (this.isInitialized()) {
                 if (!api.checkAccessToken()) {
                     this.redirectTo();
                 }
                 return;
             }
-            await this.configInit();
-            await this.syncStores('auth');
-            await this.domainInit();
-            await this.syncStores('domain');
-            this.preparationTo();
+
+            //this.preparationTo();
         },
         async configInit() {
             await config.init();
