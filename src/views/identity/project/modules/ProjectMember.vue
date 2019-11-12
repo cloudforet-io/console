@@ -85,6 +85,12 @@ export default {
         MemberDetail,
         ActionCheckModal,
     },
+    props: {
+        selectedNode: {
+            type: Object,
+            default: null,
+        },
+    },
     data() {
         return {
             members: [],
@@ -199,18 +205,10 @@ export default {
         async listMembers(limit, start, sort, filter, filterOr) {
             this.reset();
             this.saveMeta(limit, start, sort, filter, filterOr);
-            let url = null;
-            const param = {
-                query: this.searchQuery,
-            };
-
-            if (this.$attrs['selected-data'].node.data.item_type === 'PROJECT_GROUP') {
-                url = '/identity/project-group/member/list';
-                param.project_group_id = this.$attrs['selected-data'].node.data.id;
-            } else {
-                url = '/identity/project/member/list';
-                param.project_id = this.$attrs['selected-data'].node.data.id;
-            }
+            const query = { query: this.searchQuery };
+            const selectedNodeDT = this.selectedNode.node.data;
+            const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id, ...query } : { project_id: selectedNodeDT.id, ...query };
+            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/member/list`;
 
             console.log('Parameters', JSON.stringify(param));
             await this.$http.post(url, param).then((response) => {
