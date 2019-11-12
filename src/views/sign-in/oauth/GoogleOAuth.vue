@@ -53,6 +53,7 @@
 import url from 'url';
 import { mapGetters } from 'vuex';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
+
 const { gapi } = window;
 export default {
     components: { BaseSimpleModal },
@@ -127,12 +128,12 @@ export default {
                 if (!auth2.isSignedIn.get()) {
                     return;
                 }
-
                 auth2.disconnect();
-                if (localStorage.getItem('common.nextPath') === '/google-sign-in') {
-                    localStorage.setItem('common.nextPath', '/');
+
+                if (localStorage.getItem('common.toNextPath') === '/google-sign-in' || localStorage.getItem('common.toNextPath') === null) {
+                    localStorage.setItem('common.toNextPath', '/');
                 }
-                this.$router.push({ path: localStorage.getItem('common.nextPath') });
+                this.$router.push({ path: localStorage.getItem('common.toNextPath') });
                 this.setTimeZone();
             }).catch((error) => {
                 if (!this.isEmpty(error.message)) {
