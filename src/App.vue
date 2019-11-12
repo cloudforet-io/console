@@ -22,6 +22,8 @@ export default {
     },
     data() {
         return {
+            configSet: false,
+            domainSet: false,
             isInit: false,
         };
     },
@@ -30,7 +32,11 @@ export default {
     },
     methods: {
         isInitialized() {
-            if (this.isEmpty($cookies.get('domainInfo')) || this.isEmpty(_.get(Vue, 'prototype.$http'))) {
+            //infiniti loop on dev?
+            /*if (this.isEmpty($cookies.get('domainInfo')) || this.isEmpty(_.get(Vue, 'prototype.$http'))) {
+                return false;
+            }*/
+            if (!this.configSet || !this.domainSet) {
                 return false;
             }
             this.isInit = true;
@@ -62,6 +68,7 @@ export default {
             });
 
             Vue.prototype.$http = api.instance;
+            this.configSet = true;
         },
         async domainInit() {
             if (!this.$store.getters['domain/id']) {
@@ -74,6 +81,7 @@ export default {
                     this.$router.push({ path: '/error-page' });
                 }
             }
+            this.domainSet = true;
         },
         async syncStores(storeName) {
             await this.$store.dispatch(`${storeName}/sync`);
