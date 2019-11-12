@@ -38,7 +38,9 @@ export default {
         },
         async preparationTo() {
             if (this.isInitialized()) {
-                this.redirectTo();
+                if (!api.checkAccessToken()) {
+                    this.redirectTo();
+                }
                 return;
             }
             await this.configInit();
@@ -75,11 +77,7 @@ export default {
         },
         redirectTo() {
             const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
-            if (!api.checkAccessToken()) {
-                this.$router.push(nextPath);
-            } else {
-                this.$router.push({ path: localStorage.getItem('common.nextPath') });
-            }
+            this.$router.push(nextPath);
         },
     },
 };

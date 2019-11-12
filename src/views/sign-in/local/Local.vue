@@ -159,6 +159,9 @@ export default {
             }
 
             await this.$store.dispatch('auth/signIn', credentials).then((response) => {
+                if (localStorage.getItem('common.nextPath') === '/sign-in') {
+                    localStorage.setItem('common.nextPath', '/');
+                }
                 this.$router.push({ path: localStorage.getItem('common.nextPath') });
             }).catch((error) => {
                 if (error.message) {
