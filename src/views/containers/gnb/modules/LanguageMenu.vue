@@ -2,6 +2,7 @@
     <div>
         <p-menu-list :list-items="languages"
                      :tooltip="tooltip"
+                     :tooltip-options="{offset: '20px'}"
                      @select="changeLanguage"
         >
             <template #contents>

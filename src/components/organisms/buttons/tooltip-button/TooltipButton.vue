@@ -55,10 +55,9 @@ export default {
     },
     computed: {
         options() {
-            return {
+            return this._.merge({
                 hideOnTargetClick: true,
-                ...this.tooltipOptions,
-            };
+            }, this.tooltipOptions);
         },
     },
 };

@@ -1,7 +1,7 @@
 <template>
     <div class="sitemap-container">
         <p-tooltip-button tooltip="Services"
-                          :tooltip-options="{offset: '12px'}"
+                          :tooltip-options="{offset: '20px'}"
                           :active="visible"
                           @click="show"
         >
