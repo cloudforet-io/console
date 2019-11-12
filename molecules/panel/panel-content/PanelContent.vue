@@ -2,12 +2,15 @@
     <p-dl class="row">
         <div v-for="(def, idx) in definitionList" :key="idx" class="col-sm-12 col-md-6 content-list">
             <slot name="details">
-                <p-dt class="col-sm-12 col-md-6">
+                <p-dt class="col-sm-12 col-md-4">
                     {{ def.title }}
                 </p-dt>
-                <p-dd v-if="hasURL" @mouseover="mouseInOut(idx, true)" @mouseout="mouseInOut(idx, false)">
+                <p-dd v-if="hasURL" class="col-sm-12 col-md-8 copyFlagged"
+                      @mouseover="mouseInOut(idx,true)"
+                      @mouseleave="mouseInOut(idx,false)"
+                >
                     <a :href="def.contents.link">{{ def.contents.text }}</a>
-                    <template v-show="active[idx] ==true">
+                    <template v-if="activeArr(idx)">
                         &nbsp;&nbsp; <p-button v-if="isCopyFlagged(def)"
                                                style="display: inline-block;" outline
                                                :style-type="'secondary'"
@@ -18,12 +21,12 @@
                         </p-button>
                     </template>
                 </p-dd>
-                <p-dd v-else class="col-sm-12 col-md-6 copyFlagged"
-                      @mouseover="mouseInOut(idx, true)"
-                      @mouseout="mouseInOut(idx, false)"
-                >
+                <p-dd v-else class="col-sm-12 col-md-8 copyFlagged"
+                      @mouseover="mouseInOut(idx,true)"
+                      @mouseleave="mouseInOut(idx,false)"
+                      >
                     {{ def.contents.text }}
-                    <template v-show="active[idx] == true">
+                    <template v-if="activeArr(idx)">
                         &nbsp;&nbsp; <p-button v-if="isCopyFlagged(def)"
                                                style="display: inline-block;" outline
                                                :style-type="'secondary'"
@@ -62,27 +65,23 @@ export default {
     },
     data() {
         return {
-            active: [],
+            active: null,
             parseItem: false,
         };
     },
-    watch: {
-        def: {
-            handler(newValue) {
-                console.log(`Person with ID:${newValue.title} modified`);
-                console.log(`New age: ${newValue.text}`);
-            },
-            deep: true,
-        },
-    },
     created() {
-        this.setActiveArray();
+       this.setActiveArray();
     },
     methods: {
+        activeArr(idx){
+            return this.active[idx];
+        },
         setActiveArray() {
+            let emptyArr = [];
             for (let i = 0; i < this.definitionList.length; i++) {
-                this.active.push(false);
+                emptyArr.push(false);
             }
+            this.active = emptyArr;
         },
         isCopyFlagged(definition) {
             return (_.get(definition, 'copyFlag') === true);
@@ -93,8 +92,8 @@ export default {
         copyText(text) {
             this.selectToCopyToClipboard(text);
         },
-        mouseInOut(idx) {
-            this.active[idx] = !this.active[idx];
+        mouseInOut(idx, flag) {
+            this.$set(this.active, idx, flag);
         },
     },
 };
