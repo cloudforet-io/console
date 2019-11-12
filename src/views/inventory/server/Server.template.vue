@@ -61,8 +61,11 @@
                     <template v-slot:col-os_distro-format="data">
                         {{ data.item.data.os.os_distro }}
                     </template>
+                    <template v-slot:col-server_type-format="data">
+                        <PBadge>{{ data.value }}</PBadge>
+                    </template>
                     <template v-slot:col-platform_type-format="data">
-                        {{ data.item.data.vm.platform_type }}
+                        <PBadge>{{ data.item.data.vm.platform_type }}</PBadge>
                     </template>
                 </p-toolbox-table>
             </template>
@@ -79,8 +82,8 @@ import PStatus from '@/components/molecules/status/Status';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
-import PI from '@/components/atoms/icons/PI';
 import PDropdown from '@/components/organisms/buttons/dropdown/Dropdown';
+import PBadge from '@/components/atoms/badges/Badge';
 import { makeTrFields, timestampFormater } from '@/components/organisms/tables/data-table/DataTabel.util';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import {
@@ -185,7 +188,7 @@ export default {
         BaseDragHorizontal,
         PToolboxTable,
         PButton,
-        PI,
+        PBadge,
         PDropdown,
     },
     setup(props, context) {

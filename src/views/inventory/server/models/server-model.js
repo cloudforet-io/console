@@ -17,8 +17,8 @@ casual.define('serverData', () => ({
         os_arch: 'x86_64',
     },
     base: {
-        memory: 0,
-        core: 2,
+        memory: casual.integer(2, 125),
+        core: casual.integer(1, 20),
     },
     compute: {
         created_by_user_id: casual._uuid().slice(-12),
@@ -37,7 +37,7 @@ casual.define('serverData', () => ({
         host_vm_id: casual.make_id('i'),
         vm_id: casual.make_id('i'),
         vm_name: 'cloudone-dev-eks-cluster_kubectl-test',
-        platform_type: 'AWS',
+        platform_type: casual.random_element(['AWS', 'AZURE', 'GCP']),
     },
 }));
 
@@ -73,6 +73,18 @@ casual.define('zoneInfo', () => ({
     deleted_at: casual.timestamp,
 }));
 
+casual.define('poolInfo', () => ({
+    pool_id: casual.make_id('pool'),
+    name: casual.word,
+    state: casual.random_element(['ACTIVE', 'DEACTIVE']),
+    tags: {},
+    domain_id: '',
+    region_info: null,
+    zone_info: null,
+    created_at: casual.timestamp,
+    deleted_at: casual.timestamp,
+}));
+
 casual.define('collectInfo', () => ({
     state: 'NEW',
     collectors: arrayOf(casual.integer(1, 3), casual.make_id, 'collector'),
@@ -90,7 +102,7 @@ casual.define('server', () => ({
     nics: arrayOf(casual.integer(2, 5), casual._nic),
     disks: arrayOf(casual.integer(2, 5), casual._disk),
     template_data: {},
-    pool_info: null,
+    pool_info: casual.poolInfo,
     zone_info: casual.zoneInfo,
     project_id: casual.make_id('project'),
     domain_id: casual.make_id('domain'),
