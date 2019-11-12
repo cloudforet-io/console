@@ -22,8 +22,6 @@ export default {
     },
     data() {
         return {
-            configSet: false,
-            domainSet: false,
             isInit: false,
         };
     },
@@ -32,18 +30,15 @@ export default {
     },
     methods: {
         isInitialized() {
-            //infiniti loop on dev?
-            /*if (this.isEmpty($cookies.get('domainInfo')) || this.isEmpty(_.get(Vue, 'prototype.$http'))) {
-                return false;
-            }*/
-            if (!this.configSet || !this.domainSet) {
+            if (this.isEmpty($cookies.get('domainInfo')) || this.isEmpty(_.get(Vue, 'prototype.$http'))) {
+                console.log('domainInfo', $cookies.get('domainInfo'));
+                console.log('#####################', _.get(Vue, 'prototype.$http'));
                 return false;
             }
             this.isInit = true;
             return true;
         },
         async preparationTo() {
-
             await this.configInit();
             await this.syncStores('auth');
             await this.domainInit();
@@ -53,10 +48,7 @@ export default {
                 if (!api.checkAccessToken()) {
                     this.redirectTo();
                 }
-                return;
             }
-
-            //this.preparationTo();
         },
         async configInit() {
             await config.init();
@@ -68,7 +60,6 @@ export default {
             });
 
             Vue.prototype.$http = api.instance;
-            this.configSet = true;
         },
         async domainInit() {
             if (!this.$store.getters['domain/id']) {
@@ -81,7 +72,6 @@ export default {
                     this.$router.push({ path: '/error-page' });
                 }
             }
-            this.domainSet = true;
         },
         async syncStores(storeName) {
             await this.$store.dispatch(`${storeName}/sync`);
@@ -99,4 +89,3 @@ export default {
     @import 'styles/style';
     //test
 </style>
-f
