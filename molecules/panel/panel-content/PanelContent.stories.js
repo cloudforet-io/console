@@ -1,6 +1,4 @@
-import faker from 'faker';
-import PanelContent from './PanelContent.vue';
-import { autoProps } from '../../../../setup/storybook-util';
+import PanelContent from '@/components/molecules/panel/panel-content/PanelContent';
 
 export default {
     title: 'molecules/panel/panel-content',
@@ -15,9 +13,6 @@ export default {
 export const panelContents = () => ({
     components: { PanelContent },
     template: '<div style="width: 80vw;"><panel-content :definitionList="renderData"></panel-content></div>',
-    props: {
-        ...autoProps(PanelContent),
-    },
     data() {
         return {
             renderData: [
