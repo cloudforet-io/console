@@ -32,7 +32,7 @@
                         @click="theadClick(field,index,$event)"
                     >
                         {{ field.label ? field.label : field.name }}
-                        <template v-if="sortable">
+                        <template v-if="sortable&&field.sortable">
                             <f-i
                                 v-if="sortable&&field.name==sortBy"
                                 icon-style="solid"
@@ -172,9 +172,12 @@ export default {
             const data = [];
             this.fields.forEach((value) => {
                 if (typeof value === 'string') {
-                    data.push({ name: value });
+                    data.push({ name: value, label: value, sortable: true });
                 } else {
-                    data.push(value);
+                    data.push({
+                        sortable: true,
+                        ...value,
+                    });
                 }
             });
             return data;
@@ -216,14 +219,17 @@ export default {
         rowMouseOut(item, index, event) {
             this.$emit('rowMouseOut', item, index, event);
         },
+
         theadClick(field, index, event) {
-            if (this.sortBy !== field.name) {
-                this.$emit('update:sortBy', field.name);
-                if (!this.sortDesc) {
-                    this.$emit('update:sortDesc', true);
+            if (this.sortable && field.sortable) {
+                if (this.sortBy !== field.name) {
+                    this.$emit('update:sortBy', field.name);
+                    if (!this.sortDesc) {
+                        this.$emit('update:sortDesc', true);
+                    }
+                } else {
+                    this.$emit('update:sortDesc', !this.sortDesc);
                 }
-            } else {
-                this.$emit('update:sortDesc', !this.sortDesc);
             }
             this.$emit('theadClick', field, index, event);
         },

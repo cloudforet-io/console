@@ -64,7 +64,7 @@ casual.define('disk', () => ({
 
 casual.define('zoneInfo', () => ({
     zone_id: casual.make_id('zone'),
-    name: casual.name,
+    name: casual.word,
     state: casual.random_element(['ACTIVE', 'DEACTIVE']),
     tags: {},
     region_info: null,
@@ -80,7 +80,7 @@ casual.define('collectInfo', () => ({
 }));
 casual.define('server', () => ({
     server_id: casual.make_id('server'),
-    name: casual._name(),
+    name: casual.word,
     state: casual.random_element(['INSERVICE', 'PENDING', 'MAINTENANCE', 'CLOSED', 'DELETED']),
     primary_ip_address: casual.ip,
     ip_addresses: casual.ip_list,
