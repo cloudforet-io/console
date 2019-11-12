@@ -160,23 +160,10 @@ export default {
                 if (localStorage.getItem('common.toNextPath') === '/sign-in' || localStorage.getItem('common.toNextPath') === null) {
                     localStorage.setItem('common.toNextPath', '/');
                 }
-
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
             }).catch((error) => {
-                if (error.message) {
-                    try {
-                        const errorConfig = JSON.parse(error.message);
-                        const errorCode = errorConfig.error_code;
-                        const errorMSG = errorConfig.error_dt_code;
-                        if (errorMSG === 'ERROR_NOT_FOUND' && errorCode === 400) {
-                            this.showErorrMSG();
-                        }
-                    } catch (e) {
-                        return false;
-                    }
-                } else {
-                    this.consoleLogEnv('error', error);
-                }
+                //console.log(error.message)
+                this.showErorrMSG();
             });
         },
         showErorrMSG() {

@@ -140,12 +140,10 @@ export default {
                     const errorConfig = JSON.parse(error.message);
                     const errorMSG = errorConfig.error_dt_code;
                     auth2.disconnect();
-                    if (errorMSG === 'ERROR_AUTHENTICATED_WITHOUT_USER') {
-                        this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
-                    }
                 } else {
                     this.consoleLogEnv('error', error);
                 }
+                this.showErorrMSG();
             });
         },
         async setTimeZone() {
