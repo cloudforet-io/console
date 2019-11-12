@@ -1,5 +1,6 @@
 export const en = {
     COMMON: {
+        COPY: 'Copy',
         WELCOME_MSG: 'Welcome to {0} Portal.',
         WELCOME_MSG_P: 'Welcome to {0} Portal',
         SIGN_UP: 'Sign up',

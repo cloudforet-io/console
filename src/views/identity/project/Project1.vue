@@ -29,6 +29,7 @@
                             <template #details="{tabName}">
                                 <keep-alive>
                                     <project-summary-top
+                                        :selected-node="getSelectedNodeAndTree"
                                         :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
                                     />
                                 </keep-alive>
@@ -41,11 +42,11 @@
                 </BaseDragHorizontal>
                 <div>
                     <template v-if="tabsData.activeTab === 'details'">
-                        <project-summary-bottom />
+                        <project-summary-bottom
+                          :selected-node="getSelectedNodeAndTree"
+                        />
                     </template>
-                    <template v-else>
-                        2
-                    </template>
+                    <template v-else />
                 </div>
             </template>
         </default-tree>
@@ -87,6 +88,7 @@ export default {
             displayTree: false,
             treeData: [],
             selectedData: {},
+            selectedNodeData: null,
             isInitializing: false,
             contextItem: null,
         };
@@ -94,6 +96,9 @@ export default {
     computed: {
         getSelectedData() {
             return this.contextItem;
+        },
+        getSelectedNodeAndTree() {
+            return this.selectedNodeData;
         },
     },
     created() {
@@ -105,7 +110,7 @@ export default {
         },
 
         pNodeClicked(node, tree) {
-
+            this.selectedNodeData = { node, tree };
         },
 
         async pNodeToggled(node, tree) {

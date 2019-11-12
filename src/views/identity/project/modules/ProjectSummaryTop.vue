@@ -1,7 +1,7 @@
 <template>
     <InfoPanel :info-title-style="responsiveStyle"
-               :info-title="renderTitle"
-               :content-data="renderData"
+               :info-title="topPanelTitle"
+               :content-data="topPanel"
     />
 </template>
 
@@ -23,6 +23,10 @@ export default {
         InfoPanel,
     },
     props: {
+        selectedNode: {
+            type: Object,
+            default: null,
+        },
         responsiveStyle: {
             type: Object,
             default: null,
@@ -39,11 +43,32 @@ export default {
         };
     },
     computed: {
+        topPanelTitle() {
+            return this.tr('COMMON.DETAILS');
+        },
         topPanel() {
             return [
-                { title: this.tr('COL_NM.ID'), contents: this.summaryData.id, copyFlag: true },
-                { title: this.tr('COL_NM.NAME'), contents: this.summaryData.title, copyFlag: true },
-                { title: this.tr('COL_NM.CREAT'), contents: this.summaryData.create, copyFlag: true },
+                {
+                    title: this.tr('COL_NM.ID'),
+                    contents: {
+                        text: this.summaryData.id,
+                    },
+                    copyFlag: true,
+                },
+                {
+                    title: this.tr('COL_NM.NAME'),
+                    contents: {
+                        text: this.summaryData.title,
+                    },
+                    copyFlag: true,
+                },
+                {
+                    title: this.tr('COL_NM.CREAT'),
+                    contents: {
+                        text: this.summaryData.create,
+                    },
+                    copyFlag: true,
+                },
             ];
         },
         tag() {
@@ -107,17 +132,12 @@ export default {
             this.sampleDropData2.dropDownTitle = params.optionTitle;
         },
         async setInitData() {
-            const selectedNode = this.$attrs['selected-data'].node;
-            let url = null;
-            const param = {};
-            if (selectedNode.data.item_type === 'PROJECT_GROUP') {
-                url = '/identity/project-group/get';
-                param.project_group_id = selectedNode.data.id;
-            } else {
-                url = '/identity/project/get';
-                param.project_id = selectedNode.data.id;
-            }
+            const selectedNodeDT = this.selectedNode.node.data;
+            const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
+            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/get`;
+
             await this.$http.post(url, param).then((response) => {
+                debugger;
                 if (!this.isEmpty(response.data)) {
                     this.summaryData.id = response.data.hasOwnProperty('project_group_id') ? response.data.project_group_id : response.data.project_id;
                     this.summaryData.title = response.data.name;

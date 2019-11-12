@@ -129,6 +129,9 @@ export default {
                 }
 
                 auth2.disconnect();
+                if (localStorage.getItem('common.nextPath') === '/google-sign-in') {
+                    localStorage.setItem('common.nextPath', '/');
+                }
                 this.$router.push({ path: localStorage.getItem('common.nextPath') });
                 this.setTimeZone();
             }).catch((error) => {

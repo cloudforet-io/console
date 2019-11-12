@@ -1,5 +1,6 @@
 export const ko = {
     COMMON: {
+        COPY: '복사하기',
         WELCOME_MSG: 'Welcome to {0} Portal.',
         WELCOME_MSG_P: 'Welcome to {0} Portal',
         SIGN_UP: '회원가입',
