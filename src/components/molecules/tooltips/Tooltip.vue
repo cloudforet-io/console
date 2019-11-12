@@ -1,10 +1,5 @@
 <template>
-    <span v-tooltip="{
-              content: contents,
-              placement: position,
-              classes: ['p-tooltip'],
-              ...options,
-          }"
+    <span v-tooltip="tooltipOptions"
           class="p-tooltip-target"
           v-on="$listeners"
     >
@@ -26,7 +21,7 @@ export default {
         },
         position: {
             type: String,
-            default: 'right',
+            default: 'top',
         },
         options: {
             type: Object,
@@ -37,6 +32,22 @@ export default {
                  */
                 return true;
             },
+        },
+    },
+    computed: {
+        tooltipOptions() {
+            return this._.merge({
+                content: this.contents,
+                placement: this.position,
+                classes: ['p-tooltip'],
+                popperOptions: {
+                    modifiers: {
+                        keepTogether: {
+                            enabled: false,
+                        },
+                    },
+                },
+            }, this.options);
         },
     },
 };
@@ -71,7 +82,7 @@ export default {
         }
 
         &[x-placement^="top"] {
-            margin-bottom: calc(#{$space} + 9px);
+            margin-bottom: calc(#{$space});
 
             .tooltip-arrow {
                 border-width: 11px 7.5px 0 7.5px;
@@ -79,14 +90,14 @@ export default {
                 border-right-color: transparent !important;
                 border-bottom-color: transparent !important;
                 bottom: -9px;
-                left: calc(50% - 5px);
+                left: calc(50% - 11px);
                 margin-top: 0;
                 margin-bottom: 0;
             }
         }
 
         &[x-placement^="bottom"] {
-            margin-top: calc(#{$space} + 9px);
+            margin-top: calc(#{$space});
 
             .tooltip-arrow {
                 border-width: 0 7.5px 11px 7.5px;
@@ -94,14 +105,14 @@ export default {
                 border-right-color: transparent !important;
                 border-top-color: transparent !important;
                 top: -9px;
-                left: calc(50% - 5px);
+                left: calc(50% - 11px);
                 margin-top: 0;
                 margin-bottom: 0;
             }
         }
 
         &[x-placement^="right"] {
-            margin-left: calc(#{$space} + 9px);
+            margin-left: calc(#{$space});
 
             .tooltip-arrow {
                 border-width: 7.5px 11px 7.5px 0px;
@@ -109,22 +120,22 @@ export default {
                 border-top-color: transparent !important;
                 border-bottom-color: transparent !important;
                 left: -9px;
-                top: calc(50% - 5px);
+                top: calc(50% - 13px);
                 margin-left: 0;
                 margin-right: 0;
             }
         }
 
         &[x-placement^="left"] {
-            margin-right: calc(#{$space} + 9px);
+            margin-right: calc(#{$space});
 
             .tooltip-arrow {
-                border-width: 11px 0 7.5px 7.5px;
+                border-width: 7.5px 0 7.5px 11px;
                 border-top-color: transparent !important;
                 border-right-color: transparent !important;
                 border-bottom-color: transparent !important;
                 right: -9px;
-                top: calc(50% - 5px);
+                top: calc(50% - 13px);
                 margin-left: 0;
                 margin-right: 0;
             }

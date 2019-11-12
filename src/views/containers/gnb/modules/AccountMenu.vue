@@ -2,6 +2,7 @@
     <div>
         <p-menu-list :list-items="menuList"
                      :tooltip="userId"
+                     :tooltip-options="{offset: '20px'}"
                      @select="doAction"
         >
             <template #contents>
