@@ -6,6 +6,8 @@ export const ko = {
         SIGN_UP: '회원가입',
         SIGN_IN_MSG: '어카운트 로그인 하기',
         SIGN_IN: '로그 인',
+        AUTH_FAIL_TITLE: '인증 실패',
+        AUTH_FAIL_BODY: '구글 계정을 확인해 주세요.',
         SIGN_FAIL_TITLE: '아이디나 패스워드가 에러.',
         SIGN_FAIL_BODY: '아이디나 패스워드를 다시 한번 확인해 주세요.',
         PROCESSED: '수행되었습니다',
