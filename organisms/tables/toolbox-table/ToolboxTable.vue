@@ -73,7 +73,7 @@
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation';
 import PIconButton from '@/components/molecules/buttons/IconButton';
-import PDropdown from '@/components/organisms/buttons/dropdown/Dropdown';
+import PDropdown from '@/components/organisms/buttons/dropdown/DropdownBtn';
 
 export default {
     name: 'PToolboxTable',
