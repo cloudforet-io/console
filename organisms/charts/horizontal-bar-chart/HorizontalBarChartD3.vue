@@ -23,6 +23,7 @@ export default {
         chartOptions() {
             return this._.merge({}, DEFAULT_OPTIONS, HORIZONTAL_OPTIONS, this.options);
         },
+        max() { return d3.max(this.data, d => d.value); },
         textPadTop() { return this.chartOptions.labels.padTop; },
         textPadBottom() { return this.chartOptions.labels.padBottom; },
         textHeight() { return this.chartOptions.labels.textHeight; },
@@ -115,7 +116,6 @@ export default {
         },
         onMouseover(data, idx, bars) {
             d3.select(bars[idx].parentElement).classed('hover', true);
-            // this.appendTooltips(data, idx, bars, { color: PRIMARY_COLORSET[9] });
         },
         onMouseout(data, idx, bars) {
             d3.select(bars[idx].parentElement).classed('hover', false);
