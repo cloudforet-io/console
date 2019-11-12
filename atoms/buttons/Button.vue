@@ -9,28 +9,30 @@ export default {
     render(h, {
         props, listeners, children, data,
     }) {
-        function getClass() {
-            if (!props.forceClass) {
+        function getClass(prop) {
+            if (!prop.forceClass) {
                 const cls = {
                     btn: true,
-                    disabled: props.disabled,
-                    'btn-block': props.block,
-                    'btn-link': props.link,
-                    ...getBindClass(data.class),
+                    disabled: prop.disabled,
+                    'btn-block': prop.block,
+                    'btn-link': prop.link,
                 };
-                if (props.size) {
-                    cls[`btn-${props.size}`] = true;
+                if (prop.size) {
+                    cls[`btn-${prop.size}`] = true;
                 }
-                if (!props.link && props.styleType) {
-                    cls[`btn${props.outline ? '-outline' : ''}-${props.styleType}`] = true;
+                if (!prop.link && prop.styleType) {
+                    cls[`btn${prop.outline ? '-outline' : ''}-${prop.styleType}`] = true;
                 }
                 return cls;
             }
-            return props.forceClass;
+            return prop.forceClass;
         }
         return h('button', {
             ...data,
-            class: getClass(),
+            class: {
+                ...getClass(props),
+                ...getBindClass(data.class),
+            },
             on: {
                 ...listeners,
                 click: (event) => {

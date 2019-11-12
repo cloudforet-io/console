@@ -21,9 +21,27 @@ export const panelContents = () => ({
     data() {
         return {
             renderData: [
-                { header: 'ID', content: 'Fire Birds' },
-                { header: 'Name', content: 'Paul Phoenix' },
-                { header: 'Created', content: '2019-09-11 21:11:22' },
+                {
+                    title: 'ID',
+                    contents: {
+                        text: 'Fire Birds',
+                        link: 'www.google.com',
+                    },
+                    copyFlag: true,
+                },
+                {
+                    title: 'Name',
+                    contents: {
+                        text: 'Shawn Mandus',
+                    },
+                },
+                {
+                    title: 'Created',
+                    contents: {
+                        text: '2019-09-08 23:11:23',
+                    },
+                    copyFlag: true,
+                },
             ],
         };
     },

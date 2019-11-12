@@ -25,8 +25,8 @@ export default {
             default: null,
         },
         contentData: {
-            type: String,
-            default: 'NoTitle',
+            type: Array,
+            default: () => [],
         },
     },
     methods: {
