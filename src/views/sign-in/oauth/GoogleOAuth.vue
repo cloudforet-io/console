@@ -16,8 +16,8 @@
                                         </transition>
                                         <transition v-if="seenError" name="slide-fade">
                                             <p class="message" style="color: #B82E24">
-                                                <b>{{ $t('COMMON.SIGN_FAIL_TITLE') }}</b>
-                                                <br> {{ $t('COMMON.SIGN_FAIL_BODY') }}
+                                                <b>{{ $t('COMMON.AUTH_FAIL_TITLE') }}</b>
+                                                <br> {{ $t('COMMON.AUTH_FAIL_BODY') }}
                                             </p>
                                         </transition>
                                         <b-input-group class="mb-4">
