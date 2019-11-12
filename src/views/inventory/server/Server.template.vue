@@ -21,14 +21,8 @@
                     @clickRefresh="clickRefresh"
                 >
                     <template slot="toolbox-left">
-                        <p-button
-                            style-type="primary"
-                            @click="clickAdd"
-                        >
-                            <p-i name="ic_plus" color="transparent white"
-                                 width="1.3rem" height="1.3rem" :fill="true"
-                            />
-                            Create
+                        <p-button style-type="primary" @click="clickCollectData">
+                            Collect Data
                         </p-button>
                         <p-dropdown
                             id="user-dropdown-btn"
@@ -58,6 +52,18 @@
                     <template v-slot:col-memory-format="data">
                         {{ data.item.data.base.memory }}
                     </template>
+                    <template v-slot:col-project-format="data">
+                        {{ data.item.project_id }}
+                    </template>
+                    <template v-slot:col-pool-format="data">
+                        {{ data.item.pool_info ? data.item.pool_info.name :'' }}
+                    </template>
+                    <template v-slot:col-os_distro-format="data">
+                        {{ data.item.data.os.os_distro }}
+                    </template>
+                    <template v-slot:col-platform_type-format="data">
+                        {{ data.item.data.vm.platform_type }}
+                    </template>
                 </p-toolbox-table>
             </template>
         </BaseDragHorizontal>
@@ -80,13 +86,13 @@ import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table
 import {
     alert, safe, other1, other2, gray,
 } from '@/styles/_variables.scss';
-import { statusColorBindFactory } from '@/components/molecules/status/Status.util';
+import { statusBindFactory } from '@/components/molecules/status/Status.util';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrFields([
         ['name', 'COL_NM.NAME'],
         ['state', 'COL_NM.STATE'],
-        ['primary_ip_address', 'COL_NM.IP'],
+        ['primary_ip_address', 'COL_NM.IP', { sortable: false }],
         ['core', 'COL_NM.CORE'],
         ['memory', 'COL_NM.MEMORY'],
         ['os_type', 'COL_NM.O_TYPE'],
@@ -135,7 +141,7 @@ export const serverSetup = (props, context) => reactive({
             type: 'item', text: 'deactivated', event: 'deactivated', disabled: false,
         },
     ],
-    serverStateBind: statusColorBindFactory({
+    serverStateBind: statusBindFactory({
         INSERVICE: {
             iconColor: safe,
             textColor: safe,
@@ -160,7 +166,7 @@ export const serverSetup = (props, context) => reactive({
     },
     value => value.toLowerCase()),
     timestampFormater,
-    clickAdd() {
+    clickCollectData() {
         console.log('add');
     },
     changePageSize() { },
@@ -190,8 +196,6 @@ export default {
         };
     },
 };
-
-
 </script>
 
 <style lang="scss" scoped>

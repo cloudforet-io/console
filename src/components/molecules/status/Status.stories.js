@@ -10,7 +10,7 @@ import {
     rotatingMapping,
     sizeMapping,
 } from '../../atoms/icons/FiMapping';
-import { statusColorBindFactory } from '@/components/molecules/status/Status.util';
+import { statusBindFactory } from '@/components/molecules/status/Status.util';
 
 
 export default {
@@ -95,7 +95,7 @@ export const useUtil = () => ({
         };
     },
     methods: {
-        statusBind: statusColorBindFactory({
+        statusBind: statusBindFactory({
             ENABLED: {
                 iconColor: safe,
                 textColor: safe,
