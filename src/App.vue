@@ -29,25 +29,22 @@ export default {
         this.preparationTo();
     },
     methods: {
-        isInitialized() {
-            if (this.isEmpty($cookies.get('domainInfo')) || this.isEmpty(_.get(Vue, 'prototype.$http'))) {
-                console.log('domainInfo', $cookies.get('domainInfo'));
-                console.log('#####################', _.get(Vue, 'prototype.$http'));
-                return false;
-            }
-            this.isInit = true;
-            return true;
-        },
         async preparationTo() {
-            await this.configInit();
-            await this.syncStores('auth');
-            await this.domainInit();
-            await this.syncStores('domain');
 
-            if (this.isInitialized()) {
+            try {
+
+                await this.configInit();
+                await this.syncStores('auth');
+                await this.domainInit();
+                await this.syncStores('domain');
+                this.isInit = true;
+
                 if (!api.checkAccessToken()) {
                     this.redirectTo();
                 }
+
+            } catch (e) {
+                console.log(e);
             }
         },
         async configInit() {
