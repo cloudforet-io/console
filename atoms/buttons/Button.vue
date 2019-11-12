@@ -29,11 +29,8 @@ export default {
             return props.forceClass;
         }
         return h('button', {
+            ...data,
             class: getClass(),
-            staticClass: data.staticClass,
-            staticStyle: data.staticStyle,
-            attrs: data.attrs,
-            style: data.style,
             on: {
                 ...listeners,
                 click: (event) => {

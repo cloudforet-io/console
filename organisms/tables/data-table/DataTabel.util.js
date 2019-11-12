@@ -34,11 +34,14 @@ export const makeField = (parent, name, trLabel, extra) => {
  * // returns [
  *  {text: 'name', label:tr('COL_NM.NAME',null,parent)},
  *  {text: 'state', label:tr('COL_NM.NAME','en',parent)},
- *  {text: 'name', label:tr('COL_NM.NAME','en',parent)},
+ *  {text: 'primary_ip_address', label:tr('COL_NM.NAME','en',parent), sortable:false},
  * ]
  * makeTrFields([
  *  ['name', 'COL_NM.NAME'],
- *  ['state', ['COL_NM.STATE','en']]
+ *  ['state', ['COL_NM.STATE','en']],
+ *  ['primary_ip_address', 'COL_NM.IP',{sortable:false}],
+ *  ],
+ *  parent)
  */
 export const makeTrFields = (fields, parent) => {
     const result = [];
