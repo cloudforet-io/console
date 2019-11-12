@@ -59,6 +59,7 @@ export default {
                     authType: getters.authType,
                     clientId: getters.clientId,
                 });
+
             } else {
                 throw new Error(`Domain not found. (${window.location.hostname})`);
             }
