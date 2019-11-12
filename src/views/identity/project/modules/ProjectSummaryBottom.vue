@@ -41,6 +41,10 @@ export default {
             type: Object,
             default: () => (SummaryModel),
         },
+        selectedNode: {
+            type: Object,
+            default: null,
+        },
     },
     data() {
         return {
@@ -126,17 +130,12 @@ export default {
             this.sampleDropData2.dropDownTitle = params.optionTitle;
         },
         async setInitData() {
-            const selectedNode = this.$attrs['selected-data'].node;
-            let url = null;
-            const param = {};
-            if (selectedNode.data.item_type === 'PROJECT_GROUP') {
-                url = '/identity/project-group/get';
-                param.project_group_id = selectedNode.data.id;
-            } else {
-                url = '/identity/project/get';
-                param.project_id = selectedNode.data.id;
-            }
+            const selectedNodeDT = this.selectedNode.node.data;
+            const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
+            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/get`;
+
             await this.$http.post(url, param).then((response) => {
+                debugger;
                 if (!this.isEmpty(response.data)) {
                     this.summaryData.id = response.data.hasOwnProperty('project_group_id') ? response.data.project_group_id : response.data.project_id;
                     this.summaryData.title = response.data.name;

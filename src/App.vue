@@ -37,15 +37,20 @@ export default {
             return true;
         },
         async preparationTo() {
-            if (this.isInitialized()) {
-                this.redirectTo();
-                return;
-            }
+
             await this.configInit();
             await this.syncStores('auth');
             await this.domainInit();
             await this.syncStores('domain');
-            this.preparationTo();
+
+            if (this.isInitialized()) {
+                if (!api.checkAccessToken()) {
+                    this.redirectTo();
+                }
+                return;
+            }
+
+            //this.preparationTo();
         },
         async configInit() {
             await config.init();
@@ -75,11 +80,7 @@ export default {
         },
         redirectTo() {
             const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
-            if (!api.checkAccessToken()) {
-                this.$router.push(nextPath);
-            } else {
-                this.$router.push({ path: localStorage.getItem('common.nextPath') });
-            }
+            this.$router.push(nextPath);
         },
     },
 };
