@@ -24,16 +24,13 @@
                         <p-button style-type="primary" @click="clickCollectData">
                             Collect Data
                         </p-button>
-                        <p-dropdown
-                            id="user-dropdown-btn"
+                        <PDropdownMenuBtn
+                            id="server-dropdown-btn"
                             :menu="dropdown"
-                            @click-update="clickUpdate"
-                            @click-delete="clickDelete"
-                            @click-activated="clickActivated"
-                            @click-deactivated="clickDeactivated"
+                            @clickMenuEvent="clickMenuEvent"
                         >
-                            Actions
-                        </p-dropdown>
+                            Action
+                        </PDropdownMenuBtn>
                     </template>
                     <template v-slot:col-state-format="data">
                         <p-status
@@ -82,7 +79,7 @@ import PStatus from '@/components/molecules/status/Status';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
-import PDropdown from '@/components/organisms/buttons/dropdown/Dropdown';
+import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 import PBadge from '@/components/atoms/badges/Badge';
 import { makeTrFields, timestampFormater } from '@/components/organisms/tables/data-table/DataTabel.util';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
@@ -132,16 +129,24 @@ export const serverSetup = (props, context) => reactive({
     ...toRefs(serverTableReactive(context.parent)),
     dropdown: [
         {
-            type: 'item', text: 'update', event: 'update', disabled: false,
-        },
-        {
             type: 'item', text: 'delete', event: 'delete', disabled: false,
         },
+        { type: 'divider' },
         {
-            type: 'item', text: 'activated', event: 'activated', disabled: false,
+            type: 'item', text: 'set Maintenance', event: 'maintenance', disabled: false,
         },
         {
-            type: 'item', text: 'deactivated', event: 'deactivated', disabled: false,
+            type: 'item', text: 'set In-Service', event: 'in-service', disabled: false,
+        },
+        {
+            type: 'item', text: 'set Closed', event: 'closed', disabled: false,
+        },
+        { type: 'divider' },
+        {
+            type: 'item', text: 'change project', event: 'project', disabled: false,
+        },
+        {
+            type: 'item', text: 'change pool', event: 'pool', disabled: false,
         },
     ],
     serverStateBind: statusBindFactory({
@@ -175,10 +180,9 @@ export const serverSetup = (props, context) => reactive({
     changePageSize() { },
     changePageNumber() {},
     clickRefresh() {},
-    clickUpdate() {},
-    clickDelete() {},
-    clickActivated() {},
-    clickDeactivated() {},
+    clickMenuEvent(eventName) {
+        console.log(eventName);
+    },
 });
 
 export default {
@@ -189,7 +193,7 @@ export default {
         PToolboxTable,
         PButton,
         PBadge,
-        PDropdown,
+        PDropdownMenuBtn,
     },
     setup(props, context) {
         const state = serverSetup(props, context);
@@ -202,7 +206,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    #user-dropdown-btn {
+    #server-dropdown-btn {
         margin-left: 1rem;
     }
     #empty-space{
