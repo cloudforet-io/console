@@ -137,7 +137,6 @@ export default {
             const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/get`;
 
             await this.$http.post(url, param).then((response) => {
-                debugger;
                 if (!this.isEmpty(response.data)) {
                     this.summaryData.id = response.data.hasOwnProperty('project_group_id') ? response.data.project_group_id : response.data.project_id;
                     this.summaryData.title = response.data.name;

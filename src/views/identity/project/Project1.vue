@@ -35,7 +35,7 @@
                                 </keep-alive>
                             </template>
                             <template #member="{tabName}">
-                                <project-member />
+                                <project-member :selected-node="getSelectedNodeAndTree" />
                             </template>
                         </PTab>
                     </template>
@@ -43,7 +43,7 @@
                 <div>
                     <template v-if="tabsData.activeTab === 'details'">
                         <project-summary-bottom
-                          :selected-node="getSelectedNodeAndTree"
+                            :selected-node="getSelectedNodeAndTree"
                         />
                     </template>
                     <template v-else />

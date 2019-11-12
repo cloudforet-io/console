@@ -28,12 +28,14 @@ export const panelContents = () => ({
                         link: 'www.google.com',
                     },
                     copyFlag: true,
+                    visible: false,
                 },
                 {
                     title: 'Name',
                     contents: {
                         text: 'Shawn Mandus',
                     },
+                    visible: false,
                 },
                 {
                     title: 'Created',
@@ -41,6 +43,7 @@ export const panelContents = () => ({
                         text: '2019-09-08 23:11:23',
                     },
                     copyFlag: true,
+                    visible: false,
                 },
             ],
         };
