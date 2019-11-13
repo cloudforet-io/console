@@ -1,37 +1,23 @@
 <template>
     <p-dl class="row">
-        <div v-for="(def, idx) in definitionList" :key="idx" class="col-sm-12 col-md-6 content-list">
+        <div v-for="(def, idx) in defs" :key="idx" class="col-sm-12 col-md-6 content-list">
             <slot name="details">
                 <p-dt class="col-sm-12 col-md-4">
-                    {{ def.title }}
+                    {{ def.label }}
                 </p-dt>
-                <p-dd v-if="hasURL" class="col-sm-12 col-md-8 copyFlagged"
-                      @mouseover="mouseInOut(idx,true)"
+                <p-dd class="col-sm-12 col-md-8 copyFlagged"
+                      @mouseenter="mouseInOut(idx,true)"
                       @mouseleave="mouseInOut(idx,false)"
                 >
-                    <a :href="def.contents.link">{{ def.contents.text }}</a>
+                    <slot :name="`def-${def.name}-format`" :value="def.value" :def="def">
+                        {{ def.value }}
+                    </slot>
                     <template v-if="activeArr(idx)">
                         &nbsp;&nbsp; <p-button v-if="isCopyFlagged(def)"
                                                style="display: inline-block;" outline
                                                :style-type="'secondary'"
                                                :size="'sm'"
-                                               @click="copyText(def.contents.text)"
-                        >
-                            {{ tr('COMMON.COPY') }}
-                        </p-button>
-                    </template>
-                </p-dd>
-                <p-dd v-else class="col-sm-12 col-md-8 copyFlagged"
-                      @mouseover="mouseInOut(idx,true)"
-                      @mouseleave="mouseInOut(idx,false)"
-                      >
-                    {{ def.contents.text }}
-                    <template v-if="activeArr(idx)">
-                        &nbsp;&nbsp; <p-button v-if="isCopyFlagged(def)"
-                                               style="display: inline-block;" outline
-                                               :style-type="'secondary'"
-                                               :size="'sm'"
-                                               @click="copyText(def.contents.text)"
+                                               @click="copyText(def.value)"
                         >
                             {{ tr('COMMON.COPY') }}
                         </p-button>
@@ -58,7 +44,7 @@ export default {
         PDd,
     },
     props: {
-        definitionList: {
+        defs: {
             type: Array,
             default: () => [],
         },
@@ -70,24 +56,21 @@ export default {
         };
     },
     created() {
-       this.setActiveArray();
+        this.setActiveArray();
     },
     methods: {
-        activeArr(idx){
+        activeArr(idx) {
             return this.active[idx];
         },
         setActiveArray() {
-            let emptyArr = [];
-            for (let i = 0; i < this.definitionList.length; i++) {
+            const emptyArr = [];
+            for (let i = 0; i < this.defs.length; i++) {
                 emptyArr.push(false);
             }
             this.active = emptyArr;
         },
         isCopyFlagged(definition) {
             return (_.get(definition, 'copyFlag') === true);
-        },
-        hasURL(contents) {
-            return (!this.isEmpty(_.get(contents, 'link')));
         },
         copyText(text) {
             this.selectToCopyToClipboard(text);
