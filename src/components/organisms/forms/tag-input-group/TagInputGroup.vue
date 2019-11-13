@@ -56,9 +56,7 @@ export const setup = (props, context) => {
     const destructTags = ref(destruct(props.tags));
 
     const syncTags = () => {
-        const newtags = mergeTags(destructTags.value);
-        debugger;
-        context.emit('update:tags', newtags);
+        context.emit('update:tags', mergeTags(destructTags.value));
         context.emit('TagsChange');
     };
     const updateTag = (index, position, value) => {
