@@ -40,8 +40,9 @@
                             v-bind="serverStateBind(data.value)"
                         />
                     </template>
+                    <template />
                     <template v-slot:col-updated_at-format="data">
-                        {{ timestampFormater(data.value) }}
+                        {{ timestampFormatter(data.value) }}
                     </template>
                     <template v-slot:col-core-format="data">
                         {{ data.item.data.base.core }}
@@ -81,7 +82,7 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button';
 import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 import PBadge from '@/components/atoms/badges/Badge';
-import { makeTrFields, timestampFormater } from '@/components/organisms/tables/data-table/DataTabel.util';
+import { makeTrFields, timestampFormatter } from '@/components/organisms/tables/data-table/DataTabel.util';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import {
     alert, safe, other1, other2, gray,
@@ -173,7 +174,7 @@ export const serverSetup = (props, context) => reactive({
         },
     },
     value => value.toLowerCase()),
-    timestampFormater,
+    timestampFormatter,
     clickCollectData() {
         console.log('add');
     },
