@@ -20,6 +20,7 @@ Vue.use(VueCompositionApi);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
+Vue.use(VueCompositionApi);
 Vue.use(VueLodash, { name: 'lodash' });
 Vue.use(SvgIcon, {
     tagName: 'svgicon',
