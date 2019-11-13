@@ -27,7 +27,7 @@ export default {
             }
             return prop.forceClass;
         }
-        return h('button', {
+        return h('div', {
             ...data,
             class: {
                 ...getClass(props),
