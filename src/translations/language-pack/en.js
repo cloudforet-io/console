@@ -6,7 +6,7 @@ export const en = {
         SIGN_UP: 'Sign up',
         SIGN_IN: 'Sign In',
         SIGN_IN_MSG: 'Sign in to your Account.',
-        AUTH_FAIL_BODY: 'Please confirm your Google Account',
+        AUTH_G_FAIL_BODY: 'Please confirm your Google Account',
         AUTH_FAIL_TITLE: 'Authentication failed',
         SIGN_FAIL_BODY: 'Please confirm your Username or Password.',
         SIGN_FAIL_TITLE: 'Wrong Password or Username.',
@@ -131,6 +131,8 @@ export const en = {
     },
     SIGNIN: {
         ROOT_CREDENTIALS: 'Sign-in using root account credentials',
+        USER_EMPTY: 'User ID can\'t be blank.',
+        PASS_EMPTY: 'Password can\'t be blank.'
     },
     IDENTITY: {
         NO_PROJECT_SEL: 'No Selected Project',

@@ -80,6 +80,7 @@ export default {
 }
 
 .btn{
+    cursor:pointer;
     border-radius: 2px;
     opacity: 1;
     min-width:6rem;
