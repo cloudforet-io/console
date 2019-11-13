@@ -10,8 +10,7 @@
             @DTNodeClicked="pNodeClicked"
             @DTNodeToggled="pNodeToggled"
             @DTBeforeDropped="pBeforeDropped"
-            @DTContextVisible="pContextVisible"
-        >
+            @DTContextVisible="pContextVisible">
             <!--<template slot="icon" slot-scope="node">
                 <span class="item-icon">
                     <i v-if="node.isLeaf" class="fas fa-cube" />

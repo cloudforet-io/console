@@ -111,64 +111,6 @@ a {
     }
 }
 
-///* b-dropdown */
-//.dropdown-menu {
-//  padding: 3px 0 !important;
-//  border: none;
-//  box-shadow: 2px 2px 10px 0px rgba($black, 0.2);
-//}
-//.b-dropdown.no-selected {
-//    .dropdown-item:hover .item {
-//        font-weight: 400;
-//        background-color: $lightgray;
-//    }
-//}
-//.dropdown-item {
-//  padding: 3px 6px;
-//  &.sm {
-//
-//  }
-//  &:hover, &:focus {
-//    color: $black;
-//    background-color: transparent;
-//    .item {
-//      font-weight: 500;
-//      background-color: rgba($black, 0.05);
-//    }
-//  }
-//  &.active, &:active {
-//    color: darken($blue, 10%);
-//    background-color: transparent;
-//    .item {
-//      background-color: $skyblue;
-//    }
-//  }
-//  .item {
-//    display: flex;
-//    align-items: center;
-//    padding: 10px;
-//    border-radius: 5px;
-//    &.sm {
-//        padding: 5px;
-//        padding-right: 10px;
-//    }
-//    .icon {
-//        display: inline-block;
-//        margin-left: 0;
-//        color: inherit;
-//        font-weight: inherit;
-//        font-size: 1.3em;
-//        width: 20px;
-//        text-align: center;
-//    }
-//    .name {
-//      padding-left: 15px;
-//      color: inherit;
-//      font-weight: inherit;
-//    }
-//  }
-//}
-
 
 /* sl-vue-tree */
 @mixin node-item-background($bg-color) {

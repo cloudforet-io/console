@@ -4,7 +4,7 @@ import PStatus from '@/components/molecules/status/Status';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
-
+import PBadge from '@/components/atoms/badges/Badge';
 import Server, { serverSetup } from '@/views/inventory/server/Server.template';
 import { arrayOf } from '@/lib/casual';
 import casual from '@/views/inventory/server/models/server-model';
@@ -38,6 +38,7 @@ export const mockPage = () => ({
         BaseDragHorizontal,
         PToolboxTable,
         PButton,
+        PBadge,
     },
     mixins: [Server],
     setup(props, context) {

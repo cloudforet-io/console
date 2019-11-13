@@ -15,9 +15,7 @@ export default {
 export const panelContents = () => ({
     components: { InfoPanel },
     template: '<div style="width: 80vw;"><InfoPanel :infoTitle="renderTitle" :contentData="renderData"></InfoPanel></div>',
-    props: {
-        ...autoProps(InfoPanel),
-    },
+
     data() {
         return {
             renderTitle: 'Information',

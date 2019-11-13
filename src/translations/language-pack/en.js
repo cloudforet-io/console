@@ -6,6 +6,8 @@ export const en = {
         SIGN_UP: 'Sign up',
         SIGN_IN: 'Sign In',
         SIGN_IN_MSG: 'Sign in to your Account.',
+        AUTH_FAIL_BODY: 'Please confirm your Google Account',
+        AUTH_FAIL_TITLE: 'Authentication failed',
         SIGN_FAIL_BODY: 'Please confirm your Username or Password.',
         SIGN_FAIL_TITLE: 'Wrong Password or Username.',
         PROCESSED: 'processed',

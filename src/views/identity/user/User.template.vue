@@ -61,7 +61,7 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button';
 import PTd from '@/components/atoms/table/Td';
 import PI from '@/components/atoms/icons/PI';
-import PDropdown from '@/components/organisms/buttons/dropdown/Dropdown';
+import PDropdown from '@/components/organisms/buttons/dropdown/DropdownBtn';
 import { safe, alert } from '@/styles/_variables.scss';
 
 export default {
