@@ -19,17 +19,26 @@ export default {
                 ].indexOf(value) !== -1;
             },
         },
+        backgroundColor: {
+            type: String,
+            default: undefined,
+        },
     },
     render(h, { props, data, children }) {
-        const badgeClassObject = { badge: true };
-        badgeClassObject[`badge-${props.styleType}`] = true;
-        return h('span', {
+        const newData = {
             ...data,
             class: {
                 ...getBindClass(data.class),
-                ...badgeClassObject,
             },
-        }, children);
+        };
+        newData.class.badge = true;
+        if (props.backgroundColor) {
+            newData.staticStyle = data.staticStyle ? data.staticStyle : {};
+            newData.staticStyle['background-color'] = props.backgroundColor;
+        } else {
+            newData.class[`badge-${props.styleType}`] = true;
+        }
+        return h('span', newData, children);
     },
 };
 </script>
@@ -47,6 +56,7 @@ export default {
     background-clip: padding-box;
     text-align: center;
     font: 12px/14px Arial;
+    color: $white;
     letter-spacing: 0;
     padding:  0.1875rem 0.5rem 0.1875rem 0.5rem;
 }

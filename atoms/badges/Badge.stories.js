@@ -1,4 +1,4 @@
-import { select, text } from '@storybook/addon-knobs/vue';
+import { select, text, color } from '@storybook/addon-knobs/vue';
 import PBadge from './Badge';
 
 export default {
@@ -16,7 +16,7 @@ const data = {};
 
 export const badge = () => ({
     components: { PBadge },
-    template: '<PBadge :styleType="styleType">{{text}}</PBadge>',
+    template: '<PBadge style="width: auto" :styleType="styleType" :backgroundColor="backgroundColor">{{text}}</PBadge>',
     props: {
         styleType: {
             default: select('styleType', [
@@ -27,6 +27,9 @@ export const badge = () => ({
         },
         text: {
             default: text('text', 'badge'),
+        },
+        backgroundColor: {
+            default: color('backgroundColor', ''),
         },
     },
     data() {
@@ -51,6 +54,9 @@ export const longBadge = () => ({
                 'gray', 'gray1', 'gray2', 'gray3',
                 'alert', 'safe', 'dark',
             ], null),
+        },
+        backgroundColor: {
+            default: color('backgroundColor', null),
         },
     },
     data() {

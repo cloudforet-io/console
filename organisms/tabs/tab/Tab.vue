@@ -18,25 +18,20 @@
 
 <script>
 import PTabBar from '@/components/molecules/tabs/tab-bar/TabBar';
+import { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar.mixins';
+import { makeProxy } from '@/mixins/compostion-util';
+
 
 export default {
     name: 'PTab',
     components: { PTabBar },
-    mixins: [PTabBar],
-    computed: {
-        proxyActiveTab: {
-            get() {
-                return this.activeTab;
-            },
-            set(value) {
-                this.$emit('update:activeTab', value);
-            },
-        },
-    },
-    methods: {
-        isActive(name) {
-            return this.activeTab === name;
-        },
+    mixins: [tabBarProps],
+    setup(props, { emit }) {
+        return {
+            proxyActiveTab: makeProxy('activeTab', props, emit),
+            tabData: tabData(props),
+            isActive: isActive(props),
+        };
     },
 };
 </script>
