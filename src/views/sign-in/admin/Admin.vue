@@ -9,10 +9,10 @@
                                 <div class="signIn-title">
                                     {{ $t('COMMON.ADMIN_USER') }} {{ $t('COMMON.SIGN_IN') }}
                                 </div>
-                                <div v-show.visible="seenGreet" class="signIn-sub-title">
+                                <div v-show.visible="greeting" class="signIn-sub-title">
                                     {{ $t('COMMON.SIGN_IN_MSG') }}
                                 </div>
-                                <div v-show.visible="seenError" class="signIn-sub-title">
+                                <div v-show.visible="!greeting" class="signIn-sub-title">
                                     <div class="sign-in-alert">
                                         {{ $t('COMMON.SIGN_FAIL_BODY') }}
                                     </div>
@@ -99,8 +99,7 @@ export default {
     data() {
         return {
             adminRememberStatus: false,
-            seenGreet: true,
-            seenError: false,
+            greeting: true,
             adminUserId: '',
             password: '',
             styler: {
@@ -154,7 +153,7 @@ export default {
             }
         },
         async signIn() {
-            this.showGreetMSG();
+            this.displayGreetingMSG(true);
             const credentials = {
                 user_id: this.adminUserId,
                 password: this.password,
@@ -169,21 +168,17 @@ export default {
 
             await this.$store.dispatch('auth/signIn', credentials).then(() => {
                 this.$router.push({ path: '/' });
+
             }).catch((e) => {
                 this.isInvalid.userId = true;
                 this.isInvalid.password = true;
                 this.$refs.userId.focus();
-                this.showErorrMSG();
+                this.displayGreetingMSG(false);
                 console.log(e);
             });
         },
-        showErorrMSG() {
-            this.seenGreet = false;
-            this.seenError = true;
-        },
-        showGreetMSG() {
-            this.seenGreet = true;
-            this.seenError = false;
+        displayGreetingMSG(flag) {
+            this.greeting = flag;
         },
     },
 };
