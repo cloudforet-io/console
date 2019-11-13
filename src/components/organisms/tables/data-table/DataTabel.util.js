@@ -50,4 +50,4 @@ export const makeTrFields = (fields, parent) => {
     });
     return result;
 };
-export const timestampFormater = value => Util.methods.getDatefromTimeStamp(value.seconds, localStorage.getItem('timezone'));
+export const timestampFormatter = value => Util.methods.getDatefromTimeStamp(value.seconds, localStorage.getItem('timezone'));
