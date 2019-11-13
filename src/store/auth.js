@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import VueCookies from 'vue-cookies';
 import api from '@/lib/api';
+import { Util } from '@/lib/global-util';
 
 export default {
     namespaced: true,
@@ -67,7 +68,7 @@ export default {
 
             localStorage.userId = userInfo.user_id;
             localStorage.language = userInfo.language;
-            localStorage.timezone = userInfo.timezone;
+            localStorage.timezone = Util.methods.isEmpty(userInfo.timezone) ?  'Etc/GMT' : userInfo.timezone;
         },
 
         async signIn({ dispatch, rootGetters }, credentials) {
@@ -80,11 +81,10 @@ export default {
             /**
               * Do not proceeds if Auth type is not local
               * * */
-            if (_.get(credentials, 'user_type') !== 'DOMAIN_OWNER'
-                || _.get(VueCookies.get('domainInfo'), 'clientId') !== null
-                || _.get(credentials, 'user_type') !== 'DOMAIN_OWNER' && _.get(VueCookies.get('domainInfo'), 'clientId') !== null
-            ) {
-                await dispatch('getUser', response.data.user_id);
+            if (_.get(credentials, 'user_type') !== 'DOMAIN_OWNER') {
+                if (_.get(VueCookies.get('domainInfo'), 'clientId') !== null) {
+
+                } else await dispatch('getUser', response.data.user_id);
             }
         },
 

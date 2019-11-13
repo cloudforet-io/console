@@ -9,10 +9,10 @@
                                 <div class="signIn-title">
                                     {{ $t('COMMON.SIGN_IN') }}
                                 </div>
-                                <div v-show.visible="seenGreet" class="signIn-sub-title">
+                                <div v-show.visible="greeting" class="signIn-sub-title">
                                     {{ $t('COMMON.SIGN_IN_MSG') }}
                                 </div>
-                                <div v-show.visible="seenError" class="signIn-sub-title">
+                                <div v-show.visible="!greeting" class="signIn-sub-title">
                                     <div class="sign-in-alert">
                                         {{ $t('COMMON.SIGN_FAIL_BODY') }}
                                     </div>
@@ -107,8 +107,7 @@ export default {
     data() {
         return {
             rememberStatus: false,
-            seenGreet: true,
-            seenError: false,
+            greeting: true,
             userId: '',
             password: 'admin',
             styler: {
@@ -168,8 +167,8 @@ export default {
         },
 
         async signIn() {
-            this.showGreetMSG();
 
+            this.displayGreetingMSG(true);
             const credentials = {
                 user_id: this.userId,
                 password: this.password,
@@ -181,40 +180,21 @@ export default {
                 return;
             }
 
-            await this.$store.dispatch('auth/signIn', credentials).then((response) => {
+            await this.$store.dispatch('auth/signIn', credentials).then(() => {
                 if (localStorage.getItem('common.toNextPath') === '/sign-in' || localStorage.getItem('common.toNextPath') === null) {
                     localStorage.setItem('common.toNextPath', '/');
                 }
-
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
+
             }).catch((error) => {
                 this.isInvalid.userId = true;
                 this.isInvalid.password = true;
                 this.$refs.userId.focus();
-                this.showErorrMSG();
+                this.displayGreetingMSG(false);
             });
         },
-        showErorrMSG() {
-            this.seenGreet = false;
-            this.seenError = true;
-        },
-        showGreetMSG() {
-            this.seenGreet = true;
-            this.seenError = false;
-        },
-        popSignUpInstruction() {
-            this.$refs.LogInSimpleModal.showModal();
-        },
-        async setTimeZone() {
-            await this.$http.post('identity/user/get', {
-                user_id: this.userId,
-                domainId: sessionStorage.getItem('domainId'),
-            }).then((response) => {
-                const timeZone = this.isEmpty(response.data.timezone) ? 'Etc/GMT' : response.data.timezone;
-                localStorage.timeZone = timeZone;
-            }).catch(() => {
-                this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
-            });
+        displayGreetingMSG(flag) {
+            this.greeting = flag;
         },
     },
 };

@@ -9,10 +9,10 @@
                                 <div class="signIn-title">
                                     {{ $t('COMMON.SIGN_IN') }}
                                 </div>
-                                <div v-show.visible="seenGreet" class="signIn-sub-title">
+                                <div v-show.visible="greeting" class="signIn-sub-title">
                                     {{ $t('COMMON.SIGN_IN_MSG') }}
                                 </div>
-                                <div v-show.visible="seenError" class="signIn-sub-title">
+                                <div v-show.visible="!greeting" class="signIn-sub-title">
                                     <div class="sign-in-alert">
                                         {{ $t('COMMON.AUTH_G_FAIL_BODY') }}
                                     </div>
@@ -54,7 +54,6 @@
 import url from 'url';
 import { mapGetters } from 'vuex';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
-
 const { gapi } = window;
 export default {
     components: { BaseSimpleModal },
@@ -63,8 +62,7 @@ export default {
             isSignedIn: false,
             loginId: null,
             oathSignParam: null,
-            seenGreet: true,
-            seenError: false,
+            greeting: true,
             pramObject: null,
         };
     },
@@ -91,11 +89,10 @@ export default {
         },
         async setGoogleSignInButton() {
             const vm = this;
-            const clientId = this.isEmpty(this.$store.getters['domain/clientId']) ? $cookies.get('domainInfo').clientId : this.$store.getters['domain/clientId'];
 
             gapi.load('auth', () => {
                 const auth2 = gapi.auth2.init({
-                    client_id: clientId,
+                    client_id: this.$store.getters['domain/clientId'],
                     fetch_basic_profile: false,
                     scope: 'profile',
                 });
@@ -124,6 +121,7 @@ export default {
             this.login();
         },
         async login() {
+            this.displayGreetingMSG(true);
             const auth2 = gapi.auth2.getAuthInstance();
             await this.$store.dispatch('auth/signIn', this.oathSignParam).then((response) => {
                 if (!auth2.isSignedIn.get()) {
@@ -135,10 +133,9 @@ export default {
                     localStorage.setItem('common.toNextPath', '/');
                 }
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
-                this.setTimeZone();
             }).catch((error) => {
                 auth2.disconnect();
-                this.showErorrMSG();
+                this.displayGreetingMSG(false);
                 console.log(error);
                 /* if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
@@ -149,27 +146,8 @@ export default {
                 } */
             });
         },
-        async setTimeZone() {
-            await this.$http.post('identity/user/get', {
-                user_id: this.loginId,
-                domainId: sessionStorage.getItem('domainId'),
-            }).then((response) => {
-                const timeZone = this.isEmpty(response.data.timezone) ? 'Etc/GMT' : response.data.timezone;
-                localStorage.timeZone = timeZone;
-            }).catch(() => {
-                this.showErorrMSG();
-            });
-        },
-        showErorrMSG() {
-            this.seenGreet = false;
-            this.seenError = true;
-        },
-        showGreetMSG() {
-            this.seenGreet = true;
-            this.seenError = false;
-        },
-        popSignUpInstruction() {
-            this.$refs.LogInSimpleModal.showModal();
+        displayGreetingMSG(flag) {
+            this.greeting = flag;
         },
     },
 };
@@ -251,7 +229,6 @@ export default {
 
     .root-sign {
         text-align: left;
-        text-decoration: underline;
         font: Regular 14px/16px Arial;
         letter-spacing: 0;
         color: #8185D1;
