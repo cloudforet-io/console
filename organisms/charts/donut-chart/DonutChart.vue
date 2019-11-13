@@ -25,7 +25,6 @@ export default {
         return {
             pathGroup: null,
             arc: null,
-            colorset: PRIMARY_COLORSET,
         };
     },
     computed: {
