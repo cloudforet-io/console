@@ -8,7 +8,7 @@
                 :name="tag.name"
                 :value="tag.value"
                 :disabled="!editMode"
-                @update:name="updateTag(index,'key',$event )"
+                @update:name="updateTag(index,'name',$event )"
                 @update:value="updateTag(index, 'value',$event)"
             />
         </div>
@@ -18,7 +18,7 @@
                 name="ic_delete"
                 @click="resetTag"
             />
-            <p-tag-input :name.sync="newTagName" :value.sync="newTagValue" />
+            <p-tag-input :name.sync="newTag.name" :value.sync="newTag.value" />
             <p-icon-button
                 class="add-btn"
                 button-style="dark"
@@ -32,6 +32,7 @@
 
 <script>
 import _ from 'lodash';
+import { reactive, ref, watch } from '@vue/composition-api';
 import PTagInput from '@/components/molecules/forms/TagInput';
 import PIconButton from '@/components/molecules/buttons/IconButton';
 
@@ -40,8 +41,56 @@ const mergeTags = tags => _.transform(tags, (result, tag) => {
 }, {});
 
 const destruct = tags => _.transform(tags, (result, value, name) => {
-    result.push({ name, value });
+    result.push(({ name, value }));
 }, []);
+
+export const setup = (props, context) => {
+    const newTag = reactive({
+        name: '',
+        value: '',
+    });
+    const resetTag = () => {
+        newTag.name = '';
+        newTag.value = '';
+    };
+    const destructTags = ref(destruct(props.tags));
+
+    const syncTags = () => {
+        context.emit('update:tags', mergeTags(destructTags.value));
+        context.emit('TagsChange');
+    };
+    const updateTag = (index, position, value) => {
+        destructTags.value[index][position] = value;
+        syncTags();
+    };
+    const deleteTag = (index) => {
+        destructTags.value.splice(index, 1);
+        syncTags();
+    };
+
+    const addTag = () => {
+        if (newTag.name) {
+            destructTags.value.push(reactive({ ...newTag }));
+            syncTags();
+        }
+        resetTag();
+    };
+
+    watch(() => props.tags, (tags) => {
+        if (tags !== mergeTags(destructTags.value)) {
+            destructTags.value = destruct(tags);
+        }
+    });
+
+    return {
+        newTag,
+        destructTags,
+        resetTag,
+        updateTag,
+        deleteTag,
+        addTag,
+    };
+};
 
 export default {
     name: 'PTagInputGroup',
@@ -56,43 +105,8 @@ export default {
         },
 
     },
-    data() {
-        return {
-            destructTags: destruct(this.tags),
-            newTagName: '',
-            newTagValue: '',
-        };
-    },
-    watch: {
-        tags() {
-            if (this.tags !== mergeTags(this.destructTags)) {
-                this.destructTags = destruct(this.tags);
-            }
-        },
-    },
-    methods: {
-        syncTags() {
-            this.$emit('update:tags', mergeTags(this.destructTags));
-        },
-        updateTag(index, position, value) {
-            this.destructTags[index][position] = value;
-            this.syncTags();
-        },
-        deleteTag(index) {
-            this.destructTags.splice(index, 1);
-            this.syncTags();
-        },
-        resetTag() {
-            this.newTagName = '';
-            this.newTagValue = '';
-        },
-        addTag() {
-            if (this.newTagName) {
-                this.destructTags.push({ name: this.newTagName, value: this.newTagValue });
-                this.syncTags();
-            }
-            this.resetTag();
-        },
+    setup(...args) {
+        return setup(...args);
     },
 };
 </script>
