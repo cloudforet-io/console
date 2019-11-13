@@ -10,7 +10,7 @@
             />
         </div>
 
-        <span class="tag-input-split">:</span>
+        <span class="tag-input-split" :class="{disabled}">{{ disabled? '': ':' }}</span>
         <div class="tag-input-box tag-value-input">
             <p-input-text
                 class="tag-input"
@@ -48,10 +48,11 @@ export default {
         padding-left: 0.125rem;
         padding-right: 0.125rem;
         flex: none;
+        &.disabled{
+            width: 0.5625rem;
+        }
     }
     .tag-input-box{
-        background-color: #0f69ff;
-        border-color: #0f69ff;
         &.tag-key-input{
             flex-grow: 1;
             flex-shrink: 1;

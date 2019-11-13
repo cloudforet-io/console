@@ -50,7 +50,7 @@ import PDd from '@/components/atoms/definition/dd/Dd';
 import PButton from '@/components/atoms/buttons/Button';
 
 export default {
-    name: 'PanelContent',
+    name: 'PPanelContent',
     components: {
         PButton,
         PDt,
