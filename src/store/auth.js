@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import api from '@/lib/api';
 import VueCookies from 'vue-cookies';
+import api from '@/lib/api';
 
 export default {
     namespaced: true,
@@ -77,8 +77,13 @@ export default {
             });
 
             api.setAccessToken(response.data.access_token);
-
-            if (_.get(credentials, 'user_type') !== 'DOMAIN_OWNER' || _.get(VueCookies.get('domainInfo'), 'clientId') !== null ) {
+            /**
+              * Do not proceeds if Auth type is not local
+              * * */
+            if (_.get(credentials, 'user_type') !== 'DOMAIN_OWNER'
+                || _.get(VueCookies.get('domainInfo'), 'clientId') !== null
+                || _.get(credentials, 'user_type') !== 'DOMAIN_OWNER' && _.get(VueCookies.get('domainInfo'), 'clientId') !== null
+            ) {
                 await dispatch('getUser', response.data.user_id);
             }
         },

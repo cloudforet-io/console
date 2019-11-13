@@ -17,31 +17,39 @@
                                         {{ $t('COMMON.SIGN_FAIL_BODY') }}
                                     </div>
                                 </div>
-                                <form class="form-binder">
+                                <form class="form-binder novalidate">
                                     <div class="form-group">
                                         <p-label class="input-title">
                                             User ID
                                         </p-label>
-                                        <input v-model="userId" class="form-control input-content is-invalid"
-                                               type="text"
-                                               placeholder="  user ID"
-                                               @keyup.enter="signIn"
-                                               required
-                                        ><!--<div class="invalid-feedback">
-                                        User ID is Required field
-                                    </div>-->
+                                        <p-text-input ref="userId" v-model="userId"
+                                                      :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
+                                                      class="form-control"
+                                                      type="text"
+                                                      placeholder="  user ID"
+                                                      required
+                                                      @keyup="removeCSS('userId')"
+                                                      @keyup.enter="signIn"
+                                        />
+                                        <div v-show="validatorUser" style="display:block" class="invalid-feedback">
+                                            * {{ $t('SIGNIN.USER_EMPTY') }}
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <p-label class="input-title">
                                             Password
                                         </p-label>
-                                        <input v-model="password" type="password" class="form-control input-content is-invalid"
-                                               placeholder="  password"
-                                               @keyup.enter="signIn"
-                                               required
-                                        ><!--<div class="invalid-feedback">
-                                        User ID is Required field
-                                    </div>-->
+                                        <p-text-input ref="password" v-model="password" type="password"
+                                                      :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
+                                                      class="form-control"
+                                                      placeholder="  password"
+                                                      required
+                                                      @keyup="removeCSS('password')"
+                                                      @keyup.enter="signIn"
+                                        />
+                                        <div v-show="validatorPassword" style="display:block" class="invalid-feedback">
+                                            * {{ $t('SIGNIN.PASS_EMPTY') }}
+                                        </div>
                                     </div>
                                     <div class="row">
                                         <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
@@ -50,21 +58,15 @@
                                             </div>
                                         </b-col>
                                     </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-4 ml-auto col-xs-12 col-sm-12">
-                                            <b-button type="button" block class="signIn-btn"
-                                                      @click="signIn"
-                                            >
-                                                {{ $t('COMMON.SIGN_IN') }}
-                                            </b-button>
-
-                                            <!--<p-button style="display: inline-block;"
+                                    <div class="row mt-4">
+                                        <div class="col-md-12 col-xs-12 col-sm-12">
+                                            <p-button class="button-cover"
+                                                      :size="'lg'"
                                                       :style-type="'primary'"
-                                                      :size="'md'"
                                                       @click="signIn"
                                             >
                                                 {{ $t('COMMON.SIGN_IN') }}
-                                            </p-button>-->
+                                            </p-button>
                                         </div>
                                     </div>
                                 </form>
@@ -91,16 +93,16 @@
 <script>
 import { mapGetters } from 'vuex';
 import url from 'url';
-
 import PLabel from '@/components/atoms/labels/Label';
 import PButton from '@/components/atoms/buttons/Button';
-
+import PTextInput from '@/components/atoms/inputs/TextInput';
 
 export default {
     name: 'LocalSignIn',
     components: {
         PLabel,
         PButton,
+        PTextInput,
     },
     data() {
         return {
@@ -109,12 +111,35 @@ export default {
             seenError: false,
             userId: '',
             password: 'admin',
+            styler: {
+                border: '1px solid #EF3817',
+            },
+            validator: {
+                userId: false,
+                password: false,
+            },
+            isInvalid: {
+                userId: false,
+                password: false,
+            },
         };
     },
     computed: {
         ...mapGetters('auth', [
             'nextPath',
         ]),
+        validatorUser() {
+            return this.validator.userId;
+        },
+        validatorPassword() {
+            return this.validator.password;
+        },
+        getIsInvalidUser() {
+            return this.isInvalid.userId ? this.styler.border : '';
+        },
+        getIsInvalidPassword() {
+            return this.isInvalid.password ? this.styler.border : '';
+        },
         getGreetMessage() {
             const GreetingMsg = this.$store.getters['auth/greetDesc'];
             return !this.isEmpty(GreetingMsg) ? GreetingMsg : '';
@@ -125,29 +150,47 @@ export default {
         },
     },
     methods: {
+        removeCSS(type) {
+            this.validator[type] = false;
+            this.isInvalid[type] = false;
+        },
+        validateInput(param, key) {
+            const _key = _.camelCase(key);
+            if (this.isEmpty(param[_key])) {
+                this.validator[_key] = true;
+                this.isInvalid[_key] = true;
+                this.$refs[_key].focus();
+            }
+        },
         async directToAdmin() {
             this.$router.push({ name: 'Admin-SignIn' });
             this.$router.push({ path: '/admin-sign-in' });
         },
+
         async signIn() {
             this.showGreetMSG();
+
             const credentials = {
                 user_id: this.userId,
                 password: this.password,
             };
 
             if (this.isEmpty(credentials.user_id) || this.isEmpty(credentials.password)) {
-                this.showErorrMSG();
+                this.validateInput(credentials, 'user_id');
+                this.validateInput(credentials, 'password');
                 return;
             }
 
             await this.$store.dispatch('auth/signIn', credentials).then((response) => {
-                console.log(localStorage.getItem('common.toNextPath'));
                 if (localStorage.getItem('common.toNextPath') === '/sign-in' || localStorage.getItem('common.toNextPath') === null) {
                     localStorage.setItem('common.toNextPath', '/');
                 }
+
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
             }).catch((error) => {
+                this.isInvalid.userId = true;
+                this.isInvalid.password = true;
+                this.$refs.userId.focus();
                 this.showErorrMSG();
             });
         },
@@ -158,25 +201,6 @@ export default {
         showGreetMSG() {
             this.seenGreet = true;
             this.seenError = false;
-        },
-        isRemembered() {
-            localStorage.checkbox = (localStorage.checkbox === 'true');
-            if (localStorage && !this.isEmpty(localStorage.userId)) {
-                this.rememberStatus = true;
-                this.userId = localStorage.userId;
-            } else {
-                this.rememberStatus = false;
-                this.userId = '';
-            }
-        },
-        rememberMe() {
-            if (this.rememberStatus && !this.isEmpty(this.userId)) {
-                localStorage.userId = this.userId;
-                localStorage.checkbox = this.rememberStatus;
-            } else {
-                localStorage.userId = '';
-                localStorage.checkbox = false;
-            }
         },
         popSignUpInstruction() {
             this.$refs.LogInSimpleModal.showModal();
@@ -220,6 +244,7 @@ export default {
         color: #000000;
         opacity: 1;
     }
+
     .sign-in-alert{
         text-align: left;
         font: 14px/16px Arial;
@@ -227,18 +252,15 @@ export default {
         color: $alert;
         opacity: 1;
     }
-    .card-left-container {
-        padding: 1.5rem;
-    }
 
     .card-left-container {
         padding: 1.5rem;
     }
+
 
     .card-right-container {
         border: none;
-        background: transparent linear-gradient(220deg, #5541B0 0%, #5A55AA00 100%) 0% 0% no-repeat padding-box;
-        opacity: 1;
+        background:  $primary;
         > img {
             border-radius: 0;
             border-top-right-radius: 7px;
@@ -251,14 +273,31 @@ export default {
     }
 
     .input-title {
-        background: #FFFFFF 0% 0% no-repeat padding-box;
-        box-shadow: 0px 0px 8px #4D49B614;
-        opacity: 1;
+        text-align: left;
+        font: Bold 14px/28px Arial;
+        letter-spacing: 0;
+        color: $dark;
+        margin-bottom: 0px;
     }
+
     .input-content {
         background: #FFFFFF 0% 0% no-repeat padding-box;
         border: 1px solid $gray2;
         border-radius: 2px;
+        opacity: 1;
+    }
+
+    .input-alert {
+        background: #FFFFFF 0% 0% no-repeat padding-box;
+        border: 1px solid #EF3817;
+        border-radius: 2px;
+    }
+
+    .root-sign {
+        text-align: left;
+        font: Regular 14px/16px Arial;
+        letter-spacing: 0;
+        color: #8185D1;
         opacity: 1;
     }
 
@@ -267,14 +306,6 @@ export default {
         cursor: pointer
     }
 
-    .root-sign {
-        text-align: left;
-        text-decoration: underline;
-        font: Regular 14px/16px Arial;
-        letter-spacing: 0;
-        color: #8185D1;
-        opacity: 1;
-    }
 
     .right-info-card-body {
         display: flex;
@@ -295,18 +326,25 @@ export default {
         transform: translate(-50%, -50%);
     }
 
-
     .card-group {
         @extend %sheet;
-        .input-group-text {
-            border: 0;
-            background: none;
+        .form-control-alert{
+            border: 1px solid $alert;
+            box-shadow: unset;
         }
-        .form-control {
-            border: 1px solid $lightgray;
-            border-radius: 5px;
-        }
+
     }
+
+    .button-cover{
+        display: inline-block;
+        text-align: center;
+        float: right;
+        font: 16px/18px Arial;
+        letter-spacing: 0;
+        color: #FFFFFF;
+        opacity: 1;
+    }
+
     .signIn-btn {
         border: 0;
         background: $primary;
@@ -315,13 +353,5 @@ export default {
             color: $white;
         }
     }
+
 </style>
-
-
-<p-button style="display: inline-block;"
-          :style-type="'primary'"
-          :size="'md'"
-          @click="signIn"
->
-    {{ $t('COMMON.SIGN_IN') }}
-</p-button>
