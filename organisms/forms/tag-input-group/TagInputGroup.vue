@@ -44,17 +44,8 @@ const destruct = tags => _.transform(tags, (result, value, name) => {
     result.push(({ name, value }));
 }, []);
 
-export const setup = (props, context) => {
-    const newTag = reactive({
-        name: '',
-        value: '',
-    });
-    const resetTag = () => {
-        newTag.name = '';
-        newTag.value = '';
-    };
+export const useTagsBuffer = (props, context) => {
     const destructTags = ref(destruct(props.tags));
-
     const syncTags = () => {
         context.emit('update:tags', mergeTags(destructTags.value));
         context.emit('TagsChange');
@@ -67,28 +58,47 @@ export const setup = (props, context) => {
         destructTags.value.splice(index, 1);
         syncTags();
     };
-
-    const addTag = () => {
-        if (newTag.name) {
-            destructTags.value.push(reactive({ ...newTag }));
-            syncTags();
-        }
-        resetTag();
-    };
-
     watch(() => props.tags, (tags) => {
         if (tags !== mergeTags(destructTags.value)) {
             destructTags.value = destruct(tags);
         }
     });
-
     return {
-        newTag,
         destructTags,
-        resetTag,
+        syncTags,
         updateTag,
         deleteTag,
+    };
+};
+export const useNewTag = (props, context, tagsBuffer) => {
+    const newTag = reactive({
+        name: '',
+        value: '',
+    });
+    const resetTag = () => {
+        newTag.name = '';
+        newTag.value = '';
+    };
+    const addTag = () => {
+        if (newTag.name) {
+            tagsBuffer.destructTags.value.push(reactive({ ...newTag }));
+            tagsBuffer.syncTags();
+        }
+        resetTag();
+    };
+    return {
+        newTag,
         addTag,
+        resetTag,
+    };
+};
+
+export const setup = (props, context) => {
+    const tagsBuffer = useTagsBuffer(props, context);
+    const newTagState = useNewTag(props, context, tagsBuffer);
+    return {
+        ...tagsBuffer,
+        ...newTagState,
     };
 };
 
