@@ -24,8 +24,6 @@
 </template>
 
 <script>
-import { server } from '@/views/inventory/server/models/server-model';
-
 const BasePanel = () => import('@/components/base/panel/BasePanel');
 const BaseModal = () => import('@/components/base/modal/BaseModal');
 const BaseTag = () => import('@/components/base/tags/BaseTag');

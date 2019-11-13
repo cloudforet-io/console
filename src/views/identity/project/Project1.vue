@@ -10,8 +10,7 @@
             @DTNodeClicked="pNodeClicked"
             @DTNodeToggled="pNodeToggled"
             @DTBeforeDropped="pBeforeDropped"
-            @DTContextVisible="pContextVisible"
-        >
+            @DTContextVisible="pContextVisible">
             <!--<template slot="icon" slot-scope="node">
                 <span class="item-icon">
                     <i v-if="node.isLeaf" class="fas fa-cube" />
@@ -29,23 +28,24 @@
                             <template #details="{tabName}">
                                 <keep-alive>
                                     <project-summary-top
-                                      :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
+                                        :selected-node="getSelectedNodeAndTree"
+                                        :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
                                     />
                                 </keep-alive>
                             </template>
                             <template #member="{tabName}">
-                                <project-member />
+                                <project-member :selected-node="getSelectedNodeAndTree" />
                             </template>
                         </PTab>
                     </template>
                 </BaseDragHorizontal>
                 <div>
                     <template v-if="tabsData.activeTab === 'details'">
-                        <project-summary-bottom></project-summary-bottom>
+                        <project-summary-bottom
+                            :selected-node="getSelectedNodeAndTree"
+                        />
                     </template>
-                    <template v-else>
-                        2
-                    </template>
+                    <template v-else />
                 </div>
             </template>
         </default-tree>
@@ -58,6 +58,7 @@ import ProjectContext from '@/views/identity/project/modules/ProjectContext';
 import DefaultTree from '@/components/organisms/trees/area-tree/AreaTree';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
+
 const projectSummaryTop = () => import('@/views/identity/project/modules/ProjectSummaryTop');
 const projectSummaryBottom = () => import('@/views/identity/project/modules/ProjectSummaryBottom');
 const projectMember = () => import('@/views/identity/project/modules/ProjectMember');
@@ -86,6 +87,7 @@ export default {
             displayTree: false,
             treeData: [],
             selectedData: {},
+            selectedNodeData: null,
             isInitializing: false,
             contextItem: null,
         };
@@ -93,6 +95,9 @@ export default {
     computed: {
         getSelectedData() {
             return this.contextItem;
+        },
+        getSelectedNodeAndTree() {
+            return this.selectedNodeData;
         },
     },
     created() {
@@ -104,7 +109,7 @@ export default {
         },
 
         pNodeClicked(node, tree) {
-
+            this.selectedNodeData = { node, tree };
         },
 
         async pNodeToggled(node, tree) {

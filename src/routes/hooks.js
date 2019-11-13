@@ -1,3 +1,6 @@
+/*
+
+This Code is deprecated since new update.
 import url from 'url';
 import { setApi, getApi } from '@/setup/api';
 import store from '@/store';
@@ -118,3 +121,4 @@ export const beforeEach = async (to, from, next) => {
 
     next();
 };
+*/

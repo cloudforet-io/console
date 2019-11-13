@@ -1,10 +1,13 @@
 export const en = {
     COMMON: {
+        COPY: 'Copy',
         WELCOME_MSG: 'Welcome to {0} Portal.',
         WELCOME_MSG_P: 'Welcome to {0} Portal',
         SIGN_UP: 'Sign up',
         SIGN_IN: 'Sign In',
         SIGN_IN_MSG: 'Sign in to your Account.',
+        AUTH_FAIL_BODY: 'Please confirm your Google Account',
+        AUTH_FAIL_TITLE: 'Authentication failed',
         SIGN_FAIL_BODY: 'Please confirm your Username or Password.',
         SIGN_FAIL_TITLE: 'Wrong Password or Username.',
         PROCESSED: 'processed',

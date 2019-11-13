@@ -3,7 +3,7 @@ import VueLodash from 'vue-lodash';
 import timezone from 'countries-and-timezones';
 import { GlobalEnum } from '@/setup/enum';
 
-export const Mixin = {
+export const Util = {
     methods: {
         /** ********************************************************************************
          * Name       : getGraphColor
@@ -219,9 +219,13 @@ export const Mixin = {
          * Output  => String translation Message
          * Description:  translation of i18n
          ********************************************************************************* */
-        tr(m, a) {
-            if (this.$i18n.te(m)) {
-                return this.isEmpty(m) ? this.$i18n.t(m) : this.$i18n.t(m, a);
+        tr(m, a, parent) {
+            let vm = this;
+            if (parent) {
+                vm = parent;
+            }
+            if (vm.$i18n.te(m)) {
+                return vm.isEmpty(m) ? vm.$i18n.t(m) : vm.$i18n.t(m, a);
             }
             return 'No Message';
         },
@@ -323,7 +327,7 @@ export const Mixin = {
                     selectedNode.data.group = type;
 
                     if (isFirstLoad) {
-                        selectedNode.data['is_cached'] = false;
+                        selectedNode.data.is_cached = false;
                     }
                 }
 

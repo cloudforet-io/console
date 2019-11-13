@@ -60,12 +60,17 @@
             <b-col cols="6">
                 <div class="chart-container">
                     <div class="chart">
-                        <p-chart ref="chart"
-                                 type="doughnut"
-                                 :data="chartData"
-                                 :options="chartOptions"
-                                 :plugins="{beforeDraw, beforeInit}"
-                                 :loading="loading"
+                        <!--                        <p-chart ref="chart"-->
+                        <!--                                 type="doughnut"-->
+                        <!--                                 :data="chartData"-->
+                        <!--                                 :options="chartOptions"-->
+                        <!--                                 :plugins="{beforeDraw, beforeInit}"-->
+                        <!--                                 :loading="loading"-->
+                        <!--                        />-->
+                        <p-donut-chart
+                            :data="serverStates"
+                            :options="chartOptions"
+                            :loading="loading"
                         />
                     </div>
                 </div>
@@ -76,12 +81,15 @@
 
 <script>
 import PChart from '@/components/molecules/charts/Chart';
+import PDonutChart from '@/components/organisms/charts/donut-chart/DonutChart';
+import { sampleDataGenerator } from '@/components/organisms/charts/donut-chart/DonutChartD3.map';
 
 const BaseStateTag = () => import('@/components/base/tags/BaseStateTag.vue');
 export default {
     name: 'CollectionState',
     components: {
         PChart,
+        PDonutChart,
         BaseStateTag,
     },
     props: {
@@ -122,17 +130,17 @@ export default {
                     },
                 },
             },
-            chartOptions: {
-                cutoutPercentage: 70,
-                centerText: {
-                    display: true,
-                    text: 'SERVER',
-                    fontSize: 20,
-                },
-                legendPad: {
-                    bottom: 10,
-                },
-            },
+            // chartOptions: {
+            //     cutoutPercentage: 70,
+            //     centerText: {
+            //         display: true,
+            //         text: 'SERVER',
+            //         fontSize: 20,
+            //     },
+            //     legendPad: {
+            //         bottom: 10,
+            //     },
+            // },
             chartData: {
                 labels: [],
                 datasets: [{
@@ -154,6 +162,9 @@ export default {
                 }],
             },
             loading: true,
+            chartOptions: {
+            },
+            serverStates: [],
         };
     },
     computed: {
@@ -183,47 +194,27 @@ export default {
         },
     },
     created() {
-        this.listCollectionStates();
+        // this.listCollectionStates();
     },
     methods: {
         refresh() {
             this.loading = true;
             setTimeout(() => {
-                this.collectionStates = {
-                    server: {
-                        title: 'Server',
-                        data: {
-                            NEW: 6,
-                            ACTIVE: 2,
-                            DUPLICATED: 3,
-                        },
-                    },
-                    network: {
-                        title: 'Network',
-                        data: {
-                            NEW: 8,
-                            ACTIVE: 1,
-                            DUPLICATED: 2,
-                        },
-                    },
-                    ip_address: {
-                        title: 'IP Address',
-                        data: {
-                            NEW: 0,
-                            ACTIVE: 0,
-                            DUPLICATED: 0,
-                        },
-                    },
-                },
-                this.setChartData();
-                this.setChartLabels();
+                // this.serverStates = sampleDataGenerator();
+                this.serverStates = [
+                    { key: 'Bob', value: 10 },
+                    { key: 'Sam', value: 3 },
+                    { key: 'Robin', value: 23 },
+                    { key: 'Anne', value: 17 },
+                    { key: 'Gina', value: 13 },
+                ];
                 this.loading = false;
             }, 1000);
         },
         async listCollectionStates() {
             this.loading = true;
             try {
-                const res = await this.$axios.post('/statistics/collection-state');
+                const res = await this.$http.post('/statistics/collection-state');
                 this.setCollectionStates(res.data);
                 this.updateChartDataConfig();
                 this.loading = false;

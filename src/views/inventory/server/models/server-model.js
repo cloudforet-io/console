@@ -1,5 +1,4 @@
-import casual from '@/lib/casual';
-import { arrayOf } from '@/lib/casual';
+import casual, { arrayOf } from '@/lib/casual';
 
 casual.define('security_group_rule', () => ({
     port_range_min: casual.integer(0, 1000),
@@ -18,8 +17,8 @@ casual.define('serverData', () => ({
         os_arch: 'x86_64',
     },
     base: {
-        memory: 0,
-        core: 2,
+        memory: casual.integer(2, 125),
+        core: casual.integer(1, 20),
     },
     compute: {
         created_by_user_id: casual._uuid().slice(-12),
@@ -38,7 +37,7 @@ casual.define('serverData', () => ({
         host_vm_id: casual.make_id('i'),
         vm_id: casual.make_id('i'),
         vm_name: 'cloudone-dev-eks-cluster_kubectl-test',
-        platform_type: 'AWS',
+        platform_type: casual.random_element(['AWS', 'AZURE', 'GCP']),
     },
 }));
 
@@ -65,11 +64,23 @@ casual.define('disk', () => ({
 
 casual.define('zoneInfo', () => ({
     zone_id: casual.make_id('zone'),
-    name: casual.name,
+    name: casual.word,
     state: casual.random_element(['ACTIVE', 'DEACTIVE']),
     tags: {},
     region_info: null,
     domain_id: casual.make_id('domain'),
+    created_at: casual.timestamp,
+    deleted_at: casual.timestamp,
+}));
+
+casual.define('poolInfo', () => ({
+    pool_id: casual.make_id('pool'),
+    name: casual.word,
+    state: casual.random_element(['ACTIVE', 'DEACTIVE']),
+    tags: {},
+    domain_id: '',
+    region_info: null,
+    zone_info: null,
     created_at: casual.timestamp,
     deleted_at: casual.timestamp,
 }));
@@ -81,17 +92,17 @@ casual.define('collectInfo', () => ({
 }));
 casual.define('server', () => ({
     server_id: casual.make_id('server'),
-    name: casual._name(),
-    state: casual.random_element(['INSERVICE', 'clock', 'table']),
+    name: casual.word,
+    state: casual.random_element(['INSERVICE', 'PENDING', 'MAINTENANCE', 'CLOSED', 'DELETED']),
     primary_ip_address: casual.ip,
     ip_addresses: casual.ip_list,
     server_type: casual.random_element(['VM', 'BARE METAL']),
     os_type: casual.random_element(['LINUX', 'WINDOW']),
-    data: casual.data,
+    data: casual.serverData,
     nics: arrayOf(casual.integer(2, 5), casual._nic),
     disks: arrayOf(casual.integer(2, 5), casual._disk),
     template_data: {},
-    pool_info: null,
+    pool_info: casual.poolInfo,
     zone_info: casual.zoneInfo,
     project_id: casual.make_id('project'),
     domain_id: casual.make_id('domain'),
@@ -101,6 +112,4 @@ casual.define('server', () => ({
     updated_at: casual.timestamp,
     deleted_at: null,
 }));
-
-export const server = () => casual.server;
-export const serverList = count => arrayOf(count, casual._server);
+export default casual;

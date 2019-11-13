@@ -16,8 +16,8 @@
                                         </transition>
                                         <transition v-if="seenError" name="slide-fade">
                                             <p class="message" style="color: #B82E24">
-                                                <b>{{ $t('COMMON.SIGN_FAIL_TITLE') }}</b>
-                                                <br> {{ $t('COMMON.SIGN_FAIL_BODY') }}
+                                                <b>{{ $t('COMMON.AUTH_FAIL_TITLE') }}</b>
+                                                <br> {{ $t('COMMON.AUTH_FAIL_BODY') }}
                                             </p>
                                         </transition>
                                         <b-input-group class="mb-4">
@@ -53,6 +53,7 @@
 import url from 'url';
 import { mapGetters } from 'vuex';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
+
 const { gapi } = window;
 export default {
     components: { BaseSimpleModal },
@@ -89,14 +90,17 @@ export default {
         },
         async setGoogleSignInButton() {
             const vm = this;
-            const clientId = this.$store.getters['auth/clientId'];
+            const clientId = this.isEmpty(this.$store.getters['domain/clientId']) ? $cookies.get('domainInfo').clientId : this.$store.getters['domain/clientId'];
+
             gapi.load('auth', () => {
                 const auth2 = gapi.auth2.init({
                     client_id: clientId,
                     fetch_basic_profile: false,
                     scope: 'profile',
                 });
+
                 vm.isSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
+
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
                     width: 300,
@@ -124,21 +128,24 @@ export default {
                 if (!auth2.isSignedIn.get()) {
                     return;
                 }
-
                 auth2.disconnect();
-                this.$router.push({ path: localStorage.getItem('common.nextPath') });
+
+                if (localStorage.getItem('common.toNextPath') === '/google-sign-in' || localStorage.getItem('common.toNextPath') === null) {
+                    localStorage.setItem('common.toNextPath', '/');
+                }
+                this.$router.push({ path: localStorage.getItem('common.toNextPath') });
                 this.setTimeZone();
             }).catch((error) => {
-                if (!this.isEmpty(error.message)) {
+                auth2.disconnect();
+                this.showErorrMSG();
+                console.log(error);
+                /* if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
                     const errorMSG = errorConfig.error_dt_code;
-                    auth2.disconnect();
-                    if (errorMSG === 'ERROR_AUTHENTICATED_WITHOUT_USER') {
-                        this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
-                    }
+
                 } else {
                     this.consoleLogEnv('error', error);
-                }
+                } */
             });
         },
         async setTimeZone() {

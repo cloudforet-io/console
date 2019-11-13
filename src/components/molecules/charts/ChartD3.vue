@@ -27,16 +27,14 @@
      *
      * 1. horizontal stacked bar (Servers by Type)
      *---      1) value(%) overlay
-     *      2) labels custom
-     *---      3) height fix
+     *---      2) height fix
      * 2. horizontal bar (Servers by Type - sub categories)
      *---      1) border radius
      *---      2) label custom
      *---          a. label position
-     *---        b. value position
+     *---          b. value position
      * 3. donut chart (Server State)
-     *      1) label custom
-     *      2) center text
+     *---      1) tooltip
      * 4. bubble chart (Resources by Region)
      *      1) background
      *      2) bubble position by data, by background
@@ -127,7 +125,6 @@ export default {
         chartOptions() {
             return this._.merge({}, DEFAULT_OPTIONS, this.options);
         },
-        max() { return d3.max(this.data, d => d.value); },
         responsiveWidthOnly() {
             return this.chartOptions.responsive.width && !this.chartOptions.responsive.height;
         },
@@ -181,15 +178,16 @@ export default {
              * @param key           unique data for target element. essential.
              * @param options       tooltip.js options. optional.
              */
-        appendTooltips(data, idx, els, options) {
+        appendTooltips(data, idx, el, options) {
             if (this.tooltipEls[data.key]) return;
-            // eslint-disable-next-line no-param-reassign
-            if (!options) options = {};
-
-            this.tooltipEls[data.key] = new Tooltip(els[idx], this._.merge({
+            const mergedOptions = this.getTooltipOptions(data, idx, el, options || {});
+            this.tooltipEls[data.key] = new Tooltip(el, mergedOptions);
+        },
+        getTooltipOptions(data, idx, el, options) {
+            return this._.merge({
                 title: this.generateTooltipTitle(data, idx, options.color),
                 container: this.svgContainerRef,
-            }, this.chartOptions.tooltips, options));
+            }, this.chartOptions.tooltips, options);
         },
         generateTooltipTitle(data, idx, color) {
             const title = document.createElement('div');
@@ -197,7 +195,7 @@ export default {
 
             const circle = document.createElement('span');
             circle.classList.add('circle');
-            circle.style.backgroundColor = color || PRIMARY_COLORSET[idx];
+            circle.style.backgroundColor = color;
 
             const text = document.createElement('span');
             text.classList.add('text');
@@ -214,9 +212,7 @@ export default {
                 this.setSvgResponsive();
             } else {
                 this.svg.remove();
-                console.log('removed g', this.$parent);
             }
-            console.log('appended g', this.$parent);
             this.svg = this.svgEl.append('g');
         },
         setSvgResponsive() {

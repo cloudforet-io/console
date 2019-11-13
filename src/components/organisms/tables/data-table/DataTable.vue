@@ -2,11 +2,11 @@
     <p-table
         :table-style-type="tableStyleType"
         :thead-style-type="theadStyleType"
-        :responsiveStyle="responsiveStyle"
-        :tableStyle="tableStyle"
-        :tbodyStyle="tbodyStyle"
-        :theadStyle="theadStyle"
-        :tfootStyle="tfootStyle"
+        :responsive-style="responsiveStyle"
+        :table-style="tableStyle"
+        :tbody-style="tbodyStyle"
+        :thead-style="theadStyle"
+        :tfoot-style="tfootStyle"
         :striped="striped"
         :bord="bord"
         :hover="hover"
@@ -24,13 +24,7 @@
             >
                 <p-tr>
                     <p-th v-if="selectable">
-                        <input
-                            v-model="allState"
-                            type="checkbox"
-                            :true-value="true"
-                            :false-value="false"
-                            @change.stop="selectAllToggle"
-                        >
+                        <PCheckBox v-model="allState" @change="selectAllToggle" />
                     </p-th>
                     <p-th
                         v-for="(field,index) in fieldsData"
@@ -38,7 +32,7 @@
                         @click="theadClick(field,index,$event)"
                     >
                         {{ field.label ? field.label : field.name }}
-                        <template v-if="sortable">
+                        <template v-if="sortable&&field.sortable">
                             <f-i
                                 v-if="sortable&&field.name==sortBy"
                                 icon-style="solid"
@@ -78,13 +72,12 @@
                             @mouseover="rowMouseOver(item,index, $event)"
                             @mouseout="rowMouseOut(item,index, $event)"
                         >
-                            <p-td v-if="selectable">
-                                <input
-                                    v-model="selectIndex"
-                                    type="checkbox"
-                                    :value="index"
-                                    @change.stop
-                                >
+                            <p-td v-if="selectable"
+                                  @click.stop.prevent="selectClick"
+                                  @mouseenter="hoverIndex=index"
+                                  @mouseleave="hoverIndex=null"
+                            >
+                                <PCheckBox v-model="proxySelectIndex" :value="index" :hovered="hoverIndex===index" />
                             </p-td>
                             <template v-for="field in fieldsName">
                                 <slot
@@ -94,7 +87,17 @@
                                     :index="index"
                                     :field="field"
                                 >
-                                    <p-td>{{ item[field] }}</p-td>
+                                    <p-td>
+                                        <slot
+                                            :name="'col-'+field+'-format'"
+                                            :item="item"
+                                            :value="item[field]"
+                                            :index="index"
+                                            :field="field"
+                                        >
+                                            {{ item[field] }}
+                                        </slot>
+                                    </p-td>
                                 </slot>
                             </template>
                         </p-tr>
@@ -114,17 +117,22 @@ import PTr from '@/components/atoms/table/Tr';
 import PTd from '@/components/atoms/table/Td';
 import PTh from '@/components/atoms/table/Th';
 import FI from '@/components/atoms/icons/FI';
+import PCheckBox from '@/components/molecules/forms/CheckBox';
 
 export default {
     name: 'PDataTable',
     components: {
-        PTable, PTd, PTh, PTr, FI,
+        PTable, PTd, PTh, PTr, FI, PCheckBox,
     },
     mixins: [PTable],
     props: {
         fields: Array,
         items: Array,
         sortable: {
+            type: Boolean,
+            default: false,
+        },
+        rowClickMultiSelectMode: {
             type: Boolean,
             default: false,
         },
@@ -144,21 +152,32 @@ export default {
             type: Boolean,
             default: true,
         },
-
     },
     data() {
         return {
             allState: false,
+            hoverIndex: null,
         };
     },
     computed: {
+        proxySelectIndex: {
+            get() {
+                return this.selectIndex;
+            },
+            set(value) {
+                return this.$emit('update:selectIndex', value);
+            },
+        },
         fieldsData() {
             const data = [];
             this.fields.forEach((value) => {
                 if (typeof value === 'string') {
-                    data.push({ name: value });
+                    data.push({ name: value, label: value, sortable: true });
                 } else {
-                    data.push(value);
+                    data.push({
+                        sortable: true,
+                        ...value,
+                    });
                 }
             });
             return data;
@@ -181,7 +200,11 @@ export default {
         rowLeftClick(item, index, event) {
             this.$emit('rowLeftClick', item, index, event);
             if (this.selectable) {
-                this.checkboxToggle(index);
+                if (this.rowClickMultiSelectMode) {
+                    this.checkboxToggle(index);
+                } else {
+                    this.proxySelectIndex = [index];
+                }
             }
         },
         rowRightClick(item, index, event) {
@@ -196,23 +219,26 @@ export default {
         rowMouseOut(item, index, event) {
             this.$emit('rowMouseOut', item, index, event);
         },
+
         theadClick(field, index, event) {
-            if (this.sortBy !== field.name) {
-                this.$emit('update:sortBy', field.name);
-                if (!this.sortDesc) {
-                    this.$emit('update:sortDesc', true);
+            if (this.sortable && field.sortable) {
+                if (this.sortBy !== field.name) {
+                    this.$emit('update:sortBy', field.name);
+                    if (!this.sortDesc) {
+                        this.$emit('update:sortDesc', true);
+                    }
+                } else {
+                    this.$emit('update:sortDesc', !this.sortDesc);
                 }
-            } else {
-                this.$emit('update:sortDesc', !this.sortDesc);
             }
             this.$emit('theadClick', field, index, event);
         },
 
         isSelected(index) {
-            return this.selectIndex.indexOf(index) !== -1;
+            return this.proxySelectIndex.indexOf(index) !== -1;
         },
         checkboxToggle(index) {
-            const newSelected = [...this.selectIndex];
+            const newSelected = [...this.proxySelectIndex];
             if (this.isSelected(index)) {
                 const idx = newSelected.indexOf(index);
                 newSelected.splice(idx, 1);
@@ -220,18 +246,21 @@ export default {
             } else {
                 newSelected.push(index);
             }
-            this.$emit('update:selectIndex', newSelected);
+            this.proxySelectIndex = newSelected;
+        },
+        selectClick(event) {
+            event.target.children[0].click();
         },
         selectAllToggle() {
             if (this.allState) {
-                this.$emit('update:selectIndex', Array.from(new Array(this.items.length).keys()));
+                this.proxySelectIndex = Array.from(new Array(this.items.length).keys());
             } else {
-                this.$emit('update:selectIndex', []);
+                this.proxySelectIndex = [];
             }
         },
         getSelectItem() {
             const selectItem = [];
-            this.selectIndex.forEach((index) => {
+            this.proxySelectIndex.forEach((index) => {
                 selectItem.push(this.items[index]);
             });
             return selectItem;

@@ -27,14 +27,11 @@ export default {
             validator(value) {
                 return [
                     null,
-                    'primary',
-                    'secondary',
-                    'success',
-                    'danger',
-                    'warning',
-                    'info',
-                    'light',
-                    'dark',
+                    'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
+                    'secondary', 'secondary1', 'secondary2',
+                    'other1', 'other2', 'other3', 'other4',
+                    'gray', 'gray1', 'gray2', 'gray3',
+                    'alert', 'safe', 'dark',
                 ].indexOf(value) !== -1;
             },
         },

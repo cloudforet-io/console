@@ -36,9 +36,8 @@ class Config {
     get(key) {
         if (key) {
             return _.get(this.config, key);
-        } else {
-            return this.config;
         }
+        return this.config;
     }
 }
 

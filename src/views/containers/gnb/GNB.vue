@@ -3,6 +3,7 @@
         <li class="logo">
             <p-tooltip contents="Dashboard"
                        :options="{offset: '8px'}"
+                       position="right"
                        @click="hideSitemap"
             >
                 <template #target>

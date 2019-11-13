@@ -13,14 +13,18 @@ import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
-import { Mixin } from '@/mixins/global-util';
+import { Util } from '@/lib/global-util';
 import VueLodash from 'vue-lodash';
-import VueI18n from 'vue-i18n';
 import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
+import VueCompositionApi from '@vue/composition-api';
+import { i18n } from '@/translations';
+import VueI18n from 'vue-i18n';
 import VueCompositionApi from '@vue/composition-api'
 
-Vue.mixin(Mixin);
+Vue.use(VueCompositionApi);
+Vue.use(VueI18n);
+Vue.mixin(Util);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueI18n);
@@ -50,6 +54,10 @@ addDecorator(withA11y);
 addDecorator(withKnobs);
 addDecorator(centered);
 addDecorator(withCssResources);
+addDecorator(() => ({
+    template: '<story/>',
+    i18n,
+}));
 addParameters({
     viewport: {
         viewports: INITIAL_VIEWPORTS,
