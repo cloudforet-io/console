@@ -1,9 +1,10 @@
 <template>
     <div class="col-sm-12" :style="panelTitleStyle">
         <div class="card panel-card">
-            <div class="panel-header">
-                {{ panelTitle }}
-                <slot name="head"></slot>
+            <div class="p-panel-top-header">
+                <div class="p-panel-top-header-title">
+                    {{ panelTitle }}
+                </div><slot name="head" />
             </div>
             <hr>
             <slot name="body" />
@@ -13,7 +14,7 @@
 
 <script>
 export default {
-    name: 'PanelTop',
+    name: 'PPanelTop',
     props: {
         panelTitle: {
             type: String,
@@ -24,9 +25,7 @@ export default {
             default: null,
         },
     },
-    methods: {
 
-    },
 };
 </script>
 
@@ -34,11 +33,20 @@ export default {
     .panel-card{
         border:none;
     }
-    .panel-header{
+    hr{
+        margin-top: 0rem;
+    }
+    .p-panel-top-header{
         text-align: left;
-        font:  18px/21px Arial;
+        font:  18px Arial;
         letter-spacing: 0;
         color: #202433;
         opacity: 1;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        display: flex;
     }
+    .p-panel-top-header-title{
+        align-self:center;
+            }
 </style>

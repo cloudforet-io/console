@@ -1,19 +1,20 @@
 <template>
-    <panel-top :panel-title="infoTitle" :panel-title-style="infoTitleStyle">
+    <p-panel-top :panel-title="infoTitle" :panel-title-style="infoTitleStyle">
         <template #body>
-            <panel-content :definition-list="contentData" />
+            <p-panel-content :definition-list="contentData" />
         </template>
-    </panel-top>
+    </p-panel-top>
 </template>
 
 <script>
-import PanelTop from '@/components/molecules/panel/panel-top/PanelTop';
-import PanelContent from '@/components/molecules/panel/panel-content/PanelContent';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop';
+import PPanelContent from '@/components/molecules/panel/panel-content/PanelContent';
+
 export default {
-    name: 'InfoPanel',
+    name: 'PInfoPanel',
     components: {
-        PanelContent,
-        PanelTop,
+        PPanelContent,
+        PPanelTop,
     },
     props: {
         infoTitle: {
