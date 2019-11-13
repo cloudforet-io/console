@@ -73,10 +73,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        type: {
-            type: String,
-            default: 'doughnut',
-        },
         data: {
             type: Array,
             required: true,
