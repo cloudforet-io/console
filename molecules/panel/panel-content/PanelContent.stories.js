@@ -17,7 +17,7 @@ export const panelContents = () => ({
     components: { PanelContent, PBadge },
     template: `
 <div style="width: 80vw;">
-    <panel-content :defs="renderData">
+    <panel-content :defs="renderData" :item="item">
     <template #def-state-format="scope">
     <p-badge styleType="primary">{{scope.value}}</p-badge>
 </template>
@@ -25,22 +25,24 @@ export const panelContents = () => ({
 </div>`,
     data() {
         return {
+            item: {
+                id: 'Fire Birds',
+                name: 'Shawn Mandus',
+                state: 'enabled',
+            },
             renderData: [
                 {
                     name: 'id',
                     label: 'ID',
-                    value: 'Fire Birds',
                     copyFlag: true,
                 },
                 {
                     name: 'name',
                     label: 'NAME',
-                    value: 'Shawn Mandus',
                 },
                 {
                     name: 'state',
                     label: 'state',
-                    value: 'enabled',
                     copyFlag: true,
                 },
             ],
@@ -52,7 +54,7 @@ export const trHelper = () => ({
     components: { PanelContent, PBadge },
     template: `
 <div style="width: 80vw;">
-    <panel-content :defs="defs">
+    <panel-content :defs="defs" :item="item">
     <template #def-state-format="scope">
     <p-badge styleType="primary">{{scope.value}}</p-badge>
 </template>
@@ -60,11 +62,16 @@ export const trHelper = () => ({
 </div>`,
     setup(props, context) {
         const sampleDefs = ref([
-            ['name', 'COL_NM.NAME', 'abcd'],
-            ['state', ['COL_NM.STATE', 'en'], 'enabled'],
-            ['primary_ip_address', 'COL_NM.IP', '1.1.1.1', { copyFlag: true }],
+            ['name', 'COMMON.NAME', { copyFlag: true }],
+            ['state', ['COMMON.STATE', 'en'], { copyFlag: true }],
+            ['primary_ip_address', 'COMMON.IP', { copyFlag: true }],
         ]);
         return {
+            item: {
+                name: '펭수',
+                state: '하태하태',
+                primary_ip_address: '1.1.1.1',
+            },
             defs: computed(() => makeTrDefs(sampleDefs.value, context.parent)),
         };
     },

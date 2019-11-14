@@ -9,15 +9,19 @@
                       @mouseenter="mouseInOut(idx,true)"
                       @mouseleave="mouseInOut(idx,false)"
                 >
-                    <slot :name="`def-${def.name}-format`" :value="def.value" :def="def">
-                        {{ def.value }}
+                    <slot :name="`def-${def.name}-format`"
+                          :value="getValue(def.name)"
+                          :item="item"
+                          :def="def"
+                    >
+                        {{ getValue(def.name) }}
                     </slot>
                     <template v-if="activeArr(idx)">
                         &nbsp;&nbsp; <p-button v-if="isCopyFlagged(def)"
                                                style="display: inline-block;" outline
                                                :style-type="'secondary'"
                                                :size="'sm'"
-                                               @click="copyText(def.value)"
+                                               @click="copyText($event)"
                         >
                             {{ tr('COMMON.COPY') }}
                         </p-button>
@@ -48,6 +52,10 @@ export default {
             type: Array,
             default: () => [],
         },
+        item: {
+            type: Object,
+            default: () => new Object(),
+        },
     },
     data() {
         return {
@@ -72,11 +80,17 @@ export default {
         isCopyFlagged(definition) {
             return (_.get(definition, 'copyFlag') === true);
         },
-        copyText(text) {
+        copyText(event) {
+            const rawText = event.target.parentElement.innerText;
+            const copyLength = this.tr('COMMON.COPY').length;
+            const text = rawText.slice(0, -copyLength).trim();
             this.selectToCopyToClipboard(text);
         },
         mouseInOut(idx, flag) {
             this.$set(this.active, idx, flag);
+        },
+        getValue(name) {
+            return this.item[name] ? this.item[name] : '';
         },
     },
 };
