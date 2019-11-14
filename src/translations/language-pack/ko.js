@@ -116,42 +116,6 @@ export const ko = {
         LOCAL: 'Local',
         OFFICIAL: 'Official',
         LIST: '목록',
-    },
-    ATOM: {
-
-    },
-    MOLECULES: {
-
-    },
-    SIGNIN: {
-        ROOT_CREDENTIALS: '루트 계정 로그인',
-        USER_EMPTY: '아이디는 필수 입력 항목입니다.',
-        PASS_EMPTY: '패스워드를 입력해주세요.'
-    },
-    ORGANISMS: {
-        CREATE_ARG: '{0} 생성',
-        UPDATE_ARG: '{0} 갱신',
-        DELETE_ARG: '{0} 삭제',
-        CLICK_RIGHT: '좌측 패널의 아이템을 클릭해 주세요.'
-    },
-    IDENTITY: {
-        NO_PROJECT_SEL: '프로젝트를 선택해주십시오.',
-        NO_PROJECT_SEL_DT: '왼쪽 트리 패널의 아이템을 클릭 하세요.',
-    },
-    INVENTORY: {
-
-    },
-    TREE_TYPE: {
-        PROJECT: '프로젝트',
-        PROJECT_GROUP: '프로젝트 그룹',
-        REGION: 'Region',
-        ZONE: 'Zone',
-        POOL: 'Pool',
-        CREATE: '{0} 생성하기',
-        UPDATE: '{0} 업데이트',
-        DELETE: '삭제하기',
-    },
-    COL_NM: {
         C_COMMAND_ID: '커맨드 아이디',
         C_USER_ID: '유저 아이디',
         C_NAME: '이름',
@@ -245,6 +209,40 @@ export const ko = {
         FINISHED: '완료일',
         KEY: '키(Key)',
         FAIL_REASON: '실패 원인',
+    },
+    ATOM: {
+
+    },
+    MOLECULES: {
+
+    },
+    SIGNIN: {
+        ROOT_CREDENTIALS: '루트 계정 로그인',
+        USER_EMPTY: '아이디는 필수 입력 항목입니다.',
+        PASS_EMPTY: '패스워드를 입력해주세요.'
+    },
+    ORGANISMS: {
+        CREATE_ARG: '{0} 생성',
+        UPDATE_ARG: '{0} 갱신',
+        DELETE_ARG: '{0} 삭제',
+        CLICK_RIGHT: '좌측 패널의 아이템을 클릭해 주세요.'
+    },
+    IDENTITY: {
+        NO_PROJECT_SEL: '프로젝트를 선택해주십시오.',
+        NO_PROJECT_SEL_DT: '왼쪽 트리 패널의 아이템을 클릭 하세요.',
+    },
+    INVENTORY: {
+
+    },
+    TREE_TYPE: {
+        PROJECT: '프로젝트',
+        PROJECT_GROUP: '프로젝트 그룹',
+        REGION: 'Region',
+        ZONE: 'Zone',
+        POOL: 'Pool',
+        CREATE: '{0} 생성하기',
+        UPDATE: '{0} 업데이트',
+        DELETE: '삭제하기',
     },
     MODAL_TITLE: {
         NOT_ALLOW: '수행불가 작업',

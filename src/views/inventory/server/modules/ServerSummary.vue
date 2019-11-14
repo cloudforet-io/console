@@ -100,7 +100,7 @@ export default {
         },
         serverInfo() {
             return [
-                { title: `${this.tr('SERVER')} ${this.tr('ID')}`, contents: this.serverData.server_id, copyFlag: true },
+                { title: `${this.tr('COMMON.SERVER')} ${this.tr('COMMON.ID')}`, contents: this.serverData.server_id, copyFlag: true },
                 { title: this.tr('COL_NM.NAME'), contents: this.serverData.name, copyFlag: true },
                 {
                     title: this.tr('COL_NM.STATE'), state: this.serverData.state, stateType: 'SERVER_STATE', copyFlag: true,

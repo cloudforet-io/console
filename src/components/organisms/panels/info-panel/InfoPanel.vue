@@ -1,7 +1,7 @@
 <template>
     <p-panel-top :panel-title="infoTitle" :panel-title-style="infoTitleStyle">
         <template #body>
-            <p-panel-content :defs="defs">
+            <p-panel-content :defs="defs" :item="item">
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                     <slot :name="slot" v-bind="scope" />
                 </template>
@@ -32,6 +32,10 @@ export default {
         defs: {
             type: Array,
             default: () => [],
+        },
+        item: {
+            type: Object,
+            default: () => {},
         },
     },
     methods: {

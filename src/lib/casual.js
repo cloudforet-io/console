@@ -29,9 +29,11 @@ const provider = {
     security_group_name() {
         return `${casual.word}.${casual.word}`;
     },
-    tag() {
+    tags() {
         const tag = {};
-        tag[casual._word()] = casual._word();
+        for (let i = 0; i < casual.integer(3, 5); i++) {
+            tag[casual._word()] = casual._word();
+        }
         return tag;
     },
 
