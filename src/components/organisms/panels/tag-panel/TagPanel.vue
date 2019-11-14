@@ -5,7 +5,7 @@
                 <p-button v-if="!editMode" style-type="primary" class="header-btn"
                           @click="clickEdit()"
                 >
-                    <p-i icon=""></p-i> edit
+                    edit
                 </p-button>
                 <p-button v-if="editMode" style-type="secondary" :outline="true"
                           class="header-btn"

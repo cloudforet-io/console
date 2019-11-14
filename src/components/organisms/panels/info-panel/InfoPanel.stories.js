@@ -15,7 +15,7 @@ export default {
 };
 export const panelContents = () => ({
     components: { InfoPanel },
-    template: '<div style="width: 80vw;"><InfoPanel :infoTitle="renderTitle" :defs="defs"></InfoPanel></div>',
+    template: '<div style="width: 80vw;"><InfoPanel :infoTitle="renderTitle" :defs="defs" :item="item"></InfoPanel></div>',
 
     data() {
         return {
@@ -24,21 +24,23 @@ export const panelContents = () => ({
                 {
                     name: 'id',
                     label: 'ID',
-                    value: 'Fire Birds',
                     copyFlag: true,
                 },
                 {
                     name: 'name',
                     label: 'NAME',
-                    value: 'Shawn Mandus',
                 },
                 {
                     name: 'state',
                     label: 'state',
-                    value: 'enabled',
                     copyFlag: true,
                 },
             ],
+            item: {
+                name: '펭수',
+                id: 'ebs',
+                state: 'KMJ',
+            },
         };
     },
 });
@@ -47,7 +49,7 @@ export const trHelper = () => ({
     components: { InfoPanel, PBadge },
     template: `
 <div style="width: 80vw;">
-    <InfoPanel :infoTitle="renderTitle" :defs="defs">
+    <InfoPanel :infoTitle="renderTitle" :defs="defs" :item="item">
     <template #def-state-format="scope">
     <p-badge styleType="primary">{{scope.value}}</p-badge>
 </template>
@@ -56,12 +58,18 @@ export const trHelper = () => ({
 
     setup(props, context) {
         const sampleDefs = ref([
-            ['name', 'COL_NM.NAME', 'abcd'],
-            ['state', ['COL_NM.STATE', 'en'], 'enabled', { copyFlag: true }],
-            ['primary_ip_address', 'COL_NM.IP', '1.1.1.1', { copyFlag: true }],
+            ['name', 'COMMON.NAME'],
+            ['state', ['COMMON.STATE', 'en'], { copyFlag: true }],
+            ['primary_ip_address', 'COMMON.IP', { copyFlag: true }],
         ]);
         return {
-            defs: computed(() => makeTrDefs(sampleDefs.value, context.parent)),
+            renderTitle: 'Information',
+            defs: makeTrDefs(sampleDefs.value, context.parent),
+            item: {
+                name: '펭수',
+                state: '하태하태',
+                primary_ip_address: '1.1.1.1',
+            },
         };
     },
 });

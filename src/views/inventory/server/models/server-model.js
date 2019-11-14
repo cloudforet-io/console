@@ -106,7 +106,7 @@ casual.define('server', () => ({
     zone_info: casual.zoneInfo,
     project_id: casual.make_id('project'),
     domain_id: casual.make_id('domain'),
-    tags: {},
+    tags: casual.tags,
     collect_info: casual.collectInfo,
     created_at: casual.timestamp,
     updated_at: casual.timestamp,
