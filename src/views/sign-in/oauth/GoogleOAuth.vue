@@ -128,11 +128,11 @@ export default {
                 if (!auth2.isSignedIn.get()) {
                     return;
                 }
-                await auth2.disconnect();
+                auth2.disconnect();
                 if (localStorage.getItem('common.toNextPath') === '/google-sign-in' || localStorage.getItem('common.toNextPath') === null) {
                     localStorage.setItem('common.toNextPath', '/');
                 }
-                await this.$router.push({ path: localStorage.getItem('common.toNextPath') });
+               this.$router.push({ path: localStorage.getItem('common.toNextPath') });
 
             }).catch((error) => {
                 debugger;
