@@ -201,6 +201,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
     .background-cover {
         height: 100vh;
         width: 100vw;
@@ -208,6 +209,7 @@ export default {
         background-size: cover;
         background-image: url("../../../assets/images/landing/cloudone_console_sign-in_bg.jpg");
     }
+
     .signIn-title {
         text-align: left;
         font: Bold 32px/37px Arial;
@@ -236,7 +238,6 @@ export default {
     .card-left-container {
         padding: 1.5rem;
     }
-
 
     .card-right-container {
         border: none;
@@ -285,7 +286,6 @@ export default {
         text-decoration: underline;
         cursor: pointer
     }
-
 
     .right-info-card-body {
         display: flex;
