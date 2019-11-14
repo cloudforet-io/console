@@ -49,24 +49,6 @@ export const Util = {
             return !!((v === '' || v === null || v === undefined || (v !== null && typeof v === 'object' && !Object.keys(v).length)));
         },
         /** ********************************************************************************
-         * Name       : cssStyler
-         * Input        => (c:css Object      => type of Object,
-         *                  i:use 'Style' YN  => Boolean
-         *                  t:use  Trim   YN  => Boolean )
-         * Output       => (String): All trimmed css String by condition;
-         * Description:    Generate full String of css given Object c by condition of i, t
-         ********************************************************************************* */
-        cssStyler(c, i, t) {
-            let style = '';
-            Object.entries(c).forEach(([key, val]) => {
-                if (t) {
-                    return style += `${key.trim()}:${val.trim()}${val.indexOf(';') > 0}` ? '' : ';';
-                }
-                return style += `${key}:${val};`;
-            });
-            return (i) ? `style="${style}"` : style;
-        },
-        /** ********************************************************************************
          * Name       : selectToCopyToClipboard
          * Input   => (t:text            =>  String)
          * Output  => (Empty):
@@ -225,7 +207,7 @@ export const Util = {
                 vm = parent;
             }
             if (vm.$i18n.te(m)) {
-                return vm.isEmpty(m) ? vm.$i18n.t(m) : vm.$i18n.t(m, a);
+                return vm.isEmpty(a) ? vm.$i18n.t(m) : vm.$i18n.t(m, a);
             }
             return 'No Message';
         },

@@ -54,6 +54,7 @@
 import url from 'url';
 import { mapGetters } from 'vuex';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
+
 const { gapi } = window;
 export default {
     components: { BaseSimpleModal },
@@ -124,6 +125,10 @@ export default {
             this.displayGreetingMSG(true);
             const auth2 = await gapi.auth2.getAuthInstance();
 
+            if (this.isEmpty(this.oathSignParam)) {
+                return;
+            }
+
             await this.$store.dispatch('auth/signIn', this.oathSignParam).then((response) => {
                 if (!auth2.isSignedIn.get()) {
                     return;
@@ -132,8 +137,7 @@ export default {
                 if (localStorage.getItem('common.toNextPath') === '/google-sign-in' || localStorage.getItem('common.toNextPath') === null) {
                     localStorage.setItem('common.toNextPath', '/');
                 }
-               this.$router.push({ path: localStorage.getItem('common.toNextPath') });
-
+                this.$router.push({ path: localStorage.getItem('common.toNextPath') });
             }).catch((error) => {
                 debugger;
                 auth2.disconnect();
