@@ -123,17 +123,19 @@ export default {
         async login() {
             this.displayGreetingMSG(true);
             const auth2 = gapi.auth2.getAuthInstance();
+
             await this.$store.dispatch('auth/signIn', this.oathSignParam).then((response) => {
                 if (!auth2.isSignedIn.get()) {
                     return;
                 }
                 auth2.disconnect();
-
                 if (localStorage.getItem('common.toNextPath') === '/google-sign-in' || localStorage.getItem('common.toNextPath') === null) {
                     localStorage.setItem('common.toNextPath', '/');
                 }
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
+
             }).catch((error) => {
+                debugger;
                 auth2.disconnect();
                 this.displayGreetingMSG(false);
                 console.log(error);
