@@ -124,9 +124,11 @@ export default {
         async login() {
             this.displayGreetingMSG(true);
             const auth2 = await gapi.auth2.getAuthInstance();
+
             if (this.isEmpty(this.oathSignParam)) {
                 return;
             }
+
             await this.$store.dispatch('auth/signIn', this.oathSignParam).then((response) => {
                 if (!auth2.isSignedIn.get()) {
                     return;
