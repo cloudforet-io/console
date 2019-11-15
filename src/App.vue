@@ -3,7 +3,7 @@
         <router-view />
     </div>
     <div v-else class="Aligner">
-        <p-loading ref="ploading"/>
+        <p-loading ref="ploading" />
     </div>
 </template>
 <script>
@@ -44,7 +44,6 @@ export default {
         },
         async preparationTo() {
             try {
-
                 await this.configInit();
                 await this.syncStores('auth');
                 await this.domainInit();
@@ -54,16 +53,13 @@ export default {
                 this.stopLottie();
                 const excludeAuth = this.getMeta();
 
-                if (!api.checkAccessToken()) {
-                    if (this.checkMatchedPath(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
-                        const nextPath = this.$store.getters['domain/authType'] === 'local' ? '/sign-in' : '/google-sign-in';
-                        localStorage.setItem('common.toNextPath', nextPath);
-                        this.$router.push({ path: nextPath });
-                    }
+                // TODO:: Please Remove this for later when every domian sign in use Config options.
+                if (this.checkMatchedPath(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
+                    this.redirectTo('set');
+                }
 
-                    if (excludeAuth !== true) {
-                        this.redirectTo();
-                    }
+                if (!api.checkAccessToken() && excludeAuth !== true) {
+                    this.redirectTo();
                 }
             } catch (e) {
                 this.$router.push({ path: '/error-page' });
@@ -94,9 +90,11 @@ export default {
         async syncStores(storeName) {
             await this.$store.dispatch(`${storeName}/sync`);
         },
-        redirectTo() {
+        redirectTo(set) {
             const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
-
+            if (!this.isEmpty(set)) {
+                localStorage.setItem('common.toNextPath', nextPath);
+            }
             this.$router.push(nextPath);
         },
         getMeta() {
