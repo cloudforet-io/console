@@ -1,5 +1,5 @@
 <template>
-    <div div class="animated fadeIn">
+    <div class="animated fadeIn">
         <default-tree
             ref="IDPJ001_ProjectTree"
             :tree-data="treeData"
@@ -11,13 +11,6 @@
             @DTNodeToggled="pNodeToggled"
             @DTBeforeDropped="pBeforeDropped"
             @DTContextVisible="pContextVisible">
-            <!--<template slot="icon" slot-scope="node">
-                <span class="item-icon">
-                    <i v-if="node.isLeaf" class="fas fa-cube" />
-                    <i v-else-if="node.isExpanded" class="far fa-globe-americas" />
-                    <i v-else class="fal fa-folder-minus" />
-                </span>
-            </template>-->
             <template slot="context">
                 <project-context :context-data="getSelectedData" />
             </template>
