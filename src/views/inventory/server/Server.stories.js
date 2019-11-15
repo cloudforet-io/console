@@ -43,6 +43,7 @@ export const mockPage = () => ({
     mixins: [Server],
     setup(props, context) {
         const state = serverSetup(props, context);
+        console.log(state);
         const items = computed(() => arrayOf(state.pageSize, casual._server));
         return {
             ...toRefs(state),

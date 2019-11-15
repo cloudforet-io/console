@@ -20,7 +20,6 @@ import SvgIcon from 'vue-svgicon';
 import VueCompositionApi from '@vue/composition-api';
 import { i18n } from '@/translations';
 import VueI18n from 'vue-i18n';
-import VueCompositionApi from '@vue/composition-api'
 
 Vue.use(VueCompositionApi);
 Vue.use(VueI18n);
@@ -28,7 +27,6 @@ Vue.mixin(Util);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueI18n);
-Vue.use(VueCompositionApi);
 Vue.use(VueInputAutowidth);
 Vue.use(VueLodash, { name: 'lodash' });
 Vue.use(SvgIcon, {

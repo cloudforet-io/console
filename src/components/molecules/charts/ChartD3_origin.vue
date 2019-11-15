@@ -21,47 +21,11 @@
 </template>
 
 <script>
-/**
-     * TODO:
-     * <CHILD COMPONENTS>
-     *
-     * 1. horizontal stacked bar (Servers by Type)
-     *---      1) value(%) overlay
-     *---      2) height fix
-     * 2. horizontal bar (Servers by Type - sub categories)
-     *---      1) border radius
-     *---      2) label custom
-     *---          a. label position
-     *---          b. value position
-     * 3. donut chart (Server State)
-     *---      1) tooltip
-     * 4. bubble chart (Resources by Region)
-     *      1) background
-     *      2) bubble position by data, by background
-     *      3) label custom
-     *          a. hovered label active
-     *          b. label position
-     *
-     */
-
-/**
-     * TODO:
-     * <COMPONENT'S FUNCTION>
-     *
-     *--- 1. lazy data loading with spinner
-     *
-     *--- 2. options, externals, plugins deep merge
-     *
-     *--- 3. auto update
-     *---      1) deeply update
-     *
-     */
-
 
 import * as d3 from 'd3';
 import Tooltip from 'tooltip.js';
 import Spinner from '@/components/base/spinner/BaseSpinner';
-import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from './ChartD3.map';
+import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from './Chart.map';
 
 export default {
     name: 'PChartD3',
