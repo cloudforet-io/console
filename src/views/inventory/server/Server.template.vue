@@ -1,8 +1,9 @@
 <template>
-    <div class="animated fadeIn">
+    <div class="animated fadeIn server">
         <BaseDragHorizontal>
             <template #container="{ height }">
                 <p-toolbox-table
+                    ref="toolbox"
                     :items="items"
                     :fields="fields"
                     :selectable="true"
@@ -68,26 +69,45 @@
                 </p-toolbox-table>
             </template>
         </BaseDragHorizontal>
-        <div id="empty-space">
+        <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
+            <template #detail="{tabName}">
+                <p-server-detail ref="serverDetail" :item="items[selectIndex[0]]"
+                                 @confirm="tagConfirm"
+                />
+            </template>
+            <template #data="{tabName}">
+                <p> this tab is {{ tabName }}</p>
+            </template>
+            <template #rawData="{tabName}">
+                <p> this tab is {{ tabName }}</p>
+            </template>
+            <template #admin="{tabName}">
+                <p> this tab is {{ tabName }}</p>
+            </template>
+        </PTab>
+
+        <div v-else id="empty-space">
             Select a user above for details.
         </div>
     </div>
 </template>
 
 <script>
-import { reactive, toRefs, computed } from '@vue/composition-api';
+import {
+    reactive, toRefs, ref, computed, watch,
+} from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
 import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 import PBadge from '@/components/atoms/badges/Badge';
-import { makeTrFields, timestampFormatter } from '@/components/organisms/tables/data-table/DataTabel.util';
+import PServerDetail from '@/views/inventory/server/modules/ServerDetail';
+import PTab from '@/components/organisms/tabs/tab/Tab';
+import { makeTrFields } from '@/components/organisms/tables/data-table/DataTabel.util';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
-import {
-    alert, safe, other1, other2, gray,
-} from '@/styles/_variables.scss';
-import { statusBindFactory } from '@/components/molecules/status/Status.util';
+import { timestampFormatter } from '@/lib/formatter';
+import { serverStateBind } from '@/views/inventory/server/Server.util';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrFields([
@@ -106,6 +126,7 @@ export const serverTableReactive = parent => reactive({
     ],
     parent),
     selectIndex: [],
+    toolbox: null, // template refs
 });
 
 /**
@@ -125,69 +146,70 @@ export const serverTableReactive = parent => reactive({
  * @function
  * @return {serverState} reactive object
  */
-export const serverSetup = (props, context) => reactive({
-    ...toRefs(requestMetaReactive),
-    ...toRefs(serverTableReactive(context.parent)),
-    dropdown: [
-        {
-            type: 'item', text: 'delete', event: 'delete', disabled: false,
-        },
-        { type: 'divider' },
-        {
-            type: 'item', text: 'set Maintenance', event: 'maintenance', disabled: false,
-        },
-        {
-            type: 'item', text: 'set In-Service', event: 'in-service', disabled: false,
-        },
-        {
-            type: 'item', text: 'set Closed', event: 'closed', disabled: false,
-        },
-        { type: 'divider' },
-        {
-            type: 'item', text: 'change project', event: 'project', disabled: false,
-        },
-        {
-            type: 'item', text: 'change pool', event: 'pool', disabled: false,
-        },
-    ],
-    serverStateBind: statusBindFactory({
-        INSERVICE: {
-            iconColor: safe,
-            textColor: safe,
-        },
-        PENDING: {
-            iconColor: other1,
-            textColor: other1,
-        },
-        MAINTENANCE: {
-            iconColor: other2,
-            textColor: other2,
+export const serverSetup = (props, context) => {
+    const tableState = serverTableReactive(context.parent);
+    const tabData = reactive({
+        tabs: [
+            { name: 'detail', label: '디테일' },
+            { name: 'data', label: '데이터' },
+            { name: 'rawData', label: '데이터 원본' },
+            { name: 'admin', label: '관리자' },
+        ],
+        activeTab: 'detail',
+        serverDetail: null, // template refs
+    });
+    const tags = ref({});
+    const tabAction = reactive({
+        isSelectedOne: computed(() => tableState.selectIndex.length === 1),
+    });
 
+
+    return reactive({
+        ...toRefs(requestMetaReactive),
+        ...toRefs(tableState),
+        ...toRefs(tabData),
+        ...toRefs(tabAction),
+        tags,
+        dropdown: [
+            {
+                type: 'item', text: 'delete', event: 'delete', disabled: false,
+            },
+            { type: 'divider' },
+            {
+                type: 'item', text: 'set Maintenance', event: 'maintenance', disabled: false,
+            },
+            {
+                type: 'item', text: 'set In-Service', event: 'in-service', disabled: false,
+            },
+            {
+                type: 'item', text: 'set Closed', event: 'closed', disabled: false,
+            },
+            { type: 'divider' },
+            {
+                type: 'item', text: 'change project', event: 'project', disabled: false,
+            },
+            {
+                type: 'item', text: 'change pool', event: 'pool', disabled: false,
+            },
+        ],
+        serverStateBind,
+        timestampFormatter,
+        clickCollectData() {
+            console.log('add');
         },
-        CLOSED: {
-            iconColor: alert,
-            textColor: alert,
+        changePageSize() { },
+        changePageNumber() {},
+        clickRefresh() {},
+        clickMenuEvent(eventName) {
+            console.log(eventName);
         },
-        DELETED: {
-            iconColor: gray,
-            textColor: gray,
-        },
-    },
-    value => value.toLowerCase()),
-    timestampFormatter,
-    clickCollectData() {
-        console.log('add');
-    },
-    changePageSize() { },
-    changePageNumber() {},
-    clickRefresh() {},
-    clickMenuEvent(eventName) {
-        console.log(eventName);
-    },
-});
+        tagConfirm() {},
+
+    });
+};
 
 export default {
-    name: 'Server',
+    name: 'ServerTemplate',
     components: {
         PStatus,
         BaseDragHorizontal,
@@ -195,15 +217,21 @@ export default {
         PButton,
         PBadge,
         PDropdownMenuBtn,
+        PServerDetail,
+        PTab,
     },
     setup(props, context) {
-        const state = serverSetup(props, context);
+        const dataBind = reactive({
+            items: computed(() => []),
+        });
+        const state = serverSetup(props, context, dataBind.items);
         return {
             ...toRefs(state),
-            items: computed(() => []),
+            ...toRefs(dataBind),
         };
     },
 };
+
 </script>
 
 <style lang="scss" scoped>
@@ -215,5 +243,10 @@ export default {
         margin-bottom: 0.5rem;
         color: $primary2;
         font: 24px/32px Arial;
+    }
+    .server{
+        margin-top: 1.5625rem;
+        margin-left: 2rem;
+        margin-right: 2rem;
     }
 </style>
