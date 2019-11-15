@@ -1,7 +1,7 @@
-import { reactive } from '@vue/composition-api';
 
-export const makeDef = (parent, name, trLabel,  extra) => {
-    const def = extra ? { ...extra, name  } : { name  };
+export const makeDef = (parent, commonOption, name, trLabel, extra) => {
+    const defaultOption = commonOption || {};
+    const def = extra ? { ...defaultOption, ...extra, name } : { ...defaultOption, name };
     if (trLabel) {
         if (typeof trLabel === 'string') {
             def.label = parent.tr(trLabel, null, parent);
@@ -31,29 +31,23 @@ export const makeDef = (parent, name, trLabel,  extra) => {
  *
  * @example <caption>simpe example</caption>
  * // returns [
- *  {name: 'name', label:tr('COL_NM.NAME',null,parent)},
- *  {name: 'state', label:tr('COL_NM.NAME','en',parent)},
- *  {name: 'primary_ip_address', label:tr('COL_NM.NAME','en',parent), copyFlag: true,},
+ *  {name: 'name', label:tr('COL_NM.NAME',null,parent),copyFlag:true},
+ *  {name: 'state', label:tr('COL_NM.NAME','en',parent),copyFlag:true},
+ *  {name: 'primary_ip_address', label:tr('COL_NM.NAME','en',parent), copyFlag: false,},
  * ]
  * makeTrFields([
  *  ['name', 'COL_NM.NAME'],
  *  ['state', ['COL_NM.STATE','en']],
- *  ['primary_ip_address', 'COL_NM.IP',{copyFlag: true,}],
+ *  ['primary_ip_address', 'COL_NM.IP',{copyFlag: false,}],
  *  ],
- *  parent)
+ *  parent,
+ *  {copyFlag:true} // common option! but you can overwrite this option using extra argument
+ *  )
  */
-export const makeTrDefs = (defs, parent) => {
+export const makeTrDefs = (defs, parent, commonOption) => {
     const result = [];
     defs.forEach((def) => {
-        result.push(makeDef(parent, ...def));
+        result.push(makeDef(parent, commonOption, ...def));
     });
     return result;
-};
-
-export const makeReactiveTrDefs = (defs, parent) => {
-    const result = [];
-    defs.forEach((def) => {
-        result.push(reactive(makeDef(parent, ...def)));
-    });
-    return reactive(result);
 };

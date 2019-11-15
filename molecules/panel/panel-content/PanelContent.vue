@@ -5,7 +5,8 @@
                 <p-dt class="col-sm-12 col-md-4">
                     {{ def.label }}
                 </p-dt>
-                <p-dd class="col-sm-12 col-md-8 copyFlagged"
+                <p-dd :ref="'dd-'+def.name"
+                      class="col-sm-12 col-md-8 copyFlagged"
                       @mouseenter="mouseInOut(idx,true)"
                       @mouseleave="mouseInOut(idx,false)"
                 >
@@ -16,7 +17,7 @@
                     >
                         {{ getValue(def.name) }}
                     </slot>
-                    <template v-if="activeArr(idx)">
+                    <template v-if="activeArr(idx,def)">
                         &nbsp;&nbsp; <p-button v-if="isCopyFlagged(def)"
                                                style="display: inline-block;" outline
                                                :style-type="'secondary'"
@@ -67,8 +68,8 @@ export default {
         this.setActiveArray();
     },
     methods: {
-        activeArr(idx) {
-            return this.active[idx];
+        activeArr(idx, def) {
+            return this.active[idx] && this.$refs[`dd-${def.name}`][0].innerText;
         },
         setActiveArray() {
             const emptyArr = [];
