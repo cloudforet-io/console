@@ -40,6 +40,7 @@
             </div>
         </div>
         <p-data-table
+            ref="table"
             :fields="fields"
             :items="items"
             :sortable="sortable"
@@ -183,6 +184,9 @@ export default {
         },
         changePageNumber(page) {
             this.$emit('changePageNumber', page);
+        },
+        getSelectItem() {
+            return this.$refs.table.getSelectItem();
         },
     },
 

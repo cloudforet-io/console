@@ -85,6 +85,16 @@ casual.define('poolInfo', () => ({
     deleted_at: casual.timestamp,
 }));
 
+casual.define('regionInfo', () => ({
+    region_id: casual.make_id('region'),
+    state: casual.random_element(['ACTIVE', 'DEACTIVE']),
+    name: casual.word,
+    tags: casual.tags,
+    domain_id: casual.make_id('domain'),
+    created_at: casual.timestamp,
+    deleted_at: casual.timestamp,
+}));
+
 casual.define('collectInfo', () => ({
     state: 'NEW',
     collectors: arrayOf(casual.integer(1, 3), casual.make_id, 'collector'),
@@ -104,6 +114,7 @@ casual.define('server', () => ({
     template_data: {},
     pool_info: casual.poolInfo,
     zone_info: casual.zoneInfo,
+    region_info: casual.regionInfo,
     project_id: casual.make_id('project'),
     domain_id: casual.make_id('domain'),
     tags: casual.tags,

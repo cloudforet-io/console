@@ -72,16 +72,16 @@ export default {
             }
             state.tagInputGroup.resetTag();
         };
-        const resetTag = () => {
-            state.proxyTags = state.originTags;
-        };
+
         return {
             ...toRefs(state),
             clickEdit,
             clickCancel,
             clickConfirm,
             // if tag confirm fail, you can reset tags to before edit value
-            resetTag,
+            resetTag: () => {
+                state.proxyTags = state.originTags;
+            },
         };
     },
 
