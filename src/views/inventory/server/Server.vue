@@ -18,13 +18,15 @@ export default {
         serverEventNames.tagResetEvent = 'resetTagEvent';
 
         const state = serverSetup(props, context, serverEventNames);
-
-        const requestServerList = () => {
+        const requestServerList = async () => {
             console.log(state.pageSize, state.thisPage);
-            setTimeout(() => {
-            // 2초 후 작동해야할 코드
-                state.items = arrayOf(state.pageSize, casual._server);
-            }, 2000);
+            const res = await context.parent.$http.post('/inventory/server/list', {
+                domain_id: sessionStorage.getItem('domainId'),
+            });
+            state.items = res.data.results;
+            const allPage = res.data.total_count / state.pageSize;
+            state.allPage = allPage < 1 ? 1 : allPage;
+            state.selectIndex = [];
         };
         const tagConfirm = (tag) => {
             console.log(tag);
