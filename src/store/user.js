@@ -2,7 +2,7 @@ export default {
     namespaced: true,
     state: {
         userId: localStorage.userId || null,
-        locale: localStorage.locale || null,
+        language: localStorage.language || null,
         domainId: sessionStorage.domainId || null,
     },
     mutations: {
@@ -12,7 +12,7 @@ export default {
         },
         setLocale(state, value) {
             state.locale = value;
-            localStorage.locale = value;
+            localStorage.language = value;
         },
         setDomainId(state, value) {
             state.locale = value;
@@ -21,7 +21,7 @@ export default {
     },
     getters: {
         userId: state => state.userId,
-        locale: state => state.locale,
+        language: state => state.language,
         domainId: state => state.domainId,
     },
 };
