@@ -26,7 +26,7 @@
                                                       :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
                                                       class="form-control"
                                                       type="text"
-                                                      placeholder="  user ID"
+                                                      placeholder="  User ID"
                                                       required
                                                       @keyup="removeCSS('userId')"
                                                       @keyup.enter="signIn"
@@ -42,7 +42,7 @@
                                         <p-text-input ref="password" v-model="password" type="password"
                                                       :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
                                                       class="form-control"
-                                                      placeholder="  password"
+                                                      placeholder="  Password"
                                                       required
                                                       @keyup="removeCSS('password')"
                                                       @keyup.enter="signIn"
@@ -51,23 +51,24 @@
                                             * {{ $t('SIGNIN.PASS_EMPTY') }}
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
-                                            <div @click="directToAdmin">
-                                                <span class="root-sign">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
-                                            </div>
-                                        </b-col>
-                                    </div>
-                                    <div class="row mt-4">
+                                    <div class="row mt-3">
                                         <div class="col-md-12 col-xs-12 col-sm-12">
-                                            <p-button class="button-cover"
+                                            <p-button class="button-cover btn-lg"
                                                       :size="'lg'"
+
                                                       :style-type="'primary'"
                                                       @click="signIn"
                                             >
                                                 {{ $t('COMMON.SIGN_IN') }}
                                             </p-button>
                                         </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
+                                            <div @click="directToAdmin">
+                                                <span class="root-sign">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
+                                            </div>
+                                        </b-col>
                                     </div>
                                 </form>
                             </div>
@@ -76,7 +77,7 @@
                                 <div class="card-img-overlay text-white d-flex flex-column justify-content-center">
                                     <div class="text-center">
                                         <p style="margin-bottom: 10px">
-                                            <img src="@/assets/images/brand/dcos.png" width="100vh" height="100vh">
+                                            <img src="@/assets/images/brand/brand_logo.png" width="100vh" height="100vh">
                                         </p><h1>{{ getCurrentHostname }}</h1></p>
                                         <p>{{ getGreetMessage }} </p>
                                     </div>
@@ -109,7 +110,7 @@ export default {
             rememberStatus: false,
             greeting: true,
             userId: '',
-            password: 'admin',
+            password: '',
             styler: {
                 border: '1px solid #EF3817',
             },
@@ -140,15 +141,22 @@ export default {
             return this.isInvalid.password ? this.styler.border : '';
         },
         getGreetMessage() {
-            const GreetingMsg = this.$store.getters['auth/greetDesc'];
-            return !this.isEmpty(GreetingMsg) ? GreetingMsg : '';
+            const companyTitle = this.$store.getters['domain/companyTitle'];
+            const companyDesc = this.$store.getters['domain/description'];
+            const hostName = this.getWindowHostName();
+            return !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG', [companyDesc]) : !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
         },
         getCurrentHostname() {
-            const hostName = url.parse(window.location.href).host;
-            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
+            const companyTitle = this.$store.getters['domain/companyTitle'];
+            const hostName = this.getWindowHostName();
+            return !this.isEmpty(companyTitle) ? companyTitle : hostName;
         },
     },
     methods: {
+        getWindowHostName() {
+            const hostName = url.parse(window.location.href).host;
+            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
+        },
         removeCSS(type) {
             this.validator[type] = false;
             this.isInvalid[type] = false;
@@ -167,7 +175,6 @@ export default {
         },
 
         async signIn() {
-
             this.displayGreetingMSG(true);
             const credentials = {
                 user_id: this.userId,
@@ -185,7 +192,6 @@ export default {
                     localStorage.setItem('common.toNextPath', '/');
                 }
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
-
             }).catch((error) => {
                 this.isInvalid.userId = true;
                 this.isInvalid.password = true;
@@ -316,9 +322,10 @@ export default {
     }
 
     .button-cover{
+        width: 50%;
         display: inline-block;
         text-align: center;
-        float: right;
+        float: left;
         font: 16px/18px Arial;
         letter-spacing: 0;
         color: #FFFFFF;

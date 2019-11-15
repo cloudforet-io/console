@@ -1,8 +1,6 @@
 export const ko = {
     COMMON: {
         COPY: '복사하기',
-        WELCOME_MSG: 'Welcome to {0} Portal.',
-        WELCOME_MSG_P: 'Welcome to {0} Portal',
         SIGN_UP: '회원가입',
         SIGN_IN_MSG: '어카운트 로그인 하기',
         SIGN_IN: '로그 인',
@@ -85,7 +83,6 @@ export const ko = {
         DATA_CENTER: 'Data Center',
         SERVER: 'Server',
         SETTINGS: 'Settings',
-        COLLECTOR: 'Collector',
         IDENTITY: 'Identity',
         USER: 'User',
         PROJECT: 'Project',
@@ -108,7 +105,6 @@ export const ko = {
         ADMIN: '관리자',
         JOBS: '잡(Jobs)',
         NO_ITEM: '{0} 없음',
-        SCHEDULE: '스케줄',
         NO_SELECT: '위에서 {0} 을(를) 선택하세요.',
         LOCAL: 'Local',
         OFFICIAL: 'Official',
@@ -152,7 +148,6 @@ export const ko = {
         IP: '아이피(IP)',
         CIDR: 'CIDR',
         MAC: 'MAC',
-        SERVER_ID: '서버 아이디',
         NETWORK: '네트워크',
         DIRECTION: 'Direction',
         PROTOCOL: '프로토콜',
@@ -191,6 +186,7 @@ export const ko = {
         RESOURCE: '리소스 타입',
         LAST_COL: '마지막 수집일',
         CREATED: '생성일',
+        COLLECTOR: '수집기',
         DEF_COL_STATE: '기본 수집 상태',
         COL_DATA: '데이터 수집',
         VERIFY: '검증',
@@ -198,6 +194,7 @@ export const ko = {
         JOB_ID: '잡(Job) 아이디',
         COL_MODE: '수집 모드',
         LAST_SCHEDULED: '최종 스케줄 실행일',
+        SCHEDULE: '스케줄',
         COL_ID: '컬렉터 아이디',
         VERSION: '버젼 정보',
         CRT_COUNT: '생성 카운트',
@@ -213,15 +210,17 @@ export const ko = {
 
     },
     SIGNIN: {
+        WELCOME_MSG: 'Welcome to {0}',
+        WELCOME_MSG_P: 'Welcome to {0} Portal',
         ROOT_CREDENTIALS: '루트 계정 로그인',
         USER_EMPTY: '아이디는 필수 입력 항목입니다.',
-        PASS_EMPTY: '패스워드를 입력해주세요.',
+        PASS_EMPTY: '패스워드를 입력해주세요.'
     },
     ORGANISMS: {
         CREATE_ARG: '{0} 생성',
         UPDATE_ARG: '{0} 갱신',
         DELETE_ARG: '{0} 삭제',
-        CLICK_RIGHT: '좌측 패널의 아이템을 클릭해 주세요.',
+        CLICK_RIGHT: '좌측 패널의 아이템을 클릭해 주세요.'
     },
     IDENTITY: {
         NO_PROJECT_SEL: '프로젝트를 선택해주십시오.',

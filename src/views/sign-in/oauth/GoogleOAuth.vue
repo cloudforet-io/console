@@ -19,16 +19,16 @@
                                 </div>
                                 <form class="form-binder">
                                     <div class="row">
+                                        <div class="g-signin2">
+                                            <div id="g-signin-btn" style="width: 70%;" @click="login" />
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
                                         <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
                                             <div @click="directToAdmin">
                                                 <span class="root-sign">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
                                             </div>
                                         </b-col>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="form-binder g-signin2">
-                                            <div id="g-signin-btn" style="width: 70%;" @click="login" />
-                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -37,7 +37,7 @@
                                 <div class="card-img-overlay text-white d-flex flex-column justify-content-center">
                                     <div class="text-center">
                                         <p style="margin-bottom: 10px">
-                                            <img src="@/assets/images/brand/dcos.png" width="100vh" height="100vh">
+                                            <img src="@/assets/images/brand/brand_logo.png" width="100vh" height="100vh">
                                         </p><h1>{{ getCurrentHostname }}</h1></p>
                                         <p>{{ getGreetMessage }} </p>
                                     </div>
@@ -71,19 +71,26 @@ export default {
         ...mapGetters('auth', [
             'nextPath',
         ]),
-        getCurrentHostname() {
-            const hostName = url.parse(window.location.href).host;
-            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
-        },
         getGreetMessage() {
-            const GreetingMsg = this.$store.getters['auth/greetDesc'];
-            return !this.isEmpty(GreetingMsg) ? GreetingMsg : '';
+            const companyTitle = this.$store.getters['domain/companyTitle'];
+            const companyDesc = this.$store.getters['domain/description'];
+            const hostName = this.getWindowHostName();
+            return !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG', [companyDesc]) : !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
+        },
+        getCurrentHostname() {
+            const companyTitle = this.$store.getters['domain/companyTitle'];
+            const hostName = this.getWindowHostName();
+            return !this.isEmpty(companyTitle) ? companyTitle : hostName;
         },
     },
     async mounted() {
         await this.setGoogleSignInButton();
     },
     methods: {
+        getWindowHostName() {
+            const hostName = url.parse(window.location.href).host;
+            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
+        },
         async directToAdmin() {
             this.$router.push({ name: 'Admin-SignIn' });
             this.$router.push({ path: '/admin-sign-in' });
@@ -216,18 +223,6 @@ export default {
         margin-top: 1.5rem;
     }
 
-    .input-title {
-        background: #FFFFFF 0% 0% no-repeat padding-box;
-        box-shadow: 0px 0px 8px #4D49B614;
-        opacity: 1;
-    }
-    .input-content {
-        background: #FFFFFF 0% 0% no-repeat padding-box;
-        border: 1px solid $gray2;
-        border-radius: 2px;
-        opacity: 1;
-    }
-
     span.root-sign:hover {
         text-decoration: underline;
         cursor: pointer
@@ -240,13 +235,13 @@ export default {
         color: #8185D1;
         opacity: 1;
     }
+
     .g-signin2{
         width: 100%;
+        padding-left: 1rem;
     }
 
-    .g-signin2 > div{
-        margin: 0 auto;
-    }
+
     .right-info-card-body {
         display: flex;
         flex-wrap: wrap;

@@ -11,6 +11,7 @@ export const makeDef = (parent, commonOption, name, trLabel, extra) => {
     }
     return def;
 };
+
 /**
  * use by tr(trArgument) or tr(...trArgument)
  * @typedef {(string||string[])} trArgument

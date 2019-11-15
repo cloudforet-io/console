@@ -8,6 +8,7 @@ export default {
         id: null,
         name: null,
         description: null,
+        companyTitle: null,
         authType: 'local',
         clientId: null,
     },
@@ -16,10 +17,11 @@ export default {
             state.name = name;
         },
         setDomainInfo(state, {
-            id, description, authType, clientId,
+            id, description, companyTitle, authType, clientId,
         }) {
             state.id = id;
             state.description = description;
+            state.companyTitle = companyTitle;
             state.authType = authType;
             state.clientId = clientId;
         },
@@ -28,8 +30,10 @@ export default {
         id: state => state.id,
         name: state => state.name,
         description: state => state.description,
+        companyTitle: state => state.companyTitle,
         authType: state => state.authType,
         clientId: state => state.clientId,
+
     },
     actions: {
         parseHostname({ commit }) {
@@ -48,6 +52,7 @@ export default {
                 commit('setDomainInfo', {
                     id: domainInfo.domain_id,
                     description: _.get(domainInfo, 'tags.description', null),
+                    companyTitle: _.get(domainInfo, 'tags.name', ''),
                     authType: _.get(domainInfo, 'plugin_info.options.auth_type', 'local'),
                     clientId: _.get(domainInfo, 'plugin_info.options.client_id', null),
                 });

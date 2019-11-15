@@ -1,8 +1,6 @@
 export const en = {
     COMMON: {
         COPY: 'Copy',
-        WELCOME_MSG: 'Welcome to {0} Portal.',
-        WELCOME_MSG_P: 'Welcome to {0} Portal',
         SIGN_UP: 'Sign up',
         SIGN_IN: 'Sign In',
         SIGN_IN_MSG: 'Sign in to your Account.',
@@ -68,7 +66,6 @@ export const en = {
         RG: 'Region',
         ZE: 'Zone',
         PL: 'Pool',
-        SERVER_ID: 'Server ID',
         RG_ID: 'Region ID',
         RG_NM: 'Region Name',
         ZE_ID: 'Zone ID',
@@ -219,6 +216,8 @@ export const en = {
         CLICK_RIGHT: 'Please, Click a item from left tree Panel.',
     },
     SIGNIN: {
+        WELCOME_MSG: 'Welcome to {0}',
+        WELCOME_MSG_P: 'Welcome to {0} Portal',
         ROOT_CREDENTIALS: 'Sign-in using root account credentials',
         USER_EMPTY: 'User ID can\'t be blank.',
         PASS_EMPTY: 'Password can\'t be blank.',
