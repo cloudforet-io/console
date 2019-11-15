@@ -5,12 +5,13 @@
 </template>
 <script>
 import lottie from 'lottie-web';
+
 export default {
     name: 'PLoading',
     props: {
         name: {
             type: String,
-            default: '',
+            default: 'cloudone_loading',
         },
     },
     data() {
@@ -20,21 +21,23 @@ export default {
     },
     methods: {
         async create() {
-             const animationDT = () => import(`@/assets/loading/${this.name}.json`);
-            await lottie.loadAnimation({
-                name: this.name,
-                container: this.$refs.loading,
-                renderer: 'svg',
-                loop: true,
-                autoplay: true,
-                animationData: animationDT,
-                rendererSettings: {
-                    scaleMode: 'noScale',
-                    clearCanvas: false,
-                    progressiveLoad: false,
-                    hideOnTransparent: true,
-                },
-            });
+            const animationDT = await import(`@/assets/loading/${this.name}.json`);
+            if (!this.isEmpty(animationDT)) {
+                await lottie.loadAnimation({
+                    name: this.name,
+                    container: this.$refs.loading,
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    animationData: animationDT,
+                    rendererSettings: {
+                        scaleMode: 'noScale',
+                        clearCanvas: false,
+                        progressiveLoad: false,
+                        hideOnTransparent: true,
+                    },
+                });
+            }
         },
         destroy() {
             lottie.destroy(this.name);

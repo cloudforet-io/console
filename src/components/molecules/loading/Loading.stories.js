@@ -17,7 +17,7 @@ const actions = {
 
 export const loading = () => ({
     components: { PLoading },
-    template: `<div style="width: 80vw;"><panel-top :panelTitle="panelTitle"></panel-top></div>`,
+    template: `<div style="width: 80vw;"><p-loading ></p-loading></div>`,
     props: {
         ...autoProps(PLoading),
     },
