@@ -1,9 +1,9 @@
 import {
     alert, safe, other1, other2, gray,
 } from '@/styles/_variables.scss';
-import { statusBindFactory } from '@/components/molecules/status/Status.util'
+import { statusBindFactory } from '@/components/molecules/status/Status.util';
 
-export const serverStateBind = statusBindFactory({
+export const serverStateFormatter = statusBindFactory({
     INSERVICE: {
         iconColor: safe,
         textColor: safe,

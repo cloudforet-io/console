@@ -6,7 +6,7 @@
                     icon="fa-circle"
                     icon-style="solid"
                     size="xs"
-                    v-bind="serverStateBind(scope.value)"
+                    v-bind="serverStateFormatter(scope.value)"
                 />
             </template>
             <template #def-core-format="scope">
@@ -67,10 +67,16 @@ import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
 import PBadge from '@/components/atoms/badges/Badge';
 import PStatus from '@/components/molecules/status/Status';
-import { makeByPass, makeProxy } from '@/lib/compostion-util';
 import { makeTrDefs } from '@/components/molecules/panel/panel-content/PanelContent.uitl';
 import { timestampFormatter } from '@/lib/formatter';
-import { serverStateBind } from '@/views/inventory/server/Server.util';
+import { serverStateFormatter } from '@/views/inventory/server/Server.util';
+import ServerEventBus from '@/views/inventory/server/ServerEventBus';
+import { mountBusEvent } from '@/lib/compostion-util';
+
+export const serverDetailEventNames = {
+    tagConfirmEvent: String,
+    tagResetEvent: String,
+};
 
 export default {
     name: 'PServerDetail',
@@ -82,8 +88,10 @@ export default {
             type: Object,
             default: () => {},
         },
+        // todo: need confirm that this is good way - sinsky
+        ...serverDetailEventNames,
     },
-    setup(props, { emit, parent }) {
+    setup(props, { parent }) {
         const baseDefs = makeTrDefs([
             ['server_id', 'COMMON.SERVER_ID'],
             ['name', 'COMMON.NAME'],
@@ -122,6 +130,10 @@ export default {
         ], parent, { copyFlag: true });
         const tags = ref({ ...props.item.tags });
         const tagPanel = ref(null);
+        const resetTag = () => {
+            tagPanel.value.resetTag();
+        };
+        mountBusEvent(ServerEventBus, props.tagResetEvent, resetTag);
 
         return {
             baseDefs,
@@ -129,12 +141,11 @@ export default {
             computeDefs,
             tags,
             tagPanel,
-            resetTag: () => {
-                tagPanel.value.resetTag();
+            confirm(...event) {
+                ServerEventBus.$emit(props.tagConfirmEvent, ...event);
             },
-            confirm: makeByPass(emit, 'confirm'),
             timestampFormatter,
-            serverStateBind,
+            serverStateFormatter,
             getVm: computed(() => (props.item ? props.item.data.vm : {})),
             getCompute: computed(() => (props.item ? props.item.data.compute : {})),
         };

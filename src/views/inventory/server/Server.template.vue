@@ -17,9 +17,9 @@
                     :page-size.sync="pageSize"
                     :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
                     :setting-visible="false"
-                    @changePageSize="changePageSize"
-                    @changePageNumber="changePageNumber"
-                    @clickRefresh="clickRefresh"
+                    @changePageSize="getServers"
+                    @changePageNumber="getServers"
+                    @clickRefresh="getServers"
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary" @click="clickCollectData">
@@ -38,7 +38,7 @@
                             icon="fa-circle"
                             icon-style="solid"
                             size="xs"
-                            v-bind="serverStateBind(data.value)"
+                            v-bind="serverStateFormatter(data.value)"
                         />
                     </template>
                     <template />
@@ -71,8 +71,10 @@
         </BaseDragHorizontal>
         <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
             <template #detail="{tabName}">
-                <p-server-detail ref="serverDetail" :item="items[selectIndex[0]]"
-                                 @confirm="tagConfirm"
+                <p-server-detail ref="serverDetail"
+                                 :item="items[selectIndex[0]]"
+                                 :tag-confirm-event="tagConfirmEvent"
+                                 :tag-reset-event="tagResetEvent"
                 />
             </template>
             <template #data="{tabName}">
@@ -94,7 +96,7 @@
 
 <script>
 import {
-    reactive, toRefs, ref, computed, watch,
+    reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
@@ -102,30 +104,32 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button';
 import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 import PBadge from '@/components/atoms/badges/Badge';
-import PServerDetail from '@/views/inventory/server/modules/ServerDetail';
+import PServerDetail, { serverDetailEventNames } from '@/views/inventory/server/modules/ServerDetail';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import { makeTrFields } from '@/components/organisms/tables/data-table/DataTabel.util';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import { timestampFormatter } from '@/lib/formatter';
-import { serverStateBind } from '@/views/inventory/server/Server.util';
+import { serverStateFormatter } from '@/views/inventory/server/Server.util';
+import serverEventBus from '@/views/inventory/server/ServerEventBus';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrFields([
-        ['name', 'COL_NM.NAME'],
-        ['state', 'COL_NM.STATE'],
-        ['primary_ip_address', 'COL_NM.IP', { sortable: false }],
-        ['core', 'COL_NM.CORE'],
-        ['memory', 'COL_NM.MEMORY'],
-        ['os_type', 'COL_NM.O_TYPE'],
-        ['os_distro', 'COL_NM.O_DIS'],
-        ['server_type', 'COL_NM.SE_TYPE'],
-        ['platform_type', 'COL_NM.PLATFORM'],
-        ['project', 'COL_NM.PROJ'],
-        ['pool', 'COL_NM.POOL'],
-        ['updated_at', 'COL_NM.UPDATE'],
+        ['name', 'COMMON.NAME'],
+        ['state', 'COMMON.STATE'],
+        ['primary_ip_address', 'COMMON.IP', { sortable: false }],
+        ['core', 'COMMON.CORE'],
+        ['memory', 'COMMON.MEMORY'],
+        ['os_type', 'COMMON.O_TYPE'],
+        ['os_distro', 'COMMON.O_DIS'],
+        ['server_type', 'COMMON.SE_TYPE'],
+        ['platform_type', 'COMMON.PLATFORM'],
+        ['project', 'COMMON.PROJ'],
+        ['pool', 'COMMON.POOL'],
+        ['updated_at', 'COMMON.UPDATE'],
     ],
     parent),
     selectIndex: [],
+    items: [],
     toolbox: null, // template refs
 });
 
@@ -146,7 +150,15 @@ export const serverTableReactive = parent => reactive({
  * @function
  * @return {serverState} reactive object
  */
-export const serverSetup = (props, context) => {
+export const eventNames = {
+    tagResetEvent: '',
+    tagConfirmEvent: '',
+    getServerList: '',
+
+};
+
+export const serverSetup = (props, context, eventName) => {
+    const eventBus = serverEventBus;
     const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
         tabs: [
@@ -162,7 +174,6 @@ export const serverSetup = (props, context) => {
     const tabAction = reactive({
         isSelectedOne: computed(() => tableState.selectIndex.length === 1),
     });
-
 
     return reactive({
         ...toRefs(requestMetaReactive),
@@ -192,19 +203,25 @@ export const serverSetup = (props, context) => {
                 type: 'item', text: 'change pool', event: 'pool', disabled: false,
             },
         ],
-        serverStateBind,
+        serverStateFormatter,
         timestampFormatter,
         clickCollectData() {
             console.log('add');
         },
+        getServers() {
+            console.log('request');
+            eventBus.$emit(eventName.getServerList);
+        },
         changePageSize() { },
         changePageNumber() {},
         clickRefresh() {},
-        clickMenuEvent(eventName) {
-            console.log(eventName);
+        clickMenuEvent(menuName) {
+            console.log(menuName);
         },
-        tagConfirm() {},
-
+        // todo: need confirm that this is good way - sinsky
+        // EventBus Names
+        ...serverDetailEventNames,
+        ...eventNames,
     });
 };
 
