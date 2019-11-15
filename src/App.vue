@@ -3,7 +3,7 @@
         <router-view />
     </div>
     <div v-else class="Aligner">
-        <div ref="loading" class="Aligner-item" />
+        <p-loading ref="ploading"/>
     </div>
 </template>
 <script>
@@ -11,19 +11,18 @@ import _ from 'lodash';
 import Vue from '@/main.js';
 import api from '@/lib/api';
 import config from '@/lib/config';
-import cloudLoading from '@/assets/loading/cloudone_loading.json';
-import lottie from 'lottie-web';
+import PLoading from '@/components/molecules/loading/Loading';
 
 export default {
     name: 'App',
+    components: {
+        PLoading,
+    },
     props: {
         processEnv: {
             type: String,
             default: process.env.NODE_ENV,
         },
-    },
-    components: {
-        lottie
     },
     data() {
         return {
@@ -38,26 +37,14 @@ export default {
     },
     methods: {
         async drawLottie() {
-            lottie.loadAnimation({
-                name: 'test',
-                container: this.$refs.loading,
-                renderer: 'svg',
-                loop: true,
-                autoplay: true,
-                animationData: cloudLoading,
-                rendererSettings: {
-                    scaleMode: 'noScale',
-                    clearCanvas: false,
-                    progressiveLoad: false,
-                    hideOnTransparent: true,
-                },
-            });
+            this.$refs.ploading.create();
         },
-        stopLottie (){
-            lottie.destroy('test');
+        stopLottie() {
+            this.$refs.ploading.destroy();
         },
         async preparationTo() {
             try {
+
                 await this.configInit();
                 await this.syncStores('auth');
                 await this.domainInit();
@@ -79,6 +66,7 @@ export default {
                     }
                 }
             } catch (e) {
+                this.$router.push({ path: '/error-page' });
                 console.log(e);
             }
         },
@@ -124,16 +112,6 @@ export default {
 
 <style lang="scss">
     @import 'styles/style';
-    .Aligner {
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .Aligner-item {
-        max-width: 100%;
-    }
     #loading {
         background-color: transparent;
         /*loading image size*/
