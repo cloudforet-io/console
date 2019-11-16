@@ -2,7 +2,7 @@
     <InfoPanel v-show="isVisible"
                :info-title-style="responsiveStyle"
                :info-title="topPanelTitle"
-               :item="topPanelItem"
+               :item="item"
                :defs="topPanel"
     />
 </template>
@@ -49,10 +49,6 @@ export default {
     computed: {
         topPanelTitle() {
             return this.tr('COMMON.DETAILS');
-        },
-        topPanelItem() {
-            console.log('##########################################################');
-            return this.item;
         },
         topPanel() {
             return [
@@ -110,9 +106,11 @@ export default {
 
             await this.$http.post(url, param).then((response) => {
                 if (!this.isEmpty(response.data)) {
-                    this.item.id = response.data.hasOwnProperty('project_group_id') ? response.data.project_group_id : response.data.project_id;
-                    this.item.name = response.data.name;
-                    this.item.create = this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone);
+                    this.item = {
+                        id: response.data.hasOwnProperty('project_group_id') ? response.data.project_group_id : response.data.project_id,
+                        name: response.data.name,
+                        create: this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone),
+                    };
                     this.isVisible = true;
                     // this.summaryData.tags = response.data.tags;
                     console.log('this.item', this.item);
