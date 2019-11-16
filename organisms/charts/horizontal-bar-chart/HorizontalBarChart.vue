@@ -1,129 +1,145 @@
+<template>
+    <div>
+        <p-chart v-bind="$props" :options="chartOptions" @ready="draw">
+            <template>
+                <g v-for="(d, idx) in chartData" :key="d.key"
+                   class="horizontal-bar-g"
+                   :class="{hover: hoverList[idx]}"
+                >
+                    <text class="key-label" dominant-baseline="hanging"
+                          :y="yScale(d.key) + textPadTop"
+                    >
+                        {{ d.key }}
+                    </text>
+                    <text class="value-label" dominant-baseline="hanging"
+                          text-anchor="end"
+                          :x="xScale(max)"
+                          :y="yScale(d.key) + textPadTop"
+                    >
+                        {{ d.value }}
+                    </text>
+                    <rect class="back-bar"
+                          :rx="round" :ry="round"
+                          x="0" :y="yScale(d.key) + barPosY"
+                          :height="barThickness"
+                          :width="xScale(max)"
+                    />
+                    <rect class="bar"
+                          :rx="round" :ry="round"
+                          x="0" :y="yScale(d.key) + barPosY"
+                          :height="barThickness"
+                          :width="xScale(d.value)"
+                          @mouseenter="onMouseEnter(idx)"
+                          @mouseleave="onMouseLeave(idx)"
+                    />
+                </g>
+            </template>
+        </p-chart>
+    </div>
+</template>
+
 
 <script>
+import _ from 'lodash';
 import * as d3 from 'd3';
-import PChartD3 from '@/components/molecules/charts/Chart';
-import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
+import {
+    reactive, ref, toRefs, watch, computed,
+} from '@vue/composition-api';
+import PChart from '@/components/molecules/charts/Chart';
 import { HORIZONTAL_OPTIONS } from './HorizontalBarChart.map';
+
+const setDrawTools = (props, context, chartOptions) => {
+    const state = reactive({
+        yScale: null,
+        xScale: null,
+        chartData: null,
+        barGroup: null,
+        hoverList: [],
+        max: computed(() => d3.max(props.data, d => d.value)),
+        textPadTop: computed(() => chartOptions.value.labels.padTop),
+        textPadBottom: computed(() => chartOptions.value.labels.padBottom),
+        textHeight: computed(() => chartOptions.value.labels.textHeight),
+        barThickness: computed(() => chartOptions.value.bars.thickness),
+    });
+
+    const initYScale = (svgTools) => {
+        const bandWidth = state.textHeight + state.textPadTop + state.textPadBottom + state.barThickness;
+        svgTools.setChartHeight(props.data.length * bandWidth);
+        return d3.scaleBand()
+            .range([0, svgTools.chartHeight.value])
+            .domain(props.data.map(d => d.key));
+    };
+
+    const initXScale = (svgTools) => {
+        d3.scaleLinear().range([0, svgTools.chartWidth.value]).domain([0, state.max]);
+        return d3.scaleLinear().range([0, svgTools.chartWidth.value]).domain([0, state.max]);
+    };
+
+    const draw = (svgTools) => {
+        state.yScale = initYScale(svgTools);
+        state.xScale = initXScale(svgTools);
+        state.hoverList = new Array(props.data.length).fill(false);
+        state.chartData = props.data;
+    };
+
+    const barPosY = computed(() => state.textHeight + state.textPadTop + state.textPadBottom);
+    const round = computed(() => state.barThickness / 2);
+
+    const onMouseEnter = (idx) => {
+        state.hoverList.splice(idx, 1, true);
+    };
+
+    const onMouseLeave = (idx) => {
+        state.hoverList.splice(idx, 1, false);
+    };
+
+    return {
+        ...toRefs(state),
+        round,
+        barPosY,
+        draw,
+        onMouseEnter,
+        onMouseLeave,
+    };
+};
 
 export default {
     name: 'PHorizontalBarChart',
+    components: { PChart },
     events: ['click'],
-    extends: PChartD3,
     props: {
+        loading: {
+            type: Boolean,
+            default: true,
+        },
+        data: {
+            type: Array,
+            required: true,
+        },
         options: {
             type: Object,
             default: () => ({}),
         },
+        minHeight: {
+            type: Number,
+            default: 200,
+        },
+        minWidth: {
+            type: Number,
+            default: 500,
+        },
+        maxHeight: {
+            type: Number,
+            default: null,
+        },
     },
-    data() {
+    setup(props, context) {
+        const chartOptions = computed(() => _.merge({}, HORIZONTAL_OPTIONS, props.options));
+        const drawTools = setDrawTools(props, context, chartOptions);
         return {
-            barGroup: null,
+            chartOptions,
+            ...drawTools,
         };
-    },
-    computed: {
-        chartOptions() {
-            return this._.merge({}, DEFAULT_OPTIONS, HORIZONTAL_OPTIONS, this.options);
-        },
-        max() { return d3.max(this.data, d => d.value); },
-        textPadTop() { return this.chartOptions.labels.padTop; },
-        textPadBottom() { return this.chartOptions.labels.padBottom; },
-        textHeight() { return this.chartOptions.labels.textHeight; },
-        barWidth() { return this.chartOptions.bars.thickness; },
-        barPosY() { return this.textHeight + this.textPadTop + this.textPadBottom; },
-        round() { return this.barWidth / 2; },
-    },
-    methods: {
-        /**
-         * @override
-         */
-        initXScale() {
-            this.xScale = d3.scaleLinear()
-                .range([0, this.xScaleWidth])
-                .domain([0, this.max]);
-        },
-        /**
-         * @override
-         */
-        initYScale() {
-            const bandWidth = this.textHeight + this.textPadTop + this.textPadBottom + this.barWidth;
-            this.yScaleHeight = this.data.length * bandWidth;
-            this.yScale = d3.scaleBand()
-                .range([0, this.yScaleHeight])
-                .domain(this.data.map(d => d.key));
-        },
-        /**
-         * @override
-         */
-        appendChartElements() {
-            this.appendBarGroup();
-            this.appendLabels();
-            if (this.chartOptions.bars.backBar.display) this.appendBackBars();
-            this.appendBars();
-        },
-
-        appendBarGroup() {
-            this.barGroup = this.svg.selectAll('.horizontal-bar-g').data(this.data)
-                .enter().append('g')
-                .attr('class', 'horizontal-bar-g');
-        },
-        appendLabels() {
-            // append key labels
-            this.barGroup.append('text')
-                .attr('class', 'key-label')
-                .attr('dominant-baseline', 'hanging')
-                .text(d => d.key)
-                .attr('y', d => this.yScale(d.key) + this.textPadTop);
-
-            // append value labels
-            this.barGroup.append('text')
-                .attr('class', 'value-label')
-                .attr('dominant-baseline', 'hanging')
-                .attr('text-anchor', 'end')
-                .attr('x', () => this.xScale(this.max))
-                .text(d => d.value)
-                .attr('y', d => this.yScale(d.key) + this.textPadTop)
-                .on('click', this.onClickValue);
-        },
-        appendBackBars() {
-            const backBars = this.barGroup.append('rect')
-                .attr('class', 'back-bar')
-                .attr('rx', this.round)
-                .attr('ry', this.round)
-                .attr('x', 0)
-                .attr('y', d => this.yScale(d.key) + this.barPosY)
-                .attr('height', this.barWidth)
-                .attr('width', () => this.xScale(this.max));
-
-            // apply styles to background bars
-            this._.forIn(this.chartOptions.bars.backBar.styles, (val, key) => {
-                backBars.style(key, val);
-            });
-        },
-        appendBars() {
-            const bars = this.barGroup.append('rect')
-                .attr('class', 'bar')
-                .attr('rx', this.round)
-                .attr('ry', this.round)
-                .attr('y', d => this.yScale(d.key) + this.barPosY)
-                .attr('height', this.barWidth)
-                .attr('width', d => this.xScale(d.value))
-                .on('mouseover', this.onMouseover)
-                .on('mouseout', this.onMouseout);
-
-            // apply custom styles to bars
-            this._.forIn(this.chartOptions.bars.styles, (val, key) => {
-                bars.style(key, val);
-            });
-        },
-        onMouseover(data, idx, bars) {
-            d3.select(bars[idx].parentElement).classed('hover', true);
-        },
-        onMouseout(data, idx, bars) {
-            d3.select(bars[idx].parentElement).classed('hover', false);
-        },
-        onClickValue(data, idx, valueLabels) {
-            this.$emit('click', data, idx, valueLabels);
-        },
     },
 };
 </script>

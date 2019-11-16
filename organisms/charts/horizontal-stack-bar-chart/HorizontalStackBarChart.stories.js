@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
-import PHorizontalStackBarChart from './HorizontalStackBarChartD3';
+import PHorizontalStackBarChart from './HorizontalStackBarChart';
 import { autoProps } from '@/setup/storybook-util';
-import { sampleDataGenerator } from './HorizontalStackBarChartD3.map';
+import { sampleDataGenerator } from './HorizontalStackBarChart.map';
 
 export default {
     title: 'Organisms/charts/horizontal-stack-bar-chart',
@@ -24,9 +24,12 @@ export const defaultCase = () => ({
                     <div style="position: absolute; 
                                 top: 150px; left: 50px;
                                 border: 1px solid lightgray;
-                                width: 600px;"
+                                display: inline-block;"
                     >
-                        <p-horizontal-stack-bar-chart v-bind="$props" :data="chartData" :loading="loadingChartData"/>
+                        <p-horizontal-stack-bar-chart v-bind="$props" 
+                            :data="chartData" 
+                            :loading="loadingChartData"
+                        />
                     </div>
                </div>`,
     data() {

@@ -1,10 +1,10 @@
 <template>
     <div class="hs-chart-container">
-        <p-chart-d3 ref="chart" v-bind="$props"
-                    :data="[]"
-                    :no-draw="true"
-                    :min-height="yScaleHeight"
-                    :max-height="yScaleHeight"
+        <p-chart ref="chart" v-bind="$props"
+                 :data="[]"
+                 :no-draw="true"
+                 :min-height="yScaleHeight"
+                 :max-height="yScaleHeight"
         />
         <div v-for="(d, i) in data" :key="i" class="legend-container">
             <div v-for="(key, idx) in keys" :key="key" class="legend">
@@ -21,14 +21,14 @@
 
 <script>
 import * as d3 from 'd3';
-import PChartD3 from '@/components/molecules/charts/Chart';
+import PChart from '@/components/molecules/charts/Chart';
 import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
-import { HORIZONTAL_STACK_OPTIONS } from './HorizontalStackBarChartD3.map';
+import { HORIZONTAL_STACK_OPTIONS } from './HorizontalStackBarChart.map';
 
 export default {
-    name: 'PHorizontalStackBarChartD3',
-    components: { PChartD3 },
-    extends: PChartD3,
+    name: 'PHorizontalStackBarChart',
+    components: { PChart },
+    extends: PChart,
     props: {
         options: {
             type: Object,

@@ -1,28 +1,11 @@
 import { withKnobs, number } from '@storybook/addon-knobs/vue';
 import PChart from './Chart';
 import { autoProps } from '@/setup/storybook-util';
-import { sampleDataGenerator } from '@/components/organisms/charts/donut-chart/DonutChartD3.map';
 
 export default {
     title: 'Molecules/charts/chart-d3',
     component: PChart,
     decorators: [withKnobs],
-};
-
-
-export const SAMPLE_DATA = [
-    { key: 'Bob', value: parseInt(Math.random() * 10) },
-    { key: 'Robin', value: parseInt(Math.random() * 10) },
-    { key: 'Anne', value: parseInt(Math.random() * 10) },
-    { key: 'Mark', value: parseInt(Math.random() * 10) },
-    { key: 'Joe', value: parseInt(Math.random() * 10) },
-    { key: 'Eve', value: parseInt(Math.random() * 10) },
-    { key: 'Mary', value: parseInt(Math.random() * 10) },
-];
-
-export const barChartSampleDataGenerator = function () {
-    const start = Math.round(Math.random() * 10);
-    return SAMPLE_DATA.slice(start < SAMPLE_DATA.length ? start : 0);
 };
 
 
@@ -54,7 +37,7 @@ export const chart = () => ({
         refresh() {
             this.loadingChartData = true;
             setTimeout(() => {
-                this.chartData = barChartSampleDataGenerator();
+                this.chartData = [];
                 this.loadingChartData = false;
             }, 1000);
         },
