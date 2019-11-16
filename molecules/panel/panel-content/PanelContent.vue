@@ -1,37 +1,28 @@
 <template>
     <p-dl class="row">
-        <div v-for="(def, idx) in definitionList" :key="idx" class="col-sm-12 col-md-6 content-list">
+        <div v-for="(def, idx) in defs" :key="idx" class="col-sm-12 col-md-6 content-list">
             <slot name="details">
                 <p-dt class="col-sm-12 col-md-4">
-                    {{ def.title }}
+                    {{ def.label }}
                 </p-dt>
-                <p-dd v-if="hasURL" class="col-sm-12 col-md-8 copyFlagged"
-                      @mouseover="mouseInOut(idx,true)"
+                <p-dd :ref="'dd-'+def.name"
+                      class="col-sm-12 col-md-8 copyFlagged"
+                      @mouseenter="mouseInOut(idx,true)"
                       @mouseleave="mouseInOut(idx,false)"
                 >
-                    <a :href="def.contents.link">{{ def.contents.text }}</a>
-                    <template v-if="activeArr(idx)">
+                    <slot :name="`def-${def.name}-format`"
+                          :value="getValue(def.name)"
+                          :item="item"
+                          :def="def"
+                    >
+                        {{ getValue(def.name) }}
+                    </slot>
+                    <template v-if="activeArr(idx,def)">
                         &nbsp;&nbsp; <p-button v-if="isCopyFlagged(def)"
                                                style="display: inline-block;" outline
                                                :style-type="'secondary'"
                                                :size="'sm'"
-                                               @click="copyText(def.contents.text)"
-                        >
-                            {{ tr('COMMON.COPY') }}
-                        </p-button>
-                    </template>
-                </p-dd>
-                <p-dd v-else class="col-sm-12 col-md-8 copyFlagged"
-                      @mouseover="mouseInOut(idx,true)"
-                      @mouseleave="mouseInOut(idx,false)"
-                      >
-                    {{ def.contents.text }}
-                    <template v-if="activeArr(idx)">
-                        &nbsp;&nbsp; <p-button v-if="isCopyFlagged(def)"
-                                               style="display: inline-block;" outline
-                                               :style-type="'secondary'"
-                                               :size="'sm'"
-                                               @click="copyText(def.contents.text)"
+                                               @click="copyText($event)"
                         >
                             {{ tr('COMMON.COPY') }}
                         </p-button>
@@ -50,7 +41,7 @@ import PDd from '@/components/atoms/definition/dd/Dd';
 import PButton from '@/components/atoms/buttons/Button';
 
 export default {
-    name: 'PanelContent',
+    name: 'PPanelContent',
     components: {
         PButton,
         PDt,
@@ -58,9 +49,13 @@ export default {
         PDd,
     },
     props: {
-        definitionList: {
+        defs: {
             type: Array,
             default: () => [],
+        },
+        item: {
+            type: Object,
+            default: () => new Object(),
         },
     },
     data() {
@@ -70,15 +65,15 @@ export default {
         };
     },
     created() {
-       this.setActiveArray();
+        this.setActiveArray();
     },
     methods: {
-        activeArr(idx){
-            return this.active[idx];
+        activeArr(idx, def) {
+            return this.active[idx] && this.$refs[`dd-${def.name}`][0].innerText;
         },
         setActiveArray() {
-            let emptyArr = [];
-            for (let i = 0; i < this.definitionList.length; i++) {
+            const emptyArr = [];
+            for (let i = 0; i < this.defs.length; i++) {
                 emptyArr.push(false);
             }
             this.active = emptyArr;
@@ -86,14 +81,17 @@ export default {
         isCopyFlagged(definition) {
             return (_.get(definition, 'copyFlag') === true);
         },
-        hasURL(contents) {
-            return (!this.isEmpty(_.get(contents, 'link')));
-        },
-        copyText(text) {
+        copyText(event) {
+            const rawText = event.target.parentElement.innerText;
+            const copyLength = this.tr('COMMON.COPY').length;
+            const text = rawText.slice(0, -copyLength).trim();
             this.selectToCopyToClipboard(text);
         },
         mouseInOut(idx, flag) {
             this.$set(this.active, idx, flag);
+        },
+        getValue(name) {
+            return this.item[name] ? this.item[name] : '';
         },
     },
 };
