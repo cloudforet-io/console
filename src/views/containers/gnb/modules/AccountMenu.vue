@@ -41,20 +41,15 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('user', [
+        ...mapGetters('auth', [
             'userId',
         ]),
-        ...mapGetters('auth', [
-            'client_id',
-        ]),
         ...mapGetters('domain', [
+            'clientId',
             'authType',
         ]),
     },
     methods: {
-        ...mapMutations('user', [
-            'setUserId',
-        ]),
         ...mapActions('auth', [
             'signOut',
         ]),
@@ -68,8 +63,8 @@ export default {
                 this.$router.push({ path: '/sign-in' });
             } else {
                 await this.signOut();
-                this.$router.push({ path: '/google-sign-in' });
                 this.oAuthSignOut();
+                this.$router.push({ path: '/google-sign-in' });
             }
         },
         openProfile() {

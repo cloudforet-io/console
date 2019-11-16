@@ -35,25 +35,25 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('user', [
-            'locale',
+        ...mapGetters('auth', [
+            'language',
         ]),
         tooltip() {
-            return `Language: ${LANGUAGES[this.locale]}`;
+            return `Language: ${LANGUAGES[this.language]}`;
         },
     },
     created() {
         this.init();
     },
     methods: {
-        ...mapMutations('user', [
-            'setLocale',
+        ...mapMutations('auth', [
+            'setLanguage',
         ]),
         init() {
-            if (this.locale) this.$i18n.locale = this.locale;
+            if (this.language) this.$i18n.locale = this.language;
         },
         changeLanguage(item) {
-            this.setLocale(item.key);
+            this.setLanguage(item.key);
         },
     },
 };

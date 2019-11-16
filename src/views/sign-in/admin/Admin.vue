@@ -1,128 +1,118 @@
 <template>
-    <b-row align-v="center">
-        <ul class="cb-slideshow">
-            <li>
-                <span/>
-                <div><h3>Clo·ud San·d·box</h3></div>
-            </li>
-            <li>
-                <span/>
-                <div><h3>com·po·sure</h3></div>
-            </li>
-            <li>
-                <span/>
-                <div><h3>e·qua·nim·i·ty</h3></div>
-            </li>
-            <li>
-                <span/>
-                <div><h3>bal·an·ce</h3></div>
-            </li>
-            <li>
-                <span/>
-                <div><h3>qui·e·tude</h3></div>
-            </li>
-            <li>
-                <span/>
-                <div><h3>Ma·inf·rame compu·ter</h3></div>
-            </li>
-        </ul>
-
-        <div class="container fade-in">
-            <!--<BaseSimpleModal
-                ref="LogInSimpleModal"
-                :title="tr('TR_NOTI')"
-            >
-                <template #contents>
-                    <div>
-                        We apologize for inconvenience. 'Sign up', 'Password retrieval' feature currently unavailable due to our policies.
-                        <br>Please, contact System Administrator for following contacts:
-                        <br>
-                        <div>● e-mail:<a href="mailto:admin@mz.co.kr"> <b> admin@mz.co.kr</b></a></div>
-                        <div>● Phone: <a href="#">+82 (02)<b>1644-2243</b></a></div>
-                    </div>
-                </template>-->
-            </BaseSimpleModal>
-
-            <b-row class="justify-content-center">
-                <b-col md="8">
-                    <b-card-group class="card-group">
-                        <b-card no-body class="p-4">
-                            <b-card-body>
-                                <b-form>
-                                    <h1>
-                                        Admin {{ $t('COMMON.SIGN_IN') }}
-                                    </h1>
-                                    <transition v-if="seenGreet" name="slide-fade">
-                                        <p class="message">
-                                            <b>{{ $t('COMMON.SIGN_IN_MSG') }}</b>
-                                        </p>
-                                    </transition>
-                                    <transition v-if="seenError" name="slide-fade">
-                                        <p class="message" style="color: #B82E24">
-                                            <b>{{ $t('COMMON.SIGN_FAIL_TITLE') }}</b>
-                                            <br> {{ $t('COMMON.SIGN_FAIL_BODY') }}
-                                        </p>
-                                    </transition>
-                                    <b-input-group class="mb-3">
-                                        <b-input-group-prepend>
-                                            <b-input-group-text><i class="fal fa-user"/></b-input-group-text>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model="adminUserId" type="text" placeholder="User ID"/>
-                                    </b-input-group>
-                                    <b-input-group class="mb-3">
-                                        <b-input-group-prepend>
-                                            <b-input-group-text><i class="fal fa-key"/></b-input-group-text>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model="password" type="password" placeholder="Password"
-                                                      autocomplete="current-password" @keyup.enter="login"
-                                        />
-                                    </b-input-group>
-                                    <b-row class="mb-3">
-                                        <b-col md="4" class="ml-auto col-xs-12 col-sm-12">
-                                            <b-button type="button" block class="login-btn" @click="login">
-                                                {{ $t('COMMON.SIGN_IN') }}
-                                            </b-button>
-                                        </b-col>
-                                    </b-row>
-                                </b-form>
-                            </b-card-body>
-                        </b-card>
-                        <b-card no-body class="text-white bg-danger py-5 d-md-down-none" style="width:44%">
-                            <b-card-body class="text-center">
-                                <div>
-                                    <p/>
-                                    <h2>{{ tr('MSG.WELCOME_MSG_P',[getCurrentHostname]) }} for Admin.</h2> </p>
-                                    <p> {{ $t('MSG.SIGN_IN_DESC') }}</p>
+    <div class="background-cover">
+        <div class="row">
+            <div class="container fade-in">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card-group">
+                            <div class="card col-7 card-left-container">
+                                <div class="signIn-title">
+                                    {{ $t('COMMON.ADMIN_USER') }} {{ $t('COMMON.SIGN_IN') }}
                                 </div>
-                            </b-card-body>
-                        </b-card>
-                    </b-card-group>
-                </b-col>
-            </b-row>
+                                <div v-show.visible="greeting" class="signIn-sub-title">
+                                    {{ $t('COMMON.SIGN_IN_MSG') }}
+                                </div>
+                                <div v-show.visible="!greeting" class="signIn-sub-title">
+                                    <div class="sign-in-alert">
+                                        {{ $t('COMMON.SIGN_FAIL_BODY') }}
+                                    </div>
+                                </div>
+                                <form class="form-binder">
+                                    <div class="form-group">
+                                        <p-label class="input-title">
+                                            User ID
+                                        </p-label>
+                                        <p-text-input ref="userId" v-model="adminUserId"
+                                                      :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
+                                                      class="form-control"
+                                                      type="text"
+                                                      placeholder="  User ID"
+                                                      required
+                                                      @keyup="removeCSS('userId')"
+                                                      @keyup.enter="signIn"
+                                        />
+                                    </div>
+                                    <div v-show="validatorUser" style="display:block" class="invalid-feedback">
+                                        * {{ $t('SIGNIN.USER_EMPTY') }}
+                                    </div>
+                                    <div class="form-group">
+                                        <p-label class="input-title">
+                                            Password
+                                        </p-label>
+                                        <p-text-input ref="password" v-model="password" type="password"
+                                                      :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
+                                                      class="form-control"
+                                                      placeholder="  Password"
+                                                      required
+                                                      @keyup="removeCSS('password')"
+                                                      @keyup.enter="signIn"
+                                        />
+                                        <div v-show="validatorPassword" style="display:block" class="invalid-feedback">
+                                            * {{ $t('SIGNIN.PASS_EMPTY') }}
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12 col-xs-12 col-sm-12">
+                                            <p-button class="button-cover"
+                                                      :size="'lg'"
+                                                      :style-type="'primary1'"
+                                                      @click="signIn"
+                                            >
+                                                {{ $t('COMMON.SIGN_IN') }}
+                                            </p-button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="card card-right-container">
+                                <img class="card-img" src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg" alt="Bologna">
+                                <div class="card-img-overlay text-white d-flex flex-column justify-content-center">
+                                    <div class="text-center">
+                                        <p style="margin-bottom: 10px">
+                                            <img src="@/assets/images/brand/brand_logo.png" width="100vh" height="100vh">
+                                        </p><h1>{{ getCurrentHostname }}</h1></p>
+                                        <p>{{ getGreetMessage }} </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </b-row>
+    </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import url from 'url';
-import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal.vue';
+import PButton from '@/components/atoms/buttons/Button';
+import PLabel from '@/components/atoms/labels/Label';
+import PTextInput from '@/components/atoms/inputs/TextInput';
 
-const signupContents = 'We apologize for inconvenience. \'Sign up\', \'Password retrieval\' feature currently unavailable due to our policies.'
-        + ' Please, contact System Administrator for following contacts: ' + '<br>'
-        + '● e-mail: admin@mz.co.kr';
 export default {
     components: {
-        BaseSimpleModal,
+        PButton,
+        PLabel,
+        PTextInput,
     },
     data() {
         return {
-            instructionContents: signupContents,
             adminRememberStatus: false,
-            seenGreet: true,
-            seenError: false,
+            greeting: true,
             adminUserId: '',
             password: '',
+            styler: {
+                border: '1px solid #EF3817',
+            },
+            validator: {
+                userId: false,
+                password: false,
+            },
+            isInvalid: {
+                userId: false,
+                password: false,
+            },
         };
     },
     computed: {
@@ -132,25 +122,49 @@ export default {
         ...mapGetters('domain', [
             'authType',
         ]),
+        validatorUser() {
+            return this.validator.userId;
+        },
+        validatorPassword() {
+            return this.validator.password;
+        },
+        getIsInvalidUser() {
+            return this.isInvalid.userId ? this.styler.border : '';
+        },
+        getIsInvalidPassword() {
+            return this.isInvalid.password ? this.styler.border : '';
+        },
+        getGreetMessage() {
+            const companyTitle = this.$store.getters['domain/companyTitle'];
+            const companyDesc = this.$store.getters['domain/description'];
+            const hostName = this.getWindowHostName();
+            return !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG', [companyDesc]) : !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
+        },
         getCurrentHostname() {
+            const companyTitle = this.$store.getters['domain/companyTitle'];
+            const hostName = this.getWindowHostName();
+            return !this.isEmpty(companyTitle) ? companyTitle : hostName;
+        },
+    },
+    methods: {
+        getWindowHostName() {
             const hostName = url.parse(window.location.href).host;
             return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
         },
-    },
-    mounted() {
-        this.isRemembered();
-    },
-    methods: {
-        async directToCommonUser() {
-            if (this.authType === 'local') {
-                this.$router.push({ path: '/sign-in' });
-            } else {
-                this.$router.push({ path: '/google-sign-in' });
+        removeCSS(type) {
+            this.validator[type] = false;
+            this.isInvalid[type] = false;
+        },
+        validateInput(param, key) {
+            const _key = _.camelCase(key);
+            if (this.isEmpty(param[_key])) {
+                this.validator[_key] = true;
+                this.isInvalid[_key] = true;
+                this.$refs[_key].focus();
             }
         },
-        async login() {
-            this.showGreetMSG();
-
+        async signIn() {
+            this.displayGreetingMSG(true);
             const credentials = {
                 user_id: this.adminUserId,
                 password: this.password,
@@ -158,66 +172,118 @@ export default {
             };
 
             if (this.isEmpty(credentials.user_id) || this.isEmpty(credentials.password)) {
-                this.showErorrMSG();
+                this.validateInput(credentials, 'user_id');
+                this.validateInput(credentials, 'password');
                 return;
             }
 
             await this.$store.dispatch('auth/signIn', credentials).then(() => {
                 this.$router.push({ path: '/' });
-                this.setTimeZone();
-            }).catch(() => {
-                this.showErorrMSG();
+            }).catch((e) => {
+                this.isInvalid.userId = true;
+                this.isInvalid.password = true;
+                this.$refs.userId.focus();
+                this.displayGreetingMSG(false);
+                console.log(e);
             });
         },
-        showErorrMSG() {
-            this.seenGreet = false;
-            this.seenError = true;
-        },
-        showGreetMSG() {
-            this.seenGreet = true;
-            this.seenError = false;
-        },
-        isRemembered() {
-            localStorage.checkbox = (localStorage.checkbox === 'true');
-            if (localStorage && !this.isEmpty(localStorage.adminUserId)) {
-                this.adminRememberStatus = true;
-                this.adminUserId = localStorage.adminUserId;
-            } else {
-                this.adminRememberStatus = false;
-                this.adminUserId = '';
-            }
-        },
-        rememberMe() {
-            if (this.adminRememberStatus && !this.isEmpty(this.adminUserId)) {
-                localStorage.adminUserId = this.adminUserId;
-                localStorage.checkbox = this.adminRememberStatus;
-            } else {
-                localStorage.adminUserId = '';
-                localStorage.checkbox = false;
-            }
-        },
-        popSignUpInstruction() {
-            this.$refs.LogInSimpleModal.showModal();
-        },
-        async setTimeZone() {
-            await this.$http.post('identity/user/get', {
-                user_id: this.adminUserId,
-                domainId: sessionStorage.getItem('domainId'),
-            }).then((response) => {
-                const timeZone = this.isEmpty(response.data.timezone) ? 'Etc/GMT' : response.data.timezone;
-                localStorage.timeZone = timeZone;
-            }).catch(() => {
-                this.showErorrMSG(setTimeout(() => this.showGreetMSG(), 3000));
-            });
+        displayGreetingMSG(flag) {
+            this.greeting = flag;
         },
     },
 };
 </script>
 
 <style lang="scss" scoped>
-    @import '../../../styles/css/slideShow.css';
+    .background-cover {
+        height: 100vh;
+        width: 100vw;
+        background-position: center bottom;
+        background-size: cover;
+        background-image: url("../../../assets/images/landing/cloudone_console_sign-in_bg.jpg");
+    }
+    .signIn-title {
+        text-align: left;
+        font: Bold 32px/37px Arial;
+        letter-spacing: 0;
+        color: #222532;
+        opacity: 1;
+    }
 
-    .login-check {
+    .signIn-sub-title {
+        margin-top: 0.5rem;
+        text-align: left;
+        font: 14px/16px Arial;
+        letter-spacing: 0;
+        color: #000000;
+        opacity: 1;
+    }
+    .sign-in-alert{
+        text-align: left;
+        font: 14px/16px Arial;
+        letter-spacing: 0;
+        color: $alert;
+        opacity: 1;
+    }
+    .card-left-container {
+        padding: 1.5rem;
+    }
+
+    .card-right-container {
+        border: none;
+        background:  $primary1;
+        opacity: 1;
+        > img {
+            border-radius: 0;
+            border-top-right-radius: 7px;
+            border-bottom-right-radius: 7px;
+        }
+    }
+
+    .form-binder {
+        margin-top: 1.5rem;
+    }
+
+    .input-title {
+        text-align: left;
+        font: Bold 14px/28px Arial;
+        letter-spacing: 0;
+        color: $dark;
+        margin-bottom: 0px;
+    }
+    .form-control:focus{
+        border-color: red;
+    }
+
+    .input-content {
+        background: #FFFFFF 0% 0% no-repeat padding-box;
+        border: 1px solid $gray2;
+        border-radius: 2px;
+        opacity: 1;
+    }
+
+    span.root-sign:hover {
+        text-decoration: underline;
+        cursor: pointer
+    }
+
+    .root-sign {
+        text-align: left;
+        text-decoration: underline;
+        font: Regular 14px/16px Arial;
+        letter-spacing: 0;
+        color: #8185D1;
+        opacity: 1;
+    }
+
+    .right-info-card-body {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .signIn-check {
         float: right;
         padding: 0px 6px 6px 0px;
     }
@@ -229,26 +295,32 @@ export default {
         transform: translate(-50%, -50%);
     }
 
+    .button-cover{
+        width: 50%;
+        display: inline-block;
+        text-align: center;
+        float: left;
+        font: 16px/18px Arial;
+        letter-spacing: 0;
+        color: #FFFFFF;
+        opacity: 1;
+    }
+
     .card-group {
         @extend %sheet;
-
         .input-group-text {
             border: 0;
             background: none;
         }
-
         .form-control {
             border: 1px solid $lightgray;
             border-radius: 5px;
         }
     }
-
-    .login-btn {
+    .signIn-btn {
         border: 0;
-        background: linear-gradient(to right, $blue, $violet);
-        box-shadow: 0 0 5px 1px rgba($navy, 0.3);
+        background: $primary;
         color: $white;
-
         &:hover {
             color: $white;
         }

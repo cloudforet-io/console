@@ -10,6 +10,11 @@ export default {
             type: Boolean,
             default: false,
         },
+        type: {
+            type: String,
+            default: 'text',
+            validator: value => ['text', 'password'].indexOf(value) !== -1,
+        }
     },
     render(h, { data, props, listeners }) {
         return h('input', {
@@ -21,7 +26,7 @@ export default {
             attrs: {
                 ...data.attrs,
                 disabled: props.disabled,
-                type: 'text',
+                type: props.type,
             },
             domProps: {
                 value: props.value,

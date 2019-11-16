@@ -19,7 +19,7 @@
 <script>
 import PTabBar from '@/components/molecules/tabs/tab-bar/TabBar';
 import { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar.mixins';
-import { makeProxy } from '@/mixins/compostion-util';
+import { makeProxy } from '@/lib/compostion-util';
 
 
 export default {

@@ -1,6 +1,7 @@
-import faker from 'faker';
+import { computed, ref } from '@vue/composition-api';
 import InfoPanel from './InfoPanel.vue';
-import { autoProps } from '../../../../setup/storybook-util';
+import { makeTrDefs } from '@/components/molecules/panel/panel-content/PanelContent.uitl';
+import PBadge from '@/components/atoms/badges/Badge';
 
 export default {
     title: 'organisms/panel/info-panel',
@@ -14,34 +15,61 @@ export default {
 };
 export const panelContents = () => ({
     components: { InfoPanel },
-    template: '<div style="width: 80vw;"><InfoPanel :infoTitle="renderTitle" :contentData="renderData"></InfoPanel></div>',
+    template: '<div style="width: 80vw;"><InfoPanel :infoTitle="renderTitle" :defs="defs" :item="item"></InfoPanel></div>',
 
     data() {
         return {
             renderTitle: 'Information',
-            renderData: [
+            defs: [
                 {
-                    title: 'ID',
-                    contents: {
-                        text: 'Fire Birds',
-                        link: 'www.google.com',
-                    },
+                    name: 'id',
+                    label: 'ID',
                     copyFlag: true,
                 },
                 {
-                    title: 'Name',
-                    contents: {
-                        text: 'Shawn Mandus',
-                    },
+                    name: 'name',
+                    label: 'NAME',
                 },
                 {
-                    title: 'Created',
-                    contents: {
-                        text: '2019-09-08 23:11:23',
-                    },
+                    name: 'state',
+                    label: 'state',
                     copyFlag: true,
                 },
             ],
+            item: {
+                name: '펭수',
+                id: 'ebs',
+                state: 'KMJ',
+            },
+        };
+    },
+});
+
+export const trHelper = () => ({
+    components: { InfoPanel, PBadge },
+    template: `
+<div style="width: 80vw;">
+    <InfoPanel :infoTitle="renderTitle" :defs="defs" :item="item">
+    <template #def-state-format="scope">
+    <p-badge styleType="primary">{{scope.value}}</p-badge>
+</template>
+</InfoPanel>
+</div>`,
+
+    setup(props, context) {
+        const sampleDefs = ref([
+            ['name', 'COMMON.NAME'],
+            ['state', ['COMMON.STATE', 'en'], { copyFlag: true }],
+            ['primary_ip_address', 'COMMON.IP', { copyFlag: true }],
+        ]);
+        return {
+            renderTitle: 'Information',
+            defs: makeTrDefs(sampleDefs.value, context.parent),
+            item: {
+                name: '펭수',
+                state: '하태하태',
+                primary_ip_address: '1.1.1.1',
+            },
         };
     },
 });

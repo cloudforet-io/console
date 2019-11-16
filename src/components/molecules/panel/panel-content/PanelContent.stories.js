@@ -1,4 +1,7 @@
+import { ref, computed } from '@vue/composition-api';
 import PanelContent from '@/components/molecules/panel/panel-content/PanelContent';
+import PBadge from '@/components/atoms/badges/Badge';
+import { makeTrDefs } from '@/components/molecules/panel/panel-content/PanelContent.uitl';
 
 export default {
     title: 'molecules/panel/panel-content',
@@ -11,36 +14,66 @@ export default {
     },
 };
 export const panelContents = () => ({
-    components: { PanelContent },
-    template: '<div style="width: 80vw;"><panel-content :definitionList="renderData"></panel-content></div>',
+    components: { PanelContent, PBadge },
+    template: `
+<div style="width: 80vw;">
+    <panel-content :defs="renderData" :item="item">
+    <template #def-state-format="scope">
+    <p-badge styleType="primary">{{scope.value}}</p-badge>
+</template>
+    </panel-content>
+</div>`,
     data() {
         return {
+            item: {
+                id: 'Fire Birds',
+                name: 'Shawn Mandus',
+                state: 'enabled',
+            },
             renderData: [
                 {
-                    title: 'ID',
-                    contents: {
-                        text: 'Fire Birds',
-                        link: 'www.google.com',
-                    },
+                    name: 'id',
+                    label: 'ID',
                     copyFlag: true,
-                    visible: false,
                 },
                 {
-                    title: 'Name',
-                    contents: {
-                        text: 'Shawn Mandus',
-                    },
-                    visible: false,
+                    name: 'name',
+                    label: 'NAME',
                 },
                 {
-                    title: 'Created',
-                    contents: {
-                        text: '2019-09-08 23:11:23',
-                    },
+                    name: 'state',
+                    label: 'state',
                     copyFlag: true,
-                    visible: false,
                 },
             ],
         };
     },
+});
+
+export const trHelper = () => ({
+    components: { PanelContent, PBadge },
+    template: `
+<div style="width: 80vw;">
+    <panel-content :defs="defs" :item="item">
+    <template #def-state-format="scope">
+    <p-badge styleType="primary">{{scope.value}}</p-badge>
+</template>
+    </panel-content>
+</div>`,
+    setup(props, context) {
+        const sampleDefs = ref([
+            ['name', 'COMMON.NAME', { copyFlag: true }],
+            ['state', ['COMMON.STATE', 'en'], { copyFlag: true }],
+            ['primary_ip_address', 'COMMON.IP', { copyFlag: true }],
+        ]);
+        return {
+            item: {
+                name: '펭수',
+                state: '하태하태',
+                primary_ip_address: '1.1.1.1',
+            },
+            defs: computed(() => makeTrDefs(sampleDefs.value, context.parent)),
+        };
+    },
+
 });

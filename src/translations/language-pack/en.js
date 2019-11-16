@@ -1,12 +1,10 @@
 export const en = {
     COMMON: {
         COPY: 'Copy',
-        WELCOME_MSG: 'Welcome to {0} Portal.',
-        WELCOME_MSG_P: 'Welcome to {0} Portal',
         SIGN_UP: 'Sign up',
         SIGN_IN: 'Sign In',
         SIGN_IN_MSG: 'Sign in to your Account.',
-        AUTH_FAIL_BODY: 'Please confirm your Google Account',
+        AUTH_G_FAIL_BODY: 'Please confirm your Google Account',
         AUTH_FAIL_TITLE: 'Authentication failed',
         SIGN_FAIL_BODY: 'Please confirm your Username or Password.',
         SIGN_FAIL_TITLE: 'Wrong Password or Username.',
@@ -20,7 +18,6 @@ export const en = {
         TR_NOTI_CON: '',
         SUMMARY: 'SUMMARY',
         AUDIT: 'AUDIT',
-        TAG: 'Tags',
         BTN_CANCEL: 'Cancel',
         BTN_EDIT: 'Edit',
         BTN_SAVE: 'Save',
@@ -86,17 +83,14 @@ export const en = {
         DATA_CENTER: 'Data Center',
         SERVER: 'Server',
         SETTINGS: 'Settings',
-        COLLECTOR: 'Collector',
         IDENTITY: 'Identity',
         USER: 'User',
         PROJECT: 'Project',
-        POOL: 'Pool',
         INFO: 'Information',
         TITLE: '{0} {1}',
         VM: 'VM',
         COMPUTE: 'Compute',
         RELEASE: 'Release',
-        STATE: 'State',
         REPO: 'Repository',
         CREDENTIAL: 'Credential',
         CREDENTIALS: 'Credentials',
@@ -115,44 +109,7 @@ export const en = {
         NO_SELECT: 'Select a {0} Above.',
         LOCAL: 'Local',
         OFFICIAL: 'OFFICIAL',
-        LIST: 'List'
-    },
-    ATOM: {
-
-    },
-    MOLECULES: {
-
-    },
-    ORGANISMS: {
-        CREATE_ARG: 'Create {0}',
-        UPDATE_ARG: 'Update {0}',
-        DELETE_ARG: 'Delete {0}',
-        CLICK_RIGHT: 'Please, Click a item from left tree Panel.'
-    },
-    SIGNIN: {
-        ROOT_CREDENTIALS: 'Sign-in using root account credentials',
-    },
-    IDENTITY: {
-        NO_PROJECT_SEL: 'No Selected Project',
-        NO_PROJECT_SEL_DT: 'Please, Click an item from left tree Panel.',
-    },
-    INVENTORY: {
-
-    },
-    MSG: {
-
-    },
-    TREE_TYPE: {
-        PROJECT: 'Project',
-        PROJECT_GROUP: 'Project Group',
-        REGION: 'Region',
-        ZONE: 'Zone',
-        POOL: 'Pool',
-        CREATE: 'Create {0}',
-        UPDATE: 'Update {0}',
-        DELETE: 'Delete Selected'
-    },
-    COL_NM: {
+        LIST: 'List',
         C_COMMAND_ID: 'COMMAND ID',
         C_USER_ID: 'USER ID',
         C_NAME: 'NAME',
@@ -237,7 +194,6 @@ export const en = {
         JOB_ID: 'Job ID',
         COL_MODE: 'Collect mode',
         LAST_SCHEDULED: 'Last Scheduled',
-        SCHEDULE: 'Schedule',
         COL_DATA: 'Collect Data',
         COL_ID: 'Collector ID',
         VERSION: 'Version',
@@ -245,16 +201,55 @@ export const en = {
         UPT_COUNT: 'Updated Count',
         FINISHED: 'Finished',
         KEY: 'Key',
-        FAIL_REASON: 'Reason for Failure'
+        FAIL_REASON: 'Reason for Failure',
+    },
+    ATOM: {
+
+    },
+    MOLECULES: {
+
+    },
+    ORGANISMS: {
+        CREATE_ARG: 'Create {0}',
+        UPDATE_ARG: 'Update {0}',
+        DELETE_ARG: 'Delete {0}',
+        CLICK_RIGHT: 'Please, Click a item from left tree Panel.',
+    },
+    SIGNIN: {
+        WELCOME_MSG: 'Welcome to {0}',
+        WELCOME_MSG_P: 'Welcome to {0} Portal',
+        ROOT_CREDENTIALS: 'Sign-in using root account credentials',
+        USER_EMPTY: 'User ID can\'t be blank.',
+        PASS_EMPTY: 'Password can\'t be blank.',
+    },
+    IDENTITY: {
+        NO_PROJECT_SEL: 'No Selected Project',
+        NO_PROJECT_SEL_DT: 'Please, Click an item from left tree Panel.',
+    },
+    INVENTORY: {
+
+    },
+    MSG: {
+
+    },
+    TREE_TYPE: {
+        PROJECT: 'Project',
+        PROJECT_GROUP: 'Project Group',
+        REGION: 'Region',
+        ZONE: 'Zone',
+        POOL: 'Pool',
+        CREATE: 'Create {0}',
+        UPDATE: 'Update {0}',
+        DELETE: 'Delete Selected',
     },
     MODAL_TITLE: {
         NOT_ALLOW: 'Action not allowed',
-        NO_USER: 'No Valid User'
+        NO_USER: 'No Valid User',
     },
     MODAL_MSG: {
         LEAF_NOMOVE: ' {0} can not be located at Root position.',
         NO_USER_VALID: 'User ID ({0}) is invalid. Please confirm your accessibility with Administrator.',
-        LEAF_PUSHTO:  'Can\'t locate the {0} into {1}. Please, Check your Action.'
+        LEAF_PUSHTO: 'Can\'t locate the {0} into {1}. Please, Check your Action.',
     },
     PANEL: {
         BASE_INFO: 'Base Information',
@@ -272,26 +267,26 @@ export const en = {
         VM: 'VM',
         COMPUTE: 'Compute',
         LOCAL: 'Local',
-        OFFICIAL: 'OFFICIAL'
+        OFFICIAL: 'OFFICIAL',
     },
     FORM: {
         TYPE: {
             STR: 'String',
-            LIST: 'List'
+            LIST: 'List',
         },
         INVALID: {
             MANDATORY: 'This is a mandatory field.',
             UNIQUE: 'This must be unique.',
-            LENGTH: '{0} must be {1}~{2} characters long.'
+            LENGTH: '{0} must be {1}~{2} characters long.',
         },
         VALID: {
-            AVAIL: 'This is Available.'
+            AVAIL: 'This is Available.',
         },
         CHECK: {
             RESET: 'Are you sure you want to reset a form you entered?',
-            AVAIL: 'Please check availability.'
+            AVAIL: 'Please check availability.',
         },
-        SELECT: 'Select {0}'
+        SELECT: 'Select {0}',
     },
     ACTION: {
         TITLE_DEFAULT: 'Action',
@@ -300,17 +295,17 @@ export const en = {
         CHECK: 'Are you sure you want to {0} selected {1}(s) below?',
         CHECK_DEFAULT: 'Are you sure you want to execute an action to selected item(s) below?',
         ERROR: 'ERROR OCCURED',
-        SUCCESS: 'SUCCEED'
+        SUCCESS: 'SUCCEED',
     },
     ALERT: {
         ALT_CHECK_TYPE: 'Please, check your input type ({0}) is valid.',
         SUCCESS: '{0} Successfully {1}.',
         ERROR: 'ERROR OCCURED during {0} {1}.',
-        NO_PARAM: 'An item must be chosen.'
+        NO_PARAM: 'An item must be chosen.',
     },
     TABLE: {
         SETTINGS: 'Table Settings',
-        LIMIT_LABEL: 'Rows per page: '
+        LIMIT_LABEL: 'Rows per page: ',
     },
     USER: {
         ID: 'User ID',
@@ -326,27 +321,27 @@ export const en = {
         FIND: {
             FAILED: {
                 TITLE: 'User Find Failed',
-                MISSING: 'The User you entered is missing. Please check if you entered the correct User ID.'
-            }
+                MISSING: 'The User you entered is missing. Please check if you entered the correct User ID.',
+            },
         },
-        ID_DUPL: 'This is duplicated. Please use another ID.'
+        ID_DUPL: 'This is duplicated. Please use another ID.',
     },
     ENUM: {
         SERVER_STATE: {
             SERVICE: 'In Service',
             MAINTENANCE: 'Maintenance',
             CLOSED: 'Closed',
-            DELETED: 'Deleted'
+            DELETED: 'Deleted',
         },
         COLLECT_STATE: {
             NEW: 'New',
             ACTIVE: 'Active',
             DISCONNECTED: 'Disconnected',
             DUPLICATED: 'Duplicated',
-            UNMANAGED: 'Unmanaged'
-        }
+            UNMANAGED: 'Unmanaged',
+        },
     },
     ERR_CODE: {
-        ERR_LOG_001: 'User ID and Password error'
-    }
+        ERR_LOG_001: 'User ID and Password error',
+    },
 };

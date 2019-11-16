@@ -263,6 +263,8 @@ export default {
             this.proxySelectIndex.forEach((index) => {
                 selectItem.push(this.items[index]);
             });
+            console.log('after tick', this.proxySelectIndex);
+            console.log(selectItem);
             return selectItem;
         },
     },

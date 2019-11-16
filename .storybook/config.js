@@ -17,7 +17,6 @@ import { Util } from '@/lib/global-util';
 import VueLodash from 'vue-lodash';
 import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
-import VueCompositionApi from '@vue/composition-api';
 import { i18n } from '@/translations';
 import VueI18n from 'vue-i18n';
 

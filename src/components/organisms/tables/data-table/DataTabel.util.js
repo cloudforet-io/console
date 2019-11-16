@@ -1,5 +1,3 @@
-import { Util } from '@/lib/global-util';
-
 export const makeField = (parent, name, trLabel, extra) => {
     const field = extra ? { ...extra, name } : { name };
     if (trLabel) {
@@ -50,4 +48,3 @@ export const makeTrFields = (fields, parent) => {
     });
     return result;
 };
-export const timestampFormatter = value => Util.methods.getDatefromTimeStamp(value.seconds, localStorage.getItem('timezone'));

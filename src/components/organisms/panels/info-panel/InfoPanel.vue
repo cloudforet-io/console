@@ -1,19 +1,24 @@
 <template>
-    <panel-top :panel-title="infoTitle" :panel-title-style="infoTitleStyle">
+    <p-panel-top :panel-title="infoTitle" :panel-title-style="infoTitleStyle">
         <template #body>
-            <panel-content :definition-list="contentData" />
+            <p-panel-content :defs="defs" :item="item">
+                <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                    <slot :name="slot" v-bind="scope" />
+                </template>
+            </p-panel-content>
         </template>
-    </panel-top>
+    </p-panel-top>
 </template>
 
 <script>
-import PanelTop from '@/components/molecules/panel/panel-top/PanelTop';
-import PanelContent from '@/components/molecules/panel/panel-content/PanelContent';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop';
+import PPanelContent from '@/components/molecules/panel/panel-content/PanelContent';
+
 export default {
-    name: 'InfoPanel',
+    name: 'PInfoPanel',
     components: {
-        PanelContent,
-        PanelTop,
+        PPanelContent,
+        PPanelTop,
     },
     props: {
         infoTitle: {
@@ -24,9 +29,13 @@ export default {
             type: Object,
             default: null,
         },
-        contentData: {
+        defs: {
             type: Array,
             default: () => [],
+        },
+        item: {
+            type: Object,
+            default: () => {},
         },
     },
     methods: {

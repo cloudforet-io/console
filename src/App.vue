@@ -2,8 +2,8 @@
     <div v-if="isInit" id="app">
         <router-view />
     </div>
-    <div v-else>
-        This is Loading Page
+    <div v-else class="Aligner">
+        <p-loading ref="ploading" />
     </div>
 </template>
 <script>
@@ -11,9 +11,13 @@ import _ from 'lodash';
 import Vue from '@/main.js';
 import api from '@/lib/api';
 import config from '@/lib/config';
+import PLoading from '@/components/molecules/loading/Loading';
 
 export default {
     name: 'App',
+    components: {
+        PLoading,
+    },
     props: {
         processEnv: {
             type: String,
@@ -28,7 +32,16 @@ export default {
     created() {
         this.preparationTo();
     },
+    mounted() {
+        this.drawLottie();
+    },
     methods: {
+        async drawLottie() {
+            this.$refs.ploading.create();
+        },
+        stopLottie() {
+            this.$refs.ploading.destroy();
+        },
         async preparationTo() {
             try {
                 await this.configInit();
@@ -37,21 +50,19 @@ export default {
                 await this.syncStores('domain');
 
                 this.isInit = true;
+                this.stopLottie();
                 const excludeAuth = this.getMeta();
 
-                if (!api.checkAccessToken()) {
+                // TODO:: Please Remove this for later when every domian sign in use Config options.
+                if (this.checkMatchedPath(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
+                    this.redirectTo('set');
+                }
 
-                    if (this.checkMatchedPath(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
-                        const nextPath = this.$store.getters['domain/authType'] === 'local' ? '/sign-in' : '/google-sign-in';
-                        localStorage.setItem('common.toNextPath', nextPath);
-                        this.$router.push({ path: nextPath });
-                    }
-
-                    if (excludeAuth !== true) {
-                        this.redirectTo();
-                    }
+                if (!api.checkAccessToken() && excludeAuth !== true) {
+                    this.redirectTo();
                 }
             } catch (e) {
+                this.$router.push({ path: '/error-page' });
                 console.log(e);
             }
         },
@@ -79,9 +90,11 @@ export default {
         async syncStores(storeName) {
             await this.$store.dispatch(`${storeName}/sync`);
         },
-        redirectTo() {
+        redirectTo(set) {
             const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
-
+            if (!this.isEmpty(set)) {
+                localStorage.setItem('common.toNextPath', nextPath);
+            }
             this.$router.push(nextPath);
         },
         getMeta() {
@@ -97,5 +110,61 @@ export default {
 
 <style lang="scss">
     @import 'styles/style';
-    //test
+    #loading {
+        background-color: transparent;
+        /*loading image size*/
+        width: 100%;
+        height: auto;
+        max-width: 600px;
+        max-height: 600px;
+        /*loading image size end*/
+        display: block;
+        overflow: hidden;
+        margin: auto;
+        padding-top: 100px;
+        z-index: 999;
+        animation: fadein 3s;
+        -moz-animation: fadein 3s;
+        -webkit-animation: fadein 3s;
+        -o-animation: fadein 3s;
+    }
+
+    @keyframes fadein {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @-moz-keyframes fadein {
+        /* Firefox */
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @-webkit-keyframes fadein {
+        /* Safari and Chrome */
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @-o-keyframes fadein {
+        /* Opera */
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
 </style>
