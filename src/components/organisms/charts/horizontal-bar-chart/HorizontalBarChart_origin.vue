@@ -1,8 +1,8 @@
 <script>
 import * as d3 from 'd3';
-import PChartD3 from '@/components/molecules/charts/ChartD3';
-import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from '@/components/molecules/charts/ChartD3.map';
-import { HORIZONTAL_OPTIONS } from './HorizontalBarChartD3.map';
+import PChartD3 from '@/components/molecules/charts/Chart';
+import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
+import { HORIZONTAL_OPTIONS } from './HorizontalBarChart.map';
 
 export default {
     name: 'PHorizontalBarChart',

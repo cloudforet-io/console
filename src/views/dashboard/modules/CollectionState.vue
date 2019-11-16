@@ -82,7 +82,7 @@
 <script>
 import PChart from '@/components/molecules/charts/Chart';
 import PDonutChart from '@/components/organisms/charts/donut-chart/DonutChart';
-import { sampleDataGenerator } from '@/components/organisms/charts/donut-chart/DonutChartD3.map';
+import { sampleDataGenerator } from '@/components/organisms/charts/donut-chart/DonutChart.map';
 
 const BaseStateTag = () => import('@/components/base/tags/BaseStateTag.vue');
 export default {

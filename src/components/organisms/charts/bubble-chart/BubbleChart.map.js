@@ -1,24 +1,6 @@
 import styles from '@/styles/_variables.scss';
 
-export const HORIZONTAL_OPTIONS = Object.freeze({
-    labels: {
-        padTop: 8,
-        padBottom: 4,
-        textHeight: 14,
-        valueFontWeight: 'bold',
-    },
-    bars: {
-        thickness: 8,
-        styles: {
-            // fill: styles.primary1,
-        },
-        backBar: {
-            display: true,
-            styles: {
-                // fill: styles.primary3,
-            },
-        },
-    },
+export const BUBBLE_OPTIONS = Object.freeze({
 });
 
 export const SAMPLE_DATA = [
