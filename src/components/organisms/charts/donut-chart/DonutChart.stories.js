@@ -2,7 +2,7 @@
 import countries from 'countries-and-timezones';
 import PDonutChart from './DonutChart';
 import { autoProps } from '@/setup/storybook-util';
-import { sampleDataGenerator } from './DonutChartD3.map';
+import { sampleDataGenerator } from './DonutChart.map';
 
 export default {
     title: 'Organisms/charts/donut-chart',

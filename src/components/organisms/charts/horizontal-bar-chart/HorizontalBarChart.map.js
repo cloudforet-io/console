@@ -1,5 +1,3 @@
-import styles from '@/styles/_variables.scss';
-
 export const HORIZONTAL_OPTIONS = Object.freeze({
     labels: {
         padTop: 8,
@@ -9,14 +7,8 @@ export const HORIZONTAL_OPTIONS = Object.freeze({
     },
     bars: {
         thickness: 8,
-        styles: {
-            // fill: styles.primary1,
-        },
         backBar: {
             display: true,
-            styles: {
-                // fill: styles.primary3,
-            },
         },
     },
 });

@@ -1,5 +1,3 @@
-import styles from '@/styles/_variables.scss';
-
 export const DONUT_OPTIONS = Object.freeze({
     donut: {
         thickness: 40,

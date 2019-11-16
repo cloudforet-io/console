@@ -1,12 +1,4 @@
 import styles from '@/styles/_variables.scss';
-import chartStyles from '@/components/molecules/charts/Chart.styles.scss';
-
-export const DATA_PROPERTIES = Object.freeze([
-    'key', 'value', 'label',
-]);
-
-export const DEFAULT_SIZE = Object.freeze({
-});
 
 export const DEFAULT_OPTIONS = Object.freeze({
     scales: {
@@ -22,20 +14,6 @@ export const DEFAULT_OPTIONS = Object.freeze({
             meetOrSlice: 'meet',
         },
     },
-    tooltips: {
-        placement: 'top',
-        trigger: 'hover',
-        template: `<div class="tooltip p-tooltip" role="tooltip">
-                        <div class="tooltip-arrow"></div>
-                        <div class="tooltip-inner"></div>
-                    </div>`,
-        html: true,
-        // popperOptions: {
-        //     offset: {
-        //         offset: '0 -50%',
-        //     },
-        // },
-    },
 });
 
 export const PRIMARY_COLORSET = Object.freeze([
@@ -49,17 +27,4 @@ export const PRIMARY_COLORSET = Object.freeze([
     styles.other3,
     styles.other2,
     styles.primary1,
-]);
-
-export const HOVER_COLORSET = Object.freeze([
-    chartStyles.primary_op3,
-    chartStyles.primary2_op3,
-    chartStyles.other1_op3,
-    chartStyles.secondary_op3,
-    chartStyles.secondary1_op3,
-    chartStyles.safe_op3,
-    chartStyles.other4_op3,
-    chartStyles.other3_op3,
-    chartStyles.other2_op3,
-    chartStyles.primary1_op3,
 ]);
