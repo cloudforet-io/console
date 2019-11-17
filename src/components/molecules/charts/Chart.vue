@@ -13,13 +13,13 @@
             <slot name="default" />
         </svg>
 
-        <Spinner :value="!startDraw"
-                 :backdrop="true"
-                 class="p-loading-spinner"
-                 :style="{
-                     minHeight: `${minHeight}px`,
-                     minWidth: `${minWidth}px`,
-                 }"
+        <p-spinner :value="!startDraw"
+                   :backdrop="true"
+                   class="p-loading-spinner"
+                   :style="{
+                       minHeight: `${minHeight}px`,
+                       minWidth: `${minWidth}px`,
+                   }"
         />
     </div>
 </template>
@@ -29,7 +29,7 @@ import _ from 'lodash';
 import {
     reactive, toRefs, watch, onMounted, computed, onUnmounted,
 } from '@vue/composition-api';
-import Spinner from '@/components/base/spinner/BaseSpinner';
+import PSpinner from '@/components/molecules/spinner/Spinner';
 import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from './Chart.map';
 
 
@@ -181,7 +181,7 @@ export default {
     name: 'PChartD3',
     events: ['resize', 'ready'],
     components: {
-        Spinner,
+        PSpinner,
     },
     props: {
         loading: {
