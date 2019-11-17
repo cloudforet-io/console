@@ -4,26 +4,31 @@
                  :options="chartOptions"
                  :min-height="chartHeight" :max-height="chartHeight"
                  @ready="draw"
+                 @resize="resizeElements"
         >
             <template #default>
-                <text dominant-baseline="middle" text-anchor="middle">
-                </text>
                 <g v-for="(cd, ci) in chartData" :key="cd.key"
                    class="horizontal-stack-bar-g"
                    :data-key="cd.key"
                    :style="{ fill: colors(ci) }"
                 >
-                    <g v-for="(d, idx) in cd" :key="idx">
+                    <g v-for="(d, idx) in cd" ref="bar" :key="cd.key + idx"
+                       :d0="d[0]" :d1="d[1]"
+                       @mouseenter="onMouseEnter($event)"
+                       @mouseleave="onMouseLeave"
+                    >
                         <rect class="bar"
-                              :x="xScale(d[0])" :y="yScale[idx]"
+                              :x="xScale(d[0])" :y="yScale(idx)"
                               :width="xScale(d[1] - d[0])"
                               :height="barThickness"
                               :data-idx="idx"
                         />
+                        <text>
+                            {{ xScale(d[0]) }}
+                        </text>
                         <text class="percent-label"
                               :x="xScale((d[0] + d[1]) / 2)" :y="yScale(idx + 0.5)"
                               dominant-baseline="middle" text-anchor="middle"
-                              :style="{visibility: getLabelVisibility(d, idx)}"
                         >
                             {{ Math.round(d.data[keys[ci]] / sumList[idx] * 100) }}%
                         </text>
@@ -64,6 +69,8 @@ const setDrawTools = (props, context, chartOptions) => {
         hoverList: [],
         colors: d3.scaleOrdinal().range(PRIMARY_COLORSET),
         barThickness: computed(() => chartOptions.value.bars.thickness),
+        labels: null,
+        visibleLabels: [],
     });
 
     const chartHeight = computed(() => state.barThickness * (props.data.length || 1));
@@ -73,6 +80,7 @@ const setDrawTools = (props, context, chartOptions) => {
         state.sumList = props.data.map(d => d3.sum(Object.values(d)));
         state.keys = props.data[0] ? Object.keys(props.data[0]) : [];
     };
+
     const initYScale = (svgTools) => {
         svgTools.setChartHeight(chartHeight.value);
         state.yScale = d3.scaleLinear()
@@ -85,23 +93,34 @@ const setDrawTools = (props, context, chartOptions) => {
             .domain([0, max.value]);
     };
 
-    const getChartData = () => d3.stack().keys(state.keys)(props.data);
-
-    const draw = (svgTools) => {
+    const setLabelVisibility = () => {
+        context.refs.bar.forEach((bar) => {
+            const rect = bar.firstElementChild;
+            const label = bar.lastElementChild;
+            label.style.visibility = rect.getAttribute('width') > label.getBoundingClientRect().width ? 'visible' : 'hidden';
+        });
+    };
+    const draw = async (svgTools) => {
         initComputingData();
         initYScale(svgTools);
         initXScale(svgTools);
-        state.hoverList = new Array(props.data.length).fill(false);
-        state.chartData = getChartData();
+        state.hoverList = new Array(props.data.length);
+        state.chartData = d3.stack().keys(state.keys)(props.data);
+        context.root.$nextTick(() => { setLabelVisibility(); });
     };
 
-    const getLabelVisibility = (data, idx, e) => {
-        return true;
+    const onMouseEnter = (e) => {
+        context.refs.bar.forEach((b) => { b.style.opacity = 0.3; });
+        e.target.style.opacity = 1;
     };
 
-    const onMouseover = (data, idx, bars) => {
-        // this.rectGroup.classed('hover-group', true);
-        // d3.select(bars[idx]).classed('hover', true);
+    const onMouseLeave = () => {
+        context.refs.bar.forEach((b) => { b.style.opacity = 1; });
+    };
+
+    const resizeElements = (svgTools) => {
+        initXScale(svgTools);
+        setLabelVisibility();
     };
 
 
@@ -109,7 +128,9 @@ const setDrawTools = (props, context, chartOptions) => {
         ...toRefs(state),
         chartHeight,
         draw,
-        getLabelVisibility,
+        resizeElements,
+        onMouseEnter,
+        onMouseLeave,
     };
 };
 
@@ -153,12 +174,6 @@ export default {
         width: 100%;
     }
     .horizontal-stack-bar-g {
-        .hover-group {
-            opacity: 0.3;
-        }
-        .hover {
-            opacity: 1.0;
-        }
         .percent-label {
             font-size: 14px;
             fill: $white;
