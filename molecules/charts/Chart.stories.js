@@ -3,7 +3,7 @@ import PChart from './Chart';
 import { autoProps } from '@/setup/storybook-util';
 
 export default {
-    title: 'Molecules/charts/chart-d3',
+    title: 'Molecules/charts/chart',
     component: PChart,
     decorators: [withKnobs],
 };

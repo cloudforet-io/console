@@ -24,7 +24,7 @@
 
 import * as d3 from 'd3';
 import Tooltip from 'tooltip.js';
-import Spinner from '@/components/base/spinner/BaseSpinner';
+import Spinner from '@/components/molecules/spinner/Spinner';
 import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from './Chart.map';
 
 export default {
