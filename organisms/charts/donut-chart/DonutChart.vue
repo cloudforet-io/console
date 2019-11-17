@@ -1,7 +1,6 @@
 <template>
     <div class="hs-chart-container">
-        <p-chart v-bind="$props" :options="chartOptions" @ready="draw"
-        >
+        <p-chart v-bind="$props" :options="chartOptions" @ready="draw">
             <template>
                 <g :class="gClass" :transform="gTransform">
                     <g v-for="(pd, idx) in pieData" ref="pathGroup" :key="idx"

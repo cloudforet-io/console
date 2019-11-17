@@ -89,11 +89,6 @@ export const setSvg = (props, context, options) => {
         state.chartHeight = height;
     };
 
-    const resizeSvg = () => {
-        context.emit('resize');
-        // if (resizeElementsFn) resizeElementsFn(); // IMPEMENT IN CHILD COMPONENT
-    };
-
     const setPreserveAspectRatio = (preserve) => {
         if (preserve) {
             state.svgRatio = `${preserve.align} ${preserve.meetOrSlice}`;
@@ -102,13 +97,23 @@ export const setSvg = (props, context, options) => {
         }
     };
 
-    const setSvgResponsiveWidthOnly = () => {
+    const resizeSvg = () => {
         if (!context.refs.chartRef) return;
         const width = context.refs.chartRef.getBoundingClientRect().width;
         setChartWidth(width);
         state.svgWidth = `${state.chartWidth}px`;
-        window.addEventListener('resize', resizeSvg);
     };
+    const emitResizeEvent = () => {
+        resizeSvg();
+        context.emit('resize', { ...toRefs(state) });
+    };
+    const setSvgResponsiveWidthOnly = () => {
+        resizeSvg();
+        window.addEventListener('resize', emitResizeEvent);
+    };
+    onUnmounted(() => {
+        if (responsiveWidthOnly.value) window.removeEventListener('resize', emitResizeEvent);
+    });
 
     const setSvgSize = () => {
         const responsive = options.value.responsive;
@@ -117,10 +122,6 @@ export const setSvg = (props, context, options) => {
 
         setPreserveAspectRatio(responsive.preserveAspectRatio);
     };
-
-    onUnmounted(() => {
-        if (responsiveWidthOnly.value) window.removeEventListener('resize', resizeSvg);
-    });
 
     return {
         ...toRefs(state),
