@@ -6,6 +6,7 @@ import { withCssResources } from '@storybook/addon-cssresources';
 import '@storybook/addon-console';
 import "@/styles/style.scss";
 import { withInfo } from 'storybook-addon-vue-info'
+import VueCompositionApi from '@vue/composition-api';
 // main.js
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
