@@ -1,19 +1,22 @@
-import styles from '@/styles/_variables.scss';
+import regions from './aws-regions.json';
 
 export const BUBBLE_OPTIONS = Object.freeze({
+    bubble: {
+        maxRadius: 30,
+    },
 });
 
-export const SAMPLE_DATA = [
-    { key: 'Bob', value: parseInt(Math.random() * 10) },
-    { key: 'Robin', value: parseInt(Math.random() * 10) },
-    { key: 'Anne', value: parseInt(Math.random() * 10) },
-    { key: 'Mark', value: parseInt(Math.random() * 10) },
-    { key: 'Joe', value: parseInt(Math.random() * 10) },
-    { key: 'Eve', value: parseInt(Math.random() * 10) },
-    { key: 'Mary', value: parseInt(Math.random() * 10) },
-];
-
 export const sampleDataGenerator = function () {
-    const start = Math.round(Math.random() * 10);
-    return SAMPLE_DATA.slice(start < SAMPLE_DATA.length ? start : 0);
+    const regionKeys = Object.keys(regions);
+    const length = Math.round(Math.random() * regionKeys.length) || 5;
+    const arr = [];
+    for (let i = 0; i < length; i++) {
+        arr.push({
+            key: regionKeys[i],
+            value: Math.round(Math.random() * 10),
+            longitude: regions[regionKeys[i]].longitude,
+            latitude: regions[regionKeys[i]].latitude,
+        });
+    }
+    return arr;
 };
