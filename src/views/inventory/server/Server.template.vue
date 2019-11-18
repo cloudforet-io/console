@@ -17,7 +17,7 @@
                     :page-size.sync="pageSize"
                     :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
                     :setting-visible="false"
-                    @changePageSize="getServers"
+                    @changePageSize="changePageSize"
                     @changePageNumber="getServers"
                     @clickRefresh="getServers"
                 >
@@ -104,7 +104,7 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button';
 import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 import PBadge from '@/components/atoms/badges/Badge';
-import PServerDetail, { serverDetailEventNames } from '@/views/inventory/server/modules/ServerDetail';
+import PServerDetail from '@/views/inventory/server/modules/ServerDetail';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import { makeTrFields } from '@/components/organisms/tables/data-table/DataTabel.util';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
@@ -174,9 +174,18 @@ export const serverSetup = (props, context, eventName) => {
     const tabAction = reactive({
         isSelectedOne: computed(() => tableState.selectIndex.length === 1),
     });
+    const state = requestMetaReactive();
+    const getServers = () => {
+        eventBus.$emit(eventName.getServerList);
+    };
+    const changePageSize = () => {
+        state.thisPage = 1;
+        state.allPage = 1;
+        getServers();
+    };
 
     return reactive({
-        ...toRefs(requestMetaReactive),
+        ...toRefs(state),
         ...toRefs(tableState),
         ...toRefs(tabData),
         ...toRefs(tabAction),
@@ -208,19 +217,13 @@ export const serverSetup = (props, context, eventName) => {
         clickCollectData() {
             console.log('add');
         },
-        getServers() {
-            console.log('request');
-            eventBus.$emit(eventName.getServerList);
-        },
-        changePageSize() { },
-        changePageNumber() {},
-        clickRefresh() {},
+        getServers,
+        changePageSize,
         clickMenuEvent(menuName) {
             console.log(menuName);
         },
         // todo: need confirm that this is good way - sinsky
         // EventBus Names
-        ...serverDetailEventNames,
         ...eventNames,
     });
 };

@@ -62,7 +62,9 @@
 </template>
 
 <script>
-import { computed, ref } from '@vue/composition-api';
+import {
+    computed, ref, watch,
+} from '@vue/composition-api';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
 import PBadge from '@/components/atoms/badges/Badge';
@@ -73,10 +75,6 @@ import { serverStateFormatter } from '@/views/inventory/server/Server.util';
 import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 
-export const serverDetailEventNames = {
-    tagConfirmEvent: String,
-    tagResetEvent: String,
-};
 
 export default {
     name: 'PServerDetail',
@@ -89,7 +87,8 @@ export default {
             default: () => {},
         },
         // todo: need confirm that this is good way - sinsky
-        ...serverDetailEventNames,
+        tagConfirmEvent: String,
+        tagResetEvent: String,
     },
     setup(props, { parent }) {
         const baseDefs = makeTrDefs([
@@ -129,6 +128,9 @@ export default {
             ['security_groups', 'COMMON.SEC_GROUP'],
         ], parent, { copyFlag: true });
         const tags = ref({ ...props.item.tags });
+        watch(() => props.item, (value) => {
+            tags.value = value.tags;
+        });
         const tagPanel = ref(null);
         const resetTag = () => {
             tagPanel.value.resetTag();
@@ -142,7 +144,7 @@ export default {
             tags,
             tagPanel,
             confirm(...event) {
-                ServerEventBus.$emit(props.tagConfirmEvent, ...event);
+                ServerEventBus.$emit(props.tagConfirmEvent, props.item.server_id, ...event);
             },
             timestampFormatter,
             serverStateFormatter,
