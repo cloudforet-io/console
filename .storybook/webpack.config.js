@@ -27,7 +27,6 @@ module.exports = async ({ config, mode }) => {
         node_modules: path.resolve('./node_modules'),
         'vue': 'vue/dist/vue.common.js',
         '@': path.resolve(__dirname, '../src'),
-        node_modules: path.resolve('./node_modules'),
     };
     config.module.rules.push({
         test: /\.vue$/,

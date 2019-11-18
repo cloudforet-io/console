@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import Spinner from '@/components/base/spinner/BaseSpinner';
+import Spinner from '@/components/molecules/spinner/Spinner';
 
 export default {
     name: 'Summary',

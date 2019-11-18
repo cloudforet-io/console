@@ -21,10 +21,16 @@ export const HORIZONTAL_STACK_OPTIONS = Object.freeze({
 
 
 export const sampleDataGenerator = function () {
-    return [{
+    const getObj = () => ({
         apples: Math.round(Math.random() * 10),
         bananas: Math.round(Math.random() * 10),
         cherries: Math.round(Math.random() * 10),
         dates: Math.round(Math.random() * 10),
-    }];
+    });
+    const arr = [];
+    const length = Math.round(Math.random() * 5) || 1;
+    for (let i = 0; i < length; i++) {
+        arr.push(getObj());
+    }
+    return arr;
 };
