@@ -6,14 +6,11 @@
         :centered="centered"
         :size="size"
         :fade="fade"
-        :keyboard="keyboard"
         :backdrop="backdrop"
 
-        @shown="shown"
-        @hidden="hidden"
-        @cancel="onCancelClick"
-        @close="onCloseClick"
-        @confirm="onConfirmClick"
+        @cancel="cancel"
+        @close="close"
+        @confirm="confirm"
     >
         <template #body>
             <div>
@@ -26,15 +23,38 @@
     </p-button-modal>
 </template>
 <script>
+import { reactive, computed, toRefs } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
-import PModal from '@/components/molecules/modals/Modal';
-import buttonActionMixin from '@/components/organisms/modals/button-modal/ButtonModal.mixins';
+import { propsMixin } from '@/components/molecules/modals/Modal';
+import { setup as contentModalSetup } from '../content-modal/ContentModal';
+import { makeByPass } from '@/lib/compostion-util';
+
+const setup = (props, context) => {
+    const state = contentModalSetup(props, context);
+    const sortState = reactive({
+        sortBy: '',
+        sortDesc: true,
+    });
+    return {
+        ...state,
+        ...toRefs(sortState),
+        sortedItems: computed(() => {
+            if (sortState.sortBy) {
+                return props.items;
+            }
+            return props.items;
+        }),
+        cancel: makeByPass(context.emit, 'cancel'),
+        close: makeByPass(context.emit, 'close'),
+        confirm: makeByPass(context.emit, 'confirm'),
+    };
+};
 
 export default {
     name: 'PTableCheckModal',
     components: { PButtonModal, PDataTable },
-    mixins: [PModal, buttonActionMixin],
+    mixins: [propsMixin],
     props: {
         themeColor: {
             type: String,
@@ -49,24 +69,11 @@ export default {
         fields: Array,
         items: Array,
     },
-    data() {
-        return {
-            sortBy: '',
-            sortDesc: true,
-        };
+    setup(props, context) {
+        return setup(props, context);
     },
-    computed: {
-        modalElement() {
-            console.log('asf');
-            return this.$refs.modal.$children[0].$children[0].$el;
-        },
-        sortedItems() {
-            if (this.sortBy) {
-                return this.items;
-            }
-            return this.items;
-        },
-    },
+
+
 };
 </script>
 
