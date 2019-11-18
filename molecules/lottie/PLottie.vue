@@ -7,7 +7,7 @@
 import lottie from 'lottie-web';
 
 export default {
-    name: 'PLoading',
+    name: 'PLottie',
     props: {
         name: {
             type: String,
@@ -15,7 +15,7 @@ export default {
         },
         size: {
             type: Number,
-            default: 2,
+            default: null,
         },
     },
     data() {
