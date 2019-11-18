@@ -1,32 +1,25 @@
 <template>
-    <span>
-        <f-i
-            :icon="icon"
-            :iconStyle="iconStyle"
-            :size="size"
-            :animation="animation"
-            :rotating="rotating"
-            :flip="flip"
-            :style="fiStyle"
-        />
-        <p-label
-            :style="labelStyle"
-        >
+    <span class="p-status">
+        <p-i v-if="icon" :name="icon" :color="`transparent ${iconColor}`"/>
+        <span v-else class="circle" :style="circleStyle" />
+        <p-label class="label" :style="labelStyle">
             {{ text }}
         </p-label>
     </span>
 </template>
 
 <script>
-import FIMixin from '@/components/atoms/icons/FIMixin';
-import FI from '@/components/atoms/icons/FI';
+import PI from '@/components/atoms/icons/PI';
 import PLabel from '@/components/atoms/labels/Label';
 
 export default {
-    name: 'p-status',
-    components: { FI, PLabel },
-    mixins: [FIMixin],
+    name: 'PStatus',
+    components: { PI, PLabel },
     props: {
+        icon: {
+            type: String,
+            default: null,
+        },
         text: {
             type: String,
         },
@@ -43,13 +36,25 @@ export default {
         labelStyle() {
             return this.textColor ? { color: this.textColor } : null;
         },
-        fiStyle() {
-            return this.iconColor ? { color: this.iconColor } : null;
+        circleStyle() {
+            return this.iconColor ? { backgroundColor: this.iconColor } : null;
         },
     },
 };
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+    .p-status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .circle {
+            border-radius: 50%;
+            height: 8px;
+            width: 8px;
+        }
+        .label {
+            margin: 0 0 0 8px;
+        }
+    }
 </style>
