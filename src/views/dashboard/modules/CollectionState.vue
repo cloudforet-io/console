@@ -10,10 +10,9 @@
             <div class="dropdown-container">
                 <b-dropdown no-caret right
                             variant="outline-secondary"
-                            class="no-selected"
-                >
+                            class="no-selected">
                     <template #button-content>
-                        <span>{{ collectionStates[selectedItem].title }}</span> &nbsp;
+                        <span> {{ collectionStates[selectedItem].title }} </span> &nbsp;
                         <i class="fal fa-angle-down" />
                     </template>
                     <b-dropdown-item v-for="(datasets, key) in collectionStates"
@@ -65,7 +64,7 @@
                         <!--                                 :data="chartData"-->
                         <!--                                 :options="chartOptions"-->
                         <!--                                 :plugins="{beforeDraw, beforeInit}"-->
-                        <!--                                 :loading="loading"-->
+                        <!--                                 :lottie="lottie"-->
                         <!--                        />-->
                         <p-donut-chart
                             :data="serverStates"

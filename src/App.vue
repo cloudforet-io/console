@@ -3,7 +3,7 @@
         <router-view />
     </div>
     <div v-else class="Aligner">
-        <p-loading ref="ploading" />
+        <p-lottie ref="ploading" />
     </div>
 </template>
 <script>
@@ -11,12 +11,12 @@ import _ from 'lodash';
 import Vue from '@/main.js';
 import api from '@/lib/api';
 import config from '@/lib/config';
-import PLoading from '@/components/molecules/loading/Loading';
+import PLottie from '@/components/molecules/lottie/PLottie';
 
 export default {
     name: 'App',
     components: {
-        PLoading,
+        PLottie,
     },
     props: {
         processEnv: {
@@ -111,12 +111,12 @@ export default {
     @import 'styles/style';
     #loading {
         background-color: transparent;
-        /*loading image size*/
+        /*lottie image size*/
         width: 100%;
         height: auto;
         max-width: 600px;
         max-height: 600px;
-        /*loading image size end*/
+        /*lottie image size end*/
         display: block;
         overflow: hidden;
         margin: auto;
