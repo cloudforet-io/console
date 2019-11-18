@@ -1,15 +1,15 @@
+import _ from 'lodash';
 
-export const makeDef = (parent, commonOption, name, trLabel, extra) => {
-    const defaultOption = commonOption || {};
-    const def = extra ? { ...defaultOption, ...extra, name } : { ...defaultOption, name };
-    if (trLabel) {
-        if (typeof trLabel === 'string') {
-            def.label = parent.tr(trLabel, null, parent);
-        } else {
-            def.label = parent.tr(...trLabel, parent);
-        }
+export const makeItem = (parent, commonOption, name, trLabel, extra) => {
+    let item = extra ? { ...extra, name } : { name };
+    if (commonOption) {
+        item = _.defaultsDeep(item, commonOption);
     }
-    return def;
+    if (trLabel) {
+        const label = (typeof trLabel === 'string') ? [trLabel, null] : trLabel;
+        item.label = parent.tr(...label, parent);
+    }
+    return item;
 };
 
 /**
@@ -45,10 +45,10 @@ export const makeDef = (parent, commonOption, name, trLabel, extra) => {
  *  {copyFlag:true} // common option! but you can overwrite this option using extra argument
  *  )
  */
-export const makeTrDefs = (defs, parent, commonOption) => {
+export const makeTrItems = (items, parent, commonOption) => {
     const result = [];
-    defs.forEach((def) => {
-        result.push(makeDef(parent, commonOption, ...def));
+    items.forEach((item) => {
+        result.push(makeItem(parent, commonOption, ...item));
     });
     return result;
 };

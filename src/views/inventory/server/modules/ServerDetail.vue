@@ -69,11 +69,11 @@ import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
 import PBadge from '@/components/atoms/badges/Badge';
 import PStatus from '@/components/molecules/status/Status';
-import { makeTrDefs } from '@/components/molecules/panel/panel-content/PanelContent.uitl';
 import { timestampFormatter } from '@/lib/formatter';
 import { serverStateFormatter } from '@/views/inventory/server/Server.util';
 import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
+import { makeTrItems } from '@/lib/helper'
 
 
 export default {
@@ -91,7 +91,7 @@ export default {
         tagResetEvent: String,
     },
     setup(props, { parent }) {
-        const baseDefs = makeTrDefs([
+        const baseDefs = makeTrItems([
             ['server_id', 'COMMON.SERVER_ID'],
             ['name', 'COMMON.NAME'],
             ['state', 'COMMON.STATE'],
@@ -114,13 +114,13 @@ export default {
             ['updated_at', 'COMMON.UPDATE'],
             ['deleted_at', 'COMMON.DELETE'],
         ], parent, { copyFlag: true });
-        const vmDefs = makeTrDefs([
+        const vmDefs = makeTrItems([
             ['vm_id', 'COMMON.ID'],
             ['vm_name', 'COMMON.NAME'],
             ['platform_type', 'COMMON.PLATFORM'],
             ['image', 'COMMON.IMAGE'],
         ], parent, { copyFlag: true });
-        const computeDefs = makeTrDefs([
+        const computeDefs = makeTrItems([
             ['instance_id', 'COMMON.INST_ID'],
             ['keypair', 'COMMON.KEY_PAIR'],
             ['instance_type', 'COMMON.INST_TYPE'],
