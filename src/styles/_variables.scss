@@ -85,6 +85,13 @@ $box-shadow: 0px 0 10px 0px rgba($black, 0.1);
 /* ------------------------------- */
 
 /* STYLE */
+%pane {
+    background-color: $white;
+    box-shadow: 0 0 8px rgba($primary, 0.08);
+    border: 1px solid $gray3;
+    border-radius: 2px;
+}
+
 /* ----- TEMPORARY VARIABLES ----- */
 %box-shadow {
   box-shadow: 0px 0 10px 0px rgba($black, 0.1);
