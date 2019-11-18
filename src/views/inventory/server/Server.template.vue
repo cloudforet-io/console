@@ -107,14 +107,14 @@ import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMe
 import PBadge from '@/components/atoms/badges/Badge';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail';
 import PTab from '@/components/organisms/tabs/tab/Tab';
-import { makeTrFields } from '@/components/organisms/tables/data-table/DataTabel.util';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import { timestampFormatter } from '@/lib/formatter';
 import { serverStateFormatter } from '@/views/inventory/server/Server.util';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
+import { makeTrItems } from '@/lib/helper'
 
 export const serverTableReactive = parent => reactive({
-    fields: makeTrFields([
+    fields: makeTrItems([
         ['name', 'COMMON.NAME'],
         ['state', 'COMMON.STATE'],
         ['primary_ip_address', 'COMMON.IP', { sortable: false }],
