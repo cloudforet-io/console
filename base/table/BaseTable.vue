@@ -165,7 +165,7 @@
                             > {{ data.item.name }}
                         </template>
                         <template v-else>
-                            <img class="row-gears" src="@/assets/icons/common-gear.svg"
+                            <img class="row-gears"
                                  height="42vh"
                                  width="42vh"
                             > {{ data.item.name }}
