@@ -22,7 +22,7 @@
                                 <keep-alive>
                                     <project-summary-top
                                         :selected-node="getSelectedNodeAndTree"
-                                        :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
+                                        :responsive-style="{'min-height': height/2+'px', 'overflow-y':'auto'}"
                                     />
                                 </keep-alive>
                             </template>
@@ -163,10 +163,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    #scrollspy-example {
-        position: relative;
-        height: 200px;
-        overflow-y: scroll;
-        border: 1px solid blue;
-    }
+
 </style>

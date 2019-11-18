@@ -1,6 +1,6 @@
 <template>
     <div class="Aligner">
-        <div ref="loading" class="Aligner-item" />
+        <div ref="loading" class="Aligner-item" :style="{'height': `${size}rem`,'width': `${size}rem`}"/>
     </div>
 </template>
 <script>
@@ -12,6 +12,10 @@ export default {
         name: {
             type: String,
             default: 'cloudone_loading',
+        },
+        size: {
+            type: Number,
+            default: 2,
         },
     },
     data() {
