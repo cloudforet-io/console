@@ -105,3 +105,19 @@ class API {
 }
 
 export default new API();
+
+export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc) => {
+    const query = {
+        page: {
+            start: ((thisPage - 1) * pageSize) + 1,
+            limit: pageSize,
+        },
+    };
+    if (sortBy) {
+        query.sort = {
+            key: sortBy,
+            desc: sortDesc,
+        };
+    }
+    return query;
+};

@@ -124,6 +124,10 @@ export default {
     components: {
         PTable, PTd, PTh, PTr, FI, PCheckBox,
     },
+    events: [
+        'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
+        'changeSort', 'theadClick',
+    ],
     mixins: [PTable],
     props: {
         fields: Array,
@@ -230,6 +234,7 @@ export default {
                 } else {
                     this.$emit('update:sortDesc', !this.sortDesc);
                 }
+                this.$emit('changeSort');
             }
             this.$emit('theadClick', field, index, event);
         },
@@ -263,8 +268,6 @@ export default {
             this.proxySelectIndex.forEach((index) => {
                 selectItem.push(this.items[index]);
             });
-            console.log('after tick', this.proxySelectIndex);
-            console.log(selectItem);
             return selectItem;
         },
     },
