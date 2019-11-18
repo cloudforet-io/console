@@ -4,6 +4,7 @@ import { toRefs, computed, reactive } from '@vue/composition-api';
 import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
+import { defaultQuery } from '@/lib/api';
 
 
 export default {
@@ -16,18 +17,12 @@ export default {
         serverEventNames.tagResetEvent = 'resetTagEvent';
 
         const state = serverSetup(props, context, serverEventNames);
-        const resetTableState = () => {
-            state.selectIndex = [];
-            state.sortBy = '';
-            state.sortDesc = true;
-        };
+
         const requestState = reactive({
-            query: computed(() => ({
-                page: {
-                    start: ((state.thisPage - 1) * state.pageSize) + 1,
-                    limit: state.pageSize,
-                },
-            })),
+            query: computed(() => (defaultQuery(
+                state.thisPage, state.pageSize,
+                state.sortBy, state.sortDesc,
+            ))),
         });
         const requestServerList = async () => {
             const res = await context.parent.$http.post('/inventory/server/list', {
@@ -35,10 +30,9 @@ export default {
                 query: requestState.query,
             });
             state.items = res.data.results;
-            debugger;
             const allPage = Math.ceil(res.data.total_count / state.pageSize);
             state.allPage = allPage || 1;
-            resetTableState();
+            state.selectIndex = [];
         };
 
 
