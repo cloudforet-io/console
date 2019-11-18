@@ -29,7 +29,7 @@ import _ from 'lodash';
 import {
     reactive, toRefs, watch, onMounted, computed, onUnmounted,
 } from '@vue/composition-api';
-import PSpinner from '@/components/molecules/spinner/Spinner';
+import PSpinner from '@/components/base/spinner/BaseSpinner';
 import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from './Chart.map';
 
 
