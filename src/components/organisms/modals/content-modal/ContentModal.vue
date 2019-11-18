@@ -1,6 +1,11 @@
 <template>
-    <p-modal ref="modal" v-bind="$props" @shown="onShown"
-             @hidden="onHidden"
+    <p-modal ref="modal"
+             :fade="fade"
+             :scrollable="scrollable"
+             :size="size"
+             :centered="centered"
+             :backdrop="backdrop"
+             :visible.sync="proxyVisible"
              :class="[`modal-${themeColor}`]"
     >
         <div v-if="headerVisible" class="modal-header" :class="headerClass">
@@ -16,13 +21,36 @@
 </template>
 
 <script>
-import 'bootstrap';
-import PModal from '../../../molecules/modals/Modal.vue';
+import { reactive, toRefs } from '@vue/composition-api';
+import PModal, { propsMixin } from '@/components/molecules/modals/Modal';
+import { makeProxy } from '@/lib/compostion-util';
+
+export const setup = (props, context) => {
+    const state = reactive({
+        proxyVisible: makeProxy('visible', props, context.emit),
+        modal: null,
+    });
+    return {
+        ...toRefs(state),
+        show() {
+            state.modal.show();
+        },
+        hide() {
+            state.modal.hide();
+        },
+        toggle() {
+            state.modal.toggle();
+        },
+    };
+};
 
 export default {
     name: 'PContentModal',
     components: { PModal },
-    mixins: [PModal],
+    mixins: [propsMixin],
+    setup(props, context) {
+        return setup(props, context);
+    },
     props: {
         themeColor: {
             type: String,
@@ -53,18 +81,15 @@ export default {
             default: true,
         },
     },
-    computed: {
-        modalElement() {
-            return this.$refs.modal.$el;
-        },
-    },
+
 };
 </script>
 
 <style lang="scss" scoped>/* b-modal */
-.modal .modal-dialog {
+.modal-dialog {
     .modal-header {
         padding: 1rem 1.5rem 1rem 1.5rem;
+        font:  22px Arial;
     }
     .modal-body{
         padding: 2rem 1.5rem 1.5rem 1.5rem;
