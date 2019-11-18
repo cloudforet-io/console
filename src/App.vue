@@ -57,7 +57,6 @@ export default {
                 if (this.checkMatchedPath(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
                     this.redirectTo('set');
                 }
-
                 if (!api.checkAccessToken() && excludeAuth !== true) {
                     this.redirectTo();
                 }

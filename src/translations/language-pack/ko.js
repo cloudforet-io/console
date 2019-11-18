@@ -220,7 +220,8 @@ export const ko = {
         CREATE_ARG: '{0} 생성',
         UPDATE_ARG: '{0} 갱신',
         DELETE_ARG: '{0} 삭제',
-        CLICK_RIGHT: '좌측 패널의 아이템을 클릭해 주세요.'
+        CLICK_RIGHT: '좌측 패널의 아이템을 클릭해 주세요.',
+        TAG_EMPTY: '태그의 키값은 필수 입력 항목입니다.'
     },
     IDENTITY: {
         NO_PROJECT_SEL: '프로젝트를 선택해주십시오.',

@@ -1,89 +1,33 @@
 <template>
-    <div class="animated fadeIn">
-        <b-row>
-            <b-col cols="12">
-                <BaseTable :table-data="members"
-                           :fields="fields"
-                           :per-page="perPage"
-                           searchable
-                           :total-rows="totalCount"
-                           :search-context-data="searchQueryData"
-                           show-caption
-                           :busy="isLoading"
-                           :cardless="false"
-                           underlined
-                           @rowSelected="rowSelected"
-                           @list="listMembers"
-                           @limitChanged="limitChanged"
-                           @onSelectAll="rowAllSelected"
-                >
-                    <template #caption>
-                        <b-row align-v="center" align-h="center">
-                            <b-col class="pr-1" cols="5">
-                                <BaseModal ref="addMember"
-                                           title="Add Member"
-                                           centered
-                                           hide-footer
-                                >
-                                    <template #activator>
-                                        <b-button block variant="primary">
-                                            {{ $t('MSG.BTN_ADD') }}
-                                        </b-button>
-                                    </template>
-                                    <template #contents>
-                                        <MemberDetail creatable
-                                                      updatable
-                                                      :memebers="memberUserIDs"
-                                                      :selected-data="anySelectedRow"
-                                                      @close="$refs.addMember.hideModal()"
-                                        />
-                                    </template>
-                                </BaseModal>
-                            </b-col>
-                            <b-col class="pl-1" cols="5">
-                                <template v-if="hasSelectedMember">
-                                    <b-button block variant="danger" @click="deleteSelected">
-                                        {{ $t('MSG.BTN_DELETE') }}
-                                    </b-button>
-                                </template>
-                            </b-col>
-                            <b-col class="pr-0" cols="2" />
-                        </b-row>
-                    </template>
-                </BaseTable>
-            </b-col>
-        </b-row>
-
-        <ActionCheckModal ref="IDPJ005_DeleteUser"
-                          primary-key="user_id"
-                          :data="selectedMembers"
-                          :fields="selectedFields"
-                          :action="actionProcess"
-                          :title="actionCommandData.title"
-                          :type="actionCommandData.type"
-                          :text="actionCommandData.text"
-                          @succeed="listMembers"
-                          @failed="listMembers"
-        />
-    </div>
+    <p-toolbox-table style="padding:0px"
+                     :items="items"
+                     :fields="fields"
+                     :selectable="selectable"
+                     :sortable="sortable"
+                     :sort-by.sync="sortBy"
+                     :sort-desc.sync="sortDesc"
+                     :all-page="allPage"
+                     :this-page.sync="thisPage"
+                     :select-index.sync="selectIndex"
+                     :page-size.sync="pageSize"
+                     @rowLeftClick="rowLeftClick"
+                     @rowRightClick="rowRightClick"
+                     @changePageSize="changePageSize"
+                     @changePageNumber="changePageNumber"
+                     @clickSetting="clickSetting"
+                     @clickRefresh="clickRefresh"
+                     @theadClick="theadClick"
+    />
 </template>
 
 <script>
-
-import searchContext from '@/views/identity/project/search-context/query';
-import BaseTable from '@/components/base/table/BaseTable';
-import ActionCheckModal from '@/components/base/modal/ActionCheckModal';
-import BaseModal from '@/components/base/modal/BaseModal';
-import MemberDetail from '@/views/identity/project/modules/ProjectMemberDetail';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 
 export default {
     name: 'ProjectMember',
     components: {
+        PToolboxTable,
 
-        BaseTable,
-        BaseModal,
-        MemberDetail,
-        ActionCheckModal,
     },
     props: {
         selectedNode: {
@@ -93,20 +37,14 @@ export default {
     },
     data() {
         return {
-            members: [],
-            memberUserIDs: [],
-            selectedIdx: undefined,
-            addModal: false,
-            totalCount: 0,
-            searchQueryData: searchContext,
-            searchQuery: {},
-            actionCommandData: {},
-            isReadyForSearch: false,
-            perPage: 3,
-            actionFlag: null,
-            isLoading: true,
-            selectedItems: [],
-            selectedMember: null,
+            selectable: true,
+            sortable: true,
+            selectIndex: [],
+            sortBy: 'name',
+            sortDesc: true,
+            thisPage: 1,
+            allPage: 10,
+            pageSize: 15,
         };
     },
     computed: {
@@ -116,7 +54,7 @@ export default {
         selectedFields() {
             return [
                 {
-                    key: 'user_id', label: this.tr('COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' },
+                    key: 'user_id', label: this.tr('COMMON.COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' },
                 },
                 {
                     key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' },
@@ -133,25 +71,22 @@ export default {
             return [
                 { key: 'selected', thStyle: { width: '50px' } },
                 {
-                    key: 'user_id', label: this.tr('COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' },
+                    key: 'user_id', label: this.tr('COMMON.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' },
                 },
                 {
-                    key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' },
+                    key: 'name', label: this.tr('COMMON.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' },
                 },
                 {
-                    key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
+                    key: 'state', label: this.tr('COMMON.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
                 },
                 {
-                    key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
+                    key: 'email', label: this.tr('COMMON.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
                 },
                 {
-                    key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
+                    key: 'group', label: this.tr('COMMON.GROUP'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
                 },
                 {
-                    key: 'role', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
-                },
-                {
-                    key: 'roles', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false, thClass: 'd-none', tdClass: 'd-none',
+                    key: 'role', label: this.tr('COMMON.ROLE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
                 },
             ];
         },
@@ -222,7 +157,7 @@ export default {
                     });
                     this.memberUserIDs = memberUserIds;
                 }
-                this.members = results;
+                this.items = results;
                 console.log(response.data.results);
                 this.isLoading = false;
             }).catch((error) => {

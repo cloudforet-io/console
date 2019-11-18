@@ -146,7 +146,6 @@ export default {
                 }
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
             }).catch((error) => {
-                debugger;
                 auth2.disconnect();
                 this.displayGreetingMSG(false);
                 console.log(error);

@@ -17,7 +17,7 @@ export const loading = () => ({
     template: `<div style="width: 80vw;">
                 <button @click="show">display loading</button>
                 <button @click="hide">stop loading</button>
-                <p-loading :name="name" ref="load"/>
+                <p-loading :name="name" :size="size" ref="load"/>
 </div>`,
     data() {
         return {
@@ -25,7 +25,10 @@ export const loading = () => ({
     },
     props: {
         name: {
-            default: text('name', 'cloudone_loading'),
+            default: text('name', 'spinner'),
+        },
+        size: {
+            default: text('size', '2'),
         },
     },
     methods: {

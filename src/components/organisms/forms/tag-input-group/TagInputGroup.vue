@@ -1,6 +1,6 @@
 <template>
-    <div class="p-tag-input-group">
-        <div v-for="(tag,index) in destructTags" :key="index" class="tag-input-form change-form">
+    <div class="p-tag-input-group row col-12">
+        <div v-for="(tag,index) in destructTags" :key="index" class="tag-input-form change-form col-sm-6 mr-0">
             <p-icon-button v-if="editMode" class="delete-btn" name="ic_delete"
                            @click="deleteTag(index)"
             />
@@ -12,19 +12,22 @@
                 @update:value="updateTag(index, 'value',$event)"
             />
         </div>
-        <div v-if="editMode" class="tag-input-form new-form">
+        <div v-if="editMode" class="tag-input-form new-form col-sm-6 mr-0">
             <p-icon-button
                 class="delete-btn"
                 name="ic_delete"
                 @click="resetTag"
             />
+            <!--<div v-show="validatePassword(index)" style="display:block" class="invalid-feedback">
+                * {{ $t('ORGANISMS.TAG_EMPTY') }}
+            </div>-->
             <p-tag-input :name.sync="newTag.name" :value.sync="newTag.value" />
-            <p-icon-button
-                class="add-btn"
-                button-style="dark"
-                name="ic_plus"
-                color="transparent white"
-                @click="addTag"
+            <p-icon-button :key="index"
+                           class="add-btn"
+                           button-style="dark"
+                           name="ic_plus"
+                           color="transparent white"
+                           @click="addTag(index)"
             />
         </div>
     </div>
@@ -46,6 +49,9 @@ const destruct = tags => _.transform(tags, (result, value, name) => {
 
 export const useTagsBuffer = (props, context) => {
     const destructTags = ref(destruct(props.tags));
+    const state = reactive({
+        validatePassWord: false,
+    });
     const syncTags = () => {
         context.emit('update:tags', mergeTags(destructTags.value));
         context.emit('TagsChange');
@@ -79,7 +85,7 @@ export const useNewTag = (props, context, tagsBuffer) => {
         newTag.name = '';
         newTag.value = '';
     };
-    const addTag = () => {
+    const addTag = (idx) => {
         if (newTag.name) {
             tagsBuffer.destructTags.value.push(reactive({ ...newTag }));
             tagsBuffer.syncTags();

@@ -1,15 +1,21 @@
 <template>
-    <InfoPanel v-show="isVisible"
-               :info-title-style="responsiveStyle"
-               :info-title="topPanelTitle"
-               :item="item"
-               :defs="topPanel"
-    />
+    <div :style="responsiveStyle">
+        <InfoPanel v-show="isVisible"
+                   :info-title="topPanelTitle"
+                   :item="item"
+                   :defs="topPanel"
+        />
+        <p-tag-panel ref="tagPanel"
+                     :tags.sync="tags"
+                     @confirm="updateTag"
+        />
+    </div>
 </template>
 
 <script>
+import _ from 'lodash';
 import InfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import { api } from '@/setup/api';
+import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
 
 const SummaryModel = {
     id: null,
@@ -23,6 +29,7 @@ export default {
     name: 'ProjectSummary',
     components: {
         InfoPanel,
+        PTagPanel,
     },
     props: {
         selectedNode: {
@@ -44,11 +51,15 @@ export default {
             renderTitle: null,
             renderData: [],
             item: {},
+            tags: {},
         };
     },
     computed: {
         topPanelTitle() {
             return this.tr('COMMON.DETAILS');
+        },
+        destructTags() {
+            return _.toPairsIn(this.tags);
         },
         topPanel() {
             return [
@@ -69,36 +80,13 @@ export default {
                 },
             ];
         },
-        selectedSummaryData() {
-            return [
-                {
-                    panelTitle: this.tr('PANEL.BASE_INFO'),
-                    panelIcon: {
-                        icon: 'fa-hashtag',
-                        type: 'l',
-                        size: 1,
-                        color: 'primary',
-                    },
-                    data: this.topPanel,
-                },
-                {
-                    panelTitle: this.tr('PANEL.TAG'),
-                    panelIcon: {
-                        icon: 'fa-tags',
-                        type: 'l',
-                        size: 1,
-                        color: 'danger',
-                    },
-                    data: this.tag,
-                    editable: false,
-                },
-            ];
-        },
     },
     created() {
         this.setInitData();
     },
     methods: {
+        async updateTag(){
+        },
         async setInitData() {
             const selectedNodeDT = this.selectedNode.node.data;
             const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
@@ -111,6 +99,9 @@ export default {
                         name: response.data.name,
                         create: this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone),
                     };
+
+                    this.tags = response.data.tags;
+
                     this.isVisible = true;
                     // this.summaryData.tags = response.data.tags;
                     console.log('this.item', this.item);
