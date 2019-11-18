@@ -163,7 +163,7 @@ export const setDrawTrigger = (props, context, svgTools) => {
     };
 };
 
-export const setup = (props, context) => {
+const setup = (props, context) => {
     const chartOptions = computed(() => _.merge({}, DEFAULT_OPTIONS, props.options));
     const svgState = setSvg(props, context, chartOptions);
     const svgTools = {

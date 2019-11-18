@@ -39,7 +39,7 @@
 import * as d3 from 'd3';
 import _ from 'lodash';
 import {
-    reactive, toRefs, computed
+    reactive, toRefs, computed,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
 import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
@@ -76,6 +76,13 @@ const setDrawTools = (props, context, chartOptions) => {
     const draw = () => {
         initRScale();
         state.chartData = props.data;
+        //
+        // {
+        //  "coordinates": {
+        //    "latitude": 38.13,
+        //    "longitude": -78.45
+        //  }
+        // }
     };
 
     const onMouseEnter = (e) => {
