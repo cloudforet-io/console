@@ -17,8 +17,7 @@
 </template>
 
 <script>
-import PTabBar from '@/components/molecules/tabs/tab-bar/TabBar';
-import { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar.mixins';
+import PTabBar, { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar';
 import { makeProxy } from '@/lib/compostion-util';
 
 
