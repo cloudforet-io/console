@@ -17,13 +17,13 @@
                     />
                 </div>
                 <div v-if="pageSizeVisible" class="tool">
-                    <p-dropdown
+                    <PDropdownMenuBtn
                         class="page-size-dropdown"
                         :menu="pageSizeOptions"
-                        @clickMenu="changePageSize"
+                        @clickMenuEvent="changePageSize"
                     >
-                        {{ pageSize }}
-                    </p-dropdown>
+                        {{ proxyPageSize }}
+                    </PDropdownMenuBtn>
                 </div>
                 <div v-if="settingVisible" class="tool">
                     <p-icon-button
@@ -74,12 +74,12 @@
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation';
 import PIconButton from '@/components/molecules/buttons/IconButton';
-import PDropdown from '@/components/organisms/buttons/dropdown/DropdownBtn';
+import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 
 export default {
     name: 'PToolboxTable',
     components: {
-        PDataTable, PTextPagenation, PIconButton, PDropdown,
+        PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn,
     },
     mixins: [PDataTable],
     props: {
@@ -178,7 +178,7 @@ export default {
         changePageSize(size) {
             const sizeNum = Number(size);
             if (this.pageSize !== sizeNum) {
-                this.$emit('update:pageSize', sizeNum);
+                this.proxyPageSize = sizeNum;
                 this.$emit('changePageSize', sizeNum);
             }
         },

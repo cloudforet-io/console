@@ -6,7 +6,6 @@
         <PDropdownMenu
             v-if="popup"
             :menu="menu"
-            v-on="$listeners"
             @clickMenuEvent="clickMenuEvent"
         />
     </div>
@@ -33,10 +32,9 @@ export default {
     methods: {
         clickMenuEvent(eventName) {
             this.$emit('clickMenuEvent', eventName);
+            this.$emit(`click-${eventName}`);
             this.popup = false;
         },
     },
 };
 </script>
-
-

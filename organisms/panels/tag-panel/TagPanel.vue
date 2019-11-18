@@ -68,7 +68,7 @@ export default {
         const clickConfirm = () => {
             state.editMode = false;
             if (JSON.stringify(state.originTags) !== JSON.stringify(state.proxyTags)) {
-                context.emit('confirm', state.proxyTags);
+                context.emit('confirm', state.proxyTags,state.originTags);
             }
             state.tagInputGroup.resetTag();
         };
