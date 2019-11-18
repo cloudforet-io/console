@@ -81,6 +81,12 @@ export default {
     components: {
         PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn,
     },
+    events: [
+        'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
+        'changeSort', 'theadClick',
+        'clickSetting', 'clickRefresh',
+        'changePageSize', 'changePageNumber',
+    ],
     mixins: [PDataTable],
     props: {
         pagenationVisible: {
