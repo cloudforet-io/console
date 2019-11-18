@@ -9,7 +9,7 @@
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src",
     "storybook": "start-storybook -p 6006 -s ./public,./src/asset",
-    "build-storybook": "build-storybook",
+    "build-storybook": "build-storybook -s ./public -o .out",
     "svg": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6"
   },
   "dependencies": {
