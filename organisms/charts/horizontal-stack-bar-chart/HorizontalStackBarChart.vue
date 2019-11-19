@@ -6,35 +6,33 @@
                  @ready="draw"
                  @resize="resizeElements"
         >
-            <template #default>
-                <g v-for="(cd, ci) in chartData" :key="cd.key"
-                   class="horizontal-stack-bar-g"
-                   :data-key="cd.key"
-                   :style="{ fill: colors(ci) }"
+            <g v-for="(cd, ci) in chartData" :key="cd.key"
+               class="horizontal-stack-bar-g"
+               :data-key="cd.key"
+               :style="{ fill: colors(ci) }"
+            >
+                <g v-for="(d, idx) in cd" ref="bar" :key="cd.key + idx"
+                   :d0="d[0]" :d1="d[1]"
+                   @mouseenter="onMouseEnter($event)"
+                   @mouseleave="onMouseLeave"
                 >
-                    <g v-for="(d, idx) in cd" ref="bar" :key="cd.key + idx"
-                       :d0="d[0]" :d1="d[1]"
-                       @mouseenter="onMouseEnter($event)"
-                       @mouseleave="onMouseLeave"
+                    <rect class="bar"
+                          :x="xScale(d[0])" :y="yScale(idx)"
+                          :width="xScale(d[1] - d[0])"
+                          :height="barThickness"
+                          :data-idx="idx"
+                    />
+                    <text>
+                        {{ xScale(d[0]) }}
+                    </text>
+                    <text class="percent-label"
+                          :x="xScale((d[0] + d[1]) / 2)" :y="yScale(idx + 0.5)"
+                          dominant-baseline="middle" text-anchor="middle"
                     >
-                        <rect class="bar"
-                              :x="xScale(d[0])" :y="yScale(idx)"
-                              :width="xScale(d[1] - d[0])"
-                              :height="barThickness"
-                              :data-idx="idx"
-                        />
-                        <text>
-                            {{ xScale(d[0]) }}
-                        </text>
-                        <text class="percent-label"
-                              :x="xScale((d[0] + d[1]) / 2)" :y="yScale(idx + 0.5)"
-                              dominant-baseline="middle" text-anchor="middle"
-                        >
-                            {{ Math.round(d.data[keys[ci]] / sumList[idx] * 100) }}%
-                        </text>
-                    </g>
+                        {{ Math.round(d.data[keys[ci]] / sumList[idx] * 100) }}%
+                    </text>
                 </g>
-            </template>
+            </g>
         </p-chart>
         <div v-for="(d, i) in data" :key="i" class="legend-container">
             <p-chart-legend v-for="(key, idx) in keys" :key="key" class="legend"

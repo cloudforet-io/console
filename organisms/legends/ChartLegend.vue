@@ -1,7 +1,10 @@
 <template>
-    <span class="p-chart-legend">
+    <span class="p-chart-legend"
+          :style="{opacity}"
+          v-on="chartLegendListeners"
+    >
         <p-status class="p-status" v-bind="$props" />
-        <span class="count">{{ count }}</span>
+        <span ref="count" class="count">{{ count }}</span>
     </span>
 </template>
 
@@ -24,13 +27,35 @@ export default {
             type: Number,
             default: null,
         },
+        opacity: {
+            type: Number,
+            default: 1.0,
+        },
+    },
+    computed: {
+        chartLegendListeners() {
+            const vm = this;
+            return Object.assign({},
+                this.$listeners, {
+                    click(e) {
+                        if (vm.$refs && e.target === vm.$refs.count) {
+                            vm.$emit('click', vm.text, vm.count, e);
+                        }
+                    },
+                });
+        },
+    },
+    methods: {
+        test() {
+            console.log('testtestste');
+        },
     },
 };
 </script>
 
 <style lang="scss" scoped>
     .p-chart-legend {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         padding-top: .5rem;
         .p-status::v-deep {
@@ -50,6 +75,7 @@ export default {
             padding-left: .5rem;
             font-weight: bold;
             font-size: .875rem;
+            cursor: pointer;
         }
     }
 </style>

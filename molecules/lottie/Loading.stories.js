@@ -1,5 +1,7 @@
+import { text, number, boolean } from '@storybook/addon-knobs/vue';
 import PLottie from './PLottie.vue';
-import { text, select } from '@storybook/addon-knobs/vue';
+import { autoProps } from '@/setup/storybook-util';
+
 export default {
     title: 'molecules/lottie/lottie',
     component: PLottie,
@@ -17,7 +19,7 @@ export const loading = () => ({
     template: `<div style="width: 80vw;">
                 <button @click="show">display loading</button>
                 <button @click="hide">stop loading</button>
-                <p-lottie :name="name" :size="size" ref="load"/>
+                <p-lottie v-bind="$props" ref="load"/>
 </div>`,
     data() {
         return {
@@ -28,8 +30,9 @@ export const loading = () => ({
             default: text('name', 'spinner'),
         },
         size: {
-            default: text('size', '2'),
+            default: number('size', 2),
         },
+        ...autoProps(PLottie),
     },
     methods: {
         show() {
@@ -40,3 +43,27 @@ export const loading = () => ({
         },
     },
 });
+
+
+export const autoLoading = () => ({
+    components: { PLottie },
+    template: `<div style="width: 80vw;">
+                <p-lottie v-bind="$props"/>
+</div>`,
+    data() {
+        return {
+        };
+    },
+    props: {
+        name: {
+            default: text('name', 'spinner'),
+        },
+        size: {
+            default: number('size', 2),
+        },
+        auto: {
+            default: boolean('auto', true),
+        },
+    },
+});
+
