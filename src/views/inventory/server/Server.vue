@@ -15,9 +15,12 @@ export default {
         serverEventNames.getServerList = 'getServerData';
         serverEventNames.tagConfirmEvent = 'ServerTagConfirmEvent';
         serverEventNames.tagResetEvent = 'resetTagEvent';
+        serverEventNames.getServerSubData = 'requestSubData';
 
         const state = serverSetup(props, context, serverEventNames);
 
+
+        // request server list
         const requestState = reactive({
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
@@ -26,7 +29,6 @@ export default {
         });
         const requestServerList = async () => {
             const res = await context.parent.$http.post('/inventory/server/list', {
-                domain_id: sessionStorage.getItem('domainId'),
                 query: requestState.query,
             });
             state.items = res.data.results;
@@ -35,7 +37,26 @@ export default {
             state.selectIndex = [];
         };
 
+        // request server sub data
+        const requestSubDataState = reactive({
+            query: computed(() => (defaultQuery(
+                state.subData.thisPage, state.subData.pageSize,
+                state.subData.sortBy, state.subData.sortDesc,
+            ))),
+        });
+        const requestServerSubData = async (serverId, name) => {
+            const res = await context.parent.$http.post('/inventory/server/get-data', {
+                query: requestSubDataState.query,
+                data_type: name,
+                server_id: serverId,
+            });
+            console.log(res.data);
+            state.subData.items = res.data.results;
+            const allPage = Math.ceil(res.data.total_count / state.subData.pageSize);
+            state.subData.allPage = allPage || 1;
+        };
 
+        // change tag
         const ServerTagConfirm = async (serverId, tags, originTags) => {
             const idx = state.selectIndex[0];
             try {
@@ -53,6 +74,8 @@ export default {
         };
         mountBusEvent(serverEventBus, serverEventNames.getServerList, requestServerList);
         mountBusEvent(serverEventBus, serverEventNames.tagConfirmEvent, ServerTagConfirm);
+        mountBusEvent(serverEventBus, serverEventNames.getServerSubData, requestServerSubData);
+
         requestServerList();
         return {
             ...toRefs(state),
