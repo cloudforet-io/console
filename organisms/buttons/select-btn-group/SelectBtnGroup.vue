@@ -1,7 +1,8 @@
 <template>
-    <div class="p-select-btn-group">
+    <div ref="btnGroup" class="p-select-btn-group">
         <p-button v-for="btn in btnsData"
                   :key="btn.name"
+                  class="select-btn"
                   :class="{ active:selected===btn.name}"
                   v-bind="btn.vbind"
                   @click="clickEvent(btn.name)"
@@ -12,7 +13,10 @@
 </template>
 
 <script>
-import { reactive, computed, toRefs } from '@vue/composition-api';
+import {
+    reactive, computed, toRefs, onMounted, onUnmounted,
+} from '@vue/composition-api';
+import ScrollBooster from 'scrollbooster';
 import PButton from '@/components/atoms/buttons/Button';
 
 export default {
@@ -36,20 +40,53 @@ export default {
                 });
                 return buttons;
             }),
+            btnGroup: null,
+            sb: null,
+        });
+
+        onMounted(() => {
+            const scrollOptions = {
+                viewport: context.parent.$el,
+                content: state.btnGroup,
+                mode: 'x',
+                onUpdate: (data) => {
+                    state.btnGroup.scrollLeft = data.position.x;
+                },
+            };
+            state.sb = new ScrollBooster(scrollOptions);
+        });
+        onUnmounted(() => {
+            state.sb.destroy();
         });
         return {
             ...toRefs(state),
             clickEvent(name) {
-                context.emit('update:selected', name);
+                if (props.selected !== name) {
+                    context.emit('update:selected', name);
+                    context.emit('clickButton', name);
+                    context.emit(`click-${name}`, name);
+                }
             },
         };
     },
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .p-select-btn-group{
     white-space:nowrap;
-    overflow-x:scroll;
+    overflow-x:auto;
+    scroll-snap-type: x mandatory;
+    display: flex;
+    justify-content: flex-start ;
+    -ms-overflow-style: none; // scroll hide in IE
+    &::-webkit-scrollbar {
+        display: none !important; //scroll hide in window,chrome
+    }
+    .select-btn{
+        margin-right: 0.5rem;
+        min-width: auto;
+        display: inline;
+    }
 }
 </style>
