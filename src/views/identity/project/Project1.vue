@@ -1,7 +1,7 @@
 <template>
     <div class="animated fadeIn">
         <default-tree
-            ref="IDPJ001_ProjectTree"
+            ref="ProjectTree"
             :tree-data="treeData"
             :show-tree="displayTree"
             :context-init="isInitializing"
@@ -27,7 +27,8 @@
                                 </keep-alive>
                             </template>
                             <template #member="{tabName}">
-                                <project-member :selected-node="getSelectedNodeAndTree" />
+                                <project-member :selected-node="getSelectedNodeAndTree"
+                                                :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"/>
                             </template>
                         </PTab>
                     </template>
@@ -57,7 +58,7 @@ const projectSummaryBottom = () => import('@/views/identity/project/modules/Proj
 const projectMember = () => import('@/views/identity/project/modules/ProjectMember');
 
 export default {
-    name: 'Project1',
+    name: 'Project',
     components: {
         DefaultTree,
         ProjectContext,

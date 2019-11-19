@@ -1,7 +1,7 @@
 <template>
     <div div class="animated fadeIn">
         <default-tree
-            ref="IDPJ001_ProjectTree"
+            ref="ProjectTree"
             :tree-data="treeData"
             :show-tree="displayTree"
             :context-init="isInitializing"
