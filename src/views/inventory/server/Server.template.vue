@@ -79,7 +79,16 @@
                 />
             </template>
             <template #data="{tabName}">
-                <p> this tab is {{ tabName }}</p>
+                <PServerData
+                    :server-id="items[selectIndex[0]].server_id"
+                    :items="subData.items"
+                    :sort-by.sync="subData.sortBy"
+                    :sort-desc.sync="subData.sortDesc"
+                    :page-size.sync="subData.pageSize"
+                    :all-page="subData.allPage"
+                    :this-page.sync="subData.thisPage"
+                    :get-server-sub-data="getServerSubData"
+                />
             </template>
             <template #rawData="{tabName}">
                 <p> this tab is {{ tabName }}</p>
@@ -111,7 +120,8 @@ import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table
 import { timestampFormatter } from '@/lib/formatter';
 import { serverStateFormatter } from '@/views/inventory/server/Server.util';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
-import { makeTrItems } from '@/lib/helper'
+import { makeTrItems } from '@/lib/helper';
+import PServerData from '@/views/inventory/server/modules/ServerData';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -155,6 +165,7 @@ export const eventNames = {
     tagResetEvent: '',
     tagConfirmEvent: '',
     getServerList: '',
+    getServerSubData: '',
 
 };
 
@@ -179,6 +190,14 @@ export const serverSetup = (props, context, eventName) => {
     const getServers = () => {
         eventBus.$emit(eventName.getServerList);
     };
+    const subData = reactive({
+        items: [],
+        sortBy: '',
+        sortDesc: true,
+        pageSize: 15,
+        allPage: 1,
+        thisPage: 1,
+    });
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
@@ -219,6 +238,7 @@ export const serverSetup = (props, context, eventName) => {
         // todo: need confirm that this is good way - sinsky
         // EventBus Names
         ...eventNames,
+        subData,
     });
 };
 
@@ -233,12 +253,14 @@ export default {
         PDropdownMenuBtn,
         PServerDetail,
         PTab,
+        PServerData,
     },
     setup(props, context) {
         const dataBind = reactive({
             items: computed(() => []),
         });
         const state = serverSetup(props, context, dataBind.items);
+
         return {
             ...toRefs(state),
             ...toRefs(dataBind),
