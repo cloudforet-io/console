@@ -5,6 +5,7 @@
                            :loading="loading"
                            :min-width="188"
                            :min-height="188"
+                           @legendClick="onLegendClick"
             />
         </div>
     </p-board-layout>
@@ -46,6 +47,12 @@ export default {
     computed: {
         chartData() {
             return Object.keys(this.data).map(key => ({ key, value: this.data[key] }));
+        },
+    },
+    methods: {
+        onLegendClick(key, val) {
+            console.log('onLegendClick', key, val);
+            this.$router.push({ path: '/inventory/server', query: { plan: 'private' } });
         },
     },
 };

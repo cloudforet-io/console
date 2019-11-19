@@ -166,4 +166,8 @@ export default {
             opacity: 1;
         }
     }
+
+    .Aligner {
+        height: 100vh;
+    }
 </style>

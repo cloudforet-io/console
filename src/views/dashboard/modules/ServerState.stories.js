@@ -17,16 +17,15 @@ export const mockPage = () => ({
     },
     template: `<div >
                     <button @click="refresh">refresh</button>
-                    <div style="border: 1px solid lightgray;
-                                display: inline-block;
-                                width: 278px;"
+                    <div style="display: inline-block;
+                                width: 278px; height: 376px;"
                     >
                         <ServerState v-bind="$props" :data="chartData" :loading="loadingChartData"/>
                     </div>
                </div>`,
     data() {
         return {
-            chartData: [],
+            chartData: {},
             loadingChartData: true,
         };
     },

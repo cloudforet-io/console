@@ -1,7 +1,7 @@
 <template>
     <div class="bubble-chart-container"
          :class="legendPosition"
-         :style="{maxHeight: maxHeight ? `${maxHeight}px` : null }"
+         :style="{maxHeight: maxHeight && legendPosition === 'left' ? `${maxHeight}px` : null }"
     >
         <p-chart v-bind="$props" class="p-chart"
                  :options="chartOptions"
@@ -165,13 +165,13 @@ export default {
             width: 100%;
             flex-direction: row-reverse;
             align-items: flex-end;
-            overflow: hidden;
             .legend-container {
                 width: 22%;
                 overflow-y: scroll;
                 .legend::v-deep {
+                    display: flex;
                     .p-status {
-                        width: calc(100% - 1.625rem);
+                        max-width: calc(100% - 1.625rem);
                         justify-content: start;
                     }
                 }
@@ -181,6 +181,7 @@ export default {
             }
         }
         .p-chart {
+            overflow: hidden;
             .map-path {
                 fill: $primary3;
             }

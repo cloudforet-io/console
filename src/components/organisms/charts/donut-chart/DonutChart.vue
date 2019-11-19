@@ -1,30 +1,34 @@
 <template>
     <div class="hs-chart-container">
         <p-chart v-bind="$props" :options="chartOptions" @ready="draw">
-            <template>
-                <g :class="gClass" :transform="gTransform">
-                    <g v-for="(pd, idx) in pieData" ref="pathGroup" :key="idx"
-                       :fill="colors(idx)"
-                    >
-                        <path :d="arc(pd)"
-                              @mouseenter="onMouseenter(pd.data, idx)"
-                              @mouseleave="onMouseleave(idx)"
-                        />
-                        <circle v-tooltip="{
-                                    ...getTooltipOptions(pd.data, idx),
-                                    trigger: 'manual',
-                                    show: visibleTooltips[idx],
-                                }"
-                                :cx="Math.round(arc.centroid(pd)[0])"
-                                :cy="Math.round(arc.centroid(pd)[1])"
-                        />
-                    </g>
+            <g :class="gClass" :transform="gTransform">
+                <g v-for="(pd, idx) in pieData" ref="pathGroup" :key="idx"
+                   :style="{
+                       fill: colors(idx),
+                       opacity: !hoverState || hoverList[idx] ? 1.0 : 0.3
+                   }"
+                   @mouseenter="onMouseenter(idx)"
+                   @mouseleave="resetHoverList"
+                >
+                    <path :d="arc(pd)" />
+                    <circle v-tooltip="{
+                                ...getTooltipOptions(pd.data, idx),
+                                trigger: 'manual',
+                                show: hoverList[idx],
+                            }"
+                            :cx="Math.round(arc.centroid(pd)[0])"
+                            :cy="Math.round(arc.centroid(pd)[1])"
+                    />
                 </g>
-            </template>
+            </g>
         </p-chart>
         <div class="legend-container">
             <p-chart-legend v-for="(d, idx) in data" :key="d.key" class="legend"
                             :text="d.key" :count="d.value" :icon-color="colors(idx)"
+                            :opacity="!hoverState || hoverList[idx] ? 1.0 : 0.3"
+                            @mouseenter="onMouseenter(idx)"
+                            @mouseleave="resetHoverList"
+                            @click="legendClick"
             />
         </div>
     </div>
@@ -61,39 +65,42 @@ const setDrawTools = (props, context, chartOptions) => {
         pathGroup: null,
         pieData: [],
         tooltipOptions: [],
-        visibleTooltips: [],
+        hoverList: [],
+        hoverState: false,
         chartEl: undefined,
     });
 
+    const resetHoverList = () => {
+        state.hoverState = false;
+        state.hoverList = new Array(props.data.length).fill(false);
+    };
     const draw = () => {
-        state.visibleTooltips = new Array(props.data.length).fill(false);
+        resetHoverList();
         state.pieData = getPieData();
     };
 
-    const onMouseenter = (data, idx) => {
-        state.visibleTooltips.splice(idx, 1, true);
-        state.pathGroup.forEach((path, i) => {
-            path.style.opacity = i === idx ? 1.0 : 0.3;
-        });
+    const onMouseenter = (idx) => {
+        state.hoverState = true;
+        state.hoverList.splice(idx, 1, true);
     };
 
-    const onMouseleave = (idx) => {
-        state.visibleTooltips.splice(idx, 1, false);
-        state.pathGroup.forEach((path) => {
-            path.style.opacity = 1.0;
-        });
+    const legendClick = (key, val, e) => {
+        context.emit('legendClick', key, val, e);
     };
+
 
     return {
         ...toRefs(state),
         draw,
         onMouseenter,
-        onMouseleave,
+        resetHoverList,
+        legendClick,
     };
 };
 
 export default {
     name: 'PDonutChart',
+    events: ['click'],
     components: { PChart, PChartLegend },
     directives: { tooltip: VTooltip },
     props: {
