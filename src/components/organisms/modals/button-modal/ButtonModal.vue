@@ -20,6 +20,7 @@
                 {{ headerTitle }}
             </slot>
             <p-button v-if="headerCloseButtonVisible"
+                      style="cursor: pointer"
                       :force-class="['close']"
                       @click="onCloseClick"
             >

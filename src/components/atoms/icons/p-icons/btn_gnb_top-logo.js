@@ -4,9 +4,9 @@
 import icon from 'vue-svgicon'
 icon.register({
   'btn_gnb_top-logo': {
-    width: 56,
-    height: 56,
+    width: 16,
+    height: 16,
     viewBox: '0 0 56 56',
-    data: '<path pid="0" _fill="none" d="M0 0h56v56H0z"/><path pid="1" d="M28 8A20 20 0 118 28 20 20 0 0128 8z" _fill="#fff"/><text transform="translate(28 33)" _fill="#5541b0" font-size="14" font-family="Arial-BoldMT,Arial" font-weight="700"><tspan x="-15.162" y="0">MZC</tspan></text>'
+    data: '<path pid="0" _fill="none" d="M0 0h56v56H0z"/><path pid="1" d="M28 8c11 0 20 9 20 20s-9 20-20 20S8 39 8 28 17 8 28 8z" _fill="#fff"/><g _fill="#5541b0"><path pid="2" d="M13.8 33V23h3l1.8 6.8 1.8-6.8h3v10h-1.9v-7.9l-2 7.9h-1.9l-2-7.9V33h-1.8zM24.7 33v-1.8l5.3-6.5h-4.7V23h7.3v1.6l-5.5 6.8h5.7V33h-8.1zM40.5 29.3l2 .6c-.3 1.1-.8 1.9-1.5 2.4s-1.6.8-2.7.8c-1.3 0-2.4-.5-3.3-1.4-.9-.9-1.3-2.2-1.3-3.7 0-1.7.4-3 1.3-3.9.9-.9 2-1.4 3.4-1.4 1.2 0 2.2.4 3 1.1.5.4.8 1 1 1.8l-2 .5c-.1-.5-.4-.9-.7-1.2s-.8-.5-1.4-.5c-.7 0-1.3.3-1.8.8s-.7 1.4-.7 2.6c0 1.3.2 2.2.7 2.7.5.5 1 .8 1.8.8.5 0 1-.2 1.4-.5.3-.2.6-.8.8-1.5z"/></g>'
   }
 })
