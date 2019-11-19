@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="display:inline-flex">
         <p-button
             :disabled="disabled"
             :class="btnClassObject"
