@@ -15,7 +15,11 @@ const propsTypeMapping = {
 function makeKnobProp(prop, value, knobType) {
     const typeName = knobType || prop.type.name;
     let defaultValue = value;
+
     if (!value) defaultValue = undefined;
+    else if (typeName === 'object' && value.name === '_default') defaultValue = {};
+    else if (typeName === 'array' && value.name === '_default') defaultValue = [];
+
     const knobsType = propsTypeMapping[typeName];
     if (knobsType) {
     // let defaultValue = prop.defaultValue.func ? eval(prop.defaultValue.value)() : eval(prop.defaultValue.value) ;

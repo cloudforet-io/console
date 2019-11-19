@@ -1,6 +1,6 @@
 <template>
     <span class="p-status">
-        <p-i v-if="icon" :name="icon" :color="`transparent ${iconColor}`"/>
+        <p-i v-if="icon" :name="icon" :color="iconStyle" />
         <span v-else class="circle" :style="circleStyle" />
         <p-label class="label" :style="labelStyle">
             {{ text }}
@@ -22,6 +22,7 @@ export default {
         },
         text: {
             type: String,
+            default: null,
         },
         textColor: {
             type: String,
@@ -39,22 +40,26 @@ export default {
         circleStyle() {
             return this.iconColor ? { backgroundColor: this.iconColor } : null;
         },
+        iconStyle() {
+            return this.iconColor ? `transparent ${this.iconColor}` : null;
+        },
     },
 };
 </script>
 
 <style lang="scss" scoped>
     .p-status {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         .circle {
             border-radius: 50%;
-            height: 8px;
-            width: 8px;
+            height: 0.5rem;
+            width: 0.5rem;
         }
         .label {
-            margin: 0 0 0 8px;
+            margin: 0;
+            padding-left: .5rem;
         }
     }
 </style>

@@ -3,7 +3,7 @@ import PLabel from './Label.vue';
 
 
 export default {
-    title: 'atoms/labels/label',
+    title: 'atoms/legends/label',
     component: PLabel,
     parameters: {
         info: {

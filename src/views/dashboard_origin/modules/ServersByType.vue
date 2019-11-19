@@ -1,219 +1,252 @@
 <template>
-    <div>
-        <p v-if="showTitle" class="board-title">
-            Servers by Type
-        </p>
+  <div>
+    <p v-if="showTitle" class="board-title">
+      Servers by Type
+    </p>
+    <b-row>
+      <b-col v-for="(data, type) in chartDataList" 
+             :key="type" 
+             cols="6"
+      >
         <b-row>
-            <b-col v-for="(data, type) in chartDataList"
-                   :key="type"
-                   cols="6"
-            >
-                <b-row>
-                    <b-col cols="12">
-                        <div class="chart-container">
-                            <div class="chart">
-                                <p-horizontal-bar-chart
-                                    ref="chart"
-                                    type="horizontalBar"
-                                    :data="getChartDataConfig(type)"
-                                    :options="getChartOptions(type)"
-                                    :loading="isLoading[type]"
-                                />
-                            </div>
-                        </div>
-                    </b-col>
-                    <b-col cols="12">
-                        <div class="legend-container">
-                            <div v-for="(count, label, idx) in data"
-                                 :key="label"
-                                 cols="4"
-                                 class="legend"
-                            >
-                                <span class="indicator"
-                                      :style="{ color: colorSets[idx] }"
-                                >
-                                    <i class="fas fa-square" />
-                                </span>
-                                <span class="title">{{ label }}</span>
-                                <span class="count">{{ count }}</span>
-                            </div>
-                        </div>
-                    </b-col>
-                </b-row>
-            </b-col>
+          <b-col cols="12">
+            <div class="chart-container">
+              <div class="chart">
+                <BaseChart ref="chart"
+                           :key="type"
+                           :data="getChartDataConfig(type)"
+                           :options="getChartOptions(type)"
+                           :width="200" :height="200"
+                />
+              </div>
+            </div>
+          </b-col>
+          <b-col cols="12">
+            <div class="legend-container">
+              <div v-for="(count, label, idx) in data" 
+                   :key="label"
+                   cols="4"
+                   class="legend"
+              >
+                <span class="indicator"
+                      :style="{ color: colorSets[idx] }"
+                >
+                  <i class="fas fa-square" />
+                </span>
+                <span class="title">{{ label }}</span>
+                <span class="count">{{ count }}</span>
+              </div>
+            </div>
+          </b-col>
         </b-row>
-    </div>
+      </b-col>
+    </b-row>
+  </div>
 </template>
 
 <script>
-import PHorizontalBarChart from '@/components/organisms/charts/horizontal-bar-chart/HorizontalBarChart';
-
+import BaseChart from '@/components/base/charts/BaseChart';
 export default {
     name: 'ServersByType',
     components: {
-        PHorizontalBarChart,
+        BaseChart
     },
     props: {
         drawBy: {
             type: Object,
-            default: null,
+            default: null
             // default: () => ({ 'region_id': 'region-2a8873d89c8c' })
         },
         showTitle: {
             type: Boolean,
-            default: true,
-        },
+            default: true
+        }
     },
-    data() {
+    data () {
         return {
             colorSets: [
                 'rgba(72,86,242,1.0)',
                 'rgba(45,158,110,1.0)',
                 'rgba(255,174,8,1.0)',
                 'rgba(217,0,57,1.0)',
-                'rgba(0,0,0,1.0)',
+                'rgba(0,0,0,1.0)'
             ],
             vmData: {
                 AWS: 0,
                 AZURE: 0,
                 GCP: 0,
                 OPENSTACK: 0,
-                VMWARE: 0,
+                VMWARE: 0
             },
             osData: {
                 WINDOWS: 0,
-                LINUX: 0,
+                LINUX: 0
             },
             loadingState: {
                 vm: true,
-                os: true,
+                os: true
             },
-            isLoading: [true, true],
+            isLoading: true,
+            isMounted: false
         };
     },
     computed: {
-        chartDataList() {
-            return {
-                vm_type: this.vmData,
-                os_type: this.osData,
+        chartDataList () {
+            console.log('data computed');
+            return  {
+                'vm_type': this.vmData,
+                'os_type': this.osData
             };
         },
-        chartTypes() {
+        chartTypes () {
             return this._.keys(this.chartDataList);
         },
+        isReadyToDrawChart () {
+            return !this.isLoading && this.isMounted;
+        }
     },
-    created() {
+    watch: {
+        loadingState: {
+            deep: true,
+            handler () {
+                if (this.loadingState.vm || this.loadingState.os) {
+                    this.isLoading = true;
+                } else {
+                    this.isLoading = false;
+                }
+            }
+        },
+        drawBy (obj) {
+            if (obj) {
+                this.resetLoadingState();
+                this.init();
+            }
+        },
+        isReadyToDrawChart (val) {
+            if (val) {
+                if (this.drawBy) {
+                    this.updateDataAndChart();
+                } else {
+                    this.updateChart();
+                }
+                
+            }
+        }
+    },
+    created () {
         this.init();
     },
+    mounted() {
+        this.isMounted = true;
+    },
     methods: {
-        init() {
-            this.chartTypes.forEach((item) => {
+        init () {
+            this.chartTypes.map((item) => {
                 this.listData(item);
             });
         },
-        async listData(itemType) {
-            this.isLoading[itemType] = true;
+        async listData (itemType) {
             try {
-                const res = await this.$http.post('/statistics/server-type', this.getParams(itemType));
+                let res = await this.$http.post('/statistics/server-type', this.getParams(itemType));
                 this.setData(itemType, res.data);
-                this.isLoading[itemType] = false;
             } catch (err) {
                 console.error(err);
             }
         },
-        getParams(itemType) {
-            const params = {
+        getParams (itemType) {
+            let params = {
                 domain_id: sessionStorage.getItem('domainId'),
-                item_type: itemType,
+                item_type: itemType
             };
             if (this.drawBy) {
                 this._.assignIn(params, this.drawBy);
             }
             return params;
         },
-        setData(itemType, data) {
+        setData (itemType, data) {
             if (itemType === 'vm_type') {
                 this.setVMData(data);
             } else if (itemType === 'os_type') {
                 this.setOSData(data);
             }
         },
-        setVMData(data) {
+        setVMData (data) {
             this._.forIn(data, (val, key) => {
                 this.vmData[key] = data[key];
             });
             this.loadingState.vm = false;
         },
-        setOSData(data) {
+        setOSData (data) {
             this._.forIn(data, (val, key) => {
                 this.osData[key] = data[key];
             });
             this.loadingState.os = false;
         },
-        getCenterText(key) {
+        resetLoadingState () {
+            this.loadingState = {
+                vm: true,
+                os: true
+            };
+            this.isLoading = true;
+        },
+        getCenterText (key) {
             return key.split('_')[0].toUpperCase();
         },
-        getChartOptions(key) {
-            return {
+        getChartOptions (key) {
+            return  {
                 cutoutPercentage: 70,
                 centerText: {
                     display: true,
                     text: this.getCenterText(key),
-                    fontSize: 20,
+                    fontSize: 20
                 },
                 legend: {
-                    display: false,
-                },
+                    display: false
+                }
             };
         },
-        getChartLabels(key) {
+        getChartLabels (key) {
             return this._.keys(this.chartDataList[key]);
         },
-        getChartData(key) {
+        getChartData (key) {
             return this._.values(this.chartDataList[key]);
         },
-        getChartDataConfig(key) {
+        getChartDataConfig (key) {
             return {
                 labels: this.getChartLabels(key),
                 datasets: [{
                     data: this.getChartData(key),
+                    backgroundColor: this.colorSets,
                     borderWidth: 0,
-                    hoverBorderWidth: 10,
-                }],
-                // labels: ['a', 'b', 'c'],
-                // datasets: [{
-                //     data: [3, 2],
-                // }, {
-                //     data: [5, 1],
-                // }, {
-                //     data: [6, 8],
-                // }],
+                    hoverBorderColor: this.colorSets,
+                    hoverBorderWidth: 10
+                }]
             };
         },
-        updateChartDataConfig(chart, key) {
+        updateChartDataConfig (chart, key) {
             chart.data.labels = this.getChartLabels(key);
             chart.data.datasets[0].data = this.getChartData(key);
         },
-        updateChartOptions(chart, key) {
+        updateChartOptions (chart, key) {
             chart.options.centerText.text = this.getCenterText(key);
         },
-        updateChart() {
+        updateChart () {
             this.$refs.chart.map((ref) => {
                 this.updateChartDataConfig(ref.chart, ref.$vnode.key);
                 this.updateChartOptions(ref.chart, ref.$vnode.key);
                 ref.chart.update();
             });
         },
-        async updateDataAndChart() {
+        async updateDataAndChart () {
             await this.chartTypes.map(async (item, idx) => {
                 await this.listData(item);
-                const ref = this.$refs.chart[idx];
+                let ref = this.$refs.chart[idx];
                 this.updateChartDataConfig(ref.chart, ref.$vnode.key);
                 this.updateChartOptions(ref.chart, ref.$vnode.key);
                 ref.chart.update();
             });
-        },
-    },
+        }
+    }
 };
 </script>
 
