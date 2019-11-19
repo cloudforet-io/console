@@ -1,6 +1,6 @@
 <template>
     <div class="p-tag-input-group row col-12">
-        <div v-for="(tag,index) in destructTags" :key="index" class="tag-input-form change-form col-sm-6 mr-0">
+        <div v-for="(tag,index) in destructTags" :key="index" class="tag-input-form change-form col-md-6 col-sm-12 mr-0">
             <p-icon-button v-if="editMode" class="delete-btn" name="ic_delete"
                            @click="deleteTag(index)"
             />
@@ -12,22 +12,23 @@
                 @update:value="updateTag(index, 'value',$event)"
             />
         </div>
-        <div v-if="editMode" class="tag-input-form new-form col-sm-6 mr-0">
+
+        <div v-if="editMode" class="tag-input-form new-form col-md-6 col-sm-12 mr-0">
             <p-icon-button
                 class="delete-btn"
                 name="ic_delete"
                 @click="resetTag"
             />
-            <!--<div v-show="validatePassword(index)" style="display:block" class="invalid-feedback">
+            <!--  <div v-show="validatePassWord()" style="display:block" class="invalid-feedback">
                 * {{ $t('ORGANISMS.TAG_EMPTY') }}
             </div>-->
             <p-tag-input :name.sync="newTag.name" :value.sync="newTag.value" />
-            <p-icon-button :key="index"
-                           class="add-btn"
-                           button-style="dark"
-                           name="ic_plus"
-                           color="transparent white"
-                           @click="addTag(index)"
+            <p-icon-button
+                class="add-btn"
+                button-style="dark"
+                name="ic_plus"
+                color="transparent white"
+                @click="addTag"
             />
         </div>
     </div>
