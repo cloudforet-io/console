@@ -3,46 +3,38 @@ import PStatus from './Status';
 import {
     alert, safe, other1, other2, gray,
 } from '@/styles/_variables.scss';
-
+import { autoProps } from '@/setup/storybook-util';
 import { statusBindFactory } from '@/components/molecules/status/Status.util';
 
 
 export default {
     title: 'molecules/status',
     component: PStatus,
-    parameters: {
-        info: {
-            summary: '',
-            components: { PStatus },
-        },
-    },
 };
 
 
 export const base = () => ({
     components: { PStatus },
-    template: `
-<p-status  
-    :icon="icon" 
-    :text="text"
-    :textColor="textColor"
-    :iconColor="iconColor"
-    />
-`,
     props: {
-        text: {
-            default: text('text', 'enabled'),
-        },
-        icon: {
-            default: text('icon', null),
-        },
-        textColor: {
-            default: color('textColor', '#000000'),
-        },
-        iconColor: {
-            default: color('iconColor', '#60B731'),
-        },
+        ...autoProps(PStatus, [
+            {
+                name: 'text',
+                default: text('text', 'enabled'),
+            },
+            {
+                name: 'iconColor',
+                default: color('iconColor', safe),
+                knobType: 'color',
+            },
+            {
+                name: 'textColor',
+                default: color('textColor', safe),
+                knobType: 'color',
+            },
+        ]),
+
     },
+    template: '<p-status  v-bind="$props"/>',
 });
 export const example = () => ({
     components: { PStatus },

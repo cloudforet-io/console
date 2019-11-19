@@ -22,6 +22,11 @@
                 </g>
             </template>
         </p-chart>
+        <div class="legend-container">
+            <p-chart-legend v-for="(d, idx) in data" :key="d.key" class="legend"
+                            :text="d.key" :count="d.value" :icon-color="colors(idx)"
+            />
+        </div>
     </div>
 </template>
 
@@ -33,6 +38,7 @@ import {
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
 import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
+import PChartLegend from '@/components/organisms/legends/ChartLegend';
 import { PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
 import { DONUT_OPTIONS } from './DonutChart.map';
 
@@ -87,8 +93,8 @@ const setDrawTools = (props, context, chartOptions) => {
 };
 
 export default {
-    name: 'DonutChart',
-    components: { PChart },
+    name: 'PDonutChart',
+    components: { PChart, PChartLegend },
     directives: { tooltip: VTooltip },
     props: {
         loading: {
@@ -127,3 +133,9 @@ export default {
     },
 };
 </script>
+
+<style lang="scss" scoped>
+    .legend-container {
+        padding-top: 1.5rem;
+    }
+</style>
