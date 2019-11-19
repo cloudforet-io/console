@@ -17,7 +17,7 @@
                          :color="'transparent inherit'"
                          :width="'1rem'"
                          :height="'1rem'"
-                         :name="'ic_inventory'" />
+                         :name="'ic_tree_project'" />
                     <p-i v-else-if="node.isExpanded"
                          :color="'transparent inherit'"
                          :width="'1rem'"

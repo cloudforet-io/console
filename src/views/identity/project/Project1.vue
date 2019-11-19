@@ -28,7 +28,7 @@
                             </template>
                             <template #member="{tabName}">
                                 <project-member :selected-node="getSelectedNodeAndTree"
-                                                :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"/>
+                                                :responsive-style="{'height': height+'px', 'overflow-y':'auto', 'box-shadow': 'none', 'border': 'none'}"/>
                             </template>
                         </PTab>
                     </template>

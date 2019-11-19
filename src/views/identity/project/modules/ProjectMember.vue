@@ -57,10 +57,9 @@ import PContentModal from '@/components/organisms/modals/content-modal/ContentMo
 export default {
     name: 'ProjectMember',
     components: {
-        /* ProjectMemberDetail, */
         PToolboxTable,
         PButton,
-        PContentModal,
+        ProjectMemberDetail
     },
     props: {
         selectedNode: {
@@ -140,9 +139,6 @@ export default {
                     this.tablePage.sortDesc,
                 ),
             };
-        },
-        showModals() {
-            this.$refs.modal.show();
         },
         reset() {
             this.members = [];
@@ -238,6 +234,9 @@ export default {
         deleteSelected() {
             this.actionFlag = 'delete';
             this.actionCommand();
+        },
+        showModals() {
+            this.$refs.MemberAdd.showModal();
         },
     },
 };

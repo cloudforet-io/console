@@ -193,6 +193,7 @@ export const en = {
         CRT_COUNT: 'Created Count',
         UPT_COUNT: 'Updated Count',
         FINISHED: 'Finished',
+        MEMBER: 'Member',
         KEY: 'Key',
         FAIL_REASON: 'Reason for Failure',
     },
@@ -224,6 +225,9 @@ export const en = {
         PASS_EMPTY: 'Password can\'t be blank.',
     },
     IDENTITY: {
+        ADD_ARG: 'Add {0}',
+        DEL_ARG: 'Delete {0}',
+        UPT_ARG: 'Update {0}',
         NO_PROJECT_SEL: 'No Selected Project',
         NO_PROJECT_SEL_DT: 'Please, Click an item from left tree Panel.',
     },

@@ -1,19 +1,21 @@
 <template>
     <div class="animated fadeIn">
-        <!-- <p-content-modal
+        <p-button-modal
             ref="modal"
             :scrollable="true"
             :centered="true"
-            size="xl">
-            <template #header>
-                <h3>This is Header</h3>
-            </template>
+            :size="'xl'"
+            :fade="true"
+            :backdrop="true"
+            :header-title="getMemberModalTitle"
+            :visible.sync="visible"
+            @close="close"
+            @confirm="confirm"
+        >
             <template #body>
-                <p>8181818181818</p>
+                <p>what the fuck</p>
             </template>
-            <template #footer />
-        </p-content-modal>-->
-
+        </p-button-modal>
     </div>
 </template>
 <script>
@@ -28,21 +30,30 @@ export default {
     },
     data() {
         return {
-
+            visible: false,
         };
     },
     computed: {
-
+        getMemberModalTitle() {
+            return this.tr('IDENTITY.ADD_ARG', [this.tr('COMMON.MEMBER')]);
+        },
     },
     mounted() {
 
     },
+
     methods: {
         showModal() {
-            this.$refs.modal.show();
+            this.visible = true;
         },
         hideModal() {
-            this.$refs.modal.hide();
+            this.visible = false;
+        },
+        confirm() {
+            this.visible = true;
+        },
+        close() {
+            this.visible = false;
         },
     },
 };

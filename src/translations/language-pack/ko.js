@@ -194,6 +194,7 @@ export const ko = {
         UPT_COUNT: '업데이트 카운트',
         FINISHED: '완료일',
         KEY: '키(Key)',
+        MEMBER: '팀원',
         FAIL_REASON: '실패 원인',
     },
     ATOM: {
@@ -224,6 +225,9 @@ export const ko = {
         TAG_EMPTY: '태그의 키값은 필수 입력 항목입니다.'
     },
     IDENTITY: {
+        ADD_ARG: '{0} 추가하기',
+        DEL_ARG: '{0} 삭제하기',
+        UPT_ARG: '{0} 갱신하기',
         NO_PROJECT_SEL: '프로젝트를 선택해주십시오.',
         NO_PROJECT_SEL_DT: '왼쪽 트리 패널의 아이템을 클릭 하세요.',
     },

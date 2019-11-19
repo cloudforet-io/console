@@ -3,7 +3,7 @@
 // @ts-ignore
 import icon from 'vue-svgicon'
 icon.register({
-  'ic_tree_folder--opened': {
+  'ic_tree_project-group—opened': {
     width: 16,
     height: 16,
     viewBox: '0 0 16 16',
