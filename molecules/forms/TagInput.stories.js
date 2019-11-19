@@ -22,8 +22,8 @@ export const tagInput = () => ({
 <div class="row" style="width: 80vw">
 <p-tag-input
 style="width: 100%" 
-    :tagKey.sync="key" 
-    :tagValue.sync="value" 
+    :name.sync="key" 
+    :value.sync="value" 
     :disabled="disabled"
     :tagKeyPlaceholder="tagKeyPlaceholder"
     :tagValuePlaceholder="tagValuePlaceholder"
