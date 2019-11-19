@@ -7,7 +7,7 @@
                         <div class="card-group">
                             <div class="card col-7 card-left-container">
                                 <div class="signIn-title">
-                                    {{ $t('COMMON.ADMIN_USER') }} {{ $t('SIGNIN.SIGN_IN') }}
+                                    Admin Sign In
                                 </div>
                                 <div v-show.visible="greeting" class="signIn-sub-title">
                                     {{ $t('SIGNIN.SIGN_IN_MSG') }}

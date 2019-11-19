@@ -1,5 +1,5 @@
 <template>
-    <div class="toolbox-table">
+    <div :class="{'toolbox-table': true,'toolbox-shadow': shadow, 'toolbox-border': border}">
         <div class="toolbox">
             <div class="left">
                 <slot name="toolbox-left" />
@@ -94,6 +94,14 @@ export default {
             default: true,
         },
         pageSizeVisible: {
+            type: Boolean,
+            default: true,
+        },
+        shadow: {
+            type: Boolean,
+            default: true,
+        },
+        border: {
             type: Boolean,
             default: true,
         },
@@ -200,11 +208,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .toolbox-shadow {
+        box-shadow: 0px 0px 8px #4D49B614;
+    }
+
+    .toolbox-border {
+        border: 1px solid #F2F2F2;
+    }
+
     .toolbox-table {
         background-color: $white;
         padding: 1rem;
-        box-shadow: 0px 0px 8px #4D49B614;
-        border: 1px solid #F2F2F2;
         .toolbox {
             margin-top: 0.5rem;
             margin-bottom: 1rem;
