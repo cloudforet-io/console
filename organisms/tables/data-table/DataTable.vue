@@ -232,6 +232,9 @@ export default {
                         this.$emit('update:sortDesc', true);
                     }
                 } else {
+                    if (!this.sortDesc) {
+                        this.$emit('update:sortBy', '');
+                    }
                     this.$emit('update:sortDesc', !this.sortDesc);
                 }
                 this.$emit('changeSort');
