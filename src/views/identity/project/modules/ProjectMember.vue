@@ -22,7 +22,10 @@
         >
             <template slot="toolbox-left">
                 <p-button style-type="primary" @click="showModals">
-                    {{tr('COMMON.BTN_ADD')}}
+                    <p-i :color="'transparent inherit'"
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_plus'"/>   {{tr('COMMON.BTN_ADD')}}
                 </p-button>
                 <p-button style-type="alert" :outline="true" :disabled="isDisabled" class="btn-margin">
                     {{tr('COMMON.BTN_DELETE')}}
@@ -54,12 +57,13 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button';
 import ProjectMemberDetail from '@/views/identity/project/modules/ProjectMemberDetail';
 import { defaultQuery } from '@/lib/api';
-
+import PI from '@/components/atoms/icons/PI';
 export default {
     name: 'ProjectMember',
     components: {
         PToolboxTable,
         PButton,
+        PI,
         ProjectMemberDetail
     },
     props: {

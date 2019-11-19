@@ -5,7 +5,7 @@
         <div class="input-container"
              :class="{border: border}"
         >
-          <div ref="inputBox" class="input-box" 
+          <div ref="inputBox" class="input-box"
                @click.self="focusOnInput"
           >
             <InputTag v-for="(tag, idx) in tagList"
@@ -14,18 +14,18 @@
                       class="input-tag"
                       :tabindex="idx"
                       :idx="idx"
-                      :list-data="contextData.queryList" 
+                      :list-data="contextData.queryList"
                       :contents="tag"
                       @delete="deleteTagAndSearch(idx)"
                       @update="upsertTagAndSearch"
                       @deleteLeft="deleteLeftTag(idx - 1)"
             />
 
-            <QueryInput ref="input" 
+            <QueryInput ref="input"
                         class="input"
                         :context-data="contextData.queryList"
                         :no-reset="plainSearch"
-                        @commit="addTagAndSearch" 
+                        @commit="addTagAndSearch"
                         @deleteLeft="deleteLeftTag(tagList.length - 1)"
             />
           </div>
@@ -64,9 +64,9 @@ const contextDataModel = {
 export default {
     name: 'BaseSearch',
     events: ['search', 'empty'],
-    components: { 
-        QueryInput, 
-        InputTag 
+    components: {
+        QueryInput,
+        InputTag
     },
     props: {
         contextData: {
@@ -75,11 +75,11 @@ export default {
             validator (obj) {
                  /**
              * TODO: Add validation for queryList format
-             */ 
-                return obj.queryList !== undefined && 
-                        obj.queryList !== null && 
+             */
+                return obj.queryList !== undefined &&
+                        obj.queryList !== null &&
                         obj.queryList instanceof Array &&
-                    obj.autokeyList !== undefined && 
+                    obj.autokeyList !== undefined &&
                     obj.autokeyList !== null && obj.autokeyList instanceof Array;
             }
         },
@@ -137,7 +137,7 @@ export default {
         addQueryToFilterOrListWithAutoKey (obj) {
             if (this.filterOrList.length === 0) {
                 this.generateValueEmptyFilterOrList();
-            } 
+            }
 
             this.filterOrList.map((filter) => {
                 filter.value.push(obj.value);
@@ -152,7 +152,7 @@ export default {
         },
         generateValueEmptyFilterOrList () {
             this.contextData.autokeyList.map((autokey) => {
-                this.filterOrList.push({ 
+                this.filterOrList.push({
                     key: autokey,
                     value: [],
                     operator: this.getOperator(':')
@@ -175,7 +175,7 @@ export default {
                 if (item.key === obj.key && item.operator === this.getOperator(obj.operator)) {
                     idx = i;
                 }
-                return item.key === obj.key && item.operator === this.getOperator(obj.operator); 
+                return item.key === obj.key && item.operator === this.getOperator(obj.operator);
             });
 
             if (isExist) {
@@ -189,7 +189,7 @@ export default {
                 });
                 obj.valueIdx = 0;
             }
-            
+
             obj.filterName = 'filter';
             obj.filterIdx = idx;
         },
@@ -280,9 +280,9 @@ export default {
             }
         },
         getNewTag (item) {
-            return Object.assign({ 
-                id: ++this.lastId, 
-                filterName: '', 
+            return Object.assign({
+                id: ++this.lastId,
+                filterName: '',
                 filterIdx: null,
                 valueIdx: null
             }, item);

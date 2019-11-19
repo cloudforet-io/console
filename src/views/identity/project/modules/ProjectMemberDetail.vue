@@ -14,7 +14,7 @@
         >
             <template #body>
                 <p-toolbox-table :items="searchedResult"
-                                 :responsive-style="{'height': 400 +'px', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
+                                 :responsive-style="{'height': '50vh', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
                                  :fields="selectedFields"
                                  :selectable="true"
                                  :sortable="true"
@@ -27,7 +27,13 @@
                                  :select-index.sync="selectIndex"
                                  :page-size.sync="tablePage.pageSize"
                 >
-                    <template slot="toolbox-left" />
+                    <template slot="toolbox-left">
+                        <p-search
+                            :search-placeholder="getSearchPlaceHolder"
+                            :search-text.sync="searchText"
+                            @onSearch="search"
+                        />
+                    </template>
                     <template v-slot:col-user_id-format="data">
                         {{ data.item.user_info.user_id }}
                     </template>
@@ -61,6 +67,7 @@
 import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
+import PSearch from '@/components/molecules/search/Search';
 
 export default {
     name: 'ProjectMember',
@@ -68,11 +75,14 @@ export default {
     components: {
         PButtonModal,
         PToolboxTable,
+        PSearch,
+
     },
     data() {
         return {
             visible: false,
             searchedResult: [],
+            searchText: null,
             selectable: true,
             sortable: true,
             selectIndex: [],
@@ -89,19 +99,19 @@ export default {
         getMemberModalTitle() {
             return this.tr('IDENTITY.ADD_ARG', [this.tr('COMMON.MEMBER')]);
         },
+        getSearchPlaceHolder() {
+            return this.tr('IDENTITY.SCH_PAC_DT');
+        },
         selectedFields() {
             return [
                 {
-                    name: 'user_id', label: this.tr('COMMON.COL_NM.UID'),
+                    name: 'user_id', label: this.tr('COMMON.UID'),
                 },
                 {
-                    name: 'name', label: this.tr('COL_NM.NAME'),
+                    name: 'name', label: this.tr('COMMON.NAME'),
                 },
                 {
-                    name: 'state', label: this.tr('COL_NM.STATE'),
-                },
-                {
-                    name: 'email', label: this.tr('COL_NM.EMAIL'),
+                    name: 'email', label: this.tr('COMMON.EMAIL'),
                 },
             ];
         },
@@ -127,7 +137,7 @@ export default {
         hideModal() {
             this.visible = false;
         },
-        confirm() {
+        search() {
 
         },
         close() {

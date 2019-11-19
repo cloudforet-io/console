@@ -228,6 +228,7 @@ export const en = {
         ADD_ARG: 'Add {0}',
         DEL_ARG: 'Delete {0}',
         UPT_ARG: 'Update {0}',
+        SCH_PAC_DT: 'Search members by its user name or others',
         NO_PROJECT_SEL: 'No Selected Project',
         NO_PROJECT_SEL_DT: 'Please, Click an item from left tree Panel.',
     },
