@@ -1,182 +1,177 @@
 <template>
-    <p-toolbox-table style="padding:0px"
-                     :items="items"
-                     :fields="fields"
-                     :selectable="selectable"
-                     :sortable="sortable"
-                     :sort-by.sync="sortBy"
-                     :sort-desc.sync="sortDesc"
-                     :all-page="allPage"
-                     :this-page.sync="thisPage"
-                     :select-index.sync="selectIndex"
-                     :page-size.sync="pageSize"
-                     @rowLeftClick="rowLeftClick"
-                     @rowRightClick="rowRightClick"
-                     @changePageSize="changePageSize"
-                     @changePageNumber="changePageNumber"
-                     @clickSetting="clickSetting"
-                     @clickRefresh="clickRefresh"
-                     @theadClick="theadClick"
-    />
+    <div>
+        <project-member-detail ref="MemberAdd">
+        </project-member-detail>
+        <p-toolbox-table :items="members"
+                         :style="responsiveStyle"
+                         :fields="fields"
+                         :selectable="selectable"
+                         :sortable="sortable"
+                         :sort-by.sync="tablePage.sortBy"
+                         :sort-desc.sync="tablePage.sortDesc"
+                         :all-page="tablePage.allPage"
+                         :this-page.sync="tablePage.thisPage"
+                         :select-index.sync="selectIndex"
+                         :page-size.sync="tablePage.pageSize"
+                         @changePageSize="changePageSize"
+                         @changeSort="getMembers(true)"
+                         @changePageNumber="getMembers(true)"
+                         @clickRefresh="getMembers"
+        >
+            <template slot="toolbox-left">
+                <p-button style-type="primary" @click="showModals">
+                    Add Member
+                </p-button>
+                <p-button style-type="primary" :disabled="isDisabled" class="btn-margin">
+                    Delete Member
+                </p-button>
+            </template>
+            <template v-slot:col-user_id-format="data">
+                {{ data.item.user_info.user_id }}
+            </template>
+            <template v-slot:col-name-format="data">
+                {{ data.item.user_info.name }}
+            </template>
+            <template v-slot:col-email-format="data">
+                {{ data.item.user_info.email }}
+            </template>
+            <template v-slot:col-mobile-format="data">
+                {{ data.item.user_info.mobile }}
+            </template>
+            <template v-slot:col-group-format="data">
+                {{ data.item.user_info.group }}
+            </template>
+            <template v-slot:col-roles-format="data">
+                {{ data.item.user_info.roles }}
+            </template>
+        </p-toolbox-table>
+    </div>
 </template>
-
 <script>
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
+import PButton from '@/components/atoms/buttons/Button';
+import ProjectMemberDetail from '@/views/identity/project/modules/ProjectMemberDetail';
+import { defaultQuery } from '@/lib/api';
+import PContentModal from '@/components/organisms/modals/content-modal/ContentModal';
 
 export default {
     name: 'ProjectMember',
     components: {
+        /* ProjectMemberDetail, */
         PToolboxTable,
-
+        PButton,
+        PContentModal,
     },
     props: {
         selectedNode: {
             type: Object,
             default: null,
         },
+        responsiveStyle: {
+            type: Object,
+            default: null,
+        },
     },
     data() {
         return {
+            members: [],
             selectable: true,
             sortable: true,
             selectIndex: [],
-            sortBy: 'name',
-            sortDesc: true,
-            thisPage: 1,
-            allPage: 10,
-            pageSize: 15,
+            tablePage: {
+                sortBy: 'name',
+                sortDesc: true,
+                thisPage: 1,
+                allPage: 1,
+                pageSize: 15,
+            },
         };
     },
     computed: {
-        anySelectedRow() {
-            return this.$attrs['selected-data'];
+        isDisabled() {
+            return !(this.selectIndex.length > 0);
         },
         selectedFields() {
             return [
                 {
-                    key: 'user_id', label: this.tr('COMMON.COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' },
+                    key: 'user_id', label: this.tr('COMMON.COL_NM.UID'),
                 },
                 {
-                    key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' },
+                    key: 'name', label: this.tr('COL_NM.NAME'),
                 },
                 {
-                    key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
+                    key: 'state', label: this.tr('COL_NM.STATE'),
                 },
                 {
-                    key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
+                    key: 'email', label: this.tr('COL_NM.EMAIL'),
                 },
             ];
-        },
+        }, // state
         fields() {
             return [
-                { key: 'selected', thStyle: { width: '50px' } },
                 {
-                    key: 'user_id', label: this.tr('COMMON.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' },
+                    name: 'user_id', label: this.tr('COMMON.UID'),
                 },
                 {
-                    key: 'name', label: this.tr('COMMON.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' },
+                    name: 'name', label: this.tr('COMMON.NAME'),
                 },
                 {
-                    key: 'state', label: this.tr('COMMON.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
+                    name: 'email', label: this.tr('COMMON.EMAIL'),
                 },
                 {
-                    key: 'email', label: this.tr('COMMON.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
+                    name: 'group', label: this.tr('COMMON.GROUP'),
                 },
                 {
-                    key: 'group', label: this.tr('COMMON.GROUP'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
-                },
-                {
-                    key: 'role', label: this.tr('COMMON.ROLE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
+                    name: 'roles', label: this.tr('COMMON.ROLE'),
                 },
             ];
-        },
-        isMultiSelected() {
-            return this.selectedItems.length > 1;
-        },
-        hasSelectedMember() {
-            return this.selectedItems.length > 0;
-        },
-        selectedMembers() {
-            return this.selectedItems.map(item => item.data);
         },
     },
     mounted() {
-        this.init();
+        this.listMembers();
     },
     methods: {
-        init() {
-            this.listMembers(this.perPage, 0);
+        getDefaultQuery() {
+            return {
+                query: defaultQuery(
+                    this.tablePage.thisPage,
+                    this.tablePage.pageSize,
+                    this.tablePage.sortBy,
+                    this.tablePage.sortDesc,
+                ),
+            };
+        },
+        showModals() {
+            this.$refs.modal.show();
         },
         reset() {
             this.members = [];
-            this.selectedMember = null;
-            this.isLoading = true;
         },
-        saveMeta(limit, start, sort, filter, filterOr) {
-            if (this.isEmpty(limit)) {
-                limit = 10;
+        getMembers(fixSort) {
+            if (!fixSort) {
+                this.tablePage.sortBy = '';
+                this.tablePage.sortDesc = true;
             }
-            if (this.isEmpty(start)) {
-                start = 0;
-            }
-            if (this.isEmpty(sort)) {
-                sort = {};
-            }
-            if (this.isEmpty(filter)) {
-                filter = [];
-            }
-            if (this.isEmpty(filterOr)) {
-                filterOr = [];
-            }
-            this.searchQuery = {
-                sort,
-                page: {
-                    start,
-                    limit,
-                },
-                filter_or: filterOr,
-            };
+            this.listMembers();
         },
-        async listMembers(limit, start, sort, filter, filterOr) {
-            this.reset();
-            this.saveMeta(limit, start, sort, filter, filterOr);
-            const query = { query: this.searchQuery };
+        changePageSize() {
+            this.tablePage.thisPage = 1;
+            this.tablePage.allPage = 1;
+            this.listMembers();
+        },
+        async listMembers() {
+            const query = this.getDefaultQuery();
             const selectedNodeDT = this.selectedNode.node.data;
-            const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id, ...query } : { project_id: selectedNodeDT.id, ...query };
+            const param = selectedNodeDT.item_type === 'PROJECT_GROUP' ? { project_group_id: selectedNodeDT.id, ...query } : { project_id: selectedNodeDT.id, ...query };
             const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/member/list`;
-
-            console.log('Parameters', JSON.stringify(param));
             await this.$http.post(url, param).then((response) => {
-                const results = [];
-                if (!this.isEmpty(response.data.results)) {
-                    const memberUserIds = [];
-                    response.data.results.forEach((current) => {
-                        current.user_info.role = current.user_info.roles.join(', ');
-                        results.push(current.user_info);
-                        memberUserIds.push(current.user_info.user_id);
-                    });
-                    this.memberUserIDs = memberUserIds;
-                }
-                this.items = results;
-                console.log(response.data.results);
-                this.isLoading = false;
+                this.members = response.data.results;
+                const allPage = Math.ceil(response.data.total_count / this.tablePage.pageSize);
+                this.tablePage.allPage = allPage || 1;
+                this.selectIndex = [];
             }).catch((error) => {
                 console.error(error);
-                this.isLoading = false;
             });
-        },
-        rowSelected(rows) {
-            this.selectedItems = rows;
-            if (rows.length === 1) {
-                this.selectedIdx = rows[0].idx;
-            }
-        },
-        rowAllSelected(isSelectedAll, rows) {
-            this.selectedItems = rows;
-        },
-        limitChanged(val) {
-            this.perPage = Number(val);
-            this.init();
         },
         getSelectedInfo(key) {
             const selectedObj = this.$attrs['selected-data'].node;
@@ -221,12 +216,12 @@ export default {
             if (!this.isEmpty(url) && !this.isEmpty(url)) {
                 await this.$http.post(url, param);
                 /*     .then((response) => {
-                    if (this.isEmpty(response.data)){
-                        console.log('success');
-                    }
-                }).catch((error) =>{
-                    console.log(error);
-                }); */
+                        if (this.isEmpty(response.data)){
+                            console.log('success');
+                        }
+                    }).catch((error) =>{
+                        console.log(error);
+                    }); */
             }
         },
         actionCommand() {
@@ -249,7 +244,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .base-table {
-    @extend %sheet;
-  }
+    .base-table {
+        @extend %sheet;
+    }
+    .btn-margin{
+        margin-left: 1rem;
+    }
 </style>

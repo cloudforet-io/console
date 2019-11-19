@@ -26,7 +26,7 @@
             </div>
         </div>
 
-        <BaseTree ref="IDPJ001_ProjectTree"
+        <BaseTree ref="ProjectTree"
                   :tree-prop="treeData"
                   :tree-type="'PROJECT'"
                   :context-init="isInitializing"

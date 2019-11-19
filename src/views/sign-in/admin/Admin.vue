@@ -7,14 +7,14 @@
                         <div class="card-group">
                             <div class="card col-7 card-left-container">
                                 <div class="signIn-title">
-                                    {{ $t('COMMON.ADMIN_USER') }} {{ $t('COMMON.SIGN_IN') }}
+                                    {{ $t('SIGNIN.ADMIN_USER') }} {{ $t('COMMON.SIGN_IN') }}
                                 </div>
                                 <div v-show.visible="greeting" class="signIn-sub-title">
-                                    {{ $t('COMMON.SIGN_IN_MSG') }}
+                                    {{ $t('SIGNIN.SIGN_IN_MSG') }}
                                 </div>
                                 <div v-show.visible="!greeting" class="signIn-sub-title">
                                     <div class="sign-in-alert">
-                                        {{ $t('COMMON.SIGN_FAIL_BODY') }}
+                                        {{ $t('SIGNIN.SIGN_FAIL_BODY') }}
                                     </div>
                                 </div>
                                 <form class="form-binder">
@@ -58,7 +58,7 @@
                                                       :style-type="'primary1'"
                                                       @click="signIn"
                                             >
-                                                {{ $t('COMMON.SIGN_IN') }}
+                                                {{ $t('SIGNIN.SIGN_IN') }}
                                             </p-button>
                                         </div>
                                     </div>

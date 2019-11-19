@@ -1,13 +1,6 @@
 export const en = {
     COMMON: {
         COPY: 'Copy',
-        SIGN_UP: 'Sign up',
-        SIGN_IN: 'Sign In',
-        SIGN_IN_MSG: 'Sign in to your Account.',
-        AUTH_G_FAIL_BODY: 'Please confirm your Google Account',
-        AUTH_FAIL_TITLE: 'Authentication failed',
-        SIGN_FAIL_BODY: 'Please confirm your Username or Password.',
-        SIGN_FAIL_TITLE: 'Wrong Password or Username.',
         PROCESSED: 'processed',
         DR_SERV: 'Services',
         COMMON_USER: 'User',
@@ -219,6 +212,13 @@ export const en = {
     SIGNIN: {
         WELCOME_MSG: 'Welcome to {0}',
         WELCOME_MSG_P: 'Welcome to {0} Portal',
+        SIGN_UP: 'Sign up',
+        SIGN_IN: 'Sign In',
+        SIGN_IN_MSG: 'Sign in to your Account.',
+        AUTH_G_FAIL_BODY: 'Please confirm your Google Account',
+        AUTH_FAIL_TITLE: 'Authentication failed',
+        SIGN_FAIL_BODY: 'Please confirm your Username or Password.',
+        SIGN_FAIL_TITLE: 'Wrong Password or Username.',
         ROOT_CREDENTIALS: 'Sign-in using root account credentials',
         USER_EMPTY: 'User ID can\'t be blank.',
         PASS_EMPTY: 'Password can\'t be blank.',
