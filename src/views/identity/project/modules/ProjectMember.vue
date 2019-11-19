@@ -5,6 +5,8 @@
         <p-toolbox-table :items="members"
                          :style="responsiveStyle"
                          :fields="fields"
+                         :shadow="false"
+                         :border="false"
                          :selectable="selectable"
                          :sortable="sortable"
                          :sort-by.sync="tablePage.sortBy"
@@ -20,10 +22,10 @@
         >
             <template slot="toolbox-left">
                 <p-button style-type="primary" @click="showModals">
-                    Add Member
+                    {{tr('COMMON.BTN_ADD')}}
                 </p-button>
-                <p-button style-type="primary" :disabled="isDisabled" class="btn-margin">
-                    Delete Member
+                <p-button style-type="alert" :outline="true" :disabled="isDisabled" class="btn-margin">
+                    {{tr('COMMON.BTN_DELETE')}}
                 </p-button>
             </template>
             <template v-slot:col-user_id-format="data">
@@ -52,7 +54,6 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button';
 import ProjectMemberDetail from '@/views/identity/project/modules/ProjectMemberDetail';
 import { defaultQuery } from '@/lib/api';
-import PContentModal from '@/components/organisms/modals/content-modal/ContentModal';
 
 export default {
     name: 'ProjectMember',
@@ -105,7 +106,7 @@ export default {
                     key: 'email', label: this.tr('COL_NM.EMAIL'),
                 },
             ];
-        }, // state
+        },
         fields() {
             return [
                 {
@@ -207,8 +208,6 @@ export default {
             } else {
                 return;
             }
-
-
             if (!this.isEmpty(url) && !this.isEmpty(url)) {
                 await this.$http.post(url, param);
                 /*     .then((response) => {
