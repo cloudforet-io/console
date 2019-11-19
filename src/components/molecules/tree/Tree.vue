@@ -8,7 +8,8 @@
         @nodeclick="nodeClick"
         @beforedrop="beforeDrop"
         @toggle="nodeToggle"
-        @nodecontextmenu="nodeContextMenu">
+        @nodecontextmenu="nodeContextMenu"
+    >
         <template #title="{ node }">
             <span v-if="node.data.init" class="fas fa-exclamation-triangle" />
             <slot name="icon" v-bind="node">
@@ -17,17 +18,20 @@
                          :color="'transparent inherit'"
                          :width="'1rem'"
                          :height="'1rem'"
-                         :name="'ic_tree_project'"/>
+                         :name="'ic_tree_project'"
+                    />
                     <p-i v-else-if="node.isExpanded"
                          :color="'transparent inherit'"
                          :width="'1rem'"
                          :height="'1rem'"
-                         :name="'ic_tree_folder--opened'"/>
+                         :name="'ic_tree_folder--opened'"
+                    />
                     <p-i v-else
                          :color="'transparent inherit'"
                          :width="'1rem'"
                          :height="'1rem'"
-                         :name="'ic_tree_folder'"/>
+                         :name="'ic_tree_folder'"
+                    />
                 </span>
             </slot>
             <span class="item-title">{{ node.title }}</span>
@@ -37,132 +41,133 @@
                  :color="'transparent inherit'"
                  :width="'1rem'"
                  :height="'1rem'"
-                 :name="'ic_tree_arrow--opened'"/>
+                 :name="'ic_tree_arrow--opened'"
+            />
             <p-i v-else
                  :color="'transparent inherit'"
                  :width="'1rem'"
                  :height="'1rem'"
-                 :name="'ic_tree_arrow'"/>
+                 :name="'ic_tree_arrow'"
+            />
         </template>
     </sl-vue-tree>
 </template>
 
 <script>
-    import SlVueTree from 'sl-vue-tree';
-    import PI from '@/components/atoms/icons/PI';
+import SlVueTree from 'sl-vue-tree';
+import PI from '@/components/atoms/icons/PI';
+export default {
+    name: 'PTree',
+    events: [],
+    components: {
+        PI,
+        SlVueTree,
+    },
+    props: {
+        /** Tree Node Data */
+        treeData: {
+            type: Array,
+            default: () => [],
+        },
+        /** Initial Tree panel Width */
+        initialTreeWidth: {
+            type: String,
+            default: '300px',
+        },
+        /** Allow select multiple Nodes */
+        useMultiSelect: {
+            type: Boolean,
+            default: true,
+        },
+        /** Ues Y/N to user default Node icon on Tree */
+        useDefaultTreeIcon: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    data() {
+        return {
+            currentTreeData: null,
+            clickedNode: null,
+        };
+    },
+    computed: {
+        computedTreeData: {
+            get() {
+                let returnVal = this.treeData;
+                if (this.isEmpty(returnVal)) {
+                    returnVal = [{
+                        title: '!Please, Right Click me',
+                        isLeaf: true,
+                        init: true,
+                    }];
+                }
+                return returnVal;
+            },
+            set(value) {
+                this.currentTreeData = value;
+            },
+        },
+    },
+    methods: {
+        nodeClick(node) {
+            if (this.clickedNode) {
+                this.removeClickedClass(this.clickedNode);
+            }
 
-    export default {
-        name: 'PTree',
-        events: [],
-        components: {
-            PI,
-            SlVueTree,
+            this.clickedNode = node;
+            this.addClickedClass(node);
+
+            this.$emit('nodeClick', node);
         },
-        props: {
-            /** Tree Node Data */
-            treeData: {
-                type: Array,
-                default: () => [],
-            },
-            /** Initial Tree panel Width */
-            initialTreeWidth: {
-                type: String,
-                default: '300px',
-            },
-            /** Allow select multiple Nodes */
-            useMultiSelect: {
-                type: Boolean,
-                default: true,
-            },
-            /** Ues Y/N to user default Node icon on Tree */
-            useDefaultTreeIcon: {
-                type: Boolean,
-                default: true,
-            },
+        beforeDrop(node, position, cancel) {
+            this.$emit('beforeDrop', node, position, cancel);
         },
-        data() {
-            return {
-                currentTreeData: null,
-                clickedNode: null,
-            };
+        nodeToggle(node) {
+            if (!node.isExpanded) {
+                this.setClickedNodeItem(node);
+                if (!node.data.is_cached) {
+                    this.$emit('nodeToggle', node);
+                }
+            }
         },
-        computed: {
-            computedTreeData: {
-                get() {
-                    let returnVal = this.treeData;
-                    if (this.isEmpty(returnVal)) {
-                        returnVal = [{
-                            title: '!Please, Right Click me',
-                            isLeaf: true,
-                            init: true,
-                        }];
+        nodeContextMenu(node, event, hasClicked) {
+            this.$emit('nodeContextMenu', node, event, hasClicked);
+        },
+        setClickedNodeItem(node) {
+            let hasNoClickedItem = false;
+            if (this.clickedNode) {
+                hasNoClickedItem = node.path.some((path, i) => path !== this.clickedNode.path[i]);
+            } else {
+                hasNoClickedItem = true;
+            }
+            if (!hasNoClickedItem) {
+                const addClassInterval = setInterval(() => {
+                    if (this.addClickedClass(this.clickedNode)) {
+                        clearInterval(addClassInterval);
                     }
-                    return returnVal;
-                },
-                set(value) {
-                    this.currentTreeData = value;
-                },
-            },
+                }, 10);
+            }
         },
-        methods: {
-            nodeClick(node) {
-                if (this.clickedNode) {
-                    this.removeClickedClass(this.clickedNode);
-                }
-
-                this.clickedNode = node;
-                this.addClickedClass(node);
-
-                this.$emit('nodeClick', node);
-            },
-            beforeDrop(node, position, cancel) {
-                this.$emit('beforeDrop', node, position, cancel);
-            },
-            nodeToggle(node) {
-                if (!node.isExpanded) {
-                    this.setClickedNodeItem(node);
-                    if (!node.data.is_cached) {
-                        this.$emit('nodeToggle', node);
-                    }
-                }
-            },
-            nodeContextMenu(node, event, hasClicked) {
-                this.$emit('nodeContextMenu', node, event, hasClicked);
-            },
-            setClickedNodeItem(node) {
-                let hasNoClickedItem = false;
-                if (this.clickedNode) {
-                    hasNoClickedItem = node.path.some((path, i) => path !== this.clickedNode.path[i]);
-                } else {
-                    hasNoClickedItem = true;
-                }
-                if (!hasNoClickedItem) {
-                    const addClassInterval = setInterval(() => {
-                        if (this.addClickedClass(this.clickedNode)) {
-                            clearInterval(addClassInterval);
-                        }
-                    }, 10);
-                }
-            },
-            getNodeEl(node) {
-                return this.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
-            },
-            addClickedClass(node) {
-                const elem = this.getNodeEl(node);
-                if (elem) {
-                    elem.classList.add('sl-vue-node-clicked');
-                    return true;
-                }
-                return false;
-            },
-            removeClickedClass(node) {
-                const elem = this.getNodeEl(node);
-                if (elem) {
-                    elem.classList.remove('sl-vue-node-clicked');
-                }
-            },
+        getNodeEl(node) {
+            return this.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
         },
-    };
+        addClickedClass(node) {
+            const elem = this.getNodeEl(node);
+            if (elem) {
+                elem.classList.add('sl-vue-node-clicked');
+                return true;
+            }
+            return false;
+        },
+        removeClickedClass(node) {
+            const elem = this.getNodeEl(node);
+            if (elem) {
+                elem.classList.remove('sl-vue-node-clicked');
+            }
+        },
+    },
+};
 </script>
 
 <style lang="scss" scoped>

@@ -1,68 +1,67 @@
 <template>
     <div :class="{'toolbox-table': true,'toolbox-shadow': shadow, 'toolbox-border': border}">
         <div class="toolbox">
-            <div class="left">
+            <div class="left" :style="{width:hasCenterSlot}">
                 <slot name="toolbox-left" />
             </div>
-            <div class="center">
+            <div v-if="$slots['toolbox-center']" class="center">
                 <slot name="toolbox-center" />
             </div>
             <div class="right">
                 <slot name="toolbox-right" />
                 <div v-if="pagenationVisible" class="tool">
                     <p-text-pagenation
-                        :this-page.sync="proxyThisPage"
-                        :all-page="allPage"
-                        @pageChange="changePageNumber"
+                            :this-page.sync="proxyThisPage"
+                            :all-page="allPage"
+                            @pageChange="changePageNumber"
                     />
                 </div>
                 <div v-if="pageSizeVisible" class="tool">
                     <PDropdownMenuBtn
-                        class="page-size-dropdown"
-                        :menu="pageSizeOptions"
-                        @clickMenuEvent="changePageSize"
+                            class="page-size-dropdown"
+                            :menu="pageSizeOptions"
+                            @clickMenuEvent="changePageSize"
                     >
                         {{ proxyPageSize }}
                     </PDropdownMenuBtn>
                 </div>
                 <div v-if="settingVisible" class="tool">
                     <p-icon-button
-                        name="ic_setting"
-                        @click="$emit('clickSetting',$event)"
+                            name="ic_setting"
+                            @click="$emit('clickSetting',$event)"
                     />
                 </div>
                 <div v-if="refreshVisible" class="tool">
                     <p-icon-button
-                        name="ic_refresh"
-                        @click="$emit('clickRefresh',$event)"
+                            name="ic_refresh"
+                            @click="$emit('clickRefresh',$event)"
                     />
                 </div>
             </div>
         </div>
         <p-data-table
-            ref="table"
-            :fields="fields"
-            :items="items"
-            :sortable="sortable"
-            :selectable="selectable"
-            :select-index.sync="proxySelectIndex"
-            :sort-by.sync="proxySortBy"
-            :sort-desc.sync="proxySortDesc"
-            :table-style-type="tableStyleType"
-            :thead-style-type="theadStyleType"
-            :responsive-style="responsiveStyle"
-            :table-style="tableStyle"
-            :tbody-style="tbodyStyle"
-            :thead-style="theadStyle"
-            :tfoot-style="tfootStyle"
-            :striped="striped"
-            :bord="bord"
-            :hover="hover"
-            :small="small"
-            :background="background"
-            :responsive="responsive"
-            v-on="$listeners"
-            @changeSort="changeSort"
+                ref="table"
+                :fields="fields"
+                :items="items"
+                :sortable="sortable"
+                :selectable="selectable"
+                :select-index.sync="proxySelectIndex"
+                :sort-by.sync="proxySortBy"
+                :sort-desc.sync="proxySortDesc"
+                :table-style-type="tableStyleType"
+                :thead-style-type="theadStyleType"
+                :responsive-style="responsiveStyle"
+                :table-style="tableStyle"
+                :tbody-style="tbodyStyle"
+                :thead-style="theadStyle"
+                :tfoot-style="tfootStyle"
+                :striped="striped"
+                :bord="bord"
+                :hover="hover"
+                :small="small"
+                :background="background"
+                :responsive="responsive"
+                v-on="$listeners"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot :name="slot" v-bind="scope" />
@@ -72,144 +71,143 @@
 </template>
 
 <script>
-import PDataTable from '@/components/organisms/tables/data-table/DataTable';
-import PTextPagenation from '@/components/organisms/pagenations/textPagenation';
-import PIconButton from '@/components/molecules/buttons/IconButton';
-import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
+    import PDataTable from '@/components/organisms/tables/data-table/DataTable';
+    import PTextPagenation from '@/components/organisms/pagenations/textPagenation';
+    import PIconButton from '@/components/molecules/buttons/IconButton';
+    import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 
-export default {
-    name: 'PToolboxTable',
-    components: {
-        PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn,
-    },
-    events: [
-        'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
-        'changeSort', 'theadClick',
-        'clickSetting', 'clickRefresh',
-        'changePageSize', 'changePageNumber',
-    ],
-    mixins: [PDataTable],
-    props: {
-        pagenationVisible: {
-            type: Boolean,
-            default: true,
+    export default {
+        name: 'PToolboxTable',
+        components: {
+            PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn,
         },
-        pageSizeVisible: {
-            type: Boolean,
-            default: true,
-        },
-        shadow: {
-            type: Boolean,
-            default: true,
-        },
-        border: {
-            type: Boolean,
-            default: true,
-        },
-        settingVisible: {
-            type: Boolean,
-            default: true,
-        },
-        refreshVisible: {
-            type: Boolean,
-            default: true,
-        },
-        pageSize: {
-            type: Number,
-            default: 15,
-        },
-        allPage: {
-            type: Number,
-            validator(value) {
-                return value > 0;
+        events: [
+            'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
+            'changeSort', 'theadClick',
+            'clickSetting', 'clickRefresh',
+            'changePageSize', 'changePageNumber',
+        ],
+        mixins: [PDataTable],
+        props: {
+            pagenationVisible: {
+                type: Boolean,
+                default: true,
+            },
+            pageSizeVisible: {
+                type: Boolean,
+                default: true,
+            },
+            shadow: {
+                type: Boolean,
+                default: true,
+            },
+            border: {
+                type: Boolean,
+                default: true,
+            },
+            settingVisible: {
+                type: Boolean,
+                default: true,
+            },
+            refreshVisible: {
+                type: Boolean,
+                default: true,
+            },
+            pageSize: {
+                type: Number,
+                default: 15,
+            },
+            allPage: {
+                type: Number,
+                validator(value) {
+                    return value > 0;
+                },
+            },
+            thisPage: {
+                type: Number,
+                validator(value) {
+                    return value > 0;
+                },
             },
         },
-        thisPage: {
-            type: Number,
-            validator(value) {
-                return value > 0;
+        data() {
+            return {
+                pageSizeOptions: [
+                    { type: 'item', text: 15, event: 15 },
+                    { type: 'item', text: 30, event: 30 },
+                    { type: 'item', text: 45, event: 45 },
+                ],
+            };
+        },
+        computed: {
+            hasCenterSlot() {
+                return !this.$slots['toolbox-center'] ? '100%' : 'auto';
+            },
+            proxyPageSize: {
+                get() {
+                    return this.pageSize;
+                },
+                set(value) {
+                    this.$emit('update:pageSize', value);
+                },
+            },
+            proxyThisPage: {
+                get() {
+                    return this.thisPage;
+                },
+                set(value) {
+                    this.$emit('update:thisPage', value);
+                },
+            },
+            proxySelectIndex: {
+                get() {
+                    return this.selectIndex;
+                },
+                set(value) {
+                    this.$emit('update:selectIndex', value);
+                },
+            },
+            proxySortBy: {
+                get() {
+                    return this.sortBy;
+                },
+                set(value) {
+                    this.$emit('update:sortBy', value);
+                },
+            },
+            proxySortDesc: {
+                get() {
+                    return this.sortDesc;
+                },
+                set(value) {
+                    this.$emit('update:sortDesc', value);
+                },
+            },
+            slotFieldsName() {
+                const slotNames = [];
+                this.fieldsName.forEach((value) => {
+                    slotNames.push(`col-${value}`);
+                });
+                return slotNames;
             },
         },
-    },
-    data() {
-        return {
-            pageSizeOptions: [
-                { type: 'item', text: 15, event: 15 },
-                { type: 'item', text: 30, event: 30 },
-                { type: 'item', text: 45, event: 45 },
-            ],
-        };
-    },
-    computed: {
-        proxyPageSize: {
-            get() {
-                return this.pageSize;
+        methods: {
+            changePageSize(size) {
+                const sizeNum = Number(size);
+                if (this.pageSize !== sizeNum) {
+                    this.proxyPageSize = sizeNum;
+                    this.$emit('changePageSize', sizeNum);
+                }
             },
-            set(value) {
-                this.$emit('update:pageSize', value);
+            changePageNumber(page) {
+                this.$emit('changePageNumber', page);
+            },
+            getSelectItem() {
+                return this.$refs.table.getSelectItem();
             },
         },
-        proxyThisPage: {
-            get() {
-                return this.thisPage;
-            },
-            set(value) {
-                this.$emit('update:thisPage', value);
-            },
-        },
-        proxySelectIndex: {
-            get() {
-                return this.selectIndex;
-            },
-            set(value) {
-                this.$emit('update:selectIndex', value);
-            },
-        },
-        proxySortBy: {
-            get() {
-                return this.sortBy;
-            },
-            set(value) {
-                this.$emit('update:sortBy', value);
-            },
-        },
-        proxySortDesc: {
-            get() {
-                return this.sortDesc;
-            },
-            set(value) {
-                this.$emit('update:sortDesc', value);
-            },
-        },
-        slotFieldsName() {
-            const slotNames = [];
-            this.fieldsName.forEach((value) => {
-                slotNames.push(`col-${value}`);
-            });
-            return slotNames;
-        },
-    },
-    methods: {
-        changePageSize(size) {
-            const sizeNum = Number(size);
-            if (this.pageSize !== sizeNum) {
-                this.proxyPageSize = sizeNum;
-                this.proxyThisPage = 1;
-                this.$emit('changePageSize', sizeNum);
-            }
-        },
-        changePageNumber(page) {
-            this.$emit('changePageNumber', page);
-        },
-        getSelectItem() {
-            return this.$refs.table.getSelectItem();
-        },
-        changeSort() {
-            this.proxyThisPage = 1;
-        },
-    },
 
-};
+    };
 </script>
 
 <style lang="scss" scoped>
