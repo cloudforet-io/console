@@ -20,7 +20,7 @@ import ScrollBooster from 'scrollbooster';
 import PButton from '@/components/atoms/buttons/Button';
 
 export default {
-    name: 'SelectBtnGroup',
+    name: 'PSelectBtnGroup',
     components: { PButton },
     props: {
         buttons: Array,

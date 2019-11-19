@@ -17,10 +17,10 @@
                     :page-size.sync="pageSize"
                     :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
                     :setting-visible="false"
-                    @changePageSize="changePageSize"
-                    @changePageNumber="getServers($event,true)"
+                    @changePageSize="getServers"
+                    @changePageNumber="getServers"
                     @clickRefresh="getServers"
-                    @changeSort="getServers($event,true)"
+                    @changeSort="getServers"
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary" @click="clickCollectData">
@@ -176,17 +176,8 @@ export const serverSetup = (props, context, eventName) => {
         isSelectedOne: computed(() => tableState.selectIndex.length === 1),
     });
     const state = requestMetaReactive();
-    const getServers = (_, fixSort) => {
-        if (!fixSort) {
-            state.sortBy = '';
-            state.sortDesc = true;
-        }
+    const getServers = () => {
         eventBus.$emit(eventName.getServerList);
-    };
-    const changePageSize = (event) => {
-        state.thisPage = 1;
-        state.allPage = 1;
-        getServers(event);
     };
     return reactive({
         ...toRefs(state),
@@ -222,7 +213,6 @@ export const serverSetup = (props, context, eventName) => {
             console.log('add');
         },
         getServers,
-        changePageSize,
         clickMenuEvent(menuName) {
             console.log(menuName);
         },
