@@ -1,6 +1,10 @@
 <template>
     <div class="Aligner">
-        <div ref="loading" class="Aligner-item" :style="{'height': `${size}rem`,'width': `${size}rem`}" />
+        <div ref="loading" class="Aligner-item" :style="{
+            height: `${size}rem`,
+            width: `${size}rem`
+        }"
+        />
     </div>
 </template>
 <script>

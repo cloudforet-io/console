@@ -5,10 +5,14 @@
              minHeight: `${minHeight}px`,
              minWidth: `${minWidth}px`,
              maxHeight: maxHeight ? `${maxHeight}px` : null,
+             maxWidth: maxWidth ? `${maxWidth}px` : null,
          }"
     >
-        <svg :viewBox="`0 0 ${chartWidth} ${chartHeight}`" :width="svgWidth"
+        <svg :viewBox="`0 0 ${chartWidth} ${chartHeight}`"
              :preserveAspectRatio="svgRatio"
+             :style="{
+                 width: svgWidth,
+             }"
         >
             <slot name="default" />
         </svg>
@@ -120,10 +124,15 @@ export const setSvg = (props, context, options) => {
         if (responsiveWidthOnly.value) window.removeEventListener('resize', emitResizeEvent);
     });
 
+    const setSvgResponsiveHeightOnly = () => {
+        state.svgWidth = `${props.minWidth}px`;
+    };
+
     const setSvgSize = () => {
         const responsive = options.value.responsive;
 
         if (responsiveWidthOnly.value) setSvgResponsiveWidthOnly();
+        else if (!responsive.width && responsive.height) setSvgResponsiveHeightOnly();
 
         setPreserveAspectRatio(responsive.preserveAspectRatio);
     };
@@ -152,6 +161,11 @@ export const setDrawTrigger = (props, context, svgTools) => {
         if (!val && state.isMounted) emitReadyEvent();
         else state.startDraw = false;
     });
+
+    // watch(() => props.loading, (val) => {
+    //     if (!val && state.isMounted) emitReadyEvent();
+    //     else state.startDraw = false;
+    // });
 
     watch(() => state.isMounted, (val) => {
         if (val && !props.loading) emitReadyEvent();
@@ -193,6 +207,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        data: {
+            type: Array,
+            default: null,
+        },
         options: {
             type: Object,
             default: () => ({}),
@@ -230,6 +248,8 @@ export default {
         position: relative;
         width: 100%;
         height: 100%;
+        display: flex;
+        justify-content: center;
     }
 
     .tooltip-title {
@@ -259,7 +279,7 @@ export default {
         background: rgba($white, .5);
         .spinner {
             position: absolute;
-            display: inline-block;
+            display: inline-flex;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);

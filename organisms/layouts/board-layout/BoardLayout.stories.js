@@ -3,7 +3,7 @@ import PBoardLayout from './BoardLayout';
 import { autoProps } from '@/setup/storybook-util';
 
 export default {
-    title: 'Molecules/layouts/board-layout',
+    title: 'Organisms/layouts/board-layout',
     component: PBoardLayout,
     decorators: [withKnobs],
 };
