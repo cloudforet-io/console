@@ -1,6 +1,10 @@
 <template>
     <div class="Aligner">
-        <div ref="loading" class="Aligner-item" :style="{'height': `${size}rem`,'width': `${size}rem`}"/>
+        <div ref="loading" class="Aligner-item" :style="{
+            height: `${size}rem`,
+            width: `${size}rem`
+        }"
+        />
     </div>
 </template>
 <script>
@@ -15,13 +19,23 @@ export default {
         },
         size: {
             type: Number,
-            default: null,
+            default: 1,
+        },
+        auto: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {
         return {
             animation: null,
         };
+    },
+    created() {
+        if (this.auto) this.create();
+    },
+    destroy() {
+        if (this.auto) this.destroy();
     },
     methods: {
         async create() {
@@ -53,7 +67,6 @@ export default {
 
 <style lang="scss" scoped>
     .Aligner {
-        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;

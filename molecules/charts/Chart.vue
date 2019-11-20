@@ -5,22 +5,30 @@
              minHeight: `${minHeight}px`,
              minWidth: `${minWidth}px`,
              maxHeight: maxHeight ? `${maxHeight}px` : null,
+             maxWidth: maxWidth ? `${maxWidth}px` : null,
          }"
     >
-        <svg :viewBox="`0 0 ${chartWidth} ${chartHeight}`" :width="svgWidth"
+        <svg :viewBox="`0 0 ${chartWidth} ${chartHeight}`"
              :preserveAspectRatio="svgRatio"
+             :style="{
+                 width: svgWidth,
+             }"
         >
             <slot name="default" />
         </svg>
 
-        <p-spinner :value="!startDraw"
-                   :backdrop="true"
-                   class="p-loading-spinner"
-                   :style="{
-                       minHeight: `${minHeight}px`,
-                       minWidth: `${minWidth}px`,
-                   }"
-        />
+        <transition name="fade-in">
+            <div v-if="!startDraw" class="spinner-container"
+                 :style="{
+                     minHeight: `${minHeight}px`,
+                     minWidth: `${minWidth}px`,
+                 }"
+            >
+                <p-lottie class="spinner"
+                          :size="1.5" :auto="true" name="spinner"
+                />
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -30,6 +38,7 @@ import {
     reactive, toRefs, watch, onMounted, computed, onUnmounted,
 } from '@vue/composition-api';
 import PSpinner from '@/components/base/spinner/BaseSpinner';
+import PLottie from '@/components/molecules/lottie/PLottie';
 import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from './Chart.map';
 
 
@@ -115,10 +124,15 @@ export const setSvg = (props, context, options) => {
         if (responsiveWidthOnly.value) window.removeEventListener('resize', emitResizeEvent);
     });
 
+    const setSvgResponsiveHeightOnly = () => {
+        state.svgWidth = `${props.minWidth}px`;
+    };
+
     const setSvgSize = () => {
         const responsive = options.value.responsive;
 
         if (responsiveWidthOnly.value) setSvgResponsiveWidthOnly();
+        else if (!responsive.width && responsive.height) setSvgResponsiveHeightOnly();
 
         setPreserveAspectRatio(responsive.preserveAspectRatio);
     };
@@ -147,6 +161,11 @@ export const setDrawTrigger = (props, context, svgTools) => {
         if (!val && state.isMounted) emitReadyEvent();
         else state.startDraw = false;
     });
+
+    // watch(() => props.loading, (val) => {
+    //     if (!val && state.isMounted) emitReadyEvent();
+    //     else state.startDraw = false;
+    // });
 
     watch(() => state.isMounted, (val) => {
         if (val && !props.loading) emitReadyEvent();
@@ -181,12 +200,16 @@ export default {
     name: 'PChartD3',
     events: ['resize', 'ready'],
     components: {
-        PSpinner,
+        PLottie,
     },
     props: {
         loading: {
             type: Boolean,
             default: true,
+        },
+        data: {
+            type: Array,
+            default: null,
         },
         options: {
             type: Object,
@@ -225,14 +248,8 @@ export default {
         position: relative;
         width: 100%;
         height: 100%;
-        .p-loading-spinner {
-            position: absolute;
-            left: 0;
-            top: 0;
-            z-index: 99;
-            width: 100%;
-            height: 100%;
-        }
+        display: flex;
+        justify-content: center;
     }
 
     .tooltip-title {
@@ -248,6 +265,39 @@ export default {
             padding-left: 4px;
             font-size: 14px;
             color: $white;
+        }
+    }
+
+    .spinner-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 99;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: rgba($white, .5);
+        .spinner {
+            position: absolute;
+            display: inline-flex;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        &.fade-in-enter-active {
+            transition: opacity .3s, visibility .3s;
+        }
+        &.fade-in-leave-active {
+            transition: opacity .3s, visibility .3s;
+        }
+        &.fade-in-enter, &.fade-in-leave-to {
+            visibility: hidden;
+            opacity: 0;
+        }
+        &.fade-in-leave, &.fade-in-enter-to {
+            visibility: visible;
+            opacity: 1;
         }
     }
 </style>
