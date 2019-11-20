@@ -29,7 +29,16 @@ export default {
             popup: false,
         };
     },
+    mounted() {
+        window.addEventListener('click', this.windowClick);
+    },
+    destroyed() {
+        window.removeEventListener('click', this.windowClick);
+    },
     methods: {
+        windowClick(event) {
+            this.popup = false;
+        },
         clickMenuEvent(eventName) {
             this.$emit('clickMenuEvent', eventName);
             this.$emit(`click-${eventName}`);
