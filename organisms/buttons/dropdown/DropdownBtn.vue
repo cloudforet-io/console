@@ -4,7 +4,7 @@
             :disabled="disabled"
             :class="btnClassObject"
             class="dropdown-btn menu-btn"
-            @click="onClick"
+            @click.stop="onClick"
             @mouseover="onMouseOver"
             @mouseout="onMouseOut"
         >
@@ -16,7 +16,7 @@
                        :disabled="disabled"
                        :color="`transparent ${ disabled ? '#A7A9B2' : popup||mouseover ?'#0080FB' : '#222532'}`"
                        button-style="white"
-                       @click="onClick"
+                       @click.stop="onClick"
                        @mouseover="onMouseOver"
                        @mouseout="onMouseOut"
         />
