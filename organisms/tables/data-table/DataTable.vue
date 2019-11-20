@@ -64,8 +64,10 @@
                     >
                         <p-tr
                             :key="index"
+                            :data-index="index"
                             :class="{'tr-selected': isSelected(index)} "
                             v-bind="item.hasOwnProperty('vbind') ? item.vbind : null"
+                            onselectstart="return false"
                             @click.left="rowLeftClick( item, index, $event )"
                             @click.right="rowRightClick( item, index, $event )"
                             @click.middle="rowMiddleClick( item, index, $event )"
@@ -87,7 +89,7 @@
                                     :index="index"
                                     :field="field"
                                 >
-                                    <p-td>
+                                    <p-td onselectstart="return true" style="user-select: all">
                                         <slot
                                             :name="'col-'+field+'-format'"
                                             :item="item"
@@ -112,6 +114,7 @@
 </template>
 
 <script>
+import DragSelect from 'dragselect';
 import PTable from '@/components/molecules/tables/Table';
 import PTr from '@/components/atoms/table/Tr';
 import PTd from '@/components/atoms/table/Td';
@@ -133,6 +136,10 @@ export default {
         fields: Array,
         items: Array,
         sortable: {
+            type: Boolean,
+            default: false,
+        },
+        dragable: {
             type: Boolean,
             default: false,
         },
@@ -161,6 +168,7 @@ export default {
         return {
             allState: false,
             hoverIndex: null,
+            dragSelect: null,
         };
     },
     computed: {
@@ -199,15 +207,83 @@ export default {
             }
             return 'fa-sort-up';
         },
+        selectArea() {
+            return this.$el;
+        },
+        dragSelectAbles() {
+            return this.selectArea.children[0].children[1].children;
+        },
+    },
+    watch: {
+        items() {
+            if (this.selectable && this.dragable && this.$options.name === 'PDataTable' && this.items) {
+                this.$nextTick(() => {
+                    this.dragSelect.setSelectables(this.dragSelectAbles);
+                });
+            }
+        },
+    },
+    mounted() {
+        if (this.$options.name === 'PDataTable') {
+            if (this.selectable && this.dragable) {
+                // todo: fix when chnage comosition api
+                this.dragSelect = new DragSelect({
+                    selectables: this.dragSelectAbles,
+                    area: this.selectArea,
+                    callback: this.dragSelectItmes,
+                });
+            }
+            if (this.selectable) {
+                window.addEventListener('keydown', this.copy);
+            }
+        }
+    },
+    onUnmounted() {
+        // todo: fix when chnage comosition api
+        if (this.$options.name === 'PDataTable' && this.selectable) {
+            window.addEventListener('keydown', this.copy);
+        }
     },
     methods: {
+        makeTableText(el) {
+            let result = '';
+            el.children.forEach((td, idx) => {
+                if (this.selectable && idx === 0) { return; }
+                result += `${td.innerText}\t`;
+            });
+            return `${result}\n`;
+        },
+        copy(event) {
+            if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && this.selectIndex.length > 0) {
+                let result = '';
+                this.selectIndex.forEach((td) => {
+                    result += this.makeTableText(this.dragSelectAbles[td]);
+                });
+                console.log(result);
+                this.selectToCopyToClipboard(result);
+            }
+        },
+        dragSelectItmes(items, event) {
+            const select = [];
+            if (items.length > 1) {
+                items.forEach((item) => {
+                    select.push(Number(item.attributes['data-index'].value));
+                });
+                this.proxySelectIndex = select;
+            }
+        },
         rowLeftClick(item, index, event) {
             this.$emit('rowLeftClick', item, index, event);
             if (this.selectable) {
                 if (this.rowClickMultiSelectMode) {
                     this.checkboxToggle(index);
                 } else {
-                    this.proxySelectIndex = [index];
+                    console.log(event);
+                    if (event.shiftKey) {
+                        this.proxySelectIndex = [...this.proxySelectIndex, index];
+                    } else {
+                        this.proxySelectIndex = [index];
+                    }
                 }
             }
         },
