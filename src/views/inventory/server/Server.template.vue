@@ -8,6 +8,7 @@
                     :fields="fields"
                     :selectable="true"
                     :sortable="true"
+                    :dragable="true"
                     :hover="true"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"

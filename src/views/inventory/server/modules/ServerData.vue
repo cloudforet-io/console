@@ -5,7 +5,7 @@
             :items="items"
             :fields="dataFields[selected]"
             :selectable="false"
-            :sortable="true"
+            :sortable="false"
             :hover="true"
             :sort-by.sync="proxySortBy"
             :sort-desc.sync="proxySortDesc"
