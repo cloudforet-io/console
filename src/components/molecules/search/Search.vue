@@ -6,6 +6,7 @@
                           :disabled="disabled"
                           :placeholder="searchPlaceholder"
                           @input="$emit('update:searchText',$event)"
+                          @keyup.enter="onSearch"
             />
             <slot name="input-text" />
             <div>
@@ -56,7 +57,7 @@ export default {
     },
     methods: {
         onSearch() {
-            this.$emit('search', this.searchText);
+            this.$emit('onSearch', this.searchText);
         },
     },
 };
