@@ -66,14 +66,14 @@ export default {
                 .attr('class', 'horizontal-bar-g');
         },
         appendLabels() {
-            // append key labels
+            // append key legends
             this.barGroup.append('text')
                 .attr('class', 'key-label')
                 .attr('dominant-baseline', 'hanging')
                 .text(d => d.key)
                 .attr('y', d => this.yScale(d.key) + this.textPadTop);
 
-            // append value labels
+            // append value legends
             this.barGroup.append('text')
                 .attr('class', 'value-label')
                 .attr('dominant-baseline', 'hanging')

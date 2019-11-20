@@ -8,7 +8,7 @@
     "serve:docker": "docker build --tag wconsole-client . && docker run -p 80:80 wconsole-client",
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src",
-    "storybook": "start-storybook -p 6006 -s ./public,./src/asset",
+    "storybook": "start-storybook -p 6006 -s ./public",
     "build-storybook": "build-storybook -s ./public -o .out",
     "svg": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6"
   },
