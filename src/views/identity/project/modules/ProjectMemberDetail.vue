@@ -13,10 +13,10 @@
             @confirm="confirm"
         >
             <template #body>
-                <p-toolbox-table :items="searchedResult"
-                                 :responsive-style="{'height': '50vh', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
+                <p-toolbox-table :items="users"
+                                 :responsive-style="{'height': '35vh', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
                                  :fields="selectedFields"
-                                 :selectable="true"
+                                 :selectable="false"
                                  :sortable="true"
                                  :shadow="false"
                                  :border="false"
@@ -26,6 +26,11 @@
                                  :this-page.sync="tablePage.thisPage"
                                  :select-index.sync="selectIndex"
                                  :page-size.sync="tablePage.pageSize"
+                                 @rowLeftClick="onSelect"
+                                 @changePageSize="getMembers"
+                                 @changeSort="getMembers"
+                                 @changePageNumber="getMembers"
+                                 @clickRefresh="getMembers"
                 >
                     <template slot="toolbox-left">
                         <p-search
@@ -35,24 +40,16 @@
                         />
                     </template>
                     <template v-slot:col-user_id-format="data">
-                        {{ data.item.user_info.user_id }}
+                        {{ data.item.user_id }}
                     </template>
                     <template v-slot:col-name-format="data">
-                        {{ data.item.user_info.name }}
+                        {{ data.item.name }}
                     </template>
                     <template v-slot:col-email-format="data">
-                        {{ data.item.user_info.email }}
-                    </template>
-                    <template v-slot:col-mobile-format="data">
-                        {{ data.item.user_info.mobile }}
-                    </template>
-                    <template v-slot:col-group-format="data">
-                        {{ data.item.user_info.group }}
-                    </template>
-                    <template v-slot:col-roles-format="data">
-                        {{ data.item.user_info.roles }}
+                        {{ data.item.email }}
                     </template>
                 </p-toolbox-table>
+                <div class="card tag-input" />
             </template>
             <template #close-button>
                 {{ tr('COMMON.BTN_CANCEL') }}
@@ -76,12 +73,17 @@ export default {
         PButtonModal,
         PToolboxTable,
         PSearch,
-
+    },
+    props: {
+        referenceMember: {
+            type: Array,
+            default: () => [],
+        },
     },
     data() {
         return {
             visible: false,
-            searchedResult: [],
+            users: [],
             searchText: null,
             selectable: true,
             sortable: true,
@@ -119,7 +121,6 @@ export default {
     mounted() {
 
     },
-
     methods: {
         getDefaultQuery() {
             return {
@@ -131,13 +132,46 @@ export default {
                 ),
             };
         },
+        getMembers() {
+            this.listMembersOnSearch();
+        },
+        changePageSize() {
+            this.tablePage.thisPage = 1;
+            this.tablePage.allPage = 1;
+            this.listMembers();
+        },
+        async listMembersOnSearch(text) {
+            const defaultQuery = this.getDefaultQuery();
+            const query = {
+                keyword: this.isEmpty(text) ? this.searchText : text,
+                filter: [
+                    { key: 'user_id', value: this.referenceMember, operator: 'not_in' },
+                ],
+                ...defaultQuery,
+            };
+            await this.$http.post('/identity/user/list', { query }).then((response) => {
+                this.users = response.data.results;
+                const allPage = Math.ceil(response.data.total_count / this.tablePage.pageSize);
+                this.tablePage.allPage = allPage || 1;
+                this.selectIndex = [];
+            }).catch((error) => {
+                console.error(error);
+            });
+
+        },
         showModal() {
             this.visible = true;
         },
         hideModal() {
             this.visible = false;
         },
+        onSelect(e, text){
+            debugger;
+        },
         search() {
+            this.listMembersOnSearch(this.searchText);
+        },
+        confirm() {
 
         },
         close() {
@@ -147,4 +181,11 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+    .tag-input {
+        height: 20vh;
+        overflow-y: auto;
+        background: $primary4 0% 0% no-repeat padding-box;
+        border: 1px solid $gray3;
+        opacity: 1;
+    }
 </style>

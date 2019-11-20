@@ -1,6 +1,8 @@
 <template>
     <div>
-        <project-member-detail ref="MemberAdd">
+        <project-member-detail ref="MemberAdd"
+            :referenceMember="getBindMember"
+        >
         </project-member-detail>
         <p-toolbox-table :items="members"
                          :style="responsiveStyle"
@@ -53,6 +55,7 @@
     </div>
 </template>
 <script>
+import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
 import ProjectMemberDetail from '@/views/identity/project/modules/ProjectMemberDetail';
@@ -71,6 +74,10 @@ export default {
             type: Object,
             default: null,
         },
+        referenceMember: {
+            type: Array,
+            default: () => [],
+        },
         responsiveStyle: {
             type: Object,
             default: null,
@@ -83,8 +90,8 @@ export default {
             sortable: true,
             selectIndex: [],
             tablePage: {
-                sortBy: 'name',
-                sortDesc: true,
+                sortBy: 'user_id',
+                sortDesc: false,
                 thisPage: 1,
                 allPage: 1,
                 pageSize: 15,
@@ -92,24 +99,11 @@ export default {
         };
     },
     computed: {
+        getBindMember() {
+            return _.map(this.members, 'user_info.user_id');
+        },
         isDisabled() {
             return !(this.selectIndex.length > 0);
-        },
-        selectedFields() {
-            return [
-                {
-                    key: 'user_id', label: this.tr('COMMON.COL_NM.UID'),
-                },
-                {
-                    key: 'name', label: this.tr('COL_NM.NAME'),
-                },
-                {
-                    key: 'state', label: this.tr('COL_NM.STATE'),
-                },
-                {
-                    key: 'email', label: this.tr('COL_NM.EMAIL'),
-                },
-            ];
         },
         fields() {
             return [
@@ -145,9 +139,6 @@ export default {
                 ),
             };
         },
-        reset() {
-            this.members = [];
-        },
         getMembers(fixSort) {
             if (!fixSort) {
                 this.tablePage.sortBy = '';
@@ -159,6 +150,9 @@ export default {
             this.tablePage.thisPage = 1;
             this.tablePage.allPage = 1;
             this.listMembers();
+        },
+        reset() {
+            this.members = [];
         },
         async listMembers() {
             const query = this.getDefaultQuery();

@@ -1,30 +1,31 @@
 <template>
-  <span class="input-tag-container">
-    <QueryInput v-if="isUpdateMode" 
-                :context-data="listData" 
-                :contents="contents"
-                :autofocus="true"
-                autoselect
-                @commit="onUpdate"
-                @empty="$emit('delete')"
-                @deleteLeft="$emit('deleteLeft')"
-    />
+    <span class="input-tag-container">
+        <QueryInput v-if="isUpdateMode"
+                    :context-data="listData"
+                    :contents="contents"
+                    :autofocus="true"
+                    autoselect
+                    @commit="onUpdate"
+                    @empty="$emit('delete')"
+                    @deleteLeft="$emit('deleteLeft')"
+        />
 
-    <span v-else class="badge tag-badge">
-      <span v-if="useTagOnly" class="contents" @click="onUpdateMode">
-        {{ `${tagOnlyKey} : ${tagOnlySubKey}` }}
-      </span>
-      <span v-else class="contents" @click="onUpdateMode">
-        {{ `${label} ${operator} ${value}` }}
-      </span>
-      <span class="icon" @click="$emit('delete')"><i class="fal fa-times-circle" /></span>
+        <span v-else class="badge tag-badge">
+            <span v-if="useTagOnly" class="contents" @click="onUpdateMode">
+                {{ `${tagOnlyKey} : ${tagOnlySubKey}` }}
+            </span>
+            <span v-else class="contents" @click="onUpdateMode">
+                {{ `${label} ${operator} ${value}` }}
+            </span>
+            <span class="icon" @click="$emit('delete')"><i class="fal fa-times-circle" /></span>
+        </span>
+
     </span>
-
-  </span>
 </template>
 
 <script>
 import QueryInput from '@/components/base/input/QueryInput';
+
 export default {
     name: 'InputTag',
     events: ['delete', 'update', 'deleteLeft'],
@@ -32,55 +33,55 @@ export default {
     props: {
         listData: {
             type: Array,
-            default: () => []
+            default: () => [],
         },
         contents: {
             type: Object,
-            default: () => {}
+            default: () => {},
         },
         useTagOnly: {
             type: Boolean,
-            default: false
+            default: false,
         },
         idx: {
             type: Number,
-            required: true
-        }
+            required: true,
+        },
     },
-    data () {
+    data() {
         return {
-            isUpdateMode: false
+            isUpdateMode: false,
         };
     },
     computed: {
-        tagOnlyKey () {
+        tagOnlyKey() {
             return this.contents.key ? ` ${this.contents.key}` : '';
         },
-        tagOnlySubKey () {
+        tagOnlySubKey() {
             return this.contents.subKey ? `${this.contents.subKey}` : '';
         },
-        subKey () {
-            return this.contents.subKey ? `.${this.contents.subKey}` : ''; 
+        subKey() {
+            return this.contents.subKey ? `.${this.contents.subKey}` : '';
         },
-        label () {
+        label() {
             return this.contents.key ? `${this.contents.label}${this.subKey}` : 'Search';
         },
-        value () {
-            return this.contents.value || ''; 
+        value() {
+            return this.contents.value || '';
         },
-        operator () {
-            return this.contents.operator; 
-        }
+        operator() {
+            return this.contents.operator;
+        },
     },
     methods: {
-        onUpdateMode () {
+        onUpdateMode() {
             this.isUpdateMode = true;
         },
-        onUpdate (items) {
+        onUpdate(items) {
             this.$emit('update', items, this.idx);
             this.isUpdateMode = false;
-        }
-    }
+        },
+    },
 };
 </script>
 

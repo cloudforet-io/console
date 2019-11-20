@@ -55,7 +55,6 @@
                                         <div class="col-md-12 col-xs-12 col-sm-12">
                                             <p-button class="button-cover btn-lg"
                                                       :size="'lg'"
-
                                                       :style-type="'primary'"
                                                       @click="signIn"
                                             >
