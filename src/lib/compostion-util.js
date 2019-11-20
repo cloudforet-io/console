@@ -11,6 +11,6 @@ export const makeByPass = (emit, name) => (...event) => {
     emit(name, ...event);
 };
 export const mountBusEvent = (bus, eventName, handler) => {
-    onMounted(() => bus.$on(eventName, handler));
+    bus.$on(eventName, handler);
     onUnmounted(() => bus.$off(eventName, handler));
 };

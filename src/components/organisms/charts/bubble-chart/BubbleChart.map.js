@@ -1,6 +1,11 @@
 import regions from './aws-regions.json';
 
 export const BUBBLE_OPTIONS = Object.freeze({
+    responsive: {
+        width: false,
+        height: true,
+        preserveAspectRatio: false,
+    },
     bubble: {
         maxRadius: 30,
     },

@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
-import { text } from '@storybook/addon-knobs/vue';
+import { text, number } from '@storybook/addon-knobs/vue';
 import PBubbleChart from './BubbleChart';
 import { autoProps } from '@/setup/storybook-util';
 import { sampleDataGenerator } from './BubbleChart.map';
@@ -15,13 +15,25 @@ export default {
 export const leftCase = () => ({
     components: { PBubbleChart },
     props: {
-        ...autoProps(PBubbleChart),
+        ...autoProps(PBubbleChart, [
+            {
+                name: 'minWidth',
+                default: number('minWidth', 700),
+            },
+            {
+                name: 'minHeight',
+                default: number('minHeight', 200),
+            },
+            {
+                name: 'maxHeight',
+                default: number('maxHeight', 260),
+            },
+        ]),
     },
     template: `<div >
                     <button @click="refresh">refresh</button>
                     <div style="border: 1px solid lightgray;
-                                display: inline-block;
-                                width: 100%;"
+                                display: inline-block;"
                     >
                         <p-bubble-chart v-bind="$props" :data="chartData" :loading="loadingChartData"/>
                     </div>
@@ -51,7 +63,7 @@ export const bottomCase = () => ({
             {
                 name: 'legendPosition',
                 default: text('legendPosition', 'bottom'),
-            }
+            },
         ]),
     },
     template: `<div >

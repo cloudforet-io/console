@@ -1,10 +1,14 @@
 <template>
     <div class="bubble-chart-container"
          :class="legendPosition"
-         :style="{maxHeight: maxHeight && legendPosition === 'left' ? `${maxHeight}px` : null }"
+         :style="{
+             maxHeight: maxHeight && legendPosition === 'left' ? `${maxHeight}px` : null,
+             minWidth: `${minWidth}px`
+         }"
     >
         <p-chart v-bind="$props" class="p-chart"
                  :options="chartOptions"
+                 :min-width="chartMinWidth"
                  @ready="draw"
         >
             <g>
@@ -22,22 +26,29 @@
                             :cx="circleLoc([d.longitude, d.latitude])[0]"
                             :cy="circleLoc([d.longitude, d.latitude])[1]"
                             :r="rScale(d.value)"
-                            :style="{ fillOpacity: 0.3,
+                            :style="{ fillOpacity: hoverList[idx] ? 1.0 : 0.3,
                                       fill: colors(idx),
                                       stroke: colors(idx),
                                       strokeWidth: 1,
                             }"
-                            @mouseover="onMouseEnter"
-                            @mouseout="onMouseLeave"
+                            @mouseover="onMouseEnter(idx)"
+                            @mouseout="resetHoverList"
                     />
                 </g>
             </g>
         </p-chart>
         <div class="legend-container"
-             :style="{maxHeight: maxHeight ? `${maxHeight}px` : null }"
+             :style="{
+                 maxHeight: maxHeight && legendPosition === 'left' ? `${maxHeight}px` : null,
+                 width: legendPosition === 'left' ? `${minWidth - chartMinWidth}px` : `${minWidth}px`,
+             }"
         >
             <p-chart-legend v-for="(d, idx) in data" :key="d.key" class="legend"
                             :text="d.key" :count="d.value" :icon-color="colors(idx)"
+                            :opacity="!hoverState || hoverList[idx] ? 1.0 : 0.3"
+                            @mouseenter="onMouseEnter(idx)"
+                            @mouseleave="resetHoverList"
+                            @click="legendClick"
             />
         </div>
     </div>
@@ -59,8 +70,10 @@ import { PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
 
 
 const setDrawTools = (props, context, chartOptions) => {
+    const chartMinWidth = computed(() => (props.legendPosition === 'left' ? props.minWidth * 0.78 : props.minWidth));
+
     const mapData = countries;
-    const xy = d3.geoEquirectangular().fitSize([props.minWidth, props.minHeight], mapData);
+    const xy = d3.geoEquirectangular().fitExtent([[0, 0], [chartMinWidth.value, props.minHeight]], mapData);
 
     const state = reactive({
         mapFeatures: mapData.features,
@@ -70,6 +83,8 @@ const setDrawTools = (props, context, chartOptions) => {
         rScale: d3.scaleLinear().range([0, chartOptions.value.maxRadius]),
         chartData: [],
         colors: d3.scaleOrdinal().range(PRIMARY_COLORSET),
+        hoverList: [],
+        hoverState: false,
     });
 
     const maxRadius = computed(() => chartOptions.value.bubble.maxRadius);
@@ -82,23 +97,23 @@ const setDrawTools = (props, context, chartOptions) => {
             .domain([min.value, max.value]);
     };
 
-    const draw = (svgTools) => {
-        initRScale();
-        state.chartData = props.data;
-        //
-        // {
-        //  "coordinates": {
-        //    "latitude": 38.13,
-        //    "longitude": -78.45
-        //  }
-        // }
+    const resetHoverList = () => {
+        state.hoverState = false;
+        state.hoverList = new Array(props.data.length).fill(false);
     };
 
-    const onMouseEnter = (e) => {
-        e.target.style.fillOpacity = 1;
+    const draw = () => {
+        initRScale();
+        resetHoverList();
+        state.chartData = props.data;
     };
-    const onMouseLeave = (e) => {
-        e.target.style.fillOpacity = 0.3;
+
+    const onMouseEnter = (idx) => {
+        state.hoverState = true;
+        state.hoverList.splice(idx, 1, true);
+    };
+    const legendClick = (key, val, e) => {
+        context.emit('legendClick', key, val, e);
     };
 
 
@@ -106,7 +121,9 @@ const setDrawTools = (props, context, chartOptions) => {
         ...toRefs(state),
         draw,
         onMouseEnter,
-        onMouseLeave,
+        resetHoverList,
+        chartMinWidth,
+        legendClick,
     };
 };
 
@@ -135,6 +152,10 @@ export default {
             type: Number,
             default: 500,
         },
+        /**
+         * @name maxHeight
+         * @description it doesn't work when the legendPosition is 'bottom'
+         */
         maxHeight: {
             type: Number,
             default: 200,
@@ -161,29 +182,27 @@ export default {
 <style lang="scss" scoped>
     .bubble-chart-container {
         display: flex;
+        .p-chart {
+            overflow: hidden;
+            .map-path {
+                fill: $primary3;
+            }
+        }
         &.left {
             width: 100%;
             flex-direction: row-reverse;
             align-items: flex-end;
             .legend-container {
-                width: 22%;
+                padding-right: 1rem;
                 overflow-y: scroll;
                 .legend::v-deep {
                     display: flex;
+                    justify-content: space-between;
                     .p-status {
                         max-width: calc(100% - 1.625rem);
                         justify-content: start;
                     }
                 }
-            }
-            .p-chart {
-                width: 78%;
-            }
-        }
-        .p-chart {
-            overflow: hidden;
-            .map-path {
-                fill: $primary3;
             }
         }
         &.bottom {

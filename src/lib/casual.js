@@ -12,6 +12,20 @@ export const arrayOf = (times, generator, ...args) => {
     return result;
 };
 
+export const dictOf = (times, generator, ...args) => {
+    const result = {};
+    let i = 0;
+    while (i < times) {
+        const obj = generator(...args);
+        const key = Object.keys(obj)[0];
+        if (!result[key]) {
+            result[key] = obj[key];
+            i += 1;
+        }
+    }
+    return result;
+};
+
 const provider = {
     make_id(name) {
         return `${name}_${casual._uuid().slice(-8)}`;

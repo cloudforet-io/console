@@ -12,8 +12,9 @@
 </template>
 
 <script>
-import PBoardLayout from '@/components/molecules/layouts/BoardLayout';
+import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
 import PDonutChart from '@/components/organisms/charts/donut-chart/DonutChart';
+import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 
 export default {
     name: 'ServerState',
@@ -30,10 +31,6 @@ export default {
             type: Boolean,
             default: true,
         },
-        loading: {
-            type: Boolean,
-            default: true,
-        },
         data: {
             type: Object,
             required: true,
@@ -44,10 +41,23 @@ export default {
             }),
         },
     },
+    data() {
+        return {
+            loading: true,
+        };
+    },
     computed: {
         chartData() {
             return Object.keys(this.data).map(key => ({ key, value: this.data[key] }));
         },
+    },
+    watch: {
+        data() {
+            if (this.loading) this.loading = false;
+        },
+    },
+    created() {
+        DashboardEventBus.$emit('listServerState');
     },
     methods: {
         onLegendClick(key, val) {

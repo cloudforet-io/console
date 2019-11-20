@@ -7,7 +7,7 @@
                        fill: colors(idx),
                        opacity: !hoverState || hoverList[idx] ? 1.0 : 0.3
                    }"
-                   @mouseenter="onMouseenter(idx)"
+                   @mouseenter="onMouseEnter(idx)"
                    @mouseleave="resetHoverList"
                 >
                     <path :d="arc(pd)" />
@@ -26,7 +26,7 @@
             <p-chart-legend v-for="(d, idx) in data" :key="d.key" class="legend"
                             :text="d.key" :count="d.value" :icon-color="colors(idx)"
                             :opacity="!hoverState || hoverList[idx] ? 1.0 : 0.3"
-                            @mouseenter="onMouseenter(idx)"
+                            @mouseenter="onMouseEnter(idx)"
                             @mouseleave="resetHoverList"
                             @click="legendClick"
             />
@@ -79,7 +79,7 @@ const setDrawTools = (props, context, chartOptions) => {
         state.pieData = getPieData();
     };
 
-    const onMouseenter = (idx) => {
+    const onMouseEnter = (idx) => {
         state.hoverState = true;
         state.hoverList.splice(idx, 1, true);
     };
@@ -92,7 +92,7 @@ const setDrawTools = (props, context, chartOptions) => {
     return {
         ...toRefs(state),
         draw,
-        onMouseenter,
+        onMouseEnter,
         resetHoverList,
         legendClick,
     };
@@ -144,5 +144,8 @@ export default {
 <style lang="scss" scoped>
     .legend-container {
         padding-top: 1.5rem;
+        .legend::v-deep {
+            display: flex;
+        }
     }
 </style>
