@@ -238,10 +238,10 @@ export default {
             }
         }
     },
-    onUnmounted() {
+    destroyed() {
         // todo: fix when chnage comosition api
         if (this.$options.name === 'PDataTable' && this.selectable) {
-            window.addEventListener('keydown', this.copy);
+            window.removeEventListener('keydown', this.copy);
         }
     },
     methods: {
