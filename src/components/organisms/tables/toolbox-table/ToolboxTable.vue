@@ -45,6 +45,7 @@
             :items="items"
             :sortable="sortable"
             :selectable="selectable"
+            :dragable="dragable"
             :select-index.sync="proxySelectIndex"
             :sort-by.sync="proxySortBy"
             :sort-desc.sync="proxySortDesc"
