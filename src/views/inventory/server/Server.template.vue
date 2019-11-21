@@ -118,7 +118,7 @@ import PBadge from '@/components/atoms/badges/Badge';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
-import { timestampFormatter } from '@/lib/formatter';
+import { timestampFormatter } from '@/lib/util';
 import { serverStateFormatter } from '@/views/inventory/server/Server.util';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeTrItems } from '@/lib/helper';

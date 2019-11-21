@@ -1,4 +1,5 @@
 const path = require('path');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
     lintOnSave: false,
@@ -14,6 +15,8 @@ module.exports = {
                 @import "~@/styles/_variables.scss";
                 `,
                 includePaths: ['./node_modules'],
+                excludePaths: [path.resolve(__dirname, '..', 'node_modules/monaco-editor')],
+
             },
         },
     },
@@ -25,5 +28,11 @@ module.exports = {
             },
         },
         devtool: 'source-map',
+        plugins: [
+            new MonacoWebpackPlugin({
+                languages: ['json', 'html', 'python', 'javascript', 'css'],
+            }),
+        ],
     },
+
 };
