@@ -1,4 +1,5 @@
 const path = require('path');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = async ({ config, mode }) => {
     config.module.rules.push(
@@ -20,7 +21,9 @@ module.exports = async ({ config, mode }) => {
                     }
                 },
             ],
-            include: path.resolve(__dirname, '../')
+            include: path.resolve(__dirname, '../'),
+            exclude:[path.resolve(__dirname, '..', 'node_modules/monaco-editor')]
+
         }
     );
     config.resolve.alias = {
@@ -33,5 +36,9 @@ module.exports = async ({ config, mode }) => {
         loader: 'storybook-addon-vue-info/loader',
         enforce: 'post'
     })
+  debugger;
+    config.plugins.push(new MonacoWebpackPlugin({
+        languages:['javascript','json','css','html']
+    }))
     return config;
 };
