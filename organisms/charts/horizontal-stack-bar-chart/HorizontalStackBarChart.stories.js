@@ -1,6 +1,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
+import { action } from '@storybook/addon-actions';
 import PHorizontalStackBarChart from './HorizontalStackBarChart';
 import { autoProps } from '@/setup/storybook-util';
+
 import { sampleDataGenerator } from './HorizontalStackBarChart.map';
 
 export default {
@@ -26,12 +28,13 @@ export const defaultCase = () => ({
                             :data="chartData" 
                             :loading="loadingChartData"
                             style="width: 100%;"
+                            @legendClick="legendClick"
                         />
                     </div>
                </div>`,
     data() {
         return {
-            chartData: [],
+            chartData: {},
             loadingChartData: true,
         };
     },
@@ -43,5 +46,6 @@ export const defaultCase = () => ({
                 this.loadingChartData = false;
             }, 1000);
         },
+        legendClick: action('legendClick'),
     },
 });

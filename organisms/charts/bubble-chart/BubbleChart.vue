@@ -48,7 +48,7 @@
                             :opacity="!hoverState || hoverList[idx] ? 1.0 : 0.3"
                             @mouseenter="onMouseEnter(idx)"
                             @mouseleave="resetHoverList"
-                            @click="legendClick"
+                            @click="$emit('legendClick', d.key, d.value)"
             />
         </div>
     </div>
@@ -112,9 +112,6 @@ const setDrawTools = (props, context, chartOptions) => {
         state.hoverState = true;
         state.hoverList.splice(idx, 1, true);
     };
-    const legendClick = (key, val, e) => {
-        context.emit('legendClick', key, val, e);
-    };
 
 
     return {
@@ -123,7 +120,6 @@ const setDrawTools = (props, context, chartOptions) => {
         onMouseEnter,
         resetHoverList,
         chartMinWidth,
-        legendClick,
     };
 };
 
