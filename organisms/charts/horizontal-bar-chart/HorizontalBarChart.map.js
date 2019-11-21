@@ -1,4 +1,9 @@
 export const HORIZONTAL_OPTIONS = Object.freeze({
+    responsive: {
+        width: true,
+        height: false,
+        preserveAspectRatio: false,
+    },
     labels: {
         padTop: 8,
         padBottom: 4,
