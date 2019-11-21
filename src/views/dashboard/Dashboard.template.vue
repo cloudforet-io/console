@@ -1,11 +1,21 @@
 <template>
     <div class="dashboard-container">
         <main>
-            <ResourcesByRegion class="resources-by-region" :data="resourcesByRegionData" />
-            <ServerState class="server-state" :data="serverStateData" />
+            <div class="row">
+                <ResourcesByRegion class="col" :data="resourcesByRegionData" />
+                <ServerState class="col server-state" :data="serverStateData" />
+            </div>
+            <div class="row">
+                <ServersByType class="col"
+                               :server-data="serverTypeData"
+                               :vm-data="vmTypeData"
+                               :os-data="osTypeData"
+                               :hypervisor-data="hypervisorTypeData"
+                />
+            </div>
+
         <!--                            <Summary title="Summary" />-->
         <!--                            <CollectionState />-->
-        <!--                            <ServersByType />-->
         </main>
     </div>
 </template>
@@ -22,6 +32,10 @@ export const setup = (props, context) => {
     const state = reactive({
         resourcesByRegionData: {},
         serverStateData: {},
+        serverTypeData: {},
+        vmTypeData: {},
+        osTypeData: {},
+        hypervisorTypeData: {},
     });
     return {
         ...toRefs(state),
@@ -49,12 +63,11 @@ export default {
     padding: 2rem 2rem 1rem 2rem;
     justify-content: center;
     main {
-        display: flex;
         width: 100%;
         min-width: calc(1200px - #{$gnb-width});
         max-width: 1280px;
-        .resources-by-region {
-            width: 100%;
+        .row {
+            padding-bottom: 1rem;
         }
         .server-state {
             margin-left: 1.25rem;
@@ -62,6 +75,7 @@ export default {
             max-width: 280px;
             width: 100%;
         }
+
     }
 }
 </style>

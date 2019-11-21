@@ -30,6 +30,7 @@ module.exports = {
       },
     }],
     "no-param-reassign": ["error", { "props": false }],
+    "no-underscore-dangle": ["off"],
   },
   parserOptions: {
     parser: 'babel-eslint',

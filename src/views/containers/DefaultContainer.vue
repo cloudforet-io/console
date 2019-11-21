@@ -46,9 +46,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    $min-width: 1200px;
 .app {
     overflow-y: hidden;
     min-height: 100vh;
+    min-width: $min-width;
     .gnb {
         display: inline-block;
         position: fixed;
@@ -59,10 +61,12 @@ export default {
     .app-body {
         margin-left: $gnb-width;
         width: calc(100vw - #{$gnb-width});
+        min-width: calc(#{$min-width} - #{$gnb-width});
         min-height: 100vh;
         .main {
             margin: 0;
             width: calc(100vw - #{$gnb-width});
+            min-width: calc(#{$min-width} - #{$gnb-width});
             overflow-x: hidden;
         }
     }

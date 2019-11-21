@@ -11,10 +11,11 @@
                :data-key="cd.key"
                :style="{ fill: colors(ci) }"
             >
-                <g v-for="(d, idx) in cd" ref="bar" :key="cd.key + idx"
-                   :d0="d[0]" :d1="d[1]"
-                   @mouseenter="onMouseEnter($event)"
-                   @mouseleave="onMouseLeave"
+                <g v-for="(d, idx) in cd" ref="bar"
+                   :key="cd.key + idx"
+                   :style="{ opacity: !hoverState || hoverList[ci] ? 1.0 : 0.3 }"
+                   @mouseenter="onMouseEnter(ci)"
+                   @mouseleave="resetHoverList"
                 >
                     <rect class="bar"
                           :x="xScale(d[0])" :y="yScale(idx)"
@@ -29,14 +30,18 @@
                           :x="xScale((d[0] + d[1]) / 2)" :y="yScale(idx + 0.5)"
                           dominant-baseline="middle" text-anchor="middle"
                     >
-                        {{ Math.round(d.data[keys[ci]] / sumList[idx] * 100) }}%
+                        {{ Math.round(d.data[keys[ci]] / sum * 100) }}%
                     </text>
                 </g>
             </g>
         </p-chart>
-        <div v-for="(d, i) in data" :key="i" class="legend-container">
-            <p-chart-legend v-for="(key, idx) in keys" :key="key" class="legend"
-                            :text="key" :count="d[key]" :icon-color="colors(idx)"
+        <div class="legend-container">
+            <p-chart-legend v-for="(val, key, idx) in data" :key="key" class="legend"
+                            :text="key" :count="val" :icon-color="colors(idx)"
+                            :opacity="!hoverState || hoverList[idx] ? 1.0 : 0.3"
+                            @mouseenter="onMouseEnter(idx)"
+                            @mouseleave="resetHoverList"
+                            @click="$emit('legendClick', key, val)"
             />
         </div>
     </div>
@@ -46,7 +51,7 @@
 import * as d3 from 'd3';
 import _ from 'lodash';
 import {
-    reactive, toRefs, computed, ref, watch,
+    reactive, toRefs, computed,
 } from '@vue/composition-api';
 import PChart from '@/components/molecules/charts/Chart';
 import PChartLegend from '@/components/organisms/legends/ChartLegend';
@@ -57,34 +62,28 @@ const setDrawTools = (props, context, chartOptions) => {
     const state = reactive({
         yScale: null,
         xScale: null,
-        sumList: null,
-        keys: null,
+        sum: computed(() => d3.sum(Object.values(props.data))),
+        keys: computed(() => Object.keys(props.data)),
+        chartHeight: computed(() => state.barThickness),
         chartData: null,
         hoverList: [],
+        hoverState: false,
         colors: d3.scaleOrdinal().range(PRIMARY_COLORSET),
         barThickness: computed(() => chartOptions.value.bars.thickness),
         labels: null,
         visibleLabels: [],
     });
 
-    const chartHeight = computed(() => state.barThickness * (props.data.length || 1));
-    const max = computed(() => d3.max(state.sumList));
-
-    const initComputingData = () => {
-        state.sumList = props.data.map(d => d3.sum(Object.values(d)));
-        state.keys = props.data[0] ? Object.keys(props.data[0]) : [];
-    };
-
     const initYScale = (svgTools) => {
-        svgTools.setChartHeight(chartHeight.value);
+        svgTools.setChartHeight(state.chartHeight);
         state.yScale = d3.scaleLinear()
-            .rangeRound([0, chartHeight.value])
-            .domain([0, props.data.length]);
+            .rangeRound([0, state.chartHeight])
+            .domain([0, 1]);
     };
     const initXScale = (svgTools) => {
         state.xScale = d3.scaleLinear()
             .range([0, svgTools.chartWidth.value])
-            .domain([0, max.value]);
+            .domain([0, state.sum]);
     };
 
     const setLabelVisibility = () => {
@@ -94,22 +93,22 @@ const setDrawTools = (props, context, chartOptions) => {
             label.style.visibility = rect.getAttribute('width') > label.getBoundingClientRect().width ? 'visible' : 'hidden';
         });
     };
+
+    const resetHoverList = () => {
+        state.hoverState = false;
+        state.hoverList = new Array(state.keys.length).fill(false);
+    };
     const draw = async (svgTools) => {
-        initComputingData();
         initYScale(svgTools);
         initXScale(svgTools);
-        state.hoverList = new Array(props.data.length);
-        state.chartData = d3.stack().keys(state.keys)(props.data);
+        resetHoverList();
+        state.chartData = d3.stack().keys(state.keys)([props.data]);
         context.root.$nextTick(() => { setLabelVisibility(); });
     };
 
-    const onMouseEnter = (e) => {
-        context.refs.bar.forEach((b) => { b.style.opacity = 0.3; });
-        e.target.style.opacity = 1;
-    };
-
-    const onMouseLeave = () => {
-        context.refs.bar.forEach((b) => { b.style.opacity = 1; });
+    const onMouseEnter = (idx) => {
+        state.hoverState = true;
+        state.hoverList.splice(idx, 1, true);
     };
 
     const resizeElements = (svgTools) => {
@@ -117,14 +116,12 @@ const setDrawTools = (props, context, chartOptions) => {
         setLabelVisibility();
     };
 
-
     return {
         ...toRefs(state),
-        chartHeight,
         draw,
         resizeElements,
         onMouseEnter,
-        onMouseLeave,
+        resetHoverList,
     };
 };
 
@@ -137,7 +134,7 @@ export default {
             default: true,
         },
         data: {
-            type: Array,
+            type: Object,
             required: true,
         },
         options: {
