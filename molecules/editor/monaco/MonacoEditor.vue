@@ -5,7 +5,7 @@
 <script>
 import * as monaco from 'monaco-editor';
 import {
-    onMounted, reactive, toRefs,
+    onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 
@@ -33,12 +33,15 @@ export default {
             default: () => {},
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit, parent }) {
         const state = reactive({
             editorDom: null, // ref
             editor: null,
+            buffer: '',
         });
         const syncValue = () => {
+            const value = state.editor.getValue();
+            state.buffer = value;
             emit('update:code', state.editor.getValue());
         };
         onMounted(() => {
@@ -47,9 +50,15 @@ export default {
                 theme: props.theme,
                 language: props.language,
                 readOnly: props.readOnly,
+                automaticLayout: true,
                 ...props.createOptions,
             });
             state.editor.onDidChangeModelContent(syncValue);
+            watch(() => props.code, (value) => {
+                if (value !== state.buffer) {
+                    state.editor.setValue(value);
+                }
+            });
         });
         return {
             ...toRefs(state),
@@ -57,10 +66,3 @@ export default {
     },
 };
 </script>
-
-<style lang="scss" scoped>
-.p-monaco{
-    width: 100%;
-    height: 100%;
-}
-</style>
