@@ -205,7 +205,7 @@ export const editorMode = () => ({
     components: { PMonacoEditor },
     template: `
 <div style="width: 80vw; height:80vh" class="row">
-    <PMonaco  :code.sync="code" class="col-sm-6"/>
+    <PMonacoEditor  :code.sync="code" class="col-sm-6"/>
     <pre class="col-sm-6">{{code}}</pre>
 </div>`,
     data() {
@@ -219,7 +219,7 @@ export const readOnlyMode = () => ({
     components: { PMonacoEditor },
     template: `
 <div style="width: 80vw; height:80vh" class="row">
-    <PMonaco  :code.sync="code" :readOnly="true" class="col-sm-6"/>
+    <PMonacoEditor  :code.sync="code" :readOnly="true" class="col-sm-6"/>
     <pre class="col-sm-6">{{code}}</pre>
 </div>`,
     data() {

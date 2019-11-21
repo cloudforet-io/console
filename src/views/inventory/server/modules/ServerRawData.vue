@@ -1,35 +1,28 @@
 <template>
-  <div class="row">
-    <b-col class="col-xs-6 col-sm-6 col-md-6 col-lg-12">
-      <b-card>
-        <BasePanelJson
-          :json-data="serverData"
-        />
-      </b-card>
-    </b-col>
-  </div>
+    <PMonacoEditor style="width: 100%;height: 70vh;" :code="code" :read-only="true" />
 </template>
 
 <script>
-import BasePanelJson from '@/components/base/panel/BasePanelJson';
+import { computed } from '@vue/composition-api';
+import PMonacoEditor from '@/components/molecules/editor/monaco/MonacoEditor';
 
 export default {
-    name: 'ServerRawData',
+    name: 'PServerRawData',
     components: {
-        BasePanelJson
+        PMonacoEditor,
     },
     props: {
-        serverData: {
+        item: {
             type: Object,
-            default: () => ({})
-        }
+            default: () => {},
+        },
     },
-    data () {
+    setup(props) {
+        const code = computed(() => JSON.stringify(props.item, undefined, 4));
         return {
+            code,
         };
-    }
+    },
+
 };
 </script>
-
-<style lang="scss" scoped>
-</style>
