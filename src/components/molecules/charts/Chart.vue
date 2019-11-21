@@ -2,8 +2,8 @@
     <div ref="chartRef"
          class="p-chart-container"
          :style="{
-             minHeight: `${minHeight}px`,
-             minWidth: `${minWidth}px`,
+             minHeight: minHeight ? `${minHeight}px` : null,
+             minWidth: minWidth ? `${minWidth}px` : null,
              maxHeight: maxHeight ? `${maxHeight}px` : null,
              maxWidth: maxWidth ? `${maxWidth}px` : null,
          }"
@@ -85,8 +85,8 @@ export const setSvg = (props, context, options) => {
     const state = reactive({
         svgRatio: '',
         svgWidth: '100%',
-        chartHeight: props.minHeight,
-        chartWidth: props.minWidth,
+        chartHeight: props.minHeight || 0,
+        chartWidth: props.minWidth || 0,
     });
 
     const responsiveWidthOnly = computed(() => options.value.responsive.width && !options.value.responsive.height);
@@ -207,21 +207,17 @@ export default {
             type: Boolean,
             default: true,
         },
-        data: {
-            type: Array,
-            default: null,
-        },
         options: {
             type: Object,
             default: () => ({}),
         },
         minHeight: {
             type: Number,
-            default: 100,
+            default: null,
         },
         minWidth: {
             type: Number,
-            default: 250,
+            default: null,
         },
         maxHeight: {
             type: Number,

@@ -11,7 +11,7 @@ export default {
     setup(props, context) {
         const state = setup(props, context);
 
-        // ResourcesByRegion
+        // Resources By Region
         const listRegionByServer = () => {
             setTimeout(() => {
                 state.resourcesByRegionData.value = casual.resourcesByRegion;
@@ -26,7 +26,7 @@ export default {
         mountBusEvent(DashboardEventBus, 'listRegionByServer', listRegionByServer);
         mountBusEvent(DashboardEventBus, 'listRegionByCloudService', listRegionByCloudService);
 
-        // ServerState
+        // Server State
         const listServerState = () => {
             setTimeout(() => {
                 state.serverStateData.value = casual.serverStates;
@@ -34,6 +34,36 @@ export default {
         };
 
         mountBusEvent(DashboardEventBus, 'listServerState', listServerState);
+
+        // Servers by Type
+        const listServerType = () => {
+            setTimeout(() => {
+                state.serverTypeData.value = casual.serverType;
+            }, 1000);
+        };
+        mountBusEvent(DashboardEventBus, 'listServerType', listServerType);
+
+        const listVmType = () => {
+            setTimeout(() => {
+                state.vmTypeData.value = casual.vmType;
+            }, 1000);
+        };
+        mountBusEvent(DashboardEventBus, 'listServerType', listVmType);
+
+        const listOsType = () => {
+            setTimeout(() => {
+                state.osTypeData.value = casual.osType;
+            }, 1000);
+        };
+        mountBusEvent(DashboardEventBus, 'listOsType', listOsType);
+
+        const listHypervisorType = () => {
+            setTimeout(() => {
+                state.hypervisorTypeData.value = casual.hypervisorType;
+            }, 1000);
+        };
+        mountBusEvent(DashboardEventBus, 'listHypervisorType', listHypervisorType);
+
         return { ...toRefs(state) };
     },
 };

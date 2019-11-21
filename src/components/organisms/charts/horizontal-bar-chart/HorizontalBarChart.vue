@@ -1,41 +1,37 @@
 <template>
-    <div>
-        <p-chart v-bind="$props" :options="chartOptions" @ready="draw">
-            <template>
-                <g v-for="(d, idx) in chartData" :key="d.key"
-                   class="horizontal-bar-g"
-                   :class="{hover: hoverList[idx]}"
-                >
-                    <text class="key-label" dominant-baseline="hanging"
-                          :y="yScale(d.key) + textPadTop"
-                    >
-                        {{ d.key }}
-                    </text>
-                    <text class="value-label" dominant-baseline="hanging"
-                          text-anchor="end"
-                          :x="xScale(max)"
-                          :y="yScale(d.key) + textPadTop"
-                    >
-                        {{ d.value }}
-                    </text>
-                    <rect class="back-bar"
-                          :rx="round" :ry="round"
-                          x="0" :y="yScale(d.key) + barPosY"
-                          :height="barThickness"
-                          :width="xScale(max)"
-                    />
-                    <rect class="bar"
-                          :rx="round" :ry="round"
-                          x="0" :y="yScale(d.key) + barPosY"
-                          :height="barThickness"
-                          :width="xScale(d.value)"
-                          @mouseenter="onMouseEnter(idx)"
-                          @mouseleave="onMouseLeave(idx)"
-                    />
-                </g>
-            </template>
-        </p-chart>
-    </div>
+    <p-chart v-bind="$props" :options="chartOptions" @ready="draw">
+        <g v-for="(d, idx) in chartData" :key="d.key"
+           class="horizontal-bar-g"
+           :class="{hover: hoverList[idx]}"
+        >
+            <text class="key-label" dominant-baseline="hanging"
+                  :y="yScale(d.key) + textPadTop"
+            >
+                {{ d.key }}
+            </text>
+            <text class="value-label" dominant-baseline="hanging"
+                  text-anchor="end"
+                  :x="xScale(max)"
+                  :y="yScale(d.key) + textPadTop"
+            >
+                {{ d.value }}
+            </text>
+            <rect class="back-bar"
+                  :rx="round" :ry="round"
+                  x="0" :y="yScale(d.key) + barPosY"
+                  :height="barThickness"
+                  :width="xScale(max)"
+            />
+            <rect class="bar"
+                  :rx="round" :ry="round"
+                  x="0" :y="yScale(d.key) + barPosY"
+                  :height="barThickness"
+                  :width="xScale(d.value)"
+                  @mouseenter="onMouseEnter(idx)"
+                  @mouseleave="onMouseLeave(idx)"
+            />
+        </g>
+    </p-chart>
 </template>
 
 
@@ -64,7 +60,9 @@ const setDrawTools = (props, context, chartOptions) => {
 
     const initYScale = (svgTools) => {
         const bandWidth = state.textHeight + state.textPadTop + state.textPadBottom + state.barThickness;
-        svgTools.setChartHeight(props.data.length * bandWidth);
+        if (!chartOptions.value.responsive.height) {
+            svgTools.setChartHeight(props.data.length * bandWidth);
+        }
         return d3.scaleBand()
             .range([0, svgTools.chartHeight.value])
             .domain(props.data.map(d => d.key));
@@ -122,11 +120,11 @@ export default {
         },
         minHeight: {
             type: Number,
-            default: 200,
+            default: null,
         },
         minWidth: {
             type: Number,
-            default: 500,
+            default: null,
         },
         maxHeight: {
             type: Number,
