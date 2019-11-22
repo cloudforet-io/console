@@ -88,6 +88,7 @@ export default {
     text-align: center;
     font: 14px/16px Arial;
     letter-spacing: 0;
+    line-height: 1.2rem;
 
     @include btn-color('primary', $primary, $white);
     @include btn-color('primary-dark', $primary-dark, $white);

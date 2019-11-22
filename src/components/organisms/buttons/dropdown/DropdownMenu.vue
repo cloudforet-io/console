@@ -46,6 +46,7 @@ export default {
         margin: 0px;
         min-width: 8.5rem;
         cursor:default;
+        top: 98%;
         .dropdown-divider{
             margin: 0;
             border-top:1px solid $secondary;

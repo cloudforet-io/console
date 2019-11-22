@@ -31,18 +31,18 @@
                         :key="index"
                         @click="theadClick(field,index,$event)"
                     >
-                        {{ field.label ? field.label : field.name }}
+                        <div style="vertical-align: middle !important;display: inline;">
+                            {{ field.label ? field.label : field.name }}
+                        </div>
                         <template v-if="sortable&&field.sortable">
-                            <f-i
+                            <p-i
                                 v-if="sortable&&field.name==sortBy"
-                                icon-style="solid"
-                                :icon="sortIcon"
+                                :name="sortIcon"
                                 class="sort-icon"
                             />
-                            <f-i
+                            <p-i
                                 v-else
-                                icon-style="solid"
-                                icon="fa-sort"
+                                name="ic_table_sort"
                                 class="sort-icon"
                             />
                         </template>
@@ -119,13 +119,13 @@ import PTable from '@/components/molecules/tables/Table';
 import PTr from '@/components/atoms/table/Tr';
 import PTd from '@/components/atoms/table/Td';
 import PTh from '@/components/atoms/table/Th';
-import FI from '@/components/atoms/icons/FI';
+import PI from '@/components/atoms/icons/PI';
 import PCheckBox from '@/components/molecules/forms/CheckBox';
 
 export default {
     name: 'PDataTable',
     components: {
-        PTable, PTd, PTh, PTr, FI, PCheckBox,
+        PTable, PTd, PTh, PTr, PI, PCheckBox,
     },
     events: [
         'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
@@ -203,9 +203,9 @@ export default {
         },
         sortIcon() {
             if (this.sortDesc) {
-                return 'fa-sort-down';
+                return 'ic_table_sort_fromZ';
             }
-            return 'fa-sort-up';
+            return 'ic_table_sort_fromA';
         },
         selectArea() {
             return this.$el;
@@ -276,12 +276,10 @@ export default {
             if (this.selectable) {
                 if (this.rowClickMultiSelectMode) {
                     this.checkboxToggle(index);
+                } else if (event.shiftKey) {
+                    this.proxySelectIndex = [...this.proxySelectIndex, index];
                 } else {
-                    if (event.shiftKey) {
-                        this.proxySelectIndex = [...this.proxySelectIndex, index];
-                    } else {
-                        this.proxySelectIndex = [index];
-                    }
+                    this.proxySelectIndex = [index];
                 }
             }
         },
@@ -373,6 +371,7 @@ export default {
     thead{
         tr{
             th{
+                white-space:nowrap;
                 .sort-icon{
                     float: right;
                     color: $gray2;
