@@ -1,9 +1,11 @@
 <template>
     <div>
-        <project-member-detail ref="MemberAdd"
-            :referenceMember="getBindMember"
-        >
-        </project-member-detail>
+        <project-member-add ref="MemberAdd"
+                            :reference-member="getBindMember"
+        />
+        <project-member-delete ref="MemberDelete"
+                               :reference-member="getMemberData"
+        />
         <p-toolbox-table :items="members"
                          :style="responsiveStyle"
                          :fields="fields"
@@ -18,19 +20,24 @@
                          :select-index.sync="selectIndex"
                          :page-size.sync="tablePage.pageSize"
                          @changePageSize="changePageSize"
-                         @changeSort="getMembers(true)"
-                         @changePageNumber="getMembers(true)"
+                         @changeSort="getMembers"
+                         @changePageNumber="getMembers"
                          @clickRefresh="getMembers"
         >
             <template slot="toolbox-left">
-                <p-button style-type="primary" @click="showModals">
+                <p-button style-type="primary" @click="showModals('add')">
                     <p-i :color="'transparent inherit'"
                          :width="'1rem'"
                          :height="'1rem'"
-                         :name="'ic_plus'"/>   {{tr('COMMON.BTN_ADD')}}
+                         :name="'ic_plus'"
+                    />   {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
-                <p-button style-type="alert" :outline="true" :disabled="isDisabled" class="btn-margin">
-                    {{tr('COMMON.BTN_DELETE')}}
+                <p-button style-type="alert" :outline="true"
+                          :disabled="isDisabled"
+                          class="btn-margin"
+                          @click="showModals('del')"
+                >
+                    {{ tr('COMMON.BTN_DELETE') }}
                 </p-button>
             </template>
             <template v-slot:col-user_id-format="data">
@@ -49,7 +56,7 @@
                 {{ data.item.user_info.group }}
             </template>
             <template v-slot:col-roles-format="data">
-                {{ data.item.user_info.roles }}
+                {{ getEmptyString(data.item.user_info.roles) }}
             </template>
         </p-toolbox-table>
     </div>
@@ -58,16 +65,19 @@
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
-import ProjectMemberDetail from '@/views/identity/project/modules/ProjectMemberDetail';
+import ProjectMemberAdd from '@/views/identity/project/modules/ProjectMemberAdd';
+import ProjectMemberDelete from '@/views/identity/project/modules/ProjectMemberDelete';
 import { defaultQuery } from '@/lib/api';
 import PI from '@/components/atoms/icons/PI';
+
 export default {
     name: 'ProjectMember',
     components: {
         PToolboxTable,
         PButton,
         PI,
-        ProjectMemberDetail
+        ProjectMemberAdd,
+        ProjectMemberDelete
     },
     props: {
         selectedNode: {
@@ -102,6 +112,9 @@ export default {
         getBindMember() {
             return _.map(this.members, 'user_info.user_id');
         },
+        getMemberData() {
+            return this.members;
+        },
         isDisabled() {
             return !(this.selectIndex.length > 0);
         },
@@ -129,6 +142,9 @@ export default {
         this.listMembers();
     },
     methods: {
+        getEmptyString(object){
+            return this.isEmpty(object) ? '' : object;
+        },
         getDefaultQuery() {
             return {
                 query: defaultQuery(
@@ -139,11 +155,7 @@ export default {
                 ),
             };
         },
-        getMembers(fixSort) {
-            if (!fixSort) {
-                this.tablePage.sortBy = '';
-                this.tablePage.sortDesc = true;
-            }
+        getMembers() {
             this.listMembers();
         },
         changePageSize() {
@@ -232,8 +244,12 @@ export default {
             this.actionFlag = 'delete';
             this.actionCommand();
         },
-        showModals() {
-            this.$refs.MemberAdd.showModal();
+        showModals(type) {
+            if (type === 'add') {
+                this.$refs.MemberAdd.showModal();
+            } else {
+                this.$refs.MemberDelete.showModal();
+            }
         },
     },
 };

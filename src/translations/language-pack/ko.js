@@ -231,6 +231,7 @@ export const ko = {
         SCH_PAC_DT: '유저 아이디, 이름 등으로 검색하십시오.',
         NO_PROJECT_SEL: '프로젝트를 선택해주십시오.',
         NO_PROJECT_SEL_DT: '왼쪽 트리 패널의 아이템을 클릭 하세요.',
+        DEL_MEMBER_PRJ: '{0} 에서 다음 회원을 제거 하시겠습니까? ',
     },
     INVENTORY: {
 

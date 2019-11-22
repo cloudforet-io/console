@@ -231,6 +231,7 @@ export const en = {
         SCH_PAC_DT: 'Search members by its user name or others',
         NO_PROJECT_SEL: 'No Selected Project',
         NO_PROJECT_SEL_DT: 'Please, Click an item from left tree Panel.',
+        DEL_MEMBER_PRJ: 'Are you sure you want to remove a following members from {0} ?',
     },
     INVENTORY: {
 

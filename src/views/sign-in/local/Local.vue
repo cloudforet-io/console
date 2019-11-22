@@ -144,7 +144,6 @@ export default {
             const companyDesc = this.$store.getters['domain/description'];
             const hostName = this.getWindowHostName();
             return !this.isEmpty(companyTitle) ? companyDesc: !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
-            /*return !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG', [companyDesc]) : !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);*/
         },
         getCurrentHostname() {
             const companyTitle = this.$store.getters['domain/companyTitle'];
@@ -318,7 +317,6 @@ export default {
             border: 1px solid $alert;
             box-shadow: unset;
         }
-
     }
 
     .button-cover{
