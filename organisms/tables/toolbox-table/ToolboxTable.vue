@@ -63,6 +63,7 @@
             :background="background"
             :responsive="responsive"
             v-on="$listeners"
+            @changeSort="changeSort"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot :name="slot" v-bind="scope" />
@@ -197,6 +198,7 @@ export default {
             const sizeNum = Number(size);
             if (this.pageSize !== sizeNum) {
                 this.proxyPageSize = sizeNum;
+                this.proxyThisPage = 1;
                 this.$emit('changePageSize', sizeNum);
             }
         },
@@ -205,6 +207,9 @@ export default {
         },
         getSelectItem() {
             return this.$refs.table.getSelectItem();
+        },
+        changeSort() {
+            this.proxyThisPage = 1;
         },
     },
 
