@@ -14,7 +14,7 @@ export default {
             type: String,
             default: 'text',
             validator: value => ['text', 'password'].indexOf(value) !== -1,
-        }
+        },
     },
     render(h, { data, props, listeners }) {
         return h('input', {
@@ -43,7 +43,7 @@ export default {
 </script>
 
 <style lang="scss">
-input[type="text"].p-text-input{
+@mixin setInput() {
     min-height: 2rem;
 
     padding-left: 1rem;
@@ -65,5 +65,13 @@ input[type="text"].p-text-input{
         border-color:$gray2;
         background-color: $gray2;
     }
+}
+
+input[type="text"].p-text-input{
+    @include setInput();
+}
+
+input[type="password"].p-text-input{
+    @include setInput();
 }
 </style>

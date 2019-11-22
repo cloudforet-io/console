@@ -40,13 +40,6 @@ export default {
                 content: this.contents,
                 placement: this.position,
                 classes: ['p-tooltip'],
-                popperOptions: {
-                    modifiers: {
-                        keepTogether: {
-                            enabled: false,
-                        },
-                    },
-                },
             }, this.options);
         },
     },

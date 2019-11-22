@@ -20,7 +20,7 @@
                 {{ headerTitle }}
             </slot>
             <p-button v-if="headerCloseButtonVisible"
-                      style="cursor: pointer"
+                      class="close-modal-btn"
                       :force-class="['close']"
                       @click="onCloseClick"
             >
@@ -124,6 +124,11 @@ export default {
         },
     },
 
-
 };
 </script>
+<style lang="scss" scoped>
+    .close-modal-btn {
+        cursor: pointer;
+        color: $dark;
+    }
+</style>
