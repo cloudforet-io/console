@@ -22,7 +22,8 @@
                   :height="barThickness"
                   :width="xScale(max)"
             />
-            <rect class="bar"
+            <rect v-tooltip="getTooltipOptions(d, idx, { color: barColor })"
+                  class="bar"
                   :rx="round" :ry="round"
                   x="0" :y="yScale(d.key) + barPosY"
                   :height="barThickness"
@@ -41,7 +42,8 @@ import * as d3 from 'd3';
 import {
     reactive, ref, toRefs, watch, computed,
 } from '@vue/composition-api';
-import PChart from '@/components/molecules/charts/Chart';
+import { VTooltip } from 'v-tooltip';
+import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
 import { HORIZONTAL_OPTIONS } from './HorizontalBarChart.map';
 
 const setDrawTools = (props, context, chartOptions) => {
@@ -56,6 +58,7 @@ const setDrawTools = (props, context, chartOptions) => {
         textPadBottom: computed(() => chartOptions.value.labels.padBottom),
         textHeight: computed(() => chartOptions.value.labels.textHeight),
         barThickness: computed(() => chartOptions.value.bars.thickness),
+        barColor: computed(() => chartOptions.value.bars.color),
     });
 
     const initYScale = (svgTools) => {
@@ -103,8 +106,9 @@ const setDrawTools = (props, context, chartOptions) => {
 
 export default {
     name: 'PHorizontalBarChart',
+    events: ['legendClick'],
     components: { PChart },
-    events: ['click'],
+    directives: { tooltip: VTooltip },
     props: {
         loading: {
             type: Boolean,
@@ -133,9 +137,11 @@ export default {
     },
     setup(props, context) {
         const chartOptions = computed(() => _.merge({}, HORIZONTAL_OPTIONS, props.options));
+        const tooltips = setTooltips(props, context, chartOptions);
         const drawTools = setDrawTools(props, context, chartOptions);
         return {
             chartOptions,
+            ...tooltips,
             ...drawTools,
         };
     },

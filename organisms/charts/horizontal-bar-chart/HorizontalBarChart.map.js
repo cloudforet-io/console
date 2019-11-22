@@ -1,3 +1,5 @@
+import styles from '@/styles/_variables.scss';
+
 export const HORIZONTAL_OPTIONS = Object.freeze({
     responsive: {
         width: true,
@@ -15,6 +17,7 @@ export const HORIZONTAL_OPTIONS = Object.freeze({
         backBar: {
             display: true,
         },
+        color: styles.primary1,
     },
 });
 

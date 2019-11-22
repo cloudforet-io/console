@@ -2,7 +2,7 @@
     <div class="dropdown-menu" style="display: block;">
         <template v-for="(item, index) in menu">
             <a v-if="item.type==='item'" :key="index" class="dropdown-content dropdown-item"
-               :disabled="item.disabled" @click.stop="menuClick(item.event,$event)"
+               :disabled="item.disabled" @click.stop="menuClick(item.event, index, $event)"
             >
                 {{ item.text }}
             </a>
@@ -29,9 +29,9 @@ export default {
         },
     },
     methods: {
-        menuClick(eventName, event) {
-            this.$emit(`click-${eventName}`, event);
-            this.$emit('clickMenuEvent', eventName);
+        menuClick(eventName, index, event) {
+            this.$emit(`click-${eventName}`, index, event);
+            this.$emit('clickMenuEvent', eventName, index);
         },
     },
 };

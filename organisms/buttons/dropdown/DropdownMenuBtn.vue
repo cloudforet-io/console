@@ -39,9 +39,9 @@ export default {
         windowClick(event) {
             this.popup = false;
         },
-        clickMenuEvent(eventName) {
-            this.$emit('clickMenuEvent', eventName);
-            this.$emit(`click-${eventName}`);
+        clickMenuEvent(eventName, idx) {
+            this.$emit('clickMenuEvent', eventName, idx);
+            this.$emit(`click-${eventName}`, idx);
             this.popup = false;
         },
     },

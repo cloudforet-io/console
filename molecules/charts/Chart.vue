@@ -44,12 +44,14 @@ import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from './Chart.map';
 
 export const setTooltips = () => {
     const generateTooltipTitle = (data, idx, color) => {
+        const colorStyle = color || PRIMARY_COLORSET[idx];
+
         const title = document.createElement('div');
         title.classList.add('tooltip-title');
 
         const circle = document.createElement('span');
         circle.classList.add('circle');
-        circle.style.backgroundColor = color;
+        circle.style.backgroundColor = colorStyle;
 
         const text = document.createElement('span');
         text.classList.add('text');
@@ -61,19 +63,31 @@ export const setTooltips = () => {
         return title;
     };
 
-    const getTooltipOptions = (data, idx, options) => {
-        const obj = _.merge({
-            placement: 'top',
-            trigger: 'hover',
-            template: `<div class="tooltip p-tooltip" role="tooltip">
+    /**
+     *
+     * @param data : object. data to show on tooltip. required.
+     *               {
+     *                   key: string
+     *                   value: number
+     *               }
+     * @param idx : number. data index for auto color mapping. required.
+     * @param options : object. tooltip generation options. optional.
+     *                  {
+     *                      color: string
+     *                  }
+     * @returns {{template: string, html: boolean, autoHide: boolean, placement: string, trigger: string, content: *}}
+     */
+    const getTooltipOptions = (data, idx, options) => ({
+        placement: 'top',
+        trigger: 'hover',
+        template: `<div class="tooltip p-tooltip" role="tooltip">
                         <div class="tooltip-arrow"></div>
                         <div class="tooltip-inner"></div>
                     </div>`,
-            html: true,
-            content: generateTooltipTitle(data, idx, PRIMARY_COLORSET[idx]),
-        }, options);
-        return obj;
-    };
+        html: true,
+        content: generateTooltipTitle(data, idx, options ? options.color : undefined),
+        autoHide: false,
+    });
 
     return {
         getTooltipOptions,

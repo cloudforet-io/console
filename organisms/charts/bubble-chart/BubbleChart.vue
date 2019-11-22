@@ -125,6 +125,7 @@ const setDrawTools = (props, context, chartOptions) => {
 
 export default {
     name: 'BubbleChart',
+    events: ['legendClick'],
     components: { PChart, PChartLegend },
     directives: { tooltip: VTooltip },
     props: {
