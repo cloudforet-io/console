@@ -3,27 +3,39 @@
         <p-icon-button
             name="ic_arrow_left"
             :disabled="thisPage === 1"
-            color="transparent inherit"
+            :hover-color="iconHoverColor"
             @click="update(thisPage-1)"
         />
         <div class="page-number">
-            <div>{{ thisPage }}/{{ allPage }}</div>
+            <div class="page-number-text">
+                <span class="this-page">{{ thisPage }}</span> / <span>{{ allPage }}</span>
+            </div>
         </div>
 
         <p-icon-button
             name="ic_arrow_right"
             :disabled="thisPage === allPage"
-            color="transparent inherit"
+            :hover-color="iconHoverColor"
             @click="update(thisPage+1)"
         />
     </nav>
 </template>
 <script>
 import PIconButton from '@/components/molecules/buttons/IconButton';
+import { secondary1 } from '@/styles/_variables.scss';
 
 export default {
     name: 'PTextButton',
-    components: { PIconButton,  },
+    components: { PIconButton },
+    setup(props, { emit }) {
+        return {
+            update(page) {
+                emit('update:thisPage', page);
+                emit('pageChange', page);
+            },
+            iconHoverColor: `transparent ${secondary1}`,
+        };
+    },
     props: {
         thisPage: {
             type: Number,
@@ -36,12 +48,6 @@ export default {
             validator(value) {
                 return value > 0;
             },
-        },
-    },
-    methods: {
-        update(page) {
-            this.$emit('update:thisPage', page);
-            this.$emit('pageChange', page);
         },
     },
 };
@@ -61,6 +67,20 @@ export default {
         min-width: 64px;
         min-height: 32px;
         align-items: center;
+        cursor: default;
+        .page-number-text{
+            line-height: 1.2rem;
+            .this-page{
+                font-weight: bold;
+            }
+        }
+
+    }
+    .icon-button{
+        &:not(:disabled):not(.disabled):hover{
+            background-color: $white;
+            border-color:transparent ;
+        }
     }
 
 </style>

@@ -10,13 +10,14 @@
                     :sortable="true"
                     :dragable="true"
                     :hover="true"
+                    :responsive="true"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
                     :all-page="allPage"
                     :this-page.sync="thisPage"
                     :select-index.sync="selectIndex"
                     :page-size.sync="pageSize"
-                    :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
+                    :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
                     :setting-visible="false"
                     @changePageSize="getServers"
                     @changePageNumber="getServers"
@@ -176,7 +177,7 @@ export const serverSetup = (props, context, eventName) => {
     const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
         tabs: [
-            { name: 'detail', label: '디테일',keepAlive: true },
+            { name: 'detail', label: '디테일', keepAlive: true },
             { name: 'data', label: '데이터' },
             { name: 'rawData', label: '데이터 원본', keepAlive: true },
             { name: 'admin', label: '관리자' },
