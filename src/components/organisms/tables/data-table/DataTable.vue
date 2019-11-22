@@ -24,7 +24,7 @@
             >
                 <p-tr>
                     <p-th v-if="selectable">
-                        <PCheckBox v-model="allState" @change="selectAllToggle" />
+                        <PCheckBox v-model="allState" style="margin: 0 1rem" @change="selectAllToggle" />
                     </p-th>
                     <p-th
                         v-for="(field,index) in fieldsData"
