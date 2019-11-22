@@ -259,7 +259,6 @@ export default {
                 this.selectIndex.forEach((td) => {
                     result += this.makeTableText(this.dragSelectAbles[td]);
                 });
-                console.log(result);
                 this.selectToCopyToClipboard(result);
             }
         },
@@ -278,7 +277,6 @@ export default {
                 if (this.rowClickMultiSelectMode) {
                     this.checkboxToggle(index);
                 } else {
-                    console.log(event);
                     if (event.shiftKey) {
                         this.proxySelectIndex = [...this.proxySelectIndex, index];
                     } else {
