@@ -15,6 +15,7 @@
                        :name="popup ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                        :disabled="disabled"
                        :color="`transparent ${ disabled ? '#A7A9B2' : popup||mouseover ?'#0080FB' : '#222532'}`"
+                       :hover-color="iconHoverColor"
                        button-style="white"
                        @click.stop="onClick"
                        @mouseover="onMouseOver"
@@ -26,6 +27,7 @@
 <script>
 import PButton from '@/components/atoms/buttons/Button';
 import PIconButton from '@/components/molecules/buttons/IconButton';
+import { secondary } from '@/styles/_variables.scss';
 
 export default {
     name: 'PDropdownBtn',
@@ -43,6 +45,7 @@ export default {
     data() {
         return {
             mouseover: false,
+            iconHoverColor: `transparent ${secondary}`,
         };
     },
     computed: {
