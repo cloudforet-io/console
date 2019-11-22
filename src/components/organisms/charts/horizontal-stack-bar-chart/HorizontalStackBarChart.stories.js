@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
 import { action } from '@storybook/addon-actions';
 import PHorizontalStackBarChart from './HorizontalStackBarChart';
 import { autoProps } from '@/setup/storybook-util';

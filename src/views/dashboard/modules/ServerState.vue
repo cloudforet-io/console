@@ -34,11 +34,7 @@ export default {
         data: {
             type: Object,
             required: true,
-            default: () => ({
-                INSERVICE: 0,
-                MAINTENANCE: 0,
-                CLOSED: 0,
-            }),
+            default: () => ({}),
         },
     },
     data() {

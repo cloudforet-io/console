@@ -59,7 +59,12 @@ export default {
         z-index: 100;
     }
     .app-body {
-        margin-left: $gnb-width;
+        position: fixed;
+        left: $gnb-width;
+        top: 0;
+        overflow-y: scroll;
+        max-height: 100%;
+        //margin-left: $gnb-width;
         width: calc(100vw - #{$gnb-width});
         min-width: calc(#{$min-width} - #{$gnb-width});
         min-height: 100vh;

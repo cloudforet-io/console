@@ -7,32 +7,16 @@
                                           @legendClick="onServerTypeLegendClick"
             />
         </div>
-        <div class="sub-chart-container">
-            <div class="sub-chart">
-                <p-horizontal-bar-chart
-                    :data="chartData.vm"
-                    :loading="loading.vm"
-                    :min-width="150"
-                    :style="{width: '100%'}"
+        <p-card-layout>
+            <template v-for="(d, key) in chartData" :slot="key">
+                <p-horizontal-bar-chart :key="key"
+                                        :data="d"
+                                        :loading="loading[key]"
+                                        :min-width="150"
+                                        :style="{width: '100%'}"
                 />
-            </div>
-            <div class="sub-chart">
-                <p-horizontal-bar-chart
-                    :data="chartData.os"
-                    :loading="loading.os"
-                    :min-width="150"
-                    :style="{width: '100%'}"
-                />
-            </div>
-            <div class="sub-chart">
-                <p-horizontal-bar-chart
-                    :data="chartData.hypervisor"
-                    :loading="loading.hypervisor"
-                    :min-width="150"
-                    :style="{width: '100%'}"
-                />
-            </div>
-        </div>
+            </template>
+        </p-card-layout>
     </p-board-layout>
 </template>
 
@@ -41,6 +25,7 @@ import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayou
 import PHorizontalStackBarChart from '@/components/organisms/charts/horizontal-stack-bar-chart/HorizontalStackBarChart';
 import PHorizontalBarChart from '@/components/organisms/charts/horizontal-bar-chart/HorizontalBarChart';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
+import PCardLayout from '@/components/molecules/layouts/card-layout/CardLayout';
 
 export default {
     name: 'ServersByType',
@@ -48,6 +33,7 @@ export default {
         PBoardLayout,
         PHorizontalStackBarChart,
         PHorizontalBarChart,
+        PCardLayout,
     },
     props: {
         drawBy: {

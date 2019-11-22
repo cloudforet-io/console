@@ -15,6 +15,14 @@
                                 ...getTooltipOptions(pd.data, idx),
                                 trigger: 'manual',
                                 show: hoverList[idx],
+                                popperOptions: {
+                                    onCreate(o) {
+                                        o.instance.popper.addEventListener('mouseenter', () => {
+                                            onMouseEnter(idx)
+                                        })
+                                        o.instance.popper.addEventListener('mouseleave', resetHoverList)
+                                    },
+                                },
                             }"
                             :cx="Math.round(arc.centroid(pd)[0])"
                             :cy="Math.round(arc.centroid(pd)[1])"
@@ -64,7 +72,6 @@ const setDrawTools = (props, context, chartOptions) => {
         colors,
         pathGroup: null,
         pieData: [],
-        tooltipOptions: [],
         hoverList: [],
         hoverState: false,
         chartEl: undefined,
@@ -94,7 +101,7 @@ const setDrawTools = (props, context, chartOptions) => {
 
 export default {
     name: 'PDonutChart',
-    events: ['click'],
+    events: ['legendClick'],
     components: { PChart, PChartLegend },
     directives: { tooltip: VTooltip },
     props: {
