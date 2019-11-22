@@ -1,5 +1,9 @@
 <template>
     <div v-if="isInit" id="app">
+        <p-notice-alert :group="'noticeTopLeft'" :position="'top left'"/>
+        <p-notice-alert :group="'noticeTopRight'" :position="'top right'"/>
+        <p-notice-alert :group="'noticeBottomLeft'" :position="'bottom left'"/>
+        <p-notice-alert :group="'noticeBottomRight'" :position="'bottom right'"/>
         <router-view />
     </div>
     <div v-else class="Aligner">
@@ -12,11 +16,13 @@ import Vue from '@/main.js';
 import api from '@/lib/api';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie';
+import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert';
 
 export default {
     name: 'App',
     components: {
         PLottie,
+        PNoticeAlert,
     },
     props: {
         processEnv: {
