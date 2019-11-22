@@ -12,7 +12,6 @@ import SignIn from '@/views/sign-in/local/Local';
 import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth';
 import Admin from '@/views/sign-in/admin/Admin';
 import Redirect404 from '@/views/common/404/Redirect404';
-import Init from '@/views/common/init/Init';
 import api from '@/lib/api';
 import store from '@/store';
 
@@ -23,12 +22,6 @@ const router = new VueRouter({
     hash: false,
     linkActiveClass: 'open active',
     routes: [
-        {
-            path: '/init',
-            name: 'Init',
-            meta: { excludeAuth: true },
-            component: Init,
-        },
         {
             path: '/error-page',
             name: 'error',

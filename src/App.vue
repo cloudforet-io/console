@@ -76,7 +76,7 @@ export default {
             await api.init(config.get('VUE_APP_API.ENDPOINT'), {
                 authError: (error) => {
                     this.$store.dispatch('auth/signOut');
-                    // TODO: show popup (re-sign-in)
+                    this.$router.push({ path: '/error-page' });
                 },
             });
 
