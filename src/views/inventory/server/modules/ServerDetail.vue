@@ -69,7 +69,7 @@ import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
 import PBadge from '@/components/atoms/badges/Badge';
 import PStatus from '@/components/molecules/status/Status';
-import { timestampFormatter } from '@/lib/formatter';
+import { timestampFormatter } from '@/lib/util';
 import { serverStateFormatter } from '@/views/inventory/server/Server.util';
 import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';

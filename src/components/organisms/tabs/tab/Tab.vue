@@ -4,6 +4,8 @@
         <div class="tab-content">
             <template v-for="tab in tabData">
                 <div
+                    v-if="tab.keepAlive? true:tab.name===proxyActiveTab"
+                    v-show="tab.name===proxyActiveTab"
                     :key="tab.name"
                     class="tab-pane fade"
                     :class="{show:isActive(tab.name),active:isActive(tab.name)}"

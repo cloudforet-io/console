@@ -92,7 +92,7 @@
                 />
             </template>
             <template #rawData="{tabName}">
-                <p> this tab is {{ tabName }}</p>
+                <p-server-raw-data :item="items[selectIndex[0]]" />
             </template>
             <template #admin="{tabName}">
                 <p> this tab is {{ tabName }}</p>
@@ -116,9 +116,10 @@ import PButton from '@/components/atoms/buttons/Button';
 import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 import PBadge from '@/components/atoms/badges/Badge';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail';
+import PServerRawData from '@/views/inventory/server/modules/ServerRawData';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
-import { timestampFormatter } from '@/lib/formatter';
+import { timestampFormatter } from '@/lib/util';
 import { serverStateFormatter } from '@/views/inventory/server/Server.util';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeTrItems } from '@/lib/helper';
@@ -175,9 +176,9 @@ export const serverSetup = (props, context, eventName) => {
     const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
         tabs: [
-            { name: 'detail', label: '디테일' },
+            { name: 'detail', label: '디테일',keepAlive: true },
             { name: 'data', label: '데이터' },
-            { name: 'rawData', label: '데이터 원본' },
+            { name: 'rawData', label: '데이터 원본', keepAlive: true },
             { name: 'admin', label: '관리자' },
         ],
         activeTab: 'detail',
@@ -255,6 +256,7 @@ export default {
         PServerDetail,
         PTab,
         PServerData,
+        PServerRawData,
     },
     setup(props, context) {
         const dataBind = reactive({
