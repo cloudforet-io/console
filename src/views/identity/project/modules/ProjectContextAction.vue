@@ -1,92 +1,43 @@
 <template>
-    <div class="animated fadeIn">
-        <p-button-modal
-            ref="modal"
-            :scrollable="true"
-            :centered="true"
-            :size="'xl'"
-            :fade="true"
-            :backdrop="true"
-            :header-title="getMemberModalTitle"
-            :visible.sync="visible"
-            @close="close"
-            @confirm="confirm"
-        >
-            <template #body>
-                <p-toolbox-table :items="users"
-                                 :responsive-style="{'height': '35vh', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
-                                 :fields="selectedFields"
-                                 :selectable="false"
-                                 :sortable="true"
-                                 :shadow="false"
-                                 :border="false"
-                                 :hover="true"
-                                 :sort-by.sync="tablePage.sortBy"
-                                 :sort-desc.sync="tablePage.sortDesc"
-                                 :all-page="tablePage.allPage"
-                                 :this-page.sync="tablePage.thisPage"
-                                 :select-index.sync="selectIndex"
-                                 :page-size.sync="tablePage.pageSize"
-                                 @rowLeftClick="onSelect"
-                                 @changePageSize="getMembers"
-                                 @changeSort="getMembers"
-                                 @changePageNumber="getMembers"
-                                 @clickRefresh="getMembers"
-                >
-                    <template slot="toolbox-left">
-                        <p-search
-                            :search-placeholder="getSearchPlaceHolder"
-                            :search-text.sync="searchText"
-                            @onSearch="search"
-                        />
-                    </template>
-                    <template v-slot:col-user_id-format="data">
-                        {{ data.item.user_id }}
-                    </template>
-                    <template v-slot:col-name-format="data">
-                        {{ data.item.name }}
-                    </template>
-                    <template v-slot:col-email-format="data">
-                        {{ data.item.email }}
-                    </template>
-                </p-toolbox-table>
-                <p-input-tag
-                    :responsive-style="{'height': '20vh', 'overflow-y':'auto'}"
-                    :tag-text.sync="tagRelated.currentTagText"
-                    :tag-array.sync="tagRelated.Tags"
-                    :tag-place-holder="tagRelated.placeHolder"
-                />
-            </template>
-            <template #close-button>
-                {{ tr('COMMON.BTN_CANCEL') }}
-            </template>
-            <template #confirm-button>
-                {{ tr('COMMON.BTN_OK') }}
-            </template>
-        </p-button-modal>
-    </div>
+    <p-button-modal
+        ref="modal"
+        :scrollable="true"
+        :centered="true"
+        :size="'xl'"
+        :fade="true"
+        :backdrop="true"
+        :header-title="getMemberModalTitle"
+        :visible.sync="visible"
+        @close="close"
+        @confirm="confirm"
+    >
+        <template #body>
+            ㅁㄴㅇㄹㅁㄴ이럼ㄴ이ㅏ럼니알
+        </template>
+        <template #close-button>
+            {{ tr('COMMON.BTN_CANCEL') }}
+        </template>
+        <template #confirm-button>
+            {{ tr('COMMON.BTN_OK') }}
+        </template>
+    </p-button-modal>
 </template>
 <script>
 import _ from 'lodash';
 import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
-import PSearch from '@/components/molecules/search/Search';
 import PInputTag from '@/components/molecules/input-tag/InputTag';
 
 export default {
-    name: 'ProjectMemberAdd',
-    events: ['close'],
+    name: 'ProjectContextAction',
     components: {
         PButtonModal,
-        PToolboxTable,
         PInputTag,
-        PSearch,
     },
     props: {
-        referenceMember: {
-            type: Array,
-            default: () => [],
+        selectedNode: {
+            type: Object,
+            default: null,
         },
     },
     data() {
@@ -209,12 +160,12 @@ export default {
     },
 };
 </script>
+
 <style lang="scss" scoped>
-    .tag-input {
-        height: 20vh;
-        overflow-y: auto;
-        background: $primary4 0% 0% no-repeat padding-box;
-        border: 1px solid $gray3;
-        opacity: 1;
+    .base-table {
+        @extend %sheet;
+    }
+    .btn-margin{
+        margin-left: 1rem;
     }
 </style>

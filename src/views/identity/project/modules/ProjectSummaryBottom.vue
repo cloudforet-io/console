@@ -1,11 +1,11 @@
 <template>
     <div  class="row animated fadeIn no-gutters">
-        <b-col cols="6" class="pr-2 mt-3 mb-3">
+        <!--<b-col cols="6" class="pr-2 mt-3 mb-3">
             <ServersByType :draw-by="drawBy" />
         </b-col>
         <b-col cols="6" class="pl-2 mt-3 mb-3">
             <ItemsByRegion :draw-by="drawBy" title="Items by Region" />
-        </b-col>
+        </b-col>-->
     </div>
 </template>
 

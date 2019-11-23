@@ -9,8 +9,9 @@
                 @input="$emit('update:name',$event)"
             />
         </div>
-
+        &nbsp;
         <span class="tag-input-split" :class="{disabled}">{{ disabled? '': ':' }}</span>
+        &nbsp;
         <div class="tag-input-box tag-value-input">
             <p-input-text
                 class="tag-input"
@@ -59,7 +60,7 @@ export default {
             flex-basis: 7.5rem;
         }
         &.tag-value-input{
-            flex-grow: 2;
+            flex-grow: 1.5;
             flex-shrink: 1;
             flex-basis: 15rem;
         }

@@ -1,18 +1,24 @@
 <template>
     <div class="animated fadeIn">
+        <project-context-action :selected-node="getSelectedNodeAndTree" />
         <default-tree
             ref="ProjectTree"
             :tree-data="treeData"
             :show-tree="displayTree"
             :context-init="isInitializing"
             :no-select-m-s-g="noSelectMessage"
+            :context-menu-visible.sync="isContextMenuVisible"
             @DTIsRootClicked="pRootClicked"
             @DTNodeClicked="pNodeClicked"
             @DTNodeToggled="pNodeToggled"
             @DTBeforeDropped="pBeforeDropped"
-            @DTContextVisible="pContextVisible">
-            <template slot="context">
-                <project-context :context-data="getSelectedData" />
+            @DTContextVisible="pContextVisible"
+        >
+            <template #context>
+                <project-context
+                    :context-data="getSelectedData"
+                    @executeContext="actionOnProject"
+                />
             </template>
             <template #treeSubPanel>
                 <BaseDragHorizontal>
@@ -28,7 +34,8 @@
                             </template>
                             <template #member="{tabName}">
                                 <project-member :selected-node="getSelectedNodeAndTree"
-                                                :responsive-style="{'height': height+'px', 'overflow-y':'auto', 'box-shadow': 'none', 'border': 'none'}"/>
+                                                :responsive-style="{'height': height+'px', 'overflow-y':'auto', 'box-shadow': 'none', 'border': 'none'}"
+                                />
                             </template>
                         </PTab>
                     </template>
@@ -56,12 +63,13 @@ import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
 const projectSummaryTop = () => import('@/views/identity/project/modules/ProjectSummaryTop');
 const projectSummaryBottom = () => import('@/views/identity/project/modules/ProjectSummaryBottom');
 const projectMember = () => import('@/views/identity/project/modules/ProjectMember');
-
+const ProjectContextAction = () => import('@/views/identity/project/modules/ProjectContextAction');
 export default {
     name: 'Project',
     components: {
         DefaultTree,
         ProjectContext,
+        ProjectContextAction,
         BaseDragHorizontal,
         PTab,
         projectSummaryTop,
@@ -84,6 +92,7 @@ export default {
             selectedNodeData: null,
             isInitializing: false,
             contextItem: null,
+            isContextMenuVisible: false,
         };
     },
     computed: {
@@ -158,6 +167,9 @@ export default {
                 console.error(error);
             });
             this.displayTree = true;
+        },
+        async actionOnProject() {
+            debugger;
         },
     },
 };

@@ -55,8 +55,8 @@
 
 import projectSummary from './modules/ProjectSummaryTop.vue';
 import projectMember from './modules/ProjectMember.vue';
-import projectEditPopupName from '@/views/identity/project/modules/ProjectEditPopupName';
-import projectEditPopupTag from '@/views/identity/project/modules/ProjectEditPopupTag';
+import projectEditPopupName from '@/views/identity/project/modules/previous/ProjectEditPopupName';
+import projectEditPopupTag from '@/views/identity/project/modules/previous/ProjectEditPopupTag';
 
 import BaseTabNav from '@/components/base/tab/BaseTabNav';
 import BaseModal from '@/components/base/modal/BaseModal';

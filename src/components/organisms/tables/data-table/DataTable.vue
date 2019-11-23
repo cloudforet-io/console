@@ -75,6 +75,7 @@
                             @mouseout="rowMouseOut(item,index, $event)"
                         >
                             <p-td v-if="selectable"
+                                  class="select-checkbox"
                                   @click.stop.prevent="selectClick"
                                   @mouseenter="hoverIndex=index"
                                   @mouseleave="hoverIndex=null"
@@ -338,9 +339,11 @@ export default {
                 this.proxySelectIndex = [];
             }
         },
-        getSelectItem() {
+        getSelectItem(sortable) {
+            const selectedIndex = this.isEmpty(sortable) ? this.proxySelectIndex : this.proxySelectIndex.sort((a, b) => a - b);
             const selectItem = [];
-            this.proxySelectIndex.forEach((index) => {
+            console.log(selectedIndex);
+            this.selectedIndex.forEach((index) => {
                 selectItem.push(this.items[index]);
             });
             return selectItem;
@@ -351,11 +354,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
     %selected-row {
         background-color: $secondary2;
         td {
             color: $secondary;
         }
+    }
+    .select-checkbox{
+        cursor:pointer;
     }
     tbody{
         display: block;

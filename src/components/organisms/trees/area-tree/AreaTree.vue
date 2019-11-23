@@ -1,12 +1,15 @@
 <template>
     <div>
         <div class="row no-gutters" @click="contextMenuIsVisible=false">
-            <transition appear name="tree-trans" @before-enter="beforeEnter" @enter="enter">
+            <transition appear name="tree-trans" @before-enter="beforeEnter"
+                        @enter="enter"
+            >
                 <div v-if="showTree">
                     <vertical-layout>
                         <template #leftContainer="{ width }">
                             <div id="rootPanel"
-                                 @click.right.stop="isRootClicked">
+                                 @click.right.stop="isRootClicked"
+                            >
                                 <PTree ref="primeTree"
                                        :tree-data="treeData"
                                        :initial-tree-width="width"
@@ -27,9 +30,13 @@
                                     <slot name="treeSubPanel" />
                                 </div>
                                 <div v-else class="empty">
-                                    <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'"/>
-                                    <div class="msg">{{ getNoSelectMSG[0] }}</div><br>
-                                    <div class="dt">{{ getNoSelectMSG[1] }}</div>
+                                    <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
+                                    <div class="msg">
+                                        {{ getNoSelectMSG[0] }}
+                                    </div><br>
+                                    <div class="dt">
+                                        {{ getNoSelectMSG[1] }}
+                                    </div>
                                 </div>
                             </transition>
                         </template>
@@ -129,6 +136,11 @@ export default {
         this.showTree = true;
     },
     methods: {
+        setContextVisible(flag) {
+            if (this.isSelectedType(flag, 'b')) {
+                this.contextMenuIsVisible = flag;
+            }
+        },
         getTree() {
             return this.isEmpty(this) ? null : _.get(this, '$refs.primeTree.$refs.slVueTree');
         },
