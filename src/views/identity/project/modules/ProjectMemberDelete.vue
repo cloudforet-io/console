@@ -145,7 +145,6 @@ export default {
             this.visible = true;
             const sortedIndex = this.$parent._data.selectIndex;
             this.getSelectedMember(sortedIndex);
-            this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('PROFILE')]));
         },
         hideModal() {
             this.visible = false;
@@ -158,33 +157,40 @@ export default {
             });
             this.memberToDelete = selectItem;
         },
-
-        async deleteUserOnProject() {
-            const selectedNodeDT = this.$parent.selectedNode.node.data;
-            const selectedId = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
-            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/add`;
-            const param = { users: _.map(this.tagRelated.Tags, 'text'), ...selectedId };
-
-            await this.$http.post(url, param).then(() => {
-                this.$parent.getMembers();
-                this.tagRelated.Tags = [];
-                this.hideModal();
-            }).catch((error) => {
-                console.error(error);
-            });
-        },
         onSelect(item, index, event) {
             if (!_.find(this.tagRelated.Tags, { text: item.user_id })) {
                 this.tagRelated.Tags.push({ text: item.user_id, tiClasses: ['ti-valid'] });
             }
         },
+        async deleteUserOnProject() {
+            const selectedNodeDT = this.$parent.selectedNode.node.data;
+            const selectedId = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
+            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/remove`;
+            const param = { users:  _.map(this.memberToDelete, 'user_info.user_id'), ...selectedId };
+            await this.$http.post(url, param).then(() => {
+                this.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Success',
+                    text: 'Selected item successfully Removed from Project Group',
+                    duration: 3000,
+                    speed: 2000
+                })
+                this.$parent.getMembers();
+                this.hideModal();
+            }).catch((error) => {
+
+                console.error(error);
+            });
+        },
         search() {
             this.listMembersOnSearch(this.searchText);
         },
         confirm() {
-            this.addUserOnProject();
+            this.deleteUserOnProject();
         },
         close() {
+            debugger;
             console.log('close Modal');
         },
     },

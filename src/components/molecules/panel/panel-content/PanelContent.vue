@@ -2,11 +2,11 @@
     <p-dl class="row">
         <div v-for="(def, idx) in defs" :key="idx" class="col-sm-12 col-md-6 content-list">
             <slot name="details">
-                <p-dt class="col-sm-12 col-md-4">
+                <p-dt class="col-sm-12 col-md-2">
                     {{ def.label }}
                 </p-dt>
                 <p-dd :ref="'dd-'+def.name"
-                      class="col-sm-12 col-md-8 copyFlagged"
+                      class="col-sm-12 col-md-10 copyFlagged"
                       @mouseenter="mouseInOut(idx,true)"
                       @mouseleave="mouseInOut(idx,false)"
                 >

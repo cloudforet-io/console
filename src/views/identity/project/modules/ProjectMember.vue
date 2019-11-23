@@ -11,6 +11,7 @@
                          :fields="fields"
                          :shadow="false"
                          :border="false"
+                         :hover="true"
                          :selectable="selectable"
                          :sortable="sortable"
                          :sort-by.sync="tablePage.sortBy"
