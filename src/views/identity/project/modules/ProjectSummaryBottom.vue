@@ -1,18 +1,24 @@
 <template>
-    <div  class="row animated fadeIn no-gutters">
-        <!--<b-col cols="6" class="pr-2 mt-3 mb-3">
-            <ServersByType :draw-by="drawBy" />
-        </b-col>
-        <b-col cols="6" class="pl-2 mt-3 mb-3">
-            <ItemsByRegion :draw-by="drawBy" title="Items by Region" />
-        </b-col>-->
+    <div class="row no-gutters">
+        <ServersByType class="col"
+                       :server-data="serverTypeData"
+                       :vm-data="vmTypeData"
+                       :os-data="osTypeData"
+                       :hypervisor-data="hypervisorTypeData"
+                       :col-max="2"
+                       :draw-by="drawBy"
+        />
+        <ResourcesByRegion class="col region"
+                           :data="resourcesByRegionData"
+                           legend-position="bottom"
+                           :draw-by="drawBy"
+        />
     </div>
 </template>
 
 <script>
 
-import ServerState from '@/views/dashboard/modules/ServerState';
-import ItemsByRegion from '@/views/dashboard/modules/ItemsByRegion';
+import ResourcesByRegion from '@/views/dashboard/modules/ResourcesByRegion';
 import ServersByType from '@/views/dashboard/modules/ServersByType';
 import InfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import { api } from '@/setup/api';
@@ -32,8 +38,7 @@ export default {
     components: {
         BasePanel,
         InfoPanel,
-        ServerState,
-        ItemsByRegion,
+        ResourcesByRegion,
         ServersByType,
     },
     props: {
@@ -59,6 +64,11 @@ export default {
             sampleDropData2: null,
             chartDataAndOption1: null,
             chartDataAndOption2: null,
+            serverTypeData: {},
+            vmTypeData: {},
+            osTypeData: {},
+            hypervisorTypeData: {},
+            resourcesByRegionData: {},
         };
     },
     computed: {
@@ -316,7 +326,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+    .region {
+        margin-left: 1rem;
+    }
 
   .quote {
     border-left: 0.5em solid #415ee1;

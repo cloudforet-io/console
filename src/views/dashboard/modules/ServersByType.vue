@@ -5,17 +5,15 @@
                                           @legendClick="onServerTypeLegendClick"
             />
         </div>
-        <p-card-layout>
-            <template v-for="(d, key) in chartData" :slot="key">
-                <div :key="key">
-                    <p class="title">
-                        {{ d.title }}
-                    </p>
-                    <p-horizontal-bar-chart :data="d.data"
-                                            :style="{width: '100%'}"
-                    />
-                </div>
-            </template>
+        <p-card-layout :col-max="colMax">
+            <div v-for="(d, key) in chartData" :slot="key" :key="key">
+                <p class="title">
+                    {{ d.title }}
+                </p>
+                <p-horizontal-bar-chart :data="d.data"
+                                        :style="{width: '100%'}"
+                />
+            </div>
         </p-card-layout>
     </p-board-layout>
 </template>
@@ -57,9 +55,14 @@ export default {
             type: Object,
             required: true,
         },
+        colMax: {
+            type: Number,
+            default: null,
+        },
     },
     data() {
         return {
+            test: 'test',
             chartData: {
                 vm: { title: 'VM', data: [] },
                 os: { title: 'OS', data: [] },

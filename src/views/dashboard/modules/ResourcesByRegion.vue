@@ -8,6 +8,7 @@
                         :data="chartData"
                         :loading="loading"
                         :height="310"
+                        :legend-position="legendPosition"
                         @legendClick="onLegendClick"
         />
     </p-board-layout>
@@ -29,13 +30,13 @@ export default {
             type: Object,
             default: null,
         },
-        showTitle: {
-            type: Boolean,
-            default: true,
-        },
         data: {
             type: Object,
             required: true,
+        },
+        legendPosition: {
+            type: String,
+            default: 'left',
         },
     },
     data() {

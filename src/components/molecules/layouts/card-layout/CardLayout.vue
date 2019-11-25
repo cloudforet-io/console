@@ -1,8 +1,9 @@
 <template>
     <div class="card-layout">
-        <div v-for="(vnode, name) in $slots" :key="name"
+        <div v-for="(name) in slots" :key="name"
              class="card-container"
-             :style="{ width: `${100 / $slots.length}%` }"
+             :class="{'no-border': noBorders[name]}"
+             :style="{ width: `${width}%` }"
         >
             <slot :name="name" />
         </div>
@@ -12,23 +13,48 @@
 <script>
 export default {
     name: 'PCardLayout',
+    props: {
+        colMax: {
+            type: Number,
+            default: null,
+        },
+    },
+    data() {
+        return {
+            slots: Object.keys(this.$slots),
+        };
+    },
+    computed: {
+        width() {
+            return 100 / (this.colMax ? this.colMax : this.slots.length);
+        },
+        noBorders() {
+            const obj = {}
+            this.slots.forEach((s, i) => {
+                if (i === this.slots.length - 1) obj[s] = true;
+                else if (this.colMax && (i + 1) % this.colMax === 0) obj[s] = true;
+                else obj[s] = false;
+            });
+            return obj;
+        },
+    },
 };
 </script>
 
 <style lang="scss" scoped>
     .card-layout {
-        display: table;
+        display: flex;
+        flex-wrap: wrap;
         width: 100%;
         table-layout: fixed;
         border: 1px solid $gray2;
         border-radius: 2px;
-        padding: 1rem 0;
         .card-container {
-            display: table-cell;
             vertical-align: top;
             border-right: 1px solid $gray2;
+            margin: 1rem 0;
             padding: 0 1rem;
-            &:last-child {
+            &.no-border {
                 border-right: 0;
             }
         }
