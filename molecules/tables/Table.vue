@@ -154,17 +154,17 @@ export default {
                 th{
                     position: sticky;
                     top: 0;
-                    padding: 0;
+                    padding: .25rem 0;
                     background-color: $gray3 ;
                     border-top: 1px solid $gray2;
                     border-bottom: 1px solid $gray2;
-                    line-height: 2rem;
+                    line-height: 1.5rem;
                     text-align: left;
                     font: Bold 14px/16px Arial;
                     letter-spacing: 0;
                     color: $gray1;
                     height: 2rem;
-                    vertical-align: middle;
+                    vertical-align: sub;
                 }
             }
         }

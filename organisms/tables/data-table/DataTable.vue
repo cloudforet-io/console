@@ -31,9 +31,7 @@
                         :key="index"
                         @click="theadClick(field,index,$event)"
                     >
-                        <div style="vertical-align: middle !important;display: inline;">
-                            {{ field.label ? field.label : field.name }}
-                        </div>
+                        <span>{{ field.label ? field.label : field.name }}</span>
                         <template v-if="sortable&&field.sortable">
                             <p-i
                                 v-if="sortable&&field.name==sortBy"
