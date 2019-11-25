@@ -20,6 +20,7 @@
                                  :sortable="true"
                                  :shadow="false"
                                  :border="false"
+                                 :hover="true"
                                  :sort-by.sync="tablePage.sortBy"
                                  :sort-desc.sync="tablePage.sortDesc"
                                  :all-page="tablePage.allPage"
@@ -49,7 +50,12 @@
                         {{ data.item.email }}
                     </template>
                 </p-toolbox-table>
-                <div class="card tag-input" />
+                <p-input-tag
+                    :responsive-style="{'height': '20vh', 'overflow-y':'auto'}"
+                    :tag-text.sync="tagRelated.currentTagText"
+                    :tag-array.sync="tagRelated.Tags"
+                    :tag-place-holder="tagRelated.placeHolder"
+                />
             </template>
             <template #close-button>
                 {{ tr('COMMON.BTN_CANCEL') }}
@@ -61,17 +67,20 @@
     </div>
 </template>
 <script>
+import _ from 'lodash';
 import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PSearch from '@/components/molecules/search/Search';
+import PInputTag from '@/components/molecules/input-tag/InputTag';
 
 export default {
-    name: 'ProjectMember',
+    name: 'ProjectMemberAdd',
     events: ['close'],
     components: {
         PButtonModal,
         PToolboxTable,
+        PInputTag,
         PSearch,
     },
     props: {
@@ -94,6 +103,11 @@ export default {
                 thisPage: 1,
                 allPage: 1,
                 pageSize: 15,
+            },
+            tagRelated: {
+                currentTagText: '',
+                Tags: [],
+                placeHolder: '',
             },
         };
     },
@@ -132,13 +146,19 @@ export default {
                 ),
             };
         },
-        getMembers() {
-            this.listMembersOnSearch();
-        },
         changePageSize() {
             this.tablePage.thisPage = 1;
             this.tablePage.allPage = 1;
             this.listMembers();
+        },
+        getMembers() {
+            this.listMembersOnSearch();
+        },
+        showModal() {
+            this.visible = true;
+        },
+        hideModal() {
+            this.visible = false;
         },
         async listMembersOnSearch(text) {
             const defaultQuery = this.getDefaultQuery();
@@ -157,25 +177,34 @@ export default {
             }).catch((error) => {
                 console.error(error);
             });
+        },
+        async addUserOnProject() {
+            const selectedNodeDT = this.$parent.selectedNode.node.data;
+            const selectedId = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
+            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/add`;
+            const param = { users: _.map(this.tagRelated.Tags, 'text'), ...selectedId };
 
+            await this.$http.post(url, param).then(() => {
+                this.$parent.getMembers();
+                this.tagRelated.Tags = [];
+                this.hideModal();
+            }).catch((error) => {
+                console.error(error);
+            });
         },
-        showModal() {
-            this.visible = true;
-        },
-        hideModal() {
-            this.visible = false;
-        },
-        onSelect(e, text){
-            debugger;
+        onSelect(item, index, event) {
+            if (!_.find(this.tagRelated.Tags, { text: item.user_id })) {
+                this.tagRelated.Tags.push({ text: item.user_id, tiClasses: ['ti-valid'] });
+            }
         },
         search() {
             this.listMembersOnSearch(this.searchText);
         },
         confirm() {
-
+            this.addUserOnProject();
         },
         close() {
-
+            console.log('close Modal');
         },
     },
 };

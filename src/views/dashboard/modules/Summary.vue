@@ -13,8 +13,8 @@
                 <span class="count"
                       @mouseenter="onMouseEnter(key)"
                       @mouseleave="onMouseLeave(key)"
-                      @click="onLinkClick(key, d.count)"
-                >{{ d.count || 0 }}</span>
+                      @click="onLinkClick(key, data[key])"
+                >{{ data[key] || 0 }}</span>
             </p-board-layout>
         </div>
     </div>
@@ -57,19 +57,15 @@ export default {
     },
     watch: {
         data() {
-            this.setDataMap();
+            /**
+             * TODO: Start Number Increase Animation
+             */
         },
     },
     created() {
         DashboardEventBus.$emit('listSummary');
     },
     methods: {
-        setDataMap() {
-            this._.forIn(this.data, (val, key) => {
-                this.$set(this.dataMap[key], 'count', val);
-            });
-            console.log('data watched', this.dataMap);
-        },
         onMouseEnter(key) {
             this.dataMap[key].hover = true;
         },

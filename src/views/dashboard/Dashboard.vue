@@ -14,7 +14,7 @@ export default {
         // Summary
         const listSummary = () => {
             setTimeout(() => {
-                state.summaryData = casual.summary;
+                state.summaryData.value = casual.summary;
             }, 1000);
         };
 

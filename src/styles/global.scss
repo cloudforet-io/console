@@ -341,3 +341,6 @@ $form-padding: 0.375rem 0.75rem;
 .light {
   color:$white;
 }
+.table > tbody > tr > th {
+  vertical-align: middle;
+}

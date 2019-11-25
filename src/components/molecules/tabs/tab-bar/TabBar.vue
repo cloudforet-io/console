@@ -76,14 +76,18 @@ export default {
         .nav-link{
             border: 1px solid $gray3;
             background-color: $white;
-            font: Bold 14px/16px Arial;
+            font: 14px/16px Arial;
             min-width: 7.5rem;
             min-height: 2rem;
             max-height: 2rem;
             border-radius: 2px 2px 0px 0px;
             text-align: center;
             margin-bottom: -1px;
+            &:hover{
+                color: $secondary;
+            }
             &.active{
+                font-weight: bold;
                 box-shadow: 0.25rem -0.25rem 0.75rem -0.25rem  #4D49B614,
                             -0.25rem -0.25rem 0.75rem -0.25rem #4D49B614;
                 color: $primary;
