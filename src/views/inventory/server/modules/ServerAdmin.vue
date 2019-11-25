@@ -1,139 +1,123 @@
 <template>
-  <b-card class="base first-tab">
-    <BaseTable :table-data="tableData" 
-               :fields="fields"
-               :selectable="false"
-               :dark-header="false"
-               :caption-width="500"
-               :search-width="300"
-               :busy="isLoading"
-               :per-page="query.page.limit"
-               :total-rows="totalCount"
-               plain-search
-               cardless
-               underlined
-               searchable
-               @limitChanged="limitChanged"
-               @list="listServerAdmin"
-    >
-      <template #caption />
-    </BaseTable>
-  </b-card>
+    <div>
+        <p-toolbox-table
+            :items="items"
+            :fields="fields"
+            :selectable="false"
+            :sortable="true"
+            :hover="true"
+            :sort-by.sync="proxySortBy"
+            :sort-desc.sync="proxySortDesc"
+            :all-page="proxyAllPage"
+            :this-page.sync="proxyThisPage"
+            :page-size.sync="proxyPageSize"
+            :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
+            :setting-visible="false"
+            :shadow="false"
+            :border="false"
+            @changePageSize="getData"
+            @changePageNumber="getData"
+            @clickRefresh="getData"
+            @changeSort="getData"
+        >
+            <!-- nic fields -->
+            <template #col-ip_address-format="{item}">
+                {{ item.ip_addresses? item.ip_addresses[0].ip_address:'' }}
+            </template>
+            <template #col-cidr-format="{item}">
+                {{ item.ip_addresses? item.ip_addresses[0].cidr :'' }}
+            </template>
+            <template #col-subnet_id-format="{item}">
+                {{ item.ip_addresses? item.ip_addresses[0].subnet_id :'' }}
+            </template>
+            <!-- sg -->
+            <template #col-port_range-format="{item}">
+                {{ item.port_range_min }} - {{ item.port_range_max }}
+            </template>
+        </p-toolbox-table>
+    </div>
 </template>
 
 <script>
-const BaseTable = () => import('@/components/base/table/BaseTable');
+import {
+    onMounted, reactive, toRefs, watch,
+} from '@vue/composition-api';
+import { makeTrItems } from '@/lib/helper';
+import serverEventBus from '@/views/inventory/server/ServerEventBus';
+import { isEmpty } from '@/lib/util';
+import { makeProxy } from '@/lib/compostion-util';
+
+const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
+
 
 export default {
-    name: 'ServerAdmin',
-    components: {
-        BaseTable
-    },
+    name: 'PServerData',
+    components: { PToolboxTable },
     props: {
-        serverId: {
+        selectIndex: Array,
+        items: {
+            type: Array,
+            default: () => [],
+        },
+        sortBy: {
             type: String,
-            default: ''
-        }
-    },
-    data () {
-        return {
-            tableData: [],
-            query: { 
-                page: {
-                    start: 1, 
-                    limit: 10
-                }, 
-                keyword: ''
+            default: null,
+        },
+        sortDesc: {
+            type: Boolean,
+            default: true,
+        },
+        pageSize: {
+            type: Number,
+            default: 15,
+        },
+        allPage: {
+            type: Number,
+            default: 1,
+            validator(value) {
+                return value > 0;
             },
-            isLoading: true,
-            totalCount: 0
+        },
+        thisPage: {
+            type: Number,
+            default: 1,
+            validator(value) {
+                return value > 0;
+            },
+        },
+        getServerAdmin: String, // event name
+    },
+    setup(props, { parent, emit }) {
+        const fields = makeTrItems([
+            ['user_id', 'COMMON.ID'],
+            ['name', 'COMMON.NAME'],
+            ['email', 'COMMON.EMAIL'],
+            ['group', 'COMMON.GROUP'],
+            ['tags', 'COMMON.TAG'],
+        ], parent);
+        const state = reactive({
+            proxyThisPage: makeProxy('thisPage', props, emit),
+            proxyAllPage: makeProxy('allPage', props, emit),
+            proxyPageSize: makeProxy('pageSize', props, emit),
+            proxySortBy: makeProxy('sortBy', props, emit),
+            proxySortDesc: makeProxy('sortDesc', props, emit),
+            fields,
+        });
+        const getData = () => {
+            serverEventBus.$emit(props.getServerAdmin, props.selectIndex);
+        };
+        onMounted(() => {
+            watch(() => props.selectIndex, (val) => {
+                if (isEmpty(val)) {
+                    getData();
+                }
+            });
+        });
+
+        return {
+            ...toRefs(state),
+            getData,
         };
     },
-    computed: {
-        fields () {
-            return [
-                { key: 'user_id', label: this.tr('COL_NM.ID'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '150px' }},
-                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '150px' }},
-                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '180px' }},
-                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, formatter: this.userInfoFormatter, thStyle: { width: '130px' }}
-            ];
-        }
-    },
-    watch: {
-        serverId () {
-            this.reset();
-            this.listServerAdmin();
-        }
-    },
-    created () {
-        this.listServerAdmin();
-    },
-    methods: {
-        setQuery (limit, start, sort, keyword) {
-            this.query.page.limit = limit || 10;
-            this.query.page.start = start || 0;
-            this.query.sort = sort || {};
-            this.query.keyword = keyword || '';
-        },
-        async listServerAdmin (limit, start, sort, keyword) {
-            this.reset();
-            this.setQuery(limit, start, sort, keyword);
-            try {
-                let res = await this.$http.post('/inventory/server/admin/list', {
-                    domain_id: sessionStorage.getItem('domainId'),
-                    server_id: this.serverId,
-                    query: this.query
-                });
-                this.tableData = res.data.results;
-                this.totalCount = res.data.total_count;
-            } catch (err) {
-                this.alertError(err);
-            }
-            this.isLoading = false;
-        },
-        reset () {
-            this.isLoading = true;
-            this.tableData = [];
-        },
-        alertError (err) {
-            console.error(err);
-            this.$alertify.error(this.tr('ALERT.ERROR', [this.tr('GET_CONT'), this.tr('SERVER')]));
-        },
-        limitChanged (val) {
-            this.query.page.limit = val;
-            this.listServerAdmin();
-        },
-        userInfoFormatter (val, key, data) {
-            return data.user_info ? data.user_info[key] : '';
-        }
-    }
 };
 </script>
-
-
-<style lang="scss" scoped>
-.data-container {
-    background-color: $white;
-}
-
-.nav-container.nav {
-    .nav-item {
-        margin-right: 5px;
-        .nav-link {
-            vertical-align: middle;
-            padding: 5px 10px 3px 10px;
-            border-radius: 3px;
-            background-color: $lightgray;
-            &.active {
-                background-color: $blue;
-            }
-            &:hover {
-                background-color: $gray;
-                &.active {
-                    background-color: darken($blue, 10%);
-                }
-            }
-        }
-    }
-}
-</style>
