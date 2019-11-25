@@ -1,10 +1,11 @@
 <template>
-    <div class="row animated fadeIn no-gutters">
+    <div class="row no-gutters">
         <ServersByType class="col"
                        :server-data="serverTypeData"
                        :vm-data="vmTypeData"
                        :os-data="osTypeData"
                        :hypervisor-data="hypervisorTypeData"
+                       :col-max="2"
                        :draw-by="drawBy"
         />
         <ResourcesByRegion class="col region"
