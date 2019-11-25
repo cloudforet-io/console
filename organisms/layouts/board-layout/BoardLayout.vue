@@ -1,7 +1,7 @@
 <template>
     <div class="board-pane">
         <div v-if="title" class="header" :class="{'no-pad': dropdownMenu}">
-            <p v-if="title" class="title">
+            <p class="title">
                 {{ title }}
             </p>
             <p-dropdown-menu-btn v-if="dropdownMenu" :menu="dropdownMenu"
