@@ -82,18 +82,11 @@ export default {
             ))),
         });
 
-        const getSelectServerIDs = computed(() => {
-            const ids = [];
-            state.selectIndex.forEach((idx) => {
-                ids.push(state.items[idx].server_id);
-            });
-            return ids;
-        });
 
         const requestServerAdmin = async () => {
             const res = await context.parent.$http.post('/inventory/server/member/list', {
                 query: requestAdminState.query,
-                servers: getSelectServerIDs.value,
+                servers: state.getSelectServerIds.value,
             });
             console.log(res.data);
             state.subData.items = res.data.results;
