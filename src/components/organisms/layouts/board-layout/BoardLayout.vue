@@ -1,7 +1,7 @@
 <template>
     <div class="board-pane">
-        <div class="header">
-            <p v-if="title" class="title">
+        <div v-if="title" class="header" :class="{'no-pad': dropdownMenu}">
+            <p class="title">
                 {{ title }}
             </p>
             <p-dropdown-menu-btn v-if="dropdownMenu" :menu="dropdownMenu"
@@ -41,12 +41,18 @@ export default {
 <style lang="scss" scoped>
     .board-pane {
         @extend %pane;
-        padding: 16px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
         .header {
-            padding-top: 14px;
+            padding-top: 0.875rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            &.no-pad {
+                padding-top: 0;
+                height: 3rem;
+            }
             .title {
                 font-size: 1.125rem;
             }

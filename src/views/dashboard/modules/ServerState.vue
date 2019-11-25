@@ -1,11 +1,11 @@
 <template>
     <p-board-layout title="Server States">
         <div class="chart">
-            <p-donut-chart :data="chartData"
-                           :loading="loading"
-                           :min-width="188"
-                           :min-height="188"
-                           @legendClick="onLegendClick"
+            <p-donut-chart
+                :data="chartData"
+                :loading="loading"
+                :height="188"
+                @legendClick="onLegendClick"
             />
         </div>
     </p-board-layout>
@@ -34,11 +34,7 @@ export default {
         data: {
             type: Object,
             required: true,
-            default: () => ({
-                INSERVICE: 0,
-                MAINTENANCE: 0,
-                CLOSED: 0,
-            }),
+            default: () => ({}),
         },
     },
     data() {
@@ -70,6 +66,6 @@ export default {
 
 <style lang="scss" scoped>
 .chart {
-    padding: 1.5rem 1.25rem 0 1.25rem;
+    padding-top: 1.5rem;
 }
 </style>

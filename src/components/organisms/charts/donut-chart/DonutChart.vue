@@ -1,7 +1,10 @@
 <template>
-    <div class="hs-chart-container">
-        <p-chart v-bind="$props" :options="chartOptions" @ready="draw">
-            <g :class="gClass" :transform="gTransform">
+    <div class="p-donut-chart">
+        <p-chart ref="chartRef"
+                 v-bind="$props" :options="chartOptions"
+                 @ready="draw"
+        >
+            <g :transform="gTransform">
                 <g v-for="(pd, idx) in pieData" ref="pathGroup" :key="idx"
                    :style="{
                        fill: colors(idx),
@@ -15,6 +18,14 @@
                                 ...getTooltipOptions(pd.data, idx),
                                 trigger: 'manual',
                                 show: hoverList[idx],
+                                popperOptions: {
+                                    onCreate(o) {
+                                        o.instance.popper.addEventListener('mouseenter', () => {
+                                            onMouseEnter(idx)
+                                        })
+                                        o.instance.popper.addEventListener('mouseleave', resetHoverList)
+                                    },
+                                },
                             }"
                             :cx="Math.round(arc.centroid(pd)[0])"
                             :cy="Math.round(arc.centroid(pd)[1])"
@@ -38,7 +49,7 @@
 import * as d3 from 'd3';
 import _ from 'lodash';
 import {
-    reactive, toRefs, computed,
+    reactive, toRefs, computed, onMounted,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
 import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
@@ -46,25 +57,45 @@ import PChartLegend from '@/components/organisms/legends/ChartLegend';
 import { PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
 import { DONUT_OPTIONS } from './DonutChart.map';
 
-const setDrawTools = (props, context, chartOptions) => {
-    const colors = d3.scaleOrdinal().range(PRIMARY_COLORSET);
-    const outerRadius = Math.min(props.minHeight, props.minWidth) / 2;
-    const innerRadius = outerRadius - chartOptions.value.donut.thickness;
 
-    const arc = d3.arc()
-        .innerRadius(outerRadius)
-        .outerRadius(innerRadius > 0 ? innerRadius : 0);
+const setSizeTools = (props, context, chartOptions) => {
+    const state = reactive({
+    });
+
+    return {
+        ...toRefs(state),
+    };
+};
+
+const setDrawTools = (props, context, chartOptions) => {
+    const sizeTools = reactive({
+        clientWidth: 0,
+        clientHeight: 0,
+        gTransform: '',
+    });
+
+    onMounted(() => {
+        const clientRect = context.refs.chartRef.$el.getBoundingClientRect();
+        sizeTools.clientHeight = clientRect.height;
+        sizeTools.clientWidth = clientRect.width;
+        sizeTools.gTransform = `translate(${sizeTools.clientWidth / 2}, ${(props.height || sizeTools.clientHeight) / 2})`;
+    });
+
+    const colors = d3.scaleOrdinal().range(PRIMARY_COLORSET);
+
+    const outerRadius = computed(() => Math.min(sizeTools.clientWidth, props.height || sizeTools.clientHeight) / 2);
+    const innerRadius = computed(() => outerRadius.value - chartOptions.value.donut.thickness);
+    const arc = computed(() => d3.arc()
+        .innerRadius(outerRadius.value)
+        .outerRadius(innerRadius.value > 0 ? innerRadius.value : 0));
 
     const getPieData = () => d3.pie().value(d => d.value).sort(null)(props.data);
 
     const state = reactive({
-        gClass: 'donut-g',
-        gTransform: `translate(${props.minWidth / 2}, ${props.minHeight / 2})`,
         arc,
         colors,
         pathGroup: null,
         pieData: [],
-        tooltipOptions: [],
         hoverList: [],
         hoverState: false,
         chartEl: undefined,
@@ -85,6 +116,7 @@ const setDrawTools = (props, context, chartOptions) => {
     };
 
     return {
+        ...toRefs(sizeTools),
         ...toRefs(state),
         draw,
         onMouseEnter,
@@ -94,13 +126,13 @@ const setDrawTools = (props, context, chartOptions) => {
 
 export default {
     name: 'PDonutChart',
-    events: ['click'],
+    events: ['legendClick'],
     components: { PChart, PChartLegend },
     directives: { tooltip: VTooltip },
     props: {
         loading: {
             type: Boolean,
-            default: true,
+            default: undefined,
         },
         data: {
             type: Array,
@@ -113,11 +145,7 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        minWidth: {
-            type: Number,
-            default: 400,
-        },
-        minHeight: {
+        height: {
             type: Number,
             default: 400,
         },
@@ -125,10 +153,12 @@ export default {
     setup(props, context) {
         const chartOptions = computed(() => _.merge({}, DONUT_OPTIONS, props.options));
         const tooltips = setTooltips(props, context, chartOptions);
+        const sizeTools = setSizeTools(props, context, chartOptions);
         const drawTools = setDrawTools(props, context, chartOptions);
         return {
             chartOptions,
             ...tooltips,
+            ...sizeTools,
             ...drawTools,
         };
     },
@@ -136,10 +166,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .legend-container {
-        padding-top: 1.5rem;
-        .legend::v-deep {
-            display: flex;
+    .p-donut-chart {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .p-chart-container::v-deep {
+            height: auto;
+        }
+        .legend-container {
+            padding-top: 1.5rem;
+            .legend::v-deep {
+                display: flex;
+            }
         }
     }
 </style>

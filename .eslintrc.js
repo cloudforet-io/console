@@ -31,6 +31,9 @@ module.exports = {
     }],
     "no-param-reassign": ["error", { "props": false }],
     "no-underscore-dangle": ["off"],
+    "import/no-extraneous-dependencies": ["error", {
+      "devDependencies": true,
+    }]
   },
   parserOptions: {
     parser: 'babel-eslint',
