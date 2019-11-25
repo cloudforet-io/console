@@ -1,6 +1,7 @@
 import casual, { dictOf } from '@/lib/casual';
 
 casual.define('serverStates', () => ({
+    PENDING: casual.integer(0, 1000),
     INSERVICE: casual.integer(0, 1000),
     MAINTENANCE: casual.integer(0, 1000),
     CLOSED: casual.integer(0, 1000),
@@ -43,6 +44,14 @@ casual.define('hypervisorType', () => ({
 casual.define('osType', () => ({
     WINDOWS: casual.integer(0, 1000),
     LINUX: casual.integer(0, 1000),
+}));
+
+casual.define('summary', () => ({
+    project: casual.integer(0, 1000),
+    server: casual.integer(0, 1000),
+    // eslint-disable-next-line camelcase
+    cloud_service: casual.integer(0, 1000),
+    network: casual.integer(0, 1000),
 }));
 
 export default casual;

@@ -3,8 +3,11 @@ import regions from './aws-regions.json';
 export const BUBBLE_OPTIONS = Object.freeze({
     responsive: {
         width: false,
-        height: true,
-        preserveAspectRatio: false,
+        height: false,
+        preserveAspectRatio: {
+            align: 'xMidYMid',
+            meetOrSlice: 'meet',
+        },
     },
     bubble: {
         maxRadius: 30,

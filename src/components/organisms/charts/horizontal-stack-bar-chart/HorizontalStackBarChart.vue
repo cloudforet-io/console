@@ -17,7 +17,12 @@
                    @mouseenter="onMouseEnter(ci)"
                    @mouseleave="resetHoverList"
                 >
-                    <rect class="bar"
+                    <rect v-tooltip="{
+                              ...getTooltipOptions({key: keys[ci], value: data[keys[ci]]}, ci),
+                              trigger: 'manual',
+                              show: hoverList[ci],
+                          }"
+                          class="bar"
                           :x="xScale(d[0])" :y="yScale(idx)"
                           :width="xScale(d[1] - d[0])"
                           :height="barThickness"
@@ -53,7 +58,8 @@ import _ from 'lodash';
 import {
     reactive, toRefs, computed,
 } from '@vue/composition-api';
-import PChart from '@/components/molecules/charts/Chart';
+import { VTooltip } from 'v-tooltip';
+import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
 import PChartLegend from '@/components/organisms/legends/ChartLegend';
 import { PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
 import { HORIZONTAL_STACK_OPTIONS } from './HorizontalStackBarChart.map';
@@ -127,11 +133,13 @@ const setDrawTools = (props, context, chartOptions) => {
 
 export default {
     name: 'PHorizontalStackBarChart',
+    events: ['legendClick'],
     components: { PChart, PChartLegend },
+    directives: { tooltip: VTooltip },
     props: {
         loading: {
             type: Boolean,
-            default: true,
+            default: undefined,
         },
         data: {
             type: Object,
@@ -141,16 +149,14 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        minWidth: {
-            type: Number,
-            default: 400,
-        },
     },
     setup(props, context) {
         const chartOptions = computed(() => _.merge({}, HORIZONTAL_STACK_OPTIONS, props.options));
+        const tooltips = setTooltips(props, context, chartOptions);
         const drawTools = setDrawTools(props, context, chartOptions);
         return {
             chartOptions,
+            ...tooltips,
             ...drawTools,
         };
     },

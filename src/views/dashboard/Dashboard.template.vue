@@ -2,8 +2,15 @@
     <div class="dashboard-container">
         <main>
             <div class="row">
-                <ResourcesByRegion class="col" :data="resourcesByRegionData" />
-                <ServerState class="col server-state" :data="serverStateData" />
+                <Summary :data="summaryData" />
+            </div>
+            <div class="row height-fix">
+                <ResourcesByRegion class="col region"
+                                   :data="resourcesByRegionData"
+                />
+                <ServerState class="col server-state"
+                             :data="serverStateData"
+                />
             </div>
             <div class="row">
                 <ServersByType class="col"
@@ -14,7 +21,6 @@
                 />
             </div>
 
-        <!--                            <Summary title="Summary" />-->
         <!--                            <CollectionState />-->
         </main>
     </div>
@@ -30,6 +36,7 @@ import ServersByType from '@/views/dashboard/modules/ServersByType';
 
 export const setup = (props, context) => {
     const state = reactive({
+        summaryData: {},
         resourcesByRegionData: {},
         serverStateData: {},
         serverTypeData: {},
@@ -37,6 +44,7 @@ export const setup = (props, context) => {
         osTypeData: {},
         hypervisorTypeData: {},
     });
+
     return {
         ...toRefs(state),
     };
@@ -68,12 +76,14 @@ export default {
         max-width: 1280px;
         .row {
             padding-bottom: 1rem;
-        }
-        .server-state {
-            margin-left: 1.25rem;
-            min-width: 250px;
-            max-width: 280px;
-            width: 100%;
+            .region {
+                max-width: calc(100% - 330px);
+                margin-right: 1rem;
+            }
+            .server-state {
+                min-width: 215px;
+                max-width: 330px;
+            }
         }
 
     }

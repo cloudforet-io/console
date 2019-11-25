@@ -1,5 +1,7 @@
 <template>
-    <p-chart v-bind="$props" :options="chartOptions" @ready="draw">
+    <p-chart v-bind="$props" :options="chartOptions"
+             @ready="draw" @resize="resizeElements"
+    >
         <g v-for="(d, idx) in chartData" :key="d.key"
            class="horizontal-bar-g"
            :class="{hover: hoverList[idx]}"
@@ -22,7 +24,8 @@
                   :height="barThickness"
                   :width="xScale(max)"
             />
-            <rect class="bar"
+            <rect v-tooltip="getTooltipOptions(d, idx, { color: barColor })"
+                  class="bar"
                   :rx="round" :ry="round"
                   x="0" :y="yScale(d.key) + barPosY"
                   :height="barThickness"
@@ -41,7 +44,8 @@ import * as d3 from 'd3';
 import {
     reactive, ref, toRefs, watch, computed,
 } from '@vue/composition-api';
-import PChart from '@/components/molecules/charts/Chart';
+import { VTooltip } from 'v-tooltip';
+import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
 import { HORIZONTAL_OPTIONS } from './HorizontalBarChart.map';
 
 const setDrawTools = (props, context, chartOptions) => {
@@ -56,6 +60,7 @@ const setDrawTools = (props, context, chartOptions) => {
         textPadBottom: computed(() => chartOptions.value.labels.padBottom),
         textHeight: computed(() => chartOptions.value.labels.textHeight),
         barThickness: computed(() => chartOptions.value.bars.thickness),
+        barColor: computed(() => chartOptions.value.bars.color),
     });
 
     const initYScale = (svgTools) => {
@@ -63,19 +68,19 @@ const setDrawTools = (props, context, chartOptions) => {
         if (!chartOptions.value.responsive.height) {
             svgTools.setChartHeight(props.data.length * bandWidth);
         }
-        return d3.scaleBand()
+        state.yScale = d3.scaleBand()
             .range([0, svgTools.chartHeight.value])
             .domain(props.data.map(d => d.key));
     };
 
     const initXScale = (svgTools) => {
         d3.scaleLinear().range([0, svgTools.chartWidth.value]).domain([0, state.max]);
-        return d3.scaleLinear().range([0, svgTools.chartWidth.value]).domain([0, state.max]);
+        state.xScale = d3.scaleLinear().range([0, svgTools.chartWidth.value]).domain([0, state.max]);
     };
 
     const draw = (svgTools) => {
-        state.yScale = initYScale(svgTools);
-        state.xScale = initXScale(svgTools);
+        initYScale(svgTools);
+        initXScale(svgTools);
         state.hoverList = new Array(props.data.length).fill(false);
         state.chartData = props.data;
     };
@@ -91,6 +96,12 @@ const setDrawTools = (props, context, chartOptions) => {
         state.hoverList.splice(idx, 1, false);
     };
 
+
+    const resizeElements = (svgTools) => {
+        initXScale(svgTools);
+        // setLabelVisibility();
+    };
+
     return {
         ...toRefs(state),
         round,
@@ -98,17 +109,19 @@ const setDrawTools = (props, context, chartOptions) => {
         draw,
         onMouseEnter,
         onMouseLeave,
+        resizeElements,
     };
 };
 
 export default {
     name: 'PHorizontalBarChart',
+    events: ['legendClick'],
     components: { PChart },
-    events: ['click'],
+    directives: { tooltip: VTooltip },
     props: {
         loading: {
             type: Boolean,
-            default: true,
+            default: undefined,
         },
         data: {
             type: Array,
@@ -118,24 +131,14 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        minHeight: {
-            type: Number,
-            default: null,
-        },
-        minWidth: {
-            type: Number,
-            default: null,
-        },
-        maxHeight: {
-            type: Number,
-            default: null,
-        },
     },
     setup(props, context) {
         const chartOptions = computed(() => _.merge({}, HORIZONTAL_OPTIONS, props.options));
+        const tooltips = setTooltips(props, context, chartOptions);
         const drawTools = setDrawTools(props, context, chartOptions);
         return {
             chartOptions,
+            ...tooltips,
             ...drawTools,
         };
     },

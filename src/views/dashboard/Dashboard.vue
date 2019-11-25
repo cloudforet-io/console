@@ -11,6 +11,15 @@ export default {
     setup(props, context) {
         const state = setup(props, context);
 
+        // Summary
+        const listSummary = () => {
+            setTimeout(() => {
+                state.summaryData.value = casual.summary;
+            }, 1000);
+        };
+
+        mountBusEvent(DashboardEventBus, 'listSummary', listSummary);
+
         // Resources By Region
         const listRegionByServer = () => {
             setTimeout(() => {

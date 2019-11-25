@@ -1,18 +1,15 @@
 <template>
     <p-board-layout title="Resources by Region"
                     :dropdown-menu="dropdownMenu"
-                    :dropdown-selected="dropdownSelected"
+                    :dropdown-selected="dropdownMenu[selectedIdx].text"
                     @clickMenuEvent="onClickMenu"
     >
-        <div class="chart">
-            <p-bubble-chart :data="chartData"
-                            :loading="loading"
-                            :min-width="830"
-                            :min-height="290"
-                            :max-height="290"
-                            @legendClick="onLegendClick"
-            />
-        </div>
+        <p-bubble-chart class="chart"
+                        :data="chartData"
+                        :loading="loading"
+                        :height="310"
+                        @legendClick="onLegendClick"
+        />
     </p-board-layout>
 </template>
 
@@ -47,7 +44,7 @@ export default {
                 { type: 'item', text: 'Server', event: 'Server' },
                 { type: 'item', text: 'Cloud Service', event: 'CloudService' },
             ],
-            dropdownSelected: 'Server',
+            selectedIdx: 0,
             serverEventNames: {
                 getServerList: 'getServerData',
                 tagConfirmEvent: 'ServerTagConfirmEvent',
@@ -75,10 +72,10 @@ export default {
         DashboardEventBus.$emit('listRegionByServer');
     },
     methods: {
-        onClickMenu(e) {
-            this.dropdownSelected = e;
+        onClickMenu(name, idx) {
+            this.selectedIdx = idx;
             this.loading = true;
-            DashboardEventBus.$emit(`listRegionBy${e}`);
+            DashboardEventBus.$emit(`listRegionBy${name}`);
         },
         onLegendClick(key, val) {
             console.log('onLegendClick', key, val);
