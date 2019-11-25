@@ -16,20 +16,10 @@ export const defaultCase = () => ({
     props: {
         ...autoProps(PHorizontalBarChart),
     },
-    template: `<div style="display: inline-block; position: relative;
-                           height: 600px; width: 600px;"
-               >
-                    <button style="position: absolute; 
-                                    top: 100px; left: 50px;"
-                            @click="refresh"
-                    >refresh</button>
-                    <div style="position: absolute; 
-                                top: 150px; left: 50px;
-                                border: 1px solid lightgray;"
-                    >
-                        <p-horizontal-bar-chart v-bind="$props" :data="chartData" :loading="loadingChartData"/>
-                    </div>
-               </div>`,
+    template: `<div>
+                    <button @click="refresh">refresh</button>
+                    <p-horizontal-bar-chart v-bind="$props" :data="chartData" :loading="loadingChartData"/>
+                </div>`,
     data() {
         return {
             chartData: [],

@@ -4,15 +4,12 @@
                     :dropdown-selected="dropdownMenu[selectedIdx].text"
                     @clickMenuEvent="onClickMenu"
     >
-        <div class="chart">
-            <p-bubble-chart :data="chartData"
-                            :loading="loading"
-                            :min-width="830"
-                            :min-height="290"
-                            :max-height="290"
-                            @legendClick="onLegendClick"
+            <p-bubble-chart class="chart"
+                :data="chartData"
+                :loading="loading"
+                :height="310"
+                @legendClick="onLegendClick"
             />
-        </div>
     </p-board-layout>
 </template>
 

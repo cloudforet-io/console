@@ -11,14 +11,17 @@ export default {
 
 export const mockPage = () => ({
     components: { ServersByType },
-    template: `<div style="width: 100%;">
+    template: `<div>
+                <button @click="refresh">refresh</button>
+                <div style="width: 100%;">
                     <ServersByType v-bind="$props" 
                         :serverData="serverTypeData"
                         :vmData="vmData"
                         :osData="osData"
                         :hypervisorData="hypervisorData"
                     />
-                </div>`,
+                </div>
+               </div>`,
     setup() {
         const state = reactive({
             serverTypeData: {},
@@ -54,6 +57,17 @@ export const mockPage = () => ({
             }, 1000);
         };
         mountBusEvent(DashboardEventBus, 'listHypervisorType', listHypervisorType);
-        return { ...toRefs(state) };
+
+        const refresh = () => {
+            listServerType();
+            listVmType();
+            listOsType();
+            listHypervisorType();
+        };
+
+        return {
+            ...toRefs(state),
+            refresh,
+        };
     },
 });

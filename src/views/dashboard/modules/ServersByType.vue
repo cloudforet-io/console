@@ -2,19 +2,19 @@
     <p-board-layout title="Servers by Type">
         <div class="server-type-chart">
             <p-horizontal-stack-bar-chart :data="serverData"
-                                          :loading="loading.server"
-                                          :min-width="410"
                                           @legendClick="onServerTypeLegendClick"
             />
         </div>
         <p-card-layout>
             <template v-for="(d, key) in chartData" :slot="key">
-                <p-horizontal-bar-chart :key="key"
-                                        :data="d"
-                                        :loading="loading[key]"
-                                        :min-width="150"
-                                        :style="{width: '100%'}"
-                />
+                <div :key="key">
+                    <p class="title">
+                        {{ d.title }}
+                    </p>
+                    <p-horizontal-bar-chart :data="d.data"
+                                            :style="{width: '100%'}"
+                    />
+                </div>
             </template>
         </p-card-layout>
     </p-board-layout>
@@ -61,32 +61,20 @@ export default {
     data() {
         return {
             chartData: {
-                vm: [],
-                os: [],
-                hypervisor: [],
-            },
-            loading: {
-                server: true,
-                vm: true,
-                os: true,
-                hypervisor: true,
+                vm: { title: 'VM', data: [] },
+                os: { title: 'OS', data: [] },
+                hypervisor: { title: 'Hypervisor', data: [] },
             },
         };
     },
     watch: {
-        serverData() {
-            this.setLoading('server', false);
-        },
         vmData(data) {
-            this.setLoading('vm', false);
             this.setChartData('vm', data);
         },
         osData(data) {
-            this.setLoading('os', false);
             this.setChartData('os', data);
         },
         hypervisorData(data) {
-            this.setLoading('hypervisor', false);
             this.setChartData('hypervisor', data);
         },
     },
@@ -97,13 +85,10 @@ export default {
         DashboardEventBus.$emit('listHypervisorType');
     },
     methods: {
-        setLoading(type, val) {
-            if (this.loading[type]) this.loading[type] = val;
-        },
         setChartData(type, data) {
-            if (data instanceof Array) this.chartData[type] = data;
+            if (data instanceof Array) this.chartData[type].data = data;
             else {
-                this.chartData[type] = Object.keys(data).map(key => ({
+                this.chartData[type].data = Object.keys(data).map(key => ({
                     key,
                     value: data[key],
                 }));
@@ -118,23 +103,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.server-type-chart {
-    padding: 1.375rem 0;
-}
-.sub-chart-container {
-    display: table;
-    width: 100%;
-    border: 1px solid $gray2;
-    border-radius: 2px;
-    padding: 1rem 0;
-    .sub-chart {
-        display: table-cell;
-        vertical-align: top;
-        border-right: 1px solid $gray2;
-        padding: 0 1rem;
-        &:last-child {
-            border-right: 0;
-        }
+    .server-type-chart {
+        padding: 1.375rem 0;
     }
-}
+    .title {
+        font-weight: bold;
+        font-size: 1rem;
+        padding-bottom: 1rem;
+    }
 </style>

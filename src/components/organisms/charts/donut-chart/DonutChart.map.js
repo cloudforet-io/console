@@ -1,4 +1,12 @@
 export const DONUT_OPTIONS = Object.freeze({
+    responsive: {
+        width: true,
+        height: false,
+        preserveAspectRatio: {
+            align: 'xMinYMin',
+            meetOrSlice: 'meet',
+        },
+    },
     donut: {
         thickness: 40,
     },

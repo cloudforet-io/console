@@ -1,14 +1,14 @@
 <template>
     <div class="bubble-chart-container"
          :class="legendPosition"
-         :style="{
-             maxHeight: maxHeight && legendPosition === 'left' ? `${maxHeight}px` : null,
-             minWidth: `${minWidth}px`
-         }"
+         :style="chartContainerStyle"
     >
-        <p-chart v-bind="$props" class="p-chart"
+        <p-chart ref="chartRef"
+                 v-bind="$props" class="p-chart"
                  :options="chartOptions"
-                 :min-width="chartMinWidth"
+                 :style="{
+                     minWidth: `${chartMinWidth}px`
+                 }"
                  @ready="draw"
         >
             <g>
@@ -38,10 +38,7 @@
             </g>
         </p-chart>
         <div class="legend-container"
-             :style="{
-                 maxHeight: maxHeight && legendPosition === 'left' ? `${maxHeight}px` : null,
-                 width: legendPosition === 'left' ? `${minWidth - chartMinWidth}px` : `${minWidth}px`,
-             }"
+             :style="legendContainerStyle"
         >
             <p-chart-legend v-for="(d, idx) in data" :key="d.key" class="legend"
                             :text="d.key" :count="d.value" :icon-color="colors(idx)"
@@ -58,28 +55,72 @@
 import * as d3 from 'd3';
 import _ from 'lodash';
 import {
-    reactive, toRefs, computed,
+    reactive, toRefs, computed, onMounted,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
 import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
 import PChartLegend from '@/components/organisms/legends/ChartLegend';
 import countries from './countries.json';
-import regions from './aws-regions.json';
 import { BUBBLE_OPTIONS } from './BubbleChart.map';
 import { PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
 
+const setSizeTools = (props, context, chartOptions) => {
+    const state = reactive({
+        chartMinWidth: null,
+        chartContainerStyle: {
+            maxHeight: props.maxHeight && props.legendPosition === 'left' ? `${props.maxHeight}px` : null,
+            width: '100%',
+            height: props.height ? `${props.height}px` : null,
+        },
+        legendContainerStyle: {
+            maxHeight: null,
+            width: null,
+        },
+    });
+
+    onMounted(() => {
+        const clientRect = context.refs.chartRef.$el.getBoundingClientRect();
+        if (props.legendPosition === 'left') {
+            state.chartMinWidth = clientRect.width * 0.78;
+            state.legendContainerStyle.width = `${clientRect.width * 0.22}px`;
+            state.legendContainerStyle.maxHeight = props.legendPosition === 'left' ? `${clientRect.height}px` : null;
+        }
+    });
+
+    return {
+        ...toRefs(state),
+    };
+};
+
+const setMapTools = (props, context, chartOptions) => {
+    const state = reactive({
+        mapFeatures: [],
+        mapPath: () => {},
+        circleLoc: () => {},
+        chartRef: null,
+    });
+
+    const setMap = () => {
+        const clientRect = state.chartRef.$el.getBoundingClientRect();
+        const xy = d3.geoEquirectangular()
+            .fitExtent([
+                [0, 0],
+                [clientRect.width * 0.78, clientRect.height],
+            ], countries);
+        state.mapFeatures = countries.features;
+        state.mapPath = d3.geoPath().projection(xy);
+        state.circleLoc = xy;
+    };
+
+    onMounted(() => { setMap(); });
+
+    return {
+        ...toRefs(state),
+    };
+};
 
 const setDrawTools = (props, context, chartOptions) => {
-    const chartMinWidth = computed(() => (props.legendPosition === 'left' ? props.minWidth * 0.78 : props.minWidth));
-
-    const mapData = countries;
-    const xy = d3.geoEquirectangular().fitExtent([[0, 0], [chartMinWidth.value, props.minHeight]], mapData);
-
     const state = reactive({
-        mapFeatures: mapData.features,
-        mapPath: d3.geoPath().projection(xy),
-        circleLoc: xy,
-        regions,
         rScale: d3.scaleLinear().range([0, chartOptions.value.maxRadius]),
         chartData: [],
         colors: d3.scaleOrdinal().range(PRIMARY_COLORSET),
@@ -119,7 +160,6 @@ const setDrawTools = (props, context, chartOptions) => {
         draw,
         onMouseEnter,
         resetHoverList,
-        chartMinWidth,
     };
 };
 
@@ -131,7 +171,7 @@ export default {
     props: {
         loading: {
             type: Boolean,
-            default: true,
+            default: undefined,
         },
         data: {
             type: Array,
@@ -141,13 +181,9 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        minHeight: {
+        height: {
             type: Number,
-            default: 200,
-        },
-        minWidth: {
-            type: Number,
-            default: 500,
+            default: null,
         },
         /**
          * @name maxHeight
@@ -155,7 +191,7 @@ export default {
          */
         maxHeight: {
             type: Number,
-            default: 200,
+            default: null,
         },
         legendPosition: {
             type: String,
@@ -166,10 +202,14 @@ export default {
     setup(props, context) {
         const chartOptions = computed(() => _.merge({}, BUBBLE_OPTIONS, props.options));
         const tooltips = setTooltips(props, context, chartOptions);
+        const sizeTools = setSizeTools(props, context, chartOptions);
+        const mapTools = setMapTools(props, context, chartOptions);
         const drawTools = setDrawTools(props, context, chartOptions);
         return {
             chartOptions,
             ...tooltips,
+            ...sizeTools,
+            ...mapTools,
             ...drawTools,
         };
     },

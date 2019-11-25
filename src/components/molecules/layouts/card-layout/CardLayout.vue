@@ -2,6 +2,7 @@
     <div class="card-layout">
         <div v-for="(vnode, name) in $slots" :key="name"
              class="card-container"
+             :style="{ width: `${100 / $slots.length}%` }"
         >
             <slot :name="name" />
         </div>
@@ -18,6 +19,7 @@ export default {
     .card-layout {
         display: table;
         width: 100%;
+        table-layout: fixed;
         border: 1px solid $gray2;
         border-radius: 2px;
         padding: 1rem 0;
