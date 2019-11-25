@@ -64,6 +64,7 @@ export default {
     .vue-tags-input.p-input-tag{
         min-width: 100%;
         border: 1px solid $gray3;
+        background-color: $primary4;
     }
 
     .vue-tags-input.p-input-tag .ti-tag {

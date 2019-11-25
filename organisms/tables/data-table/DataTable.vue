@@ -24,25 +24,25 @@
             >
                 <p-tr>
                     <p-th v-if="selectable">
-                        <PCheckBox v-model="allState" @change="selectAllToggle" />
+                        <PCheckBox v-model="allState" style="margin: 0 1rem" @change="selectAllToggle" />
                     </p-th>
                     <p-th
                         v-for="(field,index) in fieldsData"
                         :key="index"
                         @click="theadClick(field,index,$event)"
                     >
-                        {{ field.label ? field.label : field.name }}
+                        <div style="vertical-align: middle !important;display: inline;">
+                            {{ field.label ? field.label : field.name }}
+                        </div>
                         <template v-if="sortable&&field.sortable">
-                            <f-i
+                            <p-i
                                 v-if="sortable&&field.name==sortBy"
-                                icon-style="solid"
-                                :icon="sortIcon"
+                                :name="sortIcon"
                                 class="sort-icon"
                             />
-                            <f-i
+                            <p-i
                                 v-else
-                                icon-style="solid"
-                                icon="fa-sort"
+                                name="ic_table_sort"
                                 class="sort-icon"
                             />
                         </template>
@@ -75,6 +75,7 @@
                             @mouseout="rowMouseOut(item,index, $event)"
                         >
                             <p-td v-if="selectable"
+                                  class="select-checkbox"
                                   @click.stop.prevent="selectClick"
                                   @mouseenter="hoverIndex=index"
                                   @mouseleave="hoverIndex=null"
@@ -119,13 +120,13 @@ import PTable from '@/components/molecules/tables/Table';
 import PTr from '@/components/atoms/table/Tr';
 import PTd from '@/components/atoms/table/Td';
 import PTh from '@/components/atoms/table/Th';
-import FI from '@/components/atoms/icons/FI';
+import PI from '@/components/atoms/icons/PI';
 import PCheckBox from '@/components/molecules/forms/CheckBox';
 
 export default {
     name: 'PDataTable',
     components: {
-        PTable, PTd, PTh, PTr, FI, PCheckBox,
+        PTable, PTd, PTh, PTr, PI, PCheckBox,
     },
     events: [
         'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
@@ -203,9 +204,9 @@ export default {
         },
         sortIcon() {
             if (this.sortDesc) {
-                return 'fa-sort-down';
+                return 'ic_table_sort_fromZ';
             }
-            return 'fa-sort-up';
+            return 'ic_table_sort_fromA';
         },
         selectArea() {
             return this.$el;
@@ -276,12 +277,10 @@ export default {
             if (this.selectable) {
                 if (this.rowClickMultiSelectMode) {
                     this.checkboxToggle(index);
+                } else if (event.shiftKey) {
+                    this.proxySelectIndex = [...this.proxySelectIndex, index];
                 } else {
-                    if (event.shiftKey) {
-                        this.proxySelectIndex = [...this.proxySelectIndex, index];
-                    } else {
-                        this.proxySelectIndex = [index];
-                    }
+                    this.proxySelectIndex = [index];
                 }
             }
         },
@@ -340,9 +339,11 @@ export default {
                 this.proxySelectIndex = [];
             }
         },
-        getSelectItem() {
+        getSelectItem(sortable) {
+            const selectedIndex = this.isEmpty(sortable) ? this.proxySelectIndex : this.proxySelectIndex.sort((a, b) => a - b);
             const selectItem = [];
-            this.proxySelectIndex.forEach((index) => {
+            console.log(selectedIndex);
+            this.selectedIndex.forEach((index) => {
                 selectItem.push(this.items[index]);
             });
             return selectItem;
@@ -353,11 +354,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
     %selected-row {
         background-color: $secondary2;
         td {
             color: $secondary;
         }
+    }
+    .select-checkbox{
+        cursor:pointer;
     }
     tbody{
         display: block;
@@ -373,6 +378,7 @@ export default {
     thead{
         tr{
             th{
+                white-space:nowrap;
                 .sort-icon{
                     float: right;
                     color: $gray2;
