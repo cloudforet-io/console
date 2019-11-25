@@ -43,11 +43,12 @@
 import {
     onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import { makeTrItems } from '@/lib/helper';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeProxy } from '@/lib/compostion-util';
+
+const PSelectBtnGroup = () => import('@/components/organisms/buttons/select-btn-group/SelectBtnGroup');
+const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 
 
 export default {

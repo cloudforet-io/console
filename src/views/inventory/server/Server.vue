@@ -16,6 +16,7 @@ export default {
         serverEventNames.tagConfirmEvent = 'ServerTagConfirmEvent';
         serverEventNames.tagResetEvent = 'resetTagEvent';
         serverEventNames.getServerSubData = 'requestSubData';
+        serverEventNames.getServerAdmin = 'requestAdmin';
 
         const state = serverSetup(props, context, serverEventNames);
 
@@ -72,9 +73,37 @@ export default {
                 console.error(e);
             }
         };
+
+        // get server admin data
+        const requestAdminState = reactive({
+            query: computed(() => (defaultQuery(
+                state.admin.thisPage, state.admin.pageSize,
+                state.admin.sortBy, state.admin.sortDesc,
+            ))),
+        });
+
+        const getSelectServerIDs = computed(() => {
+            const ids = [];
+            state.selectIndex.forEach((idx) => {
+                ids.push(state.items[idx].server_id);
+            });
+            return ids;
+        });
+
+        const requestServerAdmin = async () => {
+            const res = await context.parent.$http.post('/inventory/server/member/list', {
+                query: requestAdminState.query,
+                servers: getSelectServerIDs.value,
+            });
+            console.log(res.data);
+            state.subData.items = res.data.results;
+            const allPage = Math.ceil(res.data.total_count / state.subData.pageSize);
+            state.subData.allPage = allPage || 1;
+        };
         mountBusEvent(serverEventBus, serverEventNames.getServerList, requestServerList);
         mountBusEvent(serverEventBus, serverEventNames.tagConfirmEvent, ServerTagConfirm);
         mountBusEvent(serverEventBus, serverEventNames.getServerSubData, requestServerSubData);
+        mountBusEvent(serverEventBus, serverEventNames.getServerAdmin, requestServerAdmin);
 
         requestServerList();
         return {

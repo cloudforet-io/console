@@ -96,7 +96,15 @@
                 <p-server-raw-data :item="items[selectIndex[0]]" />
             </template>
             <template #admin="{tabName}">
-                <p> this tab is {{ tabName }}</p>
+                <p-server-admin :select-index="selectIndex"
+                                :items="admin.items"
+                                :sort-by.sync="admin.sortBy"
+                                :sort-desc.sync="admin.sortDesc"
+                                :page-size.sync="admin.pageSize"
+                                :all-page="admin.allPage"
+                                :this-page.sync="admin.thisPage"
+                                :get-server-admin="getServerAdmin"
+                />
             </template>
         </PTab>
 
@@ -111,20 +119,24 @@ import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status';
-import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
-import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 import PBadge from '@/components/atoms/badges/Badge';
-import PServerDetail from '@/views/inventory/server/modules/ServerDetail';
-import PServerRawData from '@/views/inventory/server/modules/ServerRawData';
-import PTab from '@/components/organisms/tabs/tab/Tab';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import { timestampFormatter } from '@/lib/util';
 import { serverStateFormatter } from '@/views/inventory/server/Server.util';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeTrItems } from '@/lib/helper';
-import PServerData from '@/views/inventory/server/modules/ServerData';
+
+const PTab = () => import('@/components/organisms/tabs/tab/Tab');
+
+const BaseDragHorizontal = () => import('@/components/base/drag/BaseDragHorizontal');
+const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
+const PDropdownMenuBtn = () => import('@/components/organisms/buttons/dropdown/DropdownMenuBtn');
+
+const PServerDetail = () => import('@/views/inventory/server/modules/ServerDetail');
+const PServerRawData = () => import('@/views/inventory/server/modules/ServerRawData');
+const PServerData = () => import('@/views/inventory/server/modules/ServerData');
+const PServerAdmin = () => import('@/views/inventory/server/modules/ServerAdmin');
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -169,6 +181,7 @@ export const eventNames = {
     tagConfirmEvent: '',
     getServerList: '',
     getServerSubData: '',
+    getServerAdmin: '',
 
 };
 
@@ -194,6 +207,15 @@ export const serverSetup = (props, context, eventName) => {
         eventBus.$emit(eventName.getServerList);
     };
     const subData = reactive({
+        items: [],
+        sortBy: '',
+        sortDesc: true,
+        pageSize: 15,
+        allPage: 1,
+        thisPage: 1,
+    });
+
+    const admin = reactive({
         items: [],
         sortBy: '',
         sortDesc: true,
@@ -242,6 +264,7 @@ export const serverSetup = (props, context, eventName) => {
         // EventBus Names
         ...eventNames,
         subData,
+        admin,
     });
 };
 
@@ -258,6 +281,7 @@ export default {
         PTab,
         PServerData,
         PServerRawData,
+        PServerAdmin,
     },
     setup(props, context) {
         const dataBind = reactive({
