@@ -18,7 +18,7 @@
                    @mouseleave="resetHoverList"
                 >
                     <rect v-tooltip="{
-                              ...getTooltipOptions({key: keys[ci], value: data[keys[ci]]}, idx),
+                              ...getTooltipOptions({key: keys[ci], value: data[keys[ci]]}, ci),
                               trigger: 'manual',
                               show: hoverList[ci],
                           }"
@@ -139,7 +139,7 @@ export default {
     props: {
         loading: {
             type: Boolean,
-            default: true,
+            default: undefined,
         },
         data: {
             type: Object,
@@ -148,10 +148,6 @@ export default {
         options: {
             type: Object,
             default: () => ({}),
-        },
-        minWidth: {
-            type: Number,
-            default: 400,
         },
     },
     setup(props, context) {

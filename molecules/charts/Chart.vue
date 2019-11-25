@@ -1,29 +1,19 @@
 <template>
     <div ref="chartRef"
          class="p-chart-container"
-         :style="{
-             minHeight: minHeight ? `${minHeight}px` : null,
-             minWidth: minWidth ? `${minWidth}px` : null,
-             maxHeight: maxHeight ? `${maxHeight}px` : null,
-             maxWidth: maxWidth ? `${maxWidth}px` : null,
-         }"
     >
         <svg :viewBox="`0 0 ${chartWidth} ${chartHeight}`"
              :preserveAspectRatio="svgRatio"
              :style="{
-                 width: svgWidth,
+                 width: svgWidth ? `${svgWidth}px` : '100%',
+                 height: svgHeight ? `${svgHeight}px` : '100%',
              }"
         >
             <slot name="default" />
         </svg>
 
         <transition name="fade-in">
-            <div v-if="!startDraw" class="spinner-container"
-                 :style="{
-                     minHeight: `${minHeight}px`,
-                     minWidth: `${minWidth}px`,
-                 }"
-            >
+            <div v-if="!startDraw" class="spinner-container">
                 <p-lottie class="spinner"
                           :size="1.5" :auto="true" name="spinner"
                 />
@@ -98,12 +88,13 @@ export const setTooltips = () => {
 export const setSvg = (props, context, options) => {
     const state = reactive({
         svgRatio: '',
-        svgWidth: '100%',
-        chartHeight: props.minHeight || 0,
-        chartWidth: props.minWidth || 0,
+        svgWidth: null,
+        svgHeight: null,
+        chartHeight: 0,
+        chartWidth: 0,
     });
 
-    const responsiveWidthOnly = computed(() => options.value.responsive.width && !options.value.responsive.height);
+    const isWidthResponsive = computed(() => options.value.responsive.width);
 
     const setChartWidth = (width) => {
         state.chartWidth = width;
@@ -120,33 +111,29 @@ export const setSvg = (props, context, options) => {
         }
     };
 
-    const resizeSvg = () => {
-        if (!context.refs.chartRef) return;
-        const width = context.refs.chartRef.getBoundingClientRect().width;
-        setChartWidth(width);
-        state.svgWidth = `${state.chartWidth}px`;
-    };
     const emitResizeEvent = () => {
-        resizeSvg();
+        setChartWidth(context.refs.chartRef.getBoundingClientRect().width);
+        state.svgWidth = state.chartWidth;
         context.emit('resize', { ...toRefs(state) });
     };
-    const setSvgResponsiveWidthOnly = () => {
-        resizeSvg();
+    const setSvgResponsiveWidth = () => {
+        state.svgWidth = state.chartWidth;
         window.addEventListener('resize', emitResizeEvent);
     };
     onUnmounted(() => {
-        if (responsiveWidthOnly.value) window.removeEventListener('resize', emitResizeEvent);
+        if (isWidthResponsive.value) window.removeEventListener('resize', emitResizeEvent);
     });
-
-    const setSvgResponsiveHeightOnly = () => {
-        state.svgWidth = `${props.minWidth}px`;
-    };
 
     const setSvgSize = () => {
         const responsive = options.value.responsive;
 
-        if (responsiveWidthOnly.value) setSvgResponsiveWidthOnly();
-        else if (!responsive.width && responsive.height) setSvgResponsiveHeightOnly();
+        setChartWidth(context.refs.chartRef.getBoundingClientRect().width);
+        if (isWidthResponsive.value) setSvgResponsiveWidth();
+
+        if (!options.value.responsive.height && props.height) {
+            setChartHeight(props.height);
+            state.svgHeight = state.chartHeight;
+        }
 
         setPreserveAspectRatio(responsive.preserveAspectRatio);
     };
@@ -162,7 +149,7 @@ export const setSvg = (props, context, options) => {
 export const setDrawTrigger = (props, context, svgTools) => {
     const state = reactive({
         isMounted: false,
-        startDraw: !props.loading,
+        startDraw: false, //! props.loading,
     });
 
     const emitReadyEvent = () => {
@@ -171,20 +158,22 @@ export const setDrawTrigger = (props, context, svgTools) => {
         context.emit('ready', svgTools);
     };
 
-    watch(() => props.loading, (val) => {
-        if (!val && state.isMounted) emitReadyEvent();
-        else state.startDraw = false;
-    });
+    const isDataReady = (data) => {
+        if (data instanceof Array) return data.length > 0;
+        return Object.keys(data).length > 0;
+    };
 
-    // watch(() => props.loading, (val) => {
-    //     if (!val && state.isMounted) emitReadyEvent();
-    //     else state.startDraw = false;
-    // });
-
-    watch(() => state.isMounted, (val) => {
-        if (val && !props.loading) emitReadyEvent();
-        else state.startDraw = false;
-    });
+    if (props.loading === undefined) {
+        watch([() => props.data, () => state.isMounted], ([data, isMounted]) => {
+            if (isDataReady(data) && isMounted) emitReadyEvent();
+            else state.startDraw = false;
+        });
+    } else {
+        watch([() => props.loading, () => state.isMounted], ([loading, isMounted]) => {
+            if (!loading && isMounted) emitReadyEvent();
+            else state.startDraw = false;
+        });
+    }
 
 
     onMounted(() => {
@@ -211,7 +200,7 @@ const setup = (props, context) => {
 };
 
 export default {
-    name: 'PChartD3',
+    name: 'PChart',
     events: ['resize', 'ready'],
     components: {
         PLottie,
@@ -219,25 +208,17 @@ export default {
     props: {
         loading: {
             type: Boolean,
-            default: true,
+            default: undefined,
+        },
+        data: {
+            type: [Array, Object],
+            required: true,
         },
         options: {
             type: Object,
             default: () => ({}),
         },
-        minHeight: {
-            type: Number,
-            default: null,
-        },
-        minWidth: {
-            type: Number,
-            default: null,
-        },
-        maxHeight: {
-            type: Number,
-            default: null,
-        },
-        maxWidth: {
+        height: {
             type: Number,
             default: null,
         },

@@ -1,6 +1,6 @@
 <template>
     <div class="board-pane">
-        <div class="header" :class="{'no-pad': dropdownMenu}">
+        <div v-if="title" class="header" :class="{'no-pad': dropdownMenu}">
             <p v-if="title" class="title">
                 {{ title }}
             </p>
@@ -42,6 +42,8 @@ export default {
     .board-pane {
         @extend %pane;
         padding: 1rem;
+        display: flex;
+        flex-direction: column;
         .header {
             padding-top: 0.875rem;
             display: flex;
