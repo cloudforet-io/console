@@ -133,7 +133,7 @@ export default {
 .query-list {
       display: inline-block;
       min-height: 100px;
-      overflow-y: scroll;
+      overflow-y: auto;
       left: 0;
       width: auto;
       min-width: 250px;

@@ -231,7 +231,7 @@ export default {
             align-items: flex-end;
             .legend-container {
                 padding-right: 1rem;
-                overflow-y: scroll;
+                overflow-y: auto;
                 .legend::v-deep {
                     display: flex;
                     justify-content: space-between;

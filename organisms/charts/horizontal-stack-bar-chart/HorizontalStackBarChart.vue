@@ -104,7 +104,15 @@ const setDrawTools = (props, context, chartOptions) => {
         state.hoverState = false;
         state.hoverList = new Array(state.keys.length).fill(false);
     };
+    const drawEmptyBar = () => {
+
+    };
+
     const draw = async (svgTools) => {
+        if (!state.sum) {
+            drawEmptyBar();
+            return;
+        }
         initYScale(svgTools);
         initXScale(svgTools);
         resetHoverList();
