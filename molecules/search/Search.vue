@@ -1,6 +1,6 @@
 <template>
     <div class="row" style="width:100%">
-        <div :class="getColsizer" >
+        <div :class="getColsizer">
             <p-input-text class="form-control py-2 border-right-0 border"
                           :value="searchText"
                           :disabled="disabled"
@@ -26,6 +26,7 @@
 import PInputText from '@/components/atoms/inputs/TextInput';
 import PI from '@/components/atoms/icons/PI';
 import PButton from '@/components/atoms/buttons/Button';
+
 export default {
     name: 'PSearch',
     components: {
@@ -33,13 +34,8 @@ export default {
         PInputText,
         PI,
     },
-    computed: {
-        getColsizer() {
-            return 'input-group col-' + this.size;
-        },
-    },
     props: {
-        size:{
+        size: {
             type: Number,
             default: 12,
         },
@@ -55,6 +51,11 @@ export default {
             default: false,
         },
     },
+    computed: {
+        getColsizer() {
+            return `input-group col-${this.size}`;
+        },
+    },
     methods: {
         onSearch() {
             this.$emit('onSearch', this.searchText);
@@ -64,10 +65,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .form-control{
+        height: 2rem !important;
+    }
     .search-btn {
         min-width: 32px;
         background-color: white;
-        height: 35px;
         border-radius: 0px 2px 2px 0px;
         border-top: 1px solid $gray2;
         border-right: 1px solid $gray2;
