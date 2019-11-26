@@ -37,12 +37,7 @@
                         </PDropdownMenuBtn>
                     </template>
                     <template v-slot:col-state-format="data">
-                        <p-status
-                            icon="fa-circle"
-                            icon-style="solid"
-                            size="xs"
-                            v-bind="serverStateFormatter(data.value)"
-                        />
+                        <p-status v-bind="serverStateFormatter(data.value)" />
                     </template>
                     <template />
                     <template v-slot:col-updated_at-format="data">
@@ -80,12 +75,7 @@
                                  :tag-reset-event="tagResetEvent"
                 >
                     <template v-slot:col-state-format="data">
-                        <p-status
-                            icon="fa-circle"
-                            icon-style="solid"
-                            size="xs"
-                            v-bind="serverStateFormatter(data.value)"
-                        />
+                        <p-status justifyContent="flex-start" v-bind="serverStateFormatter(data.value)" />
                     </template>
                     <template />
                     <template v-slot:col-updated_at-format="data">
@@ -148,6 +138,7 @@
                     :sortable="false"
                     :selectable="false"
                     :items="getSelectServerItems"
+                    :col-copy="true"
                 >
                     <template v-slot:col-state-format="data">
                         <p-status
@@ -198,7 +189,7 @@
         </PTab>
 
         <div v-else id="empty-space">
-            Select a user above for details.
+            Select a Server above for details.
         </div>
     </div>
 </template>
@@ -344,28 +335,18 @@ export const serverSetup = (props, context, eventName) => {
         ...toRefs(tabData),
         ...toRefs(tabAction),
         tags,
-        dropdown: [
-            {
-                type: 'item', text: 'delete', event: 'delete', disabled: false,
-            },
-            { type: 'divider' },
-            {
-                type: 'item', text: 'set Maintenance', event: 'maintenance', disabled: false,
-            },
-            {
-                type: 'item', text: 'set In-Service', event: 'in-service', disabled: false,
-            },
-            {
-                type: 'item', text: 'set Closed', event: 'closed', disabled: false,
-            },
-            { type: 'divider' },
-            {
-                type: 'item', text: 'change project', event: 'project', disabled: false,
-            },
-            {
-                type: 'item', text: 'change pool', event: 'pool', disabled: false,
-            },
+        dropdown: makeTrItems([
+            ['delete', 'COMMON.BTN_DELETE'],
+            [null, null, { type: 'divider' }],
+            ['maintenance', 'COMMON.BTN_S_MANT'],
+            ['in-service', 'COMMON.BTN_S_SERV'],
+            ['closed', 'COMMON.BTN_S_CLOSE'],
+            [null, null, { type: 'divider' }],
+            ['project', 'COMMON.CHG_PRO'],
+            ['pool', 'COMMON.CHG_POOL'],
         ],
+        context.parent,
+        { type: 'item', disabled: false }),
         serverStateFormatter,
         timestampFormatter,
         clickCollectData() {

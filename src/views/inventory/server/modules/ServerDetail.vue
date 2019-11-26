@@ -2,12 +2,7 @@
     <div>
         <p-info-panel info-title="Base Information" :defs="baseDefs" :item="item">
             <template #def-state-format="scope">
-                <p-status
-                    icon="fa-circle"
-                    icon-style="solid"
-                    size="xs"
-                    v-bind="serverStateFormatter(scope.value)"
-                />
+                <p-status v-bind="serverStateFormatter(scope.value)" />
             </template>
             <template #def-core-format="scope">
                 {{ scope.item.data.base.core }}
@@ -73,7 +68,7 @@ import { timestampFormatter } from '@/lib/util';
 import { serverStateFormatter } from '@/views/inventory/server/Server.util';
 import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { makeTrItems } from '@/lib/helper'
+import { makeTrItems } from '@/lib/helper';
 
 
 export default {
