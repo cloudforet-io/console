@@ -25,16 +25,20 @@
                     @changeSort="getServers"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary" @click="clickCollectData">
+                        <p-button style-type="primary" :disabled="true" @click="clickCollectData">
                             Collect Data
                         </p-button>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
+                            class="left-toolbox-item"
                             :menu="dropdown"
                             @clickMenuEvent="clickMenuEvent"
                         >
                             Action
                         </PDropdownMenuBtn>
+                        <div style="width: 50vw" class="left-toolbox-item">
+                            <p-search :search-text.sync="searchText" @onSearch="getServers" />
+                        </div>
                     </template>
                     <template v-slot:col-state-format="data">
                         <p-status v-bind="serverStateFormatter(data.value)" />
@@ -75,7 +79,7 @@
                                  :tag-reset-event="tagResetEvent"
                 >
                     <template v-slot:col-state-format="data">
-                        <p-status justifyContent="flex-start" v-bind="serverStateFormatter(data.value)" />
+                        <p-status justify-content="flex-start" v-bind="serverStateFormatter(data.value)" />
                     </template>
                     <template />
                     <template v-slot:col-updated_at-format="data">
@@ -113,6 +117,7 @@
                     :page-size.sync="subData.pageSize"
                     :all-page="subData.allPage"
                     :this-page.sync="subData.thisPage"
+                    :search-text.sync="subData.searchText"
                     :get-server-sub-data="getServerSubData"
                 />
             </template>
@@ -127,6 +132,7 @@
                                 :page-size.sync="admin.pageSize"
                                 :all-page="admin.allPage"
                                 :this-page.sync="admin.thisPage"
+                                :search-text.sync="admin.searchText"
                                 :get-server-admin="getServerAdmin"
                 />
             </template>
@@ -141,12 +147,7 @@
                     :col-copy="true"
                 >
                     <template v-slot:col-state-format="data">
-                        <p-status
-                            icon="fa-circle"
-                            icon-style="solid"
-                            size="xs"
-                            v-bind="serverStateFormatter(data.value)"
-                        />
+                        <p-status v-bind="serverStateFormatter(data.value)" />
                     </template>
                     <template />
                     <template v-slot:col-updated_at-format="data">
@@ -212,7 +213,7 @@ const PDataTable = () => import('@/components/organisms/tables/data-table/DataTa
 const BaseDragHorizontal = () => import('@/components/base/drag/BaseDragHorizontal');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 const PDropdownMenuBtn = () => import('@/components/organisms/buttons/dropdown/DropdownMenuBtn');
-
+const PSearch = () => import('@/components/molecules/search/Search');
 const PServerDetail = () => import('@/views/inventory/server/modules/ServerDetail');
 const PServerRawData = () => import('@/views/inventory/server/modules/ServerRawData');
 const PServerData = () => import('@/views/inventory/server/modules/ServerData');
@@ -236,6 +237,7 @@ export const serverTableReactive = parent => reactive({
     parent),
     selectIndex: [],
     items: [],
+    searchText: '',
     toolbox: null, // template refs
 });
 
@@ -299,6 +301,7 @@ export const serverSetup = (props, context, eventName) => {
         pageSize: 15,
         allPage: 1,
         thisPage: 1,
+        searchText: '',
     });
 
     const admin = reactive({
@@ -308,6 +311,7 @@ export const serverSetup = (props, context, eventName) => {
         pageSize: 15,
         allPage: 1,
         thisPage: 1,
+        searchText: '',
     });
     const sortSelectIndex = computed(() => {
         const idxs = [...tableState.selectIndex];
@@ -382,6 +386,7 @@ export default {
         PServerRawData,
         PServerAdmin,
         PDataTable,
+        PSearch,
     },
     setup(props, context) {
         const dataBind = reactive({
@@ -399,9 +404,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    #server-dropdown-btn {
+    .left-toolbox-item{
         margin-left: 1rem;
     }
+
     #empty-space{
         text-align: center;
         margin-bottom: 0.5rem;

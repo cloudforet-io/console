@@ -1,6 +1,9 @@
 <template>
     <div>
-        <p-select-btn-group :buttons="buttons" :selected.sync="selected" @clickButton="getData" />
+        <p-select-btn-group
+            style="margin-bottom: 1rem"
+            :buttons="buttons" :selected.sync="selected" @clickButton="getData"
+        />
         <p-toolbox-table
             :items="items"
             :fields="dataFields[selected]"
@@ -16,11 +19,17 @@
             :setting-visible="false"
             :shadow="false"
             :border="false"
+            :padding="false"
             @changePageSize="getData"
             @changePageNumber="getData"
             @clickRefresh="getData"
             @changeSort="getData"
         >
+            <template #toolbox-left>
+                <div style="width: 50vw">
+                    <p-search :search-text.sync="proxySearchText" @onSearch="getData" />
+                </div>
+            </template>
             <!-- nic fields -->
             <template #col-ip_address-format="{item}">
                 {{ item.ip_addresses? item.ip_addresses[0].ip_address:'' }}
@@ -49,11 +58,12 @@ import { makeProxy } from '@/lib/compostion-util';
 
 const PSelectBtnGroup = () => import('@/components/organisms/buttons/select-btn-group/SelectBtnGroup');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
+const PSearch = () => import('@/components/molecules/search/Search');
 
 
 export default {
     name: 'ServerData',
-    components: { PSelectBtnGroup, PToolboxTable },
+    components: { PSelectBtnGroup, PToolboxTable, PSearch },
     props: {
         serverId: String,
         items: {
@@ -71,6 +81,10 @@ export default {
         pageSize: {
             type: Number,
             default: 15,
+        },
+        searchText: {
+            type: String,
+            default: '',
         },
         allPage: {
             type: Number,
@@ -131,6 +145,7 @@ export default {
             proxyPageSize: makeProxy('pageSize', props, emit),
             proxySortBy: makeProxy('sortBy', props, emit),
             proxySortDesc: makeProxy('sortDesc', props, emit),
+            proxySearchText: makeProxy('searchText', props, emit),
             dataFields,
             buttons,
         });

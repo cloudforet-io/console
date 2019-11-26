@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 export const makeItem = (parent, commonOption, name, trLabel, extra) => {
-    let item = extra ? { ...extra } : { name };
+    let item = extra ? { ...extra, name } : { name };
     if (commonOption) {
         item = _.defaultsDeep(item, commonOption);
     }

@@ -106,7 +106,7 @@ class API {
 
 export default new API();
 
-export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc) => {
+export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText) => {
     const query = {
         page: {
             start: ((thisPage - 1) * pageSize) + 1,
@@ -118,6 +118,9 @@ export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc) => {
             key: sortBy,
             desc: sortDesc,
         };
+    }
+    if (searchText) {
+        query.keyword = searchText || '';
     }
     return query;
 };
