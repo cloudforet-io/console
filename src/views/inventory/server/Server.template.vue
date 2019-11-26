@@ -53,9 +53,6 @@
                     <template v-slot:col-memory-format="data">
                         {{ data.item.data.base.memory }}
                     </template>
-                    <template v-slot:col-project-format="data">
-                        {{ data.item.project_id }}
-                    </template>
                     <template v-slot:col-pool-format="data">
                         {{ data.item.pool_info ? data.item.pool_info.name :'' }}
                     </template>
@@ -90,9 +87,6 @@
                     </template>
                     <template v-slot:col-memory-format="data">
                         {{ data.item.data.base.memory }}
-                    </template>
-                    <template v-slot:col-project-format="data">
-                        {{ data.item.project_id }}
                     </template>
                     <template v-slot:col-pool-format="data">
                         {{ data.item.pool_info ? data.item.pool_info.name :'' }}
@@ -138,7 +132,7 @@
             </template>
         </PTab>
         <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
-            <template #datas="{tabName}">
+            <template #data="{tabName}">
                 <p-data-table
                     :fields="fields"
                     :sortable="false"
@@ -158,9 +152,6 @@
                     </template>
                     <template v-slot:col-memory-format="data">
                         {{ data.item.data.base.memory }}
-                    </template>
-                    <template v-slot:col-project-format="data">
-                        {{ data.item.project_id }}
                     </template>
                     <template v-slot:col-pool-format="data">
                         {{ data.item.pool_info ? data.item.pool_info.name :'' }}
@@ -271,18 +262,19 @@ export const serverSetup = (props, context, eventName) => {
     const eventBus = serverEventBus;
     const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
-        tabs: [
-            { name: 'detail', label: '디테일', keepAlive: true },
-            { name: 'data', label: '데이터' },
-            { name: 'rawData', label: '데이터 원본', keepAlive: true },
-            { name: 'admin', label: '관리자' },
+        tabs: makeTrItems([
+            ['detail', 'COMMON.DETAILS', { keepAlive: true }],
+            ['data', 'COMMON.DATA'],
+            ['rawData', 'COMMON.RAWDATA', { keepAlive: true }],
+            ['admin', 'COMMON.ADMIN'],
         ],
+        context.parent),
         activeTab: 'detail',
-        multiSelectTabs: [
-            { name: 'datas', label: '데이터', keepAlive: true },
-            { name: 'admin', label: '관리자' },
-        ],
-        multiSelectActiveTab: 'datas',
+        multiSelectTabs: makeTrItems([
+            ['data', 'COMMON.DATA', { keepAlive: true }],
+            ['admin', 'COMMON.ADMIN'],
+        ], context.parent),
+        multiSelectActiveTab: 'data',
         serverDetail: null, // template refs
     });
     const tags = ref({});

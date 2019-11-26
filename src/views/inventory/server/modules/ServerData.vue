@@ -30,6 +30,10 @@
                     <p-search :search-text.sync="proxySearchText" @onSearch="getData" />
                 </div>
             </template>
+            <!-- nic,disk -->
+            <template #col-tags-format="{value}">
+                <p-tag-list :tags="value" />
+            </template>
             <!-- nic fields -->
             <template #col-ip_address-format="{item}">
                 {{ item.ip_addresses? item.ip_addresses[0].ip_address:'' }}
@@ -59,11 +63,13 @@ import { makeProxy } from '@/lib/compostion-util';
 const PSelectBtnGroup = () => import('@/components/organisms/buttons/select-btn-group/SelectBtnGroup');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 const PSearch = () => import('@/components/molecules/search/Search');
-
+const PTagList = () => import('@/components/molecules/tag-list/TagList');
 
 export default {
     name: 'ServerData',
-    components: { PSelectBtnGroup, PToolboxTable, PSearch },
+    components: {
+        PSelectBtnGroup, PToolboxTable, PSearch, PTagList,
+    },
     props: {
         serverId: String,
         items: {
