@@ -1,6 +1,12 @@
 <template>
     <div class="animated fadeIn">
-        <project-context-action :selected-node="getSelectedNodeAndTree" />
+        <project-context-action ref="contextPopUp"
+                                :selected-node="getSelectedNodeAndTree"
+                                :action-flag="getContextActionFlag"
+                                @create="createProjectAndGroup"
+                                @update="updateProjectAndGroup"
+                                @delete="deleteProjectAndGroup"
+        />
         <default-tree
             ref="ProjectTree"
             :tree-data="treeData"
@@ -17,7 +23,7 @@
             <template #context>
                 <project-context
                     :context-data="getSelectedData"
-                    @executeContext="actionOnProject"
+                    @executeContext="contextMenuOnAction"
                 />
             </template>
             <template #treeSubPanel>
@@ -26,9 +32,9 @@
                         <PTab :tabs="tabsData.tabs" :active-tab.sync="tabsData.activeTab">
                             <template #details="{tabName}">
                                 <keep-alive>
-                                    <project-summary-top
-                                        :selected-node="getSelectedNodeAndTree"
-                                        :responsive-style="{'min-height': height/2+'px', 'overflow-y':'auto'}"
+                                    <project-summary-top ref="detailsTop"
+                                                         :selected-node="getSelectedNodeAndTree"
+                                                         :responsive-style="{'min-height': height/2+'px', 'overflow-y':'auto'}"
                                     />
                                 </keep-alive>
                             </template>
@@ -42,8 +48,8 @@
                 </BaseDragHorizontal>
                 <div>
                     <template v-if="tabsData.activeTab === 'details'">
-                        <project-summary-bottom
-                            :selected-node="getSelectedNodeAndTree"
+                        <project-summary-bottom ref="detailsBottom"
+                                                :selected-node="getSelectedNodeAndTree"
                         />
                     </template>
                     <template v-else />
@@ -92,10 +98,17 @@ export default {
             selectedNodeData: null,
             isInitializing: false,
             contextItem: null,
+            contextActionFlag: null,
             isContextMenuVisible: false,
         };
     },
     computed: {
+        getContext() {
+            return this.contextItem;
+        },
+        getContextActionFlag() {
+            return this.contextActionFlag;
+        },
         getSelectedData() {
             return this.contextItem;
         },
@@ -147,7 +160,12 @@ export default {
             const actionOBJ = {
                 node, event, hasClicked, tree,
             };
+            this.selectedNodeData = { node, tree };
             this.contextItem = actionOBJ;
+        },
+        async contextMenuOnAction(actionFlag) {
+            this.contextActionFlag = actionFlag;
+            this.$refs.contextPopUp.showModal(actionFlag);
         },
         async listProject() {
             await this.$http.post('/identity/project/tree', {
@@ -168,8 +186,123 @@ export default {
             });
             this.displayTree = true;
         },
-        async actionOnProject() {
-            debugger;
+        async createProjectAndGroup(flag, tree, nodeData) {
+            const paramBasic = {
+                name: this.$refs.contextPopUp._data.textInput.name,
+                tags: this.$refs.contextPopUp._data.tagInput.tags,
+            };
+
+            const param = flag[1] === 'RT' ? { is_root: true, ...paramBasic } : flag[1] === 'PR' ? { parent_project_group_id: nodeData.id, ...paramBasic } : { project_group_id: nodeData.id, ...paramBasic };
+            const url = flag[1] === 'PJ' ? 'project' : 'project-group';
+
+            await this.$http.post(`/identity/${url}/create`, param).then((response) => {
+                const responseData = !this.isEmpty(response.data) ? response.data : {};
+                if (!this.isEmpty(responseData)) {
+                    const placement = flag[1] === 'RT' ? 'after' : 'inside';
+                    const InitializingData = {
+                        id: !this.isEmpty(responseData.project_group_id) ? responseData.project_group_id : responseData.project_id,
+                        item_type: !this.isEmpty(responseData.project_group_id) ? 'PROJECT_GROUP' : 'PROJECT',
+                        is_root: !this.isEmpty(responseData.is_root) ? responseData.is_root : false,
+                        name: param.name,
+                    };
+                    const newNode = this.getSelectedNode(InitializingData, 'PROJECT');
+
+                    if (flag[1] !== 'RT') {
+                        this.applyActionOnScreen(tree, { node: newNode, placement });
+                    } else {
+                        tree.insert({ node: tree.getSelected()[0], placement }, newNode);
+                    }
+                    if (this.isInitializing) {
+                        tree.remove([tree.getFirstNode()].map(node => node.path));
+                        this.isInitializing = false;
+                    }
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+            this.$refs.contextPopUp.hideModal();
+        },
+        async updateProjectAndGroup(flag, tree, nodeData) {
+            const basicParam = {
+                name: this.$refs.contextPopUp._data.textInput.name,
+                tags: this.$refs.contextPopUp._data.tagInput.tags,
+            };
+
+            const key = `${nodeData.item_type.toLowerCase()}_id`;
+            const url = `/identity/${this.replaceAll(nodeData.item_type, '_', '-').toLowerCase()}/update`;
+            const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: nodeData.id, ...basicParam } : { project_id: nodeData.id, ...basicParam };
+
+            await this.$http.post(url, param).then((response) => {
+                if (response.data[key] === nodeData.id) {
+                    if (!this.isEmpty(this.$refs.detailsTop)) {
+                        this.$refs.detailsTop.setInitData();
+                    }
+                }
+                tree.updateNode(tree.getSelected()[0].path, { title: param.name });
+            }).catch((error) => {
+                console.error(error);
+            });
+            this.$refs.contextPopUp.hideModal();
+        },
+        async deleteProjectAndGroup() {
+            const nodeData = this.selectedNodeData.node.data;
+            const treeV = this.selectedNodeData.tree;
+            const itemType = nodeData.item_type;
+            const selectedId = nodeData.id;
+            const path = treeV.getSelected().map(node => node.path);
+            const url = `/identity/${this.replaceAll(itemType, '_', '-').toLowerCase()}/delete`;
+            const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedId } : { project_id: selectedId };
+
+            await this.$http.post(url, param).then((response) => {
+                const responseData = response.data;
+                if (this.isEmpty(responseData)) {
+                    treeV.remove(path);
+                    this.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Success',
+                        text: 'Selected item successfully deleted.',
+                        duration: 3000,
+                        speed: 2000,
+                    });
+                    if (this.treeData.length === 1) {
+                        this.isInitializing = true;
+                        this.treeData = [{
+                            title: '! Please, Right Click me',
+                            isLeaf: true,
+                            data: {
+                                init: true,
+                            },
+                        }];
+                    }
+                }
+            }).catch((error) => {
+                if (error.code.includes('ERROR_EXIST_CHILD')) {
+                    this.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Fail',
+                        text: 'Delete selected item has failed.',
+                        duration: 3000,
+                        speed: 2000,
+                    });
+                }
+            });
+        },
+        async applyActionOnScreen(tree, data) {
+            const selected = tree.getSelected()[0];
+            const { path } = selected;
+            if (!selected.isExpanded) {
+                if (selected.data.is_cached) {
+                    tree.insert({ node: tree.getSelected()[0], placement: data.placement }, data.node);
+                    tree.updateNode(path, { isExpanded: true });
+                } else {
+                    this.pNodeToggled(selected, tree);
+                    tree.updateNode(path, { isExpanded: true });
+                }
+            } else {
+                tree.insert({ node: tree.getSelected()[0], placement: data.placement }, data.node);
+            }
         },
     },
 };

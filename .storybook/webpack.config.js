@@ -36,7 +36,6 @@ module.exports = async ({ config, mode }) => {
         loader: 'storybook-addon-vue-info/loader',
         enforce: 'post'
     })
-  debugger;
     config.plugins.push(new MonacoWebpackPlugin({
         languages:['javascript','json','css','html']
     }))
