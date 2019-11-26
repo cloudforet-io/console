@@ -34,13 +34,12 @@
                         @mouseleave="thHoverIndex=null"
                     >
                         <transition name="fade" mode="out-in">
-                            <div
+                            <span
                                 v-if="!isThOver(index)"
                                 key="colName"
-                                style="vertical-align: middle !important;display: inline;"
                             >
                                 {{ field.label ? field.label : field.name }}
-                            </div>
+                            </span>
                             <p-button v-else
                                       key="copyBtn"
                                       style="display: inline-block;" outline
