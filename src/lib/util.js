@@ -11,3 +11,17 @@ export const timestampFormatter = value => Util.methods.getDatefromTimeStamp(val
  * @return {boolean}
  * */
 export const isEmpty = value => !!((value === '' || value === null || value === undefined || (value !== null && typeof value === 'object' && !Object.keys(value).length)));
+
+/** @function
+ * @name selectToCopyToClipboard
+ * @description copy given text to clipboard
+ * @param {String} text
+ * */
+export const selectToCopyToClipboard = (t) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = t;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('Copy');
+    textArea.remove();
+};
