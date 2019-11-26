@@ -494,6 +494,6 @@ export default {
 }
 .tag-container {
     height: 260px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 </style>

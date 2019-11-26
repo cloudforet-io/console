@@ -55,7 +55,7 @@ const setDrawTools = (props, context, chartOptions) => {
         chartData: null,
         barGroup: null,
         hoverList: [],
-        max: computed(() => d3.max(props.data, d => d.value)),
+        max: computed(() => d3.max(props.data, d => d.value) || 1),
         textPadTop: computed(() => chartOptions.value.labels.padTop),
         textPadBottom: computed(() => chartOptions.value.labels.padBottom),
         textHeight: computed(() => chartOptions.value.labels.textHeight),

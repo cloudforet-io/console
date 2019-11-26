@@ -431,7 +431,7 @@ export default {
     #scrollspy-example {
         position: relative;
         height: 200px;
-        overflow-y: scroll;
+        overflow-y: auto;
         border: 1px solid blue;
     }
 </style>

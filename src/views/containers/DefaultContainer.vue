@@ -62,7 +62,7 @@ export default {
         position: fixed;
         left: $gnb-width;
         top: 0;
-        overflow-y: scroll;
+        overflow-y: auto;
         max-height: 100%;
         //margin-left: $gnb-width;
         width: calc(100vw - #{$gnb-width});
