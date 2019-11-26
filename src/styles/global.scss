@@ -128,6 +128,23 @@ p {
     }
 }
 
+.sl-vue-tree-cursor {
+    position: absolute;
+    border: 1px solid $secondary;
+    height: 1px;
+    width: 100%;
+}
+
+
+.sl-vue-tree-drag-info {
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    opacity: 0.5;
+    margin-left: 20px;
+    padding: 5px 10px;
+}
+
 .sl-vue-tree.sl-vue-tree-root {
     background-color: transparent;
     border: none;
@@ -137,6 +154,7 @@ p {
             &.sl-vue-tree-selected {
                 @include node-item-background(transparent);
             }
+
             .sl-vue-tree-node-item {
                 border-radius: 2px;
                 cursor: pointer;
@@ -161,6 +179,13 @@ p {
                         font-size: 0.87em;
                     }
                 }
+                &.sl-vue-tree-cursor-inside {
+                  /*  border-top: none;
+                    border-left: none;
+                    border-right: none;*/
+                    border: 1px solid $secondary;
+                }
+
                 .sl-vue-tree-title {
                     display: flex;
                     width: 100%;

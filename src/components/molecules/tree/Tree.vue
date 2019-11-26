@@ -77,7 +77,7 @@ export default {
         /** Allow select multiple Nodes */
         useMultiSelect: {
             type: Boolean,
-            default: true,
+            default: false,
         },
         /** Ues Y/N to user default Node icon on Tree */
         useDefaultTreeIcon: {
@@ -105,7 +105,7 @@ export default {
                 return returnVal;
             },
             set(value) {
-                this.currentTreeData = value;
+                this.$emit('update:treeData', value);
             },
         },
     },

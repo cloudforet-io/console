@@ -5,7 +5,7 @@
                         @enter="enter"
             >
                 <div v-if="showTree">
-                    <vertical-layout>
+                    <vertical-layout :autoSaveLeftWidth="true">
                         <template #leftContainer="{ width }">
                             <div id="rootPanel"
                                  @click.right.stop="isRootClicked"
@@ -109,8 +109,6 @@ export default {
     },
     computed: {
         getNoSelectMSG() {
-            console.log(this.noSelectMSG[0]);
-            console.log(this.noSelectMSG[1]);
             return [this.tr(this.noSelectMSG[0]), this.tr(this.noSelectMSG[1])];
         },
         getCurrentNode() {
@@ -147,6 +145,26 @@ export default {
         getNodeEl(node) {
             return this.$refs.primeTree.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
         },
+        addClickedClass(node) {
+            const elem = this.getNodeEl(node);
+            if (elem) {
+                elem.classList.add('sl-vue-node-clicked');
+                return true;
+            }
+            return false;
+        },
+        removeAllClass() {
+            const elem = this.$refs.primeTree.$refs.slVueTree.$el.querySelectorAll('.sl-vue-tree-nodes-list .sl-vue-tree-node .sl-vue-node-clicked');
+            elem.forEach((curItem) => {
+                curItem.classList.remove('sl-vue-node-clicked');
+            });
+        },
+        removeClickedClass(node) {
+            const elem = this.getNodeEl(node);
+            if (elem) {
+                elem.classList.remove('sl-vue-node-clicked');
+            }
+        },
         isRootClicked(e) {
             this.preventEvent(e);
             const treeV = this.getTree();
@@ -173,6 +191,8 @@ export default {
             this.$emit('DTIsRootClicked', actionObj);
         },
         nodeClicked(node) {
+            this.removeAllClass();
+            this.addClickedClass(node);
             if (!node.data.hasOwnProperty('init')) {
                 this.nodeKey = (this.nodeKey !== node.data.id) ? node.data.id : this.nodeKey;
                 this.hasSelected = true;
@@ -195,11 +215,15 @@ export default {
             if (!hasClicked) {
                 event.preventDefault();
             }
+
             event.stopPropagation();
 
             if (this.contextMenuIsVisible) {
                 this.contextMenuIsVisible = false;
             }
+
+            this.removeAllClass(node);
+            this.addClickedClass(node);
 
             this.$emit('DTContextVisible', node, event, hasClicked, this.getTree());
             this.contextMenuIsVisible = true;
