@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'toolbox-table': true,'toolbox-shadow': shadow, 'toolbox-border': border}">
+    <div :class="{'toolbox-table': true,'no-padding':!padding,'toolbox-shadow': shadow, 'toolbox-border': border}">
         <div class="toolbox">
             <div class="left" :style="{width:hasCenterSlot}">
                 <slot name="toolbox-left" />
@@ -136,6 +136,10 @@ export default {
             type: Array,
             default: () => [15, 30, 45],
         },
+        padding: {
+            type: Boolean,
+            default: true,
+        },
     },
     data() {
         return {
@@ -244,6 +248,9 @@ export default {
             flex-wrap: nowrap;
             align-items: center;
 
+        }
+        &.no-padding{
+            padding: 0;
         }
     }
 

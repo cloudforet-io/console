@@ -26,6 +26,7 @@ export default {
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
                 state.sortBy, state.sortDesc,
+                state.searchText,
             ))),
         });
         const requestServerList = async () => {
@@ -43,6 +44,7 @@ export default {
             query: computed(() => (defaultQuery(
                 state.subData.thisPage, state.subData.pageSize,
                 state.subData.sortBy, state.subData.sortDesc,
+                state.subData.searchText,
             ))),
         });
         const requestServerSubData = async (serverId, name) => {
@@ -79,6 +81,7 @@ export default {
             query: computed(() => (defaultQuery(
                 state.admin.thisPage, state.admin.pageSize,
                 state.admin.sortBy, state.admin.sortDesc,
+                state.admin.searchText,
             ))),
         });
 
