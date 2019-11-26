@@ -21,7 +21,9 @@ module.exports = {
       js: 'never',
       vue: 'never'
     }],
-    'camelcase': ["error", { "properties": "always" }],
+    'camelcase': ["error", { "properties": "always", "allow": [
+        "domain_id", "item_type", "region_id"
+      ]}],
     'vue/max-attributes-per-line': ["error", {
       'singleline': 3,
       'multiline': {
