@@ -51,7 +51,11 @@
                 </p-badge>
             </template>
         </p-info-panel>
-        <p-info-panel info-title="Compute" :defs="computeDefs" :item="getCompute" />
+        <p-info-panel info-title="Compute" :defs="computeDefs" :item="getCompute">
+            <template #def-security_groups-format="scope">
+                {{ scope.value.join(', ') }}
+            </template>
+        </p-info-panel>
         <p-tag-panel ref="tagPanel" :tags.sync="tags" @confirm="confirm" />
     </div>
 </template>
@@ -87,7 +91,7 @@ export default {
     },
     setup(props, { parent }) {
         const baseDefs = makeTrItems([
-            ['server_id', 'COMMON.SERVER_ID'],
+            ['server_id', 'COMMON.ID'],
             ['name', 'COMMON.NAME'],
             ['state', 'COMMON.STATE'],
             ['primary_ip_address', 'COMMON.PRI_IP'],
@@ -97,7 +101,7 @@ export default {
             ['menory', 'COMMON.MEMORY'],
             ['os_type', 'COMMON.O_TYPE'],
             ['os_distro', 'COMMON.O_DIS'],
-            ['project_id', 'COMMON.PROJ'],
+            ['project', 'COMMON.PROJ'],
             ['os_detail', 'COMMON.O_DETAIL'],
             ['region', 'COMMON.REGION'],
             ['oArch', 'COMMON.O_ARCH'],
