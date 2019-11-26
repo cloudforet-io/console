@@ -65,11 +65,12 @@ export default {
     computed: {
         getSelectedData() {
             const hasClicked = _.get(this.contextData, 'node.data.back_panel_click');
+            const initializing = _.get(this.contextData, 'node.data.init');
             const objectType = _.get(this.contextData, 'node.data.item_type');
             const arrContext = [this.selectRT, this.selectPT, this.selectPG];
 
             let contextIndex = objectType === 'PROJECT' ? 1 : 2;
-            if (hasClicked) {
+            if (hasClicked || initializing) {
                 contextIndex = 0;
             }
 

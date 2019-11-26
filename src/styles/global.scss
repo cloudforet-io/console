@@ -138,11 +138,15 @@ p {
 
 .sl-vue-tree-drag-info {
     position: absolute;
-    background-color: rgba(0,0,0,0.5);
-    color: white;
-    opacity: 0.5;
-    margin-left: 20px;
-    padding: 5px 10px;
+    min-width: 120px;
+    text-align: left;
+    font: 14px/16px Arial;
+    letter-spacing: 0;
+    color: $secondary;
+    margin-left: 10px;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 0px 8px #4D49B629;
+    border-radius: 2px;
 }
 
 .sl-vue-tree.sl-vue-tree-root {
@@ -152,6 +156,12 @@ p {
         .sl-vue-tree-node {
             @include node-item-background(transparent);
             &.sl-vue-tree-selected {
+
+                > span {
+                    color: $primary4;
+                    font-weight: 500;
+                }
+
                 @include node-item-background(transparent);
             }
 
@@ -173,6 +183,7 @@ p {
                         font-weight: 500;
                         background-color: $primary2;
                     }
+
                 }
                 &.sl-vue-tree-node-is-leaf {
                     .item-icon {

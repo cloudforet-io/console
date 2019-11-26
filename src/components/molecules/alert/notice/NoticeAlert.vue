@@ -66,6 +66,7 @@ export default {
     .vue-notification-group{
         width: 20rem !important;
     }
+
     .notice-alert {
         height: 10rem !important;
         margin: 2rem 2rem 2rem 2rem;
@@ -105,6 +106,7 @@ export default {
         }
 
         &.success {
+            padding: 1rem;
             border-radius: 2px;
             background: #FFFFFF 0% 0% no-repeat padding-box;
             box-shadow: 0px 0px 8px #4D49B629;
@@ -137,6 +139,7 @@ export default {
         }
 
         &.warning {
+            padding: 1rem;
             border-radius: 2px;
             background: #FFFFFF 0% 0% no-repeat padding-box;
             box-shadow: 0px 0px 8px #4D49B629;

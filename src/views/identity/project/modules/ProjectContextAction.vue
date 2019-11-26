@@ -92,14 +92,13 @@ export default {
     data() {
         return {
             visible: false,
-            users: [],
-            searchText: null,
-            selectable: true,
-            sortable: true,
-            selectIndex: [],
             projectNameValidity: false,
             styler: {
                 border: '1px solid #EF3817',
+            },
+            necParam: {
+                tree: null,
+                nodeData: null,
             },
             tagInput: {
                 tags: {
@@ -193,7 +192,7 @@ export default {
                 this.visible = true;
                 this.selectProjectMetas(reservedActionFlag);
             } else {
-                this.deletedSelectedOnTree(reservedActionFlag);
+                this.deletedSelectedOnTree(reservedActionFlag, this.selectedNode.tree, this.selectedNode.node.data);
             }
         },
         hideModal() {
@@ -227,8 +226,8 @@ export default {
         async updateProjectAndGroup(flag, tree, nodeData) {
             this.$emit('update', flag, tree, nodeData);
         },
-        async deletedSelectedOnTree(flag) {
-            this.$emit('delete', flag);
+        async deletedSelectedOnTree(flag, tree, nodeData) {
+            this.$emit('delete', flag, tree, nodeData);
         },
         getSplitActionFlag() {
             let actionFlag = [];

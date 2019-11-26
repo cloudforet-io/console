@@ -14,7 +14,6 @@
             :context-init="isInitializing"
             :no-select-m-s-g="noSelectMessage"
             :context-menu-visible.sync="isContextMenuVisible"
-            @DTIsRootClicked="pRootClicked"
             @DTNodeClicked="pNodeClicked"
             @DTNodeToggled="pNodeToggled"
             @DTBeforeDropped="pBeforeDropped"
@@ -70,6 +69,22 @@ const projectSummaryTop = () => import('@/views/identity/project/modules/Project
 const projectSummaryBottom = () => import('@/views/identity/project/modules/ProjectSummaryBottom');
 const projectMember = () => import('@/views/identity/project/modules/ProjectMember');
 const ProjectContextAction = () => import('@/views/identity/project/modules/ProjectContextAction');
+
+const proEnum = {
+    PROJECT: {
+        type: 'PROJECT',
+        root_able: false,
+        accept: [],
+        isLeaf: true,
+    },
+    PROJECT_GROUP: {
+        type: 'PROJECT_GROUP',
+        root_able: true,
+        accept: ['PROJECT_GROUP', 'PROJECT'],
+        isLeaf: false,
+    },
+};
+
 export default {
     name: 'Project',
     components: {
@@ -120,10 +135,6 @@ export default {
         this.listProject();
     },
     methods: {
-        pRootClicked(clickObj) {
-
-        },
-
         pNodeClicked(node, tree) {
             this.selectedNodeData = { node, tree };
         },
@@ -152,9 +163,93 @@ export default {
                 console.error(error);
             });
         },
-
         pBeforeDropped(node, position, cancel, tree) {
+            const srcNode = node[0];
+            const srcNodeDT = srcNode.data;
+            const targetNodeDT = position.node.data;
+            const acceptable = proEnum[targetNodeDT.item_type].accept;
+            if (position.node.path.length == 1 && position.placement !== 'inside' && srcNodeDT.item_type === 'PROJECT'
+                || !acceptable.includes(srcNodeDT.item_type)) {
+                this.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Not allowed action ',
+                    duration: 2000,
+                    speed: 1000,
+                });
+                cancel(true);
+                return;
+            }
 
+            const shareParam = this.doTheyShareSameParent(node, position);
+            const isCanceled = !!shareParam;
+
+            if (!position.node.data.is_cached) {
+                tree.remove(tree.getSelected().map(node => node.path));
+                cancel(true);
+            }
+
+            this.moveProject(
+                node,
+                position,
+                tree,
+                cancel,
+                isCanceled,
+            );
+        },
+        async moveProject(node, position, tree, cancel, isCanceled) {
+            const fromItem = node[0].data;
+            const toItem = position.node.data;
+            const url = `/identity/${this.replaceAll(fromItem.item_type, '_', '-').toLowerCase()}/update`;
+            const keySrouce = `${fromItem.item_type.toLowerCase()}_id`;
+            const keyTo = `${toItem.item_type.toLowerCase()}_id`;
+            const param = {};
+            param[keySrouce] = fromItem.id;
+            param[keyTo] = toItem.id;
+            debugger;
+            if (node[0].isLeaf) {
+                param.project_id = fromItem.id;
+                param.project_group_id = toItem.id;
+            } else {
+                param.project_group_id = fromItem.id;
+                param.parent_project_group_id = position.node.path.length == 1 ? 'root' : toItem.id;
+                if (position.placement !== 'inside' && toItem.is_root) {
+                    param.release_parent_project_group = true;
+                }
+            }
+            await this.$http.post(url, param).then((response) => {
+                const responseData = response.data;
+                if (!this.isEmpty(responseData)) {
+                    console.log('Item successfully moved. ');
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+
+            if (!position.node.data.is_cached) {
+                if (isCanceled) {
+                    position.node.path[position.node.path.length - 1] = position.node.path[position.node.path.length - 1] - 1;
+                    tree.select(position.node.path, { addToSelection: false });
+                }
+                tree.updateNode(position.node.path, { isExpanded: true });
+                this.pNodeToggled(position.node, tree);
+            }
+        },
+        doTheyShareSameParent(fromNode, toNode) {
+            let isNeedToProcessOnSC = false;
+            if (!toNode.node.data.is_cached) {
+                const sourceNode_path = JSON.parse(JSON.stringify(fromNode[0].path));
+                const toNode_path = JSON.parse(JSON.stringify(toNode.node.path));
+                if (sourceNode_path.length === toNode_path.length) {
+                    sourceNode_path.pop();
+                    toNode_path.pop();
+                    if (JSON.stringify(sourceNode_path) === JSON.stringify(toNode_path)) {
+                        isNeedToProcessOnSC = true;
+                    }
+                }
+            }
+            return isNeedToProcessOnSC;
         },
         pContextVisible(node, event, hasClicked, tree) {
             const actionOBJ = {
@@ -180,7 +275,6 @@ export default {
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0], 'data.init'))) {
                     this.isInitializing = true;
                 }
-                console.log(this.treeData);
             }).catch((error) => {
                 console.error(error);
             });
@@ -244,27 +338,25 @@ export default {
             });
             this.$refs.contextPopUp.hideModal();
         },
-        async deleteProjectAndGroup() {
-            const nodeData = this.selectedNodeData.node.data;
-            const treeV = this.selectedNodeData.tree;
-            const itemType = nodeData.item_type;
-            const selectedId = nodeData.id;
-            const path = treeV.getSelected().map(node => node.path);
-            const url = `/identity/${this.replaceAll(itemType, '_', '-').toLowerCase()}/delete`;
-            const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedId } : { project_id: selectedId };
+        async deleteProjectAndGroup(flag, tree, nodeData) {
+            const path = tree.getSelected().map(node => node.path);
+            const url = `/identity/${this.replaceAll(nodeData.item_type, '_', '-').toLowerCase()}/delete`;
+            const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: nodeData.id } : { project_id: nodeData.id };
+            const arg = (nodeData.item_type === 'PROJECT_GROUP') ? this.tr('COMMON.PG_GR') : this.tr('COMMON.PG');
 
             await this.$http.post(url, param).then((response) => {
                 const responseData = response.data;
                 if (this.isEmpty(responseData)) {
-                    treeV.remove(path);
+                    tree.remove(path);
                     this.$notify({
                         group: 'noticeBottomRight',
-                        type: 'alert',
+                        type: 'success',
                         title: 'Success',
-                        text: 'Selected item successfully deleted.',
-                        duration: 3000,
-                        speed: 2000,
+                        text: this.tr('IDENTITY.DEL_SUCC_ARG', [arg]),
+                        duration: 2000,
+                        speed: 1000,
                     });
+
                     if (this.treeData.length === 1) {
                         this.isInitializing = true;
                         this.treeData = [{
@@ -282,9 +374,18 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'alert',
                         title: 'Fail',
-                        text: 'Delete selected item has failed.',
-                        duration: 3000,
-                        speed: 2000,
+                        text: this.tr('IDENTITY.DEL_FAIL_CHI_ARG', [arg]),
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                } else {
+                    this.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Fail',
+                        text: this.tr('IDENTITY.DEL_FAIL_ARG', [arg]),
+                        duration: 2000,
+                        speed: 1000,
                     });
                 }
             });
