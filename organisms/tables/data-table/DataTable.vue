@@ -30,10 +30,27 @@
                         v-for="(field,index) in fieldsData"
                         :key="index"
                         @click="theadClick(field,index,$event)"
+                        @mouseenter="thHoverIndex=index"
+                        @mouseleave="thHoverIndex=null"
                     >
-                        <div style="vertical-align: middle !important;display: inline;">
-                            {{ field.label ? field.label : field.name }}
-                        </div>
+                        <transition name="fade" mode="out-in">
+                            <div
+                                v-if="!isThOver(index)"
+                                key="colName"
+                                style="vertical-align: middle !important;display: inline;"
+                            >
+                                {{ field.label ? field.label : field.name }}
+                            </div>
+                            <p-button v-else
+                                      key="copyBtn"
+                                      style="display: inline-block;" outline
+                                      :style-type="'secondary'"
+                                      :size="'sm'"
+                                      @click="clickColCopy(index)"
+                            >
+                                {{ tr('COMMON.COPY') }}
+                            </p-button>
+                        </transition>
                         <template v-if="sortable&&field.sortable">
                             <p-i
                                 v-if="sortable&&field.name==sortBy"
@@ -121,12 +138,15 @@ import PTr from '@/components/atoms/table/Tr';
 import PTd from '@/components/atoms/table/Td';
 import PTh from '@/components/atoms/table/Th';
 import PI from '@/components/atoms/icons/PI';
-import PCheckBox from '@/components/molecules/forms/CheckBox';
+import { selectToCopyToClipboard } from '@/lib/util';
+
+const PCheckBox = () => import('@/components/molecules/forms/CheckBox');
+const PButton = () => import('@/components/atoms/buttons/Button');
 
 export default {
     name: 'PDataTable',
     components: {
-        PTable, PTd, PTh, PTr, PI, PCheckBox,
+        PTable, PTd, PTh, PTr, PI, PCheckBox, PButton,
     },
     events: [
         'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
@@ -164,12 +184,17 @@ export default {
             type: Boolean,
             default: true,
         },
+        colCopy: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
             allState: false,
             hoverIndex: null,
             dragSelect: null,
+            thHoverIndex: null,
         };
     },
     computed: {
@@ -260,7 +285,7 @@ export default {
                 this.selectIndex.forEach((td) => {
                     result += this.makeTableText(this.dragSelectAbles[td]);
                 });
-                this.selectToCopyToClipboard(result);
+                selectToCopyToClipboard(result);
             }
         },
         dragSelectItmes(items, event) {
@@ -348,6 +373,21 @@ export default {
             });
             return selectItem;
         },
+        isThOver(index) {
+            return this.colCopy && this.thHoverIndex === index;
+        },
+        clickColCopy(idx) {
+            let result = '';
+            this.dragSelectAbles.forEach((el) => {
+                el.children.forEach((td, colIdx) => {
+                    if (colIdx === idx) {
+                        result += `${td.innerText}\t`;
+                    }
+                });
+            });
+            console.log('copy data', result);
+            selectToCopyToClipboard(result);
+        },
     },
 };
 
@@ -385,6 +425,12 @@ export default {
                 }
             }
         }
+    }
+    .fade-enter{
+        opacity: 0;
+    }
+    .fade-enter-active{
+        transition: opacity .8s;
     }
 
 </style>
