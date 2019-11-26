@@ -2,9 +2,9 @@
     <div class="dropdown-menu" style="display: block;">
         <template v-for="(item, index) in menu">
             <a v-if="item.type==='item'" :key="index" class="dropdown-content dropdown-item"
-               :disabled="item.disabled" @click.stop="menuClick(item.event, index, $event)"
+               :disabled="item.disabled" @click.stop="menuClick(item.name, index, $event)"
             >
-                {{ item.text }}
+                {{ item.label }}
             </a>
             <div v-else-if="item.type==='divider'" :key="index" class="dropdown-divider"
                  @click.stop
@@ -12,7 +12,7 @@
             <div v-else-if="item.type==='header'" :key="index" class="dropdown-content dropdown-title"
                  @click.stop
             >
-                {{ item.text }}
+                {{ item.label }}
             </div>
         </template>
     </div>
