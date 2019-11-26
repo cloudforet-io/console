@@ -46,6 +46,7 @@
             :sortable="sortable"
             :selectable="selectable"
             :dragable="dragable"
+            :col-copy="colCopy"
             :select-index.sync="proxySelectIndex"
             :sort-by.sync="proxySortBy"
             :sort-desc.sync="proxySortDesc"
@@ -131,14 +132,14 @@ export default {
                 return value > 0;
             },
         },
+        pageNationValues: {
+            type: Array,
+            default: () => [15, 30, 45],
+        },
     },
     data() {
         return {
-            pageSizeOptions: [
-                { type: 'item', text: 15, event: 15 },
-                { type: 'item', text: 30, event: 30 },
-                { type: 'item', text: 45, event: 45 },
-            ],
+            pageSizeOptions: this.getPageNationValue(),
         };
     },
     computed: {
@@ -194,6 +195,13 @@ export default {
         },
     },
     methods: {
+        getPageNationValue() {
+            const result = [];
+            this.pageNationValues.forEach((size) => {
+                result.push({ type: 'item', label: size, name: size });
+            });
+            return result;
+        },
         changePageSize(size) {
             const sizeNum = Number(size);
             if (this.pageSize !== sizeNum) {

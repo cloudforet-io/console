@@ -1,7 +1,7 @@
 <template>
     <p-board-layout title="Resources by Region"
                     :dropdown-menu="dropdownMenu"
-                    :dropdown-selected="dropdownMenu[selectedIdx].text"
+                    :dropdown-selected="dropdownMenu[selectedIdx].label"
                     @clickMenuEvent="onClickMenu"
     >
         <p-bubble-chart class="chart"
@@ -42,8 +42,8 @@ export default {
     data() {
         return {
             dropdownMenu: [
-                { type: 'item', text: 'Server', event: 'Server' },
-                { type: 'item', text: 'Cloud Service', event: 'CloudService' },
+                { type: 'item', label: 'Server', name: 'Server' },
+                { type: 'item', label: 'Cloud Service', name: 'CloudService' },
             ],
             selectedIdx: 0,
             serverEventNames: {
