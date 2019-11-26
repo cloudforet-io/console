@@ -5,7 +5,7 @@
                         @enter="enter"
             >
                 <div v-if="showTree">
-                    <vertical-layout :autoSaveLeftWidth="true">
+                    <vertical-layout :auto-save-left-width="true">
                         <template #leftContainer="{ width }">
                             <div id="rootPanel"
                                  @click.right.stop="isRootClicked"
@@ -54,7 +54,6 @@ import _ from 'lodash';
 import PTree from '@/components/molecules/tree/Tree';
 import PI from '@/components/atoms/icons/PI';
 import styles from '@/styles/_variables.scss';
-
 import VerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
 
 export default {
@@ -221,9 +220,10 @@ export default {
             if (this.contextMenuIsVisible) {
                 this.contextMenuIsVisible = false;
             }
-
-            this.removeAllClass(node);
-            this.addClickedClass(node);
+            if (!node.data.init) {
+                this.removeAllClass(node);
+                this.addClickedClass(node);
+            }
 
             this.$emit('DTContextVisible', node, event, hasClicked, this.getTree());
             this.contextMenuIsVisible = true;

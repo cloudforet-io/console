@@ -79,7 +79,7 @@ export default {
         return {
             draggerHeight: 30,
             leftContainerWidth: parseFloat(this.leftWidth),
-            draggerWidth: 15,
+            draggerWidth: 5,
             dragging: false,
             pageX: null,
         };
