@@ -10,21 +10,29 @@ export default {
     extends: DashboardTemplate,
     setup(props, context) {
         const state = setup(props, context);
+        const api = context.root.$http;
+        const baseParam = { domain_id: sessionStorage.getItem('domainId') };
 
         // Summary
-        const listSummary = () => {
-            setTimeout(() => {
-                state.summaryData.value = casual.summary;
-            }, 1000);
+        const listSummary = async () => {
+            const res = await api.post('/statistics/summary', {
+                ...baseParam,
+            });
+            state.summaryData.value = res.data;
         };
 
         mountBusEvent(DashboardEventBus, 'listSummary', listSummary);
 
         // Resources By Region
-        const listRegionByServer = () => {
+        const listRegionByServer = async () => {
             setTimeout(() => {
                 state.resourcesByRegionData.value = casual.resourcesByRegion;
             }, 1000);
+            // const res = await api.post('/statistics/summary', {
+            //     ...baseParam,
+            //     item_type: 'server',
+            // });
+            // state.resourcesByRegionData.value = res.data;
         };
         const listRegionByCloudService = () => {
             setTimeout(() => {
@@ -36,40 +44,49 @@ export default {
         mountBusEvent(DashboardEventBus, 'listRegionByCloudService', listRegionByCloudService);
 
         // Server State
-        const listServerState = () => {
-            setTimeout(() => {
-                state.serverStateData.value = casual.serverStates;
-            }, 1000);
+        const listServerState = async () => {
+            const res = await api.post('/statistics/server-state', {
+                ...baseParam,
+            });
+            state.serverStateData.value = res.data;
         };
 
         mountBusEvent(DashboardEventBus, 'listServerState', listServerState);
 
         // Servers by Type
-        const listServerType = () => {
-            setTimeout(() => {
-                state.serverTypeData.value = casual.serverType;
-            }, 1000);
+        const listServerType = async () => {
+            const res = await api.post('/statistics/server-type', {
+                ...baseParam,
+                item_type: 'server_type',
+            });
+            state.serverTypeData.value = res.data;
         };
         mountBusEvent(DashboardEventBus, 'listServerType', listServerType);
 
-        const listVmType = () => {
-            setTimeout(() => {
-                state.vmTypeData.value = casual.vmType;
-            }, 1000);
+        const listVmType = async () => {
+            const res = await api.post('/statistics/server-type', {
+                ...baseParam,
+                item_type: 'vm_type',
+            });
+            state.vmTypeData.value = res.data;
         };
         mountBusEvent(DashboardEventBus, 'listServerType', listVmType);
 
-        const listOsType = () => {
-            setTimeout(() => {
-                state.osTypeData.value = casual.osType;
-            }, 1000);
+        const listOsType = async () => {
+            const res = await api.post('/statistics/server-type', {
+                ...baseParam,
+                item_type: 'os_type',
+            });
+            state.osTypeData.value = res.data;
         };
         mountBusEvent(DashboardEventBus, 'listOsType', listOsType);
 
-        const listHypervisorType = () => {
-            setTimeout(() => {
-                state.hypervisorTypeData.value = casual.hypervisorType;
-            }, 1000);
+        const listHypervisorType = async () => {
+            const res = await api.post('/statistics/server-type', {
+                ...baseParam,
+                item_type: 'hypervisor_type',
+            });
+            state.hypervisorTypeData.value = res.data;
         };
         mountBusEvent(DashboardEventBus, 'listHypervisorType', listHypervisorType);
 

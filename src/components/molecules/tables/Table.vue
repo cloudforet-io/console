@@ -160,11 +160,8 @@ export default {
                     border-bottom: 1px solid $gray2;
                     line-height: 1.5rem;
                     text-align: left;
-                    font: Bold 14px Arial;
                     letter-spacing: 0;
                     color: $gray1;
-                    height: 2rem;
-                    vertical-align: sub;
                 }
             }
         }

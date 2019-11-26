@@ -20,21 +20,18 @@
                                :hypervisor-data="hypervisorTypeData"
                 />
             </div>
-
-        <!--                            <CollectionState />-->
         </main>
     </div>
 </template>
 
 <script>
-import { toRefs, computed, reactive } from '@vue/composition-api';
+import { toRefs, reactive } from '@vue/composition-api';
 import Summary from '@/views/dashboard/modules/Summary';
-import CollectionState from '@/views/dashboard/modules/CollectionState';
 import ServerState from '@/views/dashboard/modules/ServerState';
 import ResourcesByRegion from '@/views/dashboard/modules/ResourcesByRegion';
 import ServersByType from '@/views/dashboard/modules/ServersByType';
 
-export const setup = (props, context) => {
+export const setup = () => {
     const state = reactive({
         summaryData: {},
         resourcesByRegionData: {},
@@ -54,7 +51,6 @@ export default {
     name: 'Dashboard',
     components: {
         Summary,
-        CollectionState,
         ServerState,
         ResourcesByRegion,
         ServersByType,

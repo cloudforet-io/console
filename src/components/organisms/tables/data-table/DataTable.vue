@@ -29,27 +29,26 @@
                     <p-th
                         v-for="(field,index) in fieldsData"
                         :key="index"
+                        :class="{'fix-width': colCopy}"
                         @click="theadClick(field,index,$event)"
                         @mouseenter="thHoverIndex=index"
                         @mouseleave="thHoverIndex=null"
                     >
-                        <transition name="fade" mode="out-in">
-                            <span
-                                v-if="!isThOver(index)"
-                                key="colName"
-                            >
-                                {{ field.label ? field.label : field.name }}
-                            </span>
-                            <p-button v-else
-                                      key="copyBtn"
-                                      style="display: inline-block;" outline
-                                      :style-type="'secondary'"
-                                      :size="'sm'"
-                                      @click="clickColCopy(index)"
-                            >
-                                {{ tr('COMMON.COPY') }}
-                            </p-button>
-                        </transition>
+                        <span key="colName"
+                              :style="{visibility: isThOver(index) ? 'hidden' : 'visible'}"
+                        >
+                            {{ field.label ? field.label : field.name }}
+                        </span>
+                        <p-button v-if="isThOver(index)"
+                                  key="copyBtn"
+                                  class="copy-btn"
+                                  outline
+                                  :style-type="'secondary'"
+                                  :size="'sm'"
+                                  @click="clickColCopy(index)"
+                        >
+                            {{ tr('COMMON.COPY') }}
+                        </p-button>
                         <template v-if="sortable&&field.sortable">
                             <p-i
                                 v-if="sortable&&field.name==sortBy"
@@ -422,14 +421,27 @@ export default {
                     float: right;
                     color: $gray2;
                 }
+                &.fix-width {
+                    min-width: 4.75rem;
+                }
             }
         }
     }
-    .fade-enter{
+    .fade-enter {
         opacity: 0;
     }
-    .fade-enter-active{
-        transition: opacity .8s;
+    .fade-enter-active {
+        transition: opacity 0s;
+    }
+    .copy-btn {
+        display: inline-block;
+        position: absolute;
+        top: .25rem;
+        left: .75rem;
+        padding: .3rem .75rem;
+        font-size: .75rem;
+        line-height: .875rem;
+        vertical-align: middle;
     }
 
 </style>
