@@ -4,15 +4,15 @@
             <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
         </div>
 
-        <div class="dragger-container" :class="{ line: line }"
+        <div class="dragger-container" :class="{ line: line }" @mousedown="onMousedown"
              :style="{
                  height: height,
                  width: `${draggerWidth}px`,
              }"
         >
-            <span class="dragger" @mousedown="onMousedown">
+            <span class="dragger">
                 <slot name="dragger">
-                    <f-i icon="fa-grip-lines-vertical" icon-style="light" />
+                    <!--<f-i icon="fa-grip-lines-vertical" icon-style="light" />-->
                 </slot>
             </span>
         </div>
@@ -70,7 +70,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        autosaveLeftWidth: {
+        autoSaveLeftWidth: {
             type: Boolean,
             default: true,
         },
@@ -79,7 +79,7 @@ export default {
         return {
             draggerHeight: 30,
             leftContainerWidth: parseFloat(this.leftWidth),
-            draggerWidth: 15,
+            draggerWidth: 5,
             dragging: false,
             pageX: null,
         };
@@ -113,7 +113,7 @@ export default {
             }
         },
         initDefaultLeftWidth() {
-            if (this.autosaveLeftWidth) {
+            if (this.autoSaveLeftWidth) {
                 this.leftContainerWidth = parseFloat(this.verticalLeftWidth) || parseFloat(this.leftWidth);
             }
         },
@@ -123,7 +123,7 @@ export default {
             }
         },
         finalizeDefaultLeftWidth() {
-            if (this.autosaveLeftWidth) {
+            if (this.autoSaveLeftWidth) {
                 this.setVerticalLeftWidth(`${this.leftContainerWidth}px`);
             }
         },
@@ -183,8 +183,11 @@ export default {
         align-items: center;
         justify-content: center;
         &.line {
-            border-left: 1px solid $lightgray;
             border-right: 1px solid $lightgray;
+            &:hover {
+                border-right: 1px solid $secondary;
+                cursor: pointer;
+            }
         }
         .dragger {
             display: inline-block;

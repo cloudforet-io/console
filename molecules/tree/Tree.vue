@@ -11,7 +11,18 @@
         @nodecontextmenu="nodeContextMenu"
     >
         <template #title="{ node }">
-            <span v-if="node.data.init" class="fas fa-exclamation-triangle" />
+            <div v-if="node.data.init" class="empty-node" >
+                <span >
+                    <p-i :color="'transparent primary3'"
+                         :width="'14rem'"
+                         :height="'14rem'"
+                         :name="'ic_no_project-group'"
+                    />
+                </span>
+                <br>
+                <span>{{ node.title }}</span>
+            </div>
+
             <slot name="icon" v-bind="node">
                 <span v-if="!node.data.init" class="item-icon">
                     <p-i v-if="node.isLeaf"
@@ -34,7 +45,8 @@
                     />
                 </span>
             </slot>
-            <span class="item-title">{{ node.title }}</span>
+            <span v-if="!node.data.init" class="item-title" @mousedown="setTitle">{{ node.title }}</span>
+
         </template>
         <template #toggle="{ node }">
             <p-i v-if="node.isExpanded"
@@ -49,6 +61,9 @@
                  :height="'1rem'"
                  :name="'ic_tree_arrow'"
             />
+        </template>
+        <template #draginfo>
+            {{selectedNodesTitle}}
         </template>
     </sl-vue-tree>
 </template>
@@ -77,7 +92,7 @@ export default {
         /** Allow select multiple Nodes */
         useMultiSelect: {
             type: Boolean,
-            default: true,
+            default: false,
         },
         /** Ues Y/N to user default Node icon on Tree */
         useDefaultTreeIcon: {
@@ -89,6 +104,7 @@ export default {
         return {
             currentTreeData: null,
             clickedNode: null,
+            selectedNodesTitle: null,
         };
     },
     computed: {
@@ -97,7 +113,7 @@ export default {
                 let returnVal = this.treeData;
                 if (this.isEmpty(returnVal)) {
                     returnVal = [{
-                        title: '!Please, Right Click me',
+                        title: 'Click right button to create a new project Group.',
                         isLeaf: true,
                         init: true,
                     }];
@@ -105,11 +121,14 @@ export default {
                 return returnVal;
             },
             set(value) {
-                this.currentTreeData = value;
+                this.$emit('update:treeData', value);
             },
         },
     },
     methods: {
+        setTitle(e){
+            this.selectedNodesTitle =  e.target.innerText
+        },
         nodeClick(node) {
             if (this.clickedNode) {
                 this.removeClickedClass(this.clickedNode);
@@ -198,5 +217,11 @@ export default {
             cursor: pointer;
         }
     }
-
+    .empty-node {
+        text-align: center;
+        font: 18px/21px Arial;
+        letter-spacing: 0;
+        color: #A5ACCE;
+        opacity: 1;
+    }
 </style>
