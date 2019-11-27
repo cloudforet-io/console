@@ -13,10 +13,6 @@
     "svg": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6"
   },
   "dependencies": {
-    "@coreui/coreui": "^2.1.9",
-    "@coreui/coreui-plugin-chartjs-custom-tooltips": "^1.2.0",
-    "@coreui/icons": "0.3.0",
-    "@coreui/vue": "^2.1.2",
     "@johmun/vue-tags-input": "^2.1.0",
     "@vue/composition-api": "^0.3.2",
     "axios": "^0.18.0",
