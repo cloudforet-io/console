@@ -186,7 +186,7 @@ export default {
             border-right: 1px solid $lightgray;
             &:hover {
                 border-right: 1px solid $secondary;
-                cursor: pointer;
+                cursor: ew-resize;
             }
         }
         .dragger {

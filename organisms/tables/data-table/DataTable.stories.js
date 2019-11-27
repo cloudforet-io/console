@@ -1,6 +1,7 @@
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import possibleConstructorReturn from '@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn';
+import { boolean } from '@storybook/addon-knobs';
 import PDataTable from './DataTable.vue';
 import PTr from '../../../atoms/table/Tr.vue';
 import PTd from '../../../atoms/table/Td.vue';
@@ -294,5 +295,41 @@ export const customColSlot = () => ({
     methods: {
         ...actions,
         sendEmail: action('send_email'),
+    },
+});
+
+export const loading = () => ({
+    components: { PDataTable },
+    mixins: [mockupMixin],
+    template: `
+<PDataTable 
+    :items="items" 
+    :fields="fields"
+    :hover="true"
+    @rowLeftClick="rowLeftClick"
+    @rowRightClick="rowRightClick"
+    @rowMiddleClick="rowMiddleClick"
+    @rowMouseOver="rowMouseOver"
+    @rowMouseOut="rowMouseOut"
+>
+</PDataTable>
+`,
+    props: {
+        loding: {
+            default: boolean('loading', false),
+        },
+        useSpinnerLoding: { default: boolean('useSpinnerLoding', true) },
+        useCursorLoding: {
+            default: boolean('useCursorLoding', false),
+        },
+
+    },
+    data() {
+        return {
+            ...data,
+        };
+    },
+    methods: {
+        ...actions,
     },
 });
