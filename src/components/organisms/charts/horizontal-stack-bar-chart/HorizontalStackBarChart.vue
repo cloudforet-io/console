@@ -1,41 +1,42 @@
 <template>
     <div class="hs-chart-container">
         <p-chart v-bind="$props"
-                 :options="chartOptions"
                  :min-height="chartHeight" :max-height="chartHeight"
                  @ready="draw"
                  @resize="resizeElements"
         >
             <g v-for="(cd, ci) in chartData" :key="cd.key"
-               class="horizontal-stack-bar-g"
                :data-key="cd.key"
-               :style="{ fill: colors(ci) }"
+               :style="{ fill: empty ? emptyColor : colors(ci) }"
             >
                 <g v-for="(d, idx) in cd" ref="bar"
                    :key="cd.key + idx"
                    :style="{ opacity: !hoverState || hoverList[ci] ? 1.0 : 0.3 }"
                    @mouseenter="onMouseEnter(ci)"
-                   @mouseleave="resetHoverList"
+                   @mouseleave="resetHoverList()"
                 >
                     <rect v-tooltip="{
                               ...getTooltipOptions({key: keys[ci], value: data[keys[ci]]}, ci),
                               trigger: 'manual',
-                              show: hoverList[ci],
+                              show: d.data[cd.key] && hoverList[ci],
                           }"
                           class="bar"
                           :x="xScale(d[0])" :y="yScale(idx)"
                           :width="xScale(d[1] - d[0])"
                           :height="barThickness"
                           :data-idx="idx"
+                          @click="$emit('legendClick', cd.key, d.data[cd.key])"
                     />
-                    <text>
-                        {{ xScale(d[0]) }}
-                    </text>
                     <text class="percent-label"
+                          :class="{empty: empty}"
                           :x="xScale((d[0] + d[1]) / 2)" :y="yScale(idx + 0.5)"
                           dominant-baseline="middle" text-anchor="middle"
                     >
-                        {{ Math.round(d.data[keys[ci]] / sum * 100) }}%
+                        {{
+                            empty ?
+                                'No data to display' :
+                                `${Math.round(d.data[keys[ci]] / sum * 100)}%`
+                        }}
                     </text>
                 </g>
             </g>
@@ -54,17 +55,16 @@
 
 <script>
 import * as d3 from 'd3';
-import _ from 'lodash';
 import {
     reactive, toRefs, computed,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
 import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
 import PChartLegend from '@/components/organisms/legends/ChartLegend';
-import { PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
-import { HORIZONTAL_STACK_OPTIONS } from './HorizontalStackBarChart.map';
+import { colorset } from '@/lib/util';
+import styles from '@/styles/_variables.scss';
 
-const setDrawTools = (props, context, chartOptions) => {
+const setDrawTools = (props, context) => {
     const state = reactive({
         yScale: null,
         xScale: null,
@@ -74,10 +74,10 @@ const setDrawTools = (props, context, chartOptions) => {
         chartData: null,
         hoverList: [],
         hoverState: false,
-        colors: d3.scaleOrdinal().range(PRIMARY_COLORSET),
-        barThickness: computed(() => chartOptions.value.bars.thickness),
-        labels: null,
-        visibleLabels: [],
+        colors: d3.scaleOrdinal().range(colorset),
+        barThickness: props.thickness,
+        empty: false,
+        emptyColor: styles.primary3,
     });
 
     const initYScale = (svgTools) => {
@@ -89,7 +89,7 @@ const setDrawTools = (props, context, chartOptions) => {
     const initXScale = (svgTools) => {
         state.xScale = d3.scaleLinear()
             .range([0, svgTools.chartWidth.value])
-            .domain([0, state.sum]);
+            .domain([0, state.empty ? 1 : state.sum]);
     };
 
     const setLabelVisibility = () => {
@@ -101,26 +101,27 @@ const setDrawTools = (props, context, chartOptions) => {
     };
 
     const resetHoverList = () => {
+        if (state.empty) return;
         state.hoverState = false;
         state.hoverList = new Array(state.keys.length).fill(false);
     };
-    const drawEmptyBar = () => {
-
-    };
 
     const draw = async (svgTools) => {
-        if (!state.sum) {
-            drawEmptyBar();
-            return;
-        }
+        state.empty = !state.sum;
         initYScale(svgTools);
         initXScale(svgTools);
         resetHoverList();
-        state.chartData = d3.stack().keys(state.keys)([props.data]);
-        context.root.$nextTick(() => { setLabelVisibility(); });
+
+        if (state.empty) {
+            state.chartData = d3.stack().keys(['empty'])([{ empty: 1 }]);
+        } else {
+            state.chartData = d3.stack().keys(state.keys)([props.data]);
+            context.root.$nextTick(() => { setLabelVisibility(); });
+        }
     };
 
     const onMouseEnter = (idx) => {
+        if (state.empty) return;
         state.hoverState = true;
         state.hoverList.splice(idx, 1, true);
     };
@@ -157,13 +158,23 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        preserve: {
+            type: [Object, Boolean],
+            default: false,
+        },
+        responsive: {
+            type: Boolean,
+            default: true,
+        },
+        thickness: {
+            type: Number,
+            default: 24,
+        },
     },
     setup(props, context) {
-        const chartOptions = computed(() => _.merge({}, HORIZONTAL_STACK_OPTIONS, props.options));
-        const tooltips = setTooltips(props, context, chartOptions);
-        const drawTools = setDrawTools(props, context, chartOptions);
+        const tooltips = setTooltips(props, context);
+        const drawTools = setDrawTools(props, context);
         return {
-            chartOptions,
             ...tooltips,
             ...drawTools,
         };
@@ -171,25 +182,28 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     .hs-chart-container {
         width: 100%;
-    }
-    .horizontal-stack-bar-g {
+        .bar {
+            cursor: pointer;
+        }
         .percent-label {
-            font-size: 14px;
+            font-size: .875rem;
             fill: $white;
         }
-    }
-</style>
-
-<style lang="scss" scoped>
-    .legend-container {
-        display: flex;
-        flex-wrap: wrap;
-        .legend {
-            padding-top: 1rem;
-            padding-right: 2rem;
+        .empty {
+            font-size: 1rem;
+            fill: $primary2;
+            font-weight: 100;
+        }
+        .legend-container {
+            display: flex;
+            flex-wrap: wrap;
+            .legend {
+                margin-top: 1rem;
+                margin-right: 2rem;
+            }
         }
     }
 </style>

@@ -37,11 +37,11 @@ export default {
             const vm = this;
             return Object.assign({},
                 this.$listeners, {
-                    click(e) {
-                        if (vm.$refs && e.target === vm.$refs.count) {
-                            vm.$emit('click', vm.text, vm.count, e);
-                        }
-                    },
+                    // click(e) {
+                    //     if (vm.$refs && e.target === vm.$refs.count) {
+                    //         vm.$emit('click', vm.text, vm.count, e);
+                    //     }
+                    // },
                 });
         },
     },
@@ -57,11 +57,13 @@ export default {
     .p-chart-legend {
         display: inline-flex;
         align-items: center;
-        padding-top: .5rem;
+        margin-top: .5rem;
+        cursor: pointer;
         .p-status::v-deep {
             .circle {
                 height: .75rem;
                 width: .75rem;
+                cursor: pointer;
             }
             .label {
                 font-size: .875rem;
@@ -69,13 +71,13 @@ export default {
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 width: calc(100% - .75em);
+                cursor: pointer;
             }
         }
         .count {
             padding-left: .5rem;
             font-weight: bold;
             font-size: .875rem;
-            cursor: pointer;
         }
     }
 </style>

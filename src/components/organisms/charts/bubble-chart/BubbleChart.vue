@@ -1,14 +1,11 @@
 <template>
-    <div class="bubble-chart-container"
+    <div ref="containerRef"
+         class="bubble-chart-container"
          :class="legendPosition"
-         :style="chartContainerStyle"
     >
         <p-chart ref="chartRef"
                  v-bind="$props" class="p-chart"
-                 :options="chartOptions"
-                 :style="{
-                     minWidth: `${chartMinWidth}px`
-                 }"
+                 :style="chartStyle"
                  @ready="draw"
         >
             <g>
@@ -61,30 +58,25 @@ import { VTooltip } from 'v-tooltip';
 import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
 import PChartLegend from '@/components/organisms/legends/ChartLegend';
 import countries from './countries.json';
-import { BUBBLE_OPTIONS } from './BubbleChart.map';
-import { PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
+import { colorset } from '@/lib/util';
 
-const setSizeTools = (props, context, chartOptions) => {
+const setSizeTools = (props, context) => {
     const state = reactive({
-        chartMinWidth: null,
-        chartContainerStyle: {
-            maxHeight: props.maxHeight && props.legendPosition === 'left' ? `${props.maxHeight}px` : null,
-            width: '100%',
-            height: props.height ? `${props.height}px` : null,
+        chartStyle: {
+            width: props.legendPosition === 'left' ? '78%' : '100%',
         },
         legendContainerStyle: {
-            maxHeight: null,
-            width: null,
+            maxHeight: props.height,
+            width: props.legendPosition === 'left' ? '22%' : '100%',
         },
+        containerWidth: 0,
+        containerHeight: 0,
     });
 
     onMounted(() => {
-        const clientRect = context.refs.chartRef.$el.getBoundingClientRect();
-        if (props.legendPosition === 'left') {
-            state.chartMinWidth = clientRect.width * 0.78;
-            state.legendContainerStyle.width = `${clientRect.width * 0.22}px`;
-            state.legendContainerStyle.maxHeight = props.legendPosition === 'left' ? `${clientRect.height}px` : null;
-        }
+        const clientRect = context.refs.containerRef.getBoundingClientRect();
+        state.containerHeight = clientRect.height;
+        state.containerWidth = clientRect.width;
     });
 
     return {
@@ -92,7 +84,7 @@ const setSizeTools = (props, context, chartOptions) => {
     };
 };
 
-const setMapTools = (props, context, chartOptions) => {
+const setMapTools = (props, context, sizeTools) => {
     const state = reactive({
         mapFeatures: [],
         mapPath: () => {},
@@ -101,40 +93,40 @@ const setMapTools = (props, context, chartOptions) => {
     });
 
     const setMap = () => {
-        const clientRect = state.chartRef.$el.getBoundingClientRect();
         const xy = d3.geoEquirectangular()
             .fitExtent([
                 [0, 0],
-                [clientRect.width * 0.78, clientRect.height],
+                [sizeTools.containerWidth.value * 0.78, sizeTools.containerHeight.value],
             ], countries);
         state.mapFeatures = countries.features;
         state.mapPath = d3.geoPath().projection(xy);
         state.circleLoc = xy;
     };
 
-    onMounted(() => { setMap(); });
+    onMounted(() => {
+        setMap();
+    });
 
     return {
         ...toRefs(state),
     };
 };
 
-const setDrawTools = (props, context, chartOptions) => {
+const setDrawTools = (props, context) => {
     const state = reactive({
-        rScale: d3.scaleLinear().range([0, chartOptions.value.maxRadius]),
+        rScale: null,
         chartData: [],
-        colors: d3.scaleOrdinal().range(PRIMARY_COLORSET),
+        colors: d3.scaleOrdinal().range(colorset),
         hoverList: [],
         hoverState: false,
     });
 
-    const maxRadius = computed(() => chartOptions.value.bubble.maxRadius);
     const max = computed(() => _.maxBy(props.data, d => d.value).value);
     const min = computed(() => _.minBy(props.data, d => d.value).value);
 
     const initRScale = () => {
         state.rScale = d3.scaleLinear()
-            .range([0, maxRadius.value])
+            .range([0, props.maxRadius])
             .domain([min.value, max.value]);
     };
 
@@ -181,9 +173,24 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        preserve: {
+            type: [Object, Boolean],
+            default: () => ({
+                align: 'xMidYMid',
+                meetOrSlice: 'meet',
+            }),
+        },
+        responsive: {
+            type: Boolean,
+            default: false,
+        },
         height: {
             type: Number,
             default: null,
+        },
+        maxRadius: {
+            type: Number,
+            default: 30,
         },
         /**
          * @name maxHeight
@@ -200,13 +207,11 @@ export default {
         },
     },
     setup(props, context) {
-        const chartOptions = computed(() => _.merge({}, BUBBLE_OPTIONS, props.options));
-        const tooltips = setTooltips(props, context, chartOptions);
-        const sizeTools = setSizeTools(props, context, chartOptions);
-        const mapTools = setMapTools(props, context, chartOptions);
-        const drawTools = setDrawTools(props, context, chartOptions);
+        const tooltips = setTooltips(props, context);
+        const sizeTools = setSizeTools(props, context);
+        const mapTools = setMapTools(props, context, sizeTools);
+        const drawTools = setDrawTools(props, context);
         return {
-            chartOptions,
             ...tooltips,
             ...sizeTools,
             ...mapTools,
@@ -219,6 +224,7 @@ export default {
 <style lang="scss" scoped>
     .bubble-chart-container {
         display: flex;
+        width: 100%;
         .p-chart {
             overflow: hidden;
             .map-path {
