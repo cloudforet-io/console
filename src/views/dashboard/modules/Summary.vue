@@ -14,10 +14,11 @@
                 <span class="label">{{ d.label }}</span>
                 <span class="count"
                       @click="onLinkClick(key, data[key])"
-                >{{ data[key] || 0 }}
-                    <animated-number :value="data[key]"
-                                     :duration="300"
-                    />
+                ><animated-number :value="data[key]"
+                                  :formatValue="countFormatter"
+                                  :duration="500"
+                                  easing="easeInOutSine"
+                />
                 </span>
             </p-board-layout>
         </div>
@@ -26,6 +27,8 @@
 
 <script>
 import AnimatedNumber from 'animated-number-vue';
+import anime from 'animejs/lib/anime.es';
+// import numFormat from 'vue-filter-number-format';
 import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 
@@ -72,6 +75,9 @@ export default {
         DashboardEventBus.$emit('listSummary');
     },
     methods: {
+        countFormatter(value) {
+            return `${value.toFixed(0)}`;
+        },
         onMouseEnter(key) {
             this.dataMap[key].hover = true;
         },
