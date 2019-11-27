@@ -5,8 +5,7 @@
         <div class="app-body">
             <router-view name="lnb" />
 
-            <main
-                class="main"
+            <main class="main"
                 :style="{minHeight: mainMinHeight}"
             >
                 <router-view name="main" />
@@ -73,6 +72,7 @@ export default {
             width: calc(100vw - #{$gnb-width});
             min-width: calc(#{$min-width} - #{$gnb-width});
             overflow-x: hidden;
+            padding-bottom: 1rem;
         }
     }
 }
