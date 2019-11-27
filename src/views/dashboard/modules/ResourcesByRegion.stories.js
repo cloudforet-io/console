@@ -11,7 +11,7 @@ export default {
 
 export const mockPage = () => ({
     components: { ResourcesByRegion },
-    template: '<ResourcesByRegion v-bind="$props" :data="data"/>',
+    template: '<ResourcesByRegion v-bind="$props" :data="data" style="width: 500px;"/>',
     setup() {
         const state = reactive({
             data: {},

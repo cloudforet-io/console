@@ -1,5 +1,6 @@
 <script>
 import { toRefs } from '@vue/composition-api';
+import _ from 'lodash';
 import DashboardTemplate, { setup } from '@/views/dashboard/Dashboard.template';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 import casual from '@/views/dashboard/models/dashboard-model';
@@ -48,6 +49,9 @@ export default {
             const res = await api.post('/statistics/server-state', {
                 ...baseParam,
             });
+            // _.forIn(res.data, (val, key) => {
+            //     if (val) res.data[key] = 0;
+            // });
             state.serverStateData.value = res.data;
         };
 
@@ -59,6 +63,9 @@ export default {
                 ...baseParam,
                 item_type: 'server_type',
             });
+            // _.forIn(res.data, (val, key) => {
+            //     if (val) res.data[key] = 0;
+            // });
             state.serverTypeData.value = res.data;
         };
         mountBusEvent(DashboardEventBus, 'listServerType', listServerType);
