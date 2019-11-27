@@ -17,24 +17,14 @@ export const leftCase = () => ({
     props: {
         ...autoProps(PBubbleChart, [
             {
-                name: 'minWidth',
-                default: number('minWidth', 700),
-            },
-            {
-                name: 'minHeight',
-                default: number('minHeight', 200),
-            },
-            {
                 name: 'maxHeight',
                 default: number('maxHeight', 260),
             },
         ]),
     },
-    template: `<div >
+    template: `<div>
                     <button @click="refresh">refresh</button>
-                    <div style="border: 1px solid lightgray;
-                                display: inline-block;"
-                    >
+                    <div style="border: 1px solid lightgray;">
                         <p-bubble-chart v-bind="$props" :data="chartData" :loading="loadingChartData"/>
                     </div>
                </div>`,

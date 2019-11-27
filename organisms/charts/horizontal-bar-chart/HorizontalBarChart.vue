@@ -1,11 +1,18 @@
 <template>
-    <p-chart v-bind="$props" :options="chartOptions"
+    <p-chart v-bind="$props"
              @ready="draw" @resize="resizeElements"
     >
         <g v-for="(d, idx) in chartData" :key="d.key"
            class="horizontal-bar-g"
            :class="{hover: hoverList[idx]}"
+           @mouseenter="onMouseEnter(idx)"
+           @mouseleave="onMouseLeave(idx)"
+           @click="$emit('legendClick', d.key, d.value)"
         >
+            <rect class="container" :class="{hover: hoverList[idx]}"
+                  x="0" :y="yScale(d.key) + textPadTop - 2"
+                  :height="hoverBarHeight" :width="xScale(max)"
+            />
             <text class="key-label" dominant-baseline="hanging"
                   :y="yScale(d.key) + textPadTop"
             >
@@ -30,8 +37,6 @@
                   x="0" :y="yScale(d.key) + barPosY"
                   :height="barThickness"
                   :width="xScale(d.value)"
-                  @mouseenter="onMouseEnter(idx)"
-                  @mouseleave="onMouseLeave(idx)"
             />
         </g>
     </p-chart>
@@ -39,16 +44,25 @@
 
 
 <script>
-import _ from 'lodash';
 import * as d3 from 'd3';
 import {
-    reactive, ref, toRefs, watch, computed,
+    reactive, toRefs, computed,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
 import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
-import { HORIZONTAL_OPTIONS } from './HorizontalBarChart.map';
+import styles from '@/styles/_variables.scss';
 
-const setDrawTools = (props, context, chartOptions) => {
+const LABELS = {
+    PAD: { TOP: 8, BOTTOM: 4 },
+    HEIGHT: 14,
+};
+const BARS = {
+    THICKNESS: 8,
+    HEIGHT: 14,
+    COLOR: styles.primary1,
+};
+
+const setDrawTools = (props, context) => {
     const state = reactive({
         yScale: null,
         xScale: null,
@@ -56,18 +70,21 @@ const setDrawTools = (props, context, chartOptions) => {
         barGroup: null,
         hoverList: [],
         max: computed(() => d3.max(props.data, d => d.value) || 1),
-        textPadTop: computed(() => chartOptions.value.labels.padTop),
-        textPadBottom: computed(() => chartOptions.value.labels.padBottom),
-        textHeight: computed(() => chartOptions.value.labels.textHeight),
-        barThickness: computed(() => chartOptions.value.bars.thickness),
-        barColor: computed(() => chartOptions.value.bars.color),
+        textPadTop: LABELS.PAD.TOP,
+        textPadBottom: LABELS.PAD.BOTTOM,
+        textHeight: LABELS.HEIGHT,
+        barThickness: BARS.THICKNESS,
+        barColor: BARS.COLOR,
+        hoverBarHeight: 0,
     });
 
     const initYScale = (svgTools) => {
         const bandWidth = state.textHeight + state.textPadTop + state.textPadBottom + state.barThickness;
-        if (!chartOptions.value.responsive.height) {
-            svgTools.setChartHeight(props.data.length * bandWidth);
-        }
+
+        state.hoverBarHeight = bandWidth - state.textPadTop;
+
+        svgTools.setChartHeight(props.data.length * bandWidth);
+
         state.yScale = d3.scaleBand()
             .range([0, svgTools.chartHeight.value])
             .domain(props.data.map(d => d.key));
@@ -99,7 +116,6 @@ const setDrawTools = (props, context, chartOptions) => {
 
     const resizeElements = (svgTools) => {
         initXScale(svgTools);
-        // setLabelVisibility();
     };
 
     return {
@@ -131,13 +147,19 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        preserve: {
+            type: [Object, Boolean],
+            default: false,
+        },
+        responsive: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props, context) {
-        const chartOptions = computed(() => _.merge({}, HORIZONTAL_OPTIONS, props.options));
-        const tooltips = setTooltips(props, context, chartOptions);
-        const drawTools = setDrawTools(props, context, chartOptions);
+        const tooltips = setTooltips(props, context);
+        const drawTools = setDrawTools(props, context);
         return {
-            chartOptions,
             ...tooltips,
             ...drawTools,
         };
@@ -147,6 +169,12 @@ export default {
 
 <style lang="scss">
     .horizontal-bar-g {
+        .container {
+            fill: transparent;
+            &.hover {
+                fill: $primary3;
+            }
+        }
         .key-label {
             fill: $dark;
             font-size: 12px;
@@ -164,6 +192,7 @@ export default {
             fill: $primary3;
         }
         &.hover {
+            cursor: pointer;
             .key-label {
                 fill: $primary-dark;
             }

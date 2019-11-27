@@ -1,19 +1,5 @@
 import regions from './aws-regions.json';
 
-export const BUBBLE_OPTIONS = Object.freeze({
-    responsive: {
-        width: false,
-        height: false,
-        preserveAspectRatio: {
-            align: 'xMidYMid',
-            meetOrSlice: 'meet',
-        },
-    },
-    bubble: {
-        maxRadius: 30,
-    },
-});
-
 export const sampleDataGenerator = function () {
     const regionKeys = Object.keys(regions);
     const length = Math.round(Math.random() * regionKeys.length) || 5;

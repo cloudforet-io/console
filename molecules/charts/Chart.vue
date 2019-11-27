@@ -23,18 +23,16 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import {
-    reactive, toRefs, watch, onMounted, computed, onUnmounted,
+    reactive, toRefs, watch, onMounted, onUnmounted,
 } from '@vue/composition-api';
-import PSpinner from '@/components/base/spinner/BaseSpinner';
 import PLottie from '@/components/molecules/lottie/PLottie';
-import { DEFAULT_OPTIONS, PRIMARY_COLORSET } from './Chart.map';
+import { colorset } from '@/lib/util';
 
 
 export const setTooltips = () => {
     const generateTooltipTitle = (data, idx, color) => {
-        const colorStyle = color || PRIMARY_COLORSET[idx];
+        const colorStyle = color || colorset[idx];
 
         const title = document.createElement('div');
         title.classList.add('tooltip-title');
@@ -85,16 +83,14 @@ export const setTooltips = () => {
     };
 };
 
-export const setSvg = (props, context, options) => {
+export const setSvg = (props, context) => {
     const state = reactive({
         svgRatio: '',
         svgWidth: null,
-        svgHeight: null,
+        svgHeight: props.height,
         chartHeight: 0,
         chartWidth: 0,
     });
-
-    const isWidthResponsive = computed(() => options.value.responsive.width);
 
     const setChartWidth = (width) => {
         state.chartWidth = width;
@@ -103,9 +99,9 @@ export const setSvg = (props, context, options) => {
         state.chartHeight = height;
     };
 
-    const setPreserveAspectRatio = (preserve) => {
-        if (preserve) {
-            state.svgRatio = `${preserve.align} ${preserve.meetOrSlice}`;
+    const setPreserveAspectRatio = () => {
+        if (props.preserve) {
+            state.svgRatio = `${props.preserve.align} ${props.preserve.meetOrSlice}`;
         } else {
             state.svgRatio = null;
         }
@@ -116,26 +112,24 @@ export const setSvg = (props, context, options) => {
         state.svgWidth = state.chartWidth;
         context.emit('resize', { ...toRefs(state) });
     };
+
+    onUnmounted(() => {
+        if (props.responsive) window.removeEventListener('resize', emitResizeEvent);
+    });
     const setSvgResponsiveWidth = () => {
         state.svgWidth = state.chartWidth;
         window.addEventListener('resize', emitResizeEvent);
     };
-    onUnmounted(() => {
-        if (isWidthResponsive.value) window.removeEventListener('resize', emitResizeEvent);
-    });
 
     const setSvgSize = () => {
-        const responsive = options.value.responsive;
+        const clientRect = context.refs.chartRef.getBoundingClientRect();
 
-        setChartWidth(context.refs.chartRef.getBoundingClientRect().width);
-        if (isWidthResponsive.value) setSvgResponsiveWidth();
+        setChartWidth(props.width || clientRect.width);
+        setChartHeight(props.height || clientRect.height);
 
-        if (!options.value.responsive.height && props.height) {
-            setChartHeight(props.height);
-            state.svgHeight = state.chartHeight;
-        }
+        if (props.responsive) setSvgResponsiveWidth();
 
-        setPreserveAspectRatio(responsive.preserveAspectRatio);
+        setPreserveAspectRatio();
     };
 
     return {
@@ -149,7 +143,7 @@ export const setSvg = (props, context, options) => {
 export const setDrawTrigger = (props, context, svgTools) => {
     const state = reactive({
         isMounted: false,
-        startDraw: false, //! props.loading,
+        startDraw: props.loading || false,
     });
 
     const emitReadyEvent = () => {
@@ -186,8 +180,7 @@ export const setDrawTrigger = (props, context, svgTools) => {
 };
 
 const setup = (props, context) => {
-    const chartOptions = computed(() => _.merge({}, DEFAULT_OPTIONS, props.options));
-    const svgState = setSvg(props, context, chartOptions);
+    const svgState = setSvg(props, context);
     const svgTools = {
         ...svgState,
     };
@@ -214,11 +207,22 @@ export default {
             type: [Array, Object],
             required: true,
         },
-        options: {
-            type: Object,
-            default: () => ({}),
+        preserve: {
+            type: [Object, Boolean],
+            default: () => ({
+                align: 'xMinYMin',
+                meetOrSlice: 'meet',
+            }),
+        },
+        responsive: {
+            type: Boolean,
+            default: false,
         },
         height: {
+            type: Number,
+            default: null,
+        },
+        width: {
             type: Number,
             default: null,
         },
