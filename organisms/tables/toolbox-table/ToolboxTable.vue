@@ -63,6 +63,9 @@
             :small="small"
             :background="background"
             :responsive="responsive"
+            :loading="loading"
+            :use-spinner-loading="useSpinnerLoading"
+            :use-cursor-loading="useCursorLoading"
             v-on="$listeners"
             @changeSort="changeSort"
         >

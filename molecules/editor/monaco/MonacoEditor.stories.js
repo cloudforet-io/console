@@ -177,7 +177,7 @@ const value = {
     project_id: 'project-4b0a522442fc',
     domain_id: 'domain-22f45f0c5bc4',
     tags: {},
-    collect_info: {
+    collection_info: {
         state: 'NEW',
         collectors: [
             'collector-d73e5abf65fd',
@@ -185,7 +185,8 @@ const value = {
             'collector-6d004ff04d8a',
             'collector-5eb1a46c4946',
         ],
-        data_version: {},
+        update_history: [],
+        pinned_keys: [],
     },
     created_at: {
         seconds: '1568965462',
