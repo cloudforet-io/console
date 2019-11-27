@@ -1,5 +1,5 @@
 <template>
-    <div class="board-pane">
+    <div class="board-pane" v-on="$listeners">
         <div v-if="title" class="header" :class="{'no-pad': dropdownMenu}">
             <p class="title">
                 {{ title }}

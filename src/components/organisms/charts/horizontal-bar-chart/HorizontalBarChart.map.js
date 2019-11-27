@@ -1,26 +1,3 @@
-import styles from '@/styles/_variables.scss';
-
-export const HORIZONTAL_OPTIONS = Object.freeze({
-    responsive: {
-        width: true,
-        height: false,
-        preserveAspectRatio: false,
-    },
-    labels: {
-        padTop: 8,
-        padBottom: 4,
-        textHeight: 14,
-        valueFontWeight: 'bold',
-    },
-    bars: {
-        thickness: 8,
-        backBar: {
-            display: true,
-        },
-        color: styles.primary1,
-    },
-});
-
 export const SAMPLE_DATA = [
     { key: 'Bob', value: parseInt(Math.random() * 10) },
     { key: 'Robin', value: parseInt(Math.random() * 10) },

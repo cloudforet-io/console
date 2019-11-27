@@ -7,7 +7,7 @@
         <p-bubble-chart class="chart"
                         :data="chartData"
                         :loading="loading"
-                        :height="310"
+                        :max-height="310"
                         :legend-position="legendPosition"
                         @legendClick="onLegendClick"
         />
@@ -38,6 +38,7 @@ export default {
             type: String,
             default: 'left',
         },
+
     },
     data() {
         return {
@@ -89,5 +90,6 @@ export default {
 <style lang="scss" scoped>
 .chart {
     padding: 1.5rem 0 0 0;
+    height: 312px;
 }
 </style>

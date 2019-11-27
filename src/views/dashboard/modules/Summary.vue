@@ -8,11 +8,11 @@
                             class="summary-card"
                             :class="{hover: d.hover}"
                             :style="{ width: `${100 / dataLength}%` }"
+                            @mouseenter="onMouseEnter(key)"
+                            @mouseleave="onMouseLeave(key)"
             >
                 <span class="label">{{ d.label }}</span>
                 <span class="count"
-                      @mouseenter="onMouseEnter(key)"
-                      @mouseleave="onMouseLeave(key)"
                       @click="onLinkClick(key, data[key])"
                 >{{ data[key] || 0 }}</span>
             </p-board-layout>

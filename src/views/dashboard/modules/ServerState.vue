@@ -40,22 +40,29 @@ export default {
     data() {
         return {
             loading: true,
+            chartData: [
+                { key: 'Pending', value: 0 },
+                { key: 'In-Service', value: 0 },
+                { key: 'Maintenance', value: 0 },
+                { key: 'Closed', value: 0 },
+            ],
         };
-    },
-    computed: {
-        chartData() {
-            return Object.keys(this.data).map(key => ({ key, value: this.data[key] }));
-        },
     },
     watch: {
         data() {
             if (this.loading) this.loading = false;
+            this.setDataMap();
         },
     },
     created() {
         DashboardEventBus.$emit('listServerState');
     },
     methods: {
+        setDataMap() {
+            this.chartData.forEach((d) => {
+                d.value = this.data[d.key];
+            });
+        },
         onLegendClick(key, val) {
             console.log('onLegendClick', key, val);
             this.$router.push({ path: '/inventory/server', query: { plan: 'private' } });
