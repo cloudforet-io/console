@@ -14,13 +14,18 @@
                 <span class="label">{{ d.label }}</span>
                 <span class="count"
                       @click="onLinkClick(key, data[key])"
-                >{{ data[key] || 0 }}</span>
+                >{{ data[key] || 0 }}
+                    <animated-number :value="data[key]"
+                                     :duration="300"
+                    />
+                </span>
             </p-board-layout>
         </div>
     </div>
 </template>
 
 <script>
+import AnimatedNumber from 'animated-number-vue';
 import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 
@@ -28,6 +33,7 @@ export default {
     name: 'Summary',
     components: {
         PBoardLayout,
+        AnimatedNumber,
     },
     props: {
         data: {
@@ -39,7 +45,7 @@ export default {
         return {
             dataMap: {
                 project: {
-                    label: 'Project', path: '/inventory/project', hover: false,
+                    label: 'Project', path: '/identity/project', hover: false,
                 },
                 server: {
                     label: 'Server', path: '/inventory/server', hover: false,
@@ -72,10 +78,9 @@ export default {
         onMouseLeave(key) {
             this.dataMap[key].hover = false;
         },
-        onLinkClick(key, val) {
-            console.log('onLinkClick', key, val);
+        onLinkClick(key) {
             if (this.dataMap[key].path) {
-                this.$router.push({ path: this.dataMap[key].path, query: { plan: 'private' } });
+                this.$router.push({ path: this.dataMap[key].path });
             }
         },
     },
