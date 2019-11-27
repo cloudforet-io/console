@@ -98,7 +98,8 @@ casual.define('regionInfo', () => ({
 casual.define('collectInfo', () => ({
     state: 'NEW',
     collectors: arrayOf(casual.integer(1, 3), casual.make_id, 'collector'),
-    data_version: {},
+    update_history: [],
+    pinned_keys: [],
 }));
 casual.define('server', () => ({
     server_id: casual.make_id('server'),
@@ -118,7 +119,7 @@ casual.define('server', () => ({
     project_id: casual.make_id('project'),
     domain_id: casual.make_id('domain'),
     tags: casual.tags,
-    collect_info: casual.collectInfo,
+    collection_info: casual.collection_info,
     created_at: casual.timestamp,
     updated_at: casual.timestamp,
     deleted_at: null,

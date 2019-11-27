@@ -334,7 +334,7 @@ export default {
                     this.tr('MSG.DELETE_SUCC',[this.tr(`TREE_TYPE.${itemType}`),itemId]);
                     if (this.treeData.length === 1) {
                         this.isInitializing = true;
-                        this.treeData = [{ title: '! Please, Right Click me',
+                        this.treeData = [{ title: 'Click right button to create a new project Group.',
                             isLeaf: true,
                             data: {
                                 init: true

@@ -13,10 +13,6 @@
     "svg": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6"
   },
   "dependencies": {
-    "@coreui/coreui": "^2.1.9",
-    "@coreui/coreui-plugin-chartjs-custom-tooltips": "^1.2.0",
-    "@coreui/icons": "0.3.0",
-    "@coreui/vue": "^2.1.2",
     "@johmun/vue-tags-input": "^2.1.0",
     "@vue/composition-api": "^0.3.2",
     "animated-number-vue": "^1.0.0",
@@ -66,7 +62,6 @@
   },
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.6.0",
-    "@fortawesome/fontawesome-pro": "^5.11.2",
     "@storybook/addon-a11y": "^5.2.3",
     "@storybook/addon-actions": "^5.2.1",
     "@storybook/addon-backgrounds": "^5.2.1",
