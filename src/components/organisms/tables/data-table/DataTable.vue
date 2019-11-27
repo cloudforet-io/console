@@ -186,11 +186,15 @@ export default {
             type: Boolean,
             default: false,
         },
-        loding: {
+        loading: {
             type: Boolean,
             default: false,
         },
-        cursorLoding: {
+        useSpinnerLoading: {
+            type: Boolean,
+            default: false,
+        },
+        useCursorLoading: {
             type: Boolean,
             default: false,
         },
@@ -254,6 +258,15 @@ export default {
                 });
             }
         },
+        loading() {
+            if (this.useCursorLoading) {
+                if (this.loading) {
+                    document.body.style.cursor = 'progress';
+                } else {
+                    document.body.style.cursor = 'default';
+                }
+            }
+        },
     },
     mounted() {
         if (this.$options.name === 'PDataTable') {
@@ -267,6 +280,10 @@ export default {
             }
             if (this.selectable) {
                 window.addEventListener('keydown', this.copy);
+            }
+            if (this.loading) {
+                console.log('on loading startup');
+                document.body.style.cursor = 'progress';
             }
         }
     },

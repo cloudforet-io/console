@@ -19,13 +19,16 @@
                     :page-size.sync="pageSize"
                     :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
                     :setting-visible="false"
+                    :loading="loading"
+                    :use-spinner-loading="true"
+                    :use-cursor-loading="true"
                     @changePageSize="getServers"
                     @changePageNumber="getServers"
                     @clickRefresh="getServers"
                     @changeSort="getServers"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary" :disabled="true" @click="clickCollectData">
+                        <p-button style-type="primary" @click="clickCollectData">
                             Collect Data
                         </p-button>
                         <PDropdownMenuBtn
@@ -90,6 +93,7 @@
                     :all-page="subData.allPage"
                     :this-page.sync="subData.thisPage"
                     :search-text.sync="subData.searchText"
+                    :loading="subData.loading"
                     :get-server-sub-data="getServerSubData"
                 />
             </template>
@@ -105,6 +109,7 @@
                                 :all-page="admin.allPage"
                                 :this-page.sync="admin.thisPage"
                                 :search-text.sync="admin.searchText"
+                                :loading="admin.loading"
                                 :get-server-admin="getServerAdmin"
                 />
             </template>
@@ -157,6 +162,8 @@
                                 :page-size.sync="admin.pageSize"
                                 :all-page="admin.allPage"
                                 :this-page.sync="admin.thisPage"
+                                :search-text.sync="admin.searchText"
+                                :loading="admin.loading"
                                 :get-server-admin="getServerAdmin"
                 />
             </template>
@@ -210,6 +217,7 @@ export const serverTableReactive = parent => reactive({
     selectIndex: [],
     items: [],
     searchText: '',
+    loading: false,
     toolbox: null, // template refs
 });
 
@@ -275,6 +283,7 @@ export const serverSetup = (props, context, eventName) => {
         allPage: 1,
         thisPage: 1,
         searchText: '',
+        loading: false,
     });
 
     const admin = reactive({
@@ -285,6 +294,7 @@ export const serverSetup = (props, context, eventName) => {
         allPage: 1,
         thisPage: 1,
         searchText: '',
+        loading: false,
     });
     const sortSelectIndex = computed(() => {
         const idxs = [...tableState.selectIndex];

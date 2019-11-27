@@ -61,6 +61,7 @@ export const en = {
         RG: 'Region',
         ZE: 'Zone',
         PL: 'Pool',
+        LABELS: 'Labels',
         RG_ID: 'Region ID',
         RG_NM: 'Region Name',
         ZE_ID: 'Zone ID',
@@ -210,7 +211,7 @@ export const en = {
         UPDATE_ARG: 'Update {0}',
         DELETE_ARG: 'Delete {0}',
         CLICK_RIGHT: 'Please, Click a item from left tree Panel.',
-        TAG_EMPTY: 'Tag\'s key can\' be blank. Please, input your key.'
+        TAG_EMPTY: 'Tag\'s key can\' be blank. Please, input your key.',
     },
     SIGNIN: {
         WELCOME_MSG: 'Welcome to {0}',
