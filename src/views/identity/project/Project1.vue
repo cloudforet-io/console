@@ -162,6 +162,14 @@ export default {
             }
             return true;
         },
+        isSkipAble(node, position) {
+            if (position.node.path.length === 1 && position.placement !== 'inside') {
+                return true;
+            } if (position.node.data.item_type && position.placement !== 'inside') {
+                return true;
+            }
+            return true;
+        },
         pBeforeDropped(node, position, cancel, tree) {
             if (!this.isValidMove(node, position)) {
                 this.$notify({
@@ -178,8 +186,7 @@ export default {
 
             const isCanceled = this.doTheyShareSameParent(node, position);
             if (!position.node.data.is_cached) {
-                if (position.node.path.length === 1 && position.placement !== 'inside') {
-                } else {
+                if (!this.isSkipAble(node, position)) {
                     tree.remove(tree.getSelected().map(node => node.path));
                     cancel(true);
                 }
@@ -202,10 +209,8 @@ export default {
             const keySource = `${fromItem.item_type.toLowerCase()}_id`;
             const keyTo = fromItem.item_type === 'PROJECT_GROUP' ? 'parent_project_group_id' : `${toItem.item_type.toLowerCase()}_id`;
             param[keySource] = fromItem.id;
-            param[keyTo] = toItem.id;
-            //_.take(position.node.path, position.node.path.length-1)
+            param[keyTo] = toItem.item_type === 'PROJECT' ? tree.getNode(_.take(position.node.path, position.node.path.length - 1)).data.id : toItem.id;
 
-            return;
             if (fromItem.item_type === 'PROJECT_GROUP' && position.placement !== 'inside' && position.node.level === 1) {
                 param.release_parent_project_group = true;
             }
