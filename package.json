@@ -65,7 +65,6 @@
   },
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.6.0",
-    "@fortawesome/fontawesome-pro": "^5.11.2",
     "@storybook/addon-a11y": "^5.2.3",
     "@storybook/addon-actions": "^5.2.1",
     "@storybook/addon-backgrounds": "^5.2.1",

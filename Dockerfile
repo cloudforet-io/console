@@ -22,7 +22,6 @@ COPY src ${BUILD_PATH}/src
 
 ENV NODE_ENV production
 RUN npm run build && cp -ar ${BUILD_PATH}/dist/* ${ROOT_PATH}/ && rm -rf ${BUILD_PATH}
-WORKDIR ${ROOT_PATH}
 
 EXPOSE ${PORT}
 
