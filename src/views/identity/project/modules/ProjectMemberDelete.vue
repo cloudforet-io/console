@@ -190,7 +190,6 @@ export default {
             this.deleteUserOnProject();
         },
         close() {
-            debugger;
             console.log('close Modal');
         },
     },

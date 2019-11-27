@@ -35,7 +35,8 @@
                   @edited="editSelected"
                   @delete="deletedSelectedOnTree"
                   @noCacheDrop="moveProject"
-                  @toggled="getNextLayerOnTree">
+                  @toggled="getNextLayerOnTree"
+        >
             <template #treeSubPanel>
                 <BaseTabNav
                     ref="IDPJ001_TreeSubPanel"
@@ -387,10 +388,11 @@ export default {
             const url = `/identity/${fromItem.data.item_type.toLowerCase()}/update`;
             const keySrouce = `${fromItem.data.item_type.toLowerCase()}_id`;
             const keyTo = `${toItem.data.item_type.toLowerCase()}_id`;
+            const param = {};
             param[keySrouce] = fromItem.data.id;
             param[keyTo] = toItem.data.id;
 
-            let param = {};
+
             if (fromItem.isLeaf) {
                 param.project_id = fromItem.data.id;
                 param.project_group_id = toItem.data.id;

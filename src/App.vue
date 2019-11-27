@@ -1,13 +1,13 @@
 <template>
     <div v-if="isInit" id="app">
-        <p-notice-alert :group="'noticeTopLeft'" :position="'top left'"/>
-        <p-notice-alert :group="'noticeTopRight'" :position="'top right'"/>
-        <p-notice-alert :group="'noticeBottomLeft'" :position="'bottom left'"/>
-        <p-notice-alert :group="'noticeBottomRight'" :position="'bottom right'"/>
+        <p-notice-alert :group="'noticeTopLeft'" :position="'top left'" />
+        <p-notice-alert :group="'noticeTopRight'" :position="'top right'" />
+        <p-notice-alert :group="'noticeBottomLeft'" :position="'bottom left'" />
+        <p-notice-alert :group="'noticeBottomRight'" :position="'bottom right'" />
         <router-view />
     </div>
     <div v-else class="Aligner">
-        <p-lottie ref="ploading" />
+        <p-lottie ref="pageLoading" :auto="true" :size="45" />
     </div>
 </template>
 <script>
@@ -38,16 +38,7 @@ export default {
     created() {
         this.preparationTo();
     },
-    mounted() {
-        this.drawLottie();
-    },
     methods: {
-        async drawLottie() {
-            this.$refs.ploading.create();
-        },
-        stopLottie() {
-            this.$refs.ploading.destroy();
-        },
         async preparationTo() {
             try {
                 await this.configInit();
@@ -56,7 +47,6 @@ export default {
                 await this.syncStores('domain');
 
                 this.isInit = true;
-                this.stopLottie();
                 const excludeAuth = this.getMeta();
 
                 // TODO:: Please Remove this for later when every domian sign in use Config options.

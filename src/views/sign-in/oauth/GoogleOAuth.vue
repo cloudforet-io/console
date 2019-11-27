@@ -75,6 +75,7 @@ export default {
             const companyTitle = this.$store.getters['domain/companyTitle'];
             const companyDesc = this.$store.getters['domain/description'];
             const hostName = this.getWindowHostName();
+            //return !this.isEmpty(companyTitle) ? companyDesc: !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
             return !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG', [companyDesc]) : !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
         },
         getCurrentHostname() {
@@ -208,7 +209,7 @@ export default {
         border: none;
         background:  $primary;
         opacity: 1;
-        max-height: 30vh;
+        //max-height: 40vh;
         > img {
             object-fit: cover;
             max-height: 30vh;

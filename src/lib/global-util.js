@@ -268,7 +268,7 @@ export const Util = {
                 });
             } else {
                 returnTree = [{
-                    title: 'Please, Right Click me',
+                    title: 'Click right button to create a new project Group.',
                     isLeaf: true,
                     data: {
                         init: true,
