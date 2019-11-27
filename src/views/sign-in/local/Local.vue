@@ -23,6 +23,7 @@
                                             User ID
                                         </p-label>
                                         <p-text-input ref="userId" v-model="userId"
+                                                      :autocomplete="'username'"
                                                       :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
                                                       class="form-control"
                                                       type="text"
@@ -40,6 +41,7 @@
                                             Password
                                         </p-label>
                                         <p-text-input ref="password" v-model="password" type="password"
+                                                      :autocomplete="'new-password'"
                                                       :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
                                                       class="form-control"
                                                       placeholder="  Password"

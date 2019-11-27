@@ -2,7 +2,7 @@
 import { getBindClass } from '@/components/atoms/utils/functional';
 
 export default {
-    name: 'Badge',
+    name: 'PBadge',
     functional: true,
     props: {
         /** @type {string} */
@@ -33,7 +33,7 @@ export default {
         };
         newData.class.badge = true;
         if (props.backgroundColor) {
-            newData.staticStyle = data.staticStyle ? data.staticStyle : {};
+            newData.staticStyle = data.staticStyle || {};
             newData.staticStyle['background-color'] = props.backgroundColor;
         } else {
             newData.class[`badge-${props.styleType}`] = true;

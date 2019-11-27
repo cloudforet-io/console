@@ -25,16 +25,20 @@
                     @changeSort="getServers"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary" @click="clickCollectData">
+                        <p-button style-type="primary" :disabled="true" @click="clickCollectData">
                             Collect Data
                         </p-button>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
+                            class="left-toolbox-item"
                             :menu="dropdown"
                             @clickMenuEvent="clickMenuEvent"
                         >
                             Action
                         </PDropdownMenuBtn>
+                        <div style="width: 50vw" class="left-toolbox-item">
+                            <p-search :search-text.sync="searchText" @onSearch="getServers" />
+                        </div>
                     </template>
                     <template v-slot:col-state-format="data">
                         <p-status v-bind="serverStateFormatter(data.value)" />
@@ -49,9 +53,6 @@
                     <template v-slot:col-memory-format="data">
                         {{ data.item.data.base.memory }}
                     </template>
-                    <template v-slot:col-project-format="data">
-                        {{ data.item.project_id }}
-                    </template>
                     <template v-slot:col-pool-format="data">
                         {{ data.item.pool_info ? data.item.pool_info.name :'' }}
                     </template>
@@ -59,10 +60,14 @@
                         {{ data.item.data.os.os_distro }}
                     </template>
                     <template v-slot:col-server_type-format="data">
-                        <PBadge>{{ data.value }}</PBadge>
+                        <PBadge v-bind="platformBadgeFormatter(data.value)">
+                            {{ data.value }}
+                        </PBadge>
                     </template>
                     <template v-slot:col-platform_type-format="data">
-                        <PBadge>{{ data.item.data.vm.platform_type }}</PBadge>
+                        <PBadge v-bind="platformBadgeFormatter(data.item.data.vm.platform_type)">
+                            {{ data.item.data.vm.platform_type }}
+                        </PBadge>
                     </template>
                 </p-toolbox-table>
             </template>
@@ -73,36 +78,7 @@
                                  :item="items[selectIndex[0]]"
                                  :tag-confirm-event="tagConfirmEvent"
                                  :tag-reset-event="tagResetEvent"
-                >
-                    <template v-slot:col-state-format="data">
-                        <p-status justifyContent="flex-start" v-bind="serverStateFormatter(data.value)" />
-                    </template>
-                    <template />
-                    <template v-slot:col-updated_at-format="data">
-                        {{ timestampFormatter(data.value) }}
-                    </template>
-                    <template v-slot:col-core-format="data">
-                        {{ data.item.data.base.core }}
-                    </template>
-                    <template v-slot:col-memory-format="data">
-                        {{ data.item.data.base.memory }}
-                    </template>
-                    <template v-slot:col-project-format="data">
-                        {{ data.item.project_id }}
-                    </template>
-                    <template v-slot:col-pool-format="data">
-                        {{ data.item.pool_info ? data.item.pool_info.name :'' }}
-                    </template>
-                    <template v-slot:col-os_distro-format="data">
-                        {{ data.item.data.os.os_distro }}
-                    </template>
-                    <template v-slot:col-server_type-format="data">
-                        <PBadge>{{ data.value }}</PBadge>
-                    </template>
-                    <template v-slot:col-platform_type-format="data">
-                        <PBadge>{{ data.item.data.vm.platform_type }}</PBadge>
-                    </template>
-                </p-server-detail>
+                />
             </template>
             <template #data="{tabName}">
                 <PServerData
@@ -113,6 +89,7 @@
                     :page-size.sync="subData.pageSize"
                     :all-page="subData.allPage"
                     :this-page.sync="subData.thisPage"
+                    :search-text.sync="subData.searchText"
                     :get-server-sub-data="getServerSubData"
                 />
             </template>
@@ -127,12 +104,13 @@
                                 :page-size.sync="admin.pageSize"
                                 :all-page="admin.allPage"
                                 :this-page.sync="admin.thisPage"
+                                :search-text.sync="admin.searchText"
                                 :get-server-admin="getServerAdmin"
                 />
             </template>
         </PTab>
         <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
-            <template #datas="{tabName}">
+            <template #data="{tabName}">
                 <p-data-table
                     :fields="fields"
                     :sortable="false"
@@ -141,12 +119,7 @@
                     :col-copy="true"
                 >
                     <template v-slot:col-state-format="data">
-                        <p-status
-                            icon="fa-circle"
-                            icon-style="solid"
-                            size="xs"
-                            v-bind="serverStateFormatter(data.value)"
-                        />
+                        <p-status v-bind="serverStateFormatter(data.value)" />
                     </template>
                     <template />
                     <template v-slot:col-updated_at-format="data">
@@ -158,9 +131,6 @@
                     <template v-slot:col-memory-format="data">
                         {{ data.item.data.base.memory }}
                     </template>
-                    <template v-slot:col-project-format="data">
-                        {{ data.item.project_id }}
-                    </template>
                     <template v-slot:col-pool-format="data">
                         {{ data.item.pool_info ? data.item.pool_info.name :'' }}
                     </template>
@@ -168,10 +138,14 @@
                         {{ data.item.data.os.os_distro }}
                     </template>
                     <template v-slot:col-server_type-format="data">
-                        <PBadge>{{ data.value }}</PBadge>
+                        <PBadge v-bind="platformBadgeFormatter(data.value)">
+                            {{ data.value }}
+                        </PBadge>
                     </template>
                     <template v-slot:col-platform_type-format="data">
-                        <PBadge>{{ data.item.data.vm.platform_type }}</PBadge>
+                        <PBadge v-bind="platformBadgeFormatter(data.item.data.vm.platform_type)">
+                            {{ data.item.data.vm.platform_type }}
+                        </PBadge>
                     </template>
                 </p-data-table>
             </template>
@@ -202,8 +176,7 @@ import PStatus from '@/components/molecules/status/Status';
 import PButton from '@/components/atoms/buttons/Button';
 import PBadge from '@/components/atoms/badges/Badge';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
-import { timestampFormatter } from '@/lib/util';
-import { serverStateFormatter } from '@/views/inventory/server/Server.util';
+import { timestampFormatter, serverStateFormatter, platformBadgeFormatter } from '@/lib/util';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeTrItems } from '@/lib/helper';
 
@@ -212,7 +185,7 @@ const PDataTable = () => import('@/components/organisms/tables/data-table/DataTa
 const BaseDragHorizontal = () => import('@/components/base/drag/BaseDragHorizontal');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 const PDropdownMenuBtn = () => import('@/components/organisms/buttons/dropdown/DropdownMenuBtn');
-
+const PSearch = () => import('@/components/molecules/search/Search');
 const PServerDetail = () => import('@/views/inventory/server/modules/ServerDetail');
 const PServerRawData = () => import('@/views/inventory/server/modules/ServerRawData');
 const PServerData = () => import('@/views/inventory/server/modules/ServerData');
@@ -236,6 +209,7 @@ export const serverTableReactive = parent => reactive({
     parent),
     selectIndex: [],
     items: [],
+    searchText: '',
     toolbox: null, // template refs
 });
 
@@ -269,18 +243,19 @@ export const serverSetup = (props, context, eventName) => {
     const eventBus = serverEventBus;
     const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
-        tabs: [
-            { name: 'detail', label: '디테일', keepAlive: true },
-            { name: 'data', label: '데이터' },
-            { name: 'rawData', label: '데이터 원본', keepAlive: true },
-            { name: 'admin', label: '관리자' },
+        tabs: makeTrItems([
+            ['detail', 'COMMON.DETAILS', { keepAlive: true }],
+            ['data', 'COMMON.DATA'],
+            ['rawData', 'COMMON.RAWDATA', { keepAlive: true }],
+            ['admin', 'COMMON.ADMIN'],
         ],
+        context.parent),
         activeTab: 'detail',
-        multiSelectTabs: [
-            { name: 'datas', label: '데이터', keepAlive: true },
-            { name: 'admin', label: '관리자' },
-        ],
-        multiSelectActiveTab: 'datas',
+        multiSelectTabs: makeTrItems([
+            ['data', 'COMMON.DATA', { keepAlive: true }],
+            ['admin', 'COMMON.ADMIN'],
+        ], context.parent),
+        multiSelectActiveTab: 'data',
         serverDetail: null, // template refs
     });
     const tags = ref({});
@@ -299,6 +274,7 @@ export const serverSetup = (props, context, eventName) => {
         pageSize: 15,
         allPage: 1,
         thisPage: 1,
+        searchText: '',
     });
 
     const admin = reactive({
@@ -308,6 +284,7 @@ export const serverSetup = (props, context, eventName) => {
         pageSize: 15,
         allPage: 1,
         thisPage: 1,
+        searchText: '',
     });
     const sortSelectIndex = computed(() => {
         const idxs = [...tableState.selectIndex];
@@ -349,6 +326,7 @@ export const serverSetup = (props, context, eventName) => {
         { type: 'item', disabled: false }),
         serverStateFormatter,
         timestampFormatter,
+        platformBadgeFormatter,
         clickCollectData() {
             console.log('add');
         },
@@ -382,6 +360,7 @@ export default {
         PServerRawData,
         PServerAdmin,
         PDataTable,
+        PSearch,
     },
     setup(props, context) {
         const dataBind = reactive({
@@ -399,9 +378,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    #server-dropdown-btn {
+    .left-toolbox-item{
         margin-left: 1rem;
     }
+
     #empty-space{
         text-align: center;
         margin-bottom: 0.5rem;

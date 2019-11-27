@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 export const makeItem = (parent, commonOption, name, trLabel, extra) => {
-    let item = extra ? { ...extra } : { name };
+    let item = extra ? { ...extra, name } : { name };
     if (commonOption) {
         item = _.defaultsDeep(item, commonOption);
     }
@@ -52,3 +52,7 @@ export const makeTrItems = (items, parent, commonOption) => {
     });
     return result;
 };
+export const ColorBindFactory = (colorMapping, textFnc) => value => ({
+    text: textFnc(value),
+    ...colorMapping[value],
+});

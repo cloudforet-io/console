@@ -1,11 +1,19 @@
 <template>
-    <div :style="responsiveStyle">
+    <div class="row" :style="responsiveStyle">
+        <transition name="fade-in">
+            <div v-if="!isVisible" class="spinner-container">
+                <p-lottie class="spinner"
+                          :size="1.5" :auto="true" name="spinner"
+                />
+            </div>
+        </transition>
         <InfoPanel v-show="isVisible"
                    :info-title="topPanelTitle"
                    :item="item"
                    :defs="topPanel"
         />
-        <p-tag-panel ref="tagPanel"
+        <p-tag-panel v-show="isVisible"
+                     ref="tagPanel"
                      :tags.sync="tags"
                      @confirm="updateTag"
         />
@@ -16,20 +24,14 @@
 import _ from 'lodash';
 import InfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
-
-const SummaryModel = {
-    id: null,
-    title: null,
-    create: null,
-    tags: [],
-};
-
+import PLottie from '@/components/molecules/lottie/PLottie';
 
 export default {
     name: 'ProjectSummary',
     components: {
         InfoPanel,
         PTagPanel,
+        PLottie,
     },
     props: {
         selectedNode: {
@@ -40,13 +42,10 @@ export default {
             type: Object,
             default: null,
         },
-        summaryData: {
-            type: Object,
-            default: () => (SummaryModel),
-        },
     },
     data() {
         return {
+            isLoadingVisible: false,
             isVisible: false,
             renderTitle: null,
             renderData: [],
@@ -64,7 +63,7 @@ export default {
         topPanel() {
             return [
                 {
-                    name: 'name',
+                    name: 'id',
                     label: this.tr('COMMON.ID'),
                     copyFlag: true,
                 },
@@ -81,17 +80,27 @@ export default {
             ];
         },
     },
-    created() {
+    mounted() {
         this.setInitData();
     },
     methods: {
-        async updateTag(){
+        async updateTag() {
+            const selectedNodeDT = this.selectedNode.node.data;
+            const tags = { tags: this.tags };
+            const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id, ...tags } : { project_id: selectedNodeDT.id, ...tags };
+            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/update`;
+            await this.$http.post(url, param).then((response) => {
+                if (!this.isEmpty(response.data)) {
+                    this.tags = response.data.tags;
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
         },
         async setInitData() {
             const selectedNodeDT = this.selectedNode.node.data;
             const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
             const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/get`;
-
             await this.$http.post(url, param).then((response) => {
                 if (!this.isEmpty(response.data)) {
                     this.item = {
@@ -99,11 +108,8 @@ export default {
                         name: response.data.name,
                         create: this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone),
                     };
-
                     this.tags = response.data.tags;
-
                     this.isVisible = true;
-                    // this.summaryData.tags = response.data.tags;
                     console.log('this.item', this.item);
                 }
             }).catch((error) => {
@@ -132,4 +138,35 @@ export default {
     }
   }
 
+  .spinner-container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 99;
+      height: 50%;
+      overflow: hidden;
+      background: rgba($white, .5);
+      .spinner {
+          position: relative;
+          display: inline-flex;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+      }
+
+      &.fade-in-enter-active {
+          transition: opacity .3s, visibility .3s;
+      }
+      &.fade-in-leave-active {
+          transition: opacity .3s, visibility .3s;
+      }
+      &.fade-in-enter, &.fade-in-leave-to {
+          visibility: hidden;
+          opacity: 0;
+      }
+      &.fade-in-leave, &.fade-in-enter-to {
+          visibility: visible;
+          opacity: 1;
+      }
+  }
 </style>

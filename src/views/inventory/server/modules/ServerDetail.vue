@@ -46,12 +46,16 @@
         </p-info-panel>
         <p-info-panel info-title="VM" :defs="vmDefs" :item="getVm">
             <template #def-platform_type-format="scope">
-                <p-badge style-type="primary">
+                <p-badge v-bind="platformBadgeFormatter(scope.value)">
                     {{ scope.value }}
                 </p-badge>
             </template>
         </p-info-panel>
-        <p-info-panel info-title="Compute" :defs="computeDefs" :item="getCompute" />
+        <p-info-panel info-title="Compute" :defs="computeDefs" :item="getCompute">
+            <template #def-security_groups-format="scope">
+                {{ arrayFormatter(scope.value) }}
+            </template>
+        </p-info-panel>
         <p-tag-panel ref="tagPanel" :tags.sync="tags" @confirm="confirm" />
     </div>
 </template>
@@ -64,12 +68,12 @@ import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
 import PBadge from '@/components/atoms/badges/Badge';
 import PStatus from '@/components/molecules/status/Status';
-import { timestampFormatter } from '@/lib/util';
-import { serverStateFormatter } from '@/views/inventory/server/Server.util';
+import {
+    timestampFormatter, serverStateFormatter, arrayFormatter, platformBadgeFormatter,
+} from '@/lib/util';
 import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { makeTrItems } from '@/lib/helper';
-
 
 export default {
     name: 'PServerDetail',
@@ -87,7 +91,7 @@ export default {
     },
     setup(props, { parent }) {
         const baseDefs = makeTrItems([
-            ['server_id', 'COMMON.SERVER_ID'],
+            ['server_id', 'COMMON.ID'],
             ['name', 'COMMON.NAME'],
             ['state', 'COMMON.STATE'],
             ['primary_ip_address', 'COMMON.PRI_IP'],
@@ -97,7 +101,7 @@ export default {
             ['menory', 'COMMON.MEMORY'],
             ['os_type', 'COMMON.O_TYPE'],
             ['os_distro', 'COMMON.O_DIS'],
-            ['project_id', 'COMMON.PROJ'],
+            ['project', 'COMMON.PROJ'],
             ['os_detail', 'COMMON.O_DETAIL'],
             ['region', 'COMMON.REGION'],
             ['oArch', 'COMMON.O_ARCH'],
@@ -143,6 +147,8 @@ export default {
             },
             timestampFormatter,
             serverStateFormatter,
+            arrayFormatter,
+          platformBadgeFormatter,
             getVm: computed(() => (props.item ? props.item.data.vm : {})),
             getCompute: computed(() => (props.item ? props.item.data.compute : {})),
         };

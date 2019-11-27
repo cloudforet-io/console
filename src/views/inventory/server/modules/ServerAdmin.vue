@@ -1,41 +1,45 @@
 <template>
-    <div>
-        <p-toolbox-table
-            :items="items"
-            :fields="fields"
-            :selectable="false"
-            :sortable="true"
-            :hover="true"
-            :sort-by.sync="proxySortBy"
-            :sort-desc.sync="proxySortDesc"
-            :all-page="proxyAllPage"
-            :this-page.sync="proxyThisPage"
-            :page-size.sync="proxyPageSize"
-            :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
-            :setting-visible="false"
-            :shadow="false"
-            :border="false"
-            @changePageSize="getData"
-            @changePageNumber="getData"
-            @clickRefresh="getData"
-            @changeSort="getData"
-        >
-            <!-- nic fields -->
-            <template #col-ip_address-format="{item}">
-                {{ item.ip_addresses? item.ip_addresses[0].ip_address:'' }}
-            </template>
-            <template #col-cidr-format="{item}">
-                {{ item.ip_addresses? item.ip_addresses[0].cidr :'' }}
-            </template>
-            <template #col-subnet_id-format="{item}">
-                {{ item.ip_addresses? item.ip_addresses[0].subnet_id :'' }}
-            </template>
-            <!-- sg -->
-            <template #col-port_range-format="{item}">
-                {{ item.port_range_min }} - {{ item.port_range_max }}
-            </template>
-        </p-toolbox-table>
-    </div>
+    <p-toolbox-table
+        :items="items"
+        :fields="fields"
+        :selectable="false"
+        :sortable="true"
+        :hover="true"
+        :sort-by.sync="proxySortBy"
+        :sort-desc.sync="proxySortDesc"
+        :all-page="proxyAllPage"
+        :this-page.sync="proxyThisPage"
+        :page-size.sync="proxyPageSize"
+        :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
+        :setting-visible="false"
+        :shadow="false"
+        :border="false"
+        :padding="false"
+        @changePageSize="getData"
+        @changePageNumber="getData"
+        @clickRefresh="getData"
+        @changeSort="getData"
+    >
+        <template #toolbox-left>
+            <div style="width: 50vw">
+                <p-search :search-text.sync="proxySearchText" @onSearch="getData" />
+            </div>
+        </template>
+        <!-- nic fields -->
+        <template #col-ip_address-format="{item}">
+            {{ item.ip_addresses? item.ip_addresses[0].ip_address:'' }}
+        </template>
+        <template #col-cidr-format="{item}">
+            {{ item.ip_addresses? item.ip_addresses[0].cidr :'' }}
+        </template>
+        <template #col-subnet_id-format="{item}">
+            {{ item.ip_addresses? item.ip_addresses[0].subnet_id :'' }}
+        </template>
+        <!-- sg -->
+        <template #col-port_range-format="{item}">
+            {{ item.port_range_min }} - {{ item.port_range_max }}
+        </template>
+    </p-toolbox-table>
 </template>
 
 <script>
@@ -48,11 +52,12 @@ import { isEmpty } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
 
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
+const PSearch = () => import('@/components/molecules/search/Search');
 
 
 export default {
     name: 'PServerData',
-    components: { PToolboxTable },
+    components: { PToolboxTable, PSearch },
     props: {
         selectIndex: Array,
         items: {
@@ -101,6 +106,7 @@ export default {
             proxyPageSize: makeProxy('pageSize', props, emit),
             proxySortBy: makeProxy('sortBy', props, emit),
             proxySortDesc: makeProxy('sortDesc', props, emit),
+            proxySearchText: makeProxy('searchText', props, emit),
             fields,
         });
         const getData = () => {
@@ -121,3 +127,8 @@ export default {
     },
 };
 </script>
+<style lang="scss" scoped>
+    .toolbox-table{
+        padding: 0;
+    }
+</style>

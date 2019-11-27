@@ -4,7 +4,7 @@ import {
     alert, safe, other1, other2, gray,
 } from '@/styles/_variables.scss';
 import { autoProps } from '@/setup/storybook-util';
-import { statusBindFactory } from '@/components/molecules/status/Status.util';
+import { ColorBindFactory } from '@/lib/util'
 
 
 export default {

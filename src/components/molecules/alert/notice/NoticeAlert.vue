@@ -66,6 +66,7 @@ export default {
     .vue-notification-group{
         width: 20rem !important;
     }
+
     .notice-alert {
         height: 10rem !important;
         margin: 2rem 2rem 2rem 2rem;
@@ -105,13 +106,69 @@ export default {
         }
 
         &.success {
-            background: #ffb648;
-            border-left-color: #f48a06;
+            padding: 1rem;
+            border-radius: 2px;
+            background: #FFFFFF 0% 0% no-repeat padding-box;
+            box-shadow: 0px 0px 8px #4D49B629;
+            border: 1px solid $safe !important;
+            opacity: 1;
+
+            .title {
+                text-align: left;
+                text-decoration: underline;
+                font: Bold 16px/18px Arial;
+                letter-spacing: 0;
+                color: $safe;
+                opacity: 1;
+
+            }
+
+            .content {
+                margin-top: 1rem;
+                text-align: left;
+                font: 14px/17px Arial;
+                letter-spacing: 0;
+                color: $dark;
+                opacity: 1;
+            }
+
+            &:hover {
+                cursor:pointer;
+                border: 2px solid $safe !important;
+            }
         }
 
-        &.fail {
-            background: #68CD86;
-            border-left-color: #42A85F;
+        &.warning {
+            padding: 1rem;
+            border-radius: 2px;
+            background: #FFFFFF 0% 0% no-repeat padding-box;
+            box-shadow: 0px 0px 8px #4D49B629;
+            border: 1px solid $other1 !important;
+            opacity: 1;
+
+            .title {
+                text-align: left;
+                text-decoration: underline;
+                font: Bold 16px/18px Arial;
+                letter-spacing: 0;
+                color:  $other1;
+                opacity: 1;
+
+            }
+
+            .content {
+                margin-top: 1rem;
+                text-align: left;
+                font: 14px/17px Arial;
+                letter-spacing: 0;
+                color: $dark;
+                opacity: 1;
+            }
+
+            &:hover {
+                cursor:pointer;
+                border: 2px solid $other1 !important;
+            }
         }
     }
 
