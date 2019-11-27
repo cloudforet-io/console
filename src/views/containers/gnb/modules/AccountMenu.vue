@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList';
 import ProfileModal from '@/views/common/profile/ProfileModal';
 import PI from '@/components/atoms/icons/PI';

@@ -1,10 +1,10 @@
 import casual, { dictOf } from '@/lib/casual';
 
 casual.define('serverStates', () => ({
-    PENDING: casual.integer(0, 1000),
-    INSERVICE: casual.integer(0, 1000),
-    MAINTENANCE: casual.integer(0, 1000),
-    CLOSED: casual.integer(0, 1000),
+    Pending: casual.integer(0, 1000),
+    'In-Service': casual.integer(0, 1000),
+    Maintenance: casual.integer(0, 1000),
+    Closed: casual.integer(0, 1000),
 }));
 
 casual.define('coordinate', () => ({

@@ -1,23 +1,32 @@
 <template>
     <div class="p-donut-chart">
-        <p-chart ref="chartRef"
-                 v-bind="$props" :options="chartOptions"
-                 @ready="draw"
+        <p-chart ref="chartRef" v-bind="$props"
+                 @ready="draw" @resize="resizeElements"
         >
             <g :transform="gTransform">
                 <g v-for="(pd, idx) in pieData" ref="pathGroup" :key="idx"
                    :style="{
-                       fill: colors(idx),
+                       fill: empty? emptyColor : colors(idx),
                        opacity: !hoverState || hoverList[idx] ? 1.0 : 0.3
                    }"
                    @mouseenter="onMouseEnter(idx)"
                    @mouseleave="resetHoverList"
                 >
-                    <path :d="arc(pd)" />
-                    <circle v-tooltip="{
+                    <path class="donut-path"
+                          :d="arc(pd)"
+                          @click="$emit('legendClick', pd.data.key, pd.data.value)"
+                    />
+                    <text v-if="empty" class="empty-text"
+                          text-anchor="middle" dominant-baseline="middle"
+                          :y="0"
+                    >
+                        No Data
+                    </text>
+                    <circle v-else
+                            v-tooltip="{
                                 ...getTooltipOptions(pd.data, idx),
                                 trigger: 'manual',
-                                show: hoverList[idx],
+                                show: pd.data.value && hoverList[idx],
                                 popperOptions: {
                                     onCreate(o) {
                                         o.instance.popper.addEventListener('mouseenter', () => {
@@ -54,20 +63,11 @@ import {
 import { VTooltip } from 'v-tooltip';
 import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
 import PChartLegend from '@/components/organisms/legends/ChartLegend';
-import { PRIMARY_COLORSET } from '@/components/molecules/charts/Chart.map';
-import { DONUT_OPTIONS } from './DonutChart.map';
+import { colorset } from '@/lib/util';
+import styles from '@/styles/_variables.scss';
 
 
-const setSizeTools = (props, context, chartOptions) => {
-    const state = reactive({
-    });
-
-    return {
-        ...toRefs(state),
-    };
-};
-
-const setDrawTools = (props, context, chartOptions) => {
+const setDrawTools = (props, context) => {
     const sizeTools = reactive({
         clientWidth: 0,
         clientHeight: 0,
@@ -81,15 +81,13 @@ const setDrawTools = (props, context, chartOptions) => {
         sizeTools.gTransform = `translate(${sizeTools.clientWidth / 2}, ${(props.height || sizeTools.clientHeight) / 2})`;
     });
 
-    const colors = d3.scaleOrdinal().range(PRIMARY_COLORSET);
+    const colors = d3.scaleOrdinal().range(colorset);
 
     const outerRadius = computed(() => Math.min(sizeTools.clientWidth, props.height || sizeTools.clientHeight) / 2);
-    const innerRadius = computed(() => outerRadius.value - chartOptions.value.donut.thickness);
+    const innerRadius = computed(() => outerRadius.value - props.thickness);
     const arc = computed(() => d3.arc()
         .innerRadius(outerRadius.value)
         .outerRadius(innerRadius.value > 0 ? innerRadius.value : 0));
-
-    const getPieData = () => d3.pie().value(d => d.value).sort(null)(props.data);
 
     const state = reactive({
         arc,
@@ -99,9 +97,18 @@ const setDrawTools = (props, context, chartOptions) => {
         hoverList: [],
         hoverState: false,
         chartEl: undefined,
+        empty: computed(() => !d3.sum(props.data, d => d.value)),
+        emptyColor: styles.primary3,
     });
 
+
+    const getPieData = () => {
+        if (state.empty) return d3.pie().value(d => d.value).sort(null)([{ key: 'empty', value: 1 }]);
+        return d3.pie().value(d => d.value).sort(null)(props.data);
+    };
+
     const resetHoverList = () => {
+        if (state.empty) return;
         state.hoverState = false;
         state.hoverList = new Array(props.data.length).fill(false);
     };
@@ -111,8 +118,16 @@ const setDrawTools = (props, context, chartOptions) => {
     };
 
     const onMouseEnter = (idx) => {
+        if (state.empty) return;
         state.hoverState = true;
         state.hoverList.splice(idx, 1, true);
+    };
+
+    const resizeElements = (svgTools) => {
+        sizeTools.gTransform = `
+            translate(${svgTools.chartWidth.value / 2},
+            ${(svgTools.chartHeight.value) / 2})
+        `;
     };
 
     return {
@@ -121,6 +136,7 @@ const setDrawTools = (props, context, chartOptions) => {
         draw,
         onMouseEnter,
         resetHoverList,
+        resizeElements,
     };
 };
 
@@ -145,20 +161,31 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        preserve: {
+            type: [Object, Boolean],
+            default: () => ({
+                align: 'xMinYMin',
+                meetOrSlice: 'meet',
+            }),
+        },
+        responsive: {
+            type: Boolean,
+            default: false,
+        },
         height: {
             type: Number,
             default: 400,
         },
+        thickness: {
+            type: Number,
+            default: 40,
+        },
     },
     setup(props, context) {
-        const chartOptions = computed(() => _.merge({}, DONUT_OPTIONS, props.options));
-        const tooltips = setTooltips(props, context, chartOptions);
-        const sizeTools = setSizeTools(props, context, chartOptions);
-        const drawTools = setDrawTools(props, context, chartOptions);
+        const tooltips = setTooltips(props, context);
+        const drawTools = setDrawTools(props, context);
         return {
-            chartOptions,
             ...tooltips,
-            ...sizeTools,
             ...drawTools,
         };
     },
@@ -174,11 +201,17 @@ export default {
         .p-chart-container::v-deep {
             height: auto;
         }
+        .donut-path {
+            cursor: pointer;
+        }
         .legend-container {
             padding-top: 1.5rem;
             .legend::v-deep {
                 display: flex;
             }
+        }
+        .empty-text {
+            fill: $primary2;
         }
     }
 </style>

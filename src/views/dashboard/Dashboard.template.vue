@@ -1,19 +1,21 @@
 <template>
     <div class="dashboard-container">
         <main>
-            <div class="row">
-                <Summary :data="summaryData" />
+            <div class="flex-row">
+                <Summary class="item" :data="summaryData" />
             </div>
-            <div class="row height-fix">
-                <ResourcesByRegion class="col region"
-                                   :data="resourcesByRegionData"
-                />
-                <ServerState class="col server-state"
-                             :data="serverStateData"
-                />
+            <div class="flex-row">
+                <div class="item flex">
+                    <ResourcesByRegion class="region"
+                                       :data="resourcesByRegionData"
+                    />
+                    <ServerState class="server-state"
+                                 :data="serverStateData"
+                    />
+                </div>
             </div>
-            <div class="row">
-                <ServersByType class="col"
+            <div class="flex-row">
+                <ServersByType class="item"
                                :server-data="serverTypeData"
                                :vm-data="vmTypeData"
                                :os-data="osTypeData"
@@ -70,15 +72,23 @@ export default {
         width: 100%;
         min-width: calc(1200px - #{$gnb-width});
         max-width: 1280px;
-        .row {
+        .flex-row {
+            display: flex;
             padding-bottom: 1rem;
-            .region {
-                max-width: calc(100% - 330px);
-                margin-right: 1rem;
-            }
-            .server-state {
-                min-width: 215px;
-                max-width: 330px;
+            width: 100%;
+            .item {
+                width: 100%;
+                &.flex {
+                    display: flex;
+                    width: 100%;
+                    .region {
+                        width: calc(75% + .5rem);
+                        margin-right: 1rem;
+                    }
+                    .server-state {
+                        width: calc(25% - .5rem);
+                    }
+                }
             }
         }
 

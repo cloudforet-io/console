@@ -3,7 +3,7 @@
         <p-tooltip-button tooltip="Services"
                           :tooltip-options="{offset: '20px'}"
                           :active="visible"
-                          @click="show"
+                          @click="toggle"
         >
             <template #buttonContents>
                 <p-i name="ic_gnb_services" width="32px" height="32px"
@@ -118,6 +118,9 @@ export default {
         },
         hide() {
             this.visible = false;
+        },
+        toggle() {
+            this.visible = !this.visible;
         },
     },
 };

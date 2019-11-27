@@ -1,8 +1,5 @@
 <template>
     <div class="summary">
-        <p class="title">
-            Summary
-        </p>
         <div class="card-container">
             <p-board-layout v-for="(d, key) in dataMap" :key="key"
                             class="summary-card"
@@ -14,41 +11,33 @@
                 <span class="label">{{ d.label }}</span>
                 <span class="count"
                       @click="onLinkClick(key, data[key])"
-                ><animated-number :value="data[key]"
-                                  :formatValue="countFormatter"
-                                  :duration="500"
-                                  easing="easeInOutSine"
-                />
-                </span>
+                >{{ data[key] || 0 }}</span>
             </p-board-layout>
         </div>
     </div>
 </template>
-
 <script>
-import AnimatedNumber from 'animated-number-vue';
-import anime from 'animejs/lib/anime.es';
-// import numFormat from 'vue-filter-number-format';
 import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
-import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
-
 export default {
     name: 'Summary',
     components: {
         PBoardLayout,
-        AnimatedNumber,
     },
     props: {
         data: {
             type: Object,
             required: true,
         },
+        selectedNode: {
+            type: Object,
+            default: null,
+        },
     },
     data() {
         return {
             dataMap: {
-                project: {
-                    label: 'Project', path: '/identity/project', hover: false,
+                members: {
+                    label: 'Members', path: '/inventory/project', hover: false,
                 },
                 server: {
                     label: 'Server', path: '/inventory/server', hover: false,
@@ -67,26 +56,23 @@ export default {
     watch: {
         data() {
             /**
-             * TODO: Start Number Increase Animation
-             */
+                 * TODO: Start Number Increase Animation
+                 */
         },
     },
     created() {
-        DashboardEventBus.$emit('listSummary');
     },
     methods: {
-        countFormatter(value) {
-            return `${value.toFixed(0)}`;
-        },
         onMouseEnter(key) {
             this.dataMap[key].hover = true;
         },
         onMouseLeave(key) {
             this.dataMap[key].hover = false;
         },
-        onLinkClick(key) {
+        onLinkClick(key, val) {
+            console.log('onLinkClick', key, val);
             if (this.dataMap[key].path) {
-                this.$router.push({ path: this.dataMap[key].path });
+                this.$router.push({ path: this.dataMap[key].path, query: { plan: 'private' } });
             }
         },
     },

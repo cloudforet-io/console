@@ -1,17 +1,3 @@
-export const DONUT_OPTIONS = Object.freeze({
-    responsive: {
-        width: true,
-        height: false,
-        preserveAspectRatio: {
-            align: 'xMinYMin',
-            meetOrSlice: 'meet',
-        },
-    },
-    donut: {
-        thickness: 40,
-    },
-});
-
 export const SAMPLE_DATA = [
     { key: 'Bob', value: parseInt(Math.random() * 10) },
     { key: 'Robin', value: parseInt(Math.random() * 10) },
