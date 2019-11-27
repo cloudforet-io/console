@@ -20,6 +20,9 @@
             :shadow="false"
             :border="false"
             :padding="false"
+            :loading="loading"
+            :use-spinner-loading="true"
+            :use-cursor-loading="true"
             @changePageSize="getData"
             @changePageNumber="getData"
             @clickRefresh="getData"
@@ -105,6 +108,10 @@ export default {
             validator(value) {
                 return value > 0;
             },
+        },
+        loading: {
+            type: Boolean,
+            default: false,
         },
         getServerSubData: String, // event name
     },
