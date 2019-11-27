@@ -34,33 +34,35 @@
                         @mouseenter="thHoverIndex=index"
                         @mouseleave="thHoverIndex=null"
                     >
-                        <span key="colName"
-                              :style="{visibility: isThOver(index) ? 'hidden' : 'visible'}"
-                        >
-                            {{ field.label ? field.label : field.name }}
+                        <span class="th-contents">
+                            <span key="colName"
+                                  :style="{visibility: isThOver(index) ? 'hidden' : 'visible'}"
+                            >
+                                {{ field.label ? field.label : field.name }}
+                            </span>
+                            <p-button v-if="isThOver(index)"
+                                      key="copyBtn"
+                                      class="copy-btn"
+                                      outline
+                                      :style-type="'secondary'"
+                                      :size="'sm'"
+                                      @click="clickColCopy(index)"
+                            >
+                                {{ tr('COMMON.COPY') }}
+                            </p-button>
+                            <template v-if="sortable&&field.sortable">
+                                <p-i
+                                    v-if="sortable&&field.name==sortBy"
+                                    :name="sortIcon"
+                                    class="sort-icon"
+                                />
+                                <p-i
+                                    v-else
+                                    name="ic_table_sort"
+                                    class="sort-icon"
+                                />
+                            </template>
                         </span>
-                        <p-button v-if="isThOver(index)"
-                                  key="copyBtn"
-                                  class="copy-btn"
-                                  outline
-                                  :style-type="'secondary'"
-                                  :size="'sm'"
-                                  @click="clickColCopy(index)"
-                        >
-                            {{ tr('COMMON.COPY') }}
-                        </p-button>
-                        <template v-if="sortable&&field.sortable">
-                            <p-i
-                                v-if="sortable&&field.name==sortBy"
-                                :name="sortIcon"
-                                class="sort-icon"
-                            />
-                            <p-i
-                                v-else
-                                name="ic_table_sort"
-                                class="sort-icon"
-                            />
-                        </template>
                     </p-th>
                 </p-tr>
             </slot>
@@ -275,7 +277,7 @@ export default {
                 this.dragSelect = new DragSelect({
                     selectables: this.dragSelectAbles,
                     area: this.selectArea,
-                    callback: this.dragSelectItmes,
+                    callback: this.dragSelectItems,
                 });
             }
             if (this.selectable) {
@@ -311,7 +313,7 @@ export default {
                 selectToCopyToClipboard(result);
             }
         },
-        dragSelectItmes(items, event) {
+        dragSelectItems(items) {
             const select = [];
             if (items.length > 1) {
                 items.forEach((item) => {
@@ -441,7 +443,11 @@ export default {
     thead{
         tr{
             th{
+                vertical-align: middle;
                 white-space:nowrap;
+                .th-contents {
+                    display: inline-flex;
+                }
                 .sort-icon{
                     float: right;
                     color: $gray2;

@@ -258,8 +258,8 @@ export default {
     }
 
     .left{
-        display: inline-flex;
-        flex-wrap:nowrap;
+        display: flex;
+        flex-wrap: wrap;
         width: auto;
         justify-content: flex-start;
     }

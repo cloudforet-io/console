@@ -1,6 +1,7 @@
 <script>
 import { mixin, getClass } from '@/components/atoms/table/styleMixin';
 import { getBindClass } from '@/components/atoms/utils/functional';
+
 export default {
     name: 'PTh',
     functional: true,

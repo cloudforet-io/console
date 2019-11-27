@@ -39,7 +39,7 @@
                         >
                             Action
                         </PDropdownMenuBtn>
-                        <div style="width: 50vw" class="left-toolbox-item">
+                        <div class="left-toolbox-item">
                             <p-search :search-text.sync="searchText" @onSearch="getServers" />
                         </div>
                     </template>
@@ -390,6 +390,9 @@ export default {
 <style lang="scss" scoped>
     .left-toolbox-item{
         margin-left: 1rem;
+        &:last-child {
+            flex-grow: 1;
+        }
     }
 
     #empty-space{
