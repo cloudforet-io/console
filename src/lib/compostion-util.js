@@ -1,6 +1,4 @@
-import { computed, onMounted, onUnmounted } from '@vue/composition-api';
-import { buttonSlotCase } from '@/components/organisms/buttons/tooltip-button/TooltipButton.stories';
-import serverEventBus from '@/views/inventory/server/ServerEventBus';
+import { computed, onUnmounted } from '@vue/composition-api';
 
 export const makeProxy = (name, props, emit) => computed({
     get: () => props[name],

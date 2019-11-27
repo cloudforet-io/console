@@ -4,7 +4,7 @@
             {{ serviceGroup }}
         </span>
         <span v-if="services.length > 0" class="menu">
-            <f-i icon="fa-chevron-right" icon-style="light" />
+            <p-i name="ic_breadcrum_arrow" />
         </span>
         <span
             v-for="service in services"
@@ -22,11 +22,11 @@
 </template>
 
 <script>
-import FI from '@/components/atoms/icons/FI';
+import PI from '@/components/atoms/icons/PI';
 
 export default {
     name: 'LNBTemplate',
-    components: { FI },
+    components: { PI },
     data() {
         return {
             /**
@@ -48,6 +48,7 @@ export default {
         position: relative;
         z-index: 10;
         display: flex;
+        align-items: center;
         height: $lnb-height;
         box-shadow: 0px 4px 8px rgba($dark, 0.08);
         background-color: $white;
@@ -55,7 +56,7 @@ export default {
         font-size: 0.875rem;
         padding: 12px 18px;
         .menu {
-            padding: 0 15px;
+            padding: 0 .5rem;
         }
         .service-link {
             .open.active {
