@@ -186,6 +186,14 @@ export default {
             type: Boolean,
             default: false,
         },
+        loding: {
+            type: Boolean,
+            default: false,
+        },
+        cursorLoding: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
