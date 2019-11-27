@@ -28,10 +28,9 @@ export default {
                 if (isEmpty(projectNameList.value)) {
                     items[i].project = items[i].project_id;
                 } else {
-                    items[i].project = projectNameList.value[items[i].project_id];
+                    items[i].project = projectNameList.value[items[i].project_id] || items[i].project_id;
                 }
             }
-            console.log(items);
             return items;
         };
 
@@ -42,7 +41,6 @@ export default {
                 res.data.results.forEach((project) => {
                     projectNameList.value[project.project_id] = `${project.project_group_info.name} ${project.name}`;
                 });
-                console.log(projectNameList.value);
             } catch (e) {
                 console.error(e);
             }
@@ -57,13 +55,23 @@ export default {
             ))),
         });
         const requestServerList = async () => {
-            const res = await context.parent.$http.post('/inventory/server/list', {
-                query: requestState.query,
-            });
-            state.items = matchProject(res.data.results);
-            const allPage = Math.ceil(res.data.total_count / state.pageSize);
-            state.allPage = allPage || 1;
-            state.selectIndex = [];
+            console.log('before', state.loading);
+            state.loading = true;
+            state.items = [];
+            try {
+                console.log('start', state.loading);
+                const res = await context.parent.$http.post('/inventory/server/list', {
+                    query: requestState.query,
+                });
+                state.items = matchProject(res.data.results);
+                const allPage = Math.ceil(res.data.total_count / state.pageSize);
+                state.allPage = allPage || 1;
+                state.selectIndex = [];
+                state.loading = false;
+            } catch (e) {
+                console.log(e);
+                state.loading = false;
+            }
         };
 
         // request server sub data
@@ -75,15 +83,17 @@ export default {
             ))),
         });
         const requestServerSubData = async (serverId, name) => {
+            state.subData.loading = true;
+
             const res = await context.parent.$http.post('/inventory/server/get-data', {
                 query: requestSubDataState.query,
                 data_type: name,
                 server_id: serverId,
             });
-            console.log(res.data);
             state.subData.items = res.data.results;
             const allPage = Math.ceil(res.data.total_count / state.subData.pageSize);
             state.subData.allPage = allPage || 1;
+            state.subData.loading = false;
         };
 
         // change tag
@@ -114,14 +124,17 @@ export default {
 
 
         const requestServerAdmin = async () => {
+            console.log(state.getSelectServerIds);
+            state.admin.loading = true;
+            state.admin.items = [];
             const res = await context.parent.$http.post('/inventory/server/member/list', {
                 query: requestAdminState.query,
-                servers: state.getSelectServerIds.value,
+                servers: state.getSelectServerIds,
             });
-            console.log(res.data);
-            state.subData.items = res.data.results;
+            state.admin.items = res.data.results;
             const allPage = Math.ceil(res.data.total_count / state.subData.pageSize);
-            state.subData.allPage = allPage || 1;
+            state.admin.allPage = allPage || 1;
+            state.admin.loading = false;
         };
         mountBusEvent(serverEventBus, serverEventNames.getServerList, requestServerList);
         mountBusEvent(serverEventBus, serverEventNames.tagConfirmEvent, ServerTagConfirm);

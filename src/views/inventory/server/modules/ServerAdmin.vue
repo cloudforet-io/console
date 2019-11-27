@@ -3,7 +3,7 @@
         :items="items"
         :fields="fields"
         :selectable="false"
-        :sortable="true"
+        :sortable="false"
         :hover="true"
         :sort-by.sync="proxySortBy"
         :sort-desc.sync="proxySortDesc"
@@ -15,6 +15,9 @@
         :shadow="false"
         :border="false"
         :padding="false"
+        :loading="loading"
+        :use-spinner-loading="true"
+        :use-cursor-loading="true"
         @changePageSize="getData"
         @changePageNumber="getData"
         @clickRefresh="getData"
@@ -26,18 +29,18 @@
             </div>
         </template>
         <!-- nic fields -->
-        <template #col-ip_address-format="{item}">
-            {{ item.ip_addresses? item.ip_addresses[0].ip_address:'' }}
+        <template #col-user_id-format="{item}">
+            {{ item.user_info.user_id }}
         </template>
-        <template #col-cidr-format="{item}">
-            {{ item.ip_addresses? item.ip_addresses[0].cidr :'' }}
+        <template #col-name-format="{item}">
+            {{ item.user_info.name }}
         </template>
-        <template #col-subnet_id-format="{item}">
-            {{ item.ip_addresses? item.ip_addresses[0].subnet_id :'' }}
+        <template #col-email-format="{item}">
+            {{ item.user_info.email }}
         </template>
         <!-- sg -->
-        <template #col-port_range-format="{item}">
-            {{ item.port_range_min }} - {{ item.port_range_max }}
+        <template #col-labels-format="{item}">
+            {{ arrayFormatter(item.value) }}
         </template>
     </p-toolbox-table>
 </template>
@@ -48,7 +51,7 @@ import {
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/helper';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
-import { isEmpty } from '@/lib/util';
+import { isEmpty, arrayFormatter } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
 
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
@@ -90,6 +93,10 @@ export default {
                 return value > 0;
             },
         },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
         getServerAdmin: String, // event name
     },
     setup(props, { parent, emit }) {
@@ -97,8 +104,7 @@ export default {
             ['user_id', 'COMMON.ID'],
             ['name', 'COMMON.NAME'],
             ['email', 'COMMON.EMAIL'],
-            ['group', 'COMMON.GROUP'],
-            ['tags', 'COMMON.TAG'],
+            ['labels', 'COMMON.LABELS'],
         ], parent);
         const state = reactive({
             proxyThisPage: makeProxy('thisPage', props, emit),
@@ -110,19 +116,24 @@ export default {
             fields,
         });
         const getData = () => {
+            console.log('request');
+            console.log(props.selectIndex);
             serverEventBus.$emit(props.getServerAdmin, props.selectIndex);
         };
         onMounted(() => {
             watch(() => props.selectIndex, (val) => {
-                if (isEmpty(val)) {
+                console.log(val);
+                if (val.length > 0) {
                     getData();
                 }
             });
+            getData();
         });
 
         return {
             ...toRefs(state),
             getData,
+            arrayFormatter,
         };
     },
 };
