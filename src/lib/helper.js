@@ -52,3 +52,7 @@ export const makeTrItems = (items, parent, commonOption) => {
     });
     return result;
 };
+export const ColorBindFactory = (colorMapping, textFnc) => value => ({
+    text: textFnc(value),
+    ...colorMapping[value],
+});

@@ -60,10 +60,14 @@
                         {{ data.item.data.os.os_distro }}
                     </template>
                     <template v-slot:col-server_type-format="data">
-                        <PBadge>{{ data.value }}</PBadge>
+                        <PBadge v-bind="platformBadgeFormatter(data.value)">
+                            {{ data.value }}
+                        </PBadge>
                     </template>
                     <template v-slot:col-platform_type-format="data">
-                        <PBadge>{{ data.item.data.vm.platform_type }}</PBadge>
+                        <PBadge v-bind="platformBadgeFormatter(data.item.data.vm.platform_type)">
+                            {{ data.item.data.vm.platform_type }}
+                        </PBadge>
                     </template>
                 </p-toolbox-table>
             </template>
@@ -74,33 +78,7 @@
                                  :item="items[selectIndex[0]]"
                                  :tag-confirm-event="tagConfirmEvent"
                                  :tag-reset-event="tagResetEvent"
-                >
-                    <template v-slot:col-state-format="data">
-                        <p-status justify-content="flex-start" v-bind="serverStateFormatter(data.value)" />
-                    </template>
-                    <template />
-                    <template v-slot:col-updated_at-format="data">
-                        {{ timestampFormatter(data.value) }}
-                    </template>
-                    <template v-slot:col-core-format="data">
-                        {{ data.item.data.base.core }}
-                    </template>
-                    <template v-slot:col-memory-format="data">
-                        {{ data.item.data.base.memory }}
-                    </template>
-                    <template v-slot:col-pool-format="data">
-                        {{ data.item.pool_info ? data.item.pool_info.name :'' }}
-                    </template>
-                    <template v-slot:col-os_distro-format="data">
-                        {{ data.item.data.os.os_distro }}
-                    </template>
-                    <template v-slot:col-server_type-format="data">
-                        <PBadge>{{ data.value }}</PBadge>
-                    </template>
-                    <template v-slot:col-platform_type-format="data">
-                        <PBadge>{{ data.item.data.vm.platform_type }}</PBadge>
-                    </template>
-                </p-server-detail>
+                />
             </template>
             <template #data="{tabName}">
                 <PServerData
@@ -160,10 +138,14 @@
                         {{ data.item.data.os.os_distro }}
                     </template>
                     <template v-slot:col-server_type-format="data">
-                        <PBadge>{{ data.value }}</PBadge>
+                        <PBadge v-bind="platformBadgeFormatter(data.value)">
+                            {{ data.value }}
+                        </PBadge>
                     </template>
                     <template v-slot:col-platform_type-format="data">
-                        <PBadge>{{ data.item.data.vm.platform_type }}</PBadge>
+                        <PBadge v-bind="platformBadgeFormatter(data.item.data.vm.platform_type)">
+                            {{ data.item.data.vm.platform_type }}
+                        </PBadge>
                     </template>
                 </p-data-table>
             </template>
@@ -194,8 +176,7 @@ import PStatus from '@/components/molecules/status/Status';
 import PButton from '@/components/atoms/buttons/Button';
 import PBadge from '@/components/atoms/badges/Badge';
 import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
-import { timestampFormatter } from '@/lib/util';
-import { serverStateFormatter } from '@/views/inventory/server/Server.util';
+import { timestampFormatter, serverStateFormatter, platformBadgeFormatter } from '@/lib/util';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeTrItems } from '@/lib/helper';
 
@@ -345,6 +326,7 @@ export const serverSetup = (props, context, eventName) => {
         { type: 'item', disabled: false }),
         serverStateFormatter,
         timestampFormatter,
+        platformBadgeFormatter,
         clickCollectData() {
             console.log('add');
         },
