@@ -66,6 +66,13 @@
             </slot>
         </template>
         <template #body>
+            <p-tr v-if="loading&&useSpinnerLoading">
+                <p-td :colspan="selectable? fieldsData.length +1 :fieldsData.length">
+                    <p-lottie name="spinner" :size="2"
+                              :auto="true"
+                    />
+                </p-td>
+            </p-tr>
             <slot
                 name="body"
                 :items="items"
@@ -136,6 +143,7 @@ import PTr from '@/components/atoms/table/Tr';
 import PTd from '@/components/atoms/table/Td';
 import PTh from '@/components/atoms/table/Th';
 import PI from '@/components/atoms/icons/PI';
+import PLottie from '@/components/molecules/lottie/PLottie';
 import { selectToCopyToClipboard } from '@/lib/util';
 
 const PCheckBox = () => import('@/components/molecules/forms/CheckBox');
@@ -144,7 +152,7 @@ const PButton = () => import('@/components/atoms/buttons/Button');
 export default {
     name: 'PDataTable',
     components: {
-        PTable, PTd, PTh, PTr, PI, PCheckBox, PButton,
+        PTable, PTd, PTh, PTr, PI, PCheckBox, PButton, PLottie,
     },
     events: [
         'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
@@ -468,5 +476,4 @@ export default {
         line-height: .875rem;
         vertical-align: middle;
     }
-
 </style>
