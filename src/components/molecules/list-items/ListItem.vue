@@ -1,6 +1,9 @@
 <template>
     <div :class="typeChecker" v-on="$listeners">
         <pre class="indent-text">{{ indentText }}</pre>
+        <span v-if="selected" class="selected">
+            <p-i name="ic_check" height=".875rem" width=".875rem"/>
+        </span>
         <slot>
             <span>{{ contents }}</span>
         </slot>
@@ -8,9 +11,11 @@
 </template>
 
 <script>
+import PI from '@/components/atoms/icons/PI';
 
 export default {
     name: 'PListItem',
+    components: { PI },
     props: {
         contents: {
             type: String,
@@ -19,6 +24,10 @@ export default {
         indent: {
             type: Number,
             default: 0,
+        },
+        selected: {
+            type: Boolean,
+            default: false,
         },
         type: {
             type: String,

@@ -3,18 +3,14 @@
         <p-tooltip-button :tooltip="tooltip"
                           :tooltip-options="tooltipOptions"
                           :active="visible"
-                          @click.stop="show"
+                          @click.stop="() => {}"
         >
             <template #button>
-                <span class="activator" @click="show">
-                    <slot name="activator" :active="visible">
-                        <p-button class="activator-btn" :class="{active: visible}">
-                            <slot name="contents">
-                                {{contents}}
-                            </slot>
-                        </p-button>
+                <p-button class="activator" :class="{active: visible}" @click="show">
+                    <slot name="contents">
+                        {{ contents }}
                     </slot>
-                </span>
+                </p-button>
             </template>
         </p-tooltip-button>
 
@@ -29,7 +25,8 @@
                     class="menu"
                     :contents="item.contents"
                     :indent="item.indent"
-                    @click.stop="select(item, $event)"
+                    :selected="item.selected"
+                    @click.stop="select(item, idx, $event)"
                 />
             </div>
         </transition>
@@ -39,7 +36,6 @@
 <script>
 import PListItem from '@/components/molecules/list-items/ListItem';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton';
-import { LIST_ITEM_PROPERTIES } from './MenuList.map';
 import PButton from '@/components/atoms/buttons/Button';
 
 const ACTIVATOR_MENU_SPACE = -8;
@@ -55,7 +51,7 @@ export default {
             validator(listItems) {
                 return listItems.every((listItem) => {
                     const keys = Object.keys(listItem);
-                    return keys.every(key => LIST_ITEM_PROPERTIES.includes(key));
+                    return keys.every(key => ['key', 'contents', 'indent', 'selected'].includes(key));
                 });
             },
         },
@@ -75,6 +71,7 @@ export default {
     data() {
         return {
             visible: false,
+            selectedIdx: null,
         };
     },
     computed: {
@@ -86,6 +83,7 @@ export default {
         },
     },
     created() {
+        this.setSelectedIdx();
         document.addEventListener('click', this.hide, true);
         document.addEventListener('click', this.hide, false);
     },
@@ -94,15 +92,29 @@ export default {
         document.removeEventListener('click', this.hide, false);
     },
     methods: {
+        setSelectedIdx() {
+            this.listItems.some((item, idx) => {
+                if (item.selected) this.selectedIdx = idx;
+                return item.selected;
+            });
+        },
         show() {
             this.visible = true;
         },
         hide() {
             this.visible = false;
         },
-        select(item, e) {
+        toggle() {
+            this.visible = !this.visible;
+        },
+        select(item, idx, e) {
             this.hide();
-            this.$emit('select', item, e);
+            if (this.selectedIdx !== null) {
+                this.$set(this.listItems[this.selectedIdx], 'selected', false);
+                this.$set(this.listItems[idx], 'selected', true);
+                this.selectedIdx = idx;
+            }
+            this.$emit('select', item, idx, e);
         },
     },
 };
@@ -113,16 +125,13 @@ export default {
     position: relative;
     .activator {
         display: inline-block;
-        .activator-btn {
-            display: inline-block;
-            padding: 0;
-            border-radius: 2px;
-            border: 0px;
-            min-width: 32px;
-            color: $primary4;
-            &:hover, &.active {
-                background-color: $primary-dark;
-            }
+        padding: 0;
+        border-radius: 2px;
+        border: 0px;
+        min-width: 32px;
+        color: $primary4;
+        &:hover, &.active {
+            background-color: $primary-dark;
         }
     }
     .menu-container {
