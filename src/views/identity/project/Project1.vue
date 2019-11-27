@@ -70,20 +70,6 @@ const projectSummaryBottom = () => import('@/views/identity/project/modules/Proj
 const projectMember = () => import('@/views/identity/project/modules/ProjectMember');
 const ProjectContextAction = () => import('@/views/identity/project/modules/ProjectContextAction');
 
-const proEnum = {
-    PROJECT: {
-        type: 'PROJECT',
-        root_able: false,
-        accept: [],
-        isLeaf: true,
-    },
-    PROJECT_GROUP: {
-        type: 'PROJECT_GROUP',
-        root_able: true,
-        accept: ['PROJECT_GROUP', 'PROJECT'],
-        isLeaf: false,
-    },
-};
 
 export default {
     name: 'Project',
@@ -163,13 +149,21 @@ export default {
                 console.error(error);
             });
         },
+        isValidMove(node, position) {
+            const placementTo = _.get(position, 'placement');
+            const targetNodeType = _.get(position, 'node.data.item_type');
+            const sourceNodeItemType = _.get(node[0], 'data.item_type');
+            if (position.node.path.length === 1 && placementTo !== 'inside' && sourceNodeItemType === 'PROJECT') {
+                return false;
+            } if (sourceNodeItemType === 'PROJECT_GROUP' && placementTo === 'inside' && targetNodeType === 'PROJECT') {
+                return false;
+            } if (sourceNodeItemType === 'PROJECT' && placementTo === 'inside' && targetNodeType === 'PROJECT') {
+                return false;
+            }
+            return true;
+        },
         pBeforeDropped(node, position, cancel, tree) {
-            const srcNode = node[0];
-            const srcNodeDT = srcNode.data;
-            const targetNodeDT = position.node.data;
-            const acceptable = proEnum[targetNodeDT.item_type].accept;
-            if (position.node.path.length == 1 && position.placement !== 'inside' && srcNodeDT.item_type === 'PROJECT'
-                || !acceptable.includes(srcNodeDT.item_type)) {
+            if (!this.isValidMove(node, position)) {
                 this.$notify({
                     group: 'noticeBottomLeft',
                     type: 'alert',
@@ -182,12 +176,13 @@ export default {
                 return;
             }
 
-            const shareParam = this.doTheyShareSameParent(node, position);
-            const isCanceled = !!shareParam;
-
+            const isCanceled = this.doTheyShareSameParent(node, position);
             if (!position.node.data.is_cached) {
-                tree.remove(tree.getSelected().map(node => node.path));
-                cancel(true);
+                if (position.node.path.length === 1 && position.placement !== 'inside') {
+                } else {
+                    tree.remove(tree.getSelected().map(node => node.path));
+                    cancel(true);
+                }
             }
 
             this.moveProject(
@@ -201,23 +196,20 @@ export default {
         async moveProject(node, position, tree, cancel, isCanceled) {
             const fromItem = node[0].data;
             const toItem = position.node.data;
-            const url = `/identity/${this.replaceAll(fromItem.item_type, '_', '-').toLowerCase()}/update`;
-            const keySrouce = `${fromItem.item_type.toLowerCase()}_id`;
-            const keyTo = `${toItem.item_type.toLowerCase()}_id`;
             const param = {};
-            param[keySrouce] = fromItem.id;
+            const url = `/identity/${this.replaceAll(fromItem.item_type, '_', '-').toLowerCase()}/update`;
+
+            const keySource = `${fromItem.item_type.toLowerCase()}_id`;
+            const keyTo = fromItem.item_type === 'PROJECT_GROUP' ? 'parent_project_group_id' : `${toItem.item_type.toLowerCase()}_id`;
+            param[keySource] = fromItem.id;
             param[keyTo] = toItem.id;
-            debugger;
-            if (node[0].isLeaf) {
-                param.project_id = fromItem.id;
-                param.project_group_id = toItem.id;
-            } else {
-                param.project_group_id = fromItem.id;
-                param.parent_project_group_id = position.node.path.length == 1 ? 'root' : toItem.id;
-                if (position.placement !== 'inside' && toItem.is_root) {
-                    param.release_parent_project_group = true;
-                }
+            //_.take(position.node.path, position.node.path.length-1)
+
+            return;
+            if (fromItem.item_type === 'PROJECT_GROUP' && position.placement !== 'inside' && position.node.level === 1) {
+                param.release_parent_project_group = true;
             }
+
             await this.$http.post(url, param).then((response) => {
                 const responseData = response.data;
                 if (!this.isEmpty(responseData)) {

@@ -1,45 +1,9 @@
-import { hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import VueLodash from 'vue-lodash';
 import timezone from 'countries-and-timezones';
 import { GlobalEnum } from '@/setup/enum';
 
 export const Util = {
     methods: {
-        /** ********************************************************************************
-         * Name       : getGraphColor
-         * Input      : => (o: opacity,   => Boolean,
-         *                  r: random,    => Boolean,
-         *                  l: length     => Number)
-         * Output     : => (String || Array of String contains Hex color)
-         * Description:    generate random color HEX digits.
-         ********************************************************************************* */
-        getGraphColor: (o, r, l) => {
-            const colorListWithOpacity = [
-                hexToRgba('#2C68F9', 70),
-                hexToRgba('#e81d2a', 70),
-                hexToRgba('#8a2be2', 70),
-                hexToRgba('#1a1f3e', 70),
-                hexToRgba('#0F2965', 70),
-                hexToRgba('#4856f2', 70),
-                hexToRgba('#FFAE08', 70),
-                hexToRgba('#2D9E6E', 70),
-            ];
-            const colorListWithOutOpacity = ['#2C68F9', '#e81d2a', '#8a2be2', '#1a1f3e', '#4856f2', '#FFAE08', '#2D9E6E'];
-
-            const selectedColor = (o) ? colorListWithOpacity : colorListWithOutOpacity;
-            const returnColorVal = l == 0 ? (r) ? selectedColor[Math.floor(Math.random() * selectedColor.length)] : selectedColor[0] : [];
-            let idx = 0;
-
-            for (let i = 0; i < l; i++) {
-                if (r) {
-                    returnColorVal.push(selectedColor[Math.floor(Math.random() * selectedColor.length)]);
-                } else {
-                    idx = i >= selectedColor.length ? l % selectedColor.length : i;
-                    returnColorVal.push(selectedColor[idx]);
-                }
-            }
-            return returnColorVal;
-        },
         /** ********************************************************************************
          * Input        => (v:value: => Any)
          * Output       => (Boolean)
