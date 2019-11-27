@@ -2,7 +2,6 @@ const Identity = () => import('@/views/identity/Identity');
 const IdentityNavBar = () => import('@/views/identity/IdentityNavBar');
 const User = () => import('@/views/identity/user/User');
 const Project = () => import('@//views/identity/project/Project');
-const Project1 = () => import('@//views/identity/project/Project1');
 
 export default {
     path: 'identity',
@@ -18,7 +17,7 @@ export default {
             path: 'project',
             name: 'project',
             meta: { label: 'Project', requiresAuth: true },
-            component: Project1,
+            component: Project,
         },
         {
             path: 'user',

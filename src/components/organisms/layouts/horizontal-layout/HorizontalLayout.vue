@@ -19,7 +19,6 @@
                      :height="'1.5rem'"
                      :name="'btn_height-modifier'"
                 />
-                <!-- <i v-if="!$slots.dragger" class="fal fa-grip-lines" />-->
             </span>
 
             <div class="line right"
@@ -34,7 +33,7 @@
 import PI from '@/components/atoms/icons/PI';
 
 export default {
-    name: 'BaseDragHorizontal',
+    name: 'HorizontalLayout',
     components: { PI },
     props: {
         line: {
@@ -110,39 +109,39 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .dragger-container {
-    position: relative;
-    margin-top: 13px;
-    padding-bottom: 30px;
-    .line {
-      position: absolute;
-      display: inline-block;
-      border-bottom: 1px solid;
-      border-color: transparent;
-      &.colored {
-        border-color: $gray;
-      }
-      &.left {
-        left: 0;
-      }
-      &.right {
-        right: 0;
-      }
+    .dragger-container {
+        position: relative;
+        margin-top: 13px;
+        padding-bottom: 30px;
+        .line {
+            position: absolute;
+            display: inline-block;
+            border-bottom: 1px solid;
+            border-color: transparent;
+            &.colored {
+                border-color: $gray;
+            }
+            &.left {
+                left: 0;
+            }
+            &.right {
+                right: 0;
+            }
+        }
+        .dragger {
+            position: absolute;
+            top: 1px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: inline-block;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: row-resize;
+            color: inherit;
+        }
+        &:active {
+            cursor: row-resize;
+        }
     }
-    .dragger {
-      position: absolute;
-      top: 1px;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: inline-block;
-      font-size: 1.5rem;
-      font-weight: 600;
-      text-align: center;
-      cursor: row-resize;
-      color: inherit;
-    }
-    &:active {
-        cursor: row-resize;
-      }
-  }
 </style>
