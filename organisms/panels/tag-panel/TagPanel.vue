@@ -98,6 +98,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .tag-panel-title{
+        min-height: 100px;
+    };
     .panel-header{
         display: inline-flex;
         width: 100%;
