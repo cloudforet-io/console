@@ -60,8 +60,8 @@ export default {
             return Object.keys(this.data).map(key => ({
                 key,
                 value: this.data[key].count,
-                longitude: this.data[key].coordinates.longitude,
-                latitude: this.data[key].coordinates.latitude,
+                longitude: this.data[key].longitude,
+                latitude: this.data[key].latitude,
             }));
         },
     },

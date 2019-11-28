@@ -17,7 +17,8 @@
             </g>
             <g>
                 <g v-for="(d, idx) in chartData" :key="d.key">
-                    <circle v-tooltip="getTooltipOptions(d, idx, {
+                    <circle v-if="d.longitude !== null"
+                            v-tooltip="getTooltipOptions(d, idx, {
                                 content: generateTooltipTitle(d, idx, colors(idx))
                             })"
                             :cx="circleLoc([d.longitude, d.latitude])[0]"
