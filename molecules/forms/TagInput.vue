@@ -1,5 +1,5 @@
 <template>
-    <div class="p-tag-input">
+    <div class="p-tag-input" v-on="$listeners">
         <div class="tag-input-box tag-key-input">
             <p-input-text
                 class="tag-input"
