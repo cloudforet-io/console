@@ -164,9 +164,9 @@ export default {
                     position: sticky;
                     top: 0;
                     padding: .25rem 0 .25rem .75rem;
-                    background-color: $gray3 ;
-                    border-top: 1px solid $gray2;
-                    border-bottom: 1px solid $gray2;
+                    background-color: $white;
+                    border-top: 1px solid $dark;
+                    border-bottom: 1px solid $dark;
                     line-height: 1.5rem;
                     text-align: left;
                     letter-spacing: 0;
