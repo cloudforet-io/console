@@ -29,7 +29,7 @@
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary">
-                            Collect Data
+                            Create
                         </p-button>
                         <PDropdownMenuBtn class="left-toolbox-item"
                                           :menu="dropdown"
@@ -71,35 +71,9 @@
             <template #detail>
                 <collector-detail :item="items[selectIndex[0]]" />
             </template>
-        <!--            <template #data="{tabName}">-->
-        <!--                <PServerData-->
-        <!--                        :server-id="items[selectIndex[0]].server_id"-->
-        <!--                        :items="subData.items"-->
-        <!--                        :sort-by.sync="subData.sortBy"-->
-        <!--                        :sort-desc.sync="subData.sortDesc"-->
-        <!--                        :page-size.sync="subData.pageSize"-->
-        <!--                        :all-page="subData.allPage"-->
-        <!--                        :this-page.sync="subData.thisPage"-->
-        <!--                        :search-text.sync="subData.searchText"-->
-        <!--                        :loading="subData.loading"-->
-        <!--                        :get-server-sub-data="getServerSubData"-->
-        <!--                />-->
+        <!--            <template #credentials="{tabName}">-->
         <!--            </template>-->
-        <!--            <template #rawData="{tabName}">-->
-        <!--                <p-server-raw-data :item="items[selectIndex[0]]" />-->
-        <!--            </template>-->
-        <!--            <template #admin="{tabName}">-->
-        <!--                <p-server-admin :select-index="selectIndex"-->
-        <!--                                :items="admin.items"-->
-        <!--                                :sort-by.sync="admin.sortBy"-->
-        <!--                                :sort-desc.sync="admin.sortDesc"-->
-        <!--                                :page-size.sync="admin.pageSize"-->
-        <!--                                :all-page="admin.allPage"-->
-        <!--                                :this-page.sync="admin.thisPage"-->
-        <!--                                :search-text.sync="admin.searchText"-->
-        <!--                                :loading="admin.loading"-->
-        <!--                                :get-server-admin="getServerAdmin"-->
-        <!--                />-->
+        <!--            <template #jobs="{tabName}">-->
         <!--            </template>-->
         </PTab>
         <!--        <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">-->
@@ -111,35 +85,6 @@
         <!--                        :items="getSelectServerItems"-->
         <!--                        :col-copy="true"-->
         <!--                >-->
-        <!--                    <template v-slot:col-state-format="data">-->
-        <!--                        <p-status v-bind="serverStateFormatter(data.value)" />-->
-        <!--                    </template>-->
-        <!--                    <template />-->
-        <!--                    <template v-slot:col-updated_at-format="data">-->
-        <!--                        {{ timestampFormatter(data.value) }}-->
-        <!--                    </template>-->
-        <!--                    <template v-slot:col-core-format="data">-->
-        <!--                        {{ data.item.data.base.core }}-->
-        <!--                    </template>-->
-        <!--                    <template v-slot:col-memory-format="data">-->
-        <!--                        {{ data.item.data.base.memory }}-->
-        <!--                    </template>-->
-        <!--                    <template v-slot:col-pool-format="data">-->
-        <!--                        {{ data.item.pool_info ? data.item.pool_info.name :'' }}-->
-        <!--                    </template>-->
-        <!--                    <template v-slot:col-os_distro-format="data">-->
-        <!--                        {{ data.item.data.os.os_distro }}-->
-        <!--                    </template>-->
-        <!--                    <template v-slot:col-server_type-format="data">-->
-        <!--                        <PBadge v-bind="platformBadgeFormatter(data.value)">-->
-        <!--                            {{ data.value }}-->
-        <!--                        </PBadge>-->
-        <!--                    </template>-->
-        <!--                    <template v-slot:col-platform_type-format="data">-->
-        <!--                        <PBadge v-bind="platformBadgeFormatter(data.item.data.vm.platform_type)">-->
-        <!--                            {{ data.item.data.vm.platform_type }}-->
-        <!--                        </PBadge>-->
-        <!--                    </template>-->
         <!--                </p-data-table>-->
         <!--            </template>-->
         <!--            <template #admin="{tabName}">-->
@@ -165,7 +110,7 @@
 
 <script>
 import {
-    reactive, toRefs, ref, computed, watch,
+    reactive, toRefs, computed,
 } from '@vue/composition-api';
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/helper';
@@ -174,10 +119,8 @@ import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import PI from '@/components/atoms/icons/PI';
 import PStatus from '@/components/molecules/status/Status';
 import PButton from '@/components/atoms/buttons/Button';
-import PBadge from '@/components/atoms/badges/Badge';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
-const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 const PDropdownMenuBtn = () => import('@/components/organisms/buttons/dropdown/DropdownMenuBtn');
@@ -213,7 +156,7 @@ const setCollectorTable = (props, context) => {
     };
 };
 
-const setTableToolbox = (props, context, tableState) => {
+const setTableToolbox = (props, context) => {
     const navigationState = reactive({
         sortBy: '',
         sortDesc: true,
@@ -224,14 +167,13 @@ const setTableToolbox = (props, context, tableState) => {
 
     const state = reactive({
         dropdown: makeTrItems([
+            ['update', 'COMMON.BTN_UPT'],
+            [null, null, { type: 'divider' }],
+            ['enable', 'COMMON.BTN_ENABLE'],
+            ['disable', 'COMMON.BTN_DISABLE'],
             ['delete', 'COMMON.BTN_DELETE'],
             [null, null, { type: 'divider' }],
-            ['maintenance', 'COMMON.BTN_S_MANT'],
-            ['in-service', 'COMMON.BTN_S_SERV'],
-            ['closed', 'COMMON.BTN_S_CLOSE'],
-            [null, null, { type: 'divider' }],
-            ['project', 'COMMON.CHG_PRO'],
-            ['pool', 'COMMON.CHG_POOL'],
+            ['collectData', 'COMMON.COLLECT'],
         ], context.parent,
         { type: 'item', disabled: false }),
         clickMenuEvent(menuName) {
@@ -271,8 +213,8 @@ const setTabData = (props, context) => {
     const state = reactive({
         tabs: makeTrItems([
             ['detail', 'PANEL.DETAILS', { keepAlive: true }],
-            ['rawData', 'PANEL.CREDENTIAL', { keepAlive: true }],
-            ['admin', 'PANEL.JOBS'],
+            ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
+            ['jobs', 'PANEL.JOBS'],
         ], context.parent),
     });
     return {
@@ -303,10 +245,8 @@ export default {
         PHorizontalLayout,
         PToolboxTable,
         PButton,
-        PBadge,
         PDropdownMenuBtn,
         PTab,
-        PDataTable,
         PSearch,
         CollectorDetail,
     },
@@ -333,6 +273,13 @@ export default {
             .icon {
                 margin-right: 1rem;
             }
+        }
+
+        ul {
+            list-style-type: disc;
+        }
+        li {
+            display: list-item;
         }
     }
 
