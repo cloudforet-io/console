@@ -20,7 +20,7 @@
                 {{ scope.item.data.os.os_distro }}
             </template>
             <template #def-region-format="scope">
-                {{ scope.item.region_info.region_id }}
+                {{ scope.item.region_info ? scope.item.region_info.region_id : '' }}
             </template>
             <template #def-oArch-format="scope">
                 {{ scope.item.data.os.os_arch }}
@@ -32,16 +32,16 @@
                 {{ scope.item.data.base.kernel }}
             </template>
             <template #def-pool-format="scope">
-                {{ scope.item.pool_info.pool_id }}
+                {{ scope.item.pool_info ? scope.item.pool_info.pool_id : '' }}
             </template>
             <template #def-created_at-format="scope">
-                {{ timestampFormatter(scope.value) }}
+                {{ scope.value ? timestampFormatter(scope.value) : '' }}
             </template>
             <template #def-updated_at-format="scope">
-                {{ timestampFormatter(scope.value) }}
+                {{ scope.value ? timestampFormatter(scope.value) : '' }}
             </template>
             <template #def-deleted_at-format="scope">
-                {{ timestampFormatter(scope.value) }}
+                {{ scope.value ? timestampFormatter(scope.value) : '' }}
             </template>
         </p-info-panel>
         <p-info-panel info-title="VM" :defs="vmDefs" :item="getVm">
@@ -148,7 +148,7 @@ export default {
             timestampFormatter,
             serverStateFormatter,
             arrayFormatter,
-          platformBadgeFormatter,
+            platformBadgeFormatter,
             getVm: computed(() => (props.item ? props.item.data.vm : {})),
             getCompute: computed(() => (props.item ? props.item.data.compute : {})),
         };
