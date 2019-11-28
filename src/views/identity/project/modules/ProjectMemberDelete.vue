@@ -32,8 +32,10 @@
                     <template v-slot:col-email-format="data">
                         {{ data.item.user_info.email }}
                     </template>
-                    <template v-slot:col-tags-format="data">
-                        {{ getEmptyString(data.item.user_info.tags) }}
+                    <template v-slot:col-labels-format="data">
+                        <div>
+                            <PBadge class="p-label" :styleType="'gray2'" v-for="label in data.item.labels"> {{ getEmptyString(label) }}</PBadge>
+                        </div>
                     </template>
                 </p-data-table>
             </template>
@@ -51,13 +53,14 @@ import _ from 'lodash';
 import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
-
+import PBadge from '@/components/atoms/badges/Badge';
 export default {
     name: 'ProjectMemberDelete',
     events: ['close'],
     components: {
         PButtonModal,
         PDataTable,
+        PBadge
     },
     props: {
         referenceMember: {
@@ -114,7 +117,7 @@ export default {
                     name: 'email', label: this.tr('COMMON.EMAIL'),
                 },
                 {
-                    name: 'tags', label: this.tr('COMMON.TAG'),
+                    name: 'labels', label: this.tr('COMMON.LABELS'),
                 },
             ];
         },
@@ -170,7 +173,7 @@ export default {
             await this.$http.post(url, param).then(() => {
                 this.$notify({
                     group: 'noticeBottomRight',
-                    type: 'alert',
+                    type: 'success',
                     title: 'Success',
                     text: 'Selected item successfully Removed from Project Group',
                     duration: 3000,
@@ -196,6 +199,11 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+    .p-label {
+        margin-bottom:5px;
+        margin-right: 0.5rem;
+        color:$dark;
+    }
     .delete-alert{
         margin-bottom: 2rem;
         text-align: left;

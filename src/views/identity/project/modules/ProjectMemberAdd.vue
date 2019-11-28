@@ -61,14 +61,17 @@
                         <p-label class="input-title">
                             {{ tr('COMMON.LABELS') }}
                         </p-label>
-                        <p-text-input ref="labels" v-model="Label"
-                                      :style="{'boxShadow': 'none' } "
-                                      :disabled="releaseDisabled"
+                        <p-text-input ref="labels" v-model="label.input"
+                                      :style="{'border': `${getInvalidityHashTag}`, 'boxShadow': 'none' } "
                                       class="form-control"
                                       type="text"
                                       placeholder="  #Labels,"
                                       required
+                                      @keyup="removeCSS"
                         />
+                    </div>
+                    <div v-show="isValidHashTag" style="display:block" class="invalid-feedback">
+                        * {{ tr('IDENTITY.CHECK_HASH') }}
                     </div>
                 </div>
             </template>
@@ -116,7 +119,11 @@ export default {
             selectable: true,
             sortable: true,
             selectIndex: [],
-            Label: '',
+            label: {
+                input: '',
+                hashTagInvalidity: false,
+                border: '1px solid #EF3817',
+            },
             tablePage: {
                 sortBy: 'name',
                 sortDesc: true,
@@ -132,8 +139,11 @@ export default {
         };
     },
     computed: {
-        releaseDisabled() {
-            return !this.isEmpty(this.tagRelated.Tags);
+        getInvalidityHashTag() {
+            return this.label.hashTagInvalidity ? this.label.border : '';
+        },
+        isValidHashTag() {
+            return this.label.hashTagInvalidity;
         },
         getMemberModalTitle() {
             return this.tr('IDENTITY.ADD_ARG', [this.tr('COMMON.MEMBER')]);
@@ -159,6 +169,9 @@ export default {
 
     },
     methods: {
+        removeCSS() {
+            this.label.hashTagInvalidity = false;
+        },
         getDefaultQuery() {
             return {
                 query: defaultQuery(
@@ -185,6 +198,7 @@ export default {
             this.visible = false;
         },
         resetToBlank() {
+            this.label.input = '';
             this.searchText = null;
             this.users = [];
             this.tablePage = {
@@ -214,25 +228,34 @@ export default {
             });
         },
         checkValidity() {
-            const targets = this.Label.split(',');
+            const targets = this.label.input.split(',');
             const labelArr = [];
             targets.forEach((value) => {
-                const currernt = this.replaceAll(value, ' ', '');
-                if (currernt.startsWith('#')) {
-                    labelArr.push(currernt);
-                    return false;
+                const current = this.replaceAll(value, ' ', '');
+                if (current.startsWith('#')) {
+                    labelArr.push(current);
+                } else {
+                    this.label.hashTagInvalidity = true;
                 }
             });
-            return labelArr;
+            return this.label.hashTagInvalidity ? false : labelArr;
         },
         async addUserOnProject() {
             const selectedNodeDT = this.$parent.selectedNode.node.data;
             const selectedId = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
             const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/add`;
             const param = { users: _.map(this.tagRelated.Tags, 'text'), ...selectedId };
-            if (this.isEmpty(this.Label)) {
 
+            if (!this.isEmpty(this.label.input)) {
+                const isValid = this.checkValidity();
+                if (isValid === false) {
+                    return false;
+                }
+                param.labels = isValid;
+            } else if (this.isEmpty(param.users)) {
+                return false;
             }
+
             await this.$http.post(url, param).then(() => {
                 this.$parent.getMembers();
                 this.tagRelated.Tags = [];

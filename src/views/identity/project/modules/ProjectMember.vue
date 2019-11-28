@@ -21,6 +21,9 @@
                          :this-page.sync="tablePage.thisPage"
                          :select-index.sync="selectIndex"
                          :page-size.sync="tablePage.pageSize"
+                         :loading="loading"
+                         :use-spinner-loading="true"
+                         :use-cursor-loading="true"
                          @changePageSize="changePageSize"
                          @changeSort="getMembers"
                          @changePageNumber="getMembers"
@@ -58,7 +61,11 @@
                 {{ data.item.user_info.group }}
             </template>
             <template v-slot:col-labels-format="data">
-                {{ getEmptyString(data.item.labels) }}
+                <div>
+                    <PBadge v-for="label in data.item.labels" class="p-label" :style-type="'gray2'">
+                        {{ getEmptyString(label) }}
+                    </PBadge>
+                </div>
             </template>
         </p-toolbox-table>
     </div>
@@ -71,6 +78,7 @@ import ProjectMemberAdd from '@/views/identity/project/modules/ProjectMemberAdd'
 import ProjectMemberDelete from '@/views/identity/project/modules/ProjectMemberDelete';
 import { defaultQuery } from '@/lib/api';
 import PI from '@/components/atoms/icons/PI';
+import PBadge from '@/components/atoms/badges/Badge';
 
 export default {
     name: 'ProjectMember',
@@ -80,6 +88,7 @@ export default {
         PI,
         ProjectMemberAdd,
         ProjectMemberDelete,
+        PBadge,
     },
     props: {
         tabBasicHeight: {
@@ -105,6 +114,7 @@ export default {
             selectable: true,
             sortable: true,
             selectIndex: [],
+            loading: false,
             tablePage: {
                 sortBy: 'user_id',
                 sortDesc: false,
@@ -116,7 +126,6 @@ export default {
     },
     computed: {
         getPropHeight() {
-            console.log('############', this.tabBasicHeight);
             return this.tabBasicHeight;
         },
         getBindMember() {
@@ -131,19 +140,19 @@ export default {
         fields() {
             return [
                 {
-                    name: 'user_id', label: this.tr('COMMON.UID'),
+                    name: 'user_id', label: this.tr('COMMON.UID'), size: '145px',
                 },
                 {
-                    name: 'name', label: this.tr('COMMON.NAME'),
+                    name: 'name', label: this.tr('COMMON.NAME'), size: '200px',
                 },
                 {
-                    name: 'email', label: this.tr('COMMON.EMAIL'),
+                    name: 'email', label: this.tr('COMMON.EMAIL'), size: '150px',
                 },
                 {
-                    name: 'group', label: this.tr('COMMON.GROUP'),
+                    name: 'group', label: this.tr('COMMON.GROUP'), size: '120px',
                 },
                 {
-                    name: 'labels', label: this.tr('COMMON.LABELS'),
+                    name: 'labels', label: this.tr('COMMON.LABELS'), size: '120px',
                 },
             ];
         },
@@ -177,6 +186,7 @@ export default {
             this.members = [];
         },
         async listMembers() {
+            this.loading = true;
             const query = this.getDefaultQuery();
             const selectedNodeDT = this.selectedNode.node.data;
             const param = selectedNodeDT.item_type === 'PROJECT_GROUP' ? { project_group_id: selectedNodeDT.id, ...query } : { project_id: selectedNodeDT.id, ...query };
@@ -189,6 +199,7 @@ export default {
             }).catch((error) => {
                 console.error(error);
             });
+            this.loading = false;
         },
         getSelectedInfo(key) {
             const selectedObj = this.$attrs['selected-data'].node;
@@ -266,6 +277,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .p-label {
+        margin-bottom:5px;
+        margin-right: 0.5rem;
+        color:$dark;
+    }
     .base-table {
         @extend %sheet;
     }

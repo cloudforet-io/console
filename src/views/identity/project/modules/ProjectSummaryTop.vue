@@ -1,12 +1,5 @@
 <template>
     <div class="row" :style="responsiveStyle">
-        <transition name="fade-in">
-            <div v-if="!isVisible" class="spinner-container">
-                <p-lottie class="spinner"
-                          :size="1.5" :auto="true" name="spinner"
-                />
-            </div>
-        </transition>
         <InfoPanel v-show="isVisible"
                    :info-title="topPanelTitle"
                    :item="item"
