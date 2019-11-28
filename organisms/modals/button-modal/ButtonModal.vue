@@ -35,6 +35,7 @@
             <p-button
                 v-if="footerCancelButtonVisible"
                 v-bind="footerCancelButtonBind"
+                :class="{'get-margin-right':getCancelButtonMarginRight}"
                 @click="onCancelClick"
             >
                 <slot name="close-button">
@@ -43,6 +44,7 @@
             </p-button>
             <p-button v-if="footerConfirmButtonVisible"
                       v-bind="footerConfirmButtonBind"
+                      :class="{'get-margin-right':footerConfirmButtonVisible}"
                       @click="onConfirmClick"
             >
                 <slot name="confirm-button">
@@ -54,6 +56,7 @@
 </template>
 
 <script>
+import { computed } from '@vue/composition-api';
 import PButton from '../../../atoms/buttons/Button';
 import PContentModal, { setup as contentModalSetup } from '../content-modal/ContentModal';
 
@@ -72,11 +75,13 @@ export const setup = (props, context) => {
     const onConfirmClick = () => {
         context.emit('confirm');
     };
+    const getCancelButtonMarginRight = computed(() => !props.footerConfirmButtonVisible && props.footerCancelButtonVisible);
     return {
         ...state,
         onCloseClick,
         onCancelClick,
         onConfirmClick,
+        getCancelButtonMarginRight,
     };
 };
 
@@ -130,5 +135,8 @@ export default {
     .close-modal-btn {
         cursor: pointer;
         color: $dark;
+    }
+    .get-margin-right {
+        margin-right: 1rem;
     }
 </style>
