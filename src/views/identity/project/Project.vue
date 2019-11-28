@@ -30,12 +30,10 @@
                     <template #container="{ height }">
                         <PTab :tabs="tabsData.tabs" :active-tab.sync="tabsData.activeTab">
                             <template #details="{tabName}">
-                                <keep-alive>
-                                    <project-summary-top ref="detailsTop"
-                                                         :selected-node="getSelectedNodeAndTree"
-                                                         :responsive-style="{'height': height-100+'px', 'overflow-y':'auto'}"
-                                    />
-                                </keep-alive>
+                                <project-summary-top ref="detailsTop"
+                                                     :selected-node="getSelectedNodeAndTree"
+                                                     :responsive-style="{'height': height-100+'px', 'overflow-y':'auto'}"
+                                />
                             </template>
                             <template #member="{tabName}">
                                 <project-member :tab-basic-height="height"
@@ -87,8 +85,8 @@ export default {
         return {
             tabsData: {
                 tabs: [
-                    { name: 'details', label: 'Details' },
-                    { name: 'member', label: 'Member' },
+                    { name: 'details', label: 'Details', keepAlive: true },
+                    { name: 'member', label: 'Member', keepAlive: true },
                 ],
                 activeTab: 'details',
             },

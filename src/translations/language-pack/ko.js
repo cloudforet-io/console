@@ -233,6 +233,7 @@ export const ko = {
         UPT_ARG: '{0} 갱신하기',
         SELECT_ARG: '선택된 {0}',
         PARENT_ARG: '부모 {0}',
+        CHECK_HASH: ' 잘못된 해시태그 포맷입니다.',
         CRT_SUCC_ARG: '새로운 {0} 을/를 생성에 성공하였습니다.',
         CRT_FAIL_ARG: '{0} 을/를 생성에 실패하였습니다.',
         UPT_SUCC_ARG: '{0} 을/를 갱신였습니다.',

@@ -238,6 +238,7 @@ export const en = {
         DEL_SUCC_ARG: '{0} has been successfully deleted.',
         DEL_FAIL_ARG: 'Fail to delete {0}. Please, check your action.',
         DEL_FAIL_CHI_ARG: 'Fail to delete {0} due to child Project group/project underneath.',
+        CHECK_HASH: 'Please, Check format for \'Hash Tag\'.',
         SELECT_ARG: 'Selected {0}',
         PARENT_ARG: 'Parent {0}',
         SCH_PAC_DT: 'Search members by its user name or others',

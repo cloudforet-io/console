@@ -23,12 +23,13 @@
                 :fields="fieldsData"
             >
                 <p-tr>
-                    <p-th v-if="selectable">
+                    <p-th v-if="selectable" style="width: 16px;">
                         <PCheckBox v-model="allState" @change="selectAllToggle" />
                     </p-th>
                     <p-th
                         v-for="(field,index) in fieldsData"
                         :key="index"
+                        :style="{ width: getColWidth(field.size), 'text-align' : getAligning(field.align)}"
                         :class="{'fix-width': colCopy}"
                         @click="theadClick(field,index,$event)"
                         @mouseenter="thHoverIndex=index"
@@ -317,6 +318,12 @@ export default {
         }
     },
     methods: {
+        getAligning(align){
+            return this.isEmpty(align) ? 'left' : align;
+        },
+        getColWidth(size) {
+            return this.isEmpty(size) ? 'auto' : size;
+        },
         makeTableText(el) {
             let result = '';
             const startIdx = this.selectable ? 1 : 0;

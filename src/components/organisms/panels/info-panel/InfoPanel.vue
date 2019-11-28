@@ -1,5 +1,5 @@
 <template>
-    <p-panel-top :panel-title="infoTitle" :panel-title-style="infoTitleStyle">
+    <p-panel-top :panel-title="infoTitle" :panel-title-style="infoTitleStyle" class="info-panel-basic">
         <template #body>
             <p-panel-content :defs="defs" :item="item">
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -45,4 +45,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .info-panel-basic {
+    min-height: 100px}
 </style>
