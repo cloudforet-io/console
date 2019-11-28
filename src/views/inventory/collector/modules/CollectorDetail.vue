@@ -28,37 +28,38 @@
                 {{ timestampFormatter(data.value) }}
             </template>
         </p-info-panel>
+
         <p-tag-panel ref="tagPanel" :tags.sync="tags" @confirm="confirm" />
+
+        <p-info-panel class="last-panel" info-title="Filter Format">
+            <p-data-table
+                :fields="fields"
+                :sortable="false"
+                :selectable="false"
+                :items="filterItems"
+                :col-copy="true"
+            />
+        </p-info-panel>
     </div>
 </template>
 
 <script>
 import {
-    computed, ref, watch,
+    ref, watch, computed, reactive, toRefs,
 } from '@vue/composition-api';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
-import PBadge from '@/components/atoms/badges/Badge';
 import PStatus from '@/components/molecules/status/Status';
 import PI from '@/components/atoms/icons/PI';
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { makeTrItems } from '@/lib/helper';
+import PDataTable from '@/components/organisms/tables/data-table/DataTable';
 
-export default {
-    name: 'PServerDetail',
-    components: {
-        PI, PInfoPanel, PTagPanel, PBadge, PStatus,
-    },
-    props: {
-        item: {
-            type: Object,
-            default: () => {},
-        },
-    },
-    setup(props, { parent }) {
-        const baseDefs = makeTrItems([
+const setBaseInfoStates = (props, parent) => {
+    const state = reactive({
+        baseDefs: makeTrItems([
             ['collector_id', 'COMMON.ID'],
             ['name', 'COMMON.NAME'],
             ['state', 'COMMON.STATE'],
@@ -67,40 +68,94 @@ export default {
             ['default_collect_state', 'COMMON.DEF_COL_STATE'],
             ['last_collected_at', 'COMMON.LAST_COL'],
             ['created_at', 'COMMON.CREATED'],
-        ], parent, { copyFlag: true });
-        const tags = ref({ ...props.item.tags });
-        watch(() => props.item, (value) => {
-            tags.value = value.tags;
-        });
-        const tagPanel = ref(null);
-        const resetTag = () => {
-            tagPanel.value.resetTag();
-        };
-        mountBusEvent(collectorEventBus, 'resetTags', resetTag);
+        ], parent, { copyFlag: true }),
+    });
 
+    return {
+        ...toRefs(state),
+    };
+};
+
+const setTagStates = (props, parent) => {
+    const state = reactive({
+        tags: props.item.tags,
+        confirm(...event) {
+            collectorEventBus.$emit('confirmTags', props.item.collector_id, ...event);
+        },
+        tagPanel: null,
+    });
+
+    watch(() => props.item, (value) => {
+        state.tags = value.tags;
+    });
+
+    const resetTag = () => {
+        state.tagPanel.resetTag();
+    };
+    mountBusEvent(collectorEventBus, 'resetTags', resetTag);
+
+    return {
+        ...toRefs(state),
+    };
+};
+
+const setFilterFormatStates = (props, parent) => {
+    const state = reactive({
+        fields: makeTrItems([
+            ['name', 'COMMON.NAME'],
+            ['key', 'COMMON.KEY'],
+            ['type', 'COMMON.TYPE'],
+            ['resource_type', 'COMMON.RESOURCE'],
+        ],
+        parent),
+        filterItems: computed(() => props.item.plugin_info.options.filter_format || []),
+    });
+
+    return {
+        timestampFormatter,
+        collectorStateFormatter,
+        ...toRefs(state),
+    };
+};
+
+export default {
+    name: 'PServerDetail',
+    components: {
+        PI, PInfoPanel, PTagPanel, PDataTable, PStatus,
+    },
+    props: {
+        item: {
+            type: Object,
+            default: () => {},
+        },
+    },
+    setup(props, { parent }) {
+        const baseInfoStates = setBaseInfoStates(props, parent);
+        const tagStates = setTagStates(props, parent);
+        const filterFormatStates = setFilterFormatStates(props, parent);
         return {
-            baseDefs,
-            tags,
-            tagPanel,
-            confirm(...event) {
-                collectorEventBus.$emit('confirmTags', props.item.collector_id, ...event);
-            },
-            timestampFormatter,
-            collectorStateFormatter,
-            //   serverStateFormatter,
-            //   arrayFormatter,
-            // platformBadgeFormatter,
+            ...baseInfoStates,
+            ...tagStates,
+            ...filterFormatStates,
         };
     },
 };
 </script>
 
 <style lang="scss" scoped>
-
     .name {
         .icon {
             margin-right: 1rem;
         }
+    }
+    ul {
+        list-style-type: disc;
+    }
+    li {
+        display: list-item;
+    }
+    .last-panel {
+        margin-top: 2rem;
     }
 
 </style>
