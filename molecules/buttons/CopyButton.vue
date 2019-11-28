@@ -1,0 +1,51 @@
+<template>
+    <span class="copy-btn-container">
+        <p-button
+            class="copy-btn"
+            outline
+            style-type="secondary"
+            size="sm"
+            @click="copyText"
+        >
+            {{ tr('COMMON.COPY') }}
+        </p-button>
+    </span>
+</template>
+
+<script>
+import PButton from '@/components/atoms/buttons/Button';
+import { selectToCopyToClipboard } from '@/lib/util';
+
+export default {
+    name: 'PCopyButton',
+    components: { PButton },
+    props: {
+        value: {
+            type: String,
+            default: '',
+        },
+    },
+    methods: {
+        copyText() {
+            selectToCopyToClipboard(this.value);
+        },
+    },
+};
+</script>
+
+<style lang="scss" scoped>
+    .copy-btn-container {
+        position: relative;
+        min-width: 55px;
+        .copy-btn {
+            display: inline-block;
+            position: absolute;
+            top: -.3rem;
+            left: 0.75rem;
+            padding: .3rem .75rem;
+            font-size: .75rem;
+            line-height: .875rem;
+            vertical-align: middle;
+        }
+    }
+</style>
