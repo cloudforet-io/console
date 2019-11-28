@@ -1,7 +1,7 @@
 <template>
     <span class="copy-btn-container">
         <p-button
-            class="copy-btn"
+            class="p-copy-btn"
             outline
             style-type="secondary"
             size="sm"
@@ -37,15 +37,15 @@ export default {
     .copy-btn-container {
         position: relative;
         min-width: 55px;
-        .copy-btn {
-            display: inline-block;
-            position: absolute;
-            top: -.3rem;
-            left: 0.75rem;
-            padding: .3rem .75rem;
-            font-size: .75rem;
-            line-height: .875rem;
-            vertical-align: middle;
-        }
+    }
+    .p-copy-btn {
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        left: 0.75rem;
+        padding: .3rem .75rem;
+        font-size: .75rem;
+        line-height: .875rem;
+        vertical-align: middle;
     }
 </style>
