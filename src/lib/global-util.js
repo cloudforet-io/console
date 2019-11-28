@@ -380,7 +380,8 @@ export const Util = {
             if (!this.isEmpty(mxTimezones[tz])) {
                 options.timeZone = tz;
             }
-            const DateTime = this.isEmpty(tzr) ? new Date(ts * 1000).toLocaleString('sq-AL', options).substring(0, 19) : new Date(ts * 1000).toLocaleString('sq-AL', options);
+            const timeStamps = new Date(ts * 1000).toLocaleString('en-US', options).split(' ');
+            const DateTime = this.isEmpty(tzr) ? `${this.getTimeStampFormatter(timeStamps[0])} ${timeStamps[1]}` : new Date(ts * 1000).toLocaleString('en-US', options)
             return DateTime;
         },
         /** ********************************************************************************
@@ -389,8 +390,9 @@ export const Util = {
          * Output  => Node
          * Description:  return tree array of object which suits for BaseTree
          ********************************************************************************* */
-        getTimeStampfromDate() {
-            return 'a';
+        getTimeStampFormatter(date) {
+            const DateArr = date.split('/');
+            return DateArr.length === 3 ? `${this.replaceAll(DateArr[2], ',', '')}-${DateArr[0]}-${DateArr[1]}` : date;
         },
         /** ********************************************************************************
          * Name       : validateLength

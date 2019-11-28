@@ -24,7 +24,6 @@ export default {
     components: {
         InfoPanel,
         PTagPanel,
-        PLottie,
     },
     props: {
         selectedNode: {
