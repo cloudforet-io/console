@@ -36,13 +36,11 @@ import _ from 'lodash';
 import PDt from '@/components/atoms/definition/dt/Dt';
 import PDl from '@/components/atoms/definition/dl/Dl';
 import PDd from '@/components/atoms/definition/dd/Dd';
-import PButton from '@/components/atoms/buttons/Button';
 import PCopyButton from '@/components/molecules/buttons/CopyButton';
 
 export default {
     name: 'PPanelContent',
     components: {
-        PButton,
         PCopyButton,
         PDt,
         PDl,
@@ -130,9 +128,12 @@ export default {
                 margin: 0;
             }
         }
-        .copy-btn {
+        .copy-btn::v-deep {
             flex: 1;
             height: 1rem;
+            .p-copy-btn {
+                top: -.3rem;
+            }
         }
     }
 

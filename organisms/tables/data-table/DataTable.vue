@@ -35,21 +35,13 @@
                         @mouseleave="thHoverIndex=null"
                     >
                         <span class="th-contents">
-                            <span key="colName"
-                                  :style="{visibility: isThOver(index) ? 'hidden' : 'visible'}"
-                            >
+                            <span :style="{visibility: isThOver(index) ? 'hidden' : 'visible'}">
                                 {{ field.label ? field.label : field.name }}
                             </span>
-                            <p-button v-if="isThOver(index)"
-                                      key="copyBtn"
-                                      class="copy-btn"
-                                      outline
-                                      :style-type="'secondary'"
-                                      :size="'sm'"
-                                      @click="clickColCopy(index)"
-                            >
-                                {{ tr('COMMON.COPY') }}
-                            </p-button>
+                            <p-copy-button v-if="isThOver(index)"
+                                           class="copy-btn"
+                                           :value="clickColCopy(index)"
+                            />
                             <template v-if="sortable&&field.sortable">
                                 <p-i
                                     v-if="sortable&&field.name==sortBy"
@@ -154,12 +146,12 @@ import PLottie from '@/components/molecules/lottie/PLottie';
 import { selectToCopyToClipboard } from '@/lib/util';
 
 const PCheckBox = () => import('@/components/molecules/forms/CheckBox');
-const PButton = () => import('@/components/atoms/buttons/Button');
+const PCopyButton = () => import('@/components/molecules/buttons/CopyButton');
 
 export default {
     name: 'PDataTable',
     components: {
-        PTable, PTd, PTh, PTr, PI, PCheckBox, PButton, PLottie,
+        PTable, PTd, PTh, PTr, PI, PCheckBox, PCopyButton, PLottie,
     },
     events: [
         'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
@@ -425,15 +417,16 @@ export default {
         },
         clickColCopy(idx) {
             let result = '';
-            this.dragSelectAbles.forEach((el) => {
-                el.children.forEach((td, colIdx) => {
+            const arr = Array.from(this.dragSelectAbles);
+            arr.forEach((el) => {
+                const children = Array.from(el.children);
+                children.forEach((td, colIdx) => {
                     if (colIdx === idx) {
                         result += `${td.innerText}\t`;
                     }
                 });
             });
-            console.log('copy data', result);
-            selectToCopyToClipboard(result);
+            return result;
         },
     },
 };
@@ -487,15 +480,11 @@ export default {
     .fade-enter-active {
         transition: opacity 0s;
     }
-    .copy-btn {
-        display: inline-block;
-        position: absolute;
-        top: .25rem;
-        left: .75rem;
-        padding: .3rem .75rem;
-        font-size: .75rem;
-        line-height: .875rem;
-        vertical-align: middle;
+    .copy-btn::v-deep {
+        position: absolute !important;
+        .p-copy-btn {
+            left: 0;
+        }
     }
     .no-data-row{
         &:hover{
