@@ -12,6 +12,7 @@
                          :shadow="false"
                          :border="false"
                          :hover="true"
+                         :responsive-style="{'height': getPropHeight + 'px', 'overflow-y':'auto'}"
                          :selectable="selectable"
                          :sortable="sortable"
                          :sort-by.sync="tablePage.sortBy"
@@ -56,8 +57,8 @@
             <template v-slot:col-group-format="data">
                 {{ data.item.user_info.group }}
             </template>
-            <template v-slot:col-roles-format="data">
-                {{ getEmptyString(data.item.user_info.roles) }}
+            <template v-slot:col-labels-format="data">
+                {{ getEmptyString(data.item.labels) }}
             </template>
         </p-toolbox-table>
     </div>
@@ -78,9 +79,13 @@ export default {
         PButton,
         PI,
         ProjectMemberAdd,
-        ProjectMemberDelete
+        ProjectMemberDelete,
     },
     props: {
+        tabBasicHeight: {
+            type: Number,
+            default: 40,
+        },
         selectedNode: {
             type: Object,
             default: null,
@@ -110,6 +115,10 @@ export default {
         };
     },
     computed: {
+        getPropHeight() {
+            console.log('############', this.tabBasicHeight);
+            return this.tabBasicHeight;
+        },
         getBindMember() {
             return _.map(this.members, 'user_info.user_id');
         },
@@ -134,7 +143,7 @@ export default {
                     name: 'group', label: this.tr('COMMON.GROUP'),
                 },
                 {
-                    name: 'roles', label: this.tr('COMMON.ROLE'),
+                    name: 'labels', label: this.tr('COMMON.LABELS'),
                 },
             ];
         },
@@ -143,7 +152,7 @@ export default {
         this.listMembers();
     },
     methods: {
-        getEmptyString(object){
+        getEmptyString(object) {
             return this.isEmpty(object) ? '' : object;
         },
         getDefaultQuery() {

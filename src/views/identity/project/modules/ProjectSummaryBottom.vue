@@ -54,6 +54,7 @@ export default {
     },
     mounted() {
         this.initSummaryData();
+        this.getResourcesByRegionData();
         this.getServerByTypeData();
     },
     methods: {
@@ -70,7 +71,7 @@ export default {
                 console.error(e);
             }
         },
-        async getServerByTypeData() {
+        async getResourcesByRegionData() {
             const selectedNodeDT = this.selectedNode.node.data;
             try {
                 const serverDT = await this.$http.post('/statistics/server-type', { project_id: selectedNodeDT.id, item_type: 'server_type' });
@@ -84,6 +85,16 @@ export default {
                     osTypeData: osTypeDT.data,
                     hypervisorTypeData: hypervisorTypeDT.data,
                 };
+
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        async getServerByTypeData() {
+            const selectedNodeDT = this.selectedNode.node.data;
+            try {
+                const resourceTypeDT = await this.$http.post('/statistics/datacenter-items', { project_id: selectedNodeDT.id, item_type: 'server'  });
+                this.resourcesByRegionData = resourceTypeDT.data;
             } catch (e) {
                 console.error(e);
             }
