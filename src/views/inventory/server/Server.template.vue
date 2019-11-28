@@ -1,6 +1,6 @@
 <template>
-    <div class="animated fadeIn server">
-        <BaseDragHorizontal>
+    <div class="server">
+        <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
                     ref="toolbox"
@@ -74,7 +74,7 @@
                     </template>
                 </p-toolbox-table>
             </template>
-        </BaseDragHorizontal>
+        </p-horizontal-layout>
         <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
             <template #detail="{tabName}">
                 <p-server-detail ref="serverDetail"
@@ -164,7 +164,7 @@ import { makeTrItems } from '@/lib/helper';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
-const BaseDragHorizontal = () => import('@/components/base/drag/BaseDragHorizontal');
+const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout')
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 const PDropdownMenuBtn = () => import('@/components/organisms/buttons/dropdown/DropdownMenuBtn');
 const PSearch = () => import('@/components/molecules/search/Search');
@@ -342,7 +342,7 @@ export default {
     name: 'ServerTemplate',
     components: {
         PStatus,
-        BaseDragHorizontal,
+        PHorizontalLayout,
         PToolboxTable,
         PButton,
         PBadge,

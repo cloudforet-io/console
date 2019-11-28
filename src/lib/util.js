@@ -24,16 +24,15 @@ export const colorset = Object.freeze([
 export const serverStateColor = Object.freeze({
     INSERVICE: {
         iconColor: styles.safe,
-        textColor: styles.safe,
+        textColor: styles.dark,
     },
     PENDING: {
         iconColor: styles.other1,
-        textColor: styles.other1,
+        textColor: styles.dark,
     },
     MAINTENANCE: {
         iconColor: styles.other2,
-        textColor: styles.other2,
-
+        textColor: styles.dark,
     },
     CLOSED: {
         iconColor: styles.alert,
@@ -42,6 +41,18 @@ export const serverStateColor = Object.freeze({
     DELETED: {
         iconColor: styles.gray,
         textColor: styles.gray,
+    },
+});
+
+
+export const collectorStateColor = Object.freeze({
+    ENABLED: {
+        iconColor: styles.safe,
+        textColor: styles.dark,
+    },
+    DISABLED: {
+        iconColor: styles.alert,
+        textColor: styles.alert,
     },
 });
 
@@ -74,6 +85,7 @@ export const platformBadgeFormatter = (value) => {
 };
 export const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
 // from @/lib/global-util.js
+export const collectorStateFormatter = ColorBindFactory(collectorStateColor, value => value.toLowerCase());
 
 /** @function
  * @name isEmpty
