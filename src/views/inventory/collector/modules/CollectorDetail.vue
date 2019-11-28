@@ -11,11 +11,11 @@
                 <p-status v-bind="collectorStateFormatter(data.value)" />
             </template>
             <template #def-plugin_info-format="data">
-                <ul v-if="data.value.options && data.value.options.supported_resource_type">
-                    <li v-for="(d, i) in data.value.options.supported_resource_type" :key="i">
+                <template v-if="data.value.options && data.value.options.supported_resource_type">
+                    <div v-for="(d, i) in data.value.options.supported_resource_type" :key="i">
                         {{ d }}
-                    </li>
-                </ul>
+                    </div>
+                </template>
                 <span v-else />
             </template>
             <template #def-default_collect_state-format="data">
@@ -148,14 +148,4 @@ export default {
             margin-right: 1rem;
         }
     }
-    ul {
-        list-style-type: disc;
-    }
-    li {
-        display: list-item;
-    }
-    .last-panel {
-        margin-top: 2rem;
-    }
-
 </style>
