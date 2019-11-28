@@ -73,7 +73,7 @@
                     />
                 </p-td>
             </p-tr>
-            <p-tr v-if="!loading&&items.length === 0" class="no-data-row">
+            <p-tr v-if="showNoData" class="no-data-row">
                 <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                     No Data
                 </p-td>
@@ -261,6 +261,15 @@ export default {
         },
         dragSelectAbles() {
             return this.selectArea.children[0].children[1].children;
+        },
+        showNoData() {
+            if (this.items.length === 0) {
+                if (this.useSpinnerLoading && this.loading) {
+                    return false;
+                }
+                return true;
+            }
+            return false;
         },
     },
     watch: {
