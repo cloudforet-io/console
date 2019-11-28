@@ -66,11 +66,16 @@
             </slot>
         </template>
         <template #body>
-            <p-tr v-if="loading&&useSpinnerLoading">
-                <p-td :colspan="selectable? fieldsData.length +1 :fieldsData.length">
+            <p-tr v-if="loading&&useSpinnerLoading" class="no-data-row">
+                <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                     <p-lottie name="spinner" :size="2"
                               :auto="true"
                     />
+                </p-td>
+            </p-tr>
+            <p-tr v-if="!loading&&items.length === 0" class="no-data-row">
+                <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
+                    No Data
                 </p-td>
             </p-tr>
             <slot
@@ -290,7 +295,6 @@ export default {
                 window.addEventListener('keydown', this.copy);
             }
             if (this.loading) {
-                console.log('on loading startup');
                 document.body.style.cursor = 'progress';
             }
         }
@@ -304,10 +308,11 @@ export default {
     methods: {
         makeTableText(el) {
             let result = '';
-            el.children.forEach((td, idx) => {
-                if (this.selectable && idx === 0) { return; }
-                result += `${td.innerText}\t`;
-            });
+            const startIdx = this.selectable ? 1 : 0;
+            const tds = el.children;
+            for (let idx = startIdx; idx < el.childElementCount; idx++) {
+                result += `${tds[idx].innerText}\t`;
+            }
             return `${result}\n`;
         },
         copy(event) {
@@ -427,7 +432,7 @@ export default {
 <style lang="scss" scoped>
 
     %selected-row {
-        background-color: $secondary2;
+        background-color: $primary3 !important;
         td {
             color: $secondary;
         }
@@ -476,4 +481,17 @@ export default {
         line-height: .875rem;
         vertical-align: middle;
     }
+    .no-data-row{
+        &:hover{
+            background-color: initial !important;
+        }
+        .no-data{
+            text-align: center;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            color: $primary2;
+            font: 24px/32px Arial;
+        }
+    }
+
 </style>
