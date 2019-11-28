@@ -8,10 +8,10 @@
             <thead :class="theadClassObject" :style="theadStyle">
                 <slot name="head" />
             </thead>
-            <tbody :class="theadClassObject" :style="tbodyStyle">
+            <tbody :class="tbodyClassObject" :style="tbodyStyle">
                 <slot name="body" />
             </tbody>
-            <tfoot :class="theadClassObject" :style="tfootStyle">
+            <tfoot :class="tfootClassObject" :style="tfootStyle">
                 <slot name="foot" />
             </tfoot>
         </table>
@@ -59,7 +59,7 @@ export default {
         },
         striped: {
             type: Boolean,
-            default: false,
+            default: true,
         },
         bord: {
             type: Boolean,
@@ -180,10 +180,10 @@ export default {
         }
     }
 
-    .table-striped tbody tr:nth-of-type(odd) {
+    .table-striped tbody tr:nth-of-type(even) {
         @extend %striped-row;
         &:hover {
-            @extend %striped-row;
+            @extend %hover;
         }
     }
 
