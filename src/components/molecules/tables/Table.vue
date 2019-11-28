@@ -8,10 +8,10 @@
             <thead :class="theadClassObject" :style="theadStyle">
                 <slot name="head" />
             </thead>
-            <tbody :class="tbodyClassObject" :style="tbodyStyle">
+            <tbody :class="tbodyClass" :style="tbodyStyle">
                 <slot name="body" />
             </tbody>
-            <tfoot :class="tfootClassObject" :style="tfootStyle">
+            <tfoot :class="tfootClass" :style="tfootStyle">
                 <slot name="foot" />
             </tfoot>
         </table>
@@ -57,6 +57,15 @@ export default {
             type: Object,
             default: null,
         },
+        tbodyClass: {
+            type: Object,
+            default: null,
+        },
+        tfootClass: {
+            type: Object,
+            default: null,
+        },
+
         striped: {
             type: Boolean,
             default: true,
