@@ -1,6 +1,6 @@
 <template>
-    <div class="animated fadeIn server">
-        <BaseDragHorizontal>
+    <div class="server">
+        <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
                     ref="toolbox"
@@ -74,7 +74,7 @@
                     </template>
                 </p-toolbox-table>
             </template>
-        </BaseDragHorizontal>
+        </p-horizontal-layout>
         <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
             <template #detail="{tabName}">
                 <p-server-detail ref="serverDetail"
@@ -117,7 +117,7 @@
         <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
             <template #data="{tabName}">
                 <p-data-table
-                    :fields="fields"
+                    :fields="multiSelectFields"
                     :sortable="false"
                     :selectable="false"
                     :items="getSelectServerItems"
@@ -127,31 +127,6 @@
                         <p-status v-bind="serverStateFormatter(data.value)" />
                     </template>
                     <template />
-                    <template v-slot:col-updated_at-format="data">
-                        {{ timestampFormatter(data.value) }}
-                    </template>
-                    <template v-slot:col-core-format="data">
-                        {{ data.item.data.base.core }}
-                    </template>
-                    <template v-slot:col-memory-format="data">
-                        {{ data.item.data.base.memory }}
-                    </template>
-                    <template v-slot:col-pool-format="data">
-                        {{ data.item.pool_info ? data.item.pool_info.name :'' }}
-                    </template>
-                    <template v-slot:col-os_distro-format="data">
-                        {{ data.item.data.os.os_distro }}
-                    </template>
-                    <template v-slot:col-server_type-format="data">
-                        <PBadge v-bind="platformBadgeFormatter(data.value)">
-                            {{ data.value }}
-                        </PBadge>
-                    </template>
-                    <template v-slot:col-platform_type-format="data">
-                        <PBadge v-bind="platformBadgeFormatter(data.item.data.vm.platform_type)">
-                            {{ data.item.data.vm.platform_type }}
-                        </PBadge>
-                    </template>
                 </p-data-table>
             </template>
             <template #admin="{tabName}">
@@ -189,7 +164,7 @@ import { makeTrItems } from '@/lib/helper';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
-const BaseDragHorizontal = () => import('@/components/base/drag/BaseDragHorizontal');
+const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout')
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 const PDropdownMenuBtn = () => import('@/components/organisms/buttons/dropdown/DropdownMenuBtn');
 const PSearch = () => import('@/components/molecules/search/Search');
@@ -212,6 +187,13 @@ export const serverTableReactive = parent => reactive({
         ['project', 'COMMON.PROJ'],
         ['pool', 'COMMON.POOL'],
         ['updated_at', 'COMMON.UPDATE'],
+    ],
+    parent),
+    multiSelectFields: makeTrItems([
+        ['name', 'COMMON.NAME'],
+        ['state', 'COMMON.STATE'],
+        ['primary_ip_address', 'COMMON.IP'],
+        ['os_type', 'COMMON.O_TYPE'],
     ],
     parent),
     selectIndex: [],
@@ -272,6 +254,7 @@ export const serverSetup = (props, context, eventName) => {
         isSelectedMulti: computed(() => tableState.selectIndex.length > 1),
     });
     const state = requestMetaReactive();
+    state.sortBy = 'name';
     const getServers = () => {
         eventBus.$emit(eventName.getServerList);
     };
@@ -359,7 +342,7 @@ export default {
     name: 'ServerTemplate',
     components: {
         PStatus,
-        BaseDragHorizontal,
+        PHorizontalLayout,
         PToolboxTable,
         PButton,
         PBadge,

@@ -4,7 +4,7 @@ const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
 const DataCenter = () => import('@/views/inventory/data-center/DataCenter.vue');
 const Server = () => import('@/views/inventory/server/Server.vue');
 const Collector = () => import('@/views/inventory/collector/Collector.vue');
-const newCollector = () => import('@/views/inventory/collector/modules/CollectorAction.vue');
+const newCollector = () => import('@/views/inventory/collector_origin/modules/CollectorAction.vue');
 
 export default {
     path: 'inventory',
