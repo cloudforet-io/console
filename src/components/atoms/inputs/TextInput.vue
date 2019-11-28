@@ -5,7 +5,10 @@ export default {
     name: 'PTextInput',
     functional: true,
     props: {
-        value: String,
+        value: {
+            type: [String, Number],
+            default: undefined,
+        },
         disabled: {
             type: Boolean,
             default: false,

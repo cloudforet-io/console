@@ -32,7 +32,10 @@ export default {
     components: { PInputText },
     props: {
         name: String,
-        value: String,
+        value: {
+            type: [String, Number],
+            default: undefined,
+        },
         tagKeyPlaceholder: String,
         tagValuePlaceholder: String,
         disabled: Boolean,

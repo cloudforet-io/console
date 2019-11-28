@@ -468,7 +468,8 @@ export default {
                 vertical-align: middle;
                 white-space:nowrap;
                 .th-contents {
-                    display: inline-flex;
+                    display: flex;
+                    justify-content: space-between;
                 }
                 .sort-icon{
                     float: right;
