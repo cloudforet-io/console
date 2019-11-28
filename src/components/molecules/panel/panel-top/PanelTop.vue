@@ -4,7 +4,8 @@
             <div class="p-panel-top-header">
                 <div class="p-panel-top-header-title">
                     {{ panelTitle }}
-                </div><slot name="head" />
+                </div>
+                <slot name="head" />
             </div>
             <hr>
             <slot name="body" />

@@ -7,7 +7,7 @@
             class="menu"
             :contents="item.contents"
             :indent="item.indent"
-           @click.stop="executeContext(item, $event)"
+            @click.stop="executeContext(item, $event)"
         />
     </div>
 </template>
@@ -56,9 +56,12 @@ export default {
              */
             selectPG: [
                 { flag: 'CRT_PR', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.PG_GR')]), indent: 0 },
-                { flag: 'CRT_PJ', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.PG')]), indent: 0 },
                 { flag: 'UPT_PR', contents: this.tr('ORGANISMS.UPDATE_ARG', [this.tr('COMMON.PG_GR')]), indent: 0 },
                 { flag: 'DEL_PR', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.PG_GR')]), indent: 0 },
+                {
+                    flag: '', contents: '', indent: 0, divider: true,
+                },
+                { flag: 'CRT_PJ', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.PG')]), indent: 0 },
             ],
         };
     },

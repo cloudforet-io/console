@@ -14,7 +14,7 @@
         >
             <template #body>
                 <p-toolbox-table :items="users"
-                                 :responsive-style="{'height': '35vh', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
+                                 :responsive-style="{'height': '30vh', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
                                  :fields="selectedFields"
                                  :selectable="false"
                                  :sortable="true"
@@ -51,11 +51,26 @@
                     </template>
                 </p-toolbox-table>
                 <p-input-tag
-                    :responsive-style="{'height': '20vh', 'overflow-y':'auto'}"
+                    :responsive-style="{'height': '15vh', 'overflow-y':'auto', 'margin-left': '1rem'}"
                     :tag-text.sync="tagRelated.currentTagText"
                     :tag-array.sync="tagRelated.Tags"
                     :tag-place-holder="tagRelated.placeHolder"
                 />
+                <div class="label-group">
+                    <div class="form-group">
+                        <p-label class="input-title">
+                            {{ tr('COMMON.LABELS') }}
+                        </p-label>
+                        <p-text-input ref="labels" v-model="Label"
+                                      :style="{'boxShadow': 'none' } "
+                                      :disabled="releaseDisabled"
+                                      class="form-control"
+                                      type="text"
+                                      placeholder="  #Labels,"
+                                      required
+                        />
+                    </div>
+                </div>
             </template>
             <template #close-button>
                 {{ tr('COMMON.BTN_CANCEL') }}
@@ -73,6 +88,8 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PSearch from '@/components/molecules/search/Search';
 import PInputTag from '@/components/molecules/input-tag/InputTag';
+import PTextInput from '@/components/atoms/inputs/TextInput';
+import PLabel from '@/components/atoms/labels/Label';
 
 export default {
     name: 'ProjectMemberAdd',
@@ -81,7 +98,9 @@ export default {
         PButtonModal,
         PToolboxTable,
         PInputTag,
+        PTextInput,
         PSearch,
+        PLabel,
     },
     props: {
         referenceMember: {
@@ -97,6 +116,7 @@ export default {
             selectable: true,
             sortable: true,
             selectIndex: [],
+            Label: '',
             tablePage: {
                 sortBy: 'name',
                 sortDesc: true,
@@ -112,6 +132,9 @@ export default {
         };
     },
     computed: {
+        releaseDisabled() {
+            return !this.isEmpty(this.tagRelated.Tags);
+        },
         getMemberModalTitle() {
             return this.tr('IDENTITY.ADD_ARG', [this.tr('COMMON.MEMBER')]);
         },
@@ -156,9 +179,21 @@ export default {
         },
         showModal() {
             this.visible = true;
+            this.resetToBlank();
         },
         hideModal() {
             this.visible = false;
+        },
+        resetToBlank() {
+            this.searchText = null;
+            this.users = [];
+            this.tablePage = {
+                sortBy: 'name',
+                sortDesc: true,
+                thisPage: 1,
+                allPage: 1,
+                pageSize: 15,
+            };
         },
         async listMembersOnSearch(text) {
             const defaultQuery = this.getDefaultQuery();
@@ -178,12 +213,26 @@ export default {
                 console.error(error);
             });
         },
+        checkValidity() {
+            const targets = this.Label.split(',');
+            const labelArr = [];
+            targets.forEach((value) => {
+                const currernt = this.replaceAll(value, ' ', '');
+                if (currernt.startsWith('#')) {
+                    labelArr.push(currernt);
+                    return false;
+                }
+            });
+            return labelArr;
+        },
         async addUserOnProject() {
             const selectedNodeDT = this.$parent.selectedNode.node.data;
             const selectedId = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
             const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/add`;
             const param = { users: _.map(this.tagRelated.Tags, 'text'), ...selectedId };
+            if (this.isEmpty(this.Label)) {
 
+            }
             await this.$http.post(url, param).then(() => {
                 this.$parent.getMembers();
                 this.tagRelated.Tags = [];
@@ -215,6 +264,19 @@ export default {
         overflow-y: auto;
         background: $primary4 0% 0% no-repeat padding-box;
         border: 1px solid $gray3;
+        opacity: 1;
+    }
+    .label-group {
+        margin-left: 1rem;
+        margin-right: 1rem;
+        margin-bottom: 0rem;
+    }
+    .input-title{
+        margin-top: 0.5rem;
+        text-align: left;
+        font: Bold 14px/28px Arial;
+        letter-spacing: 0;
+        color: #222532;
         opacity: 1;
     }
 </style>

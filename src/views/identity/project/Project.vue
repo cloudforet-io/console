@@ -38,8 +38,8 @@
                                 </keep-alive>
                             </template>
                             <template #member="{tabName}">
-                                <project-member :selected-node="getSelectedNodeAndTree"
-                                                :responsive-style="{'height': height+'px', 'overflow-y':'auto', 'box-shadow': 'none', 'border': 'none'}"
+                                <project-member :tab-basic-height="height"
+                                                :selected-node="getSelectedNodeAndTree"
                                 />
                             </template>
                         </PTab>
