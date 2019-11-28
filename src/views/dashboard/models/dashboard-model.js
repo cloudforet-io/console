@@ -11,10 +11,8 @@ casual.define('coordinate', () => ({
     [casual.make_id(casual.random_element('region', 'zone', 'pool'))]: {
         name: casual.country,
         count: casual.integer(0, 1000),
-        coordinates: {
-            latitude: casual.latitude,
-            longitude: casual.longitude,
-        },
+        latitude: casual.latitude,
+        longitude: casual.longitude,
     },
 }));
 

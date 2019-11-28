@@ -14,88 +14,28 @@ export default {
         const api = context.root.$http;
         const baseParam = { domain_id: sessionStorage.getItem('domainId') };
 
-        // Summary
-        const listSummary = async () => {
-            const res = await api.post('/statistics/summary', {
-                ...baseParam,
-            });
-            state.summaryData.value = res.data;
+        const callApi = (url, target, params) => async () => {
+            const res = await api.post(url, params);
+            state[target].value = res.data;
         };
 
-        mountBusEvent(DashboardEventBus, 'listSummary', listSummary);
+        // Summary
+        mountBusEvent(DashboardEventBus, 'listSummary', callApi('/statistics/summary', 'summaryData'));
 
         // Resources By Region
-        const listRegionByServer = async () => {
-            setTimeout(() => {
-                state.resourcesByRegionData.value = casual.resourcesByRegion;
-            }, 1000);
-            // const res = await api.post('/statistics/summary', {
-            //     ...baseParam,
-            //     item_type: 'server',
-            // });
-            // state.resourcesByRegionData.value = res.data;
-        };
-        const listRegionByCloudService = () => {
-            setTimeout(() => {
-                state.resourcesByRegionData.value = casual.resourcesByRegion;
-            }, 1000);
-        };
-
-        mountBusEvent(DashboardEventBus, 'listRegionByServer', listRegionByServer);
-        mountBusEvent(DashboardEventBus, 'listRegionByCloudService', listRegionByCloudService);
+        mountBusEvent(DashboardEventBus, 'listRegionByServer', callApi('/statistics/datacenter-items', 'resourcesByRegionData', {
+            item_type: 'server',
+        }));
+        // mountBusEvent(DashboardEventBus, 'listRegionByCloudService', callApi('/statistics/datacenter-items', 'resourcesByRegionData'));
 
         // Server State
-        const listServerState = async () => {
-            const res = await api.post('/statistics/server-state', {
-                ...baseParam,
-            });
-            // _.forIn(res.data, (val, key) => {
-            //     if (val) res.data[key] = 0;
-            // });
-            state.serverStateData.value = res.data;
-        };
-
-        mountBusEvent(DashboardEventBus, 'listServerState', listServerState);
+        mountBusEvent(DashboardEventBus, 'listServerState', callApi('/statistics/server-state', 'serverStateData'));
 
         // Servers by Type
-        const listServerType = async () => {
-            const res = await api.post('/statistics/server-type', {
-                ...baseParam,
-                item_type: 'server_type',
-            });
-            // _.forIn(res.data, (val, key) => {
-            //     if (val) res.data[key] = 0;
-            // });
-            state.serverTypeData.value = res.data;
-        };
-        mountBusEvent(DashboardEventBus, 'listServerType', listServerType);
-
-        const listVmType = async () => {
-            const res = await api.post('/statistics/server-type', {
-                ...baseParam,
-                item_type: 'vm_type',
-            });
-            state.vmTypeData.value = res.data;
-        };
-        mountBusEvent(DashboardEventBus, 'listServerType', listVmType);
-
-        const listOsType = async () => {
-            const res = await api.post('/statistics/server-type', {
-                ...baseParam,
-                item_type: 'os_type',
-            });
-            state.osTypeData.value = res.data;
-        };
-        mountBusEvent(DashboardEventBus, 'listOsType', listOsType);
-
-        const listHypervisorType = async () => {
-            const res = await api.post('/statistics/server-type', {
-                ...baseParam,
-                item_type: 'hypervisor_type',
-            });
-            state.hypervisorTypeData.value = res.data;
-        };
-        mountBusEvent(DashboardEventBus, 'listHypervisorType', listHypervisorType);
+        mountBusEvent(DashboardEventBus, 'listServerType', callApi('/statistics/server-type', 'serverTypeData', { item_type: 'server_type' }));
+        mountBusEvent(DashboardEventBus, 'listVmType', callApi('/statistics/server-type', 'vmTypeData', { item_type: 'vm_type' }));
+        mountBusEvent(DashboardEventBus, 'listOsType', callApi('/statistics/server-type', 'osTypeData', { item_type: 'os_type' }));
+        mountBusEvent(DashboardEventBus, 'listHypervisorType', callApi('/statistics/server-type', 'hypervisorTypeData', { item_type: 'hypervisor_type' }));
 
         return { ...toRefs(state) };
     },
