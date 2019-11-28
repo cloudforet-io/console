@@ -48,6 +48,7 @@
             <div class="input-tag-card">
                 <div style="margin-top: 8px;">
                     <p-tag-input-group ref="tagPanel"
+                                       :useFullCol="true"
                                        :tag-key-placeholder="'key'"
                                        :tag-value-placeholder="'value'"
                                        :edit-mode="tagInput.editMode"
