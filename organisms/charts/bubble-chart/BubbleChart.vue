@@ -97,7 +97,10 @@ const setMapTools = (props, context, sizeTools) => {
         const xy = d3.geoEquirectangular()
             .fitExtent([
                 [0, 0],
-                [sizeTools.containerWidth.value * 0.78, sizeTools.containerHeight.value],
+                [
+                    sizeTools.containerWidth.value * (props.legendPosition === 'left' ? 0.78 : 1),
+                    sizeTools.containerHeight.value,
+                ],
             ], countries);
         state.mapFeatures = countries.features;
         state.mapPath = d3.geoPath().projection(xy);
