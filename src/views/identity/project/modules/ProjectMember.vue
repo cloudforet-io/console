@@ -7,7 +7,6 @@
                                :reference-member="getMemberData"
         />
         <p-toolbox-table :items="members"
-                         :style="responsiveStyle"
                          :fields="fields"
                          :shadow="false"
                          :border="false"
