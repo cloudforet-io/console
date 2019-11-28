@@ -57,11 +57,11 @@
                         {{ timestampFormatter(data.value) }}
                     </template>
                     <template #col-plugin_info-format="data">
-                        <ul v-if="data.value.options && data.value.options.supported_resource_type">
-                            <li v-for="(d, i) in data.value.options.supported_resource_type" :key="i">
+                        <template v-if="data.value.options && data.value.options.supported_resource_type">
+                            <div v-for="(d, i) in data.value.options.supported_resource_type" :key="i">
                                 {{ d }}
-                            </li>
-                        </ul>
+                            </div>
+                        </template>
                         <span v-else />
                     </template>
                 </p-toolbox-table>

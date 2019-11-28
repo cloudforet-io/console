@@ -10,11 +10,10 @@
                             :style="{ width: `${100 / dataLength}%` }"
                             @mouseenter="onMouseEnter(key)"
                             @mouseleave="onMouseLeave(key)"
+                            @click="onLinkClick(key, data[key])"
             >
                 <span class="label">{{ d.label }}</span>
-                <span class="count"
-                      @click="onLinkClick(key, data[key])"
-                >
+                <span class="count">
                     <animated-number :value="data[key]"
                                      :format-value="countFormatter"
                                      :duration="500"
@@ -116,6 +115,7 @@ export default {
         justify-content: space-between;
         padding: 2rem 1rem;
         margin-right: 1rem;
+        cursor: pointer;
         &:last-child {
             margin-right: 0;
         }
@@ -135,7 +135,6 @@ export default {
             font-size: 2rem;
             color: $primary-dark;
             font-weight: bold;
-            cursor: pointer;
         }
     }
 
