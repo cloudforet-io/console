@@ -51,16 +51,16 @@
                         {{ timestampFormatter(data.value) }}
                     </template>
                     <template v-slot:col-core-format="data">
-                        {{ data.item.data.base.core }}
+                        {{ data.item.data.base ? data.item.data.base.core : '' }}
                     </template>
                     <template v-slot:col-memory-format="data">
-                        {{ data.item.data.base.memory }}
+                        {{ data.item.data.base ? data.item.data.base.memory : '' }}
                     </template>
                     <template v-slot:col-pool-format="data">
                         {{ data.item.pool_info ? data.item.pool_info.name :'' }}
                     </template>
                     <template v-slot:col-os_distro-format="data">
-                        {{ data.item.data.os.os_distro }}
+                        {{ data.item.data.os ? data.item.data.os.os_distro : '' }}
                     </template>
                     <template v-slot:col-server_type-format="data">
                         <PBadge v-bind="platformBadgeFormatter(data.value)">
@@ -69,7 +69,7 @@
                     </template>
                     <template v-slot:col-platform_type-format="data">
                         <PBadge v-bind="platformBadgeFormatter(data.item.data.vm.platform_type)">
-                            {{ data.item.data.vm.platform_type }}
+                            {{ data.item.data.vm ? data.item.data.vm.platform_type : '' }}
                         </PBadge>
                     </template>
                 </p-toolbox-table>
@@ -164,7 +164,7 @@ import { makeTrItems } from '@/lib/helper';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
-const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout')
+const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 const PDropdownMenuBtn = () => import('@/components/organisms/buttons/dropdown/DropdownMenuBtn');
 const PSearch = () => import('@/components/molecules/search/Search');
