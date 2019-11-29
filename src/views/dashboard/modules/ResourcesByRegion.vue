@@ -57,6 +57,7 @@ export default {
     },
     computed: {
         chartData() {
+            console.log('resources by region data >>', this.data)
             return Object.keys(this.data).map(key => ({
                 key: this.data[key].name,
                 value: this.data[key].count,

@@ -43,7 +43,7 @@
                     </template>
                     <template #col-name-format="data">
                         <span class="name">
-                            <p-i name="aws-ec2" class="icon" />
+                            <img class="icon" :src="data.item.tags.icon || defaultImg">
                             {{ data.value }}
                         </span>
                     </template>
@@ -119,6 +119,7 @@ import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import PI from '@/components/atoms/icons/PI';
 import PStatus from '@/components/molecules/status/Status';
 import PButton from '@/components/atoms/buttons/Button';
+import config from '@/lib/config';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
@@ -193,6 +194,7 @@ const setTableData = (props, context) => {
     const state = reactive({
         timestampFormatter,
         collectorStateFormatter,
+        defaultImg: config.get('COLLECTOR_IMG'),
     });
     return {
         ...toRefs(state),
@@ -271,7 +273,9 @@ export default {
 
         .name {
             .icon {
-                margin-right: 1rem;
+                width: 1.5rem;
+                height: 1.5rem;
+                margin-right: .5rem;
             }
         }
 
