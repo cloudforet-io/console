@@ -23,7 +23,7 @@
                                             User ID
                                         </p-label>
                                         <p-text-input ref="userId" v-model="userId"
-                                                      :autocomplete="'username'"
+                                                      autocomplete="on"
                                                       :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
                                                       class="form-control"
                                                       type="text"
@@ -41,7 +41,7 @@
                                             Password
                                         </p-label>
                                         <p-text-input ref="password" v-model="password" type="password"
-                                                      :autocomplete="'new-password'"
+                                                      autocomplete="on"
                                                       :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
                                                       class="form-control"
                                                       placeholder="  Password"
@@ -124,6 +124,9 @@ export default {
                 password: false,
             },
         };
+    },
+    mounted() {
+        this.$refs.userId.focus();
     },
     computed: {
         ...mapGetters('auth', [

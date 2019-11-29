@@ -23,7 +23,8 @@
                                             User ID
                                         </p-label>
                                         <p-text-input ref="userId" v-model="adminUserId"
-                                                      :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
+                                                      :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none', 'border-radius': '2px' } "
+                                                      autocomplete="on"
                                                       class="form-control"
                                                       type="text"
                                                       placeholder="  User ID"
@@ -40,7 +41,8 @@
                                             Password
                                         </p-label>
                                         <p-text-input ref="password" v-model="password" type="password"
-                                                      :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
+                                                      autocomplete="on"
+                                                      :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none', 'border-radius': '2px' } "
                                                       class="form-control"
                                                       placeholder="  Password"
                                                       required
@@ -114,6 +116,9 @@ export default {
                 password: false,
             },
         };
+    },
+    mounted() {
+        this.$refs.userId.focus();
     },
     computed: {
         ...mapGetters('auth', [
