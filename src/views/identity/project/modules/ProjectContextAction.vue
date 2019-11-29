@@ -46,9 +46,9 @@
                 {{ tr('COMMON.TAG') }}
             </div>
             <div class="input-tag-card">
-                <div style="margin-top: 8px;">
+                <div>
                     <p-tag-input-group ref="tagPanel"
-                                       :useFullCol="true"
+                                       :use-full-col="true"
                                        :tag-key-placeholder="'key'"
                                        :tag-value-placeholder="'value'"
                                        :edit-mode="tagInput.editMode"
@@ -275,6 +275,11 @@ export default {
         background: #F8F8FC 0% 0% no-repeat padding-box !important;
         border: 1px solid #F2F2F2 !important;
         opacity: 1;
-        heihgt: 30vh;
+     > div {
+         margin-top: 8px;
+         height: 15vh;
+         max-height: 20vh;
+         overflow-y: auto;
+     }
     }
 </style>

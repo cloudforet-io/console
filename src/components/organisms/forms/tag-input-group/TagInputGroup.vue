@@ -7,7 +7,7 @@
             <p-icon-button v-if="editMode" class="delete-btn" name="ic_delete"
                            @click="deleteTag(index)"
             />
-            <div @mouseleave="mouseInOut(index, false)">
+            <span class="data" @mouseleave="mouseInOut(index, false)">
                 <p-tag-input :name="tag.name"
                              :value="tag.value"
                              :disabled="!editMode"
@@ -16,7 +16,7 @@
                              @update:value="updateTag(index, 'value',$event)"
                 />
                 <p-copy-button v-if="getActiveState(index) && !editMode" class="copy-btn" :value="tag.value" />
-            </div>
+            </span>
         </div>
 
         <div v-if="editMode" :class="{'tag-input-form': true, 'mr-0': true, 'col-6': !useFullCol, 'col-12': useFullCol}">
@@ -189,6 +189,9 @@ export default {
     .btn{
         flex: none;
     }
+    .delete-btn{
+        margin-left: 0.5rem;
+    }
     .add-btn{
         margin-left: 0.5rem;
     }
@@ -210,6 +213,10 @@ export default {
         &:not(.new-form){
             margin-right: 2.5rem;
         }
+    }
+    .data{
+        display: block;
+        width: 100%;
     }
     .copy-btn::v-deep{
         .p-copy-btn{top:-.3rem;
