@@ -154,7 +154,8 @@ export default {
         },
         finalizeDefaultLeftWidth() {
             if (this.autoSaveLeftWidth) {
-                this.setVerticalLeftWidth(`${this.leftContainerWidth}px`);
+                if (this.isMinimized) this.setVerticalLeftWidth(`${this.previousWidth}px`);
+                else this.setVerticalLeftWidth(`${this.leftContainerWidth}px`);
             }
         },
         onMousedown() {
