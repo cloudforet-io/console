@@ -15,7 +15,7 @@
                              @update:name="updateTag(index,'name',$event )"
                              @update:value="updateTag(index, 'value',$event)"
                 />
-                <p-copy-button v-if="getActiveState(index)" class="copy-btn" :value="tag.value" />
+                <p-copy-button v-if="getActiveState(index) && !editMode" class="copy-btn" :value="tag.value" />
             </div>
         </div>
 
