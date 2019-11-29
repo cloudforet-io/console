@@ -1,5 +1,5 @@
 <template>
-    <div class="p-tag-input-group row col-12">
+    <div class="p-tag-input-group row ">
         <div v-for="(tag,index) in destructTags"
              :key="index"
              :class="{'tag-input-form': true, 'mr-0': true, 'col-6': !useFullCol, 'col-12': useFullCol}"
@@ -7,7 +7,7 @@
             <p-icon-button v-if="editMode" class="delete-btn" name="ic_delete"
                            @click="deleteTag(index)"
             />
-            <span class="data" @mouseleave="mouseInOut(index, false)">
+            <div @mouseleave="mouseInOut(index, false)">
                 <p-tag-input :name="tag.name"
                              :value="tag.value"
                              :disabled="!editMode"
@@ -15,8 +15,8 @@
                              @update:name="updateTag(index,'name',$event )"
                              @update:value="updateTag(index, 'value',$event)"
                 />
-                <!--<p-copy-button v-if="isActive" class="copy-btn" :value="tag.value" />-->
-            </span>
+                <p-copy-button v-if="getActiveState(index)" class="copy-btn" :value="tag.value" />
+            </div>
         </div>
 
         <div v-if="editMode" :class="{'tag-input-form': true, 'mr-0': true, 'col-6': !useFullCol, 'col-12': useFullCol}">
@@ -69,7 +69,6 @@ export const useTagsBuffer = (props, context) => {
     };
 
     const updateTag = (index, position, value) => {
-        debugger;
         destructTags.value[index][position] = value;
         syncTags();
     };
@@ -120,36 +119,37 @@ export const useNewTag = (props, context, tagsBuffer) => {
     };
 };
 
-export const setup = (props, context) => {
-    const tagsBuffer = useTagsBuffer(props, context);
-    const newTagState = useNewTag(props, context, tagsBuffer);
+const setTagCopy = () => {
     const state = reactive({
-        isActivated: {},
         currentIdx: null,
     });
 
     const mouseInOut = (idx, flag) => {
-        const index = `index${idx}`;
         if (flag) {
             state.currentIdx = idx;
         } else {
             state.currentIdx = null;
         }
-        state.isActivated[index] = flag;
     };
-    const isActive = computed(() => {
-        if (state.currentIdx !== null) {
-            const idx = `index${state.currentIdx}`;
-            return state.isActivated[idx];
-        }
-        return false;
-    });
+
+    const getActiveState = idx => state.currentIdx === idx;
+
     return {
         ...toRefs(state),
+        mouseInOut,
+        getActiveState,
+    };
+};
+
+export const setup = (props, context) => {
+    const tagsBuffer = useTagsBuffer(props, context);
+    const newTagState = useNewTag(props, context, tagsBuffer);
+    const tagCopyState = setTagCopy();
+
+    return {
         ...tagsBuffer,
         ...newTagState,
-        mouseInOut,
-        isActive,
+        ...tagCopyState,
     };
 };
 
