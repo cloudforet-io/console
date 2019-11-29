@@ -46,12 +46,11 @@ export default {
 <style lang="scss" scoped>
     .p-tag-input{
         display: inline-flex;
+        align-items: center;
     }
     .tag-input-split{
-        font: 14px/28px Arial;
         padding-left: 0.125rem;
         padding-right: 0.125rem;
-        flex: none;
         &.disabled{
             width: 0.5625rem;
         }

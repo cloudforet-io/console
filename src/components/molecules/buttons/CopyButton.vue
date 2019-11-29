@@ -21,13 +21,19 @@ export default {
     components: { PButton },
     props: {
         value: {
-            type: String,
+            type: [String, Array],
             default: '',
         },
     },
     methods: {
         copyText() {
-            selectToCopyToClipboard(this.value);
+            if (this.value instanceof Array) {
+                let res = '';
+                this.value.forEach((v) => {
+                    res += v;
+                });
+                selectToCopyToClipboard(res);
+            } else selectToCopyToClipboard(this.value || '');
         },
     },
 };
