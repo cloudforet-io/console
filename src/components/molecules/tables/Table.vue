@@ -8,7 +8,12 @@
             <thead :class="theadClassObject" :style="theadStyle">
                 <slot name="head" />
             </thead>
-            <tbody :class="tbodyClass" :style="tbodyStyle">
+            <tbody is="transition-group" name="table-row"
+                   :class="tbodyClass" :style="tbodyStyle"
+                   @before-enter="beforRowEnter"
+                   @enter="rowEnter"
+                   @leave="rowLeave"
+            >
                 <slot name="body" />
             </tbody>
             <tfoot :class="tfootClass" :style="tfootStyle">
@@ -130,6 +135,38 @@ export default {
         },
     },
     methods: {
+        beforRowEnter(el) {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(30px)';
+        },
+        rowEnter(el, done) {
+            const delay = el.dataset.index * 100;
+            const vm = this;
+            setTimeout(() => {
+                vm.$velocity(el, { translateY: '0px', opacity: 1 },
+                    {
+                        duration: 100,
+                        complete() {
+                            done();
+                        },
+                    });
+                done();
+            }, delay);
+        },
+        rowLeave(el, done) {
+            const delay = el.dataset.index * 100;
+            const vm = this;
+            setTimeout(() => {
+                vm.$velocity(el, { translateY: '30px', opacity: 0 },
+                    {
+                        duration: 100,
+                        complete() {
+                            done();
+                        },
+                    });
+                done();
+            }, delay);
+        },
         getStyle(tableStyle, bgStyle) {
             if (bgStyle && tableStyle) {
                 return `bg-${tableStyle}`;
@@ -142,7 +179,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     %row {
         background-color: $white;
     }
@@ -162,6 +199,7 @@ export default {
             tr{
                 th{
                     position: sticky;
+                    z-index: 1;
                     top: 0;
                     padding: .25rem 0 .25rem .75rem;
                     background-color: $white;
@@ -183,6 +221,7 @@ export default {
             tr{
                 @extend %row;
                 td{
+                    z-index: 0;
                     vertical-align: middle;
                 }
             }
@@ -195,6 +234,4 @@ export default {
             @extend %hover;
         }
     }
-
-
 </style>

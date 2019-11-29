@@ -377,3 +377,8 @@ $form-padding: 0.375rem 0.75rem;
 .light {
   color:$white;
 }
+
+/* table */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: transparent;
+}

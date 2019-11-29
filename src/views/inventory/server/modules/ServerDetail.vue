@@ -26,7 +26,7 @@
                 {{ scope.item.data.os.os_arch }}
             </template>
             <template #def-zone-format="scope">
-                {{ scope.item.zone_info.zone_id }}
+                {{ scope.item.zone_info ? scope.item.zone_info.zone_id : '' }}
             </template>
             <template #def-kernel-format="scope">
                 {{ scope.item.data.base.kernel }}
