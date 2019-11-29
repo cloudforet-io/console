@@ -67,7 +67,7 @@ const setSizeTools = (props, context) => {
             width: props.legendPosition === 'left' ? '78%' : '100%',
         },
         legendContainerStyle: {
-            maxHeight: props.height,
+            maxHeight: null,
             width: props.legendPosition === 'left' ? '22%' : '100%',
         },
         containerWidth: 0,
@@ -77,6 +77,7 @@ const setSizeTools = (props, context) => {
     onMounted(() => {
         const clientRect = context.refs.containerRef.getBoundingClientRect();
         state.containerHeight = clientRect.height;
+        state.legendContainerStyle.maxHeight = props.legendPosition === 'left' ? `${clientRect.height}px` : null;
         state.containerWidth = clientRect.width;
     });
 
