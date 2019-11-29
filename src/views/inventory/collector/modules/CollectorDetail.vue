@@ -3,7 +3,7 @@
         <p-info-panel info-title="Base Information" :defs="baseDefs" :item="item">
             <template #def-name-format="data">
                 <span class="name">
-                    <p-i name="aws-ec2" class="icon" />
+                    <img class="icon" :src="data.item.tags.icon || defaultImg">
                     {{ data.value }}
                 </span>
             </template>
@@ -56,6 +56,7 @@ import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { makeTrItems } from '@/lib/helper';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
+import config from '@/lib/config';
 
 const setBaseInfoStates = (props, parent) => {
     const state = reactive({
@@ -69,6 +70,7 @@ const setBaseInfoStates = (props, parent) => {
             ['last_collected_at', 'COMMON.LAST_COL'],
             ['created_at', 'COMMON.CREATED'],
         ], parent, { copyFlag: true }),
+        defaultImg: config.get('COLLECTOR_IMG'),
     });
 
     return {
@@ -145,7 +147,9 @@ export default {
 <style lang="scss" scoped>
     .name {
         .icon {
-            margin-right: 1rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: .5rem;
         }
     }
 </style>
