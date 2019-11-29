@@ -16,14 +16,14 @@
                 />
             </g>
             <g>
-                <g v-for="(d, idx) in chartData" :key="d.key">
+                <g v-for="(d, idx) in chartData" :key="idx + d.key">
                     <circle v-if="d.longitude !== null"
                             v-tooltip="getTooltipOptions(d, idx, {
                                 content: generateTooltipTitle(d, idx, colors(idx))
                             })"
                             :cx="circleLoc([d.longitude, d.latitude])[0]"
                             :cy="circleLoc([d.longitude, d.latitude])[1]"
-                            :r="rScale(d.value)"
+                            :r="d.value === 0 ? 0 : rScale(d.value)"
                             :style="{ fillOpacity: hoverList[idx] ? 1.0 : 0.3,
                                       fill: colors(idx),
                                       stroke: colors(idx),
@@ -38,7 +38,7 @@
         <div class="legend-container"
              :style="legendContainerStyle"
         >
-            <p-chart-legend v-for="(d, idx) in data" :key="d.key" class="legend"
+            <p-chart-legend v-for="(d, idx) in data" :key="idx + d.key" class="legend"
                             :text="d.key" :count="d.value" :icon-color="colors(idx)"
                             :opacity="!hoverState || hoverList[idx] ? 1.0 : 0.3"
                             @mouseenter="onMouseEnter(idx)"
@@ -130,7 +130,7 @@ const setDrawTools = (props, context) => {
 
     const initRScale = () => {
         state.rScale = d3.scaleLinear()
-            .range([0, props.maxRadius])
+            .range([props.minRadius, props.maxRadius])
             .domain([min.value, max.value]);
     };
 
@@ -191,6 +191,10 @@ export default {
         height: {
             type: Number,
             default: null,
+        },
+        minRadius: {
+            type: Number,
+            default: 2,
         },
         maxRadius: {
             type: Number,
