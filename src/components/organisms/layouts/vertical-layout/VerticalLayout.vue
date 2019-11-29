@@ -4,16 +4,35 @@
             <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
         </div>
 
-        <div class="dragger-container" :class="{ line: line }" @mousedown="onMousedown"
-             :style="{
+        <div class="dragger-container" :class="{ line: line }" :style="{
                  height: height,
                  width: `${draggerWidth}px`,
              }"
+             @mousedown="onMousedown"
         >
             <span class="dragger">
-                <slot name="dragger">
-                    <!--<f-i icon="fa-grip-lines-vertical" icon-style="light" />-->
-                </slot>
+                <span @mouseenter="mouseOnOver(true)"
+                      @mouseleave="mouseOnOver(false)"
+                >
+                    <slot name="dragger">
+                        <p-i v-if="!isMinimized"
+                             class="btn-vertical-dragger"
+                             :color="shiftColorWhenMouseOver"
+                             :width="'1rem'"
+                             :height="'1rem'"
+                             :name="'btn_ic_tree_hidden'"
+                             @click="setMinimizeAndRevert(true)"
+                        />
+                        <p-i v-else
+                             class="btn-vertical-dragger"
+                             :color="shiftColorWhenMouseOver"
+                             :width="'1rem'"
+                             :height="'1rem'"
+                             :name="'btn_ic_tree_hidden—folded'"
+                             @click="setMinimizeAndRevert(false)"
+                        />
+                    </slot>
+                </span>
             </span>
         </div>
 
@@ -34,12 +53,12 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import styles from '@/styles/_variables.scss';
-import FI from '@/components/atoms/icons/FI';
 import FNB from '@/views/containers/fnb/FNB';
+import PI from '@/components/atoms/icons/PI';
 
 export default {
     name: 'VerticalLayout',
-    components: { FI, FNB },
+    components: { PI, FNB },
     events: ['start', 'move', 'stop'],
     props: {
         height: {
@@ -77,11 +96,16 @@ export default {
     },
     data() {
         return {
-            draggerHeight: 30,
             leftContainerWidth: parseFloat(this.leftWidth),
-            draggerWidth: 5,
+            isMinimized: false,
+            draggerWidth: 10,
+            previousWidth: null,
             dragging: false,
+            mouseOver: false,
             pageX: null,
+            minimize: {
+
+            },
         };
     },
     computed: {
@@ -91,6 +115,9 @@ export default {
         ]),
         rightContainerWidth() {
             return `calc(100vw - ${styles.gnbWidth} - ${this.leftContainerWidth + this.draggerWidth}px)`;
+        },
+        shiftColorWhenMouseOver() {
+            return this.mouseOver ? `white ${styles.secondary}` : 'white primary3';
         },
     },
     created() {
@@ -111,6 +138,9 @@ export default {
             if (!this.hideFNB) {
                 this.hideDefaultFNB();
             }
+        },
+        mouseOnOver(flag) {
+            this.mouseOver = flag;
         },
         initDefaultLeftWidth() {
             if (this.autoSaveLeftWidth) {
@@ -158,6 +188,20 @@ export default {
                 this.$emit('stop', this.leftContainerWidth);
             }
         },
+        setMinimizeAndRevert(flag) {
+            if (flag) {
+                this.previousWidth = this.leftContainerWidth;
+                this.leftContainerWidth = 16;
+                this.setVerticalLeftWidth(`${this.previousWidth}px`);
+                this.mouseOver = false;
+            } else {
+                this.leftContainerWidth = this.previousWidth;
+                this.mouseOver = false;
+                this.previousWidth = null;
+            }
+            this.isMinimized = flag;
+            this.$emit('minimize', flag);
+        },
     },
 };
 </script>
@@ -180,22 +224,34 @@ export default {
     }
     .dragger-container {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         &.line {
-            border-right: 1px solid $lightgray;
+            border-left: 1px solid $lightgray;
             &:hover {
-                border-right: 1px solid $secondary;
+                border-left: 1px solid $secondary;
                 cursor: ew-resize;
             }
         }
         .dragger {
             display: inline-block;
+            cursor: pointer;
             height: 30px;
             font-size: 1.5rem;
             font-weight: 600;
             text-align: center;
+            z-index: 99999;
             cursor: col-resize;
+            color: $darkgray;
+            > span {
+                margin-right: 26px;
+                cursor: pointer;
+            }
+        }
+        .btn-vertical-dragger{
+            margin-top: 1rem;
+            margin-left: 1rem;
+            justify-content: center;
             color: $darkgray;
         }
     }
