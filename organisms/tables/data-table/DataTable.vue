@@ -61,73 +61,63 @@
             </slot>
         </template>
         <template #body>
-            <p-tr v-if="loading&&useSpinnerLoading" class="no-data-row">
+            <p-tr v-if="loading&&useSpinnerLoading" class="no-data-row" key="loading">
                 <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                     <p-lottie name="spinner" :size="2"
                               :auto="true"
                     />
                 </p-td>
             </p-tr>
-            <p-tr v-if="showNoData" class="no-data-row">
+            <p-tr v-if="showNoData" class="no-data-row" key="noData">
                 <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                     No Data
                 </p-td>
             </p-tr>
-            <slot
-                name="body"
-                :items="items"
-            >
-                <template v-for="(item,index) in items">
-                    <slot
-                        name="row"
-                        :fields="fieldsName"
-                        :item="item"
-                        :index="index"
+            <slot name="body" :items="items">
+                <slot v-for="(item, index) in items" name="row" :fields="fieldsName"
+                      :item="item" :index="index"
+                >
+                    <p-tr :key="index" :data-index="index"
+                          :class="{'tr-selected': isSelected(index)} "
+                          v-bind="item.hasOwnProperty('vbind') ? item.vbind : null"
+                          onselectstart="return false"
+                          @click.left="rowLeftClick( item, index, $event )"
+                          @click.right="rowRightClick( item, index, $event )"
+                          @click.middle="rowMiddleClick( item, index, $event )"
+                          @mouseover="rowMouseOver(item,index, $event)"
+                          @mouseout="rowMouseOut(item,index, $event)"
                     >
-                        <p-tr
-                            :key="index"
-                            :data-index="index"
-                            :class="{'tr-selected': isSelected(index)} "
-                            v-bind="item.hasOwnProperty('vbind') ? item.vbind : null"
-                            onselectstart="return false"
-                            @click.left="rowLeftClick( item, index, $event )"
-                            @click.right="rowRightClick( item, index, $event )"
-                            @click.middle="rowMiddleClick( item, index, $event )"
-                            @mouseover="rowMouseOver(item,index, $event)"
-                            @mouseout="rowMouseOut(item,index, $event)"
+                        <p-td v-if="selectable"
+                              class="select-checkbox"
+                              @click.stop.prevent="selectClick"
+                              @mouseenter="hoverIndex=index"
+                              @mouseleave="hoverIndex=null"
                         >
-                            <p-td v-if="selectable"
-                                  class="select-checkbox"
-                                  @click.stop.prevent="selectClick"
-                                  @mouseenter="hoverIndex=index"
-                                  @mouseleave="hoverIndex=null"
+                            <PCheckBox v-model="proxySelectIndex" :value="index" :hovered="hoverIndex===index" />
+                        </p-td>
+                        <template v-for="field in fieldsName">
+                            <slot
+                                :name="'col-'+field"
+                                :item="item"
+                                :value="item[field]"
+                                :index="index"
+                                :field="field"
                             >
-                                <PCheckBox v-model="proxySelectIndex" :value="index" :hovered="hoverIndex===index" />
-                            </p-td>
-                            <template v-for="field in fieldsName">
-                                <slot
-                                    :name="'col-'+field"
-                                    :item="item"
-                                    :value="item[field]"
-                                    :index="index"
-                                    :field="field"
-                                >
-                                    <p-td onselectstart="return true" style="user-select: all">
-                                        <slot
-                                            :name="'col-'+field+'-format'"
-                                            :item="item"
-                                            :value="item[field]"
-                                            :index="index"
-                                            :field="field"
-                                        >
-                                            {{ item[field] }}
-                                        </slot>
-                                    </p-td>
-                                </slot>
-                            </template>
-                        </p-tr>
-                    </slot>
-                </template>
+                                <p-td onselectstart="return true" style="user-select: all">
+                                    <slot
+                                        :name="'col-'+field+'-format'"
+                                        :item="item"
+                                        :value="item[field]"
+                                        :index="index"
+                                        :field="field"
+                                    >
+                                        {{ item[field] }}
+                                    </slot>
+                                </p-td>
+                            </slot>
+                        </template>
+                    </p-tr>
+                </slot>
             </slot>
         </template>
         <template #foot>
@@ -310,7 +300,7 @@ export default {
         }
     },
     methods: {
-        getAligning(align){
+        getAligning(align) {
             return this.isEmpty(align) ? 'left' : align;
         },
         getColWidth(size) {
@@ -505,5 +495,4 @@ export default {
             font: 24px/32px Arial;
         }
     }
-
 </style>
