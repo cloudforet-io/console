@@ -44,7 +44,7 @@
         </p-chart>
         <div class="legend-container">
             <p-chart-legend v-for="(d, idx) in data" :key="d.key" class="legend"
-                            :text="d.key" :count="d.value" :icon-color="colors(idx)"
+                            :text="d.label || d.key" :count="d.value" :icon-color="colors(idx)"
                             :opacity="!hoverState || hoverList[idx] ? 1.0 : 0.3"
                             @mouseenter="onMouseEnter(idx)"
                             @mouseleave="resetHoverList"
@@ -208,6 +208,9 @@ export default {
             padding-top: 1.5rem;
             .legend::v-deep {
                 display: flex;
+                width: 50%;
+                max-width: 150px;
+                justify-content: space-between;
             }
         }
         .empty-text {

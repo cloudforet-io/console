@@ -42,7 +42,7 @@ export default {
             loading: true,
             chartData: [
                 { key: 'Pending', value: 0 },
-                { key: 'In-Service', value: 0 },
+                { key: 'In-Service', label: 'In Service', value: 0 },
                 { key: 'Maintenance', value: 0 },
                 { key: 'Closed', value: 0 },
             ],
