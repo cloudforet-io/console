@@ -58,7 +58,7 @@ export default {
     computed: {
         chartData() {
             return Object.keys(this.data).map(key => ({
-                key,
+                key: this.data[key].name,
                 value: this.data[key].count,
                 longitude: this.data[key].longitude,
                 latitude: this.data[key].latitude,
