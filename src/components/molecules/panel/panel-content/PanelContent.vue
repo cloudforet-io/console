@@ -70,11 +70,7 @@ export default {
             return this.active[idx] && this.$refs[`dd-${def.name}`][0].innerText;
         },
         setActiveArray() {
-            const emptyArr = [];
-            for (let i = 0; i < this.defs.length; i++) {
-                emptyArr.push(false);
-            }
-            this.active = emptyArr;
+            this.active = Array(this.defs.length).fill(false);
         },
         isCopyFlagged(definition) {
             return (_.get(definition, 'copyFlag') === true);
