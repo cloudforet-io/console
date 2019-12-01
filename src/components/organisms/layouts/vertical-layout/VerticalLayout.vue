@@ -1,6 +1,6 @@
 <template>
     <div class="box-container" :style="{height: height}">
-        <div class="content-container">
+        <div class="content-container left" tabindex="0" @keyup="setMinimizeAndRevertByKey">
             <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
         </div>
 
@@ -93,6 +93,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        minLeftSize: {
+            type: Number,
+            default: 16,
+        },
     },
     data() {
         return {
@@ -103,9 +107,6 @@ export default {
             dragging: false,
             mouseOver: false,
             pageX: null,
-            minimize: {
-
-            },
         };
     },
     computed: {
@@ -189,10 +190,15 @@ export default {
                 this.$emit('stop', this.leftContainerWidth);
             }
         },
+        setMinimizeAndRevertByKey(e) {
+            if (e.key === 't' || e.key === 'T') {
+                this.setMinimizeAndRevert(!this.isMinimized);
+            }
+        },
         setMinimizeAndRevert(flag) {
             if (flag) {
                 this.previousWidth = this.leftContainerWidth;
-                this.leftContainerWidth = 16;
+                this.leftContainerWidth = this.minLeftSize;
                 this.setVerticalLeftWidth(`${this.previousWidth}px`);
                 this.mouseOver = false;
             } else {
@@ -210,6 +216,7 @@ export default {
 <style lang="scss" scoped>
     .box-container {
         display: flex;
+        flex-grow: 1;
     }
     .content-container {
         overflow: scroll;
@@ -222,6 +229,14 @@ export default {
                 max-height: $fnb-height;
             }
         }
+    }
+    .left{
+      > div {
+          transition: width 0.5s;
+         > div {
+             transition: inherit;
+         }
+      }
     }
     .dragger-container {
         display: flex;
