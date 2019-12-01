@@ -87,6 +87,19 @@ export const arrayFormatter = value => ((value && Array.isArray(value) && value.
 // from @/lib/global-util.js
 export const collectorStateFormatter = ColorBindFactory(collectorStateColor, value => value.toLowerCase());
 
+// filters
+export const getValue = (scope, paths, defaultValue) => {
+    let value = scope;
+    try {
+        for (let i = 0; i < paths.length; i++) {
+            value = value[paths[i]];
+        }
+    } catch (e) {
+        return defaultValue || '';
+    }
+    return value;
+};
+
 /** @function
  * @name isEmpty
  * @description  Check whether given value is empty.
