@@ -16,7 +16,7 @@ import _ from 'lodash';
 import PListItem from '@/components/molecules/list-items/ListItem';
 
 export default {
-    name: 'ProjectContext',
+    name: 'DataCenterContext',
     components: {
         PListItem,
     },
@@ -75,7 +75,6 @@ export default {
             const objectType = _.get(this.contextData, 'node.data.item_type');
             const arrContext = [this.selectRT, this.selectRE, this.selectZN, this.selectPL];
 
-            // eslint-disable-next-line no-nested-ternary
             let contextIndex = objectType === 'REGION' ? 1 : objectType === 'ZONE' ? 2 : 3;
             if (hasClicked || initializing) {
                 contextIndex = 0;
@@ -87,7 +86,7 @@ export default {
     methods: {
         executeContext(item, event) {
             if (!this.isEmpty(_.get(item, 'flag'))) {
-                this.$parent.$parent.$refs.ProjectTree.setContextVisible(false);
+                this.$parent.$parent.$refs.DataCenterTree.setContextVisible(false);
             }
             this.$emit('executeContext', _.get(item, 'flag'));
         },

@@ -21,7 +21,7 @@
                     <p-text-input ref="projectID" v-model="textInput.id"
                                   :style="{'boxShadow': 'none' } "
                                   :disabled="true"
-                                  class="form-control"
+                                  class="form-control col-6"
                                   type="text"
                                   placeholder="  Project ID"
                                   required

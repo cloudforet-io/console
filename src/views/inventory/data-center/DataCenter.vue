@@ -3,9 +3,9 @@
         <data-center-context-action ref="contextPopUp"
                                     :selected-node="getSelectedNodeAndTree"
                                     :action-flag="getContextActionFlag"
-                                    @create="createProjectAndGroup"
-                                    @update="updateProjectAndGroup"
-                                    @delete="deleteProjectAndGroup"
+                                    @create="createOnDataCenter"
+                                    @update="updateOnDataCenter"
+                                    @delete="deleteOnDataCenter"
         />
         <area-tree
             ref="DataCenterTree"
@@ -16,7 +16,6 @@
             :context-menu-visible.sync="isContextMenuVisible"
             @DTNodeClicked="pNodeClicked"
             @DTNodeToggled="pNodeToggled"
-            @DTBeforeDropped="pBeforeDropped"
             @DTContextVisible="pContextVisible"
         >
             <template slot="icon" slot-scope="node">
@@ -93,7 +92,7 @@ const DataCenterContextAction = () => import('@/views/inventory/data-center/modu
 const DataCenterContext = () => import('@/views/inventory/data-center/modules/DataCenterContext');
 
 export default {
-    name: 'Project',
+    name: 'DataCenter',
     components: {
         PI,
         AreaTree,
@@ -104,8 +103,6 @@ export default {
         DataCenterAdmin,
         DataCenterContextAction,
         DataCenterContext,
-
-
     },
     data() {
         return {
@@ -160,7 +157,6 @@ export default {
             dataParam.is_cached = true;
             const param = {
                 item_type: _.get(node, 'data.item_type'),
-                // eslint-disable-next-line camelcase
                 item_id: _.get(node, 'data.id'),
                 domain_id: sessionStorage.domainId,
             };
@@ -175,104 +171,6 @@ export default {
             }).catch((error) => {
                 console.error(error);
             });
-        },
-        isValidMove(node, position) {
-            const placementTo = _.get(position, 'placement');
-            const targetNodeType = _.get(position, 'node.data.item_type');
-            const sourceNodeItemType = _.get(node[0], 'data.item_type');
-            if (position.node.path.length === 1 && placementTo !== 'inside' && sourceNodeItemType === 'PROJECT') {
-                return false;
-            } if (sourceNodeItemType === 'PROJECT_GROUP' && placementTo === 'inside' && targetNodeType === 'PROJECT') {
-                return false;
-            } if (sourceNodeItemType === 'PROJECT' && placementTo === 'inside' && targetNodeType === 'PROJECT') {
-                return false;
-            }
-            return true;
-        },
-        isSkipAble(node, position) {
-            if (position.node.path.length === 1 && position.placement !== 'inside') {
-                return true;
-            } if (position.node.data.item_type && position.placement !== 'inside') {
-                return true;
-            }
-            return true;
-        },
-        pBeforeDropped(node, position, cancel, tree) {
-            if (!this.isValidMove(node, position)) {
-                this.$notify({
-                    group: 'noticeBottomLeft',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'Not allowed action ',
-                    duration: 2000,
-                    speed: 1000,
-                });
-                cancel(true);
-                return;
-            }
-
-            const isCanceled = this.doTheyShareSameParent(node, position);
-            if (!position.node.data.is_cached) {
-                if (!this.isSkipAble(node, position)) {
-                    tree.remove(tree.getSelected().map(node => node.path));
-                    cancel(true);
-                }
-            }
-            this.moveProject(
-                node,
-                position,
-                tree,
-                cancel,
-                isCanceled,
-            );
-        },
-        async moveProject(node, position, tree, cancel, isCanceled) {
-            const fromItem = node[0].data;
-            const toItem = position.node.data;
-            const param = {};
-            const url = `/identity/${this.replaceAll(fromItem.item_type, '_', '-').toLowerCase()}/update`;
-
-            const keySource = `${fromItem.item_type.toLowerCase()}_id`;
-            const keyTo = fromItem.item_type === 'PROJECT_GROUP' ? 'parent_project_group_id' : `${toItem.item_type.toLowerCase()}_id`;
-            param[keySource] = fromItem.id;
-            param[keyTo] = toItem.item_type === 'PROJECT' ? tree.getNode(_.take(position.node.path, position.node.path.length - 1)).data.id : toItem.id;
-
-            if (fromItem.item_type === 'PROJECT_GROUP' && position.placement !== 'inside' && position.node.level === 1) {
-                param.release_parent_project_group = true;
-            }
-
-            await this.$http.post(url, param).then((response) => {
-                const responseData = response.data;
-                if (!this.isEmpty(responseData)) {
-                    console.log('Item successfully moved. ');
-                }
-            }).catch((error) => {
-                console.error(error);
-            });
-
-            if (!position.node.data.is_cached) {
-                if (isCanceled) {
-                    position.node.path[position.node.path.length - 1] = position.node.path[position.node.path.length - 1] - 1;
-                    tree.select(position.node.path, { addToSelection: false });
-                }
-                tree.updateNode(position.node.path, { isExpanded: true });
-                this.pNodeToggled(position.node, tree);
-            }
-        },
-        doTheyShareSameParent(fromNode, toNode) {
-            let isNeedToProcessOnSC = false;
-            if (!toNode.node.data.is_cached) {
-                const sourceNode_path = JSON.parse(JSON.stringify(fromNode[0].path));
-                const toNode_path = JSON.parse(JSON.stringify(toNode.node.path));
-                if (sourceNode_path.length === toNode_path.length) {
-                    sourceNode_path.pop();
-                    toNode_path.pop();
-                    if (JSON.stringify(sourceNode_path) === JSON.stringify(toNode_path)) {
-                        isNeedToProcessOnSC = true;
-                    }
-                }
-            }
-            return isNeedToProcessOnSC;
         },
         pContextVisible(node, event, hasClicked, tree) {
             const actionOBJ = {
@@ -303,32 +201,34 @@ export default {
             });
             this.displayTree = true;
         },
-        async createProjectAndGroup(flag, tree, nodeData) {
-            const paramBasic = {
+        async createOnDataCenter(flag, tree, nodeData) {
+            const param = {
                 name: this.$refs.contextPopUp._data.textInput.name,
                 tags: this.$refs.contextPopUp._data.tagInput.tags,
             };
-
-            const param = flag[1] === 'RT' ? { is_root: true, ...paramBasic } : flag[1] === 'PR' ? { parent_project_group_id: nodeData.id, ...paramBasic } : { project_group_id: nodeData.id, ...paramBasic };
-            const url = flag[1] === 'PJ' ? 'project' : 'project-group';
-
-            await this.$http.post(`/identity/${url}/create`, param).then((response) => {
+            if (flag[1] != 'RE') {
+                const key = flag[1] === 'ZN' ? 'region_id' : 'zone_id';
+                param[key] = nodeData.id;
+            }
+            const url = flag[1] === 'RE' ? 'region' : flag[1] === 'ZN' ? 'zone' : 'pool';
+            await this.$http.post(`/inventory/${url}/create`, param).then((response) => {
                 const responseData = !this.isEmpty(response.data) ? response.data : {};
                 if (!this.isEmpty(responseData)) {
-                    const placement = flag[1] === 'RT' ? 'after' : 'inside';
+                    const placement = flag[1] === 'RE' ? 'after' : 'inside';
                     const InitializingData = {
-                        id: !this.isEmpty(responseData.project_group_id) ? responseData.project_group_id : responseData.project_id,
-                        item_type: !this.isEmpty(responseData.project_group_id) ? 'PROJECT_GROUP' : 'PROJECT',
-                        is_root: !this.isEmpty(responseData.is_root) ? responseData.is_root : false,
+                        id: flag[1] === 'RE' ? responseData.region_id : flag[1] === 'ZN' ? responseData.zone_id : responseData.pool_id,
+                        item_type: flag[1] === 'RE' ? 'REGION' : flag[1] === 'ZN' ? 'ZONE' : 'POOL',
                         name: param.name,
                     };
-                    const newNode = this.getSelectedNode(InitializingData, 'PROJECT');
 
-                    if (flag[1] !== 'RT') {
+                    const newNode = this.getSelectedNode(InitializingData, 'DATA_CENTER');
+
+                    if (flag[1] !== 'RE') {
                         this.applyActionOnScreen(tree, { node: newNode, placement });
                     } else {
                         tree.insert({ node: tree.getSelected()[0], placement }, newNode);
                     }
+
                     if (this.isInitializing) {
                         tree.remove([tree.getFirstNode()].map(node => node.path));
                         this.isInitializing = false;
@@ -339,15 +239,15 @@ export default {
             });
             this.$refs.contextPopUp.hideModal();
         },
-        async updateProjectAndGroup(flag, tree, nodeData) {
-            const basicParam = {
+        async updateOnDataCenter(flag, tree, nodeData) {
+            const param = {
                 name: this.$refs.contextPopUp._data.textInput.name,
                 tags: this.$refs.contextPopUp._data.tagInput.tags,
             };
-
-            const key = `${nodeData.item_type.toLowerCase()}_id`;
-            const url = `/identity/${this.replaceAll(nodeData.item_type, '_', '-').toLowerCase()}/update`;
-            const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: nodeData.id, ...basicParam } : { project_id: nodeData.id, ...basicParam };
+            const itemType = nodeData.item_type;
+            const key = `${itemType.toLowerCase()}_id`;
+            const url = `/inventory/${itemType.toLowerCase()}/update`;
+            param[key] = nodeData.id;
 
             await this.$http.post(url, param).then((response) => {
                 if (response.data[key] === nodeData.id) {
@@ -356,16 +256,19 @@ export default {
                     }
                 }
                 tree.updateNode(tree.getSelected()[0].path, { title: param.name });
+
             }).catch((error) => {
                 console.error(error);
             });
             this.$refs.contextPopUp.hideModal();
         },
-        async deleteProjectAndGroup(flag, tree, nodeData) {
+        async deleteOnDataCenter(flag, tree, nodeData) {
             const path = tree.getSelected().map(node => node.path);
-            const url = `/identity/${this.replaceAll(nodeData.item_type, '_', '-').toLowerCase()}/delete`;
-            const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: nodeData.id } : { project_id: nodeData.id };
-            const arg = (nodeData.item_type === 'PROJECT_GROUP') ? this.tr('COMMON.PG_GR') : this.tr('COMMON.PG');
+            const itemType = nodeData.item_type;
+            // eslint-disable-next-line no-nested-ternary
+            const param = itemType === 'REGION' ? { region_id: nodeData.id } : itemType === 'ZONE' ? { zone_id: nodeData.id } : { pool_id: nodeData.id };
+            const arg = itemType === 'REGION' ? this.tr('COMMON.REGION') : itemType === 'ZONE' ? this.tr('COMMON.ZONE') : this.tr('COMMON.POOL');
+            const url = `/inventory/${itemType.toLowerCase()}/delete`;
 
             await this.$http.post(url, param).then((response) => {
                 const responseData = response.data;
@@ -375,7 +278,7 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'success',
                         title: 'Success',
-                        text: this.tr('IDENTITY.DEL_SUCC_ARG', [arg]),
+                        text: this.tr('INVENTORY.DEL_SUCC_ARG', [arg]),
                         duration: 2000,
                         speed: 1000,
                     });
