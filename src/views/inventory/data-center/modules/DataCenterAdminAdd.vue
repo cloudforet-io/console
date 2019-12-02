@@ -240,11 +240,12 @@ export default {
             });
             return this.label.hashTagInvalidity ? false : labelArr;
         },
-        async addUserOnProject() {
+        async addUserOnDataCenter() {
             const selectedNodeDT = this.$parent.selectedNode.node.data;
-            const selectedId = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
-            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/add`;
-            const param = { users: _.map(this.tagRelated.Tags, 'text'), ...selectedId };
+            const param = { users: _.map(this.tagRelated.Tags, 'text') };
+            const key = `${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}_id`;
+            param[key] = selectedNodeDT.id;
+            const url = `/inventory/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/add`;
 
             if (!this.isEmpty(this.label.input)) {
                 const isValid = this.checkValidity();
@@ -255,7 +256,6 @@ export default {
             } else if (this.isEmpty(param.users)) {
                 return false;
             }
-
             await this.$http.post(url, param).then(() => {
                 this.$parent.getMembers();
                 this.tagRelated.Tags = [];
@@ -273,7 +273,7 @@ export default {
             this.listMembersOnSearch(this.searchText);
         },
         confirm() {
-            this.addUserOnProject();
+            this.addUserOnDataCenter();
         },
         close() {
             console.log('close Modal');

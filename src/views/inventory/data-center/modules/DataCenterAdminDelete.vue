@@ -97,7 +97,7 @@ export default {
     computed: {
         getSelectedTypeKey() {
             const currentType = this.$parent.selectedNode.node.data.item_type;
-            return (currentType === 'PROJECT_GROUP') ? 'COMMON.PG_GR' : 'COMMON.PG';
+            return (currentType === 'REGION') ? 'COMMON.REGION' : (currentType === 'ZONE') ? 'COMMON.ZONE' : 'COMMON.POOL';
         },
         getMemberModalTitle() {
             return this.tr('IDENTITY.DEL_ARG', [this.tr('COMMON.MEMBER')]);
@@ -167,9 +167,10 @@ export default {
         },
         async deleteUserOnProject() {
             const selectedNodeDT = this.$parent.selectedNode.node.data;
-            const selectedId = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
-            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/remove`;
-            const param = { users:  _.map(this.memberToDelete, 'user_info.user_id'), ...selectedId };
+            const param = { users:  _.map(this.memberToDelete, 'user_info.user_id') };
+            const key = `${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}_id`;
+            param[key] = selectedNodeDT.id;
+            const url = `/inventory/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/remove`;
             await this.$http.post(url, param).then(() => {
                 this.$notify({
                     group: 'noticeBottomRight',
