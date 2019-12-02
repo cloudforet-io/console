@@ -219,7 +219,7 @@ export default {
         flex-grow: 1;
     }
     .content-container {
-        overflow: scroll;
+        overflow: auto;
         &.right {
             display: inline-flex;
             flex-direction: column;
@@ -232,9 +232,10 @@ export default {
     }
     .left{
       > div {
-          transition: width 0.5s;
          > div {
-             transition: inherit;
+             transition:  width 0.5s;
+             overflow-y: auto;
+             overflow-x: hidden;
          }
       }
     }
