@@ -247,7 +247,8 @@ export const ko = {
         DEL_MEMBER_PRJ: '{0} 에서 다음 회원을 제거 하시겠습니까? ',
     },
     INVENTORY: {
-
+        NO_DT_CEN_SEL: '데이터 센터를 선택해주십시오.',
+        NO_DT_CEN_DT: '왼쪽 트리 패널의 아이템을 클릭 하세요.',
     },
     TREE_TYPE: {
         PROJECT: '프로젝트',

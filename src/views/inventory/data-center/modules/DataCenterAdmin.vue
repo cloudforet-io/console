@@ -1,290 +1,290 @@
 <template>
-  <div class="animated fadeIn">
-    <b-row>
-      <b-col cols="12">
-        <BaseTable :table-data="admins"
-                   :fields="fields"
-                   :per-page="perPage"
-                   searchable
-                   :total-rows="totalCount"
-                   :search-context-data="searchQueryData"
-                   show-caption
-                   :busy="isLoading"
-                   :cardless="false"
-                   underlined
-                   @rowSelected="rowSelected"
-                   @list="listAdmins"
-                   @limitChanged="limitChanged"
-                   @onSelectAll="rowAllSelected"
+    <div>
+        <project-member-add ref="MemberAdd"
+                            :reference-member="getBindMember"
+        />
+        <project-member-delete ref="MemberDelete"
+                               :reference-member="getMemberData"
+        />
+        <p-toolbox-table :items="members"
+                         :fields="fields"
+                         :shadow="false"
+                         :border="false"
+                         :hover="true"
+                         :responsive-style="{'height': getPropHeight + 'px', 'overflow-y':'auto'}"
+                         :selectable="selectable"
+                         :sortable="sortable"
+                         :sort-by.sync="tablePage.sortBy"
+                         :sort-desc.sync="tablePage.sortDesc"
+                         :all-page="tablePage.allPage"
+                         :this-page.sync="tablePage.thisPage"
+                         :select-index.sync="selectIndex"
+                         :page-size.sync="tablePage.pageSize"
+                         :loading="loading"
+                         :use-spinner-loading="true"
+                         :use-cursor-loading="true"
+                         @changePageSize="changePageSize"
+                         @changeSort="getMembers"
+                         @changePageNumber="getMembers"
+                         @clickRefresh="getMembers"
         >
-          <template #caption>
-            <b-row align-v="center" align-h="center">
-              <b-col  class="pr-1" cols="5" >
-                <BaseModal ref="addMember"
-                           title="Add Member"
-                           centered
-                           hide-footer
+            <template slot="toolbox-left">
+                <p-button style-type="primary" @click="showModals('add')">
+                    <p-i :color="'transparent inherit'"
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_plus'"
+                    />   {{ tr('COMMON.BTN_ADD') }}
+                </p-button>
+                <p-button style-type="alert" :outline="true"
+                          :disabled="isDisabled"
+                          class="btn-margin"
+                          @click="showModals('del')"
                 >
-                  <template #activator>
-                    <b-button block variant="primary">
-                      {{ $t('MSG.BTN_ADD') }}
-                    </b-button>
-                  </template>
-                  <template #contents>
-                    <AdminDetail creatable
-                                  updatable
-                                  :admins="adminUserIDs"
-                                  :selected-data="anySelectedRow"
-                                  @close="$refs.addMember.hideModal()"
-                    />
-                  </template>
-                </BaseModal>
-              </b-col>
-              <b-col  class="pl-1" cols="5" >
-                <template v-if="hasSelectedMember">
-                  <b-button class="mr-5" block variant="danger" @click="deleteSelected">
-                    {{ $t('MSG.BTN_DELETE') }}
-                  </b-button>
-                </template>
-              </b-col>
-              <b-col  cols="2" />
-            </b-row>
-          </template>
-        </BaseTable>
-      </b-col>
-    </b-row>
-
-    <ActionCheckModal ref="IVDC005_DeleteUser"
-                      primary-key="user_id"
-                      :data="selectedAdmins"
-                      :fields="selectedFields"
-                      :action="actionProcess"
-                      :title="actionCommandData.title"
-                      :type="actionCommandData.type"
-                      :text="actionCommandData.text"
-                      @succeed="listAdmins"
-                      @failed="listAdmins"
-    />
-  </div>
+                    {{ tr('COMMON.BTN_DELETE') }}
+                </p-button>
+            </template>
+            <template v-slot:col-user_id-format="data">
+                {{ data.item.user_info.user_id }}
+            </template>
+            <template v-slot:col-name-format="data">
+                {{ data.item.user_info.name }}
+            </template>
+            <template v-slot:col-email-format="data">
+                {{ data.item.user_info.email }}
+            </template>
+            <template v-slot:col-mobile-format="data">
+                {{ data.item.user_info.mobile }}
+            </template>
+            <template v-slot:col-group-format="data">
+                {{ data.item.user_info.group }}
+            </template>
+            <template v-slot:col-labels-format="data">
+                <div>
+                    <PBadge v-for="label in data.item.labels" class="p-label" :style-type="'gray2'">
+                        {{ getEmptyString(label) }}
+                    </PBadge>
+                </div>
+            </template>
+        </p-toolbox-table>
+    </div>
 </template>
-
 <script>
-import searchContext from '@/views/identity/project/search-context/query';
-import BaseTable from '@/components/base/table/BaseTable';
-import ActionCheckModal from '@/components/base/modal/ActionCheckModal';
-import BaseModal from '@/components/base/modal/BaseModal';
-import AdminDetail from '@/views/inventory/data-center//modules/DataCenterAdminDetail';
+import _ from 'lodash';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
+import PButton from '@/components/atoms/buttons/Button';
+import ProjectMemberAdd from '@/views/identity/project/modules/ProjectMemberAdd';
+import ProjectMemberDelete from '@/views/identity/project/modules/ProjectMemberDelete';
+import { defaultQuery } from '@/lib/api';
+import PI from '@/components/atoms/icons/PI';
+import PBadge from '@/components/atoms/badges/Badge';
 
 export default {
-    name: 'DataCenterAdmin',
+    name: 'ProjectMember',
     components: {
-        BaseTable,
-        BaseModal,
-        AdminDetail,
-        ActionCheckModal
+        PToolboxTable,
+        PButton,
+        PI,
+        ProjectMemberAdd,
+        ProjectMemberDelete,
+        PBadge,
     },
-    data () {
+    props: {
+        tabBasicHeight: {
+            type: Number,
+            default: 40,
+        },
+        selectedNode: {
+            type: Object,
+            default: null,
+        },
+        referenceMember: {
+            type: Array,
+            default: () => [],
+        },
+        responsiveStyle: {
+            type: Object,
+            default: null,
+        },
+    },
+    data() {
         return {
-            admins: [],
-            adminUserIDs: [],
-            selectedIdx: undefined,
-            addModal: false,
-            totalCount: 0,
-            searchQueryData: searchContext,
-            searchQuery: {},
-            actionCommandData:{},
-            isReadyForSearch: false,
-            perPage: 3,
-            actionFlag: null,
-            isLoading: true,
-            selectedItems: [],
-            selectedMember: null
+            members: [],
+            selectable: true,
+            sortable: true,
+            selectIndex: [],
+            loading: false,
+            tablePage: {
+                sortBy: 'user_id',
+                sortDesc: false,
+                thisPage: 1,
+                allPage: 1,
+                pageSize: 15,
+            },
         };
     },
     computed: {
-        anySelectedRow(){
-            return this.$attrs['selected-data'];
+        getPropHeight() {
+            return this.tabBasicHeight;
         },
-        selectedFields () {
+        getBindMember() {
+            return _.map(this.members, 'user_info.user_id');
+        },
+        getMemberData() {
+            return this.members;
+        },
+        isDisabled() {
+            return !(this.selectIndex.length > 0);
+        },
+        fields() {
             return [
-                { key: 'user_id', label: this.tr('COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
-                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
-                { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }}
+                {
+                    name: 'user_id', label: this.tr('COMMON.UID'), size: '145px',
+                },
+                {
+                    name: 'name', label: this.tr('COMMON.NAME'), size: '200px',
+                },
+                {
+                    name: 'email', label: this.tr('COMMON.EMAIL'), size: '150px',
+                },
+                {
+                    name: 'group', label: this.tr('COMMON.GROUP'), size: '120px',
+                },
+                {
+                    name: 'labels', label: this.tr('COMMON.LABELS'), size: '120px',
+                },
             ];
         },
-        fields () {
-            return [
-                { key: 'selected', thStyle: { width: '50px' }},
-                { key: 'user_id', label: this.tr('COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' }},
-                { key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' }},
-                { key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'role', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' }},
-                { key: 'roles', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false,  thClass: 'd-none', tdClass: 'd-none' }
-            ];
-        },
-        isMultiSelected () {
-            return this.selectedItems.length > 1;
-        },
-        hasSelectedMember () {
-            return this.selectedItems.length > 0;
-        },
-        selectedAdmins () {
-            return this.selectedItems.map((item) => {
-                return item.data;
-            });
-        }
     },
-    mounted () {
-        this.init();
+    mounted() {
+        this.listMembers();
     },
     methods: {
-        init () {
-            this.listAdmins(this.perPage, 0);
+        getEmptyString(object) {
+            return this.isEmpty(object) ? '' : object;
         },
-        reset () {
-            this.admins = [];
-            this.selectedMember = null;
-            this.isLoading = true;
-        },
-        saveMeta (limit, start, sort, filter, filterOr) {
-            if (this.isEmpty(limit)) {
-                limit = 10;
-            }
-            if (this.isEmpty(start)) {
-                start = 0;
-            }
-            if (this.isEmpty(sort)) {
-                sort = {};
-            }
-            if (this.isEmpty(filter)) {
-                filter = [];
-            }
-            if (this.isEmpty(filterOr)) {
-                filterOr = [];
-            }
-            this.searchQuery = {
-                sort,
-                page: {
-                    start: start,
-                    limit
-                },
-                filter_or: filterOr
+        getDefaultQuery() {
+            return {
+                query: defaultQuery(
+                    this.tablePage.thisPage,
+                    this.tablePage.pageSize,
+                    this.tablePage.sortBy,
+                    this.tablePage.sortDesc,
+                ),
             };
         },
-        async listAdmins (limit, start, sort, filter, filterOr) {
-            this.reset();
-            this.saveMeta(limit, start, sort, filter, filterOr);
-
-            let param = {
-                query: this.searchQuery
-            };
-
-            const itemType = this.$attrs['selected-data'].node.data.item_type;
-            const url = `/inventory/${itemType.toLowerCase()}/admin/list`;
-            const key = `${itemType.toLowerCase()}_id`;
-            param[key] =  this.$attrs['selected-data'].node.data.id;
-
-            await this.$http.post(url,param).then((response) => {
-                let results = [];
-                if (!this.isEmpty(response.data.results)){
-                    let adminUserIds =[];
-                    response.data.results.forEach(function(current){
-                        //current.user_info['role'] = current.user_info.roles.join(', ');
-                        results.push(current.user_info);
-                        adminUserIds.push(current.user_info.user_id);
-                    });
-                    this.adminUserIDs = adminUserIds;
-                }
-                this.admins = results;
-                console.log(response.data.results);
-                this.isLoading = false;
-            }).catch((error) =>{
+        getMembers() {
+            this.listMembers();
+        },
+        changePageSize() {
+            this.tablePage.thisPage = 1;
+            this.tablePage.allPage = 1;
+            this.listMembers();
+        },
+        reset() {
+            this.members = [];
+        },
+        async listMembers() {
+            this.loading = true;
+            const query = this.getDefaultQuery();
+            const selectedNodeDT = this.selectedNode.node.data;
+            const param = selectedNodeDT.item_type === 'PROJECT_GROUP' ? { project_group_id: selectedNodeDT.id, ...query } : { project_id: selectedNodeDT.id, ...query };
+            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/member/list`;
+            await this.$http.post(url, param).then((response) => {
+                this.members = response.data.results;
+                const allPage = Math.ceil(response.data.total_count / this.tablePage.pageSize);
+                this.tablePage.allPage = allPage || 1;
+                this.selectIndex = [];
+            }).catch((error) => {
                 console.error(error);
-                this.isLoading = false;
             });
+            this.loading = false;
         },
-        rowSelected (rows) {
-            this.selectedItems = rows;
-            if (rows.length === 1) {
-                this.selectedIdx = rows[0].idx;
-            }
-        },
-        rowAllSelected (isSelectedAll, rows) {
-            this.selectedItems = rows;
-        },
-        limitChanged (val) {
-            this.perPage = Number(val);
-            this.init();
-        },
-        getSelectedInfo(key){
+        getSelectedInfo(key) {
             const selectedObj = this.$attrs['selected-data'].node;
             const Obj = {
                 id: selectedObj.data.id,
                 is_cached: selectedObj.data.is_cached,
                 is_root: selectedObj.data.is_root,
-                item_type: selectedObj.data.item_type
+                item_type: selectedObj.data.item_type,
             };
 
-            if (this.isEmpty(selectedObj)){
+            if (this.isEmpty(selectedObj)) {
                 return false;
-            } else if (this.isEmpty(key)){
+            } if (this.isEmpty(key)) {
                 return Obj;
-            } else if (Obj.hasOwnProperty(key)){
+            } if (Obj.hasOwnProperty(key)) {
                 return Obj[key];
-            } else {
-                return false;
             }
+            return false;
         },
-        async actionProcess () {
-            let param = {};
+        async actionProcess() {
             let url = null;
-            if (this.selectedAdmins.length > 0){
-                const adminsIds = this.selectedAdmins;
-                const key = `${this.getSelectedInfo('item_type').toLowerCase()}_id`;
-                url =   `/inventory/${this.getSelectedInfo('item_type').toLowerCase()}/admin/remove`;
-                param[key] =  this.getSelectedInfo('id');
-                param['users'] =  this.getSelectedValArr(adminsIds, 'user_id');
+            const param = {};
+
+            if (this.selectedMembers.length > 0) {
+                const membersIds = this.selectedMembers;
+                if (this.actionFlag === 'delete') {
+                    if (this.getSelectedInfo('item_type') === 'PROJECT_GROUP') {
+                        url = '/identity/project-group/member/remove';
+                        param.project_group_id = this.getSelectedInfo('id');
+                        param.users = this.getSelectedValArr(membersIds, 'user_id');
+                    } else {
+                        url = '/identity/project/member/remove';
+                        param.project_id = this.getSelectedInfo('id');
+                        param.users = this.getSelectedValArr(membersIds, 'user_id');
+                    }
+                }
             } else {
                 return;
             }
-            if (!this.isEmpty(url) && !this.isEmpty(param)) {
+            if (!this.isEmpty(url) && !this.isEmpty(url)) {
                 await this.$http.post(url, param);
+                /*     .then((response) => {
+                        if (this.isEmpty(response.data)){
+                            console.log('success');
+                        }
+                    }).catch((error) =>{
+                        console.log(error);
+                    }); */
             }
         },
-        actionCommand(){
-            let itemType = this.getSelectedInfo('item_type') === 'REGION' ? this.tr('MSG.RG') : this.getSelectedInfo('item_type') === 'ZONE' ? this.tr('MSG.ZE'): this.tr('MSG.PL');
-            if (this.actionFlag ==='delete'){
-                let obj = {};
-                obj['title'] = this.tr('MSG.DEL_PARAM', [this.tr('MSG.ADMIN_USER')]);
-                obj['type'] = 'danger';
-                obj['text'] =  this.tr('DELETE_YN', [itemType]);
+        actionCommand() {
+            const itemType = this.getSelectedInfo('item_type') === 'PROJECT_GROUP' ? this.tr('PG_GR') : this.tr('PG');
+            if (this.actionFlag === 'delete') {
+                const obj = {};
+                obj.title = this.tr('DEL_MEM');
+                obj.type = 'danger';
+                obj.text = this.tr('DELETE_YN', [itemType]);
                 this.actionCommandData = obj;
             }
-            this.$refs.IVDC005_DeleteUser.showModal();
+            this.$refs.IDPJ005_DeleteUser.showModal();
         },
-        deleteSelected () {
+        deleteSelected() {
             this.actionFlag = 'delete';
             this.actionCommand();
-        }
-    }
+        },
+        showModals(type) {
+            if (type === 'add') {
+                this.$refs.MemberAdd.showModal();
+            } else {
+                this.$refs.MemberDelete.showModal();
+            }
+        },
+    },
 };
 </script>
 
 <style lang="scss" scoped>
-
-
-  .col-left-gap-measure {
-    padding-left: 5px;
-  }
-
-  .col-right-gap-measure {
-    padding-left: 0px;
-    padding-right: 25px;
-  }
-  .base-table {
-    @extend %sheet;
-  }
+    .p-label {
+        margin-bottom:5px;
+        margin-right: 0.5rem;
+        color:$dark;
+    }
+    .base-table {
+        @extend %sheet;
+    }
+    .btn-margin{
+        margin-left: 1rem;
+    }
 </style>

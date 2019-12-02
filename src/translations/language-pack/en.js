@@ -247,7 +247,8 @@ export const en = {
         DEL_MEMBER_PRJ: 'Are you sure you want to remove a following members from {0} ?',
     },
     INVENTORY: {
-
+        NO_DT_CEN_SEL: 'No Selected Data Center',
+        NO_DT_CEN_DT: 'Please, Click an item from left tree panel.',
     },
     MSG: {
 
