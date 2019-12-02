@@ -91,12 +91,14 @@ export default {
         },
         async setInitData() {
             const selectedNodeDT = this.selectedNode.node.data;
-            const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
-            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/get`;
+            const param = {};
+            const key = `${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}_id`;
+            param[key] = selectedNodeDT.id;
+            const url = `/inventory/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/get`;
             await this.$http.post(url, param).then((response) => {
                 if (!this.isEmpty(response.data)) {
                     this.item = {
-                        id: response.data.hasOwnProperty('project_group_id') ? response.data.project_group_id : response.data.project_id,
+                        id: response.data.hasOwnProperty('region_id') ? response.data.region_id : response.data.hasOwnProperty('zone_id') ? response.data.zone_id : response.data.pool_id,
                         name: response.data.name,
                         create: this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone),
                     };

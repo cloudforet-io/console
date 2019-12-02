@@ -73,7 +73,7 @@ import PTextInput from '@/components/atoms/inputs/TextInput';
 import PTagInputGroup from '@/components/organisms/forms/tag-input-group/TagInputGroup';
 
 export default {
-    name: 'ProjectContextAction',
+    name: 'DataCenterContextAction',
     components: {
         PButtonModal,
         PLabel,
@@ -144,7 +144,7 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                const targetObj = actionFlag[1] === 'PJ' ? this.tr('COMMON.PG') : this.tr('COMMON.PG_GR');
+                const targetObj = actionFlag[1] === 'RE' ? this.tr('COMMON.REGION') : actionFlag[1] === 'ZN' ? this.tr('COMMON.ZONE') : this.tr('COMMON.POOL');
                 if (actionFlag[0] === 'CRT') {
                     selectedLabel = this.tr('ORGANISMS.CREATE_ARG', [targetObj]);
                 } else if (actionFlag[0] === 'UPT') {
@@ -159,11 +159,14 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                const targetObj = actionFlag[1] === 'PJ' ? this.tr('COMMON.PG') : this.tr('COMMON.PG_GR');
+                const targetObj = actionFlag[1] === 'RE' ? this.tr('COMMON.REGION') : actionFlag[1] === 'ZN' ? this.tr('COMMON.ZONE') : this.tr('COMMON.POOL');
                 if (actionFlag[0] === 'CRT') {
-                    selectedLabel = this.tr('IDENTITY.PARENT_ARG', [this.tr('COMMON.PG_GR')]);
+                    if (actionFlag[0] === 'CRT') {
+
+                    }
+                    selectedLabel = this.tr('INVENTORY.PARENT_ARG', [this.tr('COMMON.PG_GR')]);
                 } else if (actionFlag[0] === 'UPT') {
-                    selectedLabel = this.tr('IDENTITY.SELECT_ARG', [targetObj]);
+                    selectedLabel = this.tr('INVENTORY.SELECT_ARG', [targetObj]);
                 } else {
                     selectedLabel = this.tr('ORGANISMS.DELETE_ARG', [targetObj]);
                 }

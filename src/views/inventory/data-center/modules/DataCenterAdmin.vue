@@ -80,7 +80,7 @@ import PI from '@/components/atoms/icons/PI';
 import PBadge from '@/components/atoms/badges/Badge';
 
 export default {
-    name: 'ProjectMember',
+    name: 'DataCenterMember',
     components: {
         PToolboxTable,
         PButton,
@@ -188,8 +188,10 @@ export default {
             this.loading = true;
             const query = this.getDefaultQuery();
             const selectedNodeDT = this.selectedNode.node.data;
-            const param = selectedNodeDT.item_type === 'PROJECT_GROUP' ? { project_group_id: selectedNodeDT.id, ...query } : { project_id: selectedNodeDT.id, ...query };
-            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/member/list`;
+            const param = { ...query };
+            const key = `${selectedNodeDT.item_type.toLowerCase()}_id`;
+            param[key] = selectedNodeDT.id;
+            const url = `/inventory/${selectedNodeDT.item_type.toLowerCase()}/member/list`;
             await this.$http.post(url, param).then((response) => {
                 this.members = response.data.results;
                 const allPage = Math.ceil(response.data.total_count / this.tablePage.pageSize);

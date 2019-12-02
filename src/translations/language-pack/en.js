@@ -249,6 +249,8 @@ export const en = {
     INVENTORY: {
         NO_DT_CEN_SEL: 'No Selected Data Center',
         NO_DT_CEN_DT: 'Please, Click an item from left tree panel.',
+        SELECT_ARG: 'Selected {0}',
+        PARENT_ARG: 'Parent {0}',
     },
     MSG: {
 

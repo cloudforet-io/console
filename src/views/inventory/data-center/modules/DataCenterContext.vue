@@ -30,38 +30,41 @@ export default {
         return {
             /**
              * Flag:
-             * CRT_RT: Create Root
-             * UPT_PJ: Update Project
-             * DEL_PJ: Delete Project
-             * CRT_PR: Create Project group
-             * CRT_PJ: Create Project
-             * UPT_PR: Update Project group
-             * DEL_PR: Delete Project group
              * */
             /**
              * When Back panel or Root has clicked
             */
             selectRT: [
-                { flag: 'CRT_RT', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.PG_GR')]), indent: 0 },
+                { flag: 'CRT_RE', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.REGION')]), indent: 0 },
             ],
             /**
-             * When Project has Selected
+             * When Region has Selected
              */
-            selectPT: [
-                { flag: 'UPT_PJ', contents: this.tr('ORGANISMS.UPDATE_ARG', [this.tr('COMMON.PG')]), indent: 0 },
-                { flag: 'DEL_PJ', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.PG')]), indent: 0 },
-            ],
-            /**
-             * When Project Group has Selected
-             */
-            selectPG: [
-                { flag: 'CRT_PR', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.PG_GR')]), indent: 0 },
-                { flag: 'UPT_PR', contents: this.tr('ORGANISMS.UPDATE_ARG', [this.tr('COMMON.PG_GR')]), indent: 0 },
-                { flag: 'DEL_PR', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.PG_GR')]), indent: 0 },
+            selectRE: [
+                { flag: 'CRT_ZN', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.ZONE')]), indent: 0 },
                 {
                     flag: '', contents: '', indent: 0, divider: true,
                 },
-                { flag: 'CRT_PJ', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.PG')]), indent: 0 },
+                { flag: 'UPT_RE', contents: this.tr('ORGANISMS.UPDATE_ARG', [this.tr('COMMON.REGION')]), indent: 0 },
+                { flag: 'DEL_RE', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.REGION')]), indent: 0 },
+            ],
+            /**
+             * When Zone has Selected
+             */
+            selectZN: [
+                { flag: 'CRT_PL', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.POOL')]), indent: 0 },
+                {
+                    flag: '', contents: '', indent: 0, divider: true,
+                },
+                { flag: 'UPT_ZN', contents: this.tr('ORGANISMS.UPDATE_ARG', [this.tr('COMMON.ZONE')]), indent: 0 },
+                { flag: 'DEL_ZM', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.ZONE')]), indent: 0 },
+            ],
+            /**
+             * When Pool has Selected
+             */
+            selectPL: [
+                { flag: 'UPT_PL', contents: this.tr('ORGANISMS.UPDATE_ARG', [this.tr('COMMON.POOL')]), indent: 0 },
+                { flag: 'DEL_PL', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.POOL')]), indent: 0 },
             ],
         };
     },
@@ -70,9 +73,10 @@ export default {
             const hasClicked = _.get(this.contextData, 'node.data.back_panel_click');
             const initializing = _.get(this.contextData, 'node.data.init');
             const objectType = _.get(this.contextData, 'node.data.item_type');
-            const arrContext = [this.selectRT, this.selectPT, this.selectPG];
+            const arrContext = [this.selectRT, this.selectRE, this.selectZN, this.selectPL];
 
-            let contextIndex = objectType === 'PROJECT' ? 1 : 2;
+            // eslint-disable-next-line no-nested-ternary
+            let contextIndex = objectType === 'REGION' ? 1 : objectType === 'ZONE' ? 2 : 3;
             if (hasClicked || initializing) {
                 contextIndex = 0;
             }

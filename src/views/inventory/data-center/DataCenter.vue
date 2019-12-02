@@ -19,10 +19,9 @@
             @DTBeforeDropped="pBeforeDropped"
             @DTContextVisible="pContextVisible"
         >
-            <template #icon="{ node }">
-{{node}}
-                <!--<span v-if="!node.data.init" class="item-icon">
-                    &lt;!&ndash;<p-i v-if="node.data.item_type == 'REGION'"
+            <template slot="icon" slot-scope="node">
+                <span v-if="!node.data.init" class="item-icon">
+                    <p-i v-if="node.data.item_type === 'REGION'"
                          :color="'transparent inherit'"
                          :width="'1rem'"
                          :height="'1rem'"
@@ -39,9 +38,8 @@
                          :width="'1rem'"
                          :height="'1rem'"
                          :name="'ic_tree_pool'"
-                    />&ndash;&gt;
-                    asdlkfjaslkdjf
-                </span>-->
+                    />
+                </span>
             </template>
             <template #context>
                 <data-center-context
@@ -296,7 +294,6 @@ export default {
             }).then((response) => {
                 const responseData = this.treeDataHandler(response.data, 'DATA_CENTER');
                 this.treeData = responseData;
-                debugger;
                 // Note: Initialize Project trees and then display only a context, This must be included as well.
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0], 'data.init'))) {
                     this.isInitializing = true;
