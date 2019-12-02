@@ -247,10 +247,20 @@ export const en = {
         DEL_MEMBER_PRJ: 'Are you sure you want to remove a following members from {0} ?',
     },
     INVENTORY: {
+        CRT_SUCC_ARG: 'New {0} has been successfully created.',
+        CRT_FAIL_ARG: 'Fail to create {0}. Please, check your action.',
+        UPT_SUCC_ARG: '{0} has been successfully updated.',
+        UPT_FAIL_ARG: 'Fail to delete {0}. Please, check your action.',
+        DEL_SUCC_ARG: '{0} has been successfully deleted.',
+        DEL_FAIL_ARG: 'Fail to delete {0}. Please, check your action.',
+        DEL_FAIL_CHI_ARG: 'Fail to delete {0} due to child Project group/project underneath.',
         NO_DT_CEN_SEL: 'No Selected Data Center',
         NO_DT_CEN_DT: 'Please, Click an item from left tree panel.',
         SELECT_ARG: 'Selected {0}',
         PARENT_ARG: 'Parent {0}',
+        REGION_NM: 'Region Name',
+        ZONE_NM: 'Zone Name',
+        POOL_NM: 'Pool Name',
     },
     MSG: {
 
