@@ -1,6 +1,6 @@
 <template>
     <div class="box-container" :style="{height: height}">
-        <div class="content-container left" tabindex="0" @keyup="setMinimizeAndRevertByKey">
+        <div :class="{'content-container':true, left: transitionEffect } " tabindex="0" @keyup="setMinimizeAndRevertByKey">
             <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
         </div>
 
@@ -100,6 +100,7 @@ export default {
     },
     data() {
         return {
+            transitionEffect: true,
             leftContainerWidth: parseFloat(this.leftWidth),
             isMinimized: false,
             draggerWidth: 10,
@@ -161,6 +162,7 @@ export default {
         },
         onMousedown() {
             this.dragging = true;
+            this.transitionEffect = false;
             this.$emit('start', this.leftContainerWidth);
             window.document.addEventListener('mousemove', this.onMousemove);
             window.document.addEventListener('mouseup', this.onMouseup);
@@ -184,6 +186,7 @@ export default {
         onMouseup() {
             if (this.dragging) {
                 this.dragging = false;
+                this.transitionEffect = true;
                 this.pageX = null;
                 window.document.removeEventListener('mousemove', this.onMousemove);
                 window.document.removeEventListener('mouseup', this.onMouseup);
@@ -191,7 +194,7 @@ export default {
             }
         },
         setMinimizeAndRevertByKey(e) {
-            if (e.key === 't' || e.key === 'T') {
+            if (e.key === '[' || e.key === '{') {
                 this.setMinimizeAndRevert(!this.isMinimized);
             }
         },
@@ -220,6 +223,8 @@ export default {
     }
     .content-container {
         overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
         &.right {
             display: inline-flex;
             flex-direction: column;
@@ -232,10 +237,9 @@ export default {
     }
     .left{
       > div {
+          transition:  width 0.5s;
          > div {
-             transition:  width 0.5s;
-             overflow-y: auto;
-             overflow-x: hidden;
+             transition:  inherit;
          }
       }
     }
