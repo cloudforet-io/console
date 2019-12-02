@@ -79,8 +79,10 @@ export default {
         async updateTag() {
             const selectedNodeDT = this.selectedNode.node.data;
             const tags = { tags: this.tags };
-            const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id, ...tags } : { project_id: selectedNodeDT.id, ...tags };
-            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/update`;
+            const param = {...tags };
+            const key = `${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}_id`;
+            param[key] = selectedNodeDT.id;
+            const url = `/inventory/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/update`;
             await this.$http.post(url, param).then((response) => {
                 if (!this.isEmpty(response.data)) {
                     this.tags = response.data.tags;
@@ -98,7 +100,7 @@ export default {
             await this.$http.post(url, param).then((response) => {
                 if (!this.isEmpty(response.data)) {
                     this.item = {
-                        id: response.data.hasOwnProperty('region_id') ? response.data.region_id : response.data.hasOwnProperty('zone_id') ? response.data.zone_id : response.data.pool_id,
+                        id: response.data.hasOwnProperty('region_id') ? response.data.region_id : response.data.hasOwnProperty('zone_id') ?response.data.zone_id : response.data.pool_id,
                         name: response.data.name,
                         create: this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone),
                     };

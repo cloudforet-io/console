@@ -1,10 +1,10 @@
 <template>
     <div>
-        <project-member-add ref="MemberAdd"
-                            :reference-member="getBindMember"
+        <data-center-member-add ref="MemberAdd"
+                                :reference-member="getBindMember"
         />
-        <project-member-delete ref="MemberDelete"
-                               :reference-member="getMemberData"
+        <data-center-member-delete ref="MemberDelete"
+                                   :reference-member="getMemberData"
         />
         <p-toolbox-table :items="members"
                          :fields="fields"
@@ -73,8 +73,8 @@
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
-import ProjectMemberAdd from '@/views/identity/project/modules/ProjectMemberAdd';
-import ProjectMemberDelete from '@/views/identity/project/modules/ProjectMemberDelete';
+import DataCenterMemberAdd from '@/views/inventory/data-center/modules/DataCenterAdminAdd';
+import DataCenterMemberDelete from '@/views/inventory/data-center/modules/DataCenterAdminDelete';
 import { defaultQuery } from '@/lib/api';
 import PI from '@/components/atoms/icons/PI';
 import PBadge from '@/components/atoms/badges/Badge';
@@ -85,8 +85,8 @@ export default {
         PToolboxTable,
         PButton,
         PI,
-        ProjectMemberAdd,
-        ProjectMemberDelete,
+        DataCenterMemberAdd,
+        DataCenterMemberDelete,
         PBadge,
     },
     props: {
