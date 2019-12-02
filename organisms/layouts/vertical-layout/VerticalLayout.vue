@@ -1,6 +1,8 @@
 <template>
-    <div class="box-container" :style="{height: height}">
-        <div :class="{'content-container':true, left: transitionEffect } " tabindex="0" @keyup="setMinimizeAndRevertByKey">
+    <div class="box-container" :style="{height: height}"
+         @keyup="setMinimizeAndRevertByKey"
+         tabindex="0"  >
+        <div :class="{'content-container':true, left: transitionEffect }">
             <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
         </div>
 
