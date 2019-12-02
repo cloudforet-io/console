@@ -19,6 +19,11 @@
             @DTBeforeDropped="pBeforeDropped"
             @DTContextVisible="pContextVisible"
         >
+            <template #icon="{ node }">
+                <span v-if="!node !== null" class="item-icon">
+                    {{node.data}}
+                </span>
+            </template>
             <template #context>
                 <project-context
                     :context-data="getSelectedData"
