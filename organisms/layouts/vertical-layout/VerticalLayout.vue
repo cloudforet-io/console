@@ -1,8 +1,11 @@
 <template>
-    <div class="box-container" :style="{height: height}"
+    <div class="box-container" :style="{height: `calc(${height} - 1rem`}"
+         tabindex="0"
          @keyup="setMinimizeAndRevertByKey"
-         tabindex="0"  >
-        <div :class="{'content-container':true, left: transitionEffect, 'overflow-effect': true }">
+    >
+        <div :style="{height: height}"
+             :class="{'content-container':true, left: transitionEffect, 'overflow-effect': true}"
+        >
             <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
         </div>
 
@@ -234,14 +237,14 @@ export default {
                 max-height: $fnb-height;
             }
         }
-    }
-    .left{
-      > div {
-          transition:  width 0.5s;
-         > div {
-             transition:  inherit;
-         }
-      }
+        &.left{
+            > div {
+                transition:  width 0.5s;
+                > div {
+                    transition:  inherit;
+                }
+            }
+        }
     }
     .overflow-effect{
         > div {
