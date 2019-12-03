@@ -2,7 +2,7 @@
     <div class="box-container" :style="{height: height}"
          @keyup="setMinimizeAndRevertByKey"
          tabindex="0"  >
-        <div :class="{'content-container':true, left: transitionEffect }">
+        <div :class="{'content-container':true, left: transitionEffect, 'overflow-effect': true }">
             <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
         </div>
 
@@ -225,8 +225,6 @@ export default {
     }
     .content-container {
         overflow: auto;
-        overflow-y: auto;
-        overflow-x: hidden;
         &.right {
             display: inline-flex;
             flex-direction: column;
@@ -244,6 +242,14 @@ export default {
              transition:  inherit;
          }
       }
+    }
+    .overflow-effect{
+        > div {
+            > div {
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+        }
     }
     .dragger-container {
         display: flex;
