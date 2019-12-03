@@ -1,6 +1,11 @@
 <template>
-    <div class="box-container" :style="{height: height}">
-        <div class="content-container">
+    <div class="box-container" :style="{height: `calc(${height} - 1rem`}"
+         tabindex="0"
+         @keyup="setMinimizeAndRevertByKey"
+    >
+        <div :style="{height: height}"
+             :class="{'content-container':true, left: transitionEffect, 'overflow-effect': true}"
+        >
             <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
         </div>
 
@@ -93,9 +98,14 @@ export default {
             type: Boolean,
             default: true,
         },
+        minLeftSize: {
+            type: Number,
+            default: 16,
+        },
     },
     data() {
         return {
+            transitionEffect: true,
             leftContainerWidth: parseFloat(this.leftWidth),
             isMinimized: false,
             draggerWidth: 10,
@@ -103,9 +113,6 @@ export default {
             dragging: false,
             mouseOver: false,
             pageX: null,
-            minimize: {
-
-            },
         };
     },
     computed: {
@@ -160,6 +167,7 @@ export default {
         },
         onMousedown() {
             this.dragging = true;
+            this.transitionEffect = false;
             this.$emit('start', this.leftContainerWidth);
             window.document.addEventListener('mousemove', this.onMousemove);
             window.document.addEventListener('mouseup', this.onMouseup);
@@ -183,16 +191,22 @@ export default {
         onMouseup() {
             if (this.dragging) {
                 this.dragging = false;
+                this.transitionEffect = true;
                 this.pageX = null;
                 window.document.removeEventListener('mousemove', this.onMousemove);
                 window.document.removeEventListener('mouseup', this.onMouseup);
                 this.$emit('stop', this.leftContainerWidth);
             }
         },
+        setMinimizeAndRevertByKey(e) {
+            if (e.key === '[' || e.key === '{') {
+                this.setMinimizeAndRevert(!this.isMinimized);
+            }
+        },
         setMinimizeAndRevert(flag) {
             if (flag) {
                 this.previousWidth = this.leftContainerWidth;
-                this.leftContainerWidth = 16;
+                this.leftContainerWidth = this.minLeftSize;
                 this.setVerticalLeftWidth(`${this.previousWidth}px`);
                 this.mouseOver = false;
             } else {
@@ -210,9 +224,10 @@ export default {
 <style lang="scss" scoped>
     .box-container {
         display: flex;
+        flex-grow: 1;
     }
     .content-container {
-        overflow: scroll;
+        overflow: auto;
         &.right {
             display: inline-flex;
             flex-direction: column;
@@ -220,6 +235,22 @@ export default {
             .fnb {
                 min-height: $fnb-height;
                 max-height: $fnb-height;
+            }
+        }
+        &.left{
+            > div {
+                transition:  width 0.5s;
+                > div {
+                    transition:  inherit;
+                }
+            }
+        }
+    }
+    .overflow-effect{
+        > div {
+            > div {
+                overflow-y: auto;
+                overflow-x: hidden;
             }
         }
     }

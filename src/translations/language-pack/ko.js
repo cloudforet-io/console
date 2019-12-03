@@ -247,7 +247,20 @@ export const ko = {
         DEL_MEMBER_PRJ: '{0} 에서 다음 회원을 제거 하시겠습니까? ',
     },
     INVENTORY: {
-
+        CRT_SUCC_ARG: '새로운 {0} 을/를 생성에 성공하였습니다.',
+        CRT_FAIL_ARG: '{0} 을/를 생성에 실패하였습니다.',
+        UPT_SUCC_ARG: '{0} 을/를 갱신였습니다.',
+        UPT_FAIL_ARG: '{0} 을/를 갱신에 실패하였습니다.',
+        DEL_SUCC_ARG: '{0} 을/를 삭제하였습니다.',
+        DEL_FAIL_ARG: '새로운 {0} 을/를 삭제에 실패하였습니다.',
+        DEL_FAIL_CHI_ARG: '자식 프로젝트 그룹/프로젝트 가 존재합니다. 확인 후 다시 시도해주세요.',
+        NO_DT_CEN_SEL: '데이터 센터를 선택해주십시오.',
+        NO_DT_CEN_DT: '왼쪽 트리 패널의 아이템을 클릭 하세요.',
+        SELECT_ARG: '선택된 {0}',
+        PARENT_ARG: '부모 {0}',
+        REGION_NM: '리젼(Region) 명',
+        ZONE_NM: '존(Zone) 명',
+        POOL_NM: '풀(Pool) 명',
     },
     TREE_TYPE: {
         PROJECT: '프로젝트',

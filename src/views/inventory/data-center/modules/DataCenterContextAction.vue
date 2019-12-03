@@ -34,7 +34,7 @@
                     <p-text-input ref="projectName" v-model="textInput.name"
                                   :style="{'border': `${getIsInvalidProjectName}`, 'boxShadow': 'none' } "
                                   class="form-control"
-                                  placeholder="  Project Name"
+                                  :placeholder="getPlaceHolderName"
                                   required
                     />
                     <div v-show="false" style="display:block" class="invalid-feedback">
@@ -73,7 +73,7 @@ import PTextInput from '@/components/atoms/inputs/TextInput';
 import PTagInputGroup from '@/components/organisms/forms/tag-input-group/TagInputGroup';
 
 export default {
-    name: 'ProjectContextAction',
+    name: 'DataCenterContextAction',
     components: {
         PButtonModal,
         PLabel,
@@ -116,10 +116,22 @@ export default {
     computed: {
         getVisible() {
             let visible = true;
-            if (!this.isEmpty(this.actionFlag) && this.actionFlag === 'CRT_RT') {
+            if (!this.isEmpty(this.actionFlag) && this.actionFlag === 'CRT_RE') {
                 visible = false;
             }
             return visible;
+        },
+        getPlaceHolderName() {
+            let msg = 'INVENTORY.REGION_NM';
+            const actionFlag = this.getSplitActionFlag();
+            if (!this.isEmpty(this.actionFlag)) {
+                if (actionFlag[1] === 'ZN') {
+                    msg = 'INVENTORY.ZONE_NM';
+                } else if (actionFlag[1] === 'PL') {
+                    msg = 'INVENTORY.POOL_NM';
+                }
+            }
+            return this.tr(msg);
         },
         getIsInvalidProjectName() {
             return this.projectNameValidity ? this.styler.border : '';
@@ -144,7 +156,7 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                const targetObj = actionFlag[1] === 'PJ' ? this.tr('COMMON.PG') : this.tr('COMMON.PG_GR');
+                const targetObj = actionFlag[1] === 'RE' ? this.tr('COMMON.REGION') : actionFlag[1] === 'ZN' ? this.tr('COMMON.ZONE') : this.tr('COMMON.POOL');
                 if (actionFlag[0] === 'CRT') {
                     selectedLabel = this.tr('ORGANISMS.CREATE_ARG', [targetObj]);
                 } else if (actionFlag[0] === 'UPT') {
@@ -159,11 +171,17 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                const targetObj = actionFlag[1] === 'PJ' ? this.tr('COMMON.PG') : this.tr('COMMON.PG_GR');
+                const targetObj = actionFlag[1] === 'RE' ? this.tr('COMMON.REGION') : actionFlag[1] === 'ZN' ? this.tr('COMMON.ZONE') : this.tr('COMMON.POOL');
                 if (actionFlag[0] === 'CRT') {
-                    selectedLabel = this.tr('IDENTITY.PARENT_ARG', [this.tr('COMMON.PG_GR')]);
+                    if (actionFlag[1] === 'ZN') {
+                        selectedLabel = this.tr('INVENTORY.PARENT_ARG', [this.tr('COMMON.REGION')]);
+                    } else if (actionFlag[1] === 'PL') {
+                        selectedLabel = this.tr('INVENTORY.PARENT_ARG', [this.tr('COMMON.ZONE')]);
+                    } else {
+                        selectedLabel = this.tr('INVENTORY.PARENT_ARG', [this.tr('COMMON.POOL')]);
+                    }
                 } else if (actionFlag[0] === 'UPT') {
-                    selectedLabel = this.tr('IDENTITY.SELECT_ARG', [targetObj]);
+                    selectedLabel = this.tr('INVENTORY.SELECT_ARG', [targetObj]);
                 } else {
                     selectedLabel = this.tr('ORGANISMS.DELETE_ARG', [targetObj]);
                 }
@@ -174,7 +192,7 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                selectedLabel = actionFlag[1] === 'PJ' ? this.tr('COMMON.PG_NM') : this.tr('COMMON.PG_GR_NM');
+                selectedLabel = actionFlag[1] === 'RE' ? this.tr('INVENTORY.REGION_NM') : actionFlag[1] === 'ZN' ? this.tr('INVENTORY.ZONE_NM') : this.tr('INVENTORY.POOL_NM');
             }
             return selectedLabel;
         },
@@ -191,7 +209,7 @@ export default {
             const reservedActionFlag = actionFlag.split('_');
             if (!this.isEmpty(reservedActionFlag) && reservedActionFlag[0] !== 'DEL') {
                 this.visible = true;
-                this.selectProjectMetas(reservedActionFlag);
+                this.selectDataCenterMetas(reservedActionFlag);
             } else {
                 this.deletedSelectedOnTree(reservedActionFlag, this.selectedNode.tree, this.selectedNode.node.data);
             }
@@ -200,16 +218,17 @@ export default {
             this.cleanModal();
             this.visible = false;
         },
-        async selectProjectMetas(reservedActionFlag) {
+        async selectDataCenterMetas(reservedActionFlag) {
             const selectedNodeDT = this.selectedNode.node.data;
-            const param = selectedNodeDT.item_type === 'PROJECT_GROUP' ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
-            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/get`;
+            const param = {};
+            const url = `/inventory/${selectedNodeDT.item_type.toLowerCase()}/get`;
+            const key = `${selectedNodeDT.item_type.toLowerCase()}_id`;
+            param[key] = selectedNodeDT.id;
 
             await this.$http.post(url, param).then((response) => {
-                const id = this.isEmpty(_.get(response, 'data.project_group_id')) ? _.get(response, 'data.project_id') : _.get(response, 'data.project_group_id');
+                const id = response.data[key];
                 let name = _.get(response, 'data.name');
                 let tags = _.get(response, 'data.tags');
-
                 if (reservedActionFlag[0] === 'CRT') {
                     name = '';
                     tags = {};
