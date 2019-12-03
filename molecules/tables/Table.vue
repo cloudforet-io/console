@@ -8,8 +8,7 @@
             <thead :class="theadClassObject" :style="theadStyle">
                 <slot name="head" />
             </thead>
-            <tbody is="transition-group" name="table-row"
-                   :class="tbodyClass" :style="tbodyStyle"
+            <tbody :class="tbodyClass" :style="tbodyStyle"
                    @before-enter="beforRowEnter"
                    @enter="rowEnter"
                    @leave="rowLeave"
