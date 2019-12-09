@@ -157,7 +157,7 @@ import {
 import PStatus from '@/components/molecules/status/Status';
 import PButton from '@/components/atoms/buttons/Button';
 import PBadge from '@/components/atoms/badges/Badge';
-import { requestMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
+import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import {
     timestampFormatter, serverStateFormatter, platformBadgeFormatter, getValue,
 } from '@/lib/util';
@@ -256,7 +256,7 @@ export const serverSetup = (props, context, eventName) => {
         isSelectedOne: computed(() => tableState.selectIndex.length === 1),
         isSelectedMulti: computed(() => tableState.selectIndex.length > 1),
     });
-    const state = requestMetaReactive();
+    const state = requestToolboxTableMetaReactive();
     state.sortBy = 'name';
     const getServers = () => {
         eventBus.$emit(eventName.getServerList);

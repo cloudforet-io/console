@@ -1,156 +1,278 @@
 <template>
-    <div class="animated fadeIn">
-        <BaseDragHorizontal>
+    <div class="user">
+        <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
+                    ref="toolbox"
                     :items="items"
                     :fields="fields"
                     :selectable="true"
                     :sortable="true"
+                    :dragable="true"
+                    :hover="true"
+                    :responsive="true"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
                     :all-page="allPage"
                     :this-page.sync="thisPage"
                     :select-index.sync="selectIndex"
                     :page-size.sync="pageSize"
-                    :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
+                    :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
                     :setting-visible="false"
-                    @changePageSize="changePageSize"
-                    @changePageNumber="changePageNumber"
-                    @clickRefresh="clickRefresh"
+                    :loading="loading"
+                    :use-spinner-loading="true"
+                    :use-cursor-loading="true"
+                    @changePageSize="getUsers"
+                    @changePageNumber="getUsers"
+                    @clickRefresh="getUsers"
+                    @changeSort="getUsers"
                 >
                     <template slot="toolbox-left">
-                        <p-button
-                            style-type="primary"
-                            @click="clickAdd"
-                        >
-                            <p-i name="ic_plus" color="transparent white"
-                                 width="1.3rem" height="1.3rem" :fill="true"
-                            />
-                            Create
+                        <p-button style-type="primary" @click="clickCollectData">
+                            {{ tr('COMMON.BTN_ADD') }}
                         </p-button>
-                        <p-dropdown
-                            id="user-dropdown-btn"
+                        <PDropdownMenuBtn
+                            id="server-dropdown-btn"
+                            class="left-toolbox-item"
                             :menu="dropdown"
-                            @click-update="clickUpdate"
-                            @click-delete="clickDelete"
-                            @click-activated="clickActivated"
-                            @click-deactivated="clickDeactivated"
+                            @clickMenuEvent="clickMenuEvent"
                         >
-                            Actions
-                        </p-dropdown>
+                            Action
+                        </PDropdownMenuBtn>
+                        <div class="left-toolbox-item">
+                            <p-search :search-text.sync="searchText" @onSearch="getUsers" />
+                        </div>
                     </template>
-                    <template slot="col-state" slot-scope="{value}">
-                        <p-td>
-                            <p-status v-bind="stateBind(value)" />
-                        </p-td>
+                    <template v-slot:col-state-format="{value}">
+                        <p-status v-bind="userStateFormatter(value)" />
                     </template>
                 </p-toolbox-table>
             </template>
-        </BaseDragHorizontal>
-        <div id="empty-space">
-            Select a user above for details.
+        </p-horizontal-layout>
+        <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
+            <template #detail="{tabName}">
+                <p-user-detail ref="userDetail"
+                               :item="items[selectIndex[0]]"
+                               :tag-confirm-event="tagConfirmEvent"
+                               :tag-reset-event="tagResetEvent"
+                />
+            </template>
+        </PTab>
+        <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
+            <template #data="{tabName}">
+                <p-data-table
+                    :fields="multiSelectFields"
+                    :sortable="false"
+                    :selectable="false"
+                    :items="getSelectedUserItems"
+                    :col-copy="true"
+                />
+            </template>
+        </PTab>
+
+        <div v-else id="empty-space">
+            Select a User above for details.
         </div>
     </div>
 </template>
 
 <script>
+import {
+    reactive, toRefs, ref, computed,
+} from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status';
-import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
-import PTd from '@/components/atoms/table/Td';
-import PI from '@/components/atoms/icons/PI';
-import PDropdown from '@/components/organisms/buttons/dropdown/DropdownBtn';
-import { safe, alert } from '@/styles/_variables.scss';
+import PBadge from '@/components/atoms/badges/Badge';
+import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
+import { timestampFormatter, getValue, userStateFormatter } from '@/lib/util';
+import { makeTrItems } from '@/lib/helper';
+import userEventBus from '@/views/identity/user/UserEventBus';
 
-export default {
-    name: 'User',
-    components: {
-        PStatus,
-        BaseDragHorizontal,
-        PToolboxTable,
-        PButton,
-        PTd,
-        PI,
-        PDropdown,
-    },
-    data() {
-        return {
-            sortBy: null,
-            sortDesc: true,
-            thisPage: 1,
-            allPage: 10,
-            pageSize: 15,
-            selectIndex: [],
-            fields: [{ name: 'user_id', label: 'id' }, 'name', 'email', 'state', 'mobile', 'group', 'language', 'timezone'],
-            dropdown: [
-                {
-                    type: 'item', text: 'update', event: 'update', disabled: false,
-                },
-                {
-                    type: 'item', text: 'delete', event: 'delete', disabled: false,
-                },
-                {
-                    type: 'item', text: 'activated', event: 'activated', disabled: false,
-                },
-                {
-                    type: 'item', text: 'deactivated', event: 'deactivated', disabled: false,
-                },
-            ],
-        };
-    },
-    computed: {
-        items() {
-            return [];
-        },
-    },
-    methods: {
-        clickAdd() {
-            console.log('add');
-        },
-        changePageSize() {
 
-        },
-        changePageNumber() {
+const PTab = () => import('@/components/organisms/tabs/tab/Tab');
+const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
+const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
+const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
+const PDropdownMenuBtn = () => import('@/components/organisms/buttons/dropdown/DropdownMenuBtn');
+const PSearch = () => import('@/components/molecules/search/Search');
+const PUserDetail = () => import('@/views/identity/user/modules/UserDetail');
 
-        },
-        clickRefresh() {},
-        clickUpdate() {},
-        clickDelete() {},
-        clickActivated() {},
-        clickDeactivated() {},
-        stateBind(state) {
-            const obj = {
-                icon: 'fa-circle',
-                iconStyle: 'solid',
-                size: 'xs',
-            };
-            if (state === 'ENABLED') {
-                obj.text = 'enabled';
-                obj.iconColor = safe;
-            } else {
-                obj.text = 'disabled';
-                obj.iconColor = alert;
-                obj.textColor = alert;
-            }
-            return obj;
-        },
-    },
+export const UserTableReactive = parent => reactive({
+    fields: makeTrItems([
+        ['user_id', 'COMMON.ID'],
+        ['name', 'COMMON.NAME'],
+        ['email', 'COMMON.EMAIL'],
+        ['state', 'COMMON.STATE'],
+        ['mobile', 'COMMON.PHONE', { sortable: false }],
+        ['group', 'COMMON.GROUP'],
+        ['language', 'COMMON.LANGUAGE'],
+        ['timezone', 'COMMON.TIMEZONE'],
+    ],
+    parent),
+    multiSelectFields: makeTrItems([
+        ['user_id', 'COMMON.ID'],
+        ['name', 'COMMON.NAME'],
+        ['email', 'COMMON.EMAIL'],
+        ['group', 'COMMON.GROUP'],
+    ],
+    parent),
+    selectIndex: [],
+    items: [],
+    searchText: '',
+    loading: false,
+    toolbox: null, // template refs
+});
 
+/**
+   * @typedef {Object} UserState
+   * @property {string} sortBy
+   * @property {boolean} sortDesc
+   * @property {number} thisPage
+   * @property {number} allPage
+   * @property {number} pageSize
+   * @property {Array} fields
+   * @property {Array} selectIndex
+   *
+   */
+
+/**
+   * server default setup reactive object
+   * @function
+   * @return {serverState} reactive object
+   */
+export const eventNames = {
+    tagResetEvent: '',
+    tagConfirmEvent: '',
+    getUserList: '',
 };
 
+export const userSetup = (props, context, eventName) => {
+    const eventBus = userEventBus;
+    const tableState = UserTableReactive(context.parent);
+    const tabData = reactive({
+        tabs: makeTrItems([
+            ['detail', 'COMMON.DETAILS', { keepAlive: true }],
+        ],
+        context.parent),
+        activeTab: 'detail',
+        multiSelectTabs: makeTrItems([
+            ['data', 'COMMON.DATA', { keepAlive: true }],
+        ], context.parent),
+        multiSelectActiveTab: 'data',
+        userDetail: null, // template refs
+    });
+    const tags = ref({});
+    const tabAction = reactive({
+        isSelectedOne: computed(() => tableState.selectIndex.length === 1),
+        isSelectedMulti: computed(() => tableState.selectIndex.length > 1),
+    });
+    const state = requestToolboxTableMetaReactive();
+    state.sortBy = 'name';
+    const getUsers = () => {
+        eventBus.$emit(eventName.getUserList);
+    };
+
+    const sortSelectIndex = computed(() => {
+        const idxs = [...tableState.selectIndex];
+        idxs.sort((a, b) => a - b);
+        return idxs;
+    });
+    const getSelectedUserItems = computed(() => {
+        const items = [];
+        sortSelectIndex.value.forEach((idx) => {
+            items.push(tableState.items[idx]);
+        });
+        return items;
+    });
+    const getSelectUserIds = computed(() => {
+        const ids = [];
+        getSelectedUserItems.value.forEach((item) => {
+            ids.push(item.server_id);
+        });
+        return ids;
+    });
+    const getFirstSelectedUserId = computed(() => (getSelectUserIds.value.length >= 1 ? getSelectUserIds[0] : ''));
+    return reactive({
+        ...toRefs(state),
+        ...toRefs(tableState),
+        ...toRefs(tabData),
+        ...toRefs(tabAction),
+        tags,
+        dropdown: makeTrItems([
+            ['update', 'COMMON.BTN_UPT'],
+            ['delete', 'COMMON.BTN_DELETE'],
+            ['enable', 'COMMON.BTN_ENABLE'],
+            ['disable', 'COMMON.BTN_DISABLE'],
+
+        ],
+        context.parent,
+        { type: 'item', disabled: false }),
+        userStateFormatter,
+        timestampFormatter,
+        clickCollectData() {
+            console.log('add');
+        },
+        getUsers,
+        clickMenuEvent(menuName) {
+            console.log(menuName);
+        },
+        // todo: need confirm that this is good way - sinsky
+        // EventBus Names
+        ...eventNames,
+        getSelectedUserItems,
+        getSelectUserIds,
+        getFirstSelectedUserId,
+    });
+};
+
+export default {
+    name: 'UserTemplate',
+    filters: {
+        getValue,
+    },
+    components: {
+        PStatus,
+        PHorizontalLayout,
+        PToolboxTable,
+        PButton,
+        PDropdownMenuBtn,
+        PUserDetail,
+        PTab,
+        PDataTable,
+        PSearch,
+    },
+    setup(props, context) {
+        const dataBind = reactive({
+            items: computed(() => []),
+        });
+        const state = userSetup(props, context, dataBind.items);
+
+        return {
+            ...toRefs(state),
+            ...toRefs(dataBind),
+        };
+    },
+};
 
 </script>
 
 <style lang="scss" scoped>
-    #user-dropdown-btn {
+    .left-toolbox-item{
         margin-left: 1rem;
+        &:last-child {
+            flex-grow: 1;
+        }
     }
+
     #empty-space{
         text-align: center;
         margin-bottom: 0.5rem;
         color: $primary2;
         font: 24px/32px Arial;
+    }
+    .user{
+        margin-top: 1.5625rem;
+        margin-left: 2rem;
+        margin-right: 2rem;
     }
 </style>
