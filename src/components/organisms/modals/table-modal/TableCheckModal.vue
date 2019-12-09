@@ -42,19 +42,19 @@ const setup = (props, context) => {
         sortBy: '',
         sortDesc: true,
     });
-    const buttonsBind = reactive({
-        footerCancelButtonBind: {
-            styleType: 'dark',
-            outline: true,
-        },
-        footerConfirmButtonBind: {
-            styleType: props.themeColor,
-        },
+    const footerCancelButtonBind = reactive({
+        styleType: 'dark',
+        outline: true,
     });
+    const footerConfirmButtonBind = computed(() => ({
+        styleType: props.themeColor,
+    }));
+
     return {
         ...state,
         ...toRefs(sortState),
-        ...toRefs(buttonsBind),
+        footerCancelButtonBind,
+        footerConfirmButtonBind,
         sortedItems: computed(() => {
             if (sortState.sortBy) {
                 return props.items;
