@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y nginx \
     && mkdir -p ${BUILD_PATH} && mkdir -p ${LOG_PATH}/nginx
 COPY pkg/nginx.conf ${NGINX_CONF_PATH}/cloudone-wconsole-client.conf
 
-COPY package.json package-lock.json .npmrc *.js ${BUILD_PATH}/
+COPY package.json package-lock.json *.js ${BUILD_PATH}/
 RUN npm install
 
 COPY public ${BUILD_PATH}/public
