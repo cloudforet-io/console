@@ -7,6 +7,10 @@
         :size="size"
         :fade="fade"
         :backdrop="backdrop"
+        :visible.sync="proxyVisible"
+        :theme-color="themeColor"
+        :footer-cancel-button-bind="footerCancelButtonBind"
+        :footer-confirm-button-bind="footerConfirmButtonBind"
 
         @cancel="cancel"
         @close="close"
@@ -14,7 +18,9 @@
     >
         <template #body>
             <div>
-                <h4>{{ subTitle }}</h4>
+                <h4 class="p-table-check-modal-sub-title">
+                    {{ subTitle }}
+                </h4>
                 <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
                               :sort-by="sortBy" :sort-desc="sortDesc"
                 />
@@ -28,7 +34,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
 import { propsMixin } from '@/components/molecules/modals/Modal';
 import { setup as contentModalSetup } from '../content-modal/ContentModal';
-import { makeByPass } from '@/lib/compostion-util';
+import { makeByPass, makeProxy } from '@/lib/compostion-util';
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
@@ -36,15 +42,26 @@ const setup = (props, context) => {
         sortBy: '',
         sortDesc: true,
     });
+    const buttonsBind = reactive({
+        footerCancelButtonBind: {
+            styleType: 'dark',
+            outline: true,
+        },
+        footerConfirmButtonBind: {
+            styleType: props.themeColor,
+        },
+    });
     return {
         ...state,
         ...toRefs(sortState),
+        ...toRefs(buttonsBind),
         sortedItems: computed(() => {
             if (sortState.sortBy) {
                 return props.items;
             }
             return props.items;
         }),
+        proxyVisible: makeProxy('visible', props, context.emit),
         cancel: makeByPass(context.emit, 'cancel'),
         close: makeByPass(context.emit, 'close'),
         confirm: makeByPass(context.emit, 'confirm'),
@@ -77,6 +94,8 @@ export default {
 };
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+    .p-table-check-modal-sub-title{
+        margin-bottom: 2rem;
+    }
 </style>
