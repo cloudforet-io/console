@@ -71,40 +71,7 @@
             <template #detail>
                 <collector-detail :item="items[selectIndex[0]]" />
             </template>
-        <!--            <template #credentials="{tabName}">-->
-        <!--            </template>-->
-        <!--            <template #jobs="{tabName}">-->
-        <!--            </template>-->
         </PTab>
-        <!--        <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">-->
-        <!--            <template #data="{tabName}">-->
-        <!--                <p-data-table-->
-        <!--                        :fields="fields"-->
-        <!--                        :sortable="false"-->
-        <!--                        :selectable="false"-->
-        <!--                        :items="getSelectServerItems"-->
-        <!--                        :col-copy="true"-->
-        <!--                >-->
-        <!--                </p-data-table>-->
-        <!--            </template>-->
-        <!--            <template #admin="{tabName}">-->
-        <!--                <p-server-admin :select-index="selectIndex"-->
-        <!--                                :items="admin.items"-->
-        <!--                                :sort-by.sync="admin.sortBy"-->
-        <!--                                :sort-desc.sync="admin.sortDesc"-->
-        <!--                                :page-size.sync="admin.pageSize"-->
-        <!--                                :all-page="admin.allPage"-->
-        <!--                                :this-page.sync="admin.thisPage"-->
-        <!--                                :search-text.sync="admin.searchText"-->
-        <!--                                :loading="admin.loading"-->
-        <!--                                :get-server-admin="getServerAdmin"-->
-        <!--                />-->
-        <!--            </template>-->
-        <!--        </PTab>-->
-
-        <!--        <div v-else id="empty-space">-->
-        <!--            Select a Server above for details.-->
-        <!--        </div>-->
     </div>
 </template>
 

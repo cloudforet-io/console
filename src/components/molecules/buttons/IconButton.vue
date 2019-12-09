@@ -27,7 +27,7 @@
 import { reactive, computed, toRefs } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI';
 import PButton from '@/components/atoms/buttons/Button';
-import { white, gray1, secondary } from '@/styles/_variables.scss';
+import { white, gray1 } from '@/styles/_variables.scss';
 
 export default {
     name: 'PIconButton',
@@ -52,7 +52,7 @@ export default {
             default: `transparent ${gray1}`,
         },
     },
-    setup(props, context) {
+    setup(props) {
         const state = reactive({
             isHover: false,
             classObject: computed(() => [props.buttonStyle]),

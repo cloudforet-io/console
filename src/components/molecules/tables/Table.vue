@@ -8,7 +8,8 @@
             <thead :class="theadClassObject" :style="theadStyle">
                 <slot name="head" />
             </thead>
-            <tbody :class="tbodyClass" :style="tbodyStyle"
+            <tbody is="transition-group" name="table-row"
+                   :class="tbodyClass" :style="tbodyStyle"
                    @before-enter="beforRowEnter"
                    @enter="rowEnter"
                    @leave="rowLeave"
@@ -153,18 +154,21 @@ export default {
             }, delay);
         },
         rowLeave(el, done) {
-            const delay = el.dataset.index * 100;
-            const vm = this;
-            setTimeout(() => {
-                vm.$velocity(el, { translateY: '30px', opacity: 0 },
-                    {
-                        duration: 100,
-                        complete() {
-                            done();
-                        },
-                    });
-                done();
-            }, delay);
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(30px)';
+            done();
+            // const delay = el.dataset.index * 100;
+            // const vm = this;
+            // setTimeout(() => {
+            //     vm.$velocity(el, { translateY: '30px', opacity: 0 },
+            //         {
+            //             duration: 100,
+            //             complete() {
+            //                 done();
+            //             },
+            //         });
+            //     done();
+            // }, delay);
         },
         getStyle(tableStyle, bgStyle) {
             if (bgStyle && tableStyle) {
@@ -199,7 +203,6 @@ export default {
                 th{
                     position: sticky;
                     z-index: 1;
-                    top: 0;
                     padding: .25rem 0 .25rem .75rem;
                     background-color: $white;
                     border-top: 1px solid $dark;

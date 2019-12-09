@@ -1,9 +1,7 @@
 <script>
 import { toRefs } from '@vue/composition-api';
-import _ from 'lodash';
 import DashboardTemplate, { setup } from '@/views/dashboard/Dashboard.template';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
-import casual from '@/views/dashboard/models/dashboard-model';
 import { mountBusEvent } from '@/lib/compostion-util';
 
 export default {
@@ -12,7 +10,6 @@ export default {
     setup(props, context) {
         const state = setup(props, context);
         const api = context.root.$http;
-        const baseParam = { domain_id: sessionStorage.getItem('domainId') };
 
         const callApi = (url, target, params) => async () => {
             const res = await api.post(url, params);
