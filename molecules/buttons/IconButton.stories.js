@@ -1,6 +1,6 @@
 import { action } from '@storybook/addon-actions';
 import { text, select } from '@storybook/addon-knobs/vue';
-import PIconButton from './IconButton.vue';
+import PIconButton from './IconButton';
 
 import { autoProps } from '../../../setup/storybook-util';
 import {

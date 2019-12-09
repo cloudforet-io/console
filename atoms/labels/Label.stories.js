@@ -1,5 +1,4 @@
-import { text } from '@storybook/addon-knobs/vue';
-import PLabel from './Label.vue';
+import PLabel from './Label';
 
 
 export default {

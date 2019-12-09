@@ -1,5 +1,4 @@
-import { text } from '@storybook/addon-knobs/vue';
-import PDt from './Dt.vue';
+import PDt from './Dt';
 
 
 export default {

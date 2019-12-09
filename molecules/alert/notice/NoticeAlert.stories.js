@@ -1,5 +1,3 @@
-import { toRefs, reactive } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
 import PNoticeAlert from './NoticeAlert';
 import { autoProps } from '@/setup/storybook-util';
 
