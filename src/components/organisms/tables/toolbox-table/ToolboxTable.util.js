@@ -1,6 +1,6 @@
 import { reactive } from '@vue/composition-api';
 
-export const requestMetaReactive = () => reactive({
+export const requestToolboxTableMetaReactive = () => reactive({
     sortBy: null,
     sortDesc: true,
     thisPage: 1,
