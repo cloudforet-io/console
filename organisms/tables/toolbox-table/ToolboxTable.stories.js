@@ -1,7 +1,6 @@
 import { action } from '@storybook/addon-actions';
 import faker from 'faker';
 import PToolboxTable from './ToolboxTable';
-import { autoProps } from '../../../../setup/storybook-util';
 
 export default {
     title: 'organisms/tables/toolbox-table',
