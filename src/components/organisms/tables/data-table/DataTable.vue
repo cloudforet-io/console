@@ -61,14 +61,14 @@
             </slot>
         </template>
         <template #body>
-            <p-tr v-if="loading&&useSpinnerLoading" class="no-data-row" key="loading">
+            <p-tr v-if="loading&&useSpinnerLoading" key="loading" class="no-data-row">
                 <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                     <p-lottie name="spinner" :size="2"
                               :auto="true"
                     />
                 </p-td>
             </p-tr>
-            <p-tr v-if="showNoData" class="no-data-row" key="noData">
+            <p-tr v-if="showNoData" key="noData" class="no-data-row">
                 <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                     No Data
                 </p-td>
@@ -248,7 +248,7 @@ export default {
             return this.selectArea.children[0].children[1].children;
         },
         showNoData() {
-            if (this.items.length === 0) {
+            if (!this.items || !this.items.hasOwnProperty('length') || this.items.length === 0) {
                 if (this.useSpinnerLoading && this.loading) {
                     return false;
                 }
