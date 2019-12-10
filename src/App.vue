@@ -12,7 +12,7 @@
 </template>
 <script>
 import _ from 'lodash';
-import Vue from '@/main.js';
+import Vue from 'vue';
 import api from '@/lib/api';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie';
@@ -58,7 +58,7 @@ export default {
                 }
             } catch (e) {
                 this.$router.push({ path: '/error-page' });
-                console.log(e);
+                console.error(e);
             }
         },
         async configInit() {
@@ -77,7 +77,7 @@ export default {
                 try {
                     await this.$store.dispatch('domain/load');
                 } catch (e) {
-                    console.log(e);
+                    console.error(e);
                     this.$router.push({ path: '/error-page' });
                 }
             }

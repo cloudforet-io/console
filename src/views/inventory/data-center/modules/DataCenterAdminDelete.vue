@@ -10,13 +10,15 @@
             :backdrop="true"
             :header-title="getMemberModalTitle"
             :visible.sync="visible"
-            :footerCancelButtonBind="buttons.cancelButton"
-            :footerConfirmButtonBind="buttons.confirmButton"
+            :footer-cancel-button-bind="buttons.cancelButton"
+            :footer-confirm-button-bind="buttons.confirmButton"
             @close="close"
             @confirm="confirm"
         >
             <template #body>
-                <div class="delete-alert"> {{tr('IDENTITY.DEL_MEMBER_PRJ', [tr(getSelectedTypeKey)] )}}</div>
+                <div class="delete-alert">
+                    {{ tr('IDENTITY.DEL_MEMBER_PRJ', [tr(getSelectedTypeKey)] ) }}
+                </div>
                 <p-data-table
                     :responsive-style="{'height': '35vh', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
                     :items="memberToDelete"
@@ -34,7 +36,12 @@
                     </template>
                     <template v-slot:col-labels-format="data">
                         <div>
-                            <PBadge class="p-label" :styleType="'gray2'" v-for="label in data.item.labels"> {{ getEmptyString(label) }}</PBadge>
+                            <PBadge v-for="(label, idx) in data.item.labels" :key="idx"
+                                    class="p-label"
+                                    :style-type="'gray2'"
+                            >
+                                {{ getEmptyString(label) }}
+                            </PBadge>
                         </div>
                     </template>
                 </p-data-table>
@@ -54,13 +61,14 @@ import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
 import PBadge from '@/components/atoms/badges/Badge';
+
 export default {
     name: 'ProjectMemberDelete',
     events: ['close'],
     components: {
         PButtonModal,
         PDataTable,
-        PBadge
+        PBadge,
     },
     props: {
         referenceMember: {
@@ -167,7 +175,7 @@ export default {
         },
         async deleteUserOnProject() {
             const selectedNodeDT = this.$parent.selectedNode.node.data;
-            const param = { users:  _.map(this.memberToDelete, 'user_info.user_id') };
+            const param = { users: _.map(this.memberToDelete, 'user_info.user_id') };
             const key = `${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}_id`;
             param[key] = selectedNodeDT.id;
             const url = `/inventory/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/remove`;
@@ -178,12 +186,11 @@ export default {
                     title: 'Success',
                     text: 'Selected item successfully Removed from Project Group',
                     duration: 3000,
-                    speed: 2000
-                })
+                    speed: 2000,
+                });
                 this.$parent.getMembers();
                 this.hideModal();
             }).catch((error) => {
-
                 console.error(error);
             });
         },

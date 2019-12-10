@@ -46,9 +46,6 @@ export default {
         },
     },
     methods: {
-        test() {
-            console.log('testtestste');
-        },
     },
 };
 </script>

@@ -64,7 +64,6 @@ export default {
             });
         },
         onLegendClick(key, val) {
-            console.log('onLegendClick', key, val);
             this.$router.push({ path: '/inventory/server', query: { plan: 'private' } });
         },
     },
