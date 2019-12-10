@@ -57,7 +57,6 @@ export default {
     },
     computed: {
         chartData() {
-            console.log('resources by region data >>', this.data)
             return Object.keys(this.data).map(key => ({
                 key: this.data[key].name,
                 value: this.data[key].count,
@@ -81,7 +80,6 @@ export default {
             DashboardEventBus.$emit(`listRegionBy${name}`);
         },
         onLegendClick(key, val) {
-            console.log('onLegendClick', key, val);
             this.$router.push({ path: '/inventory/data-center', query: { plan: 'private' } });
         },
     },
