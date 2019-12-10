@@ -121,9 +121,6 @@ export default {
         this.$refs.userId.focus();
     },
     computed: {
-        ...mapGetters('auth', [
-            'nextPath',
-        ]),
         ...mapGetters('domain', [
             'authType',
         ]),

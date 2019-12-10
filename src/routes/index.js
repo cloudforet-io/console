@@ -31,19 +31,19 @@ const router = new VueRouter({
         {
             path: '/sign-in',
             name: 'SignIn',
-            meta: { label: 'Sign In', excludeAuth: true },
+            meta: { label: 'Sign In', excludeAuth: true, isSignInPage: true },
             component: SignIn,
         },
         {
             path: '/google-sign-in',
             name: 'GoogleOauthSignIn',
-            meta: { label: 'google_oauth2', excludeAuth: true },
+            meta: { label: 'google_oauth2', excludeAuth: true, isSignInPage: true },
             component: GoolgeSignIn,
         },
         {
             path: '/admin-sign-in',
             name: 'Admin-SignIn',
-            meta: { label: 'admin_sign', excludeAuth: true },
+            meta: { label: 'admin_sign', excludeAuth: true, isSignInPage: true },
             component: Admin,
         },
         {
@@ -65,10 +65,10 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
     if (store.getters['domain/id']) {
-        const nextPath = store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
-        if (to.meta && to.meta.excludeAuth !== true && !api.checkAccessToken()) {
+        if (to.meta && !to.meta.excludeAuth && !api.checkAccessToken()) {
             await store.dispatch('auth/signOut');
-            await next(nextPath);
+            const nextPath = store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
+            next(nextPath);
         } else next();
     } else {
         localStorage.setItem('common.toMeta', JSON.stringify(to.meta));

@@ -1,7 +1,7 @@
 <template>
     <div class="background-cover">
         <div class="row">
-            <div class="container fade-in">
+            <div class="container">
                 <div class="row d-flex justify-content-center">
                     <div class="col-md-8">
                         <div class="card-group">
@@ -93,7 +93,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 import url from 'url';
 import PLabel from '@/components/atoms/labels/Label';
 import PButton from '@/components/atoms/buttons/Button';
@@ -125,13 +124,7 @@ export default {
             },
         };
     },
-    mounted() {
-        this.$refs.userId.focus();
-    },
     computed: {
-        ...mapGetters('auth', [
-            'nextPath',
-        ]),
         validatorUser() {
             return this.validator.userId;
         },
@@ -148,13 +141,16 @@ export default {
             const companyTitle = this.$store.getters['domain/companyTitle'];
             const companyDesc = this.$store.getters['domain/description'];
             const hostName = this.getWindowHostName();
-            return !this.isEmpty(companyTitle) ? companyDesc: !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
+            return !this.isEmpty(companyTitle) ? companyDesc : !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
         },
         getCurrentHostname() {
             const companyTitle = this.$store.getters['domain/companyTitle'];
             const hostName = this.getWindowHostName();
             return !this.isEmpty(companyTitle) ? companyTitle : hostName;
         },
+    },
+    mounted() {
+        this.$refs.userId.focus();
     },
     methods: {
         getWindowHostName() {
@@ -196,7 +192,7 @@ export default {
                     localStorage.setItem('common.toNextPath', '/');
                 }
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
-            }).catch((error) => {
+            }).catch(() => {
                 this.isInvalid.userId = true;
                 this.isInvalid.password = true;
                 this.$refs.userId.focus();
@@ -217,7 +213,7 @@ export default {
         width: 100vw;
         background-position: center bottom;
         background-size: cover;
-        background-image: url("../../../assets/images/landing/cloudone_console_sign-in_bg.jpg");
+        background-image: url("~@/assets/images/landing/cloudone_console_sign-in_bg.jpg");
     }
 
     .signIn-title {
