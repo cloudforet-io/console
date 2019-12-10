@@ -59,18 +59,9 @@ export default {
                 hideOnTargetClick: true,
             }, this.tooltipOptions);
         },
-        listenerWrapper() {
-            return {
-                ...this.$listeners,
-                click(e) {
-                    console.log('listenerWrapper', e.currentTarget);
-                },
-            };
-        },
     },
     methods: {
         onClick() {
-            console.log('on Click');
         },
     },
 };
