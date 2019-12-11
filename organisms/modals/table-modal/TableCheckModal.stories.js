@@ -90,6 +90,9 @@ export const modal = () => ({
         subTitle: {
             default: text('sub', 'this is sub Title'),
         },
+        scrollable: {
+            default: boolean('scrollable', false),
+        },
     },
     computed: {
         ConfirmButtonBind() {
