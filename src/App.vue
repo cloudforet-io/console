@@ -1,9 +1,9 @@
 <template>
     <div v-if="isInit" id="app">
-        <p-notice-alert :group="'noticeTopLeft'" :position="'top left'" />
-        <p-notice-alert :group="'noticeTopRight'" :position="'top right'" />
-        <p-notice-alert :group="'noticeBottomLeft'" :position="'bottom left'" />
-        <p-notice-alert :group="'noticeBottomRight'" :position="'bottom right'" />
+        <p-notice-alert group="noticeTopLeft" position="top left" />
+        <p-notice-alert group="noticeTopRight" position="top right" />
+        <p-notice-alert group="noticeBottomLeft" position="bottom left" />
+        <p-notice-alert group="noticeBottomRight" position="bottom right" />
         <router-view />
     </div>
     <div v-else class="app-spinner">
@@ -49,12 +49,19 @@ export default {
                 this.isInit = true;
                 const excludeAuth = this.getMeta();
 
-                // TODO:: Please Remove this for later when every domian sign in use Config options.
-                if (this.checkMatchedPath(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
-                    this.redirectTo('set');
+                if (api.checkAccessToken() && this.$route.meta.isSignInPage) {
+                    this.$router.push({ path: '/' });
+                    return;
                 }
-                if (!api.checkAccessToken() && excludeAuth !== true) {
+
+                // TODO:: Please Remove this for later when every domian sign in use Config options.
+                if (this.isPathMissMatch(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
+                    this.redirectTo('set');
+                    return;
+                }
+                if (!api.checkAccessToken() && !excludeAuth) {
                     this.redirectTo();
+                    return;
                 }
             } catch (e) {
                 this.$router.push({ path: '/error-page' });
@@ -64,7 +71,7 @@ export default {
         async configInit() {
             await config.init();
             await api.init(config.get('VUE_APP_API.ENDPOINT'), {
-                authError: (error) => {
+                authError: () => {
                     this.$store.dispatch('auth/signOut');
                     this.$router.push({ path: '/error-page' });
                 },
@@ -87,7 +94,7 @@ export default {
         },
         redirectTo(set) {
             const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
-            if (!this.isEmpty(set)) {
+            if (set) {
                 localStorage.setItem('common.toNextPath', nextPath);
             }
             this.$router.push(nextPath);
@@ -95,8 +102,9 @@ export default {
         getMeta() {
             return this.isEmpty(localStorage.getItem('common.toMeta')) ? null : _.get(JSON.parse(localStorage.getItem('common.toMeta')), 'excludeAuth', null);
         },
-        checkMatchedPath(type, path) {
-            return (path === '/sign-in' && type !== 'local' || path === '/google-sign-in' && type !== 'google_oauth2');
+        isPathMissMatch(type, path) {
+            return (path === '/sign-in' && type !== 'local')
+                || (path === '/google-sign-in' && type !== 'google_oauth2');
         },
     },
 };
