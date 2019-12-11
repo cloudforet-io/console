@@ -46,26 +46,26 @@ export const dropdownMenu = () => ({
         menu: {
             default: object('menu', [
                 {
-                    type: 'item', text: 'add', event: 'add', disabled: false,
+                    type: 'item', label: 'add', name: 'add', disabled: false,
                 },
                 {
-                    type: 'item', text: 'hello', event: 'hello', disabled: false,
-                },
-                { type: 'divider' },
-                { type: 'header', text: 'this is header' },
-                {
-                    type: 'item', text: 'update', event: 'update', disabled: false,
-                },
-                {
-                    type: 'item', text: 'delete', event: 'delete', disabled: false,
+                    type: 'item', label: 'hello', name: 'hello', disabled: false,
                 },
                 { type: 'divider' },
+                { type: 'header', label: 'this is header' },
                 {
-                    type: 'item', text: 'collect', event: 'collect', disabled: false,
+                    type: 'item', label: 'update', name: 'update', disabled: false,
+                },
+                {
+                    type: 'item', label: 'delete', name: 'delete', disabled: true,
                 },
                 { type: 'divider' },
                 {
-                    type: 'item', text: 'remove', event: 'remove', disabled: false,
+                    type: 'item', label: 'collect', name: 'collect', disabled: false,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', label: 'remove', name: 'remove', disabled: false,
                 },
 
 

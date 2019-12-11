@@ -22,7 +22,7 @@
                     {{ subTitle }}
                 </h4>
                 <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
-                              :sort-by="sortBy" :sort-desc="sortDesc"
+                              :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 />
             </div>
         </template>
@@ -49,6 +49,9 @@ const setup = (props, context) => {
     const footerConfirmButtonBind = computed(() => ({
         styleType: props.themeColor,
     }));
+    const confirm = () => {
+        context.emit('confirm', props.items);
+    };
 
     return {
         ...state,
@@ -56,15 +59,16 @@ const setup = (props, context) => {
         footerCancelButtonBind,
         footerConfirmButtonBind,
         sortedItems: computed(() => {
+            // todo: move this feather to p-data-table
             if (sortState.sortBy) {
-                return props.items;
+                return _.orderBy(props.items, sortState.sortBy, sortState.sortDesc ? 'desc' : 'asc');
             }
             return props.items;
         }),
         proxyVisible: makeProxy('visible', props, context.emit),
         cancel: makeByPass(context.emit, 'cancel'),
         close: makeByPass(context.emit, 'close'),
-        confirm: makeByPass(context.emit, 'confirm'),
+        confirm,
     };
 };
 
@@ -85,6 +89,11 @@ export default {
         subTitle: String,
         fields: Array,
         items: Array,
+        responsiveStyle: {
+            type: Object,
+            default: () => ({ 'max-height': '100px', 'overflow-y': 'auto', 'overflow-x': 'auto' }),
+
+        },
     },
     setup(props, context) {
         return setup(props, context);

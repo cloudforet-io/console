@@ -196,6 +196,7 @@ export const userSetup = (props, context, eventName) => {
         idxs.sort((a, b) => a - b);
         return idxs;
     });
+    const isNotSelected = computed(() => tableState.selectIndex.length === 0);
     const getSelectedUserItems = computed(() => {
         const items = [];
         sortSelectIndex.value.forEach((idx) => {
@@ -252,6 +253,18 @@ export const userSetup = (props, context, eventName) => {
         eventBus.$emit(checkTableModalState.confirmEventName, ...event);
         resetCheckTableModalState();
     };
+
+    const dropdownMenu = reactive({
+        ...makeTrItems([
+            ['update', 'COMMON.BTN_UPT'],
+            ['delete', 'COMMON.BTN_DELETE'],
+            ['enable', 'COMMON.BTN_ENABLE'],
+            ['disable', 'COMMON.BTN_DISABLE'],
+        ],
+        context.parent,
+        { type: 'item', disabled: isNotSelected }),
+    });
+
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
@@ -259,15 +272,7 @@ export const userSetup = (props, context, eventName) => {
         ...toRefs(tabAction),
         checkTableModalState,
         tags,
-        dropdown: makeTrItems([
-            ['update', 'COMMON.BTN_UPT'],
-            ['delete', 'COMMON.BTN_DELETE'],
-            ['enable', 'COMMON.BTN_ENABLE'],
-            ['disable', 'COMMON.BTN_DISABLE'],
-
-        ],
-        context.parent,
-        { type: 'item', disabled: false }),
+        dropdown: dropdownMenu,
         userStateFormatter,
         timestampFormatter,
         clickCollectData() {
