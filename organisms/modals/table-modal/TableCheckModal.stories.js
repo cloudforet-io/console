@@ -1,13 +1,9 @@
 import { select, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import { propsMixin } from '../../../molecules/modals/Modal';
 import PButton from '../../../atoms/buttons/Button';
 import PTableCheckModel from './TableCheckModal';
-import { autoProps } from '../../../../setup/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
-import casual from '@/views/identity/user/models/user-model';
-import { arrayOf } from '@/lib/casual';
 
 export default {
     title: 'organisms/modals/table-check-modal',
@@ -93,6 +89,9 @@ export const modal = () => ({
         },
         subTitle: {
             default: text('sub', 'this is sub Title'),
+        },
+        scrollable: {
+            default: boolean('scrollable', false),
         },
     },
     computed: {
