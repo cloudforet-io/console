@@ -1,5 +1,5 @@
 <template>
-    <div class="row col-12">
+    <div class="row col-12 input-padding">
         <vue-tags-input class="p-input-tag"
                         :value="tagText"
                         :style="responsiveStyle"
@@ -61,6 +61,10 @@ export default {
 </script>
 
 <style lang="scss">
+    .input-padding {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
     .vue-tags-input.p-input-tag{
         min-width: 100%;
         border: 1px solid $gray3;
