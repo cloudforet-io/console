@@ -21,6 +21,7 @@
                                  :shadow="false"
                                  :border="false"
                                  :hover="true"
+                                 :padding="false"
                                  :sort-by.sync="tablePage.sortBy"
                                  :sort-desc.sync="tablePage.sortDesc"
                                  :all-page="tablePage.allPage"
@@ -34,10 +35,9 @@
                                  @clickRefresh="getMembers"
                 >
                     <template slot="toolbox-left">
-                        <p-search
-                            :search-placeholder="getSearchPlaceHolder"
-                            :search-text.sync="searchText"
-                            @onSearch="search"
+                        <p-search :search-placeholder="getSearchPlaceHolder"
+                                  :search-text.sync="searchText"
+                                  @onSearch="search"
                         />
                     </template>
                     <template v-slot:col-user_id-format="data">
@@ -290,8 +290,6 @@ export default {
         opacity: 1;
     }
     .label-group {
-        margin-left: 1rem;
-        margin-right: 1rem;
         margin-bottom: 0rem;
     }
     .input-title{

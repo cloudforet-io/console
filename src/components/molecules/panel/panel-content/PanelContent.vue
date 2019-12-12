@@ -110,7 +110,7 @@ export default {
             text-align: left;
             font-weight: bold;
             color: $gray1;
-            min-width: 150px;
+            min-width: 10rem;
             width: 25%;
         }
         .data {
