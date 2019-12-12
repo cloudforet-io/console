@@ -35,7 +35,10 @@
                             id="server-dropdown-btn"
                             class="left-toolbox-item"
                             :menu="dropdown"
-                            @clickMenuEvent="clickMenuEvent"
+                            @click-enable="clickEnable"
+                            @click-disable="clickDisable"
+                            @click-delete="clickMenuEvent"
+                            @click-update="clickMenuEvent"
                         >
                             Action
                         </PDropdownMenuBtn>
@@ -73,6 +76,20 @@
         <div v-else id="empty-space">
             Select a User above for details.
         </div>
+        <p-table-check-modal
+            v-if="!!checkTableModalState.mode"
+            :visible.sync="checkTableModalState.visible"
+            :header-title="checkTableModalState.title"
+            :sub-title="checkTableModalState.subTitle"
+            :theme-color="checkTableModalState.themeColor"
+            :fields="multiSelectFields"
+            size="lg"
+            :centered="true"
+            :selectable="false"
+            :items="getSelectedUserItems"
+
+            @confirm="checkModalConfirm"
+        />
     </div>
 </template>
 
@@ -82,7 +99,6 @@ import {
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status';
 import PButton from '@/components/atoms/buttons/Button';
-import PBadge from '@/components/atoms/badges/Badge';
 import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import { timestampFormatter, getValue, userStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/helper';
@@ -96,7 +112,7 @@ const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/
 const PDropdownMenuBtn = () => import('@/components/organisms/buttons/dropdown/DropdownMenuBtn');
 const PSearch = () => import('@/components/molecules/search/Search');
 const PUserDetail = () => import('@/views/identity/user/modules/UserDetail');
-
+const PTableCheckModal = () => import('@/components/organisms/modals/table-modal/TableCheckModal');
 export const UserTableReactive = parent => reactive({
     fields: makeTrItems([
         ['user_id', 'COMMON.ID'],
@@ -144,6 +160,9 @@ export const eventNames = {
     tagResetEvent: '',
     tagConfirmEvent: '',
     getUserList: '',
+    enableUser: '',
+    disableUser: '',
+    deleteUser: '',
 };
 
 export const userSetup = (props, context, eventName) => {
@@ -177,6 +196,7 @@ export const userSetup = (props, context, eventName) => {
         idxs.sort((a, b) => a - b);
         return idxs;
     });
+    const isNotSelected = computed(() => tableState.selectIndex.length === 0);
     const getSelectedUserItems = computed(() => {
         const items = [];
         sortSelectIndex.value.forEach((idx) => {
@@ -192,21 +212,67 @@ export const userSetup = (props, context, eventName) => {
         return ids;
     });
     const getFirstSelectedUserId = computed(() => (getSelectUserIds.value.length >= 1 ? getSelectUserIds[0] : ''));
+
+    const checkTableModalState = reactive({
+        visible: false,
+        mode: '',
+        confirmEventName: '',
+        title: '',
+        subTitle: '',
+        themeColor: '',
+    });
+
+    const resetCheckTableModalState = () => {
+        checkTableModalState.visible = false;
+        checkTableModalState.mode = '';
+        checkTableModalState.confirmEventName = '';
+        checkTableModalState.title = '';
+        checkTableModalState.subTitle = '';
+        checkTableModalState.themeColor = '';
+    };
+
+    const clickEnable = () => {
+        checkTableModalState.mode = 'enable';
+        checkTableModalState.confirmEventName = eventNames.enableUser;
+        checkTableModalState.title = 'User Enable';
+        checkTableModalState.subTitle = 'Are you sure you want to Enable selected User(s) below?';
+        checkTableModalState.themeColor = 'safe';
+        checkTableModalState.visible = true;
+    };
+    const clickDisable = () => {
+        checkTableModalState.mode = 'disable';
+        checkTableModalState.confirmEventName = eventNames.disableUser;
+        checkTableModalState.title = 'User Disable';
+        checkTableModalState.subTitle = 'Are you sure you want to Disable selected User(s) below?';
+        checkTableModalState.themeColor = 'alert';
+        checkTableModalState.visible = true;
+    };
+
+    const checkModalConfirm = (event) => {
+        console.log(checkTableModalState.confirmEventName, event);
+        eventBus.$emit(checkTableModalState.confirmEventName, ...event);
+        resetCheckTableModalState();
+    };
+
+    const dropdownMenu = reactive({
+        ...makeTrItems([
+            ['update', 'COMMON.BTN_UPT'],
+            ['delete', 'COMMON.BTN_DELETE'],
+            ['enable', 'COMMON.BTN_ENABLE'],
+            ['disable', 'COMMON.BTN_DISABLE'],
+        ],
+        context.parent,
+        { type: 'item', disabled: isNotSelected }),
+    });
+
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
         ...toRefs(tabData),
         ...toRefs(tabAction),
+        checkTableModalState,
         tags,
-        dropdown: makeTrItems([
-            ['update', 'COMMON.BTN_UPT'],
-            ['delete', 'COMMON.BTN_DELETE'],
-            ['enable', 'COMMON.BTN_ENABLE'],
-            ['disable', 'COMMON.BTN_DISABLE'],
-
-        ],
-        context.parent,
-        { type: 'item', disabled: false }),
+        dropdown: dropdownMenu,
         userStateFormatter,
         timestampFormatter,
         clickCollectData() {
@@ -222,6 +288,9 @@ export const userSetup = (props, context, eventName) => {
         getSelectedUserItems,
         getSelectUserIds,
         getFirstSelectedUserId,
+        clickEnable,
+        clickDisable,
+        checkModalConfirm,
     });
 };
 
@@ -240,6 +309,7 @@ export default {
         PTab,
         PDataTable,
         PSearch,
+        PTableCheckModal,
     },
     setup(props, context) {
         const dataBind = reactive({
