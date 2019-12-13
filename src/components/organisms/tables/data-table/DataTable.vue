@@ -79,7 +79,7 @@
                 >
                     <p-tr :key="index" :data-index="index"
                           :class="{'tr-selected': isSelected(index)} "
-                          v-bind="item.hasOwnProperty('vbind') ? item.vbind : null"
+                          v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
                           onselectstart="return false"
                           @click.left="rowLeftClick( item, index, $event )"
                           @click.right="rowRightClick( item, index, $event )"
@@ -99,7 +99,7 @@
                             <slot
                                 :name="'col-'+field"
                                 :item="item"
-                                :value="item[field]"
+                                :value=" item? item[field] :''"
                                 :index="index"
                                 :field="field"
                             >
@@ -107,11 +107,11 @@
                                     <slot
                                         :name="'col-'+field+'-format'"
                                         :item="item"
-                                        :value="item[field]"
+                                        :value=" item? item[field] :''"
                                         :index="index"
                                         :field="field"
                                     >
-                                        {{ item[field] }}
+                                        {{ item? item[field] :"" }}
                                     </slot>
                                 </p-td>
                             </slot>

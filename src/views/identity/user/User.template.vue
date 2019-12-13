@@ -250,7 +250,7 @@ export const userSetup = (props, context, eventName) => {
 
     const checkModalConfirm = (event) => {
         console.log(checkTableModalState.confirmEventName, event);
-        eventBus.$emit(checkTableModalState.confirmEventName, ...event);
+        eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
     };
 

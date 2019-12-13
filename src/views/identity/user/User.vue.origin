@@ -262,7 +262,7 @@ export default {
             this.reset();
             this.setQuery(limit, start, sort, filter, filterOr);
             let res = null;
-            if(this.isEmpty(this.$http)){
+            if (this.isEmpty(this.$http)) {
                 alert(1);
             }
             try {
