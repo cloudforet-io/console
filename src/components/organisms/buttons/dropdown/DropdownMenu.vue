@@ -25,7 +25,7 @@ export default {
     events: ['clickMenuEvent'],
     props: {
         menu: {
-            type: Array,
+            type: [Array, Object],
             default: () => [],
         },
     },

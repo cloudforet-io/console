@@ -17,6 +17,9 @@ export default {
         userEventNames.getUserList = 'getUserData';
         userEventNames.tagConfirmEvent = 'UserTagConfirmEvent';
         userEventNames.tagResetEvent = 'resetUserTagEvent';
+        userEventNames.enableUser = 'enableUser';
+        userEventNames.disableUser = 'disableUser';
+        userEventNames.deleteUser = 'deleteUser';
 
         const state = userSetup(props, context, userEventNames);
 
@@ -52,23 +55,74 @@ export default {
         // change tag
         const UserTagConfirm = async (userId, tags, originTags) => {
             const idx = state.selectIndex[0];
-            try {
-                const res = await context.parent.$http.post('/identity/user/update', {
-                    user_id: userId,
-                    tags,
-                });
+            await context.parent.$http.post('/identity/user/update', {
+                user_id: userId,
+                tags,
+            }).then((_) => {
                 state.items[idx].tags = tags;
-                console.log(res);
-            } catch (e) {
+            }).catch((error) => {
                 userEventBus.$emit(userEventNames.tagResetEvent);
                 state.items[idx].tags = originTags;
-                console.error(e);
-            }
+                console.error(error);
+            });
         };
-
+        const getUsersParam = (items) => {
+            console.log(items);
+            const result = { users: _.map(items, 'user_id') };
+            return result;
+        };
+        const EnableUser = async (items) => {
+            await context.parent.$http.post('/identity/user/enable', getUsersParam(items)).then(async (_) => {
+                await requestUserList();
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'success',
+                    title: 'success',
+                    text: 'enable users',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.error(error);
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
+        const DisableUser = async (items) => {
+            await context.parent.$http.post('/identity/user/disable', getUsersParam(items)).then(async (_) => {
+                await requestUserList();
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'success',
+                    title: 'success',
+                    text: 'disable users',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.error(error);
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
 
         mountBusEvent(userEventBus, userEventNames.getUserList, requestUserList);
         mountBusEvent(userEventBus, userEventNames.tagConfirmEvent, UserTagConfirm);
+        mountBusEvent(userEventBus, userEventNames.enableUser, EnableUser);
+        mountBusEvent(userEventBus, userEventNames.disableUser, DisableUser);
+
         requestUserList();
         return {
             ...toRefs(state),

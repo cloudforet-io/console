@@ -20,7 +20,7 @@ export default {
     components: { PDropdownBtn, PDropdownMenu },
     props: {
         menu: {
-            type: Array,
+            type: [Array, Object],
             default: () => [],
         },
     },
