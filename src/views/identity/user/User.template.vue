@@ -37,7 +37,7 @@
                             :menu="dropdown"
                             @click-enable="clickEnable"
                             @click-disable="clickDisable"
-                            @click-delete="clickMenuEvent"
+                            @click-delete="clickDelete"
                             @click-update="clickMenuEvent"
                         >
                             Action
@@ -247,6 +247,15 @@ export const userSetup = (props, context, eventName) => {
         checkTableModalState.themeColor = 'alert';
         checkTableModalState.visible = true;
     };
+    const clickDelete = () => {
+        checkTableModalState.mode = 'delete';
+        checkTableModalState.confirmEventName = eventNames.deleteUser;
+        checkTableModalState.title = 'User Delete';
+        checkTableModalState.subTitle = 'Are you sure you want to delete selected User(s) below?';
+        checkTableModalState.themeColor = 'alert';
+        checkTableModalState.visible = true;
+    };
+
 
     const checkModalConfirm = (event) => {
         console.log(checkTableModalState.confirmEventName, event);
@@ -290,6 +299,7 @@ export const userSetup = (props, context, eventName) => {
         getFirstSelectedUserId,
         clickEnable,
         clickDisable,
+        clickDelete,
         checkModalConfirm,
     });
 };
