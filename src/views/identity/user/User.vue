@@ -71,7 +71,7 @@ export default {
             const result = { users: _.map(items, 'user_id') };
             return result;
         };
-        const EnableUser = async (items) => {
+        const enableUser = async (items) => {
             await context.parent.$http.post('/identity/user/enable', getUsersParam(items)).then(async (_) => {
                 await requestUserList();
                 context.root.$notify({
@@ -94,7 +94,7 @@ export default {
                 });
             });
         };
-        const DisableUser = async (items) => {
+        const disableUser = async (items) => {
             await context.parent.$http.post('/identity/user/disable', getUsersParam(items)).then(async (_) => {
                 await requestUserList();
                 context.root.$notify({
@@ -118,10 +118,36 @@ export default {
             });
         };
 
+        const deleteUser = async (items) => {
+            await context.parent.$http.post('/identity/user/delete', getUsersParam(items)).then(async (_) => {
+                await requestUserList();
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'success',
+                    title: 'success',
+                    text: 'delete users',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.error(error);
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
+
         mountBusEvent(userEventBus, userEventNames.getUserList, requestUserList);
         mountBusEvent(userEventBus, userEventNames.tagConfirmEvent, UserTagConfirm);
-        mountBusEvent(userEventBus, userEventNames.enableUser, EnableUser);
-        mountBusEvent(userEventBus, userEventNames.disableUser, DisableUser);
+        mountBusEvent(userEventBus, userEventNames.enableUser, enableUser);
+        mountBusEvent(userEventBus, userEventNames.disableUser, disableUser);
+        mountBusEvent(userEventBus, userEventNames.deleteUser, deleteUser);
+
 
         requestUserList();
         return {
