@@ -15,3 +15,17 @@ export const getBindClass = (cls) => {
     }
     return bindClass;
 };
+
+/**
+ * merge bind class(or style) and embedded class(or style)
+ * @param originBindData : Array|Object
+ * @param newData : Object
+ * @return Array
+ */
+export const mergeBind = (originBindData, newData) => {
+    const mergeData = Array.isArray(originBindData) ? originBindData : [originBindData];
+    return [
+        newData,
+        ...mergeData,
+    ];
+};
