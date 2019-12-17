@@ -76,6 +76,7 @@ export default {
         .is-invalid{
             border: 1px solid $alert;
         }
+        margin-bottom: 1rem;
     }
 
 </style>
