@@ -46,7 +46,6 @@
     </b-col>
 </template>
 <script>
-import { api } from '@/setup/api';
 
 let baseTabParams = {};
 export default {

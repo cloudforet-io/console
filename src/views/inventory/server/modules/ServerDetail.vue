@@ -73,7 +73,7 @@ import {
 } from '@/lib/util';
 import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { makeTrItems } from '@/lib/helper';
+import { makeTrItems } from '@/lib/view-helper';
 
 export default {
     name: 'PServerDetail',

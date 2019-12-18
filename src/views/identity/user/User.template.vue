@@ -101,7 +101,7 @@ import PStatus from '@/components/molecules/status/Status';
 import PButton from '@/components/atoms/buttons/Button';
 import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import { timestampFormatter, getValue, userStateFormatter } from '@/lib/util';
-import { makeTrItems } from '@/lib/helper';
+import { makeTrItems } from '@/lib/view-helper';
 import userEventBus from '@/views/identity/user/UserEventBus';
 
 

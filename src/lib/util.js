@@ -1,6 +1,6 @@
 import { Util } from '@/lib/global-util';
 import styles from '@/styles/_variables.scss';
-import { ColorBindFactory } from '@/lib/helper';
+import { ColorBindFactory } from '@/lib/view-helper';
 
 // color set
 /**

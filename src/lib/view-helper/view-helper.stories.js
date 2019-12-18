@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { makeTrItems } from '@/lib/helper';
+import { makeTrItems } from '@/lib/view-helper/index';
 
 export default {
     title: 'functions/helper/makeTrItems',

@@ -59,7 +59,7 @@
 import {
     onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { makeTrItems } from '@/lib/helper';
+import { makeTrItems } from '@/lib/view-helper';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeProxy } from '@/lib/compostion-util';
 

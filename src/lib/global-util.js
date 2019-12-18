@@ -1,6 +1,6 @@
 import VueLodash from 'vue-lodash';
 import timezone from 'countries-and-timezones';
-import { GlobalEnum } from '@/setup/enum';
+import { GlobalEnum } from '@/lib/enum';
 
 export const Util = {
     methods: {

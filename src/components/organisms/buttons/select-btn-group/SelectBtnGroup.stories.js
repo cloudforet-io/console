@@ -1,7 +1,7 @@
 import { action } from '@storybook/addon-actions';
 import { reactive, toRefs } from '@vue/composition-api';
 import PSelectBtnGroup from './SelectBtnGroup';
-import { makeTrItems } from '@/lib/helper';
+import { makeTrItems } from '@/lib/view-helper';
 
 export default {
     title: 'organisms/buttons/select-btn-group',

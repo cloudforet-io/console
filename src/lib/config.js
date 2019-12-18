@@ -1,6 +1,7 @@
 import axios from 'axios';
 import _ from 'lodash';
 
+
 class Config {
     constructor() {
         this.config = null;

@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
 import { text, number } from '@storybook/addon-knobs/vue';
 import PBubbleChart from './BubbleChart';
-import { autoProps } from '@/setup/storybook-util';
+import { autoProps } from '../../../../../.storybook/storybook-util';
 import { sampleDataGenerator } from './BubbleChart.map';
 
 export default {

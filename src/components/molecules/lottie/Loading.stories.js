@@ -1,6 +1,6 @@
 import { text, number, boolean } from '@storybook/addon-knobs/vue';
 import PLottie from './PLottie.vue';
-import { autoProps } from '@/setup/storybook-util';
+import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
     title: 'molecules/lottie/lottie',

@@ -54,7 +54,7 @@ import PI from '@/components/atoms/icons/PI';
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { makeTrItems } from '@/lib/helper';
+import { makeTrItems } from '@/lib/view-helper';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
 import config from '@/lib/config';
 

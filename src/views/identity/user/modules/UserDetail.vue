@@ -20,7 +20,7 @@ import PBadge from '@/components/atoms/badges/Badge';
 import PStatus from '@/components/molecules/status/Status';
 import { timestampFormatter, arrayFormatter, userStateFormatter } from '@/lib/util';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { makeTrItems } from '@/lib/helper';
+import { makeTrItems } from '@/lib/view-helper';
 import userEventBus from '@/views/identity/user/UserEventBus';
 
 export default {

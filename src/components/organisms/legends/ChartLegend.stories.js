@@ -4,7 +4,7 @@ import {
     alert, safe, other1, other2, gray,
 } from '@/styles/_variables.scss';
 
-import { autoProps } from '@/setup/storybook-util';
+import { autoProps } from '../../../../.storybook/storybook-util';
 
 
 export default {
