@@ -98,6 +98,7 @@
         />
 
 
+
         <BaseTabNav v-if="hasSelectedUser" class="user-info"
                     :fill="false"
                     :nav-tabs="tabs"
