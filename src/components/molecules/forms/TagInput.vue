@@ -1,5 +1,5 @@
 <template>
-    <div class="p-tag-input">
+    <div class="p-tag-input" v-on="$listeners">
         <div class="tag-input-box tag-key-input">
             <p-input-text
                 class="tag-input"
@@ -9,8 +9,9 @@
                 @input="$emit('update:name',$event)"
             />
         </div>
-
+        &nbsp;
         <span class="tag-input-split" :class="{disabled}">{{ disabled? '': ':' }}</span>
+        &nbsp;
         <div class="tag-input-box tag-value-input">
             <p-input-text
                 class="tag-input"
@@ -31,7 +32,10 @@ export default {
     components: { PInputText },
     props: {
         name: String,
-        value: String,
+        value: {
+            type: [String, Number],
+            default: undefined,
+        },
         tagKeyPlaceholder: String,
         tagValuePlaceholder: String,
         disabled: Boolean,
@@ -42,12 +46,11 @@ export default {
 <style lang="scss" scoped>
     .p-tag-input{
         display: inline-flex;
+        align-items: center;
     }
     .tag-input-split{
-        font: 14px/28px Arial;
         padding-left: 0.125rem;
         padding-right: 0.125rem;
-        flex: none;
         &.disabled{
             width: 0.5625rem;
         }
@@ -59,7 +62,7 @@ export default {
             flex-basis: 7.5rem;
         }
         &.tag-value-input{
-            flex-grow: 2;
+            flex-grow: 1.5;
             flex-shrink: 1;
             flex-basis: 15rem;
         }

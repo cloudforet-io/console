@@ -58,6 +58,9 @@ a {
     text-decoration: unset;
   }
 }
+p {
+    margin: 0;
+}
 
 
 /*************************
@@ -125,6 +128,27 @@ a {
     }
 }
 
+.sl-vue-tree-cursor {
+    position: absolute;
+    border: 1px solid $secondary;
+    height: 1px;
+    width: 100%;
+}
+
+
+.sl-vue-tree-drag-info {
+    position: absolute;
+    min-width: 120px;
+    text-align: left;
+    font: 14px/16px Arial;
+    letter-spacing: 0;
+    color: $secondary;
+    margin-left: 10px;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 0px 8px #4D49B629;
+    border-radius: 2px;
+}
+
 .sl-vue-tree.sl-vue-tree-root {
     background-color: transparent;
     border: none;
@@ -132,10 +156,17 @@ a {
         .sl-vue-tree-node {
             @include node-item-background(transparent);
             &.sl-vue-tree-selected {
+
+                > span {
+                    color: $primary4;
+                    font-weight: 500;
+                }
+
                 @include node-item-background(transparent);
             }
+
             .sl-vue-tree-node-item {
-                border-radius: 7px;
+                border-radius: 2px;
                 cursor: pointer;
                 margin: 5px 0;
                 color: darken($darkgray, 20%);
@@ -152,12 +183,20 @@ a {
                         font-weight: 500;
                         background-color: $primary2;
                     }
+
                 }
                 &.sl-vue-tree-node-is-leaf {
                     .item-icon {
                         font-size: 0.87em;
                     }
                 }
+                &.sl-vue-tree-cursor-inside {
+                  /*  border-top: none;
+                    border-left: none;
+                    border-right: none;*/
+                    border: 1px solid $secondary;
+                }
+
                 .sl-vue-tree-title {
                     display: flex;
                     width: 100%;
@@ -337,4 +376,9 @@ $form-padding: 0.375rem 0.75rem;
 
 .light {
   color:$white;
+}
+
+/* table */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: transparent;
 }

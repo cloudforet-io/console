@@ -7,14 +7,14 @@
                         <div class="card-group">
                             <div class="card col-7 card-left-container">
                                 <div class="signIn-title">
-                                    {{ $t('COMMON.ADMIN_USER') }} {{ $t('COMMON.SIGN_IN') }}
+                                    Admin Sign In
                                 </div>
                                 <div v-show.visible="greeting" class="signIn-sub-title">
-                                    {{ $t('COMMON.SIGN_IN_MSG') }}
+                                    {{ $t('SIGNIN.SIGN_IN_MSG') }}
                                 </div>
                                 <div v-show.visible="!greeting" class="signIn-sub-title">
                                     <div class="sign-in-alert">
-                                        {{ $t('COMMON.SIGN_FAIL_BODY') }}
+                                        {{ $t('SIGNIN.SIGN_FAIL_BODY') }}
                                     </div>
                                 </div>
                                 <form class="form-binder">
@@ -23,10 +23,11 @@
                                             User ID
                                         </p-label>
                                         <p-text-input ref="userId" v-model="adminUserId"
-                                                      :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
+                                                      :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none', 'border-radius': '2px' } "
+                                                      autocomplete="on"
                                                       class="form-control"
                                                       type="text"
-                                                      placeholder="  user ID"
+                                                      placeholder="  User ID"
                                                       required
                                                       @keyup="removeCSS('userId')"
                                                       @keyup.enter="signIn"
@@ -40,9 +41,10 @@
                                             Password
                                         </p-label>
                                         <p-text-input ref="password" v-model="password" type="password"
-                                                      :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
+                                                      autocomplete="on"
+                                                      :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none', 'border-radius': '2px' } "
                                                       class="form-control"
-                                                      placeholder="  password"
+                                                      placeholder="  Password"
                                                       required
                                                       @keyup="removeCSS('password')"
                                                       @keyup.enter="signIn"
@@ -58,7 +60,7 @@
                                                       :style-type="'primary1'"
                                                       @click="signIn"
                                             >
-                                                {{ $t('COMMON.SIGN_IN') }}
+                                                {{ $t('SIGNIN.SIGN_IN') }}
                                             </p-button>
                                         </div>
                                     </div>
@@ -69,9 +71,9 @@
                                 <div class="card-img-overlay text-white d-flex flex-column justify-content-center">
                                     <div class="text-center">
                                         <p style="margin-bottom: 10px">
-                                            <img src="@/assets/images/brand/dcos.png" width="100vh" height="100vh">
+                                            <img src="@/assets/images/brand/brand_logo.png" width="100vh" height="100vh">
                                         </p><h1>{{ getCurrentHostname }}</h1></p>
-                                        <p />
+                                        <p>{{ getGreetMessage }} </p>
                                     </div>
                                 </div>
                             </div>
@@ -115,10 +117,10 @@ export default {
             },
         };
     },
+    mounted() {
+        this.$refs.userId.focus();
+    },
     computed: {
-        ...mapGetters('auth', [
-            'nextPath',
-        ]),
         ...mapGetters('domain', [
             'authType',
         ]),
@@ -134,12 +136,23 @@ export default {
         getIsInvalidPassword() {
             return this.isInvalid.password ? this.styler.border : '';
         },
+        getGreetMessage() {
+            const companyTitle = this.$store.getters['domain/companyTitle'];
+            const companyDesc = this.$store.getters['domain/description'];
+            const hostName = this.getWindowHostName();
+            return !this.isEmpty(companyTitle) ? companyDesc : !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
+        },
         getCurrentHostname() {
-            const hostName = url.parse(window.location.href).host;
-            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
+            const companyTitle = this.$store.getters['domain/companyTitle'];
+            const hostName = this.getWindowHostName();
+            return !this.isEmpty(companyTitle) ? companyTitle : hostName;
         },
     },
     methods: {
+        getWindowHostName() {
+            const hostName = url.parse(window.location.href).host;
+            return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
+        },
         removeCSS(type) {
             this.validator[type] = false;
             this.isInvalid[type] = false;
@@ -168,7 +181,6 @@ export default {
 
             await this.$store.dispatch('auth/signIn', credentials).then(() => {
                 this.$router.push({ path: '/' });
-
             }).catch((e) => {
                 this.isInvalid.userId = true;
                 this.isInvalid.password = true;
@@ -286,9 +298,10 @@ export default {
     }
 
     .button-cover{
+        width: 50%;
         display: inline-block;
         text-align: center;
-        float: right;
+        float: left;
         font: 16px/18px Arial;
         letter-spacing: 0;
         color: #FFFFFF;

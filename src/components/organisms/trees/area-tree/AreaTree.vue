@@ -1,12 +1,15 @@
 <template>
     <div>
         <div class="row no-gutters" @click="contextMenuIsVisible=false">
-            <transition appear name="tree-trans" @before-enter="beforeEnter" @enter="enter">
+            <transition appear name="tree-trans" @before-enter="beforeEnter"
+                        @enter="enter"
+            >
                 <div v-if="showTree">
-                    <vertical-layout>
+                    <vertical-layout :auto-save-left-width="true">
                         <template #leftContainer="{ width }">
                             <div id="rootPanel"
-                                 @click.right.stop="isRootClicked">
+                                 @click.right.stop="isRootClicked"
+                            >
                                 <PTree ref="primeTree"
                                        :tree-data="treeData"
                                        :initial-tree-width="width"
@@ -27,9 +30,13 @@
                                     <slot name="treeSubPanel" />
                                 </div>
                                 <div v-else class="empty">
-                                    <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'"/>
-                                    <div class="msg">{{ getNoSelectMSG[0] }}</div><br>
-                                    <div class="dt">{{ getNoSelectMSG[1] }}</div>
+                                    <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
+                                    <div class="msg">
+                                        {{ getNoSelectMSG[0] }}
+                                    </div><br>
+                                    <div class="dt">
+                                        {{ getNoSelectMSG[1] }}
+                                    </div>
                                 </div>
                             </transition>
                         </template>
@@ -47,7 +54,6 @@ import _ from 'lodash';
 import PTree from '@/components/molecules/tree/Tree';
 import PI from '@/components/atoms/icons/PI';
 import styles from '@/styles/_variables.scss';
-
 import VerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
 
 export default {
@@ -102,8 +108,6 @@ export default {
     },
     computed: {
         getNoSelectMSG() {
-            console.log(this.noSelectMSG[0]);
-            console.log(this.noSelectMSG[1]);
             return [this.tr(this.noSelectMSG[0]), this.tr(this.noSelectMSG[1])];
         },
         getCurrentNode() {
@@ -129,11 +133,36 @@ export default {
         this.showTree = true;
     },
     methods: {
+        setContextVisible(flag) {
+            if (this.isSelectedType(flag, 'b')) {
+                this.contextMenuIsVisible = flag;
+            }
+        },
         getTree() {
             return this.isEmpty(this) ? null : _.get(this, '$refs.primeTree.$refs.slVueTree');
         },
         getNodeEl(node) {
             return this.$refs.primeTree.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
+        },
+        addClickedClass(node) {
+            const elem = this.getNodeEl(node);
+            if (elem) {
+                elem.classList.add('sl-vue-node-clicked');
+                return true;
+            }
+            return false;
+        },
+        removeAllClass() {
+            const elem = this.$refs.primeTree.$refs.slVueTree.$el.querySelectorAll('.sl-vue-tree-nodes-list .sl-vue-tree-node .sl-vue-node-clicked');
+            elem.forEach((curItem) => {
+                curItem.classList.remove('sl-vue-node-clicked');
+            });
+        },
+        removeClickedClass(node) {
+            const elem = this.getNodeEl(node);
+            if (elem) {
+                elem.classList.remove('sl-vue-node-clicked');
+            }
         },
         isRootClicked(e) {
             this.preventEvent(e);
@@ -161,6 +190,8 @@ export default {
             this.$emit('DTIsRootClicked', actionObj);
         },
         nodeClicked(node) {
+            this.removeAllClass();
+            this.addClickedClass(node);
             if (!node.data.hasOwnProperty('init')) {
                 this.nodeKey = (this.nodeKey !== node.data.id) ? node.data.id : this.nodeKey;
                 this.hasSelected = true;
@@ -183,10 +214,15 @@ export default {
             if (!hasClicked) {
                 event.preventDefault();
             }
+
             event.stopPropagation();
 
             if (this.contextMenuIsVisible) {
                 this.contextMenuIsVisible = false;
+            }
+            if (!node.data.init) {
+                this.removeAllClass(node);
+                this.addClickedClass(node);
             }
 
             this.$emit('DTContextVisible', node, event, hasClicked, this.getTree());

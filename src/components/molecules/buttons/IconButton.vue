@@ -4,6 +4,8 @@
         :class="classObject"
         :disabled="disabled"
         v-on="$listeners"
+        @mouseenter="onHover(true)"
+        @mouseleave="onHover(false)"
     >
         <slot>
             <p-i
@@ -13,7 +15,7 @@
                 :width="width"
                 :height="height"
                 :scale="scale"
-                :color="color"
+                :color="iconColor"
                 :original="original"
                 :title="title"
             />
@@ -22,9 +24,10 @@
 </template>
 
 <script>
+import { reactive, computed, toRefs } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI';
 import PButton from '@/components/atoms/buttons/Button';
-
+import { white, gray1 } from '@/styles/_variables.scss';
 
 export default {
     name: 'PIconButton',
@@ -40,11 +43,37 @@ export default {
             type: Boolean,
             default: false,
         },
-    },
-    computed: {
-        classObject() {
-            return [this.buttonStyle];
+        hoverColor: {
+            type: String,
+            default: `transparent ${white}`,
         },
+        disabledColor: {
+            type: String,
+            default: `transparent ${gray1}`,
+        },
+    },
+    setup(props) {
+        const state = reactive({
+            isHover: false,
+            classObject: computed(() => [props.buttonStyle]),
+        });
+        const iconColor = computed(() => {
+            if (props.disabled) {
+                return props.disabledColor;
+            } if (state.isHover) {
+                return props.hoverColor;
+            }
+            return props.color;
+        });
+        const onHover = (value) => {
+            state.isHover = value;
+        };
+        return {
+            ...toRefs(state),
+            iconColor,
+            onHover,
+
+        };
     },
 };
 </script>
@@ -53,14 +82,15 @@ export default {
     .icon-button{
         border-radius: 2px;
         padding: 0px;
+        display: inline-flex;
+        justify-content: center;
+        align-content: center;
         min-width: 32px;
         max-width: 32px;
         min-height: 32px;
         max-height: 32px;
         &.disabled{
-            color: $gray1;
             background-color: $gray2;
-            border: 1px solid $gray2;
         }
         &.white{
             background-color: $white;
@@ -68,19 +98,20 @@ export default {
         }
         &.dark{
             background-color: $dark;
-            color:$white;
         }
         &:not(:disabled):not(.disabled):hover{
             background-color: $secondary;
             border-color: $secondary;
-            color: $white;
         }
         &.transparent{
             &.disabled{
-                background-color: rgba(255,255,255,0);
-                border-color: rgba(255,255,255,0);
+                border-color: transparent;
+                background-color: transparent;
             }
         }
+    }
+    .p-i-icon{
+        margin: auto;
     }
 
 </style>

@@ -1,7 +1,6 @@
 import { select, text, boolean } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
-import PButton from './Button.vue';
-import { autoProps } from '../../../setup/storybook-util';
+import PButton from './Button';
 
 export default {
     title: 'atoms/buttons/button',

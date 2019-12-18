@@ -1,11 +1,8 @@
-import { number, select, text } from '@storybook/addon-knobs/vue';
-import faker from 'faker';
+import { select, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PModal from '../../../molecules/modals/Modal';
 import PButton from '../../../atoms/buttons/Button';
 import PTableCheckModel from './TableCheckModal';
-import { autoProps } from '../../../../setup/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 
 export default {
@@ -25,6 +22,10 @@ const data = {
     sortable: true,
     sortBy: null,
     sortDesc: true,
+    visible: false,
+    items: [
+        { name: 'stark', phone: '000-0000-0000', email: 'stark@marvel.com' },
+    ],
 };
 
 const actions = {
@@ -36,10 +37,6 @@ const actions = {
 
 };
 
-const ptcmProps = [
-    { name: 'headerTitle', default: 'this is title' },
-    { name: 'subTitle', default: 'this is sub title' },
-];
 
 const pmProps = [
     { name: 'scrollable' },
@@ -49,26 +46,6 @@ const pmProps = [
     { name: 'keyboard' },
 ];
 
-const mockupMixin = {
-    methods: {
-        getUser() {
-            return {
-                name: faker.name.firstName(),
-                phone: faker.phone.phoneNumberFormat(),
-                email: faker.internet.email(),
-            };
-        },
-    },
-    computed: {
-        items() {
-            const data = [];
-            for (let step = 0; step < 5; step++) {
-                data.push(this.getUser());
-            }
-            return data;
-        },
-    },
-};
 
 export const modal = () => ({
     components: { PTableCheckModel, PButton },
@@ -77,26 +54,18 @@ export const modal = () => ({
 <p-button styleType="primary" @click="click">모달 띄우기</p-button>
 <PTableCheckModel
     ref="modal"
-    :scrollable="scrollable" 
-    :centered="centered"
     :size="size"
-    :fade="fade"
-    :keyboard="keyboard"
-    :backdrop="backdrop"
     :headerTitle="headerTitle"
     :subTitle="subTitle"
     :fields="fields"
     :items="items"
-    
-    @shown="shown"
-    @hidden="hidden"
+    :visible.sync="visible"
+    :themeColor="themeColor"
+
     @cancel="cancel"
     @close="close"
     @confirm="confirm"
     >
-    <template #body>
-        <p>{{lorem}}</p> 
-    </template>  
     
 </PTableCheckModel>
 </div>`,
@@ -106,10 +75,8 @@ export const modal = () => ({
         };
     },
     props: {
-        loremLength: {
-            default: number('loremLength', 10, {
-                range: true, min: 1, max: 80, step: 10,
-            }),
+        themeColor: {
+            default: select('color', ['primary', 'alert', 'safe']),
         },
         size: {
             default: select('size', [null, ...Object.keys(sizeMapping)]),
@@ -121,14 +88,13 @@ export const modal = () => ({
             default: text('header', 'this is header'),
         },
         subTitle: {
-            default: text('sub', 'sub Title'),
+            default: text('sub', 'this is sub Title'),
         },
-        ...autoProps(PModal, pmProps),
+        scrollable: {
+            default: boolean('scrollable', false),
+        },
     },
     computed: {
-        lorem() {
-            return faker.lorem.lines(this.loremLength);
-        },
         ConfirmButtonBind() {
             return {
                 styleType: 'primary',
@@ -138,10 +104,10 @@ export const modal = () => ({
     },
     methods: {
         click() {
-            this.$refs.modal.show();
+            this.visible = true;
         },
         close() {
-            this.$refs.modal.hide();
+            this.visible = false;
         },
         ...actions,
     },

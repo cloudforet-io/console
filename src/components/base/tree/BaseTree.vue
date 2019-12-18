@@ -104,7 +104,6 @@ import SlVueTree from 'sl-vue-tree';
 import styles from '@/styles/_variables.scss';
 import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
 import BaseModal from '@/components/base/modal/BaseModal';
-import { GlobalEnum } from '@/setup/enum';
 import VerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
 
 export default {

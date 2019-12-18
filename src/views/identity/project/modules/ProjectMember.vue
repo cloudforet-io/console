@@ -1,92 +1,110 @@
 <template>
-    <div class="animated fadeIn">
-        <b-row>
-            <b-col cols="12">
-                <BaseTable :table-data="members"
-                           :fields="fields"
-                           :per-page="perPage"
-                           searchable
-                           :total-rows="totalCount"
-                           :search-context-data="searchQueryData"
-                           show-caption
-                           :busy="isLoading"
-                           :cardless="false"
-                           underlined
-                           @rowSelected="rowSelected"
-                           @list="listMembers"
-                           @limitChanged="limitChanged"
-                           @onSelectAll="rowAllSelected"
-                >
-                    <template #caption>
-                        <b-row align-v="center" align-h="center">
-                            <b-col class="pr-1" cols="5">
-                                <BaseModal ref="addMember"
-                                           title="Add Member"
-                                           centered
-                                           hide-footer
-                                >
-                                    <template #activator>
-                                        <b-button block variant="primary">
-                                            {{ $t('MSG.BTN_ADD') }}
-                                        </b-button>
-                                    </template>
-                                    <template #contents>
-                                        <MemberDetail creatable
-                                                      updatable
-                                                      :memebers="memberUserIDs"
-                                                      :selected-data="anySelectedRow"
-                                                      @close="$refs.addMember.hideModal()"
-                                        />
-                                    </template>
-                                </BaseModal>
-                            </b-col>
-                            <b-col class="pl-1" cols="5">
-                                <template v-if="hasSelectedMember">
-                                    <b-button block variant="danger" @click="deleteSelected">
-                                        {{ $t('MSG.BTN_DELETE') }}
-                                    </b-button>
-                                </template>
-                            </b-col>
-                            <b-col class="pr-0" cols="2" />
-                        </b-row>
-                    </template>
-                </BaseTable>
-            </b-col>
-        </b-row>
-
-        <ActionCheckModal ref="IDPJ005_DeleteUser"
-                          primary-key="user_id"
-                          :data="selectedMembers"
-                          :fields="selectedFields"
-                          :action="actionProcess"
-                          :title="actionCommandData.title"
-                          :type="actionCommandData.type"
-                          :text="actionCommandData.text"
-                          @succeed="listMembers"
-                          @failed="listMembers"
+    <div>
+        <project-member-add ref="MemberAdd"
+                            :reference-member="getBindMember"
         />
+        <project-member-delete ref="MemberDelete"
+                               :reference-member="getMemberData"
+        />
+        <p-toolbox-table :items="members"
+                         :fields="fields"
+                         :shadow="false"
+                         :border="false"
+                         :hover="true"
+                         :responsive-style="{'height': getPropHeight + 'px', 'overflow-y':'auto'}"
+                         :selectable="selectable"
+                         :sortable="sortable"
+                         :sort-by.sync="tablePage.sortBy"
+                         :sort-desc.sync="tablePage.sortDesc"
+                         :all-page="tablePage.allPage"
+                         :this-page.sync="tablePage.thisPage"
+                         :select-index.sync="selectIndex"
+                         :page-size.sync="tablePage.pageSize"
+                         :loading="loading"
+                         :use-spinner-loading="true"
+                         :use-cursor-loading="true"
+                         @changePageSize="changePageSize"
+                         @changeSort="getMembers"
+                         @changePageNumber="getMembers"
+                         @clickRefresh="getMembers"
+        >
+            <template slot="toolbox-left">
+                <p-button style-type="primary" @click="showModals('add')">
+                    <p-i :color="'transparent inherit'"
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_plus'"
+                    />   {{ tr('COMMON.BTN_ADD') }}
+                </p-button>
+                <p-button style-type="alert" :outline="true"
+                          :disabled="isDisabled"
+                          class="btn-margin"
+                          @click="showModals('del')"
+                >
+                    {{ tr('COMMON.BTN_DELETE') }}
+                </p-button>
+            </template>
+            <template v-slot:col-user_id-format="data">
+                {{ data.item.user_info.user_id }}
+            </template>
+            <template v-slot:col-name-format="data">
+                {{ data.item.user_info.name }}
+            </template>
+            <template v-slot:col-email-format="data">
+                {{ data.item.user_info.email }}
+            </template>
+            <template v-slot:col-mobile-format="data">
+                {{ data.item.user_info.mobile }}
+            </template>
+            <template v-slot:col-group-format="data">
+                {{ data.item.user_info.group }}
+            </template>
+            <template v-slot:col-labels-format="data">
+                <div>
+                    <PBadge v-for="(label, idx) in data.item.labels" :key="idx"
+                            class="p-label" :style-type="'gray2'"
+                    >
+                        {{ getEmptyString(label) }}
+                    </PBadge>
+                </div>
+            </template>
+        </p-toolbox-table>
     </div>
 </template>
-
 <script>
-
-import searchContext from '@/views/identity/project/search-context/query';
-import BaseTable from '@/components/base/table/BaseTable';
-import ActionCheckModal from '@/components/base/modal/ActionCheckModal';
-import BaseModal from '@/components/base/modal/BaseModal';
-import MemberDetail from '@/views/identity/project/modules/ProjectMemberDetail';
+import _ from 'lodash';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
+import PButton from '@/components/atoms/buttons/Button';
+import ProjectMemberAdd from '@/views/identity/project/modules/ProjectMemberAdd';
+import ProjectMemberDelete from '@/views/identity/project/modules/ProjectMemberDelete';
+import { defaultQuery } from '@/lib/api';
+import PI from '@/components/atoms/icons/PI';
+import PBadge from '@/components/atoms/badges/Badge';
 
 export default {
     name: 'ProjectMember',
     components: {
-
-        BaseTable,
-        BaseModal,
-        MemberDetail,
-        ActionCheckModal,
+        PToolboxTable,
+        PButton,
+        PI,
+        ProjectMemberAdd,
+        ProjectMemberDelete,
+        PBadge,
     },
     props: {
+        tabBasicHeight: {
+            type: Number,
+            default: 40,
+        },
         selectedNode: {
+            type: Object,
+            default: null,
+        },
+        referenceMember: {
+            type: Array,
+            default: () => [],
+        },
+        responsiveStyle: {
             type: Object,
             default: null,
         },
@@ -94,154 +112,95 @@ export default {
     data() {
         return {
             members: [],
-            memberUserIDs: [],
-            selectedIdx: undefined,
-            addModal: false,
-            totalCount: 0,
-            searchQueryData: searchContext,
-            searchQuery: {},
-            actionCommandData: {},
-            isReadyForSearch: false,
-            perPage: 3,
-            actionFlag: null,
-            isLoading: true,
-            selectedItems: [],
-            selectedMember: null,
+            selectable: true,
+            sortable: true,
+            selectIndex: [],
+            loading: false,
+            tablePage: {
+                sortBy: 'user_id',
+                sortDesc: false,
+                thisPage: 1,
+                allPage: 1,
+                pageSize: 15,
+            },
         };
     },
     computed: {
-        anySelectedRow() {
-            return this.$attrs['selected-data'];
+        getPropHeight() {
+            return this.tabBasicHeight;
         },
-        selectedFields() {
-            return [
-                {
-                    key: 'user_id', label: this.tr('COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' },
-                },
-                {
-                    key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' },
-                },
-                {
-                    key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
-                },
-                {
-                    key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
-                },
-            ];
+        getBindMember() {
+            return _.map(this.members, 'user_info.user_id');
+        },
+        getMemberData() {
+            return this.members;
+        },
+        isDisabled() {
+            return !(this.selectIndex.length > 0);
         },
         fields() {
             return [
-                { key: 'selected', thStyle: { width: '50px' } },
                 {
-                    key: 'user_id', label: this.tr('COL_NM.UID'), sortable: true, ajaxSortable: false, thStyle: { width: '150px' },
+                    name: 'user_id', label: this.tr('COMMON.UID'), size: '145px',
                 },
                 {
-                    key: 'name', label: this.tr('COL_NM.NAME'), sortable: true, ajaxSortable: true, thStyle: { width: '170px' },
+                    name: 'name', label: this.tr('COMMON.NAME'), size: '200px',
                 },
                 {
-                    key: 'state', label: this.tr('COL_NM.STATE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
+                    name: 'email', label: this.tr('COMMON.EMAIL'), size: '150px',
                 },
                 {
-                    key: 'email', label: this.tr('COL_NM.EMAIL'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
+                    name: 'group', label: this.tr('COMMON.GROUP'), size: '120px',
                 },
                 {
-                    key: 'group', label: this.tr('COL_NM.GROUP'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
-                },
-                {
-                    key: 'role', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false, thStyle: { width: '200px' },
-                },
-                {
-                    key: 'roles', label: this.tr('COL_NM.ROLE'), sortable: true, ajaxSortable: false, thClass: 'd-none', tdClass: 'd-none',
+                    name: 'labels', label: this.tr('COMMON.LABELS'), size: '120px',
                 },
             ];
         },
-        isMultiSelected() {
-            return this.selectedItems.length > 1;
-        },
-        hasSelectedMember() {
-            return this.selectedItems.length > 0;
-        },
-        selectedMembers() {
-            return this.selectedItems.map(item => item.data);
-        },
     },
     mounted() {
-        this.init();
+        this.listMembers();
     },
     methods: {
-        init() {
-            this.listMembers(this.perPage, 0);
+        getEmptyString(object) {
+            return this.isEmpty(object) ? '' : object;
+        },
+        getDefaultQuery() {
+            return {
+                query: defaultQuery(
+                    this.tablePage.thisPage,
+                    this.tablePage.pageSize,
+                    this.tablePage.sortBy,
+                    this.tablePage.sortDesc,
+                ),
+            };
+        },
+        getMembers() {
+            this.listMembers();
+        },
+        changePageSize() {
+            this.tablePage.thisPage = 1;
+            this.tablePage.allPage = 1;
+            this.listMembers();
         },
         reset() {
             this.members = [];
-            this.selectedMember = null;
-            this.isLoading = true;
         },
-        saveMeta(limit, start, sort, filter, filterOr) {
-            if (this.isEmpty(limit)) {
-                limit = 10;
-            }
-            if (this.isEmpty(start)) {
-                start = 0;
-            }
-            if (this.isEmpty(sort)) {
-                sort = {};
-            }
-            if (this.isEmpty(filter)) {
-                filter = [];
-            }
-            if (this.isEmpty(filterOr)) {
-                filterOr = [];
-            }
-            this.searchQuery = {
-                sort,
-                page: {
-                    start,
-                    limit,
-                },
-                filter_or: filterOr,
-            };
-        },
-        async listMembers(limit, start, sort, filter, filterOr) {
-            this.reset();
-            this.saveMeta(limit, start, sort, filter, filterOr);
-            const query = { query: this.searchQuery };
+        async listMembers() {
+            this.loading = true;
+            const query = this.getDefaultQuery();
             const selectedNodeDT = this.selectedNode.node.data;
-            const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id, ...query } : { project_id: selectedNodeDT.id, ...query };
+            const param = selectedNodeDT.item_type === 'PROJECT_GROUP' ? { project_group_id: selectedNodeDT.id, ...query } : { project_id: selectedNodeDT.id, ...query };
             const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/member/list`;
-
-            console.log('Parameters', JSON.stringify(param));
             await this.$http.post(url, param).then((response) => {
-                const results = [];
-                if (!this.isEmpty(response.data.results)) {
-                    const memberUserIds = [];
-                    response.data.results.forEach((current) => {
-                        current.user_info.role = current.user_info.roles.join(', ');
-                        results.push(current.user_info);
-                        memberUserIds.push(current.user_info.user_id);
-                    });
-                    this.memberUserIDs = memberUserIds;
-                }
-                this.members = results;
-                console.log(response.data.results);
-                this.isLoading = false;
+                this.members = response.data.results;
+                const allPage = Math.ceil(response.data.total_count / this.tablePage.pageSize);
+                this.tablePage.allPage = allPage || 1;
+                this.selectIndex = [];
             }).catch((error) => {
                 console.error(error);
-                this.isLoading = false;
             });
-        },
-        rowSelected(rows) {
-            this.selectedItems = rows;
-            if (rows.length === 1) {
-                this.selectedIdx = rows[0].idx;
-            }
-        },
-        rowAllSelected(isSelectedAll, rows) {
-            this.selectedItems = rows;
-        },
-        limitChanged(val) {
-            this.perPage = Number(val);
-            this.init();
+            this.loading = false;
         },
         getSelectedInfo(key) {
             const selectedObj = this.$attrs['selected-data'].node;
@@ -281,17 +240,15 @@ export default {
             } else {
                 return;
             }
-
-
             if (!this.isEmpty(url) && !this.isEmpty(url)) {
                 await this.$http.post(url, param);
                 /*     .then((response) => {
-                    if (this.isEmpty(response.data)){
-                        console.log('success');
-                    }
-                }).catch((error) =>{
-                    console.log(error);
-                }); */
+                        if (this.isEmpty(response.data)){
+                            console.log('success');
+                        }
+                    }).catch((error) =>{
+                        console.log(error);
+                    }); */
             }
         },
         actionCommand() {
@@ -309,12 +266,27 @@ export default {
             this.actionFlag = 'delete';
             this.actionCommand();
         },
+        showModals(type) {
+            if (type === 'add') {
+                this.$refs.MemberAdd.showModal();
+            } else {
+                this.$refs.MemberDelete.showModal();
+            }
+        },
     },
 };
 </script>
 
 <style lang="scss" scoped>
-  .base-table {
-    @extend %sheet;
-  }
+    .p-label {
+        margin-bottom:5px;
+        margin-right: 0.5rem;
+        color:$dark;
+    }
+    .base-table {
+        @extend %sheet;
+    }
+    .btn-margin{
+        margin-left: 1rem;
+    }
 </style>

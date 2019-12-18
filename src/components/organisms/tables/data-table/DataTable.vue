@@ -23,86 +23,101 @@
                 :fields="fieldsData"
             >
                 <p-tr>
-                    <p-th v-if="selectable">
+                    <p-th v-if="selectable" style="width: 16px;">
                         <PCheckBox v-model="allState" @change="selectAllToggle" />
                     </p-th>
                     <p-th
                         v-for="(field,index) in fieldsData"
                         :key="index"
+                        :style="{ width: getColWidth(field.size), 'text-align' : getAligning(field.align)}"
+                        :class="{'fix-width': colCopy}"
                         @click="theadClick(field,index,$event)"
+                        @mouseenter="thHoverIndex=index"
+                        @mouseleave="thHoverIndex=null"
                     >
-                        {{ field.label ? field.label : field.name }}
-                        <template v-if="sortable&&field.sortable">
-                            <f-i
-                                v-if="sortable&&field.name==sortBy"
-                                icon-style="solid"
-                                :icon="sortIcon"
-                                class="sort-icon"
+                        <span class="th-contents">
+                            <span :style="{visibility: isThOver(index) ? 'hidden' : 'visible'}">
+                                {{ field.label ? field.label : field.name }}
+                            </span>
+                            <p-copy-button v-if="isThOver(index)"
+                                           class="copy-btn"
+                                           :value="clickColCopy(index)"
                             />
-                            <f-i
-                                v-else
-                                icon-style="solid"
-                                icon="fa-sort"
-                                class="sort-icon"
-                            />
-                        </template>
+                            <template v-if="sortable&&field.sortable">
+                                <p-i
+                                    v-if="sortable&&field.name==sortBy"
+                                    :name="sortIcon"
+                                    class="sort-icon"
+                                />
+                                <p-i
+                                    v-else
+                                    name="ic_table_sort"
+                                    class="sort-icon"
+                                />
+                            </template>
+                        </span>
                     </p-th>
                 </p-tr>
             </slot>
         </template>
         <template #body>
-            <slot
-                name="body"
-                :items="items"
-            >
-                <template v-for="(item,index) in items">
-                    <slot
-                        name="row"
-                        :fields="fieldsName"
-                        :item="item"
-                        :index="index"
+            <p-tr v-if="loading&&useSpinnerLoading" key="loading" class="no-data-row">
+                <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
+                    <p-lottie name="spinner" :size="2"
+                              :auto="true"
+                    />
+                </p-td>
+            </p-tr>
+            <p-tr v-if="showNoData" key="noData" class="no-data-row">
+                <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
+                    No Data
+                </p-td>
+            </p-tr>
+            <slot name="body" :items="items">
+                <slot v-for="(item, index) in items" name="row" :fields="fieldsName"
+                      :item="item" :index="index"
+                >
+                    <p-tr :key="index" :data-index="index"
+                          :class="{'tr-selected': isSelected(index)} "
+                          v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
+                          onselectstart="return false"
+                          @click.left="rowLeftClick( item, index, $event )"
+                          @click.right="rowRightClick( item, index, $event )"
+                          @click.middle="rowMiddleClick( item, index, $event )"
+                          @mouseover="rowMouseOver(item,index, $event)"
+                          @mouseout="rowMouseOut(item,index, $event)"
                     >
-                        <p-tr
-                            :key="index"
-                            :class="{'tr-selected': isSelected(index)} "
-                            v-bind="item.hasOwnProperty('vbind') ? item.vbind : null"
-                            @click.left="rowLeftClick( item, index, $event )"
-                            @click.right="rowRightClick( item, index, $event )"
-                            @click.middle="rowMiddleClick( item, index, $event )"
-                            @mouseover="rowMouseOver(item,index, $event)"
-                            @mouseout="rowMouseOut(item,index, $event)"
+                        <p-td v-if="selectable"
+                              class="select-checkbox"
+                              @click.stop.prevent="selectClick"
+                              @mouseenter="hoverIndex=index"
+                              @mouseleave="hoverIndex=null"
                         >
-                            <p-td v-if="selectable"
-                                  @click.stop.prevent="selectClick"
-                                  @mouseenter="hoverIndex=index"
-                                  @mouseleave="hoverIndex=null"
+                            <PCheckBox v-model="proxySelectIndex" :value="index" :hovered="hoverIndex===index" />
+                        </p-td>
+                        <template v-for="field in fieldsName">
+                            <slot
+                                :name="'col-'+field"
+                                :item="item"
+                                :value=" item? item[field] :''"
+                                :index="index"
+                                :field="field"
                             >
-                                <PCheckBox v-model="proxySelectIndex" :value="index" :hovered="hoverIndex===index" />
-                            </p-td>
-                            <template v-for="field in fieldsName">
-                                <slot
-                                    :name="'col-'+field"
-                                    :item="item"
-                                    :value="item[field]"
-                                    :index="index"
-                                    :field="field"
-                                >
-                                    <p-td>
-                                        <slot
-                                            :name="'col-'+field+'-format'"
-                                            :item="item"
-                                            :value="item[field]"
-                                            :index="index"
-                                            :field="field"
-                                        >
-                                            {{ item[field] }}
-                                        </slot>
-                                    </p-td>
-                                </slot>
-                            </template>
-                        </p-tr>
-                    </slot>
-                </template>
+                                <p-td onselectstart="return true" style="user-select: all">
+                                    <slot
+                                        :name="'col-'+field+'-format'"
+                                        :item="item"
+                                        :value=" item? item[field] :''"
+                                        :index="index"
+                                        :field="field"
+                                    >
+                                        {{ item? item[field] :"" }}
+                                    </slot>
+                                </p-td>
+                            </slot>
+                        </template>
+                    </p-tr>
+                </slot>
             </slot>
         </template>
         <template #foot>
@@ -112,23 +127,36 @@
 </template>
 
 <script>
+import DragSelect from 'dragselect';
 import PTable from '@/components/molecules/tables/Table';
 import PTr from '@/components/atoms/table/Tr';
 import PTd from '@/components/atoms/table/Td';
 import PTh from '@/components/atoms/table/Th';
-import FI from '@/components/atoms/icons/FI';
-import PCheckBox from '@/components/molecules/forms/CheckBox';
+import PI from '@/components/atoms/icons/PI';
+import PLottie from '@/components/molecules/lottie/PLottie';
+import { selectToCopyToClipboard } from '@/lib/util';
+
+const PCheckBox = () => import('@/components/molecules/forms/CheckBox');
+const PCopyButton = () => import('@/components/molecules/buttons/CopyButton');
 
 export default {
     name: 'PDataTable',
     components: {
-        PTable, PTd, PTh, PTr, FI, PCheckBox,
+        PTable, PTd, PTh, PTr, PI, PCheckBox, PCopyButton, PLottie,
     },
+    events: [
+        'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
+        'changeSort', 'theadClick',
+    ],
     mixins: [PTable],
     props: {
         fields: Array,
         items: Array,
         sortable: {
+            type: Boolean,
+            default: false,
+        },
+        dragable: {
             type: Boolean,
             default: false,
         },
@@ -152,11 +180,29 @@ export default {
             type: Boolean,
             default: true,
         },
+        colCopy: {
+            type: Boolean,
+            default: false,
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        useSpinnerLoading: {
+            type: Boolean,
+            default: false,
+        },
+        useCursorLoading: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
             allState: false,
             hoverIndex: null,
+            dragSelect: null,
+            thHoverIndex: null,
         };
     },
     computed: {
@@ -191,17 +237,109 @@ export default {
         },
         sortIcon() {
             if (this.sortDesc) {
-                return 'fa-sort-down';
+                return 'ic_table_sort_fromZ';
             }
-            return 'fa-sort-up';
+            return 'ic_table_sort_fromA';
+        },
+        selectArea() {
+            return this.$el;
+        },
+        dragSelectAbles() {
+            return this.selectArea.children[0].children[1].children;
+        },
+        showNoData() {
+            if (!this.items || !this.items.hasOwnProperty('length') || this.items.length === 0) {
+                if (this.useSpinnerLoading && this.loading) {
+                    return false;
+                }
+                return true;
+            }
+            return false;
         },
     },
+    watch: {
+        items() {
+            if (this.selectable && this.dragable && this.$options.name === 'PDataTable' && this.items) {
+                this.$nextTick(() => {
+                    this.dragSelect.setSelectables(this.dragSelectAbles);
+                });
+            }
+        },
+        loading() {
+            if (this.useCursorLoading) {
+                if (this.loading) {
+                    document.body.style.cursor = 'progress';
+                } else {
+                    document.body.style.cursor = 'default';
+                }
+            }
+        },
+    },
+    mounted() {
+        if (this.$options.name === 'PDataTable') {
+            if (this.selectable && this.dragable) {
+                // todo: fix when chnage comosition api
+                this.dragSelect = new DragSelect({
+                    selectables: this.dragSelectAbles,
+                    area: this.selectArea,
+                    callback: this.dragSelectItems,
+                });
+            }
+            if (this.selectable) {
+                window.addEventListener('keydown', this.copy);
+            }
+            if (this.loading) {
+                document.body.style.cursor = 'progress';
+            }
+        }
+    },
+    destroyed() {
+        // todo: fix when chnage comosition api
+        if (this.$options.name === 'PDataTable' && this.selectable) {
+            window.removeEventListener('keydown', this.copy);
+        }
+    },
     methods: {
+        getAligning(align) {
+            return this.isEmpty(align) ? 'left' : align;
+        },
+        getColWidth(size) {
+            return this.isEmpty(size) ? 'auto' : size;
+        },
+        makeTableText(el) {
+            let result = '';
+            const startIdx = this.selectable ? 1 : 0;
+            const tds = el.children;
+            for (let idx = startIdx; idx < el.childElementCount; idx++) {
+                result += `${tds[idx].innerText}\t`;
+            }
+            return `${result}\n`;
+        },
+        copy(event) {
+            if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && this.selectIndex.length > 0) {
+                let result = '';
+                this.selectIndex.forEach((td) => {
+                    result += this.makeTableText(this.dragSelectAbles[td]);
+                });
+                selectToCopyToClipboard(result);
+            }
+        },
+        dragSelectItems(items) {
+            const select = [];
+            if (items.length > 1) {
+                items.forEach((item) => {
+                    select.push(Number(item.attributes['data-index'].value));
+                });
+                this.proxySelectIndex = select;
+            }
+        },
         rowLeftClick(item, index, event) {
             this.$emit('rowLeftClick', item, index, event);
             if (this.selectable) {
                 if (this.rowClickMultiSelectMode) {
                     this.checkboxToggle(index);
+                } else if (event.shiftKey) {
+                    this.proxySelectIndex = [...this.proxySelectIndex, index];
                 } else {
                     this.proxySelectIndex = [index];
                 }
@@ -228,8 +366,12 @@ export default {
                         this.$emit('update:sortDesc', true);
                     }
                 } else {
+                    if (!this.sortDesc) {
+                        this.$emit('update:sortBy', '');
+                    }
                     this.$emit('update:sortDesc', !this.sortDesc);
                 }
+                this.$emit('changeSort');
             }
             this.$emit('theadClick', field, index, event);
         },
@@ -258,14 +400,30 @@ export default {
                 this.proxySelectIndex = [];
             }
         },
-        getSelectItem() {
+        getSelectItem(sortable) {
+            const selectedIndex = this.isEmpty(sortable) ? this.proxySelectIndex : this.proxySelectIndex.sort((a, b) => a - b);
             const selectItem = [];
-            this.proxySelectIndex.forEach((index) => {
+            console.log(selectedIndex);
+            this.selectedIndex.forEach((index) => {
                 selectItem.push(this.items[index]);
             });
-            console.log('after tick', this.proxySelectIndex);
-            console.log(selectItem);
             return selectItem;
+        },
+        isThOver(index) {
+            return this.colCopy && this.thHoverIndex === index;
+        },
+        clickColCopy(idx) {
+            let result = '';
+            const arr = Array.from(this.dragSelectAbles);
+            arr.forEach((el) => {
+                const children = Array.from(el.children);
+                children.forEach((td, colIdx) => {
+                    if (colIdx === idx) {
+                        result += `${td.innerText}\t`;
+                    }
+                });
+            });
+            return result;
         },
     },
 };
@@ -273,11 +431,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
     %selected-row {
-        background-color: $secondary2;
+        background-color: $primary3 !important;
         td {
             color: $secondary;
         }
+    }
+    .select-checkbox{
+        cursor:pointer;
     }
     tbody{
         display: block;
@@ -293,12 +455,44 @@ export default {
     thead{
         tr{
             th{
+                vertical-align: middle;
+                white-space:nowrap;
+                .th-contents {
+                    display: flex;
+                    justify-content: space-between;
+                }
                 .sort-icon{
                     float: right;
                     color: $gray2;
                 }
+                &.fix-width {
+                    min-width: 4.75rem;
+                }
             }
         }
     }
-
+    .fade-enter {
+        opacity: 0;
+    }
+    .fade-enter-active {
+        transition: opacity 0s;
+    }
+    .copy-btn::v-deep {
+        position: absolute !important;
+        .p-copy-btn {
+            left: 0;
+        }
+    }
+    .no-data-row{
+        &:hover{
+            background-color: initial !important;
+        }
+        .no-data{
+            text-align: center;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            color: $primary2;
+            font: 24px/32px Arial;
+        }
+    }
 </style>

@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapMutations, mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import PI from '@/components/atoms/icons/PI';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList';
 import { LANGUAGES } from '@/lib/global-enums';
@@ -29,31 +29,35 @@ export default {
     },
     data() {
         return {
-            visible: false,
-            languages: this.$i18n.availableLocales.map(lang => ({ key: lang, contents: LANGUAGES[lang] })),
+            languages: this.$i18n.availableLocales.map(lang => ({
+                key: lang,
+                contents: LANGUAGES[lang],
+                selected: localStorage.language ? localStorage.language === lang : lang === 'en'
+            })),
             iconColor: styles.primary4,
         };
     },
     computed: {
-        ...mapGetters('user', [
-            'locale',
+        ...mapGetters('auth', [
+            'language',
         ]),
         tooltip() {
-            return `Language: ${LANGUAGES[this.locale]}`;
+            return `Language: ${LANGUAGES[this.language]}`;
         },
     },
     created() {
         this.init();
     },
     methods: {
-        ...mapMutations('user', [
-            'setLocale',
+        ...mapActions('auth', [
+            'setLanguage',
         ]),
         init() {
-            if (this.locale) this.$i18n.locale = this.locale;
+            this.setLanguage(localStorage.language || 'en');
         },
         changeLanguage(item) {
-            this.setLocale(item.key);
+            this.setLanguage(item.key);
+            this.$i18n.locale = this.language;
         },
     },
 };

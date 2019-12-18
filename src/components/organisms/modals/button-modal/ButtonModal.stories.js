@@ -6,7 +6,7 @@ import PContentModal from '../content-modal/ContentModal.vue';
 import PModal from '../../../molecules/modals/Modal.vue';
 import PButton from '../../../atoms/buttons/Button.vue';
 import PButtonModal from './ButtonModal.vue';
-import { autoProps } from '../../../../setup/storybook-util';
+import { autoProps } from '../../../../../.storybook/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 
 export default {
@@ -22,7 +22,7 @@ export default {
 };
 
 const data = {
-    visible: true,
+    visible: false,
 };
 
 const actions = {
@@ -46,13 +46,7 @@ const pcmProps = [
     { name: 'bodyVisible' },
     { name: 'footerVisible' },
 ];
-const pmProps = [
-    { name: 'scrollable' },
-    { name: 'centered' },
-    { name: 'backdrop' },
-    { name: 'fade' },
-    { name: 'keyboard' },
-];
+
 export const modal = () => ({
     components: { PButtonModal, PButton },
     template: `
@@ -64,7 +58,6 @@ export const modal = () => ({
     :centered="centered"
     :size="size"
     :fade="fade"
-    :keyboard="keyboard"
     :backdrop="backdrop"
     :headerTitle="headerTitle"
     :headerVisible="headerVisible"
@@ -74,8 +67,7 @@ export const modal = () => ({
     :footerCancelButtonVisible="footerCancelButtonVisible"
     :footerConfirmButtonVisible="footerConfirmButtonVisible"
     :footerConfirmButtonBind="ConfirmButtonBind"
-    @shown="shown"
-    @hidden="hidden"
+    :visible.sync="visible"
     @cancel="cancel"
     @close="close"
     @confirm="confirm"
@@ -99,14 +91,25 @@ export const modal = () => ({
             }),
         },
         size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)]),
+            default: select('size', [null, ...Object.keys(sizeMapping)], 'sm'),
+        },
+        scrollable: {
+            default: boolean('scrollable', false),
+        },
+        centered: {
+            default: boolean('centered', false),
+        },
+        backdrop: {
+            default: boolean('backdrop', true),
+        },
+        fade: {
+            default: boolean('fade', true),
         },
         okDisabled: {
             default: boolean('ok disabled', false),
         },
         ...autoProps(PButtonModal, pbmProps),
         ...autoProps(PContentModal, pcmProps),
-        ...autoProps(PModal, pmProps),
     },
     computed: {
         lorem() {
@@ -121,10 +124,10 @@ export const modal = () => ({
     },
     methods: {
         click() {
-            this.$refs.modal.show();
+            this.visible = true;
         },
         close() {
-            this.$refs.modal.hide();
+            this.visible = false;
         },
         ...actions,
     },

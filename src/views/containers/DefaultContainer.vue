@@ -5,8 +5,7 @@
         <div class="app-body">
             <router-view name="lnb" />
 
-            <main
-                class="main"
+            <main class="main"
                 :style="{minHeight: mainMinHeight}"
             >
                 <router-view name="main" />
@@ -46,9 +45,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    $min-width: 1200px;
 .app {
     overflow-y: hidden;
     min-height: 100vh;
+    min-width: $min-width;
     .gnb {
         display: inline-block;
         position: fixed;
@@ -57,13 +58,21 @@ export default {
         z-index: 100;
     }
     .app-body {
-        margin-left: $gnb-width;
+        position: fixed;
+        left: $gnb-width;
+        top: 0;
+        overflow-y: auto;
+        max-height: 100%;
+        //margin-left: $gnb-width;
         width: calc(100vw - #{$gnb-width});
+        min-width: calc(#{$min-width} - #{$gnb-width});
         min-height: 100vh;
         .main {
             margin: 0;
             width: calc(100vw - #{$gnb-width});
+            min-width: calc(#{$min-width} - #{$gnb-width});
             overflow-x: hidden;
+            padding-bottom: 1rem;
         }
     }
 }

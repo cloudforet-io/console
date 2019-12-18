@@ -6,7 +6,6 @@
         <PDropdownMenu
             v-if="popup"
             :menu="menu"
-            v-on="$listeners"
             @clickMenuEvent="clickMenuEvent"
         />
     </div>
@@ -21,7 +20,7 @@ export default {
     components: { PDropdownBtn, PDropdownMenu },
     props: {
         menu: {
-            type: Array,
+            type: [Array, Object],
             default: () => [],
         },
     },
@@ -30,13 +29,21 @@ export default {
             popup: false,
         };
     },
+    mounted() {
+        window.addEventListener('click', this.windowClick);
+    },
+    destroyed() {
+        window.removeEventListener('click', this.windowClick);
+    },
     methods: {
-        clickMenuEvent(eventName) {
-            this.$emit('clickMenuEvent', eventName);
+        windowClick(event) {
+            this.popup = false;
+        },
+        clickMenuEvent(eventName, idx) {
+            this.$emit('clickMenuEvent', eventName, idx);
+            this.$emit(`click-${eventName}`, idx);
             this.popup = false;
         },
     },
 };
 </script>
-
-

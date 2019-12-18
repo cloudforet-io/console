@@ -1,9 +1,9 @@
 import PVerticalLayout from './VerticalLayout';
 import { action } from '@storybook/addon-actions';
-import { autoProps } from '@/setup/storybook-util';
+import { autoProps } from '../../../../../.storybook/storybook-util';
 
 export default {
-    title: 'Organisms/vertical-layout',
+    title: 'Organisms/layouts/vertical-layout',
     component: PVerticalLayout,
 };
 

@@ -54,10 +54,7 @@ const getIconFileList = function () {
     files = cropFileNames(files, customOptions.fileStart, customOptions.fileEnd);
     files = removeExceptionFromFileNames(files, customOptions.excepts);
     files = setPathToFileNames(files, customOptions.iconPath);
-
-    console.log('###################### ICONS ###################### \n');
     console.log(files);
-    console.log('\n ###################################################');
     return files;
 };
 

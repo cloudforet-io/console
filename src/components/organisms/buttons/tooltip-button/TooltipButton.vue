@@ -6,12 +6,12 @@
             <template #target>
                 <span>
                     <slot name="button" :active="active">
-                        <p-button class="tooltip-btn" :class="{active: active}">
-                            <template>
-                                <slot name="buttonContents">
-                                    {{ contents }}
-                                </slot>
-                            </template>
+                        <p-button ref="button" class="tooltip-btn" :class="{active: active}"
+                                  @click="onClick"
+                        >
+                            <slot name="buttonContents">
+                                {{ contents }}
+                            </slot>
                         </p-button>
                     </slot>
                 </span>
@@ -58,6 +58,10 @@ export default {
             return this._.merge({
                 hideOnTargetClick: true,
             }, this.tooltipOptions);
+        },
+    },
+    methods: {
+        onClick() {
         },
     },
 };

@@ -21,7 +21,9 @@ module.exports = {
       js: 'never',
       vue: 'never'
     }],
-    'camelcase': ["error", { "properties": "always" }],
+    'camelcase': ["error", { "properties": "always", "allow": [
+        "domain_id", "item_type", "region_id"
+      ]}],
     'vue/max-attributes-per-line': ["error", {
       'singleline': 3,
       'multiline': {
@@ -30,6 +32,10 @@ module.exports = {
       },
     }],
     "no-param-reassign": ["error", { "props": false }],
+    "no-underscore-dangle": ["off"],
+    "import/no-extraneous-dependencies": ["error", {
+      "devDependencies": true,
+    }]
   },
   parserOptions: {
     parser: 'babel-eslint',

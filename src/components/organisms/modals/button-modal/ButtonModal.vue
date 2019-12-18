@@ -1,12 +1,26 @@
 <template>
-    <p-content-modal ref="modal" v-bind="$props" @shown="onShown"
-                     @hidden="onHidden"
+    <p-content-modal
+        ref="modal"
+        :fade="fade"
+        :scrollable="scrollable"
+        :size="size"
+        :centered="centered"
+        :backdrop="backdrop"
+        :visible.sync="proxyVisible"
+        :theme-color="themeColor"
+        :header-class="headerClass"
+        :body-class="bodyClass"
+        :footer-class="footerClass"
+        :header-visible="headerVisible"
+        :body-visible="bodyVisible"
+        :footer-visible="footerVisible"
     >
         <template #header>
             <slot name="header">
                 {{ headerTitle }}
             </slot>
             <p-button v-if="headerCloseButtonVisible"
+                      class="close-modal-btn"
                       :force-class="['close']"
                       @click="onCloseClick"
             >
@@ -40,16 +54,40 @@
 </template>
 
 <script>
-import 'bootstrap';
 import PButton from '../../../atoms/buttons/Button';
-import PContentModal from '../content-modal/ContentModal';
-import buttonActionMixin from './ButtonModal.mixins';
+import PContentModal, { setup as contentModalSetup } from '../content-modal/ContentModal';
+
+export const setup = (props, context) => {
+    const state = contentModalSetup(props, context);
+    const onCloseClick = () => {
+        context.emit('close');
+        state.proxyVisible.value = false;
+    };
+    const onCancelClick = () => {
+        context.emit('cancel');
+        if (props.hideOnCancel) {
+            state.proxyVisible.value = false;
+        }
+    };
+    const onConfirmClick = () => {
+        context.emit('confirm');
+    };
+    return {
+        ...state,
+        onCloseClick,
+        onCancelClick,
+        onConfirmClick,
+    };
+};
 
 export default {
     name: 'PButtonModal',
     components: { PContentModal, PButton },
-    mixins: [PContentModal, buttonActionMixin],
+    mixins: [PContentModal],
     events: ['close', 'cancel', 'confirm'],
+    setup(props, context) {
+        return setup(props, context);
+    },
     props: {
         headerTitle: {
             type: String,
@@ -70,7 +108,8 @@ export default {
         footerCancelButtonBind: {
             type: Object,
             default: () => ({
-                styleType: 'danger',
+                styleType: 'primary',
+                outline: true,
             }),
         },
         footerConfirmButtonBind: {
@@ -79,18 +118,17 @@ export default {
                 styleType: 'primary',
             }),
         },
-
-
-    },
-    computed: {
-        modalElement() {
-            return this.$refs.modal.$children[0].$el;
+        hideOnCancel: {
+            type: Boolean,
+            default: true,
         },
     },
 
 };
 </script>
-
-<style scoped>
-
+<style lang="scss" scoped>
+    .close-modal-btn {
+        cursor: pointer;
+        color: $dark;
+    }
 </style>

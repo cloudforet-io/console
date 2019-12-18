@@ -13,7 +13,13 @@
                   @mousedown="onMousedown"
             >
                 <slot name="dragger" />
-                <i v-if="!$slots.dragger" class="fal fa-grip-lines" />
+                <p-i v-if="!$slots.dragger"
+                     :color="'transparent primary3'"
+                     :width="'1.5rem'"
+                     :height="'1.5rem'"
+                     :name="'btn_height-modifier'"
+                />
+                <!-- <i v-if="!$slots.dragger" class="fal fa-grip-lines" />-->
             </span>
 
             <div class="line right"
@@ -25,8 +31,11 @@
 </template>
 
 <script>
+import PI from '@/components/atoms/icons/PI';
+
 export default {
     name: 'BaseDragHorizontal',
+    components: { PI },
     props: {
         line: {
             type: Boolean,

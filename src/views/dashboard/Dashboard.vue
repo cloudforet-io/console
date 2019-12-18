@@ -1,94 +1,40 @@
-<template>
-    <div class="animated fadeIn dashboard-container">
-        <main>
-            <b-row>
-                <b-col cols="5">
-                    <b-row align-h="start">
-                        <b-col
-                            class="board"
-                            cols="12"
-                        >
-                            <Summary title="Summary" />
-                        </b-col>
-                        <b-col
-                            class="board"
-                            cols="12"
-                        >
-                            <ServerState />
-                        </b-col>
-                    </b-row>
-                </b-col>
-                <b-col cols="7">
-                    <b-row align-h="end">
-                        <b-col
-                            class="board"
-                            cols="12"
-                        >
-                            <CollectionState />
-                        </b-col>
-                    </b-row>
-                </b-col>
-            </b-row>
-            <b-row>
-                <b-col cols="5">
-                    <b-row>
-                        <b-col
-                            class="board"
-                            cols="12"
-                        >
-                            <ItemsByRegion />
-                        </b-col>
-                    </b-row>
-                </b-col>
-                <b-col cols="7">
-                    <b-row align-h="end">
-                        <b-col
-                            class="board"
-                            cols="12"
-                        >
-                            <ServersByType />
-                        </b-col>
-                    </b-row>
-                </b-col>
-            </b-row>
-        </main>
-    </div>
-</template>
-
 <script>
-import Summary from '@/views/dashboard/modules/Summary.vue';
-import CollectionState from '@/views/dashboard/modules/CollectionState.vue';
-import ServerState from '@/views/dashboard/modules/ServerState.vue';
-import ItemsByRegion from '@/views/dashboard/modules/ItemsByRegion.vue';
-import ServersByType from '@/views/dashboard/modules/ServersByType.vue';
-
+import { toRefs } from '@vue/composition-api';
+import DashboardTemplate, { setup } from '@/views/dashboard/Dashboard.template';
+import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
+import { mountBusEvent } from '@/lib/compostion-util';
 
 export default {
     name: 'Dashboard',
-    components: {
-        Summary,
-        CollectionState,
-        ServerState,
-        ItemsByRegion,
-        ServersByType,
+    extends: DashboardTemplate,
+    setup(props, context) {
+        const state = setup(props, context);
+        const api = context.root.$http;
+
+        const callApi = (url, target, params) => async () => {
+            const res = await api.post(url, params);
+            state[target].value = res.data;
+        };
+
+        // Summary
+        mountBusEvent(DashboardEventBus, 'listSummary', callApi('/statistics/summary', 'summaryData'));
+
+        // Resources By Region
+        mountBusEvent(DashboardEventBus, 'listRegionByServer', callApi('/statistics/datacenter-items', 'resourcesByRegionData', {
+            item_type: 'server',
+        }));
+        // mountBusEvent(DashboardEventBus, 'listRegionByCloudService', callApi('/statistics/datacenter-items', 'resourcesByRegionData'));
+
+        // Server State
+        mountBusEvent(DashboardEventBus, 'listServerState', callApi('/statistics/server-state', 'serverStateData'));
+
+        // Servers by Type
+        mountBusEvent(DashboardEventBus, 'listServerType', callApi('/statistics/server-type', 'serverTypeData', { item_type: 'server_type' }));
+        mountBusEvent(DashboardEventBus, 'listVmType', callApi('/statistics/server-type', 'vmTypeData', { item_type: 'vm_type' }));
+        mountBusEvent(DashboardEventBus, 'listOsType', callApi('/statistics/server-type', 'osTypeData', { item_type: 'os_type' }));
+        mountBusEvent(DashboardEventBus, 'listHypervisorType', callApi('/statistics/server-type', 'hypervisorTypeData', { item_type: 'hypervisor_type' }));
+
+        return { ...toRefs(state) };
     },
 };
 </script>
-
-<style lang="scss" scoped>
-.dashboard-container {
-    text-align: center;
-    padding-left: 20px;
-    padding-right: 20px;
-    main {
-        display: inline-block;
-        width: 100%;
-        padding: 40px 15px;
-        text-align: left;
-        .board {
-            margin: 0 0 40px 0;
-            max-width: 100%;
-        }
-    }
-}
-</style>

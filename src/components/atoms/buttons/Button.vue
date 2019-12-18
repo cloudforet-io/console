@@ -61,7 +61,6 @@ export default {
         color: $oposite-color;
         &:not(:disabled):not(.disabled):hover {
             text-decoration: underline;
-            font-weight: bold;
         }
     }
     &.btn-outline-#{$theme} {
@@ -72,7 +71,6 @@ export default {
             background-color: $color;
             background-repeat: no-repeat;
             background-clip: padding-box;
-            font-weight: bold;
             color: $oposite-color;
             text-decoration: underline;
         }
@@ -88,6 +86,7 @@ export default {
     text-align: center;
     font: 14px/16px Arial;
     letter-spacing: 0;
+    line-height: 1.2rem;
 
     @include btn-color('primary', $primary, $white);
     @include btn-color('primary-dark', $primary-dark, $white);

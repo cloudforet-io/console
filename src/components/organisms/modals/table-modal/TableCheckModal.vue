@@ -6,35 +6,76 @@
         :centered="centered"
         :size="size"
         :fade="fade"
-        :keyboard="keyboard"
         :backdrop="backdrop"
+        :visible.sync="proxyVisible"
+        :theme-color="themeColor"
+        :footer-cancel-button-bind="footerCancelButtonBind"
+        :footer-confirm-button-bind="footerConfirmButtonBind"
 
-        @shown="shown"
-        @hidden="hidden"
-        @cancel="onCancelClick"
-        @close="onCloseClick"
-        @confirm="onConfirmClick"
+        @cancel="cancel"
+        @close="close"
+        @confirm="confirm"
     >
         <template #body>
             <div>
-                <h4>{{ subTitle }}</h4>
+                <h4 class="p-table-check-modal-sub-title">
+                    {{ subTitle }}
+                </h4>
                 <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
-                              :sort-by="sortBy" :sort-desc="sortDesc"
+                              :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 />
             </div>
         </template>
     </p-button-modal>
 </template>
 <script>
+import { reactive, computed, toRefs } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
-import PModal from '@/components/molecules/modals/Modal';
-import buttonActionMixin from '@/components/organisms/modals/button-modal/ButtonModal.mixins';
+import { propsMixin } from '@/components/molecules/modals/Modal';
+import { setup as contentModalSetup } from '../content-modal/ContentModal';
+import { makeByPass, makeProxy } from '@/lib/compostion-util';
+
+const setup = (props, context) => {
+    const state = contentModalSetup(props, context);
+    const sortState = reactive({
+        sortBy: '',
+        sortDesc: true,
+    });
+    const footerCancelButtonBind = reactive({
+        styleType: 'dark',
+        outline: true,
+    });
+    const footerConfirmButtonBind = computed(() => ({
+        styleType: props.themeColor,
+    }));
+    const confirm = () => {
+        context.emit('confirm', props.items);
+    };
+
+    return {
+        ...state,
+        ...toRefs(sortState),
+        footerCancelButtonBind,
+        footerConfirmButtonBind,
+        sortedItems: computed(() => {
+            // todo: move this feather to p-data-table
+            if (sortState.sortBy) {
+                return _.orderBy(props.items, sortState.sortBy, sortState.sortDesc ? 'desc' : 'asc');
+            }
+            return props.items;
+        }),
+        proxyVisible: makeProxy('visible', props, context.emit),
+        cancel: makeByPass(context.emit, 'cancel'),
+        close: makeByPass(context.emit, 'close'),
+        confirm,
+    };
+};
 
 export default {
     name: 'PTableCheckModal',
     components: { PButtonModal, PDataTable },
-    mixins: [PModal, buttonActionMixin],
+    mixins: [propsMixin],
     props: {
         themeColor: {
             type: String,
@@ -48,28 +89,22 @@ export default {
         subTitle: String,
         fields: Array,
         items: Array,
-    },
-    data() {
-        return {
-            sortBy: '',
-            sortDesc: true,
-        };
-    },
-    computed: {
-        modalElement() {
-            console.log('asf');
-            return this.$refs.modal.$children[0].$children[0].$el;
-        },
-        sortedItems() {
-            if (this.sortBy) {
-                return this.items;
-            }
-            return this.items;
+        responsiveStyle: {
+            type: Object,
+            default: () => ({ 'max-height': '100px', 'overflow-y': 'auto', 'overflow-x': 'auto' }),
+
         },
     },
+    setup(props, context) {
+        return setup(props, context);
+    },
+
+
 };
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+    .p-table-check-modal-sub-title{
+        margin-bottom: 2rem;
+    }
 </style>

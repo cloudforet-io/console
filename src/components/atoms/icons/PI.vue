@@ -1,5 +1,5 @@
 <template>
-    <svgicon v-bind="$props" />
+    <svgicon v-bind="$props"  v-on="$listeners" />
 </template>
 <script>
 import '@/components/atoms/icons/p-icons';

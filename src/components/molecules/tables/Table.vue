@@ -8,10 +8,15 @@
             <thead :class="theadClassObject" :style="theadStyle">
                 <slot name="head" />
             </thead>
-            <tbody :class="theadClassObject" :style="tbodyStyle">
+            <tbody is="transition-group" name="table-row"
+                   :class="tbodyClass" :style="tbodyStyle"
+                   @before-enter="beforRowEnter"
+                   @enter="rowEnter"
+                   @leave="rowLeave"
+            >
                 <slot name="body" />
             </tbody>
-            <tfoot :class="theadClassObject" :style="tfootStyle">
+            <tfoot :class="tfootClass" :style="tfootStyle">
                 <slot name="foot" />
             </tfoot>
         </table>
@@ -57,9 +62,18 @@ export default {
             type: Object,
             default: null,
         },
+        tbodyClass: {
+            type: Object,
+            default: null,
+        },
+        tfootClass: {
+            type: Object,
+            default: null,
+        },
+
         striped: {
             type: Boolean,
-            default: false,
+            default: true,
         },
         bord: {
             type: Boolean,
@@ -121,6 +135,41 @@ export default {
         },
     },
     methods: {
+        beforRowEnter(el) {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(30px)';
+        },
+        rowEnter(el, done) {
+            const delay = el.dataset.index * 100;
+            const vm = this;
+            setTimeout(() => {
+                vm.$velocity(el, { translateY: '0px', opacity: 1 },
+                    {
+                        duration: 100,
+                        complete() {
+                            done();
+                        },
+                    });
+                done();
+            }, delay);
+        },
+        rowLeave(el, done) {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(30px)';
+            done();
+            // const delay = el.dataset.index * 100;
+            // const vm = this;
+            // setTimeout(() => {
+            //     vm.$velocity(el, { translateY: '30px', opacity: 0 },
+            //         {
+            //             duration: 100,
+            //             complete() {
+            //                 done();
+            //             },
+            //         });
+            //     done();
+            // }, delay);
+        },
         getStyle(tableStyle, bgStyle) {
             if (bgStyle && tableStyle) {
                 return `bg-${tableStyle}`;
@@ -133,7 +182,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     %row {
         background-color: $white;
     }
@@ -153,15 +202,15 @@ export default {
             tr{
                 th{
                     position: sticky;
-                    top: 0;
-                    background-color: $gray3 ;
-                    border-top: 2px solid $gray2;
-                    border-bottom: 2px solid $gray2;
+                    z-index: 1;
+                    padding: .25rem 0 .25rem .75rem;
+                    background-color: $white;
+                    border-top: 1px solid $dark;
+                    border-bottom: 1px solid $dark;
+                    line-height: 1.5rem;
                     text-align: left;
-                    font: Bold 14px/16px Arial;
                     letter-spacing: 0;
                     color: $gray1;
-                    height: 32px;
                 }
             }
         }
@@ -174,18 +223,17 @@ export default {
             tr{
                 @extend %row;
                 td{
+                    z-index: 0;
                     vertical-align: middle;
                 }
             }
         }
     }
 
-    .table-striped tbody tr:nth-of-type(odd) {
+    .table-striped tbody tr:nth-of-type(even) {
         @extend %striped-row;
         &:hover {
-            @extend %striped-row;
+            @extend %hover;
         }
     }
-
-
 </style>

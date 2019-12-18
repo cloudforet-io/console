@@ -1,9 +1,8 @@
-import { text } from '@storybook/addon-knobs/vue';
-import PLabel from './Label.vue';
+import PLabel from './Label';
 
 
 export default {
-    title: 'atoms/labels/label',
+    title: 'atoms/legends/label',
     component: PLabel,
     parameters: {
         info: {

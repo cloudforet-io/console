@@ -1,9 +1,10 @@
 import { number, select } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
+import { boolean } from '@storybook/addon-knobs';
 import PModal from './Modal.vue';
 import { sizeMapping } from './ModalMapping';
-import { autoProps } from '../../../setup/storybook-util';
+import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
     title: 'molecules/modals',
@@ -37,10 +38,8 @@ export const modal = () => ({
     :centered="centered"
     :size="size"
     :fade="fade"
-    :keyboard="keyboard"
+    :visible.sync="visible"
     :backdrop="backdrop"
-    @shown="shown"
-    @hidden="hidden"
     >
     <p style="min-width: 300px;min-height: 200px;">{{lorem}}</p>
     <button @click="closeAction">모달 닫기</button>
@@ -53,25 +52,27 @@ export const modal = () => ({
             ...data,
         };
     },
-
     props: {
         loremLength: {
             default: number('loremLength', 10, {
                 range: true, min: 1, max: 80, step: 10,
             }),
         },
-        size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)]),
+        scrollable: {
+            default: boolean('scrollable', false),
         },
-        ...autoProps(PModal, [
-            { name: 'centered' },
-            { name: 'backdrop' },
-            { name: 'fade' },
-            { name: 'keyboard' },
-        ]),
-    // showBtn:{
-    //     default:button('show',()=>this.showAction())
-    // }
+        size: {
+            default: select('size', [null, ...Object.keys(sizeMapping)], 'sm'),
+        },
+        centered: {
+            default: boolean('centered', false),
+        },
+        backdrop: {
+            default: boolean('backdrop', true),
+        },
+        fade: {
+            default: boolean('fade', true),
+        },
     },
     computed: {
         lorem() {
@@ -80,10 +81,10 @@ export const modal = () => ({
     },
     methods: {
         showAction() {
-            this.$refs.modal.show();
+            this.visible = true;
         },
         closeAction() {
-            this.$refs.modal.hide();
+            this.visible = false;
         },
         ...actions,
     },

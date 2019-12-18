@@ -5,29 +5,36 @@
                 <p-button v-if="!editMode" style-type="primary" class="header-btn"
                           @click="clickEdit()"
                 >
-                    edit
+                    {{ buttonTag }}
                 </p-button>
                 <p-button v-if="editMode" style-type="secondary" :outline="true"
                           class="header-btn"
                           @click="clickCancel()"
                 >
-                    Cancel
+                    {{ tr('COMMON.BTN_CANCEL') }}
                 </p-button>
                 <p-button v-if="editMode" style-type="secondary" class="header-btn"
                           @click="clickConfirm()"
                 >
-                    Confirm
+                    {{ tr('COMMON.BTN_SAVE') }}
                 </p-button>
             </div>
         </template>
         <template #body>
-            <p-tag-input-group ref="tagInputGroup" :tags.sync="proxyTags" :edit-mode="editMode" />
+            <p-tag-input-group ref="tagInputGroup"
+                               :tags.sync="proxyTags"
+                               :edit-mode="editMode"
+            />
+            <div v-if="isEmpty(proxyTags) && !editMode" class="no-tag">
+                No Tags
+            </div>
         </template>
     </p-panel-top>
 </template>
 
 <script>
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, computed } from '@vue/composition-api';
+import { Util } from '@/lib/global-util';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop';
 import PTagInputGroup from '@/components/organisms/forms/tag-input-group/TagInputGroup';
 import PButton from '@/components/atoms/buttons/Button';
@@ -46,6 +53,7 @@ export default {
     },
     setup(props, context) {
         const state = reactive({
+            buttonTag: computed(() => ((Util.methods.isEmpty(state.proxyTags)) ? Util.methods.tr('COMMON.BTN_ADD', null, context.parent) : Util.methods.tr('COMMON.BTN_EDIT', null, context.parent))),
             editMode: false,
             originTags: undefined,
             proxyTags: makeProxy('tags', props, context.emit),
@@ -73,6 +81,7 @@ export default {
             state.tagInputGroup.resetTag();
         };
 
+
         return {
             ...toRefs(state),
             clickEdit,
@@ -89,15 +98,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-   .panel-header{
-       display: inline-flex;
+    .tag-panel-title{
+        min-height: 100px;
+    };
+    .panel-header{
+        display: inline-flex;
         width: 100%;
 
-       &.edit{
-        justify-content: flex-end;
-       }
-       .header-btn{
-           margin-left: 1rem;
-       }
-   }
+        &.edit{
+            justify-content: flex-end;
+        }
+        .header-btn{
+            margin-left: 1rem;
+        }
+    }
+    .no-tag{
+        text-align: center;
+        font: 24px/32px Arial;
+        letter-spacing: 0;
+        color: #A5ACCE;
+    }
 </style>

@@ -1,7 +1,7 @@
-import { computed, ref } from '@vue/composition-api';
+import { ref } from '@vue/composition-api';
 import InfoPanel from './InfoPanel.vue';
-import { makeTrDefs } from '@/components/molecules/panel/panel-content/PanelContent.uitl';
 import PBadge from '@/components/atoms/badges/Badge';
+import { makeTrItems } from '@/lib/view-helper';
 
 export default {
     title: 'organisms/panel/info-panel',
@@ -64,7 +64,7 @@ export const trHelper = () => ({
         ]);
         return {
             renderTitle: 'Information',
-            defs: makeTrDefs(sampleDefs.value, context.parent),
+            defs: makeTrItems(sampleDefs.value, context.parent),
             item: {
                 name: '펭수',
                 state: '하태하태',

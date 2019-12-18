@@ -3,10 +3,21 @@ const casual = require('casual-browserify');
 export const arrayOf = (times, generator, ...args) => {
     const result = [];
     for (let i = 0; i < times; ++i) {
-        if (args) {
-            result.push(generator(...args));
-        } else {
-            result.push(generator());
+        const pushItem = args ? generator(...args) : generator();
+        result.push(pushItem);
+    }
+    return result;
+};
+
+export const dictOf = (times, generator, ...args) => {
+    const result = {};
+    let i = 0;
+    while (i < times) {
+        const obj = generator(...args);
+        const key = Object.keys(obj)[0];
+        if (!result[key]) {
+            result[key] = obj[key];
+            i += 1;
         }
     }
     return result;

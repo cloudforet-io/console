@@ -1,10 +1,10 @@
 <template>
-    <div class="toolbox-table">
+    <div :class="{'toolbox-table': true,'no-padding':!padding,'toolbox-shadow': shadow, 'toolbox-border': border}">
         <div class="toolbox">
-            <div class="left">
+            <div class="left" :style="{width:hasCenterSlot}">
                 <slot name="toolbox-left" />
             </div>
-            <div class="center">
+            <div v-if="$slots['toolbox-center']" class="center">
                 <slot name="toolbox-center" />
             </div>
             <div class="right">
@@ -17,13 +17,13 @@
                     />
                 </div>
                 <div v-if="pageSizeVisible" class="tool">
-                    <p-dropdown
+                    <PDropdownMenuBtn
                         class="page-size-dropdown"
                         :menu="pageSizeOptions"
-                        @clickMenu="changePageSize"
+                        @clickMenuEvent="changePageSize"
                     >
-                        {{ pageSize }}
-                    </p-dropdown>
+                        {{ proxyPageSize }}
+                    </PDropdownMenuBtn>
                 </div>
                 <div v-if="settingVisible" class="tool">
                     <p-icon-button
@@ -45,6 +45,8 @@
             :items="items"
             :sortable="sortable"
             :selectable="selectable"
+            :dragable="dragable"
+            :col-copy="colCopy"
             :select-index.sync="proxySelectIndex"
             :sort-by.sync="proxySortBy"
             :sort-desc.sync="proxySortDesc"
@@ -61,7 +63,11 @@
             :small="small"
             :background="background"
             :responsive="responsive"
+            :loading="loading"
+            :use-spinner-loading="useSpinnerLoading"
+            :use-cursor-loading="useCursorLoading"
             v-on="$listeners"
+            @changeSort="changeSort"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot :name="slot" v-bind="scope" />
@@ -74,13 +80,19 @@
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation';
 import PIconButton from '@/components/molecules/buttons/IconButton';
-import PDropdown from '@/components/organisms/buttons/dropdown/DropdownBtn';
+import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 
 export default {
     name: 'PToolboxTable',
     components: {
-        PDataTable, PTextPagenation, PIconButton, PDropdown,
+        PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn,
     },
+    events: [
+        'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
+        'changeSort', 'theadClick',
+        'clickSetting', 'clickRefresh',
+        'changePageSize', 'changePageNumber',
+    ],
     mixins: [PDataTable],
     props: {
         pagenationVisible: {
@@ -88,6 +100,14 @@ export default {
             default: true,
         },
         pageSizeVisible: {
+            type: Boolean,
+            default: true,
+        },
+        shadow: {
+            type: Boolean,
+            default: true,
+        },
+        border: {
             type: Boolean,
             default: true,
         },
@@ -115,17 +135,24 @@ export default {
                 return value > 0;
             },
         },
+        pageNationValues: {
+            type: Array,
+            default: () => [15, 30, 45],
+        },
+        padding: {
+            type: Boolean,
+            default: true,
+        },
     },
     data() {
         return {
-            pageSizeOptions: [
-                { type: 'item', text: 15, event: 15 },
-                { type: 'item', text: 30, event: 30 },
-                { type: 'item', text: 45, event: 45 },
-            ],
+            pageSizeOptions: this.getPageNationValue(),
         };
     },
     computed: {
+        hasCenterSlot() {
+            return !this.$slots['toolbox-center'] ? '100%' : 'auto';
+        },
         proxyPageSize: {
             get() {
                 return this.pageSize;
@@ -175,10 +202,18 @@ export default {
         },
     },
     methods: {
+        getPageNationValue() {
+            const result = [];
+            this.pageNationValues.forEach((size) => {
+                result.push({ type: 'item', label: size, name: size });
+            });
+            return result;
+        },
         changePageSize(size) {
             const sizeNum = Number(size);
             if (this.pageSize !== sizeNum) {
-                this.$emit('update:pageSize', sizeNum);
+                this.proxyPageSize = sizeNum;
+                this.proxyThisPage = 1;
                 this.$emit('changePageSize', sizeNum);
             }
         },
@@ -188,17 +223,26 @@ export default {
         getSelectItem() {
             return this.$refs.table.getSelectItem();
         },
+        changeSort() {
+            this.proxyThisPage = 1;
+        },
     },
 
 };
 </script>
 
 <style lang="scss" scoped>
+    .toolbox-shadow {
+        box-shadow: 0px 0px 8px #4D49B614;
+    }
+
+    .toolbox-border {
+        border: 1px solid #F2F2F2;
+    }
+
     .toolbox-table {
         background-color: $white;
         padding: 1rem;
-        box-shadow: 0px 0px 8px #4D49B614;
-        border: 1px solid #F2F2F2;
         .toolbox {
             margin-top: 0.5rem;
             margin-bottom: 1rem;
@@ -208,11 +252,14 @@ export default {
             align-items: center;
 
         }
+        &.no-padding{
+            padding: 0;
+        }
     }
 
     .left{
-        display: inline-flex;
-        flex-wrap:nowrap;
+        display: flex;
+        flex-wrap: wrap;
         width: auto;
         justify-content: flex-start;
     }

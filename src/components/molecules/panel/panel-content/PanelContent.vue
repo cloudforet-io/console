@@ -1,33 +1,31 @@
 <template>
-    <p-dl class="row">
-        <div v-for="(def, idx) in defs" :key="idx" class="col-sm-12 col-md-6 content-list">
+    <p-dl class="content-container">
+        <div v-for="(def, idx) in defs" :key="idx" class="content-list">
             <slot name="details">
-                <p-dt class="col-sm-12 col-md-4">
-                    {{ def.label }}
-                </p-dt>
-                <p-dd :ref="'dd-'+def.name"
-                      class="col-sm-12 col-md-8 copyFlagged"
-                      @mouseenter="mouseInOut(idx,true)"
-                      @mouseleave="mouseInOut(idx,false)"
-                >
-                    <slot :name="`def-${def.name}-format`"
-                          :value="getValue(def.name)"
-                          :item="item"
-                          :def="def"
+                <span class="content">
+                    <p-dt class="label">
+                        {{ def.label }}
+                    </p-dt>
+                    <span class="data"
+                          @mouseleave="mouseInOut(idx, false)"
                     >
-                        {{ getValue(def.name) }}
-                    </slot>
-                    <template v-if="activeArr(idx,def)">
-                        &nbsp;&nbsp; <p-button v-if="isCopyFlagged(def)"
-                                               style="display: inline-block;" outline
-                                               :style-type="'secondary'"
-                                               :size="'sm'"
-                                               @click="copyText($event)"
+                        <p-dd :ref="'dd-'+def.name"
+                              @mouseenter="mouseInOut(idx, true)"
                         >
-                            {{ tr('COMMON.COPY') }}
-                        </p-button>
-                    </template>
-                </p-dd>
+                            <slot :name="`def-${def.name}-format`"
+                                  :value="getValue(def.name)"
+                                  :item="item"
+                                  :def="def"
+                            >
+                                {{ getValue(def.name) }}
+                            </slot>
+                        </p-dd>
+                        <p-copy-button v-if="activeArr(idx, def) && isCopyFlagged(def)"
+                                       class="copy-btn"
+                                       :value="getValue(def.name)"
+                        />
+                    </span>
+                </span>
             </slot>
         </div>
     </p-dl>
@@ -38,12 +36,12 @@ import _ from 'lodash';
 import PDt from '@/components/atoms/definition/dt/Dt';
 import PDl from '@/components/atoms/definition/dl/Dl';
 import PDd from '@/components/atoms/definition/dd/Dd';
-import PButton from '@/components/atoms/buttons/Button';
+import PCopyButton from '@/components/molecules/buttons/CopyButton';
 
 export default {
     name: 'PPanelContent',
     components: {
-        PButton,
+        PCopyButton,
         PDt,
         PDl,
         PDd,
@@ -55,7 +53,7 @@ export default {
         },
         item: {
             type: Object,
-            default: () => new Object(),
+            default: () => ({}),
         },
     },
     data() {
@@ -72,20 +70,10 @@ export default {
             return this.active[idx] && this.$refs[`dd-${def.name}`][0].innerText;
         },
         setActiveArray() {
-            const emptyArr = [];
-            for (let i = 0; i < this.defs.length; i++) {
-                emptyArr.push(false);
-            }
-            this.active = emptyArr;
+            this.active = Array(this.defs.length).fill(false);
         },
         isCopyFlagged(definition) {
             return (_.get(definition, 'copyFlag') === true);
-        },
-        copyText(event) {
-            const rawText = event.target.parentElement.innerText;
-            const copyLength = this.tr('COMMON.COPY').length;
-            const text = rawText.slice(0, -copyLength).trim();
-            this.selectToCopyToClipboard(text);
         },
         mouseInOut(idx, flag) {
             this.$set(this.active, idx, flag);
@@ -98,30 +86,51 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .content-list {
-        > dt {
+    .content-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        width: 100%;
+        .content-list {
+            flex-basis: 50%;
+            max-width: 50%;
+        }
+    }
+    .content {
+        display: flex;
+        align-items: center;
+        padding-bottom: 1rem;
+        .label {
             float: left;
             overflow: hidden;
             clear: left;
             text-align: left;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            min-height: 20px;
-            padding: 0rem 1rem 0rem 1rem;
+            word-break: break-word;
+            padding: 0 1rem;
             text-align: left;
-            font: Bold 14px/32px Arial;
-            letter-spacing: 0;
+            font-weight: bold;
             color: $gray1;
+            min-width: 10rem;
+            width: 25%;
         }
-        > dd {
-            overflow: hidden;
-            min-height: 20px;
+        .data {
+            flex: 1;
+            display: flex;
+            align-items: center;
             text-align: left;
-            font: 14px/32px Arial;
             color: #222532;
             opacity: 1;
-
-
+            dd {
+                margin: 0;
+            }
+        }
+        .copy-btn::v-deep {
+            flex: 1;
+            height: 1rem;
+            .p-copy-btn {
+                top: -.3rem;
+            }
         }
     }
+
 </style>

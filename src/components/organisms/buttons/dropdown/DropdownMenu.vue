@@ -2,13 +2,18 @@
     <div class="dropdown-menu" style="display: block;">
         <template v-for="(item, index) in menu">
             <a v-if="item.type==='item'" :key="index" class="dropdown-content dropdown-item"
-               :disabled="item.disabled" @click="menuClick(item.event,$event)"
+               :class="{disabled:item.disabled}"
+               @click.stop="menuClick(item.name, index, $event)"
             >
-                {{ item.text }}
+                {{ item.label }}
             </a>
-            <div v-else-if="item.type==='divider'" :key="index" class="dropdown-divider" />
-            <div v-else-if="item.type==='header'" :key="index" class="dropdown-content dropdown-title">
-                {{ item.text }}
+            <div v-else-if="item.type==='divider'" :key="index" class="dropdown-divider"
+                 @click.stop
+            />
+            <div v-else-if="item.type==='header'" :key="index" class="dropdown-content dropdown-title"
+                 @click.stop
+            >
+                {{ item.label }}
             </div>
         </template>
     </div>
@@ -20,14 +25,16 @@ export default {
     events: ['clickMenuEvent'],
     props: {
         menu: {
-            type: Array,
+            type: [Array, Object],
             default: () => [],
         },
     },
     methods: {
-        menuClick(eventName, event) {
-            this.$emit(`click-${eventName}`, event);
-            this.$emit('clickMenuEvent', eventName);
+        menuClick(eventName, index, event) {
+            if (!this.menu[index].disabled) {
+                this.$emit(`click-${eventName}`, index, event);
+                this.$emit('clickMenuEvent', eventName, index);
+            }
         },
     },
 };
@@ -42,6 +49,7 @@ export default {
         margin: 0px;
         min-width: 8.5rem;
         cursor:default;
+        top: 98%;
         .dropdown-divider{
             margin: 0;
             border-top:1px solid $secondary;
@@ -70,6 +78,10 @@ export default {
                 color: $secondary !important;
                 font-weight: bold;
             }
+            &.disabled{
+                color: $gray2 !important;
+            }
         }
+
     }
 </style>

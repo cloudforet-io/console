@@ -1,8 +1,9 @@
 import { number, select } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
+import { boolean } from '@storybook/addon-knobs';
 import PButton from '../../../atoms/buttons/Button.vue';
-import { autoProps } from '../../../../setup/storybook-util';
+import { autoProps } from '../../../../../.storybook/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 import PContentModal from './ContentModal.vue';
 import PModal from '../../../molecules/modals/Modal.vue';
@@ -19,15 +20,6 @@ export default {
     },
 };
 
-const data = {
-    visible: true,
-};
-
-const actions = {
-    shown: action('shown'),
-    hidden: action('hidden'),
-};
-
 
 export const modal = () => ({
     components: { PContentModal },
@@ -40,10 +32,10 @@ export const modal = () => ({
     :headerVisible="headerVisible"
     :bodyVisible="bodyVisible"
     :footerVisible="footerVisible"
-    @shown="shown"
-    @hidden="hidden"
+    :visible.sync="visible"
+    :themeColor="primary"
     >
-    <template #header><h3>This is Header</h3></template>
+    <template #header>This is Header</template>
     <template #body>
         <p>{{lorem}}</p> 
     </template>  
@@ -52,7 +44,7 @@ export const modal = () => ({
 </p-content-modal>`,
     data() {
         return {
-            ...data,
+            visible: true,
         };
     },
     mounted() {
@@ -64,19 +56,26 @@ export const modal = () => ({
                 range: true, min: 1, max: 80, step: 10,
             }),
         },
-        size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)]),
-        },
         ...autoProps(PContentModal, [
             { name: 'headerVisible' },
             { name: 'bodyVisible' },
             { name: 'footerVisible' },
         ]),
-        ...autoProps(PModal, [
-            { name: 'scrollable' },
-            { name: 'centered' },
-
-        ]),
+        size: {
+            default: select('size', [null, ...Object.keys(sizeMapping)], 'sm'),
+        },
+        scrollable: {
+            default: boolean('scrollable', false),
+        },
+        centered: {
+            default: boolean('centered', false),
+        },
+        backdrop: {
+            default: boolean('backdrop', true),
+        },
+        fade: {
+            default: boolean('fade', true),
+        },
     },
     computed: {
         lorem() {
@@ -96,15 +95,13 @@ export const fade = () => ({
     :centered="centered"
     :size="size"
     :fade="fade"
-    :keyboard="keyboard"
     :backdrop="backdrop"
     :headerVisible="headerVisible"
     :bodyVisible="bodyVisible"
     :footerVisible="footerVisible"
-    @shown="shown"
-    @hidden="hidden"
+    :visible.sync="visible"
     >
-    <template #header><h3>This is Header</h3></template>
+    <template #header>This is Header</template>
     <template>
         <p>{{lorem}}</p> 
     </template>  
@@ -117,21 +114,31 @@ export const fade = () => ({
                 range: true, min: 1, max: 80, step: 10,
             }),
         },
-        size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)]),
-        },
         ...autoProps(PContentModal, [
             { name: 'headerVisible' },
             { name: 'bodyVisible' },
             { name: 'footerVisible' },
         ]),
-        ...autoProps(PModal, [
-            { name: 'scrollable' },
-            { name: 'centered' },
-            { name: 'backdrop' },
-            { name: 'fade' },
-            { name: 'keyboard' },
-        ]),
+        size: {
+            default: select('size', [null, ...Object.keys(sizeMapping)], 'sm'),
+        },
+        scrollable: {
+            default: boolean('scrollable', false),
+        },
+        centered: {
+            default: boolean('centered', false),
+        },
+        backdrop: {
+            default: boolean('backdrop', true),
+        },
+        fade: {
+            default: boolean('fade', true),
+        },
+    },
+    data() {
+        return {
+            visible: false,
+        };
     },
     computed: {
         lorem() {
@@ -145,6 +152,5 @@ export const fade = () => ({
         close() {
             this.$refs.modal.hide();
         },
-        ...actions,
     },
 });

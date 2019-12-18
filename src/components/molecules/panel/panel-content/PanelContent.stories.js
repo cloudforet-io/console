@@ -1,7 +1,7 @@
 import { ref, computed } from '@vue/composition-api';
 import PanelContent from '@/components/molecules/panel/panel-content/PanelContent';
 import PBadge from '@/components/atoms/badges/Badge';
-import { makeTrDefs } from '@/components/molecules/panel/panel-content/PanelContent.uitl';
+import { makeTrItems } from '@/lib/view-helper'
 
 export default {
     title: 'molecules/panel/panel-content',
@@ -72,7 +72,7 @@ export const trHelper = () => ({
                 state: '하태하태',
                 primary_ip_address: '1.1.1.1',
             },
-            defs: computed(() => makeTrDefs(sampleDefs.value, context.parent)),
+            defs: computed(() => makeTrItems(sampleDefs.value, context.parent)),
         };
     },
 

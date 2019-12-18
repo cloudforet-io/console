@@ -1,6 +1,6 @@
 # Steamug's WCF (Web-Console Front-End) 
 
-Steamug's WCF - https://git.pyengine.net/cloudone/wconsole-client. 
+Cloud One WCF - https://git.pyengine.net/cloudone/wconsole-client. 
 This project consists of Vue'js Front-End, which implements following features .... 
 
 

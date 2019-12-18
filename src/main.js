@@ -13,6 +13,7 @@ import store from './store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
 import { Util } from '@/lib/global-util';
+import Notifications from 'vue-notification';
 
 Vue.mixin(Util);
 Vue.use(VueCookies);
@@ -20,8 +21,8 @@ Vue.use(VueCompositionApi);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
-Vue.use(VueCompositionApi);
 Vue.use(VueLodash, { name: 'lodash' });
+Vue.use(Notifications, { velocity });
 Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i',

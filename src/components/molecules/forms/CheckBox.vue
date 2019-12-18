@@ -5,7 +5,9 @@
           @click.stop.prevent="onClick"
     >
         <input type="checkbox">
-        <p-i class="checkmark" v-bind="checkBoxBind" />
+        <p-i class="checkmark" width="1.25rem" height="1.25rem"
+             v-bind="checkBoxBind"
+        />
     </span>
 </template>
 
@@ -55,8 +57,6 @@ export default {
                 name,
                 color,
                 fill,
-                width: '1rem',
-                height: '1rem',
             };
         },
     },

@@ -1,29 +1,34 @@
 <template>
     <div v-if="isInit" id="app">
+        <p-notice-alert group="noticeTopLeft" position="top left" />
+        <p-notice-alert group="noticeTopRight" position="top right" />
+        <p-notice-alert group="noticeBottomLeft" position="bottom left" />
+        <p-notice-alert group="noticeBottomRight" position="bottom right" />
         <router-view />
     </div>
-    <div v-else class="Aligner">
-        <div ref="loading" class="Aligner-item" />
+    <div v-else class="app-spinner">
+        <p-lottie ref="pageLoading" :auto="true" :size="45" />
     </div>
 </template>
 <script>
 import _ from 'lodash';
-import Vue from '@/main.js';
+import Vue from 'vue';
 import api from '@/lib/api';
 import config from '@/lib/config';
-import cloudLoading from '@/assets/loading/cloudone_loading.json';
-import lottie from 'lottie-web';
+import PLottie from '@/components/molecules/lottie/PLottie';
+import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert';
 
 export default {
     name: 'App',
+    components: {
+        PLottie,
+        PNoticeAlert,
+    },
     props: {
         processEnv: {
             type: String,
             default: process.env.NODE_ENV,
         },
-    },
-    components: {
-        lottie
     },
     data() {
         return {
@@ -33,29 +38,7 @@ export default {
     created() {
         this.preparationTo();
     },
-    mounted() {
-        this.drawLottie();
-    },
     methods: {
-        async drawLottie() {
-            lottie.loadAnimation({
-                name: 'test',
-                container: this.$refs.loading,
-                renderer: 'svg',
-                loop: true,
-                autoplay: true,
-                animationData: cloudLoading,
-                rendererSettings: {
-                    scaleMode: 'noScale',
-                    clearCanvas: false,
-                    progressiveLoad: false,
-                    hideOnTransparent: true,
-                },
-            });
-        },
-        stopLottie (){
-            lottie.destroy('test');
-        },
         async preparationTo() {
             try {
                 await this.configInit();
@@ -64,30 +47,33 @@ export default {
                 await this.syncStores('domain');
 
                 this.isInit = true;
-                this.stopLottie();
                 const excludeAuth = this.getMeta();
 
-                if (!api.checkAccessToken()) {
-                    if (this.checkMatchedPath(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
-                        const nextPath = this.$store.getters['domain/authType'] === 'local' ? '/sign-in' : '/google-sign-in';
-                        localStorage.setItem('common.toNextPath', nextPath);
-                        this.$router.push({ path: nextPath });
-                    }
+                if (api.checkAccessToken() && this.$route.meta.isSignInPage) {
+                    this.$router.push({ path: '/' });
+                    return;
+                }
 
-                    if (excludeAuth !== true) {
-                        this.redirectTo();
-                    }
+                // TODO:: Please Remove this for later when every domian sign in use Config options.
+                if (this.isPathMissMatch(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
+                    this.redirectTo('set');
+                    return;
+                }
+                if (!api.checkAccessToken() && !excludeAuth) {
+                    this.redirectTo();
+                    return;
                 }
             } catch (e) {
-                console.log(e);
+                this.$router.push({ path: '/error-page' });
+                console.error(e);
             }
         },
         async configInit() {
             await config.init();
             await api.init(config.get('VUE_APP_API.ENDPOINT'), {
-                authError: (error) => {
+                authError: () => {
                     this.$store.dispatch('auth/signOut');
-                    // TODO: show popup (re-sign-in)
+                    this.$router.push({ path: '/error-page' });
                 },
             });
 
@@ -98,7 +84,7 @@ export default {
                 try {
                     await this.$store.dispatch('domain/load');
                 } catch (e) {
-                    console.log(e);
+                    console.error(e);
                     this.$router.push({ path: '/error-page' });
                 }
             }
@@ -106,16 +92,19 @@ export default {
         async syncStores(storeName) {
             await this.$store.dispatch(`${storeName}/sync`);
         },
-        redirectTo() {
+        redirectTo(set) {
             const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
-
+            if (set) {
+                localStorage.setItem('common.toNextPath', nextPath);
+            }
             this.$router.push(nextPath);
         },
         getMeta() {
             return this.isEmpty(localStorage.getItem('common.toMeta')) ? null : _.get(JSON.parse(localStorage.getItem('common.toMeta')), 'excludeAuth', null);
         },
-        checkMatchedPath(type, path) {
-            return (path === '/sign-in' && type !== 'local' || path === '/google-sign-in' && type !== 'google_oauth2');
+        isPathMissMatch(type, path) {
+            return (path === '/sign-in' && type !== 'local')
+                || (path === '/google-sign-in' && type !== 'google_oauth2');
         },
     },
 };
@@ -124,24 +113,14 @@ export default {
 
 <style lang="scss">
     @import 'styles/style';
-    .Aligner {
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .Aligner-item {
-        max-width: 100%;
-    }
     #loading {
         background-color: transparent;
-        /*loading image size*/
+        /*lottie image size*/
         width: 100%;
         height: auto;
         max-width: 600px;
         max-height: 600px;
-        /*loading image size end*/
+        /*lottie image size end*/
         display: block;
         overflow: hidden;
         margin: auto;
@@ -190,5 +169,9 @@ export default {
         to {
             opacity: 1;
         }
+    }
+
+    .app-spinner {
+        height: 100vh;
     }
 </style>

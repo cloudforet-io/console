@@ -2,12 +2,7 @@
     <div>
         <p-info-panel info-title="Base Information" :defs="baseDefs" :item="item">
             <template #def-state-format="scope">
-                <p-status
-                    icon="fa-circle"
-                    icon-style="solid"
-                    size="xs"
-                    v-bind="serverStateBind(scope.value)"
-                />
+                <p-status v-bind="serverStateFormatter(scope.value)" />
             </template>
             <template #def-core-format="scope">
                 {{ scope.item.data.base.core }}
@@ -25,52 +20,60 @@
                 {{ scope.item.data.os.os_distro }}
             </template>
             <template #def-region-format="scope">
-                {{ scope.item.region_info.region_id }}
+                {{ scope.item.region_info ? scope.item.region_info.region_id : '' }}
             </template>
             <template #def-oArch-format="scope">
                 {{ scope.item.data.os.os_arch }}
             </template>
             <template #def-zone-format="scope">
-                {{ scope.item.zone_info.zone_id }}
+                {{ scope.item.zone_info ? scope.item.zone_info.zone_id : '' }}
             </template>
             <template #def-kernel-format="scope">
                 {{ scope.item.data.base.kernel }}
             </template>
             <template #def-pool-format="scope">
-                {{ scope.item.pool_info.pool_id }}
+                {{ scope.item.pool_info ? scope.item.pool_info.pool_id : '' }}
             </template>
             <template #def-created_at-format="scope">
-                {{ timestampFormatter(scope.value) }}
+                {{ scope.value ? timestampFormatter(scope.value) : '' }}
             </template>
             <template #def-updated_at-format="scope">
-                {{ timestampFormatter(scope.value) }}
+                {{ scope.value ? timestampFormatter(scope.value) : '' }}
             </template>
             <template #def-deleted_at-format="scope">
-                {{ timestampFormatter(scope.value) }}
+                {{ scope.value ? timestampFormatter(scope.value) : '' }}
             </template>
         </p-info-panel>
         <p-info-panel info-title="VM" :defs="vmDefs" :item="getVm">
             <template #def-platform_type-format="scope">
-                <p-badge style-type="primary">
+                <p-badge v-bind="platformBadgeFormatter(scope.value)">
                     {{ scope.value }}
                 </p-badge>
             </template>
         </p-info-panel>
-        <p-info-panel info-title="Compute" :defs="computeDefs" :item="getCompute" />
+        <p-info-panel info-title="Compute" :defs="computeDefs" :item="getCompute">
+            <template #def-security_groups-format="scope">
+                {{ arrayFormatter(scope.value) }}
+            </template>
+        </p-info-panel>
         <p-tag-panel ref="tagPanel" :tags.sync="tags" @confirm="confirm" />
     </div>
 </template>
 
 <script>
-import { computed, ref } from '@vue/composition-api';
+import {
+    computed, ref, watch,
+} from '@vue/composition-api';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
 import PBadge from '@/components/atoms/badges/Badge';
 import PStatus from '@/components/molecules/status/Status';
-import { makeByPass, makeProxy } from '@/lib/compostion-util';
-import { makeTrDefs } from '@/components/molecules/panel/panel-content/PanelContent.uitl';
-import { timestampFormatter } from '@/lib/formatter';
-import { serverStateBind } from '@/views/inventory/server/Server.util';
+import {
+    timestampFormatter, serverStateFormatter, arrayFormatter, platformBadgeFormatter,
+} from '@/lib/util';
+import ServerEventBus from '@/views/inventory/server/ServerEventBus';
+import { mountBusEvent } from '@/lib/compostion-util';
+import { makeTrItems } from '@/lib/view-helper';
 
 export default {
     name: 'PServerDetail',
@@ -82,10 +85,13 @@ export default {
             type: Object,
             default: () => {},
         },
+        // todo: need confirm that this is good way - sinsky
+        tagConfirmEvent: String,
+        tagResetEvent: String,
     },
-    setup(props, { emit, parent }) {
-        const baseDefs = makeTrDefs([
-            ['server_id', 'COMMON.SERVER_ID'],
+    setup(props, { parent }) {
+        const baseDefs = makeTrItems([
+            ['server_id', 'COMMON.ID'],
             ['name', 'COMMON.NAME'],
             ['state', 'COMMON.STATE'],
             ['primary_ip_address', 'COMMON.PRI_IP'],
@@ -95,7 +101,7 @@ export default {
             ['menory', 'COMMON.MEMORY'],
             ['os_type', 'COMMON.O_TYPE'],
             ['os_distro', 'COMMON.O_DIS'],
-            ['project_id', 'COMMON.PROJ'],
+            ['project', 'COMMON.PROJ'],
             ['os_detail', 'COMMON.O_DETAIL'],
             ['region', 'COMMON.REGION'],
             ['oArch', 'COMMON.O_ARCH'],
@@ -107,13 +113,13 @@ export default {
             ['updated_at', 'COMMON.UPDATE'],
             ['deleted_at', 'COMMON.DELETE'],
         ], parent, { copyFlag: true });
-        const vmDefs = makeTrDefs([
+        const vmDefs = makeTrItems([
             ['vm_id', 'COMMON.ID'],
             ['vm_name', 'COMMON.NAME'],
             ['platform_type', 'COMMON.PLATFORM'],
             ['image', 'COMMON.IMAGE'],
         ], parent, { copyFlag: true });
-        const computeDefs = makeTrDefs([
+        const computeDefs = makeTrItems([
             ['instance_id', 'COMMON.INST_ID'],
             ['keypair', 'COMMON.KEY_PAIR'],
             ['instance_type', 'COMMON.INST_TYPE'],
@@ -121,7 +127,14 @@ export default {
             ['security_groups', 'COMMON.SEC_GROUP'],
         ], parent, { copyFlag: true });
         const tags = ref({ ...props.item.tags });
+        watch(() => props.item, (value) => {
+            tags.value = value.tags;
+        });
         const tagPanel = ref(null);
+        const resetTag = () => {
+            tagPanel.value.resetTag();
+        };
+        mountBusEvent(ServerEventBus, props.tagResetEvent, resetTag);
 
         return {
             baseDefs,
@@ -129,12 +142,13 @@ export default {
             computeDefs,
             tags,
             tagPanel,
-            resetTag: () => {
-                tagPanel.value.resetTag();
+            confirm(...event) {
+                ServerEventBus.$emit(props.tagConfirmEvent, props.item.server_id, ...event);
             },
-            confirm: makeByPass(emit, 'confirm'),
             timestampFormatter,
-            serverStateBind,
+            serverStateFormatter,
+            arrayFormatter,
+            platformBadgeFormatter,
             getVm: computed(() => (props.item ? props.item.data.vm : {})),
             getCompute: computed(() => (props.item ? props.item.data.compute : {})),
         };

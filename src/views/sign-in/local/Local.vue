@@ -1,20 +1,20 @@
 <template>
     <div class="background-cover">
         <div class="row">
-            <div class="container fade-in">
+            <div class="container">
                 <div class="row d-flex justify-content-center">
                     <div class="col-md-8">
                         <div class="card-group">
                             <div class="card col-7 card-left-container">
                                 <div class="signIn-title">
-                                    {{ $t('COMMON.SIGN_IN') }}
+                                    {{ $t('SIGNIN.SIGN_IN') }}
                                 </div>
                                 <div v-show.visible="greeting" class="signIn-sub-title">
-                                    {{ $t('COMMON.SIGN_IN_MSG') }}
+                                    {{ $t('SIGNIN.SIGN_IN_MSG') }}
                                 </div>
                                 <div v-show.visible="!greeting" class="signIn-sub-title">
                                     <div class="sign-in-alert">
-                                        {{ $t('COMMON.SIGN_FAIL_BODY') }}
+                                        {{ $t('SIGNIN.SIGN_FAIL_BODY') }}
                                     </div>
                                 </div>
                                 <form class="form-binder novalidate">
@@ -23,10 +23,11 @@
                                             User ID
                                         </p-label>
                                         <p-text-input ref="userId" v-model="userId"
+                                                      autocomplete="on"
                                                       :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
                                                       class="form-control"
                                                       type="text"
-                                                      placeholder="  user ID"
+                                                      placeholder="  User ID"
                                                       required
                                                       @keyup="removeCSS('userId')"
                                                       @keyup.enter="signIn"
@@ -40,9 +41,10 @@
                                             Password
                                         </p-label>
                                         <p-text-input ref="password" v-model="password" type="password"
+                                                      autocomplete="on"
                                                       :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
                                                       class="form-control"
-                                                      placeholder="  password"
+                                                      placeholder="  Password"
                                                       required
                                                       @keyup="removeCSS('password')"
                                                       @keyup.enter="signIn"
@@ -51,23 +53,23 @@
                                             * {{ $t('SIGNIN.PASS_EMPTY') }}
                                         </div>
                                     </div>
-                                    <div class="row">
+                                    <div class="row mt-3">
+                                        <div class="col-md-12 col-xs-12 col-sm-12">
+                                            <p-button class="button-cover btn-lg"
+                                                      :size="'lg'"
+                                                      :style-type="'primary'"
+                                                      @click="signIn"
+                                            >
+                                                {{ $t('SIGNIN.SIGN_IN') }}
+                                            </p-button>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
                                         <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
                                             <div @click="directToAdmin">
                                                 <span class="root-sign">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
                                             </div>
                                         </b-col>
-                                    </div>
-                                    <div class="row mt-4">
-                                        <div class="col-md-12 col-xs-12 col-sm-12">
-                                            <p-button class="button-cover"
-                                                      :size="'lg'"
-                                                      :style-type="'primary'"
-                                                      @click="signIn"
-                                            >
-                                                {{ $t('COMMON.SIGN_IN') }}
-                                            </p-button>
-                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -76,7 +78,7 @@
                                 <div class="card-img-overlay text-white d-flex flex-column justify-content-center">
                                     <div class="text-center">
                                         <p style="margin-bottom: 10px">
-                                            <img src="@/assets/images/brand/dcos.png" width="100vh" height="100vh">
+                                            <img src="@/assets/images/brand/brand_logo.png" width="100vh" height="100vh">
                                         </p><h1>{{ getCurrentHostname }}</h1></p>
                                         <p>{{ getGreetMessage }} </p>
                                     </div>
@@ -91,7 +93,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 import url from 'url';
 import PLabel from '@/components/atoms/labels/Label';
 import PButton from '@/components/atoms/buttons/Button';
@@ -109,7 +110,7 @@ export default {
             rememberStatus: false,
             greeting: true,
             userId: '',
-            password: 'admin',
+            password: '',
             styler: {
                 border: '1px solid #EF3817',
             },
@@ -124,9 +125,6 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('auth', [
-            'nextPath',
-        ]),
         validatorUser() {
             return this.validator.userId;
         },
@@ -140,15 +138,25 @@ export default {
             return this.isInvalid.password ? this.styler.border : '';
         },
         getGreetMessage() {
-            const GreetingMsg = this.$store.getters['auth/greetDesc'];
-            return !this.isEmpty(GreetingMsg) ? GreetingMsg : '';
+            const companyTitle = this.$store.getters['domain/companyTitle'];
+            const companyDesc = this.$store.getters['domain/description'];
+            const hostName = this.getWindowHostName();
+            return !this.isEmpty(companyTitle) ? companyDesc : !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
         },
         getCurrentHostname() {
+            const companyTitle = this.$store.getters['domain/companyTitle'];
+            const hostName = this.getWindowHostName();
+            return !this.isEmpty(companyTitle) ? companyTitle : hostName;
+        },
+    },
+    mounted() {
+        this.$refs.userId.focus();
+    },
+    methods: {
+        getWindowHostName() {
             const hostName = url.parse(window.location.href).host;
             return hostName.substring(0, hostName.indexOf('.')).toUpperCase();
         },
-    },
-    methods: {
         removeCSS(type) {
             this.validator[type] = false;
             this.isInvalid[type] = false;
@@ -167,7 +175,6 @@ export default {
         },
 
         async signIn() {
-
             this.displayGreetingMSG(true);
             const credentials = {
                 user_id: this.userId,
@@ -185,8 +192,7 @@ export default {
                     localStorage.setItem('common.toNextPath', '/');
                 }
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
-
-            }).catch((error) => {
+            }).catch(() => {
                 this.isInvalid.userId = true;
                 this.isInvalid.password = true;
                 this.$refs.userId.focus();
@@ -207,7 +213,7 @@ export default {
         width: 100vw;
         background-position: center bottom;
         background-size: cover;
-        background-image: url("../../../assets/images/landing/cloudone_console_sign-in_bg.jpg");
+        background-image: url("~@/assets/images/landing/cloudone_console_sign-in_bg.jpg");
     }
 
     .signIn-title {
@@ -312,13 +318,13 @@ export default {
             border: 1px solid $alert;
             box-shadow: unset;
         }
-
     }
 
     .button-cover{
+        width: 50%;
         display: inline-block;
         text-align: center;
-        float: right;
+        float: left;
         font: 16px/18px Arial;
         letter-spacing: 0;
         color: #FFFFFF;

@@ -3,11 +3,12 @@
         <p-tab-bar :active-tab.sync="proxyActiveTab" :tabs="tabs" />
         <div class="tab-content">
             <template v-for="tab in tabData">
-                <div
-                    :key="tab.name"
-                    class="tab-pane fade"
-                    :class="{show:isActive(tab.name),active:isActive(tab.name)}"
-                    role="tabpanel"
+                <div v-if="tab.keepAlive || tab.name === proxyActiveTab"
+                     v-show="tab.name === proxyActiveTab"
+                     :key="tab.name"
+                     class="tab-pane fade"
+                     :class="{show:isActive(tab.name),active:isActive(tab.name)}"
+                     role="tabpanel"
                 >
                     <slot :name="tab.name" :tabName="tab.name" :label="tab.label" />
                 </div>
@@ -17,8 +18,7 @@
 </template>
 
 <script>
-import PTabBar from '@/components/molecules/tabs/tab-bar/TabBar';
-import { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar.mixins';
+import PTabBar, { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar';
 import { makeProxy } from '@/lib/compostion-util';
 
 
