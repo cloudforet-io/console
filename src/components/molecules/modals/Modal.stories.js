@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import PModal from './Modal.vue';
 import { sizeMapping } from './ModalMapping';
-import { autoProps } from '../../../setup/storybook-util';
+import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
     title: 'molecules/modals',

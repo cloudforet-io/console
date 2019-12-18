@@ -1,7 +1,7 @@
 import { ref, computed } from '@vue/composition-api';
 import PanelContent from '@/components/molecules/panel/panel-content/PanelContent';
 import PBadge from '@/components/atoms/badges/Badge';
-import { makeTrItems } from '@/lib/helper'
+import { makeTrItems } from '@/lib/view-helper'
 
 export default {
     title: 'molecules/panel/panel-content',

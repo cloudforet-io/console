@@ -162,7 +162,7 @@ import {
     timestampFormatter, serverStateFormatter, platformBadgeFormatter, getValue,
 } from '@/lib/util';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
-import { makeTrItems } from '@/lib/helper';
+import { makeTrItems } from '@/lib/view-helper';
 
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');

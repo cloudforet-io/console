@@ -80,7 +80,7 @@ import {
     reactive, toRefs, computed,
 } from '@vue/composition-api';
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
-import { makeTrItems } from '@/lib/helper';
+import { makeTrItems } from '@/lib/view-helper';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
 import PI from '@/components/atoms/icons/PI';

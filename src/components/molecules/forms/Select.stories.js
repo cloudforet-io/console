@@ -1,6 +1,6 @@
 import { number, select } from '@storybook/addon-knobs/vue';
 import PSelect from './Select';
-import { autoProps } from '../../../setup/storybook-util';
+import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
     title: 'molecules/forms/select',

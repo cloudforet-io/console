@@ -1,6 +1,6 @@
 import { withKnobs, text } from '@storybook/addon-knobs/vue';
 import { toRefs, reactive } from '@vue/composition-api';
-import { autoProps } from '@/setup/storybook-util';
+import { autoProps } from '../../../../.storybook/storybook-util';
 import Summary from './Summary';
 import { mountBusEvent } from '@/lib/compostion-util';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
