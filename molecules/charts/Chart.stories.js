@@ -1,6 +1,6 @@
 import { withKnobs, number } from '@storybook/addon-knobs/vue';
 import PChart from './Chart';
-import { autoProps } from '@/setup/storybook-util';
+import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
     title: 'Molecules/charts/chart',

@@ -1,7 +1,7 @@
 import { action } from '@storybook/addon-actions';
 import  mockup  from './Tree.mockup.js';
 import PTree from './Tree.vue';
-import { autoProps } from '../../../setup/storybook-util';
+import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
     title: 'molecules/tree',

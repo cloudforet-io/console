@@ -1,5 +1,5 @@
 import PInputTag from './InputTag';
-import { autoProps } from '@/setup/storybook-util';
+import { autoProps } from '../../../../.storybook/storybook-util';
 
 
 export default {

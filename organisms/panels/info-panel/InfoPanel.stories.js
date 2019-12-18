@@ -1,7 +1,7 @@
 import { ref } from '@vue/composition-api';
 import InfoPanel from './InfoPanel.vue';
 import PBadge from '@/components/atoms/badges/Badge';
-import { makeTrItems } from '@/lib/helper';
+import { makeTrItems } from '@/lib/view-helper';
 
 export default {
     title: 'organisms/panel/info-panel',

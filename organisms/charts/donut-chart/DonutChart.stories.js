@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
 import countries from 'countries-and-timezones';
 import PDonutChart from './DonutChart';
-import { autoProps } from '@/setup/storybook-util';
+import { autoProps } from '../../../../../.storybook/storybook-util';
 import { sampleDataGenerator } from './DonutChart.map';
 
 export default {

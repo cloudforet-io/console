@@ -1,5 +1,5 @@
 import PanelTop from './PanelTop.vue';
-import { autoProps } from '../../../../setup/storybook-util';
+import { autoProps } from '../../../../../.storybook/storybook-util';
 
 export default {
     title: 'molecules/panel/panel_top',

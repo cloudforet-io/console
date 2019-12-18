@@ -1,5 +1,5 @@
 import PNoticeAlert from './NoticeAlert';
-import { autoProps } from '@/setup/storybook-util';
+import { autoProps } from '../../../../../.storybook/storybook-util';
 
 export default {
     title: 'NoticeAlert',
