@@ -8,7 +8,7 @@ import {
     iconStyleMapping,
     rotatingMapping,
     sizeMapping,
-} from '../../atoms/icons/FiMapping';
+} from '../../atoms/icons/PiMapping';
 
 export default {
     title: 'molecules/buttons/icon_button',

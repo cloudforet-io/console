@@ -2,7 +2,7 @@ import PLabel from './Label';
 
 
 export default {
-    title: 'atoms/legends/label',
+    title: 'atoms/label',
     component: PLabel,
     parameters: {
         info: {
@@ -12,7 +12,7 @@ export default {
     },
 };
 
-export const label = () => ({
+export const DefaultCase = () => ({
     components: { PLabel },
-    template: '<p-label>this is label</p-label>',
+    template: '<p-label>This is label.</p-label>',
 });
