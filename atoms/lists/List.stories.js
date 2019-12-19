@@ -23,7 +23,8 @@ export default {
 export const definitionList = () => ({
     components: { PDl, PDt, PDd  },
     template: ` <div>
-                    <h1>Definition List</h1>
+                    <h2>Definition List</h2>
+                    <br>
                     <PDl>
                       <PDt>WWW</PDt>
                       <PDd>WWW represents World Wide Web.</PDd>
@@ -35,8 +36,9 @@ export const definitionList = () => ({
 
 export const orderedList = () => ({
     components: { POl, PLi },
-    template: `<div style="background: #f4f4f4; padding: 16px">
-                     <h1>Ordered List</h1>
+    template: `<div>
+                     <h2>Ordered List</h2>
+                     <br>
                     <POl>
                       <PLi>Lorem</PLi>
                       <PLi>Ipsum</PLi>
@@ -48,6 +50,8 @@ export const orderedList = () => ({
 export const unorderedList = () => ({
     components: { PUl, PLi },
     template: `<div>
+                    <h2>Unordered List</h2>
+                    <br>
                     <p-ul>
                          <p-li> Contents </p-li>   
                          <p-li> Contents </p-li>

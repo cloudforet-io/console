@@ -1,4 +1,4 @@
-import PHr from '@/components/atoms/divider/Hr';
+import PHr from '@/components/atoms/hr/Hr';
 import PRow from '@/components/atoms/grid/row/Row';
 import PCol from '@/components/atoms/grid/col/Col';
 
