@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import PUl from '@/components/atoms/list/Ul';
-import PLi from '@/components/atoms/list/Li';
+import PUl from '@/components/atoms/lists/orun-list/Ul';
+import PLi from '@/components/atoms/lists/orun-list/Li';
 
 export default {
     name: 'PTagList',

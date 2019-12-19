@@ -3,7 +3,7 @@ import { action } from '@storybook/addon-actions';
 import PButton from './Button';
 
 export default {
-    title: 'atoms/buttons/button',
+    title: 'atoms/buttons',
     component: PButton,
     parameters: {
         info: {
@@ -17,7 +17,7 @@ const actions = {
 };
 const data = {};
 
-export const base = () => ({
+export const DefaultCase = () => ({
     components: { PButton },
     template: `
 <p-button

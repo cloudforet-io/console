@@ -3,12 +3,12 @@ import PI from './PI';
 import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
-    title: 'atoms/icon/p-i',
+    title: 'atoms/icon/',
     component: PI,
 };
 
 
-export const defaultCase = () => ({
+export const DefaultCase = () => ({
     components: { PI },
     props: {
         name: {

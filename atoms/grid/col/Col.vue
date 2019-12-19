@@ -1,5 +1,5 @@
 <script>
-import { getBindClass, mergeBind } from '@/components/atoms/utils/functional';
+import { getBindClass, mergeBind } from '@/lib/functional';
 
 export default {
     name: 'PCol',
@@ -35,7 +35,6 @@ export default {
     render(h, { props, data, children }) {
         const colSize = props.col ? `${8.3333333 * props.col}%` : 0;
         const flexStyle = {
-            display: props.inline ? 'inline-flex' : 'flex',
             order: props.order,
             flexGrow: props.col ? 0 : props.flexGrow,
             flexShrink: props.col ? 0 : props.flexShrink,
