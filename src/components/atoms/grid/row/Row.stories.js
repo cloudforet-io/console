@@ -12,8 +12,7 @@ export default {
     },
 };
 
-
-export const defaultCase = () => ({
+export const DefaultCase = () => ({
     components: { PRow },
     template: `
 <div style="border: 1px dashed #0f69ff;width: 40vw;">

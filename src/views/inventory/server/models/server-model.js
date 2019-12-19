@@ -47,7 +47,7 @@ casual.define('nic', () => ({
     device_index: 0,
     device: '',
     nic_type: 'PHYSICAL',
-    tags: {},
+    tags: casual.tags,
     ip_addresses: arrayOf(casual.integer(1, 5), casual._ipAddress),
 }));
 
@@ -57,7 +57,7 @@ casual.define('disk', () => ({
     device: 'xvda',
     storage_id: '',
     size: 8,
-    tags: {},
+    tags: casual.tags,
     disk_type: 'Ebs',
     volume_id: casual.make_id('vol'),
 }));
