@@ -14,7 +14,7 @@ export default {
 const actions = {};
 const data = {};
 
-export const badge = () => ({
+export const DefaultCase = () => ({
     components: { PBadge },
     template: '<PBadge style="width: auto" :styleType="styleType" :backgroundColor="backgroundColor">{{text}}</PBadge>',
     props: {
@@ -43,7 +43,7 @@ export const badge = () => ({
 });
 export const longBadge = () => ({
     components: { PBadge },
-    template: '<PBadge>this is v~~e~~r~~y long badge</PBadge>',
+    template: '<PBadge>Badge with long size in length</PBadge>',
     props: {
         styleType: {
             default: select('styleType', [

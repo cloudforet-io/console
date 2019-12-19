@@ -1,5 +1,5 @@
 <script>
-import { mergeBind } from '@/components/atoms/utils/functional';
+import { getBindClass, mergeBind } from '@/lib/functional';
 
 export default {
     name: 'PCol',
@@ -35,7 +35,6 @@ export default {
     render(h, { props, data, children }) {
         const colSize = props.col ? `${8.3333333 * props.col}%` : 0;
         const flexStyle = {
-            display: props.inline ? 'inline-flex' : 'flex',
             order: props.order,
             flexGrow: props.col ? 0 : props.flexGrow,
             flexShrink: props.col ? 0 : props.flexShrink,
@@ -45,9 +44,13 @@ export default {
         };
         const newData = {
             ...data,
+            class: {
+                'p-col': true,
+                ...getBindClass(data.class),
+            },
             style: mergeBind(data.style, flexStyle),
         };
-        return h('row', newData, children);
+        return h('div', newData, children);
     },
 };
 </script>

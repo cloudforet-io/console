@@ -1,5 +1,5 @@
 <script>
-import { mergeBind } from '@/components/atoms/utils/functional';
+import { getBindClass, mergeBind } from '@/lib/functional';
 
 export default {
     name: 'PRow',
@@ -46,9 +46,13 @@ export default {
         };
         const newData = {
             ...data,
+            class: {
+                'p-row': true,
+                ...getBindClass(data.class),
+            },
             style: mergeBind(data.style, flexStyle),
         };
-        return h('row', newData, children);
+        return h('div', newData, children);
     },
 };
 </script>

@@ -1,5 +1,5 @@
 <script>
-import { getBindClass } from '@/components/atoms/utils/functional';
+import { getBindClass } from '@/lib/functional';
 
 export default {
     name: 'PTextInput',

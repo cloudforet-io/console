@@ -33,9 +33,9 @@
 
 <script>
 import _ from 'lodash';
-import PDt from '@/components/atoms/definition/dt/Dt';
-import PDl from '@/components/atoms/definition/dl/Dl';
-import PDd from '@/components/atoms/definition/dd/Dd';
+import PDt from '@/components/atoms/lists/dl-list/Dt';
+import PDl from '@/components/atoms/lists/dl-list/Dl';
+import PDd from '@/components/atoms/lists/dl-list/Dd';
 import PCopyButton from '@/components/molecules/buttons/CopyButton';
 
 export default {
