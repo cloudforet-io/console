@@ -19,16 +19,25 @@
                             :required="true"
                         >
                             <template v-slot:default="{invalid}">
-                                <p-text-input
-                                    v-model="formState.userId"
-                                    v-focus
-                                    :disabled="userIdDisabled"
-                                    placeholder="Insert User ID here"
-                                    :class="{
-                                        'form-control':true,
-                                        'is-invalid':invalid
-                                    }"
-                                />
+                                <p-row style="width: 100%">
+                                    <p-col :style="{'max-width': '19rem'}">
+                                        <p-text-input
+                                            v-model="formState.userId"
+                                            v-focus
+                                            :disabled="updateMode"
+                                            placeholder="Insert User ID here"
+                                            :class="{
+                                                'form-control':true,
+                                                'is-invalid':invalid
+                                            }"
+                                        />
+                                    </p-col>
+                                    <p-col>
+                                        <p-button style-type="primary" class="user-id-check-btn" @click="()=>fieldValidation('userId')">
+                                            check user id
+                                        </p-button>
+                                    </p-col>
+                                </p-row>
                             </template>
                         </PFieldGroup>
                     </p-col>
@@ -101,12 +110,12 @@
                 </p-row>
                 <p-row>
                     <p-col :col="6">
-                        <p-row direction="column">
+                        <p-row style="width: 100%" direction="column">
                             <PFieldGroup label="Language">
-                                <p-text-input v-model="formState.name" class="form-control" />
+                                <PSelectDropdown v-model="formState.language" :items="languageSelectItems" />
                             </PFieldGroup>
                             <PFieldGroup label="Timezone">
-                                <p-text-input v-model="formState.name" class="form-control" />
+                                <PSelectDropdown v-model="formState.timezone" :items="timezoneSelectItems" />
                             </PFieldGroup>
                         </p-row>
                     </p-col>
@@ -131,12 +140,26 @@ import PFieldGroup from '@/components/molecules/forms/FieldGroup';
 import PTextInput from '@/components/atoms/inputs/TextInput';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal';
 import {
-    formValidation, makeProxy, requiredValidation, Validation,
+    formValidation, makeProxy, requiredValidation, userIDValidation, Validation,
 } from '@/lib/compostion-util';
 import PTagInputGroup from '@/components/organisms/forms/tag-input-group/TagInputGroup';
 import PDivider from '@/components/atoms/divider/Divider';
 import PRow from '@/components/atoms/grid/row/Row';
 import PCol from '@/components/atoms/grid/col/Col';
+import PSelectDropdown from '@/components/organisms/buttons/select-dropdown/SelectDropdown';
+import PButton from '@/components/atoms/buttons/Button';
+
+const components = {
+    PButtonModal,
+    PFieldGroup,
+    PTextInput,
+    PTagInputGroup,
+    PDivider,
+    PRow,
+    PCol,
+    PSelectDropdown,
+    PButton,
+};
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
@@ -153,35 +176,53 @@ const setup = (props, context) => {
         tags: {},
         ...props.item,
     });
-    const invalidState = reactive({
-        userId: false,
-        password1: false,
-        password2: false,
-    });
+    const languageSelectItems = [
+        { type: 'item', label: '한국어', name: 'korean' },
+        { type: 'item', label: 'english', name: 'english' },
+    ];
+    const timezoneSelectItems = [
+        { type: 'item', label: 'UTC', name: 'UTC' },
+        { type: 'item', label: 'SEOUL(UTC+9)', name: 'UTC+9' },
+    ];
 
     const userFormValidations = {
-        userId: [requiredValidation()],
+        userId: [requiredValidation(), userIDValidation(context.parent)],
         password1: [requiredValidation()],
         password2: [
             requiredValidation(),
             new Validation((value, data) => data.password1 === value, 'please enter same value again'),
         ],
-
     };
 
     const validateAPI = formValidation(formState, userFormValidations);
-
     const confirm = () => {
         if (validateAPI.allValidation()) {
-            context.emit('confirm', formState);
+            const data = {
+                user_id: formState.userId,
+            };
+            if (props.updateMode) {
+                if (formState.password1) {
+                    data.password = formState.password1;
+                }
+            } else {
+                data.password = formState.password1;
+            }
+            data.name = formState.name;
+            ['email', 'mobile', 'group', 'language', 'timezone', 'tags'].forEach((key) => {
+                if (formState[key]) {
+                    data[key] = formState[key];
+                }
+            });
+
+            context.emit('confirm', data);
         }
     };
-
 
     return {
         ...state,
         formState,
-        invalidState,
+        languageSelectItems,
+        timezoneSelectItems,
         proxyVisible: makeProxy('visible', props, context.emit),
         confirm,
         ...validateAPI,
@@ -190,9 +231,7 @@ const setup = (props, context) => {
 
 export default {
     name: 'PUserForm',
-    components: {
-        PButtonModal, PFieldGroup, PTextInput, PTagInputGroup, PDivider, PRow, PCol,
-    },
+    components,
     directives: {
         focus: {
             // 디렉티브 정의
@@ -210,7 +249,7 @@ export default {
         item: {
             type: Object,
             default: () => ({
-                userId: '',
+                user_id: '',
                 password1: '',
                 password2: '',
                 name: '',
@@ -222,7 +261,7 @@ export default {
                 tags: {},
             }),
         },
-        userIdDisabled: {
+        updateMode: {
             type: Boolean,
             default: false,
         },
@@ -242,6 +281,10 @@ export default {
     .p-text-input{
         max-width: 19rem;
     }
+    .p-select-dropdown{
+        max-width: 19rem;
+        width: 100%;
+    }
     .tag-input{
         padding-top: 0.5rem;
         background-color: $primary4;
@@ -252,6 +295,11 @@ export default {
     }
     .p-field-group{
         width: 100%;
+    }
+    .user-id-check-btn{
+        margin-left: 0.5rem;
+        min-height: 2rem;
+
     }
 
 </style>

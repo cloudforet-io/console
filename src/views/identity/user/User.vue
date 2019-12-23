@@ -1,7 +1,7 @@
 
 <script>
 import {
-    ref, toRefs, computed, reactive,
+    toRefs, computed, reactive,
 } from '@vue/composition-api';
 import UserTemplate, { userSetup, eventNames } from '@/views/identity/user/User.template';
 import userEventBus from '@/views/identity/user/UserEventBus';
@@ -20,6 +20,7 @@ export default {
         userEventNames.enableUser = 'enableUser';
         userEventNames.disableUser = 'disableUser';
         userEventNames.deleteUser = 'deleteUser';
+        userEventNames.addUser = 'addUser';
 
         const state = userSetup(props, context, userEventNames);
 
@@ -142,11 +143,36 @@ export default {
             });
         };
 
+        const addUser = async (item) => {
+            await context.parent.$http.post('/identity/user/create', item).then(async (_) => {
+                await requestUserList();
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'success',
+                    title: 'success',
+                    text: 'add users',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.error(error);
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
+
         mountBusEvent(userEventBus, userEventNames.getUserList, requestUserList);
         mountBusEvent(userEventBus, userEventNames.tagConfirmEvent, UserTagConfirm);
         mountBusEvent(userEventBus, userEventNames.enableUser, enableUser);
         mountBusEvent(userEventBus, userEventNames.disableUser, disableUser);
         mountBusEvent(userEventBus, userEventNames.deleteUser, deleteUser);
+        mountBusEvent(userEventBus, userEventNames.addUser, addUser);
 
 
         requestUserList();
