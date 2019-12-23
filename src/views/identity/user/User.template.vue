@@ -28,7 +28,7 @@
                     @changeSort="getUsers"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary" @click="clickCollectData">
+                        <p-button style-type="primary" @click="clickAdd">
                             {{ tr('COMMON.BTN_ADD') }}
                         </p-button>
                         <PDropdownMenuBtn
@@ -90,6 +90,12 @@
 
             @confirm="checkModalConfirm"
         />
+        <p-user-form v-if="!!userFormState.mode"
+                     :header-title="userFormState.headerTitle"
+                     :item="userFormState.item"
+                     :visible.sync="userFormState.visible"
+                     @confirm="userFormConfirm"
+        />
     </div>
 </template>
 
@@ -103,6 +109,7 @@ import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/t
 import { timestampFormatter, getValue, userStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import userEventBus from '@/views/identity/user/UserEventBus';
+import PUserForm from '@/views/identity/user/modules/UserForm';
 
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
@@ -163,6 +170,7 @@ export const eventNames = {
     enableUser: '',
     disableUser: '',
     deleteUser: '',
+    addUser: '',
 };
 
 export const userSetup = (props, context, eventName) => {
@@ -213,9 +221,32 @@ export const userSetup = (props, context, eventName) => {
     });
     const getFirstSelectedUserId = computed(() => (getSelectUserIds.value.length >= 1 ? getSelectUserIds[0] : ''));
 
+    const userFormState = reactive({
+        visible: false,
+        mode: '',
+        headerTitle: '',
+        item: null,
+        eventName: '',
+    });
+
+    const clickAdd = () => {
+        userFormState.mode = 'add';
+        userFormState.headerTitle = 'Add User';
+        userFormState.item = null;
+        userFormState.eventName = eventNames.addUser;
+        userFormState.visible = true;
+    };
+
+    const userFormConfirm = (item) => {
+        eventBus.$emit(userFormState.eventName, item);
+        userFormState.visible = false;
+        userFormState.mode = '';
+    };
+
     const checkTableModalState = reactive({
         visible: false,
         mode: '',
+        item: null,
         confirmEventName: '',
         title: '',
         subTitle: '',
@@ -230,6 +261,7 @@ export const userSetup = (props, context, eventName) => {
         checkTableModalState.subTitle = '';
         checkTableModalState.themeColor = '';
     };
+
 
     const clickEnable = () => {
         checkTableModalState.mode = 'enable';
@@ -297,10 +329,14 @@ export const userSetup = (props, context, eventName) => {
         getSelectedUserItems,
         getSelectUserIds,
         getFirstSelectedUserId,
+        userFormState,
+        clickAdd,
+        userFormConfirm,
         clickEnable,
         clickDisable,
         clickDelete,
         checkModalConfirm,
+
     });
 };
 
@@ -310,6 +346,7 @@ export default {
         getValue,
     },
     components: {
+        PUserForm,
         PStatus,
         PHorizontalLayout,
         PToolboxTable,

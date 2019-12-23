@@ -111,3 +111,16 @@ export const numberMinValidation = (min, invalidMessage) => new Validation(value
 export const numberMaxValidation = (max, invalidMessage) => new Validation(value => Number(value) >= max, invalidMessage || `value must smaller then ${max}`);
 export const lengthMinValidation = (min, invalidMessage) => new Validation(value => value.length >= min, invalidMessage);
 export const lengthMaxValidation = (max, invalidMessage) => new Validation(value => value.length >= max, invalidMessage);
+
+export const userIDValidation = (parent, invalidMessage) => new Validation(async (value) => {
+    let result = false;
+    await parent.$http.post('/identity/user/get', { user_id: value, domain_id: sessionStorage.domainId }).then().catch((error) => {
+        console.log('show error', error.code);
+        if (error.code === 'ERROR_NOT_FOUND') {
+            result = true;
+        }
+        result = false;
+    });
+    console.log('result', value, result);
+    return result;
+}, invalidMessage || 'already use that user id');

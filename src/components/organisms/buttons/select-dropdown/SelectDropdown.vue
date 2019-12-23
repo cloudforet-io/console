@@ -1,5 +1,6 @@
 <template>
     <PDropdownMenuBtn
+        class="p-select-dropdown"
         :class="invalidClass"
         :menu="items"
         @clickMenuEvent="changSelectItem"
@@ -34,7 +35,6 @@ export default {
         const items = computed(() => _.groupBy(props.items, 'name'));
         const selectItemLabel = computed(() => {
             const data = items.value[props.selectItem];
-            console.log(items.value);
             if (data && data[0].label) {
                 return data[0].label;
             }
@@ -54,10 +54,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.is-invalid::v-deep {
+.p-select-dropdown::v-deep{
+    &.is-invalid{
+        div{
+            .dropdown-btn{
+                border: 1px solid $alert;
+            }
+        }
+    }
     div{
-         .dropdown-btn{
-            border: 1px solid $alert;
+        width: 100%;
+        .dropdown-btn{
+            width: 100%;
         }
     }
 }
