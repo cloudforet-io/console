@@ -154,7 +154,7 @@ const components = {
     PFieldGroup,
     PTextInput,
     PTagInputGroup,
-    Phr,
+    PHr,
     PRow,
     PCol,
     PSelectDropdown,
