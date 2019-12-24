@@ -33,7 +33,7 @@
                                         />
                                     </p-col>
                                     <p-col>
-                                        <p-button style-type="primary" class="user-id-check-btn" @click="()=>fieldValidation('userId')">
+                                        <p-button style-type="primary" class="user-id-check-btn" @click="checkUserID">
                                             check user id
                                         </p-button>
                                     </p-col>
@@ -83,7 +83,9 @@
                         </PFieldGroup>
                     </p-col>
                 </p-row>
-                <p-row><p-hr /></p-row>
+                <p-row>
+                    <p-hr class="p-divider" />
+                </p-row>
                 <p-row>
                     <p-col :col="6">
                         <PFieldGroup label="Name">
@@ -195,8 +197,13 @@ const setup = (props, context) => {
     };
 
     const validateAPI = formValidation(formState, userFormValidations);
-    const confirm = () => {
-        if (validateAPI.allValidation()) {
+    const checkUserID = async () => {
+        const result = await validateAPI.fieldValidation('userId');
+        return result;
+    };
+    const confirm = async () => {
+        const result = await validateAPI.allValidation();
+        if (result) {
             const data = {
                 user_id: formState.userId,
             };
@@ -226,6 +233,7 @@ const setup = (props, context) => {
         proxyVisible: makeProxy('visible', props, context.emit),
         confirm,
         ...validateAPI,
+        checkUserID,
     };
 };
 
@@ -269,8 +277,6 @@ export default {
     setup(props, context) {
         return setup(props, context);
     },
-
-
 };
 </script>
 

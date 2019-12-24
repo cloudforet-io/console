@@ -69,11 +69,12 @@ export const formValidation = (data, validation) => {
      * @param name
      * @return {boolean}
      */
-    const fieldValidation = (name) => {
+    const fieldValidation = async (name) => {
         const vds = validation[name];
         for (let i = 0; i < vds.length; i++) {
             const vd = vds[i];
-            if (!vd.func(data[name], data)) {
+            const check = await vd.func(data[name], data);
+            if (!check) {
                 invalidMsg[name] = vd.invalidMessage;
                 invalidState[name] = true;
                 return false;
@@ -87,13 +88,15 @@ export const formValidation = (data, validation) => {
      * validated all fields
      * @return {boolean}
      */
-    const allValidation = () => {
+    const allValidation = async () => {
         let result = true;
-        Object.keys(validation).forEach((name) => {
-            if (!fieldValidation(name)) {
+        const vds = Object.keys(validation);
+        for (let i = 0; i < vds.length; i++) {
+            const validateResult = await fieldValidation(vds[i]);
+            if (!validateResult) {
                 result = false;
             }
-        });
+        }
         return result;
     };
     return {
@@ -119,8 +122,6 @@ export const userIDValidation = (parent, invalidMessage) => new Validation(async
         if (error.code === 'ERROR_NOT_FOUND') {
             result = true;
         }
-        result = false;
     });
-    console.log('result', value, result);
     return result;
 }, invalidMessage || 'already use that user id');
