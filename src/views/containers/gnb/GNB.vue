@@ -49,11 +49,14 @@ export default {
 
 <style lang="scss" scoped>
 .menu-container {
+    all: unset;
     display: flex !important;
     flex-flow: column;
     background-color: $primary;
     color: $primary4;
     li {
+        all: unset;
+        list-style: none;
         flex-grow: 1;
         padding: 12px 0;
         text-align: center;

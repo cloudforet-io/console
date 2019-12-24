@@ -1,5 +1,5 @@
 <script>
-import { getBindClass, mergeBind } from '@/components/atoms/utils/functional';
+import { getBindClass, mergeBind } from '@/lib/functional';
 
 export default {
     name: 'PRow',

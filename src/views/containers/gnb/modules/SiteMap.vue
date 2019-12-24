@@ -173,7 +173,11 @@ export default {
                 }
             }
         }
+        ul {
+            all:unset;
+        }
         li {
+            all:unset;
             display: block;
             cursor: pointer;
             &:hover {

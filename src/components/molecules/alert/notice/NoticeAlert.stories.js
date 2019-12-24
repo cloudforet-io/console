@@ -1,8 +1,8 @@
-import PNoticeAlert from './NoticeAlert';
-import { autoProps } from '../../../../../.storybook/storybook-util';
+import { action } from '@storybook/addon-actions';
+import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert';
 
 export default {
-    title: 'NoticeAlert',
+    title: 'molecules/alert/noticeAlert',
     component: PNoticeAlert,
     parameters: {
         info: {
@@ -11,20 +11,54 @@ export default {
         },
     },
 };
-const actions = {};
-const data = {};
-export const NoticeAlert = () => ({
+
+const data = {
+
+};
+
+const actions = {
+};
+
+export const modal = () => ({
     components: { PNoticeAlert },
-    template: '<PNoticeAlert ></PNoticeAlert>',
+    template: `<div>
+                    <button @click="showAction">Launch alert</button>
+                </div>
+               `,
     data() {
         return {
             ...data,
         };
     },
     props: {
-        ...autoProps(PNoticeAlert),
+        type: {
+            type: String,
+            default: 'dual',
+        },
+        group: {
+            type: String,
+            default: '',
+        },
+        position: {
+            type: String,
+            default: 'bottom right',
+        },
+        dynamicStyle: {
+            type: Object,
+            default: null,
+        },
     },
     methods: {
+        showAction() {
+            this.$notify({
+                group: 'noticeBottomRight',
+                type: 'alert',
+                title: 'Fail',
+                text: 'This is Type: alert',
+                duration: 2000,
+                speed: 1000,
+            });
+        },
         ...actions,
     },
 });

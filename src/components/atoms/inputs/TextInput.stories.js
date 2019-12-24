@@ -12,15 +12,12 @@ export default {
     },
 };
 
-
-export const textInput = () => ({
+export const DefaultCase = () => ({
     components: { PTextInput },
-    template: `
-<div>
-<p-text-input v-model="value" :disabled="disabled"></p-text-input>
-<p>{{value}}</p>
-</div>
-`,
+    template: `<div>
+                    <p-text-input v-model="value" :disabled="disabled"></p-text-input>
+                    <p>{{value}}</p>
+               </div>`,
     props: {
         disabled: {
             default: boolean('disabled', false),
