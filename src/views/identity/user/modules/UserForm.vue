@@ -83,7 +83,7 @@
                         </PFieldGroup>
                     </p-col>
                 </p-row>
-                <p-row><p-divider /></p-row>
+                <p-row><p-hr /></p-row>
                 <p-row>
                     <p-col :col="6">
                         <PFieldGroup label="Name">
@@ -143,7 +143,7 @@ import {
     formValidation, makeProxy, requiredValidation, userIDValidation, Validation,
 } from '@/lib/compostion-util';
 import PTagInputGroup from '@/components/organisms/forms/tag-input-group/TagInputGroup';
-import PDivider from '@/components/atoms/divider/Divider';
+import PHr from '@/components/atoms/hr/Hr';
 import PRow from '@/components/atoms/grid/row/Row';
 import PCol from '@/components/atoms/grid/col/Col';
 import PSelectDropdown from '@/components/organisms/buttons/select-dropdown/SelectDropdown';
@@ -154,7 +154,7 @@ const components = {
     PFieldGroup,
     PTextInput,
     PTagInputGroup,
-    PDivider,
+    Phr,
     PRow,
     PCol,
     PSelectDropdown,
