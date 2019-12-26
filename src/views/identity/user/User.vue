@@ -21,6 +21,7 @@ export default {
         userEventNames.disableUser = 'disableUser';
         userEventNames.deleteUser = 'deleteUser';
         userEventNames.addUser = 'addUser';
+        userEventNames.updateUser = 'updateUser';
 
         const state = userSetup(props, context, userEventNames);
 
@@ -167,15 +168,40 @@ export default {
             });
         };
 
+        const updateUser = async (item) => {
+            await context.parent.$http.post('/identity/user/update', item).then(async (_) => {
+                await requestUserList();
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'success',
+                    title: 'success',
+                    text: 'update users',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.error(error);
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
         mountBusEvent(userEventBus, userEventNames.getUserList, requestUserList);
         mountBusEvent(userEventBus, userEventNames.tagConfirmEvent, UserTagConfirm);
         mountBusEvent(userEventBus, userEventNames.enableUser, enableUser);
         mountBusEvent(userEventBus, userEventNames.disableUser, disableUser);
         mountBusEvent(userEventBus, userEventNames.deleteUser, deleteUser);
         mountBusEvent(userEventBus, userEventNames.addUser, addUser);
+      mountBusEvent(userEventBus, userEventNames.updateUser, updateUser);
 
 
-        requestUserList();
+
+      requestUserList();
         return {
             ...toRefs(state),
         };

@@ -16,6 +16,8 @@
                             label="User ID"
                             :invalid-text="invalidMsg.userId"
                             :invalid="invalidState.userId"
+                            valid-text="you can use this ID"
+                            :valid="validState.userId"
                             :required="true"
                         >
                             <template v-slot:default="{invalid}">
@@ -33,7 +35,9 @@
                                         />
                                     </p-col>
                                     <p-col>
-                                        <p-button style-type="primary" class="user-id-check-btn" @click="checkUserID">
+                                        <p-button style-type="primary" :disabled="updateMode" class="user-id-check-btn"
+                                                  @click="checkUserID"
+                                        >
                                             check user id
                                         </p-button>
                                     </p-col>
@@ -166,7 +170,7 @@ const components = {
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
     const formState = reactive({
-        userId: '',
+        user_id: '',
         password1: '',
         password2: '',
         name: '',
@@ -179,15 +183,15 @@ const setup = (props, context) => {
         ...props.item,
     });
     const languageSelectItems = [
-        { type: 'item', label: '한국어', name: 'korean' },
-        { type: 'item', label: 'english', name: 'english' },
+        { type: 'item', label: '한국어', name: 'ko' },
+        { type: 'item', label: 'english', name: 'en' },
     ];
     const timezoneSelectItems = [
         { type: 'item', label: 'UTC', name: 'UTC' },
         { type: 'item', label: 'SEOUL(UTC+9)', name: 'UTC+9' },
     ];
 
-    const userFormValidations = {
+    const addUserValidations = {
         userId: [requiredValidation(), userIDValidation(context.parent)],
         password1: [requiredValidation()],
         password2: [
@@ -196,7 +200,13 @@ const setup = (props, context) => {
         ],
     };
 
-    const validateAPI = formValidation(formState, userFormValidations);
+    const updateUserValidations = {
+        password2: [
+            new Validation((value, data) => data.password1 === value, 'please enter same value again'),
+        ],
+    };
+
+    const validateAPI = formValidation(formState, props.updateMode ? updateUserValidations : addUserValidations);
     const checkUserID = async () => {
         const result = await validateAPI.fieldValidation('userId');
         return result;
@@ -215,7 +225,7 @@ const setup = (props, context) => {
                 data.password = formState.password1;
             }
             data.name = formState.name;
-            ['email', 'mobile', 'group', 'language', 'timezone', 'tags'].forEach((key) => {
+            ['user_id', 'email', 'mobile', 'group', 'language', 'timezone', 'tags'].forEach((key) => {
                 if (formState[key]) {
                     data[key] = formState[key];
                 }

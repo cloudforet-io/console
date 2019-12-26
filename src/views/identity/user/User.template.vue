@@ -38,7 +38,7 @@
                             @click-enable="clickEnable"
                             @click-disable="clickDisable"
                             @click-delete="clickDelete"
-                            @click-update="clickMenuEvent"
+                            @click-update="clickUpdate"
                         >
                             Action
                         </PDropdownMenuBtn>
@@ -90,8 +90,9 @@
 
             @confirm="checkModalConfirm"
         />
-        <p-user-form v-if="!!userFormState.mode"
+        <p-user-form v-if="userFormState.visible"
                      :header-title="userFormState.headerTitle"
+                     :update-mode="userFormState.updateMode"
                      :item="userFormState.item"
                      :visible.sync="userFormState.visible"
                      @confirm="userFormConfirm"
@@ -171,6 +172,7 @@ export const eventNames = {
     disableUser: '',
     deleteUser: '',
     addUser: '',
+    updateUser: '',
 };
 
 export const userSetup = (props, context, eventName) => {
@@ -205,6 +207,7 @@ export const userSetup = (props, context, eventName) => {
         return idxs;
     });
     const isNotSelected = computed(() => tableState.selectIndex.length === 0);
+    const isNotOnlyOneSelected = computed(() => tableState.selectIndex.length !== 1);
     const getSelectedUserItems = computed(() => {
         const items = [];
         sortSelectIndex.value.forEach((idx) => {
@@ -230,12 +233,31 @@ export const userSetup = (props, context, eventName) => {
     });
 
     const clickAdd = () => {
-        userFormState.mode = 'add';
+        userFormState.updateMode = false;
         userFormState.headerTitle = 'Add User';
         userFormState.item = null;
         userFormState.eventName = eventNames.addUser;
         userFormState.visible = true;
     };
+
+    const clickUpdate = () => {
+        userFormState.updateMode = true;
+        userFormState.headerTitle = 'Update User';
+        const item = getSelectedUserItems.value[0];
+        userFormState.item = {
+            userId: item.user_id,
+            name: item.name,
+            email: item.name,
+            phone: item.phone,
+            group: item.group,
+            language: item.language,
+            timezone: item.timezone,
+            tags: item.tags,
+        };
+        userFormState.eventName = eventNames.updateUser;
+        userFormState.visible = true;
+    };
+
 
     const userFormConfirm = (item) => {
         eventBus.$emit(userFormState.eventName, item);
@@ -297,13 +319,14 @@ export const userSetup = (props, context, eventName) => {
 
     const dropdownMenu = reactive({
         ...makeTrItems([
-            ['update', 'COMMON.BTN_UPT'],
-            ['delete', 'COMMON.BTN_DELETE'],
-            ['enable', 'COMMON.BTN_ENABLE'],
-            ['disable', 'COMMON.BTN_DISABLE'],
+            ['update', 'COMMON.BTN_UPT', { disabled: isNotOnlyOneSelected }],
+            ['delete', 'COMMON.BTN_DELETE', { disabled: isNotSelected }],
+            [null, null, { type: 'divider' }],
+            ['enable', 'COMMON.BTN_ENABLE', { disabled: isNotSelected }],
+            ['disable', 'COMMON.BTN_DISABLE', { disabled: isNotSelected }],
         ],
         context.parent,
-        { type: 'item', disabled: isNotSelected }),
+        { type: 'item' }),
     });
 
     return reactive({
@@ -320,9 +343,6 @@ export const userSetup = (props, context, eventName) => {
             console.log('add');
         },
         getUsers,
-        clickMenuEvent(menuName) {
-            console.log(menuName);
-        },
         // todo: need confirm that this is good way - sinsky
         // EventBus Names
         ...eventNames,
@@ -331,6 +351,7 @@ export const userSetup = (props, context, eventName) => {
         getFirstSelectedUserId,
         userFormState,
         clickAdd,
+        clickUpdate,
         userFormConfirm,
         clickEnable,
         clickDisable,

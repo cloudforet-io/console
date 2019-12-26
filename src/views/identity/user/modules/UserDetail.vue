@@ -11,12 +11,9 @@
 </template>
 
 <script>
-import {
-    computed, ref, watch,
-} from '@vue/composition-api';
+import { ref, watch } from '@vue/composition-api';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
-import PBadge from '@/components/atoms/badges/Badge';
 import PStatus from '@/components/molecules/status/Status';
 import { timestampFormatter, arrayFormatter, userStateFormatter } from '@/lib/util';
 import { mountBusEvent } from '@/lib/compostion-util';
@@ -51,7 +48,7 @@ export default {
         ], parent, { copyFlag: true });
         const tags = ref({ ...props.tags });
         watch(() => props.item, (value) => {
-            tags.value = value.tags;
+            tags.value = value.tags || {};
         });
         const tagPanel = ref(null);
         const resetTag = () => {
