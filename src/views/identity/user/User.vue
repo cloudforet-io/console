@@ -197,11 +197,10 @@ export default {
         mountBusEvent(userEventBus, userEventNames.disableUser, disableUser);
         mountBusEvent(userEventBus, userEventNames.deleteUser, deleteUser);
         mountBusEvent(userEventBus, userEventNames.addUser, addUser);
-      mountBusEvent(userEventBus, userEventNames.updateUser, updateUser);
+        mountBusEvent(userEventBus, userEventNames.updateUser, updateUser);
 
 
-
-      requestUserList();
+        requestUserList();
         return {
             ...toRefs(state),
         };
