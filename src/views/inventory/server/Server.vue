@@ -21,6 +21,11 @@ export default {
         serverEventNames.getServerSubData = 'requestSubData';
         serverEventNames.getServerAdmin = 'requestAdmin';
 
+        serverEventNames.inServiceServer = 'inServiceServer';
+        serverEventNames.maintenanceServer = 'maintenanceServer';
+        serverEventNames.closedServer = 'closedServer';
+        serverEventNames.deleteServer = 'deleteServer';
+
         const state = serverSetup(props, context, serverEventNames);
         const projectNameList = ref({});
         const matchProject = (items) => {
@@ -73,6 +78,8 @@ export default {
                 state.loading = false;
             }
         };
+        mountBusEvent(serverEventBus, serverEventNames.getServerList, requestServerList);
+
 
         // request server sub data
         const requestSubDataState = reactive({
@@ -95,6 +102,8 @@ export default {
             state.subData.allPage = allPage || 1;
             state.subData.loading = false;
         };
+        mountBusEvent(serverEventBus, serverEventNames.getServerSubData, requestServerSubData);
+
 
         // change tag
         const ServerTagConfirm = async (serverId, tags, originTags) => {
@@ -112,6 +121,7 @@ export default {
                 console.error(e);
             }
         };
+        mountBusEvent(serverEventBus, serverEventNames.tagConfirmEvent, ServerTagConfirm);
 
         // get server admin data
         const requestAdminState = reactive({
@@ -136,10 +146,117 @@ export default {
             state.admin.allPage = allPage || 1;
             state.admin.loading = false;
         };
-        mountBusEvent(serverEventBus, serverEventNames.getServerList, requestServerList);
-        mountBusEvent(serverEventBus, serverEventNames.tagConfirmEvent, ServerTagConfirm);
-        mountBusEvent(serverEventBus, serverEventNames.getServerSubData, requestServerSubData);
         mountBusEvent(serverEventBus, serverEventNames.getServerAdmin, requestServerAdmin);
+
+
+        const getServersParam = (items, changeState) => {
+            console.log(items);
+            const result = { servers: _.map(items, 'server_id') };
+            if (changeState) {
+                result.state = changeState;
+            }
+            return result;
+        };
+        const maintenanceServer = async (items) => {
+            await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'MAINTENANCE')).then(async (_) => {
+                await requestServerList();
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'success',
+                    title: 'success',
+                    text: 'maintenance servers',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.error(error);
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
+        mountBusEvent(serverEventBus, serverEventNames.maintenanceServer, maintenanceServer);
+
+        const closedServer = async (items) => {
+            await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'CLOSED')).then(async (_) => {
+                await requestServerList();
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'success',
+                    title: 'success',
+                    text: 'closed servers',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.error(error);
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
+        mountBusEvent(serverEventBus, serverEventNames.closedServer, closedServer);
+
+        const inServiceServer = async (items) => {
+            await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'INSERVICE')).then(async (_) => {
+                await requestServerList();
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'success',
+                    title: 'success',
+                    text: 'in-service servers',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.error(error);
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
+        mountBusEvent(serverEventBus, serverEventNames.inServiceServer, inServiceServer);
+
+        const deleteServer = async (items) => {
+            await context.parent.$http.post('/inventory/server/delete', getServersParam(items)).then(async (_) => {
+                await requestServerList();
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'success',
+                    title: 'success',
+                    text: 'delete servers',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.error(error);
+                context.root.$notify({
+                    group: 'noticeBottomLeft',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
+        mountBusEvent(serverEventBus, serverEventNames.deleteServer, deleteServer);
+
         requestProjectList();
         requestServerList();
         return {

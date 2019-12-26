@@ -35,7 +35,10 @@
                             id="server-dropdown-btn"
                             class="left-toolbox-item"
                             :menu="dropdown"
-                            @clickMenuEvent="clickMenuEvent"
+                            @click-in-service="clickInService"
+                            @click-maintenance="clickMaintenance"
+                            @click-closed="clickClosed"
+                            @click-delete="clickDelete"
                         >
                             Action
                         </PDropdownMenuBtn>
@@ -147,6 +150,20 @@
         <div v-else id="empty-space">
             Select a Server above for details.
         </div>
+        <p-table-check-modal
+            v-if="!!checkTableModalState.mode"
+            :visible.sync="checkTableModalState.visible"
+            :header-title="checkTableModalState.title"
+            :sub-title="checkTableModalState.subTitle"
+            :theme-color="checkTableModalState.themeColor"
+            :fields="multiSelectFields"
+            size="lg"
+            :centered="true"
+            :selectable="false"
+            :items="getSelectServerItems"
+
+            @confirm="checkModalConfirm"
+        />
     </div>
 </template>
 
@@ -175,6 +192,7 @@ const PServerDetail = () => import('@/views/inventory/server/modules/ServerDetai
 const PServerRawData = () => import('@/views/inventory/server/modules/ServerRawData');
 const PServerData = () => import('@/views/inventory/server/modules/ServerData');
 const PServerAdmin = () => import('@/views/inventory/server/modules/ServerAdmin');
+const PTableCheckModal = () => import('@/components/organisms/modals/table-modal/TableCheckModal');
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -229,7 +247,10 @@ export const eventNames = {
     getServerList: '',
     getServerSubData: '',
     getServerAdmin: '',
-
+    inServiceServer: '',
+    maintenanceServer: '',
+    closedServer: '',
+    deleteServer: '',
 };
 
 export const serverSetup = (props, context, eventName) => {
@@ -287,6 +308,7 @@ export const serverSetup = (props, context, eventName) => {
         idxs.sort((a, b) => a - b);
         return idxs;
     });
+    const isNotSelected = computed(() => tableState.selectIndex.length === 0);
     const getSelectServerItems = computed(() => {
         const items = [];
         sortSelectIndex.value.forEach((idx) => {
@@ -302,13 +324,67 @@ export const serverSetup = (props, context, eventName) => {
         return ids;
     });
     const getFirstSelectServerId = computed(() => (getSelectServerIds.value.length >= 1 ? getSelectServerIds[0] : ''));
-    return reactive({
-        ...toRefs(state),
-        ...toRefs(tableState),
-        ...toRefs(tabData),
-        ...toRefs(tabAction),
-        tags,
-        dropdown: makeTrItems([
+
+    const checkTableModalState = reactive({
+        visible: false,
+        mode: '',
+        item: null,
+        confirmEventName: '',
+        title: '',
+        subTitle: '',
+        themeColor: '',
+    });
+
+    const resetCheckTableModalState = () => {
+        checkTableModalState.visible = false;
+        checkTableModalState.mode = '';
+        checkTableModalState.confirmEventName = '';
+        checkTableModalState.title = '';
+        checkTableModalState.subTitle = '';
+        checkTableModalState.themeColor = '';
+    };
+
+    const clickDelete = () => {
+        checkTableModalState.mode = 'delete';
+        checkTableModalState.confirmEventName = eventNames.deleteServer;
+        checkTableModalState.title = 'Server Delete';
+        checkTableModalState.subTitle = 'Are you Sure?';
+        checkTableModalState.themeColor = 'alert';
+        checkTableModalState.visible = true;
+    };
+    const clickMaintenance = () => {
+        checkTableModalState.mode = 'maintenance';
+        checkTableModalState.confirmEventName = eventNames.maintenanceServer;
+        checkTableModalState.title = 'Set Maintenance';
+        checkTableModalState.subTitle = 'change Server State';
+        checkTableModalState.themeColor = 'primary';
+        checkTableModalState.visible = true;
+    };
+    const clickInService = () => {
+        checkTableModalState.mode = 'in-service';
+        checkTableModalState.confirmEventName = eventNames.inServiceServer;
+        checkTableModalState.title = 'Set In-Service';
+        checkTableModalState.subTitle = 'change Server State';
+        checkTableModalState.themeColor = 'primary';
+        checkTableModalState.visible = true;
+    };
+    const clickClosed = () => {
+        checkTableModalState.mode = 'closed';
+        checkTableModalState.confirmEventName = eventNames.closedServer;
+        checkTableModalState.title = 'Set Closed';
+        checkTableModalState.subTitle = 'change Server State';
+        checkTableModalState.themeColor = 'primary';
+        checkTableModalState.visible = true;
+    };
+
+
+    const checkModalConfirm = (event) => {
+        console.log(checkTableModalState.confirmEventName, event);
+        eventBus.$emit(checkTableModalState.confirmEventName, event);
+        resetCheckTableModalState();
+    };
+    const dropdown = reactive({
+        ...makeTrItems([
             ['delete', 'COMMON.BTN_DELETE'],
             [null, null, { type: 'divider' }],
             ['maintenance', 'COMMON.BTN_S_MANT'],
@@ -319,7 +395,16 @@ export const serverSetup = (props, context, eventName) => {
             ['pool', 'COMMON.CHG_POOL'],
         ],
         context.parent,
-        { type: 'item', disabled: false }),
+        { type: 'item', disabled: isNotSelected }),
+    });
+
+    return reactive({
+        ...toRefs(state),
+        ...toRefs(tableState),
+        ...toRefs(tabData),
+        ...toRefs(tabAction),
+        tags,
+        dropdown,
         serverStateFormatter,
         timestampFormatter,
         platformBadgeFormatter,
@@ -338,6 +423,12 @@ export const serverSetup = (props, context, eventName) => {
         getSelectServerItems,
         getSelectServerIds,
         getFirstSelectServerId,
+        checkTableModalState,
+        clickDelete,
+        clickClosed,
+        clickInService,
+        clickMaintenance,
+        checkModalConfirm,
     });
 };
 
@@ -360,6 +451,7 @@ export default {
         PServerAdmin,
         PDataTable,
         PSearch,
+        PTableCheckModal,
     },
     setup(props, context) {
         const dataBind = reactive({
