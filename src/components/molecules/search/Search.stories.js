@@ -2,7 +2,7 @@ import Search from './Search.vue';
 import { boolean } from '@storybook/addon-knobs/vue';
 
 export default {
-    title: 'molecules/search/search',
+    title: 'molecules/search',
     component: Search,
     parameters: {
         info: {
@@ -15,16 +15,16 @@ const actions = {
 
 };
 const data = {
-    search: 'this is wrong',
+    search: 'This is Search Text',
 };
 
 export const search = () => ({
     components: { Search },
     template: `<div style="width: 80vw;">
-    <search :searchText.sync="search" 
-            :disabled="disabled"></search>
-     <div> {{search}}</div>
-    </div>`,
+                    <search :searchText.sync="search" :disabled="disabled"/>
+                    <br>
+                    <div> Search Text: {{search}}</div>
+                </div>`,
     props: {
         disabled: {
             default: boolean('disabled', false),

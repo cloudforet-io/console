@@ -3,13 +3,13 @@ import PChart from './Chart';
 import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
-    title: 'Molecules/charts/chart',
+    title: 'Molecules/chart',
     component: PChart,
     decorators: [withKnobs],
 };
 
 
-export const chart = () => ({
+export const DefaultCase = () => ({
     components: { PChart },
     props: {
         ...autoProps(PChart),

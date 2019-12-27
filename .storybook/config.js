@@ -7,7 +7,8 @@ import '@storybook/addon-console';
 import "@/styles/style.scss";
 import { withInfo } from 'storybook-addon-vue-info'
 import VueCompositionApi from '@vue/composition-api';
-// main.js
+import Notifications from 'vue-notification';
+
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import directive from '@/directives';
@@ -21,6 +22,7 @@ import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
 import VueI18n from 'vue-i18n';
 
+Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
 Vue.use(VueI18n);
 Vue.mixin(Util);
@@ -44,8 +46,9 @@ Vue.prototype.$velocity = velocity;
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
 
-// automatically import all files ending in *stories.js
-configure(require.context('../src', true, /\.stories\.js$/), module);
+const req = require.context('../src', true, /\.stories\.js$/);
+configure(req, module);
+
 addDecorator(withInfo);
 addDecorator(withA11y);
 addDecorator(withKnobs);

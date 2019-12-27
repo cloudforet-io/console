@@ -101,6 +101,9 @@ export default {
             },
         };
     },
+    created() {
+
+    },
     computed: {
         getSelectedTypeKey() {
             const currentType = this.$parent.selectedNode.node.data.item_type;

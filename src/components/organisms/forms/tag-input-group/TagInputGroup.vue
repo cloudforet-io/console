@@ -45,7 +45,7 @@ import _ from 'lodash';
 import {
     toRefs, reactive, ref, watch, computed,
 } from '@vue/composition-api';
-import PTagInput from '@/components/molecules/forms/TagInput';
+import PTagInput from '@/components/molecules/forms/tag-input/TagInput';
 import PIconButton from '@/components/molecules/buttons/IconButton';
 import PCopyButton from '@/components/molecules/buttons/CopyButton';
 

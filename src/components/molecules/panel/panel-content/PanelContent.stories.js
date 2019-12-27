@@ -1,19 +1,20 @@
-import { ref, computed } from '@vue/composition-api';
+import { computed, ref } from '@vue/composition-api';
 import PanelContent from '@/components/molecules/panel/panel-content/PanelContent';
 import PBadge from '@/components/atoms/badges/Badge';
-import { makeTrItems } from '@/lib/view-helper'
+import { makeTrItems } from '@/lib/view-helper';
 
 export default {
-    title: 'molecules/panel/panel-content',
-    component: PanelContent,
+    title: 'molecules/panel/panelContents',
+    component: { PanelContent, PBadge },
     parameters: {
         info: {
             summary: '',
-            components: { PanelContent },
+            components: { PanelContent, PBadge },
         },
     },
 };
-export const panelContents = () => ({
+
+export const DefaultCase = () => ({
     components: { PanelContent, PBadge },
     template: `
 <div style="width: 80vw;">
@@ -26,23 +27,23 @@ export const panelContents = () => ({
     data() {
         return {
             item: {
-                id: 'Fire Birds',
-                name: 'Shawn Mandus',
-                state: 'enabled',
+                id: 'pg-123dhs-01',
+                name: 'Project Group AMERS',
+                state: 'Enabled',
             },
             renderData: [
                 {
                     name: 'id',
-                    label: 'ID',
+                    label: this.tr('COMMON.ID'),
                     copyFlag: true,
                 },
                 {
                     name: 'name',
-                    label: 'NAME',
+                    label: this.tr('COMMON.NAME'),
                 },
                 {
                     name: 'state',
-                    label: 'state',
+                    label: this.tr('COMMON.STATE'),
                     copyFlag: true,
                 },
             ],
@@ -50,27 +51,27 @@ export const panelContents = () => ({
     },
 });
 
-export const trHelper = () => ({
+export const CaseInUseTrHelper = () => ({
     components: { PanelContent, PBadge },
-    template: `
-<div style="width: 80vw;">
-    <panel-content :defs="defs" :item="item">
-    <template #def-state-format="scope">
-    <p-badge styleType="primary">{{scope.value}}</p-badge>
-</template>
-    </panel-content>
-</div>`,
+    template: `<div style="width: 80vw;">
+                    <panel-content :defs="defs" :item="item">
+                        <template #def-state-format="scope">
+                            <p-badge styleType="primary">{{scope.value}}</p-badge>
+                        </template>
+                    </panel-content>
+                </div>`,
     setup(props, context) {
         const sampleDefs = ref([
-            ['name', 'COMMON.NAME', { copyFlag: true }],
+            ['id', 'COMMON.ID', { copyFlag: true }],
+            ['name', ['COMMON.NAME', 'en'], { copyFlag: true }],
             ['state', ['COMMON.STATE', 'en'], { copyFlag: true }],
-            ['primary_ip_address', 'COMMON.IP', { copyFlag: true }],
+
         ]);
         return {
             item: {
-                name: '펭수',
-                state: '하태하태',
-                primary_ip_address: '1.1.1.1',
+                id: 'pg-123dhs-02',
+                state: 'Disabled',
+                name: 'Project Group APAC',
             },
             defs: computed(() => makeTrItems(sampleDefs.value, context.parent)),
         };

@@ -19,6 +19,7 @@ export default {
 
 <style lang="scss">
     .line{
+        width: 100%;
         border: none;
         height: 1px;
         color: $gray2;
