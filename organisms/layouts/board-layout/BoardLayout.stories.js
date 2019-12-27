@@ -1,6 +1,6 @@
 import { withKnobs, text, number } from '@storybook/addon-knobs/vue';
 import PBoardLayout from './BoardLayout';
-import { autoProps } from '../../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 
 export default {
     title: 'Organisms/layouts/board-layout',

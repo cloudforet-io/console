@@ -1,6 +1,6 @@
 import PVerticalLayout from './VerticalLayout';
 import { action } from '@storybook/addon-actions';
-import { autoProps } from '../../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 
 export default {
     title: 'Organisms/layouts/vertical-layout',

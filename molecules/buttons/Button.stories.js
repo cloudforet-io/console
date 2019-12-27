@@ -3,7 +3,7 @@ import { text, select } from '@storybook/addon-knobs/vue';
 import PIconButton from './IconButton';
 import PCopyButton from './CopyButton';
 
-import { autoProps } from '../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 import {
     animationMapping, flipMapping,
     iconStyleMapping,

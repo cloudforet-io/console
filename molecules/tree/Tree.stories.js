@@ -1,5 +1,5 @@
 import { action } from '@storybook/addon-actions';
-import { autoProps } from '../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 import mockup from '@/components/molecules/tree/Tree.mockup';
 import PTree from '@/components/molecules/tree/Tree';
 

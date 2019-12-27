@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
 import PHorizontalBarChart from './HorizontalBarChart';
-import { autoProps } from '../../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 import { sampleDataGenerator } from './HorizontalBarChart.map';
 
 export default {
