@@ -1,6 +1,5 @@
-import PInputTag from './InputTag';
+import PInputTag from './TagsInput';
 import { autoProps } from '../../../../.storybook/storybook-util';
-
 
 export default {
     title: 'Molecules/input-Tag',
@@ -22,16 +21,16 @@ export const defaultCase = () => ({
         ...autoProps(PInputTag),
     },
     template: `<div style="width: 80vw;">
-        <p-input-tag 
-        :tagText.sync="enteringVal"
-        :tagArray.sync="newTag"
-        :tagPlaceHolder="search" 
-        />
-        <br>
-        This is text : {{ enteringVal }}
-        <br>
-        this tag values : {{ newTag }}
-        </div>`,
+                    <p-input-tag 
+                    :tagText.sync="enteringVal"
+                    :tagArray.sync="newTag"
+                    :tagPlaceHolder="search" 
+                    />
+                    <br>
+                    This is text : {{ enteringVal }}
+                    <br>
+                    this tag values : {{ newTag }}
+                </div>`,
     methods: {
         ...actions,
     },

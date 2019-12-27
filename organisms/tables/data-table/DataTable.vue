@@ -136,7 +136,7 @@ import PI from '@/components/atoms/icons/PI';
 import PLottie from '@/components/molecules/lottie/PLottie';
 import { selectToCopyToClipboard } from '@/lib/util';
 
-const PCheckBox = () => import('@/components/molecules/forms/CheckBox');
+const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox');
 const PCopyButton = () => import('@/components/molecules/buttons/CopyButton');
 
 export default {

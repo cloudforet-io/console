@@ -1,6 +1,6 @@
 <template>
     <div class="row" style="width:100%">
-        <div :class="getColsizer">
+        <div :class="getColSizer">
             <p-input-text class="form-control py-2 border-right-0 border"
                           :value="searchText"
                           :disabled="disabled"
@@ -52,7 +52,7 @@ export default {
         },
     },
     computed: {
-        getColsizer() {
+        getColSizer() {
             return `input-group col-${this.size}`;
         },
     },

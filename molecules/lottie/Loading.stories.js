@@ -3,7 +3,7 @@ import PLottie from './PLottie.vue';
 import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
-    title: 'molecules/lottie/lottie',
+    title: 'molecules/lottie',
     component: PLottie,
     parameters: {
         info: {
@@ -14,13 +14,13 @@ export default {
     },
 };
 
-export const loading = () => ({
+export const DefaultCase = () => ({
     components: { PLottie },
     template: `<div style="width: 80vw;">
-                <button @click="show">display loading</button>
-                <button @click="hide">stop loading</button>
-                <p-lottie v-bind="$props" ref="load"/>
-</div>`,
+                    <button @click="show">display loading</button>
+                    <button @click="hide">stop loading</button>
+                        <p-lottie v-bind="$props" ref="load"/>
+                </div>`,
     data() {
         return {
         };
@@ -43,27 +43,3 @@ export const loading = () => ({
         },
     },
 });
-
-
-export const autoLoading = () => ({
-    components: { PLottie },
-    template: `<div style="width: 80vw;">
-                <p-lottie v-bind="$props"/>
-</div>`,
-    data() {
-        return {
-        };
-    },
-    props: {
-        name: {
-            default: text('name', 'spinner'),
-        },
-        size: {
-            default: number('size', 2),
-        },
-        auto: {
-            default: boolean('auto', true),
-        },
-    },
-});
-

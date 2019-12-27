@@ -1,8 +1,8 @@
 import { action } from '@storybook/addon-actions';
-import PTabBar from './TabBar';
+import PTabBar from './tab-bar/TabBar';
 
 export default {
-    title: 'molecules/tabs/tabBar',
+    title: 'molecules/tabs',
     component: PTabBar,
     parameters: {
         info: {
@@ -23,7 +23,7 @@ const data = {
     activeTab: 'detail',
 };
 
-export const tabbar = () => ({
+export const DefaultCase = () => ({
     components: { PTabBar },
     template: `
 <div>

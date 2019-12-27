@@ -1,7 +1,6 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { select } from '@storybook/addon-knobs/vue';
-import Tooltip from './Tooltip.vue';
-import { PLACEMENTS } from './Tooltip.map';
+import Tooltip from '@/components/molecules/tooltips/Tooltip';
+import { PLACEMENTS } from '@/components/molecules/tooltips/Tooltip.map';
 import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
@@ -12,7 +11,7 @@ export default {
     },
 };
 
-export const defaultCase = () => ({
+export const DefaultCase = () => ({
     components: { 'p-tooltip': Tooltip },
     props: {
         position: {

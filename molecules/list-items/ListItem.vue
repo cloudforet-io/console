@@ -19,7 +19,7 @@ export default {
     props: {
         contents: {
             type: String,
-            default: '',
+            default: 'contents',
         },
         indent: {
             type: Number,

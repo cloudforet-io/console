@@ -19,7 +19,7 @@ export default {
     props: {
         panelTitle: {
             type: String,
-            default: 'NoTitle',
+            default: 'Title',
         },
         panelTitleStyle: {
             type: Object,

@@ -4,16 +4,14 @@ import {
     alert, safe, other1, other2, gray,
 } from '@/styles/_variables.scss';
 import { autoProps } from '../../../../.storybook/storybook-util';
-import { ColorBindFactory } from '@/lib/util'
-
+import { ColorBindFactory } from '@/lib/util';
 
 export default {
     title: 'molecules/status',
     component: PStatus,
 };
 
-
-export const base = () => ({
+export const DefaultCase = () => ({
     components: { PStatus },
     props: {
         ...autoProps(PStatus, [
@@ -36,15 +34,16 @@ export const base = () => ({
     },
     template: '<p-status  v-bind="$props"/>',
 });
-export const example = () => ({
+
+export const iconStatus = () => ({
     components: { PStatus },
-    template: `
-<div>
-<p-status icon="aws-ec2" iconColor="#60B731" text="enabled"></p-status><br>
-</div>
-`,
+    template: `<div>
+                    <p-status icon="aws-ec2" iconColor="#60B731" text="enabled"/><br>
+                </div>`
+    ,
 });
 
+/*
 export const useUtil = () => ({
     components: { PStatus },
     template: `
@@ -73,3 +72,4 @@ export const useUtil = () => ({
         value => value.toLowerCase()),
     },
 });
+*/

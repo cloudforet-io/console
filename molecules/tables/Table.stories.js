@@ -1,10 +1,9 @@
-import { action } from '@storybook/addon-actions';
 import { select } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
-import PTr from '../../atoms/table/Tr.vue';
-import PTd from '../../atoms/table/Td.vue';
-import PTh from '../../atoms/table/Th.vue';
-import PTable from './Table.vue';
+import PTr from '@/components/atoms/table/Tr';
+import PTd from '@/components/atoms/table/Td';
+import PTh from '@/components/atoms/table/Th';
+import PTable from '@/components/molecules/tables/Table';
 import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
@@ -23,34 +22,33 @@ export const table = () => ({
         PTable, PTr, PTd, PTh,
     },
     template: `
-<p-table 
-    :tableStyleType="tableStyleType"
-    :theadStyleType="theadStyleType"
-    :striped="striped"
-    :bord="bord"
-    :hover="hover"
-    :small="small"
-    :background="background"
-    :responsive="responsive"
-    
->
-<template #head>
-<p-tr>
-    <p-th>name</p-th>
-    <p-th>phone</p-th>
-    <p-th>email</p-th>
-</p-tr>
-</template>
-<template #body>
-<p-tr v-for="user in users">
-    <p-td>{{user[0]}}</p-td>
-    <p-td>{{user[1]}}</p-td>
-    <p-td>{{user[2]}}</p-td>
-</p-tr>
-</template>
-</p-table>
-`,
-
+            <p-table 
+                :tableStyleType="tableStyleType"
+                :theadStyleType="theadStyleType"
+                :striped="striped"
+                :bord="bord"
+                :hover="hover"
+                :small="small"
+                :background="background"
+                :responsive="responsive"
+                
+            >
+            <template #head>
+            <p-tr>
+                <p-th>name</p-th>
+                <p-th>phone</p-th>
+                <p-th>email</p-th>
+            </p-tr>
+            </template>
+            <template #body>
+                <p-tr v-for="(d, key) in dataMap" :key="key">
+                    <p-td>{{ d[0] }}</p-td>
+                    <p-td>{{ d[1] }}</p-td>
+                    <p-td>{{ d[2] }}</p-td>
+                </p-tr>
+            </template>
+            </p-table>
+            `,
     props: {
         tableStyleType: {
             default: select('tableStyleType', [null, 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'], null),
@@ -71,18 +69,27 @@ export const table = () => ({
             { name: 'background' },
         ]),
     },
-    computed: {
-        users() {
-            const data = [];
-            for (let step = 0; step < 5; step++) {
-                data.push(this.getUser());
-            }
-            return data;
-        },
+    created() {
+        this.getUsers();
+    },
+    data() {
+        return {
+            dataMap: null,
+        };
     },
     methods: {
+        getUsers() {
+            const data = [];
+            for (let i = 0; i < 5; i++) {
+                data.push(this.getUser());
+            }
+            this.dataMap = data;
+        },
         getUser() {
-            return [faker.name.firstName(), faker.phone.phoneNumberFormat(), faker.internet.email()];
+            const firstName = `${faker.name.firstName()} ${faker.name.lastName()}`;
+            const phoneNumber = faker.phone.phoneNumber();
+            const eMail = faker.internet.email();
+            return [firstName, phoneNumber, eMail];
         },
     },
 });
