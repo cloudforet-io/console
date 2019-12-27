@@ -1,6 +1,6 @@
 import { text, select } from '@storybook/addon-knobs/vue';
 import PI from './PI';
-import { autoProps } from '../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 
 export default {
     title: 'atoms/icon/',
