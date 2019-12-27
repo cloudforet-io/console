@@ -1,5 +1,5 @@
 import PanelTop from '@/components/molecules/panel/panel-top/PanelTop';
-import { autoProps } from '../../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 
 export default {
     title: 'molecules/panel/Panel Top',

@@ -6,7 +6,7 @@ import PContentModal from '../content-modal/ContentModal.vue';
 import PModal from '../../../molecules/modals/Modal.vue';
 import PButton from '../../../atoms/buttons/Button.vue';
 import PButtonModal from './ButtonModal.vue';
-import { autoProps } from '../../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 
 export default {

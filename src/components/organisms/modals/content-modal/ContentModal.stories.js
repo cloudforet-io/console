@@ -3,7 +3,7 @@ import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import PButton from '../../../atoms/buttons/Button.vue';
-import { autoProps } from '../../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 import PContentModal from './ContentModal.vue';
 import PModal from '../../../molecules/modals/Modal.vue';
