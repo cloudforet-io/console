@@ -13,7 +13,6 @@
 
 <script>
 import VueTagsInput from '@johmun/vue-tags-input';
-import _ from 'lodash';
 
 export default {
     name: 'PInputTag',
@@ -23,7 +22,7 @@ export default {
     props: {
         tagPlaceHolder: {
             type: String,
-            default: 'This is Sparta',
+            default: 'This is placeHolder',
         },
         responsiveStyle: {
             type: Object,

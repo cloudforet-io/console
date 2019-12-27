@@ -90,7 +90,7 @@ import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PSearch from '@/components/molecules/search/Search';
-import PInputTag from '@/components/molecules/input-tag/InputTag';
+import PInputTag from '@/components/molecules/tags-input/TagsInput';
 import PTextInput from '@/components/atoms/inputs/TextInput';
 import PLabel from '@/components/atoms/labels/Label';
 

@@ -142,7 +142,7 @@
 <script>
 import { reactive } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
-import PFieldGroup from '@/components/molecules/forms/FieldGroup';
+import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup';
 import PTextInput from '@/components/atoms/inputs/TextInput';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal';
 import {

@@ -1,64 +1,56 @@
-import { action } from '@storybook/addon-actions';
+import { text, select } from '@storybook/addon-knobs/vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert';
+import { alertPositionMapping, alertTypeMapping } from '@/components/molecules/alert/notice/NoticeAlertMapping';
 
 export default {
-    title: 'molecules/alert/noticeAlert',
+    title: 'molecules/alert',
     component: PNoticeAlert,
     parameters: {
         info: {
-            summary: '',
+            summary: 'Pop up notification with its flag in \'Success\', \'Fail\', and \'Warning\'. ',
             components: { PNoticeAlert },
         },
     },
 };
 
-const data = {
-
-};
-
-const actions = {
-};
-
-export const modal = () => ({
+export const noticeAlert = () => ({
     components: { PNoticeAlert },
     template: `<div>
-                    <button @click="showAction">Launch alert</button>
+                    <div> 
+                        <p-notice-alert group="noticeTopLeft" position="top left" />
+                        <p-notice-alert group="noticeTopRight" position="top right" />
+                        <p-notice-alert group="noticeBottomLeft" position="bottom left" />
+                        <p-notice-alert group="noticeBottomRight" position="bottom right" />
+                    </div>
+                    <div>
+                        <button @click="displayNotice">Launch Notice Alert</button>
+                    </div>
                 </div>
                `,
-    data() {
-        return {
-            ...data,
-        };
-    },
     props: {
-        type: {
-            type: String,
-            default: 'dual',
+        title: {
+            default: text('title', 'This is Title.'),
         },
-        group: {
-            type: String,
-            default: '',
+        alertPosition: {
+            default: select('Position',  [...Object.keys(alertPositionMapping)], 'noticeBottomLeft'),
         },
-        position: {
-            type: String,
-            default: 'bottom right',
+        alertType: {
+            default: select('Alert Type', [...Object.keys(alertTypeMapping)], 'alert'),
         },
-        dynamicStyle: {
-            type: Object,
-            default: null,
+        contents: {
+            default: text('text', 'This is Contents.'),
         },
     },
     methods: {
-        showAction() {
+        displayNotice() {
             this.$notify({
-                group: 'noticeBottomRight',
-                type: 'alert',
-                title: 'Fail',
-                text: 'This is Type: alert',
+                group: this.alertPosition,
+                type: this.alertType,
+                title: this.title,
+                text:  this.contents,
                 duration: 2000,
                 speed: 1000,
             });
         },
-        ...actions,
     },
 });
