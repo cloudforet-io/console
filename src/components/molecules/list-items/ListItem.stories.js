@@ -1,5 +1,5 @@
 import PListItem from './ListItem';
-import { autoProps } from '../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 
 
 export default {

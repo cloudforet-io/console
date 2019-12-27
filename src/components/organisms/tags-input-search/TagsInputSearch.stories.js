@@ -1,8 +1,4 @@
-import { action } from '@storybook/addon-actions';
-import VueTagsInput from '@johmun/vue-tags-input';
-import style from '@storybook/cli/generators/REACT_NATIVE/template/storybook/stories/CenterView/style';
 import TagsInputSearch from './TagsInputSearch.vue';
-import { autoProps } from '../../../../.storybook/storybook-util';
 
 export default {
     title: 'test',

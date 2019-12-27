@@ -4,7 +4,7 @@ import PTr from '@/components/atoms/table/Tr';
 import PTd from '@/components/atoms/table/Td';
 import PTh from '@/components/atoms/table/Th';
 import PTable from '@/components/molecules/tables/Table';
-import { autoProps } from '../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 
 export default {
     title: 'molecules/table',

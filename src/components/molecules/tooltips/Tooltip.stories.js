@@ -1,7 +1,7 @@
 import { select } from '@storybook/addon-knobs/vue';
 import Tooltip from '@/components/molecules/tooltips/Tooltip';
 import { PLACEMENTS } from '@/components/molecules/tooltips/Tooltip.map';
-import { autoProps } from '../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 
 export default {
     title: 'Molecules/tooltips',

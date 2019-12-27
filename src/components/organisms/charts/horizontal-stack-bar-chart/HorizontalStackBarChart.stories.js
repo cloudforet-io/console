@@ -1,6 +1,6 @@
 import { action } from '@storybook/addon-actions';
 import PHorizontalStackBarChart from './HorizontalStackBarChart';
-import { autoProps } from '../../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 
 import { sampleDataGenerator } from './HorizontalStackBarChart.map';
 

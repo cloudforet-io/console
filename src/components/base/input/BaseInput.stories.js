@@ -3,7 +3,7 @@ import {
 } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
 import BaseInput from './BaseInput';
-import { autoProps } from '../../../../.storybook/storybook-util';
+import { autoProps } from '@sb/storybook-util';
 
 export default {
     title: 'base/Input',
