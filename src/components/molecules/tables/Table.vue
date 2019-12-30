@@ -8,12 +8,11 @@
             <thead :class="theadClassObject" :style="theadStyle">
                 <slot name="head" />
             </thead>
-            <tbody is="transition-group" name="table-row"
-                   :class="tbodyClass" :style="tbodyStyle"
-                   @before-enter="beforRowEnter"
-                   @enter="rowEnter"
-                   @leave="rowLeave"
-            >
+            <tbody :class="tbodyClass" :style="tbodyStyle">
+                <!--            is="transition-group" name="table-row"-->
+                <!--            @before-enter="beforRowEnter"-->
+                <!--            @enter="rowEnter"-->
+                <!--            @leave="rowLeave"-->
                 <slot name="body" />
             </tbody>
             <tfoot :class="tfootClass" :style="tfootStyle">
