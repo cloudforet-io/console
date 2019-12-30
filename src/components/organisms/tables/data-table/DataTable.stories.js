@@ -1,12 +1,11 @@
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
-import possibleConstructorReturn from '@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn';
 import { boolean } from '@storybook/addon-knobs';
-import PDataTable from './DataTable.vue';
-import PTr from '../../../atoms/table/Tr.vue';
-import PTd from '../../../atoms/table/Td.vue';
-import PTh from '../../../atoms/table/Th.vue';
-import PButton from '../../../atoms/buttons/Button.vue';
+import PDataTable from './DataTable';
+import PTr from '@/components/atoms/table/Tr';
+import PTd from '@/components/atoms/table/Td';
+import PTh from '@/components/atoms/table/Th';
+import PButton from '@/components/atoms/buttons/Button';
 
 export default {
     title: 'organisms/tables/datatable',
@@ -78,7 +77,7 @@ export const datatable = () => ({
     },
 });
 
-export const sortTable = () => ({
+export const dataTableWithSortFunctionality = () => ({
     components: { PDataTable },
     mixins: [mockupMixin],
     template: `
@@ -301,19 +300,18 @@ export const customColSlot = () => ({
 export const loading = () => ({
     components: { PDataTable },
     mixins: [mockupMixin],
-    template: `
-<PDataTable 
-    :items="items" 
-    :fields="fields"
-    :hover="true"
-    @rowLeftClick="rowLeftClick"
-    @rowRightClick="rowRightClick"
-    @rowMiddleClick="rowMiddleClick"
-    @rowMouseOver="rowMouseOver"
-    @rowMouseOut="rowMouseOut"
->
-</PDataTable>
-`,
+    template: `<PDataTable 
+                :items="items" 
+                :fields="fields"
+                :hover="true"
+                @rowLeftClick="rowLeftClick"
+                @rowRightClick="rowRightClick"
+                @rowMiddleClick="rowMiddleClick"
+                @rowMouseOver="rowMouseOver"
+                @rowMouseOut="rowMouseOut"
+                >
+               </PDataTable>
+              `,
     props: {
         loding: {
             default: boolean('loading', false),
@@ -322,7 +320,6 @@ export const loading = () => ({
         useCursorLoding: {
             default: boolean('useCursorLoding', false),
         },
-
     },
     data() {
         return {

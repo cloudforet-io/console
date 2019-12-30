@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import PDropdownMenu from '@/components/organisms/buttons/dropdown/DropdownMenu';
-import PDropdownBtn from '@/components/organisms/buttons/dropdown/DropdownBtn';
+import PDropdownMenu from '@/components/organisms/dropdown/dropdown-menu/DropdownMenu';
+import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/DropdownBtn';
 
 export default {
     name: 'PDropdownMenuBtn',

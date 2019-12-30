@@ -4,7 +4,7 @@
 
 <script>
 import { computed } from '@vue/composition-api';
-import PMonacoEditor from '@/components/molecules/editor/monaco/MonacoEditor';
+import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor';
 
 export default {
     name: 'PServerRawData',

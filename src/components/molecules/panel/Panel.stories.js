@@ -17,6 +17,10 @@ export default {
 export const DefaultCase = () => ({
     components: { PanelTop, PanelContent, PBadge },
     template: `<div style="width: 80vw;">
+                    <a style="color:#8185D1; text-decoration: underline" href="/?path=/story/organisms-panel-info-panel--with-tr-helper">
+                        This Case same as Info Panel at Organism. 
+                    </a>
+                    <br>
                     <panel-top :panelTitle="panelTitle">
                         <template #body>
                             <panel-content :defs="renderData" :item="item">
