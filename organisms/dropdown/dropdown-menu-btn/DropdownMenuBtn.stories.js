@@ -1,14 +1,14 @@
 import { action } from '@storybook/addon-actions';
 import { object } from '@storybook/addon-knobs';
-import PDropdownMenu from '@/components/organisms/buttons/dropdown/DropdownMenu';
+import PDropdownMenuBtn from './DropdownMenuBtn';
 
 export default {
-    title: 'organisms/buttons/dropdown/menu',
-    component: PDropdownMenu,
+    title: 'organisms/dropdown/dropdownMenuBtn',
+    component: PDropdownMenuBtn,
     parameters: {
         info: {
             summary: '',
-            components: { PDropdownMenu },
+            components: { PDropdownMenuBtn },
         },
     },
 };
@@ -19,24 +19,25 @@ const actions = {
     clickUpdate: action('clickUpdate'),
     clickCollect: action('clickCollect'),
     clickRemove: action('clickRemove'),
-    clickMenuEvent: action('clickMenuEvent'),
+    clickMenuname: action('clickMenuEvent'),
 };
 const data = {};
 
-export const dropdownMenu = () => ({
-    components: { PDropdownMenu },
+export const dropdownMenuBtn = () => ({
+    components: { PDropdownMenuBtn },
     template: `
-<div class="dropdown" >
-    <PDropdownMenu 
-        @clickMenuEvent="clickMenuEvent"
-        @click-add="clickAdd"
-        @click-hello='clickHello'
-        @click-delete='clickDelete'
-        @click-update='clickUpdate'
-        @click-collect='clickCollect'
-        @click-remove='clickRemove' 
-        :menu="menu"/>
-</div>`,
+<PDropdownMenuBtn
+    :menu="menu"
+    @clickMenuEvent="clickMenuEvent"
+    @click-add="clickAdd"
+    @click-hello='clickHello'
+    @click-delete='clickDelete'
+    @click-update='clickUpdate'
+    @click-collect='clickCollect'
+    @click-remove='clickRemove' 
+ >
+Action
+</PDropdownMenuBtn>`,
     data() {
         return {
             ...data,
@@ -57,7 +58,7 @@ export const dropdownMenu = () => ({
                     type: 'item', label: 'update', name: 'update', disabled: false,
                 },
                 {
-                    type: 'item', label: 'delete', name: 'delete', disabled: true,
+                    type: 'item', label: 'delete', name: 'delete', disabled: false,
                 },
                 { type: 'divider' },
                 {

@@ -1,7 +1,7 @@
 import PMonacoEditor from './MonacoEditor';
 
 export default {
-    title: 'molecules/editor/monaco',
+    title: 'molecules/text-text-editor/monaco',
     component: PMonacoEditor,
     parameters: {
         info: {

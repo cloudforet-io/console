@@ -99,8 +99,12 @@ export const activatorContentsSlotCase = () => ({
             default: text('contents slot', 'icon', 'slot'),
         },
     },
-    template: `<p-menu-list :list-items="listItems" :contents="contents"
-                @show="show" @hide="hide" @change="change" @select="select">
+    template: `<p-menu-list :list-items="listItems" 
+                            :contents="contents"
+                            @show="show" 
+                            @hide="hide" 
+                            @change="change" 
+                            @select="select">
                     <template #contents>
                         {{contentsSlot}}
                     </template>
