@@ -2,7 +2,7 @@ import { select, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import PButton from '../../../atoms/buttons/Button';
-import PTableCheckModel from './TableCheckModal';
+import PTableCheckModel from './ActionConfirmModal';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 
 export default {
@@ -47,28 +47,27 @@ const pmProps = [
 ];
 
 
-export const modal = () => ({
+export const actionModalWithTable = () => ({
     components: { PTableCheckModel, PButton },
-    template: `
-<div>
-<p-button styleType="primary" @click="click">모달 띄우기</p-button>
-<PTableCheckModel
-    ref="modal"
-    :size="size"
-    :headerTitle="headerTitle"
-    :subTitle="subTitle"
-    :fields="fields"
-    :items="items"
-    :visible.sync="visible"
-    :themeColor="themeColor"
-
-    @cancel="cancel"
-    @close="close"
-    @confirm="confirm"
-    >
-    
-</PTableCheckModel>
-</div>`,
+    template: `<div>
+                    <p-button styleType="primary" @click="click">Launch a modal</p-button>
+                <PTableCheckModel
+                    ref="modal"
+                    :size="size"
+                    :scrollable="true"
+                    :headerTitle="headerTitle"
+                    :subTitle="subTitle"
+                    :fields="fields"
+                    :items="items"
+                    :visible.sync="visible"
+                    :themeColor="themeColor"
+                
+                    @cancel="cancel"
+                    @close="close"
+                    @confirm="confirm"
+                    >
+                </PTableCheckModel>
+            </div>`,
     data() {
         return {
             ...data,

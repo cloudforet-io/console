@@ -1,9 +1,9 @@
 import { action } from '@storybook/addon-actions';
-import { object, boolean, select } from '@storybook/addon-knobs';
-import PDropdownBtn from '@/components/organisms/buttons/dropdown/DropdownBtn';
+import { boolean, select } from '@storybook/addon-knobs';
+import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/DropdownBtn';
 
 export default {
-    title: 'organisms/buttons/dropdown/btn',
+    title: 'organisms/dropdown/default',
     component: PDropdownBtn,
     parameters: {
         info: {
@@ -21,7 +21,7 @@ const data = {
     popup: false,
 };
 
-export const simple = () => ({
+export const DefaultCase = () => ({
     components: { PDropdownBtn },
     template: `
 <PDropdownBtn 
