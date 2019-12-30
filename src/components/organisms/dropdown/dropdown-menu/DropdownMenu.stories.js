@@ -1,14 +1,14 @@
 import { action } from '@storybook/addon-actions';
 import { object } from '@storybook/addon-knobs';
-import PDropdownMenuBtn from './DropdownMenuBtn';
+import PDropdownMenu from '@/components/organisms/dropdown/dropdown-menu/DropdownMenu';
 
 export default {
-    title: 'organisms/buttons/dropdown',
-    component: PDropdownMenuBtn,
+    title: 'organisms/dropdown/menu',
+    component: PDropdownMenu,
     parameters: {
         info: {
             summary: '',
-            components: { PDropdownMenuBtn },
+            components: { PDropdownMenu },
         },
     },
 };
@@ -19,25 +19,24 @@ const actions = {
     clickUpdate: action('clickUpdate'),
     clickCollect: action('clickCollect'),
     clickRemove: action('clickRemove'),
-    clickMenuname: action('clickMenuEvent'),
+    clickMenuEvent: action('clickMenuEvent'),
 };
 const data = {};
 
-export const dropdownMenuBtn = () => ({
-    components: { PDropdownMenuBtn },
+export const dropdownMenu = () => ({
+    components: { PDropdownMenu },
     template: `
-<PDropdownMenuBtn
-    :menu="menu"
-    @clickMenuEvent="clickMenuEvent"
-    @click-add="clickAdd"
-    @click-hello='clickHello'
-    @click-delete='clickDelete'
-    @click-update='clickUpdate'
-    @click-collect='clickCollect'
-    @click-remove='clickRemove' 
- >
-Action
-</PDropdownMenuBtn>`,
+<div class="dropdown" >
+    <PDropdownMenu 
+        @clickMenuEvent="clickMenuEvent"
+        @click-add="clickAdd"
+        @click-hello='clickHello'
+        @click-delete='clickDelete'
+        @click-update='clickUpdate'
+        @click-collect='clickCollect'
+        @click-remove='clickRemove' 
+        :menu="menu"/>
+</div>`,
     data() {
         return {
             ...data,
@@ -58,7 +57,7 @@ Action
                     type: 'item', label: 'update', name: 'update', disabled: false,
                 },
                 {
-                    type: 'item', label: 'delete', name: 'delete', disabled: false,
+                    type: 'item', label: 'delete', name: 'delete', disabled: true,
                 },
                 { type: 'divider' },
                 {

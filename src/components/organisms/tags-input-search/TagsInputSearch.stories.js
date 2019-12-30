@@ -1,11 +1,11 @@
 import TagsInputSearch from './TagsInputSearch.vue';
 
 export default {
-    title: 'test',
+    title: 'organisms/tags-input-search',
     component: TagsInputSearch,
     parameters: {
         info: {
-            summary: '',
+            summary: 'This is currently unavailable.',
             components: { TagsInputSearch },
         },
     },
@@ -15,43 +15,41 @@ const data = {};
 
 export const search = () => ({
     components: { TagsInputSearch },
-    template: `
-
-<TagsInputSearch
-  v-model="tag"
-  :tags="tags"
-  :allow-edit-tags="true"
-  :autocomplete-items="items"
-  class="tags-input"
-  @tags-changed="newTags => tags = newTags"
->
-  <div
-    slot="autocomplete-item"
-    slot-scope="props"
-    class="my-item"
-    @click="props.performAdd(props.item)"
-  >
-    <i
-      :style="{ color: props.item.iconColor }"
-      class="material-icons"
-    >
-      {{ props.item.text }}
-    </i>{{ props.item.text }}
-  </div>
-  <div
-    slot="tag-left"
-    slot-scope="props"
-    class="my-tag-left"
-    @click="props.performOpenEdit(props.index)"
-  >
-    <i
-      :style="{ color: props.tag.iconColor }"
-      class="material-icons"
-    >
-      {{ props.tag.text }}
-    </i>
-  </div>
-</TagsInputSearch>`,
+    template: `<TagsInputSearch
+                  v-model="tag"
+                  :tags="tags"
+                  :allow-edit-tags="true"
+                  :autocomplete-items="items"
+                  class="tags-input"
+                  @tags-changed="newTags => tags = newTags"
+                >
+              <div
+                slot="autocomplete-item"
+                slot-scope="props"
+                class="my-item"
+                @click="props.performAdd(props.item)"
+              >
+                <i
+                  :style="{ color: props.item.iconColor }"
+                  class="material-icons"
+                >
+                  {{ props.item.text }}
+                </i>{{ props.item.text }}
+              </div>
+              <div
+                slot="tag-left"
+                slot-scope="props"
+                class="my-tag-left"
+                @click="props.performOpenEdit(props.index)"
+              >
+                <i
+                  :style="{ color: props.tag.iconColor }"
+                  class="material-icons"
+                >
+                  {{ props.tag.text }}
+                </i>
+              </div>
+            </TagsInputSearch>`,
     data() {
         return {
             tag: '',
@@ -83,9 +81,6 @@ export const search = () => ({
             return this.icons.filter(i => i.text.toLowerCase().indexOf(this.tag.toLowerCase()) !== -1);
         },
     },
-    // props: {
-    //     ...autoProps(VueTagsInput),
-    // },
     methods: {
         ...actions,
     },
