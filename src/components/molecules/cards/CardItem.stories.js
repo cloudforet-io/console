@@ -28,7 +28,7 @@ export const defaultCase = () => ({
     template: '<p-card-item v-bind="$props"/>',
 });
 
-export const pluginCase = () => ({
+export const extraSlot = () => ({
     components: {
         PCardItem,
         PBadge,
