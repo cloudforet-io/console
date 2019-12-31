@@ -1,12 +1,10 @@
 import { number, select } from '@storybook/addon-knobs/vue';
-import faker from 'faker';
-import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PButton from '../../../atoms/buttons/Button.vue';
 import { autoProps } from '@sb/storybook-util';
-import { sizeMapping } from '../../../molecules/modals/ModalMapping';
-import PContentModal from './ContentModal.vue';
-import PModal from '../../../molecules/modals/Modal.vue';
+import PButton from '@/components/atoms/buttons/Button';
+import { sizeMapping } from '@/components/molecules/modals/ModalMapping';
+import PContentModal from '@/components/organisms/modals/content-modal/ContentModal';
+import faker from 'faker';
 
 export default {
     title: 'organisms/modals/content-modal',
@@ -22,33 +20,29 @@ export default {
 
 
 export const modal = () => ({
-    components: { PContentModal },
-    template: `
-<p-content-modal
-    ref="modal"
-    :scrollable="scrollable" 
-    :centered="centered"
-    :size="size"
-    :headerVisible="headerVisible"
-    :bodyVisible="bodyVisible"
-    :footerVisible="footerVisible"
-    :visible.sync="visible"
-    :themeColor="primary"
-    >
-    <template #header>This is Header</template>
-    <template #body>
-        <p>{{lorem}}</p> 
-    </template>  
-    <template #footer>this is footer</template>
-    
-</p-content-modal>`,
+    components: { PContentModal, PButton },
+    template: `<p-content-modal
+                    ref="modal"
+                    :scrollable="scrollable" 
+                    :centered="centered"
+                    :size="size"
+                    :headerVisible="headerVisible"
+                    :bodyVisible="bodyVisible"
+                    :footerVisible="footerVisible"
+                    :visible.sync="visible"
+                    :themeColor="primary"
+                >
+                    <template #header>This is Header.</template>
+                    <template #body>
+                        <p>{{lorem}}</p> 
+                    </template>  
+                    <template #footer>this is Footer.</template>
+                </p-content-modal>
+            `,
     data() {
         return {
             visible: true,
         };
-    },
-    mounted() {
-        this.$refs.modal.show();
     },
     props: {
         loremLength: {
@@ -82,32 +76,36 @@ export const modal = () => ({
             return faker.lorem.lines(this.loremLength);
         },
     },
+    methods: {
+        click() {
+            this.visible = true;
+        },
+    },
 });
 
 export const fade = () => ({
     components: { PContentModal, PButton },
-    template: `
-<div>
-<p-button styleType="primary" @click="click">모달 띄우기</p-button>
-<p-content-modal
-    ref="modal" 
-    :scrollable="scrollable" 
-    :centered="centered"
-    :size="size"
-    :fade="fade"
-    :backdrop="backdrop"
-    :headerVisible="headerVisible"
-    :bodyVisible="bodyVisible"
-    :footerVisible="footerVisible"
-    :visible.sync="visible"
-    >
-    <template #header>This is Header</template>
-    <template>
-        <p>{{lorem}}</p> 
-    </template>  
-    <template #footer><p-button styleType="danger" @click="close">닫기</p-button></template>
-</p-content-modal>
-</div>`,
+    template: `<div>
+                <p-button styleType="primary" @click="click">Launch a modal</p-button>
+                <p-content-modal
+                    ref="modal" 
+                    :scrollable="scrollable" 
+                    :centered="centered"
+                    :size="size"
+                    :fade="fade"
+                    :backdrop="backdrop"
+                    :headerVisible="headerVisible"
+                    :bodyVisible="bodyVisible"
+                    :footerVisible="footerVisible"
+                    :visible.sync="visible"
+                    >
+                    <template #header>This is Header</template>
+                    <template>
+                        <p>{{lorem}}</p> 
+                    </template>  
+                    <template #footer><p-button styleType="danger" @click="close">닫기</p-button></template>
+                </p-content-modal>
+                </div>`,
     props: {
         loremLength: {
             default: number('loremLength', 10, {
