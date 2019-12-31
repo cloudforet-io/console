@@ -31,6 +31,10 @@ export default {
             default: 'auto',
             validator: value => ['auto', 'stretch', 'flex-start', 'flex-end', 'center', 'baseline'].indexOf(value) !== -1,
         },
+        flexDirection: {
+            type: String,
+            default: 'row',
+        },
     },
     render(h, { props, data, children }) {
         const colSize = props.col ? `${8.3333333 * props.col}%` : 0;
@@ -40,6 +44,7 @@ export default {
             flexShrink: props.col ? 0 : props.flexShrink,
             flexBasis: props.col ? colSize : props.flexBasis,
             alignSelf: props.alignSelf,
+            flexDirection: props.flexDirection,
             maxWidth: props.col ? colSize : '100%',
         };
         const newData = {

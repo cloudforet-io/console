@@ -79,7 +79,7 @@ export default {
 @include badge-color('gray', $gray, $white);
 @include badge-color('gray1', $gray1, $white);
 @include badge-color('gray2', $gray2, $white);
-@include badge-color('gray3', $gray3, $white);
+@include badge-color('gray3', $gray3, $gray);
 
 @include badge-color('other1', $other1, $white);
 @include badge-color('other2', $other2, $white);
