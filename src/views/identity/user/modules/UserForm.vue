@@ -152,7 +152,7 @@ import PTagInputGroup from '@/components/organisms/forms/tag-input-group/TagInpu
 import PHr from '@/components/atoms/hr/Hr';
 import PRow from '@/components/atoms/grid/row/Row';
 import PCol from '@/components/atoms/grid/col/Col';
-import PSelectDropdown from '@/components/organisms/buttons/select-dropdown/SelectDropdown';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown';
 import PButton from '@/components/atoms/buttons/Button';
 
 const components = {

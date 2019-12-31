@@ -3,7 +3,7 @@ import { boolean } from '@storybook/addon-knobs';
 import PSelectDropdown from './SelectDropdown';
 
 export default {
-    title: 'organisms/buttons/select-dropdown',
+    title: 'organisms/dropdown/select-dropdown',
     component: PSelectDropdown,
     parameters: {
         info: {

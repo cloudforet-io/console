@@ -2,10 +2,9 @@ import { number, select } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PContentModal from '../content-modal/ContentModal.vue';
-import PModal from '../../../molecules/modals/Modal.vue';
-import PButton from '../../../atoms/buttons/Button.vue';
-import PButtonModal from './ButtonModal.vue';
+import PContentModal from '@/components/organisms/modals/content-modal/ContentModal';
+import PButton from '@/components/atoms/buttons/Button';
+import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import { autoProps } from '@sb/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 
@@ -35,7 +34,7 @@ const actions = {
 };
 
 const pbmProps = [
-    { name: 'headerTitle', default: 'this is title' },
+    { name: 'headerTitle', default: 'This is title.' },
     { name: 'headerCloseButtonVisible' },
     { name: 'footerCancelButtonVisible' },
     { name: 'footerConfirmButtonVisible' },
@@ -49,35 +48,34 @@ const pcmProps = [
 
 export const modal = () => ({
     components: { PButtonModal, PButton },
-    template: `
-<div>
-<p-button styleType="primary" @click="click">모달 띄우기</p-button>
-<p-button-modal
-    ref="modal"
-    :scrollable="scrollable" 
-    :centered="centered"
-    :size="size"
-    :fade="fade"
-    :backdrop="backdrop"
-    :headerTitle="headerTitle"
-    :headerVisible="headerVisible"
-    :bodyVisible="bodyVisible"
-    :footerVisible="footerVisible"
-    :headerCloseButtonVisible="headerCloseButtonVisible"
-    :footerCancelButtonVisible="footerCancelButtonVisible"
-    :footerConfirmButtonVisible="footerConfirmButtonVisible"
-    :footerConfirmButtonBind="ConfirmButtonBind"
-    :visible.sync="visible"
-    @cancel="cancel"
-    @close="close"
-    @confirm="confirm"
-    >
-    <template #body>
-        <p>{{lorem}}</p> 
-    </template>  
-    
-</p-button-modal>
-</div>`,
+    template: `<div>
+                <p-button styleType="primary" @click="click">Launch a modal</p-button>
+                <p-button-modal
+                    ref="modal"
+                    :scrollable="scrollable" 
+                    :centered="centered"
+                    :size="size"
+                    :fade="fade"
+                    :backdrop="backdrop"
+                    :headerTitle="headerTitle"
+                    :headerVisible="headerVisible"
+                    :bodyVisible="bodyVisible"
+                    :footerVisible="footerVisible"
+                    :headerCloseButtonVisible="headerCloseButtonVisible"
+                    :footerCancelButtonVisible="footerCancelButtonVisible"
+                    :footerConfirmButtonVisible="footerConfirmButtonVisible"
+                    :footerConfirmButtonBind="ConfirmButtonBind"
+                    :visible.sync="visible"
+                    @cancel="cancel"
+                    @close="close"
+                    @confirm="confirm"
+                    >
+                    <template #body>
+                        <p>{{lorem}}</p> 
+                    </template>  
+                    
+                </p-button-modal>
+            </div>`,
     data() {
         return {
             ...data,

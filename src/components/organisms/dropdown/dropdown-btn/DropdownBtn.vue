@@ -14,7 +14,7 @@
                        :class="btnClassObject"
                        :name="popup ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                        :disabled="disabled"
-                       :color="`transparent ${ disabled ? '#A7A9B2' : popup||mouseover ?'#0080FB' : '#222532'}`"
+                       :color="`transparent ${ disabled ? colorSets.disabled : popup||mouseover ? colorSets.popup : colorSets.mouseover}`"
                        :hover-color="iconHoverColor"
                        button-style="white"
                        @click.stop="onClick"
@@ -44,6 +44,12 @@ export default {
     },
     data() {
         return {
+            //Consider to specify color according to Jenny's
+            colorSets: {
+                disabled: '#A7A9B2',
+                popup: '#0080FB',
+                mouseover: '#222532',
+            },
             mouseover: false,
             iconHoverColor: `transparent ${secondary}`,
         };

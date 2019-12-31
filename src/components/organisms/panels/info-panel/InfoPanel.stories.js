@@ -1,5 +1,5 @@
 import { ref } from '@vue/composition-api';
-import InfoPanel from './InfoPanel.vue';
+import InfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
 import PBadge from '@/components/atoms/badges/Badge';
 import { makeTrItems } from '@/lib/view-helper';
 
@@ -45,7 +45,7 @@ export const panelContents = () => ({
     },
 });
 
-export const trHelper = () => ({
+export const withTRHelper = () => ({
     components: { InfoPanel, PBadge },
     template: `
 <div style="width: 80vw;">

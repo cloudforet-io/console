@@ -117,10 +117,10 @@ const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
-const PDropdownMenuBtn = () => import('@/components/organisms/buttons/dropdown/DropdownMenuBtn');
+const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn');
 const PSearch = () => import('@/components/molecules/search/Search');
 const PUserDetail = () => import('@/views/identity/user/modules/UserDetail');
-const PTableCheckModal = () => import('@/components/organisms/modals/table-modal/TableCheckModal');
+const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
 export const UserTableReactive = parent => reactive({
     fields: makeTrItems([
         ['user_id', 'COMMON.ID'],

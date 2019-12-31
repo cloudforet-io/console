@@ -15,7 +15,7 @@ module.exports = {
                 @import "~@/styles/_variables.scss";
                 `,
                 includePaths: ['./node_modules'],
-                excludePaths: [path.resolve(__dirname, '..', 'node_modules/monaco-editor')],
+                excludePaths: [path.resolve(__dirname, '..', 'node_modules/monaco-text-editor')],
 
             },
         },
