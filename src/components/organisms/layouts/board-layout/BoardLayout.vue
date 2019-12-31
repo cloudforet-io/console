@@ -17,7 +17,7 @@
 
 <script>
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout';
-import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
 
 export default {
     name: 'PBoardLayout',
