@@ -1,10 +1,16 @@
 import { text, select } from '@storybook/addon-knobs/vue';
-import PI from './PI';
 import { autoProps } from '@sb/storybook-util';
+import PI from './PI';
 
 export default {
     title: 'atoms/icon/',
     component: PI,
+    parameters: {
+        info: {
+            summary: '',
+            components: { PI },
+        },
+    },
 };
 
 
@@ -24,4 +30,8 @@ export const DefaultCase = () => ({
                         <p-i v-bind="$props"/>
                    </span>
                 </div>`,
+});
+
+export const ABC = () => ({
+
 });

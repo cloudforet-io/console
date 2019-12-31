@@ -10,6 +10,7 @@ import '@/components/atoms/icons/p-icons';
 export default {
     name: 'PI',
     props: {
+        /** @type {string} */
         name: {
             type: String,
             default: '',
@@ -21,6 +22,7 @@ export default {
                 return true;
             },
         },
+        /** @type {string} */
         dir: {
             type: String,
             default: null,
@@ -31,30 +33,40 @@ export default {
                 return true;
             },
         },
+        /** @type {boolean} */
         fill: {
             type: Boolean,
             default: true,
         },
+        /** @type {string} */
         width: {
             type: String,
             default: '1.5rem',
         },
+        /** @type {string} */
         height: {
             type: String,
             default: '1.5rem',
         },
+        /** @type {string} */
         scale: {
             type: String,
             default: undefined,
         },
+        /** @type {string} */
         color: {
             type: String,
             default: undefined,
         },
+        /**
+         * use original or not
+         * @type {boolean}
+         * */
         original: {
             type: Boolean,
             default: true,
         },
+        /** @type {string} */
         title: {
             type: String,
             default: undefined,

@@ -1,5 +1,5 @@
 <template>
-    <div class="board-pane" v-on="$listeners">
+    <p-pane-layout class="board-pane" v-on="$listeners">
         <div v-if="title" class="header" :class="{'no-pad': dropdownMenu}">
             <p class="title">
                 {{ title }}
@@ -12,15 +12,16 @@
         </div>
 
         <slot />
-    </div>
+    </p-pane-layout>
 </template>
 
 <script>
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout';
+import PDropdownMenuBtn from '@/components/organisms/buttons/dropdown/DropdownMenuBtn';
 
 export default {
     name: 'PBoardLayout',
-    components: { PDropdownMenuBtn },
+    components: { PPaneLayout, PDropdownMenuBtn },
     props: {
         title: {
             type: String,
@@ -40,7 +41,6 @@ export default {
 
 <style lang="scss" scoped>
     .board-pane {
-        @extend %pane;
         padding: 1rem;
         display: flex;
         flex-direction: column;
