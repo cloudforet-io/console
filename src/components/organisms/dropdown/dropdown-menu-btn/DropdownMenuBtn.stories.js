@@ -19,7 +19,7 @@ const actions = {
     clickUpdate: action('clickUpdate'),
     clickCollect: action('clickCollect'),
     clickRemove: action('clickRemove'),
-    clickMenuname: action('clickMenuEvent'),
+    clickMenuEvent: action('clickMenuEvent'),
 };
 const data = {};
 
@@ -47,26 +47,26 @@ Action
         menu: {
             default: object('menu', [
                 {
-                    type: 'item', label: 'add', name: 'add', disabled: false,
+                    type: 'item', label: 'Add', name: 'add', disabled: false,
                 },
                 {
-                    type: 'item', label: 'hello', name: 'hello', disabled: false,
+                    type: 'item', label: 'Hello', name: 'hello', disabled: false,
                 },
                 { type: 'divider' },
                 { type: 'header', label: 'this is header' },
                 {
-                    type: 'item', label: 'update', name: 'update', disabled: false,
+                    type: 'item', label: 'Update', name: 'update', disabled: false,
                 },
                 {
-                    type: 'item', label: 'delete', name: 'delete', disabled: false,
-                },
-                { type: 'divider' },
-                {
-                    type: 'item', label: 'collect', name: 'collect', disabled: false,
+                    type: 'item', label: 'Delete', name: 'delete', disabled: false,
                 },
                 { type: 'divider' },
                 {
-                    type: 'item', label: 'remove', name: 'remove', disabled: false,
+                    type: 'item', label: 'Collect', name: 'collect', disabled: false,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', label: 'Remove', name: 'remove', disabled: false,
                 },
 
 
