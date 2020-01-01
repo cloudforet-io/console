@@ -1,5 +1,6 @@
-import Search from './Search.vue';
 import { boolean } from '@storybook/addon-knobs/vue';
+import { action } from '@storybook/addon-actions';
+import Search from './Search.vue';
 
 export default {
     title: 'molecules/search',
@@ -12,7 +13,7 @@ export default {
     },
 };
 const actions = {
-
+    onSearch: action('onSearch'),
 };
 const data = {
     search: 'This is Search Text',
@@ -21,7 +22,7 @@ const data = {
 export const search = () => ({
     components: { Search },
     template: `<div style="width: 80vw;">
-                    <search :searchText.sync="search" :disabled="disabled"/>
+                    <search :searchText.sync="search" :disabled="disabled" @onSearch="onSearch"/>
                     <br>
                     <div> Search Text: {{search}}</div>
                 </div>`,
