@@ -29,6 +29,7 @@ import PButton from '@/components/atoms/buttons/Button';
 
 export default {
     name: 'PSearch',
+    events: ['onSearch'],
     components: {
         PButton,
         PInputText,
@@ -65,6 +66,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .row {
+        margin: 0;
+        .input-group {
+            padding: 0;
+        }
+    }
     .form-control{
         height: 2rem !important;
     }
