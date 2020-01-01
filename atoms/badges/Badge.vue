@@ -49,13 +49,20 @@ export default {
         background-color: $color;
         color: $oposite-color;
     }
-
+}
+@mixin hover-color($theme, $color, $oposite-color) {
+    &.badge-#{$theme} {
+        background-color: $color;
+        color: $oposite-color;
+    }
 }
 .badge{
+    all: unset;
     border-radius: 100px;
     background-clip: padding-box;
     text-align: center;
-    font: 12px/14px Arial;
+    font-size: .75rem;
+    line-height: .875rem;
     color: $white;
     letter-spacing: 0;
     padding:  0.1875rem 0.5rem 0.1875rem 0.5rem;
@@ -78,7 +85,7 @@ export default {
 
 @include badge-color('gray', $gray, $white);
 @include badge-color('gray1', $gray1, $white);
-@include badge-color('gray2', $gray2, $white);
+@include badge-color('gray2', $gray2, $dark);
 @include badge-color('gray3', $gray3, $gray);
 
 @include badge-color('other1', $other1, $white);

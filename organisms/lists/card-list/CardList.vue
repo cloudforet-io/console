@@ -8,7 +8,9 @@
                      @click="$emit('itemClick', item, $event)"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot :name="slot" v-bind="scope" :items="items" />
+                <slot :name="slot" v-bind="scope" :items="items"
+                      :item="item"
+                />
             </template>
         </p-card-item>
     </div>
