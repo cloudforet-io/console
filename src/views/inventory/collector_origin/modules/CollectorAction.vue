@@ -190,7 +190,7 @@ import BaseField from '@/components/base/form/BaseField.vue';
 import BaseSearch from '@/components/base/search/BaseSearch.vue';
 import BaseModal from '@/components/base/modal/BaseModal';
 import CollectorActionsPopup from '@/views/inventory/collector_origin/modules/CollectorActionPopup';
-import contextData from '@/views/inventory/collector/search-context/query.js';
+import contextData from '@/views/inventory/collector_origin/search-context/query.js';
 
 const collectorModel = {
     collector_id: null,

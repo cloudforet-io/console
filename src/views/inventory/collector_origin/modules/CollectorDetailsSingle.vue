@@ -50,7 +50,7 @@
 
 <script>
 import BaseTable from '@/components/base/table/BaseTable';
-import contextData from '@/views/inventory/collector/search-context/query.js';
+import contextData from '@/views/inventory/collector_origin/search-context/query.js';
 const BasePanel = () => import('@/components/base/panel/BasePanel');
 const BaseModal = () => import('@/components/base/modal/BaseModal');
 const BaseTag = () => import('@/components/base/tags/BaseTag');
