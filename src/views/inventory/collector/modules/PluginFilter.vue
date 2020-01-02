@@ -22,10 +22,10 @@
         <p-row direction="column">
             <header>Resource Type</header>
             <span v-for="(resource) in resourceOptions" :key="resource"
-                  class="filter" :class="{selected: selectedResources.includes(resource)}"
+                  class="filter" :class="{selected: proxyFilters.includes(resource)}"
             >
-                <p-check-box v-model="selectedResources" :value="resource"
-                             @change="$emit('resourceChange', $event)"
+                <p-check-box v-model="proxyFilters" :value="resource"
+                             @change="onResourceChange(resource, $event)"
                 />
                 {{ resource }}
             </span>
@@ -43,7 +43,7 @@ import PButton from '@/components/atoms/buttons/Button';
 import PSearch from '@/components/molecules/search/Search';
 import PRadio from '@/components/molecules/forms/radio/Radio';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox';
-
+import { makeProxy } from '@/lib/compostion-util';
 
 export default {
     name: 'PluginFilter',
@@ -57,6 +57,12 @@ export default {
         PRadio,
         PCheckBox,
     },
+    props: {
+        filters: {
+            type: Array,
+            default: () => [],
+        },
+    },
     setup(props, context) {
         const state = reactive({
             search: '',
@@ -68,17 +74,24 @@ export default {
             resourceOptions: [
                 'Server', 'Network', 'Subnet', 'IP Address',
             ],
-            selectedResources: [],
         });
+
+        const proxyFilters = makeProxy('filters', props, context.emit);
 
         const onRepoChange = (val) => {
             state.selectedRepo = val;
             context.emit('repoChange', val);
         };
 
+        const onResourceChange = (resource, selected) => {
+            context.emit('resourceChange', resource, selected);
+        };
+
         return {
             ...toRefs(state),
+            proxyFilters,
             onRepoChange,
+            onResourceChange,
         };
     },
 };
