@@ -7,7 +7,6 @@
                                    @goBack="goBack"
                                    @search="search"
                                    @repoChange="repoChange"
-                                   @resourceChange="resourceChange"
                     />
                 </div>
             </template>
@@ -18,7 +17,6 @@
                     title="Plugins"
                     :sort-menu="sortMenu"
                     :sort-by.sync="sortBy"
-                    :filters.sync="filters"
                     @pageChange="onPageChange"
                     @sortChange="onSortChange"
                     @filterChange="onFilterChange"
@@ -26,7 +24,6 @@
                     <template #filters>
                         <p-filter-badge v-for="(filter, idx) in filterTools.filters" :key="`${idx}-${filter}`"
                                         :idx="idx"
-                                        @delete="onDelete"
                         >
                             {{ filter }}
                         </p-filter-badge>
@@ -121,13 +118,6 @@ const setFilters = (props, context, listState) => {
         search: () => {},
         repoChange: (repo) => {
             console.log('repo', repo);
-        },
-        resourceChange: (resource) => {
-            filterTools.addTag(resource);
-        },
-        onDelete(idx) {
-            filterTools.deleteTag(idx);
-            listState.filters.value = filterTools.filters.value;
         },
     };
 };
