@@ -260,6 +260,7 @@ export default {
         justify-content: center;
         &.line {
             border-left: 1px solid $lightgray;
+            background-color: transparent;
             &:hover {
                 border-left: 1px solid $secondary;
                 cursor: ew-resize;

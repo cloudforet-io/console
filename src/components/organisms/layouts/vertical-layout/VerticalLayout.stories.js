@@ -1,10 +1,12 @@
+import { withKnobs, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
 import { autoProps } from '@sb/storybook-util';
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
 
 export default {
-    title: 'Organisms/layouts/vertical-layout',
+    title: 'organisms/layouts/vertical-layout',
     component: PVerticalLayout,
+    decorators: [withKnobs],
     parameters: {
         info: {
             summary: '',
@@ -16,12 +18,18 @@ export default {
 export const defaultCase = () => ({
     components: { PVerticalLayout },
     props: {
-        ...autoProps(PVerticalLayout),
+        ...autoProps(PVerticalLayout, {
+            height: {
+                default: text('height', '100vh'),
+            },
+        }),
     },
-    template: `<div style="border: 1px solid red;">
-                   <p-vertical-layout>
-                        <template #leftContainer="{300 px}">
-                            This is left Container.
+    template: `<div style="border: 1px solid red; height: 100vh;">
+                   <p-vertical-layout v-bind="$props" >
+                        <template #leftContainer="{width}">
+                            <div :style="{width: width}">
+                                This is left Container.
+                            </div>
                         </template>
                         <template #rightContainer>
                             This is right Container.

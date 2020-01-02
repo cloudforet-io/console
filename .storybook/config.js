@@ -11,6 +11,7 @@ import Notifications from 'vue-notification';
 
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
+import store from '@/store';
 import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
@@ -55,6 +56,7 @@ addDecorator(withKnobs);
 addDecorator(centered);
 addDecorator(withCssResources);
 addDecorator(() => ({
+    store,
     template: '<story/>',
     i18n,
 }));
