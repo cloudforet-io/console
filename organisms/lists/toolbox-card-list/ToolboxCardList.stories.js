@@ -9,6 +9,7 @@ import PRow from '@/components/atoms/grid/row/Row';
 import PButton from '@/components/atoms/buttons/Button';
 import PI from '@/components/atoms/icons/PI';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
+import PFilterBadge, { filterBadgeList } from '@/components/molecules/badges/filter-badge/FilterBadge';
 
 export default {
     title: 'organisms/lists/ToolboxCardList',
@@ -17,27 +18,26 @@ export default {
 };
 
 const setup = (props, context) => {
-    const filters = ref({
-        filter1: 'search',
-        filter2: 'select',
-    });
+    const filterTools = filterBadgeList(ref(['tag1', 'filtertag2']));
     const sortBy = ref('Name');
 
     const onPageChange = action('pageChange');
     const onSortChange = action('sortChange');
-    const onFilterChange = action('filterChange');
+
+
     return {
-        filters,
+        filterTools,
         sortBy,
         onPageChange,
         onSortChange,
-        onFilterChange,
     };
 };
 
 
 export const defaultCase = () => ({
-    components: { PToolboxCardList },
+    components: {
+        PToolboxCardList,
+    },
     props: {
         // ...autoProps(PCardList),
         items: {
@@ -78,14 +78,16 @@ export const defaultCase = () => ({
             ]),
         },
     },
-    template: `<p-toolbox-card-list
+    template: `
+    <div>
+        <p-toolbox-card-list
                     v-bind="$props"
                     :sort-by.sync="sortBy"
-                    :filters.sync="filters"
                     @pageChange="onPageChange"
                     @sortChange="onSortChange"
-                    @filterChange="onFilterChange"
-                />`,
+                />
+    </div>
+    `,
     setup(props, context) {
         return setup(props, context);
     },
@@ -101,6 +103,7 @@ export const cardItemSlot = () => ({
         PButton,
         PI,
         PDropdownMenuBtn,
+        PFilterBadge,
     },
     props: {
         // ...autoProps(PCardList),
@@ -143,14 +146,21 @@ export const cardItemSlot = () => ({
             ]),
         },
     },
-    template: `<p-toolbox-card-list
+    template: `<div>
+                <p-toolbox-card-list
                     v-bind="$props"
                     :sort-by.sync="sortBy"
-                    :filters.sync="filters"
                     @pageChange="onPageChange"
                     @sortChange="onSortChange"
-                    @filterChange="onFilterChange"
-                >
+                >   
+                    <template #filters>
+                        <p-filter-badge v-for="(filter, idx) in filterTools.filters" :key="idx+filter"
+                                        :idx="idx"
+                                        @delete="filterTools.deleteTag"
+                        >
+                            {{ filter }}
+                        </p-filter-badge>
+                    </template>
                     <template #card-extra="{item}">
                         <p-row style="height: 100%;">
                             <p-col>
@@ -173,7 +183,9 @@ export const cardItemSlot = () => ({
                             </p-col>
                         </p-row>
                     </template>
-                </p-toolbox-card-list>`,
+                </p-toolbox-card-list>
+                <button @click="filterTools.addTag('newTag')">add new Filter</button>
+            </div>`,
     setup(props, context) {
         return setup(props, context);
     },

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container">
         <slot name="top">
             <p-row class="top-row">
                 <p-col>
@@ -24,7 +24,7 @@
                 </p-col>
             </p-row>
         </slot>
-        <p-filter-badge-list :filters.sync="proxyFilters" @delete="onDeleteFilter" />
+        <slot name="filters" />
         <p-card-list class="card-container" :items="items" :mapper="mapper">
             <template v-for="(_, slot) of cardSlots" v-slot:[slot]="scope">
                 <slot :name="`card-${slot}`" v-bind="scope" :items="items" />
@@ -45,32 +45,13 @@
 
 <script>
 import {
-    computed, toRefs, reactive, ref,
+    computed, toRefs, reactive,
 } from '@vue/composition-api';
 import PCardList from '@/components/organisms/lists/card-list/CardList';
-import PFilterBadgeList from '@/components/organisms/lists/filter-badge-list/FilterBadgeList';
 import PRow from '@/components/atoms/grid/row/Row';
 import PCol from '@/components/atoms/grid/col/Col';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
-
-const setFilters = (props, context) => {
-    const proxyFilters = computed({
-        set(filters) {
-            context.emit('update:filters', filters);
-        },
-        get() { return props.filters; },
-    });
-
-    const onDeleteFilter = (filter, type) => {
-        context.emit('filterChange', filter, type, 'delete');
-    };
-
-    return {
-        proxyFilters,
-        onDeleteFilter,
-    };
-};
 
 const setTools = (props, context) => {
     const limit = 10;
@@ -97,6 +78,7 @@ const setTools = (props, context) => {
     };
 };
 
+
 const setCardItems = (props, context) => {
     const cardSlots = computed(() => {
         const result = {};
@@ -117,7 +99,6 @@ export default {
     events: ['pageChange', 'sortChange', 'filterChange'],
     components: {
         PCardList,
-        PFilterBadgeList,
         PRow,
         PCol,
         PTextPagenation,
@@ -129,10 +110,6 @@ export default {
         totalCount: {
             type: Number,
             default: 0,
-        },
-        filters: {
-            type: Object,
-            default: () => ({}),
         },
         title: {
             type: String,
@@ -148,11 +125,9 @@ export default {
         },
     },
     setup(props, context) {
-        const filterState = setFilters(props, context);
         const toolState = setTools(props, context);
         const cardItemState = setCardItems(props, context);
         return {
-            ...filterState,
             ...toolState,
             ...cardItemState,
         };
@@ -161,6 +136,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.container {
+    width: 100%;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 916px;
+}
 .top-row {
     padding-bottom: 1.125rem;
     .title {
