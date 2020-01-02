@@ -118,10 +118,10 @@ export const lengthMaxValidation = (max, invalidMessage) => new Validation(value
 export const userIDValidation = (parent, invalidMessage) => new Validation(async (value) => {
     let result = false;
     await parent.$http.post('/identity/user/get', { user_id: value, domain_id: sessionStorage.domainId }).then().catch((error) => {
-        console.log('show error', error.code);
         if (error.code === 'ERROR_NOT_FOUND') {
             result = true;
         }
     });
     return result;
 }, invalidMessage || 'already use that user id');
+

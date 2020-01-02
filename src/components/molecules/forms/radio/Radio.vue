@@ -12,7 +12,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import { ref, computed } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI';
 import { dark } from '@/styles/_variables.scss';

@@ -59,12 +59,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.p-card-item-container:hover {
-    box-shadow: 0px 0px 8px rgba($primary, 0.22);
+.p-card-item-container {
+    &:hover {
+        box-shadow: 0px 0px 8px rgba($primary, 0.22);
+    }
 }
 .p-card-item {
     padding: 1rem;
-    width: 916px;
     height: 126px;
     .card-body {
         all: unset;

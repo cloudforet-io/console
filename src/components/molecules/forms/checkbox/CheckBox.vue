@@ -70,7 +70,7 @@ export default {
             if (this.isSelected) {
                 _.pull(newResult, this.value);
             } else { newResult.push(this.value); }
-            this.$emit('change', newResult);
+            this.$emit('change', newResult, this.isSelected);
         },
         onMouseover(value) {
             this.mouseover = value;
