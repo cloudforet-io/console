@@ -19,7 +19,6 @@ module.exports = {
     'no-empty': ["error", { "allowEmptyCatch": true }],
      'import/extensions': ['error', 'always', {
       js: 'never',
-      vue: 'never'
     }],
     'camelcase': ["error", { "properties": "always", "allow": [
         "domain_id", "item_type", "region_id"
