@@ -23,7 +23,6 @@ function makeKnobProp(prop, value, knobType) {
     const knobsType = propsTypeMapping[typeName];
     if (knobsType) {
     // let defaultValue = prop.defaultValue.func ? eval(prop.defaultValue.value)() : eval(prop.defaultValue.value) ;
-        console.log('autoprops knobsType', knobsType)
         return { default: knobsType(prop.name, defaultValue) };
     }
 }
