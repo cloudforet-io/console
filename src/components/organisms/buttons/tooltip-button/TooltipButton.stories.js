@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { text, boolean } from '@storybook/addon-knobs/vue';
+import { text, boolean, object } from '@storybook/addon-knobs/vue';
 import PTooltipButton from './TooltipButton';
 
 export default {
@@ -21,6 +21,9 @@ export const defaultCase = () => ({
         },
         active: {
             default: boolean('active', false),
+        },
+        tooltipOptions: {
+            default: object('tooltipOptions', {}),
         },
     },
     template: `<div style="background-color: gray; display: inline-block; height: 200px; width: 400px;">
@@ -45,15 +48,14 @@ export const buttonSlotCase = () => ({
         active: {
             default: boolean('active', false),
         },
-        buttonSlot: {
-            default: text('button slot', '<button>STORYBOOK BUG...T.T</button>', 'slot'),
-        },
     },
     template: `<div style="background-color: gray; display: inline-block; height: 200px; width: 400px;">
                     <p-tooltip-button :contents="contents" 
                     :tooltip="tooltip" :position="position"
                     :active="active">
-                        <template #button>{{buttonSlot}}</template>
+                        <template #button>
+                            <button>{{contents}}</button>
+                        </template>
                     </p-tooltip-button>
                 </div>`,
 });
