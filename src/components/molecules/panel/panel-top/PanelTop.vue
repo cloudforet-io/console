@@ -3,7 +3,9 @@
         <div class="card panel-card">
             <div class="p-panel-top-header">
                 <div class="p-panel-top-header-title">
-                    {{ panelTitle }}
+                    <slot>
+                        {{ panelTitle }}
+                    </slot>
                 </div>
                 <slot name="head" />
             </div>
