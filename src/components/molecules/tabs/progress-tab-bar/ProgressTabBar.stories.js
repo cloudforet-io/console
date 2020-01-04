@@ -6,50 +6,68 @@ import _ from 'lodash';
 import { VTooltip } from 'v-tooltip';
 import PProgressTabBar from './ProgressTabBar';
 import { makeProxy } from '@/lib/compostion-util';
+import BaseDragVertical from '@/components/base/drag/BaseDragVertical';
 
 export default {
     title: 'molecules/tabs/ProgressTabBar',
     component: PProgressTabBar,
     decorators: [withKnobs],
+    parameters: {
+        info: {
+            summary: `
+            This component needs 'tabs' property with follow format: \n
+            \n
+                key: String (essential),
+                label: String (recommended),
+                unvalid: Boolean,
+                help: Boolean,
+            \n
+            `,
+            components: { PProgressTabBar },
+        },
+    },
 };
 
 const getProps = () => ({
 
 });
 
-const actions = {
-    changeTabs: action('changeTabs'),
-};
+const actions = () => ({
+    changeTab: action('changeTab'),
+});
+
 const getData = (props, context) => {
     const state = reactive({
-        tabs: {
-            conf: {
+        tabs: [
+            {
+                key: 'conf',
                 label: 'Configure Collector (conf)',
                 alert: 'This is alert message!!',
-                active: true,
                 unvalid: true,
             },
-            credentials: {
+            {
+                key: 'credentials',
                 label: 'Choose Credentials (credentials)',
                 warning: 'This is warning messasge',
             },
-            tags: {
+            {
+                key: 'tags',
                 label: 'Add Tags (tags)',
                 help: 'This is description of add tags step.',
             },
-        },
-        doneTab: 'conf',
-        unvalidTabs: [false, false, false],
+        ],
+        activeIdx: 0,
+        doneTab: 0,
     });
 
     const onClickDone = () => {
-        state.tabs[state.doneTab].done = true;
-        state.tabs = { ...state.tabs };
+        state.tabs[Number(state.doneTab)].done = true;
+        state.tabs = [...state.tabs];
     };
 
-    const unvalidChange = (name, e) => {
-        state.tabs[name].unvalid = e.target.checked;
-        state.tabs = { ...state.tabs };
+    const unvalidChange = (idx, e) => {
+        state.tabs[idx].unvalid = e.target.checked;
+        state.tabs = [...state.tabs];
     };
 
 
@@ -67,17 +85,18 @@ export const defaultCase = () => ({
     <div style="width: 100vw;">
         <p-progress-tab-bar 
             :tabs.sync="tabs" 
-            @changeTabs="changeTabs"
+            :active-idx="activeIdx"
+            @changeTab="changeTab"
          />
          <br><br><br>
-         Process Done Tab: <input type="text" v-model="doneTab"> 
+         Process Done Tab Index: <input type="text" v-model="doneTab"> 
          <button @click="onClickDone">Done</button>
      </div>
     `,
     setup(...args) {
         return {
             ...getData(...args),
-            ...actions,
+            ...actions(),
         };
     },
 });
@@ -90,14 +109,15 @@ export const validationMode = () => ({
     <div style="width: 100vw;">
         <p-progress-tab-bar 
             :tabs.sync="tabs"
+            :active-idx="activeIdx"
             :show-validation="true" 
-            @changeTabs="changeTabs"
+            @changeTab="changeTab"
          />
          <br><br><br>
          <h4>Check unvalid Tabs</h4> 
-         <template v-for="(tab, key)  in tabs">
-            {{ key }}:
-            <input type="checkbox" :checked="tab.unvalid" @change="unvalidChange(key, $event)">
+         <template v-for="(tab, idx) in tabs">
+            {{ tab.key }}:
+            <input type="checkbox" :checked="tab.unvalid" @change="unvalidChange(idx, $event)">
             <br>
          </template>
      </div>
@@ -105,7 +125,7 @@ export const validationMode = () => ({
     setup(...args) {
         return {
             ...getData(...args),
-            ...actions,
+            ...actions(),
         };
     },
 });
@@ -120,7 +140,8 @@ export const helpSlot = () => ({
     <div style="width: 100vw;">
         <p-progress-tab-bar 
             :tabs.sync="tabs" 
-            @changeTabs="changeTabs"
+            :active-idx="activeIdx"
+            @changeTab="changeTab"
          >
             <template #help-conf>
                   <button v-tooltip="{
@@ -135,12 +156,12 @@ export const helpSlot = () => ({
     setup(...args) {
         return {
             ...getData(...args),
-            ...actions,
+            ...actions(),
         };
     },
 });
 
-export const defaultSlot = () => ({
+export const progressSlot = () => ({
     components: {
         PProgressTabBar,
     },
@@ -150,9 +171,9 @@ export const defaultSlot = () => ({
     <div style="width: 100vw;">
         <p-progress-tab-bar 
             :tabs.sync="tabs" 
-            @changeTabs="changeTabs"
+            @changeTab="changeTab"
          >
-            <template #default="{tab}">
+            <template #progress-conf="{tab}">
                   <button v-tooltip="{
                       content: tab.label,
                       placement: 'right',
@@ -165,7 +186,7 @@ export const defaultSlot = () => ({
     setup(...args) {
         return {
             ...getData(...args),
-            ...actions,
+            ...actions(),
         };
     },
 });
