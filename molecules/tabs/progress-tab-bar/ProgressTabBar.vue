@@ -1,26 +1,26 @@
 <template>
     <div class="progress-tab-nav">
         <div
-            v-for="(tab, key, idx) in tabs"
-            :key="key"
+            v-for="(tab, idx) in tabs"
+            :key="tab.key"
             class="nav-item"
             :class="{
-                active: tab.active,
+                active: idx == activeIdx,
                 done: tab.done,
                 unvalid: showValidation && tab.unvalid,
             }"
             :style="{width: tabWidth}"
-            @click="tabClick(key)"
+            @click="tabClick(idx)"
         >
             <span class="triangle-bg" />
             <span class="triangle" />
-            <slot :tab="tab">
-                <span>{{ idx + 1 }}.
-                    {{ tab.label || key }}
+            <slot :name="`progress-${tab.key}`" :tab="tab">
+                <span>{{ Number(idx) + 1 }}.
+                    {{ tab.label || tab.key }}
                 </span>
             </slot>
 
-            <slot :name="`help-${key}`" :tab="tab">
+            <slot :name="`help-${tab.key}`" :tab="tab">
                 <p-tooltip-button v-if="tab.help"
                                   class="help" :tooltip="tab.help" position="top"
                 >
@@ -37,38 +37,39 @@
 
 <script>
 import _ from 'lodash';
-import { computed } from '@vue/composition-api';
+import { ref, computed } from '@vue/composition-api';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton';
 import PI from '@/components/atoms/icons/PI';
 
-export const isActive = props => name => props.activeTab === name;
-
 export default {
     name: 'PProgressTabBar',
-    events: ['changeTabs'],
+    events: ['update:tabs', 'update:activeIdx', 'changeTabs'],
     components: {
         PTooltipButton,
         PI,
     },
     props: {
-        tabs: Object,
+        tabs: [Array],
+        activeIdx: {
+            type: Number,
+            default: 0,
+        },
         showValidation: {
             type: Boolean,
             default: false,
         },
     },
     setup(props, { emit }) {
-        const activeTab = computed(() => _.findKey(props.tabs, 'active'));
-
         const tabWidth = computed(() => `${100 / _.size(props.tabs)}%`);
 
-        const tabClick = (name) => {
-            if (activeTab.value !== name) {
-                const updatedTabs = { ...props.tabs };
-                updatedTabs[activeTab.value].active = false;
-                updatedTabs[name].active = true;
+        const tabClick = (idx) => {
+            if (props.activeIdx !== idx) {
+                const updatedTabs = [...props.tabs];
+                updatedTabs[props.activeIdx].active = false;
+                updatedTabs[idx].active = true;
                 emit('update:tabs', updatedTabs);
-                emit('changeTabs', updatedTabs);
+                emit('update:activeIdx', idx);
+                emit('changeTab', idx);
             }
         };
 
