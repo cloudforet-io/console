@@ -1,8 +1,8 @@
-import { withKnobs, text } from '@storybook/addon-knobs/vue';
+import { withKnobs } from '@storybook/addon-knobs/vue';
 import { ref } from '@vue/composition-api';
 import { autoProps } from '@sb/storybook-util';
 import { action } from '@storybook/addon-actions';
-import PFilterBadge, { filterBadgeList } from './FilterBadge';
+import PFilterBadge, { filterBadgeList } from './FilterBadge.vue';
 
 
 export default {
@@ -45,10 +45,9 @@ export const listCase = () => ({
     </div>
     `,
     setup() {
-        const tools = filterBadgeList();
-        tools.filters = [
+        const tools = filterBadgeList(ref([
             'filter1', 'filter2', 'filter3',
-        ];
+        ]));
 
         const newFilterName = ref('newFilter');
 

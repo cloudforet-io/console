@@ -50,7 +50,7 @@
                         {{ data.item.email }}
                     </template>
                 </p-toolbox-table>
-                <p-input-tag
+                <p-tags-input
                     :responsive-style="{'height': '15vh', 'overflow-y':'auto', 'margin-left': '1rem'}"
                     :tag-text.sync="tagRelated.currentTagText"
                     :tag-array.sync="tagRelated.Tags"
@@ -90,7 +90,7 @@ import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PSearch from '@/components/molecules/search/Search';
-import PInputTag from '@/components/molecules/tags-input/TagsInput';
+import PTagsInput from '@/components/molecules/tags-input/TagsInput';
 import PTextInput from '@/components/atoms/inputs/TextInput';
 import PLabel from '@/components/atoms/labels/Label';
 
@@ -100,7 +100,7 @@ export default {
     components: {
         PButtonModal,
         PToolboxTable,
-        PInputTag,
+        PTagsInput,
         PTextInput,
         PSearch,
         PLabel,
