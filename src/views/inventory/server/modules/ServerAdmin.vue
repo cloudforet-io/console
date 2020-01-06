@@ -51,7 +51,7 @@ import {
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
-import { isEmpty, arrayFormatter } from '@/lib/util';
+import { arrayFormatter } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
 
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');

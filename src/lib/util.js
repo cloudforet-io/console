@@ -114,14 +114,6 @@ export const getValue = (scope, paths, defaultValue) => {
 };
 
 /** @function
- * @name isEmpty
- * @description  Check whether given value is empty.
- * @param {*} value
- * @return {boolean}
- * */
-export const isEmpty = value => !!((value === '' || value === null || value === undefined || (value !== null && typeof value === 'object' && !Object.keys(value).length)));
-
-/** @function
  * @name selectToCopyToClipboard
  * @description copy given text to clipboard
  * @param {String} text
