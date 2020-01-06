@@ -1,20 +1,23 @@
 <template>
     <div class="row" style="width:100%">
-        <div :class="getColSizer">
-            <p-input-text class="form-control py-2 border-right-0 border"
+        <div class="input-group" :class="getColSizer">
+            <p-input-text v-focus.lazy="proxyFocused"
+                          class="form-control py-2 border-right-0 border"
                           :value="searchText"
                           :disabled="disabled"
                           :placeholder="searchPlaceholder"
                           @input="$emit('update:searchText',$event)"
                           @keyup.enter="onSearch"
+                          @focus="proxyFocused = true"
+                          @blur="proxyFocused = false"
             />
             <slot name="input-text" />
             <div>
                 <p-button class="search-btn" @click="onSearch">
-                    <p-i :color="'transparent inherit'"
-                         :width="'1.3rem'"
-                         :height="'1.3rem'"
-                         :name="'ic_search'"
+                    <p-i color="transparent inherit"
+                         width="1.3rem"
+                         height="1.3rem"
+                         name="ic_search"
                     />
                 </p-button>
             </div>
@@ -23,23 +26,23 @@
     </div>
 </template>
 <script>
-import PInputText from '@/components/atoms/inputs/TextInput';
-import PI from '@/components/atoms/icons/PI';
-import PButton from '@/components/atoms/buttons/Button';
+import { focus } from 'vue-focus';
+import { computed } from '@vue/composition-api';
+import PInputText from '@/components/atoms/inputs/TextInput.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import { makeProxy } from '@/lib/compostion-util';
 
 export default {
     name: 'PSearch',
     events: ['onSearch'],
+    directives: { focus },
     components: {
         PButton,
         PInputText,
         PI,
     },
     props: {
-        size: {
-            type: Number,
-            default: 12,
-        },
         searchText: {
             type: String,
         },
@@ -51,16 +54,22 @@ export default {
             type: Boolean,
             default: false,
         },
-    },
-    computed: {
-        getColSizer() {
-            return `input-group col-${this.size}`;
+        focused: {
+            type: Boolean,
+            default: false,
         },
     },
-    methods: {
-        onSearch() {
-            this.$emit('onSearch', this.searchText);
-        },
+    setup(props, context) {
+        // todo: col를 외부에서 정의하도록 하기 (row,col 제거)
+        const getColSizer = computed(() => `col-${props.size}`);
+        const proxyFocused = makeProxy('focused', props, context.emit);
+        return {
+            onSearch() {
+                context.emit('onSearch', props.searchText);
+            },
+            proxyFocused,
+            getColSizer,
+        };
     },
 };
 </script>

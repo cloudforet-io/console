@@ -22,9 +22,11 @@ const data = {
 export const search = () => ({
     components: { Search },
     template: `<div style="width: 80vw;">
-                    <search :searchText.sync="search" :disabled="disabled" @onSearch="onSearch"/>
+                    <search :searchText.sync="search" :focused.sync="focused" :disabled="disabled" @onSearch="onSearch"/>
                     <br>
                     <div> Search Text: {{search}}</div>
+        <div><input type="checkbox" v-model="focused"><label>focuse 여부</label></div>
+        
                 </div>`,
     props: {
         disabled: {
@@ -37,6 +39,7 @@ export const search = () => ({
     data() {
         return {
             ...data,
+            focused: false,
         };
     },
 });
