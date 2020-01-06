@@ -11,8 +11,8 @@
         @nodecontextmenu="nodeContextMenu"
     >
         <template #title="{ node }">
-            <div v-if="node.data.init" class="empty-node" >
-                <span >
+            <div v-if="node.data.init" class="empty-node">
+                <span>
                     <p-i :color="'transparent primary3'"
                          :width="'14rem'"
                          :height="'14rem'"
@@ -46,7 +46,6 @@
                 </span>
             </slot>
             <span v-if="!node.data.init" class="item-title" @mousedown="setTitle">{{ node.title }}</span>
-
         </template>
         <template #toggle="{ node }">
             <p-i v-if="node.isExpanded"
@@ -63,55 +62,51 @@
             />
         </template>
         <template #draginfo>
-            {{selectedNodesTitle}}
+            {{ selectedNodesTitle }}
         </template>
     </sl-vue-tree>
 </template>
 
 <script>
 import SlVueTree from 'sl-vue-tree';
-import PI from '@/components/atoms/icons/PI';
+import {
+    reactive, toRefs, computed,
+} from '@vue/composition-api';
+import PI from '@/components/atoms/icons/PI.vue';
+import { Util } from '@/lib/global-util';
+
 export default {
     name: 'PTree',
-    events: [],
-    components: {
-        PI,
-        SlVueTree,
-    },
+    components: { SlVueTree, PI },
     props: {
-        /** Tree Node Data */
         treeData: {
             type: Array,
             default: () => [],
         },
-        /** Initial Tree panel Width */
         initialTreeWidth: {
             type: String,
             default: '300px',
         },
-        /** Allow select multiple Nodes */
         useMultiSelect: {
             type: Boolean,
             default: false,
         },
-        /** Ues Y/N to user default Node icon on Tree */
         useDefaultTreeIcon: {
             type: Boolean,
             default: true,
         },
     },
-    data() {
-        return {
+    setup(props, context) {
+        const state = reactive({
             currentTreeData: null,
             clickedNode: null,
             selectedNodesTitle: null,
-        };
-    },
-    computed: {
-        computedTreeData: {
-            get() {
-                let returnVal = this.treeData;
-                if (this.isEmpty(returnVal)) {
+        });
+
+        const computedTreeData = computed({
+            get: () => {
+                let returnVal = props.treeData;
+                if (Util.methods.isEmpty(returnVal)) {
                     returnVal = [{
                         title: 'Click right button to create a new project Group.',
                         isLeaf: true,
@@ -120,71 +115,89 @@ export default {
                 }
                 return returnVal;
             },
-            set(value) {
-                this.$emit('update:treeData', value);
-            },
-        },
-    },
-    methods: {
-        setTitle(e){
-            this.selectedNodesTitle =  e.target.innerText
-        },
-        nodeClick(node) {
-            if (this.clickedNode) {
-                this.removeClickedClass(this.clickedNode);
-            }
+            set: (value) => { context.emit('update:treeData', value); },
+        });
 
-            this.clickedNode = node;
-            this.addClickedClass(node);
+        const setTitle = (e) => {
+            state.selectedNodesTitle = e.target.innerText;
+        };
 
-            this.$emit('nodeClick', node);
-        },
-        beforeDrop(node, position, cancel) {
-            this.$emit('beforeDrop', node, position, cancel);
-        },
-        nodeToggle(node) {
-            if (!node.isExpanded) {
-                this.setClickedNodeItem(node);
-                if (!node.data.is_cached) {
-                    this.$emit('nodeToggle', node);
-                }
-            }
-        },
-        nodeContextMenu(node, event, hasClicked) {
-            this.$emit('nodeContextMenu', node, event, hasClicked);
-        },
-        setClickedNodeItem(node) {
-            let hasNoClickedItem = false;
-            if (this.clickedNode) {
-                hasNoClickedItem = node.path.some((path, i) => path !== this.clickedNode.path[i]);
-            } else {
-                hasNoClickedItem = true;
-            }
-            if (!hasNoClickedItem) {
-                const addClassInterval = setInterval(() => {
-                    if (this.addClickedClass(this.clickedNode)) {
-                        clearInterval(addClassInterval);
-                    }
-                }, 10);
-            }
-        },
-        getNodeEl(node) {
-            return this.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
-        },
-        addClickedClass(node) {
-            const elem = this.getNodeEl(node);
+        const beforeDrop = (node, position, cancel) => {
+            context.emit('beforeDrop', node, position, cancel);
+        };
+
+        const getNodeEl = (node) => {
+            context.refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
+        };
+
+        const addClickedClass = (node) => {
+            const elem = getNodeEl(node);
             if (elem) {
                 elem.classList.add('sl-vue-node-clicked');
                 return true;
             }
             return false;
-        },
-        removeClickedClass(node) {
-            const elem = this.getNodeEl(node);
+        };
+
+        const removeClickedClass = (node) => {
+            const elem = getNodeEl(node);
             if (elem) {
                 elem.classList.remove('sl-vue-node-clicked');
             }
-        },
+        };
+
+        const nodeClick = (node) => {
+            if (state.clickedNode) {
+                removeClickedClass(state.clickedNode);
+            }
+            state.clickedNode = node;
+            addClickedClass(node);
+            context.emit('nodeClick', node);
+        };
+
+        const setClickedNodeItem = (node) => {
+            let hasNotClickedItem = false;
+            if (state.clickedNode) {
+                hasNotClickedItem = node.path.some((path, i) => path !== state.clickedNode.path[i]);
+            } else {
+                hasNotClickedItem = true;
+            }
+            if (!hasNotClickedItem) {
+                const addClassInterval = setInterval(() => {
+                    if (context.addClickedClass(state.clickedNode)) {
+                        clearInterval(addClassInterval);
+                    }
+                }, 10);
+            }
+        };
+
+
+        const nodeToggle = (node) => {
+            if (!node.isExpanded) {
+                setClickedNodeItem(node);
+                if (!node.data.is_cached) {
+                    context.emit('nodeToggle', node);
+                }
+            }
+        };
+
+        const nodeContextMenu = (node, event, hasClicked) => {
+            context.emit('nodeContextMenu', node, event, hasClicked);
+        };
+
+        return {
+            ...toRefs(state),
+            computedTreeData,
+            setTitle,
+            beforeDrop,
+            getNodeEl,
+            addClickedClass,
+            removeClickedClass,
+            nodeClick,
+            setClickedNodeItem,
+            nodeToggle,
+            nodeContextMenu,
+        };
     },
 };
 </script>
