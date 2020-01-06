@@ -23,10 +23,8 @@ const actions = context => ({
     nodeclick: action('nodeclick'),
     beforedrop: action('beforedrop'),
     toggle: (node) => {
-        console.log('######################################');
         const tree = context.refs.slvueTree;
         const path = tree.getSelectedNode()[0];
-        debugger;
         tree.insert(path, { data: { title: 'test!', isLeaf: true, data: { visible: false } } });
         //
         // childrenNode = this.getSelectedNodeArr(response.data.items, 'PROJECT');

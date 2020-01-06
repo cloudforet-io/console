@@ -55,7 +55,7 @@
 <script>
 import _ from 'lodash';
 import ProjectContext from '@/views/identity/project/modules/ProjectContext';
-import DefaultTree from '@/components/organisms/trees/area-tree/AreaTree';
+import DefaultTree from '@/components/organisms/trees/area-tree/AreaTree1';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
 
