@@ -27,29 +27,6 @@ export const Util = {
             textArea.remove();
         },
         /** ********************************************************************************
-         * Name       : selectBadges
-         * Input   => (s:badges flag String  => String)
-         * Output  => (String): variant value
-         * Description:  Select badges variant by given val
-         ********************************************************************************* */
-        selectBadges(s) {
-            const successFlag = ['active', 'success', 'vm'];
-            const secondaryFlag = ['inactive'];
-            const dangerFlag = ['banned', 'failure', 'fail'];
-            const warningFlag = ['pending', 'aws'];
-            const infoFlag = [];
-            const lightFlag = [];
-            const darkFlag = [];
-            return successFlag.includes(s.toLowerCase()) ? 'success'
-                : secondaryFlag.includes(s.toLowerCase()) ? 'secondary'
-                    : dangerFlag.includes(s.toLowerCase()) ? 'danger'
-                        : warningFlag.includes(s.toLowerCase()) ? 'warning'
-                            : infoFlag.includes(s.toLowerCase()) ? 'info'
-                                : lightFlag.includes(s.toLowerCase()) ? 'light'
-                                    : darkFlag.includes(s.toLowerCase()) ? 'dark'
-                                        : 'primary';
-        },
-        /** ********************************************************************************
          * Name       : capitalize
          * Input   => (s: any String   => String)
          * Output  => (String): with upper case of First letter
@@ -176,46 +153,6 @@ export const Util = {
             return 'No Message';
         },
         /** ********************************************************************************
-         * Name       : setFontSize
-         * Input   => (m: message   =>  String)
-         *            {type: type of font awesome ex: fal, fab,
-         *             icon: icon name,
-         *             size: size of icon ex: -1 ~ 10
-         *             color: variant color
-         *            }
-         * Output  => String translation Message
-         * Description:  return string with font-size with for h1,h2,h3,h4,h5,h6 and personal set data.
-         ********************************************************************************* */
-        setFontSize(f) {
-            let fontSize = 'font-size:';
-            const defaultSet = this.defaultFontSizeSet;
-            const { length } = defaultSet;
-            if (this.isSelectedType(f, 's') && f.include('px')) {
-                fontSize += f;
-            } else if (f > 0 && f < 7) {
-                fontSize += `${defaultSet[length - f]}px`;
-            } else {
-                fontSize += `${defaultSet[length - 3]}px`;
-            }
-            return fontSize;
-        },
-        /** ********************************************************************************
-         * Name       : dictToKeyValueArray
-         * Input   => (t: data                         =>  Array of data Object
-         *             k: key                          =>  String
-         *             v: additional value to attach   =>  String
-         *             l: location  =>  where to bind additional key at (b: back, or rest default: front)
-         * Output  => String translation Message
-         * Description:  translation of i18n
-         ********************************************************************************* */
-        dictToKeyValueArray(obj) {
-            const arr = [];
-            for (const key in obj) {
-                arr.push({ [key]: obj[key] });
-            }
-            return arr;
-        },
-        /** ********************************************************************************
          * Name       : treeDataHandler
          * Input   => (d: data                         =>  Array of data Object
          *             f: flag                         =>  flag key in Enum variables
@@ -284,65 +221,6 @@ export const Util = {
             return selectedNode;
         },
         /** ********************************************************************************
-         * Name       : getAllTimezones
-         *
-         * Output  => Array
-         * Description:  return Array of timezone String.
-         ********************************************************************************* */
-        getAllTimezones() {
-            return Object.keys(timezone.getAllTimezones());
-        },
-        /** ********************************************************************************
-         * Name       : getAllTimezones
-         *
-         * Output  => Array
-         * Description:  return Array of timezone String.
-         ********************************************************************************* */
-        getTimezoneSelectList() {
-            const results = [];
-            const timezones = timezone.getAllTimezones();
-            for (const tz in timezones) {
-                results.push({
-                    value: tz,
-                    text: `${tz} ${timezones[tz].offsetStr}`,
-                });
-            }
-            return results;
-        },
-        /** ********************************************************************************
-         * Name       : getLanguageSelectList
-         *
-         * Output  => Array
-         * Description:  return Array of language select list.
-         ********************************************************************************* */
-        getLanguageSelectList() {
-            return Object.values(GlobalEnum.LANGUAGES);
-        },
-        /** ********************************************************************************
-         * Name       : getLanguageName
-         * Input   => (lang                         =>  String)
-         *
-         * Output  => String
-         * Description:  return String of language name.
-         ********************************************************************************* */
-        getLanguageName(lang) {
-            const langObj = GlobalEnum.LANGUAGES[lang];
-            if (!langObj) {
-                return null;
-            }
-            return langObj.text;
-        },
-        /** ********************************************************************************
-         * Name       : getLanguage
-         * Input   => (value                         =>  String)
-         *
-         * Output  => Object
-         * Description:  return Object of language.
-         ********************************************************************************* */
-        getLanguage(value) {
-            return GlobalEnum.LANGUAGES[value];
-        },
-        /** ********************************************************************************
          * Name       : getSelectedNode
          * Input   => (o: any data Object to bind                         =>  Object)
          * Output  => Node
@@ -381,7 +259,7 @@ export const Util = {
                 options.timeZone = tz;
             }
             const timeStamps = new Date(ts * 1000).toLocaleString('en-US', options).split(' ');
-            const DateTime = this.isEmpty(tzr) ? `${this.getTimeStampFormatter(timeStamps[0])} ${timeStamps[1]}` : new Date(ts * 1000).toLocaleString('en-US', options)
+            const DateTime = this.isEmpty(tzr) ? `${this.getTimeStampFormatter(timeStamps[0])} ${timeStamps[1]}` : new Date(ts * 1000).toLocaleString('en-US', options);
             return DateTime;
         },
         /** ********************************************************************************

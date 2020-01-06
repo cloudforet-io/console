@@ -12,9 +12,15 @@
 <script>
 import _ from 'lodash';
 import { ref, reactive } from '@vue/composition-api';
-import PBadge from '@/components/atoms/badges/Badge';
-import PI from '@/components/atoms/icons/PI';
+import PBadge from '@/components/atoms/badges/Badge.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
+/**
+ * @description Generate tools for using filter badge as a list
+ * @param proxyFilters
+ * @param checkDuplicate
+ * @returns {UnwrapRef<{deleteTag: *, filters: *, addTag: *}>}
+ */
 export const filterBadgeList = (proxyFilters, checkDuplicate = true) => {
     const filters = proxyFilters || ref([]);
 
