@@ -1,8 +1,8 @@
 import { action } from '@storybook/addon-actions';
-import PTabBar from './tab-bar/TabBar';
+import PTabBar from './TabBar';
 
 export default {
-    title: 'molecules/tabs',
+    title: 'molecules/tabs/TabBar',
     component: PTabBar,
     parameters: {
         info: {
