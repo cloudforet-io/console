@@ -121,6 +121,27 @@ export const getValue = (scope, paths, defaultValue) => {
  * */
 export const isEmpty = value => !!((value === '' || value === null || value === undefined || (value !== null && typeof value === 'object' && !Object.keys(value).length)));
 
+
+export const isSelectedType = (d, t) => {
+    if (t.toUpperCase() === 'N') {
+        return (Number.isInteger(d) && !isNaN(d));
+    } if (t.toUpperCase() === 'D' || t.toUpperCase() === 'F') {
+        return (!isNaN(parseFloat(d)));
+    } if (t.toUpperCase() === 'B') {
+        return ['1', '0', 1, 0, true, false].includes(d);
+    } if (t.toUpperCase() === 'LIST') {
+        const splitString = d.split(',');
+        return !splitString.includes('');
+    } if (t.toUpperCase() === 'S' || t.toUpperCase() === 'STR') {
+        return (typeof d === 'string' || d instanceof String);
+    } if (t.toUpperCase() === 'O') {
+        return (typeof d === 'object' && d !== null && !Array.isArray(d));
+    } if (t.toUpperCase() === 'A') {
+        return Array.isArray(d);
+    }
+    throw 'Please, Check data type';
+};
+
 /** @function
  * @name selectToCopyToClipboard
  * @description copy given text to clipboard

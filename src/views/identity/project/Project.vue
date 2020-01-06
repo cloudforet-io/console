@@ -7,7 +7,7 @@
                                 @update="updateProjectAndGroup"
                                 @delete="deleteProjectAndGroup"
         />
-        <default-tree
+        <area-tree
             ref="ProjectTree"
             :tree-data="treeData"
             :show-tree="displayTree"
@@ -52,14 +52,14 @@
                     <template v-else />
                 </div>
             </template>
-        </default-tree>
+        </area-tree>
     </div>
 </template>
 
 <script>
 import _ from 'lodash';
 import ProjectContext from '@/views/identity/project/modules/ProjectContext';
-import DefaultTree from '@/components/organisms/trees/area-tree/AreaTree';
+import AreaTree from '@/components/organisms/trees/area-tree/AreaTree';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout';
 
@@ -72,7 +72,7 @@ const ProjectContextAction = () => import('@/views/identity/project/modules/Proj
 export default {
     name: 'Project',
     components: {
-        DefaultTree,
+        AreaTree,
         ProjectContext,
         ProjectContextAction,
         HorizontalLayout,
@@ -123,6 +123,7 @@ export default {
     },
     methods: {
         pNodeClicked(node, tree) {
+
             this.selectedNodeData = { node, tree };
         },
         async pNodeToggled(node, tree) {
