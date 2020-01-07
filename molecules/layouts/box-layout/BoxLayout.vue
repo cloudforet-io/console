@@ -1,6 +1,6 @@
 <template>
     <div class="p-box-layout"
-         :class="style"
+         :class="boxStyle"
          v-on="$listeners"
     >
         <slot />
@@ -11,7 +11,7 @@
 export default {
     name: 'PBoxLayout',
     props: {
-        style: {
+        boxStyle: {
             type: String,
             default: 'primary4',
         },

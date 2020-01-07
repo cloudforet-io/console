@@ -39,9 +39,11 @@ export const tagList = (proxyTags, checkDuplicate = true) => {
      * @param value {String}
      */
     const addTag = (value) => {
-        if (checkDuplicate && !validation(value)) return;
+        const val = value.trim();
+        if (!val || val === '') return;
+        if (checkDuplicate && !validation(val)) return;
         const updatedTags = [...tags.value];
-        updatedTags.push(value);
+        updatedTags.push(val);
         tags.value = updatedTags;
     };
 
