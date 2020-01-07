@@ -127,10 +127,10 @@
                     </p-col>
                     <p-col :col="6">
                         <PFieldGroup label="Tags">
-                            <p-tag-input-group class="tag-input"
-                                               :use-full-col="true"
-                                               :edit-mode="true"
-                                               :tags.sync="formState.tags"
+                            <p-dict-input-group class="tag-input"
+                                                :use-full-col="true"
+                                                :edit-mode="true"
+                                                :dict.sync="formState.tags"
                             />
                         </PFieldGroup>
                     </p-col>
@@ -148,7 +148,7 @@ import { setup as contentModalSetup } from '@/components/organisms/modals/conten
 import {
     formValidation, makeProxy, requiredValidation, userIDValidation, Validation,
 } from '@/lib/compostion-util';
-import PTagInputGroup from '@/components/organisms/forms/tag-input-group/TagInputGroup';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup';
 import PHr from '@/components/atoms/hr/Hr';
 import PRow from '@/components/atoms/grid/row/Row';
 import PCol from '@/components/atoms/grid/col/Col';
@@ -159,7 +159,7 @@ const components = {
     PButtonModal,
     PFieldGroup,
     PTextInput,
-    PTagInputGroup,
+    PDictInputGroup,
     PHr,
     PRow,
     PCol,

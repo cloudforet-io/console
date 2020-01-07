@@ -1,29 +1,28 @@
 <template>
     <div class="row" :style="responsiveStyle">
-        <InfoPanel v-show="isVisible"
-                   :info-title="topPanelTitle"
-                   :item="item"
-                   :defs="topPanel"
+        <p-info-panel v-show="isVisible"
+                      :info-title="topPanelTitle"
+                      :item="item"
+                      :defs="topPanel"
         />
-        <p-tag-panel v-show="isVisible"
-                     ref="tagPanel"
-                     :tags.sync="tags"
-                     @confirm="updateTag"
+        <p-dict-panel v-show="isVisible"
+                      ref="tagPanel"
+                      :dict.sync="tags"
+                      @confirm="updateTag"
         />
     </div>
 </template>
 
 <script>
 import _ from 'lodash';
-import InfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
-import PLottie from '@/components/molecules/lottie/PLottie';
+import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel';
 
 export default {
     name: 'ProjectSummary',
     components: {
-        InfoPanel,
-        PTagPanel,
+        PInfoPanel,
+        PDictPanel,
     },
     props: {
         selectedNode: {

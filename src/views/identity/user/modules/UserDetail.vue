@@ -6,14 +6,14 @@
             </template>
         </p-info-panel>
 
-        <p-tag-panel ref="tagPanel" :tags.sync="tags" @confirm="confirm" />
+        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="confirm" />
     </div>
 </template>
 
 <script>
 import { ref, watch } from '@vue/composition-api';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel';
 import PStatus from '@/components/molecules/status/Status';
 import { timestampFormatter, arrayFormatter, userStateFormatter } from '@/lib/util';
 import { mountBusEvent } from '@/lib/compostion-util';
@@ -23,7 +23,7 @@ import userEventBus from '@/views/identity/user/UserEventBus';
 export default {
     name: 'PUserDetail',
     components: {
-        PInfoPanel, PTagPanel, PStatus,
+        PInfoPanel, PDictPanel, PStatus,
     },
     props: {
         item: {
@@ -50,16 +50,16 @@ export default {
         watch(() => props.item, (value) => {
             tags.value = value.tags || {};
         });
-        const tagPanel = ref(null);
+        const dictPanel = ref(null);
         const resetTag = () => {
-            tagPanel.value.resetTag();
+            dictPanel.value.reset();
         };
         mountBusEvent(userEventBus, props.tagResetEvent, resetTag);
-
+w
         return {
             baseDefs,
             tags,
-            tagPanel,
+            dictPanel,
             confirm(...event) {
                 userEventBus.$emit(props.tagConfirmEvent, props.item.user_id, ...event);
             },

@@ -35,7 +35,7 @@
             </template>
             <!-- nic,disk -->
             <template #col-tags-format="{value}">
-                <p-tag-list :tags="value" />
+                <p-dict-list :dict="value" />
             </template>
             <!-- nic fields -->
             <template #col-ip_address-format="{item}">
@@ -66,12 +66,12 @@ import { makeProxy } from '@/lib/compostion-util';
 const PSelectBtnGroup = () => import('@/components/organisms/buttons/select-btn-group/SelectBtnGroup');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 const PSearch = () => import('@/components/molecules/search/Search');
-const PTagList = () => import('@/components/molecules/tag-list/TagList');
+const PDictList = () => import('@/components/molecules/lists/DictList');
 
 export default {
     name: 'ServerData',
     components: {
-        PSelectBtnGroup, PToolboxTable, PSearch, PTagList,
+        PSelectBtnGroup, PToolboxTable, PSearch, PDictList,
     },
     props: {
         serverId: String,
