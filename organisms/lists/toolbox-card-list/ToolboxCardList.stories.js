@@ -9,7 +9,7 @@ import PRow from '@/components/atoms/grid/row/Row';
 import PButton from '@/components/atoms/buttons/Button';
 import PI from '@/components/atoms/icons/PI';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
-import PFilterBadge, { filterBadgeList } from '@/components/molecules/badges/filter-badge/FilterBadge';
+import PTag, { tagList } from '@/components/molecules/tags/Tag';
 
 export default {
     title: 'organisms/lists/ToolboxCardList',
@@ -18,7 +18,7 @@ export default {
 };
 
 const setup = (props, context) => {
-    const filterTools = filterBadgeList(ref(['tag1', 'filtertag2']));
+    const filterTools = tagList(ref(['tag1', 'filtertag2']));
     const sortBy = ref('Name');
 
     const onPageChange = action('pageChange');
@@ -103,7 +103,7 @@ export const cardItemSlot = () => ({
         PButton,
         PI,
         PDropdownMenuBtn,
-        PFilterBadge,
+        PTag,
     },
     props: {
         // ...autoProps(PCardList),
@@ -154,12 +154,11 @@ export const cardItemSlot = () => ({
                     @sortChange="onSortChange"
                 >   
                     <template #filters>
-                        <p-filter-badge v-for="(filter, idx) in filterTools.filters" :key="idx+filter"
-                                        :idx="idx"
-                                        @delete="filterTools.deleteTag"
+                        <p-tag v-for="(filter, idx) in filterTools.tags" :key="idx+filter"
+                                        @delete="filterTools.deleteTag(idx)"
                         >
                             {{ filter }}
-                        </p-filter-badge>
+                        </p-tag>
                     </template>
                     <template #card-extra="{item}">
                         <p-row style="height: 100%;">

@@ -1,39 +1,38 @@
 import _ from 'lodash';
 import { boolean } from '@storybook/addon-knobs/vue';
-import PTagInputGroup from './TagInputGroup';
+import PDictInputGroup from './DictInputGroup.vue';
 
 export default {
-    title: 'organisms/forms/tag-input-group',
-    component: PTagInputGroup,
+    title: 'organisms/forms/DictInputGroup',
+    component: PDictInputGroup,
     parameters: {
         info: {
             summary: '',
-            components: { PTagInputGroup },
+            components: { PDictInputGroup },
         },
     },
 };
 const actions = {};
 const data = {
-    tags: {
+    dict: {
         tag1: 'tag1 value',
         tag2: 'tag2 value',
         tag3: 'tag3 value',
         tag4: 'tag4 value',
     },
 };
-
-export const tagInputGroup = () => ({
-    components: { PTagInputGroup },
+export const defaultCase = () => ({
+    components: { PDictInputGroup },
     template: `
 <div style="width: 80vw;">
 
 
-<PTagInputGroup :tags.sync="tags" :editMode="editMode" >
+<p-dict-input-group :dict.sync="dict" :editMode="editMode" >
 
-</PTagInputGroup>
+</p-dict-input-group>
 <h6>tag binding</h6>
 <p>
-{{destructTags}}
+{{destructDict}}
 </p>
 </div>
 `,
@@ -51,21 +50,21 @@ export const tagInputGroup = () => ({
         },
     },
     computed: {
-        destructTags() {
-            return _.toPairsIn(this.tags);
+        destructDict() {
+            return _.toPairsIn(this.dict);
         },
     },
 });
 
 export const editMode = () => ({
-    components: { PTagInputGroup },
+    components: { PDictInputGroup },
     template: `
 <div style="width: 80vw;">
-<PTagInputGroup :tags.sync="tags" :editMode="editMode" >
-</PTagInputGroup>
+<p-dict-input-group :dict.sync="dict" :editMode="editMode" >
+</p-dict-input-group>
 <h6>tag binding</h6>
 <p>
-{{destructTags}}
+{{destructDict}}
 </p>
 </div>
 `,
@@ -83,8 +82,8 @@ export const editMode = () => ({
         },
     },
     computed: {
-        destructTags() {
-            return _.toPairsIn(this.tags);
+        destructDict() {
+            return _.toPairsIn(this.dict);
         },
     },
 });
