@@ -35,6 +35,7 @@ Vue.prototype.$velocity = velocity;
  * Please, name your '$emit' event name as action + Event such as
  * nodeSelectedEvent, closeModalEvent
  **************************************************************** */
+
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
 
