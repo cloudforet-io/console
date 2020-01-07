@@ -126,7 +126,7 @@ export default {
             try {
 
                 if (!this.isEmpty(credential_group_id)) {
-                    let response = await this.getCredentials(credential_group_id, 'credential-group');
+                    let response = await this.getCredentials(credential_group_id, 'credentials-group');
                     if (!this.isEmpty(response.data)){
                         const credentails = response.data.results[0].credentials;
                         mergeGroup = credentails;
