@@ -6,7 +6,7 @@
             </template>
         </p-info-panel>
 
-        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="confirm" />
+        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="tagConfirmEvent" />
     </div>
 </template>
 
@@ -55,7 +55,6 @@ export default {
             dictPanel.value.reset();
         };
         mountBusEvent(userEventBus, props.tagResetEvent, resetTag);
-w
         return {
             baseDefs,
             tags,
