@@ -14,7 +14,7 @@ export const defaultCase = () => ({
     components: { PBoxLayout },
     props: {
         ...autoProps(PBoxLayout, [
-            { style: { default: select('style', ['primary4']) } },
+            { boxStyle: { default: select('boxStyle', ['primary4']) } },
         ]),
     },
     template: `

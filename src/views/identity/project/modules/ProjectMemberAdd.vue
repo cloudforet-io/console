@@ -91,7 +91,6 @@ import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
-import PTagsInput from '@/components/molecules/tags-input/TagsInput.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PLabel from '@/components/atoms/labels/Label.vue';
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
@@ -103,7 +102,6 @@ export default {
     components: {
         PButtonModal,
         PToolboxTable,
-        PTagsInput,
         PTextInput,
         PSearch,
         PLabel,

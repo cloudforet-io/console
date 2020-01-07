@@ -91,7 +91,7 @@ import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PSearch from '@/components/molecules/search/Search';
-import PTagsInput from '@/components/molecules/tags-input/TagsInput';
+import PTagsInput from '@/components/organisms/forms/tags-input/TagsInput';
 import PTextInput from '@/components/atoms/inputs/TextInput';
 import PLabel from '@/components/atoms/labels/Label';
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
