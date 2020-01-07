@@ -9,7 +9,7 @@ import { arrayOf } from '@/lib/casual';
 
 
 export default {
-    title: 'view/identity/user',
+    title: 'view/secret/credentials',
     component: Credentials,
     parameters: {
         info: {

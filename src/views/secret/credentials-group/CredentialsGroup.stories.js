@@ -1,3 +1,4 @@
+/*
 import { action } from '@storybook/addon-actions';
 import CredentialsGroup from './CredentialsGroup.template.vue';
 
@@ -12,14 +13,14 @@ export default {
     },
 };
 const actions = {
-    /*rowLeftClick: action('rowLeftClick'),
+    /!*rowLeftClick: action('rowLeftClick'),
     rowRightClick: action('rowRightClick'),
     rowMiddleClick: action('rowMiddleClick'),
     rowMouseOver: action('rowMouseOver'),
     rowMouseOut: action('rowMouseOut'),
     clickRefresh() {
         return action('clickRefresh');
-    },*/
+    },*!/
 };
 
 
@@ -35,3 +36,4 @@ export const template = () => ({
     computed: {
     },
 });
+*/
