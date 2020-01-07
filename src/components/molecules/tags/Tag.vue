@@ -76,6 +76,7 @@ export default {
         margin-right: .5rem;
         vertical-align: middle;
         padding-right: 0.15rem;
+        white-space: nowrap;
         .icon {
             color: $gray1;
             cursor: pointer;

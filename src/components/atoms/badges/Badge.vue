@@ -58,6 +58,7 @@ export default {
 }
 .badge{
     all: unset;
+    display: inline-block;
     border-radius: 100px;
     background-clip: padding-box;
     text-align: center;
