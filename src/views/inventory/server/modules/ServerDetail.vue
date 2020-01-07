@@ -56,7 +56,7 @@
                 {{ arrayFormatter(scope.value) }}
             </template>
         </p-info-panel>
-        <p-tag-panel ref="tagPanel" :tags.sync="tags" @confirm="confirm" />
+        <p-dict-panel ref="dictPanel" :dict.sync="dict" @confirm="confirm" />
     </div>
 </template>
 
@@ -65,7 +65,7 @@ import {
     computed, ref, watch,
 } from '@vue/composition-api';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel';
 import PBadge from '@/components/atoms/badges/Badge';
 import PStatus from '@/components/molecules/status/Status';
 import {
@@ -78,7 +78,7 @@ import { makeTrItems } from '@/lib/view-helper';
 export default {
     name: 'PServerDetail',
     components: {
-        PInfoPanel, PTagPanel, PBadge, PStatus,
+        PInfoPanel, PDictPanel, PBadge, PStatus,
     },
     props: {
         item: {
@@ -126,13 +126,13 @@ export default {
             ['created_by_user_id', 'COMMON.CREATE_BY'],
             ['security_groups', 'COMMON.SEC_GROUP'],
         ], parent, { copyFlag: true });
-        const tags = ref({ ...props.item.tags });
+        const dict = ref({ ...props.item.tags });
         watch(() => props.item, (value) => {
-            tags.value = value.tags;
+            dict.value = value.tags;
         });
-        const tagPanel = ref(null);
+        const dictPanel = ref(null);
         const resetTag = () => {
-            tagPanel.value.resetTag();
+            dictPanel.value.reset();
         };
         mountBusEvent(ServerEventBus, props.tagResetEvent, resetTag);
 
@@ -140,8 +140,8 @@ export default {
             baseDefs,
             vmDefs,
             computeDefs,
-            tags,
-            tagPanel,
+            dict,
+            dictPanel,
             confirm(...event) {
                 ServerEventBus.$emit(props.tagConfirmEvent, props.item.server_id, ...event);
             },

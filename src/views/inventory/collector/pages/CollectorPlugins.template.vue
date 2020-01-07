@@ -3,7 +3,7 @@
         <p-vertical-layout>
             <template #leftContainer="{width}">
                 <div :style="{width: width}">
-                    <plugin-filter :filters.sync="filterTools.filters"
+                    <plugin-filter :filters.sync="filterTools.tags"
                                    @goBack="goBack"
                                    @search="search"
                                    @repoChange="repoChange"
@@ -22,11 +22,11 @@
                     @filterChange="onFilterChange"
                 >
                     <template #filters>
-                        <p-filter-badge v-for="(filter, idx) in filterTools.filters" :key="`${idx}-${filter}`"
-                                        :idx="idx"
+                        <p-tag v-for="(filter, idx) in filterTools.tags" :key="`${idx}-${filter}`"
+                               @delete="filterTools.deleteTag(idx)"
                         >
                             {{ filter }}
-                        </p-filter-badge>
+                        </p-tag>
                     </template>
                     <template #card-extra="{item}">
                         <p-row style="height: 100%;">
@@ -70,7 +70,7 @@ import PBadge from '@/components/atoms/badges/Badge';
 import PButton from '@/components/atoms/buttons/Button';
 import PI from '@/components/atoms/icons/PI';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
-import PFilterBadge, { filterBadgeList } from '@/components/molecules/badges/filter-badge/FilterBadge';
+import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 
 import PluginFilter from '@/views/inventory/collector/modules/PluginFilter';
 
@@ -110,7 +110,7 @@ const setPluginList = (props, context) => {
 
 
 const setFilters = (props, context, listState) => {
-    const filterTools = filterBadgeList();
+    const filterTools = tagList();
 
     return {
         filterTools,
@@ -143,7 +143,7 @@ export default {
         PI,
         PDropdownMenuBtn,
         PluginFilter,
-        PFilterBadge,
+        PTag,
     },
     setup(props, context) {
         return setup(props, context);

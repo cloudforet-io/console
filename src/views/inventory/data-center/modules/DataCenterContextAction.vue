@@ -47,12 +47,12 @@
             </div>
             <div class="input-tag-card">
                 <div>
-                    <p-tag-input-group ref="tagPanel"
-                                       :use-full-col="true"
-                                       :tag-key-placeholder="'key'"
-                                       :tag-value-placeholder="'value'"
-                                       :edit-mode="tagInput.editMode"
-                                       :tags.sync="tagInput.tags"
+                    <p-dict-input-group ref="tagPanel"
+                                        :use-full-col="true"
+                                        :tag-key-placeholder="'key'"
+                                        :tag-value-placeholder="'value'"
+                                        :edit-mode="tagInput.editMode"
+                                        :dict.sync="tagInput.tags"
                     />
                 </div>
             </div>
@@ -70,7 +70,7 @@ import _ from 'lodash';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PLabel from '@/components/atoms/labels/Label';
 import PTextInput from '@/components/atoms/inputs/TextInput';
-import PTagInputGroup from '@/components/organisms/forms/tag-input-group/TagInputGroup';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup';
 
 export default {
     name: 'DataCenterContextAction',
@@ -78,7 +78,7 @@ export default {
         PButtonModal,
         PLabel,
         PTextInput,
-        PTagInputGroup,
+        PDictInputGroup,
     },
     props: {
         selectedNode: {

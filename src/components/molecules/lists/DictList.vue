@@ -1,20 +1,20 @@
 <template>
     <p-ul>
-        <p-li v-for="(key,value) in tags" :key="key">
+        <p-li v-for="(value, key) in dict" :key="key">
             {{ key }} : {{ value }}
         </p-li>
     </p-ul>
 </template>
 
 <script>
-import PUl from '@/components/atoms/lists/orun-list/Ul';
-import PLi from '@/components/atoms/lists/orun-list/Li';
+import PUl from '@/components/atoms/lists/orun-list/Ul.vue';
+import PLi from '@/components/atoms/lists/orun-list/Li.vue';
 
 export default {
-    name: 'PTagList',
+    name: 'PDictList',
     components: { PLi, PUl },
     props: {
-        tags: {
+        dict: {
             type: Object,
             default: () => {},
         },

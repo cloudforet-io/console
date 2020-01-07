@@ -5,10 +5,10 @@
                    :item="item"
                    :defs="topPanel"
         />
-        <p-tag-panel v-show="isVisible"
-                     ref="tagPanel"
-                     :tags.sync="tags"
-                     @confirm="updateTag"
+        <p-dict-panel v-show="isVisible"
+                      ref="tagPanel"
+                      :dict.sync="tags"
+                      @confirm="updateTag"
         />
     </div>
 </template>
@@ -16,14 +16,13 @@
 <script>
 import _ from 'lodash';
 import InfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
-import PLottie from '@/components/molecules/lottie/PLottie';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel';
 
 export default {
     name: 'ProjectSummary',
     components: {
         InfoPanel,
-        PTagPanel,
+        PDictPanel,
     },
     props: {
         selectedNode: {
@@ -79,7 +78,7 @@ export default {
         async updateTag() {
             const selectedNodeDT = this.selectedNode.node.data;
             const tags = { tags: this.tags };
-            const param = {...tags };
+            const param = { ...tags };
             const key = `${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}_id`;
             param[key] = selectedNodeDT.id;
             const url = `/inventory/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/update`;
@@ -100,7 +99,7 @@ export default {
             await this.$http.post(url, param).then((response) => {
                 if (!this.isEmpty(response.data)) {
                     this.item = {
-                        id: response.data.hasOwnProperty('region_id') ? response.data.region_id : response.data.hasOwnProperty('zone_id') ?response.data.zone_id : response.data.pool_id,
+                        id: response.data.hasOwnProperty('region_id') ? response.data.region_id : response.data.hasOwnProperty('zone_id') ? response.data.zone_id : response.data.pool_id,
                         name: response.data.name,
                         create: this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone),
                     };
