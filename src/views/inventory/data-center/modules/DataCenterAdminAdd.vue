@@ -50,12 +50,13 @@
                         {{ data.item.email }}
                     </template>
                 </p-toolbox-table>
-                <p-input-tag
-                    :responsive-style="{'height': '15vh', 'overflow-y':'auto', 'margin-left': '1rem'}"
-                    :tag-text.sync="tagRelated.currentTagText"
-                    :tag-array.sync="tagRelated.Tags"
-                    :tag-place-holder="tagRelated.placeHolder"
-                />
+                <p-box-layout class="tag-container">
+                    <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
+                           @delete="tagTools.deleteTag(idx)"
+                    >
+                        {{ tag }}
+                    </p-tag>
+                </p-box-layout>
                 <div class="label-group">
                     <div class="form-group">
                         <p-label class="input-title">
@@ -90,9 +91,11 @@ import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PSearch from '@/components/molecules/search/Search';
-import PInputTag from '@/components/molecules/tags-input/TagsInput';
+import PTagsInput from '@/components/organisms/forms/tags-input/TagsInput';
 import PTextInput from '@/components/atoms/inputs/TextInput';
 import PLabel from '@/components/atoms/labels/Label';
+import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
 
 export default {
     name: 'ProjectMemberAdd',
@@ -100,10 +103,12 @@ export default {
     components: {
         PButtonModal,
         PToolboxTable,
-        PInputTag,
+        PTagsInput,
         PTextInput,
         PSearch,
         PLabel,
+        PTag,
+        PBoxLayout,
     },
     props: {
         referenceMember: {
@@ -131,11 +136,7 @@ export default {
                 allPage: 1,
                 pageSize: 15,
             },
-            tagRelated: {
-                currentTagText: '',
-                Tags: [],
-                placeHolder: '',
-            },
+            tagTools: tagList(),
         };
     },
     computed: {
@@ -242,8 +243,9 @@ export default {
         },
         async addUserOnDataCenter() {
             const selectedNodeDT = this.$parent.selectedNode.node.data;
-            const param = { users: _.map(this.tagRelated.Tags, 'text') };
+            const param = { users: _.map(this.tagTools.tags, 'text'), ...selectedId };
             const key = `${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}_id`;
+
             param[key] = selectedNodeDT.id;
             const url = `/inventory/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/add`;
 
@@ -258,16 +260,15 @@ export default {
             }
             await this.$http.post(url, param).then(() => {
                 this.$parent.getMembers();
-                this.tagRelated.Tags = [];
+                // this.tagRelated.Tags = [];
+                this.tagTools.tags = [];
                 this.hideModal();
             }).catch((error) => {
                 console.error(error);
             });
         },
         onSelect(item, index, event) {
-            if (!_.find(this.tagRelated.Tags, { text: item.user_id })) {
-                this.tagRelated.Tags.push({ text: item.user_id, tiClasses: ['ti-valid'] });
-            }
+            this.tagTools.addTag(item.user_id);
         },
         search() {
             this.listMembersOnSearch(this.searchText);

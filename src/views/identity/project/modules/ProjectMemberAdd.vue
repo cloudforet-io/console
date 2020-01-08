@@ -50,12 +50,13 @@
                         {{ data.item.email }}
                     </template>
                 </p-toolbox-table>
-                <p-input-tag
-                    :responsive-style="{'height': '15vh', 'overflow-y':'auto', 'margin-left': '1rem'}"
-                    :tag-text.sync="tagRelated.currentTagText"
-                    :tag-array.sync="tagRelated.Tags"
-                    :tag-place-holder="tagRelated.placeHolder"
-                />
+                <p-box-layout class="tag-container">
+                    <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
+                           @delete="tagTools.deleteTag(idx)"
+                    >
+                        {{ tag }}
+                    </p-tag>
+                </p-box-layout>
                 <div class="label-group">
                     <div class="form-group">
                         <p-label class="input-title">
@@ -87,12 +88,13 @@
 <script>
 import _ from 'lodash';
 import { defaultQuery } from '@/lib/api';
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
-import PSearch from '@/components/molecules/search/Search';
-import PInputTag from '@/components/molecules/tags-input/TagsInput';
-import PTextInput from '@/components/atoms/inputs/TextInput';
-import PLabel from '@/components/atoms/labels/Label';
+import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import PSearch from '@/components/molecules/search/Search.vue';
+import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+import PLabel from '@/components/atoms/labels/Label.vue';
+import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
 
 export default {
     name: 'ProjectMemberAdd',
@@ -100,10 +102,11 @@ export default {
     components: {
         PButtonModal,
         PToolboxTable,
-        PInputTag,
         PTextInput,
         PSearch,
         PLabel,
+        PTag,
+        PBoxLayout,
     },
     props: {
         referenceMember: {
@@ -131,11 +134,7 @@ export default {
                 allPage: 1,
                 pageSize: 15,
             },
-            tagRelated: {
-                currentTagText: '',
-                Tags: [],
-                placeHolder: '',
-            },
+            tagTools: tagList(),
         };
     },
     computed: {
@@ -164,9 +163,6 @@ export default {
                 },
             ];
         },
-    },
-    mounted() {
-
     },
     methods: {
         removeCSS() {
@@ -210,13 +206,12 @@ export default {
             };
         },
         async listMembersOnSearch(text) {
-            const defaultQuery = this.getDefaultQuery();
             const query = {
                 keyword: this.isEmpty(text) ? this.searchText : text,
                 filter: [
                     { key: 'user_id', value: this.referenceMember, operator: 'not_in' },
                 ],
-                ...defaultQuery,
+                ...this.getDefaultQuery(),
             };
             await this.$http.post('/identity/user/list', { query }).then((response) => {
                 this.users = response.data.results;
@@ -242,32 +237,32 @@ export default {
         },
         async addUserOnProject() {
             const selectedNodeDT = this.$parent.selectedNode.node.data;
+            // eslint-disable-next-line camelcase
             const selectedId = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
             const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/add`;
-            const param = { users: _.map(this.tagRelated.Tags, 'text'), ...selectedId };
+            const param = { users: _.map(this.tagTools.tags, 'text'), ...selectedId };
 
             if (!this.isEmpty(this.label.input)) {
                 const isValid = this.checkValidity();
                 if (isValid === false) {
-                    return false;
+                    return;
                 }
                 param.labels = isValid;
             } else if (this.isEmpty(param.users)) {
-                return false;
+                return;
             }
 
             await this.$http.post(url, param).then(() => {
                 this.$parent.getMembers();
-                this.tagRelated.Tags = [];
+                // this.tagRelated.Tags = [];
+                this.tagTools.tags = [];
                 this.hideModal();
             }).catch((error) => {
                 console.error(error);
             });
         },
-        onSelect(item, index, event) {
-            if (!_.find(this.tagRelated.Tags, { text: item.user_id })) {
-                this.tagRelated.Tags.push({ text: item.user_id, tiClasses: ['ti-valid'] });
-            }
+        onSelect(item) {
+            this.tagTools.addTag(item.user_id);
         },
         search() {
             this.listMembersOnSearch(this.searchText);
@@ -282,13 +277,16 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-    .tag-input {
+    .tag-container {
+        min-height: 80px;
+    }
+    /*.tag-input {
         height: 20vh;
         overflow-y: auto;
         background: $primary4 0% 0% no-repeat padding-box;
         border: 1px solid $gray3;
         opacity: 1;
-    }
+    }*/
     .label-group {
         margin-bottom: 0rem;
     }

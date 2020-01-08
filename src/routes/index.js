@@ -5,13 +5,14 @@ import VueRouter from 'vue-router';
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
 import identityRoute from '@/routes/identity/identity-route';
 import inventoryRoute from '@/routes/inventory/inventory-route';
+import secretRoute from '@/routes/secret/secret-route';
 import DefaultContainer from '@/views/containers/DefaultContainer';
 
 // Views
-import SignIn from '@/views/sign-in/local/Local';
-import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth';
-import Admin from '@/views/sign-in/admin/Admin';
-import Redirect404 from '@/views/common/404/Redirect404';
+import SignIn from '@/views/sign-in/local/Local.vue';
+import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth.vue';
+import Admin from '@/views/sign-in/admin/Admin.vue';
+import Redirect404 from '@/views/common/404/Redirect404.vue';
 import api from '@/lib/api';
 import store from '@/store';
 
@@ -56,6 +57,7 @@ const router = new VueRouter({
                 dashboardRoute,
                 identityRoute,
                 inventoryRoute,
+                secretRoute
             ],
         },
         { path: '*', component: Redirect404 },

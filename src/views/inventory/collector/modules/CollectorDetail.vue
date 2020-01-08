@@ -29,7 +29,7 @@
             </template>
         </p-info-panel>
 
-        <p-tag-panel ref="tagPanel" :tags.sync="tags" @confirm="confirm" />
+        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="confirm" />
 
         <p-info-panel class="last-panel" info-title="Filter Format">
             <p-data-table
@@ -45,17 +45,16 @@
 
 <script>
 import {
-    ref, watch, computed, reactive, toRefs,
+    watch, computed, reactive, toRefs,
 } from '@vue/composition-api';
-import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
-import PStatus from '@/components/molecules/status/Status';
-import PI from '@/components/atoms/icons/PI';
+import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import PStatus from '@/components/molecules/status/Status.vue';
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { makeTrItems } from '@/lib/view-helper';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable';
+import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import config from '@/lib/config';
 
 const setBaseInfoStates = (props, parent) => {
@@ -78,13 +77,13 @@ const setBaseInfoStates = (props, parent) => {
     };
 };
 
-const setTagStates = (props, parent) => {
+const setTagStates = (props) => {
     const state = reactive({
         tags: props.item.tags,
         confirm(...event) {
             collectorEventBus.$emit('confirmTags', props.item.collector_id, ...event);
         },
-        tagPanel: null,
+        dictPanel: null,
     });
 
     watch(() => props.item, (value) => {
@@ -92,7 +91,7 @@ const setTagStates = (props, parent) => {
     });
 
     const resetTag = () => {
-        state.tagPanel.resetTag();
+        state.dictPanel.reset();
     };
     mountBusEvent(collectorEventBus, 'resetTags', resetTag);
 
@@ -123,7 +122,7 @@ const setFilterFormatStates = (props, parent) => {
 export default {
     name: 'PServerDetail',
     components: {
-        PI, PInfoPanel, PTagPanel, PDataTable, PStatus,
+        PInfoPanel, PDictPanel, PDataTable, PStatus,
     },
     props: {
         item: {

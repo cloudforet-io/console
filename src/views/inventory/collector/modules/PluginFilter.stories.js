@@ -3,7 +3,7 @@ import { toRefs, reactive } from '@vue/composition-api';
 import { autoProps } from '@sb/storybook-util';
 import { action } from '@storybook/addon-actions';
 import PluginFilter from './PluginFilter';
-import { filterBadgeList } from '@/components/molecules/badges/filter-badge/FilterBadge';
+import { tagList } from '@/components/molecules/tags/Tag';
 
 export default {
     title: 'view/inventory/collector/modules/PluginFilter',
@@ -13,7 +13,7 @@ export default {
 
 
 const setFilters = (props, context, listState) => {
-    const filterTools = filterBadgeList();
+    const filterTools = tagList();
 
     return {
         filterTools,

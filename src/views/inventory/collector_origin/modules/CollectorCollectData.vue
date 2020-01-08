@@ -245,7 +245,7 @@ export default {
                 try {
 
                     if (!this.isEmpty(credential_group_id)) {
-                        let response = await this.getCredentials(credential_group_id, 'credential-group');
+                        let response = await this.getCredentials(credential_group_id, 'credentials-group');
                         if (!this.isEmpty(response.data)){
                             const credentails = response.data.results[0].credentials;
                             mergeGroup = credentails;
@@ -253,7 +253,7 @@ export default {
                     }
 
                     if (!this.isEmpty(credential_id)) {
-                        let response = await this.getCredentials(credential_id, 'credential');
+                        let response = await this.getCredentials(credential_id, 'credentials');
                         if (!this.isEmpty(response.data)){
                             this.tableData = this.isEmpty(mergeGroup) ? response.data.results : merge(mergeGroup, response.data.results, 'credential_id');
                         }

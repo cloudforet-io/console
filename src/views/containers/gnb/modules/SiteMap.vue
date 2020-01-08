@@ -83,6 +83,27 @@
                         Project
                     </router-link>
                 </li>
+                <li>
+                    <router-link class="group" to="/secret">
+                        <span class="icon">
+                            <p-i name="ic_identity" width="24px" height="24px"
+                                 color="transparent inherit"
+                            />
+                        </span>
+                        <span class="name">Secret</span>
+                    </router-link>
+                </li>
+
+                <li>
+                    <router-link class="service" to="/secret/credentials-group">
+                        Credentials Group
+                    </router-link>
+                </li>
+                <li>
+                    <router-link class="service" to="/secret/credentials">
+                        Credentials
+                    </router-link>
+                </li>
             </ul>
         </div>
         <div

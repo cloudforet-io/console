@@ -1,8 +1,8 @@
 <template>
-    <div class="p-tag-input" v-on="$listeners">
-        <div class="tag-input-box tag-key-input">
+    <div class="p-dict-input" v-on="$listeners">
+        <div class="dict-input-box dict-key-input">
             <p-input-text
-                class="tag-input"
+                class="dict-input"
                 :value="name"
                 :disabled="disabled"
                 :placeholder="tagKeyPlaceholder"
@@ -10,25 +10,25 @@
             />
         </div>
         &nbsp;
-        <span class="tag-input-split" :class="{disabled}">{{ disabled? '': ':' }}</span>
+        <span class="dict-input-split" :class="{disabled}">{{ disabled? '': ':' }}</span>
         &nbsp;
-        <div class="tag-input-box tag-value-input">
+        <div class="dict-input-box dict-value-input">
             <p-input-text
-                class="tag-input"
+                class="dict-input"
                 :value="value"
                 :disabled="disabled"
                 :placeholder="tagValuePlaceholder"
-                @input="$emit('update:value',$event)"
+                @input="$emit('update:value', $event)"
             />
         </div>
     </div>
 </template>
 
 <script>
-import PInputText from '@/components/atoms/inputs/TextInput';
+import PInputText from '@/components/atoms/inputs/TextInput.vue';
 
 export default {
-    name: 'PTagInput',
+    name: 'PDictInput',
     components: { PInputText },
     props: {
         name: String,
@@ -44,30 +44,30 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .p-tag-input{
+    .p-dict-input {
         display: inline-flex;
         align-items: center;
     }
-    .tag-input-split{
+    .dict-input-split{
         padding-left: 0.125rem;
         padding-right: 0.125rem;
         &.disabled{
             width: 0.5625rem;
         }
     }
-    .tag-input-box{
-        &.tag-key-input{
+    .dict-input-box{
+        &.dict-key-input{
             flex-grow: 1;
             flex-shrink: 1;
             flex-basis: 7.5rem;
         }
-        &.tag-value-input{
+        &.dict-value-input{
             flex-grow: 1.5;
             flex-shrink: 1;
             flex-basis: 15rem;
         }
     }
-    .tag-input{
+    .dict-input{
         width: 100%;
         box-sizing: border-box;
     }
