@@ -1,7 +1,7 @@
 <template>
     <div class="p-context-menu" style="display: block;" :class="theme">
         <template v-for="(item, index) in menu">
-            <a v-if="item.type==='item'" :id="`context-item-${index}`" :key="index"
+            <a v-if="item.type==='item'" :id="`context-item-${index}-${uuid}`" :key="index"
                :tabindex="index"
                class="context-content context-item no-drag"
                :class="[{disabled:item.disabled},theme]"
@@ -42,6 +42,7 @@ export default {
         },
     },
     setup(props, context) {
+        const uuid = `${Math.random()}`.slice(2);
         const menuClick = (eventName, index, event) => {
             if (!props.menu[index].disabled) {
                 context.emit(`click-${eventName}`, index, event);
@@ -55,9 +56,10 @@ export default {
             }
             return idxs;
         });
-        const focus = (idx) => {
-            const pos = idx || itemsIndex.value[0];
-            document.getElementById(`context-item-${itemsIndex.value[pos]}`).focus();
+        const focus = (position) => {
+            const pos = position || itemsIndex.value[0];
+            const idx = itemsIndex.value[pos];
+            document.getElementById(`context-item-${idx}-${uuid}`).focus();
         };
         const onUpKey = (idx) => {
             const pos = itemsIndex.value.indexOf(idx);
@@ -68,7 +70,7 @@ export default {
             if (pos !== itemsIndex.value.length) { focus(pos); }
         };
         return {
-            menuClick, onDownKey, onUpKey, focus,
+            menuClick, onDownKey, onUpKey, focus, uuid,
         };
     },
 };
