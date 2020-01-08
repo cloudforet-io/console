@@ -1,5 +1,5 @@
 <template>
-    <p-panel-top panel-title="Tags" class="tag-panel-title">
+    <p-panel-top panel-title="Tags" class="dict-panel-title">
         <template #head>
             <div class="panel-header" :class="{'edit':editMode}">
                 <p-button v-if="!editMode" style-type="primary" class="header-btn"
@@ -21,11 +21,11 @@
             </div>
         </template>
         <template #body>
-            <p-tag-input-group ref="tagInputGroup"
-                               :tags.sync="proxyTags"
-                               :edit-mode="editMode"
+            <p-dict-input-group ref="tagInputGroup"
+                                :dict.sync="proxyTags"
+                                :edit-mode="editMode"
             />
-            <div v-if="isEmpty(proxyTags) && !editMode" class="no-tag">
+            <div v-if="isEmpty(proxyTags) && !editMode" class="no-dict">
                 No Tags
             </div>
         </template>
@@ -36,34 +36,34 @@
 import { reactive, toRefs, computed } from '@vue/composition-api';
 import { Util } from '@/lib/global-util';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop';
-import PTagInputGroup from '@/components/organisms/forms/tag-input-group/TagInputGroup';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup';
 import PButton from '@/components/atoms/buttons/Button';
 import { makeProxy } from '@/lib/compostion-util';
 
 export default {
-    name: 'PTagPanel',
+    name: 'PDictPanel',
     components: {
         PPanelTop,
-        PTagInputGroup,
+        PDictInputGroup,
         PButton,
     },
     events: ['confirm'],
     props: {
-        tags: Object,
+        dict: Object,
     },
     setup(props, context) {
         const state = reactive({
             buttonTag: computed(() => ((Util.methods.isEmpty(state.proxyTags)) ? Util.methods.tr('COMMON.BTN_ADD', null, context.parent) : Util.methods.tr('COMMON.BTN_EDIT', null, context.parent))),
             editMode: false,
             originTags: undefined,
-            proxyTags: makeProxy('tags', props, context.emit),
+            proxyTags: makeProxy('dict', props, context.emit),
             tagInputGroup: null, // template refs
         });
 
         const clickEdit = () => {
             state.editMode = true;
             state.originTags = {
-                ...props.tags,
+                ...props.dict,
             };
         };
         const clickCancel = () => {
@@ -71,14 +71,14 @@ export default {
             state.proxyTags = {
                 ...state.originTags,
             };
-            state.tagInputGroup.resetTag();
+            state.tagInputGroup.reset();
         };
         const clickConfirm = () => {
             state.editMode = false;
             if (JSON.stringify(state.originTags) !== JSON.stringify(state.proxyTags)) {
                 context.emit('confirm', state.proxyTags);
             }
-            state.tagInputGroup.resetTag();
+            state.tagInputGroup.reset();
         };
 
 
@@ -87,8 +87,8 @@ export default {
             clickEdit,
             clickCancel,
             clickConfirm,
-            // if tag confirm fail, you can reset tags to before edit value
-            resetTag: () => {
+            // if tag confirm fail, you can reset dict to before edit value
+            reset: () => {
                 state.proxyTags = state.originTags;
             },
         };
@@ -98,7 +98,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .tag-panel-title{
+    .dict-panel-title{
         min-height: 100px;
     };
     .panel-header{
@@ -112,7 +112,7 @@ export default {
             margin-left: 1rem;
         }
     }
-    .no-tag{
+    .no-dict{
         text-align: center;
         font: 24px/32px Arial;
         letter-spacing: 0;

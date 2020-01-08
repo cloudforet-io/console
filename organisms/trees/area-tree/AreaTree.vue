@@ -1,11 +1,12 @@
 <template>
     <div>
         <div class="row no-gutters" @click="contextMenuIsVisible=false">
-            <transition appear name="tree-trans" @before-enter="beforeEnter"
+            <transition appear name="tree-trans"
+                        @before-enter="beforeEnter"
                         @enter="enter"
             >
                 <div v-if="showTree">
-                    <vertical-layout :auto-save-left-width="true">
+                    <p-vertical-layout :auto-save-left-width="true">
                         <template #leftContainer="{ width }">
                             <div id="rootPanel"
                                  @click.right.stop="isRootClicked"
@@ -26,7 +27,7 @@
                         </template>
                         <template #rightContainer>
                             <transition name="panel-trans">
-                                <div v-if="hasSelected" :key="getNodekeyComputed" class="panel">
+                                <div v-if="hasSelected" :key="getNodeKeyComputed" class="panel">
                                     <slot name="treeSubPanel" />
                                 </div>
                                 <div v-else class="empty">
@@ -40,7 +41,7 @@
                                 </div>
                             </transition>
                         </template>
-                    </vertical-layout>
+                    </p-vertical-layout>
                     <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
                         <slot name="context" v-bind="getCurrentNode" />
                     </div>
@@ -51,16 +52,20 @@
 </template>
 <script>
 import _ from 'lodash';
-import PTree from '@/components/molecules/tree/Tree';
-import PI from '@/components/atoms/icons/PI';
+import {
+    reactive, toRefs, computed, onMounted,
+} from '@vue/composition-api';
+import PTree from '@/components/molecules/tree/Tree.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 import styles from '@/styles/_variables.scss';
-import VerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
+import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
+import { Util } from '@/lib/global-util';
 
 export default {
-    name: 'DefaultTree',
+    name: 'AreaTree',
     components: {
         PTree,
-        VerticalLayout,
+        PVerticalLayout,
         PI,
     },
     mixins: [PTree],
@@ -94,8 +99,8 @@ export default {
             default: 250,
         },
     },
-    data() {
-        return {
+    setup(props, context) {
+        const state = reactive({
             showContextFirst: false,
             selectedLeftWidth: 300,
             nodeKey: 0,
@@ -104,109 +109,56 @@ export default {
             showTree: false,
             noticePanelMsg: '',
             clickedNode: null,
-        };
-    },
-    computed: {
-        getNoSelectMSG() {
-            return [this.tr(this.noSelectMSG[0]), this.tr(this.noSelectMSG[1])];
-        },
-        getCurrentNode() {
-            const node = this.getTree();
-            return this.isEmpty(node) ? null : node;
-        },
-        selectedTreeProp() {
-            let returnVal = this.treeProp;
-            if (this.isEmpty(returnVal)) {
-                returnVal = [{
-                    title: '!Please, Right Click me',
-                    isLeaf: true,
-                    init: true,
-                }];
-            }
-            return returnVal;
-        },
-        getNodekeyComputed() {
-            return this.nodeKey;
-        },
-    },
-    mounted() {
-        this.showTree = true;
-    },
-    methods: {
-        setContextVisible(flag) {
-            if (this.isSelectedType(flag, 'b')) {
-                this.contextMenuIsVisible = flag;
-            }
-        },
-        getTree() {
-            return this.isEmpty(this) ? null : _.get(this, '$refs.primeTree.$refs.slVueTree');
-        },
-        getNodeEl(node) {
-            return this.$refs.primeTree.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
-        },
-        addClickedClass(node) {
-            const elem = this.getNodeEl(node);
+        });
+
+        onMounted(() => {
+            state.showTree = true;
+        });
+
+        const getTree = () => (Util.methods.isEmpty(context) ? null : _.get(context, 'refs.primeTree.$refs.slVueTree'));
+
+        const getNoSelectMSG = computed(() => [Util.methods.tr(props.noSelectMSG[0], null, context.parent), Util.methods.tr(props.noSelectMSG[1], null, context.parent)]);
+        const getNodeKeyComputed = computed(() => state.nodeKey);
+        const getCurrentNode = computed(() => {
+            const node = getTree();
+            return Util.methods.isEmpty(node) ? null : node;
+        });
+
+        const getNodeEl = node => context.refs.primeTree.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
+
+        const addClickedClass = (node) => {
+            const elem = getNodeEl(node);
             if (elem) {
                 elem.classList.add('sl-vue-node-clicked');
                 return true;
             }
             return false;
-        },
-        removeAllClass() {
-            const elem = this.$refs.primeTree.$refs.slVueTree.$el.querySelectorAll('.sl-vue-tree-nodes-list .sl-vue-tree-node .sl-vue-node-clicked');
+        };
+
+        const removeAllClass = () => {
+            const elem = context.refs.primeTree.$refs.slVueTree.$el.querySelectorAll('.sl-vue-tree-nodes-list .sl-vue-tree-node .sl-vue-node-clicked');
             elem.forEach((curItem) => {
                 curItem.classList.remove('sl-vue-node-clicked');
             });
-        },
-        removeClickedClass(node) {
-            const elem = this.getNodeEl(node);
+        };
+
+        const removeClickedClass = (node) => {
+            const elem = getNodeEl(node);
             if (elem) {
                 elem.classList.remove('sl-vue-node-clicked');
             }
-        },
-        isRootClicked(e) {
-            this.preventEvent(e);
-            const treeV = this.getTree();
-            let selectedNode = treeV.getSelected();
+        };
 
-            this.contextMenuIsVisible = false;
-            if (!this.contextMenuIsVisible) {
-                if (this.isEmpty(selectedNode)) {
-                    const lastNode = treeV.getLastNode();
-                    treeV.select(lastNode.path, { addToSelection: false });
-                    selectedNode = treeV.getSelected()[0];
-                } else {
-                    selectedNode = selectedNode[0];
-                }
-                selectedNode.data.back_panel_click = true;
-            }
-
-            this.showContextMenu(selectedNode, e);
-            const actionObj = {
-                tree: treeV,
-                menuVisible: this.contextMenuIsVisible,
-                event: e,
-            };
-            this.$emit('DTIsRootClicked', actionObj);
-        },
-        nodeClicked(node) {
-            this.removeAllClass();
-            this.addClickedClass(node);
-            if (!node.data.hasOwnProperty('init')) {
-                this.nodeKey = (this.nodeKey !== node.data.id) ? node.data.id : this.nodeKey;
-                this.hasSelected = true;
-                this.$emit('DTNodeClicked', node, this.getTree());
+        const preventEvent = (e, flag) => {
+            if (Util.methods.isEmpty(flag)) {
+                e.stopPropagation();
+                e.preventDefault();
             } else {
-                this.hasSelected = false;
+                e.preventDefault();
             }
-        },
-        nodeToggled(node) {
-            this.$emit('DTNodeToggled', node, this.getTree());
-        },
-        beforeDropped(node, position, cancel) {
-            this.$emit('DTBeforeDropped', node, position, cancel, this.getTree());
-        },
-        showContextMenu(node, event, hasClicked) {
+        };
+
+        const showContextMenu = (node, event, hasClicked) => {
             if (event.currentTarget.id !== 'rootPanel') {
                 node.data.back_panel_click = false;
             }
@@ -217,32 +169,86 @@ export default {
 
             event.stopPropagation();
 
-            if (this.contextMenuIsVisible) {
-                this.contextMenuIsVisible = false;
+            if (state.contextMenuIsVisible) {
+                state.contextMenuIsVisible = false;
             }
             if (!node.data.init) {
                 this.removeAllClass(node);
                 this.addClickedClass(node);
             }
 
-            this.$emit('DTContextVisible', node, event, hasClicked, this.getTree());
-            this.contextMenuIsVisible = true;
-            const $contextMenu = this.$refs.contextmenu;
+            context.emit('DTContextVisible', node, event, hasClicked, getTree());
+            state.contextMenuIsVisible = true;
+            const $contextMenu = context.refs.contextmenu;
             const coordinateX = event.clientX;
             const coordinateY = event.clientY;
-            this.getTree().select(node.path);
+            getTree().select(node.path);
 
             $contextMenu.style.left = `${coordinateX - parseFloat(styles.gnbWidth)}px`;
             $contextMenu.style.top = `${coordinateY - parseFloat(styles.lnbHeight)}px`;
-        },
-        beforeEnter(el) {
-            this.$velocity(el, {
-                translateX: `-${this.treeWidth}px`,
+        };
+
+        const isRootClicked = (e) => {
+            preventEvent(e);
+            const treeV = getTree();
+            let selectedNode = treeV.getSelected();
+
+            state.contextMenuIsVisible = false;
+            if (!state.contextMenuIsVisible) {
+                if (Util.methods.isEmpty(selectedNode)) {
+                    const lastNode = treeV.getLastNode();
+                    treeV.select(lastNode.path, { addToSelection: false });
+                    selectedNode = treeV.getSelected()[0];
+                } else {
+                    selectedNode = selectedNode[0];
+                }
+                selectedNode.data.back_panel_click = true;
+            }
+
+            showContextMenu(selectedNode, e);
+            const actionObj = {
+                tree: treeV,
+                menuVisible: state.contextMenuIsVisible,
+                event: e,
+            };
+            context.emit('DTIsRootClicked', actionObj);
+        };
+
+        const nodeClicked = (node) => {
+            removeAllClass();
+            addClickedClass(node);
+            if (!node.data.hasOwnProperty('init')) {
+                state.nodeKey = (state.nodeKey !== node.data.id) ? node.data.id : state.nodeKey;
+                state.hasSelected = true;
+                context.emit('DTNodeClicked', node, getTree());
+            } else {
+                state.hasSelected = false;
+            }
+        };
+
+        const nodeToggled = (node) => {
+            context.emit('DTNodeToggled', node, getTree());
+        };
+
+        const beforeDropped = (node, position, cancel) => {
+            context.emit('DTBeforeDropped', node, position, cancel, getTree());
+        };
+
+        const setContextVisible = (flag) => {
+            if (Util.methods.isSelectedType(flag, 'b')) {
+                state.contextMenuIsVisible = flag;
+            }
+        };
+
+        const beforeEnter = (el) => {
+            context.velocity(el, {
+                translateX: `-${props.treeWidth}px`,
                 opacity: 0,
             });
-        },
-        enter(el, done) {
-            this.$velocity(el, { translateX: '0px', opacity: 1 },
+        };
+
+        const enter = (el, done) => {
+            context.velocity(el, { translateX: '0px', opacity: 1 },
                 {
                     duration: 400,
                     complete() {
@@ -250,15 +256,29 @@ export default {
                     },
                 });
             done();
-        },
-        preventEvent(e, flag) {
-            if (this.isEmpty(flag)) {
-                e.stopPropagation();
-                e.preventDefault();
-            } else {
-                e.preventDefault();
-            }
-        },
+        };
+
+
+        return {
+            ...toRefs(state),
+            getNoSelectMSG,
+            getCurrentNode,
+            getNodeKeyComputed,
+            getTree,
+            getNodeEl,
+            addClickedClass,
+            removeAllClass,
+            removeClickedClass,
+            preventEvent,
+            showContextMenu,
+            isRootClicked,
+            nodeClicked,
+            nodeToggled,
+            beforeDropped,
+            setContextVisible,
+            beforeEnter,
+            enter
+        };
     },
 };
 </script>

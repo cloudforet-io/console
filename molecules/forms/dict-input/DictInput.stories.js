@@ -1,13 +1,13 @@
 import { boolean, text } from '@storybook/addon-knobs/vue';
-import PTagInput from './TagInput';
+import PDictInput from './DictInput.vue';
 
 export default {
-    title: 'molecules/forms/tagInput',
-    component: PTagInput,
+    title: 'molecules/forms/DictInput',
+    component: PDictInput,
     parameters: {
         info: {
             summary: '',
-            components: { PTagInput },
+            components: { PDictInput },
         },
     },
 };
@@ -16,18 +16,18 @@ const data = {
     value: '',
 };
 
-export const tagInput = () => ({
-    components: { PTagInput },
+export const defaultCase = () => ({
+    components: { PDictInput },
     template: `
 <div class="row" style="width: 80vw">
-<p-tag-input
+<p-dict-input
 style="width: 100%" 
     :name.sync="key" 
     :value.sync="value" 
     :disabled="disabled"
     :tagKeyPlaceholder="tagKeyPlaceholder"
     :tagValuePlaceholder="tagValuePlaceholder"
-></p-tag-input>
+></p-dict-input>
 <p>{{key}} : {{value}}</p>
 
 </div>

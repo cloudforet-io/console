@@ -1,30 +1,30 @@
 import { action } from '@storybook/addon-actions';
-import PTagPanel from '@/components/organisms/panels/tag-panel/TagPanel';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 
 export default {
-    title: 'organisms/panel/tag-panel',
-    component: PTagPanel,
+    title: 'organisms/panel/DictPanel',
+    component: PDictPanel,
     parameters: {
         info: {
             summary: '',
-            components: { PTagPanel },
+            components: { PDictPanel },
         },
     },
 };
 const actions = {
     confirm: action('confirm'),
 };
-export const panelContents = () => ({
-    components: { PTagPanel },
+export const defaultCase = () => ({
+    components: { PDictPanel },
     template: `
 <div style="width: 80vw;">
-    <PTagPanel ref="tagPanel" :tags.sync="tags" @confirm="confirm"></PTagPanel>
+    <p-dict-panel ref="dictPanel" :dict.sync="dict" @confirm="confirm"></p-dict-panel>
     <p>confirm 이후 태그 변경 API요청 실패시 원복하기</p>
-    <button @click="resetTag">복구하기</button>
+    <button @click="reset">복구하기</button>
 </div>`,
     data() {
         return {
-            tags: {
+            dict: {
                 as: 'df',
                 cf: 'adf',
                 df: 'adf',
@@ -33,8 +33,8 @@ export const panelContents = () => ({
     },
     methods: {
         ...actions,
-        resetTag() {
-            this.$refs.tagPanel.resetTag();
+        reset() {
+            this.$refs.dictPanel.reset();
         },
     },
 });
