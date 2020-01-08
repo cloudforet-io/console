@@ -11,7 +11,7 @@
 
 <script>
 import { computed } from '@vue/composition-api';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 
 export default {
     name: 'PSelectDropdown',
