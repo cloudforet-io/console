@@ -3,11 +3,10 @@
 import {
     ref, toRefs, computed, reactive,
 } from '@vue/composition-api';
-import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template';
+import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
-import { isEmpty } from '@/lib/util';
 
 
 export default {
@@ -30,7 +29,7 @@ export default {
         const projectNameList = ref({});
         const matchProject = (items) => {
             for (let i = 0; i < items.length; i++) {
-                if (isEmpty(projectNameList.value)) {
+                if (!Object.keys(projectNameList.value).length) {
                     items[i].project = items[i].project_id;
                 } else {
                     items[i].project = projectNameList.value[items[i].project_id] || items[i].project_id;
