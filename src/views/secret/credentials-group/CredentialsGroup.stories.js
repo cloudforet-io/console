@@ -1,39 +1,24 @@
-/*
+import { toRefs, reactive } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import CredentialsGroup from './CredentialsGroup.template.vue';
+import PCredentialsGroup from './CredentialsGroup.template.vue';
 
 export default {
-    title: 'view/secret/credential-group',
-    component: CredentialsGroup,
+    title: 'view/secret/credentialsGroup',
+    component: PCredentialsGroup,
     parameters: {
         info: {
             summary: '',
-            components: { CredentialsGroup },
+            components: { PCredentialsGroup },
         },
     },
 };
-const actions = {
-    /!*rowLeftClick: action('rowLeftClick'),
-    rowRightClick: action('rowRightClick'),
-    rowMiddleClick: action('rowMiddleClick'),
-    rowMouseOver: action('rowMouseOver'),
-    rowMouseOut: action('rowMouseOut'),
-    clickRefresh() {
-        return action('clickRefresh');
-    },*!/
-};
-
-
-export const template = () => ({
-    template: `${CredentialsGroup.template}`,
-    components: {
-        PStatus,
-        BaseDragHorizontal,
-        PToolboxTable,
-        PButton,
-    },
-    mixins: [CredentialsGroup],
-    computed: {
+const actions = {};
+export const defaultCase = () => ({
+    components: { PCredentialsGroup },
+    template: '<PCredentialsGroup ></PCredentialsGroup>',
+    setup(props, context) {
+        return {
+            ...actions,
+        };
     },
 });
-*/
