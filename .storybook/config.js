@@ -2,7 +2,6 @@ import {configure, addParameters, addDecorator} from '@storybook/vue';
 import {INITIAL_VIEWPORTS} from '@storybook/addon-viewport';
 import {withA11y} from '@storybook/addon-a11y';
 import centered from '@storybook/addon-centered/vue';
-import { withCssResources } from '@storybook/addon-cssresources';
 import '@storybook/addon-console';
 import "@/styles/style.scss";
 import { withInfo } from 'storybook-addon-vue-info'
@@ -54,7 +53,6 @@ addDecorator(withInfo);
 addDecorator(withA11y);
 addDecorator(withKnobs);
 addDecorator(centered);
-addDecorator(withCssResources);
 addDecorator(() => ({
     store,
     template: '<story/>',

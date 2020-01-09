@@ -67,7 +67,7 @@ export default {
     }
     &:disabled{
         border-color:$gray2;
-        background-color: $gray2;
+        background-color: $gray3;
     }
 }
 

@@ -1,4 +1,6 @@
-import { computed, onUnmounted, reactive } from '@vue/composition-api';
+import {
+    computed, onUnmounted, reactive, ref,
+} from '@vue/composition-api';
 import _ from 'lodash';
 
 /**
@@ -32,6 +34,26 @@ export const makeByPass = (emit, name) => (...event) => {
 export const mountBusEvent = (bus, eventName, handler) => {
     bus.$on(eventName, handler);
     onUnmounted(() => bus.$off(eventName, handler));
+};
+
+export const mouseOverState = (disabled) => {
+    const disable = disabled || false;
+    const isMouseOver = ref(false);
+    const onMouseOver = () => {
+        if (!disable && !isMouseOver.value) {
+            isMouseOver.value = true;
+        }
+    };
+    const onMouseOut = () => {
+        if (!disable && isMouseOver.value) {
+            isMouseOver.value = false;
+        }
+    };
+    return {
+        isMouseOver,
+        onMouseOver,
+        onMouseOut,
+    };
 };
 
 export class Validation {
