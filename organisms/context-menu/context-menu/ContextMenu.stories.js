@@ -1,14 +1,17 @@
 import { action } from '@storybook/addon-actions';
-import { object } from '@storybook/addon-knobs';
-import PDropdownMenu from '@/components/organisms/dropdown/dropdown-menu/DropdownMenu';
+import { object, select } from '@storybook/addon-knobs';
+import { ref } from '@vue/composition-api';
+import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
+import md from './ContextMenu.md';
 
 export default {
-    title: 'organisms/dropdown/menu',
-    component: PDropdownMenu,
+    title: 'organisms/context-menu/context-menu',
+    component: PContextMenu,
     parameters: {
+        notes: md,
         info: {
-            summary: '',
-            components: { PDropdownMenu },
+            summary: md,
+            components: { PContextMenu },
         },
     },
 };
@@ -21,28 +24,35 @@ const actions = {
     clickRemove: action('clickRemove'),
     clickMenuEvent: action('clickMenuEvent'),
 };
-const data = {};
 
-export const dropdownMenu = () => ({
-    components: { PDropdownMenu },
+export const defaultCase = () => ({
+    components: { PContextMenu },
     template: `
-<div class="dropdown" >
-    <PDropdownMenu 
-        @clickMenuEvent="clickMenuEvent"
-        @click-add="clickAdd"
-        @click-hello='clickHello'
-        @click-delete='clickDelete'
-        @click-update='clickUpdate'
-        @click-collect='clickCollect'
-        @click-remove='clickRemove' 
-        :menu="menu"/>
+<div>
+    <!--  position:static 은 스토리북에서 편하게 보기 위해 임시로 주었습니다.  -->
+    <PContextMenu
+      style="position:static" 
+      ref="contextRef"
+      @clickMenuEvent="clickMenuEvent"
+      @click-add="clickAdd"
+      @click-hello='clickHello'
+      @click-delete='clickDelete'
+      @click-update='clickUpdate'
+      @click-collect='clickCollect'
+      @click-remove='clickRemove' 
+      :menu="menu"
+      :theme="theme"
+    />
+    <div>
+        <p>부모 컴포넌트에서 컨텍스트 메뉴에 포커싱을 주고 싶을 경우 .focus 함수를 싱핼 하면 됩니다</p>
+        <button @click="contextRef.focus()">자동 포커싱</button>
+    </div>
+    
 </div>`,
-    data() {
-        return {
-            ...data,
-        };
-    },
     props: {
+        theme: {
+            default: select('theme', ['secondary', 'dark'], 'secondary'),
+        },
         menu: {
             default: object('menu', [
                 {
@@ -72,7 +82,12 @@ export const dropdownMenu = () => ({
             ]),
         },
     },
-    methods: {
-        ...actions,
+    setup() {
+        const contextRef = ref(null);
+        return {
+            ...actions,
+            contextRef,
+        };
     },
-});
+}
+);

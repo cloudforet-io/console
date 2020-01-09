@@ -19,10 +19,10 @@ const data = {
     search: 'This is Search Text',
 };
 
-export const search = () => ({
+export const defaultCase = () => ({
     components: { Search },
     template: `<div style="width: 80vw;">
-                    <search :searchText.sync="search" :disabled="disabled" @onSearch="onSearch"/>
+                    <search :searchText.sync="search"  :disabled="disabled" @onSearch="onSearch"/>
                     <br>
                     <div> Search Text: {{search}}</div>
                 </div>`,
@@ -37,6 +37,30 @@ export const search = () => ({
     data() {
         return {
             ...data,
+        };
+    },
+});
+export const focusSync = () => ({
+    components: { Search },
+    template: `<div style="width: 80vw;">
+                    <search :searchText.sync="search" :focused.sync="focused" :disabled="disabled" @onSearch="onSearch"/>
+                    <br>
+                    <div> Search Text: {{search}}</div>
+        <div><input type="checkbox" v-model="focused"><label>focuse 여부</label></div>
+        <p>not support force focus out</p>
+                </div>`,
+    props: {
+        disabled: {
+            default: boolean('disabled', false),
+        },
+    },
+    methods: {
+        ...actions,
+    },
+    data() {
+        return {
+            ...data,
+            focused: false,
         };
     },
 });
