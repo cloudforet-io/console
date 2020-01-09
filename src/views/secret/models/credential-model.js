@@ -10,7 +10,7 @@ casual.define('credential', () => ({
     created_at: casual.timestamp,
 }));
 
-casual.define('credential_group', () => ({
+casual.define('credentials_group', () => ({
     credentials: arrayOf(casual.integer(1, 20), casual._credential),
     credential_group_id: casual.make_id('cred-grp'),
     name: casual.word,
