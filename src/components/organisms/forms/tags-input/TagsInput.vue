@@ -5,11 +5,12 @@
         >
             {{ tag }}
         </p-tag>
-        <input ref="input" v-model="value"
-               v-focus="focus"
-               @keyup.enter="add"
-               @blur="proxyFocus = false"
-        >
+        <p-text-input ref="input" v-model="value"
+                      v-focus="focus"
+                      :placeholder="placeholder"
+                      @keyup.enter="add"
+                      @blur="proxyFocus = false"
+        />
     </p-box-layout>
 </template>
 
@@ -18,6 +19,7 @@ import { ref } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
+import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
 export default {
     name: 'PTagsInput',
@@ -32,6 +34,7 @@ export default {
     components: {
         PTag,
         PBoxLayout,
+        PTextInput,
     },
     props: {
         boxStyle: {
@@ -78,10 +81,12 @@ export default {
 <style lang="scss">
 .p-tags-input {
     cursor: text;
-    input {
-        all: unset;
-        font-size: .75rem;
-        line-height: .875rem;
+    input[type="text"].p-text-input {
+        border: none;
+        background-color: transparent;
+        padding-left: 0;
+        min-height: unset;
+        line-height: unset;
     }
 }
 </style>
