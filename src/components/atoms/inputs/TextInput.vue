@@ -58,7 +58,8 @@ export default {
     background-color: $white;
     color: $gray1;
 
-    font: 14px/28px Arial;
+    font-size: .875rem;
+    line-height: 1.75rem;
 
     &:focus{
         border-color:$dark;

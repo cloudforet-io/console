@@ -12,11 +12,11 @@
         </p-row>
         <p-row direction="column">
             <header>Repository</header>
-            <span v-for="(label, repo) in repoOptions" :key="repo"
+            <span v-for="(repo, idx) in repoOptions" :key="idx"
                   class="filter" :class="{selected: selectedRepo === repo}"
             >
-                <p-radio :value="selectedRepo === repo" @change="onRepoChange(repo)" />
-                {{ label }}
+                <p-radio v-model="selectedRepo" :value="repo" @change="onRepoChange(repo)" />
+                {{ repo }}
             </span>
         </p-row>
         <p-row direction="column">
@@ -66,11 +66,8 @@ export default {
     setup(props, context) {
         const state = reactive({
             search: '',
-            repoOptions: {
-                official: 'Official',
-                local: 'Local',
-            },
-            selectedRepo: 'official',
+            repoOptions: ['Official', 'Local'],
+            selectedRepo: 'Official',
             resourceOptions: [
                 'Server', 'Network', 'Subnet', 'IP Address',
             ],
@@ -79,7 +76,6 @@ export default {
         const proxyFilters = makeProxy('filters', props, context.emit);
 
         const onRepoChange = (val) => {
-            state.selectedRepo = val;
             context.emit('repoChange', val);
         };
 

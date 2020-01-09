@@ -1,4 +1,7 @@
-import { computed, onUnmounted, reactive,ref } from '@vue/composition-api';
+import {
+    computed, onUnmounted, reactive, ref,
+} from '@vue/composition-api';
+import _ from 'lodash';
 
 /**
  * make proxy computed that same name as props
@@ -36,22 +39,22 @@ export const mountBusEvent = (bus, eventName, handler) => {
 export const mouseOverState = (disabled) => {
     const disable = disabled || false;
     const isMouseOver = ref(false);
-    const onMouseOver = ()=>{
-        if (!disable&&!isMouseOver.value) {
-            isMouseOver.value = true
+    const onMouseOver = () => {
+        if (!disable && !isMouseOver.value) {
+            isMouseOver.value = true;
         }
-    }
-    const onMouseOut = ()=>{
-        if (!disable&&isMouseOver.value) {
-            isMouseOver.value = false
+    };
+    const onMouseOut = () => {
+        if (!disable && isMouseOver.value) {
+            isMouseOver.value = false;
         }
-    }
+    };
     return {
         isMouseOver,
         onMouseOver,
         onMouseOut,
-    }
-}
+    };
+};
 
 export class Validation {
     /**
@@ -128,8 +131,11 @@ export const formValidation = (data, validation) => {
     };
 };
 
-
-export const requiredValidation = invalidMessage => new Validation(value => !!value, invalidMessage || 'value is required');
+export const requiredValidation = invalidMessage => new Validation((value) => {
+    if (['boolean', 'number'].includes(typeof value)) return true;
+    if (value instanceof Array) return !!value.length;
+    return !_.isEmpty(value); // String, Object
+}, invalidMessage || 'value is required');
 export const numberMinValidation = (min, invalidMessage) => new Validation(value => Number(value) >= min, invalidMessage || `value must bigger then ${min}`);
 export const numberMaxValidation = (max, invalidMessage) => new Validation(value => Number(value) >= max, invalidMessage || `value must smaller then ${max}`);
 export const lengthMinValidation = (min, invalidMessage) => new Validation(value => value.length >= min, invalidMessage);
@@ -144,4 +150,3 @@ export const userIDValidation = (parent, invalidMessage) => new Validation(async
     });
     return result;
 }, invalidMessage || 'already use that user id');
-
