@@ -12,7 +12,7 @@ casual.define('credential', () => ({
 
 casual.define('credentials_group', () => ({
     credentials: arrayOf(casual.integer(1, 20), casual._credential),
-    credential_group_id: casual.make_id('cred-grp'),
+    cdg_id: casual.make_id('cred-grp'),
     name: casual.word,
     domain_id: casual.make_id('domain'),
     tags: casual.tags,
