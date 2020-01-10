@@ -65,7 +65,9 @@
                     </b-row>
                     <b-row>
                         <b-col class="btn-box mt-5">
-                            <b-button class="float-right ml-3 mb-1" size="md" type="submit" variant="primary">
+                            <b-button class="float-right ml-3 mb-1" size="md" type="submit"
+                                      variant="primary"
+                            >
                                 {{ tr('BTN_UPT') }}
                             </b-button>
                             <b-button class="float-right mb-1" size="md"
@@ -123,10 +125,10 @@ export default {
     },
     computed: {
         languageList() {
-            return this.getLanguageSelectList();
+            return [];
         },
         timezoneList() {
-            return this.getTimezoneSelectList();
+            return [];
         },
     },
     methods: {

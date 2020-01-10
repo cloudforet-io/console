@@ -1,16 +1,14 @@
 <script>
-import LNBTemplate from '@/views/containers/lnb/LNB.template.vue';
+import { toRefs } from '@vue/composition-api';
+import LNBTemplate, { setRouteState } from '@/views/containers/lnb/LNB.template.vue';
+import routes from '@/routes/identity/identity-route';
 
 export default {
     name: 'IdentityNavBar',
     extends: LNBTemplate,
-    data() {
+    setup() {
         return {
-            serviceGroup: 'Identity',
-            services: [
-                { path: '/identity/user', label: 'User' },
-                { path: '/identity/project', label: 'Project' },
-            ],
+            ...toRefs(setRouteState([routes])),
         };
     },
 };

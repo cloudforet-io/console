@@ -7,22 +7,22 @@ export default {
     path: 'identity',
     name: 'identity',
     redirect: '/identity/project',
-    meta: { label: 'Identity', requiresAuth: true },
+    meta: { label: 'Identity', breadcrumb: true },
     components: {
-        main: Identity,
         lnb: IdentityNavBar,
+        main: Identity,
     },
     children: [
         {
             path: 'project',
             name: 'project',
-            meta: { label: 'Project', requiresAuth: true },
+            meta: { label: 'Project', breadcrumb: true },
             component: Project,
         },
         {
             path: 'user',
             name: 'user',
-            meta: { label: 'User', requiresAuth: true },
+            meta: { label: 'User', breadcrumb: true },
             component: User,
         },
     ],

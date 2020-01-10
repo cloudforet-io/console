@@ -21,6 +21,9 @@ import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
 import VueI18n from 'vue-i18n';
+import VueRouter from 'vue-router';
+import router from '@/routes';
+
 
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
@@ -35,6 +38,7 @@ Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i'
 })
+Vue.use(VueRouter);
 
 Vue.prototype.$velocity = velocity;
 
@@ -54,6 +58,7 @@ addDecorator(withA11y);
 addDecorator(withKnobs);
 addDecorator(centered);
 addDecorator(() => ({
+    router,
     store,
     template: '<story/>',
     i18n,
