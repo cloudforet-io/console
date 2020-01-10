@@ -45,6 +45,7 @@ export const defaultCase = () => ({
     />
     <div>
         <p>부모 컴포넌트에서 컨텍스트 메뉴에 포커싱을 주고 싶을 경우 .focus 함수를 싱핼 하면 됩니다</p>
+        <p>일단 컨텍스 메뉴에 포커싱 되면 이후에는 컨텍스트 메뉴 내부에서 단축키가 작동합니다</p>
         <button @click="contextRef.focus()">자동 포커싱</button>
     </div>
     
