@@ -20,7 +20,7 @@
 import {
     computed, createComponent, onMounted, reactive, ref, watch,
 } from '@vue/composition-api';
-import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 
 import PSearch from '@/components/molecules/search/Search.vue';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
@@ -54,7 +54,7 @@ export default createComponent({
             get: () => props.searchText,
             set: _.debounce((val) => {
                 context.emit('update:searchText', val);
-            }, 200),
+            }, 100),
         });
 
         const cleanSearchText = () => { proxySearchText.value = ''; };
@@ -76,6 +76,7 @@ export default createComponent({
                 return null;
             }),
         });
+
 
         const searchFocused = ref(false);
         const contextType = computed(() => {
@@ -104,16 +105,15 @@ export default createComponent({
             }
             return false;
         });
-
+        windowEventMount('click', hideAC);
         watch([proxySearchText, showAC], async ([text, ac], [preText, preAc]) => {
             console.log(text, ac);
             if (ac && text !== preText) {
                 acState.items = await props.autocompleteHandler.getAutoCompleteData(contextType.value, text, contextState);
             }
         });
-        onMounted(async () => {
-            acState.items = await props.autocompleteHandler.getAutoCompleteData(contextType.value, proxySearchText.value, contextState);
-        });
+
+
         // windowEventMount('click', hideAC);
         const focusAC = (event) => {
             console.log('click down', event);
@@ -138,6 +138,11 @@ export default createComponent({
                 cleanSearchText();
             }
         };
+        onMounted(async () => {
+            acState.items = await props.autocompleteHandler.getAutoCompleteData(contextType.value, '', contextState);
+            console.log(acState.items);
+        });
+
 
         return {
             proxySearchText,

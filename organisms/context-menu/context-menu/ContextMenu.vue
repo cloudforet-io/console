@@ -57,7 +57,7 @@ export default {
             return idxs;
         });
         const focus = (position) => {
-            const pos = position || itemsIndex.value[0];
+            const pos = position || 0;
             const idx = itemsIndex.value[pos];
             document.getElementById(`context-item-${idx}-${uuid}`).focus();
         };
@@ -123,7 +123,7 @@ export default {
         min-width: 8.5rem;
         cursor:default;
         position: absolute;
-        top: 94%;
+        top: 95%;
         left: 0;
         z-index: 1000;
         float: left;
