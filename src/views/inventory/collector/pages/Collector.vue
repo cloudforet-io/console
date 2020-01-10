@@ -9,7 +9,7 @@ import { defaultQuery } from '@/lib/api';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
 export default {
-    name: 'Server',
+    name: 'Collector',
     extends: CollectorTemplate,
     setup(props, context) {
         const state = reactive({
