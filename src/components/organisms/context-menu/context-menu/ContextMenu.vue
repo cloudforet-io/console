@@ -1,7 +1,7 @@
 <template>
     <div class="p-context-menu" style="display: block;" :class="theme">
         <template v-for="(item, index) in menu">
-            <a v-if="item.type==='item'" :id="`context-item-${index}-${uuid}`" :key="index"
+            <a v-if="item.type==='item'" :id="`context-item-${index}-${uuid}`" :key="`${item.name}-${index}`"
                :tabindex="index"
                class="context-content context-item no-drag"
                :class="[{disabled:item.disabled},theme]"

@@ -1,4 +1,4 @@
-import { computed, onUnmounted, reactive,ref } from '@vue/composition-api';
+import { computed, onUnmounted, reactive,ref ,onMounted} from '@vue/composition-api';
 
 /**
  * make proxy computed that same name as props
@@ -33,6 +33,11 @@ export const mountBusEvent = (bus, eventName, handler) => {
     onUnmounted(() => bus.$off(eventName, handler));
 };
 
+/**
+ * 여러 엘리먼트에서 마우스 오버 여부 추적에 필요한 함수 모
+ * @param disabled
+ * @return {{onMouseOut: onMouseOut, isMouseOver: Ref<HasDefined<S> extends true ? S : RefValue<T>>, onMouseOver: onMouseOver}}
+ */
 export const mouseOverState = (disabled) => {
     const disable = disabled || false;
     const isMouseOver = ref(false);
@@ -52,6 +57,17 @@ export const mouseOverState = (disabled) => {
         onMouseOut,
     }
 }
+
+/**
+ * 윈도우 클릭 이벤트 등록
+ * 자동완성, 드롭다운 컨텍스트 메뉴 팝업을 자동으로 닫게 할때 활용
+ * @param func
+ */
+export const windowEventMount = (eventName,func) => {
+    onMounted(()=> window.addEventListener(eventName, func));
+    onUnmounted(()=> window.removeEventListener(eventName, func));
+}
+
 
 export class Validation {
     /**

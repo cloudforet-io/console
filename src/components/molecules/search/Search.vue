@@ -8,6 +8,7 @@
                       :placeholder="searchPlaceholder"
                       @input="$emit('update:searchText',$event)"
                       @keyup.enter="onSearch"
+                      @keyup.down="$emit('downKey',$event)"
                       @focus="proxyFocused = true"
                       @blur="proxyFocused = false"
                       @mouseover="onMouseOver"
