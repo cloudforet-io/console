@@ -106,6 +106,16 @@ class API {
 
 export default new API();
 
+/**
+ * @name defaultQuery
+ * @description make default query format
+ * @param thisPage
+ * @param pageSize
+ * @param sortBy
+ * @param sortDesc
+ * @param searchText
+ * @returns {{page: {start: number, limit: *}}}
+ */
 export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText) => {
     const query = {
         page: {

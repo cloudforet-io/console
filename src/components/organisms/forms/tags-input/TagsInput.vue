@@ -11,7 +11,6 @@
                       @keyup.enter="add"
                       @blur="proxyFocus = false"
         />
-        </span>
     </p-box-layout>
 </template>
 

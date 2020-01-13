@@ -1,5 +1,7 @@
 <template>
-    <p-badge class="p-tag" style-type="gray2" v-on="$listeners">
+    <p-badge class="p-tag" :class="{deletable: deletable}"
+             style-type="gray2" v-on="$listeners"
+    >
         <slot />
         <p-i v-if="deletable" name="ic_delete" width="1rem"
              height="1rem" class="icon"
@@ -77,19 +79,21 @@ export default {
     .p-tag {
         margin-right: .5rem;
         vertical-align: middle;
-        padding-right: 0.15rem;
         white-space: nowrap;
-        .icon {
-            color: $gray1;
-            cursor: pointer;
-        }
-        &:hover {
-            color: $gray2;
-            background-color: $gray3;
+        color: inherit;
+        &.deletable {
+            padding-right: 0.15rem;
             .icon {
-                color: $alert;
+                color: $gray1;
+                cursor: pointer;
             }
-
+            &:hover {
+                color: $gray2;
+                background-color: $gray3;
+                .icon {
+                    color: $alert;
+                }
+            }
         }
     }
 </style>

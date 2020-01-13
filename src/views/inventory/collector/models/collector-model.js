@@ -1,29 +1,10 @@
 import casual, { arrayOf } from '@/lib/casual';
 
-casual.define('collectorPlugins', () => ([
-    {
-        id: 'aaa',
-        name: 'Plugin1',
-        desc: 'plugin description ...',
-        tags: ['tag1', 'tag2', 'tag3333'],
-    },
-    {
-        id: 'bbb',
-        name: 'Plugin2',
-        desc: 'plugin description ...',
-        icon: 'aws-ec2',
-    },
-    {
-        id: 'ccc',
-        name: 'Plugin3',
-        desc: 'plugin description ...',
-    },
-]));
-
 casual.define('pluginOption', () => ({
     key: casual.uuid,
     name: casual.word,
     type: casual.random_element(['str', 'bool', 'list', 'int', 'float']),
+    // eslint-disable-next-line camelcase
     is_required: casual.boolean,
     enums: casual.array_of_words(5),
     example: casual.word,
@@ -41,5 +22,21 @@ casual.define('pluginInfo', () => ({
         // credentials = [{key, name, type, [is_required(bool)], [enums], [example]}, ...]
     },
 }));
+
+casual.define('credentialGroup', () => ({
+    credential_group_id: casual.make_id('credential_group'),
+    name: casual.word,
+}));
+
+casual.define('credential', () => ({
+    // eslint-disable-next-line camelcase
+    credential_id: casual.make_id('credential'),
+    name: casual.word,
+    // eslint-disable-next-line camelcase
+    issue_type: casual.random_element(['token', 'credential']),
+    // eslint-disable-next-line camelcase
+    credential_groups: arrayOf(casual.integer(1, 5), casual._credentialGroup),
+}));
+
 
 export default casual;
