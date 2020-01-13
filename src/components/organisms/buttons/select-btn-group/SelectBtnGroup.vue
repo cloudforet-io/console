@@ -17,10 +17,10 @@ import {
     reactive, computed, toRefs, onMounted, onUnmounted,
 } from '@vue/composition-api';
 import ScrollBooster from 'scrollbooster';
-import PButton from '@/components/atoms/buttons/Button';
+import PButton from '@/components/atoms/buttons/Button.vue';
 
 export default {
-    name: 'p-select-btn-group',
+    name: 'PSelectBtnGroup',
     components: { PButton },
     props: {
         buttons: Array,
@@ -51,6 +51,13 @@ export default {
                 mode: 'x',
                 onUpdate: (data) => {
                     state.btnGroup.scrollLeft = data.position.x;
+                },
+                onClick: (data, event) => {
+                    const { target } = event;
+                    const selectableElements = ['input', 'select', 'textarea'];
+                    if (selectableElements.find(element => element === target.tagName.toLowerCase())) {
+                        target.focus();
+                    }
                 },
             };
             state.sb = new ScrollBooster(scrollOptions);
