@@ -23,6 +23,9 @@ const actions = {
     clickCollect: action('clickCollect'),
     clickRemove: action('clickRemove'),
     clickMenuEvent: action('clickMenuEvent'),
+    onEndOfUpKey: action('onEndOfUpKey'),
+    onEndOfDownKey: action('onEndOfDownKey'),
+    onEscKey: action('onEscKey'),
 };
 
 export const defaultCase = () => ({
@@ -40,6 +43,9 @@ export const defaultCase = () => ({
       @click-update='clickUpdate'
       @click-collect='clickCollect'
       @click-remove='clickRemove' 
+      @onEndOfUpKey="onEndOfUpKey"
+      @onEndOfDownKey="onEndOfDownKey"
+      @onEscKey="onEscKey"
       :menu="menu"
       :theme="theme"
     />
