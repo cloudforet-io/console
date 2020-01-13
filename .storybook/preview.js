@@ -1,9 +1,7 @@
 import {configure, addParameters, addDecorator} from '@storybook/vue';
-import {INITIAL_VIEWPORTS} from '@storybook/addon-viewport';
 import {withA11y} from '@storybook/addon-a11y';
 import centered from '@storybook/addon-centered/vue';
 import '@storybook/addon-console';
-import "@/styles/style.scss";
 import { withInfo } from 'storybook-addon-vue-info'
 import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
@@ -21,6 +19,7 @@ import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
 import VueI18n from 'vue-i18n';
+import "@/styles/style.scss";
 
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
@@ -46,8 +45,6 @@ Vue.prototype.$velocity = velocity;
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
 
-const req = require.context('../src', true, /\.stories\.js$/);
-configure(req, module);
 
 addDecorator(withInfo);
 addDecorator(withA11y);
@@ -58,9 +55,4 @@ addDecorator(() => ({
     template: '<story/>',
     i18n,
 }));
-addParameters({
-    viewport: {
-        viewports: INITIAL_VIEWPORTS,
-    },
 
-});
