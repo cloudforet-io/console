@@ -1,7 +1,9 @@
 <template>
-    <div class="p-context-menu" style="display: block;" :class="theme">
+    <div class="p-context-menu" style="display: block;" :class="theme"
+         @keyup.esc="$emit('onEscKey',$event)"
+    >
         <template v-for="(item, index) in menu">
-            <a v-if="item.type==='item'" :id="`context-item-${index}-${uuid}`" :key="index"
+            <a v-if="item.type==='item'" :id="`context-item-${index}-${uuid}`" :key="`${item.name}-${index}`"
                :tabindex="index"
                class="context-content context-item no-drag"
                :class="[{disabled:item.disabled},theme]"
@@ -30,7 +32,7 @@ import { computed } from '@vue/composition-api';
 
 export default {
     name: 'PContextMenu',
-    events: ['clickMenuEvent'],
+    events: ['clickMenuEvent', 'onEndOfUpKey', 'onEndOfDownKey', 'onEscKey'],
     props: {
         menu: {
             type: [Array, Object],
@@ -57,17 +59,17 @@ export default {
             return idxs;
         });
         const focus = (position) => {
-            const pos = position || itemsIndex.value[0];
+            const pos = position || 0;
             const idx = itemsIndex.value[pos];
             document.getElementById(`context-item-${idx}-${uuid}`).focus();
         };
         const onUpKey = (idx) => {
             const pos = itemsIndex.value.indexOf(idx);
-            if (pos !== 0) { focus(pos - 1); }
+            if (pos !== 0) { focus(pos - 1); } else { context.emit('onEndOfUpKey'); }
         };
         const onDownKey = (idx) => {
             const pos = itemsIndex.value.indexOf(idx) + 1;
-            if (pos !== itemsIndex.value.length) { focus(pos); }
+            if (pos !== itemsIndex.value.length) { focus(pos); } else { context.emit('onEndOfDownKey'); }
         };
         return {
             menuClick, onDownKey, onUpKey, focus, uuid,
@@ -123,7 +125,7 @@ export default {
         min-width: 8.5rem;
         cursor:default;
         position: absolute;
-        top: 94%;
+        top: 95%;
         left: 0;
         z-index: 1000;
         float: left;
@@ -140,7 +142,9 @@ export default {
         @include context-menu-color('dark',$white,$dark);
 
         .context-content{
-            padding-left: 14px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+
         }
         .context-header{
             margin-top: 0.875rem;
