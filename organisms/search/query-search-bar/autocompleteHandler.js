@@ -46,7 +46,7 @@ export class baseAutocompleteHandler {
 
     // eslint-disable-next-line class-methods-use-this
     makeItem(value) {
-        return { type: 'item', label: value, name: value };
+        return typeof value === 'object' ? value : { type: 'item', label: value, name: value };
     }
 
     makeContextMenu(data) {
@@ -64,12 +64,11 @@ export class baseAutocompleteHandler {
 
 export const getValues = (contextType, inputText, searchQuery) => {
     const prefix = `${searchQuery.key}:${searchQuery.operator}`;
-    return [prefix, [`${prefix} ${searchQuery.value}`]];
+    return [searchQuery.key, [`${prefix} ${searchQuery.value}`]];
 };
 export const getKeys = (rawKeys) => {
-    const keys = _.flatMap(rawKeys, value => (`${value}:`));
-    const data = _.flatMap(keys, value => ({ key: value }));
-    const fuse = new Fuse(data, { keys: ['key'], id: 'key' });
+    const keys = _.flatMap(rawKeys, value => ({ type: 'item', label: value, name: `${value}:` }));
+    const fuse = new Fuse(keys, { keys: ['label'] });
     return (contextType, inputText) => {
         let result = keys;
         if (inputText) {
