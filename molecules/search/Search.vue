@@ -8,7 +8,8 @@
                       :placeholder="searchPlaceholder"
                       @input="$emit('update:searchText',$event)"
                       @keyup.enter="onSearch"
-                      @keyup.down="$emit('downKey',$event)"
+                      @keyup.down="$emit('onDownKey',$event)"
+                      @keyup.esc="$emit('onEscKey',$event)"
                       @focus="proxyFocused = true"
                       @blur="proxyFocused = false"
                       @mouseover="onMouseOver"
@@ -39,7 +40,7 @@ import { makeProxy, mouseOverState } from '@/lib/compostion-util';
 
 export default {
     name: 'PSearch',
-    events: ['onSearch'],
+    events: ['onSearch', 'onDownKey', 'onEscKey'],
     directives: { focus },
     components: {
         PButton,

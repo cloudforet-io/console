@@ -7,11 +7,14 @@
             :search-text.sync="proxySearchText"
             :focused.sync="searchFocused"
             @onSearch="newQuery"
-            @downKey="focusAC"
+            @onDownKey="focusAC"
+            @onEscKey="focusOut"
         />
         <p-context-menu v-if="showAC" ref="contextMenuRef" theme="dark"
                         :menu="acState.items"
                         @clickMenuEvent="clickMenuEvent"
+                        @onEndOfUpKey="searchFocused=true"
+                        @onEscKey="searchFocused=true"
         />
     </div>
 </template>
@@ -54,7 +57,7 @@ export default createComponent({
             get: () => props.searchText,
             set: _.debounce((val) => {
                 context.emit('update:searchText', val);
-            }, 200),
+            }, 150),
         });
 
         const cleanSearchText = () => { proxySearchText.value = ''; };
@@ -108,22 +111,22 @@ export default createComponent({
         windowEventMount('click', hideAC);
         let initData = false;
         watch([proxySearchText, showAC], async ([text, ac], [preText, preAc]) => {
-            console.log(text, ac);
             if (ac && (text !== preText || !initData)) {
                 acState.items = await props.autocompleteHandler.getAutoCompleteData(contextType.value, text, contextState);
                 if (!initData) { initData = true; }
-                console.log(acState.items);
             }
         });
 
 
-        // windowEventMount('click', hideAC);
         const focusAC = (event) => {
-            console.log('click down', event);
             if (contextMenuRef.value && acState.items.length >= 1) {
                 acState.isFocusAC = true;
                 contextMenuRef.value.focus();
             }
+        };
+        const focusOut = () => {
+            acState.isFocusAC = false;
+            searchFocused.value = false;
         };
 
         const clickMenuEvent = (event) => {
@@ -153,6 +156,7 @@ export default createComponent({
             contextMenuRef,
             searchBarRef,
             focusAC,
+            focusOut,
             clickMenuEvent,
         };
     },
