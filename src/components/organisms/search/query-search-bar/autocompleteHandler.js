@@ -38,21 +38,22 @@ export class baseAutocompleteHandler {
             // eslint-disable-next-line no-await-in-loop
             result.push(...this.makeContextMenu(await handler(contextType, inputText, searchQuery)));
         }
-        console.log('acData', result);
         return result;
     }
 
+    // eslint-disable-next-line class-methods-use-this
+    makeItem(value) {
+        return { type: 'item', label: value, name: value };
+    }
+
     makeContextMenu(data) {
-        console.log('data', data);
-        const result = [];
-        console.log(data);
-        const title = data[0];
+        let result = [];
         const menus = data[1];
         if (menus && menus.length >= 1) {
-            if (title) { result.push({ type: 'header', label: title }); }
-            result.push({ type: 'divider' });
-            menus.forEach(value => result.push({ type: 'item', label: value, name: value }));
-            return result;
+            const title = data[0] ? [{ type: 'header', label: data[0] }] : [];
+            result = title.concat({ type: 'divider' });
+            const menuItems = _.flatMap(menus, this.makeItem);
+            return result.concat(menuItems);
         }
         return [];
     }
@@ -62,9 +63,9 @@ export const getValues = (contextType, inputText, searchQuery) => {
     const prefix = `${searchQuery.key}:${searchQuery.operator}`;
     return [prefix, [`${prefix} ${searchQuery.value}`]];
 };
-export const getKeys = (keys) => {
-    const data = [];
-    keys.forEach((value) => { data.push({ key: value }); });
+export const getKeys = (rawKeys) => {
+    const keys = _.flatMap(rawKeys, value => (`${value}:`));
+    const data = _.flatMap(keys, value => ({ key: value }));
     const fuse = new Fuse(data, { keys: ['key'], id: 'key' });
     return (contextType, inputText) => {
         let result = keys;

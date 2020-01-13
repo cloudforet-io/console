@@ -59,7 +59,7 @@ export const mouseOverState = (disabled) => {
 }
 
 /**
- * 윈도우 클릭 이벤트 등록
+ * 윈도우 이벤트 등록 함수
  * 자동완성, 드롭다운 컨텍스트 메뉴 팝업을 자동으로 닫게 할때 활용
  * @param func
  */

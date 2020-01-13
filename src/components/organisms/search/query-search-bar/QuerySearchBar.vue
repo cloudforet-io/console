@@ -54,7 +54,7 @@ export default createComponent({
             get: () => props.searchText,
             set: _.debounce((val) => {
                 context.emit('update:searchText', val);
-            }, 100),
+            }, 200),
         });
 
         const cleanSearchText = () => { proxySearchText.value = ''; };
@@ -106,10 +106,13 @@ export default createComponent({
             return false;
         });
         windowEventMount('click', hideAC);
+        let initData = false;
         watch([proxySearchText, showAC], async ([text, ac], [preText, preAc]) => {
             console.log(text, ac);
-            if (ac && text !== preText) {
+            if (ac && (text !== preText || !initData)) {
                 acState.items = await props.autocompleteHandler.getAutoCompleteData(contextType.value, text, contextState);
+                if (!initData) { initData = true; }
+                console.log(acState.items);
             }
         });
 
@@ -138,10 +141,6 @@ export default createComponent({
                 cleanSearchText();
             }
         };
-        onMounted(async () => {
-            acState.items = await props.autocompleteHandler.getAutoCompleteData(contextType.value, '', contextState);
-            console.log(acState.items);
-        });
 
 
         return {
