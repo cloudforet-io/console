@@ -1,6 +1,6 @@
 <template>
     <div class="dropdown">
-        <PDropdownBtn :popup.sync="popup">
+        <PDropdownBtn :popup.sync="popup" @click="$emit('openMenu')">
             <slot />
         </PDropdownBtn>
         <PContextMenu
