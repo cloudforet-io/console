@@ -1,5 +1,5 @@
 <template>
-    <div class="user">
+    <div class="credential">
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -22,42 +22,39 @@
                     :loading="loading"
                     :use-spinner-loading="true"
                     :use-cursor-loading="true"
-                    @changePageSize="getUsers"
-                    @changePageNumber="getUsers"
-                    @clickRefresh="getUsers"
-                    @changeSort="getUsers"
+                    @changePageSize="getCredentials"
+                    @changePageNumber="getCredentials"
+                    @clickRefresh="getCredentials"
+                    @changeSort="getCredentials"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary" @click="clickAdd">
+                        <p-button style-type="primary" @click="clickCreate">
                             {{ tr('COMMON.BTN_ADD') }}
                         </p-button>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
                             class="left-toolbox-item"
                             :menu="dropdown"
-                            @click-enable="clickEnable"
-                            @click-disable="clickDisable"
                             @click-delete="clickDelete"
-                            @click-update="clickUpdate"
                         >
                             Action
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
-                            <p-search :search-text.sync="searchText" @onSearch="getUsers" />
+                            <p-search :search-text.sync="searchText" @onSearch="getCredentials" />
                         </div>
                     </template>
-                    <template v-slot:col-state-format="{value}">
-                        <p-status v-bind="userStateFormatter(value)" />
+                    <template #col-created_at-format="data">
+                        {{ timestampFormatter(data.value) }}
                     </template>
                 </p-toolbox-table>
             </template>
         </p-horizontal-layout>
         <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
             <template #detail="{tabName}">
-                <p-user-detail ref="userDetail"
-                               :item="items[selectIndex[0]]"
-                               :tag-confirm-event="tagConfirmEvent"
-                               :tag-reset-event="tagResetEvent"
+                <p-credentials-detail ref="credentialsDetail"
+                                      :item="items[selectIndex[0]]"
+                                      :tag-confirm-event="tagConfirmEvent"
+                                      :tag-reset-event="tagResetEvent"
                 />
             </template>
         </PTab>
@@ -74,7 +71,7 @@
         </PTab>
 
         <div v-else id="empty-space">
-            Select a User above for details.
+            Select a Credentials above for details.
         </div>
         <p-table-check-modal
             v-if="!!checkTableModalState.mode"
@@ -87,15 +84,14 @@
             :centered="true"
             :selectable="false"
             :items="getSelectedUserItems"
-
             @confirm="checkModalConfirm"
         />
-        <p-user-form v-if="userFormState.visible"
-                     :header-title="userFormState.headerTitle"
-                     :update-mode="userFormState.updateMode"
-                     :item="userFormState.item"
-                     :visible.sync="userFormState.visible"
-                     @confirm="userFormConfirm"
+        <p-credentials-form v-if="credentialsFormState.visible"
+                            :header-title="credentialsFormState.headerTitle"
+                            :update-mode="credentialsFormState.updateMode"
+                            :item="credentialsFormState.item"
+                            :visible.sync="credentialsFormState.visible"
+                            @confirm="credentialsFormConfirm"
         />
     </div>
 </template>
@@ -104,14 +100,12 @@
 import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
-import PStatus from '@/components/molecules/status/Status';
-import PButton from '@/components/atoms/buttons/Button';
+import PButton from '@/components/atoms/buttons/Button.vue';
 import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
-import { timestampFormatter, getValue, userStateFormatter } from '@/lib/util';
+import { timestampFormatter, getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
-import credentialsEventBus from '@/views/identity/user/UserEventBus';
-import PUserForm from '@/views/identity/user/modules/UserForm';
-
+import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
+import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
@@ -119,25 +113,21 @@ const PHorizontalLayout = () => import('@/components/organisms/layouts/horizonta
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn');
 const PSearch = () => import('@/components/molecules/search/Search');
-const PUserDetail = () => import('@/views/identity/user/modules/UserDetail');
+const PCredentialsDetail = () => import('@/views/secret/credentials/modules/CredentialsDetail');
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
-export const UserTableReactive = parent => reactive({
+
+export const CredentialsTableReactive = parent => reactive({
     fields: makeTrItems([
-        ['user_id', 'COMMON.ID'],
-        ['name', 'COMMON.NAME'],
-        ['email', 'COMMON.EMAIL'],
-        ['state', 'COMMON.STATE'],
-        ['mobile', 'COMMON.PHONE', { sortable: false }],
-        ['group', 'COMMON.GROUP'],
-        ['language', 'COMMON.LANGUAGE'],
-        ['timezone', 'COMMON.TIMEZONE'],
+        ['credential_id', 'COMMON.ID', { size: '400px' }],
+        ['name', 'COMMON.NAME', { size: '400px' }],
+        ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
+        ['group', 'COMMON.GROUP', { size: '800px', sortable: false }],
+        ['created_at', 'COMMON.CREATED', { size: '300px' }],
     ],
     parent),
     multiSelectFields: makeTrItems([
-        ['user_id', 'COMMON.ID'],
-        ['name', 'COMMON.NAME'],
-        ['email', 'COMMON.EMAIL'],
-        ['group', 'COMMON.GROUP'],
+        ['credential_id', 'COMMON.ID', { size: '400px' }],
+        ['name', 'COMMON.NAME', { size: '600px' }],
     ],
     parent),
     selectIndex: [],
@@ -147,37 +137,18 @@ export const UserTableReactive = parent => reactive({
     toolbox: null, // template refs
 });
 
-/**
-   * @typedef {Object} UserState
-   * @property {string} sortBy
-   * @property {boolean} sortDesc
-   * @property {number} thisPage
-   * @property {number} allPage
-   * @property {number} pageSize
-   * @property {Array} fields
-   * @property {Array} selectIndex
-   *
-   */
-
-/**
-   * server default setup reactive object
-   * @function
-   * @return {serverState} reactive object
-   */
 export const eventNames = {
     tagResetEvent: '',
     tagConfirmEvent: '',
-    getUserList: '',
-    enableUser: '',
-    disableUser: '',
-    deleteUser: '',
-    addUser: '',
-    updateUser: '',
+    getCredentialsList: '',
+    deleteCredentials: '',
+    createCredentials: '',
+    updateCredentials: '',
 };
 
-export const userSetup = (props, context, eventName) => {
-    const eventBus = userEventBus;
-    const tableState = UserTableReactive(context.parent);
+export const credentialsSetup = (props, context, eventName) => {
+    const eventBus = credentialsEventBus;
+    const tableState = CredentialsTableReactive(context.parent);
     const tabData = reactive({
         tabs: makeTrItems([
             ['detail', 'COMMON.DETAILS', { keepAlive: true }],
@@ -188,7 +159,7 @@ export const userSetup = (props, context, eventName) => {
             ['data', 'COMMON.DATA', { keepAlive: true }],
         ], context.parent),
         multiSelectActiveTab: 'data',
-        userDetail: null, // template refs
+        credentialsDetail: null, // template refs
     });
     const tags = ref({});
     const tabAction = reactive({
@@ -197,8 +168,8 @@ export const userSetup = (props, context, eventName) => {
     });
     const state = requestToolboxTableMetaReactive();
     state.sortBy = 'name';
-    const getUsers = () => {
-        eventBus.$emit(eventName.getUserList);
+    const getCredentials = () => {
+        eventBus.$emit(eventName.getCredentialsList);
     };
 
     const sortSelectIndex = computed(() => {
@@ -208,6 +179,7 @@ export const userSetup = (props, context, eventName) => {
     });
     const isNotSelected = computed(() => tableState.selectIndex.length === 0);
     const isNotOnlyOneSelected = computed(() => tableState.selectIndex.length !== 1);
+
     const getSelectedUserItems = computed(() => {
         const items = [];
         sortSelectIndex.value.forEach((idx) => {
@@ -215,6 +187,7 @@ export const userSetup = (props, context, eventName) => {
         });
         return items;
     });
+
     const getSelectUserIds = computed(() => {
         const ids = [];
         getSelectedUserItems.value.forEach((item) => {
@@ -224,7 +197,7 @@ export const userSetup = (props, context, eventName) => {
     });
     const getFirstSelectedUserId = computed(() => (getSelectUserIds.value.length >= 1 ? getSelectUserIds[0] : ''));
 
-    const userFormState = reactive({
+    const credentialsFormState = reactive({
         visible: false,
         mode: '',
         headerTitle: '',
@@ -232,37 +205,18 @@ export const userSetup = (props, context, eventName) => {
         eventName: '',
     });
 
-    const clickAdd = () => {
-        userFormState.updateMode = false;
-        userFormState.headerTitle = 'Add User';
-        userFormState.item = null;
-        userFormState.eventName = eventNames.addUser;
-        userFormState.visible = true;
+    const clickCreate = () => {
+        credentialsFormState.updateMode = false;
+        credentialsFormState.headerTitle = 'Create Credentails';
+        credentialsFormState.item = null;
+        credentialsFormState.eventName = eventNames.createCredentials;
+        credentialsFormState.visible = true;
     };
 
-    const clickUpdate = () => {
-        userFormState.updateMode = true;
-        userFormState.headerTitle = 'Update User';
-        const item = getSelectedUserItems.value[0];
-        userFormState.item = {
-            userId: item.user_id,
-            name: item.name,
-            email: item.name,
-            phone: item.phone,
-            group: item.group,
-            language: item.language,
-            timezone: item.timezone,
-            tags: item.tags,
-        };
-        userFormState.eventName = eventNames.updateUser;
-        userFormState.visible = true;
-    };
-
-
-    const userFormConfirm = (item) => {
-        eventBus.$emit(userFormState.eventName, item);
-        userFormState.visible = false;
-        userFormState.mode = '';
+    const credentialsFormConfirm = (item) => {
+        eventBus.$emit(credentialsFormState.eventName, item);
+        credentialsFormState.visible = false;
+        credentialsFormState.mode = '';
     };
 
     const checkTableModalState = reactive({
@@ -284,28 +238,11 @@ export const userSetup = (props, context, eventName) => {
         checkTableModalState.themeColor = '';
     };
 
-
-    const clickEnable = () => {
-        checkTableModalState.mode = 'enable';
-        checkTableModalState.confirmEventName = eventNames.enableUser;
-        checkTableModalState.title = 'User Enable';
-        checkTableModalState.subTitle = 'Are you sure you want to Enable selected User(s) below?';
-        checkTableModalState.themeColor = 'safe';
-        checkTableModalState.visible = true;
-    };
-    const clickDisable = () => {
-        checkTableModalState.mode = 'disable';
-        checkTableModalState.confirmEventName = eventNames.disableUser;
-        checkTableModalState.title = 'User Disable';
-        checkTableModalState.subTitle = 'Are you sure you want to Disable selected User(s) below?';
-        checkTableModalState.themeColor = 'alert';
-        checkTableModalState.visible = true;
-    };
     const clickDelete = () => {
         checkTableModalState.mode = 'delete';
-        checkTableModalState.confirmEventName = eventNames.deleteUser;
-        checkTableModalState.title = 'User Delete';
-        checkTableModalState.subTitle = 'Are you sure you want to delete selected User(s) below?';
+        checkTableModalState.confirmEventName = eventNames.deleteCredentials;
+        checkTableModalState.title = 'Delete Credentials';
+        checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
         checkTableModalState.themeColor = 'alert';
         checkTableModalState.visible = true;
     };
@@ -319,11 +256,7 @@ export const userSetup = (props, context, eventName) => {
 
     const dropdownMenu = reactive({
         ...makeTrItems([
-            ['update', 'COMMON.BTN_UPT', { disabled: isNotOnlyOneSelected }],
             ['delete', 'COMMON.BTN_DELETE', { disabled: isNotSelected }],
-            [null, null, { type: 'divider' }],
-            ['enable', 'COMMON.BTN_ENABLE', { disabled: isNotSelected }],
-            ['disable', 'COMMON.BTN_DISABLE', { disabled: isNotSelected }],
         ],
         context.parent,
         { type: 'item' }),
@@ -337,24 +270,18 @@ export const userSetup = (props, context, eventName) => {
         checkTableModalState,
         tags,
         dropdown: dropdownMenu,
-        userStateFormatter,
         timestampFormatter,
         clickCollectData() {
             console.log('add');
         },
-        getUsers,
-        // todo: need confirm that this is good way - sinsky
-        // EventBus Names
+        getCredentials,
         ...eventNames,
         getSelectedUserItems,
         getSelectUserIds,
         getFirstSelectedUserId,
-        userFormState,
-        clickAdd,
-        clickUpdate,
-        userFormConfirm,
-        clickEnable,
-        clickDisable,
+        credentialsFormState,
+        clickCreate,
+        credentialsFormConfirm,
         clickDelete,
         checkModalConfirm,
 
@@ -362,18 +289,17 @@ export const userSetup = (props, context, eventName) => {
 };
 
 export default {
-    name: 'UserTemplate',
+    name: 'CredentialsTemplate',
     filters: {
         getValue,
     },
     components: {
-        PUserForm,
-        PStatus,
+        PCredentialsForm,
+        PButton,
         PHorizontalLayout,
         PToolboxTable,
-        PButton,
         PDropdownMenuBtn,
-        PUserDetail,
+        PCredentialsDetail,
         PTab,
         PDataTable,
         PSearch,
@@ -383,7 +309,7 @@ export default {
         const dataBind = reactive({
             items: computed(() => []),
         });
-        const state = userSetup(props, context, dataBind.items);
+        const state = credentialsSetup(props, context, dataBind.items);
 
         return {
             ...toRefs(state),
@@ -408,7 +334,7 @@ export default {
         color: $primary2;
         font: 24px/32px Arial;
     }
-    .user{
+    .credential{
         margin-top: 1.5625rem;
         margin-left: 2rem;
         margin-right: 2rem;

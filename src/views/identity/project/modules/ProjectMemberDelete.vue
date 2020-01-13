@@ -185,7 +185,7 @@ export default {
                     group: 'noticeBottomRight',
                     type: 'success',
                     title: 'Success',
-                    text: 'Selected item successfully Removed from Project Group',
+                    text: 'Selected item successfully Removed from Project Group.',
                     duration: 3000,
                     speed: 2000,
                 });

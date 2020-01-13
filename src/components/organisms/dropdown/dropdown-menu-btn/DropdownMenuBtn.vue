@@ -1,5 +1,5 @@
 <template>
-    <div class="dropdown">
+    <div class="p-dropdown-menu-btn">
         <PDropdownBtn :popup.sync="popup" @click="$emit('openMenu')">
             <slot />
         </PDropdownBtn>
@@ -47,3 +47,8 @@ export default {
     },
 };
 </script>
+<style lang="scss" scoped>
+    .p-dropdown-menu-btn{
+        position: relative;
+    }
+</style>

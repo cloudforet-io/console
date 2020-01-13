@@ -199,6 +199,7 @@ export const en = {
         MEMBER: 'Member',
         KEY: 'Key',
         FAIL_REASON: 'Reason for Failure',
+        ISSUE_TYPE: 'Issue Type',
     },
     ATOM: {
 
