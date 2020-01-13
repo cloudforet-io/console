@@ -2,7 +2,6 @@ import {configure, addParameters, addDecorator} from '@storybook/vue';
 import {withA11y} from '@storybook/addon-a11y';
 import centered from '@storybook/addon-centered/vue';
 import '@storybook/addon-console';
-import { withInfo } from 'storybook-addon-vue-info'
 import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 
@@ -45,8 +44,6 @@ Vue.prototype.$velocity = velocity;
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
 
-
-addDecorator(withInfo);
 addDecorator(withA11y);
 addDecorator(withKnobs);
 addDecorator(centered);
@@ -55,4 +52,3 @@ addDecorator(() => ({
     template: '<story/>',
     i18n,
 }));
-

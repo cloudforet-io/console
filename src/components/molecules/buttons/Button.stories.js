@@ -1,9 +1,10 @@
 import { action } from '@storybook/addon-actions';
-import { text, select } from '@storybook/addon-knobs/vue';
+import { text, select } from '@storybook/addon-knobs';
+import { autoProps } from '@sb/storybook-util';
+import { boolean } from '@storybook/addon-knobs';
 import PIconButton from './IconButton';
 import PCopyButton from './CopyButton';
 
-import { autoProps } from '@sb/storybook-util';
 import {
     animationMapping, flipMapping,
     iconStyleMapping,
@@ -49,9 +50,9 @@ export const iconButton = () => ({
 >
 </p-icon-button>`,
     props: {
-        ...autoProps(PIconButton),
-        icon: {
-            default: text('icon', 'fa-cog'),
+        // ...autoProps(PIconButton),
+        dark: {
+            default: boolean('dark', false),
         },
         iconStyle: {
             default: select('icon_style', [...Object.keys(iconStyleMapping)], 'solid'),

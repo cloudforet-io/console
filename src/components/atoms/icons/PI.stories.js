@@ -3,7 +3,7 @@ import { autoProps } from '@sb/storybook-util';
 import PI from './PI';
 
 export default {
-    title: 'atoms/icon/',
+    title: 'atoms/icon',
     component: PI,
     parameters: {
         info: {
