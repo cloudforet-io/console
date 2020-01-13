@@ -1,6 +1,8 @@
 import axios from 'axios';
 import VueCookies from 'vue-cookies';
 import jwt from 'jsonwebtoken';
+import prefixPropName from 'bootstrap-vue/esm/utils/prefix-prop-name';
+import { object } from '@storybook/addon-knobs';
 
 class APIError extends Error {
     constructor(axiosError) {
@@ -106,6 +108,19 @@ class API {
 
 export default new API();
 
+export const operatorMap = Object.freeze({
+    '': 'contain',
+    '!': 'not_contain',
+    '>': 'lt',
+    '>=': 'lte',
+    '<': 'gt',
+    '<=': 'gte',
+    '=': 'eq',
+    '!=': 'not',
+    in: 'in',
+    '!in': 'not_in',
+});
+
 /**
  * @name defaultQuery
  * @description make default query format
@@ -114,9 +129,11 @@ export default new API();
  * @param sortBy
  * @param sortDesc
  * @param searchText
+ * @param searchQuery
  * @returns {{page: {start: number, limit: *}}}
  */
-export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText) => {
+export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText, searchQuery) => {
+
     const query = {
         page: {
             start: ((thisPage - 1) * pageSize) + 1,
@@ -131,6 +148,31 @@ export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText) =
     }
     if (searchText) {
         query.keyword = searchText || '';
+    }
+    if (searchQuery) {
+        const filter = [];
+        // eslint-disable-next-line camelcase
+        const filter_or = [];
+        const andQueryKeywords = new Set([]);
+        searchQuery.forEach((q) => {
+            const queryObject = {
+                k: q.key,
+                v: q.value,
+                o: operatorMap[q.operator],
+            };
+            if (andQueryKeywords.has(q.key)) {
+                // eslint-disable-next-line camelcase
+                filter.push(queryObject);
+            } else {
+                // eslint-disable-next-line camelcase
+                filter_or.push(queryObject);
+                andQueryKeywords.add(q.key);
+            }
+        });
+        // eslint-disable-next-line camelcase
+        if (!_.isEmpty(filter)) { query.fliter = filter; }
+        // eslint-disable-next-line camelcase
+        if (!_.isEmpty(filter_or)) { query.filter_or = filter_or; }
     }
     return query;
 };

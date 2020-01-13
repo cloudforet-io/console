@@ -7,6 +7,7 @@ import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/serve
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
+import { defaultAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 
 export default {
@@ -25,7 +26,41 @@ export default {
         serverEventNames.closedServer = 'closedServer';
         serverEventNames.deleteServer = 'deleteServer';
 
-        const state = serverSetup(props, context, serverEventNames);
+        class ACHandler extends defaultAutocompleteHandler {
+        // eslint-disable-next-line class-methods-use-this
+            get keys() {
+                return [
+                    'server_id', 'name', 'state', 'primary_ip_address', 'server_type', 'os_type', 'project_id',
+                    'data.os.os_arch', 'data.os.os_distro', 'data.base.memory', 'data.base.core',
+                ];
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get suggestKeys() {
+                return ['server_id', 'name', 'primary_ip_address'];
+            }
+
+
+            getStateValues(contextType, inputText, searchQuery) {
+                if (searchQuery.key === 'state') {
+                    const prefix = `${searchQuery.key}:${searchQuery.operator}`;
+                    return [
+                        searchQuery.key,
+                        _.flatMap(['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED'], v => `${prefix}${v}`),
+                    ];
+                }
+            }
+
+
+            // eslint-disable-next-line no-shadow
+            constructor(context) {
+                super();
+                this.context = context;
+                this.handlerMap.value = [this.getStateValues];
+            }
+        }
+
+        const state = serverSetup(props, context, serverEventNames, new ACHandler(context));
         const projectNameList = ref({});
         const matchProject = (items) => {
             for (let i = 0; i < items.length; i++) {
@@ -54,8 +89,8 @@ export default {
         const requestState = reactive({
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
-                state.sortBy, state.sortDesc,
-                state.searchText,
+                state.sortBy, state.sortDesc, null,
+                state.queryListTools.tags,
             ))),
         });
         const requestServerList = async () => {
@@ -113,7 +148,6 @@ export default {
                     tags,
                 });
                 state.items[idx].tags = tags;
-                console.log(res);
             } catch (e) {
                 serverEventBus.$emit(serverEventNames.tagResetEvent);
                 state.items[idx].tags = originTags;
@@ -160,7 +194,7 @@ export default {
             await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'MAINTENANCE')).then(async (_) => {
                 await requestServerList();
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
                     text: 'maintenance servers',
@@ -170,7 +204,7 @@ export default {
             }).catch((error) => {
                 console.error(error);
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
                     text: 'request Fail',
@@ -185,7 +219,7 @@ export default {
             await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'CLOSED')).then(async (_) => {
                 await requestServerList();
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
                     text: 'closed servers',
@@ -195,7 +229,7 @@ export default {
             }).catch((error) => {
                 console.error(error);
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
                     text: 'request Fail',
@@ -210,7 +244,7 @@ export default {
             await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'INSERVICE')).then(async (_) => {
                 await requestServerList();
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
                     text: 'in-service servers',
@@ -220,7 +254,7 @@ export default {
             }).catch((error) => {
                 console.error(error);
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
                     text: 'request Fail',
@@ -235,7 +269,7 @@ export default {
             await context.parent.$http.post('/inventory/server/delete', getServersParam(items)).then(async (_) => {
                 await requestServerList();
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
                     text: 'delete servers',
@@ -245,7 +279,7 @@ export default {
             }).catch((error) => {
                 console.error(error);
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
                     text: 'request Fail',
