@@ -2,8 +2,7 @@
     <div ref="btnGroup" class="p-select-btn-group">
         <p-button v-for="btn in btnsData"
                   :key="btn.name"
-                  class="select-btn"
-                  :class="{ active:selected===btn.name}"
+                  :class="{ active:selected===btn.name, 'select-btn': !space, 'select-next-btn': space }"
                   v-bind="btn.vbind"
                   @click="clickEvent(btn.name)"
         >
@@ -14,9 +13,8 @@
 
 <script>
 import {
-    reactive, computed, toRefs, onMounted, onUnmounted,
+    reactive, computed, toRefs,
 } from '@vue/composition-api';
-import ScrollBooster from 'scrollbooster';
 import PButton from '@/components/atoms/buttons/Button.vue';
 
 export default {
@@ -25,6 +23,11 @@ export default {
     props: {
         buttons: Array,
         selected: String,
+        space: {
+            type: Boolean,
+            default: false,
+        },
+
     },
     setup(props, context) {
         const state = reactive({
@@ -40,30 +43,6 @@ export default {
                 });
                 return buttons;
             }),
-            btnGroup: null,
-            sb: null,
-        });
-
-        onMounted(() => {
-            const scrollOptions = {
-                viewport: context.parent.$el,
-                content: state.btnGroup,
-                mode: 'x',
-                onUpdate: (data) => {
-                    state.btnGroup.scrollLeft = data.position.x;
-                },
-                onClick: (data, event) => {
-                    const { target } = event;
-                    const selectableElements = ['input', 'select', 'textarea'];
-                    if (selectableElements.find(element => element === target.tagName.toLowerCase())) {
-                        target.focus();
-                    }
-                },
-            };
-            state.sb = new ScrollBooster(scrollOptions);
-        });
-        onUnmounted(() => {
-            state.sb.destroy();
         });
         return {
             ...toRefs(state),
@@ -80,20 +59,35 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.p-select-btn-group{
-    white-space:nowrap;
-    overflow-x:auto;
-    scroll-snap-type: x mandatory;
-    display: flex;
-    justify-content: flex-start ;
-    -ms-overflow-style: none; // scroll hide in IE
-    &::-webkit-scrollbar {
-        display: none !important; //scroll hide in window,chrome
+    .p-select-btn-group{
+        white-space:nowrap;
+        overflow-x:auto;
+        scroll-snap-type: x mandatory;
+        display: flex;
+        justify-content: flex-start ;
+        -ms-overflow-style: none; // scroll hide in IE
+        &::-webkit-scrollbar {
+            display: none !important; //scroll hide in window,chrome
+        }
+
+        .select-btn{
+            margin-right: 0.5rem;
+            min-width: auto;
+            display: inline;
+        }
+
+        .select-next-btn {
+            min-width: auto;
+            display: inline;
+            border-right: none;
+            border-radius: unset;
+        }
+
+        [class~='select-next-btn']:last-of-type  {
+            min-width: auto;
+            display: inline;
+            border-right: 1px solid;
+            border-radius: unset;
+        }
     }
-    .select-btn{
-        margin-right: 0.5rem;
-        min-width: auto;
-        display: inline;
-    }
-}
 </style>
