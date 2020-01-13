@@ -38,6 +38,9 @@ export class baseAutocompleteHandler {
             // eslint-disable-next-line no-await-in-loop
             result.push(...this.makeContextMenu(await handler(contextType, inputText, searchQuery)));
         }
+        if (_.head(result).type === 'divider') {
+            return result.slice(1);
+        }
         return result;
     }
 
@@ -47,11 +50,11 @@ export class baseAutocompleteHandler {
     }
 
     makeContextMenu(data) {
-        let result = [];
+        let result = [{ type: 'divider' }];
+        const title = data[0] ? [{ type: 'header', label: data[0] }] : [];
+        result = result.concat(title);
         const menus = data[1];
         if (menus && menus.length >= 1) {
-            const title = data[0] ? [{ type: 'header', label: data[0] }] : [];
-            result = title.concat({ type: 'divider' });
             const menuItems = _.flatMap(menus, this.makeItem);
             return result.concat(menuItems);
         }

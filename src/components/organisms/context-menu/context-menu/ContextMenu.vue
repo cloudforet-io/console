@@ -1,5 +1,7 @@
 <template>
-    <div class="p-context-menu" style="display: block;" :class="theme">
+    <div class="p-context-menu" style="display: block;" :class="theme"
+         @keyup.esc="$emit('onEscKey',$event)"
+    >
         <template v-for="(item, index) in menu">
             <a v-if="item.type==='item'" :id="`context-item-${index}-${uuid}`" :key="`${item.name}-${index}`"
                :tabindex="index"
@@ -30,7 +32,7 @@ import { computed } from '@vue/composition-api';
 
 export default {
     name: 'PContextMenu',
-    events: ['clickMenuEvent'],
+    events: ['clickMenuEvent', 'onEndOfUpKey', 'onEndOfDownKey', 'onEscKey'],
     props: {
         menu: {
             type: [Array, Object],
@@ -63,11 +65,11 @@ export default {
         };
         const onUpKey = (idx) => {
             const pos = itemsIndex.value.indexOf(idx);
-            if (pos !== 0) { focus(pos - 1); }
+            if (pos !== 0) { focus(pos - 1); } else { context.emit('onEndOfUpKey'); }
         };
         const onDownKey = (idx) => {
             const pos = itemsIndex.value.indexOf(idx) + 1;
-            if (pos !== itemsIndex.value.length) { focus(pos); }
+            if (pos !== itemsIndex.value.length) { focus(pos); } else { context.emit('onEndOfDownKey'); }
         };
         return {
             menuClick, onDownKey, onUpKey, focus, uuid,
@@ -140,7 +142,9 @@ export default {
         @include context-menu-color('dark',$white,$dark);
 
         .context-content{
-            padding-left: 14px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+
         }
         .context-header{
             margin-top: 0.875rem;
