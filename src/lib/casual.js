@@ -1,5 +1,11 @@
 const casual = require('casual-browserify');
 
+/**
+ * @param times {Number}
+ * @param generator {Function}
+ * @param args : parameters for generator function
+ * @returns {[]}
+ */
 export const arrayOf = (times, generator, ...args) => {
     const result = [];
     for (let i = 0; i < times; ++i) {
@@ -9,6 +15,12 @@ export const arrayOf = (times, generator, ...args) => {
     return result;
 };
 
+/**
+ * @param times {Number}
+ * @param generator {Function}
+ * @param args : parameters for generator function
+ * @returns {Object}
+ */
 export const dictOf = (times, generator, ...args) => {
     const result = {};
     let i = 0;
@@ -46,6 +58,9 @@ const provider = {
             tag[casual._word()] = casual._word();
         }
         return tag;
+    },
+    defaultImg() {
+        return 'https://assets-console-cloudone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/ic_collector_tags.svg';
     },
 
 };

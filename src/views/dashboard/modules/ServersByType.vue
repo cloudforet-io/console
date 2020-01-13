@@ -5,7 +5,7 @@
                                           @legendClick="onServerTypeLegendClick"
             />
         </div>
-        <p-card-layout :col-max="colMax">
+        <p-card-layout :col-max="colMax" class="card-layout">
             <div v-for="(d, key) in chartData" :slot="key" :key="key">
                 <p class="title">
                     {{ d.title }}
@@ -112,5 +112,9 @@ export default {
         font-weight: bold;
         font-size: 1rem;
         padding-bottom: 1rem;
+    }
+    .card-layout {
+        border: 1px solid $gray2;
+        border-radius: 2px;
     }
 </style>

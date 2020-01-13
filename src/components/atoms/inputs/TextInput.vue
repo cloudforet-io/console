@@ -16,7 +16,7 @@ export default {
         type: {
             type: String,
             default: 'text',
-            validator: value => ['text', 'password'].indexOf(value) !== -1,
+            validator: value => ['text', 'number', 'password'].indexOf(value) !== -1,
         },
     },
     render(h, { data, props, listeners }) {
@@ -72,6 +72,11 @@ export default {
 }
 
 input[type="text"].p-text-input{
+    @include setInput();
+}
+
+
+input[type="number"].p-text-input{
     @include setInput();
 }
 
