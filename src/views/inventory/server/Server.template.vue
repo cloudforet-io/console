@@ -225,22 +225,22 @@ export const serverTableReactive = parent => reactive({
 });
 
 /**
- * @typedef {Object} serverState
- * @property {string} sortBy
- * @property {boolean} sortDesc
- * @property {number} thisPage
- * @property {number} allPage
- * @property {number} pageSize
- * @property {Array} fields
- * @property {Array} selectIndex
- *
- */
+     * @typedef {Object} serverState
+     * @property {string} sortBy
+     * @property {boolean} sortDesc
+     * @property {number} thisPage
+     * @property {number} allPage
+     * @property {number} pageSize
+     * @property {Array} fields
+     * @property {Array} selectIndex
+     *
+     */
 
 /**
- * server default setup reactive object
- * @function
- * @return {serverState} reactive object
- */
+     * server default setup reactive object
+     * @function
+     * @return {serverState} reactive object
+     */
 export const eventNames = {
     tagResetEvent: '',
     tagConfirmEvent: '',

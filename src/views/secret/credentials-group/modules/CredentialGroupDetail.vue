@@ -35,7 +35,7 @@ export default {
     },
     setup(props, { parent }) {
         const baseDefs = makeTrItems([
-            ['cdg_id', 'COMMON.ID'],
+            ['credential_group_id', 'COMMON.ID'],
             ['name', 'COMMON.NAME'],
             ['created_at', 'COMMON.CREATE'],
         ], parent, { copyFlag: true });
@@ -53,7 +53,7 @@ export default {
             tags,
             dictPanel,
             confirm(...event) {
-                cdgEventBus.$emit(props.tagConfirmEvent, props.item.cdg_id, ...event);
+                cdgEventBus.$emit(props.tagConfirmEvent, props.item.credential_group_id, ...event);
             },
             cdgStateFormatter,
             timestampFormatter,

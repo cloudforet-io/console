@@ -92,6 +92,7 @@ export const formValidation = (data, validation) => {
         let result = true;
         const vds = Object.keys(validation);
         for (let i = 0; i < vds.length; i++) {
+            // eslint-disable-next-line no-await-in-loop
             const validateResult = await fieldValidation(vds[i]);
             if (!validateResult) {
                 result = false;

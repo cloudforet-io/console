@@ -89,6 +89,7 @@
                     :update-mode="cdgFormState.updateMode"
                     :item="cdgFormState.item"
                     :visible.sync="cdgFormState.visible"
+                    :cdgNameValidation="cdgNameValidation"
                     @confirm="cdgFormConfirm"
         />
     </div>
@@ -111,16 +112,17 @@ import PSearch from '@/components/molecules/search/Search.vue';
 import PCdgDetail from '@/views/secret/credentials-group/modules/CredentialGroupDetail.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PCdgForm from '@/views/secret/credentials-group/modules/CredentialGroupForm.vue';
 
 export const CdgTableReactive = parent => reactive({
     fields: makeTrItems([
-        ['cdg_id', 'COMMON.ID'],
+        ['credential_group_id', 'COMMON.ID'],
         ['name', 'COMMON.NAME'],
         ['created_at', 'COMMON.CREATE'],
     ],
     parent),
     multiSelectFields: makeTrItems([
-        ['cdg_id', 'COMMON.ID'],
+        ['credential_group_id', 'COMMON.ID'],
         ['name', 'COMMON.NAME'],
     ],
     parent),
@@ -139,7 +141,7 @@ export const eventNames = {
     updateCdg: '',
 };
 
-export const cdgSetup = (props, context, eventName) => {
+export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
     const eventBus = cdgEventBus;
     const tableState = CdgTableReactive(context.parent);
     const tabData = reactive({
@@ -182,7 +184,7 @@ export const cdgSetup = (props, context, eventName) => {
     const getSelectedCdgIds = computed(() => {
         const ids = [];
         getSelectedCdgItems.value.forEach((item) => {
-            ids.push(item.cdg_id);
+            ids.push(item.credential_group_id);
         });
         return ids;
     });
@@ -198,6 +200,7 @@ export const cdgSetup = (props, context, eventName) => {
     const clickCreate = () => {
         cdgFormState.updateMode = false;
         cdgFormState.headerTitle = 'Create Credentials Group';
+        cdgFormState.item = null;
         cdgFormState.eventName = eventNames.createCdg;
         cdgFormState.visible = true;
     };
@@ -206,11 +209,8 @@ export const cdgSetup = (props, context, eventName) => {
         cdgFormState.headerTitle = 'Update Credentials Group';
         const item = getSelectedCdgItems.value[0];
         cdgFormState.item = {
-            cdgId: item.cdg_id,
             name: item.name,
-            domain_id: item.domain_id,
             tags: item.tags,
-            created: item.created_at,
         };
         cdgFormState.eventName = eventNames.updateCdg;
         cdgFormState.visible = true;
@@ -255,6 +255,7 @@ export const cdgSetup = (props, context, eventName) => {
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
     };
+
     const dropdownMenu = reactive({
         ...makeTrItems([
             ['update', 'COMMON.BTN_UPT', { disabled: isNotOnlyOneSelected }],
@@ -284,6 +285,7 @@ export const cdgSetup = (props, context, eventName) => {
         clickDelete,
         cdgFormConfirm,
         checkModalConfirm,
+        cdgNameValidation,
     });
 };
 export default {
@@ -292,6 +294,7 @@ export default {
         getValue,
     },
     components: {
+        PCdgForm,
         PHorizontalLayout,
         PToolboxTable,
         PButton,

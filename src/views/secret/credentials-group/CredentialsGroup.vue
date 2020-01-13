@@ -4,7 +4,7 @@ import {
 } from '@vue/composition-api';
 import CdgTemplate, { cdgSetup, eventNames } from '@/views/secret/credentials-group/CredentialsGroup.template.vue';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
-import { mountBusEvent } from '@/lib/compostion-util';
+import { mountBusEvent, Validation } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
 
 export default {
@@ -18,8 +18,28 @@ export default {
         cdgEventNames.deleteCdg = 'deleteCdg';
         cdgEventNames.createCdg = 'createCdg';
         cdgEventNames.updateCdg = 'updateCdg';
-
-        const state = cdgSetup(props, context, cdgEventNames);
+        const cdgNameValidation = new Validation(async (value) => {
+            let result = false;
+            console.log('name validation test', value);
+            await context.parent.$http.post('/secret/credential-group/list', {
+                domain_id: sessionStorage.domainId,
+                query: {
+                    minimal: true,
+                    filter: [{
+                        k: 'name',
+                        v: value,
+                        o: 'eq',
+                    }],
+                },
+            }).then((res) => {
+                console.log(res);
+                if (res.data.total_count === 0) {
+                    result = true;
+                }
+            });
+            return result;
+        }, 'Duplicated Credential Group Name');
+        const state = cdgSetup(props, context, cdgEventNames, cdgNameValidation);
 
         const requestState = reactive({
             query: computed(() => (defaultQuery(
@@ -50,7 +70,7 @@ export default {
         const CdgTagConfirm = async (cdgId, tags, originTags) => {
             const idx = state.selectIndex[0];
             await context.parent.$http.post('/secret/credential-group/update', {
-                cdg_id: cdgId,
+                credential_group_id: cdgId,
                 tags,
             }).then((_) => {
                 state.items[idx].tags = tags;
@@ -61,11 +81,12 @@ export default {
             });
         };
         const getCdgsParam = (items) => {
-            console.log(items);
-            const result = { cdgs: _.map(items, 'cdg_id') };
+            const result = { credential_group_id: _.map(items, 'credential_group_id') };
+            console.log('item test', result);
             return result;
         };
         const deleteCdg = async (items) => {
+            // console.log('delete test', items.credential_group_id);
             await context.parent.$http.post('/secret/credential-group/delete', getCdgsParam(items)).then(async (_) => {
                 await requestCdgList();
                 context.root.$notify({
@@ -112,6 +133,7 @@ export default {
             });
         };
         const updateCdg = async (item) => {
+            console.log('update test', item)
             await context.parent.$http.post('/secret/credential-group/update', item).then(async (_) => {
                 await requestCdgList();
                 context.root.$notify({
@@ -134,6 +156,8 @@ export default {
                 });
             });
         };
+
+
         mountBusEvent(cdgEventBus, cdgEventNames.getCdgList, requestCdgList);
         mountBusEvent(cdgEventBus, cdgEventNames.tagConfirmEvent, CdgTagConfirm);
         mountBusEvent(cdgEventBus, cdgEventNames.deleteCdg, deleteCdg);
