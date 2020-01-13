@@ -76,7 +76,7 @@ const setFormState = (props) => {
     const inputType = computed(() => {
         switch (formData.value.type) {
         case 'str': return 'text';
-        default: return formData.value.type;
+        default: return 'number';
         }
     });
 

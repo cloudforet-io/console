@@ -1,4 +1,4 @@
-import casual, { dictOf } from '@/lib/casual';
+import casual, { arrayOf } from '@/lib/casual';
 
 casual.define('collectorPlugins', () => ([
     {
@@ -19,5 +19,27 @@ casual.define('collectorPlugins', () => ([
         desc: 'plugin description ...',
     },
 ]));
+
+casual.define('pluginOption', () => ({
+    key: casual.uuid,
+    name: casual.word,
+    type: casual.random_element(['str', 'bool', 'list', 'int', 'float']),
+    is_required: casual.boolean,
+    enums: casual.array_of_words(5),
+    example: casual.word,
+    default: casual.word,
+}));
+
+casual.define('pluginVersions', () => casual.array_of_digits(5));
+
+
+casual.define('pluginInfo', () => ({
+    name: casual.title,
+    image: casual._defaultImg(),
+    template: {
+        options: arrayOf(casual.integer(1, 5), casual._pluginOption),
+        // credentials = [{key, name, type, [is_required(bool)], [enums], [example]}, ...]
+    },
+}));
 
 export default casual;

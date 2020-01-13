@@ -9,6 +9,13 @@ export default {
     title: 'molecules/layouts/CardLayout',
     component: CardLayout,
     decorators: [withKnobs],
+    parameters: {
+        info: {
+            summary: `
+            `,
+            components: { CardLayout },
+        },
+    },
 };
 
 
@@ -23,4 +30,3 @@ export const defaultCase = () => ({
                     <template slot="c">cc</template>
                </CardLayout>`,
 });
-
