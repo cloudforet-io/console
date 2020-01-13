@@ -21,9 +21,11 @@ import PI from '@/components/atoms/icons/PI.vue';
  * @description Generate tools for using tag badge as a list
  * @param proxyTags {Array<String>}
  * @param checkDuplicate {Boolean}
+ * @param eventBuse {EventBus}
+ * @param eventName {string}
  * @returns {UnwrapRef<{deleteTag: *, tags: *, addTag: *}>}
  */
-export const tagList = (proxyTags, checkDuplicate = true) => {
+export const tagList = (proxyTags, checkDuplicate = true, eventBuse, eventName) => {
     const tags = proxyTags || ref([]);
 
     /**
@@ -33,6 +35,12 @@ export const tagList = (proxyTags, checkDuplicate = true) => {
         const updatedTags = [...tags.value];
         updatedTags.splice(idx, 1);
         tags.value = updatedTags;
+        if (eventBuse) { eventBuse.$emit(eventName, tags.value); }
+    };
+
+    const deleteAllTags = () => {
+        tags.value = [];
+        if (eventBuse) { eventBuse.$emit(eventName, tags.value); }
     };
 
     const validation = value => tags.value.every(tag => !_.isEqual(tag, value));
@@ -41,18 +49,20 @@ export const tagList = (proxyTags, checkDuplicate = true) => {
      * @param value {String}
      */
     const addTag = (value) => {
-        const val = value.trim();
+        const val = (typeof value === 'string') ? value.trim() : value;
         if (!val || val === '') return;
         if (checkDuplicate && !validation(val)) return;
         const updatedTags = [...tags.value];
         updatedTags.push(val);
         tags.value = updatedTags;
+        if (eventBuse) { eventBuse.$emit(eventName, tags.value); }
     };
 
     return reactive({
         tags,
         deleteTag,
         addTag,
+        deleteAllTags,
     });
 };
 

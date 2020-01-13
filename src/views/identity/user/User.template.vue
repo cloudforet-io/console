@@ -113,14 +113,14 @@ import userEventBus from '@/views/identity/user/UserEventBus';
 import PUserForm from '@/views/identity/user/modules/UserForm';
 
 
-const PTab = () => import('@/components/organisms/tabs/tab/Tab');
-const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
-const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
-const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
-const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn');
-const PSearch = () => import('@/components/molecules/search/Search');
-const PUserDetail = () => import('@/views/identity/user/modules/UserDetail');
-const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
+const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
+const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
+const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue');
+const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable.vue');
+const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue');
+const PSearch = () => import('@/components/molecules/search/Search.vue');
+const PUserDetail = () => import('@/views/identity/user/modules/UserDetail.vue');
+const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
 export const UserTableReactive = parent => reactive({
     fields: makeTrItems([
         ['user_id', 'COMMON.ID'],

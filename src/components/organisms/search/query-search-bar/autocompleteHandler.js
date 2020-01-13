@@ -1,5 +1,4 @@
 import Fuse from 'fuse.js';
-import { isRef } from '@vue/composition-api';
 
 export class SearchQuery {
     constructor(key, operator, value) {
@@ -38,7 +37,7 @@ export class baseAutocompleteHandler {
             // eslint-disable-next-line no-await-in-loop
             result.push(...this.makeContextMenu(await handler(contextType, inputText, searchQuery)));
         }
-        if (_.head(result).type === 'divider') {
+        if (result.length >= 1 && _.head(result).type === 'divider') {
             return result.slice(1);
         }
         return result;
@@ -98,7 +97,7 @@ export class defaultAutocompleteHandler extends baseAutocompleteHandler {
         super();
         this.handlerMap = {
             key: [getKeys(this.keys), getSuggest(this.suggestKeys)],
-            value: [getValues],
+            value: [],
         };
     }
 }

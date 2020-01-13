@@ -112,8 +112,12 @@ export default createComponent({
         let initData = false;
         watch([proxySearchText, showAC], async ([text, ac], [preText, preAc]) => {
             if (ac && (text !== preText || !initData)) {
-                acState.items = await props.autocompleteHandler.getAutoCompleteData(contextType.value, text, contextState);
+                const result = await props.autocompleteHandler.getAutoCompleteData(contextType.value, text, contextState);
+                console.log(result);
+                acState.items = result;
                 if (!initData) { initData = true; }
+                console.log('before hide');
+                if (result.length === 0) { console.log('hide'); hideAC(); }
             }
         });
 
