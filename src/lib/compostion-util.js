@@ -1,4 +1,6 @@
-import { computed, onUnmounted, reactive,ref ,onMounted} from '@vue/composition-api';
+import {
+    computed, onUnmounted, reactive, ref, onMounted,
+} from '@vue/composition-api';
 import _ from 'lodash';
 
 /**
@@ -64,10 +66,10 @@ export const mouseOverState = (disabled) => {
  * 자동완성, 드롭다운 컨텍스트 메뉴 팝업을 자동으로 닫게 할때 활용
  * @param func
  */
-export const windowEventMount = (eventName,func) => {
-    onMounted(()=> window.addEventListener(eventName, func));
-    onUnmounted(()=> window.removeEventListener(eventName, func));
-}
+export const windowEventMount = (eventName, func) => {
+    onMounted(() => window.addEventListener(eventName, func));
+    onUnmounted(() => window.removeEventListener(eventName, func));
+};
 
 
 export class Validation {
@@ -149,7 +151,16 @@ export const requiredValidation = invalidMessage => new Validation((value) => {
     if (['boolean', 'number'].includes(typeof value)) return true;
     if (value instanceof Array) return !!value.length;
     return !_.isEmpty(value); // String, Object
-}, invalidMessage || 'value is required');
+}, invalidMessage || 'Required field!');
+export const jsonParseValidation = invalidMessage => new Validation((value) => {
+    try {
+        JSON.parse(value);
+    } catch (e) {
+        return false;
+    }
+    return true;
+},
+invalidMessage || 'Invalid Json string format!');
 export const numberMinValidation = (min, invalidMessage) => new Validation(value => Number(value) >= min, invalidMessage || `value must bigger then ${min}`);
 export const numberMaxValidation = (max, invalidMessage) => new Validation(value => Number(value) >= max, invalidMessage || `value must smaller then ${max}`);
 export const lengthMinValidation = (min, invalidMessage) => new Validation(value => value.length >= min, invalidMessage);
@@ -163,4 +174,4 @@ export const userIDValidation = (parent, invalidMessage) => new Validation(async
         }
     });
     return result;
-}, invalidMessage || 'already use that user id');
+}, invalidMessage || 'same ID exists!');
