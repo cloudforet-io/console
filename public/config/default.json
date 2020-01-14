@@ -4,7 +4,7 @@
     "google_oauth2": "/google-sign-in"
   },
   "VUE_APP_API": {
-    "ENDPOINT": "http://console-api.dev.pyengine.net"
+    "ENDPOINT": "http://console-api.stg.pyengine.net"
   },
   "COLLECTOR_IMG": "https://assets-console-cloudone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/ic_collector_tags.svg"
 }
