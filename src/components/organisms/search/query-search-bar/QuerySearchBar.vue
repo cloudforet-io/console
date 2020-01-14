@@ -104,7 +104,7 @@ export default createComponent({
         };
         const showAC = computed(() => {
             if ((contextType.value !== searchContextType.None && acState.items.length !== 0) || acState.isFocusAC) {
-                // acState.isFocusAC = true;
+                acState.isFocusAC = true;
                 return true;
             }
             return false;
