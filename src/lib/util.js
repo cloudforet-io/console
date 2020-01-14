@@ -124,14 +124,6 @@ export const getValue = (scope, paths, defaultValue) => {
     return value;
 };
 
-/** @function
- * @name isEmpty
- * @description  Check whether given value is empty.
- * @param {*} value
- * @return {boolean}
- * */
-export const isEmpty = value => !!((value === '' || value === null || value === undefined || (value !== null && typeof value === 'object' && !Object.keys(value).length)));
-
 
 export const isSelectedType = (d, t) => {
     if (t.toUpperCase() === 'N') {

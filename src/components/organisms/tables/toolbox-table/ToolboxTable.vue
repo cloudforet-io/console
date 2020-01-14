@@ -1,43 +1,48 @@
 <template>
     <div :class="{'toolbox-table': true,'no-padding':!padding,'toolbox-shadow': shadow, 'toolbox-border': border}">
         <div class="toolbox">
-            <div class="left" :style="{width:hasCenterSlot}">
-                <slot name="toolbox-left" />
-            </div>
-            <div v-if="$slots['toolbox-center']" class="center">
-                <slot name="toolbox-center" />
-            </div>
-            <div class="right">
-                <slot name="toolbox-right" />
-                <div v-if="pagenationVisible" class="tool">
-                    <p-text-pagenation
-                        :this-page.sync="proxyThisPage"
-                        :all-page="allPage"
-                        @pageChange="changePageNumber"
-                    />
+            <p-row class="toolbox-middle">
+                <div class="left" :style="{width:hasCenterSlot}">
+                    <slot name="toolbox-left" />
                 </div>
-                <div v-if="pageSizeVisible" class="tool">
-                    <PDropdownMenuBtn
-                        class="page-size-dropdown"
-                        :menu="pageSizeOptions"
-                        @clickMenuEvent="changePageSize"
-                    >
-                        {{ proxyPageSize }}
-                    </PDropdownMenuBtn>
+                <div v-if="$slots['toolbox-center']" class="center">
+                    <slot name="toolbox-center" />
                 </div>
-                <div v-if="settingVisible" class="tool">
-                    <p-icon-button
-                        name="ic_setting"
-                        @click="$emit('clickSetting',$event)"
-                    />
+                <div class="right">
+                    <slot name="toolbox-right" />
+                    <div v-if="pagenationVisible" class="tool">
+                        <p-text-pagenation
+                            :this-page.sync="proxyThisPage"
+                            :all-page="allPage"
+                            @pageChange="changePageNumber"
+                        />
+                    </div>
+                    <div v-if="pageSizeVisible" class="tool">
+                        <PDropdownMenuBtn
+                            class="page-size-dropdown"
+                            :menu="pageSizeOptions"
+                            @clickMenuEvent="changePageSize"
+                        >
+                            {{ proxyPageSize }}
+                        </PDropdownMenuBtn>
+                    </div>
+                    <div v-if="settingVisible" class="tool">
+                        <p-icon-button
+                            name="ic_setting"
+                            @click="$emit('clickSetting',$event)"
+                        />
+                    </div>
+                    <div v-if="refreshVisible" class="tool">
+                        <p-icon-button
+                            name="ic_refresh"
+                            @click="$emit('clickRefresh',$event)"
+                        />
+                    </div>
                 </div>
-                <div v-if="refreshVisible" class="tool">
-                    <p-icon-button
-                        name="ic_refresh"
-                        @click="$emit('clickRefresh',$event)"
-                    />
-                </div>
-            </div>
+            </p-row>
+            <p-row v-if="$slots['toolbox-bottom']" class="toolbox-bottom">
+                <slot name="toolbox-bottom" />
+            </p-row>
         </div>
         <p-data-table
             ref="table"
@@ -45,6 +50,7 @@
             :items="items"
             :sortable="sortable"
             :selectable="selectable"
+            :multi-select="multiSelect"
             :dragable="dragable"
             :col-copy="colCopy"
             :select-index.sync="proxySelectIndex"
@@ -77,15 +83,16 @@
 </template>
 
 <script>
-import PDataTable from '@/components/organisms/tables/data-table/DataTable';
-import PTextPagenation from '@/components/organisms/pagenations/textPagenation';
-import PIconButton from '@/components/molecules/buttons/IconButton';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
+import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
 
 export default {
     name: 'PToolboxTable',
     components: {
-        PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn,
+        PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn, PRow,
     },
     events: [
         'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
@@ -245,11 +252,40 @@ export default {
         padding: 1rem;
         .toolbox {
             margin-top: 0.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: nowrap;
-            align-items: center;
+            .toolbox-middle{
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: nowrap;
+                align-items: center;
+                margin-bottom: 1rem;
+                .left{
+                    display: flex;
+                    flex-wrap: wrap;
+                    width: auto;
+                    justify-content: flex-start;
+                }
+                .center{
+                    display: inline-flex;
+                    flex-wrap:nowrap;
+                    width: auto;
+                    justify-content: center;
+
+                }
+                .right{
+                    display: inline-flex;
+                    flex-wrap:nowrap;
+                    width: auto;
+                    justify-content: flex-end;
+                    .page-size-dropdown{
+                        &::v-deep .menu-btn{
+                            min-width: 4rem;
+                        }
+                    }
+                }
+            }
+            .toolbox-bottom{
+                width: auto;
+            }
 
         }
         &.no-padding{
@@ -257,32 +293,9 @@ export default {
         }
     }
 
-    .left{
-        display: flex;
-        flex-wrap: wrap;
-        width: auto;
-        justify-content: flex-start;
-    }
-    .center{
-        display: inline-flex;
-        flex-wrap:nowrap;
-        width: auto;
-        justify-content: center;
-
-    }
-    .right{
-        display: inline-flex;
-        flex-wrap:nowrap;
-        width: auto;
-        justify-content: flex-end;
-    }
     .tool{
         margin-left: 1rem;
         display: inline;
     }
-    .page-size-dropdown{
-        &::v-deep .menu-btn{
-            min-width: 4rem;
-        }
-    }
+
 </style>

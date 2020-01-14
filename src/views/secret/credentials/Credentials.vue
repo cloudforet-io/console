@@ -3,7 +3,7 @@
 import {
     toRefs, computed, reactive,
 } from '@vue/composition-api';
-import CredentialsTemplate, { userSetup, eventNames } from '@/views/secret/credentials/Credentials.template.vue';
+import CredentialsTemplate, { credentialsSetup, eventNames } from '@/views/secret/credentials/Credentials.template.vue';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
@@ -13,19 +13,16 @@ export default {
     name: 'Credentials',
     extends: CredentialsTemplate,
     setup(props, context) {
-        const userEventNames = eventNames;
-        userEventNames.getUserList = 'getUserData';
-        userEventNames.tagConfirmEvent = 'UserTagConfirmEvent';
-        userEventNames.tagResetEvent = 'resetUserTagEvent';
-        userEventNames.enableUser = 'enableUser';
-        userEventNames.disableUser = 'disableUser';
-        userEventNames.deleteUser = 'deleteUser';
-        userEventNames.addUser = 'addUser';
-        userEventNames.updateUser = 'updateUser';
+        const credentialsEventNames = eventNames;
+        credentialsEventNames.getCredentialsList = 'getCredentialsData';
+        credentialsEventNames.tagConfirmEvent = 'credentialsTagConfirmEvent';
+        credentialsEventNames.createCredentials = 'createCredentials';
+        credentialsEventNames.updateCredentials = 'updateCredentials';
+        credentialsEventNames.deleteCredentials = 'deleteCredentials';
 
-        const state = userSetup(props, context, userEventNames);
+        const state = credentialsSetup(props, context, credentialsEventNames);
 
-        // request user list
+        // request credentials list
         const requestState = reactive({
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
@@ -33,14 +30,14 @@ export default {
                 state.searchText,
             ))),
         });
-        const requestUserList = async () => {
-            console.log('before', state.loading);
+
+        const requestCredentialsList = async () => {
             state.loading = true;
             state.items = [];
             try {
-                console.log('start', state.loading);
-                const res = await context.parent.$http.post('/identity/user/list', {
+                const res = await context.parent.$http.post('/secret/credential/list', {
                     query: requestState.query,
+                    domain_id: context.parent.$store.getters['domain/id'],
                 });
                 state.items = res.data.results;
                 const allPage = Math.ceil(res.data.total_count / state.pageSize);
@@ -53,64 +50,43 @@ export default {
             }
         };
 
-
         // change tag
-        const UserTagConfirm = async (userId, tags, originTags) => {
+        const credentialsTagConfirm = async (credentialsId, tags, originTags) => {
             const idx = state.selectIndex[0];
-            await context.parent.$http.post('/identity/user/update', {
-                user_id: userId,
-                tags,
+            await context.parent.$http.post('/secret/credential/update', {
+                credential_id: credentialsId,
+                domain_id: context.parent.$store.getters['domain/id'],
+                tags: tags,
             }).then((_) => {
                 state.items[idx].tags = tags;
             }).catch((error) => {
-                userEventBus.$emit(userEventNames.tagResetEvent);
+                credentialsEventBus.$emit(credentialsEventNames.tagResetEvent);
                 state.items[idx].tags = originTags;
                 console.error(error);
             });
         };
-        const getUsersParam = (items) => {
+
+        const getCredentialsParam = (items) => {
             console.log(items);
-            const result = { users: _.map(items, 'user_id') };
+            const result = { credentials: _.map(items, 'credential_id') };
             return result;
         };
-        const enableUser = async (items) => {
-            await context.parent.$http.post('/identity/user/enable', getUsersParam(items)).then(async (_) => {
-                await requestUserList();
+
+        const deleteCredentials = async (items) => {
+            await context.parent.$http.post('/secret/credential/delete', getCredentialsParam(items)).then(async (_) => {
+                await requestCredentialsList();
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
-                    text: 'enable users',
+                    text: 'Selected credentials are successfully deleted.',
                     duration: 2000,
                     speed: 1000,
                 });
             }).catch((error) => {
                 console.error(error);
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            });
-        };
-        const disableUser = async (items) => {
-            await context.parent.$http.post('/identity/user/disable', getUsersParam(items)).then(async (_) => {
-                await requestUserList();
-                context.root.$notify({
-                    group: 'noticeBottomLeft',
-                    type: 'success',
-                    title: 'success',
-                    text: 'disable users',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            }).catch((error) => {
-                console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
                     text: 'request Fail',
@@ -120,87 +96,37 @@ export default {
             });
         };
 
-        const deleteUser = async (items) => {
-            await context.parent.$http.post('/identity/user/delete', getUsersParam(items)).then(async (_) => {
-                await requestUserList();
+        const createCredentials = async (item) => {
+            await context.parent.$http.post('/secret/credential/create', item).then(async (_) => {
+                await requestCredentialsList();
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
-                    text: 'delete users',
+                    text: 'New Credentials has been successfully created.',
                     duration: 2000,
                     speed: 1000,
                 });
             }).catch((error) => {
                 console.error(error);
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
+                    title: 'Fail to create credentials',
+                    text: 'Request to create credentials has failed.',
                     duration: 2000,
                     speed: 1000,
                 });
             });
         };
 
-        const addUser = async (item) => {
-            await context.parent.$http.post('/identity/user/create', item).then(async (_) => {
-                await requestUserList();
-                context.root.$notify({
-                    group: 'noticeBottomLeft',
-                    type: 'success',
-                    title: 'success',
-                    text: 'add users',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            }).catch((error) => {
-                console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomLeft',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            });
-        };
 
-        const updateUser = async (item) => {
-            await context.parent.$http.post('/identity/user/update', item).then(async (_) => {
-                await requestUserList();
-                context.root.$notify({
-                    group: 'noticeBottomLeft',
-                    type: 'success',
-                    title: 'success',
-                    text: 'update users',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            }).catch((error) => {
-                console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomLeft',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            });
-        };
-        mountBusEvent(credentialsEventBus, userEventNames.getUserList, requestUserList);
-        mountBusEvent(credentialsEventBus, userEventNames.tagConfirmEvent, UserTagConfirm);
-        mountBusEvent(credentialsEventBus, userEventNames.enableUser, enableUser);
-        mountBusEvent(credentialsEventBus, userEventNames.disableUser, disableUser);
-        mountBusEvent(credentialsEventBus, userEventNames.deleteUser, deleteUser);
-        mountBusEvent(credentialsEventBus, userEventNames.addUser, addUser);
-        mountBusEvent(credentialsEventBus, userEventNames.updateUser, updateUser);
+        mountBusEvent(credentialsEventBus, credentialsEventNames.getCredentialsList, requestCredentialsList);
+        mountBusEvent(credentialsEventBus, credentialsEventNames.tagConfirmEvent, credentialsTagConfirm);
+        mountBusEvent(credentialsEventBus, credentialsEventNames.createCredentials, createCredentials);
+        mountBusEvent(credentialsEventBus, credentialsEventNames.deleteCredentials, deleteCredentials);
 
-
-        requestUserList();
+        requestCredentialsList();
         return {
             ...toRefs(state),
         };

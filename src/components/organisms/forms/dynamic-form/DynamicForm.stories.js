@@ -5,7 +5,7 @@ import {
 import { autoProps } from '@sb/storybook-util';
 import { action } from '@storybook/addon-actions';
 import _ from 'lodash';
-import PDynamicForm, { map } from './DynamicForm';
+import PDynamicForm, { map, setValidation } from './DynamicForm.vue';
 
 const getObjToStr = (obj) => {
     let res = '';
@@ -16,34 +16,60 @@ const getObjToStr = (obj) => {
 };
 
 
-const getActions = () => ({});
+const getActions = () => ({
+    onChange: action('onChange'),
+});
 const getData = (props, context) => {
     const state = reactive({
-        templates: [
+        form: {
+            key: 'option1',
+            name: 'Option Name 1',
+            type: 'bool',
+            default: false,
+            is_required: true,
+        },
+        forms: [
             {
                 key: 'option1',
                 name: 'Option Name 1',
-                type: 'str',
+                type: 'bool',
+                default: false,
                 is_required: true,
             },
             {
                 key: 'option2',
                 name: 'Option Name 2',
                 type: 'str',
+                example: 'option2',
+                is_required: true,
             },
-        ],
-        values: {},
-        validate: false,
-    });
+            {
+                key: 'option3',
+                name: 'Option Name 3',
+                type: 'str',
+                is_required: true,
+                example: 'Select',
+                enum: [
+                    'ENUM1', 'ENUM2', 'ENUM3', 'ENUM4',
+                ],
+            },
+            {
+                key: 'option4',
+                name: 'Option Name 4',
+                type: 'list',
+                example: 'option4',
+                is_required: true,
+            },
 
-    const refreshValidation = () => {
-        console.log('refresh validation');
-        state.validate = true;
-    };
+        ],
+        value: '',
+        invalid: false,
+        invalidText: '',
+        validatable: false,
+    });
 
     return {
         ...toRefs(state),
-        refreshValidation,
     };
 };
 
@@ -54,16 +80,16 @@ export default {
     parameters: {
         info: {
             summary: `
-            This component shows forms by data template. Data template MUST follow the structure below: \n
+            This component shows forms by template form. Template form MUST follow the structure below: \n
             \n\n
             ~~~
             ${getObjToStr(map)}
             ~~~
-            You can customize this template structure by using 'mapper' props.
+            You can customize this template form structure by using 'mapper' props.
             \n\n
             Example template: \n
             ~~~
-            ${getObjToStr(getData().templates.value)}  
+            ${getObjToStr(getData().form.value)}  
             ~~~
             `,
             components: { PDynamicForm },
@@ -77,19 +103,101 @@ export const defaultCase = () => ({
     props: {
     },
     template: `<div>
-                    <p-dynamic-form :templates="templates" 
-                                    :values.sync="values"
-                                    :validate="validate"
+                    <p-dynamic-form :form="form" 
+                                    v-model="value"
+                                    :invalid="invalid"
+                                    :invalid-text="invalidText"
+                                    @change="onChange"
                     />
-                    <button @click="refreshValidation">refresh validation</button>
                 </div>
 `,
     setup(...args) {
-        // const state = reactive(getData(...args));
+        const state = reactive(getData(...args));
         return {
-            // ...toRefs(state),
-            ...getData(...args),
+            ...toRefs(state),
             ...getActions(),
+        };
+    },
+});
+
+
+export const listCase = () => ({
+    components: { PDynamicForm },
+    props: {
+    },
+    template: `<div>
+                    <p-dynamic-form v-for="(fm, idx) in forms" :key="idx"
+                                    :form="fm"
+                                    v-model="values[fm[formKey]]"
+                                    :invalid="invalidState[fm[formKey]]"
+                                    :invalid-text="invalidMsg[fm[formKey]]"
+                                    @change="onChange"
+                    />
+                    <button @click="allValidation">refresh validation</button>
+                </div>
+`,
+    setup(...args) {
+        const state = reactive(getData(...args));
+        const values = ref({});
+        const {
+            formKey,
+            invalidMsg,
+            invalidState,
+            allValidation,
+        } = setValidation(state.forms, values.value);
+
+        return {
+            ...toRefs(state),
+            values,
+            formKey,
+            invalidMsg,
+            invalidState,
+            allValidation,
+            ...getActions(),
+        };
+    },
+});
+
+export const realtimeValidate = () => ({
+    components: { PDynamicForm },
+    props: {
+    },
+    template: `<div>
+                    <p-dynamic-form v-for="(fm, idx) in forms" :key="idx"
+                                    :form="fm"
+                                    v-model="values[fm.key]"
+                                    :invalid="invalidState[fm.key]"
+                                    :invalid-text="invalidMsg[fm.key]"
+                                    :validatable="validatable"
+                                    @change="onChange(fm.key, $event)"
+                    />
+                    <button @click="validatable = !validatable">
+                        Turn {{ validatable ? 'off' : 'on'}} validatable
+                    </button>
+                </div>
+`,
+    setup(...args) {
+        const state = reactive(getData(...args));
+        const values = ref({});
+        const {
+            formKey,
+            invalidMsg,
+            invalidState,
+            fieldValidation,
+        } = setValidation(state.forms, values.value);
+
+        const onChange = (key, val) => {
+            fieldValidation(key, val);
+            getActions().onChange(val);
+        };
+
+        return {
+            ...toRefs(state),
+            values,
+            formKey,
+            invalidMsg,
+            invalidState,
+            onChange,
         };
     },
 });

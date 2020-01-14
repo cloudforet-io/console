@@ -20,7 +20,7 @@ export default {
         type: {
             type: String,
             default: 'text',
-            validator: value => ['text', 'password'].indexOf(value) !== -1,
+            validator: value => ['text', 'number', 'password'].indexOf(value) !== -1,
         },
     },
     render(h, { data, props, listeners }) {
@@ -64,7 +64,8 @@ export default {
     background-color: $white;
     color: $gray1;
 
-    font: 14px/28px Arial;
+    font-size: .875rem;
+    line-height: 1.75rem;
 
     &:focus{
         border-color:$dark;
@@ -72,11 +73,16 @@ export default {
     }
     &:disabled{
         border-color:$gray2;
-        background-color: $gray2;
+        background-color: $gray3;
     }
 }
 
 input[type="text"].p-text-input{
+    @include setInput();
+}
+
+
+input[type="number"].p-text-input{
     @include setInput();
 }
 

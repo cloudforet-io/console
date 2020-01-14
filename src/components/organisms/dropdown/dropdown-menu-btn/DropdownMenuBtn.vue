@@ -1,9 +1,9 @@
 <template>
-    <div class="dropdown">
-        <PDropdownBtn :popup.sync="popup">
+    <div class="p-dropdown-menu-btn">
+        <PDropdownBtn :popup.sync="popup" @click="$emit('openMenu')">
             <slot />
         </PDropdownBtn>
-        <PDropdownMenu
+        <PContextMenu
             v-if="popup"
             :menu="menu"
             @clickMenuEvent="clickMenuEvent"
@@ -12,12 +12,12 @@
 </template>
 
 <script>
-import PDropdownMenu from '@/components/organisms/dropdown/dropdown-menu/DropdownMenu';
-import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/DropdownBtn';
+import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
+import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/DropdownBtn.vue';
 
 export default {
     name: 'PDropdownMenuBtn',
-    components: { PDropdownBtn, PDropdownMenu },
+    components: { PDropdownBtn, PContextMenu },
     props: {
         menu: {
             type: [Array, Object],
@@ -47,3 +47,8 @@ export default {
     },
 };
 </script>
+<style lang="scss" scoped>
+    .p-dropdown-menu-btn{
+        position: relative;
+    }
+</style>

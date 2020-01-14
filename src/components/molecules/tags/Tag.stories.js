@@ -6,7 +6,7 @@ import PTag, { tagList } from './Tag.vue';
 
 
 export default {
-    title: 'molecules/badges/FilterBadge',
+    title: 'molecules/tags/Tag',
     component: PTag,
     decorators: [withKnobs],
 };

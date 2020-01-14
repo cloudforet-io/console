@@ -1,16 +1,14 @@
 <script>
-import LNBTemplate from '@/views/containers/lnb/LNB.template.vue';
+import { toRefs } from '@vue/composition-api';
+import LNBTemplate, { setRouteState } from '@/views/containers/lnb/LNB.template.vue';
+import routes from '@/routes/secret/secret-route';
 
 export default {
     name: 'SecretNavBar',
     extends: LNBTemplate,
-    data() {
+    setup() {
         return {
-            serviceGroup: 'Secret',
-            services: [
-                { path: '/secret/credentials-group', label: 'Credentials Group' },
-                { path: '/secret/credentials', label: 'Credentials' },
-            ],
+            ...toRefs(setRouteState([routes])),
         };
     },
 };

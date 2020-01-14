@@ -2,7 +2,6 @@ import {configure, addParameters, addDecorator} from '@storybook/vue';
 import {INITIAL_VIEWPORTS} from '@storybook/addon-viewport';
 import {withA11y} from '@storybook/addon-a11y';
 import centered from '@storybook/addon-centered/vue';
-import { withCssResources } from '@storybook/addon-cssresources';
 import '@storybook/addon-console';
 import "@/styles/style.scss";
 import { withInfo } from 'storybook-addon-vue-info'
@@ -22,6 +21,9 @@ import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
 import VueI18n from 'vue-i18n';
+import VueRouter from 'vue-router';
+import router from '@/routes';
+
 
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
@@ -36,6 +38,7 @@ Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i'
 })
+Vue.use(VueRouter);
 
 Vue.prototype.$velocity = velocity;
 
@@ -54,8 +57,8 @@ addDecorator(withInfo);
 addDecorator(withA11y);
 addDecorator(withKnobs);
 addDecorator(centered);
-addDecorator(withCssResources);
 addDecorator(() => ({
+    router,
     store,
     template: '<story/>',
     i18n,

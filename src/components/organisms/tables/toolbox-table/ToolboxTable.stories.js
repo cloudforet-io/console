@@ -81,7 +81,10 @@ export const table = () => ({
     @clickSetting="clickSetting"
     @clickRefresh="clickRefresh"
     @theadClick="theadClick"
-></p-toolbox-table>
+>
+    <template #toolbox-left><div style="border: 1px solid green; min-width: 300px "></div></template>
+    <template #toolbox-bottom><div style="border: 1px solid blue; width: 100%;height: 50px;"></div></template>
+</p-toolbox-table>
 <div>
 <h5>data</h5>
 <p> sortBy : {{sortBy}} / sortDesc : {{sortDesc}} / thisPage : {{thisPage}} / allPage : {{allPage}} / pageSize: {{pageSize}}</p>

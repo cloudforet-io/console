@@ -1,4 +1,7 @@
-import { computed, onUnmounted, reactive } from '@vue/composition-api';
+import {
+    computed, onUnmounted, reactive, ref, onMounted,
+} from '@vue/composition-api';
+import _ from 'lodash';
 
 /**
  * make proxy computed that same name as props
@@ -32,6 +35,42 @@ export const mountBusEvent = (bus, eventName, handler) => {
     bus.$on(eventName, handler);
     onUnmounted(() => bus.$off(eventName, handler));
 };
+
+/**
+ * 여러 엘리먼트에서 마우스 오버 여부 추적에 필요한 함수 모
+ * @param disabled
+ * @return {{onMouseOut: onMouseOut, isMouseOver: Ref<HasDefined<S> extends true ? S : RefValue<T>>, onMouseOver: onMouseOver}}
+ */
+export const mouseOverState = (disabled) => {
+    const disable = disabled || false;
+    const isMouseOver = ref(false);
+    const onMouseOver = () => {
+        if (!disable && !isMouseOver.value) {
+            isMouseOver.value = true;
+        }
+    };
+    const onMouseOut = () => {
+        if (!disable && isMouseOver.value) {
+            isMouseOver.value = false;
+        }
+    };
+    return {
+        isMouseOver,
+        onMouseOver,
+        onMouseOut,
+    };
+};
+
+/**
+ * 윈도우 이벤트 등록 함수
+ * 자동완성, 드롭다운 컨텍스트 메뉴 팝업을 자동으로 닫게 할때 활용
+ * @param func
+ */
+export const windowEventMount = (eventName, func) => {
+    onMounted(() => window.addEventListener(eventName, func));
+    onUnmounted(() => window.removeEventListener(eventName, func));
+};
+
 
 export class Validation {
     /**
@@ -109,8 +148,20 @@ export const formValidation = (data, validation) => {
     };
 };
 
-
-export const requiredValidation = invalidMessage => new Validation(value => !!value, invalidMessage || 'value is required');
+export const requiredValidation = invalidMessage => new Validation((value) => {
+    if (['boolean', 'number'].includes(typeof value)) return true;
+    if (value instanceof Array) return !!value.length;
+    return !_.isEmpty(value); // String, Object
+}, invalidMessage || 'Required field!');
+export const jsonParseValidation = invalidMessage => new Validation((value) => {
+    try {
+        JSON.parse(value);
+    } catch (e) {
+        return false;
+    }
+    return true;
+},
+invalidMessage || 'Invalid Json string format!');
 export const numberMinValidation = (min, invalidMessage) => new Validation(value => Number(value) >= min, invalidMessage || `value must bigger then ${min}`);
 export const numberMaxValidation = (max, invalidMessage) => new Validation(value => Number(value) >= max, invalidMessage || `value must smaller then ${max}`);
 export const lengthMinValidation = (min, invalidMessage) => new Validation(value => value.length >= min, invalidMessage);
@@ -124,5 +175,4 @@ export const userIDValidation = (parent, invalidMessage) => new Validation(async
         }
     });
     return result;
-}, invalidMessage || 'already use that user id');
-
+}, invalidMessage || 'same ID exists!');

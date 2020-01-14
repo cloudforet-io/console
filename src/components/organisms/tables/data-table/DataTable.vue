@@ -24,7 +24,10 @@
             >
                 <p-tr>
                     <p-th v-if="selectable" style="width: 16px;">
-                        <PCheckBox v-model="allState" @change="selectAllToggle" />
+                        <PCheckBox v-if="multiSelect"
+                                   v-model="allState"
+                                   @change="selectAllToggle"
+                        />
                     </p-th>
                     <p-th
                         v-for="(field,index) in fieldsData"
@@ -93,7 +96,16 @@
                               @mouseenter="hoverIndex=index"
                               @mouseleave="hoverIndex=null"
                         >
-                            <PCheckBox v-model="proxySelectIndex" :value="index" :hovered="hoverIndex===index" />
+                            <PCheckBox v-if="multiSelect"
+                                       v-model="proxySelectIndex"
+                                       :value="index"
+                                       :hovered="hoverIndex===index"
+                            />
+                            <p-radio v-else
+                                     v-model="proxySelectIndex"
+                                     :value="index"
+                                     :hovered="hoverIndex===index"
+                            />
                         </p-td>
                         <template v-for="field in fieldsName">
                             <slot
@@ -137,12 +149,13 @@ import PLottie from '@/components/molecules/lottie/PLottie';
 import { selectToCopyToClipboard } from '@/lib/util';
 
 const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox');
+const PRadio = () => import('@/components/molecules/forms/radio/Radio.vue');
 const PCopyButton = () => import('@/components/molecules/buttons/CopyButton');
 
 export default {
     name: 'PDataTable',
     components: {
-        PTable, PTd, PTh, PTr, PI, PCheckBox, PCopyButton, PLottie,
+        PTable, PTd, PTh, PTr, PI, PCheckBox, PCopyButton, PLottie, PRadio,
     },
     events: [
         'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
@@ -169,7 +182,7 @@ export default {
             default: false,
         },
         selectIndex: {
-            type: Array,
+            type: [Array, Number],
             default: () => [],
         },
         sortBy: {
@@ -195,6 +208,14 @@ export default {
         useCursorLoading: {
             type: Boolean,
             default: false,
+        },
+        /**
+         * @name multiSelect
+         * @description When it's 'false', should NOT give value 'true' to 'dragable' prop.
+         */
+        multiSelect: {
+            type: Boolean,
+            default: true,
         },
     },
     data() {
@@ -316,6 +337,11 @@ export default {
             return `${result}\n`;
         },
         copy(event) {
+            /**
+             * TODO: single select copy
+             */
+            if (!this.multiSelect) return;
+
             if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && this.selectIndex.length > 0) {
                 let result = '';
                 this.selectIndex.forEach((td) => {
@@ -336,7 +362,9 @@ export default {
         rowLeftClick(item, index, event) {
             this.$emit('rowLeftClick', item, index, event);
             if (this.selectable) {
-                if (this.rowClickMultiSelectMode) {
+                if (!this.multiSelect) {
+                    this.proxySelectIndex = index;
+                } else if (this.rowClickMultiSelectMode) {
                     this.checkboxToggle(index);
                 } else if (event.shiftKey) {
                     this.proxySelectIndex = [...this.proxySelectIndex, index];
@@ -377,7 +405,9 @@ export default {
         },
 
         isSelected(index) {
-            return this.proxySelectIndex.indexOf(index) !== -1;
+            return this.multiSelect
+                ? this.proxySelectIndex.indexOf(index) !== -1
+                : this.proxySelectIndex === index;
         },
         checkboxToggle(index) {
             const newSelected = [...this.proxySelectIndex];
@@ -401,10 +431,11 @@ export default {
             }
         },
         getSelectItem(sortable) {
+            if (!this.multiSelect) return [this.items[this.selectIndex]];
+
             const selectedIndex = this.isEmpty(sortable) ? this.proxySelectIndex : this.proxySelectIndex.sort((a, b) => a - b);
             const selectItem = [];
-            console.log(selectedIndex);
-            this.selectedIndex.forEach((index) => {
+            selectedIndex.forEach((index) => {
                 selectItem.push(this.items[index]);
             });
             return selectItem;

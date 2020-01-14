@@ -1,6 +1,6 @@
 import { action } from '@storybook/addon-actions';
 import { object } from '@storybook/addon-knobs';
-import PDropdownMenuBtn from './DropdownMenuBtn';
+import PDropdownMenuBtn from './DropdownMenuBtn.vue';
 
 export default {
     title: 'organisms/dropdown/dropdownMenuBtn',

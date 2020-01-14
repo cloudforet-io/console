@@ -15,8 +15,8 @@ import _ from 'lodash';
 import Vue from 'vue';
 import api from '@/lib/api';
 import config from '@/lib/config';
-import PLottie from '@/components/molecules/lottie/PLottie';
-import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
 
 export default {
     name: 'App',
