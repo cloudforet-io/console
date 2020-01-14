@@ -4,6 +4,10 @@ import { getBindClass } from '@/lib/functional';
 export default {
     name: 'PTextInput',
     functional: true,
+    model: {
+        prop: 'value',
+        event: 'onInput',
+    },
     props: {
         value: {
             type: [String, Number],
@@ -37,6 +41,8 @@ export default {
             on: {
                 ...listeners,
                 input: (event) => {
+                    // do not change order
+                    listeners.onInput(event.target.value);
                     listeners.input(event.target.value);
                 },
             },

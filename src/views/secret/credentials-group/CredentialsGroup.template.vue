@@ -59,12 +59,7 @@
                 />
             </template>
             <template #credential="{tabName}">
-                <p-data-table
-                    :fields="multiSelectFields"
-                    :sortable="false"
-                    :selectable="false"
-                    :items="getSelectedUserItems"
-                    :col-copy="true"
+                <p-cdg-raw-data :item="items[selectIndex[0]]"
                 />
             </template>
         </PTab>
@@ -176,9 +171,18 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
     });
     const state = requestToolboxTableMetaReactive();
     const getCdg = () => {
-        console.log('credentialsGroup event');
         eventBus.$emit(eventName.getCdgList);
     };
+    const cdData = reactive({
+        items: [],
+        sortBy: '',
+        sortDesc: true,
+        pageSize: 15,
+        allPage: 1,
+        thisPage: 1,
+        searchText: '',
+        loading: false,
+    });
 
     const sortSelectIndex = computed(() => {
         const idxs = [...tableState.selectIndex];
@@ -289,6 +293,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         timestampFormatter,
         getCdg,
         ...eventNames,
+        cdData,
         getSelectedCdgItems,
         getSelectedCdgIds,
         getFirstSelectedCdgId,

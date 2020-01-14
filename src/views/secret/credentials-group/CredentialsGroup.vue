@@ -160,7 +160,6 @@ export default {
             });
         };
 
-
         mountBusEvent(cdgEventBus, cdgEventNames.getCdgList, requestCdgList);
         mountBusEvent(cdgEventBus, cdgEventNames.tagConfirmEvent, CdgTagConfirm);
         mountBusEvent(cdgEventBus, cdgEventNames.deleteCdg, deleteCdg);

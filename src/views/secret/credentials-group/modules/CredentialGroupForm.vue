@@ -23,7 +23,7 @@
                                         <p-text-input
                                             v-model="formState.name"
                                             type="name"
-                                            @change="checkCdgName"
+                                            @input="checkCdgName"
 
                                             :class="{
                                                 'form-control':true,
@@ -58,7 +58,7 @@ import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import {
-    formValidation, makeProxy, requiredValidation, Validation
+    formValidation, makeProxy, requiredValidation, Validation,
 } from '@/lib/compostion-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
