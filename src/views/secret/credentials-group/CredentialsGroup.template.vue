@@ -44,6 +44,9 @@
                             <p-search :search-text.sync="searchText" @onSearch="getCdg" />
                         </div>
                     </template>
+                    <template v-slot:col-created_at-format="data">
+                        {{ timestampFormatter(data.value) }}
+                    </template>
                 </p-toolbox-table>
             </template>
         </p-horizontal-layout>
@@ -53,6 +56,15 @@
                               :item="items[selectIndex[0]]"
                               :tag-confirm-event="tagConfirmEvent"
                               :tag-reset-event="tagResetEvent"
+                />
+            </template>
+            <template #credential="{tabName}">
+                <p-data-table
+                    :fields="multiSelectFields"
+                    :sortable="false"
+                    :selectable="false"
+                    :items="getSelectedUserItems"
+                    :col-copy="true"
                 />
             </template>
         </PTab>
@@ -89,7 +101,7 @@
                     :update-mode="cdgFormState.updateMode"
                     :item="cdgFormState.item"
                     :visible.sync="cdgFormState.visible"
-                    :cdgNameValidation="cdgNameValidation"
+                    :cdg-name-validation="cdgNameValidation"
                     @confirm="cdgFormConfirm"
         />
     </div>
@@ -100,7 +112,7 @@ import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
 import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
-import { timestampFormatter, getValue, cdgStateFormatter } from '@/lib/util';
+import { timestampFormatter, getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -147,6 +159,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
     const tabData = reactive({
         tabs: makeTrItems([
             ['detail', 'COMMON.DETAILS', { keepAlive: true }],
+            ['credentials', 'COMMON.CREDENTIALS'],
         ],
         context.parent),
         activeTab: 'detail',
@@ -209,6 +222,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         cdgFormState.headerTitle = 'Update Credentials Group';
         const item = getSelectedCdgItems.value[0];
         cdgFormState.item = {
+            cdgId: item.credential_group_id,
             name: item.name,
             tags: item.tags,
         };
@@ -272,7 +286,6 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         checkTableModalState,
         tags,
         dropdown: dropdownMenu,
-        cdgStateFormatter,
         timestampFormatter,
         getCdg,
         ...eventNames,

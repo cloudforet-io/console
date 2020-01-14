@@ -1,11 +1,10 @@
 <template>
     <div>
         <p-info-panel info-title="Base Information" :defs="baseDefs" :item="item">
-            <template #def-state-format="{value}">
-                <p-status v-bind="cdgStateFormatter(value)" />
+            <template #def-created_at-format="{value}">
+                {{ value ? timestampFormatter(value) : '' }}
             </template>
         </p-info-panel>
-
         <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="tagConfirmEvent" />
     </div>
 </template>
@@ -14,8 +13,7 @@
 import { ref, watch } from '@vue/composition-api';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
-import PStatus from '@/components/molecules/status/Status.vue';
-import { timestampFormatter, arrayFormatter, cdgStateFormatter } from '@/lib/util';
+import { timestampFormatter, arrayFormatter } from '@/lib/util';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
@@ -23,7 +21,7 @@ import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventB
 export default {
     name: 'PCdgDetail',
     components: {
-        PInfoPanel, PDictPanel, PStatus,
+        PInfoPanel, PDictPanel,
     },
     props: {
         item: {
@@ -55,7 +53,6 @@ export default {
             confirm(...event) {
                 cdgEventBus.$emit(props.tagConfirmEvent, props.item.credential_group_id, ...event);
             },
-            cdgStateFormatter,
             timestampFormatter,
             arrayFormatter,
         };

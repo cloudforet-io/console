@@ -100,7 +100,6 @@ export const timestampFormatter = value => Util.methods.getDatefromTimeStamp(val
 
 export const serverStateFormatter = ColorBindFactory(serverStateColor, value => value.toLowerCase());
 export const userStateFormatter = ColorBindFactory(userStateColor, value => value.toLowerCase());
-export const cdgStateFormatter = ColorBindFactory(cdgStateColor, value => value.toLowerCase());
 
 export const platformBadgeFormatter = (value) => {
     if (platformBadgeColor.hasOwnProperty(value)) {

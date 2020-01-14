@@ -81,16 +81,19 @@ export default {
             });
         };
         const getCdgsParam = (items) => {
-            const result = { credential_group_id: _.map(items, 'credential_group_id') };
+            const result = {
+                credential_group_id: _.map(items, 'credential_group_id'),
+                name: _.map(items, 'name'),
+                tags: _.map(items, 'tags'),
+            };
             console.log('item test', result);
             return result;
         };
         const deleteCdg = async (items) => {
-            // console.log('delete test', items.credential_group_id);
             await context.parent.$http.post('/secret/credential-group/delete', getCdgsParam(items)).then(async (_) => {
                 await requestCdgList();
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
                     text: 'delete credential groups',
@@ -98,9 +101,9 @@ export default {
                     speed: 1000,
                 });
             }).catch((error) => {
-                console.error(error);
+                console.log(error);
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
                     text: 'request fail',
@@ -113,7 +116,7 @@ export default {
             await context.parent.$http.post('/secret/credential-group/create', item).then(async (_) => {
                 await requestCdgList();
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
                     text: 'Create Credential Groups',
@@ -123,7 +126,7 @@ export default {
             }).catch((error) => {
                 console.log(error);
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
                     text: 'request Fail',
@@ -132,12 +135,12 @@ export default {
                 });
             });
         };
-        const updateCdg = async (item) => {
-            console.log('update test', item)
-            await context.parent.$http.post('/secret/credential-group/update', item).then(async (_) => {
+        const updateCdg = async (items) => {
+            console.log('update test', items);
+            await context.parent.$http.post('/secret/credential-group/update', items).then(async (_) => {
                 await requestCdgList();
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
                     text: 'update credential groups',
@@ -145,9 +148,9 @@ export default {
                     speed: 1000,
                 });
             }).catch((error) => {
-                console.error(error);
+                console.log(error);
                 context.root.$notify({
-                    group: 'noticeBottomLeft',
+                    group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
                     text: 'request Fail',

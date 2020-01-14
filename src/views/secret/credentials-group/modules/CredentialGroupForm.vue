@@ -86,13 +86,13 @@ const setup = (props, context) => {
         tags: {},
         ...props.item,
     });
-    const addCdgValidations = {
+    const createCdgValidations = {
         name: [requiredValidation(), props.cdgNameValidation],
     };
     const updateCdgValidations = {
         name: [requiredValidation(), props.cdgNameValidation],
     };
-    const validateAPI = formValidation(formState, props.updateMode ? updateCdgValidations : addCdgValidations);
+    const validateAPI = formValidation(formState, props.updateMode ? updateCdgValidations : createCdgValidations);
     const checkCdgName = async () => {
         const result = await validateAPI.fieldValidation('name');
         return result;
@@ -101,9 +101,11 @@ const setup = (props, context) => {
         const result = await validateAPI.allValidation();
         if (result) {
             const data = {
+                credential_group_id: formState.cdgId,
                 name: formState.name,
             };
             if (props.updateMode) {
+                data.credential_group_id = formState.cdgId,
                 data.name = formState.name;
             }
             data.name = formState.name;
@@ -146,6 +148,7 @@ export default {
         item: {
             type: Object,
             default: () => ({
+                credential_group_id: '',
                 name: '',
                 tags: {},
             }),
