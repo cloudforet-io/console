@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import PButton from '@/components/atoms/buttons/Button';
-import PIconButton from '@/components/molecules/buttons/IconButton';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import { secondary } from '@/styles/_variables.scss';
 
 export default {

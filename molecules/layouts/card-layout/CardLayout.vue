@@ -29,7 +29,7 @@ export default {
             return 100 / (this.colMax ? this.colMax : this.slots.length);
         },
         noBorders() {
-            const obj = {}
+            const obj = {};
             this.slots.forEach((s, i) => {
                 if (i === this.slots.length - 1) obj[s] = true;
                 else if (this.colMax && (i + 1) % this.colMax === 0) obj[s] = true;
@@ -47,8 +47,6 @@ export default {
         flex-wrap: wrap;
         width: 100%;
         table-layout: fixed;
-        border: 1px solid $gray2;
-        border-radius: 2px;
         .card-container {
             vertical-align: top;
             border-right: 1px solid $gray2;

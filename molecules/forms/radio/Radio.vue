@@ -1,7 +1,7 @@
 <template>
     <span class="p-radio"
-          @mouseenter="onMouseover(true)"
-          @mouseleave="onMouseover(false)"
+          @mouseenter="mouseover = true"
+          @mouseleave="mouseover = false"
           @click.stop.prevent="onClick"
     >
         <input type="radio">
@@ -13,7 +13,8 @@
 
 <script>
 import { ref, computed } from '@vue/composition-api';
-import PI from '@/components/atoms/icons/PI';
+import _ from 'lodash';
+import PI from '@/components/atoms/icons/PI.vue';
 import { dark } from '@/styles/_variables.scss';
 
 export default {
@@ -21,27 +22,38 @@ export default {
     events: ['change'],
     components: { PI },
     model: {
-        prop: 'value',
+        prop: 'selected',
         event: 'change',
     },
     props: {
+        selected: [Boolean, String, Number, Object, Array],
         value: {
-            type: Boolean,
-            default: false,
+            type: [Boolean, String, Number, Object, Array],
+            default: true,
         },
         hovered: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, context) {
-        const mouseover = ref(false);
+    setup(props, { emit }) {
+        const isSelected = computed(() => props.selected === props.value);
 
+        const onClick = () => {
+            if (!isSelected.value) {
+                if (typeof props.selected === 'object') {
+                    if (props.selected instanceof Array) emit('change', [...props.value], isSelected.value);
+                    else emit('change', { ...props.value }, isSelected.value);
+                } else emit('change', props.value, isSelected.value);
+            }
+        };
+
+        const mouseover = ref(false);
         const radioBind = computed(() => {
             let name = 'ic_radio';
             let color;
             let fill;
-            if (props.value) {
+            if (isSelected.value) {
                 name += '--checked';
             } else if (props.hovered || mouseover.value) {
                 color = `transparent ${dark}`;
@@ -53,18 +65,10 @@ export default {
                 fill,
             };
         });
-
-        const onClick = () => {
-            context.emit('change', !props.value);
-        };
-
-        const onMouseover = (val) => {
-            mouseover.value = val;
-        };
         return {
             radioBind,
             onClick,
-            onMouseover,
+            mouseover,
         };
     },
 };

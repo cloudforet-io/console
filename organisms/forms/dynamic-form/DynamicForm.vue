@@ -1,16 +1,38 @@
 <template>
     <div>
-        <p-field-group v-for="(tp, idx) in templates" :key="idx"
-                       :label="tp[map.label]"
-                       :required="tp[map.required]"
-                       :invalid-text="invalidMsg[tp[map.key]]"
-                       :invalid="invalidState[tp[map.key]]"
+        <p-field-group :label="formData.label"
+                       :required="formData.required"
+                       :invalid-text="invalidText"
+                       :invalid="validatable ? invalid : false"
         >
             <slot>
-                <p-text-input v-if="getFormType(tp[map.type]) === 'input'"
-                              v-model="proxyValues[tp[map.key]]"
-                              :type="getInputType(tp[map.type])"
-                />
+                <div v-if="formType === 'input'">
+                    <p-text-input v-model="proxyValue"
+                                  :type="inputType"
+                                  :placeholder="formData.placeholder"
+                    />
+                </div>
+                <div v-else-if="formType === 'radio'">
+                    <span v-for="(bool) in [true, false]" :key="bool">
+                        <p-radio v-model="proxyValue"
+                                 :value="bool"
+                        />
+                        {{ bool }}
+                    </span>
+                </div>
+                <div v-else-if="formType === 'dropdown'">
+                    <p-dropdown-menu-btn :menu="setDropdownMenu(formData.menu)"
+                                         @clickMenuEvent="onClickMenu"
+                    >
+                        {{ value || formData.placeholder }}
+                    </p-dropdown-menu-btn>
+                </div>
+                <div v-else-if="formType === 'tags'">
+                    <p-tags-input :tags.sync="proxyValue"
+                                  :placeholder="formData.placeholder"
+                                  :focus="false"
+                    />
+                </div>
             </slot>
         </p-field-group>
     </div>
@@ -25,7 +47,11 @@ import {
     formValidation, makeProxy, requiredValidation,
 } from '@/lib/compostion-util';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+
+const PTextInput = () => import('@/components/atoms/inputs/TextInput.vue');
+const PRadio = () => import('@/components/molecules/forms/radio/Radio.vue');
+const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue');
+const PTagsInput = () => import('@/components/organisms/forms/tags-input/TagsInput.vue');
 
 export const map = {
     key: 'key',
@@ -34,82 +60,153 @@ export const map = {
     placeholder: 'example',
     type: 'type',
     default: 'default',
+    menu: 'enum',
 };
 
-const setFormTypes = () => reactive({
-    getFormType(type) {
-        switch (type) {
+const setFormState = (props) => {
+    const formData = computed(() => _.mapValues(map, val => props.form[val]));
+    const formType = computed(() => {
+        if (formData.value.menu) return 'dropdown';
+        switch (formData.value.type) {
         case 'bool': return 'radio';
-        case 'enum': return 'dropdown';
+        case 'list': return 'tags';
         default: return 'input';
         }
-    },
-    getInputType(type) {
-        switch (type) {
+    });
+    const inputType = computed(() => {
+        switch (formData.value.type) {
         case 'str': return 'text';
-        default: return type;
+        default: return 'number';
         }
+    });
+
+    return reactive({
+        formData,
+        formType,
+        inputType,
+    });
+};
+
+const setValueState = (props, emit, formState) => {
+    const getProxyValue = () => {
+        let setter = (val) => {
+            emit('change', val);
+        };
+        if (formState.formType === 'tags') {
+            setter = (val) => {
+                emit('change', [...val]);
+            };
+        }
+
+        return computed({
+            get: () => props.value,
+            set: setter,
+        });
+    };
+
+    const proxyValue = getProxyValue();
+
+    const setDefaultValue = () => {
+        if (formState.formData.default !== undefined) {
+            proxyValue.value = formState.formData.default;
+            return;
+        }
+        if (formState.formType === 'tags' && !proxyValue.value) proxyValue.value = [];
+    };
+
+    setDefaultValue();
+
+    return reactive({
+        proxyValue,
+    });
+};
+
+const setDropdownState = valueState => reactive({
+    setDropdownMenu(menu) {
+        return menu.map(item => ({ type: 'item', label: item, name: item }));
+    },
+    onClickMenu(name) {
+        valueState.proxyValue = name;
     },
 });
 
+/**
+ *
+ * @param forms {Array<Object>}
+ * @param values {Array<Object>}
+ * @returns {{fieldValidation: *, invalidMsg: *, invalidState: *}}
+ */
+export const setValidation = (forms, values) => {
+    const formKey = map.key;
+    const vd = {};
 
-const setValidation = (props) => {
-    const getValidation = () => {
-        const vd = {};
-        props.templates.forEach((tp) => {
-            if (tp[map.required]) {
-                const key = tp[map.key];
-                if (vd[key]) vd[key].push(requiredValidation());
-                else vd[key] = [requiredValidation()];
-            }
-        });
-        return vd;
-    };
+    forms.forEach((form) => {
+        if (form[map.required]) {
+            vd[form[formKey]] = [requiredValidation()];
+        }
+    });
 
     const {
         allValidation,
+        fieldValidation,
         invalidMsg,
         invalidState,
-    } = formValidation(props.values, getValidation());
-
-    console.log(invalidState, invalidMsg);
-
-    watch(() => props.validate, async (val) => {
-        const result = await allValidation();
-    });
+    } = formValidation(values, vd);
 
     return {
+        formKey,
+        allValidation,
+        fieldValidation,
         invalidMsg,
         invalidState,
     };
+};
+
+export const dynamicFormList = (forms, values) => {
+
 };
 
 export default {
     name: 'PDynamicForm',
-    events: ['update:values'],
+    events: ['update:value'],
     components: {
         PFieldGroup,
         PTextInput,
+        PRadio,
+        PDropdownMenuBtn,
+        PTagsInput,
+    },
+    model: {
+        prop: 'value',
+        event: 'change',
     },
     props: {
-        templates: Array,
-        validate: {
+        form: Object,
+        value: {
+            default: undefined,
+        },
+        invalidText: {
+            type: String,
+            default: '',
+        },
+        invalid: {
             type: Boolean,
             default: false,
         },
-        values: Object,
+        validatable: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
-        const proxyValues = makeProxy('values', props, emit);
-
-        const formTypeState = setFormTypes();
-        const validationStates = setValidation(props);
-
+        const formState = setFormState(props);
+        const valueState = setValueState(props, emit, formState);
+        const dropdownState = setDropdownState(valueState);
         return {
             map,
-            proxyValues,
-            ...toRefs(formTypeState),
-            ...validationStates,
+            ...toRefs(formState),
+            ...toRefs(valueState),
+            ...toRefs(dropdownState),
         };
     },
 };
