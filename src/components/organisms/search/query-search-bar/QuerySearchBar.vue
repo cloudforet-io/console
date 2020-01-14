@@ -10,7 +10,8 @@
             @onDownKey="focusAC"
             @onEscKey="focusOut"
         />
-        <p-context-menu v-if="showAC" ref="contextMenuRef" theme="dark"
+        <p-context-menu v-if="showAC" ref="contextMenuRef"
+                        theme="dark"
                         :menu="acState.items"
                         @clickMenuEvent="clickMenuEvent"
                         @onEndOfUpKey="searchFocused=true"
@@ -23,7 +24,7 @@
 import {
     computed, createComponent, onMounted, reactive, ref, watch,
 } from '@vue/composition-api';
-import { makeProxy, windowEventMount } from '@/lib/compostion-util';
+import { windowEventMount } from '@/lib/compostion-util';
 
 import PSearch from '@/components/molecules/search/Search.vue';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
@@ -98,27 +99,30 @@ export default createComponent({
 
 
         // AC = autoComplete
-        const hideAC = (event) => {
+        const hideAC = () => {
             acState.isFocusAC = false;
         };
         const showAC = computed(() => {
-            if (contextType.value !== searchContextType.None || acState.isFocusAC) {
-                acState.isFocusAC = true;
+            if ((contextType.value !== searchContextType.None && acState.items.length !== 0) || acState.isFocusAC) {
+                // acState.isFocusAC = true;
                 return true;
             }
             return false;
         });
         windowEventMount('click', hideAC);
-        let initData = false;
-        watch([proxySearchText, showAC], async ([text, ac], [preText, preAc]) => {
-            if (ac && (text !== preText || !initData)) {
-                const result = await props.autocompleteHandler.getAutoCompleteData(contextType.value, text, contextState);
-                console.log(result);
-                acState.items = result;
-                if (!initData) { initData = true; }
-                console.log('before hide');
-                if (result.length === 0) { console.log('hide'); hideAC(); }
+        const getACData = async (text, forceContextType) => {
+            const result = await props.autocompleteHandler.getAutoCompleteData(forceContextType || contextType.value, text, contextState);
+            acState.items = result;
+        };
+        watch(proxySearchText, async (text, preText) => {
+            if (text !== preText) {
+                await getACData(text);
+                if (acState.items.length === 0) { console.log('hide'); hideAC(); }
             }
+        });
+        onMounted(async () => {
+            await getACData('', searchContextType.Key);
+            console.log('onMount', acState.items);
         });
 
 

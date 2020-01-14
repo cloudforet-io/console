@@ -49,6 +49,7 @@ export default {
                         _.flatMap(['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED'], v => `${prefix}${v}`),
                     ];
                 }
+                return [];
             }
 
 
