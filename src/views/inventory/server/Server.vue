@@ -7,7 +7,10 @@ import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/serve
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
-import { defaultAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import {
+    defaultAutocompleteHandler,
+    getEnumValues,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 
 export default {
@@ -31,7 +34,8 @@ export default {
             get keys() {
                 return [
                     'server_id', 'name', 'state', 'primary_ip_address', 'server_type', 'os_type', 'project_id',
-                    'data.os.os_arch', 'data.os.os_distro', 'data.base.memory', 'data.base.core',
+                    'data.os.os_arch', 'data.os.os_distro', 'data.base.memory', 'data.base.core', 'data.vm.platform_type',
+                    'collection_info.state',
                 ];
             }
 
@@ -41,23 +45,16 @@ export default {
             }
 
 
-            getStateValues(contextType, inputText, searchQuery) {
-                if (searchQuery.key === 'state') {
-                    const prefix = `${searchQuery.key}:${searchQuery.operator}`;
-                    return [
-                        searchQuery.key,
-                        _.flatMap(['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED'], v => `${prefix}${v}`),
-                    ];
-                }
-                return [];
-            }
-
-
             // eslint-disable-next-line no-shadow
             constructor(context) {
                 super();
                 this.context = context;
-                this.handlerMap.value = [this.getStateValues];
+                this.handlerMap.value = [
+                    getEnumValues('state', ['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED']),
+                    getEnumValues('os_type', ['LINUX', 'WINDOWS']),
+                    getEnumValues('collection_info.state', ['MANUAL', 'ACTIVE', 'DISCONNECTED']),
+                    getEnumValues('server_type', ['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN']),
+                ];
             }
         }
 
@@ -85,13 +82,24 @@ export default {
                 console.error(e);
             }
         };
+        const numberTypeKeys = new Set(['data.base.memory', 'data.base.core']);
+        const valueFormatter = (key, value) => {
+            if (numberTypeKeys.has(key)) {
+                try {
+                    return Number(value);
+                } catch (e) {
+                    return value;
+                }
+            }
+            return value;
+        };
 
         // request server list
         const requestState = reactive({
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
                 state.sortBy, state.sortDesc, null,
-                state.queryListTools.tags,
+                state.queryListTools.tags, valueFormatter,
             ))),
         });
         const requestServerList = async () => {

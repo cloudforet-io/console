@@ -3,6 +3,7 @@ import VueCookies from 'vue-cookies';
 import jwt from 'jsonwebtoken';
 import prefixPropName from 'bootstrap-vue/esm/utils/prefix-prop-name';
 import { object } from '@storybook/addon-knobs';
+import construct from '@babel/runtime-corejs2/helpers/esm/construct';
 
 class APIError extends Error {
     constructor(axiosError) {
@@ -109,17 +110,18 @@ class API {
 export default new API();
 
 export const operatorMap = Object.freeze({
-    '': 'contain',
-    '!': 'not_contain',
-    '>': 'lt',
-    '>=': 'lte',
-    '<': 'gt',
-    '<=': 'gte',
-    '=': 'eq',
-    '!=': 'not',
-    in: 'in',
-    '!in': 'not_in',
+    '': 'contain_in', // merge operator
+    '!': 'not_contain', // merge operator
+    '>': 'gt',
+    '>=': 'gte',
+    '<': 'lt',
+    '<=': 'lte',
+    '=': 'in', // merge operator
+    '!=': 'not_in', // merge operator
+    $: 'regex',
 });
+
+const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 
 /**
  * @name defaultQuery
@@ -129,11 +131,11 @@ export const operatorMap = Object.freeze({
  * @param sortBy
  * @param sortDesc
  * @param searchText
- * @param searchQuery
+ * @param searchQueries
+ * @param valueFormatter <(key,value)=>value>
  * @returns {{page: {start: number, limit: *}}}
  */
-export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText, searchQuery) => {
-
+export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText, searchQueries, valueFormatter) => {
     const query = {
         page: {
             start: ((thisPage - 1) * pageSize) + 1,
@@ -149,30 +151,34 @@ export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText, s
     if (searchText) {
         query.keyword = searchText || '';
     }
-    if (searchQuery) {
+    if (searchQueries) {
         const filter = [];
         // eslint-disable-next-line camelcase
-        const filter_or = [];
-        const andQueryKeywords = new Set([]);
-        searchQuery.forEach((q) => {
-            const queryObject = {
-                k: q.key,
-                v: q.value,
-                o: operatorMap[q.operator],
-            };
-            if (andQueryKeywords.has(q.key)) {
-                // eslint-disable-next-line camelcase
-                filter.push(queryObject);
+        const mergeOpQuery = {};
+        searchQueries.forEach((q) => {
+            const op = operatorMap[q.operator];
+            const value = valueFormatter ? valueFormatter(q.key, q.value) : q.value;
+            if (mergeOperatorSet.has(op)) {
+                const prefix = `${q.key}:${op}`;
+                if (mergeOpQuery[prefix]) {
+                    mergeOpQuery[prefix].v.push(value);
+                } else {
+                    mergeOpQuery[prefix] = {
+                        k: q.key,
+                        v: [value],
+                        o: op,
+                    };
+                }
             } else {
-                // eslint-disable-next-line camelcase
-                filter_or.push(queryObject);
-                andQueryKeywords.add(q.key);
+                filter.push({
+                    k: q.key,
+                    v: value,
+                    o: op,
+                });
             }
         });
         // eslint-disable-next-line camelcase
-        if (!_.isEmpty(filter)) { query.fliter = filter; }
-        // eslint-disable-next-line camelcase
-        if (!_.isEmpty(filter_or)) { query.filter_or = filter_or; }
+        if (!_.isEmpty(filter) || !_.isEmpty(mergeOpQuery)) { query.filter = [...filter, ...Object.values(mergeOpQuery)]; }
     }
     return query;
 };
