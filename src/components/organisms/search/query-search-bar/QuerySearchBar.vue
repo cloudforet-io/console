@@ -32,7 +32,7 @@ import { baseAutocompleteHandler, searchContextType, SearchQuery } from '@/compo
 
 // regx
 const keyRegx = new RegExp('^(?<key>.+?):');
-const operatorRegx = new RegExp('^.+?:(?<operator>[=|<|>|!]=?)?');
+const operatorRegx = new RegExp('^.+?:(?<operator>[=|<|>|!|$]=?)?');
 // const valueRegx = new RegExp('^.+?:(?:[=|<|>|!]=?)?(?<value>.+)');
 
 export default createComponent({
@@ -137,13 +137,6 @@ export default createComponent({
             searchFocused.value = false;
         };
 
-        const clickMenuEvent = (event) => {
-            console.log('click menu', event);
-            proxySearchText.value = event;
-            searchFocused.value = true;
-            hideAC();
-        };
-
         const newQuery = () => {
             if (!!contextState.key && !!contextState.value) {
                 console.log('newQuery');
@@ -151,6 +144,15 @@ export default createComponent({
                 context.emit('newQuery', query);
                 cleanSearchText();
             }
+        };
+
+        const clickMenuEvent = (event) => {
+            const acType = contextType.value;
+            console.log('click menu', event);
+            proxySearchText.value = event;
+            searchFocused.value = true;
+            hideAC();
+            if (acType === searchContextType.Value) { newQuery(); }
         };
 
 
