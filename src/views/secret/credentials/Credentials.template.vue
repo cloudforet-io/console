@@ -91,10 +91,12 @@
             @confirm="checkModalConfirm"
         />
         <p-credentials-form v-if="credentialsFormState.visible"
+                            ref="CREDENTIAL_FORM"
                             :header-title="credentialsFormState.headerTitle"
                             :update-mode="credentialsFormState.updateMode"
                             :item="credentialsFormState.item"
                             :visible.sync="credentialsFormState.visible"
+                            :dynamic-form-state="dynamicFormTemp"
                             @confirm="credentialsFormConfirm"
         />
     </div>
@@ -109,7 +111,7 @@ import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/t
 import { timestampFormatter, getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
-import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm.vue';
+import PCredentialsForm from  '@/views/secret/credentials/modules/CredentialsForm.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
@@ -119,6 +121,14 @@ const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-
 const PSearch = () => import('@/components/molecules/search/Search');
 const PCredentialsDetail = () => import('@/views/secret/credentials/modules/CredentialsDetail');
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
+
+export const getDataInputType = () => {
+    const currentURL = window.location.href;
+    const url = new URL(currentURL);
+    const plugin_id = url.searchParams.get('plugin_id');
+    const repository_id = url.searchParams.get('repository_id');
+    return plugin_id;
+};
 
 export const CredentialsTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -147,7 +157,6 @@ export const eventNames = {
     getCredentialsList: '',
     deleteCredentials: '',
     createCredentials: '',
-    updateCredentials: '',
 };
 
 export const credentialsSetup = (props, context, eventName) => {
@@ -174,11 +183,19 @@ export const credentialsSetup = (props, context, eventName) => {
 
     state.sortBy = 'name';
 
+    state.daynamicForm = {
+        form: [],
+        value: {},
+    };
+
+    const dynamicFormTemp = computed(() => state.daynamicForm);
+
     const getCredentials = () => {
         eventBus.$emit(eventName.getCredentialsList);
     };
 
     const sortSelectIndex = computed(() => {
+        console.log('temp sortable', tableState.selectIndex);
         const idxs = [...tableState.selectIndex];
         idxs.sort((a, b) => a - b);
         console.log('idxs', idxs);
@@ -194,6 +211,10 @@ export const credentialsSetup = (props, context, eventName) => {
         });
         return items;
     });
+
+    const getPluginTemplate = () => {
+        credentialsEventBus.$emit('getPluginCredentialsForm', { plugin_id: getDataInputType() });
+    };
 
     const getSelectCredentialsIds = computed(() => {
         const ids = [];
@@ -282,6 +303,9 @@ export const credentialsSetup = (props, context, eventName) => {
         console.log(checkTableModalState.confirmEventName, event);
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
+        console.log('tableState.selectIndex', tableState.selectIndex);
+        tableState.selectIndex = [];
+        console.log('tableState.selectIndex', tableState.selectIndex);
     };
 
     const dropdownMenu = reactive({
@@ -291,6 +315,8 @@ export const credentialsSetup = (props, context, eventName) => {
         context.parent,
         { type: 'item' }),
     });
+
+    getPluginTemplate();
 
     return reactive({
         ...toRefs(state),
@@ -311,6 +337,7 @@ export const credentialsSetup = (props, context, eventName) => {
         getSelectCredentialsIds,
         getFirstSelectedCredentialsId,
         credentialsFormState,
+        dynamicFormTemp,
         clickCreate,
         credentialsFormConfirm,
         clickDelete,

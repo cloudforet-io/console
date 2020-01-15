@@ -75,7 +75,16 @@
                                      :invalid="invalidState.form"
                         >
                             <template v-slot:default="{invalid}">
-                                <div class="form-editor" />
+                                <div class="form-editor">
+                                    <p-dynamic-form v-for="(fm, idx) in dynamicFormState.form" :key="idx"
+                                                    v-model="values[fm.key]"
+                                                    :form="fm"
+                                                    :invalid="invalidState[fm.key]"
+                                                    :invalid-text="invalidMsg[fm.key]"
+                                                    :validatable="true"
+                                                    @change="onOptionChange"
+                                    />
+                                </div>
                             </template>
                         </PFieldGroup>
 
@@ -99,7 +108,9 @@
     </p-button-modal>
 </template>
 <script>
-import { reactive } from '@vue/composition-api';
+import {
+    computed, reactive, ref, toRefs,
+} from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import {
@@ -116,7 +127,18 @@ import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/Sel
 import PButton from '@/components/atoms/buttons/Button.vue';
 import CardLayout from '@/components/molecules/layouts/card-layout/CardLayout.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
-import PLabel from '@/components/atoms/labels/Label';
+import PLabel from '@/components/atoms/labels/Label.vue';
+import PDynamicForm, { map, setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+
+
+export const getDataInputType = () => {
+    const currentURL = window.location.href;
+    const url = new URL(currentURL);
+    const plugin_id = url.searchParams.get('plugin_id');
+    const repository_id = url.searchParams.get('repository_id');
+    return plugin_id;
+};
+
 const components = {
     CardLayout,
     PButtonModal,
@@ -125,6 +147,7 @@ const components = {
     PDictInputGroup,
     PSelectBtnGroup,
     PMonacoEditor,
+    PDynamicForm,
     PRow,
     PCol,
     PSelectDropdown,
@@ -134,33 +157,13 @@ const components = {
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
-
-    const getDataInputType = () => {
-        const currentURL = window.location.href;
-        const url = new URL(currentURL);
-        const plugin_id = url.searchParams.get('plugin_id');
-        const repository_id =  url.searchParams.get('repository_id');
-        return plugin_id;
-    };
-
     state.selected = (_.isEmpty(getDataInputType())) ? 'json' : 'form';
-
-
-    function isJson(str) {
-        try {
-            JSON.parse(str);
-        } catch (e) {
-            return false;
-        }
-        return true;
-    }
+    state.values = {};
 
     const invalidMessage = {
         name: 'Required fields!',
         data: 'Please, confirm your Json String Format.',
     };
-
-    //const replaceAll = (str, find, replace) => str.replace(new RegExp(find, 'g'), replace);
 
     const formState = reactive({
         name: '',
@@ -169,6 +172,18 @@ const setup = (props, context) => {
         data: '',
         ...props.item,
     });
+
+    const onOptionChange = () => {};
+    debugger;
+    const {
+        formKey,
+        invalidMsg,
+        invalidState,
+        fieldValidation,
+        allValidation,
+    } = setValidation(props.dynamicFormState.form, state.values);
+
+    const dynamicForm = computed(() => props.dynamicFormState.form);
 
     const issueTypeSelectItems = [
         { type: 'item', label: 'Token', name: 'token' },
@@ -192,31 +207,44 @@ const setup = (props, context) => {
     const validateAPI = formValidation(formState, formValidations);
 
     const confirm = async () => {
-        if (!_.isEmpty(formState.data)) {
-            const replaceSTR = formState.data;
-            replaceSTR.replace(/'/g, '"');
-        }
+        debugger;
 
-        const result = await validateAPI.allValidation();
+        const result = state.selected === 'form' ? await allValidation() : await validateAPI.allValidation();
+        console.log('!!!!!!!!!!!!!!', result);
 
-        console.log(result);
+        debugger;
+
         if (result) {
             const data = {
                 name: formState.name,
             };
-            ['name', 'issue_type', 'tags', 'data'].forEach((key) => {
-                if (formState[key]) {
+            const keyArr = ['name', 'issue_type', 'tags', 'data'];
+            keyArr.forEach((key) => {
+                if (formState[key] && state.selected !== 'form') {
                     data[key] = formState[key];
+                } else if (formState[key] && state.selected === 'form' && key !== 'data') {
+                    data[key] = formState[key];
+                } else {
+                    debugger;
                 }
             });
             context.emit('confirm', data);
         }
+
+
     };
 
     return {
         ...state,
         invalidMessage,
         formState,
+        dynamicForm,
+        onOptionChange,
+        formKey,
+        invalidMsg,
+        invalidState,
+        fieldValidation,
+        allValidation,
         issueTypeSelectItems,
         optionType,
         proxyVisible: makeProxy('visible', props, context.emit),
@@ -250,9 +278,11 @@ export default {
                 data: '',
             }),
         },
-        updateMode: {
-            type: Boolean,
-            default: false,
+        dynamicFormState: {
+            type: Object,
+            default: () => ({
+                form: [{}],
+            }),
         },
     },
     setup(props, context) {
