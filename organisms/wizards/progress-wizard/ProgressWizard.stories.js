@@ -19,7 +19,7 @@ export default {
                 key: String (essential),
                 label: String (recommended),
                 alert: String (or warning),
-                unvalid: Boolean,
+                invalid: Boolean,
                 help: Boolean,
                 optional: Boolean,
             \n
@@ -48,7 +48,7 @@ const getData = (props, context) => {
                 key: 'conf',
                 label: 'Configure Collector',
                 alert: 'This is alert message!!',
-                unvalid: true,
+                invalid: true,
                 optional: true,
             },
             {
@@ -72,8 +72,8 @@ const getData = (props, context) => {
         state.tabs = [...state.tabs];
     };
 
-    const unvalidChange = (name, e) => {
-        state.tabs[name].unvalid = e.target.checked;
+    const invalidChange = (name, e) => {
+        state.tabs[name].invalid = e.target.checked;
         state.tabs = [...state.tabs];
     };
 
@@ -81,7 +81,7 @@ const getData = (props, context) => {
     return {
         ...toRefs(state),
         onClickDone,
-        unvalidChange,
+        invalidChange,
     };
 };
 

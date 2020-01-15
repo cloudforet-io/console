@@ -3,7 +3,7 @@
         <p-field-group :label="formData.label"
                        :required="formData.required"
                        :invalid-text="invalidText"
-                       :invalid="validatable ? invalid : false"
+                       :invalid="typeof invalid === 'boolean' ? invalid : false"
         >
             <slot>
                 <div v-if="formType === 'input'">
@@ -91,10 +91,12 @@ const setValueState = (props, emit, formState) => {
     const getProxyValue = () => {
         let setter = (val) => {
             emit('change', val);
+            if (props.autoValidate) emit('update', val);
         };
         if (formState.formType === 'tags') {
             setter = (val) => {
                 emit('change', [...val]);
+                if (props.autoValidate) emit('update', [...val]);
             };
         }
 
@@ -191,11 +193,11 @@ export default {
         },
         invalid: {
             type: Boolean,
-            default: false,
+            default: undefined,
         },
-        validatable: {
+        autoValidate: {
             type: Boolean,
-            default: false,
+            default: true,
         },
     },
     setup(props, { emit }) {
