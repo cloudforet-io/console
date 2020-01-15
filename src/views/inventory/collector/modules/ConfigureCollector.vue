@@ -33,9 +33,9 @@
                 <p-dynamic-form v-for="(op, idx) in plugin.template.options" :key="idx"
                                 v-model="optionsValue[op[formKey]]"
                                 :form="op"
-                                :invalid="invalidState[op[formKey]]"
+                                :invalid="showValidation ? invalidState[op[formKey]] : true"
                                 :invalid-text="invalidMsg[op[formKey]]"
-                                @change="onOptionChange"
+                                @update="onUpdate(op[formKey])"
                 />
             </p-col>
         </p-row>
@@ -43,7 +43,9 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed } from '@vue/composition-api';
+import {
+    reactive, toRefs, computed, onUnmounted,
+} from '@vue/composition-api';
 import config from '@/lib/config';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
@@ -80,12 +82,16 @@ export default {
             type: Array,
             default: null,
         },
+        showValidation: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
             defaultImg: config.get('COLLECTOR_IMG'),
             priority: 10,
-            optionsValue: [],
+            optionsValue: {},
             versionsInfo: computed(() => {
                 if (props.versions) {
                     return props.versions.map(v => ({ type: 'item', label: v, name: v }));
@@ -105,24 +111,33 @@ export default {
             state.version = item;
         };
 
-        const onOptionChange = () => {};
         const {
             formKey,
             invalidMsg,
             invalidState,
+            fieldValidation,
             allValidation,
-        } = setValidation([], state.options);
+        } = setValidation(props.plugin.template.options, state.optionsValue);
+
+        // onUnmounted(async () => {
+        //     if (await allValidation()) emit('validateResult', true);
+        //     else emit('validateResult', false);
+        // });
+
 
         return {
             ...toRefs(state),
             ...readonlyState,
             getVersionsInfo,
             onSelectVersion,
-            onOptionChange,
             formKey,
             invalidMsg,
             invalidState,
             allValidation,
+            onUpdate: async (val) => {
+                if (!props.showValidation) return;
+                await fieldValidation(val);
+            },
         };
     },
 };

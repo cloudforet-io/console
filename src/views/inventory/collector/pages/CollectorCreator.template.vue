@@ -11,9 +11,13 @@
                            title="CreateCollector"
                            @cancel="onCancel"
                            @confirm="onConfirm"
+                           @changeStep="onChangeStep"
         >
-            <template #contents-conf>
-                <configure-collector :plugin="plugin" :versions="versions" />
+            <template #contents-conf="{tab}">
+                <configure-collector ref="conf"
+                                     :plugin="plugin" :versions="versions"
+                                     :show-validation="showValidation"
+                />
             </template>
             <template #contents-credentials>
                 <choose-credentials :items="credentials"
@@ -63,7 +67,7 @@ export default {
         ChooseCredentials,
         PDictInputGroup,
     },
-    setup() {
+    setup(props, { refs }) {
         const dataState = setDataState();
 
         const state = reactive({
@@ -71,7 +75,6 @@ export default {
                 {
                     key: 'conf',
                     label: 'Configure Collector',
-                    invalid: true,
                 },
                 {
                     key: 'credentials',
@@ -90,13 +93,20 @@ export default {
 
         const onCancel = () => {};
         const onConfirm = () => {};
-
+        const onChangeStep = async (beforeIdx) => {
+            state.showValidation = true;
+            if (state.tabs[beforeIdx].key === 'conf') {
+                const res = await refs.conf.allValidation();
+                state.tabs.splice(beforeIdx, 1, { ...state.tabs[beforeIdx], invalid: !res });
+            }
+        };
 
         return {
             ...toRefs(dataState),
             ...toRefs(state),
             onCancel,
             onConfirm,
+            onChangeStep,
         };
     },
 };

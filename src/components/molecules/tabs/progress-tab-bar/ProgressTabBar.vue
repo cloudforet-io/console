@@ -7,7 +7,7 @@
             :class="{
                 active: idx == activeIdx,
                 done: tab.done,
-                unvalid: showValidation && tab.unvalid,
+                invalid: showValidation && tab.invalid,
             }"
             :style="{width: tabWidth}"
             @click="tabClick(idx)"
@@ -67,9 +67,9 @@ export default {
                 const updatedTabs = [...props.tabs];
                 updatedTabs[props.activeIdx].active = false;
                 updatedTabs[idx].active = true;
+                emit('changeTab', idx, props.activeIdx);
                 emit('update:tabs', updatedTabs);
                 emit('update:activeIdx', idx);
-                emit('changeTab', idx);
             }
         };
 
@@ -155,7 +155,7 @@ $height: 2.5rem;
                 }
             }
         }
-        &.unvalid {
+        &.invalid {
             font-style: italic;
             border-color: $alert;
             background-color: $white;

@@ -6,6 +6,8 @@
                          :multi-select="false"
                          sortable
                          hover
+                         :border="false"
+                         :shadow="false"
                          :sort-by.sync="sortBy"
                          :sort-desc.sync="sortDesc"
                          :all-page="allPage"

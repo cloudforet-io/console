@@ -8,6 +8,7 @@
                 <p-progress-tab-bar :tabs.sync="proxyTabs"
                                     :active-idx.sync="proxyActiveIdx"
                                     :show-validation="showValidation"
+                                    @changeTab="onChangeTab"
                 >
                     <template v-for="(tab) in tabs" :slot="`progress-${tab.key}`">
                         <slot :name="`progress-${tab.key}`" />
@@ -30,23 +31,22 @@
                 </aside>
             </template>
         </slot>
+
         <template v-if="activeTab">
-            <slot :name="`body-${activeTab.key}`" :tab="activeTab.key">
-                <slot :name="`step-${activeTab.key}`" :tab="activeTab.key">
-                    <p-panel-top class="step-title">
-                        Step {{ activeIdx + 1 }}. {{ activeTab.label }}
-                        <span v-if="activeTab.optional" class="optional"> (optional)</span>
-                        <template #head>
-                            <div class="step-appendix">
-                                <slot :name="`step-append-${activeTab.key}`" :tab="activeTab.key" />
-                            </div>
-                        </template>
-                    </p-panel-top>
-                </slot>
-                <div class="contents">
+            <p-panel-top class="step-title">
+                Step {{ activeIdx + 1 }}. {{ activeTab.label }}
+                <span v-if="activeTab.optional" class="optional"> (optional)</span>
+                <template #head>
+                    <div class="step-appendix">
+                        <slot :name="`step-append-${activeTab.key}`" :tab="activeTab.key" />
+                    </div>
+                </template>
+            </p-panel-top>
+            <div class="contents">
+                <keep-alive>
                     <slot :name="`contents-${activeTab.key}`" :tab="activeTab.key" />
-                </div>
-            </slot>
+                </keep-alive>
+            </div>
         </template>
 
         <slot name="bottom">
@@ -65,7 +65,7 @@
                               @mouseleave="onNavBtnHover('prev', false)"
                               @click="onClickPrev"
                     >
-                        <p-i name="ic_back" :color="`transparent ${btnColor.prev}`" />Prev
+                        <p-i name="ic_back" color="transparent inherit" />Prev
                     </p-button>
                     <p-button v-if="!isLastTab" outline style-type="secondary"
                               size="lg"
@@ -73,7 +73,7 @@
                               @mouseleave="onNavBtnHover('next', false)"
                               @click="onClickNext"
                     >
-                        Next<p-i name="ic_back" :color="`transparent ${btnColor.next}`" dir="down" />
+                        Next<p-i name="ic_back" color="transparent inherit" dir="down" />
                     </p-button>
                     <p-button v-if="showConfirm" style-type="secondary" size="lg"
                               class="txt-btn"
@@ -89,18 +89,18 @@
 
 <script>
 import {
-    ref, toRefs, reactive, computed,
+    ref, toRefs, reactive, computed, onUnmounted,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
-
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout';
-import PProgressTabBar from '@/components/molecules/tabs/progress-tab-bar/ProgressTabBar';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop';
-import PI from '@/components/atoms/icons/PI';
-import PButton from '@/components/atoms/buttons/Button';
-import PRow from '@/components/atoms/grid/row/Row';
-import PCol from '@/components/atoms/grid/col/Col';
 import { secondary, white, other1 } from '@/styles/_variables.scss';
+
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
+import PProgressTabBar from '@/components/molecules/tabs/progress-tab-bar/ProgressTabBar.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
 
 const setStyles = () => {
     const warningColor = ref(other1);
@@ -119,16 +119,22 @@ const setStyles = () => {
     };
 };
 
-const setPagination = (state) => {
+const setPagination = (state, emit) => {
     const isFirstTab = computed(() => state.proxyActiveIdx - 1 < 0);
     const isLastTab = computed(() => state.proxyActiveIdx + 1 >= state.proxyTabs.length);
     const onClickPrev = () => {
         if (isFirstTab.value) return;
+        emit('changeStep', state.proxyActiveIdx);
         state.proxyActiveIdx -= 1;
     };
     const onClickNext = () => {
         if (isLastTab.value) return;
+        emit('changeStep', state.proxyActiveIdx);
         state.proxyActiveIdx += 1;
+    };
+
+    const onChangeTab = (now, beforeIdx) => {
+        emit('changeStep', beforeIdx);
     };
 
     return {
@@ -136,12 +142,13 @@ const setPagination = (state) => {
         isLastTab,
         onClickPrev,
         onClickNext,
+        onChangeTab,
     };
 };
 
 export default {
     name: 'PProgressWizard',
-    events: ['update:tabs', 'cancel', 'confirm'],
+    events: ['update:tabs', 'cancel', 'confirm', 'changeStep'],
     components: {
         PPaneLayout,
         PProgressTabBar,
@@ -177,12 +184,11 @@ export default {
         });
 
         const activeTab = computed(() => state.proxyTabs[state.proxyActiveIdx]);
-
         return {
             ...toRefs(state),
             activeTab,
             ...setStyles(),
-            ...setPagination(state),
+            ...setPagination(state, emit),
         };
     },
 };
@@ -209,6 +215,9 @@ export default {
         padding-top: 1rem;
         .p-i-icon {
             margin-right: .5rem;
+        }
+        &.warning-panel {
+            color: $other1;
         }
     }
     .txt-btn {

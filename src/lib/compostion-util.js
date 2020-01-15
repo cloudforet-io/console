@@ -150,6 +150,7 @@ export const formValidation = (data, validation) => {
 export const requiredValidation = invalidMessage => new Validation((value) => {
     if (['boolean', 'number'].includes(typeof value)) return true;
     if (value instanceof Array) return !!value.length;
+    console.log(value, !_.isEmpty(value));
     return !_.isEmpty(value); // String, Object
 }, invalidMessage || 'Required field!');
 export const jsonParseValidation = invalidMessage => new Validation((value) => {
