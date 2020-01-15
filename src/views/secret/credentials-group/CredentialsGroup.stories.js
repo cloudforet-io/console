@@ -36,19 +36,20 @@ const actions = {
     },
 };
 export const defaultCase = () => ({
-    template: `${Cdg.template}`,
-    components: {
-        PHorizontalLayout,
-        PToolboxTable,
-        PButton,
-        PDropdownMenuBtn,
-        PCdgDetail,
-        PTab,
-        PSearch,
-        PTableCheckModal,
-        PDataTable,
-    },
-    mixins: [Cdg],
+    // template: `${Cdg.template}`,
+    // components: {
+    //     PHorizontalLayout,
+    //     PToolboxTable,
+    //     PButton,
+    //     PDropdownMenuBtn,
+    //     PCdgDetail,
+    //     PTab,
+    //     PSearch,
+    //     PTableCheckModal,
+    //     PDataTable,
+    // },
+    // mixins: [Cdg],
+    extends: Cdg,
     setup(props, context) {
         const cdgEventNames = eventNames;
         cdgEventNames.getCdg = 'getCdg';

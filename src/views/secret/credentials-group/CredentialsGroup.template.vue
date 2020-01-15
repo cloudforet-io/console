@@ -292,7 +292,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         dropdown: dropdownMenu,
         timestampFormatter,
         getCdg,
-        ...eventNames,
+        eventNames,
         cdData,
         getSelectedCdgItems,
         getSelectedCdgIds,
