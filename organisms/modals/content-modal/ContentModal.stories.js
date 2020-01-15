@@ -1,9 +1,9 @@
 import { number, select } from '@storybook/addon-knobs/vue';
 import { boolean } from '@storybook/addon-knobs';
 import { autoProps } from '@sb/storybook-util';
-import PButton from '@/components/atoms/buttons/Button';
+import PButton from '@/components/atoms/buttons/Button.vue';
 import { sizeMapping } from '@/components/molecules/modals/ModalMapping';
-import PContentModal from '@/components/organisms/modals/content-modal/ContentModal';
+import PContentModal from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import faker from 'faker';
 
 export default {
@@ -56,7 +56,7 @@ export const modal = () => ({
             { name: 'footerVisible' },
         ]),
         size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)], 'sm'),
+            default: select('size', ['', ...Object.keys(sizeMapping)], 'sm'),
         },
         scrollable: {
             default: boolean('scrollable', false),
@@ -118,7 +118,7 @@ export const fade = () => ({
             { name: 'footerVisible' },
         ]),
         size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)], 'sm'),
+            default: select('size', ['', ...Object.keys(sizeMapping)], 'sm'),
         },
         scrollable: {
             default: boolean('scrollable', false),

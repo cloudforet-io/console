@@ -2,10 +2,10 @@ import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import PDataTable from './DataTable';
-import PTr from '@/components/atoms/table/Tr';
-import PTd from '@/components/atoms/table/Td';
-import PTh from '@/components/atoms/table/Th';
-import PButton from '@/components/atoms/buttons/Button';
+import PTr from '@/components/atoms/table/Tr.vue';
+import PTd from '@/components/atoms/table/Td.vue';
+import PTh from '@/components/atoms/table/Th.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 
 export default {
     title: 'organisms/tables/datatable',

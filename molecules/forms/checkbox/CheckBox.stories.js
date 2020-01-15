@@ -1,5 +1,4 @@
-import { action } from '@storybook/addon-actions';
-import PCheckBox from './CheckBox';
+import PCheckBox from './CheckBox.vue';
 
 export default {
     title: 'molecules/forms/checkBox',

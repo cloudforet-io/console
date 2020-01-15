@@ -1,7 +1,6 @@
-import { withKnobs, text } from '@storybook/addon-knobs/vue';
-import { toRefs, reactive } from '@vue/composition-api';
+import { withKnobs } from '@storybook/addon-knobs/vue';
 import { autoProps } from '@sb/storybook-util';
-import PPaneLayout from './PaneLayout';
+import PPaneLayout from './PaneLayout.vue';
 
 
 export default {
