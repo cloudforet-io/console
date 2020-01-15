@@ -12,7 +12,7 @@ export default {
     extends: CdgTemplate,
     setup(props, context) {
         const cdgEventNames = eventNames;
-        cdgEventNames.getCdg = 'getCdg';
+        cdgEventNames.getCdgList = 'getCdgList';
         cdgEventNames.tagConfirmEvent = 'CdgTagConfirmEvent';
         cdgEventNames.tagResetEvent = 'resetUserTagEvent';
         cdgEventNames.deleteCdg = 'deleteCdg';
@@ -48,6 +48,13 @@ export default {
                 state.searchText,
             ))),
         });
+        const cdRequestState = reactive({
+            query: computed(() => (defaultQuery(
+                state.cdgData.thisPage, state.cdgData.pageSize,
+                state.cdgData.sortBy, state.cdgData.sortDesc,
+                state.cdgData.searchText,
+            ))),
+        });
         const requestCdgList = async () => {
             console.log('before', state.loading);
             state.loading = true;
@@ -65,6 +72,31 @@ export default {
             } catch (e) {
                 console.log(e);
                 state.loading = false;
+            }
+        };
+        const requestCdList = async (cdgId) => {
+            state.cdgData.loading = true;
+            state.cdgData.items = [];
+            const param = {
+                query: cdRequestState.query,
+                include_credential_group: true,
+            };
+            if (cdgId) {
+                // eslint-disable-next-line camelcase
+                param.credential_group_id = cdgId;
+            }
+
+            try {
+                console.log('start', state.loading);
+                const res = await context.parent.$http.post('/secret/credential/list', param);
+                state.cdgData.items = res.data.results;
+                const allPage = Math.ceil(res.data.total_count / state.cdgData.pageSize);
+                state.cdgData.allPage = allPage || 1;
+                state.cdgData.selectIndex = [];
+                state.cdgData.loading = false;
+            } catch (e) {
+                console.log(e);
+                state.cdgData.loading = false;
             }
         };
         const CdgTagConfirm = async (cdgId, tags, originTags) => {
@@ -161,12 +193,14 @@ export default {
         };
 
         mountBusEvent(cdgEventBus, cdgEventNames.getCdgList, requestCdgList);
+        mountBusEvent(cdgEventBus, cdgEventNames.getCdList, requestCdList);
         mountBusEvent(cdgEventBus, cdgEventNames.tagConfirmEvent, CdgTagConfirm);
         mountBusEvent(cdgEventBus, cdgEventNames.deleteCdg, deleteCdg);
         mountBusEvent(cdgEventBus, cdgEventNames.createCdg, createCdg);
         mountBusEvent(cdgEventBus, cdgEventNames.updateCdg, updateCdg);
 
         requestCdgList();
+        requestCdList();
         return {
             ...toRefs(state),
         };

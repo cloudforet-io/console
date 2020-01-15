@@ -59,7 +59,17 @@
                 />
             </template>
             <template #credential="{tabName}">
-                <p-cdg-raw-data :item="items[selectIndex[0]]"
+                <PCdgData
+                    :items="cdgData.items"
+                    :sort-by.sync="cdgData.sortBy"
+                    :sort-desc.sync="cdgData.sortDesc"
+                    :page-size.sync="cdgData.pageSize"
+                    :all-page="cdgData.allPage"
+                    :this-page.sync="cdgData.thisPage"
+                    :loading="cdgData.loading"
+                    :col-copy="true"
+                    :getCdList="getCdList"
+                    :credential-group-id="getFirstSelectedCdgId"
                 />
             </template>
         </PTab>
@@ -75,7 +85,7 @@
             </template>
         </PTab>
         <div v-else id="empty-space">
-            Select a User above for details.
+            Select a Credential Group above for details.
         </div>
         <p-table-check-modal
             v-if="!!checkTableModalState.mode"
@@ -111,12 +121,16 @@ import { timestampFormatter, getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
 import PCdgDetail from '@/views/secret/credentials-group/modules/CredentialGroupDetail.vue';
+import PCdgData from '@/views/secret/credentials-group/modules/CredentialData.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PCdgForm from '@/views/secret/credentials-group/modules/CredentialGroupForm.vue';
@@ -142,7 +156,9 @@ export const CdgTableReactive = parent => reactive({
 export const eventNames = {
     tagResetEvent: '',
     tagConfirmEvent: '',
+    getCdList: '',
     getCdgList: '',
+    getCdgData: '',
     createCdg: '',
     deleteCdg: '',
     updateCdg: '',
@@ -154,7 +170,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
     const tabData = reactive({
         tabs: makeTrItems([
             ['detail', 'COMMON.DETAILS', { keepAlive: true }],
-            ['Included credentials', 'COMMON.INCLUDED_CREDENTIALS'],
+            ['credential', 'COMMON.INCLUDED_CREDENTIALS'],
         ],
         context.parent),
         activeTab: 'detail',
@@ -173,17 +189,15 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
     const getCdg = () => {
         eventBus.$emit(eventName.getCdgList);
     };
-    const cdData = reactive({
+    const cdgData = reactive({
         items: [],
         sortBy: '',
-        sortDesc: true,
         pageSize: 15,
         allPage: 1,
         thisPage: 1,
         searchText: '',
         loading: false,
     });
-
     const sortSelectIndex = computed(() => {
         const idxs = [...tableState.selectIndex];
         idxs.sort((a, b) => a - b);
@@ -277,7 +291,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
     const dropdownMenu = reactive({
         ...makeTrItems([
             ['update', 'COMMON.BTN_UPT', { disabled: isNotOnlyOneSelected }],
-            ['delete', 'COMMON.BTN_DELETE', { disabled: isNotSelected }],
+            ['delete', 'COMMON.BTN_DELETE', { disabled: isNotOnlyOneSelected }],
         ],
         context.parent,
         { type: 'item' }),
@@ -292,12 +306,12 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         dropdown: dropdownMenu,
         timestampFormatter,
         getCdg,
-        eventNames,
-        cdData,
+        ...eventNames,
         getSelectedCdgItems,
         getSelectedCdgIds,
         getFirstSelectedCdgId,
         cdgFormState,
+        cdgData,
         clickCreate,
         clickUpdate,
         clickDelete,
@@ -318,6 +332,7 @@ export default {
         PButton,
         PDropdownMenuBtn,
         PCdgDetail,
+        PCdgData,
         PTab,
         PSearch,
         PTableCheckModal,
