@@ -90,6 +90,7 @@ export const en = {
         REPO: 'Repository',
         CREDENTIAL: 'Credential',
         CREDENTIALS: 'Credentials',
+        INCLUDED_CREDENTIALS: 'Included Credentials',
         CREATE_NODE: 'Create Node',
         CREATE_LEAF: 'Create Leaf',
         UPDATE_SELECT: 'Update Selected',

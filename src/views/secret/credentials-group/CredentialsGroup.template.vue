@@ -154,7 +154,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
     const tabData = reactive({
         tabs: makeTrItems([
             ['detail', 'COMMON.DETAILS', { keepAlive: true }],
-            ['credentials', 'COMMON.CREDENTIALS'],
+            ['Included credentials', 'COMMON.INCLUDED_CREDENTIALS'],
         ],
         context.parent),
         activeTab: 'detail',
