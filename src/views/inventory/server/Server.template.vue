@@ -43,8 +43,25 @@
                             Action
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
-                            <p-search :search-text.sync="searchText" @onSearch="getServers" />
+                            <PQuerySearchBar :search-text.sync="searchText" :autocomplete-handler="ACHandler" @newQuery="queryListTools.addTag" />
                         </div>
+                    </template>
+                    <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
+                        <p-col :col="12" style="margin-bottom: .5rem;">
+                            <p-hr style="width: 100%;" />
+                            <p-row style="margin-top: .5rem;">
+                                <div style="flex-grow: 0">
+                                    <p-icon-button name="ic_delete" @click="queryListTools.deleteAllTags" />
+                                </div>
+                                <div style="flex-grow: 1;margin-left: 1rem;">
+                                    <p-tag v-for="(tag, idx) in queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
+                                           @delete="queryListTools.deleteTag(idx)"
+                                    >
+                                        {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
+                                    </p-tag>
+                                </div>
+                            </p-row>
+                        </p-col>
                     </template>
                     <template v-slot:col-state-format="data">
                         <p-status v-bind="serverStateFormatter(data.value)" />
@@ -169,11 +186,11 @@
 
 <script>
 import {
-    reactive, toRefs, ref, computed,
+    reactive, toRefs, ref, computed, readonly,
 } from '@vue/composition-api';
-import PStatus from '@/components/molecules/status/Status';
-import PButton from '@/components/atoms/buttons/Button';
-import PBadge from '@/components/atoms/badges/Badge';
+import PStatus from '@/components/molecules/status/Status.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
 import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import {
     timestampFormatter, serverStateFormatter, platformBadgeFormatter, getValue,
@@ -181,18 +198,22 @@ import {
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeTrItems } from '@/lib/view-helper';
 
-
-const PTab = () => import('@/components/organisms/tabs/tab/Tab');
-const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
-const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
-const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
-const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn');
-const PSearch = () => import('@/components/molecules/search/Search');
-const PServerDetail = () => import('@/views/inventory/server/modules/ServerDetail');
-const PServerRawData = () => import('@/views/inventory/server/modules/ServerRawData');
-const PServerData = () => import('@/views/inventory/server/modules/ServerData');
-const PServerAdmin = () => import('@/views/inventory/server/modules/ServerAdmin');
-const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
+import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PTab from '@/components/organisms/tabs/tab/Tab.vue';
+import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
+import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
+import PServerRawData from '@/views/inventory/server/modules/ServerRawData.vue';
+import PServerData from '@/views/inventory/server/modules/ServerData.vue';
+import PServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
+import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -225,22 +246,22 @@ export const serverTableReactive = parent => reactive({
 });
 
 /**
- * @typedef {Object} serverState
- * @property {string} sortBy
- * @property {boolean} sortDesc
- * @property {number} thisPage
- * @property {number} allPage
- * @property {number} pageSize
- * @property {Array} fields
- * @property {Array} selectIndex
- *
- */
+     * @typedef {Object} serverState
+     * @property {string} sortBy
+     * @property {boolean} sortDesc
+     * @property {number} thisPage
+     * @property {number} allPage
+     * @property {number} pageSize
+     * @property {Array} fields
+     * @property {Array} selectIndex
+     *
+     */
 
 /**
- * server default setup reactive object
- * @function
- * @return {serverState} reactive object
- */
+     * server default setup reactive object
+     * @function
+     * @return {serverState} reactive object
+     */
 export const eventNames = {
     tagResetEvent: '',
     tagConfirmEvent: '',
@@ -253,7 +274,7 @@ export const eventNames = {
     deleteServer: '',
 };
 
-export const serverSetup = (props, context, eventName) => {
+export const serverSetup = (props, context, eventName, ACHandler) => {
     const eventBus = serverEventBus;
     const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
@@ -397,7 +418,8 @@ export const serverSetup = (props, context, eventName) => {
         context.parent,
         { type: 'item', disabled: isNotSelected }),
     });
-
+    const queryList = ref([]);
+    const queryListTools = tagList(queryList, true, eventBus, eventName.getServerList);
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
@@ -429,6 +451,8 @@ export const serverSetup = (props, context, eventName) => {
         clickInService,
         clickMaintenance,
         checkModalConfirm,
+        ACHandler,
+        queryListTools,
     });
 };
 
@@ -450,8 +474,13 @@ export default {
         PServerRawData,
         PServerAdmin,
         PDataTable,
-        PSearch,
+        PQuerySearchBar,
+        PTag,
         PTableCheckModal,
+        PRow,
+        PCol,
+        PHr,
+        PIconButton,
     },
     setup(props, context) {
         const dataBind = reactive({

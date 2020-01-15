@@ -1,12 +1,12 @@
-import PLi from '@/components/atoms/lists/orun-list/Li';
-import POl from '@/components/atoms/lists/orun-list/Ol';
-import PUl from '@/components/atoms/lists/orun-list/Ul';
-import PDd from '@/components/atoms/lists/dl-list/Dd';
-import PDt from '@/components/atoms/lists/dl-list/Dt';
-import PDl from '@/components/atoms/lists/dl-list/Dl';
+import PLi from '@/components/atoms/lists/orun-list/Li.vue';
+import POl from '@/components/atoms/lists/orun-list/Ol.vue';
+import PUl from '@/components/atoms/lists/orun-list/Ul.vue';
+import PDd from '@/components/atoms/lists/dl-list/Dd.vue';
+import PDt from '@/components/atoms/lists/dl-list/Dt.vue';
+import PDl from '@/components/atoms/lists/dl-list/Dl.vue';
 
 export default {
-    title: 'atoms/lists/',
+    title: 'atoms/lists',
     component: {
         PLi, POl, PUl, PDd, PDt, PDl,
     },

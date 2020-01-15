@@ -1,12 +1,12 @@
 <template>
     <p-box-layout class="p-tags-input" :box-style="boxStyle" @click="onBoxClick">
         <p-tag v-for="(tag, idx) in tagTools.tags" :key="`${idx}-${tag}`"
-               @delete="tagTools.deleteTag(idx)"
+               class="item" @delete="tagTools.deleteTag(idx)"
         >
             {{ tag }}
         </p-tag>
-        <p-text-input ref="input" v-model="value"
-                      v-focus="focus"
+        <p-text-input ref="input" v-model="value" v-focus="focus"
+                      class="item input"
                       :placeholder="placeholder"
                       @keyup.enter="add"
                       @blur="proxyFocus = false"
@@ -81,12 +81,23 @@ export default {
 <style lang="scss">
 .p-tags-input {
     cursor: text;
-    input[type="text"].p-text-input {
-        border: none;
-        background-color: transparent;
-        padding-left: 0;
-        min-height: unset;
-        line-height: unset;
+    vertical-align: middle;
+    &.p-box-layout {
+        padding-bottom: 0;
+    }
+    .item {
+        display: inline-block;
+        margin-bottom: .5rem;
+        &.p-tag:last-child {
+            margin-right: 0;
+        }
+        &.p-text-input {
+            border: none;
+            background-color: transparent;
+            padding-left: 0;
+            min-height: unset;
+            line-height: unset;
+        }
     }
 }
 </style>

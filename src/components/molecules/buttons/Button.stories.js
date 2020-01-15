@@ -1,9 +1,9 @@
 import { action } from '@storybook/addon-actions';
-import { text, select } from '@storybook/addon-knobs/vue';
-import PIconButton from './IconButton';
-import PCopyButton from './CopyButton';
+import { text, select, boolean } from '@storybook/addon-knobs/vue';
 
-import { autoProps } from '@sb/storybook-util';
+import PIconButton from './IconButton.vue';
+import PCopyButton from './CopyButton.vue';
+
 import {
     animationMapping, flipMapping,
     iconStyleMapping,
@@ -26,11 +26,6 @@ const actions = {
     click: action('click'),
 };
 
-const data = {
-    sampleCopyData: 'This is a String to copy.',
-
-};
-
 
 export const iconButton = () => ({
     components: { PIconButton },
@@ -49,24 +44,24 @@ export const iconButton = () => ({
 >
 </p-icon-button>`,
     props: {
-        ...autoProps(PIconButton),
-        icon: {
-            default: text('icon', 'fa-cog'),
+        // ...autoProps(PIconButton),
+        dark: {
+            default: boolean('dark', false),
         },
         iconStyle: {
             default: select('icon_style', [...Object.keys(iconStyleMapping)], 'solid'),
         },
         size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)], null),
+            default: select('size', ['', ...Object.keys(sizeMapping)], ''),
         },
         animation: {
-            default: select('animation', [null, ...Object.keys(animationMapping)], null),
+            default: select('animation', ['', ...Object.keys(animationMapping)], ''),
         },
         rotating: {
-            default: select('rotating', [null, ...Object.keys(rotatingMapping)], null),
+            default: select('rotating', ['', ...Object.keys(rotatingMapping)], ''),
         },
         flip: {
-            default: select('flip', [null, ...Object.keys(flipMapping)], null),
+            default: select('flip', ['', ...Object.keys(flipMapping)], ''),
         },
         buttonStyle: {
             default: select('style', ['white', 'transparent', 'dark'], 'white'),

@@ -11,15 +11,15 @@
                 </div>
             </template>
             <template #rightContainer>
-                <p-toolbox-card-list
-                    :items="plugins"
-                    :mapper="pluginMapper"
-                    title="Plugins"
-                    :sort-menu="sortMenu"
-                    :sort-by.sync="sortBy"
-                    @pageChange="onPageChange"
-                    @sortChange="onSortChange"
-                    @filterChange="onFilterChange"
+                <p-toolbox-card-list class="card-list"
+                                     :items="plugins"
+                                     :mapper="pluginMapper"
+                                     title="Plugins"
+                                     :sort-menu="sortMenu"
+                                     :sort-by.sync="sortBy"
+                                     @pageChange="onPageChange"
+                                     @sortChange="onSortChange"
+                                     @filterChange="onFilterChange"
                 >
                     <template #filters>
                         <p-tag v-for="(filter, idx) in filterTools.tags" :key="`${idx}-${filter}`"
@@ -62,19 +62,19 @@
 import { toRefs, reactive } from '@vue/composition-api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
-import PRow from '@/components/atoms/grid/row/Row';
-import PCol from '@/components/atoms/grid/col/Col';
-import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout';
-import PToolboxCardList from '@/components/organisms/lists/toolbox-card-list/ToolboxCardList';
-import PBadge from '@/components/atoms/badges/Badge';
-import PButton from '@/components/atoms/buttons/Button';
-import PI from '@/components/atoms/icons/PI';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
+import PToolboxCardList from '@/components/organisms/lists/toolbox-card-list/ToolboxCardList.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 
-import PluginFilter from '@/views/inventory/collector/modules/PluginFilter';
+import PluginFilter from '@/views/inventory/collector/modules/PluginFilter.vue';
 
-const setPluginList = (props, context) => {
+const setPluginList = () => {
     const state = reactive({
         plugins: [],
         pluginMapper: {
@@ -152,5 +152,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.card-list {
+    padding-top: 1.625rem;
+    padding-bottom: 2.25rem;
+}
 </style>

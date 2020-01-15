@@ -1,5 +1,5 @@
 import { number } from '@storybook/addon-knobs/vue';
-import PNumberBadge from './NumberBadge';
+import PNumberBadge from './NumberBadge.vue';
 
 export default {
     title: 'molecules/badges',

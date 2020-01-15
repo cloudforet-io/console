@@ -67,6 +67,17 @@ export const userStateColor = Object.freeze({
     },
 });
 
+export const cdgStateColor = Object.freeze({
+    ENABLED: {
+        iconColor: styles.safe,
+        textColor: styles.dark,
+    },
+    DISABLED: {
+        iconColor: styles.alert,
+        textColor: styles.alert,
+    },
+});
+
 export const platformBadgeColor = Object.freeze({
     BAREMETAL: { backgroundColor: styles.dark },
     HYPERVISOR: { backgroundColor: styles.primary },

@@ -1,9 +1,9 @@
 import { select, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PButton from '../../../atoms/buttons/Button';
-import PTableCheckModel from './ActionConfirmModal';
-import { sizeMapping } from '../../../molecules/modals/ModalMapping';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PTableCheckModel from './ActionConfirmModal.vue';
+import { sizeMapping } from '@/components/molecules/modals/ModalMapping';
 
 export default {
     title: 'organisms/modals/table-check-modal',
@@ -77,7 +77,7 @@ export const actionModalWithTable = () => ({
             default: select('color', ['primary', 'alert', 'safe']),
         },
         size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)]),
+            default: select('size', ['', ...Object.keys(sizeMapping)]),
         },
         okDisabled: {
             default: boolean('ok disabled', false),
