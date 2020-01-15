@@ -1,6 +1,6 @@
 import { action } from '@storybook/addon-actions';
 import Credentials from '@/views/secret/credentials/Credentials.template.vue';
-import casual from '@/views/identity/user/models/user-model';
+import casual from '@/views/secret/credentials/models/credentials-model';
 import PStatus from '@/components/molecules/status/Status.vue';
 import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
@@ -19,14 +19,6 @@ export default {
     },
 };
 const actions = {
-    rowLeftClick: action('rowLeftClick'),
-    rowRightClick: action('rowRightClick'),
-    rowMiddleClick: action('rowMiddleClick'),
-    rowMouseOver: action('rowMouseOver'),
-    rowMouseOut: action('rowMouseOut'),
-    clickRefresh() {
-        return action('clickRefresh');
-    },
 };
 
 
@@ -40,8 +32,6 @@ export const template = () => ({
     },
     mixins: [Credentials],
     computed: {
-        items() {
-            return arrayOf(this.pageSize, casual._user);
-        },
+
     },
 });

@@ -7,7 +7,7 @@ export default {
     path: 'secret',
     name: 'secret',
     redirect: 'secret/credentials-group',
-    meta: { label: 'Secret', requiresAuth: true },
+    meta: { label: 'Secret', breadcrumb: true },
     components: {
         lnb: SecretNavBar,
         main: Secret,
@@ -16,13 +16,13 @@ export default {
         {
             path: 'credentials-group',
             name: 'credentialsGroup',
-            meta: { label: 'Credentials Group', requiresAuth: true },
+            meta: { label: 'Credentials Group', breadcrumb: true },
             component: CredentialsGroup,
         },
         {
             path: 'credentials',
             name: 'credentials',
-            meta: { label: 'Credentials', requiresAuth: true },
+            meta: { label: 'Credentials', breadcrumb: true },
             component: Credentials,
         },
     ],

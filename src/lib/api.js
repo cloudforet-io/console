@@ -1,6 +1,9 @@
 import axios from 'axios';
 import VueCookies from 'vue-cookies';
 import jwt from 'jsonwebtoken';
+import prefixPropName from 'bootstrap-vue/esm/utils/prefix-prop-name';
+import { object } from '@storybook/addon-knobs';
+import construct from '@babel/runtime-corejs2/helpers/esm/construct';
 
 class APIError extends Error {
     constructor(axiosError) {
@@ -106,7 +109,33 @@ class API {
 
 export default new API();
 
-export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText) => {
+export const operatorMap = Object.freeze({
+    '': 'contain_in', // merge operator
+    '!': 'not_contain', // merge operator
+    '>': 'gt',
+    '>=': 'gte',
+    '<': 'lt',
+    '<=': 'lte',
+    '=': 'in', // merge operator
+    '!=': 'not_in', // merge operator
+    $: 'regex',
+});
+
+const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
+
+/**
+ * @name defaultQuery
+ * @description make default query format
+ * @param thisPage
+ * @param pageSize
+ * @param sortBy
+ * @param sortDesc
+ * @param searchText
+ * @param searchQueries
+ * @param valueFormatter <(key,value)=>value>
+ * @returns {{page: {start: number, limit: *}}}
+ */
+export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText, searchQueries, valueFormatter) => {
     const query = {
         page: {
             start: ((thisPage - 1) * pageSize) + 1,
@@ -121,6 +150,35 @@ export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText) =
     }
     if (searchText) {
         query.keyword = searchText || '';
+    }
+    if (searchQueries) {
+        const filter = [];
+        // eslint-disable-next-line camelcase
+        const mergeOpQuery = {};
+        searchQueries.forEach((q) => {
+            const op = operatorMap[q.operator];
+            const value = valueFormatter ? valueFormatter(q.key, q.value) : q.value;
+            if (mergeOperatorSet.has(op)) {
+                const prefix = `${q.key}:${op}`;
+                if (mergeOpQuery[prefix]) {
+                    mergeOpQuery[prefix].v.push(value);
+                } else {
+                    mergeOpQuery[prefix] = {
+                        k: q.key,
+                        v: [value],
+                        o: op,
+                    };
+                }
+            } else {
+                filter.push({
+                    k: q.key,
+                    v: value,
+                    o: op,
+                });
+            }
+        });
+        // eslint-disable-next-line camelcase
+        if (!_.isEmpty(filter) || !_.isEmpty(mergeOpQuery)) { query.filter = [...filter, ...Object.values(mergeOpQuery)]; }
     }
     return query;
 };

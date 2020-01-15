@@ -1,5 +1,6 @@
 <template>
     <div class="collector-page">
+        <router-view />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -28,7 +29,7 @@
                     @changeSort="getCollectors"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary">
+                        <p-button style-type="primary" @click="$router.push('/inventory/collector/create/plugins')">
                             Create
                         </p-button>
                         <PDropdownMenuBtn class="left-toolbox-item"

@@ -6,7 +6,7 @@ import dashboardRoute from '@/routes/dashboard/dashboard-route';
 import identityRoute from '@/routes/identity/identity-route';
 import inventoryRoute from '@/routes/inventory/inventory-route';
 import secretRoute from '@/routes/secret/secret-route';
-import DefaultContainer from '@/views/containers/DefaultContainer';
+import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 
 // Views
 import SignIn from '@/views/sign-in/local/Local.vue';

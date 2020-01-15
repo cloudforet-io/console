@@ -199,6 +199,7 @@ export const ko = {
         KEY: '키(Key)',
         MEMBER: '팀원',
         FAIL_REASON: '실패 원인',
+        ISSUE_TYPE: '발행 타입',
     },
     ATOM: {
 
