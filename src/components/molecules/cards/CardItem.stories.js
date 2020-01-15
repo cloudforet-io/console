@@ -1,9 +1,8 @@
 import { withKnobs, text } from '@storybook/addon-knobs/vue';
-import { toRefs, reactive } from '@vue/composition-api';
-import PCardItem from './CardItem';
-import PBadge from '@/components/atoms/badges/Badge';
-import PCol from '@/components/atoms/grid/col/Col';
-import PRow from '@/components/atoms/grid/row/Row';
+import PCardItem from './CardItem.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
 
 export default {
     title: 'molecules/cards/CardItem',
