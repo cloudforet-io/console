@@ -7,7 +7,7 @@
             :class="{
                 active: idx == activeIdx,
                 done: tab.done,
-                invalid: showValidation && tab.invalid,
+                invalid: tab.showValidation && tab.invalid,
             }"
             :style="{width: tabWidth}"
             @click="tabClick(idx)"
@@ -54,21 +54,13 @@ export default {
             type: Number,
             default: 0,
         },
-        showValidation: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props, { emit }) {
         const tabWidth = computed(() => `${100 / _.size(props.tabs)}%`);
 
         const tabClick = (idx) => {
             if (props.activeIdx !== idx) {
-                const updatedTabs = [...props.tabs];
-                updatedTabs[props.activeIdx].active = false;
-                updatedTabs[idx].active = true;
                 emit('changeTab', idx, props.activeIdx);
-                emit('update:tabs', updatedTabs);
                 emit('update:activeIdx', idx);
             }
         };

@@ -33,9 +33,9 @@
                 <p-dynamic-form v-for="(op, idx) in plugin.template.options" :key="idx"
                                 v-model="optionsValue[op[formKey]]"
                                 :form="op"
-                                :invalid="showValidation ? invalidState[op[formKey]] : true"
+                                :invalid="showValidation ? invalidState[op[formKey]] : false"
                                 :invalid-text="invalidMsg[op[formKey]]"
-                                @update="onUpdate(op[formKey])"
+                                @change="onChange(op[formKey])"
                 />
             </p-col>
         </p-row>
@@ -44,7 +44,7 @@
 
 <script>
 import {
-    reactive, toRefs, computed, onUnmounted,
+    reactive, toRefs, computed, ref,
 } from '@vue/composition-api';
 import config from '@/lib/config';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
@@ -55,6 +55,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+import { makeProxy } from '@/lib/compostion-util';
 
 export default {
     name: 'ConfigureCollector',
@@ -86,6 +87,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        isInvalid: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -98,6 +103,7 @@ export default {
                 } return [];
             }),
             version: 'Select Version',
+            proxyIsInvalid: makeProxy('isInvalid', props, emit),
         });
 
         const readonlyState = {
@@ -117,13 +123,10 @@ export default {
             invalidState,
             fieldValidation,
             allValidation,
+            isAllValid,
         } = setValidation(props.plugin.template.options, state.optionsValue);
 
-        // onUnmounted(async () => {
-        //     if (await allValidation()) emit('validateResult', true);
-        //     else emit('validateResult', false);
-        // });
-
+        const isAllValidBefore = ref(isAllValid.value);
 
         return {
             ...toRefs(state),
@@ -134,9 +137,15 @@ export default {
             invalidMsg,
             invalidState,
             allValidation,
-            onUpdate: async (val) => {
+            isAllValid,
+            isAllValidBefore,
+            onChange: async (val) => {
                 if (!props.showValidation) return;
                 await fieldValidation(val);
+                if (isAllValidBefore.value !== isAllValid.value) {
+                    emit('changeValidState', isAllValid.value);
+                    isAllValidBefore.value = isAllValid.value;
+                }
             },
         };
     },

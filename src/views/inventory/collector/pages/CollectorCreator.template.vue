@@ -6,24 +6,24 @@
         </p-button>
         <p-progress-wizard :tabs.sync="tabs"
                            :active-idx.sync="activeIdx"
-                           :show-validation="showValidation"
-                           :show-confirm="showConfirm"
+                           :show-confirm="isAllTabValid"
                            title="CreateCollector"
                            @cancel="onCancel"
                            @confirm="onConfirm"
                            @changeStep="onChangeStep"
         >
             <template #contents-conf="{tab}">
-                <configure-collector ref="conf"
-                                     :plugin="plugin" :versions="versions"
-                                     :show-validation="showValidation"
+                <configure-collector ref="conf" :plugin="plugin" :versions="versions"
+                                     :show-validation="tab.showValidation"
+                                     @changeValidState="updateTabInvalid(0, $event)"
                 />
             </template>
             <template #contents-credentials>
-                <choose-credentials :items="credentials"
+                <choose-credentials ref="crd" :items="credentials"
                                     :fields="fields"
                                     :total-count="totalCount"
                                     :loading="loading"
+                                    @changeValidState="updateTabInvalid(1, $event)"
                 />
             </template>
             <template #contents-tags>
@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, computed } from '@vue/composition-api';
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -75,10 +75,14 @@ export default {
                 {
                     key: 'conf',
                     label: 'Configure Collector',
+                    showValidation: false,
+                    invalid: true,
                 },
                 {
                     key: 'credentials',
                     label: 'Choose Credentials',
+                    showValidation: false,
+                    invalid: true,
                 },
                 {
                     key: 'tags',
@@ -87,25 +91,37 @@ export default {
                 },
             ],
             activeIdx: 0,
-            showValidation: false,
             showConfirm: false,
         });
 
         const onCancel = () => {};
         const onConfirm = () => {};
-        const onChangeStep = async (beforeIdx) => {
-            state.showValidation = true;
-            if (state.tabs[beforeIdx].key === 'conf') {
-                const res = await refs.conf.allValidation();
-                state.tabs.splice(beforeIdx, 1, { ...state.tabs[beforeIdx], invalid: !res });
-            }
+
+        const isAllTabValid = computed(() => _.every(state.tabs, tab => !!tab.invalid === false));
+
+        const updateTabInvalid = (tabIdx, value) => {
+            state.tabs[tabIdx] = { ...state.tabs[tabIdx], invalid: !value };
+            state.tabs = [...state.tabs];
         };
+
+        const onChangeStep = async (beforeIdx) => {
+            let res = null;
+
+            if (state.tabs[beforeIdx].key === 'conf') res = await refs.conf.allValidation();
+            else if (state.tabs[beforeIdx].key === 'credentials') res = refs.crd.validate();
+            else return;
+
+            updateTabInvalid(beforeIdx, res);
+        };
+
 
         return {
             ...toRefs(dataState),
             ...toRefs(state),
             onCancel,
             onConfirm,
+            isAllTabValid,
+            updateTabInvalid,
             onChangeStep,
         };
     },

@@ -4,7 +4,7 @@ casual.define('pluginOption', () => ({
     key: casual.uuid,
     name: casual.word,
     // type: casual.random_element(['str', 'bool', 'list', 'int', 'float']),
-    type: 'bool',
+    type: 'list',
     // eslint-disable-next-line camelcase
     is_required: casual.boolean,
     enums: casual.array_of_words(5),
