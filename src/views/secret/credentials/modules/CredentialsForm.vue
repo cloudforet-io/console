@@ -69,7 +69,6 @@
                                             :space="true"
                                             :buttons="optionType"
                                             :selected.sync="selected"
-                                            @clickButton="getData"
                         />
                         <PFieldGroup v-if="selected === 'form'"
                                      :invalid-text="invalidMessage.form"
@@ -117,7 +116,7 @@ import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/Sel
 import PButton from '@/components/atoms/buttons/Button.vue';
 import CardLayout from '@/components/molecules/layouts/card-layout/CardLayout.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
-
+import PLabel from '@/components/atoms/labels/Label';
 const components = {
     CardLayout,
     PButtonModal,
@@ -129,18 +128,39 @@ const components = {
     PRow,
     PCol,
     PSelectDropdown,
+    PLabel,
     PButton,
 };
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
-    state.selected = 'form';
+
+    const getDataInputType = () => {
+        const currentURL = window.location.href;
+        const url = new URL(currentURL);
+        const plugin_id = url.searchParams.get('plugin_id');
+        const repository_id =  url.searchParams.get('repository_id');
+        return plugin_id;
+    };
+
+    state.selected = (_.isEmpty(getDataInputType())) ? 'json' : 'form';
+
+
+    function isJson(str) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
 
     const invalidMessage = {
         name: 'Required fields!',
         data: 'Please, confirm your Json String Format.',
     };
 
+    //const replaceAll = (str, find, replace) => str.replace(new RegExp(find, 'g'), replace);
 
     const formState = reactive({
         name: '',
@@ -172,13 +192,18 @@ const setup = (props, context) => {
     const validateAPI = formValidation(formState, formValidations);
 
     const confirm = async () => {
+        if (!_.isEmpty(formState.data)) {
+            const replaceSTR = formState.data;
+            replaceSTR.replace(/'/g, '"');
+        }
+
         const result = await validateAPI.allValidation();
+
         console.log(result);
         if (result) {
             const data = {
                 name: formState.name,
             };
-
             ['name', 'issue_type', 'tags', 'data'].forEach((key) => {
                 if (formState[key]) {
                     data[key] = formState[key];

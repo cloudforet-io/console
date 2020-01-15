@@ -20,7 +20,7 @@ import { makeTrItems } from '@/lib/view-helper';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
 
 export default {
-    name: 'PUserDetail',
+    name: 'PCredentialsDetail',
     components: {
         PInfoPanel, PDictPanel
     },
@@ -40,6 +40,7 @@ export default {
             ['issue_type', 'COMMON.ISSUE_TYPE'],
             ['created_at', 'COMMON.CREAT'],
         ], parent, { copyFlag: true });
+        debugger;
         const tags = ref({ ...props.tags });
         watch(() => props.item, (value) => {
             tags.value = value.tags || {};
