@@ -126,7 +126,6 @@ export default {
             isAllValid,
         } = setValidation(props.plugin.template.options, state.optionsValue);
 
-        const isAllValidBefore = ref(isAllValid.value);
 
         return {
             ...toRefs(state),
@@ -137,15 +136,10 @@ export default {
             invalidMsg,
             invalidState,
             allValidation,
-            isAllValid,
-            isAllValidBefore,
             onChange: async (val) => {
                 if (!props.showValidation) return;
                 await fieldValidation(val);
-                if (isAllValidBefore.value !== isAllValid.value) {
-                    emit('changeValidState', isAllValid.value);
-                    isAllValidBefore.value = isAllValid.value;
-                }
+                emit('changeValidState', isAllValid.value);
             },
         };
     },
