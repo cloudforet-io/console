@@ -1,8 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { withKnobs, text } from '@storybook/addon-knobs/vue';
-import { toRefs, reactive } from '@vue/composition-api';
+import { withKnobs } from '@storybook/addon-knobs/vue';
 import { autoProps } from '@sb/storybook-util';
-import CardLayout from './CardLayout';
+import CardLayout from './CardLayout.vue';
 
 
 export default {

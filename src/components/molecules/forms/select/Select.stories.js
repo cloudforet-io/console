@@ -1,5 +1,5 @@
 import { number, select } from '@storybook/addon-knobs/vue';
-import PSelect from './Select';
+import PSelect from './Select.vue';
 import { autoProps } from '@sb/storybook-util';
 
 export default {
@@ -41,7 +41,7 @@ export const base = () => ({
     },
     props: {
         optionSize: number('option size', 0),
-        selectSize: select('selectSize', [null, 'sm', 'lg'], null),
+        selectSize: select('selectSize', ['', 'sm', 'lg'], ''),
         ...autoProps(PSelect, [
             { name: 'customStyle' },
         ]),
@@ -79,7 +79,7 @@ export const multiSelect = () => ({
     },
     props: {
         optionSize: number('option size', 0),
-        selectSize: select('selectSize', [null, 'sm', 'lg'], null),
+        selectSize: select('selectSize', ['', 'sm', 'lg'], ''),
         ...autoProps(PSelect, [
             { name: 'customStyle' },
         ]),
@@ -121,7 +121,7 @@ export const objectOptions = () => ({
     },
     props: {
         optionSize: number('option size', 0),
-        selectSize: select('selectSize', [null, 'sm', 'lg'], null),
+        selectSize: select('selectSize', ['', 'sm', 'lg'], ''),
         ...autoProps(PSelect, [
             { name: 'customStyle' },
         ]),

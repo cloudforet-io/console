@@ -1,5 +1,5 @@
-import PListItem from './ListItem';
 import { autoProps } from '@sb/storybook-util';
+import PListItem from './ListItem.vue';
 
 
 export default {

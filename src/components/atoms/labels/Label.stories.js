@@ -1,4 +1,4 @@
-import PLabel from './Label';
+import PLabel from './Label.vue';
 
 
 export default {

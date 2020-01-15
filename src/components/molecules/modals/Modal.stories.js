@@ -61,7 +61,7 @@ export const modal = () => ({
             default: boolean('scrollable', false),
         },
         size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)], 'sm'),
+            default: select('size', ['', ...Object.keys(sizeMapping)], 'sm'),
         },
         centered: {
             default: boolean('centered', false),

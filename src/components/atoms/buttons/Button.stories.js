@@ -1,6 +1,6 @@
 import { select, text, boolean } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
-import PButton from './Button';
+import PButton from './Button.vue';
 
 export default {
     title: 'atoms/buttons',
@@ -40,19 +40,19 @@ export const DefaultCase = () => ({
     props: {
         styleType: {
             default: select('styleType', [
-                null,
+                '',
                 'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
                 'secondary', 'secondary1', 'secondary2',
                 'other1', 'other2', 'other3', 'other4',
                 'gray', 'gray1', 'gray2', 'gray3',
                 'alert', 'safe', 'dark',
-            ], null),
+            ], ''),
         },
         size: {
-            default: select('size', [null, 'sm', 'lg'], null),
+            default: select('size', ['', 'sm', 'lg'], ''),
         },
         shape: {
-            default: select('shape', [null, 'circle'], null),
+            default: select('shape', ['', 'circle'], ''),
         },
         defaultSlot: {
             default: text('default slot', 'button', 'slot'),
@@ -102,14 +102,14 @@ export const block = () => ({
     props: {
         styleType: {
             default: select('styleType', [
-                null, 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark',
+                '', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark',
             ], 'primary'),
         },
         size: {
-            default: select('size', [null, 'sm', 'lg'], null),
+            default: select('size', ['', 'sm', 'lg'], ''),
         },
         shape: {
-            default: select('shape', [null, 'circle'], null),
+            default: select('shape', ['', 'circle'], ''),
         },
         defaultSlot: {
             default: text('default slot', 'button', 'slot'),
