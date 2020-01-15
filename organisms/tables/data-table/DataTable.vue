@@ -102,7 +102,7 @@
                                        :hovered="hoverIndex===index"
                             />
                             <p-radio v-else
-                                     v-model="proxySelectIndex"
+                                     v-model="proxySelectIndex[0]"
                                      :value="index"
                                      :hovered="hoverIndex===index"
                             />
@@ -140,12 +140,12 @@
 
 <script>
 import DragSelect from 'dragselect';
-import PTable from '@/components/molecules/tables/Table';
-import PTr from '@/components/atoms/table/Tr';
-import PTd from '@/components/atoms/table/Td';
-import PTh from '@/components/atoms/table/Th';
-import PI from '@/components/atoms/icons/PI';
-import PLottie from '@/components/molecules/lottie/PLottie';
+import PTable from '@/components/molecules/tables/Table.vue';
+import PTr from '@/components/atoms/table/Tr.vue';
+import PTd from '@/components/atoms/table/Td.vue';
+import PTh from '@/components/atoms/table/Th.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { selectToCopyToClipboard } from '@/lib/util';
 
 const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox');
@@ -282,7 +282,12 @@ export default {
         items() {
             if (this.selectable && this.dragable && this.$options.name === 'PDataTable' && this.items) {
                 this.$nextTick(() => {
-                    this.dragSelect.setSelectables(this.dragSelectAbles);
+                    // this.dragSelect.setSelectables(this.dragSelectAbles);
+                    this.dragSelect = new DragSelect({
+                        selectables: this.dragSelectAbles,
+                        area: this.selectArea,
+                        callback: this.dragSelectItems,
+                    });
                 });
             }
         },
@@ -361,17 +366,16 @@ export default {
         },
         rowLeftClick(item, index, event) {
             this.$emit('rowLeftClick', item, index, event);
-            if (this.selectable) {
-                if (!this.multiSelect) {
-                    this.proxySelectIndex = index;
-                } else if (this.rowClickMultiSelectMode) {
+            if (!this.selectable) return;
+            if (this.multiSelect) {
+                if (this.rowClickMultiSelectMode) {
                     this.checkboxToggle(index);
                 } else if (event.shiftKey) {
                     this.proxySelectIndex = [...this.proxySelectIndex, index];
-                } else {
-                    this.proxySelectIndex = [index];
                 }
+                return;
             }
+            this.proxySelectIndex = [index];
         },
         rowRightClick(item, index, event) {
             this.$emit('rowRightClick', item, index, event);
@@ -407,7 +411,7 @@ export default {
         isSelected(index) {
             return this.multiSelect
                 ? this.proxySelectIndex.indexOf(index) !== -1
-                : this.proxySelectIndex === index;
+                : this.proxySelectIndex[0] === index;
         },
         checkboxToggle(index) {
             const newSelected = [...this.proxySelectIndex];
@@ -431,8 +435,6 @@ export default {
             }
         },
         getSelectItem(sortable) {
-            if (!this.multiSelect) return [this.items[this.selectIndex]];
-
             const selectedIndex = this.isEmpty(sortable) ? this.proxySelectIndex : this.proxySelectIndex.sort((a, b) => a - b);
             const selectItem = [];
             selectedIndex.forEach((index) => {
