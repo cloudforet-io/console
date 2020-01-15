@@ -13,7 +13,8 @@
 </template>
 
 <script>
-import PButton from '@/components/atoms/buttons/Button';
+import _ from 'lodash';
+import PButton from '@/components/atoms/buttons/Button.vue';
 import { selectToCopyToClipboard } from '@/lib/util';
 
 export default {
@@ -21,18 +22,16 @@ export default {
     components: { PButton },
     props: {
         value: {
-            type: [String, Array],
+            type: [String, Array, Number, Object, Boolean],
             default: '',
         },
     },
     methods: {
         copyText() {
             if (this.value instanceof Array) {
-                let res = '';
-                this.value.forEach((v) => {
-                    res += v;
-                });
-                selectToCopyToClipboard(res);
+                selectToCopyToClipboard(_.toString(this.value));
+            } else if (typeof this.value === 'object') {
+                selectToCopyToClipboard(JSON.stringify(this.value));
             } else selectToCopyToClipboard(this.value || '');
         },
     },

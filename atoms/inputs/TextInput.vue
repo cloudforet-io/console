@@ -4,6 +4,10 @@ import { getBindClass } from '@/lib/functional';
 export default {
     name: 'PTextInput',
     functional: true,
+    model: {
+        prop: 'value',
+        event: 'onInput',
+    },
     props: {
         value: {
             type: [String, Number],
@@ -16,7 +20,7 @@ export default {
         type: {
             type: String,
             default: 'text',
-            validator: value => ['text', 'password'].indexOf(value) !== -1,
+            validator: value => ['text', 'number', 'password'].indexOf(value) !== -1,
         },
     },
     render(h, { data, props, listeners }) {
@@ -37,6 +41,8 @@ export default {
             on: {
                 ...listeners,
                 input: (event) => {
+                    // do not change order
+                    listeners.onInput(event.target.value);
                     listeners.input(event.target.value);
                 },
             },
@@ -58,7 +64,8 @@ export default {
     background-color: $white;
     color: $gray1;
 
-    font: 14px/28px Arial;
+    font-size: .875rem;
+    line-height: 1.75rem;
 
     &:focus{
         border-color:$dark;
@@ -71,6 +78,11 @@ export default {
 }
 
 input[type="text"].p-text-input{
+    @include setInput();
+}
+
+
+input[type="number"].p-text-input{
     @include setInput();
 }
 

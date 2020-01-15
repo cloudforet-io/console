@@ -34,6 +34,7 @@ selectIndex 타입이 Array일 경우 다중 선택 인덱스가 출력 됩니�
         ...actions,
     },
 });
+
 export const singleSelect = () => ({
     components: { PCheckBox },
     template: `

@@ -1,5 +1,5 @@
-import PRow from '@/components/atoms/grid/row/Row';
-import PCol from '@/components/atoms/grid/col/Col';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
 
 export default {
     title: 'atoms/grid',

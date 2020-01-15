@@ -103,6 +103,5 @@ export default {
     .list-item-CON:last-of-type{
         border-bottom-left-radius: 2px;
         border-bottom-right-radius: 2px;
-
     }
 </style>

@@ -1,5 +1,4 @@
 import Fuse from 'fuse.js';
-import { isRef } from '@vue/composition-api';
 
 export class SearchQuery {
     constructor(key, operator, value) {
@@ -38,7 +37,7 @@ export class baseAutocompleteHandler {
             // eslint-disable-next-line no-await-in-loop
             result.push(...this.makeContextMenu(await handler(contextType, inputText, searchQuery)));
         }
-        if (_.head(result).type === 'divider') {
+        if (result.length >= 1 && _.head(result).type === 'divider') {
             return result.slice(1);
         }
         return result;
@@ -66,6 +65,18 @@ export const getValues = (contextType, inputText, searchQuery) => {
     const prefix = `${searchQuery.key}:${searchQuery.operator}`;
     return [searchQuery.key, [`${prefix} ${searchQuery.value}`]];
 };
+
+export const getEnumValues = (key, values) => (contextType, inputText, searchQuery) => {
+    if (searchQuery.key === key) {
+        const prefix = `${searchQuery.key}:${searchQuery.operator}`;
+        return [
+            searchQuery.key,
+            _.flatMap(values, v => `${prefix} ${v}`),
+        ];
+    }
+    return [];
+};
+
 export const getKeys = (rawKeys) => {
     const keys = _.flatMap(rawKeys, value => ({ type: 'item', label: value, name: `${value}:` }));
     const fuse = new Fuse(keys, { keys: ['label'] });
@@ -98,7 +109,8 @@ export class defaultAutocompleteHandler extends baseAutocompleteHandler {
         super();
         this.handlerMap = {
             key: [getKeys(this.keys), getSuggest(this.suggestKeys)],
-            value: [getValues],
+            // todo: 개별 키 자동 완성은 object방식으로 처리 하고 키와 무관한 자동완성은 array에서 가져와 처리하여 처리 속도 최적화 하기 - sinsky
+            value: [],
         };
     }
 }
