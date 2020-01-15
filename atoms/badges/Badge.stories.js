@@ -1,5 +1,5 @@
 import { select, text, color } from '@storybook/addon-knobs/vue';
-import PBadge from './Badge';
+import PBadge from './Badge.vue';
 
 export default {
     title: 'atoms/badges',
@@ -43,20 +43,20 @@ export const DefaultCase = () => ({
 });
 export const longBadge = () => ({
     components: { PBadge },
-    template: '<PBadge>Badge with long size in length</PBadge>',
+    template: '<PBadge :styleType="styleType" :backgroundColor="backgroundColor">Badge with long size in length</PBadge>',
     props: {
         styleType: {
             default: select('styleType', [
-                null,
+                '',
                 'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
                 'secondary', 'secondary1', 'secondary2',
                 'other1', 'other2', 'other3', 'other4',
                 'gray', 'gray1', 'gray2', 'gray3',
                 'alert', 'safe', 'dark',
-            ], null),
+            ], ''),
         },
         backgroundColor: {
-            default: color('backgroundColor', null),
+            default: color('backgroundColor', ''),
         },
     },
     data() {

@@ -1,10 +1,10 @@
 import { select } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
-import PTr from '@/components/atoms/table/Tr';
-import PTd from '@/components/atoms/table/Td';
-import PTh from '@/components/atoms/table/Th';
-import PTable from '@/components/molecules/tables/Table';
 import { autoProps } from '@sb/storybook-util';
+import PTr from '@/components/atoms/table/Tr.vue';
+import PTd from '@/components/atoms/table/Td.vue';
+import PTh from '@/components/atoms/table/Th.vue';
+import PTable from '@/components/molecules/tables/Table.vue';
 
 export default {
     title: 'molecules/table',
@@ -51,16 +51,16 @@ export const table = () => ({
             `,
     props: {
         tableStyleType: {
-            default: select('tableStyleType', [null, 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'], null),
+            default: select('tableStyleType', ['', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'], ''),
         },
         theadStyleType: {
-            default: select('theadStyleType', [null, 'light', 'dark'], null),
+            default: select('theadStyleType', ['', 'light', 'dark'], ''),
         },
         responsive: {
-            default: select('responsive', [null, true, 'sma', 'md', 'lg', 'xl'], null),
+            default: select('responsive', ['', true, 'sma', 'md', 'lg', 'xl'], ''),
         },
         bord: {
-            default: select('responsive', [null, true, false], null),
+            default: select('responsive', ['', true, false], ''),
         },
         ...autoProps(PTable, [
             { name: 'striped' },

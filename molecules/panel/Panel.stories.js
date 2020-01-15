@@ -1,6 +1,6 @@
-import PanelTop from '@/components/molecules/panel/panel-top/PanelTop';
-import PanelContent from '@/components/molecules/panel/panel-content/PanelContent';
-import PBadge from '@/components/atoms/badges/Badge';
+import PanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PanelContent from '@/components/molecules/panel/panel-content/PanelContent.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
 import { autoProps } from '@sb/storybook-util';
 
 export default {

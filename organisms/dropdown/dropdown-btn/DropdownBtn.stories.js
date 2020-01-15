@@ -1,6 +1,6 @@
 import { action } from '@storybook/addon-actions';
 import { boolean, select } from '@storybook/addon-knobs';
-import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/DropdownBtn';
+import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/DropdownBtn.vue';
 
 export default {
     title: 'organisms/dropdown/default',
@@ -41,11 +41,11 @@ Action
     props: {
         styleType: {
             default: select('styleType', [
-                null, 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark',
+                '', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark',
             ], 'primary'),
         },
         size: {
-            default: select('size', [null, 'sm', 'lg'], null),
+            default: select('size', ['', 'sm', 'lg'], ''),
         },
         disabled: {
             default: boolean('disabled', false),

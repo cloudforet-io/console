@@ -1,4 +1,4 @@
-import { text, number, boolean } from '@storybook/addon-knobs/vue';
+import { text, number  } from '@storybook/addon-knobs/vue';
 import PLottie from './PLottie.vue';
 import { autoProps } from '../../../../.storybook/storybook-util';
 
