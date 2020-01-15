@@ -39,7 +39,7 @@ export default {
                 {
                     path: '/',
                     name: 'collectorMain',
-                    meta: { label: '', requiresAuth: true },
+                    meta: { label: '' },
                     component: Collector,
                 },
                 {

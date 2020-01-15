@@ -3,7 +3,7 @@
         <p-field-group :label="formData.label"
                        :required="formData.required"
                        :invalid-text="invalidText"
-                       :invalid="validatable ? invalid : false"
+                       :invalid="typeof invalid === 'boolean' ? invalid : false"
         >
             <slot>
                 <div v-if="formType === 'input'">
@@ -88,23 +88,12 @@ const setFormState = (props) => {
 };
 
 const setValueState = (props, emit, formState) => {
-    const getProxyValue = () => {
-        let setter = (val) => {
-            emit('change', val);
-        };
-        if (formState.formType === 'tags') {
-            setter = (val) => {
-                emit('change', [...val]);
-            };
-        }
-
-        return computed({
-            get: () => props.value,
-            set: setter,
-        });
-    };
-
-    const proxyValue = getProxyValue();
+    const proxyValue = computed({
+        get: () => props.value,
+        set: (val) => {
+            emit('change', val); // for v-model
+        },
+    });
 
     const setDefaultValue = () => {
         if (formState.formData.default !== undefined) {
@@ -151,6 +140,7 @@ export const setValidation = (forms, values) => {
         fieldValidation,
         invalidMsg,
         invalidState,
+        isAllValid,
     } = formValidation(values, vd);
 
     return {
@@ -159,6 +149,7 @@ export const setValidation = (forms, values) => {
         fieldValidation,
         invalidMsg,
         invalidState,
+        isAllValid,
     };
 };
 
@@ -191,11 +182,7 @@ export default {
         },
         invalid: {
             type: Boolean,
-            default: false,
-        },
-        validatable: {
-            type: Boolean,
-            default: false,
+            default: undefined,
         },
     },
     setup(props, { emit }) {

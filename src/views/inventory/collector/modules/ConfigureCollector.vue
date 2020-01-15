@@ -33,9 +33,9 @@
                 <p-dynamic-form v-for="(op, idx) in plugin.template.options" :key="idx"
                                 v-model="optionsValue[op[formKey]]"
                                 :form="op"
-                                :invalid="invalidState[op[formKey]]"
+                                :invalid="showValidation ? invalidState[op[formKey]] : false"
                                 :invalid-text="invalidMsg[op[formKey]]"
-                                @change="onOptionChange"
+                                @change="onChange(op[formKey])"
                 />
             </p-col>
         </p-row>
@@ -43,7 +43,9 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed } from '@vue/composition-api';
+import {
+    reactive, toRefs, computed, ref,
+} from '@vue/composition-api';
 import config from '@/lib/config';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
@@ -53,6 +55,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+import { makeProxy } from '@/lib/compostion-util';
 
 export default {
     name: 'ConfigureCollector',
@@ -80,18 +83,27 @@ export default {
             type: Array,
             default: null,
         },
+        showValidation: {
+            type: Boolean,
+            default: false,
+        },
+        isInvalid: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
             defaultImg: config.get('COLLECTOR_IMG'),
             priority: 10,
-            optionsValue: [],
+            optionsValue: {},
             versionsInfo: computed(() => {
                 if (props.versions) {
                     return props.versions.map(v => ({ type: 'item', label: v, name: v }));
                 } return [];
             }),
             version: 'Select Version',
+            proxyIsInvalid: makeProxy('isInvalid', props, emit),
         });
 
         const readonlyState = {
@@ -105,24 +117,36 @@ export default {
             state.version = item;
         };
 
-        const onOptionChange = () => {};
         const {
             formKey,
             invalidMsg,
             invalidState,
+            fieldValidation,
             allValidation,
-        } = setValidation([], state.options);
+            isAllValid,
+        } = setValidation(props.plugin.template.options, state.optionsValue);
+
+        const isAllValidBefore = ref(isAllValid.value);
 
         return {
             ...toRefs(state),
             ...readonlyState,
             getVersionsInfo,
             onSelectVersion,
-            onOptionChange,
             formKey,
             invalidMsg,
             invalidState,
             allValidation,
+            isAllValid,
+            isAllValidBefore,
+            onChange: async (val) => {
+                if (!props.showValidation) return;
+                await fieldValidation(val);
+                if (isAllValidBefore.value !== isAllValid.value) {
+                    emit('changeValidState', isAllValid.value);
+                    isAllValidBefore.value = isAllValid.value;
+                }
+            },
         };
     },
 };

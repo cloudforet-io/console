@@ -3,12 +3,12 @@ import casual, { arrayOf } from '@/lib/casual';
 casual.define('pluginOption', () => ({
     key: casual.uuid,
     name: casual.word,
-    type: casual.random_element(['str', 'bool', 'list', 'int', 'float']),
+    // type: casual.random_element(['str', 'bool', 'list', 'int', 'float']),
+    type: 'list',
     // eslint-disable-next-line camelcase
     is_required: casual.boolean,
     enums: casual.array_of_words(5),
     example: casual.word,
-    default: casual.word,
 }));
 
 casual.define('pluginVersions', () => casual.array_of_digits(5));

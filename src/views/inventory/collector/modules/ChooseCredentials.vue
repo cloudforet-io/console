@@ -6,6 +6,8 @@
                          :multi-select="false"
                          sortable
                          hover
+                         :border="false"
+                         :shadow="false"
                          :sort-by.sync="sortBy"
                          :sort-desc.sync="sortDesc"
                          :all-page="allPage"
@@ -16,6 +18,7 @@
                          :loading="loading"
                          use-spinner-loading
                          use-cursor-loading
+                         @changeSelectIndex="onChangeSelectIndex"
                          @changePageSize="listCredentials"
                          @changePageNumber="listCredentials"
                          @clickRefresh="listCredentials"
@@ -79,17 +82,23 @@ export default {
         totalCount: Number,
         loading: Boolean,
     },
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
             sortBy: '',
             sortDesc: '',
             pageSize: 10,
             thisPage: 1,
             searchText: '',
-            selectIndex: null,
+            selectIndex: [],
             crdTypes: ['Credentials Group', 'Credentials'],
             crdType: 'Credentials',
         });
+
+        const validate = () => state.selectIndex.length !== 0;
+
+        const onChangeSelectIndex = () => {
+            emit('changeValidState', validate());
+        };
 
         const allPage = computed(() => Math.ceil(props.totalCount / state.pageSize) || 1);
 
@@ -108,6 +117,8 @@ export default {
 
         return {
             ...toRefs(state),
+            validate,
+            onChangeSelectIndex,
             allPage,
             listCredentials,
         };

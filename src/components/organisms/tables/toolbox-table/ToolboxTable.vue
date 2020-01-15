@@ -99,6 +99,7 @@ export default {
         'changeSort', 'theadClick',
         'clickSetting', 'clickRefresh',
         'changePageSize', 'changePageNumber',
+        'changeSelectIndex',
     ],
     mixins: [PDataTable],
     props: {
