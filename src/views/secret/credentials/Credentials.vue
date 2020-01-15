@@ -19,6 +19,7 @@ export default {
         credentialsEventNames.createCredentials = 'createCredentials';
         credentialsEventNames.updateCredentials = 'updateCredentials';
         credentialsEventNames.deleteCredentials = 'deleteCredentials';
+        credentialsEventNames.getPluginCredentialsForm = 'getPluginCredentialsForm';
 
         const state = credentialsSetup(props, context, credentialsEventNames);
 
@@ -56,7 +57,7 @@ export default {
             await context.parent.$http.post('/secret/credential/update', {
                 credential_id: credentialsId,
                 domain_id: context.parent.$store.getters['domain/id'],
-                tags: tags,
+                tags,
             }).then((_) => {
                 state.items[idx].tags = tags;
             }).catch((error) => {
@@ -120,11 +121,25 @@ export default {
             });
         };
 
+        const getPluginCredentialsForm = async (items) => {
+            const params = {
+                plugin_id: items.plugin_id,
+            };
+
+            try {
+                const res = await context.parent.$http.post('/repository/plugin/get', params);
+                state.daynamicForm.form = res.data.template.credentials;
+            } catch (e) {
+                console.log(e);
+                state.loading = false;
+            }
+        };
 
         mountBusEvent(credentialsEventBus, credentialsEventNames.getCredentialsList, requestCredentialsList);
         mountBusEvent(credentialsEventBus, credentialsEventNames.tagConfirmEvent, credentialsTagConfirm);
         mountBusEvent(credentialsEventBus, credentialsEventNames.createCredentials, createCredentials);
         mountBusEvent(credentialsEventBus, credentialsEventNames.deleteCredentials, deleteCredentials);
+        mountBusEvent(credentialsEventBus, credentialsEventNames.getPluginCredentialsForm, getPluginCredentialsForm);
 
         requestCredentialsList();
         return {

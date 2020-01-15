@@ -51,7 +51,7 @@
                         <PFieldGroup
                             label="Password"
                             :invalid-text="invalidMsg.password1"
-                            help-text="Your Password must be 5~12 characters long"
+                            help-text="Your Password must be 5 ~ 12 characters long"
                             :invalid="invalidState.password1"
                             :required="true"
                         >

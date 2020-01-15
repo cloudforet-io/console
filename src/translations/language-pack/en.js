@@ -263,6 +263,9 @@ export const en = {
         ZONE_NM: 'Zone Name',
         POOL_NM: 'Pool Name',
     },
+    SECRET: {
+        JASON_ALERT: 'Please, Check Json Format (Use double quotation( \\" ) mark instead of single quotation (\').',
+    },
     MSG: {
 
     },

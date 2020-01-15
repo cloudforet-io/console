@@ -263,6 +263,9 @@ export const ko = {
         ZONE_NM: '존(Zone) 명',
         POOL_NM: '풀(Pool) 명',
     },
+    SECRET: {
+        JASON_ALERT: "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (\') )",
+    },
     TREE_TYPE: {
         PROJECT: '프로젝트',
         PROJECT_GROUP: '프로젝트 그룹',

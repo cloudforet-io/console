@@ -64,14 +64,14 @@
                     :fields="multiSelectFields"
                     :sortable="false"
                     :selectable="false"
-                    :items="getSelectedUserItems"
+                    :items="getSelectedCredentialsItems"
                     :col-copy="true"
                 />
             </template>
         </PTab>
 
         <div v-else id="empty-space">
-            Select a Credentials above for details.
+            Select a Credentials from above in details.
         </div>
         <p-table-check-modal
             v-if="!!checkTableModalState.mode"
@@ -83,14 +83,20 @@
             size="lg"
             :centered="true"
             :selectable="false"
-            :items="getSelectedUserItems"
+            :double-confirm="doubleState.doubleConfirm"
+            :double-confirm-origin="doubleState.origin"
+            :double-confirm-title="doubleState.title"
+            :double-confirm-place-holder="doubleState.placeHolder"
+            :items="getSelectedCredentialsItems"
             @confirm="checkModalConfirm"
         />
         <p-credentials-form v-if="credentialsFormState.visible"
+                            ref="CREDENTIAL_FORM"
                             :header-title="credentialsFormState.headerTitle"
                             :update-mode="credentialsFormState.updateMode"
                             :item="credentialsFormState.item"
                             :visible.sync="credentialsFormState.visible"
+                            :dynamic-form-state="dynamicFormTemp"
                             @confirm="credentialsFormConfirm"
         />
     </div>
@@ -105,7 +111,7 @@ import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/t
 import { timestampFormatter, getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
-import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm.vue';
+import PCredentialsForm from  '@/views/secret/credentials/modules/CredentialsForm.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
@@ -115,6 +121,14 @@ const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-
 const PSearch = () => import('@/components/molecules/search/Search');
 const PCredentialsDetail = () => import('@/views/secret/credentials/modules/CredentialsDetail');
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
+
+export const getDataInputType = () => {
+    const currentURL = window.location.href;
+    const url = new URL(currentURL);
+    const plugin_id = url.searchParams.get('plugin_id');
+    const repository_id = url.searchParams.get('repository_id');
+    return plugin_id;
+};
 
 export const CredentialsTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -143,7 +157,6 @@ export const eventNames = {
     getCredentialsList: '',
     deleteCredentials: '',
     createCredentials: '',
-    updateCredentials: '',
 };
 
 export const credentialsSetup = (props, context, eventName) => {
@@ -167,20 +180,31 @@ export const credentialsSetup = (props, context, eventName) => {
         isSelectedMulti: computed(() => tableState.selectIndex.length > 1),
     });
     const state = requestToolboxTableMetaReactive();
+
     state.sortBy = 'name';
+
+    state.daynamicForm = {
+        form: [],
+        value: {},
+    };
+
+    const dynamicFormTemp = computed(() => state.daynamicForm);
+
     const getCredentials = () => {
         eventBus.$emit(eventName.getCredentialsList);
     };
 
     const sortSelectIndex = computed(() => {
+        console.log('temp sortable', tableState.selectIndex);
         const idxs = [...tableState.selectIndex];
         idxs.sort((a, b) => a - b);
+        console.log('idxs', idxs);
         return idxs;
     });
-    const isNotSelected = computed(() => tableState.selectIndex.length === 0);
-    const isNotOnlyOneSelected = computed(() => tableState.selectIndex.length !== 1);
 
-    const getSelectedUserItems = computed(() => {
+    const isNotSelected = computed(() => tableState.selectIndex.length === 0);
+
+    const getSelectedCredentialsItems = computed(() => {
         const items = [];
         sortSelectIndex.value.forEach((idx) => {
             items.push(tableState.items[idx]);
@@ -188,14 +212,18 @@ export const credentialsSetup = (props, context, eventName) => {
         return items;
     });
 
-    const getSelectUserIds = computed(() => {
+    const getPluginTemplate = () => {
+        credentialsEventBus.$emit('getPluginCredentialsForm', { plugin_id: getDataInputType() });
+    };
+
+    const getSelectCredentialsIds = computed(() => {
         const ids = [];
-        getSelectedUserItems.value.forEach((item) => {
+        getSelectedCredentialsItems.value.forEach((item) => {
             ids.push(item.server_id);
         });
         return ids;
     });
-    const getFirstSelectedUserId = computed(() => (getSelectUserIds.value.length >= 1 ? getSelectUserIds[0] : ''));
+    const getFirstSelectedCredentialsId = computed(() => (getSelectCredentialsIds.value.length >= 1 ? getSelectCredentialsIds[0] : ''));
 
     const credentialsFormState = reactive({
         visible: false,
@@ -229,6 +257,13 @@ export const credentialsSetup = (props, context, eventName) => {
         themeColor: '',
     });
 
+    const doubleState = reactive({
+        doubleConfirm: true,
+        origin: '',
+        title: '',
+        placeHolder: 'Please, enter the name from above to delete selected item.',
+    });
+
     const resetCheckTableModalState = () => {
         checkTableModalState.visible = false;
         checkTableModalState.mode = '';
@@ -239,12 +274,28 @@ export const credentialsSetup = (props, context, eventName) => {
     };
 
     const clickDelete = () => {
-        checkTableModalState.mode = 'delete';
-        checkTableModalState.confirmEventName = eventNames.deleteCredentials;
-        checkTableModalState.title = 'Delete Credentials';
-        checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
-        checkTableModalState.themeColor = 'alert';
-        checkTableModalState.visible = true;
+        if (tabAction.isSelectedMulti) {
+            context.root.$notify({
+                group: 'noticeBottomRight',
+                type: 'alert',
+                title: 'Invalid delete action.',
+                text: 'Multiple credentials can not be deleted at once. Please, select a single credentials.',
+                duration: 2000,
+                speed: 1000,
+            });
+        } else {
+            const selectedItemName = tableState.items[tableState.selectIndex].name;
+            doubleState.origin = selectedItemName;
+            doubleState.title = 'Delete Credentials confirmation.';
+            doubleState.placeHolder = `Please, enter the name from above to delete selected item: ${selectedItemName} .`;
+
+            checkTableModalState.mode = 'delete';
+            checkTableModalState.confirmEventName = eventNames.deleteCredentials;
+            checkTableModalState.title = 'Delete Credentials';
+            checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
+            checkTableModalState.themeColor = 'alert';
+            checkTableModalState.visible = true;
+        }
     };
 
 
@@ -252,6 +303,9 @@ export const credentialsSetup = (props, context, eventName) => {
         console.log(checkTableModalState.confirmEventName, event);
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
+        console.log('tableState.selectIndex', tableState.selectIndex);
+        tableState.selectIndex = [];
+        console.log('tableState.selectIndex', tableState.selectIndex);
     };
 
     const dropdownMenu = reactive({
@@ -262,12 +316,15 @@ export const credentialsSetup = (props, context, eventName) => {
         { type: 'item' }),
     });
 
+    getPluginTemplate();
+
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
         ...toRefs(tabData),
         ...toRefs(tabAction),
         checkTableModalState,
+        doubleState,
         tags,
         dropdown: dropdownMenu,
         timestampFormatter,
@@ -276,10 +333,11 @@ export const credentialsSetup = (props, context, eventName) => {
         },
         getCredentials,
         ...eventNames,
-        getSelectedUserItems,
-        getSelectUserIds,
-        getFirstSelectedUserId,
+        getSelectedCredentialsItems,
+        getSelectCredentialsIds,
+        getFirstSelectedCredentialsId,
         credentialsFormState,
+        dynamicFormTemp,
         clickCreate,
         credentialsFormConfirm,
         clickDelete,

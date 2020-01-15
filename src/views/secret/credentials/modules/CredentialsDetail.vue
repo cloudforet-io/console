@@ -20,9 +20,9 @@ import { makeTrItems } from '@/lib/view-helper';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
 
 export default {
-    name: 'PUserDetail',
+    name: 'PCredentialsDetail',
     components: {
-        PInfoPanel, PDictPanel
+        PInfoPanel, PDictPanel,
     },
     props: {
         item: {
@@ -42,7 +42,7 @@ export default {
         ], parent, { copyFlag: true });
         const tags = ref({ ...props.tags });
         watch(() => props.item, (value) => {
-            tags.value = value.tags || {};
+            tags.value = _.isEmpty(value) ? {} : value.tags;
         });
         const dictPanel = ref(null);
         const resetTag = () => {

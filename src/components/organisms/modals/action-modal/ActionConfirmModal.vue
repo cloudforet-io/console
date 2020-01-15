@@ -24,20 +24,63 @@
                 <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
                               :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 />
+                <div v-if="doubleConfirm" style="width:100%">
+                    <p-hr />
+                    <p-row style="margin-top: 33px">
+                        <p-col :col="12">
+                            <PFieldGroup
+                                :label="doubleConfirmTitle"
+                                :invalid-text="invalidMsg.input"
+                                :invalid="invalidState.input"
+                                :valid="validState.input"
+                                :required="true"
+                            >
+                                <template v-slot:default="{invalid}">
+                                    <p-row style="width: 100%">
+                                        <p-col :col="8">
+                                            <p-text-input
+                                                v-model="singleState.input"
+                                                :placeholder="doubleConfirmPlaceHolder"
+                                                :class="{
+                                                    'form-control':true,
+                                                    'is-invalid':invalid
+                                                }"
+                                            />
+                                        </p-col>
+                                    </p-row>
+                                </template>
+                            </PFieldGroup>
+                        </p-col>
+                    </p-row>
+                </div>
             </div>
         </template>
     </p-button-modal>
 </template>
 <script>
 import { reactive, computed, toRefs } from '@vue/composition-api';
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable';
-import { propsMixin } from '@/components/molecules/modals/Modal';
-import { setup as contentModalSetup } from '../content-modal/ContentModal';
-import { makeByPass, makeProxy } from '@/lib/compostion-util';
+import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
+import { propsMixin } from '@/components/molecules/modals/Modal.vue';
+import { setup as contentModalSetup } from '../content-modal/ContentModal.vue';
+import {
+    makeByPass, makeProxy, formValidation, requiredValidation, Validation,
+} from '@/lib/compostion-util';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
+    const originalInput = computed(() => props.doubleConfirmOrigin);
+
+    const singleState = reactive({
+        originInput: originalInput,
+        input: '',
+    });
+
     const sortState = reactive({
         sortBy: '',
         sortDesc: true,
@@ -49,8 +92,25 @@ const setup = (props, context) => {
     const footerConfirmButtonBind = computed(() => ({
         styleType: props.themeColor,
     }));
-    const confirm = () => {
-        context.emit('confirm', props.items);
+
+    const singleItemValidations = {
+        input: [
+            requiredValidation(),
+            new Validation((value, data) => data.originInput === value, 'Please enter same value again'),
+        ],
+    };
+
+    const validateAPI = formValidation(singleState, singleItemValidations);
+
+    const confirm = async () => {
+        if (props.doubleConfirm) {
+            const result = await validateAPI.allValidation();
+            if (result) {
+                context.emit('confirm', props.items);
+            }
+        } else {
+            context.emit('confirm', props.items);
+        }
     };
 
     return {
@@ -58,6 +118,8 @@ const setup = (props, context) => {
         ...toRefs(sortState),
         footerCancelButtonBind,
         footerConfirmButtonBind,
+        singleState,
+        ...validateAPI,
         sortedItems: computed(() => {
             // todo: move this feather to p-data-table
             if (sortState.sortBy) {
@@ -74,7 +136,9 @@ const setup = (props, context) => {
 
 export default {
     name: 'PTableCheckModal',
-    components: { PButtonModal, PDataTable },
+    components: {
+        PButtonModal, PDataTable, PRow, PCol, PTextInput, PHr, PFieldGroup
+    },
     mixins: [propsMixin],
     props: {
         themeColor: {
@@ -85,6 +149,20 @@ export default {
             type: Boolean,
             default: true,
         },
+        doubleConfirm: {
+            type: Boolean,
+            default: false,
+        },
+        item: {
+            type: Object,
+            default: () => ({
+                originInput: '',
+                input: '',
+            }),
+        },
+        doubleConfirmOrigin: String,
+        doubleConfirmTitle: String,
+        doubleConfirmPlaceHolder: String,
         headerTitle: String,
         subTitle: String,
         fields: Array,
