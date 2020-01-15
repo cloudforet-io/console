@@ -1,12 +1,6 @@
-import {
-    toRefs, reactive, ref, computed,
-} from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
-import {
-    text, boolean, object, number, array,
-} from '@storybook/addon-knobs/vue';
-import Vue from 'vue';
-import PBreadcrumb, { setRouteState } from './Breadcrumb.vue';
+import {toRefs, reactive } from '@vue/composition-api';
+import { object, number } from '@storybook/addon-knobs/vue';
+import PBreadcrumb from './Breadcrumb.vue';
 import md from './Breadcrumb.md';
 
 
