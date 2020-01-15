@@ -1,5 +1,5 @@
-import { withKnobs, number } from '@storybook/addon-knobs/vue';
-import PChart from './Chart';
+import { withKnobs  } from '@storybook/addon-knobs/vue';
+import PChart from './Chart.vue';
 import { autoProps } from '@sb/storybook-util';
 
 export default {

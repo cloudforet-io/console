@@ -1,5 +1,5 @@
 <template>
-    <div class="p-context-menu" style="display: block;" :class="theme"
+    <div class="p-context-menu" :class="theme"
          @keyup.esc="$emit('onEscKey',$event)"
     >
         <template v-for="(item, index) in menu">
@@ -132,6 +132,7 @@ export default {
         text-align: left;
         list-style: none;
         background-clip: padding-box;
+        display: block;
 
         .context-divider{
             margin: 0;
