@@ -1,5 +1,5 @@
 import Vue from 'vue';
 
-const credentialsGroupEventBus = new Vue();
+const cdgEventBus = new Vue();
 
-export default credentialsGroupEventBus;
+export default cdgEventBus;

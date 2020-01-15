@@ -2,9 +2,9 @@ import { number, select } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PContentModal from '@/components/organisms/modals/content-modal/ContentModal';
-import PButton from '@/components/atoms/buttons/Button';
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
+import PContentModal from '@/components/organisms/modals/content-modal/ContentModal.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import { autoProps } from '@sb/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 
@@ -89,7 +89,7 @@ export const modal = () => ({
             }),
         },
         size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)], 'sm'),
+            default: select('size', ['', ...Object.keys(sizeMapping)], 'sm'),
         },
         scrollable: {
             default: boolean('scrollable', false),
