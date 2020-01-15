@@ -42,8 +42,8 @@ export default {
                 ...listeners,
                 input: (event) => {
                     // do not change order
-                    listeners.onInput(event.target.value);
-                    listeners.input(event.target.value);
+                    if (listeners.onInput) listeners.onInput(event.target.value);
+                    if (listeners.input) listeners.input(event.target.value);
                 },
             },
         });
