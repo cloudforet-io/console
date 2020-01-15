@@ -370,10 +370,12 @@ export default {
             if (this.multiSelect) {
                 if (this.rowClickMultiSelectMode) {
                     this.checkboxToggle(index);
-                } else if (event.shiftKey) {
-                    this.proxySelectIndex = [...this.proxySelectIndex, index];
+                    return;
                 }
-                return;
+                if (event.shiftKey) {
+                    this.proxySelectIndex = [...this.proxySelectIndex, index];
+                    return;
+                }
             }
             this.proxySelectIndex = [index];
         },
