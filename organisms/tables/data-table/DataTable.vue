@@ -100,11 +100,13 @@
                                        v-model="proxySelectIndex"
                                        :value="index"
                                        :hovered="hoverIndex===index"
+                                       @change="$emit('changeSelectIndex', $event)"
                             />
                             <p-radio v-else
                                      v-model="proxySelectIndex[0]"
                                      :value="index"
                                      :hovered="hoverIndex===index"
+                                     @change="$emit('changeSelectIndex', $event)"
                             />
                         </p-td>
                         <template v-for="field in fieldsName">
@@ -232,7 +234,7 @@ export default {
                 return this.selectIndex;
             },
             set(value) {
-                return this.$emit('update:selectIndex', value);
+                this.$emit('update:selectIndex', value);
             },
         },
         fieldsData() {

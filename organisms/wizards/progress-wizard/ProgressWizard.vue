@@ -5,9 +5,8 @@
         </header>
         <slot name="top">
             <slot name="progress">
-                <p-progress-tab-bar :tabs.sync="proxyTabs"
+                <p-progress-tab-bar :tabs="proxyTabs"
                                     :active-idx.sync="proxyActiveIdx"
-                                    :show-validation="showValidation"
                                     @changeTab="onChangeTab"
                 >
                     <template v-for="(tab) in tabs" :slot="`progress-${tab.key}`">
@@ -38,13 +37,13 @@
                 <span v-if="activeTab.optional" class="optional"> (optional)</span>
                 <template #head>
                     <div class="step-appendix">
-                        <slot :name="`step-append-${activeTab.key}`" :tab="activeTab.key" />
+                        <slot :name="`step-append-${activeTab.key}`" :tab="activeTab" />
                     </div>
                 </template>
             </p-panel-top>
             <div class="contents">
                 <keep-alive>
-                    <slot :name="`contents-${activeTab.key}`" :tab="activeTab.key" />
+                    <slot :name="`contents-${activeTab.key}`" :tab="activeTab" />
                 </keep-alive>
             </div>
         </template>
@@ -89,7 +88,7 @@
 
 <script>
 import {
-    ref, toRefs, reactive, computed, onUnmounted,
+    ref, toRefs, reactive, computed,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import { secondary, white, other1 } from '@/styles/_variables.scss';
@@ -119,22 +118,28 @@ const setStyles = () => {
     };
 };
 
-const setPagination = (state, emit) => {
+const setPagination = (props, state, emit) => {
     const isFirstTab = computed(() => state.proxyActiveIdx - 1 < 0);
     const isLastTab = computed(() => state.proxyActiveIdx + 1 >= state.proxyTabs.length);
+
+    const changeStep = (idx) => {
+        state.proxyTabs.splice(idx, 1, { ...state.proxyTabs[idx], showValidation: true });
+        emit('changeStep', idx);
+    };
+
     const onClickPrev = () => {
         if (isFirstTab.value) return;
-        emit('changeStep', state.proxyActiveIdx);
+        changeStep(state.proxyActiveIdx);
         state.proxyActiveIdx -= 1;
     };
     const onClickNext = () => {
         if (isLastTab.value) return;
-        emit('changeStep', state.proxyActiveIdx);
+        changeStep(state.proxyActiveIdx);
         state.proxyActiveIdx += 1;
     };
 
     const onChangeTab = (now, beforeIdx) => {
-        emit('changeStep', beforeIdx);
+        changeStep(beforeIdx);
     };
 
     return {
@@ -164,10 +169,6 @@ export default {
             type: Number,
             default: 0,
         },
-        showValidation: {
-            type: Boolean,
-            default: false,
-        },
         showConfirm: {
             type: Boolean,
             default: false,
@@ -179,7 +180,12 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyTabs: makeProxy('tabs', props, emit),
+            proxyTabs: computed({
+                get: () => props.tabs,
+                set: (val) => {
+                    emit('update:tabs', val);
+                },
+            }),
             proxyActiveIdx: makeProxy('activeIdx', props, emit),
         });
 
@@ -188,7 +194,7 @@ export default {
             ...toRefs(state),
             activeTab,
             ...setStyles(),
-            ...setPagination(state, emit),
+            ...setPagination(props, state, emit),
         };
     },
 };
