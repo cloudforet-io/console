@@ -1,8 +1,7 @@
 import { withKnobs, boolean } from '@storybook/addon-knobs/vue';
-import { ref, toRefs, reactive } from '@vue/composition-api';
-import { autoProps } from '@sb/storybook-util';
+import { ref } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import PRadio from './Radio';
+import PRadio from './Radio.vue';
 
 
 export default {

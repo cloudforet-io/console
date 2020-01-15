@@ -44,6 +44,16 @@ Vue.prototype.$velocity = velocity;
 Vue.prototype.$bus = new Vue({});
 directive(Vue);
 
+addParameters({
+    docs: {
+        extractComponentDescription: (component, { notes }) => {
+            if (notes) {
+                return typeof notes === 'string' ? notes : notes.markdown || notes.text;
+            }
+            return null;
+        },
+    },
+});
 addDecorator(withA11y);
 addDecorator(withKnobs);
 addDecorator(centered);
