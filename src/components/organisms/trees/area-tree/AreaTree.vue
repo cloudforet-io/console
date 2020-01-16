@@ -173,8 +173,8 @@ export default {
                 state.contextMenuIsVisible = false;
             }
             if (!node.data.init) {
-                this.removeAllClass(node);
-                this.addClickedClass(node);
+                removeAllClass(node);
+                addClickedClass(node);
             }
 
             context.emit('DTContextVisible', node, event, hasClicked, getTree());
@@ -241,14 +241,14 @@ export default {
         };
 
         const beforeEnter = (el) => {
-            context.velocity(el, {
+            context.parent.$velocity(el, {
                 translateX: `-${props.treeWidth}px`,
                 opacity: 0,
             });
         };
 
         const enter = (el, done) => {
-            context.velocity(el, { translateX: '0px', opacity: 1 },
+            context.parent.$velocity(el, { translateX: '0px', opacity: 1 },
                 {
                     duration: 400,
                     complete() {

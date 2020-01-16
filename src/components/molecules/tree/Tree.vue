@@ -164,7 +164,7 @@ export default {
             }
             if (!hasNotClickedItem) {
                 const addClassInterval = setInterval(() => {
-                    if (context.addClickedClass(state.clickedNode)) {
+                    if (addClickedClass(state.clickedNode)) {
                         clearInterval(addClassInterval);
                     }
                 }, 10);
