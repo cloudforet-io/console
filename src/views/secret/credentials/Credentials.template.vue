@@ -131,6 +131,7 @@ const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-
 const PSearch = () => import('@/components/molecules/search/Search');
 const PCredentialsDetail = () => import('@/views/secret/credentials/modules/CredentialsDetail');
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
+
 export const getDataInputType = () => {
     const currentURL = window.location.href;
     const url = new URL(currentURL);
@@ -326,7 +327,9 @@ export const credentialsSetup = (props, context, eventName) => {
         { type: 'item' }),
     });
 
-    getPluginTemplate();
+    if (!_.isEmpty(getDataInputType())) {
+        getPluginTemplate();
+    }
 
     return reactive({
         ...toRefs(state),
@@ -408,5 +411,11 @@ export default {
         margin-top: 1.5625rem;
         margin-left: 2rem;
         margin-right: 2rem;
+    }
+    .p-label {
+        left-margin: 0.5rem;
+        margin-bottom:5px;
+        margin-right: 0.5rem;
+        color:$dark;
     }
 </style>

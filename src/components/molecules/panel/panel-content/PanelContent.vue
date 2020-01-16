@@ -1,33 +1,35 @@
 <template>
     <p-dl class="content-container">
-        <div v-for="(def, idx) in defs" :key="idx" class="content-list">
-            <slot name="details">
-                <span class="content">
-                    <p-dt class="label">
-                        {{ def.label }}
-                    </p-dt>
-                    <span class="data"
-                          @mouseleave="mouseInOut(idx, false)"
-                    >
-                        <p-dd :ref="'dd-'+def.name"
-                              @mouseenter="mouseInOut(idx, true)"
+        <template v-for="(def, idx) in defs" >
+            <div :key="idx" :class="{'content-list': !getFullLengthUsability(def), 'content-full-list': getFullLengthUsability(def)}">
+                <slot name="details">
+                    <span class="content">
+                        <p-dt  :class="{'label':true, 'label-common': !getFullLengthUsability(def), 'label-full': getFullLengthUsability(def)}">
+                            {{ def.label }}
+                        </p-dt>
+                        <span class="data"
+                              @mouseleave="mouseInOut(idx, false)"
                         >
-                            <slot :name="`def-${def.name}-format`"
-                                  :value="getValue(def.name)"
-                                  :item="item"
-                                  :def="def"
+                            <p-dd :ref="'dd-'+def.name"
+                                  @mouseenter="mouseInOut(idx, true)"
                             >
-                                {{ getValue(def.name) }}
-                            </slot>
-                        </p-dd>
-                        <p-copy-button v-if="activeArr(idx, def) && isCopyFlagged(def)"
-                                       class="copy-btn"
-                                       :value="getValue(def.name)"
-                        />
+                                <slot :name="`def-${def.name}-format`"
+                                      :value="getValue(def.name)"
+                                      :item="item"
+                                      :def="def"
+                                >
+                                    {{ getValue(def.name) }}
+                                </slot>
+                            </p-dd>
+                            <p-copy-button v-if="activeArr(idx, def) && isCopyFlagged(def)"
+                                           class="copy-btn"
+                                           :value="getValue(def.name)"
+                            />
+                        </span>
                     </span>
-                </span>
-            </slot>
-        </div>
+                </slot>
+            </div>
+        </template>
     </p-dl>
 </template>
 
@@ -55,6 +57,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        fullWidth: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -71,6 +77,9 @@ export default {
         },
         setActiveArray() {
             this.active = Array(this.defs.length).fill(false);
+        },
+        getFullLengthUsability(definition) {
+            return (_.get(definition, 'full') === true);
         },
         isCopyFlagged(definition) {
             return (_.get(definition, 'copyFlag') === true);
@@ -95,6 +104,10 @@ export default {
             flex-basis: 50%;
             max-width: 50%;
         }
+        .content-full-list {
+            flex-basis: 100%;
+            max-width: 100%;
+        }
     }
     .content {
         display: flex;
@@ -111,8 +124,15 @@ export default {
             font-weight: bold;
             color: $gray1;
             min-width: 10rem;
+
+        }
+        .label-common {
             width: 25%;
         }
+        .label-full {
+            width: 12.5%;
+        }
+
         .data {
             flex: 1;
             display: flex;
