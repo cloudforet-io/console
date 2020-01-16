@@ -35,15 +35,18 @@ export const DefaultCase = () => ({
                 {
                     name: 'id',
                     label: this.tr('COMMON.ID'),
+                    full: true,
                     copyFlag: true,
                 },
                 {
                     name: 'name',
+                    full: false,
                     label: this.tr('COMMON.NAME'),
                 },
                 {
                     name: 'state',
                     label: this.tr('COMMON.STATE'),
+                    full: false,
                     copyFlag: true,
                 },
             ],
