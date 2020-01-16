@@ -27,6 +27,7 @@ import PI from '@/components/atoms/icons/PI.vue';
  */
 export const tagList = (proxyTags, checkDuplicate = true, eventBuse, eventName) => {
     const tags = proxyTags || ref([]);
+    if (!tags.value) tags.value = [];
 
     /**
      * @param idx {Number}
