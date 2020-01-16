@@ -17,6 +17,9 @@
                                      title="Plugins"
                                      :sort-menu="sortMenu"
                                      :sort-by.sync="sortBy"
+                                     :this-page.sync="thisPage"
+                                     :page-size="pageSize"
+                                     :total-count="totalCount"
                                      @pageChange="onPageChange"
                                      @sortChange="onSortChange"
                                      @filterChange="onFilterChange"
@@ -59,8 +62,9 @@
 </template>
 
 <script>
-import { toRefs, reactive } from '@vue/composition-api';
+import { toRefs, reactive, computed } from '@vue/composition-api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
+import { defaultQuery } from '@/lib/api';
 
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -84,14 +88,25 @@ const setPluginList = () => {
             contents: 'desc',
         },
         sortMenu: [
-            { type: 'item', label: 'Name', name: 'Name' },
-            { type: 'item', label: 'Recent', name: 'Recent' },
+            { type: 'item', label: 'Name', name: 'name' },
+            { type: 'item', label: 'Recent', name: 'created_at' },
         ],
-        sortBy: 'Name',
+        sortBy: 'name',
+        thisPage: 1,
+        totalCount: 0,
+        pageSize: 10,
         filters: [],
     });
 
-    const onPageChange = () => {};
+    const query = computed(() => (defaultQuery(
+        state.thisPage, state.pageSize,
+        state.sortBy, true,
+        undefined, state.filters,
+    )));
+
+    const onPageChange = (page) => {
+        console.log('page change', page);
+    };
     const onSortChange = () => {};
     const onFilterChange = () => {};
 
