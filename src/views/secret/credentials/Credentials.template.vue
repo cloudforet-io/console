@@ -27,6 +27,15 @@
                     @clickRefresh="getCredentials"
                     @changeSort="getCredentials"
                 >
+                    <template #col-credential_group_id-format="{item}">
+                        <div>
+                            <PBadge v-for="(label, idx) in item.credential_groups" :key="idx" class="p-label"
+                                    :style-type="'gray2'"
+                            >
+                                {{ getEmptyString(label.name) }}
+                            </PBadge>
+                        </div>
+                    </template>
                     <template slot="toolbox-left">
                         <p-button style-type="primary" @click="clickCreate">
                             {{ tr('COMMON.BTN_ADD') }}
@@ -111,7 +120,8 @@ import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/t
 import { timestampFormatter, getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
-import PCredentialsForm from  '@/views/secret/credentials/modules/CredentialsForm.vue';
+import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
@@ -121,7 +131,6 @@ const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-
 const PSearch = () => import('@/components/molecules/search/Search');
 const PCredentialsDetail = () => import('@/views/secret/credentials/modules/CredentialsDetail');
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
-
 export const getDataInputType = () => {
     const currentURL = window.location.href;
     const url = new URL(currentURL);
@@ -135,7 +144,7 @@ export const CredentialsTableReactive = parent => reactive({
         ['credential_id', 'COMMON.ID', { size: '400px' }],
         ['name', 'COMMON.NAME', { size: '400px' }],
         ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
-        ['group', 'COMMON.GROUP', { size: '800px', sortable: false }],
+        ['credential_group_id', 'COMMON.GROUP', { size: '800px', sortable: false }],
         ['created_at', 'COMMON.CREATED', { size: '300px' }],
     ],
     parent),
@@ -298,6 +307,7 @@ export const credentialsSetup = (props, context, eventName) => {
         }
     };
 
+    const getEmptyString = object => (_.isEmpty(object) ? '' : object);
 
     const checkModalConfirm = (event) => {
         console.log(checkTableModalState.confirmEventName, event);
@@ -341,6 +351,7 @@ export const credentialsSetup = (props, context, eventName) => {
         clickCreate,
         credentialsFormConfirm,
         clickDelete,
+        getEmptyString,
         checkModalConfirm,
 
     });
@@ -361,6 +372,7 @@ export default {
         PTab,
         PDataTable,
         PSearch,
+        PBadge,
         PTableCheckModal,
     },
     setup(props, context) {
