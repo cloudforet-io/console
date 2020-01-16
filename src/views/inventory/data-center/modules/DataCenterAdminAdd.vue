@@ -243,7 +243,8 @@ export default {
         },
         async addUserOnDataCenter() {
             const selectedNodeDT = this.$parent.selectedNode.node.data;
-            const param = { users: _.map(this.tagTools.tags, 'text'), ...selectedId };
+
+            const param = { users: this.tagTools.tags};
             const key = `${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}_id`;
 
             param[key] = selectedNodeDT.id;
