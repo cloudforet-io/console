@@ -31,11 +31,11 @@
                     Options
                 </p>
                 <p-dynamic-form v-for="(op, idx) in plugin.template.options" :key="idx"
-                                v-model="optionsValue[op[formKey]]"
+                                v-model="optionsValue[op.key]"
                                 :form="op"
-                                :invalid="showValidation ? invalidState[op[formKey]] : false"
-                                :invalid-text="invalidMsg[op[formKey]]"
-                                @change="onChange(op[formKey])"
+                                :invalid="showValidation ? vdApi.invalidState[op.key] : false"
+                                :invalid-text="vdApi.invalidMsg[op.key]"
+                                @change="onChange(op.key)"
                 />
             </p-col>
         </p-row>
@@ -44,7 +44,7 @@
 
 <script>
 import {
-    reactive, toRefs, computed, ref,
+    reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
 import config from '@/lib/config';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
@@ -117,29 +117,30 @@ export default {
             state.version = item;
         };
 
-        const {
-            formKey,
-            invalidMsg,
-            invalidState,
-            fieldValidation,
-            allValidation,
-            isAllValid,
-        } = setValidation(props.plugin.template.options, state.optionsValue);
+        const vdApi = setValidation(props.plugin.template.options, state.optionsValue);
 
+        watch(() => props.plugin, () => {
+            state.optionsValue = {};
+            const newVdApi = setValidation(props.plugin.template.options, state.optionsValue);
+            vdApi.invalidMsg = newVdApi.invalidMsg;
+            vdApi.invalidState = newVdApi.invalidState;
+            vdApi.fieldValidation = newVdApi.fieldValidation;
+            vdApi.allValidation = newVdApi.allValidation;
+            vdApi.isAllValid = newVdApi.isAllValid;
+        });
+
+        CollectorEventBus.$emit('getPlugin');
 
         return {
             ...toRefs(state),
             ...readonlyState,
             getVersionsInfo,
             onSelectVersion,
-            formKey,
-            invalidMsg,
-            invalidState,
-            allValidation,
+            vdApi,
             onChange: async (val) => {
                 if (!props.showValidation) return;
-                await fieldValidation(val);
-                emit('changeValidState', isAllValid.value);
+                await vdApi.fieldValidation(val);
+                emit('changeValidState', vdApi.isAllValid.value);
             },
         };
     },
