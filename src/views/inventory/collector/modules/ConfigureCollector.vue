@@ -14,7 +14,7 @@
                             <p-dropdown-menu-btn :menu="versionsInfo"
                                                  @clickMenuEvent="onSelectVersion"
                             >
-                                {{ version }}
+                                {{ selectedVersion }}
                             </p-dropdown-menu-btn>
                         </p-field-group>
                         <p-field-group label="Priority">
@@ -57,8 +57,12 @@ import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynami
 import { makeProxy } from '@/lib/compostion-util';
 
 export const confState = reactive({
+    pluginId: undefined,
     plugin: undefined,
     versions: [],
+    selectedVersion: undefined,
+    priority: 10,
+    optionsValue: {},
 });
 
 export default {
@@ -82,14 +86,11 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        if (!confState.plugin) {
-            CollectorEventBus.$emit('getPlugin', root.$route.params.pluginId);
-            CollectorEventBus.$emit('listVersionsInfo', root.$route.params.pluginId);
-        }
+        confState.pluginId = root.$route.params.pluginId;
+        CollectorEventBus.$emit('getPlugin');
+        CollectorEventBus.$emit('listVersionsInfo');
 
         const state = reactive({
-            priority: 10,
-            optionsValue: {},
             version: root.$route.query.version,
             proxyIsInvalid: makeProxy('isInvalid', props, emit),
             proxyPluginOptions: computed(() => {
@@ -102,19 +103,19 @@ export default {
             return config.get('COLLECTOR_IMG');
         });
         const versionsInfo = computed(() => {
-            if (!state.version) state.version = confState.versions[0];
+            if (!confState.selectedVersion) confState.selectedVersion = confState.versions[0];
             return confState.versions.map(v => ({ type: 'item', label: v, name: v }));
         });
 
         const onSelectVersion = (item) => {
-            state.version = item;
+            confState.version = item;
         };
 
-        const vdApi = setValidation(state.proxyPluginOptions, state.optionsValue);
+        const vdApi = setValidation(state.proxyPluginOptions, confState.optionsValue);
 
         watch(() => confState.plugin, () => {
-            state.optionsValue = {};
-            const newVdApi = setValidation(state.proxyPluginOptions, state.optionsValue);
+            confState.optionsValue = {};
+            const newVdApi = setValidation(state.proxyPluginOptions, confState.optionsValue);
             vdApi.invalidMsg = newVdApi.invalidMsg;
             vdApi.invalidState = newVdApi.invalidState;
             vdApi.fieldValidation = newVdApi.fieldValidation;

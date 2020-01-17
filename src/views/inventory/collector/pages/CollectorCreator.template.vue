@@ -18,10 +18,7 @@
                 />
             </template>
             <template #contents-credentials>
-                <choose-credentials ref="crd" :items="credentials"
-                                    :fields="fields"
-                                    :total-count="totalCount"
-                                    :loading="loading"
+                <choose-credentials ref="crd"
                                     @changeValidState="updateTabInvalid(1, $event)"
                 />
             </template>
@@ -47,10 +44,6 @@ const ChooseCredentials = () => import('@/views/inventory/collector/modules/Choo
 const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup.vue');
 
 export const setDataState = (props, args) => reactive({
-    credentials: [],
-    fields: ['credential_id', 'name', 'issue_type', 'credential_groups'],
-    totalCount: 0,
-    loading: true,
     tags: {},
 });
 
@@ -92,8 +85,12 @@ export default {
             showConfirm: false,
         });
 
-        const onCancel = () => {};
-        const onConfirm = () => {};
+        const onCancel = () => {
+            root.$router.push('/inventory/collector');
+        };
+        const onConfirm = () => {
+            CollectorEventBus.$emit('createCollector');
+        };
 
         const isAllTabValid = computed(() => _.every(state.tabs, tab => !!tab.invalid === false));
 
