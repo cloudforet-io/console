@@ -128,8 +128,10 @@ const setPluginList = (router) => {
     };
 
     const onPluginCreate = (item) => {
-        console.log('item', item);
-        router.push({ path: `./collector-creator/${item.plugin_id}?version=${state.selectedVersions[item.plugin_id]}` });
+        let path = `./collector-creator/${item.plugin_id}`;
+        if (state.selectedVersions[item.plugin_id]) path += `?version=${state.selectedVersions[item.plugin_id]}`;
+
+        router.push({ path });
     };
 
     const listVersions = (pluginId) => {

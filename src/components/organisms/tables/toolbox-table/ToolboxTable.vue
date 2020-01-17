@@ -102,7 +102,6 @@ export default {
         'changeSort', 'theadClick',
         'clickSetting', 'clickRefresh',
         'changePageSize', 'changePageNumber',
-        'changeSelectIndex',
     ],
     props: {
         ...dataTableProps,
