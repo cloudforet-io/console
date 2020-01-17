@@ -91,13 +91,14 @@
                         <PFieldGroup v-else
                                      :invalid-text="invalidMsg.data"
                                      :invalid="invalidState.data"
+                                     :valid="validState.data"
                         >
                             <template v-slot:default="{invalid}">
                                 <div>
                                     <PMonacoEditor class="json-editor" :code.sync="formState.data" />
-                                    <div v-show="invalid" style="display:block" class="invalid-feedback">
+                                    <!--<div v-show="invalid" style="display:block" class="invalid-feedback">
                                         * {{ $t('SECRET.JASON_ALERT') }}
-                                    </div>
+                                    </div>-->
                                 </div>
                             </template>
                         </PFieldGroup>
@@ -199,7 +200,7 @@ const setup = (props, context) => {
         name: [requiredValidation(), credentialsNameValidation(context.parent)],
     };
 
-    if (state.selected === 'json') { leftHalfValidations.data = [jsonParseValidation()]; }
+    if (state.selected === 'json') { leftHalfValidations.data = [requiredValidation(), jsonParseValidation()]; }
 
     const validateAPI = formValidation(formState, leftHalfValidations);
 
