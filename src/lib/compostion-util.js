@@ -37,7 +37,7 @@ export const mountBusEvent = (bus, eventName, handler) => {
 };
 
 /**
- * 여러 엘리먼트에서 마우스 오버 여부 추적에 필요한 함수 모
+ * 여러 엘리먼트에서 마우스 오버 여부 추적에 필요한 함수 모음
  * @param disabled
  * @return {{onMouseOut: onMouseOut, isMouseOver: Ref<HasDefined<S> extends true ? S : RefValue<T>>, onMouseOver: onMouseOver}}
  */

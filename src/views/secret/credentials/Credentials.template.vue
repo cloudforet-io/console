@@ -142,16 +142,16 @@ export const getDataInputType = () => {
 
 export const CredentialsTableReactive = parent => reactive({
     fields: makeTrItems([
-        ['credential_id', 'COMMON.ID', { size: '400px' }],
-        ['name', 'COMMON.NAME', { size: '400px' }],
-        ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
-        ['credential_group_id', 'COMMON.GROUP', { size: '800px', sortable: false }],
-        ['created_at', 'COMMON.CREATED', { size: '300px' }],
+        ['credential_id', 'COMMON.ID', { style: { width: '400px' } }],
+        ['name', 'COMMON.NAME', { style: { width: '400px' } }],
+        ['issue_type', 'COMMON.ISSUE_TYPE', { style: { width: '400px' } }],
+        ['credential_group_id', 'COMMON.GROUP', { style: { width: '800px' }, sortable: false }],
+        ['created_at', 'COMMON.CREATED', { style: { width: '300px' } }],
     ],
     parent),
     multiSelectFields: makeTrItems([
-        ['credential_id', 'COMMON.ID', { size: '400px' }],
-        ['name', 'COMMON.NAME', { size: '600px' }],
+        ['credential_id', 'COMMON.ID', { style: { width: '400px' } }],
+        ['name', 'COMMON.NAME', { style: { width: '600px' } }],
     ],
     parent),
     selectIndex: [],
