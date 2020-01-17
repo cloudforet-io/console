@@ -169,6 +169,19 @@ export const numberMaxValidation = (max, invalidMessage) => new Validation(value
 export const lengthMinValidation = (min, invalidMessage) => new Validation(value => value.length >= min, invalidMessage);
 export const lengthMaxValidation = (max, invalidMessage) => new Validation(value => value.length >= max, invalidMessage);
 
+export const credentialsNameValidation = (parent, invalidMessage) => new Validation(async (value) => {
+    let result = false;
+    await parent.$http.post('/secret/credential/list', { name: value, domain_id: sessionStorage.domainId }).then((res) => {
+        if (res.data.total_count === 0) {
+            result = true;
+        }
+    }).catch((error) => {
+        console.log(error);
+    });
+    debugger;
+    return result;
+}, invalidMessage || 'same name exists!');
+
 export const userIDValidation = (parent, invalidMessage) => new Validation(async (value) => {
     let result = false;
     await parent.$http.post('/identity/user/get', { user_id: value, domain_id: sessionStorage.domainId }).then().catch((error) => {

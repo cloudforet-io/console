@@ -96,7 +96,7 @@
                                 <div>
                                     <PMonacoEditor class="json-editor" :code.sync="formState.data" />
                                     <div v-show="invalid" style="display:block" class="invalid-feedback">
-                                        * {{ $t('SIGNIN.PASS_EMPTY') }}
+                                        * {{ $t('SECRET.JASON_ALERT') }}
                                     </div>
                                 </div>
                             </template>
@@ -114,7 +114,7 @@ import {
 import { makeTrItems } from '@/lib/view-helper';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import {
-    formValidation, makeProxy, requiredValidation, jsonParseValidation,
+    formValidation, makeProxy, requiredValidation, jsonParseValidation, credentialsNameValidation
 } from '@/lib/compostion-util';
 import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
@@ -170,7 +170,6 @@ const setup = (props, context) => {
         tags: {},
         issue_type: 'credential',
         data: '',
-        ...props.item,
     });
 
     const onOptionChange = () => {};
@@ -202,7 +201,7 @@ const setup = (props, context) => {
     );
 
     const leftHalfValidations = {
-        name: [requiredValidation()],
+        name: [requiredValidation(), credentialsNameValidation(context.parent)],
     };
 
     if (state.selected === 'json') { leftHalfValidations.data = [jsonParseValidation()]; }
