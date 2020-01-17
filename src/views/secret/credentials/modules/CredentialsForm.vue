@@ -266,15 +266,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        item: {
-            type: Object,
-            default: () => ({
-                name: '',
-                issue_type: '',
-                tags: {},
-                data: '',
-            }),
-        },
         dynamicFormState: {
             type: Object,
             default: () => ({

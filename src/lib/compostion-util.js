@@ -178,7 +178,6 @@ export const credentialsNameValidation = (parent, invalidMessage) => new Validat
     }).catch((error) => {
         console.log(error);
     });
-    debugger;
     return result;
 }, invalidMessage || 'same name exists!');
 
