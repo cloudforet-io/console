@@ -79,6 +79,7 @@ export default {
             state.cdgData.items = [];
             const param = {
                 query: cdRequestState.query,
+                // eslint-disable-next-line camelcase
                 include_credential_group: true,
             };
             if (cdgId) {
@@ -102,6 +103,7 @@ export default {
         const CdgTagConfirm = async (cdgId, tags, originTags) => {
             const idx = state.selectIndex[0];
             await context.parent.$http.post('/secret/credential-group/update', {
+                // eslint-disable-next-line camelcase
                 credential_group_id: cdgId,
                 tags,
             }).then((_) => {
@@ -114,6 +116,7 @@ export default {
         };
         const getCdgsParam = (items) => {
             const result = {
+                // eslint-disable-next-line camelcase
                 credential_group_id: _.map(items, 'credential_group_id'),
                 name: _.map(items, 'name'),
                 tags: _.map(items, 'tags'),
@@ -168,14 +171,13 @@ export default {
             });
         };
         const updateCdg = async (items) => {
-            console.log('update test', items);
             await context.parent.$http.post('/secret/credential-group/update', items).then(async (_) => {
                 await requestCdgList();
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
-                    text: 'update credential groups',
+                    text: 'Update credential groups',
                     duration: 2000,
                     speed: 1000,
                 });
