@@ -2,7 +2,7 @@
     <div :class="{'toolbox-table': true,'no-padding':!padding,'toolbox-shadow': shadow, 'toolbox-border': border}">
         <div class="toolbox">
             <p-row class="toolbox-middle">
-                <div class="left" :style="{width:hasCenterSlot}">
+                <div class="left" :style="{width:$slots['toolbox-center'] ? 'auto' : '100%'}">
                     <slot name="toolbox-left" />
                 </div>
                 <div v-if="$slots['toolbox-center']" class="center">
@@ -83,11 +83,14 @@
 </template>
 
 <script>
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import _ from 'lodash';
+import { computed, ref } from '@vue/composition-api';
+import PDataTable, { dataTableProps } from '@/components/organisms/tables/data-table/DataTable.vue';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
+import { makeProxy } from '@/lib/compostion-util';
 
 export default {
     name: 'PToolboxTable',
@@ -101,8 +104,8 @@ export default {
         'changePageSize', 'changePageNumber',
         'changeSelectIndex',
     ],
-    mixins: [PDataTable],
     props: {
+        ...dataTableProps,
         pagenationVisible: {
             type: Boolean,
             default: true,
@@ -152,90 +155,42 @@ export default {
             default: true,
         },
     },
-    data() {
+    setup(props, { emit }) {
+        const pageSizeOptions = computed(() => (_.flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size }))));
+        const proxyPageSize = makeProxy('pageSize', props, emit);
+        const proxyThisPage = makeProxy('thisPage', props, emit);
+        const proxySelectIndex = makeProxy('selectIndex', props, emit);
+        const proxySortBy = makeProxy('sortBy', props, emit);
+        const proxySortDesc = makeProxy('sortDesc', props, emit);
+        const changePageSize = (size) => {
+            const sizeNum = Number(size);
+            if (props.pageSize !== sizeNum) {
+                proxyPageSize.value = sizeNum;
+                proxyThisPage.value = 1;
+                emit('changePageSize', sizeNum);
+            }
+        };
+        const changePageNumber = (page) => {
+            emit('changePageNumber', page);
+        };
+        const table = ref(null);
+        const getSelectItem = () => table.getSelectItem();
+        const changeSort = () => {
+            proxyThisPage.value = 1;
+        };
         return {
-            pageSizeOptions: this.getPageNationValue(),
+            pageSizeOptions,
+            proxyPageSize,
+            proxyThisPage,
+            proxySelectIndex,
+            proxySortBy,
+            proxySortDesc,
+            changePageSize,
+            changePageNumber,
+            getSelectItem,
+            changeSort,
         };
     },
-    computed: {
-        hasCenterSlot() {
-            return !this.$slots['toolbox-center'] ? '100%' : 'auto';
-        },
-        proxyPageSize: {
-            get() {
-                return this.pageSize;
-            },
-            set(value) {
-                this.$emit('update:pageSize', value);
-            },
-        },
-        proxyThisPage: {
-            get() {
-                return this.thisPage;
-            },
-            set(value) {
-                this.$emit('update:thisPage', value);
-            },
-        },
-        proxySelectIndex: {
-            get() {
-                return this.selectIndex;
-            },
-            set(value) {
-                this.$emit('update:selectIndex', value);
-            },
-        },
-        proxySortBy: {
-            get() {
-                return this.sortBy;
-            },
-            set(value) {
-                this.$emit('update:sortBy', value);
-            },
-        },
-        proxySortDesc: {
-            get() {
-                return this.sortDesc;
-            },
-            set(value) {
-                this.$emit('update:sortDesc', value);
-            },
-        },
-        slotFieldsName() {
-            const slotNames = [];
-            this.fieldsName.forEach((value) => {
-                slotNames.push(`col-${value}`);
-            });
-            return slotNames;
-        },
-    },
-    methods: {
-        getPageNationValue() {
-            const result = [];
-            this.pageNationValues.forEach((size) => {
-                result.push({ type: 'item', label: size, name: size });
-            });
-            return result;
-        },
-        changePageSize(size) {
-            const sizeNum = Number(size);
-            if (this.pageSize !== sizeNum) {
-                this.proxyPageSize = sizeNum;
-                this.proxyThisPage = 1;
-                this.$emit('changePageSize', sizeNum);
-            }
-        },
-        changePageNumber(page) {
-            this.$emit('changePageNumber', page);
-        },
-        getSelectItem() {
-            return this.$refs.table.getSelectItem();
-        },
-        changeSort() {
-            this.proxyThisPage = 1;
-        },
-    },
-
 };
 </script>
 
@@ -268,7 +223,7 @@ export default {
                 .center{
                     display: inline-flex;
                     flex-wrap:nowrap;
-                    width: auto;
+                    width: 100%;
                     justify-content: center;
 
                 }
