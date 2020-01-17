@@ -158,6 +158,7 @@ export const requiredValidation = invalidMessage => new Validation((value) => {
 
 export const jsonParseValidation = invalidMessage => new Validation((value) => {
     try {
+        if (value[0] !== '{' && value[value.length - 1] !== '}') return false;
         JSON.parse(value);
     } catch (e) {
         return false;
