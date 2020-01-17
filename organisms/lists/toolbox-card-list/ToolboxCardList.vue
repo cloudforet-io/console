@@ -18,7 +18,7 @@
                                              :menu="sortMenu"
                                              @clickMenuEvent="onClickSortMenu"
                         >
-                            Sort by {{ sortBy }}
+                            Sort by {{ sortMenu[sortByIdx].label }}
                         </p-dropdown-menu-btn>
                     </slot>
                 </p-col>
@@ -65,9 +65,9 @@ const setTools = (props, context) => {
         context.emit('pageChange', page);
     };
 
-    const onClickSortMenu = (menu) => {
-        context.emit('update:sortBy', menu);
-        context.emit('sortChange', menu);
+    const onClickSortMenu = (menu, idx) => {
+        context.emit('update:sortByIdx', idx);
+        context.emit('sortChange', idx);
     };
 
     return {
@@ -95,7 +95,7 @@ const setCardItems = (props, context) => {
 
 export default {
     name: 'ToolboxCardList',
-    events: ['pageChange', 'sortChange', 'filterChange'],
+    events: ['pageChange', 'sortChange'],
     components: {
         PCardList,
         PRow,
@@ -126,9 +126,9 @@ export default {
             type: Number,
             default: 10,
         },
-        sortBy: {
-            type: String,
-            default: '',
+        sortByIdx: {
+            type: Number,
+            default: 0,
         },
     },
     setup(props, context) {

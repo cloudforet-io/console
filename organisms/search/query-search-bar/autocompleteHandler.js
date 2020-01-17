@@ -2,9 +2,9 @@ import Fuse from 'fuse.js';
 
 export class SearchQuery {
     constructor(key, operator, value) {
-        this.key = key;
-        this.operator = operator;
-        this.value = value;
+        this.key = key; // string
+        this.operator = operator; // string
+        this.value = value; // any type except object
     }
 }
 
