@@ -103,7 +103,6 @@ export default {
     components: {
         PButtonModal,
         PToolboxTable,
-        PTagsInput,
         PTextInput,
         PSearch,
         PLabel,
@@ -166,9 +165,6 @@ export default {
             ];
         },
     },
-    mounted() {
-
-    },
     methods: {
         removeCSS() {
             this.label.hashTagInvalidity = false;
@@ -201,6 +197,7 @@ export default {
         resetToBlank() {
             this.label.input = '';
             this.searchText = null;
+            this.tagTools.tags = [];
             this.users = [];
             this.tablePage = {
                 sortBy: 'name',
