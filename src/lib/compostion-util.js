@@ -155,6 +155,7 @@ export const requiredValidation = invalidMessage => new Validation((value) => {
     if (value instanceof Array) return !!value.length;
     return !_.isEmpty(value); // String, Object
 }, invalidMessage || 'Required field!');
+
 export const jsonParseValidation = invalidMessage => new Validation((value) => {
     try {
         JSON.parse(value);

@@ -17,7 +17,7 @@
                             <p-col :col="12">
                                 <PFieldGroup
                                     label="Credentials Name"
-                                    :invalid-text="invalidMessage.name"
+                                    :invalid-text="invalidMsg.name"
                                     :invalid="invalidState.name"
                                     :valid="validState.name"
                                     :required="true"
@@ -71,7 +71,7 @@
                                             :selected.sync="selected"
                         />
                         <PFieldGroup v-if="selected === 'form'"
-                                     :invalid-text="invalidMessage.form"
+                                     :invalid-text="invalidMsg.form"
                                      :invalid="invalidState.form"
                         >
                             <template v-slot:default="{invalid}">
@@ -89,7 +89,7 @@
                         </PFieldGroup>
 
                         <PFieldGroup v-else
-                                     :invalid-text="invalidMessage.data"
+                                     :invalid-text="invalidMsg.data"
                                      :invalid="invalidState.data"
                         >
                             <template v-slot:default="{invalid}">
@@ -109,7 +109,7 @@
 </template>
 <script>
 import {
-    computed, reactive, ref, toRefs, watch,
+    computed, reactive, watch,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
@@ -159,11 +159,6 @@ const setup = (props, context) => {
     const state = contentModalSetup(props, context);
     state.selected = _.isEmpty(getDataInputType()) ? 'json' : 'form';
     state.values = {};
-
-    const invalidMessage = {
-        name: 'Required fields!',
-        data: 'Please, confirm your Json String Format.',
-    };
 
     const formState = reactive({
         name: '',
@@ -237,7 +232,6 @@ const setup = (props, context) => {
 
     return {
         ...state,
-        invalidMessage,
         formState,
         dynamicForm,
         onOptionChange,
