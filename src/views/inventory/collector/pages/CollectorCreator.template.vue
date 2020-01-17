@@ -107,7 +107,7 @@ export default {
         const onChangeStep = async (beforeIdx) => {
             let res = null;
 
-            if (state.tabs[beforeIdx].key === 'conf') res = await refs.conf.allValidation();
+            if (state.tabs[beforeIdx].key === 'conf') res = await refs.conf.vdApi.allValidation();
             else if (state.tabs[beforeIdx].key === 'credentials') res = refs.crd.validate();
             else return;
 

@@ -10,7 +10,7 @@
                 <p-col :flex-grow="0" align-self="flex-end">
                     <slot name="rightTop">
                         <p-text-pagenation class="tool pagination"
-                                           :this-page.sync="thisPage"
+                                           :this-page.sync="proxyThisPage"
                                            :all-page="allPage"
                                            @pageChange="onPageChange"
                         />
@@ -33,7 +33,7 @@
         <p-row class="bottom-row" justify-content="center">
             <slot name="bottom">
                 <p-col>
-                    <p-text-pagenation :this-page.sync="thisPage"
+                    <p-text-pagenation :this-page.sync="proxyThisPage"
                                        :all-page="allPage"
                                        @pageChange="onPageChange"
                     />
@@ -47,22 +47,21 @@
 import {
     computed, toRefs, reactive,
 } from '@vue/composition-api';
-import PCardList from '@/components/organisms/lists/card-list/CardList';
-import PRow from '@/components/atoms/grid/row/Row';
-import PCol from '@/components/atoms/grid/col/Col';
-import PTextPagenation from '@/components/organisms/pagenations/textPagenation';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
+import PCardList from '@/components/organisms/lists/card-list/CardList.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import { makeProxy } from '@/lib/compostion-util';
 
 const setTools = (props, context) => {
-    const limit = 10;
-
     const state = reactive({
-        thisPage: 1,
-        allPage: Math.ceil((props.totalCount || 1) / limit),
+        allPage: computed(() => Math.ceil((props.totalCount || 1) / props.pageSize)),
+        proxyThisPage: makeProxy('thisPage', props, context.emit),
     });
 
     const onPageChange = (page) => {
-        state.thisPage = page;
+        state.proxyThisPage = page;
         context.emit('pageChange', page);
     };
 
@@ -118,6 +117,14 @@ export default {
         sortMenu: {
             type: Array,
             default: null,
+        },
+        thisPage: {
+            type: Number,
+            default: 1,
+        },
+        pageSize: {
+            type: Number,
+            default: 10,
         },
         sortBy: {
             type: String,

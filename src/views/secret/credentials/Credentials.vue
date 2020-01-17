@@ -38,6 +38,7 @@ export default {
             try {
                 const res = await context.parent.$http.post('/secret/credential/list', {
                     query: requestState.query,
+                    include_credential_group: true,
                     domain_id: context.parent.$store.getters['domain/id'],
                 });
                 state.items = res.data.results;

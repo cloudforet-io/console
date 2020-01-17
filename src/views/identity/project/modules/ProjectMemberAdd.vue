@@ -240,7 +240,7 @@ export default {
             // eslint-disable-next-line camelcase
             const selectedId = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
             const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/member/add`;
-            const param = { users: _.map(this.tagTools.tags, 'text'), ...selectedId };
+            const param = { users: this.tagTools.tags, ...selectedId };
 
             if (!this.isEmpty(this.label.input)) {
                 const isValid = this.checkValidity();

@@ -79,8 +79,8 @@
                                     <p-dynamic-form v-for="(fm, idx) in dynamicFormState.form" :key="idx"
                                                     v-model="values[fm.key]"
                                                     :form="fm"
-                                                    :invalid="invalidState[fm.key]"
-                                                    :invalid-text="invalidMsg[fm.key]"
+                                                    :invalid="vdApi.invalidState[fm.key]"
+                                                    :invalid-text="vdApi.invalidMsg[fm.key]"
                                                     :validatable="true"
                                                     @change="onOptionChange"
                                     />
@@ -109,7 +109,7 @@
 </template>
 <script>
 import {
-    computed, reactive, ref, toRefs,
+    computed, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
@@ -157,7 +157,7 @@ const components = {
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
-    state.selected = (_.isEmpty(getDataInputType())) ? 'json' : 'form';
+    state.selected = _.isEmpty(getDataInputType()) ? 'json' : 'form';
     state.values = {};
 
     const invalidMessage = {
@@ -174,16 +174,18 @@ const setup = (props, context) => {
     });
 
     const onOptionChange = () => {};
-    debugger;
-    const {
-        formKey,
-        invalidMsg,
-        invalidState,
-        fieldValidation,
-        allValidation,
-    } = setValidation(props.dynamicFormState.form, state.values);
-
     const dynamicForm = computed(() => props.dynamicFormState.form);
+    const vdApi = setValidation(props.dynamicFormState.form, state.values);
+
+    watch(() => props.dynamicFormState, () => {
+        state.values = reactive({});
+        const newVdApi = setValidation(props.dynamicFormState.form, state.values);
+        vdApi.invalidMsg = newVdApi.invalidMsg;
+        vdApi.invalidState = newVdApi.invalidState;
+        vdApi.fieldValidation = newVdApi.fieldValidation;
+        vdApi.allValidation = newVdApi.allValidation;
+        vdApi.isAllValid = newVdApi.isAllValid;
+    });
 
     const issueTypeSelectItems = [
         { type: 'item', label: 'Token', name: 'token' },
@@ -199,39 +201,39 @@ const setup = (props, context) => {
         { vbind: { styleType: 'dark', outline: true } },
     );
 
-    const formValidations = {
+    const leftHalfValidations = {
         name: [requiredValidation()],
-        data: [jsonParseValidation()],
     };
 
-    const validateAPI = formValidation(formState, formValidations);
+    if (state.selected === 'json') { leftHalfValidations.data = [jsonParseValidation()]; }
+
+    const validateAPI = formValidation(formState, leftHalfValidations);
 
     const confirm = async () => {
-        debugger;
+        const leftHalfResult = await validateAPI.allValidation();
+        const rightHalfResult = state.selected === 'json' ? true : await vdApi.allValidation();
 
-        const result = state.selected === 'form' ? await allValidation() : await validateAPI.allValidation();
-        console.log('!!!!!!!!!!!!!!', result);
-
-        debugger;
-
-        if (result) {
-            const data = {
+        if (leftHalfResult && rightHalfResult) {
+            const params = {
                 name: formState.name,
             };
             const keyArr = ['name', 'issue_type', 'tags', 'data'];
+
+            if (state.selected === 'form') {
+                const formParam = {};
+                for (const [k, v] of Object.entries(state.values)) {
+                    formParam[k] = v;
+                }
+                formState.data = formParam;
+            }
+
             keyArr.forEach((key) => {
-                if (formState[key] && state.selected !== 'form') {
-                    data[key] = formState[key];
-                } else if (formState[key] && state.selected === 'form' && key !== 'data') {
-                    data[key] = formState[key];
-                } else {
-                    debugger;
+                if (formState[key]) {
+                    params[key] = formState[key];
                 }
             });
-            context.emit('confirm', data);
+            context.emit('confirm', params);
         }
-
-
     };
 
     return {
@@ -240,11 +242,7 @@ const setup = (props, context) => {
         formState,
         dynamicForm,
         onOptionChange,
-        formKey,
-        invalidMsg,
-        invalidState,
-        fieldValidation,
-        allValidation,
+        vdApi,
         issueTypeSelectItems,
         optionType,
         proxyVisible: makeProxy('visible', props, context.emit),
