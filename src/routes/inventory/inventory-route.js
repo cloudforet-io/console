@@ -6,6 +6,7 @@ const Server = () => import('@/views/inventory/server/Server.vue');
 const Collector = () => import('@/views/inventory/collector/pages/Collector.vue');
 
 const CollectorPlugins = () => import('@/views/inventory/collector/pages/CollectorPlugins.vue');
+const CollectorCreator = () => import('@/views/inventory/collector/pages/CollectorCreator.vue');
 
 export default {
     path: 'inventory',
@@ -39,7 +40,6 @@ export default {
                 {
                     path: '/',
                     name: 'collectorMain',
-                    meta: { label: '' },
                     component: Collector,
                 },
                 {
@@ -52,14 +52,21 @@ export default {
                         {
                             path: 'plugins',
                             name: 'collectorPlugins',
-                            meta: { label: 'Plugins' },
                             component: CollectorPlugins,
                         },
                         {
                             path: 'collector-creator',
-                            name: 'collectorCreator',
-                            meta: { label: 'Collector Creator' },
-                            component: CollectorPlugins,
+                            name: Symbol('collector-creator'),
+                            // redirect: './plugins',
+                            component: { template: '<router-view />' },
+                            children: [
+                                {
+                                    path: ':pluginId',
+                                    name: Symbol(':pluginId'),
+                                    props: true,
+                                    component: CollectorCreator,
+                                },
+                            ],
                         },
                     ],
                 },

@@ -4,9 +4,12 @@
             <template #leftContainer="{width}">
                 <div :style="{width: width}">
                     <plugin-filter :filters.sync="filterTools.tags"
+                                   :repositories="repositories"
+                                   :selected-repo-id.sync="selectedRepoId"
                                    @goBack="goBack"
                                    @search="search"
-                                   @repoChange="repoChange"
+                                   @repoChange="listPlugins"
+                                   @filtersChange="listPlugins"
                     />
                 </div>
             </template>
@@ -16,17 +19,16 @@
                                      :mapper="pluginMapper"
                                      title="Plugins"
                                      :sort-menu="sortMenu"
-                                     :sort-by.sync="sortBy"
+                                     :sort-by-idx.sync="sortByIdx"
                                      :this-page.sync="thisPage"
                                      :page-size="pageSize"
                                      :total-count="totalCount"
-                                     @pageChange="onPageChange"
-                                     @sortChange="onSortChange"
-                                     @filterChange="onFilterChange"
+                                     @pageChange="listPlugins"
+                                     @sortChange="listPlugins"
                 >
                     <template #filters>
                         <p-tag v-for="(filter, idx) in filterTools.tags" :key="`${idx}-${filter}`"
-                               @delete="filterTools.deleteTag(idx)"
+                               @delete="onDeleteTag(idx)"
                         >
                             {{ filter }}
                         </p-tag>
@@ -34,18 +36,24 @@
                     <template #card-extra="{item}">
                         <p-row style="height: 100%;">
                             <p-col>
-                                <template v-if="item.tags">
-                                    <p-badge v-for="(tag, idx) in item.tags" :key="idx" style-type="gray3">
-                                        {{ tag }}
+                                <template v-if="item.labels">
+                                    <p-badge v-for="(label, idx) in item.labels" :key="idx" style-type="gray3"
+                                             style="margin-right: .5rem;"
+                                    >
+                                        {{ label }}
                                     </p-badge>
                                 </template>
                             </p-col>
                             <p-col :flex-grow="0" align-self="flex-end">
                                 <p-row>
-                                    <p-dropdown-menu-btn :menu="[]" style="margin-right: 1.25rem;">
-                                        Version
+                                    <p-dropdown-menu-btn :menu="versionsMenu[item.plugin_id]"
+                                                         style="margin-right: 1.25rem;"
+                                                         @openMenu="listVersions(item.plugin_id)"
+                                                         @clickMenuEvent="onSelectVersion(item.plugin_id, $event)"
+                                    >
+                                        {{ selectedVersions[item.plugin_id] || 'Version' }}
                                     </p-dropdown-menu-btn>
-                                    <p-button style-type="primary-dark">
+                                    <p-button style-type="primary-dark" @click="onPluginCreate(item)">
                                         <p-i name="ic_plus" color="transparent inherit"
                                              width="1rem" height="1rem"
                                         />
@@ -62,9 +70,12 @@
 </template>
 
 <script>
-import { toRefs, reactive, computed } from '@vue/composition-api';
+import {
+    toRefs, reactive, ref, computed,
+} from '@vue/composition-api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { defaultQuery } from '@/lib/api';
+import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -78,71 +89,125 @@ import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 
 import PluginFilter from '@/views/inventory/collector/modules/PluginFilter.vue';
 
-const setPluginList = () => {
+const setRepoList = () => reactive({
+    repositories: [],
+    selectedRepoId: undefined,
+});
+
+const setPluginList = (router) => {
     const state = reactive({
         plugins: [],
         pluginMapper: {
-            key: 'id',
-            icon: 'icon',
+            key: 'plugin_id',
+            icon: 'tags.icon',
             title: 'name',
-            contents: 'desc',
+            contents: 'tags.description',
         },
+        totalCount: 0,
+        thisPage: 1,
+        pageSize: 10,
         sortMenu: [
             { type: 'item', label: 'Name', name: 'name' },
             { type: 'item', label: 'Recent', name: 'created_at' },
         ],
-        sortBy: 'name',
-        thisPage: 1,
-        totalCount: 0,
-        pageSize: 10,
-        filters: [],
+        sortByIdx: 0,
+        sortBy: undefined,
+        versions: {},
+        selectedVersions: {},
     });
 
-    const query = computed(() => (defaultQuery(
-        state.thisPage, state.pageSize,
-        state.sortBy, true,
-        undefined, state.filters,
-    )));
-
-    const onPageChange = (page) => {
-        console.log('page change', page);
-    };
-    const onSortChange = () => {};
-    const onFilterChange = () => {};
+    const versionsMenu = computed(() => {
+        const res = _.forEach(state.versions, (vlist, pid) => {
+            state.versions[pid] = vlist.map(v => ({ type: 'item', name: v, label: v }));
+        });
+        return res;
+    });
 
     const listPlugins = () => {
         CollectorEventBus.$emit('listPlugins');
     };
-    listPlugins();
+
+    const onPluginCreate = (item) => {
+        console.log('item', item);
+        router.push({ path: `./collector-creator/${item.plugin_id}?version=${state.selectedVersions[item.plugin_id]}` });
+    };
+
+    const listVersions = (pluginId) => {
+        if (state.versions[pluginId]) return;
+        CollectorEventBus.$emit('listVersions', pluginId);
+    };
+
+    const onSelectVersion = (pluginId, e) => {
+        state.selectedVersions = { ...state.selectedVersions, [pluginId]: e };
+    };
+
+    CollectorEventBus.$emit('listPluginsInit');
 
     return {
         ...toRefs(state),
-        onPageChange,
-        onSortChange,
-        onFilterChange,
+        versionsMenu,
+        listPlugins,
+        onPluginCreate,
+        listVersions,
+        onSelectVersion,
     };
 };
 
 
-const setFilters = (props, context, listState) => {
+const setFilters = (pluginListState, router) => {
     const filterTools = tagList();
+    const searchText = ref('');
 
     return {
         filterTools,
-        goBack: () => {},
-        search: () => {},
-        repoChange: (repo) => {
-            console.log('repo', repo);
+        goBack: () => {
+            router.push('/inventory/collector');
+        },
+        search: (val) => {
+            searchText.value = val;
+            pluginListState.listPlugins();
+        },
+        onDeleteTag: (idx) => {
+            filterTools.deleteTag(idx);
+            pluginListState.listPlugins(filterTools.tags);
         },
     };
 };
 
-export const setup = (props, context) => {
-    const pluginListState = setPluginList(props, context);
-    const filterState = setFilters(props, context, pluginListState);
-    return {
+const setQueryState = (state) => {
+    const queryState = reactive({
+        query: undefined,
+        searchQueries: computed(() => state.filterTools.tags.map(filter => new SearchQuery('labels', '=', filter))),
+    });
+
+    state.sortBy = computed(() => state.sortMenu[state.sortByIdx].name);
+
+    queryState.query = computed(() => (defaultQuery(
+        state.thisPage, state.pageSize,
+        state.sortBy, true,
+        state.searchText, queryState.searchQueries,
+    )));
+
+    return queryState;
+};
+
+export const setup = (props, { root }) => {
+    const repoState = setRepoList();
+    const pluginListState = setPluginList(root.$router);
+    const filterState = setFilters(pluginListState, root.$router);
+
+    const allState = reactive({
         ...filterState,
         ...pluginListState,
+        ...toRefs(repoState),
+    });
+
+    const queryState = setQueryState(allState);
+
+    return {
+        ...toRefs(allState),
+        ...toRefs(queryState),
+
     };
 };
 
