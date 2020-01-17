@@ -11,6 +11,7 @@
             :all-page="proxyAllPage"
             :this-page.sync="proxyThisPage"
             :page-size.sync="proxyPageSize"
+            :select-index.sync="selectIndex"
             :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
             :setting-visible="false"
             :shadow="false"
@@ -24,8 +25,22 @@
             @clickRefresh="getData"
             @changeSort="getData"
         >
+            <template slot="toolbox-left">
+
+                <p-button class="left-toolbox-item" style-type="primary"
+                          @click="$router.push({ name:'addCredentials', params: { id: 'cred-grp-21a4cd399efe' }})"
+                >
+                    {{ tr('COMMON.BTN_ADD') }}
+                </p-button>
+                <p-button class="left-toolbox-item" style-type="primary">
+                    {{ tr('COMMON.BTN_DELETE') }}
+                </p-button>
+            </template>
             <template #col-credential_group_info-format="{value}">
-                {{value}}
+                {{ value }}
+            </template>
+            <template #col-created_at-format="{value}">
+                {{ timestampFormatter(value) }}
             </template>
         </p-toolbox-table>
     </div>
@@ -37,6 +52,8 @@ import {
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import { timestampFormatter } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
 
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable.vue');
@@ -44,7 +61,10 @@ const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/
 
 export default {
     name: 'PCdgData',
-    components: { PToolboxTable },
+    components: {
+        PToolboxTable,
+        PButton,
+    },
     props: {
         credentialGroupId: String,
         items: {
@@ -81,8 +101,12 @@ export default {
             type: Boolean,
             default: false,
         },
-        getCdList: String, // event name!
-        // TODO: ADD button, Delete Button
+        selectIndex: {
+            type: Array,
+            default: () => [],
+        },
+
+        getCdList: String,
     },
     setup(props, { parent, emit }) {
         const fields = makeTrItems([
@@ -101,7 +125,7 @@ export default {
             fields,
         });
         const getData = () => {
-            console.log(props.getCdList)
+            console.log(props.getCdList);
             cdgEventBus.$emit(props.getCdList, props.credentialGroupId);
         };
         onMounted(() => {
@@ -116,11 +140,18 @@ export default {
         return {
             ...toRefs(state),
             getData,
+            timestampFormatter,
         };
     },
 };
 </script>
 <style lang="scss" scoped>
+    .left-toolbox-item{
+        margin-right: 1rem;
+        display: inline;
+
+    }
+
     .toolbox-table{
         padding: 0;
     }

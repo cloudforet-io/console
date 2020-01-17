@@ -31,14 +31,7 @@ const actions = {
 
 
 export const template = () => ({
-    template: `${User.template}`,
-    components: {
-        PStatus,
-        BaseDragHorizontal,
-        PToolboxTable,
-        PButton,
-    },
-    mixins: [User],
+    extends: User,
     computed: {
         items() {
             return arrayOf(this.pageSize, casual._user);
