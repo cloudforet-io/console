@@ -29,13 +29,14 @@
                  * {{ $t('ORGANISMS.TAG_EMPTY') }}
             </div>-->
             <!-- <p-dict-input :name.sync="newPair.name" :value.sync="newPair.value" />-->
-            <p-icon-button
-                class="add-btn"
-                button-style="dark"
-                name="ic_plus"
-                color="transparent white"
-                @click="addPair"
-            />
+            <p-button class="add-btn" style-type="primary-dark"
+                      @click="addPair"
+            >
+                <p-i name="ic_plus" color="transparent inherit"
+                     width="1rem" height="1rem"
+                />
+                Add
+            </p-button>
         </div>
     </div>
 </template>
@@ -48,6 +49,8 @@ import {
 import PDictInput from '@/components/molecules/forms/dict-input/DictInput.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 
 const mergeDict = dict => _.transform(dict, (result, pair) => {
     result[pair.name] = pair.value;
@@ -110,6 +113,9 @@ const useNewPair = (props, context, dictBuffer) => {
         dictBuffer.syncDict();
         reset();
     };
+
+    if (props.showEmptyInput) addPair();
+
     return {
         newPair,
         addPair,
@@ -153,7 +159,9 @@ export const setup = (props, context) => {
 
 export default {
     name: 'PDictInputGroup',
-    components: { PDictInput, PIconButton, PCopyButton },
+    components: {
+        PDictInput, PIconButton, PCopyButton, PI, PButton,
+    },
     events: ['update:dict', 'change'],
     props: {
         editMode: {
@@ -167,7 +175,10 @@ export default {
         dict: {
             type: Object,
         },
-
+        showEmptyInput: {
+            type: Boolean,
+            defulat: false,
+        },
     },
     setup(...args) {
         return setup(...args);
@@ -188,6 +199,7 @@ export default {
     }
     .add-btn{
         margin-left: 0.5rem;
+        color: $white;
     }
     p-dict-input{
         flex-grow: 1;

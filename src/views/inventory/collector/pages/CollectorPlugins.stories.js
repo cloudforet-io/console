@@ -6,6 +6,7 @@ import casual from '@/views/inventory/collector/models/collector-model';
 import CollectorPluginsTemplate, { setup } from '@/views/inventory/collector/pages/CollectorPlugins.template';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
+import { arrayOf } from '@/lib/casual';
 
 export default {
     title: 'view/inventory/collector/pages/CollectorPlugins',
@@ -14,17 +15,25 @@ export default {
 export const defaultCase = () => ({
     extends: CollectorPluginsTemplate,
     setup(props, context) {
-        const state = setup(props, context);
+        const state = reactive({
+            ...setup(props, context),
+        });
 
-        const listPlugins = () => {
+        /**
+         *
+         * @param query
+         */
+        const listPlugins = (query) => {
+            state.plugins = [];
             setTimeout(() => {
-                state.plugins.value = casual.collectorPlugins;
+                state.totalCount = casual.integer(10, 100);
+                state.plugins = arrayOf(state.totalCount, casual._pluginInfo);
             }, 1000);
         };
         mountBusEvent(CollectorEventBus, 'listPlugins', listPlugins);
 
         return {
-            ...state,
+            ...toRefs(state),
         };
     },
 });

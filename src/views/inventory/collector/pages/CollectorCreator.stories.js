@@ -52,10 +52,13 @@ export const defaultCase = () => ({
         mountBusEvent(CollectorEventBus, 'listCredentialsGroup', listCredentialsGroup);
 
 
-        const init = () => {
-            state.plugin = casual.pluginInfo;
+        const getPlugin = () => {
+            setTimeout(() => {
+                state.totalCount = casual.integer(10, 100);
+                state.plugin = casual.pluginInfo;
+            }, casual.integer(1000, 3000));
         };
-        init();
+        mountBusEvent(CollectorEventBus, 'getPlugin', getPlugin);
 
         return {
             ...toRefs(state),

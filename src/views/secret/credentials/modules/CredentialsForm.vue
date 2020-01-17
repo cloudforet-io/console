@@ -69,14 +69,22 @@
                                             :space="true"
                                             :buttons="optionType"
                                             :selected.sync="selected"
-                                            @clickButton="getData"
                         />
                         <PFieldGroup v-if="selected === 'form'"
                                      :invalid-text="invalidMessage.form"
                                      :invalid="invalidState.form"
                         >
                             <template v-slot:default="{invalid}">
-                                <div class="form-editor" />
+                                <div class="form-editor">
+                                    <p-dynamic-form v-for="(fm, idx) in dynamicFormState.form" :key="idx"
+                                                    v-model="values[fm.key]"
+                                                    :form="fm"
+                                                    :invalid="vdApi.invalidState[fm.key]"
+                                                    :invalid-text="vdApi.invalidMsg[fm.key]"
+                                                    :validatable="true"
+                                                    @change="onOptionChange"
+                                    />
+                                </div>
                             </template>
                         </PFieldGroup>
 
@@ -100,7 +108,9 @@
     </p-button-modal>
 </template>
 <script>
-import { reactive } from '@vue/composition-api';
+import {
+    computed, reactive, ref, toRefs, watch,
+} from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import {
@@ -117,6 +127,17 @@ import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/Sel
 import PButton from '@/components/atoms/buttons/Button.vue';
 import CardLayout from '@/components/molecules/layouts/card-layout/CardLayout.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
+import PLabel from '@/components/atoms/labels/Label.vue';
+import PDynamicForm, { map, setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+
+
+export const getDataInputType = () => {
+    const currentURL = window.location.href;
+    const url = new URL(currentURL);
+    const plugin_id = url.searchParams.get('plugin_id');
+    const repository_id = url.searchParams.get('repository_id');
+    return plugin_id;
+};
 
 const components = {
     CardLayout,
@@ -126,21 +147,23 @@ const components = {
     PDictInputGroup,
     PSelectBtnGroup,
     PMonacoEditor,
+    PDynamicForm,
     PRow,
     PCol,
     PSelectDropdown,
+    PLabel,
     PButton,
 };
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
-    state.selected = 'form';
+    state.selected = _.isEmpty(getDataInputType()) ? 'json' : 'form';
+    state.values = {};
 
     const invalidMessage = {
         name: 'Required fields!',
         data: 'Please, confirm your Json String Format.',
     };
-
 
     const formState = reactive({
         name: '',
@@ -148,6 +171,20 @@ const setup = (props, context) => {
         issue_type: 'credential',
         data: '',
         ...props.item,
+    });
+
+    const onOptionChange = () => {};
+    const dynamicForm = computed(() => props.dynamicFormState.form);
+    const vdApi = setValidation(props.dynamicFormState.form, state.values);
+
+    watch(() => props.dynamicFormState, () => {
+        state.values = reactive({});
+        const newVdApi = setValidation(props.dynamicFormState.form, state.values);
+        vdApi.invalidMsg = newVdApi.invalidMsg;
+        vdApi.invalidState = newVdApi.invalidState;
+        vdApi.fieldValidation = newVdApi.fieldValidation;
+        vdApi.allValidation = newVdApi.allValidation;
+        vdApi.isAllValid = newVdApi.isAllValid;
     });
 
     const issueTypeSelectItems = [
@@ -164,27 +201,38 @@ const setup = (props, context) => {
         { vbind: { styleType: 'dark', outline: true } },
     );
 
-    const formValidations = {
+    const leftHalfValidations = {
         name: [requiredValidation()],
-        data: [jsonParseValidation()],
     };
 
-    const validateAPI = formValidation(formState, formValidations);
+    if (state.selected === 'json') { leftHalfValidations.data = [jsonParseValidation()]; }
+
+    const validateAPI = formValidation(formState, leftHalfValidations);
 
     const confirm = async () => {
-        const result = await validateAPI.allValidation();
-        console.log(result);
-        if (result) {
-            const data = {
+        const leftHalfResult = await validateAPI.allValidation();
+        const rightHalfResult = state.selected === 'json' ? true : await vdApi.allValidation();
+
+        if (leftHalfResult && rightHalfResult) {
+            const params = {
                 name: formState.name,
             };
+            const keyArr = ['name', 'issue_type', 'tags', 'data'];
 
-            ['name', 'issue_type', 'tags', 'data'].forEach((key) => {
+            if (state.selected === 'form') {
+                const formParam = {};
+                for (const [k, v] of Object.entries(state.values)) {
+                    formParam[k] = v;
+                }
+                formState.data = formParam;
+            }
+
+            keyArr.forEach((key) => {
                 if (formState[key]) {
-                    data[key] = formState[key];
+                    params[key] = formState[key];
                 }
             });
-            context.emit('confirm', data);
+            context.emit('confirm', params);
         }
     };
 
@@ -192,6 +240,9 @@ const setup = (props, context) => {
         ...state,
         invalidMessage,
         formState,
+        dynamicForm,
+        onOptionChange,
+        vdApi,
         issueTypeSelectItems,
         optionType,
         proxyVisible: makeProxy('visible', props, context.emit),
@@ -225,9 +276,11 @@ export default {
                 data: '',
             }),
         },
-        updateMode: {
-            type: Boolean,
-            default: false,
+        dynamicFormState: {
+            type: Object,
+            default: () => ({
+                form: [{}],
+            }),
         },
     },
     setup(props, context) {

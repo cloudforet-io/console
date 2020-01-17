@@ -201,6 +201,13 @@ export default {
             });
             this.displayTree = true;
         },
+        getLastNodeInFirstLayer(tree) {
+            let lastNode = null;
+            tree.traverse((node) => {
+                if (node.path.length === 1) lastNode = node;
+            });
+            return lastNode;
+        },
         async createOnDataCenter(flag, tree, nodeData) {
             const param = {
                 name: this.$refs.contextPopUp._data.textInput.name,
@@ -222,11 +229,11 @@ export default {
                     };
 
                     const newNode = this.getSelectedNode(InitializingData, 'DATA_CENTER');
-
                     if (flag[1] !== 'RE') {
                         this.applyActionOnScreen(tree, { node: newNode, placement });
                     } else {
-                        tree.insert({ node: tree.getSelected()[0], placement }, newNode);
+                        const lastNodeInFirstLayer = this.getLastNodeInFirstLayer(tree);
+                        tree.insert({ node: lastNodeInFirstLayer, placement }, newNode);
                     }
 
                     if (this.isInitializing) {
@@ -256,7 +263,6 @@ export default {
                     }
                 }
                 tree.updateNode(tree.getSelected()[0].path, { title: param.name });
-
             }).catch((error) => {
                 console.error(error);
             });

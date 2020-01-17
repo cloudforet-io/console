@@ -19,7 +19,7 @@ export default {
             \n
                 key: String (essential),
                 label: String (recommended),
-                unvalid: Boolean,
+                invalid: Boolean,
                 help: Boolean,
             \n
             `,
@@ -43,7 +43,7 @@ const getData = (props, context) => {
                 key: 'conf',
                 label: 'Configure Collector (conf)',
                 alert: 'This is alert message!!',
-                unvalid: true,
+                invalid: true,
             },
             {
                 key: 'credentials',
@@ -65,8 +65,8 @@ const getData = (props, context) => {
         state.tabs = [...state.tabs];
     };
 
-    const unvalidChange = (idx, e) => {
-        state.tabs[idx].unvalid = e.target.checked;
+    const invalidChange = (idx, e) => {
+        state.tabs[idx].invalid = e.target.checked;
         state.tabs = [...state.tabs];
     };
 
@@ -74,7 +74,7 @@ const getData = (props, context) => {
     return {
         ...toRefs(state),
         onClickDone,
-        unvalidChange,
+        invalidChange,
     };
 };
 
@@ -114,10 +114,10 @@ export const validationMode = () => ({
             @changeTab="changeTab"
          />
          <br><br><br>
-         <h4>Check unvalid Tabs</h4> 
+         <h4>Check invalid Tabs</h4> 
          <template v-for="(tab, idx) in tabs">
             {{ tab.key }}:
-            <input type="checkbox" :checked="tab.unvalid" @change="unvalidChange(idx, $event)">
+            <input type="checkbox" :checked="tab.invalid" @change="invalidChange(idx, $event)">
             <br>
          </template>
      </div>

@@ -86,7 +86,7 @@
                 <li>
                     <router-link class="group" to="/secret">
                         <span class="icon">
-                            <p-i name="ic_identity" width="24px" height="24px"
+                            <p-i name="ic_secret" width="24px" height="24px"
                                  color="transparent inherit"
                             />
                         </span>

@@ -6,20 +6,24 @@
         </p-button>
         <p-progress-wizard :tabs.sync="tabs"
                            :active-idx.sync="activeIdx"
-                           :show-validation="showValidation"
-                           :show-confirm="showConfirm"
+                           :show-confirm="isAllTabValid"
                            title="CreateCollector"
                            @cancel="onCancel"
                            @confirm="onConfirm"
+                           @changeStep="onChangeStep"
         >
-            <template #contents-conf>
-                <configure-collector :plugin="plugin" :versions="versions" />
+            <template #contents-conf="{tab}">
+                <configure-collector ref="conf" :plugin="plugin" :versions="versions"
+                                     :show-validation="tab.showValidation"
+                                     @changeValidState="updateTabInvalid(0, $event)"
+                />
             </template>
             <template #contents-credentials>
-                <choose-credentials :items="credentials"
+                <choose-credentials ref="crd" :items="credentials"
                                     :fields="fields"
                                     :total-count="totalCount"
                                     :loading="loading"
+                                    @changeValidState="updateTabInvalid(1, $event)"
                 />
             </template>
             <template #contents-tags>
@@ -32,7 +36,7 @@
 </template>
 
 <script>
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, computed } from '@vue/composition-api';
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -63,7 +67,7 @@ export default {
         ChooseCredentials,
         PDictInputGroup,
     },
-    setup() {
+    setup(props, { refs }) {
         const dataState = setDataState();
 
         const state = reactive({
@@ -71,11 +75,14 @@ export default {
                 {
                     key: 'conf',
                     label: 'Configure Collector',
+                    showValidation: false,
                     invalid: true,
                 },
                 {
                     key: 'credentials',
                     label: 'Choose Credentials',
+                    showValidation: false,
+                    invalid: true,
                 },
                 {
                     key: 'tags',
@@ -84,12 +91,28 @@ export default {
                 },
             ],
             activeIdx: 0,
-            showValidation: false,
             showConfirm: false,
         });
 
         const onCancel = () => {};
         const onConfirm = () => {};
+
+        const isAllTabValid = computed(() => _.every(state.tabs, tab => !!tab.invalid === false));
+
+        const updateTabInvalid = (tabIdx, value) => {
+            state.tabs[tabIdx] = { ...state.tabs[tabIdx], invalid: !value };
+            state.tabs = [...state.tabs];
+        };
+
+        const onChangeStep = async (beforeIdx) => {
+            let res = null;
+
+            if (state.tabs[beforeIdx].key === 'conf') res = await refs.conf.vdApi.allValidation();
+            else if (state.tabs[beforeIdx].key === 'credentials') res = refs.crd.validate();
+            else return;
+
+            updateTabInvalid(beforeIdx, res);
+        };
 
 
         return {
@@ -97,6 +120,9 @@ export default {
             ...toRefs(state),
             onCancel,
             onConfirm,
+            isAllTabValid,
+            updateTabInvalid,
+            onChangeStep,
         };
     },
 };

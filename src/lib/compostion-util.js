@@ -103,6 +103,7 @@ export const formValidation = (data, validation) => {
     const invalidMsg = reactive(Object.fromEntries(validationFields.map(x => [x, ''])));
     const invalidState = reactive(Object.fromEntries(validationFields.map(x => [x, false])));
     const validState = reactive(Object.fromEntries(validationFields.map(x => [x, false])));
+    const isAllValid = computed(() => _.every(invalidState, val => val === false));
     /**
      * validated only one field
      * @param name
@@ -145,6 +146,7 @@ export const formValidation = (data, validation) => {
         invalidMsg,
         invalidState,
         validState,
+        isAllValid,
     };
 };
 
