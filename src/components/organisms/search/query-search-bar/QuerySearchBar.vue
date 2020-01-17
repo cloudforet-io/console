@@ -75,7 +75,7 @@ export default createComponent({
             value: computed(() => {
                 if (operatorRegx.test(proxySearchText.value)) {
                     const operatorIndex = operatorRegx.exec(proxySearchText.value)[0].length;
-                    return proxySearchText.value.slice(operatorIndex);
+                    return proxySearchText.value.slice(operatorIndex).trim();
                 }
                 return null;
             }),
@@ -117,12 +117,11 @@ export default createComponent({
         watch(proxySearchText, async (text, preText) => {
             if (text !== preText) {
                 await getACData(text);
-                if (acState.items.length === 0) { console.log('hide'); hideAC(); }
+                if (acState.items.length === 0) { hideAC(); }
             }
         });
         onMounted(async () => {
             await getACData('', searchContextType.Key);
-            console.log('onMount', acState.items);
         });
 
 
@@ -139,16 +138,15 @@ export default createComponent({
 
         const newQuery = () => {
             if (!!contextState.key && !!contextState.value) {
-                console.log('newQuery');
                 const query = new SearchQuery(contextState.key, contextState.operator, contextState.value);
                 context.emit('newQuery', query);
+                console.debug('newQuery', query);
                 cleanSearchText();
             }
         };
 
         const clickMenuEvent = (event) => {
             const acType = contextType.value;
-            console.log('click menu', event);
             proxySearchText.value = event;
             searchFocused.value = true;
             hideAC();
