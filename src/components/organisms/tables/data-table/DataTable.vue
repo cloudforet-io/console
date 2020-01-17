@@ -301,21 +301,26 @@ export default {
         /**
          * TODO: single select copy
          */
-            if (!props.multiSelect) return;
+            const hasSelectData = () => {
+                const selection = document.getSelection();
+                if (selection && selection.type === 'Range') {
+                    return true;
+                }
+                return false;
+            };
+            if (!hasSelectData()) {
+                if (!props.multiSelect) return;
 
-            if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && props.selectIndex.length > 0) {
-                let result = '';
-                props.selectIndex.forEach((td) => {
-                    result += makeTableText(dragSelectAbles.value[td]);
-                });
-                selectToCopyToClipboard(result);
+                if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && props.selectIndex.length > 0) {
+                    let result = '';
+                    props.selectIndex.forEach((td) => {
+                        result += makeTableText(dragSelectAbles.value[td]);
+                    });
+                    selectToCopyToClipboard(result);
+                }
             }
         };
-        const isSelected = (index) => {
-            console.log(props.selectIndex);
-            console.log(proxySelectIndex.value);
-            return props.multiSelect ? proxySelectIndex.value.indexOf(index) !== -1 : proxySelectIndex.value[0] === index;
-        };
+        const isSelected = index => (props.multiSelect ? proxySelectIndex.value.indexOf(index) !== -1 : proxySelectIndex.value[0] === index);
         const checkboxToggle = (index) => {
             const newSelected = [...proxySelectIndex.value];
             if (isSelected(index)) {
