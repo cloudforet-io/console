@@ -131,7 +131,7 @@ const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in'
  * @param sortBy
  * @param sortDesc
  * @param searchText
- * @param searchQueries
+ * @param searchQueries {Array<SearchQuery>}
  * @param valueFormatter <(key,value)=>value>
  * @returns {{page: {start: number, limit: *}}}
  */

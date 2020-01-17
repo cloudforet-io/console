@@ -15,12 +15,31 @@ export default {
             ...setup(props, context),
         });
 
-        const listPlugins = async (query) => {
+        const listRepositories = async () => {
+            state.repositories = [];
+            try {
+                const res = await context.parent.$http.post('/repository/repository/list');
+                state.repositories = res.data.results;
+                if (!state.selectedRepoId) {
+                    state.selectedRepoId = state.repositories[0].repository_id;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const listPlugins = async () => {
+            const params = {
+                // eslint-disable-next-line camelcase
+                repository_id: state.selectedRepoId,
+                // eslint-disable-next-line camelcase
+                service_type: 'inventory.collector',
+                query: state.query,
+            };
+
             state.plugins = [];
             try {
-                const res = await context.parent.$http.post('/repository/remote-repository/list', {
-                    query,
-                });
+                const res = await context.parent.$http.post('/repository/plugin/list', params);
                 state.totalCount = res.data.total_count;
                 state.plugins = res.data.results;
             } catch (e) {
@@ -28,8 +47,27 @@ export default {
             }
         };
 
+        const listPluginsInit = async () => {
+            await listRepositories();
+            await listPlugins();
+        };
+
+        mountBusEvent(CollectorEventBus, 'listPluginsInit', listPluginsInit);
         mountBusEvent(CollectorEventBus, 'listPlugins', listPlugins);
 
+
+        const listVersions = async (pluginId) => {
+            try {
+                const res = await context.parent.$http.post('/repository/plugin/get-versions', {
+                    // eslint-disable-next-line camelcase
+                    plugin_id: pluginId,
+                });
+                state.versions = { ...state.versions, [pluginId]: res.data.version };
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'listVersions', listVersions);
         return {
             ...toRefs(state),
         };

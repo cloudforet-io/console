@@ -3,11 +3,13 @@
         <template v-for="route in routes">
             <span v-if="current.name === route.name || !hasNext" :key="route.name">
 
-                <span v-if="route.meta.breadcrumb"
+                <span v-if="route.meta && route.meta.breadcrumb"
                       class="menu"
                       :class="{active: route.name === matched[proxyActiveIdx].name}"
                       @click="go(route)"
-                ><span class="link">{{ route.meta.label }}</span></span>
+                >
+                    <span class="link">{{ route.meta.label }}</span>
+                </span>
 
                 <template v-if="hasNext">
                     <p-i name="ic_breadcrum_arrow" />

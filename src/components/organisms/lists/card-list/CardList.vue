@@ -1,15 +1,15 @@
 <template>
     <div>
-        <p-card-item v-for="item in items" :key="item[mapper.key]"
-                     :icon="item[mapper.icon]"
-                     :title="item[mapper.title]"
-                     :contents="item[mapper.contents]"
+        <p-card-item v-for="(item, idx) in items" :key="getItem(item, mapper.key)"
+                     :icon="getItem(item, mapper.icon)"
+                     :title="getItem(item, mapper.title)"
+                     :contents="getItem(item, mapper.contents)"
                      class="item"
                      @click="$emit('itemClick', item, $event)"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot :name="slot" v-bind="scope" :items="items"
-                      :item="item"
+                      :item="item" :index="idx"
                 />
             </template>
         </p-card-item>
@@ -17,7 +17,8 @@
 </template>
 
 <script>
-import PCardItem from '@/components/molecules/cards/CardItem';
+import _ from 'lodash';
+import PCardItem from '@/components/molecules/cards/CardItem.vue';
 
 export default {
     name: 'CardList',
@@ -37,7 +38,10 @@ export default {
         },
     },
     setup() {
-        return {};
+        const getItem = (item, key) => _.get(item, key);
+        return {
+            getItem,
+        };
     },
 };
 </script>
