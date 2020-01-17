@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PDataTable, { dataTableProps } from '@/components/organisms/tables/data-table/DataTable.vue';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
@@ -101,8 +101,8 @@ export default {
         'changePageSize', 'changePageNumber',
         'changeSelectIndex',
     ],
-    mixins: [PDataTable],
     props: {
+        ...dataTableProps,
         pagenationVisible: {
             type: Boolean,
             default: true,
