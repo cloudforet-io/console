@@ -2,6 +2,7 @@ import {
     computed, onUnmounted, reactive, ref, onMounted,
 } from '@vue/composition-api';
 import _ from 'lodash';
+import moment from 'moment-timezone';
 
 /**
  * make proxy computed that same name as props
@@ -166,10 +167,11 @@ export const jsonParseValidation = invalidMessage => new Validation((value) => {
     return true;
 },
 invalidMessage || 'Invalid Json string format!');
-export const numberMinValidation = (min, invalidMessage) => new Validation(value => Number(value) >= min, invalidMessage || `value must bigger then ${min}`);
-export const numberMaxValidation = (max, invalidMessage) => new Validation(value => Number(value) >= max, invalidMessage || `value must smaller then ${max}`);
-export const lengthMinValidation = (min, invalidMessage) => new Validation(value => value.length >= min, invalidMessage);
-export const lengthMaxValidation = (max, invalidMessage) => new Validation(value => value.length >= max, invalidMessage);
+export const numberMinValidation = (min, invalidMessage) => new Validation(value => value? Number(value) >= min : true, invalidMessage || `value must bigger then ${min}`);
+export const numberMaxValidation = (max, invalidMessage) => new Validation(value => value? Number(value) <= max:true, invalidMessage || `value must smaller then ${max}`);
+export const lengthMinValidation = (min, invalidMessage) => new Validation(value => value? value.length >= min : true, invalidMessage || `value length must bigger then ${min}`);
+export const lengthMaxValidation = (max, invalidMessage) => new Validation(value => value? value.length <= max : true, invalidMessage|| `value length must smaller then ${max}`);
+export const checkTimeZoneValidation = (invalidMessage) => new Validation(value => value? moment.tz.names().indexOf(value) !== -1 : true, invalidMessage||"can not find timezone");
 
 export const credentialsNameValidation = (parent, invalidMessage) => new Validation(async (value) => {
     let result = false;

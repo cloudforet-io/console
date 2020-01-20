@@ -141,19 +141,19 @@
 </template>
 <script>
 import { reactive } from '@vue/composition-api';
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup';
-import PTextInput from '@/components/atoms/inputs/TextInput';
-import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal';
+import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
+import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import {
-    formValidation, makeProxy, requiredValidation, userIDValidation, Validation,
+    formValidation, makeProxy, requiredValidation, userIDValidation, Validation, lengthMaxValidation, lengthMinValidation, checkTimeZoneValidation,
 } from '@/lib/compostion-util';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup';
-import PHr from '@/components/atoms/hr/Hr';
-import PRow from '@/components/atoms/grid/row/Row';
-import PCol from '@/components/atoms/grid/col/Col';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown';
-import PButton from '@/components/atoms/buttons/Button';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 
 const components = {
     PButtonModal,
@@ -188,19 +188,21 @@ const setup = (props, context) => {
     ];
     const timezoneSelectItems = [
         { type: 'item', label: 'UTC', name: 'UTC' },
-        { type: 'item', label: 'SEOUL(UTC+9)', name: 'UTC+9' },
+        { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
     ];
 
     const addUserValidations = {
         userId: [requiredValidation(), userIDValidation(context.parent)],
-        password1: [requiredValidation()],
+        password1: [requiredValidation(), lengthMinValidation(5), lengthMaxValidation(12)],
         password2: [
             requiredValidation(),
             new Validation((value, data) => data.password1 === value, 'please enter same value again'),
         ],
+        timezone: [checkTimeZoneValidation()],
     };
 
     const updateUserValidations = {
+        password1: [lengthMinValidation(5), lengthMaxValidation(12)],
         password2: [
             new Validation((value, data) => data.password1 === value, 'please enter same value again'),
         ],
@@ -275,7 +277,7 @@ export default {
                 mobile: '',
                 group: '',
                 language: 'korean',
-                timezone: 'UTC',
+                timezone: 'Asia/Seoul',
                 tags: {},
             }),
         },
