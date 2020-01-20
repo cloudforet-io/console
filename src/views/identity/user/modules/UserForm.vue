@@ -104,8 +104,8 @@
                 </p-row>
                 <p-row>
                     <p-col :col="6">
-                        <PFieldGroup label="Phone">
-                            <p-text-input v-model="formState.phone" class="form-control" />
+                        <PFieldGroup label="mobile">
+                            <p-text-input v-model="formState.mobile" class="form-control" />
                         </PFieldGroup>
                     </p-col>
                     <p-col :col="6">
@@ -175,9 +175,9 @@ const setup = (props, context) => {
         password2: '',
         name: '',
         email: '',
-        phone: '',
+        mobile: '',
         group: '',
-        language: 'korean',
+        language: 'ko',
         timezone: 'UTC',
         tags: {},
         ...props.item,
@@ -272,7 +272,7 @@ export default {
                 password2: '',
                 name: '',
                 email: '',
-                phone: '',
+                mobile: '',
                 group: '',
                 language: 'korean',
                 timezone: 'UTC',
