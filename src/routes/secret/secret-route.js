@@ -1,8 +1,8 @@
 const Secret = () => import('@/views/secret/Secret.vue');
 const SecretNavBar = () => import('@/views/secret/SecretNavBar.vue');
-const CredentialsGroup = () => import('@/views/secret/credentials-group/CredentialsGroup.vue');
+const CredentialsGroup = () => import('@/views/secret/credentials-group/pages/CredentialsGroup.vue');
 const Credentials = () => import('@/views/secret/credentials/Credentials.vue');
-const AddCredentials = () => import('@/views/secret/credentials-group/modules/AddCredentials.vue');
+const AddCredentials = () => import('@/views/secret/credentials-group/pages/AddCredentials.template.vue');
 
 export default {
     path: 'secret',

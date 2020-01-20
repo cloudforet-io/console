@@ -1,16 +1,16 @@
 import { toRefs } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import Cdg, { eventNames, cdgSetup } from '@/views/secret/credentials-group/CredentialsGroup.template.vue';
+import addCdg, { eventNames, cdgSetup } from '@/views/secret/credentials-group/pages/AddCredentials.template.vue';
 import { arrayOf } from '@/lib/casual';
 import casual from '@/views/secret/models/credential-model';
 
 export default {
-    title: 'view/secret/credentialsGroup',
-    component: Cdg,
+    title: 'view/secret/addCredential',
+    component: addCdg,
     parameters: {
         info: {
             summary: '',
-            components: { Cdg },
+            components: { addCdg },
         },
     },
 };
@@ -25,22 +25,16 @@ const actions = {
     },
 };
 export const defaultCase = () => ({
-    extends: Cdg,
+    extends: addCdg,
     setup(props, context) {
-        // Show Credential Group List
         const cdgEventNames = eventNames;
-        cdgEventNames.getCdgList = 'getCdg';
         cdgEventNames.getCdList = 'getCd';
         cdgEventNames.tagConfirmEvent = 'CdgTagConfirmEvent';
         cdgEventNames.tagResetEvent = 'resetTagEvent';
-        cdgEventNames.createCdg = 'createCdg';
-        cdgEventNames.deleteCdg = 'deleteCdg';
-        cdgEventNames.updateCdg = 'updateCdg';
+        cdgEventNames.createCdg = 'addCd';
         const state = cdgSetup(props, context, cdgEventNames);
         state.items = arrayOf(state.pageSize, casual._credentials_group);
-
-        // Show Credential list
-        state.cdgData.items = arrayOf(state.cdgData.pageSize, casual._credential);
+        state.cdData.items = arrayOf(state.cdData.pageSize, casual._credential);
         return {
             ...toRefs(state),
         };

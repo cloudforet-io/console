@@ -2,7 +2,7 @@
 import {
     toRefs, computed, reactive,
 } from '@vue/composition-api';
-import CdgTemplate, { cdgSetup, eventNames } from '@/views/secret/credentials-group/CredentialsGroup.template.vue';
+import CdgTemplate, { cdgSetup, eventNames } from '@/views/secret/credentials-group/pages/CredentialsGroup.template.vue';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import { mountBusEvent, Validation } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
