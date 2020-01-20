@@ -48,7 +48,8 @@ export default {
         ], parent, { copyFlag: true });
         const tags = ref({ ...props.tags });
         watch(() => props.item, (value) => {
-            tags.value = value.tags || {};
+            // eslint-disable-next-line no-prototype-builtins
+            tags.value = value.hasOwnProperty('tags') ? value.tags : {};
         });
         const dictPanel = ref(null);
         const resetTag = () => {

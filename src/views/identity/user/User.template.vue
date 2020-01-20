@@ -244,11 +244,12 @@ export const userSetup = (props, context, eventName) => {
         userFormState.updateMode = true;
         userFormState.headerTitle = 'Update User';
         const item = getSelectedUserItems.value[0];
+        console.log(item);
         userFormState.item = {
             userId: item.user_id,
             name: item.name,
             email: item.name,
-            phone: item.phone,
+            mobile: item.mobile,
             group: item.group,
             language: item.language,
             timezone: item.timezone,

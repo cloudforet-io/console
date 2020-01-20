@@ -7,7 +7,7 @@ import _ from 'lodash';
 import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery  } from '@/lib/api';
+import { defaultQuery } from '@/lib/api';
 import {
     defaultAutocompleteHandler,
     getEnumValues, getFetchValues,
@@ -34,10 +34,8 @@ export default {
             get keys() {
                 return [
                     'server_id', 'name', 'state', 'primary_ip_address', 'server_type', 'os_type', 'project_id',
-                    'region_info.region_id', 'region_info.name',
-                    'zone_info.zone_id', 'zone_info.name',
-                    'pool_info.pool_id', 'pool_info.name',
-                    'data.os.os_arch', 'data.os.os_distro', 'data.base.memory', 'data.base.core', 'data.vm.platform_type',
+                    'data.os.os_arch', 'data.os.os_distro',
+                    'data.base.memory', 'data.base.core', 'data.vm.platform_type',
                     'data.compute.instance_name', 'data.compute.keypair', 'data.compute.instance_id',
                     'data.vm.vm_name', 'data.vm.vm_id',
                     'collection_info.state',
@@ -63,7 +61,7 @@ export default {
             get valuesFetchKeys() {
                 return [
                     'server_id', 'name', 'primary_ip_address',
-                    'data.compute.instance_name', 'data.compute.keypair', 'data.compute.instance_id',
+                    'data.compute.instance_name', 'data.compute.instance_id',
                     'data.vm.vm_name', 'data.vm.vm_id',
                 ];
             }
@@ -77,12 +75,6 @@ export default {
                     getEnumValues('collection_info.state', ['MANUAL', 'ACTIVE', 'DISCONNECTED']),
                     getEnumValues('server_type', ['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN']),
                     getFetchValues('project_id', '/identity/project/list', this.parent),
-                    getFetchValues('pool_info.pool_id', '/inventory/pool/list', this.parent, 10, 'pool_id'),
-                    getFetchValues('pool_info.name', '/inventory/pool/list', this.parent, 10, 'name'),
-                    getFetchValues('region_info.region_id', '/inventory/region/list', this.parent, 10, 'region_id'),
-                    getFetchValues('region_info.name', '/inventory/region/list', this.parent, 10, 'name'),
-                    getFetchValues('zone_info.zone_id', '/inventory/zone/list', this.parent, 10, 'zone_id'),
-                    getFetchValues('zone_info.name', '/inventory/zone/list', this.parent, 10, 'name'),
                 ]);
             }
         }

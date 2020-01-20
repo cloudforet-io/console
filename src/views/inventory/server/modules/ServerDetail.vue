@@ -128,7 +128,8 @@ export default {
         ], parent, { copyFlag: true });
         const dict = ref({ ...props.item.tags });
         watch(() => props.item, (value) => {
-            dict.value = value.tags;
+            // eslint-disable-next-line no-prototype-builtins
+            dict.value = value.hasOwnProperty('tags') ? value.tags : {};
         });
         const dictPanel = ref(null);
         const resetTag = () => {
