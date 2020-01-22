@@ -3,16 +3,63 @@
 import {
     toRefs, computed, reactive,
 } from '@vue/composition-api';
-import UserTemplate, { userSetup, eventNames } from '@/views/identity/user/User.template';
+import moment from 'moment-timezone';
+import UserTemplate, { userSetup, eventNames } from '@/views/identity/user/User.template.vue';
 import userEventBus from '@/views/identity/user/UserEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
-
+import {
+    defaultAutocompleteHandler,
+    getEnumValues, getSearchEnumValues,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 export default {
     name: 'User',
     extends: UserTemplate,
     setup(props, context) {
+        class ACHandler extends defaultAutocompleteHandler {
+        // eslint-disable-next-line class-methods-use-this
+            get keys() {
+                return [
+                    'user_id', 'name', 'state', 'email', 'mobile',
+                    'group', 'language', 'timezone',
+                ];
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get suggestKeys() {
+                return ['user_id', 'name', 'email', 'mobile'];
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get parent() {
+                return context.parent;
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get valuesFetchUrl() {
+                return '/identity/user/list';
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get valuesFetchKeys() {
+                return [
+                    'user_id', 'name', 'email', 'mobile',
+                ];
+            }
+
+            // eslint-disable-next-line no-shadow
+            constructor() {
+                super();
+                this.handlerMap.value.push(...[
+                    getEnumValues('state', ['ENABLED', 'DISABLED']),
+                    getSearchEnumValues('timezone', moment.tz.names(), [
+                        'UTC', 'Asia/Seoul',
+                    ], { caseSensitive: true, threshold: 0.8 }),
+                ]);
+            }
+        }
+
         const userEventNames = eventNames;
         userEventNames.getUserList = 'getUserData';
         userEventNames.tagConfirmEvent = 'UserTagConfirmEvent';
@@ -23,14 +70,14 @@ export default {
         userEventNames.addUser = 'addUser';
         userEventNames.updateUser = 'updateUser';
 
-        const state = userSetup(props, context, userEventNames);
+        const state = userSetup(props, context, userEventNames, new ACHandler());
 
         // request user list
         const requestState = reactive({
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
-                state.sortBy, state.sortDesc,
-                state.searchText,
+                state.sortBy, state.sortDesc, null,
+                state.queryListTools.tags,
             ))),
         });
         const requestUserList = async () => {

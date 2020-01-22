@@ -20,8 +20,12 @@ module.exports = {
     'radix': ["error", "as-needed"],
     'no-prototype-builtins': "error",
     'no-empty': ["error", { "allowEmptyCatch": true }],
-     'import/extensions': ['error', 'always', {
-      js: 'never',
+     'import/extensions': ['error', 'always',
+       {
+         "js": "never",
+         "jsx": "never",
+         "ts": "never",
+         "tsx": "never"
     }],
     'camelcase': ["error", { "properties": "always", "allow": [
         "domain_id", "item_type", "region_id"
