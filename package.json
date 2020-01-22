@@ -5,11 +5,11 @@
   "author": "CloudOne",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "serve:docker": "docker build --tag wconsole-client . && docker run -p 80:80 wconsole-client",
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src",
-    "storybook": "start-storybook -p 6006 -s ./public",
     "build-storybook": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook -s ./public -o .out",
+    "serve:docker": "docker build --tag wconsole-client . && docker run -p 80:80 wconsole-client",
+    "storybook": "start-storybook -p 6006 -s ./public",
     "svg": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6"
   },
   "dependencies": {
@@ -82,8 +82,10 @@
     "@storybook/vue": "^5.3.1",
     "@vue/cli-plugin-babel": "^3.5.5",
     "@vue/cli-plugin-eslint": "^3.5.1",
+    "@vue/cli-plugin-typescript": "^4.1.2",
     "@vue/cli-service": "^3.5.3",
     "@vue/eslint-config-airbnb": "^4.0.0",
+    "@vue/eslint-config-typescript": "^4.0.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^23.6.0",
@@ -98,6 +100,7 @@
     "sass-loader": "^7.3.1",
     "storybook-addon-vue-info": "^1.4.1",
     "style-loader": "^1.0.0",
+    "typescript": "~3.5.3",
     "vue-template-compiler": "^2.6.10",
     "webfonts-generator": "^0.4.0"
   },
