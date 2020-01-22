@@ -16,6 +16,15 @@ module.exports = {
     '@storybook/addon-docs',
   ],
   webpack:  (config) => {
+    config.module.rules.push({
+      test: /\.(ts|tsx)$/,
+      use: [
+        {
+          loader: require.resolve('awesome-typescript-loader'),
+        },
+      ],
+    });
+    config.resolve.extensions.push('.ts', '.tsx');
     config.module.rules.push(
       {
         test: /\.s?css$/,
@@ -44,11 +53,6 @@ module.exports = {
       '@': path.resolve(__dirname, '../src'),
       '@sb': path.resolve(__dirname, './'),
     };
-    // config.module.rules.push({
-    //   test: /\.vue$/,
-    //   loader: 'storybook-addon-vue-info/loader',
-    //   enforce: 'post'
-    // });
     config.plugins.push(new MonacoWebpackPlugin({
       languages:['javascript','json','css','html']
     }));

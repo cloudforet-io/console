@@ -1,12 +1,15 @@
 module.exports = {
   root: true,
+
   env: {
     node: true,
   },
+
   extends: [
     'plugin:vue/recommended',
     '@vue/airbnb',
   ],
+
   rules: {
     'max-len': ['error', { "code": 200 }],
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
@@ -36,8 +39,15 @@ module.exports = {
       "devDependencies": true,
     }]
   },
+
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: '@typescript-eslint/parser',
     ecmaVersion: 2018,
   },
+
+  'extends': [
+    'plugin:vue/recommended',
+    '@vue/airbnb',
+    '@vue/typescript'
+  ]
 }
