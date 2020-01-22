@@ -19,6 +19,8 @@ RUN npm install
 
 COPY public ${BUILD_PATH}/public
 COPY src ${BUILD_PATH}/src
+COPY tsconfig.json ${BUILD_PATH}/
+COPY vue.config.js ${BUILD_PATH}/
 
 ENV NODE_ENV production
 RUN npm run build && cp -ar ${BUILD_PATH}/dist/* ${ROOT_PATH}/ && rm -rf ${BUILD_PATH}

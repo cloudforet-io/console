@@ -43,8 +43,25 @@
                             Action
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
-                            <p-search :search-text.sync="searchText" @onSearch="getUsers" />
+                            <PQuerySearchBar :search-text.sync="searchText" :autocomplete-handler="ACHandler" @newQuery="queryListTools.addTag" />
                         </div>
+                    </template>
+                    <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
+                        <p-col :col="12" style="margin-bottom: .5rem;">
+                            <p-hr style="width: 100%;" />
+                            <p-row style="margin-top: .5rem;">
+                                <div style="flex-grow: 0">
+                                    <p-icon-button name="ic_delete" @click="queryListTools.deleteAllTags" />
+                                </div>
+                                <div style="flex-grow: 1;margin-left: 1rem;">
+                                    <p-tag v-for="(tag, idx) in queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
+                                           @delete="queryListTools.deleteTag(idx)"
+                                    >
+                                        {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
+                                    </p-tag>
+                                </div>
+                            </p-row>
+                        </p-col>
                     </template>
                     <template v-slot:col-state-format="{value}">
                         <p-status v-bind="userStateFormatter(value)" />
@@ -104,14 +121,19 @@
 import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
-import PStatus from '@/components/molecules/status/Status';
-import PButton from '@/components/atoms/buttons/Button';
+import PStatus from '@/components/molecules/status/Status.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import { timestampFormatter, getValue, userStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import userEventBus from '@/views/identity/user/UserEventBus';
-import PUserForm from '@/views/identity/user/modules/UserForm';
-
+import PUserForm from '@/views/identity/user/modules/UserForm.vue';
+import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
+import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
@@ -175,7 +197,7 @@ export const eventNames = {
     updateUser: '',
 };
 
-export const userSetup = (props, context, eventName) => {
+export const userSetup = (props, context, eventName, ACHandler) => {
     const eventBus = userEventBus;
     const tableState = UserTableReactive(context.parent);
     const tabData = reactive({
@@ -244,11 +266,12 @@ export const userSetup = (props, context, eventName) => {
         userFormState.updateMode = true;
         userFormState.headerTitle = 'Update User';
         const item = getSelectedUserItems.value[0];
+        console.log(item);
         userFormState.item = {
             userId: item.user_id,
             name: item.name,
             email: item.name,
-            phone: item.phone,
+            mobile: item.mobile,
             group: item.group,
             language: item.language,
             timezone: item.timezone,
@@ -328,6 +351,8 @@ export const userSetup = (props, context, eventName) => {
         context.parent,
         { type: 'item' }),
     });
+    const queryList = ref([]);
+    const queryListTools = tagList(queryList, true, eventBus, eventName.getUserList);
 
     return reactive({
         ...toRefs(state),
@@ -357,6 +382,8 @@ export const userSetup = (props, context, eventName) => {
         clickDisable,
         clickDelete,
         checkModalConfirm,
+        ACHandler,
+        queryListTools,
 
     });
 };
@@ -376,8 +403,13 @@ export default {
         PUserDetail,
         PTab,
         PDataTable,
-        PSearch,
+        PQuerySearchBar,
+        PTag,
         PTableCheckModal,
+        PRow,
+        PCol,
+        PHr,
+        PIconButton,
     },
     setup(props, context) {
         const dataBind = reactive({

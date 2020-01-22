@@ -6,15 +6,15 @@
             </template>
         </p-info-panel>
 
-        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="tagConfirmEvent" />
+        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="confirm" />
     </div>
 </template>
 
 <script>
 import { ref, watch } from '@vue/composition-api';
-import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel';
-import PStatus from '@/components/molecules/status/Status';
+import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import PStatus from '@/components/molecules/status/Status.vue';
 import { timestampFormatter, arrayFormatter, userStateFormatter } from '@/lib/util';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { makeTrItems } from '@/lib/view-helper';
@@ -48,7 +48,9 @@ export default {
         ], parent, { copyFlag: true });
         const tags = ref({ ...props.tags });
         watch(() => props.item, (value) => {
-            tags.value = value.tags || {};
+            if (value) {
+                tags.value = value.tags || {};
+            }
         });
         const dictPanel = ref(null);
         const resetTag = () => {

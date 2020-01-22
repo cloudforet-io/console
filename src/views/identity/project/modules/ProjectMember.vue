@@ -141,19 +141,19 @@ export default {
         fields() {
             return [
                 {
-                    name: 'user_id', label: this.tr('COMMON.UID'), size: '145px',
+                    name: 'user_id', label: this.tr('COMMON.UID'), style: { width: '145px' },
                 },
                 {
-                    name: 'name', label: this.tr('COMMON.NAME'), size: '200px',
+                    name: 'name', label: this.tr('COMMON.NAME'), style: { width: '200px' },
                 },
                 {
-                    name: 'email', label: this.tr('COMMON.EMAIL'), size: '150px',
+                    name: 'email', label: this.tr('COMMON.EMAIL'), style: { width: '150px' },
                 },
                 {
-                    name: 'group', label: this.tr('COMMON.GROUP'), size: '120px',
+                    name: 'group', label: this.tr('COMMON.GROUP'), style: { width: '120px' },
                 },
                 {
-                    name: 'labels', label: this.tr('COMMON.LABELS'), size: '120px',
+                    name: 'labels', label: this.tr('COMMON.LABELS'), style: { width: '120px' },
                 },
             ];
         },
