@@ -265,6 +265,8 @@ export const en = {
     },
     SECRET: {
         JASON_ALERT: 'Please, Check Json Format (Use double quotation( \\" ) mark instead of single quotation (\').',
+        NO_FORMAT: 'No Template found.',
+
     },
     MSG: {
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="p-dict-input-group row ">
+    <div :class="{'p-dict-input-group': true, 'row': !removeRowEffect }">
         <div v-for="(pair, index) in destructDict"
              :key="index"
              :class="{'dict-input-form': true, 'mr-0': true, 'col-6': !useFullCol, 'col-12': useFullCol}"
@@ -174,6 +174,10 @@ export default {
         },
         dict: {
             type: Object,
+        },
+        removeRowEffect: {
+            type: Boolean,
+            default: false,
         },
         showEmptyInput: {
             type: Boolean,

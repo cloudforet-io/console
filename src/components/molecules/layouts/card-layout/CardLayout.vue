@@ -1,8 +1,7 @@
 <template>
     <div class="card-layout">
         <div v-for="(name) in slots" :key="name"
-             class="card-container"
-             :class="{'no-border': noBorders[name]}"
+             :class="{'card-container': true, 'card-margin': !noMargin, 'card-padding': !noPadding,'no-border': noBorders[name]}"
              :style="{ width: `${width}%` }"
         >
             <slot :name="name" />
@@ -17,6 +16,14 @@ export default {
         colMax: {
             type: Number,
             default: null,
+        },
+        noMargin: {
+            type: Boolean,
+            default: false,
+        },
+        noPadding: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {
@@ -50,10 +57,14 @@ export default {
         .card-container {
             vertical-align: top;
             border-right: 1px solid $gray2;
-            margin: 1rem 0;
-            padding: 0 1rem;
             &.no-border {
                 border-right: 0;
+            }
+            &.card-margin {
+                margin: 1rem 0;
+            }
+            &.card-padding {
+                padding: 0 1rem;
             }
         }
     }

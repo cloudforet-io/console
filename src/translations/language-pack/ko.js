@@ -265,6 +265,7 @@ export const ko = {
     },
     SECRET: {
         JASON_ALERT: "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (\') )",
+        NO_FORMAT: '템플릿이 존재하지 않습니다. 확인후 다시 시도해 주시기 바랍니다.',
     },
     TREE_TYPE: {
         PROJECT: '프로젝트',
