@@ -227,7 +227,9 @@ const setActions = (props, context) => {
     const onClickEnable = () => {};
     const onClickDisable = () => {};
     const onClickDelete = () => {};
-    const onClickCollectData = () => {};
+    const onClickCollectData = () => {
+        console.log(context.refs.collectDataModal);
+    };
 
     return {
         getCollectors,
@@ -243,7 +245,7 @@ export const collectorSetup = (props, context) => {
     const collectorState = setCollectorState(props, context);
     const tableRefs = setTableData(props, context, collectorState);
     const tabRefs = setTabData(props, context);
-    const actions = setActions();
+    const actions = setActions(props, context);
 
     actions.getCollectors();
 
