@@ -1,7 +1,11 @@
 import { ref } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
+import moment from 'moment-timezone';
 import PQuerySearchBar from './QuerySearchBar.vue';
-import { defaultAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import {
+    defaultAutocompleteHandler,
+    getEnumValues, getSearchEnumValues,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 export default {
     title: 'organisms/search/query-search-bar',
@@ -36,6 +40,37 @@ export const defaultCase = () => ({
             value: ref(''),
             newQuery: action('newQuery'),
             mockHandler: new ACHandler(),
+        };
+    },
+});
+
+class CustomEnumValueHandler extends defaultAutocompleteHandler {
+    // eslint-disable-next-line class-methods-use-this
+    get keys() {
+        return ['state', 'timezone'];
+    }
+
+    constructor() {
+        super();
+        this.handlerMap.value.push(...[
+            getEnumValues('state', ['ENABLED', 'DISABLED']),
+            getSearchEnumValues('timezone', moment.tz.names(), [
+                'UTC', 'Asia/Seoul',
+            ], { caseSensitive: true, threshold: 0.8 }),
+        ]);
+    }
+}
+
+export const customEnumValue = () => ({
+    components: { PQuerySearchBar },
+    template: `<div>
+      <PQuerySearchBar :searchText.sync="value" @newQuery="newQuery" :autocompleteHandler="mockHandler"></PQuerySearchBar>
+  </div>`,
+    setup() {
+        return {
+            value: ref(''),
+            newQuery: action('newQuery'),
+            mockHandler: new CustomEnumValueHandler(),
         };
     },
 });

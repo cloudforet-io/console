@@ -1,4 +1,6 @@
 import Fuse from 'fuse.js';
+import _ from 'lodash';
+import { autoCompleteQuery } from '@/lib/api';
 
 export class SearchQuery {
     constructor(key, operator, value) {
@@ -77,6 +79,31 @@ export const getEnumValues = (key, values) => (contextType, inputText, searchQue
     return [];
 };
 
+export const getSearchEnumValues = (key, values, defaultValues = [], fuseOptions = {}) => {
+    const searchValues = _.flatMap(values, value => ({ label: value }));
+    const fuse = new Fuse(searchValues, {
+        ...fuseOptions,
+        keys: ['label'],
+        shouldSort: true,
+    });
+    return (contextType, inputText, searchQuery) => {
+        if (searchQuery.key === key) {
+            const prefix = `${searchQuery.key}:${searchQuery.operator}`;
+            if (searchQuery.value) {
+                const result = fuse.search(searchQuery.value);
+                return [
+                    searchQuery.key,
+                    _.flatMap(result, v => `${prefix} ${v.label}`),
+                ];
+            }
+            return defaultValues.length ? [searchQuery.key, _.flatMap(defaultValues, v => `${prefix} ${v}`),
+            ] : [];
+        }
+        return [];
+    };
+};
+
+
 export const getKeys = (rawKeys) => {
     const keys = _.flatMap(rawKeys, value => ({ type: 'item', label: value, name: `${value}:` }));
     const fuse = new Fuse(keys, { keys: ['label'] });
@@ -94,6 +121,28 @@ export const getSuggest = suggestKeys => (contextType, inputText) => {
     return ['Suggest', result];
 };
 
+export const getFetchValues = (key, urlPath, parent, limit = 10, matchKey) => async (contextType, inputText, searchQuery) => {
+    if (searchQuery.key === key) {
+        const realKey = matchKey || searchQuery.key;
+        const res = await parent.$http.post(urlPath, {
+            query: autoCompleteQuery({ ...searchQuery, key: realKey }, limit),
+        });
+
+        const prefix = `${searchQuery.key}:${searchQuery.operator}`;
+        return [
+            `${searchQuery.key}(total: ${res.data.total_count})`,
+            _.flatMap(res.data.results, item => `${prefix} ${_.get(item, realKey)}`),
+        ];
+    }
+    return [];
+};
+const makeValuesFetchHandler = (parent, valuesFetchUrl, valuesFetchKeys) => {
+    if (parent && valuesFetchUrl && valuesFetchKeys.length > 0) {
+        return _.flatMap(valuesFetchKeys, key => getFetchValues(key, valuesFetchUrl, parent));
+    }
+    return [];
+};
+
 export class defaultAutocompleteHandler extends baseAutocompleteHandler {
     // eslint-disable-next-line class-methods-use-this
     get keys() {
@@ -105,12 +154,25 @@ export class defaultAutocompleteHandler extends baseAutocompleteHandler {
         return [];
     }
 
+    // todo: api 요청용 클라이언트를 import 방식으로 가져오게 변경하기 - sinsky
+    get parent() {
+        return null;
+    }
+
+    get valuesFetchUrl() {
+        return '';
+    }
+
+    get valuesFetchKeys() {
+        return [];
+    }
+
     constructor() {
         super();
         this.handlerMap = {
             key: [getKeys(this.keys), getSuggest(this.suggestKeys)],
             // todo: 개별 키 자동 완성은 object방식으로 처리 하고 키와 무관한 자동완성은 array에서 가져와 처리하여 처리 속도 최적화 하기 - sinsky
-            value: [],
+            value: [...makeValuesFetchHandler(this.parent, this.valuesFetchUrl, this.valuesFetchKeys)],
         };
     }
 }
