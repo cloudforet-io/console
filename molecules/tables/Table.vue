@@ -230,6 +230,9 @@ export default {
         }
     }
 
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: transparent;
+    }
     .table-striped tbody tr:nth-of-type(even) {
         @extend %striped-row;
         &:hover {

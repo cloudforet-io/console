@@ -60,7 +60,7 @@ export const map = {
     placeholder: 'example',
     type: 'type',
     default: 'default',
-    menu: 'enum',
+    menu: 'enums',
 };
 
 const setFormState = (props) => {
