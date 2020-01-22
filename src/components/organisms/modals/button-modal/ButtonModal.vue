@@ -31,24 +31,26 @@
             <slot name="body" />
         </template>
         <template #footer>
-            <slot name="footer" />
-            <p-button
-                v-if="footerCancelButtonVisible"
-                v-bind="footerCancelButtonBind"
-                @click="onCancelClick"
-            >
-                <slot name="close-button">
-                    close
-                </slot>
-            </p-button>
-            <p-button v-if="footerConfirmButtonVisible"
-                      v-bind="footerConfirmButtonBind"
-                      @click="onConfirmClick"
-            >
-                <slot name="confirm-button">
-                    confirm
-                </slot>
-            </p-button>
+            <slot name="footer">
+                <slot name="footer-extra" />
+                <p-button
+                    v-if="footerCancelButtonVisible"
+                    v-bind="footerCancelButtonBind"
+                    @click="onCancelClick"
+                >
+                    <slot name="close-button">
+                        close
+                    </slot>
+                </p-button>
+                <p-button v-if="footerConfirmButtonVisible"
+                          v-bind="footerConfirmButtonBind"
+                          @click="onConfirmClick"
+                >
+                    <slot name="confirm-button">
+                        confirm
+                    </slot>
+                </p-button>
+            </slot>
         </template>
     </p-content-modal>
 </template>

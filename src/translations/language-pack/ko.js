@@ -302,6 +302,7 @@ export const ko = {
         COMPUTE: 'Compute',
         LOCAL: 'Local',
         OFFICIAL: 'Official',
+        SELECTED: '선택된 항목',
     },
     FORM: {
         TYPE: {

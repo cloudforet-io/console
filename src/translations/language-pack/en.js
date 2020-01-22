@@ -305,6 +305,7 @@ export const en = {
         COMPUTE: 'Compute',
         LOCAL: 'Local',
         OFFICIAL: 'OFFICIAL',
+        SELECTED: 'Selected Items',
     },
     FORM: {
         TYPE: {
