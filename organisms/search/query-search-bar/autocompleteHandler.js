@@ -88,15 +88,16 @@ export const getSearchEnumValues = (key, values, defaultValues = [], fuseOptions
     });
     return (contextType, inputText, searchQuery) => {
         if (searchQuery.key === key) {
+            const prefix = `${searchQuery.key}:${searchQuery.operator}`;
             if (searchQuery.value) {
                 const result = fuse.search(searchQuery.value);
-                const prefix = `${searchQuery.key}:${searchQuery.operator}`;
                 return [
                     searchQuery.key,
                     _.flatMap(result, v => `${prefix} ${v.label}`),
                 ];
             }
-            return defaultValues.length ? [searchQuery.key, defaultValues] : [];
+            return defaultValues.length ? [searchQuery.key, _.flatMap(defaultValues, v => `${prefix} ${v}`),
+            ] : [];
         }
         return [];
     };
