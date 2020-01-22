@@ -131,7 +131,7 @@ const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in'
  * @param sortBy
  * @param sortDesc
  * @param searchText
- * @param searchQueries
+ * @param searchQueries {Array<SearchQuery>}
  * @param valueFormatter <(key,value)=>value>
  * @returns {{page: {start: number, limit: *}}}
  */
@@ -179,6 +179,34 @@ export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText, s
         });
         // eslint-disable-next-line camelcase
         if (!_.isEmpty(filter) || !_.isEmpty(mergeOpQuery)) { query.filter = [...filter, ...Object.values(mergeOpQuery)]; }
+    }
+    return query;
+};
+
+/**
+ * make value autocomplete query
+ * @param key
+ * @param value
+ * @param itemLimit
+ * @param sortBy
+ * @param sortDesc
+ * @return {{page: {start: number, limit: *}}}
+ */
+export const autoCompleteQuery = (searchQuery, itemLimit, sortBy, sortDesc) => {
+    const query = {
+        page: { start: 1, limit: itemLimit },
+        only: [searchQuery.key],
+    };
+    if (sortBy) {
+        query.sort = { key: sortBy, desc: sortDesc };
+    }
+
+    if (searchQuery.value) {
+        query.filter = [{
+            k: searchQuery.key,
+            v: searchQuery.value,
+            o: 'contain',
+        }];
     }
     return query;
 };

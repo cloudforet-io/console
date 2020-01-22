@@ -1,5 +1,6 @@
 <template>
     <p-table
+        ref="table"
         :table-style-type="tableStyleType"
         :thead-style-type="theadStyleType"
         :responsive-style="responsiveStyle"
@@ -32,7 +33,7 @@
                     <p-th
                         v-for="(field,index) in fieldsData"
                         :key="index"
-                        :style="{ width: getColWidth(field.size), 'text-align' : getAligning(field.align)}"
+                        :style="field.style ||{}"
                         :class="{'fix-width': colCopy}"
                         @click="theadClick(field,index,$event)"
                         @mouseenter="thHoverIndex=index"
@@ -100,13 +101,11 @@
                                        v-model="proxySelectIndex"
                                        :value="index"
                                        :hovered="hoverIndex===index"
-                                       @change="$emit('changeSelectIndex', $event)"
                             />
                             <p-radio v-else
                                      v-model="proxySelectIndex[0]"
                                      :value="index"
                                      :hovered="hoverIndex===index"
-                                     @change="$emit('changeSelectIndex', $event)"
                             />
                         </p-td>
                         <template v-for="field in fieldsName">
@@ -142,17 +141,98 @@
 
 <script>
 import DragSelect from 'dragselect';
-import PTable from '@/components/molecules/tables/Table.vue';
+import {
+    toRefs, computed, reactive, watch, onMounted,
+} from '@vue/composition-api';
+import _ from 'lodash';
+import PTable, { tableProps } from '@/components/molecules/tables/Table.vue';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import PTh from '@/components/atoms/table/Th.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { selectToCopyToClipboard } from '@/lib/util';
+import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 
-const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox');
+const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox.vue');
 const PRadio = () => import('@/components/molecules/forms/radio/Radio.vue');
-const PCopyButton = () => import('@/components/molecules/buttons/CopyButton');
+const PCopyButton = () => import('@/components/molecules/buttons/CopyButton.vue');
+
+export const dataTableProps = {
+    ...tableProps,
+    fields: Array,
+    items: Array,
+    sortable: {
+        type: Boolean,
+        default: false,
+    },
+    dragable: {
+        type: Boolean,
+        default: false,
+    },
+    rowClickMultiSelectMode: {
+        type: Boolean,
+        default: false,
+    },
+    selectable: {
+        type: Boolean,
+        default: false,
+    },
+    selectIndex: {
+        type: [Array, Number],
+        default: () => [],
+    },
+    sortBy: {
+        type: String,
+        default: null,
+    },
+    sortDesc: {
+        type: Boolean,
+        default: true,
+    },
+    colCopy: {
+        type: Boolean,
+        default: false,
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    useSpinnerLoading: {
+        type: Boolean,
+        default: false,
+    },
+    useCursorLoading: {
+        type: Boolean,
+        default: false,
+    },
+    /**
+   * @name multiSelect
+   * @description When it's 'false', should NOT give value 'true' to 'dragable' prop.
+   */
+    multiSelect: {
+        type: Boolean,
+        default: true,
+    },
+};
+
+
+const loadingHandler = (props) => {
+    onMounted(() => {
+        if (props.loading) {
+            document.body.style.cursor = 'progress';
+        }
+    });
+    watch(() => props.loading, (value) => {
+        if (props.useCursorLoading) {
+            if (value) {
+                document.body.style.cursor = 'progress';
+            } else {
+                document.body.style.cursor = 'default';
+            }
+        }
+    });
+};
 
 export default {
     name: 'PDataTable',
@@ -163,295 +243,160 @@ export default {
         'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
         'changeSort', 'theadClick',
     ],
-    mixins: [PTable],
-    props: {
-        fields: Array,
-        items: Array,
-        sortable: {
-            type: Boolean,
-            default: false,
-        },
-        dragable: {
-            type: Boolean,
-            default: false,
-        },
-        rowClickMultiSelectMode: {
-            type: Boolean,
-            default: false,
-        },
-        selectable: {
-            type: Boolean,
-            default: false,
-        },
-        selectIndex: {
-            type: [Array, Number],
-            default: () => [],
-        },
-        sortBy: {
-            type: String,
-            default: null,
-        },
-        sortDesc: {
-            type: Boolean,
-            default: true,
-        },
-        colCopy: {
-            type: Boolean,
-            default: false,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        useSpinnerLoading: {
-            type: Boolean,
-            default: false,
-        },
-        useCursorLoading: {
-            type: Boolean,
-            default: false,
-        },
-        /**
-         * @name multiSelect
-         * @description When it's 'false', should NOT give value 'true' to 'dragable' prop.
-         */
-        multiSelect: {
-            type: Boolean,
-            default: true,
-        },
-    },
-    data() {
-        return {
+    props: dataTableProps,
+    setup(props, context) {
+        const state = reactive({
+            table: null,
             allState: false,
             hoverIndex: null,
             dragSelect: null,
             thHoverIndex: null,
-        };
-    },
-    computed: {
-        proxySelectIndex: {
-            get() {
-                return this.selectIndex;
-            },
-            set(value) {
-                this.$emit('update:selectIndex', value);
-            },
-        },
-        fieldsData() {
-            const data = [];
-            this.fields.forEach((value) => {
-                if (typeof value === 'string') {
-                    data.push({ name: value, label: value, sortable: true });
-                } else {
-                    data.push({
-                        sortable: true,
-                        ...value,
-                    });
-                }
+        });
+        console.log(props.selectIndex);
+        const proxySelectIndex = makeProxy('selectIndex', props, context.emit);
+        const fieldsData = computed(() => {
+            const data = _.flatMap(props.fields, (value) => {
+                if (typeof value === 'string') { return { name: value, label: value, sortable: true }; }
+                return { sortable: true, ...value };
             });
             return data;
-        },
-        fieldsName() {
-            const data = [];
-            this.fieldsData.forEach((field) => {
-                data.push(field.name);
-            });
-            return data;
-        },
-        sortIcon() {
-            if (this.sortDesc) {
-                return 'ic_table_sort_fromZ';
-            }
-            return 'ic_table_sort_fromA';
-        },
-        selectArea() {
-            return this.$el;
-        },
-        dragSelectAbles() {
-            return this.selectArea.children[0].children[1].children;
-        },
-        showNoData() {
-            if (!this.items || !this.items.hasOwnProperty('length') || this.items.length === 0) {
-                if (this.useSpinnerLoading && this.loading) {
+        });
+
+        const fieldsName = computed(() => _.flatMap(fieldsData.value, field => field.name));
+        const sortIcon = computed(() => (props.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'));
+        const selectArea = computed(() => state.table.$el);
+        const dragSelectAbles = computed(() => selectArea.value.children[0].children[1].children);
+        const showNoData = computed(() => {
+            if (!props.items || !props.items.hasOwnProperty('length') || props.items.length === 0) {
+                if (props.useSpinnerLoading && props.loading) {
                     return false;
                 }
                 return true;
             }
             return false;
-        },
-    },
-    watch: {
-        items() {
-            if (this.selectable && this.dragable && this.$options.name === 'PDataTable' && this.items) {
-                this.$nextTick(() => {
-                    // this.dragSelect.setSelectables(this.dragSelectAbles);
-                    this.dragSelect = new DragSelect({
-                        selectables: this.dragSelectAbles,
-                        area: this.selectArea,
-                        callback: this.dragSelectItems,
-                    });
-                });
-            }
-        },
-        loading() {
-            if (this.useCursorLoading) {
-                if (this.loading) {
-                    document.body.style.cursor = 'progress';
-                } else {
-                    document.body.style.cursor = 'default';
-                }
-            }
-        },
-    },
-    mounted() {
-        if (this.$options.name === 'PDataTable') {
-            if (this.selectable && this.dragable) {
-                // todo: fix when chnage comosition api
-                this.dragSelect = new DragSelect({
-                    selectables: this.dragSelectAbles,
-                    area: this.selectArea,
-                    callback: this.dragSelectItems,
-                });
-            }
-            if (this.selectable) {
-                window.addEventListener('keydown', this.copy);
-            }
-            if (this.loading) {
-                document.body.style.cursor = 'progress';
-            }
-        }
-    },
-    destroyed() {
-        // todo: fix when chnage comosition api
-        if (this.$options.name === 'PDataTable' && this.selectable) {
-            window.removeEventListener('keydown', this.copy);
-        }
-    },
-    methods: {
-        getAligning(align) {
-            return this.isEmpty(align) ? 'left' : align;
-        },
-        getColWidth(size) {
-            return this.isEmpty(size) ? 'auto' : size;
-        },
-        makeTableText(el) {
-            let result = '';
-            const startIdx = this.selectable ? 1 : 0;
-            const tds = el.children;
-            for (let idx = startIdx; idx < el.childElementCount; idx++) {
-                result += `${tds[idx].innerText}\t`;
-            }
-            return `${result}\n`;
-        },
-        copy(event) {
-            /**
-             * TODO: single select copy
-             */
-            if (!this.multiSelect) return;
-
-            if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && this.selectIndex.length > 0) {
-                let result = '';
-                this.selectIndex.forEach((td) => {
-                    result += this.makeTableText(this.dragSelectAbles[td]);
-                });
-                selectToCopyToClipboard(result);
-            }
-        },
-        dragSelectItems(items) {
+        });
+        const dragSelectItems = (items) => {
             const select = [];
             if (items.length > 1) {
                 items.forEach((item) => {
                     select.push(Number(item.attributes['data-index'].value));
                 });
-                this.proxySelectIndex = select;
+                proxySelectIndex.value = select;
             }
-        },
-        rowLeftClick(item, index, event) {
-            this.$emit('rowLeftClick', item, index, event);
-            if (!this.selectable) return;
-            if (this.multiSelect) {
-                if (this.rowClickMultiSelectMode) {
-                    this.checkboxToggle(index);
-                    return;
-                }
-                if (event.shiftKey) {
-                    this.proxySelectIndex = [...this.proxySelectIndex, index];
-                    return;
-                }
-            }
-            this.proxySelectIndex = [index];
-        },
-        rowRightClick(item, index, event) {
-            this.$emit('rowRightClick', item, index, event);
-        },
-        rowMiddleClick(item, index, event) {
-            this.$emit('rowMiddleClick', item, index, event);
-        },
-        rowMouseOver(item, index, event) {
-            this.$emit('rowMouseOver', item, index, event);
-        },
-        rowMouseOut(item, index, event) {
-            this.$emit('rowMouseOut', item, index, event);
-        },
+        };
 
-        theadClick(field, index, event) {
-            if (this.sortable && field.sortable) {
-                if (this.sortBy !== field.name) {
-                    this.$emit('update:sortBy', field.name);
-                    if (!this.sortDesc) {
-                        this.$emit('update:sortDesc', true);
-                    }
-                } else {
-                    if (!this.sortDesc) {
-                        this.$emit('update:sortBy', '');
-                    }
-                    this.$emit('update:sortDesc', !this.sortDesc);
-                }
-                this.$emit('changeSort');
+        const makeTableText = (el) => {
+            let result = '';
+            const startIdx = props.selectable ? 1 : 0;
+            const tds = el.children;
+            // eslint-disable-next-line no-plusplus
+            for (let idx = startIdx; idx < el.childElementCount; idx++) {
+                result += `${tds[idx].innerText}\t`;
             }
-            this.$emit('theadClick', field, index, event);
-        },
+            return `${result}\n`;
+        };
+        const copy = (event) => {
+        /**
+         * TODO: single select copy
+         */
+            const hasSelectData = () => {
+                const selection = document.getSelection();
+                if (selection && selection.type === 'Range') {
+                    return true;
+                }
+                return false;
+            };
+            if (!hasSelectData()) {
+                if (!props.multiSelect) return;
 
-        isSelected(index) {
-            return this.multiSelect
-                ? this.proxySelectIndex.indexOf(index) !== -1
-                : this.proxySelectIndex[0] === index;
-        },
-        checkboxToggle(index) {
-            const newSelected = [...this.proxySelectIndex];
-            if (this.isSelected(index)) {
+                if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && props.selectIndex.length > 0) {
+                    let result = '';
+                    props.selectIndex.forEach((td) => {
+                        result += makeTableText(dragSelectAbles.value[td]);
+                    });
+                    selectToCopyToClipboard(result);
+                }
+            }
+        };
+        const isSelected = index => (props.multiSelect ? proxySelectIndex.value.indexOf(index) !== -1 : proxySelectIndex.value[0] === index);
+        const checkboxToggle = (index) => {
+            const newSelected = [...proxySelectIndex.value];
+            if (isSelected(index)) {
                 const idx = newSelected.indexOf(index);
                 newSelected.splice(idx, 1);
-                this.allState = false;
+                state.allState = false;
             } else {
                 newSelected.push(index);
             }
-            this.proxySelectIndex = newSelected;
-        },
-        selectClick(event) {
-            event.target.children[0].click();
-        },
-        selectAllToggle() {
-            if (this.allState) {
-                this.proxySelectIndex = Array.from(new Array(this.items.length).keys());
-            } else {
-                this.proxySelectIndex = [];
+            proxySelectIndex.value = newSelected;
+        };
+        const rowLeftClick = (item, index, event) => {
+            context.emit('rowLeftClick', item, index, event);
+            if (!props.selectable) return;
+            if (props.multiSelect) {
+                if (props.rowClickMultiSelectMode) {
+                    checkboxToggle(index);
+                    return;
+                }
+                if (event.shiftKey) {
+                    proxySelectIndex.value = [...proxySelectIndex.value, index];
+                    return;
+                }
             }
-        },
-        getSelectItem(sortable) {
-            const selectedIndex = this.isEmpty(sortable) ? this.proxySelectIndex : this.proxySelectIndex.sort((a, b) => a - b);
+            proxySelectIndex.value = [index];
+        };
+        const rowRightClick = (item, index, event) => {
+            context.emit('rowRightClick', item, index, event);
+        };
+        const rowMiddleClick = (item, index, event) => {
+            context.emit('rowMiddleClick', item, index, event);
+        };
+        const rowMouseOver = (item, index, event) => {
+            context.emit('rowMouseOver', item, index, event);
+        };
+        const rowMouseOut = (item, index, event) => {
+            context.emit('rowMouseOut', item, index, event);
+        };
+        const theadClick = (field, index, event) => {
+            if (props.sortable && field.sortable) {
+                if (props.sortBy !== field.name) {
+                    context.emit('update:sortBy', field.name);
+                    if (!props.sortDesc) {
+                        context.emit('update:sortDesc', true);
+                    }
+                } else {
+                    if (!props.sortDesc) {
+                        context.emit('update:sortBy', '');
+                    }
+                    context.emit('update:sortDesc', !props.sortDesc);
+                }
+                context.emit('changeSort');
+            }
+            context.emit('theadClick', field, index, event);
+        };
+
+        const selectClick = (event) => {
+            event.target.children[0].click();
+        };
+        const selectAllToggle = () => {
+            if (state.allState) {
+                proxySelectIndex.value = Array.from(new Array(props.items.length).keys());
+            } else {
+                proxySelectIndex.value = [];
+            }
+        };
+        const getSelectItem = (sortable) => {
+            const selectedIndex = sortable ? proxySelectIndex.value : proxySelectIndex.value.sort((a, b) => a - b);
             const selectItem = [];
             selectedIndex.forEach((index) => {
-                selectItem.push(this.items[index]);
+                selectItem.push(props.items[index]);
             });
             return selectItem;
-        },
-        isThOver(index) {
-            return this.colCopy && this.thHoverIndex === index;
-        },
-        clickColCopy(idx) {
+        };
+        const isThOver = index => props.colCopy && state.thHoverIndex === index;
+        const clickColCopy = (idx) => {
             let result = '';
-            const arr = Array.from(this.dragSelectAbles);
+            const arr = Array.from(dragSelectAbles.value);
             arr.forEach((el) => {
                 const children = Array.from(el.children);
                 children.forEach((td, colIdx) => {
@@ -461,10 +406,57 @@ export default {
                 });
             });
             return result;
-        },
-    },
-};
+        };
 
+        let dragSelect = null;
+        onMounted(() => {
+            if (props.selectable && props.dragable) {
+                console.log(selectArea.value);
+                dragSelect = new DragSelect({
+                    selectables: dragSelectAbles.value,
+                    area: selectArea.value,
+                    callback: dragSelectItems,
+                });
+            }
+        });
+        if (props.selectable) {
+            windowEventMount('keydown', copy);
+        }
+
+        watch(() => props.items, () => {
+            if (props.selectable && props.dragable && props.items) {
+                context.root.$nextTick((() => {
+                    dragSelect.setSelectables(dragSelectAbles.value);
+                    dragSelect.clearSelection();
+                }));
+            }
+        });
+
+        loadingHandler(props);
+
+        return {
+            ...toRefs(state),
+            proxySelectIndex,
+            fieldsData,
+            fieldsName,
+            sortIcon,
+            showNoData,
+            isSelected,
+            rowLeftClick,
+            rowRightClick,
+            rowMiddleClick,
+            rowMouseOver,
+            rowMouseOut,
+            theadClick,
+            selectClick,
+            selectAllToggle,
+            getSelectItem,
+            isThOver,
+            clickColCopy,
+        };
+    },
+
+};
 </script>
 
 <style lang="scss" scoped>

@@ -3,15 +3,15 @@
 import {
     ref, toRefs, computed, reactive,
 } from '@vue/composition-api';
+import _ from 'lodash';
 import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
 import {
     defaultAutocompleteHandler,
-    getEnumValues,
+    getEnumValues, getFetchValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-
 
 export default {
     name: 'Server',
@@ -34,7 +34,10 @@ export default {
             get keys() {
                 return [
                     'server_id', 'name', 'state', 'primary_ip_address', 'server_type', 'os_type', 'project_id',
-                    'data.os.os_arch', 'data.os.os_distro', 'data.base.memory', 'data.base.core', 'data.vm.platform_type',
+                    'data.os.os_arch', 'data.os.os_distro',
+                    'data.base.memory', 'data.base.core', 'data.vm.platform_type',
+                    'data.compute.instance_name', 'data.compute.keypair', 'data.compute.instance_id',
+                    'data.vm.vm_name', 'data.vm.vm_id',
                     'collection_info.state',
                 ];
             }
@@ -44,21 +47,39 @@ export default {
                 return ['server_id', 'name', 'primary_ip_address'];
             }
 
+            // eslint-disable-next-line class-methods-use-this
+            get parent() {
+                return context.parent;
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get valuesFetchUrl() {
+                return '/inventory/server/list';
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get valuesFetchKeys() {
+                return [
+                    'server_id', 'name', 'primary_ip_address',
+                    'data.compute.instance_name', 'data.compute.instance_id',
+                    'data.vm.vm_name', 'data.vm.vm_id',
+                ];
+            }
 
             // eslint-disable-next-line no-shadow
-            constructor(context) {
+            constructor() {
                 super();
-                this.context = context;
-                this.handlerMap.value = [
+                this.handlerMap.value.push(...[
                     getEnumValues('state', ['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED']),
                     getEnumValues('os_type', ['LINUX', 'WINDOWS']),
                     getEnumValues('collection_info.state', ['MANUAL', 'ACTIVE', 'DISCONNECTED']),
                     getEnumValues('server_type', ['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN']),
-                ];
+                    getFetchValues('project_id', '/identity/project/list', this.parent),
+                ]);
             }
         }
 
-        const state = serverSetup(props, context, serverEventNames, new ACHandler(context));
+        const state = serverSetup(props, context, serverEventNames, new ACHandler());
         const projectNameList = ref({});
         const matchProject = (items) => {
             for (let i = 0; i < items.length; i++) {

@@ -1,7 +1,8 @@
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import PDataTable from './DataTable';
+import PDataTable from './DataTable.vue';
+import md from './DataTable.md';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import PTh from '@/components/atoms/table/Th.vue';
@@ -11,10 +12,7 @@ export default {
     title: 'organisms/tables/datatable',
     component: PDataTable,
     parameters: {
-        info: {
-            summary: '',
-            components: { PDataTable },
-        },
+        notes: md,
     },
 };
 const actions = {
@@ -296,37 +294,40 @@ export const customColSlot = () => ({
         sendEmail: action('send_email'),
     },
 });
-
-export const loading = () => ({
-    components: { PDataTable },
-    mixins: [mockupMixin],
-    template: `<PDataTable 
-                :items="items" 
-                :fields="fields"
-                :hover="true"
-                @rowLeftClick="rowLeftClick"
-                @rowRightClick="rowRightClick"
-                @rowMiddleClick="rowMiddleClick"
-                @rowMouseOver="rowMouseOver"
-                @rowMouseOut="rowMouseOut"
-                >
-               </PDataTable>
-              `,
-    props: {
-        loding: {
-            default: boolean('loading', false),
-        },
-        useSpinnerLoding: { default: boolean('useSpinnerLoding', true) },
-        useCursorLoding: {
-            default: boolean('useCursorLoding', false),
-        },
-    },
-    data() {
-        return {
-            ...data,
-        };
-    },
-    methods: {
-        ...actions,
-    },
-});
+//
+// export const loading = () => ({
+//     components: { PDataTable },
+//     mixins: [mockupMixin],
+//     template: `<PDataTable
+//                 :items="items"
+//                 :fields="fields"
+//                 :hover="true"
+//                 :loading="loading"
+//                 :useSpinnerLoding="useSpinnerLoading"
+//                 :useCursorLoding="useCursorLoading"
+//                 @rowLeftClick="rowLeftClick"
+//                 @rowRightClick="rowRightClick"
+//                 @rowMiddleClick="rowMiddleClick"
+//                 @rowMouseOver="rowMouseOver"
+//                 @rowMouseOut="rowMouseOut"
+//                 >
+//                </PDataTable>
+//               `,
+//     props: {
+//         loading: {
+//             default: boolean('loading', true),
+//         },
+//         useSpinnerLoading: { default: boolean('useSpinnerLoading', true) },
+//         useCursorLoading: {
+//             default: boolean('useCursorLoading', false),
+//         },
+//     },
+//     data() {
+//         return {
+//             ...data,
+//         };
+//     },
+//     methods: {
+//         ...actions,
+//     },
+// });

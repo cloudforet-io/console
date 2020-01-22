@@ -1,6 +1,6 @@
 <template>
     <div class="collector-creator-container">
-        <p-button class="back-btn">
+        <p-button class="back-btn" @click="goBack">
             <p-i name="ic_back" color="transparent inherit" />
             Back to Plugins
         </p-button>
@@ -13,16 +13,12 @@
                            @changeStep="onChangeStep"
         >
             <template #contents-conf="{tab}">
-                <configure-collector ref="conf" :plugin="plugin" :versions="versions"
-                                     :show-validation="tab.showValidation"
+                <configure-collector ref="conf" :show-validation="tab.showValidation"
                                      @changeValidState="updateTabInvalid(0, $event)"
                 />
             </template>
             <template #contents-credentials>
-                <choose-credentials ref="crd" :items="credentials"
-                                    :fields="fields"
-                                    :total-count="totalCount"
-                                    :loading="loading"
+                <choose-credentials ref="crd"
                                     @changeValidState="updateTabInvalid(1, $event)"
                 />
             </template>
@@ -37,6 +33,7 @@
 
 <script>
 import { reactive, toRefs, computed } from '@vue/composition-api';
+import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -47,12 +44,6 @@ const ChooseCredentials = () => import('@/views/inventory/collector/modules/Choo
 const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup.vue');
 
 export const setDataState = (props, args) => reactive({
-    plugin: undefined,
-    versions: undefined,
-    credentials: [],
-    fields: ['credential_id', 'name', 'issue_type', 'credential_groups'],
-    totalCount: 0,
-    loading: true,
     tags: {},
 });
 
@@ -67,7 +58,7 @@ export default {
         ChooseCredentials,
         PDictInputGroup,
     },
-    setup(props, { refs }) {
+    setup(props, { refs, root }) {
         const dataState = setDataState();
 
         const state = reactive({
@@ -94,8 +85,12 @@ export default {
             showConfirm: false,
         });
 
-        const onCancel = () => {};
-        const onConfirm = () => {};
+        const onCancel = () => {
+            root.$router.push('/inventory/collector');
+        };
+        const onConfirm = () => {
+            CollectorEventBus.$emit('createCollector');
+        };
 
         const isAllTabValid = computed(() => _.every(state.tabs, tab => !!tab.invalid === false));
 
@@ -114,6 +109,10 @@ export default {
             updateTabInvalid(beforeIdx, res);
         };
 
+        const goBack = () => {
+            root.$router.push('../plugins');
+        };
+
 
         return {
             ...toRefs(dataState),
@@ -123,6 +122,7 @@ export default {
             isAllTabValid,
             updateTabInvalid,
             onChangeStep,
+            goBack,
         };
     },
 };

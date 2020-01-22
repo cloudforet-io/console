@@ -17,7 +17,7 @@
                             <p-col :col="12">
                                 <PFieldGroup
                                     label="Credentials Name"
-                                    :invalid-text="invalidMessage.name"
+                                    :invalid-text="invalidMsg.name"
                                     :invalid="invalidState.name"
                                     :valid="validState.name"
                                     :required="true"
@@ -71,7 +71,7 @@
                                             :selected.sync="selected"
                         />
                         <PFieldGroup v-if="selected === 'form'"
-                                     :invalid-text="invalidMessage.form"
+                                     :invalid-text="invalidMsg.form"
                                      :invalid="invalidState.form"
                         >
                             <template v-slot:default="{invalid}">
@@ -89,15 +89,16 @@
                         </PFieldGroup>
 
                         <PFieldGroup v-else
-                                     :invalid-text="invalidMessage.data"
+                                     :invalid-text="invalidMsg.data"
                                      :invalid="invalidState.data"
+                                     :valid="validState.data"
                         >
                             <template v-slot:default="{invalid}">
                                 <div>
                                     <PMonacoEditor class="json-editor" :code.sync="formState.data" />
-                                    <div v-show="invalid" style="display:block" class="invalid-feedback">
-                                        * {{ $t('SIGNIN.PASS_EMPTY') }}
-                                    </div>
+                                    <!--<div v-show="invalid" style="display:block" class="invalid-feedback">
+                                        * {{ $t('SECRET.JASON_ALERT') }}
+                                    </div>-->
                                 </div>
                             </template>
                         </PFieldGroup>
@@ -109,12 +110,12 @@
 </template>
 <script>
 import {
-    computed, reactive, ref, toRefs, watch,
+    computed, reactive, watch,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import {
-    formValidation, makeProxy, requiredValidation, jsonParseValidation,
+    formValidation, makeProxy, requiredValidation, jsonParseValidation, credentialsNameValidation
 } from '@/lib/compostion-util';
 import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
@@ -160,17 +161,11 @@ const setup = (props, context) => {
     state.selected = _.isEmpty(getDataInputType()) ? 'json' : 'form';
     state.values = {};
 
-    const invalidMessage = {
-        name: 'Required fields!',
-        data: 'Please, confirm your Json String Format.',
-    };
-
     const formState = reactive({
         name: '',
         tags: {},
         issue_type: 'credential',
         data: '',
-        ...props.item,
     });
 
     const onOptionChange = () => {};
@@ -202,10 +197,10 @@ const setup = (props, context) => {
     );
 
     const leftHalfValidations = {
-        name: [requiredValidation()],
+        name: [requiredValidation(), credentialsNameValidation(context.parent)],
     };
 
-    if (state.selected === 'json') { leftHalfValidations.data = [jsonParseValidation()]; }
+    if (state.selected === 'json') { leftHalfValidations.data = [requiredValidation(), jsonParseValidation()]; }
 
     const validateAPI = formValidation(formState, leftHalfValidations);
 
@@ -238,7 +233,6 @@ const setup = (props, context) => {
 
     return {
         ...state,
-        invalidMessage,
         formState,
         dynamicForm,
         onOptionChange,
@@ -266,15 +260,6 @@ export default {
         visible: {
             type: Boolean,
             default: false,
-        },
-        item: {
-            type: Object,
-            default: () => ({
-                name: '',
-                issue_type: '',
-                tags: {},
-                data: '',
-            }),
         },
         dynamicFormState: {
             type: Object,

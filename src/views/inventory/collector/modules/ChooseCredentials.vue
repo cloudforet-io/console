@@ -1,7 +1,7 @@
 <template>
     <div>
         <p-toolbox-table :items="items"
-                         :fields="fields"
+                         :fields="fields[crdType]"
                          selectable
                          :multi-select="false"
                          sortable
@@ -18,7 +18,6 @@
                          :loading="loading"
                          use-spinner-loading
                          use-cursor-loading
-                         @changeSelectIndex="onChangeSelectIndex"
                          @changePageSize="listCredentials"
                          @changePageNumber="listCredentials"
                          @clickRefresh="listCredentials"
@@ -30,7 +29,7 @@
                         <span v-for="type in crdTypes" :key="type"
                               class="radios"
                         >
-                            <p-radio v-model="crdType" :value="type" />
+                            <p-radio v-model="crdType" :value="type" @change="listCredentials" />
                             {{ type }}
                         </span>
                     </p-col>
@@ -43,9 +42,14 @@
                 </p-row>
             </template>
             <template #col-credential_groups-format="{value}">
-                <p-tag v-for="crdg in value" :key="crdg.credential_group_id" :deletable="false">
-                    {{ crdg.name }}
-                </p-tag>
+                <span>
+                    <p-tag v-for="crdg in value" :key="crdg.credential_group_id" :deletable="false">
+                        {{ crdg }}
+                    </p-tag>
+                </span>
+            </template>
+            <template #col-created_at-format="data">
+                {{ timestampFormatter(data.value) }}
             </template>
         </p-toolbox-table>
     </div>
@@ -53,18 +57,27 @@
 
 <script>
 import {
-    reactive, toRefs, computed,
+    reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
 import { defaultQuery } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
+import { makeTrItems } from '@/lib/view-helper';
+import { timestampFormatter, getValue } from '@/lib/util';
 
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PRadio from '@/components/molecules/forms/radio/Radio.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
-import PTag from '@/components/molecules/tags/Tag.vue';
 
+export const crdState = reactive({
+    items: [],
+    totalCount: 0,
+    loading: true,
+    query: undefined,
+    selectIndex: [],
+    crdType: 'Credentials'
+});
 
 export default {
     name: 'ChooseCredentials',
@@ -74,53 +87,59 @@ export default {
         PRadio,
         PSearch,
         PToolboxTable,
-        PTag,
     },
-    props: {
-        items: Array,
-        fields: Array,
-        totalCount: Number,
-        loading: Boolean,
-    },
-    setup(props, { emit }) {
+    setup(props, { emit, root }) {
         const state = reactive({
             sortBy: '',
             sortDesc: '',
             pageSize: 10,
             thisPage: 1,
             searchText: '',
-            selectIndex: [],
             crdTypes: ['Credentials Group', 'Credentials'],
-            crdType: 'Credentials',
+            fields: {
+                'Credentials Group': makeTrItems([
+                    ['credential_group_id', 'COMMON.ID'],
+                    ['name', 'COMMON.NAME'],
+                    ['created_at', 'COMMON.CREATE'],
+                ], root),
+                Credentials: makeTrItems([
+                    ['credential_id', 'COMMON.ID', { size: '400px' }],
+                    ['name', 'COMMON.NAME', { size: '400px' }],
+                    ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
+                    ['credential_groups', 'COMMON.GROUP', { size: '800px', sortable: false }],
+                    ['created_at', 'COMMON.CREATED', { size: '300px' }],
+                ], root),
+            },
         });
 
-        const validate = () => state.selectIndex.length !== 0;
+        const validate = () => crdState.selectIndex.length !== 0;
 
-        const onChangeSelectIndex = () => {
+        watch(() => crdState.selectIndex, () => {
             emit('changeValidState', validate());
-        };
+        });
 
-        const allPage = computed(() => Math.ceil(props.totalCount / state.pageSize) || 1);
+        const allPage = computed(() => Math.ceil(crdState.totalCount / state.pageSize) || 1);
 
-        const query = computed(() => (defaultQuery(
+        crdState.query = computed(() => (defaultQuery(
             state.thisPage, state.pageSize,
             state.sortBy, state.sortDesc,
             state.searchText,
         )));
 
         const listCredentials = () => {
-            if (state.crdType === 'Credentials') CollectorEventBus.$emit('listCredentials', query.value);
-            else CollectorEventBus.$emit('listCredentialsGroup', query.value);
+            if (crdState.crdType === 'Credentials') CollectorEventBus.$emit('listCredentials');
+            else CollectorEventBus.$emit('listCredentialsGroup');
         };
 
         listCredentials();
 
         return {
+            ...toRefs(crdState),
             ...toRefs(state),
             validate,
-            onChangeSelectIndex,
             allPage,
             listCredentials,
+            timestampFormatter,
         };
     },
 };

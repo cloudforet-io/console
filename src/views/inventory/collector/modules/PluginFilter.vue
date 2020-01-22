@@ -12,11 +12,11 @@
         </p-row>
         <p-row direction="column">
             <header>Repository</header>
-            <span v-for="(repo, idx) in repoOptions" :key="idx"
-                  class="filter" :class="{selected: selectedRepo === repo}"
+            <span v-for="(repo, idx) in repositories" :key="idx"
+                  class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"
             >
-                <p-radio v-model="selectedRepo" :value="repo" @change="onRepoChange(repo)" />
-                {{ repo }}
+                <p-radio v-model="proxySelectedRepoId" :value="repo.repository_id" @change="onRepoChange(repo)" />
+                {{ repo.name }}
             </span>
         </p-row>
         <p-row direction="column">
@@ -25,7 +25,7 @@
                   class="filter" :class="{selected: proxyFilters.includes(resource)}"
             >
                 <p-check-box v-model="proxyFilters" :value="resource"
-                             @change="onResourceChange(resource, $event)"
+                             @change="onResourceChange"
                 />
                 {{ resource }}
             </span>
@@ -34,20 +34,20 @@
 </template>
 
 <script>
-import { toRefs, reactive } from '@vue/composition-api';
+import { toRefs, reactive, computed } from '@vue/composition-api';
 
-import PRow from '@/components/atoms/grid/row/Row';
-import PCol from '@/components/atoms/grid/col/Col';
-import PI from '@/components/atoms/icons/PI';
-import PButton from '@/components/atoms/buttons/Button';
-import PSearch from '@/components/molecules/search/Search';
-import PRadio from '@/components/molecules/forms/radio/Radio';
-import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PSearch from '@/components/molecules/search/Search.vue';
+import PRadio from '@/components/molecules/forms/radio/Radio.vue';
+import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import { makeProxy } from '@/lib/compostion-util';
 
 export default {
     name: 'PluginFilter',
-    events: ['goBack', 'search', 'repoChange', 'resourceChange'],
+    events: ['goBack', 'search', 'repoChange', 'filtersChange'],
     components: {
         PRow,
         PCol,
@@ -62,12 +62,19 @@ export default {
             type: Array,
             default: () => [],
         },
+        repositories: {
+            type: Array,
+            default: () => [],
+        },
+        selectedRepoId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, context) {
         const state = reactive({
             search: '',
-            repoOptions: ['Official', 'Local'],
-            selectedRepo: 'Official',
+            proxySelectedRepoId: makeProxy('selectedRepoId', props, context.emit),
             resourceOptions: [
                 'Server', 'Network', 'Subnet', 'IP Address',
             ],
@@ -79,8 +86,8 @@ export default {
             context.emit('repoChange', val);
         };
 
-        const onResourceChange = (resource, selected) => {
-            context.emit('resourceChange', resource, selected);
+        const onResourceChange = (selected) => {
+            context.emit('filtersChange', selected);
         };
 
         return {

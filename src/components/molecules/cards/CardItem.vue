@@ -1,9 +1,9 @@
 <template>
-    <p-pane-layout v-on="$listeners" class="p-card-item-container">
+    <p-pane-layout class="p-card-item-container" v-on="$listeners">
         <p-row class="p-card-item">
             <p-col :flex-grow="0">
                 <slot name="side">
-                    <p-i :name="icon" width="4.5rem" height="4.5rem" />
+                    <img :src="icon" class="icon">
                 </slot>
             </p-col>
             <p-col class="card-body">
@@ -28,20 +28,20 @@
 </template>
 
 <script>
-import PI from '@/components/atoms/icons/PI';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout';
-import PCol from '@/components/atoms/grid/col/Col';
-import PRow from '@/components/atoms/grid/row/Row';
+import config from '@/lib/config';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
 
 export default {
     name: 'CardItem',
     components: {
-        PRow, PCol, PI, PPaneLayout,
+        PRow, PCol, PPaneLayout,
     },
     props: {
         icon: {
             type: String,
-            default: 'ic_collector_tags',
+            default: config.get('COLLECTOR_IMG'),
         },
         title: {
             type: String,
@@ -67,6 +67,10 @@ export default {
 .p-card-item {
     padding: 1rem;
     height: 126px;
+    .icon {
+        width: 4.5rem;
+        height: 4.5rem;
+    }
     .card-body {
         all: unset;
         width: 100%;

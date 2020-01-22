@@ -4,18 +4,17 @@
             <p-col :flex-grow="0" class="container collector-info">
                 <p-row>
                     <p-col :flex-grow="0">
-                        <img class="img" :src="plugin.image || defaultImg">
+                        <img class="img" :src="imgUrl">
                     </p-col>
                     <p-col>
                         <p class="name">
-                            Collector Name
+                            {{ plugin ? plugin.name : '' }}
                         </p>
                         <p-field-group label="Version">
                             <p-dropdown-menu-btn :menu="versionsInfo"
-                                                 @openMenu="getVersionsInfo"
                                                  @clickMenuEvent="onSelectVersion"
                             >
-                                {{ version }}
+                                {{ selectedVersion }}
                             </p-dropdown-menu-btn>
                         </p-field-group>
                         <p-field-group label="Priority">
@@ -30,7 +29,7 @@
                 <p class="sub-title">
                     Options
                 </p>
-                <p-dynamic-form v-for="(op, idx) in plugin.template.options" :key="idx"
+                <p-dynamic-form v-for="(op, idx) in proxyPluginOptions" :key="idx"
                                 v-model="optionsValue[op.key]"
                                 :form="op"
                                 :invalid="showValidation ? vdApi.invalidState[op.key] : false"
@@ -57,6 +56,15 @@ import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue
 import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
 import { makeProxy } from '@/lib/compostion-util';
 
+export const confState = reactive({
+    pluginId: undefined,
+    plugin: undefined,
+    versions: [],
+    selectedVersion: undefined,
+    priority: 10,
+    optionsValue: {},
+});
+
 export default {
     name: 'ConfigureCollector',
     components: {
@@ -68,21 +76,6 @@ export default {
         PDynamicForm,
     },
     props: {
-        plugin: {
-            type: Object,
-            default: () => ({
-                name: '',
-                image: '',
-                template: {
-                    options: [{}],
-                    credentials: [],
-                },
-            }),
-        },
-        versions: {
-            type: Array,
-            default: null,
-        },
         showValidation: {
             type: Boolean,
             default: false,
@@ -92,36 +85,37 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit, root }) {
+        confState.pluginId = root.$route.params.pluginId;
+        CollectorEventBus.$emit('getPlugin');
+        CollectorEventBus.$emit('listVersionsInfo');
+
         const state = reactive({
-            defaultImg: config.get('COLLECTOR_IMG'),
-            priority: 10,
-            optionsValue: {},
-            versionsInfo: computed(() => {
-                if (props.versions) {
-                    return props.versions.map(v => ({ type: 'item', label: v, name: v }));
-                } return [];
-            }),
-            version: 'Select Version',
+            version: root.$route.query.version,
             proxyIsInvalid: makeProxy('isInvalid', props, emit),
+            proxyPluginOptions: computed(() => {
+                if (confState.plugin && confState.plugin.template && confState.plugin.template.options) return confState.plugin.template.options;
+                return [];
+            }),
+        });
+        const imgUrl = computed(() => {
+            if (confState.plugin && confState.plugin.tags && confState.plugin.tags.icon) return confState.plugin.tags.icon;
+            return config.get('COLLECTOR_IMG');
+        });
+        const versionsInfo = computed(() => {
+            if (!confState.selectedVersion) confState.selectedVersion = confState.versions[0];
+            return confState.versions.map(v => ({ type: 'item', label: v, name: v }));
         });
 
-        const readonlyState = {
-            name: props.plugin.name,
-        };
-
-        const getVersionsInfo = () => {
-            if (state.versionsInfo.length === 0) CollectorEventBus.$emit('listVersionsInfo');
-        };
         const onSelectVersion = (item) => {
-            state.version = item;
+            confState.version = item;
         };
 
-        const vdApi = setValidation(props.plugin.template.options, state.optionsValue);
+        const vdApi = setValidation(state.proxyPluginOptions, confState.optionsValue);
 
-        watch(() => props.plugin, () => {
-            state.optionsValue = {};
-            const newVdApi = setValidation(props.plugin.template.options, state.optionsValue);
+        watch(() => confState.plugin, () => {
+            confState.optionsValue = {};
+            const newVdApi = setValidation(state.proxyPluginOptions, confState.optionsValue);
             vdApi.invalidMsg = newVdApi.invalidMsg;
             vdApi.invalidState = newVdApi.invalidState;
             vdApi.fieldValidation = newVdApi.fieldValidation;
@@ -129,19 +123,20 @@ export default {
             vdApi.isAllValid = newVdApi.isAllValid;
         });
 
-        CollectorEventBus.$emit('getPlugin');
+        const onChange = async (val) => {
+            if (!props.showValidation) return;
+            await vdApi.fieldValidation(val);
+            emit('changeValidState', vdApi.isAllValid.value);
+        };
 
         return {
+            ...toRefs(confState),
             ...toRefs(state),
-            ...readonlyState,
-            getVersionsInfo,
+            imgUrl,
+            versionsInfo,
             onSelectVersion,
             vdApi,
-            onChange: async (val) => {
-                if (!props.showValidation) return;
-                await vdApi.fieldValidation(val);
-                emit('changeValidState', vdApi.isAllValid.value);
-            },
+            onChange,
         };
     },
 };
