@@ -76,7 +76,7 @@ export const crdState = reactive({
     loading: true,
     query: undefined,
     selectIndex: [],
-    crdType: 'Credentials'
+    crdType: 'Credentials',
 });
 
 export default {

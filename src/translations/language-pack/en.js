@@ -90,6 +90,7 @@ export const en = {
         REPO: 'Repository',
         CREDENTIAL: 'Credential',
         CREDENTIALS: 'Credentials',
+        CREDENTIAL_GRP: 'Credential Group',
         CREATE_NODE: 'Create Node',
         CREATE_LEAF: 'Create Leaf',
         UPDATE_SELECT: 'Update Selected',
@@ -200,6 +201,7 @@ export const en = {
         KEY: 'Key',
         FAIL_REASON: 'Reason for Failure',
         ISSUE_TYPE: 'Issue Type',
+        ALL: 'All',
     },
     ATOM: {
 
@@ -262,6 +264,8 @@ export const en = {
         REGION_NM: 'Region Name',
         ZONE_NM: 'Zone Name',
         POOL_NM: 'Pool Name',
+        COL_OPS: 'Collect Options',
+        FILTERS: 'Filters',
     },
     SECRET: {
         JASON_ALERT: 'Please, Check Json Format (Use double quotation( \\" ) mark instead of single quotation (\').',
@@ -307,6 +311,7 @@ export const en = {
         COMPUTE: 'Compute',
         LOCAL: 'Local',
         OFFICIAL: 'OFFICIAL',
+        SELECTED: 'Selected Items',
     },
     FORM: {
         TYPE: {
