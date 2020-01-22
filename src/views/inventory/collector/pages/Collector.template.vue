@@ -101,7 +101,10 @@
             </template>
         </p-tab>
 
-        <collect-data-modal ref="collectDataModal" />
+        <collect-data-modal v-if="collectDataModalVisible"
+                            :visible.sync="collectDataModalVisible"
+                            :collector="items[selectIndex[0]]"
+        />
     </div>
 </template>
 
@@ -175,6 +178,7 @@ const setTableData = (props, context, collectorState) => {
         timestampFormatter,
         collectorStateFormatter,
         defaultImg: config.get('COLLECTOR_IMG'),
+        collectDataModalVisible: false,
     });
 
     const nothingSelected = computed(() => collectorState.selectIndex.length === 0);
@@ -193,9 +197,14 @@ const setTableData = (props, context, collectorState) => {
         { type: 'item' }),
     });
 
+    const onClickCollectData = () => {
+        state.collectDataModalVisible = true;
+    };
+
     return {
         ...toRefs(state),
         dropdown,
+        onClickCollectData,
     };
 };
 
@@ -227,7 +236,7 @@ const setActions = (props, context) => {
     const onClickEnable = () => {};
     const onClickDisable = () => {};
     const onClickDelete = () => {};
-    const onClickCollectData = () => {};
+
 
     return {
         getCollectors,
@@ -235,7 +244,6 @@ const setActions = (props, context) => {
         onClickEnable,
         onClickDisable,
         onClickDelete,
-        onClickCollectData,
     };
 };
 
@@ -243,7 +251,7 @@ export const collectorSetup = (props, context) => {
     const collectorState = setCollectorState(props, context);
     const tableRefs = setTableData(props, context, collectorState);
     const tabRefs = setTabData(props, context);
-    const actions = setActions();
+    const actions = setActions(props, context);
 
     actions.getCollectors();
 
@@ -303,10 +311,6 @@ export default {
     }
     li {
         display: list-item;
-    }
-
-    .reset-btn {
-        margin-right: auto;
     }
 }
 </style>
