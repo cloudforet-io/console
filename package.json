@@ -16,6 +16,7 @@
     "@johmun/vue-tags-input": "^2.1.0",
     "@vue/composition-api": "^0.3.2",
     "animated-number-vue": "^1.0.0",
+    "awesome-typescript-loader": "^5.2.1",
     "axios": "^0.18.0",
     "babel-preset-vue": "^2.0.2",
     "bootstrap": "^4.3.1",
