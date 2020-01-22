@@ -28,7 +28,7 @@
             <template slot="toolbox-left">
 
                 <p-button class="left-toolbox-item" style-type="primary"
-                          @click="$router.push({ name:'addCredentials', params: { id: 'cred-grp-21a4cd399efe' }})"
+                          @click="onClick"
                 >
                     {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
@@ -108,7 +108,7 @@ export default {
 
         getCdList: String,
     },
-    setup(props, { parent, emit }) {
+    setup(props, { parent, emit, root }) {
         const fields = makeTrItems([
             ['credential_id', 'COMMON.ID'],
             ['name', 'COMMON.NAME'],
@@ -137,10 +137,15 @@ export default {
             getData();
         });
 
+
         return {
             ...toRefs(state),
             getData,
             timestampFormatter,
+            onClick: () => {
+                console.log(root.$router, root.$route,  'routing test')
+                root.$router.push('/secret/credentials-group/add/cred-grp-21a4cd399efe');
+            },
         };
     },
 };
