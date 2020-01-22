@@ -3,8 +3,8 @@
 import {
     ref, toRefs, computed, reactive,
 } from '@vue/composition-api';
-import CollectorTemplate, { collectorSetup } from '@/views/inventory/collector/pages/Collector.template';
-import { mountBusEvent } from '@/lib/compostion-util';
+import CollectorTemplate, { collectorSetup } from '@/views/inventory/collector/pages/Collector.template.vue';
+import { mountBusEvent } from '@/lib/compostion-util.ts';
 import { defaultQuery } from '@/lib/api';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 

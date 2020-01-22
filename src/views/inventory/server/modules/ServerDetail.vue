@@ -128,7 +128,9 @@ export default {
         ], parent, { copyFlag: true });
         const dict = ref({ ...props.item.tags });
         watch(() => props.item, (value) => {
-            dict.value = value.tags;
+            if (value) {
+                dict.value = value.tags || {};
+            }
         });
         const dictPanel = ref(null);
         const resetTag = () => {

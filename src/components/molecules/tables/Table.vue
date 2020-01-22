@@ -24,80 +24,81 @@
 
 <script>
 const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
-export default {
-    name: 'PTable',
-    props: {
-        tableStyleType: {
-            type: String,
-            default: null,
-            validator(value) {
-                return [null, ...color].indexOf(value) !== -1;
-            },
-        },
-        theadStyleType: {
-            type: String,
-            default: null,
-            validator(value) {
-                return [null, 'light', 'dark'].indexOf(value) !== -1;
-            },
-        },
-        responsiveStyle: {
-            type: Object,
-            default: null,
-        },
-        tableStyle: {
-            type: Object,
-            default: null,
-        },
-        theadStyle: {
-            type: Object,
-            default: null,
-        },
-        tbodyStyle: {
-            type: Object,
-            default: null,
-        },
-        tfootStyle: {
-            type: Object,
-            default: null,
-        },
-        tbodyClass: {
-            type: Object,
-            default: null,
-        },
-        tfootClass: {
-            type: Object,
-            default: null,
-        },
-
-        striped: {
-            type: Boolean,
-            default: true,
-        },
-        bord: {
-            type: Boolean,
-            default: null,
-        },
-        hover: {
-            type: Boolean,
-            default: false,
-        },
-        small: {
-            type: Boolean,
-            default: false,
-        },
-        background: {
-            type: Boolean,
-            default: false,
-        },
-        responsive: {
-            type: [String, Boolean],
-            default: false,
-            validator(value) {
-                return [false, true, 'sm', 'md', 'lg', 'xl'].indexOf(value) !== -1;
-            },
+export const tableProps = {
+    tableStyleType: {
+        type: String,
+        default: null,
+        validator(value) {
+            return [null, ...color].indexOf(value) !== -1;
         },
     },
+    theadStyleType: {
+        type: String,
+        default: null,
+        validator(value) {
+            return [null, 'light', 'dark'].indexOf(value) !== -1;
+        },
+    },
+    responsiveStyle: {
+        type: Object,
+        default: null,
+    },
+    tableStyle: {
+        type: Object,
+        default: null,
+    },
+    theadStyle: {
+        type: Object,
+        default: null,
+    },
+    tbodyStyle: {
+        type: Object,
+        default: null,
+    },
+    tfootStyle: {
+        type: Object,
+        default: null,
+    },
+    tbodyClass: {
+        type: Object,
+        default: null,
+    },
+    tfootClass: {
+        type: Object,
+        default: null,
+    },
+
+    striped: {
+        type: Boolean,
+        default: true,
+    },
+    bord: {
+        type: Boolean,
+        default: null,
+    },
+    hover: {
+        type: Boolean,
+        default: false,
+    },
+    small: {
+        type: Boolean,
+        default: false,
+    },
+    background: {
+        type: Boolean,
+        default: false,
+    },
+    responsive: {
+        type: [String, Boolean],
+        default: false,
+        validator(value) {
+            return [false, true, 'sm', 'md', 'lg', 'xl'].indexOf(value) !== -1;
+        },
+    },
+};
+export default {
+    name: 'PTable',
+    props: tableProps,
     computed: {
         classObject() {
             const obj = [
@@ -230,6 +231,9 @@ export default {
         }
     }
 
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: transparent;
+    }
     .table-striped tbody tr:nth-of-type(even) {
         @extend %striped-row;
         &:hover {

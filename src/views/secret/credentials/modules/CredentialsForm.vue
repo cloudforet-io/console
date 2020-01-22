@@ -11,20 +11,20 @@
     >
         <template #body>
             <div class="form">
-                <card-layout style="border:none">
+                <card-layout class="form-card-layout" :no-margin="true" :no-padding="true">
                     <template slot="leftHalf">
-                        <p-row>
-                            <p-col :col="12">
-                                <PFieldGroup
-                                    label="Credentials Name"
-                                    :invalid-text="invalidMessage.name"
-                                    :invalid="invalidState.name"
-                                    :valid="validState.name"
-                                    :required="true"
-                                >
-                                    <template v-slot:default="{invalid}">
-                                        <p-row style="width: 100%">
-                                            <p-col :style="{'max-width': '19rem'}">
+                        <div class="left-container">
+                            <p-row style="width: 100%">
+                                <p-col :col="12">
+                                    <PFieldGroup
+                                        label="Credentials Name"
+                                        :invalid-text="invalidMsg.name"
+                                        :invalid="invalidState.name"
+                                        :valid="validState.name"
+                                        :required="true"
+                                    >
+                                        <template v-slot:default="{invalid}">
+                                            <p-col :style="{'max-width': '32rem', 'margin-left': 'none'}">
                                                 <p-text-input
                                                     v-model="formState.name"
                                                     v-focus
@@ -35,72 +35,77 @@
                                                     }"
                                                 />
                                             </p-col>
-                                        </p-row>
-                                    </template>
-                                </PFieldGroup>
-                            </p-col>
-                        </p-row>
-                        <p-row>
-                            <p-col :col="6">
-                                <p-row style="width: 100%" direction="column">
-                                    <PFieldGroup label="Issue Type">
-                                        <PSelectDropdown v-model="formState.issue_type" :items="issueTypeSelectItems" />
+                                        </template>
                                     </PFieldGroup>
-                                </p-row>
-                            </p-col>
-                        </p-row>
-                        <p-row>
-                            <p-col :col="12">
-                                <PFieldGroup label="Tags">
-                                    <p-dict-input-group class="tag-input"
-                                                        :use-full-col="true"
-                                                        :edit-mode="true"
-                                                        :dict.sync="formState.tags"
-                                    />
-                                </PFieldGroup>
-                            </p-col>
-                        </p-row>
+                                </p-col>
+                            </p-row>
+                            <p-row>
+                                <p-col :col="6">
+                                    <p-row style="width: 100%" direction="column">
+                                        <PFieldGroup label="Issue Type">
+                                            <PSelectDropdown v-model="formState.issue_type" :items="issueTypeSelectItems" />
+                                        </PFieldGroup>
+                                    </p-row>
+                                </p-col>
+                            </p-row>
+                            <p-row>
+                                <p-col :col="12">
+                                    <PFieldGroup label="Tags">
+                                        <p-dict-input-group class="tag-input"
+                                                            :remove-row-effect="true"
+                                                            :use-full-col="true"
+                                                            :edit-mode="true"
+                                                            :dict.sync="formState.tags"
+                                        />
+                                    </PFieldGroup>
+                                </p-col>
+                            </p-row>
+                        </div>
                     </template>
                     <template slot="rightHalf">
-                        <p-label class="input-title">
-                            Data Input Type
-                        </p-label>
-                        <p-select-btn-group style="margin-bottom: 1rem"
-                                            :space="true"
-                                            :buttons="optionType"
-                                            :selected.sync="selected"
-                        />
-                        <PFieldGroup v-if="selected === 'form'"
-                                     :invalid-text="invalidMessage.form"
-                                     :invalid="invalidState.form"
-                        >
-                            <template v-slot:default="{invalid}">
-                                <div class="form-editor">
-                                    <p-dynamic-form v-for="(fm, idx) in dynamicFormState.form" :key="idx"
-                                                    v-model="values[fm.key]"
-                                                    :form="fm"
-                                                    :invalid="vdApi.invalidState[fm.key]"
-                                                    :invalid-text="vdApi.invalidMsg[fm.key]"
-                                                    :validatable="true"
-                                                    @change="onOptionChange"
-                                    />
-                                </div>
-                            </template>
-                        </PFieldGroup>
-
-                        <PFieldGroup v-else
-                                     :invalid-text="invalidMessage.data"
-                                     :invalid="invalidState.data"
-                        >
-                            <template v-slot:default="{invalid}">
-                                <div>
-                                    <PMonacoEditor class="json-editor" :code.sync="formState.data" />
-                                    <div v-show="invalid" style="display:block" class="invalid-feedback">
-                                        * {{ $t('SIGNIN.PASS_EMPTY') }}
+                        <div class="right-container">
+                            <p-label class="input-title">
+                                Data Input Type
+                            </p-label>
+                            <p-select-btn-group style="margin-bottom: 1rem; min-width: 6rem"
+                                                :space="true"
+                                                :dynamic-style="{'min-width': '96px'}"
+                                                :buttons="optionType"
+                                                :selected.sync="optionSelected.selected"
+                            />
+                            <PFieldGroup v-if="optionSelected.selected === 'form'"
+                                         :invalid-text="invalidMsg.form"
+                                         :invalid="invalidState.form"
+                            >
+                                <template v-slot:default="{invalid}">
+                                    <div v-if="dynamicFormExist" class="form-editor">
+                                        <p-dynamic-form v-for="(fm, idx) in dynamicFormState.form" :key="idx"
+                                                        v-model="values[fm.key]"
+                                                        :form="fm"
+                                                        :invalid="vdApi.invalidState[fm.key]"
+                                                        :invalid-text="vdApi.invalidMsg[fm.key]"
+                                                        :validatable="true"
+                                                        @change="onOptionChange"
+                                        />
                                     </div>
-                                </div>
-                            </template>
-                        </PFieldGroup>
+                                    <div v-else style="display:block" class="form-editor invalid-feedback">
+                                        * {{ $t('SECRET.NO_FORMAT') }}
+                                    </div>
+                                </template>
+                            </PFieldGroup>
+
+                            <PFieldGroup v-else
+                                         :invalid-text="invalidMsg.data"
+                                         :invalid="invalidState.data"
+                                         :valid="validState.data"
+                            >
+                                <template v-slot:default="{invalid}">
+                                    <div>
+                                        <PMonacoEditor class="json-editor" :code.sync="formState.data" />
+                                    </div>
+                                </template>
+                            </PFieldGroup>
+                        </div>
                     </template>
                 </card-layout>
             </div>
@@ -109,12 +114,12 @@
 </template>
 <script>
 import {
-    computed, reactive, ref, toRefs, watch,
+    computed, reactive, watch,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import {
-    formValidation, makeProxy, requiredValidation, jsonParseValidation,
+    formValidation, makeProxy, requiredValidation, jsonParseValidation, credentialsNameValidation,
 } from '@/lib/compostion-util';
 import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
@@ -157,24 +162,29 @@ const components = {
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
-    state.selected = _.isEmpty(getDataInputType()) ? 'json' : 'form';
+    const selectiveOptions = [];
+    const optionSelected = reactive({ selected: _.isEmpty(getDataInputType()) ? 'json' : 'form' });
+
+    // state.selected = reactive({selected: _.isEmpty(getDataInputType()) ? 'json' : 'form'});
     state.values = {};
 
-    const invalidMessage = {
-        name: 'Required fields!',
-        data: 'Please, confirm your Json String Format.',
-    };
+    if (optionSelected.selected === 'json') {
+        selectiveOptions.push(['json', null, { label: 'Json' }]);
+    } else {
+        selectiveOptions.push(['form', null, { label: 'Form' }]);
+        selectiveOptions.push(['json', null, { label: 'Json' }]);
+    }
 
     const formState = reactive({
         name: '',
         tags: {},
         issue_type: 'credential',
         data: '',
-        ...props.item,
     });
 
     const onOptionChange = () => {};
     const dynamicForm = computed(() => props.dynamicFormState.form);
+    const dynamicFormExist = computed(() => dynamicForm.value.length > 0);
     const vdApi = setValidation(props.dynamicFormState.form, state.values);
 
     watch(() => props.dynamicFormState, () => {
@@ -188,66 +198,80 @@ const setup = (props, context) => {
     });
 
     const issueTypeSelectItems = [
-        { type: 'item', label: 'Token', name: 'token' },
+        /* TODO:: Remove this comment out part when token feature is ready.
+        { type: 'item', label: 'Token', name: 'token' }, */
         { type: 'item', label: 'Credentials', name: 'credential' },
     ];
 
-    const optionType = makeTrItems(
-        [
-            ['form', null, { label: 'Form' }],
-            ['json', null, { label: 'Json' }],
-        ],
+
+    const optionType = makeTrItems(selectiveOptions,
         context.parent,
-        { vbind: { styleType: 'dark', outline: true } },
-    );
+        { vbind: { styleType: 'dark', outline: true } });
 
     const leftHalfValidations = {
-        name: [requiredValidation()],
+        name: [requiredValidation(), credentialsNameValidation(context.parent)],
     };
 
-    if (state.selected === 'json') { leftHalfValidations.data = [jsonParseValidation()]; }
+    const rightHalfJsonValidations = {
+        data: [requiredValidation(), jsonParseValidation()],
+    };
+    const validateLeftHalfAPI = formValidation(formState, leftHalfValidations);
+    const validaterightHalfJsonAPI = formValidation(formState, rightHalfJsonValidations);
 
-    const validateAPI = formValidation(formState, leftHalfValidations);
 
     const confirm = async () => {
-        const leftHalfResult = await validateAPI.allValidation();
-        const rightHalfResult = state.selected === 'json' ? true : await vdApi.allValidation();
-
-        if (leftHalfResult && rightHalfResult) {
-            const params = {
-                name: formState.name,
-            };
-            const keyArr = ['name', 'issue_type', 'tags', 'data'];
-
-            if (state.selected === 'form') {
-                const formParam = {};
-                for (const [k, v] of Object.entries(state.values)) {
-                    formParam[k] = v;
-                }
-                formState.data = formParam;
-            }
-
-            keyArr.forEach((key) => {
-                if (formState[key]) {
-                    params[key] = formState[key];
-                }
+        if (optionSelected.selected === 'form' && !dynamicFormExist.value) {
+            context.root.$notify({
+                group: 'noticeBottomRight',
+                type: 'alert',
+                title: 'Template unavailable',
+                text: 'Please, check selected plug-in availability!.',
+                duration: 2000,
+                speed: 1000,
             });
-            context.emit('confirm', params);
+            context.emit('close');
+        } else {
+            const leftHalfResult = await validateLeftHalfAPI.allValidation();
+            const rightHalfResult = optionSelected.selected === 'json' ? await validaterightHalfJsonAPI.allValidation() : await vdApi.allValidation();
+
+            if (leftHalfResult && rightHalfResult) {
+                const params = {
+                    name: formState.name,
+                };
+                const keyArr = ['name', 'issue_type', 'tags', 'data'];
+
+                if (optionSelected.selected === 'form') {
+                    const formParam = {};
+                    for (const [k, v] of Object.entries(state.values)) {
+                        formParam[k] = v;
+                    }
+                    formState.data = formParam;
+                }
+
+                keyArr.forEach((key) => {
+                    if (formState[key]) {
+                        params[key] = formState[key];
+                    }
+                });
+                context.emit('confirm', params);
+            }
         }
     };
 
     return {
         ...state,
-        invalidMessage,
+        optionSelected,
         formState,
         dynamicForm,
+        dynamicFormExist,
         onOptionChange,
         vdApi,
         issueTypeSelectItems,
         optionType,
         proxyVisible: makeProxy('visible', props, context.emit),
         confirm,
-        ...validateAPI,
+        ...validateLeftHalfAPI,
+        ...validaterightHalfJsonAPI,
     };
 };
 
@@ -267,15 +291,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        item: {
-            type: Object,
-            default: () => ({
-                name: '',
-                issue_type: '',
-                tags: {},
-                data: '',
-            }),
-        },
         dynamicFormState: {
             type: Object,
             default: () => ({
@@ -293,11 +308,7 @@ export default {
     .p-table-check-modal-sub-title{
         margin-bottom: 2rem;
     }
-    .p-text-input{
-        max-width: 19rem;
-    }
     .p-select-dropdown{
-        max-width: 19rem;
         width: 100%;
     }
     .tag-input{
@@ -311,10 +322,6 @@ export default {
     .p-field-group{
         width: 100%;
     }
-    .user-id-check-btn{
-        margin-left: 0.5rem;
-        min-height: 2rem;
-    }
 
     .form-editor{
         min-height: 288px;
@@ -322,7 +329,12 @@ export default {
             padding-top: 10px;
         }
     }
-
+    .right-container{
+        margin-left: 39.95px
+    }
+    .left-container{
+        margin-right: 39.95px
+    }
     .json-editor{
         min-height: 288px;
         > div {
@@ -330,6 +342,9 @@ export default {
         }
     }
 
+    .form-card-layout{
+        border:none;
+    }
     .input-title{
         margin-bottom: 0px;
         text-align: left;

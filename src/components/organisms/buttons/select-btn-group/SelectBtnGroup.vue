@@ -1,6 +1,7 @@
 <template>
     <div ref="btnGroup" class="p-select-btn-group">
         <p-button v-for="btn in btnsData"
+                  :style="dynamicStyle"
                   :key="btn.name"
                   :class="{ active:selected===btn.name, 'select-btn': !space, 'select-next-btn': space }"
                   v-bind="btn.vbind"
@@ -27,7 +28,10 @@ export default {
             type: Boolean,
             default: false,
         },
-
+        dynamicStyle: {
+            type: Object,
+            default: null,
+        },
     },
     setup(props, context) {
         const state = reactive({

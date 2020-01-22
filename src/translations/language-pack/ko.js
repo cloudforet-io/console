@@ -89,6 +89,7 @@ export const ko = {
         RELEASE: '해제',
         CREDENTIAL: '암호',
         CREDENTIALS: '암호',
+        CREDENTIAL_GRP: '암호 그룹',
         CREATE_NODE: '노드 생성',
         CREATE_LEAF: '객체 생성',
         UPDATE_SEL: '선택객체 갱신',
@@ -200,6 +201,7 @@ export const ko = {
         MEMBER: '팀원',
         FAIL_REASON: '실패 원인',
         ISSUE_TYPE: '발행 타입',
+        ALL: '모두',
     },
     ATOM: {
 
@@ -262,9 +264,12 @@ export const ko = {
         REGION_NM: '리젼(Region) 명',
         ZONE_NM: '존(Zone) 명',
         POOL_NM: '풀(Pool) 명',
+        COL_OPS: '수집 옵션',
+        FILTERS: '필터',
     },
     SECRET: {
         JASON_ALERT: "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (\') )",
+        NO_FORMAT: '템플릿이 존재하지 않습니다. 확인후 다시 시도해 주시기 바랍니다.',
     },
     TREE_TYPE: {
         PROJECT: '프로젝트',
