@@ -294,6 +294,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.board-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-bottom: 1px solid lightgray;
+    padding-bottom: 10px;
+}
 .dropdown-container {
     margin-top: -55px;
     button.dropdown-toggle {
