@@ -12,6 +12,10 @@
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "sourceMap": false,
+    "inlineSourceMap": false, // 소스맵을 결과코드에 추가
+    "inlineSources": false, // 변환전 파일 .ts 코드를 결과코드에 추가
+    "noEmit": false, // 결과파일을 저장하지 않음
+
     "baseUrl": ".",
     "types": [
       "webpack-env"
