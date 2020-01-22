@@ -1,12 +1,15 @@
 module.exports = {
   root: true,
+
   env: {
     node: true,
   },
+
   extends: [
     'plugin:vue/recommended',
     '@vue/airbnb',
   ],
+
   rules: {
     'max-len': ['error', { "code": 200 }],
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
@@ -17,8 +20,12 @@ module.exports = {
     'radix': ["error", "as-needed"],
     'no-prototype-builtins': "error",
     'no-empty': ["error", { "allowEmptyCatch": true }],
-     'import/extensions': ['error', 'always', {
-      js: 'never',
+     'import/extensions': ['error', 'always',
+       {
+         "js": "never",
+         "jsx": "never",
+         "ts": "never",
+         "tsx": "never"
     }],
     'camelcase': ["error", { "properties": "always", "allow": [
         "domain_id", "item_type", "region_id"
@@ -36,8 +43,15 @@ module.exports = {
       "devDependencies": true,
     }]
   },
+
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: '@typescript-eslint/parser',
     ecmaVersion: 2018,
   },
+
+  'extends': [
+    'plugin:vue/recommended',
+    '@vue/airbnb',
+    '@vue/typescript'
+  ]
 }

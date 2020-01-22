@@ -107,6 +107,7 @@
                             :visible.sync="credentialsFormState.visible"
                             :dynamic-form-state="dynamicFormTemp"
                             @confirm="credentialsFormConfirm"
+                            @close="credentialsFormCancel"
         />
     </div>
 </template>
@@ -245,7 +246,7 @@ export const credentialsSetup = (props, context, eventName) => {
 
     const clickCreate = () => {
         credentialsFormState.updateMode = false;
-        credentialsFormState.headerTitle = 'Create Credentails';
+        credentialsFormState.headerTitle = 'Create Credentials';
         credentialsFormState.item = null;
         credentialsFormState.eventName = eventNames.createCredentials;
         credentialsFormState.visible = true;
@@ -256,6 +257,11 @@ export const credentialsSetup = (props, context, eventName) => {
         credentialsFormState.visible = false;
         credentialsFormState.mode = '';
     };
+    const credentialsFormCancel = () => {
+        credentialsFormState.visible = false;
+        credentialsFormState.mode = '';
+    };
+
 
     const checkTableModalState = reactive({
         visible: false,
@@ -353,6 +359,7 @@ export const credentialsSetup = (props, context, eventName) => {
         dynamicFormTemp,
         clickCreate,
         credentialsFormConfirm,
+        credentialsFormCancel,
         clickDelete,
         getEmptyString,
         checkModalConfirm,

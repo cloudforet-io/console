@@ -7,13 +7,13 @@ import velocity from 'velocity-animate';
 import VueLodash from 'vue-lodash';
 import SvgIcon from 'vue-svgicon';
 import VueCompositionApi from '@vue/composition-api';
-import App from './App';
+import Notifications from 'vue-notification';
+import App from './App.vue';
 import router from '@/routes/index';
 import store from '@/store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
 import { Util } from '@/lib/global-util';
-import Notifications from 'vue-notification';
 
 Vue.mixin(Util);
 Vue.use(VueCookies);

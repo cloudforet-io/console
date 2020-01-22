@@ -79,6 +79,30 @@ export const getEnumValues = (key, values) => (contextType, inputText, searchQue
     return [];
 };
 
+export const getSearchEnumValues = (key, values, defaultValues = [], fuseOptions = {}) => {
+    const searchValues = _.flatMap(values, value => ({ label: value }));
+    const fuse = new Fuse(searchValues, {
+        ...fuseOptions,
+        keys: ['label'],
+        shouldSort: true,
+    });
+    return (contextType, inputText, searchQuery) => {
+        if (searchQuery.key === key) {
+            const prefix = `${searchQuery.key}:${searchQuery.operator}`;
+            if (searchQuery.value) {
+                const result = fuse.search(searchQuery.value);
+                return [
+                    searchQuery.key,
+                    _.flatMap(result, v => `${prefix} ${v.label}`),
+                ];
+            }
+            return defaultValues.length ? [searchQuery.key, _.flatMap(defaultValues, v => `${prefix} ${v}`),
+            ] : [];
+        }
+        return [];
+    };
+};
+
 
 export const getKeys = (rawKeys) => {
     const keys = _.flatMap(rawKeys, value => ({ type: 'item', label: value, name: `${value}:` }));
