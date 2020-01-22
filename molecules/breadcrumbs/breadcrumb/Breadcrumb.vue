@@ -58,7 +58,11 @@ export default {
 
         const go = (route) => {
             if (hasNext.value) context.root.$router.push(matched.value[props.currentIdx]);
-            else context.root.$router.push(route.path);
+            else if (matched.value[props.currentIdx + 1]) {
+                context.root.$router.push(matched.value[props.currentIdx]);
+            } else {
+                context.root.$router.push(route.path);
+            }
         };
 
         return {
