@@ -20,6 +20,7 @@ RUN npm install
 COPY public ${BUILD_PATH}/public
 COPY src ${BUILD_PATH}/src
 COPY .storybook ${BUILD_PATH}/.storybook
+COPY tsconfig.json ${BUILD_PATH}/
 
 ENV NODE_ENV production
 RUN npm run build-storybook && cp -ar ${BUILD_PATH}/.out/* ${ROOT_PATH}/ && rm -rf ${BUILD_PATH}
