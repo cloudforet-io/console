@@ -246,7 +246,7 @@ export const credentialsSetup = (props, context, eventName) => {
 
     const clickCreate = () => {
         credentialsFormState.updateMode = false;
-        credentialsFormState.headerTitle = 'Create Credentails';
+        credentialsFormState.headerTitle = 'Create Credentials';
         credentialsFormState.item = null;
         credentialsFormState.eventName = eventNames.createCredentials;
         credentialsFormState.visible = true;
