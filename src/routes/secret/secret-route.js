@@ -1,7 +1,8 @@
 const Secret = () => import('@/views/secret/Secret.vue');
 const SecretNavBar = () => import('@/views/secret/SecretNavBar.vue');
-const CredentialsGroup = () => import('@/views/secret/credentials-group/CredentialsGroup.vue');
+const CredentialsGroup = () => import('@/views/secret/credentials-group/pages/CredentialsGroup.vue');
 const Credentials = () => import('@/views/secret/credentials/Credentials.vue');
+const AddCredentials = () => import('@/views/secret/credentials-group/pages/AddCredentials.vue');
 
 export default {
     path: 'secret',
@@ -16,8 +17,22 @@ export default {
         {
             path: 'credentials-group',
             name: 'credentialsGroup',
+            redirect: '/secret/credentials-group',
             meta: { label: 'Credentials Group', breadcrumb: true },
-            component: CredentialsGroup,
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: 'credentialsGroupMain',
+                    component: CredentialsGroup,
+                },
+                {
+                    path: 'add/:id',
+                    name: 'addCredentials',
+                    meta: { label: 'Add Credentials' },
+                    component: AddCredentials,
+                },
+            ],
         },
         {
             path: 'credentials',
