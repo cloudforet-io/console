@@ -57,12 +57,12 @@ export default {
         const hasNext = computed(() => props.currentIdx < proxyActiveIdx.value);
 
         const go = (route) => {
-            if (hasNext.value) context.root.$router.push(matched.value[props.currentIdx]);
-            else if (matched.value[props.currentIdx + 1]) {
-                context.root.$router.push(matched.value[props.currentIdx]);
-            } else {
-                context.root.$router.push(route.path);
-            }
+            if (hasNext.value) context.root.$router.push(current.value);
+            // else if (matched.value[props.currentIdx + 1]) {
+            //     context.root.$router.push(`${current.value.parent.path}/${route.path}`);
+            // } else {
+            context.root.$router.push(route.path);
+            // }
         };
 
         return {
