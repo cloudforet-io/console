@@ -64,54 +64,6 @@ p {
  ********** APP **********
  *************************/
 
- /* App Header */
- .app-header {
-  .nav-item {
-    max-height: 100%;
-    button.dropdown-toggle {
-      background-color: transparent !important;
-      border-color: transparent !important;
-      color: $white !important;
-      font-size: 1rem;
-      font-weight: 400;
-      &:active, &.active, &[aria-expanded="true"] {
-        background-color: transparent !important;
-        border-color: transparent !important;
-        outline: none !important;
-      }
-      &:focus {
-        box-shadow: none !important;  
-      }
-    }
-  }
- }
-
-
-
-/* b-checkbox */
-@mixin checkbox-color($color) {
-    .custom-control-input:checked ~ .custom-control-label::before {
-        background-color: $color;
-        border-color: $color;
-    }
-}
-
-.custom-checkbox {
-    &.primary { @include checkbox-color($primary); }
-    &.secondary { @include checkbox-color($primary); }
-    &.danger { @include checkbox-color($danger); }
-    &.dark { @include checkbox-color($dark); }
-    &.info { @include checkbox-color($info); }
-    &.warning { @include checkbox-color($warning); }
-    &.light { @include checkbox-color($light); }
-    &.success { @include checkbox-color($success); }
-
-    .custom-control-label {
-      cursor: pointer;
-    }
-}
-
-
 /* sl-vue-tree */
 @mixin node-item-background($bg-color) {
     > .sl-vue-tree-node-item {
@@ -304,19 +256,6 @@ $form-padding: 0.375rem 0.75rem;
     }
 }
 
-/* b-form-select */
-.custom-select {
-    background: none;
-}
-
-/* Dropdown Options on Card */
-.button-content > button {
-  border-bottom: 0px !important;
-  border-top: 0px !important;
-  padding-bottom: 0px !important;
-  padding-top: 0px !important;
-}
-
 /* copy-clipboard */
 .copy-clipboard {
     position: relative;
@@ -331,51 +270,4 @@ $form-padding: 0.375rem 0.75rem;
     &:hover i {
         visibility: visible;
     }
-}
-
-/* dashboard */
-.board-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    border-bottom: 1px solid lightgray;
-    padding-bottom: 10px;
-}
-
-
-/* i Tag: icon */
-.primary {
-  color:$blue;
-}
-
-.info {
-  color:$blueviolet;
-}
-
-.dark {
-  color:$navy;
-}
-
-.secondary {
-  color:$gray;
-}
-
-.success {
-  color:$green;
-}
-
-.danger {
-  color:$red;
-}
-
-.warning {
-  color:$orange;
-}
-
-.light {
-  color:$white;
-}
-
-/* table */
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: transparent;
 }
