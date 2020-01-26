@@ -1,8 +1,8 @@
 <template>
     <div ref="btnGroup" class="p-select-btn-group">
         <p-button v-for="btn in btnsData"
-                  :style="dynamicStyle"
                   :key="btn.name"
+                  :style="dynamicStyle"
                   :class="{ active:selected===btn.name, 'select-btn': !space, 'select-next-btn': space }"
                   v-bind="btn.vbind"
                   @click="clickEvent(btn.name)"
@@ -12,13 +12,26 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import {
     reactive, computed, toRefs,
+    createComponent,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 
-export default {
+    interface BtnType{
+        label: string,
+        name: string
+    }
+    interface Props {
+        buttons:Array<string|BtnType>,
+        selected:string,
+        space?:boolean,
+        dynamicStyle?:Object,
+    }
+
+
+export default createComponent({
     name: 'PSelectBtnGroup',
     components: { PButton },
     props: {
@@ -33,11 +46,11 @@ export default {
             default: null,
         },
     },
-    setup(props, context) {
+    setup(props:Props, context) {
         const state = reactive({
             btnsData: computed(() => {
-                const buttons = [];
-                props.buttons.forEach((value) => {
+                const buttons :Array<BtnType> = [];
+                props.buttons.forEach((value:string|BtnType) => {
                     if (typeof value === 'string') {
                         buttons.push({ name: value, label: value });
                     } else {
@@ -50,7 +63,7 @@ export default {
         });
         return {
             ...toRefs(state),
-            clickEvent(name) {
+            clickEvent(name:string) {
                 if (props.selected !== name) {
                     context.emit('update:selected', name);
                     context.emit('clickButton', name);
@@ -59,7 +72,7 @@ export default {
             },
         };
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>
