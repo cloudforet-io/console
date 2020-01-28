@@ -12,11 +12,14 @@ export default {
     extends: AddCdgTemplate,
 
     setup(props, context) {
-        const cdgEventNames = eventNames;
-        cdgEventNames.getCdList = 'getCd';
-        cdgEventNames.tagConfirmEvent = 'CdgTagConfirmEvent';
-        cdgEventNames.tagResetEvent = 'resetTagEvent';
-        const state = cdgSetup(props, context, cdgEventNames);
+        const cdEventNames = eventNames;
+        cdEventNames.getCdList = 'getCd';
+        cdEventNames.tagConfirmEvent = 'CdTagConfirmEvent';
+        cdEventNames.tagResetEvent = 'resetTagEvent';
+        cdEventNames.addCd = 'addCd';
+        cdEventNames.deleteCd = 'deleteCd';
+
+        const state = cdgSetup(props, context, cdEventNames);
         const cdRequestState = reactive({
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
@@ -48,9 +51,70 @@ export default {
             }
         };
 
-        mountBusEvent(cdgEventBus, cdgEventNames.getCdList, requestCdList);
+        const getCdsParam = (items) => {
+            const result = {
+                // eslint-disable-next-line camelcase
+                credential_id: _.map(items, 'credential_id'),
+                name: _.map(items, 'name'),
+                tags: _.map(items, 'tags'),
+            };
+            console.log('item test', result);
+            return result;
+        };
 
+        const deleteCd = async (items) => {
+            await context.parent.$http.post('/secret/credential-group/credential/remove', getCdsParam(items)).then(async (_) => {
+                await requestCdList();
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Delete Credentials Successfully',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.log(error);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
 
+        const addCd = async (item) => {
+            await context.parent.$http.post('/secret/credential-group/credential/add', item).then(async (_) => {
+                await requestCdList();
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Add Credentials Successfully',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.log(error);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
+
+        mountBusEvent(cdgEventBus, cdEventNames.getCdList, requestCdList);
+        mountBusEvent(cdgEventBus, cdEventNames.deleteCd, deleteCd);
+        mountBusEvent(cdgEventBus, cdEventNames.addCd, addCd);
+
+        requestCdList();
         return {
             ...toRefs(state),
         };

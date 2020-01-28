@@ -31,7 +31,8 @@ export const defaultCase = () => ({
         cdgEventNames.getCdList = 'getCd';
         cdgEventNames.tagConfirmEvent = 'CdgTagConfirmEvent';
         cdgEventNames.tagResetEvent = 'resetTagEvent';
-        cdgEventNames.createCdg = 'addCd';
+        cdgEventNames.addCd = 'addCd';
+        cdgEventNames.deletCd = 'deleteCd';
         const state = cdgSetup(props, context, cdgEventNames);
         state.items = arrayOf(state.pageSize, casual._credentials_group);
         state.cdData.items = arrayOf(state.cdData.pageSize, casual._credential);

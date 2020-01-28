@@ -18,11 +18,11 @@ module.exports = {
   webpack:  (config) => {
     config.module.rules.push({
       test: /\.(ts|tsx)$/,
-      use: [
-        {
-          loader: require.resolve('awesome-typescript-loader'),
-        },
-      ],
+      loader: 'ts-loader',
+      exclude: /node_modules/,
+      options: {
+        appendTsSuffixTo: [/\.vue$/],
+      },
     });
     config.resolve.extensions.push('.ts', '.tsx');
     config.module.rules.push(
