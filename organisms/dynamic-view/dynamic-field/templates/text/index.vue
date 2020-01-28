@@ -3,12 +3,14 @@ export default {
     name: 'Text',
     functional: true,
     props: {
-        viewOption: {
+        // eslint-disable-next-line camelcase,vue/prop-name-casing
+        view_option: {
             type: Object,
             default: () => {},
         },
         data: {
-            type: [String, Object, Boolean, Array],
+            type: String,
+            required: true,
         },
     },
     render(h, { props, data }) {
