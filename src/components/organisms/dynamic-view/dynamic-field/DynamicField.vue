@@ -1,5 +1,5 @@
 <template>
-    <component :is="component" :view-option="viewOption" :data="data" />
+    <component :is="component" :view_option="view_option" :data="data" />
 </template>
 
 <script lang="ts">
@@ -16,21 +16,25 @@ interface State {
 export default createComponent({
     name: 'PDynamicField',
     props: {
-        viewType: {
+        // eslint-disable-next-line camelcase
+        view_type: {
             type: String,
+            required: true,
         },
-        viewOption: {
+        // eslint-disable-next-line camelcase,vue/prop-name-casing
+        view_option: {
             type: Object,
             default: () => {},
         },
         data: {
-            type: [String, Object, Boolean, Array],
+            type: [String, Object, Array, Boolean],
+            required: true,
         },
     },
     setup(props:any) {
         const state = reactive<any>({
             component: null,
-            loader: computed<()=>Promise<any>>(() => () => import(`./templates/${props.viewType}/index.vue`)),
+            loader: computed<()=>Promise<any>>(() => () => import(`./templates/${props.view_type}/index.vue`)),
         });
         onMounted(():void => {
             state.loader()

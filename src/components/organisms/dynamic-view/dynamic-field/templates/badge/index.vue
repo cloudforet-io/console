@@ -1,11 +1,11 @@
 <script lang="ts">
 import _ from 'lodash';
-import PStatus from '@/components/molecules/status/Status.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
 
 export default {
-    name: 'State',
+    name: 'Badge',
     functional: true,
-    components: { PStatus },
+    components: { PBadge },
     props: {
         // eslint-disable-next-line camelcase,vue/prop-name-casing
         view_option: {
@@ -18,14 +18,13 @@ export default {
         },
     },
     render(h, { props }) {
-        return h(PStatus, {
+        return h(PBadge, {
             props: {
-                icon: _.get(props.view_option, ['icon', 'image'], null),
-                iconColor: _.get(props.view_option, ['icon', 'color'], null),
+                backgroundColor: _.get(props.view_option, ['background_color'], null),
                 textColor: _.get(props.view_option, ['text_color'], null),
-                text: props.data,
             },
-        });
+        },
+        props.data);
     },
 };
 </script>
