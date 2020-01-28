@@ -19,6 +19,10 @@ export default {
                 ].indexOf(value) !== -1;
             },
         },
+        textColor: {
+            type: String,
+            default: undefined,
+        },
         backgroundColor: {
             type: String,
             default: undefined,
@@ -32,9 +36,14 @@ export default {
             },
         };
         newData.class.badge = true;
-        if (props.backgroundColor) {
+        if (props.backgroundColor || props.textColor) {
             newData.staticStyle = data.staticStyle || {};
-            newData.staticStyle['background-color'] = props.backgroundColor;
+            if (props.backgroundColor) {
+                newData.staticStyle['background-color'] = props.backgroundColor;
+            }
+            if (props.textColor) {
+                newData.staticStyle.color = props.textColor;
+            }
         } else {
             newData.class[`badge-${props.styleType}`] = true;
         }
@@ -65,6 +74,7 @@ export default {
     font-size: .75rem;
     line-height: .875rem;
     color: $white;
+    background-color:$gray;
     letter-spacing: 0;
     padding:  0.1875rem 0.5rem 0.1875rem 0.5rem;
 }
