@@ -1,4 +1,3 @@
-import PTableCheckModal from "*.vue";
 <template>
     <div class="addCdg">
         <span class="back">
@@ -28,6 +27,7 @@ import PTableCheckModal from "*.vue";
                 :sort-desc.sync="sortDesc"
                 :all-page="allPage"
                 :this-page.sync="thisPage"
+                :responsive-style="{'height': '50vh', 'overflow-y':'auto','overflow-x':'auto'}"
                 :select-index.sync="selectIndex"
                 :page-size.sync="pageSize"
                 :setting-visible="false"
@@ -68,11 +68,11 @@ import PTableCheckModal from "*.vue";
             :header-title="checkTableModalState.title"
             :sub-title="checkTableModalState.subTitle"
             :theme-color="checkTableModalState.themeColor"
-            :fields="multiSelectFields"
+            :fields="modalFields"
             size="lg"
             :centered="true"
             :selectable="false"
-            :items="getSelectedCdgItems"
+            :items="getSelectedCdItems"
             @confirm="checkModalConfirm"
         />
         <p-cdg-form v-if="cdgFormState.visible"
@@ -107,9 +107,14 @@ import PCdgForm from '@/views/secret/credentials-group/modules/CredentialGroupFo
 
 export const CdTableReactive = parent => reactive({
     fields: makeTrItems([
-        ['credentials_id', 'COMMON.ID'],
+        ['credential_id', 'COMMON.ID'],
         ['name', 'COMMON.NAME'],
         ['created_at', 'COMMON.CREATE'],
+    ],
+    parent),
+    modalFields: makeTrItems([
+        ['credential_id', 'COMMON.ID'],
+        ['name', 'COMMON.NAME'],
     ],
     parent),
     selectIndex: [],
@@ -125,6 +130,7 @@ export const eventNames = {
     getCdList: '',
     getCdData: '',
     addCd: '',
+    deleteCd: '',
 };
 
 export const cdgSetup = (props, context, eventName) => {
@@ -253,7 +259,7 @@ export default {
             ...toRefs(state),
             ...toRefs(dataBind),
             goBack: () => {
-                console.log('context', context)
+                console.log('context', context);
                 context.root.$router.push('/secret/credentials-group');
             },
         };
