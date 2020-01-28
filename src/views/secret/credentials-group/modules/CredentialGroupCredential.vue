@@ -1,11 +1,14 @@
 <template>
     <div>
         <p-toolbox-table
+            ref="toolbox"
             :items="items"
             :fields="fields"
             :selectable="true"
             :sortable="true"
+            :dragable="true"
             :hover="true"
+            :responsive="true"
             :sort-by.sync="proxySortBy"
             :sort-desc.sync="proxySortDesc"
             :all-page="proxyAllPage"
@@ -13,7 +16,7 @@
             :page-size.sync="proxyPageSize"
             :select-index.sync="selectIndex"
             :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
-            :setting-visible="false"
+            :setting-visible="true"
             :shadow="false"
             :border="false"
             :padding="false"
@@ -26,43 +29,61 @@
             @changeSort="getData"
         >
             <template slot="toolbox-left">
-
                 <p-button class="left-toolbox-item" style-type="primary"
                           @click="onClick"
                 >
                     {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
-                <p-button class="left-toolbox-item" style-type="primary">
+                <p-button class="left-toolbox-item" style-type="primary"
+                          @click="clickDelete"
+                >
                     {{ tr('COMMON.BTN_DELETE') }}
                 </p-button>
             </template>
-            <template #col-credential_group_info-format="{value}">
+            <template #col-credential_group_id-format="{value}">
                 {{ value }}
             </template>
             <template #col-created_at-format="{value}">
                 {{ timestampFormatter(value) }}
             </template>
         </p-toolbox-table>
+
+        <p-table-check-modal
+            v-if="!!checkTableModalState.mode"
+            :visible.sync="checkTableModalState.visible"
+            :header-title="checkTableModalState.title"
+            :sub-title="checkTableModalState.subTitle"
+            :theme-color="checkTableModalState.themeColor"
+            :fields="modalFields"
+            size="lg"
+            :centered="true"
+            :selectable="false"
+            :items="getSelectedCdItems"
+            @confirm="checkModalConfirm"
+        />
     </div>
 </template>
 
 <script>
 import {
+    computed,
     onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { eventNames } from '@/views/secret/credentials-group/pages/AddCredentials.template.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import { timestampFormatter } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
+import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable.vue');
 
-
 export default {
-    name: 'PCdgData',
+    name: 'PCdgCredential',
     components: {
         PToolboxTable,
+        PTableCheckModal,
         PButton,
     },
     props: {
@@ -101,20 +122,21 @@ export default {
             type: Boolean,
             default: false,
         },
-        selectIndex: {
-            type: Array,
-            default: () => [],
-        },
-
-        getCdList: String,
+        getCdList: String, // event name
+        deleteCd: String, // event name
     },
-    setup(props, { parent, emit, root }) {
+
+    setup(props, { parent, emit }) {
         const fields = makeTrItems([
             ['credential_id', 'COMMON.ID'],
             ['name', 'COMMON.NAME'],
             ['issue_type', 'COMMON.ISSUE_TYPE'],
-            ['credential_group_info', 'COMMON.GROUP'],
+            ['credential_group_id', 'COMMON.GROUP'],
             ['created_at', 'COMMON.CREATED'],
+        ], parent);
+        const modalFields = makeTrItems([
+            ['credential_id', 'COMMON.ID'],
+            ['name', 'COMMON.NAME'],
         ], parent);
         const state = reactive({
             proxyThisPage: makeProxy('thisPage', props, emit),
@@ -122,12 +144,71 @@ export default {
             proxyPageSize: makeProxy('pageSize', props, emit),
             proxySortBy: makeProxy('sortBy', props, emit),
             proxySortDesc: makeProxy('sortDesc', props, emit),
+            selectIndex: [],
             fields,
+            modalFields,
         });
         const getData = () => {
             console.log(props.getCdList);
             cdgEventBus.$emit(props.getCdList, props.credentialGroupId);
         };
+        const sortSelectIndex = computed(() => {
+            const idxs = [...state.selectIndex];
+            idxs.sort((a, b) => a - b);
+            return idxs;
+        });
+        const isNotSelected = computed(() => state.selectIndex.length === 0);
+        const isNotOnlyOneSelected = computed(() => state.selectIndex.length !== 1);
+        const getSelectedCdItems = computed(() => {
+            const items = [];
+            sortSelectIndex.value.forEach((idx) => {
+                items.push(props.items[idx]);
+            });
+            return items;
+        });
+        const getSelectedCdIds = computed(() => {
+            const ids = [];
+            getSelectedCdItems.value.forEach((item) => {
+                ids.push(item.credential_id);
+            });
+            return ids;
+        });
+        const getFirstSelectedCdId = computed(() => (getSelectedCdIds.value.length >= 1 ? getSelectedCdIds[0] : ''));
+
+        const checkTableModalState = reactive({
+            visible: false,
+            mode: '',
+            item: null,
+            confirmEventName: '',
+            title: '',
+            subTitle: '',
+            themeColor: '',
+        });
+
+        const resetCheckTableModalState = () => {
+            checkTableModalState.visible = false;
+            checkTableModalState.mode = '';
+            checkTableModalState.confirmEventName = '';
+            checkTableModalState.title = '';
+            checkTableModalState.subTitle = '';
+            checkTableModalState.themeColor = '';
+        };
+
+        const clickDelete = () => {
+            checkTableModalState.mode = 'delete';
+            checkTableModalState.confirmEventName = eventNames.deleteCd;
+            checkTableModalState.title = 'Delete Credentials from Credentials Group';
+            checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
+            checkTableModalState.themeColor = 'alert';
+            checkTableModalState.visible = true;
+        };
+
+        const checkModalConfirm = (event) => {
+            console.log(checkTableModalState.confirmEventName, event);
+            cdgEventBus.$emit(checkTableModalState.confirmEventName, event);
+            resetCheckTableModalState();
+        };
+
         onMounted(() => {
             watch(() => props.credentialGroupId, (val) => {
                 if (val) {
@@ -136,15 +217,18 @@ export default {
             });
             getData();
         });
-
-
         return {
             ...toRefs(state),
+            checkTableModalState,
+            getSelectedCdItems,
+            getSelectedCdIds,
+            getFirstSelectedCdId,
             getData,
+            clickDelete,
+            checkModalConfirm,
             timestampFormatter,
             onClick: () => {
-                console.log(root.$router, root.$route,  'routing test')
-                root.$router.push('/secret/credentials-group/add/cred-grp-21a4cd399efe');
+                parent.$router.push('/secret/credentials-group/add/cred-grp-21a4cd399efe');
             },
         };
     },

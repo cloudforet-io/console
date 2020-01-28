@@ -59,7 +59,7 @@
                 />
             </template>
             <template #credential="{tabName}">
-                <PCdgData
+                <PCdgCredential
                     :items="cdgData.items"
                     :sort-by.sync="cdgData.sortBy"
                     :sort-desc.sync="cdgData.sortDesc"
@@ -68,7 +68,7 @@
                     :this-page.sync="cdgData.thisPage"
                     :loading="cdgData.loading"
                     :col-copy="true"
-                    :getCdList="getCdList"
+                    :get-cd-list="getCdList"
                     :credential-group-id="getFirstSelectedCdgId"
                 />
             </template>
@@ -93,6 +93,10 @@
             :header-title="checkTableModalState.title"
             :sub-title="checkTableModalState.subTitle"
             :theme-color="checkTableModalState.themeColor"
+            :double-confirm="doubleState.doubleConfirm"
+            :double-confirm-origin="doubleState.origin"
+            :double-confirm-title="doubleState.title"
+            :double-confirm-place-holder="doubleState.placeHolder"
             :fields="multiSelectFields"
             size="lg"
             :centered="true"
@@ -128,7 +132,7 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
 import PCdgDetail from '@/views/secret/credentials-group/modules/CredentialGroupDetail.vue';
-import PCdgData from '@/views/secret/credentials-group/modules/CredentialData.vue';
+import PCdgCredential from '@/views/secret/credentials-group/modules/CredentialGroupCredential.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PCdgForm from '@/views/secret/credentials-group/modules/CredentialGroupForm.vue';
@@ -262,6 +266,13 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         themeColor: '',
     });
 
+    const doubleState = reactive({
+        doubleConfirm: true,
+        origin: '',
+        title: '',
+        placeHolder: 'Please, enter the name from above to delete selected item.',
+    });
+
     const resetCheckTableModalState = () => {
         checkTableModalState.visible = false;
         checkTableModalState.mode = '';
@@ -272,16 +283,19 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
     };
 
     const clickDelete = () => {
+        const selectedItemName = tableState.items[tableState.selectIndex].name;
+        doubleState.origin = selectedItemName;
+        doubleState.title = `Type ${selectedItemName} to confirm`;
+        doubleState.placeHolder = `Please, enter the name from above to delete selected item: ${selectedItemName} .`;
         checkTableModalState.mode = 'delete';
         checkTableModalState.confirmEventName = eventNames.deleteCdg;
-        checkTableModalState.title = 'Credentials Group Delete';
-        checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials Group(s) below?';
+        checkTableModalState.title = 'Delete Credentials Group';
+        checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
         checkTableModalState.themeColor = 'alert';
         checkTableModalState.visible = true;
     };
 
     const checkModalConfirm = (event) => {
-        console.log(checkTableModalState.confirmEventName, event);
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
     };
@@ -300,6 +314,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         ...toRefs(tabData),
         ...toRefs(tabAction),
         checkTableModalState,
+        doubleState,
         tags,
         dropdown: dropdownMenu,
         timestampFormatter,
@@ -330,7 +345,7 @@ export default {
         PButton,
         PDropdownMenuBtn,
         PCdgDetail,
-        PCdgData,
+        PCdgCredential,
         PTab,
         PSearch,
         PTableCheckModal,
