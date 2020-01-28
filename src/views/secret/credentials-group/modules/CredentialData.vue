@@ -32,7 +32,9 @@
                 >
                     {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
-                <p-button class="left-toolbox-item" style-type="primary">
+                <p-button class="left-toolbox-item" style-type="primary"
+                          @click="clickDelete"
+                >
                     {{ tr('COMMON.BTN_DELETE') }}
                 </p-button>
             </template>
@@ -143,8 +145,7 @@ export default {
             getData,
             timestampFormatter,
             onClick: () => {
-                console.log(root.$router, root.$route,  'routing test')
-                root.$router.push('/secret/credentials-group/add/cred-grp-21a4cd399efe');
+                parent.$router.push('/secret/credentials-group/add/cred-grp-21a4cd399efe');
             },
         };
     },

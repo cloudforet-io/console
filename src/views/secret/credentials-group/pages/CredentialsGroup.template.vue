@@ -68,7 +68,7 @@
                     :this-page.sync="cdgData.thisPage"
                     :loading="cdgData.loading"
                     :col-copy="true"
-                    :getCdList="getCdList"
+                    :get-cd-list="getCdList"
                     :credential-group-id="getFirstSelectedCdgId"
                 />
             </template>
