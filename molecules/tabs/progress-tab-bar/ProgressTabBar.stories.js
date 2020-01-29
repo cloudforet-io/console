@@ -33,7 +33,6 @@ const getProps = () => ({
 });
 
 const actions = () => ({
-    changeTab: action('changeTab'),
 });
 
 const getData = (props, context) => {
@@ -44,21 +43,29 @@ const getData = (props, context) => {
                 label: 'Configure Collector (conf)',
                 alert: 'This is alert message!!',
                 invalid: true,
+                showValidation: false,
             },
             {
                 key: 'credentials',
                 label: 'Choose Credentials (credentials)',
                 warning: 'This is warning messasge',
+                showValidation: false,
             },
             {
                 key: 'tags',
                 label: 'Add Tags (tags)',
                 help: 'This is description of add tags step.',
+                showValidation: false,
             },
         ],
         activeIdx: 0,
         doneTab: 0,
     });
+
+    const changeTab = (now, beforeIdx) => {
+        state.tabs.splice(beforeIdx, 1, { ...state.tabs[beforeIdx], showValidation: true });
+        action('changeTab')(now, beforeIdx);
+    };
 
     const onClickDone = () => {
         state.tabs[Number(state.doneTab)].done = true;
@@ -73,6 +80,7 @@ const getData = (props, context) => {
 
     return {
         ...toRefs(state),
+        changeTab,
         onClickDone,
         invalidChange,
     };
@@ -85,47 +93,52 @@ export const defaultCase = () => ({
     <div style="width: 100vw;">
         <p-progress-tab-bar 
             :tabs.sync="tabs" 
-            :active-idx="activeIdx"
-            @changeTab="changeTab"
+            :active-idx.sync="activeIdx"
          />
          <br><br><br>
          Process Done Tab Index: <input type="text" v-model="doneTab"> 
          <button @click="onClickDone">Done</button>
+        <br><br>
+        <pre>{{JSON.stringify(tabs, undefined, 2)}}</pre>
      </div>
     `,
     setup(...args) {
         return {
             ...getData(...args),
-            ...actions(),
         };
     },
 });
 
 
-export const validationMode = () => ({
+export const validationAutoChange = () => ({
     components: { PProgressTabBar },
     props: getProps(),
     template: `
     <div style="width: 100vw;">
         <p-progress-tab-bar 
             :tabs.sync="tabs"
-            :active-idx="activeIdx"
-            :show-validation="true" 
+            :active-idx.sync="activeIdx"
             @changeTab="changeTab"
          />
          <br><br><br>
-         <h4>Check invalid Tabs</h4> 
-         <template v-for="(tab, idx) in tabs">
-            {{ tab.key }}:
-            <input type="checkbox" :checked="tab.invalid" @change="invalidChange(idx, $event)">
-            <br>
-         </template>
+        <div style="display: flex; padding: 2rem;">
+            <div style="margin-right: 2rem; justify-self: flex-start;">
+                 <h4>Check invalid Tabs</h4> 
+                 <template v-for="(tab, idx) in tabs">
+                    {{ tab.key }}:
+                    <input type="checkbox" :checked="tab.invalid" @change="invalidChange(idx, $event)">
+                    <br>
+                 </template>
+            </div>
+            <div style="border: 1px solid pink; padding: 1rem;">
+                <pre>{{JSON.stringify(tabs, undefined, 2)}}</pre>
+            </div>
+        </div>
      </div>
     `,
     setup(...args) {
         return {
             ...getData(...args),
-            ...actions(),
         };
     },
 });
@@ -139,8 +152,8 @@ export const helpSlot = () => ({
     template: `
     <div style="width: 100vw;">
         <p-progress-tab-bar 
-            :tabs.sync="tabs" 
-            :active-idx="activeIdx"
+            :tabs.sync="tabs"
+            :active-idx.sync="activeIdx"
             @changeTab="changeTab"
          >
             <template #help-conf>
@@ -156,7 +169,6 @@ export const helpSlot = () => ({
     setup(...args) {
         return {
             ...getData(...args),
-            ...actions(),
         };
     },
 });
@@ -170,7 +182,8 @@ export const progressSlot = () => ({
     template: `
     <div style="width: 100vw;">
         <p-progress-tab-bar 
-            :tabs.sync="tabs" 
+            :tabs.sync="tabs"
+            :active-idx.sync="activeIdx"
             @changeTab="changeTab"
          >
             <template #progress-conf="{tab}">
@@ -186,7 +199,6 @@ export const progressSlot = () => ({
     setup(...args) {
         return {
             ...getData(...args),
-            ...actions(),
         };
     },
 });
