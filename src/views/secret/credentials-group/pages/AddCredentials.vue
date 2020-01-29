@@ -49,7 +49,9 @@ export default {
         };
 
         const getCdsParam = (items) => {
+            console.log('getCdsParam', items)
             const result = {
+
                 // eslint-disable-next-line camelcase
                 credential_id: items,
                 credential_group_id: 'cred-grp-18a27e680035',

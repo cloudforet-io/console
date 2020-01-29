@@ -171,9 +171,10 @@ export default {
             getSelectedCdItems.value.forEach((item) => {
                 ids.push(item.credential_id);
             });
+            console.log('getSelectedCdIds', ids);
             return ids;
         });
-        const getFirstSelectedCdId = computed(() => (getSelectedCdIds.value.length >= 1 ? getSelectedCdIds[0] : ''));
+        const getFirstSelectedCdId = computed(() => (getSelectedCdIds.value.length >= 1 ? getSelectedCdIds.value[0] : ''));
 
         const checkTableModalState = reactive({
             visible: false,
@@ -205,8 +206,9 @@ export default {
             checkTableModalState.visible = true;
         };
 
-        const checkModalConfirm = (event) => {
-            cdgEventBus.$emit(checkTableModalState.confirmEventName, event);
+        const checkModalConfirm = () => {
+            console.log(getFirstSelectedCdId.value, props.credentialGroupId);
+            cdgEventBus.$emit(checkTableModalState.confirmEventName, getFirstSelectedCdId.value, props.credentialGroupId);
             resetCheckTableModalState();
         };
 

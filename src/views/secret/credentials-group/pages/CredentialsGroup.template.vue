@@ -223,7 +223,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         });
         return ids;
     });
-    const getFirstSelectedCdgId = computed(() => (getSelectedCdgIds.value.length >= 1 ? getSelectedCdgIds[0] : ''));
+    const getFirstSelectedCdgId = computed(() => (getSelectedCdgIds.value.length >= 1 ? getSelectedCdgIds.value[0] : ''));
 
     const cdgFormState = reactive({
         visible: false,

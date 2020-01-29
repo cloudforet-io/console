@@ -170,7 +170,7 @@ export const cdgSetup = (props, context, eventName) => {
     const getSelectedCdIds = computed(() => {
         const ids = [];
         getSelectedCdItems.value.forEach((item) => {
-            ids.push(item.credential_id); // 여기서 item의 해당하는 값 잘 확인하기!!
+            ids.push(item.credential_id);
         });
         return ids;
     });
@@ -180,14 +180,14 @@ export const cdgSetup = (props, context, eventName) => {
         visible: false,
         mode: '',
         headerTitle: '',
-        item: undefined,
+        item: null,
         eventName: '',
     });
 
     const checkTableModalState = reactive({
         visible: false,
         mode: '',
-        item: undefined,
+        item: null,
         confirmEventName: '',
         title: '',
         subTitle: '',
@@ -196,11 +196,9 @@ export const cdgSetup = (props, context, eventName) => {
 
     const onSelect = (item) => {
         tableState.tagTools.addTag(item.credential_id);
-        console.log('onSelect test', tableState.tagTools.tags);
     };
 
     const clickAdd = () => {
-        // checkTableModalState.items = tableState.tagTools.tags;
         checkTableModalState.mode = 'add';
         checkTableModalState.confirmEventName = eventName.addCd;
         checkTableModalState.title = 'Add Credentials';
