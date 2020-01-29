@@ -59,17 +59,18 @@
                 />
             </template>
             <template #credential="{tabName}">
-                <PCdgCredential
-                    :items="cdgData.items"
-                    :sort-by.sync="cdgData.sortBy"
-                    :sort-desc.sync="cdgData.sortDesc"
-                    :page-size.sync="cdgData.pageSize"
-                    :all-page="cdgData.allPage"
-                    :this-page.sync="cdgData.thisPage"
-                    :loading="cdgData.loading"
-                    :col-copy="true"
-                    :get-cd-list="getCdList"
-                    :credential-group-id="getFirstSelectedCdgId"
+                <PCdgCredential ref="cdgCredential"
+                                :items="cdgData.items"
+                                :sort-by.sync="cdgData.sortBy"
+                                :sort-desc.sync="cdgData.sortDesc"
+                                :page-size.sync="cdgData.pageSize"
+                                :all-page="cdgData.allPage"
+                                :this-page.sync="cdgData.thisPage"
+                                :loading="cdgData.loading"
+                                :col-copy="true"
+                                :get-cd-list="getCdList"
+                                :delete-cd="deleteCd"
+                                :credential-group-id="getFirstSelectedCdgId"
                 />
             </template>
         </PTab>
@@ -164,6 +165,7 @@ export const eventNames = {
     createCdg: '',
     deleteCdg: '',
     updateCdg: '',
+    deleteCd: '',
 };
 
 export const cdgSetup = (props, context, eventName, cdgNameValidation) => {

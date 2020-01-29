@@ -69,7 +69,7 @@ import {
     computed,
     onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { eventNames } from '@/views/secret/credentials-group/pages/AddCredentials.template.vue';
+import { eventNames } from '@/views/secret/credentials-group/pages/CredentialsGroup.template.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -87,7 +87,6 @@ export default {
         PButton,
     },
     props: {
-        credentialGroupId: String,
         items: {
             type: Array,
             default: () => [],
@@ -123,7 +122,8 @@ export default {
             default: false,
         },
         getCdList: String, // event name
-        deleteCd: String, // event name
+        deleteCd: String,
+        credentialGroupId: String,
     },
 
     setup(props, { parent, emit }) {
@@ -149,6 +149,7 @@ export default {
             modalFields,
         });
         const getData = () => {
+            console.log('getData Test', props.items);
             cdgEventBus.$emit(props.getCdList, props.credentialGroupId);
         };
         const sortSelectIndex = computed(() => {
@@ -196,7 +197,7 @@ export default {
 
         const clickDelete = () => {
             checkTableModalState.mode = 'delete';
-            checkTableModalState.confirmEventName = eventNames.deleteCd;
+            checkTableModalState.confirmEventName = 'deleteCd';
             checkTableModalState.title = 'Delete Credentials from Credentials Group';
             checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
             checkTableModalState.themeColor = 'alert';
@@ -205,10 +206,7 @@ export default {
         };
 
         const checkModalConfirm = (event) => {
-            console.log(checkTableModalState.confirmEventName, event);
-            if (checkTableModalState.confirmEventName === 'deleteCd') {
-                cdgEventBus.$emit(checkTableModalState.confirmEventName, event, props.credentialGroupId);
-            }
+            cdgEventBus.$emit(checkTableModalState.confirmEventName, event);
             cdgEventBus.$emit(checkTableModalState.confirmEventName, event);
             resetCheckTableModalState();
         };

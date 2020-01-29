@@ -82,7 +82,7 @@
         />
         <p-cdg-form v-if="cdgFormState.visible"
                     :header-title="cdgFormState.headerTitle"
-                    :item="cdgFormState.item"
+                    :item="cdgFormState.items"
                     :update-mode="cdgFormState.updateMode"
                     :visible.sync="cdgFormState.visible"
                     @confirm="cdgFormConfirm"
@@ -163,6 +163,7 @@ export const cdgSetup = (props, context, eventName) => {
         for (let idx = 0; idx < tableState.tagTools.tags.length; idx++) { // 추후 리팩토링 예정
             items.push(tableState.tagTools.tags[idx]);
         }
+        console.log('getSelectedCdItems Test', items)
         return items;
     });
 
@@ -179,14 +180,14 @@ export const cdgSetup = (props, context, eventName) => {
         visible: false,
         mode: '',
         headerTitle: '',
-        item: null,
+        item: undefined,
         eventName: '',
     });
 
     const checkTableModalState = reactive({
         visible: false,
         mode: '',
-        item: null,
+        item: undefined,
         confirmEventName: '',
         title: '',
         subTitle: '',
@@ -199,7 +200,7 @@ export const cdgSetup = (props, context, eventName) => {
     };
 
     const clickAdd = () => {
-        checkTableModalState.item = tableState.tagTools.tags;
+        // checkTableModalState.items = tableState.tagTools.tags;
         checkTableModalState.mode = 'add';
         checkTableModalState.confirmEventName = eventName.addCd;
         checkTableModalState.title = 'Add Credentials';
@@ -236,7 +237,7 @@ export const cdgSetup = (props, context, eventName) => {
         checkTableModalState,
         getCd,
         onSelect,
-        ...eventName,
+        ...eventNames,
         getSelectedCdItems,
         getSelectedCdIds,
         getFirstSelectedCdId,

@@ -17,7 +17,6 @@ export default {
         cdEventNames.tagConfirmEvent = 'CdTagConfirmEvent';
         cdEventNames.tagResetEvent = 'resetTagEvent';
         cdEventNames.addCd = 'addCd';
-        cdEventNames.deleteCd = 'deleteCd';
 
         const state = cdgSetup(props, context, cdEventNames);
         const cdRequestState = reactive({
@@ -52,8 +51,7 @@ export default {
         const getCdsParam = (items) => {
             const result = {
                 // eslint-disable-next-line camelcase
-                // credential_id: _.map(items, 'credential_id'),
-                credential_id: 'cred-47451e311570',
+                credential_id: items,
                 credential_group_id: 'cred-grp-18a27e680035',
                 name: _.map(items, 'name'),
                 tags: _.map(items, 'tags'),
@@ -61,32 +59,10 @@ export default {
             return result;
         };
 
-        // const deleteCd = async (items) => {
-        //     await context.parent.$http.post('/secret/credential-group/credential/remove', getCdsParam(items)).then(async (_) => {
-        //         await requestCdList();
-        //         context.root.$notify({
-        //             group: 'noticeBottomRight',
-        //             type: 'success',
-        //             title: 'success',
-        //             text: 'Delete Credentials Successfully',
-        //             duration: 2000,
-        //             speed: 1000,
-        //         });
-        //     }).catch((error) => {
-        //         console.log(error);
-        //         context.root.$notify({
-        //             group: 'noticeBottomRight',
-        //             type: 'alert',
-        //             title: 'Fail',
-        //             text: 'request fail',
-        //             duration: 2000,
-        //             speed: 1000,
-        //         });
-        //     });
-        // };
-
         const addCd = async (items) => {
+            console.log('addCd Test', items)
             await context.parent.$http.post('/secret/credential-group/credential/add', getCdsParam(items)).then(async (_) => {
+
                 await requestCdList();
                 context.root.$notify({
                     group: 'noticeBottomRight',
@@ -110,7 +86,6 @@ export default {
         };
 
         mountBusEvent(cdgEventBus, cdEventNames.getCdList, requestCdList);
-        // mountBusEvent(cdgEventBus, cdEventNames.deleteCd, deleteCd);
         mountBusEvent(cdgEventBus, cdEventNames.addCd, addCd);
 
         requestCdList();
