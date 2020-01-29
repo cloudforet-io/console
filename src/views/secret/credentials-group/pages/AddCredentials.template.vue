@@ -1,6 +1,6 @@
 <template>
     <div class="addCdg">
-        <span class="back">
+        <span class="back" @click="goBack">
             <p-i name="ic_back" width="1.5rem" height="1.5rem"
                  color="transparent inherit"
             />
@@ -16,9 +16,8 @@
                 ref="toolbox"
                 :items="items"
                 :fields="fields"
-                :selectable="true"
+                :selectable="false"
                 :sortable="true"
-                :dragable="true"
                 :hover="true"
                 :shadow="false"
                 :border="false"
@@ -34,6 +33,7 @@
                 :loading="loading"
                 :use-spinner-loading="true"
                 :use-cursor-loading="true"
+                @rowLeftClick="onSelect"
                 @changePageSize="getCd"
                 @changePageNumber="getCd"
                 @clickRefresh="getCd"
@@ -44,11 +44,16 @@
                         <p-search :search-text.sync="searchText" @onSearch="getCd" />
                     </div>
                 </template>
+                <template v-slot:col-created_at-format="data">
+                    {{ timestampFormatter(data.value) }}
+                </template>
             </p-toolbox-table>
             <p-box-layout class="tag-container">
                 <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
                        @delete="tagTools.deleteTag(idx)"
-                />
+                >
+                    {{ tag }}
+                </p-tag>
             </p-box-layout>
             <p-row>
                 <p-button class="cancel-btn" style-type="dark" outline
@@ -77,6 +82,7 @@
         />
         <p-cdg-form v-if="cdgFormState.visible"
                     :header-title="cdgFormState.headerTitle"
+                    :item="cdgFormState.items"
                     :update-mode="cdgFormState.updateMode"
                     :visible.sync="cdgFormState.visible"
                     @confirm="cdgFormConfirm"
@@ -94,11 +100,9 @@ import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
-import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
-// import PCdData from '@/views/secret/credentials-group/pages/AddCredentials.vue';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
@@ -124,6 +128,7 @@ export const CdTableReactive = parent => reactive({
     toolbox: null, // template refs
     tagTools: tagList(),
 });
+
 export const eventNames = {
     tagResetEvent: '',
     tagConfirmEvent: '',
@@ -146,16 +151,22 @@ export const cdgSetup = (props, context, eventName) => {
         idxs.sort((a, b) => a - b);
         return idxs;
     });
-    const isNotSelected = computed(() => tableState.selectIndex.length === 0);
-    const isNotOnlyOneSelected = computed(() => tableState.selectIndex.length !== 1);
-
+    // const getSelectedCdItems = computed(() => {
+    //     const items = [];
+    //     sortSelectIndex.value.forEach((idx) => {
+    //         items.push(tableState.items[idx]);
+    //     });
+    //     return items;
+    // });
     const getSelectedCdItems = computed(() => {
         const items = [];
-        sortSelectIndex.value.forEach((idx) => {
-            items.push(tableState.items[idx]);
-        });
+        for (let idx = 0; idx < tableState.tagTools.tags.length; idx++) { // 추후 리팩토링 예정
+            items.push(tableState.tagTools.tags[idx]);
+        }
+        console.log('getSelectedCdItems Test', items)
         return items;
     });
+
     const getSelectedCdIds = computed(() => {
         const ids = [];
         getSelectedCdItems.value.forEach((item) => {
@@ -169,22 +180,27 @@ export const cdgSetup = (props, context, eventName) => {
         visible: false,
         mode: '',
         headerTitle: '',
-        item: null,
+        item: undefined,
         eventName: '',
     });
 
     const checkTableModalState = reactive({
         visible: false,
         mode: '',
-        item: null,
+        item: undefined,
         confirmEventName: '',
         title: '',
         subTitle: '',
         themeColor: '',
     });
 
+    const onSelect = (item) => {
+        tableState.tagTools.addTag(item.credential_id);
+        console.log('onSelect test', tableState.tagTools.tags);
+    };
 
     const clickAdd = () => {
+        // checkTableModalState.items = tableState.tagTools.tags;
         checkTableModalState.mode = 'add';
         checkTableModalState.confirmEventName = eventName.addCd;
         checkTableModalState.title = 'Add Credentials';
@@ -192,7 +208,6 @@ export const cdgSetup = (props, context, eventName) => {
         checkTableModalState.themeColor = 'primary';
         checkTableModalState.visible = true;
     };
-
 
     const cdgFormConfirm = (item) => {
         eventBus.$emit(cdgFormState.eventName, item);
@@ -210,7 +225,6 @@ export const cdgSetup = (props, context, eventName) => {
     };
 
     const checkModalConfirm = (event) => {
-        console.log(checkTableModalState.confirmEventName, event);
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
     };
@@ -222,7 +236,8 @@ export const cdgSetup = (props, context, eventName) => {
         timestampFormatter,
         checkTableModalState,
         getCd,
-        ...eventName,
+        onSelect,
+        ...eventNames,
         getSelectedCdItems,
         getSelectedCdIds,
         getFirstSelectedCdId,
@@ -247,19 +262,17 @@ export default {
         PBoxLayout,
         PTableCheckModal,
         PRow,
-        PCol,
+        PTag,
     },
     setup(props, context) {
         const dataBind = reactive({
             items: computed(() => []),
         });
         const state = cdgSetup(props, context, eventNames);
-
         return {
             ...toRefs(state),
             ...toRefs(dataBind),
             goBack: () => {
-                console.log('context', context);
                 context.root.$router.push('/secret/credentials-group');
             },
         };

@@ -18,9 +18,12 @@ export default {
         cdgEventNames.deleteCdg = 'deleteCdg';
         cdgEventNames.createCdg = 'createCdg';
         cdgEventNames.updateCdg = 'updateCdg';
-        const cdgNameValidation = new Validation(async (value) => {
-            let result = false;
+        const cdgNameValidation = new Validation(async (value, data) => {
             console.log('name validation test', value);
+            if (data.updateMode && data.originName === value) {
+                return true;
+            }
+            let result = false;
             await context.parent.$http.post('/secret/credential-group/list', {
                 domain_id: sessionStorage.domainId,
                 query: {
@@ -74,21 +77,18 @@ export default {
                 state.loading = false;
             }
         };
-        const requestCdList = async (cdgId) => {
+        const requestCdList = async () => {
+            const cdgInfo = state.items[state.selectIndex[0]];
+            const cdgId = cdgInfo.credential_group_id;
             state.cdgData.loading = true;
             state.cdgData.items = [];
             const param = {
                 query: cdRequestState.query,
                 // eslint-disable-next-line camelcase
+                credential_group_id: cdgId,
                 include_credential_group: true,
             };
-            if (cdgId) {
-                // eslint-disable-next-line camelcase
-                param.credential_group_id = cdgId;
-            }
-
             try {
-                console.log('start', state.loading);
                 const res = await context.parent.$http.post('/secret/credential/list', param);
                 state.cdgData.items = res.data.results;
                 const allPage = Math.ceil(res.data.total_count / state.cdgData.pageSize);
@@ -100,11 +100,14 @@ export default {
                 state.cdgData.loading = false;
             }
         };
-        const CdgTagConfirm = async (cdgId, tags, originTags) => {
+        const CdgTagConfirm = async (item, tags, originTags) => {
             const idx = state.selectIndex[0];
+            const cdgInfo = state.items[state.selectIndex[0]];
+            console.log(idx, 'idx test');
             await context.parent.$http.post('/secret/credential-group/update', {
                 // eslint-disable-next-line camelcase
-                credential_group_id: cdgId,
+                name: cdgInfo.name,
+                credential_group_id: cdgInfo.credential_group_id,
                 tags,
             }).then((_) => {
                 state.items[idx].tags = tags;
@@ -115,15 +118,27 @@ export default {
             });
         };
         const getCdgsParam = (items) => {
+            console.log('getCdgsParam test1', items);
             const result = {
                 // eslint-disable-next-line camelcase
                 credential_group_id: _.map(items, 'credential_group_id'),
+                credential_id: 'cred-47452e311570',
                 name: _.map(items, 'name'),
                 tags: _.map(items, 'tags'),
             };
-            console.log('item test', result);
+            console.log('getCdgsParam test2', result);
             return result;
         };
+        const getCdsParam = (items) => {
+            console.log('getCdsParamTest1', items);
+            const result = {
+                // credential_group_id: _.map(items, 'credential_group_id'),
+                credential_group_id: 'cred-grp-18a27e680035',
+                credential_id: items,
+            };
+            console.log('getCdsParamTest2', result);
+            return result;
+        }
         const deleteCdg = async (items) => {
             await context.parent.$http.post('/secret/credential-group/delete', getCdgsParam(items)).then(async (_) => {
                 await requestCdgList();
@@ -132,6 +147,29 @@ export default {
                     type: 'success',
                     title: 'success',
                     text: 'delete credential groups',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.log(error);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
+        const deleteCd = async (items) => {
+            await context.parent.$http.post('/secret/credential-group/credential/remove', getCdgsParam(items)).then(async (_) => {
+                await requestCdList();
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Delete Credentials Successfully',
                     duration: 2000,
                     speed: 1000,
                 });
@@ -198,6 +236,7 @@ export default {
         mountBusEvent(cdgEventBus, cdgEventNames.getCdList, requestCdList);
         mountBusEvent(cdgEventBus, cdgEventNames.tagConfirmEvent, CdgTagConfirm);
         mountBusEvent(cdgEventBus, cdgEventNames.deleteCdg, deleteCdg);
+        mountBusEvent(cdgEventBus, cdgEventNames.deleteCd, deleteCd);
         mountBusEvent(cdgEventBus, cdgEventNames.createCdg, createCdg);
         mountBusEvent(cdgEventBus, cdgEventNames.updateCdg, updateCdg);
 
