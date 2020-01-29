@@ -18,3 +18,5 @@ dist
 .idea
 *.swp
 *.bak
+
+src/assets
