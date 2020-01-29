@@ -60,9 +60,8 @@ export default {
         };
 
         const addCd = async (items) => {
-            console.log('addCd Test', items)
+            console.log('addCd Test', items);
             await context.parent.$http.post('/secret/credential-group/credential/add', getCdsParam(items)).then(async (_) => {
-
                 await requestCdList();
                 context.root.$notify({
                     group: 'noticeBottomRight',

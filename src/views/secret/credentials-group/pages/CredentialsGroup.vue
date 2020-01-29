@@ -13,9 +13,11 @@ export default {
     setup(props, context) {
         const cdgEventNames = eventNames;
         cdgEventNames.getCdgList = 'getCdgList';
+        cdgEventNames.getCdList = 'getCdList';
         cdgEventNames.tagConfirmEvent = 'CdgTagConfirmEvent';
         cdgEventNames.tagResetEvent = 'resetUserTagEvent';
         cdgEventNames.deleteCdg = 'deleteCdg';
+        cdgEventNames.deleteCd = 'deleteCd';
         cdgEventNames.createCdg = 'createCdg';
         cdgEventNames.updateCdg = 'updateCdg';
         const cdgNameValidation = new Validation(async (value, data) => {

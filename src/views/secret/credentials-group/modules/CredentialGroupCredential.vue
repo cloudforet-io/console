@@ -197,7 +197,7 @@ export default {
 
         const clickDelete = () => {
             checkTableModalState.mode = 'delete';
-            checkTableModalState.confirmEventName = 'deleteCd';
+            checkTableModalState.confirmEventName = props.deleteCd;
             checkTableModalState.title = 'Delete Credentials from Credentials Group';
             checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
             checkTableModalState.themeColor = 'alert';
@@ -206,7 +206,6 @@ export default {
         };
 
         const checkModalConfirm = (event) => {
-            cdgEventBus.$emit(checkTableModalState.confirmEventName, event);
             cdgEventBus.$emit(checkTableModalState.confirmEventName, event);
             resetCheckTableModalState();
         };
