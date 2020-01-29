@@ -6,8 +6,10 @@
 - [x] datetime
 - [ ] dict
 - [ ] image
+
 ## recursive type
 - [x] list
 - [x] enum
+
 ## passive type
 - [ ] link

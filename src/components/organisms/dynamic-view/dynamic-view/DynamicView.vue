@@ -1,8 +1,16 @@
 <template>
-    <component :is="component" :view_option="view_option" :data="data" />
+    <component :is="component"
+               :name="name"
+               :data_source="data_source"
+               :key_path="key_path"
+               :data="data"
+               :rootMode="rootMode"
+    />
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase,vue/prop-name-casing */
+
 import {
     computed, createComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
@@ -14,21 +22,31 @@ interface State {
 }
 
 export default createComponent({
-    name: 'PDynamicField',
+    name: 'PDynamicView',
     props: {
-        // eslint-disable-next-line camelcase
+        name: {
+            type: String,
+            default: '',
+        },
         view_type: {
             type: String,
             required: true,
         },
-        // eslint-disable-next-line camelcase,vue/prop-name-casing
-        view_option: {
-            type: Object,
-            default: () => {},
+        data_source: {
+            type: Array,
+            required: true,
+        },
+        key_path: {
+            type: String,
+            default: '',
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
-            default: '',
+            type: Object,
+            required: true,
+        },
+        rootMode: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props:any) {
@@ -43,7 +61,7 @@ export default createComponent({
                 })
                 .catch(() => {
                     // eslint-disable-next-line import/no-unresolved
-                    state.component = () => import('./templates/text/index.vue');
+                    state.component = () => import('./templates/item/index.vue');
                 });
         });
         return {

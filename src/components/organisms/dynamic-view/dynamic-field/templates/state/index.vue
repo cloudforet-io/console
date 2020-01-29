@@ -3,7 +3,7 @@ import _ from 'lodash';
 import PStatus from '@/components/molecules/status/Status.vue';
 
 export default {
-    name: 'State',
+    name: 'PDynamicFieldState',
     functional: true,
     components: { PStatus },
     props: {

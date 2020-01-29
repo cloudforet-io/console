@@ -43,7 +43,7 @@ export const mountBusEvent = (bus:any, eventName:string, handler:Function) => {
  * @param disabled
  * @return {{onMouseOut: onMouseOut, isMouseOver: Ref<HasDefined<S> extends true ? S : RefValue<T>>, onMouseOver: onMouseOver}}
  */
-export const mouseOverState = (disabled:boolean) => {
+export const mouseOverState = (disabled?:boolean) => {
     const disable = disabled || false;
     const isMouseOver = ref(false);
     const onMouseOver = () => {

@@ -1,84 +1,31 @@
 <template>
     <div>
-        <p-info-panel info-title="Base Information" :defs="baseDefs" :item="item">
-            <template #def-state-format="scope">
-                <p-status v-bind="serverStateFormatter(scope.value)" />
-            </template>
-            <template #def-core-format="scope">
-                {{ scope.item.data.base.core }}
-            </template>
-            <template #def-menory-format="scope">
-                {{ scope.item.data.base.memory }}
-            </template>
-            <template #def-fqdn-format="scope">
-                {{ scope.item.data.domain }}
-            </template>
-            <template #def-os_distro-format="scope">
-                {{ scope.item.data.os.os_distro }}
-            </template>
-            <template #def-os_detail-format="scope">
-                {{ scope.item.data.os.os_distro }}
-            </template>
-            <template #def-region-format="scope">
-                {{ scope.item.region_info ? scope.item.region_info.region_id : '' }}
-            </template>
-            <template #def-oArch-format="scope">
-                {{ scope.item.data.os.os_arch }}
-            </template>
-            <template #def-zone-format="scope">
-                {{ scope.item.zone_info ? scope.item.zone_info.zone_id : '' }}
-            </template>
-            <template #def-kernel-format="scope">
-                {{ scope.item.data.base.kernel }}
-            </template>
-            <template #def-pool-format="scope">
-                {{ scope.item.pool_info ? scope.item.pool_info.pool_id : '' }}
-            </template>
-            <template #def-created_at-format="scope">
-                {{ scope.value ? timestampFormatter(scope.value) : '' }}
-            </template>
-            <template #def-updated_at-format="scope">
-                {{ scope.value ? timestampFormatter(scope.value) : '' }}
-            </template>
-            <template #def-deleted_at-format="scope">
-                {{ scope.value ? timestampFormatter(scope.value) : '' }}
-            </template>
-        </p-info-panel>
-        <p-info-panel info-title="VM" :defs="vmDefs" :item="getVm">
-            <template #def-platform_type-format="scope">
-                <p-badge v-bind="platformBadgeFormatter(scope.value)">
-                    {{ scope.value }}
-                </p-badge>
-            </template>
-        </p-info-panel>
-        <p-info-panel info-title="Compute" :defs="computeDefs" :item="getCompute">
-            <template #def-security_groups-format="scope">
-                {{ arrayFormatter(scope.value) }}
-            </template>
-        </p-info-panel>
+        <p-dynamic-view name="Base Information" view_type="item" :data="item||{}"
+                        :data_source="baseDataSource" :root-mode="true"
+        />
+        <p-dynamic-view name="VM" view_type="item" :data="item.data||{}"
+                        :data_source="vmDataSource"
+        />
+        <p-dynamic-view name="Compute" view_type="item" :data="item.data||{}"
+                        :data_source="computeDataSource"
+        />
         <p-dict-panel ref="dictPanel" :dict.sync="dict" @confirm="confirm" />
     </div>
 </template>
 
 <script>
-import {
-    computed, ref, watch,
-} from '@vue/composition-api';
-import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel';
-import PBadge from '@/components/atoms/badges/Badge';
-import PStatus from '@/components/molecules/status/Status';
-import {
-    timestampFormatter, serverStateFormatter, arrayFormatter, platformBadgeFormatter,
-} from '@/lib/util';
+/* eslint-disable camelcase */
+
+import { ref, watch } from '@vue/composition-api';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { makeTrItems } from '@/lib/view-helper';
+import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 
 export default {
     name: 'PServerDetail',
     components: {
-        PInfoPanel, PDictPanel, PBadge, PStatus,
+        PDictPanel, PDynamicView,
     },
     props: {
         item: {
@@ -90,42 +37,165 @@ export default {
         tagResetEvent: String,
     },
     setup(props, { parent }) {
-        const baseDefs = makeTrItems([
-            ['server_id', 'COMMON.ID'],
-            ['name', 'COMMON.NAME'],
-            ['state', 'COMMON.STATE'],
-            ['primary_ip_address', 'COMMON.PRI_IP'],
-            ['server_type', 'COMMON.SE_TYPE'],
-            ['core', 'COMMON.CORE'],
-            ['fqdn', 'COMMON.FQDN'],
-            ['menory', 'COMMON.MEMORY'],
-            ['os_type', 'COMMON.O_TYPE'],
-            ['os_distro', 'COMMON.O_DIS'],
-            ['project', 'COMMON.PROJ'],
-            ['os_detail', 'COMMON.O_DETAIL'],
-            ['region', 'COMMON.REGION'],
-            ['oArch', 'COMMON.O_ARCH'],
-            ['zone', 'COMMON.ZONE'],
-            ['kernel', 'COMMON.KERNEL'],
-            ['pool', 'COMMON.POOL'],
-            ['booted_at', 'COMMON.LT_BOOT'],
-            ['created_at', 'COMMON.CREATE'],
-            ['updated_at', 'COMMON.UPDATE'],
-            ['deleted_at', 'COMMON.DELETE'],
-        ], parent, { copyFlag: true });
-        const vmDefs = makeTrItems([
-            ['vm_id', 'COMMON.ID'],
-            ['vm_name', 'COMMON.NAME'],
-            ['platform_type', 'COMMON.PLATFORM'],
-            ['image', 'COMMON.IMAGE'],
-        ], parent, { copyFlag: true });
-        const computeDefs = makeTrItems([
-            ['instance_id', 'COMMON.INST_ID'],
-            ['keypair', 'COMMON.KEY_PAIR'],
-            ['instance_type', 'COMMON.INST_TYPE'],
-            ['created_by_user_id', 'COMMON.CREATE_BY'],
-            ['security_groups', 'COMMON.SEC_GROUP'],
-        ], parent, { copyFlag: true });
+        const baseDataSource = [
+            { name: 'ID', key: 'server_id' },
+            { name: 'Name', key: 'name' },
+            {
+                name: 'State',
+                key: 'state',
+                view_type: 'enum',
+                view_option: {
+                    INSERVICE: {
+                        view_type: 'state',
+                        view_option: {
+                            text_color: '#222532',
+                            icon: {
+                                color: '#60B731',
+                            },
+                        },
+                    },
+                    PENDING: {
+                        view_type: 'state',
+                        view_option: {
+                            text_color: '#222532',
+                            icon: {
+                                color: '#FF7750',
+                            },
+                        },
+                    },
+                    MAINTENANCE: {
+                        view_type: 'state',
+                        view_option: {
+                            text_color: '#222532',
+                            icon: {
+                                color: '#FFCE02',
+                            },
+                        },
+                    },
+                    CLOSED: {
+                        view_type: 'state',
+                        view_option: {
+                            text_color: '#EF3817',
+                            icon: {
+                                color: '#EF3817',
+                            },
+                        },
+                    },
+                    DELETED: {
+                        view_type: 'state',
+                        view_option: {
+                            text_color: '#858895',
+                            icon: {
+                                color: '#858895',
+                            },
+                        },
+                    },
+                },
+            },
+            { name: 'Primary IP', key: 'primary_ip_address' },
+            { name: 'Server Type', key: 'server_type' },
+            { name: 'Core', key: 'data.base.core' },
+            { name: 'FQDN', key: 'data.domain' },
+            { name: 'Memory', key: 'data.base.memory' },
+            { name: 'OS Type', key: 'os_type' },
+            { name: 'OS Distro', key: 'data.os.os_distro' },
+            { name: 'Project', key: 'project' },
+            { name: 'OS Details', key: 'os_detail' },
+            { name: 'Region', key: 'region_info.region_id' },
+            { name: 'OS Architecture', key: 'data.os.os_arch' },
+            { name: 'Zone', key: 'zone_info.zone_id' },
+            { name: 'Kernel', key: 'data.base.kernel' },
+            { name: 'Pool', key: 'pool_info.pool_id' },
+            { name: 'Last Boot Time', key: 'booted_at' },
+            {
+                name: 'Created at',
+                key: 'created_at.seconds',
+                view_type: 'datetime',
+                view_option: {
+                    source_type: 'timestamp',
+                    source_format: 'seconds',
+                    display_format: 'YYYY-MM-DD HH:MM:SS z',
+                },
+            },
+            {
+                name: 'Updated at',
+                key: 'updated_at.seconds',
+                view_type: 'datetime',
+                view_option: {
+                    source_type: 'timestamp',
+                    source_format: 'seconds',
+                    display_format: 'YYYY-MM-DD HH:MM:SS z',
+                },
+            },
+            {
+                name: 'Deleted at',
+                key: 'deleted_at.seconds',
+                view_type: 'datetime',
+                view_option: {
+                    source_type: 'timestamp',
+                    source_format: 'seconds',
+                    display_format: 'YYYY-MM-DD HH:MM:SS z',
+                },
+            },
+        ];
+        const vmDataSource = [
+            { name: 'ID', key: 'data.vm.vm_id' },
+            { name: 'Name', key: 'data.vm.vm_name' },
+            {
+                name: 'Platform',
+                key: 'data.vm.platform_type',
+                view_type: 'enum',
+                view_option: {
+                    AWS: {
+                        view_type: 'badge',
+                        view_option: {
+                            text_color: 'white',
+                            background_color: '#FFCE02',
+                        },
+                    },
+                    GCP: {
+                        view_type: 'badge',
+                        view_option: {
+                            text_color: 'white',
+                            background_color: '#60B731',
+                        },
+                    },
+                    AZURE: {
+                        view_type: 'badge',
+                        view_option: {
+                            text_color: 'white',
+                            background_color: '#0080FB',
+                        },
+                    },
+                    OPENSTACK: {
+                        view_type: 'badge',
+                        view_option: {
+                            text_color: 'white',
+                            background_color: '#EF3817',
+                        },
+                    },
+                },
+
+            },
+            { name: 'Image', key: 'data.vm.image' },
+        ];
+        const computeDataSource = [
+            { name: 'Instance ID', key: 'data.compute.instance_id' },
+            { name: 'Key Pair', key: 'data.compute.keypair' },
+            { name: 'Instance Type', key: 'data.compute.instance_type' },
+            { name: 'Created By', key: 'data.compute.created_by_user_id' },
+            {
+                name: 'Security Group',
+                key: 'data.compute.security_groups',
+                view_type: 'list',
+                view_option: {
+                    item: {
+                        view_type: 'text',
+                    },
+                },
+
+            },
+        ];
         const dict = ref({ ...props.item.tags });
         watch(() => props.item, (value) => {
             if (value) {
@@ -139,20 +209,14 @@ export default {
         mountBusEvent(ServerEventBus, props.tagResetEvent, resetTag);
 
         return {
-            baseDefs,
-            vmDefs,
-            computeDefs,
+            baseDataSource,
+            vmDataSource,
+            computeDataSource,
             dict,
             dictPanel,
             confirm(...event) {
                 ServerEventBus.$emit(props.tagConfirmEvent, props.item.server_id, ...event);
             },
-            timestampFormatter,
-            serverStateFormatter,
-            arrayFormatter,
-            platformBadgeFormatter,
-            getVm: computed(() => (props.item ? props.item.data.vm : {})),
-            getCompute: computed(() => (props.item ? props.item.data.compute : {})),
         };
     },
 };
