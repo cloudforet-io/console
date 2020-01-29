@@ -88,7 +88,7 @@
             Select a Credential Group above for details.
         </div>
         <p-table-check-modal
-            v-if="!!checkTableModalState.mode"
+            v-if="!!checkTableModalState.mode && checkTableModalState.visible"
             :visible.sync="checkTableModalState.visible"
             :header-title="checkTableModalState.title"
             :sub-title="checkTableModalState.subTitle"
@@ -290,7 +290,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         checkTableModalState.mode = 'delete';
         checkTableModalState.confirmEventName = eventNames.deleteCdg;
         checkTableModalState.title = 'Delete Credentials Group';
-        checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
+        checkTableModalState.subTitle = 'Are you sure you want to delete selected Credential Group below?';
         checkTableModalState.themeColor = 'alert';
         checkTableModalState.visible = true;
     };

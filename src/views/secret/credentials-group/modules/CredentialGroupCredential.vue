@@ -40,8 +40,8 @@
                     {{ tr('COMMON.BTN_DELETE') }}
                 </p-button>
             </template>
-            <template #col-credential_group_id-format="{value}">
-                {{ value }}
+            <template #col-credential_groups-format="{value}">
+                <span v-for="grp in value">{{ grp.name }}</span>
             </template>
             <template #col-created_at-format="{value}">
                 {{ timestampFormatter(value) }}
@@ -131,7 +131,7 @@ export default {
             ['credential_id', 'COMMON.ID'],
             ['name', 'COMMON.NAME'],
             ['issue_type', 'COMMON.ISSUE_TYPE'],
-            ['credential_group_id', 'COMMON.GROUP'],
+            ['credential_groups', 'COMMON.GROUP'],
             ['created_at', 'COMMON.CREATED'],
         ], parent);
         const modalFields = makeTrItems([
@@ -149,7 +149,6 @@ export default {
             modalFields,
         });
         const getData = () => {
-            console.log(props.getCdList);
             cdgEventBus.$emit(props.getCdList, props.credentialGroupId);
         };
         const sortSelectIndex = computed(() => {
@@ -191,6 +190,7 @@ export default {
             checkTableModalState.confirmEventName = '';
             checkTableModalState.title = '';
             checkTableModalState.subTitle = '';
+            checkTableModalState.item = null;
             checkTableModalState.themeColor = '';
         };
 
@@ -200,11 +200,15 @@ export default {
             checkTableModalState.title = 'Delete Credentials from Credentials Group';
             checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
             checkTableModalState.themeColor = 'alert';
+            checkTableModalState.item = getSelectedCdItems;
             checkTableModalState.visible = true;
         };
 
         const checkModalConfirm = (event) => {
             console.log(checkTableModalState.confirmEventName, event);
+            if (checkTableModalState.confirmEventName === 'deleteCd') {
+                cdgEventBus.$emit(checkTableModalState.confirmEventName, event, props.credentialGroupId);
+            }
             cdgEventBus.$emit(checkTableModalState.confirmEventName, event);
             resetCheckTableModalState();
         };
@@ -227,8 +231,9 @@ export default {
             clickDelete,
             checkModalConfirm,
             timestampFormatter,
-            onClick: () => {
-                parent.$router.push('/secret/credentials-group/add/cred-grp-21a4cd399efe');
+            onClick: (item) => {
+                console.log('router test', item);
+                parent.$router.push('/secret/credentials-group/add/cred-grp-18a27e680035');
             },
         };
     },

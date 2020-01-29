@@ -74,23 +74,21 @@ export default {
                 state.loading = false;
             }
         };
-        const requestCdList = async (cdgId) => {
+        const requestCdList = async () => {
             state.cdgData.loading = true;
             state.cdgData.items = [];
+            console.log('requestCdList test', state.cdgData)
             const param = {
                 query: cdRequestState.query,
                 // eslint-disable-next-line camelcase
+                credential_group_id: "cred-grp-18a27e680035",
                 include_credential_group: true,
             };
-            if (cdgId) {
-                // eslint-disable-next-line camelcase
-                param.credential_group_id = cdgId;
-            }
-
             try {
                 console.log('start', state.loading);
                 const res = await context.parent.$http.post('/secret/credential/list', param);
                 state.cdgData.items = res.data.results;
+                console.log(state.cdgData.items, 'item test');
                 const allPage = Math.ceil(res.data.total_count / state.cdgData.pageSize);
                 state.cdgData.allPage = allPage || 1;
                 state.cdgData.selectIndex = [];
@@ -118,6 +116,7 @@ export default {
             const result = {
                 // eslint-disable-next-line camelcase
                 credential_group_id: _.map(items, 'credential_group_id'),
+                credential_id: 'cred-47452e311570',
                 name: _.map(items, 'name'),
                 tags: _.map(items, 'tags'),
             };
@@ -132,6 +131,29 @@ export default {
                     type: 'success',
                     title: 'success',
                     text: 'delete credential groups',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch((error) => {
+                console.log(error);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            });
+        };
+        const deleteCd = async (items) => {
+            await context.parent.$http.post('/secret/credential-group/credential/remove', getCdgsParam(items)).then(async (_) => {
+                await requestCdList();
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Delete Credentials Successfully',
                     duration: 2000,
                     speed: 1000,
                 });
@@ -198,6 +220,7 @@ export default {
         mountBusEvent(cdgEventBus, cdgEventNames.getCdList, requestCdList);
         mountBusEvent(cdgEventBus, cdgEventNames.tagConfirmEvent, CdgTagConfirm);
         mountBusEvent(cdgEventBus, cdgEventNames.deleteCdg, deleteCdg);
+        mountBusEvent(cdgEventBus, cdgEventNames.deleteCd, deleteCd);
         mountBusEvent(cdgEventBus, cdgEventNames.createCdg, createCdg);
         mountBusEvent(cdgEventBus, cdgEventNames.updateCdg, updateCdg);
 
