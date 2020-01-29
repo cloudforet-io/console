@@ -1,6 +1,6 @@
 <script lang="ts">
 export default {
-    name: 'Text',
+    name: 'PDynamicFieldText',
     functional: true,
     props: {
         // eslint-disable-next-line camelcase,vue/prop-name-casing
@@ -9,7 +9,7 @@ export default {
             default: () => {},
         },
         data: {
-            type: String,
+            type: [String, Object, Array, Boolean, Number],
             required: true,
         },
     },

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 
 export default {
-    name: 'Badge',
+    name: 'PDynamicFieldBadge',
     functional: true,
     components: { PBadge },
     props: {

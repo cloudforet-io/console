@@ -1,3 +1,4 @@
+import moment from 'moment-timezone';
 import { Util } from '@/lib/global-util';
 import styles from '@/styles/_variables.scss';
 import { ColorBindFactory } from '@/lib/view-helper';
@@ -94,9 +95,9 @@ export const platformBadgeColor = Object.freeze({
     WINDOWS: { backgroundColor: styles.secondary },
 });
 
-
+export const getLocalDatetimeFromTimeStamp = ts => moment.unix(ts).tz(localStorage.getItem('timezone')).format('YYYY-MM-DD HH:MM:SS z');
 // formatter
-export const timestampFormatter = value => Util.methods.getDatefromTimeStamp(value.seconds, localStorage.getItem('timezone'));
+export const timestampFormatter = value => getLocalDatetimeFromTimeStamp(value.seconds);
 
 export const serverStateFormatter = ColorBindFactory(serverStateColor, value => value.toLowerCase());
 export const userStateFormatter = ColorBindFactory(userStateColor, value => value.toLowerCase());
