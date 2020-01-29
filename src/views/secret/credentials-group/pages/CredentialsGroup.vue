@@ -75,20 +75,18 @@ export default {
             }
         };
         const requestCdList = async () => {
+            const cdgInfo = state.items[state.selectIndex[0]];
             state.cdgData.loading = true;
             state.cdgData.items = [];
-            console.log('requestCdList test', state.cdgData)
             const param = {
                 query: cdRequestState.query,
                 // eslint-disable-next-line camelcase
-                credential_group_id: "cred-grp-18a27e680035",
+                credential_group_id: cdgInfo.credential_group_id,
                 include_credential_group: true,
             };
             try {
-                console.log('start', state.loading);
                 const res = await context.parent.$http.post('/secret/credential/list', param);
                 state.cdgData.items = res.data.results;
-                console.log(state.cdgData.items, 'item test');
                 const allPage = Math.ceil(res.data.total_count / state.cdgData.pageSize);
                 state.cdgData.allPage = allPage || 1;
                 state.cdgData.selectIndex = [];
@@ -98,11 +96,14 @@ export default {
                 state.cdgData.loading = false;
             }
         };
-        const CdgTagConfirm = async (cdgId, tags, originTags) => {
+        const CdgTagConfirm = async (item, tags, originTags) => {
             const idx = state.selectIndex[0];
+            const cdgInfo = state.items[state.selectIndex[0]];
+            console.log(idx, 'idx test')
             await context.parent.$http.post('/secret/credential-group/update', {
                 // eslint-disable-next-line camelcase
-                credential_group_id: cdgId,
+                name: cdgInfo.name,
+                credential_group_id: cdgInfo.credential_group_id,
                 tags,
             }).then((_) => {
                 state.items[idx].tags = tags;
