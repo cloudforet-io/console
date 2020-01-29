@@ -19,7 +19,13 @@ export default {
     },
     render(h, { props }) {
         const option = _.get(props.view_option, ['item'], {});
-        const children = props.data.map(value => h(PDynamicField, { props: { ...option, data: value } }));
+        const children = props.data.map((value, idx) => {
+            let v:string = value;
+            if ((!option.view_type || option.view_type === 'text') && idx) {
+                v = `, ${v}`;
+            }
+            return h(PDynamicField, { props: { ...option, data: v } });
+        });
         return h('span', children);
     },
 };
