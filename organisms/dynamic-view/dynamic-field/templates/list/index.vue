@@ -3,7 +3,7 @@ import _ from 'lodash';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 
 export default {
-    name: 'List',
+    name: 'PDynamicFieldList',
     functional: true,
     components: { PDynamicField },
     props: {

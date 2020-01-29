@@ -1,5 +1,5 @@
 <template>
-    <div class="col-sm-12" :style="panelTitleStyle">
+    <div class="col-sm-12 p-panel-top" :style="panelTitleStyle">
         <div class="card panel-card">
             <div class="p-panel-top-header">
                 <div class="p-panel-top-header-title">
@@ -33,6 +33,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .p-panel-top{
+        padding-left: 0;
+        padding-right: 0;
+    }
     .panel-card{
         border:none;
     }
