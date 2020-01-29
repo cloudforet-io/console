@@ -6,7 +6,7 @@ import {
 import _ from 'lodash';
 import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
-import { mountBusEvent } from '@/lib/compostion-util';
+import { mountBusEvent } from '@/lib/compostion-util.ts';
 import { defaultQuery } from '@/lib/api';
 import {
     defaultAutocompleteHandler,

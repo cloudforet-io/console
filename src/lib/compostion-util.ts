@@ -180,7 +180,7 @@ export const credentialsNameValidation = (parent:any, invalidMessage:message) =>
             result = true;
         }
     }).catch((error) => {
-        console.log(error);
+        console.error(error);
     });
     return result;
 }, invalidMessage || 'same name exists!');

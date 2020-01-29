@@ -85,7 +85,7 @@ export const crdState = reactive({
     selectIndex: [],
 });
 
-const setTableRefs = (root) => {
+const setTableRefs = (ctx) => {
     const state = reactive({
         fields: makeTrItems([
             ['credential_id', 'COMMON.ID', { size: '400px' }],
@@ -93,7 +93,7 @@ const setTableRefs = (root) => {
             ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
             ['credential_groups', 'COMMON.GROUP', { size: '800px', sortable: false }],
             ['created_at', 'COMMON.CREATED', { size: '300px' }],
-        ], root),
+        ], ctx),
         sortBy: '',
         sortDesc: '',
         pageSize: 10,
@@ -140,8 +140,8 @@ export default {
     props: {
         item: Object,
     },
-    setup(props, { root }) {
-        const tableRefs = setTableRefs(root);
+    setup(props, { parent }) {
+        const tableRefs = setTableRefs(parent);
 
         return {
             ...toRefs(crdState),

@@ -86,22 +86,16 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        confState.pluginId = root.$route.params.pluginId;
+        confState.pluginId = _.get(root, '$route.params.pluginId', '');
         CollectorEventBus.$emit('getPlugin');
         CollectorEventBus.$emit('listVersionsInfo');
 
         const state = reactive({
-            version: root.$route.query.version,
+            version: _.get(root, '$route.query.version', ''),
             proxyIsInvalid: makeProxy('isInvalid', props, emit),
-            proxyPluginOptions: computed(() => {
-                if (confState.plugin && confState.plugin.template && confState.plugin.template.options) return confState.plugin.template.options;
-                return [];
-            }),
+            proxyPluginOptions: computed(() => _.get(confState.plugin, 'template.options', [])),
         });
-        const imgUrl = computed(() => {
-            if (confState.plugin && confState.plugin.tags && confState.plugin.tags.icon) return confState.plugin.tags.icon;
-            return config.get('COLLECTOR_IMG');
-        });
+        const imgUrl = computed(() => _.get(confState.plugin, 'tags.icon', config.get('COLLECTOR_IMG')));
         const versionsInfo = computed(() => {
             if (!confState.selectedVersion) confState.selectedVersion = confState.versions[0];
             return confState.versions.map(v => ({ type: 'item', label: v, name: v }));

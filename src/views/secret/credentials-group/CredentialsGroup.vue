@@ -63,7 +63,7 @@ export default {
                 state.selectIndex = [];
                 state.loading = false;
             } catch (e) {
-                console.log(e);
+                console.error(e);
                 state.loading = false;
             }
         };

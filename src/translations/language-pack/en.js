@@ -266,6 +266,7 @@ export const en = {
         POOL_NM: 'Pool Name',
         COL_OPS: 'Collect Options',
         FILTERS: 'Filters',
+        CHOOSE_CRD: 'Choose Credential',
     },
     SECRET: {
         JASON_ALERT: 'Please, Check Json Format (Use double quotation( \\" ) mark instead of single quotation (\').',

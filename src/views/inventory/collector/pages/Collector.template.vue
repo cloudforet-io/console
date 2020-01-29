@@ -1,6 +1,5 @@
 <template>
     <div class="collector-page">
-        <router-view />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table :items="items"
@@ -90,7 +89,7 @@
                 >
                     <template #col-name-format="data">
                         <span class="name">
-                            <img class="icon" :src="data.item.tags.icon || defaultImg">
+                            <img class="icon" :src="getIcon(data)">
                             {{ data.value }}
                         </span>
                     </template>
@@ -174,11 +173,12 @@ const setTableData = (props, context, collectorState) => {
             ['name', 'COMMON.NAME'],
             ['state', 'COMMON.STATE'],
             ['priority', 'COMMON.PRIORITY'],
-        ], context.root),
+        ], context.parent),
         timestampFormatter,
         collectorStateFormatter,
         defaultImg: config.get('COLLECTOR_IMG'),
         collectDataModalVisible: false,
+        getIcon: data => _.get(data, 'item.tags.icon', config.get('COLLECTOR_IMG')),
     });
 
     const nothingSelected = computed(() => collectorState.selectIndex.length === 0);
@@ -215,11 +215,11 @@ const setTabData = (props, context) => {
             ['detail', 'PANEL.DETAILS', { keepAlive: true }],
             ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
             ['jobs', 'PANEL.JOBS'],
-        ], context.root),
+        ], context.parent),
         multiActiveTab: 'selected',
         multiTabs: makeTrItems([
             ['selected', 'PANEL.SELECTED', { keepAlive: true }],
-        ], context.root),
+        ], context.parent),
     });
 
 

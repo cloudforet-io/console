@@ -88,7 +88,7 @@ export default {
         PSearch,
         PToolboxTable,
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit, root, parent }) {
         const state = reactive({
             sortBy: '',
             sortDesc: '',
@@ -101,14 +101,14 @@ export default {
                     ['credential_group_id', 'COMMON.ID'],
                     ['name', 'COMMON.NAME'],
                     ['created_at', 'COMMON.CREATE'],
-                ], root),
+                ], parent),
                 Credentials: makeTrItems([
                     ['credential_id', 'COMMON.ID', { size: '400px' }],
                     ['name', 'COMMON.NAME', { size: '400px' }],
                     ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
                     ['credential_groups', 'COMMON.GROUP', { size: '800px', sortable: false }],
                     ['created_at', 'COMMON.CREATED', { size: '300px' }],
-                ], root),
+                ], parent),
             },
         });
 

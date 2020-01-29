@@ -266,6 +266,7 @@ export const ko = {
         POOL_NM: '풀(Pool) 명',
         COL_OPS: '수집 옵션',
         FILTERS: '필터',
+        CHOOSE_CRD: '암호 선택',
     },
     SECRET: {
         JASON_ALERT: "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (\') )",
