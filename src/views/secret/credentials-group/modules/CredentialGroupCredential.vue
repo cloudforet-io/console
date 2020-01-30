@@ -32,10 +32,15 @@
                 <p-button class="left-toolbox-item" style-type="primary"
                           @click="onClick"
                 >
-                    {{ tr('COMMON.BTN_ADD') }}
+                    <p-i :color="'transparent inherit'"
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_plus'"
+                    />   {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
                 <p-button style-type="alert"
                           :disabled="isNotSelected"
+                          :outline="true"
                           class="left-toolbox-item"
                           @click="clickDelete"
                 >
@@ -75,6 +80,7 @@ import { eventNames } from '@/views/secret/credentials-group/pages/CredentialsGr
 import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 import { timestampFormatter } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
@@ -84,6 +90,7 @@ const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/
 export default {
     name: 'PCdgCredential',
     components: {
+        PI,
         PToolboxTable,
         PTableCheckModal,
         PButton,
@@ -205,7 +212,6 @@ export default {
             checkTableModalState.title = 'Delete Credentials from Credentials Group';
             checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
             checkTableModalState.themeColor = 'alert';
-            checkTableModalState.item = getSelectedCdItems;
             checkTableModalState.visible = true;
         };
 

@@ -49,10 +49,10 @@
                 </template>
             </p-toolbox-table>
             <p-box-layout class="tag-container">
-                <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
+                <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag.name}`"
                        @delete="tagTools.deleteTag(idx)"
                 >
-                    {{ tag }}
+                    {{ tag.name }}
                 </p-tag>
             </p-box-layout>
             <p-row>
@@ -82,7 +82,7 @@
         />
         <p-cdg-form v-if="cdgFormState.visible"
                     :header-title="cdgFormState.headerTitle"
-                    :item="cdgFormState.items"
+                    :items="cdgFormState.items"
                     :update-mode="cdgFormState.updateMode"
                     :visible.sync="cdgFormState.visible"
                     @confirm="cdgFormConfirm"
@@ -146,24 +146,12 @@ export const cdgSetup = (props, context, eventName) => {
     const getCd = () => {
         eventBus.$emit(eventName.getCdList);
     };
-    const sortSelectIndex = computed(() => {
-        const idxs = [...tableState.selectIndex];
-        idxs.sort((a, b) => a - b);
-        return idxs;
-    });
-    // const getSelectedCdItems = computed(() => {
-    //     const items = [];
-    //     sortSelectIndex.value.forEach((idx) => {
-    //         items.push(tableState.items[idx]);
-    //     });
-    //     return items;
-    // });
+
     const getSelectedCdItems = computed(() => {
         const items = [];
         for (let idx = 0; idx < tableState.tagTools.tags.length; idx++) { // 추후 리팩토링 예정
             items.push(tableState.tagTools.tags[idx]);
         }
-        console.log('getSelectedCdItems Test', items)
         return items;
     });
 
@@ -195,19 +183,21 @@ export const cdgSetup = (props, context, eventName) => {
     });
 
     const onSelect = (item) => {
-        tableState.tagTools.addTag(item.credential_id);
+        tableState.tagTools.addTag(item);
     };
 
     const clickAdd = () => {
         checkTableModalState.mode = 'add';
         checkTableModalState.confirmEventName = eventName.addCd;
         checkTableModalState.title = 'Add Credentials';
-        checkTableModalState.subTitle = '[Mockup Text] test';
+        checkTableModalState.subTitle = 'Are you sure you want to add selected Credential(s) below?';
         checkTableModalState.themeColor = 'primary';
+        checkTableModalState.items = null;
         checkTableModalState.visible = true;
     };
 
     const cdgFormConfirm = (item) => {
+        console.log('cdgFormConfirm test', item)
         eventBus.$emit(cdgFormState.eventName, item);
         cdgFormState.visible = false;
         cdgFormState.mode = '';
