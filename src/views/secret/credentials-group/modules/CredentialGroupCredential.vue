@@ -34,7 +34,9 @@
                 >
                     {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
-                <p-button class="left-toolbox-item" style-type="primary"
+                <p-button style-type="alert"
+                          :disabled="isNotSelected"
+                          class="left-toolbox-item"
                           @click="clickDelete"
                 >
                     {{ tr('COMMON.BTN_DELETE') }}
@@ -152,6 +154,7 @@ export default {
             console.log('getData Test', props.items);
             cdgEventBus.$emit(props.getCdList, props.credentialGroupId);
         };
+
         const sortSelectIndex = computed(() => {
             const idxs = [...state.selectIndex];
             idxs.sort((a, b) => a - b);
@@ -207,9 +210,12 @@ export default {
         };
 
         const checkModalConfirm = () => {
-            console.log(getFirstSelectedCdId.value, props.credentialGroupId);
             cdgEventBus.$emit(checkTableModalState.confirmEventName, getFirstSelectedCdId.value, props.credentialGroupId);
             resetCheckTableModalState();
+        };
+
+        const onClick = () => {
+            parent.$router.push({ name: 'addCredentials', params: { id: props.credentialGroupId } });
         };
 
         onMounted(() => {
@@ -223,6 +229,7 @@ export default {
         return {
             ...toRefs(state),
             checkTableModalState,
+            isNotSelected,
             getSelectedCdItems,
             getSelectedCdIds,
             getFirstSelectedCdId,
@@ -230,10 +237,7 @@ export default {
             clickDelete,
             checkModalConfirm,
             timestampFormatter,
-            onClick: (item) => {
-                console.log('router test', item);
-                parent.$router.push('/secret/credentials-group/add/cred-grp-18a27e680035');
-            },
+            onClick,
         };
     },
 };

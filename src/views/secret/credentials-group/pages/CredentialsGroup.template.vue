@@ -229,13 +229,13 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         visible: false,
         mode: '',
         headerTitle: '',
-        item: null,
+        item: undefined,
         eventNames: '',
     });
     const clickCreate = () => {
         cdgFormState.updateMode = false;
         cdgFormState.headerTitle = 'Create Credentials Group';
-        cdgFormState.item = null;
+        cdgFormState.item = undefined;
         cdgFormState.eventName = eventNames.createCdg;
         cdgFormState.visible = true;
     };
