@@ -51,7 +51,7 @@ export default {
         const getCdsParam = (items) => {
             const result = {
                 // eslint-disable-next-line camelcase
-                credential_id: items,
+                credential_id: items[0].credential_id,
                 credential_group_id: context.root.$route.params.id,
                 name: _.map(items, 'name'),
                 tags: _.map(items, 'tags'),
