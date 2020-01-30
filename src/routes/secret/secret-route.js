@@ -31,6 +31,7 @@ export default {
                     name: 'addCredentials',
                     meta: { label: 'Add Credentials' },
                     component: AddCredentials,
+                    props: true,
                 },
             ],
         },

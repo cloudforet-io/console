@@ -32,9 +32,16 @@
                 <p-button class="left-toolbox-item" style-type="primary"
                           @click="onClick"
                 >
-                    {{ tr('COMMON.BTN_ADD') }}
+                    <p-i :color="'transparent inherit'"
+                         :width="'1rem'"
+                         :height="'1rem'"
+                         :name="'ic_plus'"
+                    />   {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
-                <p-button class="left-toolbox-item" style-type="primary"
+                <p-button style-type="alert"
+                          :disabled="isNotSelected"
+                          :outline="true"
+                          class="left-toolbox-item"
                           @click="clickDelete"
                 >
                     {{ tr('COMMON.BTN_DELETE') }}
@@ -73,6 +80,7 @@ import { eventNames } from '@/views/secret/credentials-group/pages/CredentialsGr
 import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 import { timestampFormatter } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
@@ -82,6 +90,7 @@ const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/
 export default {
     name: 'PCdgCredential',
     components: {
+        PI,
         PToolboxTable,
         PTableCheckModal,
         PButton,
@@ -152,6 +161,7 @@ export default {
             console.log('getData Test', props.items);
             cdgEventBus.$emit(props.getCdList, props.credentialGroupId);
         };
+
         const sortSelectIndex = computed(() => {
             const idxs = [...state.selectIndex];
             idxs.sort((a, b) => a - b);
@@ -171,9 +181,10 @@ export default {
             getSelectedCdItems.value.forEach((item) => {
                 ids.push(item.credential_id);
             });
+            console.log('getSelectedCdIds', ids);
             return ids;
         });
-        const getFirstSelectedCdId = computed(() => (getSelectedCdIds.value.length >= 1 ? getSelectedCdIds[0] : ''));
+        const getFirstSelectedCdId = computed(() => (getSelectedCdIds.value.length >= 1 ? getSelectedCdIds.value[0] : ''));
 
         const checkTableModalState = reactive({
             visible: false,
@@ -201,13 +212,16 @@ export default {
             checkTableModalState.title = 'Delete Credentials from Credentials Group';
             checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
             checkTableModalState.themeColor = 'alert';
-            checkTableModalState.item = getSelectedCdItems;
             checkTableModalState.visible = true;
         };
 
-        const checkModalConfirm = (event) => {
-            cdgEventBus.$emit(checkTableModalState.confirmEventName, event);
+        const checkModalConfirm = () => {
+            cdgEventBus.$emit(checkTableModalState.confirmEventName, getFirstSelectedCdId.value, props.credentialGroupId);
             resetCheckTableModalState();
+        };
+
+        const onClick = () => {
+            parent.$router.push({ name: 'addCredentials', params: { id: props.credentialGroupId } });
         };
 
         onMounted(() => {
@@ -221,6 +235,7 @@ export default {
         return {
             ...toRefs(state),
             checkTableModalState,
+            isNotSelected,
             getSelectedCdItems,
             getSelectedCdIds,
             getFirstSelectedCdId,
@@ -228,10 +243,7 @@ export default {
             clickDelete,
             checkModalConfirm,
             timestampFormatter,
-            onClick: (item) => {
-                console.log('router test', item);
-                parent.$router.push('/secret/credentials-group/add/cred-grp-18a27e680035');
-            },
+            onClick,
         };
     },
 };

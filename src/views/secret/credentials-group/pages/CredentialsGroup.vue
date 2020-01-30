@@ -1,5 +1,7 @@
 <script>
-import {
+    /* eslint-disable camelcase */
+
+    import {
     toRefs, computed, reactive,
 } from '@vue/composition-api';
 import CdgTemplate, { cdgSetup, eventNames } from '@/views/secret/credentials-group/pages/CredentialsGroup.template.vue';
@@ -81,13 +83,12 @@ export default {
         };
         const requestCdList = async () => {
             const cdgInfo = state.items[state.selectIndex[0]];
-            const cdgId = cdgInfo.credential_group_id;
             state.cdgData.loading = true;
             state.cdgData.items = [];
             const param = {
                 query: cdRequestState.query,
                 // eslint-disable-next-line camelcase
-                credential_group_id: cdgId,
+                credential_group_id: cdgInfo.credential_group_id,
                 include_credential_group: true,
             };
             try {
@@ -119,28 +120,7 @@ export default {
                 console.error(error);
             });
         };
-        const getCdgsParam = (items) => {
-            console.log('getCdgsParam test1', items);
-            const result = {
-                // eslint-disable-next-line camelcase
-                credential_group_id: _.map(items, 'credential_group_id'),
-                credential_id: 'cred-47452e311570',
-                name: _.map(items, 'name'),
-                tags: _.map(items, 'tags'),
-            };
-            console.log('getCdgsParam test2', result);
-            return result;
-        };
-        const getCdsParam = (items) => {
-            console.log('getCdsParamTest1', items);
-            const result = {
-                // credential_group_id: _.map(items, 'credential_group_id'),
-                credential_group_id: 'cred-grp-18a27e680035',
-                credential_id: items,
-            };
-            console.log('getCdsParamTest2', result);
-            return result;
-        }
+
         const deleteCdg = async (items) => {
             await context.parent.$http.post('/secret/credential-group/delete', getCdgsParam(items)).then(async (_) => {
                 await requestCdgList();
@@ -164,8 +144,12 @@ export default {
                 });
             });
         };
-        const deleteCd = async (items) => {
-            await context.parent.$http.post('/secret/credential-group/credential/remove', getCdgsParam(items)).then(async (_) => {
+        const deleteCd = async (cd_id, cdg_id) => {
+            console.log(cd_id,  cdg_id)
+            await context.parent.$http.post('/secret/credential-group/credential/remove', {
+                credential_group_id: cdg_id,
+                credential_id: cd_id,
+            }).then(async (_) => {
                 await requestCdList();
                 context.root.$notify({
                     group: 'noticeBottomRight',

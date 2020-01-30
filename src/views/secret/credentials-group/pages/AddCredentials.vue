@@ -52,7 +52,7 @@ export default {
             const result = {
                 // eslint-disable-next-line camelcase
                 credential_id: items,
-                credential_group_id: 'cred-grp-18a27e680035',
+                credential_group_id: context.root.$route.params.id,
                 name: _.map(items, 'name'),
                 tags: _.map(items, 'tags'),
             };
@@ -60,7 +60,6 @@ export default {
         };
 
         const addCd = async (items) => {
-            console.log('addCd Test', items);
             await context.parent.$http.post('/secret/credential-group/credential/add', getCdsParam(items)).then(async (_) => {
                 await requestCdList();
                 context.root.$notify({
