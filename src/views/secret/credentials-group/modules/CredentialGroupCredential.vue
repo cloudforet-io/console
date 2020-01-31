@@ -54,7 +54,6 @@
                 {{ timestampFormatter(value) }}
             </template>
         </p-toolbox-table>
-
         <p-table-check-modal
             v-if="!!checkTableModalState.mode"
             :visible.sync="checkTableModalState.visible"
@@ -67,6 +66,13 @@
             :selectable="false"
             :items="getSelectedCdItems"
             @confirm="checkModalConfirm"
+        />
+        <p-cdg-form v-if="cdgFormState.visible"
+                    :header-title="cdgFormState.headerTitle"
+                    :items="cdgFormState.items"
+                    :update-mode="cdgFormState.updateMode"
+                    :visible.sync="cdgFormState.visible"
+                    @confirm="cdgFormConfirm"
         />
     </div>
 </template>
@@ -81,6 +87,7 @@ import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import PCdgForm from '@/views/secret/credentials-group/modules/CredentialGroupForm.vue';
 import { timestampFormatter } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
@@ -94,6 +101,7 @@ export default {
         PToolboxTable,
         PTableCheckModal,
         PButton,
+        PCdgForm,
     },
     props: {
         items: {
@@ -158,7 +166,6 @@ export default {
             modalFields,
         });
         const getData = () => {
-            console.log('getData Test', props.items);
             cdgEventBus.$emit(props.getCdList, props.credentialGroupId);
         };
 
@@ -181,15 +188,21 @@ export default {
             getSelectedCdItems.value.forEach((item) => {
                 ids.push(item.credential_id);
             });
-            console.log('getSelectedCdIds', ids);
             return ids;
         });
         const getFirstSelectedCdId = computed(() => (getSelectedCdIds.value.length >= 1 ? getSelectedCdIds.value[0] : ''));
-
+        const cdgFormState = reactive({
+            visible: false,
+            mode: '',
+            headerTitle: '',
+            item: null,
+            searchText: '',
+            eventName: '',
+        });
         const checkTableModalState = reactive({
             visible: false,
             mode: '',
-            item: null,
+            item: undefined,
             confirmEventName: '',
             title: '',
             subTitle: '',
@@ -205,6 +218,11 @@ export default {
             checkTableModalState.item = null;
             checkTableModalState.themeColor = '';
         };
+        const cdgFormConfirm = (item) => {
+            eventBus.$emit(cdgFormState.eventName, item);
+            cdgFormState.visible = false;
+            cdgFormState.mode = '';
+        };
 
         const clickDelete = () => {
             checkTableModalState.mode = 'delete';
@@ -212,11 +230,12 @@ export default {
             checkTableModalState.title = 'Delete Credentials from Credentials Group';
             checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
             checkTableModalState.themeColor = 'alert';
+            checkTableModalState.items = null;
             checkTableModalState.visible = true;
         };
 
-        const checkModalConfirm = () => {
-            cdgEventBus.$emit(checkTableModalState.confirmEventName, getFirstSelectedCdId.value, props.credentialGroupId);
+        const checkModalConfirm = (event) => {
+            cdgEventBus.$emit(checkTableModalState.confirmEventName, event, getFirstSelectedCdId.value, props.credentialGroupId);
             resetCheckTableModalState();
         };
 
@@ -241,6 +260,8 @@ export default {
             getFirstSelectedCdId,
             getData,
             clickDelete,
+            cdgFormState,
+            cdgFormConfirm,
             checkModalConfirm,
             timestampFormatter,
             onClick,

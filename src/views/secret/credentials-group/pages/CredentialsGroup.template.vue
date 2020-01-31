@@ -41,8 +41,28 @@
                             Action
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
-                            <p-search :search-text.sync="searchText" @onSearch="getCdg" />
+                            <PQuerySearchBar :search-text.sync="searchText"
+                                             :autocomplete-handler="ACHandler"
+                                             @newQuery="queryListTools.addTag"
+                            />
                         </div>
+                    </template>
+                    <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
+                        <p-col :col="12" style="margin-bottom: .5rem;">
+                            <p-hr style="width: 100%;" />
+                            <p-row style="margin-top: .5rem;">
+                                <div style="flex-grow: 0">
+                                    <p-icon-button name="ic_delete" @click="queryListTools.deleteAllTags" />
+                                </div>
+                                <div style="flex-grow: 1;margin-left: 1rem;">
+                                    <p-tag v-for="(tag, idx) in queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
+                                           @delete="queryListTools.deleteTag(idx)"
+                                    >
+                                        {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
+                                    </p-tag>
+                                </div>
+                            </p-row>
+                        </p-col>
                     </template>
                     <template v-slot:col-created_at-format="data">
                         {{ timestampFormatter(data.value) }}
@@ -131,7 +151,11 @@ import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PSearch from '@/components/molecules/search/Search.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
+import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PCdgDetail from '@/views/secret/credentials-group/modules/CredentialGroupDetail.vue';
 import PCdgCredential from '@/views/secret/credentials-group/modules/CredentialGroupCredential.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
@@ -168,7 +192,7 @@ export const eventNames = {
     deleteCd: '',
 };
 
-export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
+export const cdgSetup = (props, context, eventName, cdgNameValidation, ACHandler) => {
     const eventBus = cdgEventBus;
     const tableState = CdgTableReactive(context.parent);
     const tabData = reactive({
@@ -310,6 +334,8 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         context.parent,
         { type: 'item' }),
     });
+    const queryList = ref([]);
+    const queryListTools = tagList(queryList, true, eventBus, eventName.getCdgList);
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
@@ -333,6 +359,8 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         cdgFormConfirm,
         checkModalConfirm,
         cdgNameValidation,
+        ACHandler,
+        queryListTools,
     });
 };
 export default {
@@ -349,7 +377,12 @@ export default {
         PCdgDetail,
         PCdgCredential,
         PTab,
-        PSearch,
+        PQuerySearchBar,
+        PTag,
+        PRow,
+        PCol,
+        PHr,
+        PIconButton,
         PTableCheckModal,
         PDataTable,
     },

@@ -1,18 +1,53 @@
 <script>
-    /* eslint-disable camelcase */
+/* eslint-disable camelcase */
 
-    import {
+import {
     toRefs, computed, reactive,
 } from '@vue/composition-api';
+import moment from 'moment-timezone';
 import CdgTemplate, { cdgSetup, eventNames } from '@/views/secret/credentials-group/pages/CredentialsGroup.template.vue';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import { mountBusEvent, Validation } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
+import {
+    defaultAutocompleteHandler,
+    getEnumValues, getSearchEnumValues,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 export default {
     name: 'Cdg',
     extends: CdgTemplate,
     setup(props, context) {
+        class ACHandler extends defaultAutocompleteHandler {
+            // eslint-disable-next-line class-methods-use-this
+            get keys() {
+                return [
+                    'credential_group_id', 'name',
+                ];
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get suggestKeys() {
+                return ['name'];
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get parent() {
+                return context.parent;
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get valuesFetchUrl() {
+                return '/secret/credential-group/list';
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get valuesFetchKeys() {
+                return [
+                    'credential_group_id', 'name',
+                ];
+            }
+        }
         const cdgEventNames = eventNames;
         cdgEventNames.getCdgList = 'getCdgList';
         cdgEventNames.getCdList = 'getCdList';
@@ -23,7 +58,6 @@ export default {
         cdgEventNames.createCdg = 'createCdg';
         cdgEventNames.updateCdg = 'updateCdg';
         const cdgNameValidation = new Validation(async (value, data) => {
-            console.log('name validation test', value);
             if (data.updateMode && data.originName === value) {
                 return true;
             }
@@ -39,20 +73,19 @@ export default {
                     }],
                 },
             }).then((res) => {
-                console.log(res);
                 if (res.data.total_count === 0) {
                     result = true;
                 }
             });
             return result;
         }, 'Duplicated Credential Group Name');
-        const state = cdgSetup(props, context, cdgEventNames, cdgNameValidation);
+        const state = cdgSetup(props, context, cdgEventNames, cdgNameValidation, new ACHandler());
 
         const requestState = reactive({
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
                 state.sortBy, state.sortDesc,
-                state.searchText,
+                null, state.queryListTools.tags,
             ))),
         });
         const cdRequestState = reactive({
@@ -63,11 +96,9 @@ export default {
             ))),
         });
         const requestCdgList = async () => {
-            console.log('before', state.loading);
             state.loading = true;
             state.items = [];
             try {
-                console.log('start', state.loading);
                 const res = await context.parent.$http.post('/secret/credential-group/list', {
                     query: requestState.query,
                 });
@@ -82,13 +113,13 @@ export default {
             }
         };
         const requestCdList = async () => {
-            const cdgInfo = state.items[state.selectIndex[0]];
             state.cdgData.loading = true;
             state.cdgData.items = [];
+            const cdgId = state.items[0].credential_group_id
             const param = {
                 query: cdRequestState.query,
                 // eslint-disable-next-line camelcase
-                credential_group_id: cdgInfo.credential_group_id,
+                credential_group_id: cdgId,
                 include_credential_group: true,
             };
             try {
@@ -106,7 +137,6 @@ export default {
         const CdgTagConfirm = async (item, tags, originTags) => {
             const idx = state.selectIndex[0];
             const cdgInfo = state.items[state.selectIndex[0]];
-            console.log(idx, 'idx test');
             await context.parent.$http.post('/secret/credential-group/update', {
                 // eslint-disable-next-line camelcase
                 name: cdgInfo.name,
@@ -120,7 +150,16 @@ export default {
                 console.error(error);
             });
         };
-
+        const getCdgsParam = (items) => {
+            const result = {
+                // eslint-disable-next-line camelcase
+                credential_group_id: _.map(items, 'credential_group_id'),
+                credential_id: _.map(items, 'credential_id'),
+                name: _.map(items, 'name'),
+                tags: _.map(items, 'tags'),
+            };
+            return result;
+        };
         const deleteCdg = async (items) => {
             await context.parent.$http.post('/secret/credential-group/delete', getCdgsParam(items)).then(async (_) => {
                 await requestCdgList();
@@ -144,12 +183,17 @@ export default {
                 });
             });
         };
-        const deleteCd = async (cd_id, cdg_id) => {
-            console.log(cd_id,  cdg_id)
-            await context.parent.$http.post('/secret/credential-group/credential/remove', {
-                credential_group_id: cdg_id,
-                credential_id: cd_id,
-            }).then(async (_) => {
+        const getCdsParam = (items) => {
+            console.log('getCdsParam test', items)
+            const result = {
+                // eslint-disable-next-line camelcase
+                credentials: _.map(items, 'credential_id'),
+                credential_group_id: items[0].credential_groups[0].credential_group_id,
+            };
+            return result;
+        };
+        const deleteCd = async (items) => {
+            await context.parent.$http.post('/secret/credential-group/credential/remove', getCdsParam(items)).then(async (_) => {
                 await requestCdList();
                 context.root.$notify({
                     group: 'noticeBottomRight',
@@ -227,7 +271,6 @@ export default {
         mountBusEvent(cdgEventBus, cdgEventNames.updateCdg, updateCdg);
 
         requestCdgList();
-        requestCdList();
         return {
             ...toRefs(state),
         };
