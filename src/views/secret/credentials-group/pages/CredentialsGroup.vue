@@ -121,6 +121,18 @@ export default {
             });
         };
 
+        const getCdgsParam = (items) => {
+            console.log('getCdgsParam test1', items);
+            const result = {
+                // eslint-disable-next-line camelcase
+                credential_group_id: _.map(items, 'credential_group_id'),
+                credential_id: 'cred-47452e311570',
+                name: _.map(items, 'name'),
+                tags: _.map(items, 'tags'),
+            };
+            return result;
+        };
+
         const deleteCdg = async (items) => {
             await context.parent.$http.post('/secret/credential-group/delete', getCdgsParam(items)).then(async (_) => {
                 await requestCdgList();
