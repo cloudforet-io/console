@@ -1,15 +1,27 @@
-import axios from 'axios';
+/* eslint-disable camelcase */
+import axios, { AxiosInstance, AxiosError } from 'axios';
 import VueCookies from 'vue-cookies';
 import jwt from 'jsonwebtoken';
-import prefixPropName from 'bootstrap-vue/esm/utils/prefix-prop-name';
-import { object } from '@storybook/addon-knobs';
-import construct from '@babel/runtime-corejs2/helpers/esm/construct';
+import _ from 'lodash';
+import { VNode } from 'vue';
+import {
+    computed, reactive, Ref, ref,
+} from '@vue/composition-api';
+import { VueInstance } from '@vue/composition-api/dist/types/vue';
 
 class APIError extends Error {
-    constructor(axiosError) {
+    public status: number;
+
+    public code:string;
+
+    public axiosError:AxiosError;
+
+    constructor(axiosError:AxiosError) {
         super();
 
+        // @ts-ignore
         if (Error.captureStackTrace) {
+            // @ts-ignore
             Error.captureStackTrace(this, APIError);
         }
 
@@ -34,16 +46,16 @@ class APIError extends Error {
 }
 
 class API {
-    constructor() {
-        this.instance = null;
-    }
+    public instance:AxiosInstance|null;
 
-    getExpireTimes(accessToken) {
+    public constructor() { this.instance = null; }
+
+    getExpireTimes=(accessToken:string):number => {
         const decodedToken = jwt.decode(accessToken);
         return decodedToken.exp - Math.floor(Date.now() / 1000);
     }
 
-    createAxiosInstance(baseURL) {
+    createAxiosInstance=(baseURL:string):void => {
         const axiosConfig = {
             baseURL,
             headers: {
@@ -52,14 +64,15 @@ class API {
         };
 
         this.instance = axios.create(axiosConfig);
+        // @ts-ignore
         const accessToken = VueCookies.get('accessToken');
         if (accessToken) {
             this.instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
         }
     }
 
-    setResponseInterceptor(handlers) {
-        this.instance.interceptors.response.use((response) => {
+    setResponseInterceptor=(handlers:any):void => {
+        (this.instance as AxiosInstance).interceptors.response.use((response) => {
             const accessToken = response.headers['access-token'];
             if (accessToken) {
                 this.setAccessToken(accessToken);
@@ -78,20 +91,23 @@ class API {
         });
     }
 
-    setAccessToken(accessToken) {
-        this.instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        const expireTimes = this.getExpireTimes(accessToken);
+    setAccessToken=(accessToken:string):void => {
+        (this.instance as AxiosInstance).defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+        const expireTimes:number = this.getExpireTimes(accessToken);
+        // @ts-ignore
         VueCookies.set('accessToken', accessToken, expireTimes);
     }
 
-    removeAccessToken() {
+    removeAccessToken=():void => {
         if (this.instance) {
             delete this.instance.defaults.headers.common.Authorization;
         }
+        // @ts-ignore
         VueCookies.remove('accessToken');
     }
 
-    checkAccessToken() {
+    checkAccessToken=():boolean => {
+        // @ts-ignore
         const accessToken = VueCookies.get('accessToken');
         if (accessToken) {
             return true;
@@ -99,7 +115,7 @@ class API {
         return false;
     }
 
-    init(baseURL, handlers = {}) {
+    init=(baseURL:string, handlers:any = {}):void => {
         if (!this.instance) {
             this.createAxiosInstance(baseURL);
             this.setResponseInterceptor(handlers);
@@ -123,6 +139,40 @@ export const operatorMap = Object.freeze({
 
 const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 
+interface Sort {
+    key:string;
+    desc?:boolean;
+}
+
+interface Page {
+    start:number;
+    limit?:number;
+}
+
+interface Filter{
+    k?:string;
+    o?:string;
+    v?:any;
+    key?:string;
+    operation?:string;
+    value?:any;
+}
+
+interface ApiQuery {
+    page?:Page;
+    sort?:Sort;
+    keyword?:string;
+    filter?:Filter[];
+    only?:string[];
+}
+
+interface SearchQuery {
+    key:string,
+    operator:string,
+    value:string|number|Array<string|number>;
+}
+type ValueFormatter = (string, any)=>string|number|Array<string|number>;
+
 /**
  * @name defaultQuery
  * @description make default query format
@@ -135,8 +185,11 @@ const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in'
  * @param valueFormatter <(key,value)=>value>
  * @returns {{page: {start: number, limit: *}}}
  */
-export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText, searchQueries, valueFormatter) => {
-    const query = {
+export const defaultQuery = (
+    thisPage:number, pageSize:number, sortBy?:string, sortDesc?:boolean,
+    searchText?:string, searchQueries?:SearchQuery[], valueFormatter?:ValueFormatter,
+) => {
+    const query:ApiQuery = {
         page: {
             start: ((thisPage - 1) * pageSize) + 1,
             limit: pageSize,
@@ -152,9 +205,9 @@ export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText, s
         query.keyword = searchText || '';
     }
     if (searchQueries) {
-        const filter = [];
+        const filter:Filter[] = [];
         // eslint-disable-next-line camelcase
-        const mergeOpQuery = {};
+        const mergeOpQuery:{[propName: string]: Filter;} = {};
         searchQueries.forEach((q) => {
             const op = operatorMap[q.operator];
             const value = valueFormatter ? valueFormatter(q.key, q.value) : q.value;
@@ -192,8 +245,8 @@ export const defaultQuery = (thisPage, pageSize, sortBy, sortDesc, searchText, s
  * @param sortDesc
  * @return {{page: {start: number, limit: *}}}
  */
-export const autoCompleteQuery = (searchQuery, itemLimit, sortBy, sortDesc) => {
-    const query = {
+export const autoCompleteQuery = (searchQuery, itemLimit?:number, sortBy?:string, sortDesc?:boolean) => {
+    const query:ApiQuery = {
         page: { start: 1, limit: itemLimit },
         only: [searchQuery.key],
     };
@@ -210,3 +263,84 @@ export const autoCompleteQuery = (searchQuery, itemLimit, sortBy, sortDesc) => {
     }
     return query;
 };
+
+
+export interface HttpInstance {
+    $http:AxiosInstance
+}
+
+export abstract class DynamicAPI {
+    abstract getData();
+
+    public abstract parent:HttpInstance;
+
+    get $http() { return this.parent.$http; }
+}
+
+interface TableState {
+    items:any[];
+    pageSize: number;
+    allPage: number;
+    thisPage: number;
+    searchText: string|null|undefined;
+    loading: boolean;
+}
+
+export const getAllPage = (total_count:number, pageSize:number):number => Math.ceil(total_count / pageSize) || 1;
+
+export class SubDataAPI extends DynamicAPI {
+    public state :TableState;
+
+    private query:Ref<object>;
+
+    constructor(public parent:HttpInstance, private url, private idKey:string, private keyPath:Ref<string>, private id:Ref<string>) {
+        super();
+        this.state = reactive({
+            items: [],
+            pageSize: 15,
+            allPage: 1,
+            thisPage: 1,
+            searchText: '',
+            loading: false,
+        });
+        this.query = computed(() => (defaultQuery(
+            this.state.thisPage, this.state.pageSize,
+            undefined, undefined, this.state.searchText || '',
+        )));
+    }
+
+    public getData = async () => {
+        this.state.loading = true;
+        this.state.items = [];
+
+        const res = await this.$http.post(this.url, {
+            query: this.query.value,
+            key_path: this.keyPath.value,
+            [this.idKey]: this.id.value,
+        });
+        this.state.items = res.data.results;
+        this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
+        this.state.loading = false;
+    }
+}
+
+
+export class MockSubDataAPI extends SubDataAPI {
+    constructor(private items:any[]) {
+        super(({ } as HttpInstance), '', '', ref(''), ref(''));
+    }
+
+    private fakeData=() => {
+        this.state.items = this.items;
+        this.state.allPage = 1;
+        this.state.loading = false;
+    }
+
+    public getData= async () => {
+        this.state.loading = true;
+        this.state.allPage = 1;
+        this.state.items = [];
+
+        setTimeout(this.fakeData, 1000);
+    }
+}

@@ -2,9 +2,9 @@
     <component :is="component"
                :name="name"
                :data_source="data_source"
-               :key_path="key_path"
                :data="data"
-               :rootMode="rootMode"
+               :root-mode="rootMode"
+               :api-handler="apiHandler"
     />
 </template>
 
@@ -14,6 +14,7 @@
 import {
     computed, createComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
+import { DynamicAPI } from '@/lib/api';
 
 
 interface State {
@@ -36,20 +37,21 @@ export default createComponent({
             type: Array,
             required: true,
         },
-        key_path: {
-            type: String,
-            default: '',
-        },
         data: {
             type: Object,
-            required: true,
+            default: () => ({}),
         },
         rootMode: {
             type: Boolean,
             default: false,
         },
+        apiHandler: {
+            type: Object,
+            default: null,
+        },
     },
     setup(props:any) {
+        // noinspection TypeScriptCheckImport
         const state = reactive<any>({
             component: null,
             loader: computed<()=>Promise<any>>(() => () => import(`./templates/${props.view_type}/index.vue`)),

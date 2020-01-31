@@ -1,5 +1,7 @@
 
 <script>
+/* eslint-disable camelcase */
+
 import {
     ref, toRefs, computed, reactive,
 } from '@vue/composition-api';
@@ -7,7 +9,7 @@ import _ from 'lodash';
 import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery } from '@/lib/api';
+import { defaultQuery, getAllPage, SubDataAPI } from '@/lib/api'
 import {
     defaultAutocompleteHandler,
     getEnumValues, getFetchValues,
@@ -21,7 +23,6 @@ export default {
         serverEventNames.getServerList = 'getServerData';
         serverEventNames.tagConfirmEvent = 'ServerTagConfirmEvent';
         serverEventNames.tagResetEvent = 'resetTagEvent';
-        serverEventNames.getServerSubData = 'requestSubData';
         serverEventNames.getServerAdmin = 'requestAdmin';
 
         serverEventNames.inServiceServer = 'inServiceServer';
@@ -133,8 +134,7 @@ export default {
                     query: requestState.query,
                 });
                 state.items = matchProject(res.data.results);
-                const allPage = Math.ceil(res.data.total_count / state.pageSize);
-                state.allPage = allPage || 1;
+                state.allPage = getAllPage(res.data.total_count, state.pageSize);
                 state.selectIndex = [];
                 state.loading = false;
             } catch (e) {
@@ -143,30 +143,6 @@ export default {
             }
         };
         mountBusEvent(serverEventBus, serverEventNames.getServerList, requestServerList);
-
-
-        // request server sub data
-        const requestSubDataState = reactive({
-            query: computed(() => (defaultQuery(
-                state.subData.thisPage, state.subData.pageSize,
-                state.subData.sortBy, state.subData.sortDesc,
-                state.subData.searchText,
-            ))),
-        });
-        const requestServerSubData = async (serverId, name) => {
-            state.subData.loading = true;
-
-            const res = await context.parent.$http.post('/inventory/server/get-data', {
-                query: requestSubDataState.query,
-                data_type: name,
-                server_id: serverId,
-            });
-            state.subData.items = res.data.results;
-            const allPage = Math.ceil(res.data.total_count / state.subData.pageSize);
-            state.subData.allPage = allPage || 1;
-            state.subData.loading = false;
-        };
-        mountBusEvent(serverEventBus, serverEventNames.getServerSubData, requestServerSubData);
 
 
         // change tag
@@ -205,8 +181,7 @@ export default {
                 servers: state.getSelectServerIds,
             });
             state.admin.items = res.data.results;
-            const allPage = Math.ceil(res.data.total_count / state.subData.pageSize);
-            state.admin.allPage = allPage || 1;
+            state.admin.allPage = getAllPage(res.data.total_count, state.admin.pageSize);
             state.admin.loading = false;
         };
         mountBusEvent(serverEventBus, serverEventNames.getServerAdmin, requestServerAdmin);

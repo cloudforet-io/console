@@ -228,7 +228,18 @@ export const listType = () => ({
         };
     },
 });
-
+export const dictType = () => ({
+    components: { PDynamicField },
+    template: '<PDynamicField view_type="dict" :data="data"/>',
+    setup() {
+        return {
+            data: reactive({
+                tag1: 'asdf',
+                tag2: 'ahahah',
+            }),
+        };
+    },
+});
 
 export const enumType = () => ({
     components: { PDynamicField },

@@ -88,8 +88,8 @@
                         </PBadge>
                     </template>
                     <template v-slot:col-platform_type-format="data">
-                        <PBadge v-bind="platformBadgeFormatter(data.item.data.vm.platform_type)">
-                            {{ data | getValue(['item','data','vm','platform_type']) }}
+                        <PBadge v-bind="platformBadgeFormatter(data.item.data.platform.type)">
+                            {{ data | getValue(['item','data','platform','type']) }}
                         </PBadge>
                     </template>
                 </p-toolbox-table>
@@ -97,24 +97,12 @@
         </p-horizontal-layout>
         <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
             <template #detail="{tabName}">
-                <p-server-detail ref="serverDetail"
-                                 :item="items[selectIndex[0]]"
-                                 :tag-confirm-event="tagConfirmEvent"
-                                 :tag-reset-event="tagResetEvent"
-                />
+                <p-server-detail :item="items[selectIndex[0]]" :tag-confirm-event="tagConfirmEvent" :tag-reset-event="tagResetEvent" />
             </template>
             <template #data="{tabName}">
-                <PServerData
-                    :server-id="items[selectIndex[0]].server_id"
-                    :items="subData.items"
-                    :sort-by.sync="subData.sortBy"
-                    :sort-desc.sync="subData.sortDesc"
-                    :page-size.sync="subData.pageSize"
-                    :all-page="subData.allPage"
-                    :this-page.sync="subData.thisPage"
-                    :search-text.sync="subData.searchText"
-                    :loading="subData.loading"
-                    :get-server-sub-data="getServerSubData"
+                <PDynamicSubData
+                    :select-id="getFirstSelectServerId" :sub-data="getSubData"
+                    url="/inventory/server/get-data" id-key="server_id"
                 />
             </template>
             <template #rawData="{tabName}">
@@ -210,10 +198,10 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
 import PServerRawData from '@/views/inventory/server/modules/ServerRawData.vue';
-import PServerData from '@/views/inventory/server/modules/ServerData.vue';
 import PServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -279,7 +267,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
     const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
         tabs: makeTrItems([
-            ['detail', 'COMMON.DETAILS', { keepAlive: true }],
+            ['detail', 'COMMON.DETAILS'],
             ['data', 'COMMON.DATA'],
             ['rawData', 'COMMON.RAWDATA', { keepAlive: true }],
             ['admin', 'COMMON.ADMIN'],
@@ -291,7 +279,6 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
             ['admin', 'COMMON.ADMIN'],
         ], context.parent),
         multiSelectActiveTab: 'data',
-        serverDetail: null, // template refs
     });
     const tags = ref({});
     const tabAction = reactive({
@@ -303,16 +290,6 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
     const getServers = () => {
         eventBus.$emit(eventName.getServerList);
     };
-    const subData = reactive({
-        items: [],
-        sortBy: '',
-        sortDesc: true,
-        pageSize: 15,
-        allPage: 1,
-        thisPage: 1,
-        searchText: '',
-        loading: false,
-    });
 
     const admin = reactive({
         items: [],
@@ -344,7 +321,9 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         });
         return ids;
     });
-    const getFirstSelectServerId = computed(() => (getSelectServerIds.value.length >= 1 ? getSelectServerIds[0] : ''));
+    const getFirstSelectServerItem = computed(() => (getSelectServerItems.value.length >= 1 ? getSelectServerItems.value[0] : {}));
+    const getSubData = computed(() => _.get(getFirstSelectServerItem.value, ['metadata', 'sub_data'], []));
+    const getFirstSelectServerId = computed(() => (getSelectServerIds.value.length >= 1 ? getSelectServerIds.value[0] : ''));
 
     const checkTableModalState = reactive({
         visible: false,
@@ -440,11 +419,12 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         // todo: need confirm that this is good way - sinsky
         // EventBus Names
         ...eventNames,
-        subData,
         admin,
         getSelectServerItems,
         getSelectServerIds,
         getFirstSelectServerId,
+        getFirstSelectServerItem,
+        getSubData,
         checkTableModalState,
         clickDelete,
         clickClosed,
@@ -470,7 +450,7 @@ export default {
         PDropdownMenuBtn,
         PServerDetail,
         PTab,
-        PServerData,
+        PDynamicSubData,
         PServerRawData,
         PServerAdmin,
         PDataTable,
