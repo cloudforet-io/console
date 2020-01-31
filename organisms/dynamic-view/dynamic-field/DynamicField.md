@@ -4,7 +4,7 @@
 - [x] state
 - [x] badge
 - [x] datetime
-- [ ] dict
+- [x] dict
 - [ ] image
 
 ## recursive type

@@ -30,7 +30,6 @@ interface DataSourceType {
 
 interface Props {
     data_source: DataSourceType[];
-    keyPath: string;
     data: any;
     rootMode:boolean;
 }
@@ -72,10 +71,6 @@ export default createComponent({
         },
         data_source: {
             type: Array,
-            required: true,
-        },
-        key_path: {
-            type: String,
             required: true,
         },
         data: {

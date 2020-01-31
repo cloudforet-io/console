@@ -10,7 +10,7 @@ export default {
         },
         data: {
             type: [String, Object, Array, Boolean, Number],
-            required: true,
+            default: '',
         },
     },
     render(h, { props, data }) {
