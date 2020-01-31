@@ -53,7 +53,7 @@
     "vue": "^2.6.10",
     "vue-alertify": "^1.1.0",
     "vue-chartjs": "^3.4.2",
-    "vue-cookies": "^1.5.13",
+    "vue-cookies": "^1.6.1",
     "vue-focus": "^2.1.0",
     "vue-fragment": "^1.5.1",
     "vue-i18n": "^8.11.2",
