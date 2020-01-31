@@ -41,11 +41,30 @@
             >
                 <template slot="toolbox-left">
                     <div class="left-toolbox-item">
-                        <p-search :search-text.sync="searchText" @onSearch="getCd" />
+                        <PQuerySearchBar :search-text.sync="searchText"
+                                         :autocomplete-handler="ACHandler"
+                                         @newQuery="queryListTools.addTag" />
                     </div>
                 </template>
-                <template v-slot:col-created_at-format="data">
-                    {{ timestampFormatter(data.value) }}
+                <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
+                    <p-col :col="12" style="margin-bottom: .5rem;">
+                        <p-hr style="width: 100%;" />
+                        <p-row style="margin-top: .5rem;">
+                            <div style="flex-grow: 0">
+                                <p-icon-button name="ic_delete" @click="queryListTools.deleteAllTags" />
+                            </div>
+                            <div style="flex-grow: 1;margin-left: 1rem;">
+                                <p-tag v-for="(tag, idx) in queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
+                                       @delete="queryListTools.deleteTag(idx)"
+                                >
+                                    {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
+                                </p-tag>
+                            </div>
+                        </p-row>
+                    </p-col>
+                </template>
+                <template #col-tags-format="{value}">
+                    <p-dict-list :dict="value" />
                 </template>
             </p-toolbox-table>
             <p-box-layout class="tag-container">
@@ -93,27 +112,31 @@
 import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
-import router from 'vue-router';
 import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import { timestampFormatter, getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
-import PSearch from '@/components/molecules/search/Search.vue';
+import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PCdgForm from '@/views/secret/credentials-group/modules/CredentialGroupForm.vue';
+import PIconButton from "@/components/molecules/buttons/IconButton.vue";
+
+const PDictList = () => import('@/components/molecules/lists/DictList');
 
 export const CdTableReactive = parent => reactive({
     fields: makeTrItems([
         ['credential_id', 'COMMON.ID'],
         ['name', 'COMMON.NAME'],
-        ['created_at', 'COMMON.CREATE'],
+        ['tags', 'COMMON.TAG'],
     ],
     parent),
     modalFields: makeTrItems([
@@ -138,7 +161,7 @@ export const eventNames = {
     deleteCd: '',
 };
 
-export const cdgSetup = (props, context, eventName) => {
+export const cdgSetup = (props, context, eventName, ACHandler) => {
     const eventBus = cdgEventBus;
     const tableState = CdTableReactive(context.parent);
     const tags = ref({});
@@ -169,6 +192,7 @@ export const cdgSetup = (props, context, eventName) => {
         mode: '',
         headerTitle: '',
         item: null,
+        searchText: '',
         eventName: '',
     });
 
@@ -180,6 +204,7 @@ export const cdgSetup = (props, context, eventName) => {
         title: '',
         subTitle: '',
         themeColor: '',
+        searchText: '',
     });
 
     const onSelect = (item) => {
@@ -217,6 +242,9 @@ export const cdgSetup = (props, context, eventName) => {
         resetCheckTableModalState();
     };
 
+    const queryList = ref([]);
+    const queryListTools = tagList(queryList, true, eventBus, eventName.getCdList);
+
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
@@ -233,6 +261,8 @@ export const cdgSetup = (props, context, eventName) => {
         clickAdd,
         cdgFormConfirm,
         checkModalConfirm,
+        ACHandler,
+        queryListTools,
     });
 };
 export default {
@@ -246,11 +276,15 @@ export default {
         PToolboxTable,
         PButton,
         PCdgForm,
-        PSearch,
+        PQuerySearchBar,
         PBoxLayout,
         PTableCheckModal,
         PRow,
+        PCol,
+        PHr,
+        PIconButton,
         PTag,
+        PDictList,
     },
     setup(props, context) {
         const dataBind = reactive({

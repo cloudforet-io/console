@@ -2,35 +2,70 @@
 import {
     ref, toRefs, computed, reactive, onMounted, watch,
 } from '@vue/composition-api';
+import moment from 'moment-timezone';
 import AddCdgTemplate, { cdgSetup, eventNames } from '@/views/secret/credentials-group/pages/AddCredentials.template.vue';
+import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { defaultQuery, Validation } from '@/lib/api';
-import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
+import {
+    defaultAutocompleteHandler,
+    getEnumValues, getSearchEnumValues,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 export default {
     name: 'AddCdg',
     extends: AddCdgTemplate,
-
     setup(props, context) {
+        class ACHandler extends defaultAutocompleteHandler {
+            // eslint-disable-next-line class-methods-use-this
+            get keys() {
+                return [
+                    'credential_id', 'name', 'tags',
+                ];
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get suggestKeys() {
+                return ['name'];
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get parent() {
+                return context.parent;
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get valuesFetchUrl() {
+                return '/secret/credential/list';
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get valuesFetchKeys() {
+                return [
+                    'credential_group_id', 'name',
+                ];
+            }
+        }
+
         const cdEventNames = eventNames;
         cdEventNames.getCdList = 'getCd';
         cdEventNames.tagConfirmEvent = 'CdTagConfirmEvent';
         cdEventNames.tagResetEvent = 'resetTagEvent';
         cdEventNames.addCd = 'addCd';
 
-        const state = cdgSetup(props, context, cdEventNames);
-        const cdRequestState = reactive({
+        const state = cdgSetup(props, context, cdEventNames, new ACHandler());
+        const requestState = reactive({
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
                 state.sortBy, state.sortDesc,
-                state.searchText,
+                null, state.queryListTools.tags,
             ))),
         });
         const requestCdList = async () => {
             state.loading = true;
             state.items = [];
             const param = {
-                query: cdRequestState.query,
+                query: requestState.query,
                 // eslint-disable-next-line camelcase
                 include_credential_group: true,
             };
@@ -51,15 +86,16 @@ export default {
         const getCdsParam = (items) => {
             const result = {
                 // eslint-disable-next-line camelcase
-                credential_id: items[0].credential_id,
+                credentials: _.map(items, 'credential_id'),
                 credential_group_id: context.root.$route.params.id,
-                name: _.map(items, 'name'),
-                tags: _.map(items, 'tags'),
+                // name: _.map(items, 'name'),
+                // tags: _.map(items, 'tags'),
             };
+            console.log('getCdsParam', result)
             return result;
         };
-
         const addCd = async (items) => {
+            console.log('addCd test', items)
             await context.parent.$http.post('/secret/credential-group/credential/add', getCdsParam(items)).then(async (_) => {
                 await requestCdList();
                 context.root.$notify({
