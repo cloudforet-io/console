@@ -2,8 +2,6 @@ import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
 import CollectorCreatorTemplate, { setDataState } from './CollectorCreator.template.vue';
-import { crdState } from '@/views/inventory/collector/modules/ChooseCredentials.vue';
-import { confState } from '@/views/inventory/collector/modules/ConfigureCollector.vue';
 import casual from '@/views/inventory/collector/models/collector-model';
 import { mountBusEvent } from '@/lib/compostion-util';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
@@ -18,42 +16,35 @@ export const defaultCase = () => ({
     setup(props, context) {
         const state = setDataState();
 
-        const listCredentials = () => {
-            crdState.loading = true;
-            crdState.credentials = [];
+        const listCredentials = (params) => {
+            state.crdState.loading = true;
+            state.crdState.items = [];
             setTimeout(() => {
-                crdState.selectIndex = [];
-                crdState.totalCount = casual.integer(10, 100);
-                crdState.items = arrayOf(crdState.query.page.limit, casual._credential);
-                crdState.loading = false;
+                state.crdState.selectIndex = [];
+                state.crdState.totalCount = casual.integer(10, 100);
+                state.crdState.items = arrayOf(params.query.page.limit, casual._credential);
+                state.crdState.loading = false;
             }, casual.integer(1000, 3000));
         };
         mountBusEvent(CollectorEventBus, 'listCredentials', listCredentials);
 
-        const listCredentialsGroup = () => {
-            crdState.loading = true;
-            crdState.credentials = [];
-            setTimeout(() => {
-                crdState.selectIndex = [];
-                crdState.totalCount = casual.integer(10, 100);
-                crdState.items = arrayOf(crdState.query.page.limit, casual._credential);
-                crdState.loading = false;
-            }, casual.integer(1000, 3000));
-        };
-        mountBusEvent(CollectorEventBus, 'listCredentialsGroup', listCredentialsGroup);
-
 
         const getPlugin = () => {
+            state.confState.plugin = null;
             setTimeout(() => {
-                confState.plugin = casual.pluginInfo;
+                state.confState.plugin = casual.pluginInfo;
             }, casual.integer(1000, 3000));
         };
         mountBusEvent(CollectorEventBus, 'getPlugin', getPlugin);
 
 
         const listVersionsInfo = () => {
-            confState.versions = casual.pluginVersions;
-            if (!confState.selectedVersion) confState.selectedVersion = confState.versions[0];
+            setTimeout(() => {
+                state.confState.versions = casual.pluginVersions;
+                if (!state.confState.selectedVersion) {
+                    state.confState.selectedVersion = state.confState.versions[0];
+                }
+            }, 1000);
         };
         mountBusEvent(CollectorEventBus, 'listVersionsInfo', listVersionsInfo);
 

@@ -267,6 +267,11 @@ export const ko = {
         COL_OPS: '수집 옵션',
         FILTERS: '필터',
         CHOOSE_CRD: '암호 선택',
+        VERIFY_CRD: '암호 확인',
+        DEL_COL: '컬렉터 삭제',
+        UPT_COL: '컬렉터 수정',
+        ENABLE_COL: '컬렉터 활성화',
+        DISABLE_COL: '컬렉터 비활성화',
     },
     SECRET: {
         JASON_ALERT: "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (\') )",

@@ -267,6 +267,11 @@ export const en = {
         COL_OPS: 'Collect Options',
         FILTERS: 'Filters',
         CHOOSE_CRD: 'Choose Credential',
+        VERIFY_CRD: 'Verify Credentials',
+        DEL_COL: 'Delete Collectors',
+        UPT_COL: 'Update Collector',
+        ENABLE_COL: 'Enable Collectors',
+        DISABLE_COL: 'Disable Collectors',
     },
     SECRET: {
         JASON_ALERT: 'Please, Check Json Format (Use double quotation( \\" ) mark instead of single quotation (\').',

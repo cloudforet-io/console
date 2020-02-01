@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { Util } from '@/lib/global-util';
 import styles from '@/styles/_variables.scss';
 import { ColorBindFactory } from '@/lib/view-helper';
@@ -157,4 +158,15 @@ export const selectToCopyToClipboard = (t) => {
     textArea.select();
     document.execCommand('Copy');
     textArea.remove();
+};
+
+/** @function
+ * @name isEmpty
+ * @param value
+ * @returns {boolean}
+ */
+export const isEmpty = (value) => {
+    if (['boolean', 'number'].includes(typeof value)) return true;
+    if (value instanceof Array) return !!value.length;
+    return !_.isEmpty(value); // String, Object
 };

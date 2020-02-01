@@ -19,7 +19,7 @@
                         </p-field-group>
                         <p-field-group label="Priority">
                             <br>
-                            <p-text-input v-model="priority" />
+                            <p-text-input v-model.number="proxyPriority" type="number" />
                         </p-field-group>
                     </p-col>
                 </p-row>
@@ -29,8 +29,8 @@
                 <p class="sub-title">
                     Options
                 </p>
-                <p-dynamic-form v-for="(op, idx) in proxyPluginOptions" :key="idx"
-                                v-model="optionsValue[op.key]"
+                <p-dynamic-form v-for="(op) in pluginOptions" :key="op.key"
+                                v-model="proxyOptionsValue[op.key]"
                                 :form="op"
                                 :invalid="showValidation ? vdApi.invalidState[op.key] : false"
                                 :invalid-text="vdApi.invalidMsg[op.key]"
@@ -45,6 +45,7 @@
 import {
     reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
+import _ from 'lodash';
 import config from '@/lib/config';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
@@ -56,14 +57,14 @@ import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue
 import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
 import { makeProxy } from '@/lib/compostion-util';
 
-export const confState = reactive({
-    pluginId: undefined,
-    plugin: undefined,
-    versions: [],
-    selectedVersion: undefined,
-    priority: 10,
-    optionsValue: {},
-});
+const init = (props, root) => {
+    const params = {
+        // eslint-disable-next-line camelcase
+        plugin_id: props.pluginId,
+    };
+    CollectorEventBus.$emit('getPlugin', params);
+    CollectorEventBus.$emit('listVersionsInfo', params);
+};
 
 export default {
     name: 'ConfigureCollector',
@@ -80,56 +81,54 @@ export default {
             type: Boolean,
             default: false,
         },
-        isInvalid: {
-            type: Boolean,
-            default: false,
-        },
+        pluginId: String,
+        plugin: Object,
+        versions: Array,
+        /**
+         * sync prop
+         */
+        selectedVersion: String,
+        /**
+         * sync prop
+         */
+        optionsValue: Object,
+        /**
+         * sync prop
+         */
+        priority: Number,
     },
     setup(props, { emit, root }) {
-        confState.pluginId = _.get(root, '$route.params.pluginId', '');
-        CollectorEventBus.$emit('getPlugin');
-        CollectorEventBus.$emit('listVersionsInfo');
+        init(props, root);
 
         const state = reactive({
-            version: _.get(root, '$route.query.version', ''),
-            proxyIsInvalid: makeProxy('isInvalid', props, emit),
-            proxyPluginOptions: computed(() => _.get(confState.plugin, 'template.options', [])),
-        });
-        const imgUrl = computed(() => _.get(confState.plugin, 'tags.icon', config.get('COLLECTOR_IMG')));
-        const versionsInfo = computed(() => {
-            if (!confState.selectedVersion) confState.selectedVersion = confState.versions[0];
-            return confState.versions.map(v => ({ type: 'item', label: v, name: v }));
-        });
-
-        const onSelectVersion = (item) => {
-            confState.version = item;
-        };
-
-        const vdApi = setValidation(state.proxyPluginOptions, confState.optionsValue);
-
-        watch(() => confState.plugin, () => {
-            confState.optionsValue = {};
-            const newVdApi = setValidation(state.proxyPluginOptions, confState.optionsValue);
-            vdApi.invalidMsg = newVdApi.invalidMsg;
-            vdApi.invalidState = newVdApi.invalidState;
-            vdApi.fieldValidation = newVdApi.fieldValidation;
-            vdApi.allValidation = newVdApi.allValidation;
-            vdApi.isAllValid = newVdApi.isAllValid;
+            pluginOptions: computed(() => _.get(props.plugin, 'template.options', [])),
+            proxyOptionsValue: makeProxy('optionsValue', props, emit),
+            proxySelectedVersion: makeProxy('selectedVersion', props, emit),
+            proxyPriority: makeProxy('priority', props, emit),
+            imgUrl: computed(() => _.get(props.plugin, 'tags.icon', config.get('COLLECTOR_IMG'))),
+            versionsInfo: computed(() => {
+                if (!props.selectedVersion) state.proxySelectedVersion = props.versions[0];
+                return props.versions.map(v => ({ type: 'item', label: v, name: v }));
+            }),
+            onSelectVersion: (item) => {
+                state.proxySelectedVersion = item;
+            },
+            vdApi: setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue),
+            isAllValid: undefined,
         });
 
-        const onChange = async (val) => {
-            if (!props.showValidation) return;
-            await vdApi.fieldValidation(val);
-            emit('changeValidState', vdApi.isAllValid.value);
+        watch(() => props.plugin, (val) => {
+            state.vdApi = setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue);
+        });
+
+        const onChange = async (key) => {
+            if (!props.showValidation || !props.plugin) return;
+            await state.vdApi.fieldValidation(key);
+            emit('changeValidState', state.vdApi.isAllValid);
         };
 
         return {
-            ...toRefs(confState),
             ...toRefs(state),
-            imgUrl,
-            versionsInfo,
-            onSelectVersion,
-            vdApi,
             onChange,
         };
     },

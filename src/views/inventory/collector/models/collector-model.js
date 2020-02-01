@@ -1,16 +1,34 @@
 /* eslint-disable camelcase */
 import casual, { arrayOf } from '@/lib/casual';
 
-casual.define('pluginOption', () => ({
-    key: casual.uuid,
-    name: casual.word,
-    type: casual.random_element(['str', 'bool', 'list', 'int', 'float']),
-    is_required: casual.boolean,
-    enums: casual.array_of_words(5),
-    example: casual.word,
-}));
+casual.define('pluginOption', () => {
+    const res = {
+        key: casual.uuid,
+        name: casual.word,
+        type: casual.random_element(['str', 'bool', 'list', 'int', 'float']),
+        is_required: casual.boolean,
+    };
 
-casual.define('pluginVersions', () => casual.array_of_digits(5));
+    if (casual.random > 0.7) {
+        if (res.type === 'str') res.enums = casual.array_of_words(5);
+    }
+    if (casual.random > 0.7) {
+        if (res.type === 'str') res.example = casual.word;
+        else if (res.type === 'bool') res.example = casual.boolean;
+        else if (res.type === 'int') res.example = casual.integer();
+        else if (res.type === 'float') res.example = casual.double();
+    }
+    if (casual.random > 0.8) {
+        if (res.type === 'str') res.default = casual.word;
+        else if (res.type === 'bool') res.default = casual.boolean;
+        else if (res.type === 'int') res.default = casual.integer();
+        else if (res.type === 'float') res.default = casual.double();
+        else if (res.type === 'list') res.default = casual.array_of_words();
+    }
+    return res;
+});
+
+casual.define('pluginVersions', () => casual.array_of_digits(5).map(digit => digit.toString()));
 
 
 casual.define('pluginInfo', () => ({

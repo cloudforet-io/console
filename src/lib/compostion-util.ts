@@ -95,7 +95,7 @@ export class Validation {
  *          validState: UnwrapRef<any>,
  *          fieldValidation: fieldValidation,
  *          invalidMsg: UnwrapRef<any>,
- *          invalidState: UnwrapRef<any>
+ *          invalidState: Ref<any>
  *          }
  *      }
  */

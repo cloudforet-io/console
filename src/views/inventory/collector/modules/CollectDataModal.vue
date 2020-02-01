@@ -8,6 +8,7 @@
                         styleType: 'dark',
                         outline: true,
                     }"
+                    :footer-confirm-button-bind="confirmBtnStyle"
                     :visible.sync="proxyVisible"
                     @confirm="onClickCollectConfirm"
     >
@@ -38,21 +39,11 @@
                     </p>
                     <p-field-group :label="isCredentialType ? tr('COMMON.CREDENTIAL') : tr('COMMON.CREDENTIAL_GRP')">
                         <div v-if="isCredentialType">
-                            <p-text-input :value="crd ? crd.name : ''"
+                            <p-text-input :value="selectedCrd ? selectedCrd.name : ''"
                                           disabled
                             />
                         </div>
                         <div v-else>
-                            <!--                            <p-row>-->
-                            <!--                                <p-col class="radio-tag" :flex-grow="0">-->
-                            <!--                                    <p-radio v-model="crdRadio" value="all" />-->
-                            <!--                                    <span>{{ tr('COMMON.ALL') }}</span>-->
-                            <!--                                </p-col>-->
-                            <!--                                <p-col class="radio-tag">-->
-                            <!--                                    <p-radio v-model="crdRadio" value="each" />-->
-                            <!--                                    <span>{{ tr('INVENTORY.CHOOSE_CRD') }}</span>-->
-                            <!--                                </p-col>-->
-                            <!--                            </p-row>-->
                             <p-dropdown-menu-btn :menu="crdsMenu" @clickMenuEvent="onClickCrdMenu">
                                 {{ crdsMenu[crdMenuIdx].label }}
                             </p-dropdown-menu-btn>
@@ -82,10 +73,24 @@
             <p-button class="reset-btn"
                       style-type="primary"
                       outline
-                      @click="reset"
+                      @click="onClickReset"
             >
                 {{ tr('COMMON.BTN_RESET') }}
             </p-button>
+        </template>
+
+        <template #close-button>
+            {{ tr('COMMON.BTN_CANCEL') }}
+        </template>
+        <template #confirm-button>
+            <div class="confirm-btn">
+                <p-lottie v-if="loading" class="spinner"
+                          name="spinner"
+                          auto
+                          :size="1.5"
+                />
+                <span>{{ tr('COMMON.BTN_CONFIRM') }}</span>
+            </div>
         </template>
     </p-button-modal>
 </template>
@@ -108,17 +113,8 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import PRadio from '@/components/molecules/forms/radio/Radio.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
-
-export const collectDataState = reactive({
-    collectModeIdx: 0,
-    collectorModes: ['ALL', 'CREATE', 'UPDATE'],
-    filters: {},
-    crds: [],
-    crdMenuIdx: 0,
-    crd: null,
-});
 
 export default {
     name: 'CollectDataModal',
@@ -131,16 +127,20 @@ export default {
         PCol,
         PTextInput,
         PDropdownMenuBtn,
-        PRadio,
+        PLottie,
     },
     props: {
         collector: Object,
         visible: Boolean,
+        loading: Boolean,
+        credentials: Array,
+        isCredentialType: Boolean,
     },
     setup(props, context) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, context.emit),
             showValidation: false,
+            collectModeIdx: 0,
             collectModeMenu: makeTrItems([
                 ['ALL', 'COMMON.ALL'],
                 ['CREATE', 'COMMON.BTN_CRT'],
@@ -149,55 +149,93 @@ export default {
             image: computed(() => _.get(props.collector, 'tags.icon', config.get('COLLECTOR_IMG'))),
             version: computed(() => _.get(props.collector, 'plugin_info.version', '')),
             description: computed(() => _.get(props.collector, 'tags.description', '')),
-            credentialText: '',
             filterFormats: computed(() => _.get(props.collector, 'plugin_info.options.filter_format', [])),
-            crdRadio: 'all',
-            isCredentialType: computed(() => _.get(props.collector, 'plugin_info.credential_id')),
+            filters: {},
+            confirmBtnStyle: computed(() => {
+                const defaultStyle = { style: { padding: 0 } };
+                defaultStyle.styleType = props.loading ? 'gray2' : 'primary';
+                return defaultStyle;
+            }),
             crdsMenu: computed(() => [
                 { type: 'item', label: context.parent.tr('COMMON.ALL'), name: 'all' },
-                ...collectDataState.crds.map(crd => ({ type: 'item', label: crd.name, name: crd.credential_id })),
+                ...props.credentials.map(crd => ({ type: 'item', label: crd.name, name: crd.credential_id })),
             ]),
+            crdMenuIdx: 0,
+            selectedCrd: computed(() => {
+                if (props.isCredentialType) return props.credentials[0];
+                if (state.crdMenuIdx === 0) return null;
+                return props.credentials[state.crdMenuIdx - 1];
+            }),
         });
 
-        let vdApi;
-
-        const reset = () => {
-            collectDataState.collectModeIdx = 0;
-            collectDataState.showValidation = false;
-            collectDataState.filters = {};
-            vdApi = setValidation(state.filterFormats, collectDataState.filters);
-            collectDataState.crdMenuIdx = 0;
-        };
+        let vdApi = setValidation(state.filterFormats, state.filters);
 
         const onChange = async (val) => {
             if (!state.showValidation) return;
             await vdApi.fieldValidation(val);
-            context.emit('changeValidState', vdApi.isAllValid.value);
+            context.emit('changeValidState', vdApi.isAllValid);
         };
 
+        const onClickReset = () => {
+            if (props.loading) return;
+
+            state.collectModeIdx = 0;
+            state.showValidation = false;
+            state.filters = {};
+            vdApi = setValidation(state.filterFormats, state.filters);
+            state.crdMenuIdx = 0;
+        };
+
+        const getParams = () => {
+            const params = {
+                // eslint-disable-next-line camelcase
+                collector_id: props.collector.collector_id,
+                // eslint-disable-next-line camelcase
+                collect_mode: state.collectModeMenu[state.collectModeIdx].name,
+            };
+
+            if (!_.isEmpty(state.filters)) params.filter = state.filters;
+
+            // eslint-disable-next-line camelcase
+            if (state.selectedCrd) params.credential_id = state.selectedCrd.credential_id;
+            // eslint-disable-next-line camelcase
+            else params.credential_group_id = props.collector.plugin_info.credential_group_id;
+
+            return params;
+        };
         const onClickCollectConfirm = async () => {
+            if (props.loading) return;
             state.showValidation = true;
-            if (await vdApi.allValidation()) CollectorEventBus.$emit('collectData');
+            if (await vdApi.allValidation()) {
+                CollectorEventBus.$emit('collectData', getParams());
+            }
         };
 
         const onClickCrdMenu = (name, idx) => {
-            collectDataState.crdMenuIdx = idx;
+            state.crdMenuIdx = idx;
         };
 
-        if (state.isCredentialType) {
-            CollectorEventBus.$emit('getCredential');
-        } else {
-            CollectorEventBus.$emit('listCredentialsByGroup');
-        }
+        const listCredentials = () => {
+            if (props.credentials.length > 0) return;
 
-        reset();
+            const params = {};
+            if (props.isCredentialType) {
+                // eslint-disable-next-line camelcase
+                params.credential_id = props.collector.plugin_info.credential_id;
+            } else {
+                // eslint-disable-next-line camelcase
+                params.credential_group_id = props.collector.plugin_info.credential_group_id;
+            }
+            CollectorEventBus.$emit('listCredentials', params);
+        };
+
+        listCredentials();
 
         return {
-            ...toRefs(collectDataState),
             ...toRefs(state),
             vdApi,
-            reset,
             onChange,
+            onClickReset,
             onClickCollectConfirm,
             onClickCrdMenu,
         };
@@ -228,9 +266,6 @@ export default {
         margin-bottom: 2rem;
         font-size: .875rem;
     }
-    .radio-tag {
-        margin-right: 1rem;
-    }
 }
 .right-container {
     padding-left: 2.5rem;
@@ -243,5 +278,15 @@ export default {
 }
 .reset-btn {
     margin-right: auto;
+}
+.confirm-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    .spinner {
+        display: inline-flex;
+        padding-right: .25rem;
+    }
 }
 </style>

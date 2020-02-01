@@ -1,6 +1,6 @@
 <template>
-    <div class="Aligner">
-        <div ref="loading" class="Aligner-item" :style="{
+    <div class="aligner">
+        <div ref="loading" class="aligner-item" :style="{
             height: `${size}rem`,
             width: `${size}rem`
         }"
@@ -66,13 +66,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .Aligner {
+    .aligner {
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    .Aligner-item {
+    .aligner-item {
         max-width: 100%;
     }
 </style>

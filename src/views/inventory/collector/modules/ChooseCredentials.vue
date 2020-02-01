@@ -12,7 +12,7 @@
                          :sort-desc.sync="sortDesc"
                          :all-page="allPage"
                          :this-page.sync="thisPage"
-                         :select-index.sync="selectIndex"
+                         :select-index.sync="proxySelectIndex"
                          :page-size.sync="pageSize"
                          :setting-visible="false"
                          :loading="loading"
@@ -29,7 +29,7 @@
                         <span v-for="type in crdTypes" :key="type"
                               class="radios"
                         >
-                            <p-radio v-model="crdType" :value="type" @change="listCredentials" />
+                            <p-radio v-model="proxyCrdType" :value="type" @change="listCredentials" />
                             {{ type }}
                         </span>
                     </p-col>
@@ -69,15 +69,7 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PRadio from '@/components/molecules/forms/radio/Radio.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
-
-export const crdState = reactive({
-    items: [],
-    totalCount: 0,
-    loading: true,
-    query: undefined,
-    selectIndex: [],
-    crdType: 'Credentials',
-});
+import { makeProxy } from '@/lib/compostion-util.ts';
 
 export default {
     name: 'ChooseCredentials',
@@ -88,6 +80,19 @@ export default {
         PSearch,
         PToolboxTable,
     },
+    props: {
+        items: Array,
+        totalCount: Number,
+        loading: Boolean,
+        /**
+         * sync prop
+         */
+        crdType: String,
+        /**
+         * sync prop
+         */
+        selectIndex: Array,
+    },
     setup(props, { emit, root, parent }) {
         const state = reactive({
             sortBy: '',
@@ -96,6 +101,7 @@ export default {
             thisPage: 1,
             searchText: '',
             crdTypes: ['Credentials Group', 'Credentials'],
+            proxyCrdType: makeProxy('crdType', props, emit),
             fields: {
                 'Credentials Group': makeTrItems([
                     ['credential_group_id', 'COMMON.ID'],
@@ -110,31 +116,32 @@ export default {
                     ['created_at', 'COMMON.CREATED', { size: '300px' }],
                 ], parent),
             },
+            proxySelectIndex: makeProxy('selectIndex', props, emit),
         });
 
-        const validate = () => crdState.selectIndex.length !== 0;
+        const validate = () => props.selectIndex.length !== 0;
 
-        watch(() => crdState.selectIndex, () => {
-            emit('changeValidState', validate());
-        });
 
-        const allPage = computed(() => Math.ceil(crdState.totalCount / state.pageSize) || 1);
+        const allPage = computed(() => Math.ceil(props.totalCount / state.pageSize) || 1);
 
-        crdState.query = computed(() => (defaultQuery(
+        const query = computed(() => (defaultQuery(
             state.thisPage, state.pageSize,
             state.sortBy, state.sortDesc,
             state.searchText,
         )));
 
+        watch(() => props.selectIndex, () => {
+            emit('changeValidState', validate());
+        });
+
         const listCredentials = () => {
-            if (crdState.crdType === 'Credentials') CollectorEventBus.$emit('listCredentials');
-            else CollectorEventBus.$emit('listCredentialsGroup');
+            state.proxySelectIndex.selectIndex = [];
+            CollectorEventBus.$emit('listCredentials', { query: query.value });
         };
 
         listCredentials();
 
         return {
-            ...toRefs(crdState),
             ...toRefs(state),
             validate,
             allPage,

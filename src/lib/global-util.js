@@ -457,9 +457,6 @@ export const Util = {
     data() {
         return {
             _: VueLodash,
-            defaultFontSizeSet: [10, 12, 14, 16, 18, 24],
-            isFirstLogin: 1,
-            enums: GlobalEnum,
         };
     },
 };

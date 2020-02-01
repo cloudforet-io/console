@@ -10,12 +10,14 @@
                     <p-text-input v-model="proxyValue"
                                   :type="inputType"
                                   :placeholder="formData.placeholder"
+                                  @input="onChange"
                     />
                 </div>
                 <div v-else-if="formType === 'radio'">
                     <span v-for="(bool) in [true, false]" :key="bool">
                         <p-radio v-model="proxyValue"
                                  :value="bool"
+                                 @change="onChange"
                         />
                         {{ bool }}
                     </span>
@@ -31,6 +33,7 @@
                     <p-tags-input :tags.sync="proxyValue"
                                   :placeholder="formData.placeholder"
                                   :focus="false"
+                                  @change="onChange"
                     />
                 </div>
             </slot>
@@ -46,6 +49,9 @@ import {
 import {
     formValidation, makeProxy, requiredValidation,
 } from '@/lib/compostion-util';
+import { isEmpty } from '@/lib/util';
+
+
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 
 const PTextInput = () => import('@/components/atoms/inputs/TextInput.vue');
@@ -79,11 +85,13 @@ const setFormState = (props) => {
         default: return 'number';
         }
     });
+    const setDropdownMenu = menu => menu.map(item => ({ type: 'item', label: item, name: item }));
 
     return reactive({
         formData,
         formType,
         inputType,
+        setDropdownMenu,
     });
 };
 
@@ -91,16 +99,14 @@ const setValueState = (props, emit, formState) => {
     const proxyValue = computed({
         get: () => props.value,
         set: (val) => {
-            emit('change', val); // for v-model
+            emit('input', val); // for v-model
         },
     });
 
     const setDefaultValue = () => {
         if (formState.formData.default !== undefined) {
             proxyValue.value = formState.formData.default;
-            return;
         }
-        if (formState.formType === 'tags' && !proxyValue.value) proxyValue.value = [];
     };
 
     setDefaultValue();
@@ -110,12 +116,11 @@ const setValueState = (props, emit, formState) => {
     });
 };
 
-const setDropdownState = valueState => reactive({
-    setDropdownMenu(menu) {
-        return menu.map(item => ({ type: 'item', label: item, name: item }));
-    },
+const setChangeActions = (valueState, emit) => ({
+    onChange: (e) => { emit('change', e); },
     onClickMenu(name) {
         valueState.proxyValue = name;
+        emit('change', name);
     },
 });
 
@@ -130,9 +135,7 @@ export const setValidation = (forms, values) => {
     const vd = {};
 
     forms.forEach((form) => {
-        if (form[map.required]) {
-            vd[form[formKey]] = [requiredValidation()];
-        }
+        vd[form[formKey]] = form[map.required] ? [requiredValidation()] : [];
     });
 
     const {
@@ -153,13 +156,9 @@ export const setValidation = (forms, values) => {
     };
 };
 
-export const dynamicFormList = (forms, values) => {
-
-};
-
 export default {
     name: 'PDynamicForm',
-    events: ['update:value'],
+    events: ['input', 'change'],
     components: {
         PFieldGroup,
         PTextInput,
@@ -169,7 +168,7 @@ export default {
     },
     model: {
         prop: 'value',
-        event: 'change',
+        event: 'input',
     },
     props: {
         form: Object,
@@ -188,12 +187,12 @@ export default {
     setup(props, { emit }) {
         const formState = setFormState(props);
         const valueState = setValueState(props, emit, formState);
-        const dropdownState = setDropdownState(valueState);
+        const changeActions = setChangeActions(valueState, emit);
         return {
             map,
             ...toRefs(formState),
             ...toRefs(valueState),
-            ...toRefs(dropdownState),
+            ...changeActions,
         };
     },
 };
