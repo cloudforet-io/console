@@ -80,20 +80,7 @@ export const dataTableWithSortFunctionality = () => ({
     mixins: [mockupMixin],
     template: `
 <div>
-<PDataTable 
-    :items="items" 
-    :fields="fields"
-    :hover="true"
-    @rowLeftClick="rowLeftClick"
-    @rowRightClick="rowRightClick"
-    @rowMiddleClick="rowMiddleClick"
-    @rowMouseOver="rowMouseOver"
-    @rowMouseOut="rowMouseOut"
-    :sortable="sortable"
-    :sortBy.sync="sortBy"
-    :sortDesc.sync="sortDesc"
->
-</PDataTable>
+ㅈ
 <p>sort by : {{sortBy}}, sort desc : {{sortDesc}}</p>
 </div>
 `,

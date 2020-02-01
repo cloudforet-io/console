@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { select, boolean, text } from '@storybook/addon-knobs';
 import {
     toRefs, reactive, ref, computed,
@@ -37,34 +38,27 @@ export const datetimeType = () => ({
             data: [
                 {
                     option: {
-                        // eslint-disable-next-line camelcase
                         source_type: 'iso861',
                     },
                     raw: '2013-02-08 09:30:26.123',
                 },
                 {
                     option: {
-                        // eslint-disable-next-line camelcase
                         source_type: 'iso861',
-                        // eslint-disable-next-line camelcase
                         source_format: 'MM-DD-YYYY',
                     },
                     raw: '10-20-2019',
                 },
                 {
                     option: {
-                        // eslint-disable-next-line camelcase
                         source_type: 'iso861',
-                        // eslint-disable-next-line camelcase
                         source_format: 'MM-DD-YYYY',
-                        // eslint-disable-next-line camelcase
                         display_format: 'YYYY-MM-DD',
                     },
                     raw: '4-20-2019',
                 },
                 {
                     option: {
-                        // eslint-disable-next-line camelcase
                         source_type: 'timestamp',
                     },
                     raw: '1318781876406',
@@ -97,7 +91,6 @@ export const stateType = () => ({
             data: [
                 {
                     option: {
-                        // eslint-disable-next-line camelcase
                         text_color: '#60B731',
                         icon: {
                             image: 'ic_round',
@@ -107,7 +100,6 @@ export const stateType = () => ({
                 },
                 {
                     option: {
-                        // eslint-disable-next-line camelcase
                         text_color: '#EF3817',
                         icon: {
                             image: 'ic_delete',
@@ -118,7 +110,6 @@ export const stateType = () => ({
                 },
                 {
                     option: {
-                        // eslint-disable-next-line camelcase
                         text_color: '#FFCE02',
                         icon: {
                             image: 'aws-ec2',
@@ -145,23 +136,19 @@ export const badgeType = () => ({
                 },
                 {
                     option: {
-                        // eslint-disable-next-line camelcase
                         text_color: '#60B731',
                     },
                     raw: 'test',
                 },
                 {
                     option: {
-                        // eslint-disable-next-line camelcase
                         background_color: '#60B731',
                     },
                     raw: 'sample',
                 },
                 {
                     option: {
-                        // eslint-disable-next-line camelcase
                         text_color: 'yellow',
-                        // eslint-disable-next-line camelcase
                         background_color: '#000000',
                     },
                     raw: '펭수',
@@ -182,16 +169,13 @@ export const listType = () => ({
                 {
                     option: {
                         item: {
-                        // eslint-disable-next-line camelcase
                             view_option: {
-                            // eslint-disable-next-line camelcase
                                 text_color: '#FFCE02',
                                 icon: {
                                     image: 'aws-ec2',
                                     color: '#FFCE02',
                                 },
                             },
-                            // eslint-disable-next-line camelcase
                             view_type: 'state',
                         },
 
@@ -201,12 +185,9 @@ export const listType = () => ({
                 {
                     option: {
                         item: {
-                            // eslint-disable-next-line camelcase
                             view_option: {
-                                // eslint-disable-next-line camelcase
                                 background_color: '#FFCE02',
                             },
-                            // eslint-disable-next-line camelcase
                             view_type: 'badge',
                         },
 
@@ -216,7 +197,6 @@ export const listType = () => ({
                 {
                     option: {
                         item: {
-                            // eslint-disable-next-line camelcase
                             view_type: 'text',
                         },
 
@@ -237,69 +217,51 @@ export const enumType = () => ({
         return {
             option: {
                 AWS: {
-                    // eslint-disable-next-line camelcase
                     view_option: {
-                        // eslint-disable-next-line camelcase
                         text_color: '#FF7750',
                         icon: {
                             image: 'aws-ec2',
                             color: '#FF7750',
                         },
                     },
-                    // eslint-disable-next-line camelcase
                     view_type: 'state',
                 },
                 GCP: {
-                    // eslint-disable-next-line camelcase
                     view_option: {
-                        // eslint-disable-next-line camelcase
                         text_color: '#60B731',
                         icon: {
                             image: 'aws-ec2',
                             color: '#60B731',
                         },
                     },
-                    // eslint-disable-next-line camelcase
                     view_type: 'state',
                 },
                 AZURE: {
-                    // eslint-disable-next-line camelcase
                     view_option: {
-                        // eslint-disable-next-line camelcase
                         text_color: '#0080FB',
                         icon: {
                             image: 'aws-ec2',
                             color: '#0080FB',
                         },
                     },
-                    // eslint-disable-next-line camelcase
                     view_type: 'state',
                 },
                 AWSBadge: {
-                    // eslint-disable-next-line camelcase
                     view_option: {
-                        // eslint-disable-next-line camelcase
                         background_color: '#FF7750',
                     },
-                    // eslint-disable-next-line camelcase
                     view_type: 'badge',
                 },
                 GCPBadge: {
-                    // eslint-disable-next-line camelcase
                     view_option: {
-                        // eslint-disable-next-line camelcase
                         background_color: '#60B731',
                     },
-                    // eslint-disable-next-line camelcase
                     view_type: 'badge',
                 },
                 AZUREBadge: {
-                    // eslint-disable-next-line camelcase
                     view_option: {
-                        // eslint-disable-next-line camelcase
                         background_color: '#0080FB',
                     },
-                    // eslint-disable-next-line camelcase
                     view_type: 'badge',
                 },
             },
