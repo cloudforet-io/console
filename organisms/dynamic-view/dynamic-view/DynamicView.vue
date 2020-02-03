@@ -5,7 +5,11 @@
                :data="data"
                :root-mode="rootMode"
                :api-handler="apiHandler"
-    />
+    >
+        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <slot :name="slot" v-bind="scope" />
+        </template>
+    </component>
 </template>
 
 <script lang="ts">
