@@ -68,6 +68,7 @@ export default {
             }
         };
         mountBusEvent(CollectorEventBus, 'listVersions', listVersions);
+
         return {
             ...toRefs(state),
         };

@@ -1,3 +1,5 @@
+import moment from 'moment-timezone';
+import _ from 'lodash';
 import { Util } from '@/lib/global-util';
 import styles from '@/styles/_variables.scss';
 import { ColorBindFactory } from '@/lib/view-helper';
@@ -94,9 +96,9 @@ export const platformBadgeColor = Object.freeze({
     WINDOWS: { backgroundColor: styles.secondary },
 });
 
-
+export const getLocalDatetimeFromTimeStamp = ts => moment.unix(ts).tz(localStorage.getItem('timezone')).format('YYYY-MM-DD HH:MM:SS z');
 // formatter
-export const timestampFormatter = value => Util.methods.getDatefromTimeStamp(value.seconds, localStorage.getItem('timezone'));
+export const timestampFormatter = value => getLocalDatetimeFromTimeStamp(value.seconds);
 
 export const serverStateFormatter = ColorBindFactory(serverStateColor, value => value.toLowerCase());
 export const userStateFormatter = ColorBindFactory(userStateColor, value => value.toLowerCase());
@@ -157,4 +159,15 @@ export const selectToCopyToClipboard = (t) => {
     textArea.select();
     document.execCommand('Copy');
     textArea.remove();
+};
+
+/** @function
+ * @name isEmpty
+ * @param value
+ * @returns {boolean}
+ */
+export const isEmpty = (value) => {
+    if (['boolean', 'number'].includes(typeof value)) return true;
+    if (value instanceof Array) return !!value.length;
+    return !_.isEmpty(value); // String, Object
 };

@@ -4,7 +4,6 @@ import {
     ref, toRefs, computed, reactive,
 } from '@vue/composition-api';
 import CollectorTemplate, { collectorSetup } from '@/views/inventory/collector/pages/Collector.template.vue';
-import { crdState } from '@/views/inventory/collector/modules/CollectorCredentials.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
@@ -17,70 +16,283 @@ export default {
             ...collectorSetup(props, context),
         });
 
-        // request list
-        const requestState = reactive({
-            query: computed(() => (defaultQuery(
-                state.thisPage, state.pageSize,
-                state.sortBy, state.sortDesc,
-                state.searchText,
-            ))),
-        });
+        const collectorTableQuery = computed(() => (defaultQuery(
+            state.thisPage, state.pageSize,
+            state.sortBy, state.sortDesc,
+            state.searchText,
+        )));
 
         const getCollectorList = async () => {
             state.loading = true;
             state.items = [];
             try {
                 const res = await context.parent.$http.post('/inventory/collector/list', {
-                    query: requestState.query,
+                    query: collectorTableQuery.value,
                 });
+                state.selectIndex = [];
                 state.items = res.data.results;
                 state.allPage = Math.ceil(res.data.total_count / state.pageSize) || 1;
-                state.selectIndex = [];
                 state.loading = false;
             } catch (e) {
                 console.error(e);
                 state.loading = false;
             }
         };
-
         mountBusEvent(CollectorEventBus, 'getCollectorList', getCollectorList);
 
 
-        const listCredentials = async () => {
-            crdState.loading = true;
-            crdState.items = [];
+        const getPlugin = async (params) => {
+            state.updateModalState.plugin = null;
             try {
-                const res = await context.parent.$http.post('/secret/credential/list', {
-                    query: crdState.query,
-                });
-                crdState.selectIndex = [];
-                crdState.totalCount = res.data.total_count;
-                crdState.items = res.data.results;
-                crdState.loading = false;
+                const res = await context.parent.$http.post('/repository/plugin/get', params);
+                state.updateModalState.plugin = res.data;
             } catch (e) {
                 console.error(e);
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'getPlugin', getPlugin);
+
+
+        const listVersionsInfo = async (params) => {
+            try {
+                const res = await context.parent.$http.post('/repository/plugin/get-versions', params);
+                state.updateModalState.versions = res.data.version;
+                if (!state.updateModalState.selectedVersion) {
+                    state.updateModalState.selectedVersion = state.updateModalState.versions[0];
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'listVersionsInfo', listVersionsInfo);
+
+
+        const updateCollector = async (params) => {
+            state.updateModalState.loading = true;
+            try {
+                const res = await context.parent.$http.post('/inventory/collector/update', params);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Update Collector',
+                    duration: 2000,
+                    speed: 1000,
+                });
+                await getCollectorList();
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } finally {
+                state.updateModalState.loading = false;
+                state.updateModalState.visible = false;
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'updateCollector', updateCollector);
+
+
+        const enableCollectors = async () => {
+            try {
+                await context.parent.$http.post('/inventory/collector/enable', {
+                    collectors: state.multiItems.map(item => item.collector_id),
+                });
+                await getCollectorList();
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Enable Collector',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } finally {
+                state.checkModalState.visible = false;
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'enableCollectors', enableCollectors);
+
+
+        const disableCollectors = async () => {
+            try {
+                await context.parent.$http.post('/inventory/collector/disable', {
+                    collectors: state.multiItems.map(item => item.collector_id),
+                });
+                await getCollectorList();
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Disable Collector',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } finally {
+                state.checkModalState.visible = false;
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'disableCollectors', disableCollectors);
+
+
+        const deleteCollectors = async () => {
+            try {
+                await context.parent.$http.post('/inventory/collector/delete', {
+                    collectors: state.multiItems.map(item => item.collector_id),
+                });
+                await getCollectorList();
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Delete Collector',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } finally {
+                state.checkModalState.visible = false;
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'deleteCollectors', deleteCollectors);
+
+
+        const confirmTags = async (params) => {
+            try {
+                await context.parent.$http.post('/inventory/collector/update', params);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Update Tags',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'confirmTags', confirmTags);
+
+
+        const listCredentialsByCollector = async (query) => {
+            const crdId = _.get(state.selectedItem, 'plugin_info.credential_id');
+            const crdgId = _.get(state.selectedItem, 'plugin_info.credential_group_id');
+
+            const params = {
+                query,
+                // eslint-disable-next-line camelcase
+                include_credential_group: true,
+            };
+
+            state.crdState.loading = true;
+            state.crdState.items = [];
+            try {
+                // eslint-disable-next-line camelcase
+                if (crdId) params.credential_id = crdId;
+                // eslint-disable-next-line camelcase
+                else if (crdgId) params.credential_group_id = crdgId;
+                else throw new Error('No credential id or credential group id');
+
+                const res = await context.parent.$http.post('/secret/credential/list', params);
+                state.crdState.selectIndex = [];
+                state.crdState.totalCount = res.data.total_count;
+                state.crdState.items = res.data.results;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.crdState.loading = false;
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'listCredentialsByCollector', listCredentialsByCollector);
+
+
+        const listCredentials = async (params) => {
+            state.collectDataState.loading = true;
+            try {
+                const res = await context.parent.$http.post('/secret/credential/list', params);
+                state.collectDataState.credentials = res.data.results;
+                state.collectDataState.loading = false;
+            } catch (e) {
+                console.error(e);
+                state.collectDataState.loading = false;
             }
         };
         mountBusEvent(CollectorEventBus, 'listCredentials', listCredentials);
 
 
-        const selectedItems = computed(() => crdState.selectIndex.map(idx => crdState.items[idx]));
-        const verifyCredentials = async () => {
-            crdState.loading = true;
-            crdState.items = [];
+        const collectData = async (params) => {
+            state.collectDataState.loading = true;
+
             try {
-                const res = await context.parent.$http.post('/secret/credential/list', {
-                    query: crdState.query,
+                await context.parent.$http.post('/inventory/collector/collect', params);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Collect Data',
+                    duration: 2000,
+                    speed: 1000,
                 });
-                crdState.selectIndex = [];
-                crdState.totalCount = res.data.total_count;
-                crdState.items = res.data.results;
-                crdState.loading = false;
+                state.collectDataState.loading = false;
+                state.collectDataState.modalVisible = false;
             } catch (e) {
                 console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+                state.collectDataState.loading = false;
+                state.collectDataState.modalVisible = false;
             }
         };
-        mountBusEvent(CollectorEventBus, 'verifyCredentials', verifyCredentials);
+        mountBusEvent(CollectorEventBus, 'collectData', collectData);
 
         return {
             ...toRefs(state),

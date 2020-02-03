@@ -13,12 +13,24 @@
                            @changeStep="onChangeStep"
         >
             <template #contents-conf="{tab}">
-                <configure-collector ref="conf" :show-validation="tab.showValidation"
+                <configure-collector ref="conf"
+                                     :show-validation="tab.showValidation"
+                                     :plugin-id="confState.pluginId"
+                                     :plugin="confState.plugin"
+                                     :versions="confState.versions"
+                                     :selected-version.sync="confState.selectedVersion"
+                                     :options-value.sync="confState.optionsValue"
+                                     :priority.sync="confState.priority"
                                      @changeValidState="updateTabInvalid(0, $event)"
                 />
             </template>
             <template #contents-credentials>
                 <choose-credentials ref="crd"
+                                    :items="crdState.items"
+                                    :total-count="crdState.totalCount"
+                                    :loading="crdState.loading"
+                                    :crd-type.sync="crdState.crdType"
+                                    :select-index.sync="crdState.selectIndex"
                                     @changeValidState="updateTabInvalid(1, $event)"
                 />
             </template>
@@ -43,10 +55,32 @@ const ConfigureCollector = () => import('@/views/inventory/collector/modules/Con
 const ChooseCredentials = () => import('@/views/inventory/collector/modules/ChooseCredentials.vue');
 const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup.vue');
 
-export const setDataState = (props, args) => reactive({
-    tags: {},
+const getCrdState = () => reactive({
+    items: [],
+    totalCount: 0,
+    loading: true,
+    crdType: 'Credentials',
+    selectIndex: [],
 });
 
+const getConfState = root => reactive({
+    pluginId: _.get(root, '$route.params.pluginId', ''),
+    plugin: null,
+    versions: [],
+    selectedVersion: _.get(root, '$route.query.version', ''),
+    priority: 10,
+    optionsValue: {},
+});
+
+/**
+ * @param root
+ * @returns {UnwrapRef<{confState: UnwrapRef<{plugin: null, selectedVersion: *, versions: [], optionsValue: {}, priority: number}>, crdState: UnwrapRef<{crdType: string, selectIndex: [], totalCount: number, loading: boolean, items: []}>, tags: {}}>}
+ */
+export const setDataState = root => reactive({
+    tags: {},
+    crdState: getCrdState(),
+    confState: getConfState(root),
+});
 
 export default {
     name: 'CollectorCreator',
@@ -59,7 +93,7 @@ export default {
         PDictInputGroup,
     },
     setup(props, { refs, root }) {
-        const dataState = setDataState();
+        const dataState = setDataState(root);
 
         const state = reactive({
             tabs: [
@@ -130,6 +164,7 @@ export default {
 
 <style lang="scss" scoped>
 .collector-creator-container {
+    padding: 1.75rem 2rem 2rem 2rem;
     .back-btn {
         margin-bottom: .75rem;
         color: $primary2;

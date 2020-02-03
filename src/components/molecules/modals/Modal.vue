@@ -21,7 +21,6 @@ const setup = (props, { emit }) => {
         sizeMapping[props.size],
     ]);
     const hide = () => {
-        console.log('event');
         if (props.visible) { emit('update:visible', false); }
     };
 

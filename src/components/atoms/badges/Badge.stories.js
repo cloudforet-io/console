@@ -16,7 +16,7 @@ const data = {};
 
 export const DefaultCase = () => ({
     components: { PBadge },
-    template: '<PBadge style="width: auto" :styleType="styleType" :backgroundColor="backgroundColor">{{text}}</PBadge>',
+    template: '<PBadge style="width: auto" :styleType="styleType" :text-color="textColor" :backgroundColor="backgroundColor">{{text}}</PBadge>',
     props: {
         styleType: {
             default: select('styleType', [
@@ -27,6 +27,9 @@ export const DefaultCase = () => ({
         },
         text: {
             default: text('text', 'badge'),
+        },
+        textColor: {
+            default: color('textColor', ''),
         },
         backgroundColor: {
             default: color('backgroundColor', ''),
@@ -43,7 +46,7 @@ export const DefaultCase = () => ({
 });
 export const longBadge = () => ({
     components: { PBadge },
-    template: '<PBadge :styleType="styleType" :backgroundColor="backgroundColor">Badge with long size in length</PBadge>',
+    template: '<PBadge :styleType="styleType"  :text-color="textColor" :backgroundColor="backgroundColor">Badge with long size in length</PBadge>',
     props: {
         styleType: {
             default: select('styleType', [
@@ -54,6 +57,9 @@ export const longBadge = () => ({
                 'gray', 'gray1', 'gray2', 'gray3',
                 'alert', 'safe', 'dark',
             ], ''),
+        },
+        textColor: {
+            default: color('textColor', ''),
         },
         backgroundColor: {
             default: color('backgroundColor', ''),

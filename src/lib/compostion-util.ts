@@ -43,7 +43,7 @@ export const mountBusEvent = (bus:any, eventName:string, handler:Function) => {
  * @param disabled
  * @return {{onMouseOut: onMouseOut, isMouseOver: Ref<HasDefined<S> extends true ? S : RefValue<T>>, onMouseOver: onMouseOver}}
  */
-export const mouseOverState = (disabled:boolean) => {
+export const mouseOverState = (disabled?:boolean) => {
     const disable = disabled || false;
     const isMouseOver = ref(false);
     const onMouseOver = () => {
@@ -95,7 +95,7 @@ export class Validation {
  *          validState: UnwrapRef<any>,
  *          fieldValidation: fieldValidation,
  *          invalidMsg: UnwrapRef<any>,
- *          invalidState: UnwrapRef<any>
+ *          invalidState: Ref<any>
  *          }
  *      }
  */
@@ -180,7 +180,7 @@ export const credentialsNameValidation = (parent:any, invalidMessage:message) =>
             result = true;
         }
     }).catch((error) => {
-        console.log(error);
+        console.error(error);
     });
     return result;
 }, invalidMessage || 'same name exists!');
