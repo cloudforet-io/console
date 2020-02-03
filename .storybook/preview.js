@@ -17,16 +17,13 @@ import VueLodash from 'vue-lodash';
 import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
-import VueI18n from 'vue-i18n';
 import "@/styles/style.scss";
 
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
-Vue.use(VueI18n);
 Vue.mixin(Util);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
-Vue.use(VueI18n);
 Vue.use(VueInputAutowidth);
 Vue.use(VueLodash, { name: 'lodash' });
 Vue.use(SvgIcon, {
@@ -58,7 +55,7 @@ addDecorator(withA11y);
 addDecorator(withKnobs);
 addDecorator(centered);
 addDecorator(() => ({
+    i18n,
     store,
     template: '<story/>',
-    i18n,
 }));

@@ -252,7 +252,6 @@ export default {
             dragSelect: null,
             thHoverIndex: null,
         });
-        console.log(props.selectIndex);
         const proxySelectIndex = makeProxy('selectIndex', props, context.emit);
         const fieldsData = computed(() => {
             const data = _.flatMap(props.fields, (value) => {
@@ -411,7 +410,6 @@ export default {
         let dragSelect = null;
         onMounted(() => {
             if (props.selectable && props.dragable) {
-                console.log(selectArea.value);
                 dragSelect = new DragSelect({
                     selectables: dragSelectAbles.value,
                     area: selectArea.value,

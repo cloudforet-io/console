@@ -1,197 +1,207 @@
 export const GlobalEnum = {
     TREE: Object.freeze({
         PROJECT: {
-            PROJECT:{
+            PROJECT: {
                 type: 'PROJECT',
                 root_able: false,
                 accept: [],
-                isLeaf: true
+                isLeaf: true,
             },
-            PROJECT_GROUP:{
+            PROJECT_GROUP: {
                 type: 'PROJECT_GROUP',
                 root_able: true,
-                accept: ['PROJECT_GROUP','PROJECT'],
-                isLeaf: false
-            }
+                accept: ['PROJECT_GROUP', 'PROJECT'],
+                isLeaf: false,
+            },
         },
         DATA_CENTER: {
-            REGION:{
+            REGION: {
                 type: 'REGION',
                 root_able: false,
                 accept: ['ZONE'],
-                isLeaf: false
+                isLeaf: false,
             },
-            ZONE:{
+            ZONE: {
                 type: 'ZONE',
                 root_able: false,
                 accept: ['POOL'],
-                isLeaf: false
+                isLeaf: false,
             },
-            POOL:{
+            POOL: {
                 type: 'POOL',
                 root_able: false,
                 accept: [],
-                isLeaf: false
-            }
-        }
+                isLeaf: false,
+            },
+        },
     }),
     COLLECT_MODE: Object.freeze({
         ALL: { value: 'ALL', text: 'All' },
         CREATE: { value: 'CREATE', text: 'Create' },
-        UPDATE: { value: 'UPDATE', text: 'Update' }
+        UPDATE: { value: 'UPDATE', text: 'Update' },
     }),
     LANGUAGES: Object.freeze({
-        en: { value: 'en', text: 'English' , nation: 'US', icon: 'flag-icon flag-icon-us' },
-        ko: { value: 'ko', text: '한국어', nation: 'KR', icon: 'flag-icon flag-icon-kr' }
+        en: {
+            value: 'en', text: 'English', nation: 'US', icon: 'flag-icon flag-icon-us',
+        },
+        ko: {
+            value: 'ko', text: '한국어', nation: 'KR', icon: 'flag-icon flag-icon-kr',
+        },
     }),
     COLLECTOR: Object.freeze({
-        AWS:[{ file_name: 'aws-ec2' ,src: 'aws-ec2.svg', text: 'EC2' }, { file_name: 'aws-network', src: 'aws-network.svg', text: 'Network' }]
+        AWS: [{ file_name: 'aws-ec2', src: 'aws-ec2.svg', text: 'EC2' }, { file_name: 'aws-network', src: 'aws-network.svg', text: 'Network' }],
     }),
     JOB_STATE: Object.freeze(
         {
             PENDING: {
                 msg: 'Pending',
                 icon: 'fal fa-minus',
-                color: 'primary'
+                color: 'primary',
             },
             INPROGRESS: {
-                msg:  'In progress',
+                msg: 'In progress',
                 icon: 'fal fa-minus',
-                color: 'info'
+                color: 'info',
             },
             SUCCESS: {
-                msg:  'Success',
+                msg: 'Success',
                 icon: 'fal fa-check',
-                color: 'primary'
+                color: 'primary',
             },
             CREATED: {
                 msg: 'Created',
-                icon:  'fal fa-minus-circle',
-                color: 'warning'
+                icon: 'fal fa-minus-circle',
+                color: 'warning',
             },
             FAILURE: {
                 msg: 'Failure',
-                icon:  'fal fa-traffic-cone',
-                color: 'danger'
+                icon: 'fal fa-traffic-cone',
+                color: 'danger',
             },
             TIMEOUT: {
                 msg: 'Time out',
-                icon:  'fal fa-traffic-cone',
-                color: 'secondary'
+                icon: 'fal fa-traffic-cone',
+                color: 'secondary',
             },
             IDLE: {
                 msg: 'Idle',
-                icon:  'fal fa-traffic-cone',
-                color: 'secondary'
-            }
-        }),
+                icon: 'fal fa-traffic-cone',
+                color: 'secondary',
+            },
+        },
+    ),
     MEMBER_STATE: Object.freeze(
         {
             ENABLED: {
                 msg: 'Enabled',
                 icon: 'fal fa-check',
-                color: 'primary'
+                color: 'primary',
             },
             DISABLED: {
-                msg:  'Disabled',
+                msg: 'Disabled',
                 icon: 'fal fa-minus',
-                color: 'info'
+                color: 'info',
             },
             UNIDENTIFIED: {
                 msg: 'Unidentified',
-                icon:  'fal fa-traffic-cone',
-                color: 'secondary'
-            }
-        }),
+                icon: 'fal fa-traffic-cone',
+                color: 'secondary',
+            },
+        },
+    ),
     SERVER_STATE: Object.freeze(
         {
             INSERVICE: {
-                msg: 'In-Service', 
+                msg: 'In-Service',
                 icon: 'fas fa-check-circle',
-                color: 'success'
+                color: 'success',
             },
             MAINTENANCE: {
-                msg: 'Maintenance', 
+                msg: 'Maintenance',
                 icon: 'fas fa-exclamation-triangle',
-                color: 'warning'
+                color: 'warning',
             },
             CLOSED: {
                 msg: 'Closed',
                 icon: 'fas fa-times-circle',
-                color: 'danger'
+                color: 'danger',
             },
             DELETED: {
-                msg: 'Deleted', 
+                msg: 'Deleted',
                 icon: 'fas fa-minus-circle',
-                color: 'dark'
-            }
-        }),
+                color: 'dark',
+            },
+        },
+    ),
     SERVER_TYPE: Object.freeze(
         {
             VM: {
-                msg: 'VM', 
-                color: 'success'
-            }
-        }),
+                msg: 'VM',
+                color: 'success',
+            },
+        },
+    ),
     PLATFORM_TYPE: Object.freeze(
         {
             AWS: {
-                msg: 'AWS', 
-                color: 'warning'
-            }
-        }),
+                msg: 'AWS',
+                color: 'warning',
+            },
+        },
+    ),
     COLLECT_STATE: Object.freeze(
         {
             NEW: {
-                msg:  'New', //info
+                msg: 'New', // info
                 icon: 'fas fa-lightbulb-on',
-                color: 'info'
+                color: 'info',
             },
             ACTIVE: {
-                msg: 'Active', //primary
+                msg: 'Active', // primary
                 icon: 'fas fa-check-circle',
-                color: 'primary'
+                color: 'primary',
             },
             DISCONNECTED: {
-                msg: 'Disconnected', //danger
+                msg: 'Disconnected', // danger
                 icon: 'fas fa-plug',
-                color: 'danger'
+                color: 'danger',
             },
             DUPLICATED: {
                 msg: 'Duplicated', // warning
                 icon: 'fas fa-exclamation-triangle',
-                color: 'warning'
+                color: 'warning',
             },
             UNMANAGED: {
                 msg: 'Unmanaged', // secondary
                 icon: 'fas fa-question-circle',
-                color: 'secondary'
-            }
-        }),
+                color: 'secondary',
+            },
+        },
+    ),
     OPERATORS: Object.freeze({
         CONTAIN_IN: {
             string: 'contain_in',
-            sign: ':'
+            sign: ':',
         },
         IN: {
             string: 'in',
-            sign: ':='
+            sign: ':=',
         },
         GTE: {
             string: 'gte',
-            sign: ':>'
+            sign: ':>',
         },
         LTE: {
             string: 'lte',
-            sign: ':<'
+            sign: ':<',
         },
         NOT_IN: {
             string: 'not_in',
-            sign: ':!'
+            sign: ':!',
         },
         REGEX_IN: {
             string: 'regex_in',
-            sign: ':/'
-        }
-    })
+            sign: ':/',
+        },
+    }),
 };

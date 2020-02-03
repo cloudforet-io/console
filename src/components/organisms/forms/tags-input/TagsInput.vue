@@ -1,7 +1,7 @@
 <template>
     <p-box-layout class="p-tags-input" :box-style="boxStyle" @click="onBoxClick">
         <p-tag v-for="(tag, idx) in tagTools.tags" :key="`${idx}-${tag}`"
-               class="item" @delete="tagTools.deleteTag(idx)"
+               class="item" @delete="onDelete(idx)"
         >
             {{ tag }}
         </p-tag>
@@ -23,7 +23,7 @@ import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
 export default {
     name: 'PTagsInput',
-    events: ['update:tags'],
+    events: ['update:tags', 'change'],
     directives: {
         focus: {
             inserted(el, binding) {
@@ -61,6 +61,7 @@ export default {
 
         const add = () => {
             tagTools.addTag(value.value);
+            emit('change', tagTools.tags);
             value.value = '';
         };
 
@@ -68,11 +69,17 @@ export default {
             refs.input.focus();
         };
 
+        const onDelete = (idx) => {
+            tagTools.deleteTag(idx);
+            emit('change', tagTools.tags);
+        };
+
         return {
             value,
             tagTools,
             add,
             onBoxClick,
+            onDelete,
         };
     },
 };

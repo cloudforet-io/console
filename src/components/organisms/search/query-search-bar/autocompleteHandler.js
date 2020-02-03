@@ -121,6 +121,15 @@ export const getSuggest = suggestKeys => (contextType, inputText) => {
     return ['Suggest', result];
 };
 
+/**
+ * @description Value list fetch
+ * @param key
+ * @param urlPath
+ * @param parent
+ * @param limit
+ * @param matchKey
+ * @returns {function(...[*]=)}
+ */
 export const getFetchValues = (key, urlPath, parent, limit = 10, matchKey) => async (contextType, inputText, searchQuery) => {
     if (searchQuery.key === key) {
         const realKey = matchKey || searchQuery.key;
@@ -136,7 +145,14 @@ export const getFetchValues = (key, urlPath, parent, limit = 10, matchKey) => as
     }
     return [];
 };
-const makeValuesFetchHandler = (parent, valuesFetchUrl, valuesFetchKeys) => {
+
+/**
+ * @param parent
+ * @param valuesFetchUrl
+ * @param valuesFetchKeys
+ * @returns {Array|*[]}
+ */
+export const makeValuesFetchHandler = (parent, valuesFetchUrl, valuesFetchKeys) => {
     if (parent && valuesFetchUrl && valuesFetchKeys.length > 0) {
         return _.flatMap(valuesFetchKeys, key => getFetchValues(key, valuesFetchUrl, parent));
     }

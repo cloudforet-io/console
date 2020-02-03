@@ -16,49 +16,43 @@ export const defaultCase = () => ({
     setup(props, context) {
         const state = setDataState();
 
-        const listVersionsInfo = () => {
-            state.versions = casual.pluginVersions;
-        };
-        mountBusEvent(CollectorEventBus, 'listVersionsInfo', listVersionsInfo);
-
-        /**
-         * @name listCredentials
-         * @param query {Object}
-         */
-        const listCredentials = (query) => {
-            state.loading = true;
-            state.credentials = [];
+        const listCredentials = (params) => {
+            state.crdState.loading = true;
+            state.crdState.items = [];
             setTimeout(() => {
-                state.totalCount = casual.integer(10, 100);
-                state.credentials = arrayOf(query.page.limit, casual._credential);
-                state.loading = false;
+                state.crdState.selectIndex = [];
+                state.crdState.totalCount = casual.integer(10, 100);
+                state.crdState.items = arrayOf(params.query.page.limit, casual._credential);
+                state.crdState.loading = false;
             }, casual.integer(1000, 3000));
         };
         mountBusEvent(CollectorEventBus, 'listCredentials', listCredentials);
 
-        /**
-         * @name listCredentialsGroup
-         * @param query {Object}
-         */
-        const listCredentialsGroup = (query) => {
-            state.loading = true;
-            state.credentials = [];
-            setTimeout(() => {
-                state.totalCount = casual.integer(10, 100);
-                state.credentials = arrayOf(query.page.limit, casual._credential);
-                state.loading = false;
-            }, casual.integer(1000, 3000));
-        };
-        mountBusEvent(CollectorEventBus, 'listCredentialsGroup', listCredentialsGroup);
-
 
         const getPlugin = () => {
+            state.confState.plugin = null;
             setTimeout(() => {
-                state.totalCount = casual.integer(10, 100);
-                state.plugin = casual.pluginInfo;
+                state.confState.plugin = casual.pluginInfo;
             }, casual.integer(1000, 3000));
         };
         mountBusEvent(CollectorEventBus, 'getPlugin', getPlugin);
+
+
+        const listVersionsInfo = () => {
+            setTimeout(() => {
+                state.confState.versions = casual.pluginVersions;
+                if (!state.confState.selectedVersion) {
+                    state.confState.selectedVersion = state.confState.versions[0];
+                }
+            }, 1000);
+        };
+        mountBusEvent(CollectorEventBus, 'listVersionsInfo', listVersionsInfo);
+
+
+        const createCollector = () => {
+            action('create collector');
+        };
+        mountBusEvent(CollectorEventBus, 'createCollector', createCollector);
 
         return {
             ...toRefs(state),
