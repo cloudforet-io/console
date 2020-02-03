@@ -5,7 +5,7 @@
 
                 <span v-if="route.meta && route.meta.breadcrumb"
                       class="menu"
-                      :class="{active: route.name === matched[proxyActiveIdx].name}"
+                      :class="{active: route.name === active.name}"
                       @click="go(route)"
                 >
                     <span class="link">{{ route.meta.label }}</span>
@@ -48,26 +48,32 @@ export default {
             default: undefined,
         },
         routes: Array,
+        pathPrefix: {
+            type: String,
+            default: '/',
+        },
     },
     setup(props, context) {
         const matched = computed(() => context.root.$route.matched);
         const current = computed(() => matched.value[props.currentIdx]);
 
         const proxyActiveIdx = computed(() => props.activeIdx || _.findLastIndex(matched.value, { meta: { breadcrumb: true } }));
+        const active = computed(() => matched.value[proxyActiveIdx.value]);
         const hasNext = computed(() => props.currentIdx < proxyActiveIdx.value);
 
         const go = (route) => {
-            if (hasNext.value) context.root.$router.push(current.value);
-            // else if (matched.value[props.currentIdx + 1]) {
-            //     context.root.$router.push(`${current.value.parent.path}/${route.path}`);
-            // } else {
-            context.root.$router.push(route.path);
-            // }
+            if (hasNext.value) {
+                context.root.$router.push({ path: current.value.path });
+            } else {
+                const parent = matched.value[props.currentIdx - 1] || current.value;
+                context.root.$router.push(`${parent.path}/${route.path}`);
+            }
         };
 
         return {
             current,
             proxyActiveIdx,
+            active,
             hasNext,
             matched,
             go,
