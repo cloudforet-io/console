@@ -1,5 +1,5 @@
 <template>
-    <div class="row" :style="responsiveStyle">
+    <div class="row summary-padding" :style="responsiveStyle">
         <InfoPanel v-show="isVisible"
                    :info-title="topPanelTitle"
                    :item="item"
@@ -116,6 +116,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .summary-padding {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
   .quote {
     border-left: 0.5em solid #415ee1;
     padding: 0.5em;
