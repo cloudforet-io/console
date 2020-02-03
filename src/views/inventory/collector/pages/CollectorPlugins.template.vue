@@ -89,7 +89,7 @@ import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 
 import PluginFilter from '@/views/inventory/collector/modules/PluginFilter.vue';
 
-const setRepoList = () => reactive({
+const repoState = reactive({
     repositories: [],
     selectedRepoId: undefined,
 });
@@ -116,9 +116,11 @@ const setPluginList = (router) => {
         selectedVersions: {},
     });
 
+    const makeVersionMenu = v => (typeof v === 'object' ? v : { type: 'item', label: v, name: v });
     const versionsMenu = computed(() => {
-        const res = _.forEach(state.versions, (vlist, pid) => {
-            state.versions[pid] = vlist.map(v => ({ type: 'item', name: v, label: v }));
+        const res = {};
+        _.forEach(state.versions, (vlist, pid) => {
+            res[pid] = vlist.map(v => makeVersionMenu(v));
         });
         return res;
     });
@@ -194,14 +196,12 @@ const setQueryState = (state) => {
 };
 
 export const setup = (props, { root }) => {
-    const repoState = setRepoList();
     const pluginListState = setPluginList(root.$router);
     const filterState = setFilters(pluginListState, root.$router);
 
     const allState = reactive({
         ...filterState,
         ...pluginListState,
-        ...toRefs(repoState),
     });
 
     const queryState = setQueryState(allState);
@@ -209,6 +209,7 @@ export const setup = (props, { root }) => {
     return {
         ...toRefs(allState),
         ...toRefs(queryState),
+        ...toRefs(repoState),
 
     };
 };

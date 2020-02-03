@@ -8,6 +8,7 @@
                         styleType: 'dark',
                         outline: true,
                     }"
+                    :footer-confirm-button-bind="confirmBtnStyle"
                     :visible.sync="proxyVisible"
                     @confirm="onClickCollectConfirm"
     >
@@ -37,15 +38,16 @@
                         {{ tr('INVENTORY.COL_OPS') }}
                     </p>
                     <p-field-group :label="isCredentialType ? tr('COMMON.CREDENTIAL') : tr('COMMON.CREDENTIAL_GRP')">
-                        <div v-if="!isCredentialType">
-                            <p-text-input :value="collector.plugin_info.credential_id"
+                        <div v-if="isCredentialType">
+                            <p-text-input :value="selectedCrd ? selectedCrd.name : ''"
                                           disabled
                             />
                         </div>
-                        <p-query-search-bar v-else
-                                            :search-text.sync="credentialText"
-                                            :autocomplete-handler="ACHandler"
-                        />
+                        <div v-else>
+                            <p-dropdown-menu-btn :menu="crdsMenu" @clickMenuEvent="onClickCrdMenu">
+                                {{ crdsMenu[crdMenuIdx].label }}
+                            </p-dropdown-menu-btn>
+                        </div>
                     </p-field-group>
                     <p-field-group :label="tr('COMMON.COL_MODE')">
                         <p-dropdown-menu-btn :menu="collectModeMenu">
@@ -71,10 +73,24 @@
             <p-button class="reset-btn"
                       style-type="primary"
                       outline
-                      @click="reset"
+                      @click="onClickReset"
             >
                 {{ tr('COMMON.BTN_RESET') }}
             </p-button>
+        </template>
+
+        <template #close-button>
+            {{ tr('COMMON.BTN_CANCEL') }}
+        </template>
+        <template #confirm-button>
+            <div class="confirm-btn">
+                <p-lottie v-if="loading" class="spinner"
+                          name="spinner"
+                          auto
+                          :size="1.5"
+                />
+                <span>{{ tr('COMMON.BTN_CONFIRM') }}</span>
+            </div>
         </template>
     </p-button-modal>
 </template>
@@ -85,6 +101,8 @@ import _ from 'lodash';
 import config from '@/lib/config';
 import { makeTrItems } from '@/lib/view-helper';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
+import { makeProxy } from '@/lib/compostion-util';
+import { defaultAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -95,14 +113,8 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import { defaultAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import { makeProxy } from '@/lib/compostion-util';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
-export const collectDataState = reactive({
-    collectModeIdx: 0,
-    showValidation: false,
-    filters: {},
-});
 
 export default {
     name: 'CollectDataModal',
@@ -115,71 +127,117 @@ export default {
         PCol,
         PTextInput,
         PDropdownMenuBtn,
-        PQuerySearchBar,
+        PLottie,
     },
     props: {
         collector: Object,
         visible: Boolean,
+        loading: Boolean,
+        credentials: Array,
+        isCredentialType: Boolean,
     },
     setup(props, context) {
-        class ACHandler extends defaultAutocompleteHandler {
-            // eslint-disable-next-line class-methods-use-this
-            get suggestKeys() {
-                return ['credential_id'];
-            }
-
-            // eslint-disable-next-line no-shadow
-            constructor(context) {
-                super();
-                this.context = context;
-            }
-        }
-
         const state = reactive({
             proxyVisible: makeProxy('visible', props, context.emit),
+            showValidation: false,
+            collectModeIdx: 0,
+            collectModeMenu: makeTrItems([
+                ['ALL', 'COMMON.ALL'],
+                ['CREATE', 'COMMON.BTN_CRT'],
+                ['UPDATE', 'COMMON.BTN_UPT'],
+            ], context.parent, { type: 'item' }),
             image: computed(() => _.get(props.collector, 'tags.icon', config.get('COLLECTOR_IMG'))),
             version: computed(() => _.get(props.collector, 'plugin_info.version', '')),
             description: computed(() => _.get(props.collector, 'tags.description', '')),
-            collectModeMenu: makeTrItems([
-                ['', 'COMMON.ALL'],
-                ['create', 'COMMON.BTN_CRT'],
-                ['update', 'COMMON.BTN_UPT'],
-            ], context.root, { type: 'item' }),
-            isCredentialType: computed(() => _.get(props.collector, 'plugin_info.credential_id')),
-            credentialText: '',
-            ACHandler: new ACHandler(),
             filterFormats: computed(() => _.get(props.collector, 'plugin_info.options.filter_format', [])),
+            filters: {},
+            confirmBtnStyle: computed(() => {
+                const defaultStyle = { style: { padding: 0 } };
+                defaultStyle.styleType = props.loading ? 'gray2' : 'primary';
+                return defaultStyle;
+            }),
+            crdsMenu: computed(() => [
+                { type: 'item', label: context.parent.tr('COMMON.ALL'), name: 'all' },
+                ...props.credentials.map(crd => ({ type: 'item', label: crd.name, name: crd.credential_id })),
+            ]),
+            crdMenuIdx: 0,
+            selectedCrd: computed(() => {
+                if (props.isCredentialType) return props.credentials[0];
+                if (state.crdMenuIdx === 0) return null;
+                return props.credentials[state.crdMenuIdx - 1];
+            }),
         });
 
-        let vdApi;
-
-        const reset = () => {
-            collectDataState.collectModeIdx = 0;
-            collectDataState.showValidation = false;
-            collectDataState.filters = {};
-            vdApi = setValidation(state.filterFormats, collectDataState.filters);
-        };
+        let vdApi = setValidation(state.filterFormats, state.filters);
 
         const onChange = async (val) => {
             if (!state.showValidation) return;
             await vdApi.fieldValidation(val);
-            context.emit('changeValidState', vdApi.isAllValid.value);
+            context.emit('changeValidState', vdApi.isAllValid);
         };
 
+        const onClickReset = () => {
+            if (props.loading) return;
+
+            state.collectModeIdx = 0;
+            state.showValidation = false;
+            state.filters = {};
+            vdApi = setValidation(state.filterFormats, state.filters);
+            state.crdMenuIdx = 0;
+        };
+
+        const getParams = () => {
+            const params = {
+                // eslint-disable-next-line camelcase
+                collector_id: props.collector.collector_id,
+                // eslint-disable-next-line camelcase
+                collect_mode: state.collectModeMenu[state.collectModeIdx].name,
+            };
+
+            if (!_.isEmpty(state.filters)) params.filter = state.filters;
+
+            // eslint-disable-next-line camelcase
+            if (state.selectedCrd) params.credential_id = state.selectedCrd.credential_id;
+            // eslint-disable-next-line camelcase
+            else params.credential_group_id = props.collector.plugin_info.credential_group_id;
+
+            return params;
+        };
         const onClickCollectConfirm = async () => {
+            if (props.loading) return;
             state.showValidation = true;
-            if (await vdApi.allValidation()) CollectorEventBus.$emit('collectData');
+            if (await vdApi.allValidation()) {
+                CollectorEventBus.$emit('collectData', getParams());
+            }
         };
 
-        reset();
+        const onClickCrdMenu = (name, idx) => {
+            state.crdMenuIdx = idx;
+        };
+
+        const listCredentials = () => {
+            if (props.credentials.length > 0) return;
+
+            const params = {};
+            if (props.isCredentialType) {
+                // eslint-disable-next-line camelcase
+                params.credential_id = props.collector.plugin_info.credential_id;
+            } else {
+                // eslint-disable-next-line camelcase
+                params.credential_group_id = props.collector.plugin_info.credential_group_id;
+            }
+            CollectorEventBus.$emit('listCredentials', params);
+        };
+
+        listCredentials();
 
         return {
-            ...toRefs(collectDataState),
             ...toRefs(state),
             vdApi,
-            reset,
             onChange,
+            onClickReset,
             onClickCollectConfirm,
+            onClickCrdMenu,
         };
     },
 };
@@ -220,5 +278,15 @@ export default {
 }
 .reset-btn {
     margin-right: auto;
+}
+.confirm-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    .spinner {
+        display: inline-flex;
+        padding-right: .25rem;
+    }
 }
 </style>

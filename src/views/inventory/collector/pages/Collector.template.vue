@@ -1,6 +1,5 @@
 <template>
     <div class="collector-page">
-        <router-view />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table :items="items"
@@ -46,7 +45,7 @@
                     </template>
                     <template #col-name-format="data">
                         <span class="name">
-                            <img class="icon" :src="data.item.tags.icon || defaultImg">
+                            <img class="icon" :src="getIcon(data)">
                             {{ data.value }}
                         </span>
                     </template>
@@ -71,12 +70,23 @@
             </template>
         </p-horizontal-layout>
 
-        <p-tab v-if="selectIndex.length === 1" :tabs="tabs" :active-tab.sync="activeTab">
+        <p-tab v-if="selectIndex.length === 1"
+               :tabs="tabs"
+               :active-tab.sync="activeTab"
+        >
             <template #detail>
-                <collector-detail :item="items[selectIndex[0]]" />
+                <collector-detail :item="selectedItem" />
             </template>
             <template #credentials>
-                <collector-credentials :item="items[selectIndex[0]]" />
+                <collector-credentials :collector="selectedItem"
+                                       :total-count="crdState.totalCount"
+                                       :items="crdState.items"
+                                       :loading="crdState.loading"
+                                       :select-index="crdState.selectIndex"
+                                       :selected-items="crdState.selectedItems"
+                                       :verify-modal-visible.sync="crdState.verifyModalVisible"
+                                       @collectData="collectByCredential"
+                />
             </template>
         </p-tab>
         <p-tab v-else-if="selectIndex.length > 1" :tabs="multiTabs" :active-tab.sync="multiActiveTab">
@@ -90,7 +100,7 @@
                 >
                     <template #col-name-format="data">
                         <span class="name">
-                            <img class="icon" :src="data.item.tags.icon || defaultImg">
+                            <img class="icon" :src="getIcon(data)">
                             {{ data.value }}
                         </span>
                     </template>
@@ -101,9 +111,33 @@
             </template>
         </p-tab>
 
-        <collect-data-modal v-if="collectDataModalVisible"
-                            :visible.sync="collectDataModalVisible"
-                            :collector="items[selectIndex[0]]"
+        <collector-update-modal v-if="updateModalState.visible"
+                                :visible.sync="updateModalState.visible"
+                                :loading="updateModalState.loading"
+                                :collector="selectedItem"
+                                :plugin="updateModalState.plugin"
+                                :versions="updateModalState.versions"
+        />
+
+        <collect-data-modal v-if="collectDataState.modalVisible"
+                            :visible.sync="collectDataState.modalVisible"
+                            :collector="selectedItem"
+                            :loading="collectDataState.loading"
+                            :credentials="collectDataState.credentials"
+                            :is-credential-type="collectDataState.isCredentialType"
+        />
+
+        <p-table-check-modal v-if="checkModalState.mode"
+                             :visible.sync="checkModalState.visible"
+                             :header-title="checkModalState.title"
+                             :sub-title="checkModalState.subTitle"
+                             :theme-color="checkModalState.themeColor"
+                             :fields="multiFields"
+                             size="lg"
+                             centered
+                             :selectable="false"
+                             :items="multiItems"
+                             @confirm="checkModalState.checkModalConfirm"
         />
     </div>
 </template>
@@ -127,33 +161,30 @@ const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
 const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn');
 const PSearch = () => import('@/components/molecules/search/Search');
+const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
 
-
+const CollectorUpdateModal = () => import('@/views/inventory/collector/modules/CollectorUpdateModal.vue');
 const CollectDataModal = () => import('@/views/inventory/collector/modules/CollectDataModal.vue');
 const CollectorDetail = () => import('@/views/inventory/collector/modules/CollectorDetail');
 const CollectorCredentials = () => import('@/views/inventory/collector/modules/CollectorCredentials');
 
-const setCollectorState = () => {
-    const state = reactive({
-        selectIndex: [],
-        items: [],
-        sortSelectIndex: undefined,
-        multiItems: undefined,
-        loading: false,
-    });
-
-    state.sortSelectIndex = computed(() => {
-        const idxs = [...state.selectIndex];
+const collectorState = reactive({
+    selectIndex: [],
+    items: [],
+    sortSelectIndex: computed(() => {
+        const idxs = [...collectorState.selectIndex];
         idxs.sort((a, b) => a - b);
         return idxs;
-    });
+    }),
+    multiItems: computed(() => collectorState.sortSelectIndex.map(idx => collectorState.items[idx])),
+    loading: false,
+    getCollectors: () => {
+        collectorEventBus.$emit('getCollectorList');
+    },
+    selectedItem: computed(() => collectorState.items[collectorState.selectIndex[0]]),
+});
 
-    state.multiItems = computed(() => state.sortSelectIndex.map(idx => state.items[idx]));
-
-    return state;
-};
-
-const setTableData = (props, context, collectorState) => {
+const setTableData = (props, context) => {
     const state = reactive({
         sortBy: '',
         sortDesc: true,
@@ -174,11 +205,11 @@ const setTableData = (props, context, collectorState) => {
             ['name', 'COMMON.NAME'],
             ['state', 'COMMON.STATE'],
             ['priority', 'COMMON.PRIORITY'],
-        ], context.root),
+        ], context.parent),
         timestampFormatter,
         collectorStateFormatter,
         defaultImg: config.get('COLLECTOR_IMG'),
-        collectDataModalVisible: false,
+        getIcon: data => _.get(data, 'item.tags.icon', config.get('COLLECTOR_IMG')),
     });
 
     const nothingSelected = computed(() => collectorState.selectIndex.length === 0);
@@ -197,14 +228,9 @@ const setTableData = (props, context, collectorState) => {
         { type: 'item' }),
     });
 
-    const onClickCollectData = () => {
-        state.collectDataModalVisible = true;
-    };
-
     return {
         ...toRefs(state),
         dropdown,
-        onClickCollectData,
     };
 };
 
@@ -214,52 +240,133 @@ const setTabData = (props, context) => {
         tabs: makeTrItems([
             ['detail', 'PANEL.DETAILS', { keepAlive: true }],
             ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
-            ['jobs', 'PANEL.JOBS'],
-        ], context.root),
+        ], context.parent),
         multiActiveTab: 'selected',
         multiTabs: makeTrItems([
             ['selected', 'PANEL.SELECTED', { keepAlive: true }],
-        ], context.root),
+        ], context.parent),
     });
-
 
     return {
         ...toRefs(state),
     };
 };
 
-const setActions = (props, context) => {
-    const getCollectors = () => {
-        collectorEventBus.$emit('getCollectorList');
-    };
-    const onClickUpdate = () => {};
-    const onClickEnable = () => {};
-    const onClickDisable = () => {};
-    const onClickDelete = () => {};
+const crdState = reactive({
+    items: [],
+    totalCount: 0,
+    loading: true,
+    query: undefined,
+    selectIndex: [],
+    verifyModalVisible: false,
+    sortSelectIndex: computed(() => {
+        const idxs = [...crdState.selectIndex];
+        idxs.sort((a, b) => a - b);
+        return idxs;
+    }),
+    selectedItems: computed(() => crdState.sortSelectIndex.map(idx => crdState.items[idx])),
+});
 
+const collectDataState = reactive({
+    loading: false,
+    credentials: [],
+    isCredentialType: true,
+    modalVisible: false,
+});
+
+const crdVerifyState = reactive({});
+
+const checkModalState = reactive({
+    visible: false,
+    mode: '',
+    item: null,
+    confirmEventName: '',
+    title: '',
+    subTitle: '',
+    themeColor: '',
+    checkModalConfirm: () => {
+        collectorEventBus.$emit(checkModalState.confirmEventName);
+    },
+});
+
+const updateModalState = reactive({
+    visible: false,
+    loading: false,
+    versions: [],
+    plugin: {},
+});
+
+export const collectorSetup = (props, context, eventNames) => {
+    const state = reactive({
+        ...setTableData(props, context),
+        ...setTabData(props, context),
+        ...toRefs(collectorState),
+        crdState,
+        collectDataState,
+        crdVerifyState,
+        checkModalState,
+        updateModalState,
+    });
+
+    const onClickUpdate = () => {
+        state.updateModalState.visible = true;
+    };
+    const onClickEnable = () => {
+        state.checkModalState.mode = 'enable';
+        state.checkModalState.confirmEventName = 'enableCollectors';
+        /**
+         * TODO: translation
+         */
+        state.checkModalState.title = 'Enable Collector';
+        state.checkModalState.subTitle = 'Are you sure you want to ENABLE Selected Collector(s)?';
+        state.checkModalState.themeColor = 'primary';
+        state.checkModalState.visible = true;
+    };
+    const onClickDisable = () => {
+        state.checkModalState.mode = 'disable';
+        state.checkModalState.confirmEventName = 'disableCollectors';
+        /**
+         * TODO: translation
+         */
+        state.checkModalState.title = 'Disable Collector';
+        state.checkModalState.subTitle = 'Are you sure you want to DISABLE Selected Collector(s)?';
+        state.checkModalState.themeColor = 'primary';
+        state.checkModalState.visible = true;
+    };
+    const onClickDelete = () => {
+        state.checkModalState.mode = 'delete';
+        state.checkModalState.confirmEventName = 'deleteCollectors';
+        /**
+         * TODO: translation
+         */
+        state.checkModalState.title = 'Delete Collector';
+        state.checkModalState.subTitle = 'Are you sure you want to DELETE Selected Collector(s)?';
+        state.checkModalState.themeColor = 'alert';
+        state.checkModalState.visible = true;
+    };
+
+    const onClickCollectData = () => {
+        collectDataState.isCredentialType = !!state.selectedItem.plugin_info.credential_id;
+        collectDataState.credentials = [];
+        collectDataState.modalVisible = true;
+    };
+
+    const collectByCredential = (crd) => {
+        collectDataState.isCredentialType = true;
+        collectDataState.credentials = [crd];
+        collectDataState.modalVisible = true;
+    };
+
+    collectorState.getCollectors();
 
     return {
-        getCollectors,
+        ...toRefs(state),
         onClickUpdate,
         onClickEnable,
         onClickDisable,
         onClickDelete,
-    };
-};
-
-export const collectorSetup = (props, context) => {
-    const collectorState = setCollectorState(props, context);
-    const tableRefs = setTableData(props, context, collectorState);
-    const tabRefs = setTabData(props, context);
-    const actions = setActions(props, context);
-
-    actions.getCollectors();
-
-    return {
-        ...toRefs(collectorState),
-        ...tableRefs,
-        ...tabRefs,
-        ...actions,
+        onClickCollectData,
+        collectByCredential,
     };
 };
 
@@ -275,6 +382,8 @@ export default {
         PDropdownMenuBtn,
         PTab,
         PSearch,
+        CollectorUpdateModal,
+        PTableCheckModal,
         CollectDataModal,
         CollectorDetail,
         CollectorCredentials,

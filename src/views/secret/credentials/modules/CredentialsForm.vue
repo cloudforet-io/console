@@ -194,7 +194,6 @@ const setup = (props, context) => {
         vdApi.invalidState = newVdApi.invalidState;
         vdApi.fieldValidation = newVdApi.fieldValidation;
         vdApi.allValidation = newVdApi.allValidation;
-        vdApi.isAllValid = newVdApi.isAllValid;
     });
 
     const issueTypeSelectItems = [

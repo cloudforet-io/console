@@ -5,7 +5,6 @@
         </p-panel-top>
         <p-toolbox-table :items="items"
                          :fields="fields"
-                         selectable
                          sortable
                          hover
                          :border="false"
@@ -26,46 +25,43 @@
                          @changeSort="listCredentials"
         >
             <template #toolbox-left>
-                <p-button style-type="safe" @click="onClickVerify">
-                    {{ tr('COMMON.VERIFY') }}
-                </p-button>
+                <!--                <p-button style-type="safe" :disabled="selectedItems.length === 0"-->
+                <!--                          @click="onClickVerify"-->
+                <!--                >-->
+                <!--                    {{ tr('COMMON.VERIFY') }}-->
+                <!--                </p-button>-->
             </template>
             <template #col-credential_groups-format="{value}">
                 <span>
-                    <p-tag v-for="crdg in value" :key="crdg.credential_group_id" :deletable="false">
-                        {{ crdg }}
-                    </p-tag>
+                    <p-badge v-for="crdg in value"
+                             :key="crdg.credential_group_id"
+                             style-type="gray2"
+                    >
+                        {{ crdg.name }}
+                    </p-badge>
                 </span>
             </template>
             <template #col-created_at-format="{value}">
                 {{ timestampFormatter(value) }}
             </template>
+            <template #col-collect-format="{item}">
+                <p-button outline style-type="dark" @click.stop="$emit('collectData', item)">
+                    {{ tr('COMMON.COL_DATA') }}
+                </p-button>
+            </template>
         </p-toolbox-table>
 
-        <p-button-modal
-            :header-title="tr('COMMON.VERIFY')"
-            theme-color="safe"
-            centered
-            size="lg"
-            fade
-            backdrop
-            :footer-confirm-button-bind="{
-                styleType: 'safe',
-            }"
-            :footer-cancel-button-bind="{
-                styleType: 'safe',
-                outline: true
-            }"
-            :visible.sync="verifyModalVisible"
-            @confirm="onVerifyConfirm"
+        <credential-verify-modal v-if="verifyModalVisible" :visible="verifyModalVisible"
+                                 :items="selectedItems"
         />
     </div>
 </template>
 
 <script>
 import {
-    reactive, toRefs, computed, ref,
+    reactive, toRefs, computed, ref, watch,
 } from '@vue/composition-api';
+import _ from 'lodash';
 import { defaultQuery } from '@/lib/api';
 import { makeTrItems } from '@/lib/view-helper';
 import { timestampFormatter } from '@/lib/util';
@@ -74,78 +70,74 @@ import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
-import PContentModal from '@/components/organisms/modals/content-modal/ContentModal.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
+import { makeProxy } from '@/lib/compostion-util.ts';
 
-export const crdState = reactive({
-    items: [],
-    totalCount: 0,
-    loading: true,
-    query: undefined,
-    selectIndex: [],
-});
+const CredentialVerifyModal = () => import('@/views/inventory/collector/modules/CredentialVerifyModal.vue');
 
-const setTableRefs = (root) => {
-    const state = reactive({
-        fields: makeTrItems([
-            ['credential_id', 'COMMON.ID', { size: '400px' }],
-            ['name', 'COMMON.NAME', { size: '400px' }],
-            ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
-            ['credential_groups', 'COMMON.GROUP', { size: '800px', sortable: false }],
-            ['created_at', 'COMMON.CREATED', { size: '300px' }],
-        ], root),
-        sortBy: '',
-        sortDesc: '',
-        pageSize: 10,
-        thisPage: 1,
-        allPage: computed(() => Math.ceil(crdState.totalCount / state.pageSize) || 1),
-        verifyModalVisible: false,
-    });
-
-    crdState.query = computed(() => (defaultQuery(
-        state.thisPage, state.pageSize,
-        state.sortBy, state.sortDesc,
-    )));
-
-    const listCredentials = () => {
-        CollectorEventBus.$emit('listCredentials');
-    };
-
-    const onClickVerify = () => {
-        state.verifyModalVisible = true;
-        // CollectorEventBus.$emit('verifyCredentials');
-    };
-
-    const onVerifyConfirm = () => {};
-
-    listCredentials();
-
-    return {
-        ...toRefs(state),
-        listCredentials,
-        onClickVerify,
-        onVerifyConfirm,
-        timestampFormatter,
-    };
-};
 export default {
     name: 'CollectorCredentials',
     components: {
         PPanelTop,
         PToolboxTable,
         PButton,
-        PButtonModal,
-        PContentModal,
+        PBadge,
+        CredentialVerifyModal,
     },
     props: {
-        item: Object,
+        collector: Object,
+        totalCount: Number,
+        items: Array,
+        loading: Boolean,
+        selectIndex: Array,
+        selectedItems: Array,
+        /**
+         * sync prop
+         */
+        verifyModalVisible: Boolean,
     },
-    setup(props, { root }) {
-        const tableRefs = setTableRefs(root);
+    setup(props, { parent, emit }) {
+        const state = reactive({
+            fields: [
+                ...makeTrItems([
+                    ['credential_id', 'COMMON.ID', { size: '400px' }],
+                    ['name', 'COMMON.NAME', { size: '400px' }],
+                    ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
+                    ['credential_groups', 'COMMON.GROUP', { size: '800px', sortable: false }],
+                    ['created_at', 'COMMON.CREATED', { size: '300px' }],
+                ], parent),
+                { name: 'collect', label: ' ', sortable: false }],
+            sortBy: '',
+            sortDesc: '',
+            pageSize: 10,
+            thisPage: 1,
+            allPage: computed(() => Math.ceil(props.totalCount / state.pageSize) || 1),
+        });
+
+        const query = computed(() => (defaultQuery(
+            state.thisPage, state.pageSize,
+            state.sortBy, state.sortDesc,
+        )));
+
+        const listCredentials = () => {
+            CollectorEventBus.$emit('listCredentialsByCollector', query.value);
+        };
+
+        const onClickVerify = () => {
+            emit('verifyModalVisible:update', true);
+        };
+
+        listCredentials();
+
+        watch(() => props.collector, () => {
+            listCredentials();
+        });
 
         return {
-            ...toRefs(crdState),
-            ...tableRefs,
+            ...toRefs(state),
+            listCredentials,
+            onClickVerify,
+            timestampFormatter,
         };
     },
 };
