@@ -163,7 +163,6 @@ export const Util = {
             let returnTree = [];
             if (d.hasOwnProperty('items') && d.items.length > 0) {
                 d.items.forEach((curItem) => {
-                    this.consoleLogEnv('Tree each: ', curItem);
                     const treeItem = this.getSelectedNode(curItem, f, true);
                     returnTree.push(treeItem);
                 });

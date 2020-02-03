@@ -1,4 +1,4 @@
-import {toRefs, reactive } from '@vue/composition-api';
+import { toRefs, reactive } from '@vue/composition-api';
 import { object, number } from '@storybook/addon-knobs/vue';
 import PBreadcrumb from './Breadcrumb.vue';
 import md from './Breadcrumb.md';
