@@ -5,7 +5,7 @@
                 {{ value ? timestampFormatter(value) : '' }}
             </template>
         </p-info-panel>
-        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="tagConfirmEvent" />
+        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="confirm" />
     </div>
 </template>
 

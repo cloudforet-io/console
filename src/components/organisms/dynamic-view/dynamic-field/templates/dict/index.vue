@@ -1,11 +1,11 @@
 <script lang="ts">
 import _ from 'lodash';
-import PBadge from '@/components/atoms/badges/Badge.vue';
+import PDictList from '@/components/molecules/lists/DictList.vue';
 
 export default {
-    name: 'PDynamicFieldBadge',
+    name: 'PDynamicFieldDict',
     functional: true,
-    components: { PBadge },
+    components: { PDictList },
     props: {
         // eslint-disable-next-line camelcase,vue/prop-name-casing
         view_option: {
@@ -13,18 +13,17 @@ export default {
             default: () => {},
         },
         data: {
-            type: String,
+            type: Object,
             required: true,
         },
     },
     render(h, { props }) {
-        return h(PBadge, {
+        console.log('dy dictlist', props.data);
+        return h(PDictList, {
             props: {
-                backgroundColor: _.get(props.view_option, ['background_color'], null),
-                textColor: _.get(props.view_option, ['text_color'], null),
+                dict: props.data,
             },
-        },
-        props.data);
+        });
     },
 };
 </script>

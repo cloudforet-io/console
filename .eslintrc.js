@@ -8,6 +8,7 @@ module.exports = {
   extends: [
     'plugin:vue/recommended',
     '@vue/airbnb',
+    '@vue/typescript'
   ],
 
   rules: {
@@ -48,10 +49,4 @@ module.exports = {
     parser: '@typescript-eslint/parser',
     ecmaVersion: 2018,
   },
-
-  'extends': [
-    'plugin:vue/recommended',
-    '@vue/airbnb',
-    '@vue/typescript'
-  ]
 }

@@ -59,17 +59,18 @@
                 />
             </template>
             <template #credential="{tabName}">
-                <PCdgCredential
-                    :items="cdgData.items"
-                    :sort-by.sync="cdgData.sortBy"
-                    :sort-desc.sync="cdgData.sortDesc"
-                    :page-size.sync="cdgData.pageSize"
-                    :all-page="cdgData.allPage"
-                    :this-page.sync="cdgData.thisPage"
-                    :loading="cdgData.loading"
-                    :col-copy="true"
-                    :get-cd-list="getCdList"
-                    :credential-group-id="getFirstSelectedCdgId"
+                <PCdgCredential ref="cdgCredential"
+                                :items="cdgData.items"
+                                :sort-by.sync="cdgData.sortBy"
+                                :sort-desc.sync="cdgData.sortDesc"
+                                :page-size.sync="cdgData.pageSize"
+                                :all-page="cdgData.allPage"
+                                :this-page.sync="cdgData.thisPage"
+                                :loading="cdgData.loading"
+                                :col-copy="true"
+                                :get-cd-list="getCdList"
+                                :delete-cd="deleteCd"
+                                :credential-group-id="getFirstSelectedCdgId"
                 />
             </template>
         </PTab>
@@ -88,7 +89,7 @@
             Select a Credential Group above for details.
         </div>
         <p-table-check-modal
-            v-if="!!checkTableModalState.mode"
+            v-if="!!checkTableModalState.mode && checkTableModalState.visible"
             :visible.sync="checkTableModalState.visible"
             :header-title="checkTableModalState.title"
             :sub-title="checkTableModalState.subTitle"
@@ -164,6 +165,7 @@ export const eventNames = {
     createCdg: '',
     deleteCdg: '',
     updateCdg: '',
+    deleteCd: '',
 };
 
 export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
@@ -221,19 +223,19 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         });
         return ids;
     });
-    const getFirstSelectedCdgId = computed(() => (getSelectedCdgIds.value.length >= 1 ? getSelectedCdgIds[0] : ''));
+    const getFirstSelectedCdgId = computed(() => (getSelectedCdgIds.value.length >= 1 ? getSelectedCdgIds.value[0] : ''));
 
     const cdgFormState = reactive({
         visible: false,
         mode: '',
         headerTitle: '',
-        item: null,
+        item: undefined,
         eventNames: '',
     });
     const clickCreate = () => {
         cdgFormState.updateMode = false;
         cdgFormState.headerTitle = 'Create Credentials Group';
-        cdgFormState.item = null;
+        cdgFormState.item = undefined;
         cdgFormState.eventName = eventNames.createCdg;
         cdgFormState.visible = true;
     };
@@ -290,7 +292,7 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation) => {
         checkTableModalState.mode = 'delete';
         checkTableModalState.confirmEventName = eventNames.deleteCdg;
         checkTableModalState.title = 'Delete Credentials Group';
-        checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
+        checkTableModalState.subTitle = 'Are you sure you want to delete selected Credential Group below?';
         checkTableModalState.themeColor = 'alert';
         checkTableModalState.visible = true;
     };

@@ -23,12 +23,12 @@
                                         <p-text-input
                                             v-model="formState.name"
                                             type="name"
-                                            @input="checkCdgName"
-
                                             :class="{
                                                 'form-control':true,
                                                 'is-invalid':invalid
                                             }"
+
+                                            @input="checkCdgName"
                                         />
                                     </p-col>
                                 </p-row>
@@ -84,15 +84,14 @@ const setup = (props, context) => {
     const formState = reactive({
         name: '',
         tags: {},
+        updateMode: props.updateMode,
+        originName: props.item.name,
         ...props.item,
     });
-    const createCdgValidations = {
+    const cdgValidations = {
         name: [requiredValidation(), props.cdgNameValidation],
     };
-    const updateCdgValidations = {
-        name: [requiredValidation(), props.cdgNameValidation],
-    };
-    const validateAPI = formValidation(formState, props.updateMode ? updateCdgValidations : createCdgValidations);
+    const validateAPI = formValidation(formState, cdgValidations);
     const checkCdgName = async () => {
         const result = await validateAPI.fieldValidation('name');
         return result;
@@ -102,13 +101,14 @@ const setup = (props, context) => {
         if (result) {
             const data = {
                 credential_group_id: formState.cdgId,
-                name: formState.name,
             };
             if (props.updateMode) {
-                data.credential_group_id = formState.cdgId,
-                data.name = formState.name;
+                if (formState.originName) {
+                    data.name = formState.name;
+                } else {
+                    data.name = formState.name;
+                }
             }
-            data.name = formState.name;
             ['name', 'tags'].forEach((key) => {
                 if (formState[key]) {
                     data[key] = formState[key];
