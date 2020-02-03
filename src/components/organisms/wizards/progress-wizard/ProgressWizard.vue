@@ -22,9 +22,9 @@
                     <p-i name="ic_alert" height="1rem" width="1rem" />
                     {{ activeTab.alert }}
                 </aside>
-                <aside v-if="activeTab.warning" class="caution">
+                <aside v-if="activeTab.warning" class="caution warning">
                     <p-i name="ic_alert" height="1rem" width="1rem"
-                         :color="warningColor"
+                         color="inherit"
                     />
                     {{ activeTab.warning }}
                 </aside>
@@ -57,19 +57,16 @@
                         Cancel
                     </p-button>
                 </p-col>
-                <p-col :flex-grow="0">
+                <p-col :flex-grow="0" class="nav-btn-box">
                     <p-button v-if="!isFirstTab"
                               outline style-type="secondary" size="lg"
-                              @mouseenter="onNavBtnHover('prev', true)"
-                              @mouseleave="onNavBtnHover('prev', false)"
                               @click="onClickPrev"
                     >
                         <p-i name="ic_back" color="transparent inherit" />Prev
                     </p-button>
-                    <p-button v-if="!isLastTab" outline style-type="secondary"
+                    <p-button v-if="!isLastTab"
+                              outline style-type="secondary"
                               size="lg"
-                              @mouseenter="onNavBtnHover('next', true)"
-                              @mouseleave="onNavBtnHover('next', false)"
                               @click="onClickNext"
                     >
                         Next<p-i name="ic_back" color="transparent inherit" dir="down" />
@@ -91,7 +88,6 @@ import {
     ref, toRefs, reactive, computed,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
-import { secondary, white, other1 } from '@/styles/_variables.scss';
 
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
 import PProgressTabBar from '@/components/molecules/tabs/progress-tab-bar/ProgressTabBar.vue';
@@ -101,22 +97,6 @@ import PButton from '@/components/atoms/buttons/Button.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 
-const setStyles = () => {
-    const warningColor = ref(other1);
-    const btnColor = ref({
-        prev: secondary,
-        next: secondary,
-    });
-    const onNavBtnHover = (type, isHovered) => {
-        btnColor.value[type] = isHovered ? white : secondary;
-    };
-
-    return {
-        warningColor,
-        btnColor,
-        onNavBtnHover,
-    };
-};
 
 const setPagination = (props, state, emit) => {
     const isFirstTab = computed(() => state.proxyActiveIdx - 1 < 0);
@@ -193,7 +173,6 @@ export default {
         return {
             ...toRefs(state),
             activeTab,
-            ...setStyles(),
             ...setPagination(props, state, emit),
         };
     },
@@ -222,7 +201,7 @@ export default {
         .p-i-icon {
             margin-right: .5rem;
         }
-        &.warning-panel {
+        &.warning {
             color: $other1;
         }
     }
@@ -236,6 +215,11 @@ export default {
         display: flex;
         flex-grow: 1;
         justify-content: flex-end;
+    }
+    .nav-btn-box {
+        .btn {
+            margin-left: 1.5rem;
+        }
     }
 }
 </style>
