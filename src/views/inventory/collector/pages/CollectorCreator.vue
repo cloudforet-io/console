@@ -23,6 +23,7 @@ export default {
 
             try {
                 const res = await context.parent.$http.post(url, params);
+                state.crdState.selectIndex = [];
                 state.crdState.totalCount = res.data.total_count;
                 state.crdState.items = res.data.results;
             } catch (e) {

@@ -2,6 +2,13 @@
     <div>
         <p-panel-top>
             {{ tr('PANEL.CREDENTIAL') }}
+            <template #head>
+                <router-link class="credential-btn" to="/secret" target="_blank">
+                    <p-button outline style-type="dark">
+                        {{ tr('INVENTORY.MANAGE_CRD') }}
+                    </p-button>
+                </router-link>
+            </template>
         </p-panel-top>
         <p-toolbox-table :items="items"
                          :fields="fields"
@@ -71,7 +78,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
-import { makeProxy } from '@/lib/compostion-util.ts';
+import { makeProxy } from '@/lib/compostion-util';
 
 const CredentialVerifyModal = () => import('@/views/inventory/collector/modules/CredentialVerifyModal.vue');
 
@@ -96,7 +103,7 @@ export default {
          */
         verifyModalVisible: Boolean,
     },
-    setup(props, { parent, emit }) {
+    setup(props, { parent, emit, root }) {
         const state = reactive({
             fields: [
                 ...makeTrItems([
@@ -112,6 +119,7 @@ export default {
             pageSize: 10,
             thisPage: 1,
             allPage: computed(() => Math.ceil(props.totalCount / state.pageSize) || 1),
+            onClickVerify() { emit('verifyModalVisible:update', true); },
         });
 
         const query = computed(() => (defaultQuery(
@@ -123,9 +131,6 @@ export default {
             CollectorEventBus.$emit('listCredentialsByCollector', query.value);
         };
 
-        const onClickVerify = () => {
-            emit('verifyModalVisible:update', true);
-        };
 
         listCredentials();
 
@@ -136,7 +141,6 @@ export default {
         return {
             ...toRefs(state),
             listCredentials,
-            onClickVerify,
             timestampFormatter,
         };
     },
@@ -144,5 +148,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.credential-btn {
+    margin-left: auto;
+}
 </style>

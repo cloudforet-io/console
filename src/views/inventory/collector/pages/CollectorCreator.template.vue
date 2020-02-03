@@ -24,6 +24,13 @@
                                      @changeValidState="updateTabInvalid(0, $event)"
                 />
             </template>
+            <template #step-append-credentials>
+                <router-link class="new-crd-btn" to="/secret" target="_blank">
+                    <p-button outline style-type="dark">
+                        {{ tr('INVENTORY.CRT_CRD') }}
+                    </p-button>
+                </router-link>
+            </template>
             <template #contents-credentials>
                 <choose-credentials ref="crd"
                                     :items="crdState.items"
@@ -51,9 +58,9 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PProgressWizard from '@/components/organisms/wizards/progress-wizard/ProgressWizard.vue';
 
+const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup.vue');
 const ConfigureCollector = () => import('@/views/inventory/collector/modules/ConfigureCollector.vue');
 const ChooseCredentials = () => import('@/views/inventory/collector/modules/ChooseCredentials.vue');
-const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup.vue');
 
 const getCrdState = () => reactive({
     items: [],
@@ -170,6 +177,9 @@ export default {
         color: $primary2;
         text-align: left;
         padding-left: 0;
+    }
+    .new-crd-btn {
+
     }
 }
 </style>
