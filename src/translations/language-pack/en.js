@@ -272,6 +272,8 @@ export const en = {
         UPT_COL: 'Update Collector',
         ENABLE_COL: 'Enable Collectors',
         DISABLE_COL: 'Disable Collectors',
+        MANAGE_CRD: 'Manage Credentials',
+        CRT_CRD: 'Create new credentials',
     },
     SECRET: {
         JASON_ALERT: 'Please, Check Json Format (Use double quotation( \\" ) mark instead of single quotation (\').',

@@ -272,6 +272,8 @@ export const ko = {
         UPT_COL: '컬렉터 수정',
         ENABLE_COL: '컬렉터 활성화',
         DISABLE_COL: '컬렉터 비활성화',
+        MANAGE_CRD: '암호 관리',
+        CRT_CRD: '새로운 암호 생성',
     },
     SECRET: {
         JASON_ALERT: "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (\') )",
