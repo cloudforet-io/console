@@ -1,11 +1,20 @@
 <template>
-    <component :is="component" :view_option="view_option" :data="data" />
+    <component :is="component"
+               :name="name"
+               :data_source="data_source"
+               :data="data"
+               :root-mode="rootMode"
+               :api-handler="apiHandler"
+    />
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase,vue/prop-name-casing */
+
 import {
     computed, createComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
+import { DynamicAPI } from '@/lib/api';
 
 
 interface State {
@@ -14,24 +23,35 @@ interface State {
 }
 
 export default createComponent({
-    name: 'PDynamicField',
+    name: 'PDynamicView',
     props: {
-        // eslint-disable-next-line camelcase
+        name: {
+            type: String,
+            default: '',
+        },
         view_type: {
             type: String,
             required: true,
         },
-        // eslint-disable-next-line camelcase,vue/prop-name-casing
-        view_option: {
-            type: Object,
-            default: () => {},
+        data_source: {
+            type: Array,
+            required: true,
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
-            default: '',
+            type: Object,
+            default: () => ({}),
+        },
+        rootMode: {
+            type: Boolean,
+            default: false,
+        },
+        apiHandler: {
+            type: Object,
+            default: null,
         },
     },
     setup(props:any) {
+        // noinspection TypeScriptCheckImport
         const state = reactive<any>({
             component: null,
             loader: computed<()=>Promise<any>>(() => () => import(`./templates/${props.view_type}/index.vue`)),
@@ -43,7 +63,7 @@ export default createComponent({
                 })
                 .catch(() => {
                     // eslint-disable-next-line import/no-unresolved
-                    state.component = () => import('./templates/text/index.vue');
+                    state.component = () => import('./templates/item/index.vue');
                 });
         });
         return {

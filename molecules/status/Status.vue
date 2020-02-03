@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import PI from '@/components/atoms/icons/PI';
-import PLabel from '@/components/atoms/labels/Label';
+import PI from '@/components/atoms/icons/PI.vue';
+import PLabel from '@/components/atoms/labels/Label.vue';
 
 export default {
     name: 'PStatus',
