@@ -25,7 +25,7 @@ import PI from '@/components/atoms/icons/PI.vue';
  * @param eventName {string}
  * @returns {UnwrapRef<{deleteTag: *, tags: *, addTag: *}>}
  */
-export const tagList = (proxyTags, checkDuplicate = true, eventBuse, eventName) => {
+export const tagList = (proxyTags, checkDuplicate = true, eventBuse, eventName, addTagCallBack) => {
     const tags = proxyTags || ref([]);
     if (!tags.value) tags.value = [];
 
@@ -57,6 +57,7 @@ export const tagList = (proxyTags, checkDuplicate = true, eventBuse, eventName) 
         updatedTags.push(val);
         tags.value = updatedTags;
         if (eventBuse) { eventBuse.$emit(eventName, tags.value); }
+        if (addTagCallBack) { addTagCallBack(tags.value); }
     };
 
     return reactive({
