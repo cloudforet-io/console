@@ -164,6 +164,7 @@ export default {
 
 <style lang="scss" scoped>
 .collector-creator-container {
+    padding: 1.75rem 2rem 2rem 2rem;
     .back-btn {
         margin-bottom: .75rem;
         color: $primary2;
