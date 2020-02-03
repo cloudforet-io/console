@@ -1,5 +1,5 @@
 <template>
-    <div class="row" :style="responsiveStyle">
+    <div class="row summary-padding" :style="responsiveStyle">
         <p-info-panel v-show="isVisible"
                       :info-title="topPanelTitle"
                       :item="item"
@@ -15,8 +15,8 @@
 
 <script>
 import _ from 'lodash';
-import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel';
+import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 
 export default {
     name: 'ProjectSummary',
@@ -112,6 +112,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .summary-padding {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
   .quote {
     border-left: 0.5em solid #415ee1;
     padding: 0.5em;
