@@ -88,9 +88,8 @@ export default {
             onClickReset: () => {
                 if (props.loading) return;
 
-                state.options = {};
-                state.priority = 0;
-                state.crdMenuIdx = 0;
+                state.options = _.get(props.collector, 'plugin_info.options', {});
+                state.priority = _.get(props.collector, 'priority', 10);
             },
             confirmBtnBind: computed(() => {
                 const defaultStyle = { style: { padding: 0 } };
@@ -99,16 +98,19 @@ export default {
             }),
             onClickConfirm: async () => {
                 if (await refs.confRef.vdApi.allValidation()) {
-                    CollectorEventBus.$emit('updateCollector', {
+                    const params = {
                         // eslint-disable-next-line camelcase
                         collector_id: props.collector.collector_id,
                         // eslint-disable-next-line camelcase
                         plugin_info: {
                             version: state.selectedVersion,
-                            options: state.options,
                         },
                         priority: state.priority,
-                    });
+                    };
+
+                    if (!_.isEmpty(state.options)) params.plugin_info.options = state.options;
+
+                    CollectorEventBus.$emit('updateCollector', params);
                 }
             },
         });

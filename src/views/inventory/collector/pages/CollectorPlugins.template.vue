@@ -164,6 +164,7 @@ const setFilters = (pluginListState, router) => {
 
     return {
         filterTools,
+        searchText,
         goBack: () => {
             router.push('/inventory/collector');
         },
@@ -173,24 +174,23 @@ const setFilters = (pluginListState, router) => {
         },
         onDeleteTag: (idx) => {
             filterTools.deleteTag(idx);
-            pluginListState.listPlugins(filterTools.tags);
+            pluginListState.listPlugins();
         },
     };
 };
 
 const setQueryState = (state) => {
     const queryState = reactive({
-        query: undefined,
+        query: computed(() => (defaultQuery(
+            state.thisPage, state.pageSize,
+            state.sortBy, true,
+            state.searchText, queryState.searchQueries,
+        ))),
         searchQueries: computed(() => state.filterTools.tags.map(filter => new SearchQuery('labels', '=', filter))),
     });
 
     state.sortBy = computed(() => state.sortMenu[state.sortByIdx].name);
 
-    queryState.query = computed(() => (defaultQuery(
-        state.thisPage, state.pageSize,
-        state.sortBy, true,
-        state.searchText, queryState.searchQueries,
-    )));
 
     return queryState;
 };
