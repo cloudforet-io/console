@@ -12,25 +12,20 @@
                   :style="draggerStyle"
                   @mousedown="onMousedown"
             >
-                <slot name="dragger" />
-                <p-i v-if="!$slots.dragger"
-                     :color="'transparent primary3'"
-                     :width="'1.5rem'"
-                     :height="'1.5rem'"
-                     :name="'btn_height-modifier'"
-                />
+                <slot name="dragger">
+                    <p-i color="transparent inherit"
+                         width="1.5rem"
+                         height="1.5rem"
+                         name="btn_height-modifier"
+                    />
+                </slot>
             </span>
-
-            <div class="line right"
-                 :class="{ 'colored': line }"
-                 :style="lineStyle"
-            />
         </div>
     </div>
 </template>
 
 <script>
-import PI from '@/components/atoms/icons/PI';
+import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     name: 'HorizontalLayout',
@@ -38,7 +33,7 @@ export default {
     props: {
         line: {
             type: Boolean,
-            default: true,
+            default: false,
         },
         draggerSize: {
             type: String,
@@ -123,9 +118,6 @@ export default {
             }
             &.left {
                 left: 0;
-            }
-            &.right {
-                right: 0;
             }
         }
         .dragger {
