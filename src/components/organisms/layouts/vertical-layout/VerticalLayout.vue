@@ -6,7 +6,7 @@
         <div :style="{height: height}"
              :class="{'content-container':true, left: transitionEffect, 'overflow-effect': true}"
         >
-            <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
+            <slot name="leftContainer" :width="`${leftContainerWidth}px`" :widthRaw="leftContainerWidth" />
         </div>
 
         <div class="dragger-container" :class="{ line: line }" :style="{

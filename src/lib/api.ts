@@ -1,13 +1,17 @@
 /* eslint-disable camelcase */
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
 import VueCookies from 'vue-cookies';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
-import { VNode } from 'vue';
 import {
     computed, reactive, Ref, ref,
 } from '@vue/composition-api';
-import { VueInstance } from '@vue/composition-api/dist/types/vue';
+
+// @ts-ignore
+import { tagList } from '@/components/molecules/tags/Tag.vue';
+
+//  eslint-disable-next-line import/no-cycle
+import { getKeys, getSuggest, baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 class APIError extends Error {
     public status: number;
@@ -279,6 +283,9 @@ export abstract class DynamicAPI {
 
 interface TableState {
     items:any[];
+    selectIndex?:number[];
+    sortBy?:string;
+    sortDesc?:boolean;
     pageSize: number;
     allPage: number;
     thisPage: number;
@@ -309,11 +316,16 @@ export class SubDataAPI extends DynamicAPI {
         )));
     }
 
+    public async requestData(data:any) {
+        const res = await this.$http.post(this.url, data);
+        return res;
+    }
+
     public getData = async () => {
         this.state.loading = true;
         this.state.items = [];
 
-        const res = await this.$http.post(this.url, {
+        const res = await this.requestData({
             query: this.query.value,
             key_path: this.keyPath.value,
             [this.idKey]: this.id.value,
@@ -336,11 +348,72 @@ export class MockSubDataAPI extends SubDataAPI {
         this.state.loading = false;
     }
 
-    public getData= async () => {
+    public async requestData(data:any) {
+        setTimeout(() => {}, 1000);
+        return { data: { results: this.items, total_count: 1 } } as AxiosResponse<any>;
+    }
+}
+
+type AutoCompleteData = [string, any[]];
+type ACFunction = ()=>AutoCompleteData
+interface ACHandlerMap {
+    key: ACFunction[];
+    value:ACFunction[];
+
+}
+
+export class MainTableACHandler extends baseAutocompleteHandler {
+    constructor(public parent:HttpInstance, keys:string[] = [], suggestKeys:string[] = []) {
+        super();
+        (this.handlerMap as ACHandlerMap) = {
+            key: [getKeys(keys) as ACFunction, getSuggest(suggestKeys) as ACFunction],
+            value: [],
+        };
+    }
+}
+
+
+export class MainTableAPI extends DynamicAPI {
+    public state :TableState;
+
+    public queryListTools ;
+
+    public acHandler:MainTableACHandler;
+
+    private query:Ref<object>;
+
+    constructor(public parent:HttpInstance, private url:string, keys?:string[]) {
+        super();
+        this.state = reactive({
+            items: [],
+            selectIndex: [],
+            sortBy: '',
+            sortDesc: true,
+            pageSize: 15,
+            allPage: 1,
+            thisPage: 1,
+            searchText: '',
+            loading: false,
+        });
+        this.acHandler = new MainTableACHandler(parent, keys || ['name'], keys || ['name']);
+        this.queryListTools = tagList(null, true, undefined, undefined, this.getData);
+        this.query = computed(() => (defaultQuery(
+            this.state.thisPage, this.state.pageSize,
+            this.state.sortBy, this.state.sortDesc, undefined,
+            this.queryListTools.tags.value,
+        )));
+    }
+
+    public getData = async () => {
         this.state.loading = true;
-        this.state.allPage = 1;
         this.state.items = [];
 
-        setTimeout(this.fakeData, 1000);
+        const res = await this.$http.post(this.url, {
+            query: this.query.value,
+        });
+        this.state.items = res.data.results;
+        this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
+        this.state.selectIndex = [];
+        this.state.loading = false;
     }
 }
