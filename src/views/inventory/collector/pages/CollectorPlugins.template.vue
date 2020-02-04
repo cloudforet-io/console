@@ -187,10 +187,8 @@ const setQueryState = (state) => {
             state.searchText, queryState.searchQueries,
         ))),
         searchQueries: computed(() => state.filterTools.tags.map(filter => new SearchQuery('labels', '=', filter))),
+        sortBy: computed(() => state.sortMenu[state.sortByIdx].name),
     });
-
-    state.sortBy = computed(() => state.sortMenu[state.sortByIdx].name);
-
 
     return queryState;
 };
