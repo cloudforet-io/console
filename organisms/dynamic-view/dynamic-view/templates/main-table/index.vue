@@ -2,12 +2,13 @@
     <p-toolbox-table
         :items="apiHandler.state.items"
         :fields="fields"
-        :selectable="false"
-        :sortable="false"
+        :selectable="true"
+        :sortable="true"
         :hover="true"
         :all-page="apiHandler.state.allPage"
         :this-page.sync="apiHandler.state.thisPage"
         :page-size.sync="apiHandler.state.pageSize"
+        :select-index.sync="apiHandler.state.selectIndex"
         :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
         :setting-visible="false"
         :shadow="true"
@@ -23,12 +24,12 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item" style="width: 50%">
-                <PQuerySearchBar  :search-text.sync="apiHandler.state.searchText" :autocomplete-handler="apiHandler.querySearchHandler"
+                <PQuerySearchBar :search-text.sync="apiHandler.state.searchText" :autocomplete-handler="apiHandler.acHandler"
                                  @newQuery="apiHandler.queryListTools.addTag"
                 />
             </div>
         </template>
-        <template v-if="apiHandler.querySearchHandler&&apiHandler.queryListTools.tags.length !== 0" slot="toolbox-bottom">
+        <template v-if="apiHandler.acHandler&&apiHandler.queryListTools.tags.length !== 0" slot="toolbox-bottom">
             <p-col :col="12" style="margin-bottom: .5rem;">
                 <p-hr style="width: 100%;" />
                 <p-row style="margin-top: .5rem;">
@@ -55,12 +56,20 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { createComponent, computed, Ref } from '@vue/composition-api';
+import {
+    createComponent, computed, Ref, reactive,
+} from '@vue/composition-api';
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
-import PSearch from '@/components/molecules/search/Search.vue';
-import { SubDataAPI } from '@/lib/api';
+import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
+import { MainTableAPI, SubDataAPI } from '@/lib/api';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PTag from '@/components/molecules/tags/Tag.vue';
+import { makeTrItems } from '@/lib/view-helper';
 
 interface DataSourceType {
     name:string;
@@ -73,6 +82,7 @@ interface Props {
     data_source: DataSourceType[];
     data: any;
     rootMode:boolean;
+    apiHandler:MainTableAPI;
 }
 
 interface SlotBind {
@@ -93,7 +103,12 @@ export default createComponent({
     components: {
         PDynamicField,
         PToolboxTable,
-        PSearch,
+        PQuerySearchBar,
+        PRow,
+        PCol,
+        PHr,
+        PIconButton,
+        PTag,
     },
     props: {
         name: {
@@ -106,10 +121,10 @@ export default createComponent({
         },
         data: {
             type: [Object],
-            required: true,
+            default: () => ({}),
         },
         apiHandler: {
-            type: SubDataAPI,
+            type: MainTableAPI,
             required: true,
         },
         rootMode: {
