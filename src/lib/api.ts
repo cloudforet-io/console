@@ -8,6 +8,7 @@ import {
 } from '@vue/composition-api';
 
 // @ts-ignore
+import { debug } from 'webpack';
 import { tagList } from '@/components/molecules/tags/Tag.vue';
 
 //  eslint-disable-next-line import/no-cycle
@@ -441,14 +442,18 @@ export class BaseQuerySearchTableAPI extends DynamicAPI {
     public getData = async () => {
         this.state.loading = true;
         this.state.items = [];
-        console.log(this.query.value);
-        console.log(this.queryListTools.tags);
-        const res = await this.$http.post(this.url, {
-            query: this.query.value,
-        });
-        this.state.items = res.data.results;
-        this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
         this.state.selectIndex = [];
+
+        try {
+            const res = await this.$http.post(this.url, {
+                query: this.query.value,
+            });
+            this.state.items = res.data.results;
+            this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
+        } catch (e) {
+            console.debug('request fail', e);
+        }
+
         this.state.loading = false;
     }
 }
