@@ -112,10 +112,10 @@ export default {
                 state.loading = false;
             }
         };
-        const requestCdList = async () => {
+        const requestCdList = async (item) => {
             state.cdgData.loading = true;
             state.cdgData.items = [];
-            const cdgId = state.items[0].credential_group_id
+            const cdgId = item;
             const param = {
                 query: cdRequestState.query,
                 // eslint-disable-next-line camelcase
