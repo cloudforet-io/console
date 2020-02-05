@@ -1,27 +1,24 @@
 <template>
     <div>
-        <p-info-panel info-title="Base Information" :defs="baseDefs" :item="item">
-            <template #def-created_at-format="{value}">
-                {{ value ? timestampFormatter(value) : '' }}
-            </template>
-        </p-info-panel>
+        <p-dynamic-view name="Base Information" view_type="item" :data="item||{}"
+                        :data_source="baseDataSource" :root-mode="true"
+        />
         <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="confirm" />
     </div>
 </template>
 
 <script>
+/* eslint-disable camelcase */
 import { ref, watch } from '@vue/composition-api';
-import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
-import { timestampFormatter, arrayFormatter } from '@/lib/util';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { makeTrItems } from '@/lib/view-helper';
+import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 
 export default {
     name: 'PCdgDetail',
     components: {
-        PInfoPanel, PDictPanel,
+        PDictPanel, PDynamicView,
     },
     props: {
         item: {
@@ -32,11 +29,21 @@ export default {
         tagResetEvent: String,
     },
     setup(props, { parent }) {
-        const baseDefs = makeTrItems([
-            ['credential_group_id', 'COMMON.ID'],
-            ['name', 'COMMON.NAME'],
-            ['created_at', 'COMMON.CREATE'],
-        ], parent, { copyFlag: true });
+        const baseDataSource = [
+            { name: 'ID', key: 'credential_group_id' },
+            { name: 'Name', key: 'name' },
+            {
+                name: 'Created at',
+                key: 'created_at.seconds',
+                view_type: 'datetime',
+                view_option: {
+                    source_type: 'timestamp',
+                    source_format: 'seconds',
+                    display_format: 'YYYY-MM-DD HH:MM:SS z',
+                },
+            },
+        ];
+
         const tags = ref({ ...props.tags });
         watch(() => props.item, (value) => {
             tags.value = value.tags || {};
@@ -47,14 +54,12 @@ export default {
         };
         mountBusEvent(cdgEventBus, props.tagResetEvent, resetTag);
         return {
-            baseDefs,
+            baseDataSource,
             tags,
             dictPanel,
             confirm(...event) {
                 cdgEventBus.$emit(props.tagConfirmEvent, props.item.credential_group_id, ...event);
             },
-            timestampFormatter,
-            arrayFormatter,
         };
     },
 };
