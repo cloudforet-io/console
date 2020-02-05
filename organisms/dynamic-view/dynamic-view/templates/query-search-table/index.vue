@@ -5,31 +5,35 @@
         :selectable="true"
         :sortable="true"
         :hover="true"
+        :shadow="true"
+        :border="true"
+        :padding="true"
+        :draggable="true"
+        :sort-by.sync="apiHandler.state.sortBy"
+        :sort-desc.sync="apiHandler.state.sortDesc"
         :all-page="apiHandler.state.allPage"
         :this-page.sync="apiHandler.state.thisPage"
         :page-size.sync="apiHandler.state.pageSize"
         :select-index.sync="apiHandler.state.selectIndex"
         :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
         :setting-visible="false"
-        :shadow="true"
-        :border="true"
-        :padding="true"
-        :loading="apiHandler.state.loading"
+        :loading.sync="apiHandler.state.loading"
         :use-spinner-loading="true"
         :use-cursor-loading="true"
         @changePageSize="apiHandler.getData"
         @changePageNumber="apiHandler.getData"
         @clickRefresh="apiHandler.getData"
+        @changeSort="apiHandler.getData"
     >
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item" style="width: 50%">
-                <PQuerySearchBar :search-text.sync="apiHandler.state.searchText" :autocomplete-handler="apiHandler.acHandler"
+                <PQuerySearchBar :search-text.sync="apiHandler.state.searchText" :autocomplete-handler="apiHandler.state.acHandler"
                                  @newQuery="apiHandler.queryListTools.addTag"
                 />
             </div>
         </template>
-        <template v-if="apiHandler.acHandler&&apiHandler.queryListTools.tags.length !== 0" slot="toolbox-bottom">
+        <template v-if="apiHandler.queryListTools.tags.length !== 0" slot="toolbox-bottom">
             <p-col :col="12" style="margin-bottom: .5rem;">
                 <p-hr style="width: 100%;" />
                 <p-row style="margin-top: .5rem;">
@@ -63,7 +67,7 @@ import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import { MainTableAPI, SubDataAPI } from '@/lib/api';
+import { QuerySearchTableAPI, SubDataAPI } from '@/lib/api';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
@@ -82,7 +86,7 @@ interface Props {
     data_source: DataSourceType[];
     data: any;
     rootMode:boolean;
-    apiHandler:MainTableAPI;
+    apiHandler:QuerySearchTableAPI;
 }
 
 interface SlotBind {
@@ -99,7 +103,7 @@ interface Field {
 
 
 export default createComponent({
-    name: 'PDynamicViewMainTable',
+    name: 'PDynamicViewQuerySearchTable',
     components: {
         PDynamicField,
         PToolboxTable,
@@ -124,7 +128,7 @@ export default createComponent({
             default: () => ({}),
         },
         apiHandler: {
-            type: MainTableAPI,
+            type: QuerySearchTableAPI,
             required: true,
         },
         rootMode: {

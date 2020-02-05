@@ -153,6 +153,7 @@ export default {
             type: Boolean,
             default: true,
         },
+
     },
     setup(props, { emit }) {
         const pageSizeOptions = computed(() => (_.flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size }))));
