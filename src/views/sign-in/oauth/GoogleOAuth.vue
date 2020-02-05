@@ -53,14 +53,12 @@
 <script>
 import url from 'url';
 import { mapGetters } from 'vuex';
-import BaseSimpleModal from '@/components/base/modal/BaseSimpleModal';
-
 const { gapi } = window;
+
 export default {
-    components: { BaseSimpleModal },
     data() {
         return {
-            isSignedIn: false,
+            hasSignedIn: false,
             loginId: null,
             oathSignParam: null,
             greeting: true,
@@ -106,7 +104,7 @@ export default {
                     scope: 'profile',
                 });
 
-                vm.isSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
+                vm.hasSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
 
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',

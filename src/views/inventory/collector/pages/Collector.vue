@@ -24,12 +24,12 @@ export default {
 
         const getCollectorList = async () => {
             state.loading = true;
+            state.selectIndex = [];
             state.items = [];
             try {
                 const res = await context.parent.$http.post('/inventory/collector/list', {
                     query: collectorTableQuery.value,
                 });
-                state.selectIndex = [];
                 state.items = res.data.results;
                 state.allPage = Math.ceil(res.data.total_count / state.pageSize) || 1;
                 state.loading = false;

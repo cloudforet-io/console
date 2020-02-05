@@ -37,8 +37,6 @@ export default {
                 query: state.query,
             };
 
-            console.log('query', state.query);
-
             state.plugins = [];
             try {
                 const res = await context.parent.$http.post('/repository/plugin/list', params);

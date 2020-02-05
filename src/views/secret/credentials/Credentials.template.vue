@@ -214,6 +214,7 @@ export const credentialsSetup = (props, context, eventName) => {
     });
 
     const isNotSelected = computed(() => tableState.selectIndex.length === 0);
+    const isNotOnlyOneSelected = computed(() => tableState.selectIndex.length !== 1);
 
     const getSelectedCredentialsItems = computed(() => {
         const items = [];
@@ -290,28 +291,17 @@ export const credentialsSetup = (props, context, eventName) => {
     };
 
     const clickDelete = () => {
-        if (tabAction.isSelectedMulti) {
-            context.root.$notify({
-                group: 'noticeBottomRight',
-                type: 'alert',
-                title: 'Invalid delete action.',
-                text: 'Multiple credentials can not be deleted at once. Please, select a single credentials.',
-                duration: 2000,
-                speed: 1000,
-            });
-        } else {
-            const selectedItemName = tableState.items[tableState.selectIndex].name;
-            doubleState.origin = selectedItemName;
-            doubleState.title = 'Delete Credentials confirmation.';
-            doubleState.placeHolder = `Please, enter the name from above to delete selected item: ${selectedItemName} .`;
+        const selectedItemName = tableState.items[tableState.selectIndex].name;
+        doubleState.origin = selectedItemName;
+        doubleState.title = 'Delete Credentials confirmation.';
+        doubleState.placeHolder = `Please, enter the name from above to delete selected item: ${selectedItemName} .`;
 
-            checkTableModalState.mode = 'delete';
-            checkTableModalState.confirmEventName = eventNames.deleteCredentials;
-            checkTableModalState.title = 'Delete Credentials';
-            checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
-            checkTableModalState.themeColor = 'alert';
-            checkTableModalState.visible = true;
-        }
+        checkTableModalState.mode = 'delete';
+        checkTableModalState.confirmEventName = eventNames.deleteCredentials;
+        checkTableModalState.title = 'Delete Credentials';
+        checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
+        checkTableModalState.themeColor = 'alert';
+        checkTableModalState.visible = true;
     };
 
     const getEmptyString = object => (_.isEmpty(object) ? '' : object);
@@ -327,7 +317,7 @@ export const credentialsSetup = (props, context, eventName) => {
 
     const dropdownMenu = reactive({
         ...makeTrItems([
-            ['delete', 'COMMON.BTN_DELETE', { disabled: isNotSelected }],
+            ['delete', 'COMMON.BTN_DELETE', { disabled: isNotOnlyOneSelected }],
         ],
         context.parent,
         { type: 'item' }),

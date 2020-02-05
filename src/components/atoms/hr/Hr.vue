@@ -8,7 +8,7 @@ export default {
         return h('hr', {
             ...data,
             class: {
-                line: true,
+                'p-hr': true,
                 ...getBindClass(data.class),
             },
         },
@@ -18,7 +18,7 @@ export default {
 </script>
 
 <style lang="scss">
-    .line{
+    .p-hr {
         width: 100%;
         border: none;
         height: 1px;

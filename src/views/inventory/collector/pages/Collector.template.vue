@@ -1,6 +1,6 @@
 <template>
     <div class="collector-page">
-        <p-horizontal-layout>
+        <p-horizontal-layout :line="false">
             <template #container="{ height }">
                 <p-toolbox-table :items="items"
                                  :fields="fields"
