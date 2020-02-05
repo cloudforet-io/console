@@ -44,7 +44,8 @@ export default createComponent({
             dvs: computed(() => _.keyBy(props.subData, 'name')),
         });
 
-        const selectData = computed(() => state.dvs[state.selected]);
+        // eslint-disable-next-line camelcase
+        const selectData = computed(() => ({ view_type: 'table', ...state.dvs[state.selected] }));
         const selectKeyPath = computed(() => selectData.value.key_path);
         const selectId = computed(() => props.selectId);
         const apiHandler = new SubDataAPI(
