@@ -5,8 +5,8 @@
                 <transition name="panel-trans">
                     <div v-show="widthRaw>16" :style="{width:`${widthRaw-16}px`,height:'95%'}" style="padding-left: .5rem;padding-right: .5rem">
                         <p-toolbox-table
-                            :items="state.items"
-                            :fields="state.fields"
+                            :items="apiHandler.state.items"
+                            :fields="cstFields"
                             :selectable="true"
                             :shadow="false"
                             :border="false"
@@ -14,14 +14,30 @@
                             :draggable="false"
                             :multi-select="false"
                             :setting-visible="false"
-                            :sortable="sortable"
-                            :sort-by.sync="sortBy"
-                            :sort-desc.sync="sortDesc"
-                            :all-page="allPage"
-                            :this-page.sync="thisPage"
-                            :select-index.sync="[]"
-                            :page-size.sync="pageSize"
-                        />
+                            :sortable="true"
+                            :sort-by.sync="apiHandler.state.sortBy"
+                            :sort-desc.sync="apiHandler.state.sortDesc"
+                            :all-page="apiHandler.state.allPage"
+                            :this-page.sync="apiHandler.state.thisPage"
+                            :select-index.sync="apiHandler.state.selectIndex"
+                            :page-size.sync="apiHandler.state.pageSize"
+                            :loading.sync="apiHandler.state.loading"
+                            @changePageSize="apiHandler.getData"
+                            @changePageNumber="apiHandler.getData"
+                            @clickRefresh="apiHandler.getData"
+                            @changeSort="apiHandler.getData"
+                        >
+                            <!--                            <template #toolbox-left>-->
+                            <!--                                <div />-->
+                            <!--                                &lt;!&ndash;                                <PDropdownMenuBtn&ndash;&gt;-->
+                            <!--                                &lt;!&ndash;                                    id="cloud-service-type-dropdown-btn"&ndash;&gt;-->
+                            <!--                                &lt;!&ndash;                                    class="left-toolbox-item"&ndash;&gt;-->
+                            <!--                                &lt;!&ndash;                                    :menu="[]"&ndash;&gt;-->
+                            <!--                                &lt;!&ndash;                                >&ndash;&gt;-->
+                            <!--                                &lt;!&ndash;                                    Action&ndash;&gt;-->
+                            <!--                                &lt;!&ndash;                                </PDropdownMenuBtn>&ndash;&gt;-->
+                            <!--                            </template>-->
+                        </p-toolbox-table>
                     </div>
                 </transition>
             </template>
@@ -30,13 +46,18 @@
                     <div>
                         <p-horizontal-layout>
                             <template #container="{ height }">
-                                <p-dynamic-view view_type="main-table" :data_source="data_source" :api-handler="dmApiHandler"
+                                <p-dynamic-view view_type="main-table" :data_source="[]" :api-handler="dvApiHandler"
                                                 :data="null"
                                 >
                                     <template #toolbox-left>
-                                        <div class="left-toolbox-item">
-                                            button
-                                        </div>
+                                        <p-button>Collect Data</p-button>
+                                        <!--                                        <PDropdownMenuBtn-->
+                                        <!--                                            id="server-dropdown-btn"-->
+                                        <!--                                            class="left-toolbox-item"-->
+                                        <!--                                            :menu="CstDropdownMenu"-->
+                                        <!--                                        >-->
+                                        <!--                                            Action-->
+                                        <!--                                        </PDropdownMenuBtn>-->
                                     </template>
                                 </p-dynamic-view>
                             </template>
@@ -86,7 +107,7 @@
                         <!--                    </PTab>-->
 
                         <div id="empty-space">
-                            Select a Server above for details.
+                            Select a  above for details.
                         </div>
                         <!--                <p-table-check-modal-->
                         <!--                        v-if="!!checkTableModalState.mode"-->
@@ -111,6 +132,7 @@
 <script>
 /* eslint-disable camelcase */
 
+import { computed, reactive } from '@vue/composition-api';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
@@ -119,7 +141,7 @@ import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/Dynam
 import PTag from '@/components/molecules/tags/Tag.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
-
+import PButton from '@/components/atoms/buttons/Button.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
@@ -127,18 +149,50 @@ import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionC
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { makeTrItems } from '@/lib/view-helper';
+import { MainTableAPI } from '@/lib/api'
 
-export const cloudServiceSetup = (context, apiHandler, dmApiHandler) => ({
-    apiHandler,
-    fields: makeTrItems([
+export const cloudServiceSetup = (context, apiHandler, dvApiHandler) => {
+    const cstFields = makeTrItems([
         ['provider', 'COMMON.NAME'],
         ['group', 'COMMON.GROUP'],
-        ['name', 'COMMON.NAME', { sortable: false }],
-        ['count', 'COMMON.COUNT'],
-    ],
-    context.parent, {}),
-    dmApiHandler,
-});
+        ['name', 'COMMON.NAME'],
+        ['count', 'COMMON.COUNT', { sortable: false }],
+    ], context.parent, {});
+    const cstIsNotSelected = computed(() => apiHandler.state.selectIndex.length === 0);
+    const selectTypeDataSource = computed(() => (cstIsNotSelected.value !== true ? apiHandler.state.selectIndex[0].templates : {}));
+    console.debug(cstIsNotSelected.value, selectTypeDataSource.value);
+    // const cstDropdownMenu = reactive({
+    //     ...makeTrItems([
+    //         ['add', 'COMMON.BTN_ADD'],
+    //         ['update', 'COMMON.BTN_UPDATE', { disabled: cstIsNotSelected }],
+    //         ['delete', 'COMMON.BTN_DELETE', { disabled: cstIsNotSelected }],
+    //     ],
+    //     context.parent,
+    //     { type: 'item' }),
+    // });
+
+    //
+    // const CsDropdownMenu = reactive({
+    //     ...makeTrItems([
+    //         ['add', 'COMMON.BTN_ADD'],
+    //         ['update', 'COMMON.BTN_UPDATE', { disabled: cstIsNotSelected }],
+    //         ['delete', 'COMMON.BTN_DELETE', { disabled: cstIsNotSelected }],
+    //         [null, null, { type: 'divider' }],
+    //         ['project', 'COMMON.CHG_PRO', { disabled: cstIsNotSelected }],
+    //         ['region', 'COMMON.CHG_REGION', { disabled: cstIsNotSelected }],
+    //     ],
+    //     context.parent,
+    //     { type: 'item' }),
+    // });
+    return {
+        apiHandler,
+        dvApiHandler,
+        cstFields,
+        cstIsNotSelected,
+        // cstDropdownMenu,
+        // selectTypeDataSource,
+    };
+};
 
 
 export default {
@@ -152,66 +206,16 @@ export default {
         PToolboxTable,
         // PQuerySearchBar,
         // PDynamicSubData,
+        PButton,
         // PDropdownMenuBtn,
         // PTableCheckModal,
         // PIconButton,
         // PTag,
     },
     setup(props, context) {
-        // const mockAPI = new MainTableAPI(context.parent, '');
+        const mockAPI = new MainTableAPI(context.parent, '');
         return {
-            ...cloudServiceSetup(context, {}, {}),
-            data_source: [
-                {
-                    name: 'Index Name',
-                    key: 'IndexName',
-                },
-                {
-                    name: 'Projection Type',
-                    key: 'Projection.ProjectionType',
-                },
-                {
-                    name: 'Item Count',
-                    key: 'ItemCount',
-                },
-                {
-                    name: 'status',
-                    key: 'IndexStatus',
-                    view_type: 'enum',
-                    view_option: {
-                        DEACTIVE: {
-                            view_option: {
-                                text_color: '#FF7750',
-                                icon: {
-                                    image: 'aws-ec2',
-                                    color: '#FF7750',
-                                },
-                            },
-                            view_type: 'state',
-                        },
-                        ACTIVE: {
-                            view_option: {
-                                text_color: '#60B731',
-                                icon: {
-                                    image: 'aws-ec2',
-                                    color: '#60B731',
-                                },
-                            },
-                            view_type: 'state',
-                        },
-
-                    },
-                },
-                {
-                    name: 'Write capacity units',
-                    key: 'ProvisionedThroughput.WriteCapacityUnits',
-                },
-                {
-                    name: 'Read capacity units',
-                    key: 'ProvisionedThroughput.ReadCapacityUnits',
-                },
-            ],
-
+            ...cloudServiceSetup(context, mockAPI, mockAPI),
         };
     },
 };
