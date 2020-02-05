@@ -13,6 +13,7 @@ import { tagList } from '@/components/molecules/tags/Tag.vue';
 //  eslint-disable-next-line import/no-cycle
 import { getKeys, getSuggest, baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
+
 class APIError extends Error {
     public status: number;
 
@@ -187,11 +188,12 @@ type ValueFormatter = (string, any)=>string|number|Array<string|number>;
  * @param searchText
  * @param searchQueries {Array<SearchQuery>}
  * @param valueFormatter <(key,value)=>value>
+ * @param only
  * @returns {{page: {start: number, limit: *}}}
  */
 export const defaultQuery = (
     thisPage:number, pageSize:number, sortBy?:string, sortDesc?:boolean,
-    searchText?:string, searchQueries?:SearchQuery[], valueFormatter?:ValueFormatter,
+    searchText?:string, searchQueries?:SearchQuery[], valueFormatter?:ValueFormatter, only?:string[],
 ) => {
     const query:ApiQuery = {
         page: {
@@ -205,10 +207,13 @@ export const defaultQuery = (
             desc: sortDesc,
         };
     }
+    if (only && only.length > 0) {
+        query.only = only;
+    }
     if (searchText) {
         query.keyword = searchText || '';
     }
-    if (searchQueries) {
+    if (searchQueries && searchQueries.length > 0) {
         const filter:Filter[] = [];
         // eslint-disable-next-line camelcase
         const mergeOpQuery:{[propName: string]: Filter;} = {};
@@ -286,11 +291,14 @@ interface TableState {
     selectIndex?:number[];
     sortBy?:string;
     sortDesc?:boolean;
+    only?:string[];
     pageSize: number;
     allPage: number;
     thisPage: number;
     searchText: string|null|undefined;
+    fixSearchQuery?:SearchQuery[]|Ref<SearchQuery[]>;
     loading: boolean;
+    acHandler?:Ref<QuerySearchTableACHandler>;
 }
 
 export const getAllPage = (total_count:number, pageSize:number):number => Math.ceil(total_count / pageSize) || 1;
@@ -362,7 +370,7 @@ interface ACHandlerMap {
 
 }
 
-export class MainTableACHandler extends baseAutocompleteHandler {
+export class QuerySearchTableACHandler extends baseAutocompleteHandler {
     constructor(public parent:HttpInstance, keys:string[] = [], suggestKeys:string[] = []) {
         super();
         (this.handlerMap as ACHandlerMap) = {
@@ -372,18 +380,35 @@ export class MainTableACHandler extends baseAutocompleteHandler {
     }
 }
 
+interface AcState {
+    keys:string[];
+    suggestKeys:string[];
+}
 
-export class MainTableAPI extends DynamicAPI {
+export class BaseQuerySearchTableAPI extends DynamicAPI {
     public state :TableState;
 
     public queryListTools ;
 
-    public acHandler:MainTableACHandler;
+    public acState : AcState;
 
-    private query:Ref<object>;
 
-    constructor(public parent:HttpInstance, private url:string, keys?:string[]) {
+    protected query:Ref<object>;
+
+    protected searchQuery:Ref<SearchQuery[]>
+
+
+    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[]) {
         super();
+        this.acState = reactive({
+            keys: keys || [] as string[],
+            suggestKeys: keys || [] as string[],
+        });
+        const acHandler:Ref<any> = computed(() => {
+            console.log('new handler', this.acState.keys, this.acState.suggestKeys);
+            return new QuerySearchTableACHandler(parent, this.acState.keys, this.acState.keys);
+        });
+
         this.state = reactive({
             items: [],
             selectIndex: [],
@@ -394,20 +419,30 @@ export class MainTableAPI extends DynamicAPI {
             thisPage: 1,
             searchText: '',
             loading: false,
+            only,
+            fixSearchQuery: [],
+            acHandler,
         });
-        this.acHandler = new MainTableACHandler(parent, keys || ['name'], keys || ['name']);
-        this.queryListTools = tagList(null, true, undefined, undefined, this.getData);
+        this.queryListTools = tagList(undefined, true, undefined, undefined, this.getData);
+        // this.searchQuery = computed(() => _.flatten([this.state.fixSearchQuery || [], this.queryListTools.tags.value || []]));
+        // @ts-ignore
+        this.searchQuery = computed(() => {
+            const fix:SearchQuery[] = this.state.fixSearchQuery as SearchQuery[] || [] as SearchQuery[];
+            const sq:SearchQuery[] = this.queryListTools.tags;
+            return [...fix, ...sq];
+        });
         this.query = computed(() => (defaultQuery(
             this.state.thisPage, this.state.pageSize,
             this.state.sortBy, this.state.sortDesc, undefined,
-            this.queryListTools.tags.value,
+            this.searchQuery.value, undefined, this.state.only,
         )));
     }
 
     public getData = async () => {
         this.state.loading = true;
         this.state.items = [];
-
+        console.log(this.query.value);
+        console.log(this.queryListTools.tags);
         const res = await this.$http.post(this.url, {
             query: this.query.value,
         });
@@ -415,5 +450,42 @@ export class MainTableAPI extends DynamicAPI {
         this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
         this.state.selectIndex = [];
         this.state.loading = false;
+    }
+}
+
+interface tableSelectState {
+    isNotSelected:boolean;
+    isSelectOne:boolean;
+    isSelectMulti:boolean;
+    selectItems:any[];
+    firstSelectItem:any;
+}
+export class QuerySearchTableAPI extends BaseQuerySearchTableAPI {
+    public selectState:tableSelectState
+
+    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[]) {
+        super(parent, url, keys, only);
+        const isNotSelected:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 0 : true));
+        const isSelectOne:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 1 : false));
+        const isSelectMulti:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length > 1 : false));
+        const selectItems:Ref<any[]> = computed(() :any[] => (this.state.selectIndex ? this.state.selectIndex.map(idx => this.state.items[idx]) : []));
+        const firstSelectItem:Ref<any> = computed(():any => (!isNotSelected.value ? this.state.items[(this.state.selectIndex as number[])[0]] : {}));
+        this.selectState = reactive({
+            isNotSelected,
+            isSelectOne,
+            isSelectMulti,
+            selectItems,
+            firstSelectItem,
+        });
+    }
+
+    public resetAll() {
+        this.state.allPage = 1;
+        this.state.thisPage = 1;
+        this.state.selectIndex = [];
+        this.state.items = [];
+        this.state.sortBy = '';
+        this.state.sortDesc = true;
+        this.state.searchText = '';
     }
 }

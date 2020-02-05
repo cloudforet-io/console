@@ -1,10 +1,11 @@
 <template>
     <div class="cloud-service">
-        <p-vertical-layout :min-left-width="400">
-            <template #leftContainer="{width,widthRaw}">
+        <p-vertical-layout :min-left-width="450" :left-width="450" :max-left-width="800">
+            <template #leftContainer="{width,widthRaw,height}">
                 <transition name="panel-trans">
                     <div v-show="widthRaw>16" :style="{width:`${widthRaw-16}px`,height:'95%'}" style="padding-left: .5rem;padding-right: .5rem">
                         <p-toolbox-table
+                            :style="{height:'100%'}"
                             :items="apiHandler.state.items"
                             :fields="cstFields"
                             :selectable="true"
@@ -15,6 +16,7 @@
                             :multi-select="false"
                             :setting-visible="false"
                             :sortable="true"
+                            :small="true"
                             :sort-by.sync="apiHandler.state.sortBy"
                             :sort-desc.sync="apiHandler.state.sortDesc"
                             :all-page="apiHandler.state.allPage"
@@ -27,16 +29,14 @@
                             @clickRefresh="apiHandler.getData"
                             @changeSort="apiHandler.getData"
                         >
-                            <!--                            <template #toolbox-left>-->
-                            <!--                                <div />-->
-                            <!--                                &lt;!&ndash;                                <PDropdownMenuBtn&ndash;&gt;-->
-                            <!--                                &lt;!&ndash;                                    id="cloud-service-type-dropdown-btn"&ndash;&gt;-->
-                            <!--                                &lt;!&ndash;                                    class="left-toolbox-item"&ndash;&gt;-->
-                            <!--                                &lt;!&ndash;                                    :menu="[]"&ndash;&gt;-->
-                            <!--                                &lt;!&ndash;                                >&ndash;&gt;-->
-                            <!--                                &lt;!&ndash;                                    Action&ndash;&gt;-->
-                            <!--                                &lt;!&ndash;                                </PDropdownMenuBtn>&ndash;&gt;-->
-                            <!--                            </template>-->
+                            <template #toolbox-left>
+                                <PDropdownMenuBtn
+                                    id="cloud-service-type-dropdown-btn"
+                                    :menu="cstDropdownMenu"
+                                >
+                                    Action
+                                </PDropdownMenuBtn>
+                            </template>
                         </p-toolbox-table>
                     </div>
                 </transition>
@@ -44,69 +44,56 @@
             <template #rightContainer>
                 <transition name="panel-trans">
                     <div>
-                        <p-horizontal-layout>
+                        <p-horizontal-layout v-if="apiHandler.selectState.isSelectOne">
                             <template #container="{ height }">
-                                <p-dynamic-view view_type="main-table" :data_source="[]" :api-handler="dvApiHandler"
+                                <p-dynamic-view view_type="query-search-table" :data_source="selectTypeDataSource" :api-handler="dvApiHandler"
                                                 :data="null"
                                 >
                                     <template #toolbox-left>
-                                        <p-button>Collect Data</p-button>
-                                        <!--                                        <PDropdownMenuBtn-->
-                                        <!--                                            id="server-dropdown-btn"-->
-                                        <!--                                            class="left-toolbox-item"-->
-                                        <!--                                            :menu="CstDropdownMenu"-->
-                                        <!--                                        >-->
-                                        <!--                                            Action-->
-                                        <!--                                        </PDropdownMenuBtn>-->
+                                        <p-button style-type="primary">
+                                            Collect Data
+                                        </p-button>
+                                        <div class="left-toolbox-item">
+                                            <PDropdownMenuBtn :menu="csDropdownMenu">
+                                                Action
+                                            </PDropdownMenuBtn>
+                                        </div>
                                     </template>
                                 </p-dynamic-view>
                             </template>
                         </p-horizontal-layout>
-                        <!--                    <PTab v-if="true" :tabs="tabs" :active-tab.sync="activeTab">-->
-                        <!--                        <template #detail="{tabName}">-->
-                        <!--                            <p-server-detail :item="items[selectIndex[0]]" :tag-confirm-event="tagConfirmEvent" :tag-reset-event="tagResetEvent" />-->
-                        <!--                        </template>-->
-                        <!--                        <template #data="{tabName}">-->
-                        <!--                            <PDynamicSubData-->
-                        <!--                                :select-id="getFirstSelectServerId" :sub-data="getSubData"-->
-                        <!--                                url="/inventory/cloud-service/get-data" id-key="cloud_service_id"-->
-                        <!--                            />-->
-                        <!--                        </template>-->
-                        <!--                        <template #rawData="{tabName}">-->
-                        <!--                            <div>raw data</div>-->
-                        <!--                        </template>-->
-                        <!--                    </PTab>-->
-                        <!--                    <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">-->
-                        <!--                        <template #data="{tabName}">-->
-                        <!--                            <p-data-table-->
-                        <!--                                :fields="multiSelectFields"-->
-                        <!--                                :sortable="false"-->
-                        <!--                                :selectable="false"-->
-                        <!--                                :items="getSelectServerItems"-->
-                        <!--                                :col-copy="true"-->
-                        <!--                            >-->
-                        <!--                                <template v-slot:col-state-format="data">-->
-                        <!--                                    <p-status v-bind="serverStateFormatter(data.value)" />-->
-                        <!--                                </template>-->
-                        <!--                                <template />-->
-                        <!--                            </p-data-table>-->
-                        <!--                        </template>-->
-                        <!--                        <template #admin="{tabName}">-->
-                        <!--                            <p-server-admin :select-index="selectIndex"-->
-                        <!--                                            :items="admin.items"-->
-                        <!--                                            :sort-by.sync="admin.sortBy"-->
-                        <!--                                            :sort-desc.sync="admin.sortDesc"-->
-                        <!--                                            :page-size.sync="admin.pageSize"-->
-                        <!--                                            :all-page="admin.allPage"-->
-                        <!--                                            :this-page.sync="admin.thisPage"-->
-                        <!--                                            :search-text.sync="admin.searchText"-->
-                        <!--                                            :loading="admin.loading"-->
-                        <!--                                            :get-server-admin="getServerAdmin"-->
-                        <!--                            />-->
-                        <!--                        </template>-->
-                        <!--                    </PTab>-->
+                        <PTab v-if="dvApiHandler.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
+                            <template #detail="{tabName}">
+                                <p-dynamic-view v-for="dv in dvApiHandler.selectState.firstSelectItem.metadata.details" :key="dv.name" :name="dv.name"
+                                                :view_type="dv.view_type||'item'"
+                                                :data="dvApiHandler.selectState.firstSelectItem.data||{}"
+                                                :data_source="dv.data_source"
+                                />
+                            </template>
+                            <template #data="{tabName}">
+                                <PDynamicSubData
+                                    :select-id="dvApiHandler.selectState.firstSelectItem.cloud_service_id" :sub-data="dvApiHandler.selectState.firstSelectItem.metadata.sub_data"
+                                    url="/inventory/cloud-service/get-data" id-key="cloud_service_id"
+                                />
+                            </template>
+                            <template #rawData="{tabName}">
+                                <p-raw-data :item="dvApiHandler.selectState.firstSelectItem" />
+                            </template>
+                        </PTab>
+                        <PTab v-else-if="dvApiHandler.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="activeMultiTab">
+                            <template #data="{tabName}">
+                                <p-dynamic-view
+                                    view_type="simple-table"
+                                    :data_source="selectTypeDataSource"
+                                    :data="dvApiHandler.state.items"
+                                />
+                            </template>
+                            <template #admin="{tabName}">
+                                <div>admin</div>
+                            </template>
+                        </PTab>
 
-                        <div id="empty-space">
+                        <div v-else id="empty-space">
                             Select a  above for details.
                         </div>
                         <!--                <p-table-check-modal-->
@@ -129,10 +116,13 @@
         </p-vertical-layout>
     </div>
 </template>
-<script>
+<script lang="ts">
 /* eslint-disable camelcase */
 
-import { computed, reactive } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
+import _ from 'lodash';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
@@ -140,7 +130,6 @@ import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/Dynam
 
 import PTag from '@/components/molecules/tags/Tag.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
@@ -149,48 +138,79 @@ import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionC
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { makeTrItems } from '@/lib/view-helper';
-import { MainTableAPI } from '@/lib/api'
+import { QuerySearchTableAPI } from '@/lib/api';
+import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 
-export const cloudServiceSetup = (context, apiHandler, dvApiHandler) => {
-    const cstFields = makeTrItems([
-        ['provider', 'COMMON.NAME'],
-        ['group', 'COMMON.GROUP'],
-        ['name', 'COMMON.NAME'],
-        ['count', 'COMMON.COUNT', { sortable: false }],
-    ], context.parent, {});
-    const cstIsNotSelected = computed(() => apiHandler.state.selectIndex.length === 0);
-    const selectTypeDataSource = computed(() => (cstIsNotSelected.value !== true ? apiHandler.state.selectIndex[0].templates : {}));
-    console.debug(cstIsNotSelected.value, selectTypeDataSource.value);
-    // const cstDropdownMenu = reactive({
-    //     ...makeTrItems([
-    //         ['add', 'COMMON.BTN_ADD'],
-    //         ['update', 'COMMON.BTN_UPDATE', { disabled: cstIsNotSelected }],
-    //         ['delete', 'COMMON.BTN_DELETE', { disabled: cstIsNotSelected }],
-    //     ],
-    //     context.parent,
-    //     { type: 'item' }),
-    // });
+export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApiHandler:QuerySearchTableAPI) => {
+    const state = reactive({
+        cstFields: makeTrItems([
+            ['provider', 'COMMON.NAME'],
+            ['group', 'COMMON.GROUP'],
+            ['name', 'COMMON.NAME'],
+            ['count', 'COMMON.COUNT', { sortable: false }],
+        ], context.parent, {}),
+        tabs: makeTrItems([
+            ['detail', 'COMMON.DETAILS'],
+            ['data', 'COMMON.DATA'],
+            ['rawData', 'COMMON.RAWDATA', { keepAlive: true }],
+            ['admin', 'COMMON.ADMIN'],
+        ], context.parent),
+        activeTab: 'detail',
+        multiTabs: makeTrItems([
+            ['data', 'COMMON.DATA', { keepAlive: true }],
+            ['admin', 'COMMON.ADMIN'],
+        ], context.parent),
+        activeMultiTab: 'data',
+    });
 
-    //
-    // const CsDropdownMenu = reactive({
-    //     ...makeTrItems([
-    //         ['add', 'COMMON.BTN_ADD'],
-    //         ['update', 'COMMON.BTN_UPDATE', { disabled: cstIsNotSelected }],
-    //         ['delete', 'COMMON.BTN_DELETE', { disabled: cstIsNotSelected }],
-    //         [null, null, { type: 'divider' }],
-    //         ['project', 'COMMON.CHG_PRO', { disabled: cstIsNotSelected }],
-    //         ['region', 'COMMON.CHG_REGION', { disabled: cstIsNotSelected }],
-    //     ],
-    //     context.parent,
-    //     { type: 'item' }),
-    // });
+    const selectTypeDataSource = computed(() => (_.get(apiHandler.selectState.firstSelectItem, ['data_source'], [])));
+    watch(() => apiHandler.selectState.firstSelectItem, (type, preType) => {
+        if (preType && type !== preType) {
+            const selectType = apiHandler.selectState.firstSelectItem;
+            dvApiHandler.resetAll();
+            dvApiHandler.state.fixSearchQuery = [
+                { key: 'provider', operator: '', value: selectType.provider },
+                { key: 'cloud_service_type', operator: '', value: selectType.name },
+                { key: 'cloud_service_group', operator: '', value: selectType.group },
+            ];
+            const keys = selectTypeDataSource.value.map(v => v.key);
+            dvApiHandler.acState.keys = keys;
+            dvApiHandler.acState.suggestKeys = keys;
+            dvApiHandler.getData();
+        }
+    });
+    const cstIsNotSelected = computed(() => apiHandler.selectState.isNotSelected);
+    const cstDropdownMenu = reactive({
+        ...makeTrItems([
+            ['add', 'COMMON.BTN_ADD'],
+            ['update', 'COMMON.BTN_UPT', { disabled: cstIsNotSelected }],
+            ['delete', 'COMMON.BTN_DELETE', { disabled: cstIsNotSelected }],
+        ],
+        context.parent,
+        { type: 'item' }),
+    });
+
+    const csIsNotSelected = computed(() => dvApiHandler.selectState.isNotSelected);
+    const csIsNotSelectedOnlyOne = computed(() => !dvApiHandler.selectState.isSelectOne);
+    const csDropdownMenu = reactive({
+        ...makeTrItems([
+            ['add', 'COMMON.BTN_ADD'],
+            ['update', 'COMMON.BTN_UPT', { disabled: csIsNotSelectedOnlyOne }],
+            ['delete', 'COMMON.BTN_DELETE', { disabled: csIsNotSelected }],
+            [null, null, { type: 'divider' }],
+            ['project', 'COMMON.CHG_PRO', { disabled: csIsNotSelected }],
+            ['region', 'COMMON.CHG_REGION', { disabled: csIsNotSelected }],
+        ],
+        context.parent,
+        { type: 'item' }),
+    });
     return {
+        ...toRefs(state),
         apiHandler,
         dvApiHandler,
-        cstFields,
-        cstIsNotSelected,
-        // cstDropdownMenu,
-        // selectTypeDataSource,
+        cstDropdownMenu,
+        csDropdownMenu,
+        selectTypeDataSource,
     };
 };
 
@@ -201,19 +221,18 @@ export default {
         PHorizontalLayout,
         PVerticalLayout,
         PDynamicView,
-        // PTab,
-        // PDataTable,
+        PTab,
         PToolboxTable,
         // PQuerySearchBar,
-        // PDynamicSubData,
+        PDynamicSubData,
         PButton,
-        // PDropdownMenuBtn,
+        PRawData,
+        PDropdownMenuBtn,
         // PTableCheckModal,
-        // PIconButton,
         // PTag,
     },
     setup(props, context) {
-        const mockAPI = new MainTableAPI(context.parent, '');
+        const mockAPI = new QuerySearchTableAPI(context.parent, '');
         return {
             ...cloudServiceSetup(context, mockAPI, mockAPI),
         };
@@ -227,4 +246,15 @@ export default {
         margin-left: 2rem;
         margin-right: 2rem;
     }
+    #cloud-service-type-dropdown-btn{
+        >>> div > .dropdown-btn.menu-btn{
+            min-width: 4.7rem;
+            width: 4.7rem;
+            max-width: 4.7rem;
+        }
+    }
+    .left-toolbox-item{
+        margin-left: 1rem;
+    }
+
 </style>
