@@ -1,6 +1,10 @@
 <script lang="ts">
 import _ from 'lodash';
+import { max } from 'moment';
+import path from 'vue-i18n/src/path';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
+
+import get = Reflect.get;
 
 export default {
     name: 'PDynamicFieldList',
@@ -13,19 +17,52 @@ export default {
             default: () => {},
         },
         data: {
-            type: String,
+            type: Array,
             required: true,
         },
     },
     render(h, { props }) {
         const option = _.get(props.view_option, ['item'], {});
-        const children = props.data.map((value, idx) => {
-            let v:string = value;
-            if ((!option.view_type || option.view_type === 'text') && idx) {
-                v = `, ${v}`;
+        let datas: any[] = [];
+        const pushData = (data:any):void => {
+            datas.push([data]);
+        };
+        const getValue = (data, paths: string[], callback:(any)=>void) => {
+            console.log(data, paths);
+            if (Array.isArray(data)) {
+                for (const idx in data) {
+                    getValue(data[idx], paths, callback);
+                }
+            } else if (typeof data === 'object') {
+                getValue(data[paths[0]], paths.slice(1), callback);
+            } else if (paths.length === 0) {
+                callback(data);
             }
-            return h(PDynamicField, { props: { ...option, data: v } });
-        });
+        };
+        if (props.view_option.sub_key) {
+            const subKey = props.view_option.sub_key.split('.');
+            getValue(props.data, subKey, pushData);
+        } else {
+            datas = props.data.map((value, idx) => {
+                let v:string = value;
+                if ((!option.view_type || option.view_type === 'text') && idx) {
+                    v = `, ${v}`;
+                }
+                return v;
+            });
+        }
+        let children = datas.map(data => h(PDynamicField, { props: { ...option, data } }));
+
+        const delimiter = props.view_option.delimiter || ' ';
+        let delimiterEl;
+        if (delimiter === '<br>') {
+            delimiterEl = h('br');
+        } else {
+            delimiterEl = h('span', delimiter);
+        }
+        const dim = _.fill(Array(children.length - 1), delimiterEl);
+        children = _.flatten(_.zip(children, dim));
+
         return h('span', children);
     },
 };
