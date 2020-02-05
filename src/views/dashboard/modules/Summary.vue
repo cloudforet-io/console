@@ -54,7 +54,7 @@ export default {
                     label: 'Server', path: '/inventory/server', hover: false,
                 },
                 // eslint-disable-next-line camelcase
-                cloud_service: { label: 'Cloud Service', hover: false },
+                cloud_service: { label: 'Cloud Service', path: '/inventory/cloud-service', hover: false },
                 network: { label: 'Network', hover: false },
             },
         };

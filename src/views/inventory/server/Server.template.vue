@@ -17,6 +17,7 @@
                     :this-page.sync="thisPage"
                     :select-index.sync="selectIndex"
                     :page-size.sync="pageSize"
+                    :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
                     :setting-visible="false"
                     :loading="loading"
                     :use-spinner-loading="true"

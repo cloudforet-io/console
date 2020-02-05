@@ -57,6 +57,11 @@
                     </router-link>
                 </li>
                 <li>
+                    <router-link class="service" to="/inventory/cloud-service">
+                        Cloud Service
+                    </router-link>
+                </li>
+                <li>
                     <router-link class="service last" to="/inventory/collector">
                         Collector
                     </router-link>
