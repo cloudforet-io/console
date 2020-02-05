@@ -68,20 +68,14 @@ export default {
             });
         };
 
-        const getCredentialsParam = (items) => {
-            console.log(items);
-            const result = { credentials: _.map(items, 'credential_id') };
-            return result;
-        };
-
         const deleteCredentials = async (items) => {
-            await context.parent.$http.post('/secret/credential/delete', getCredentialsParam(items)).then(async (_) => {
+            await context.parent.$http.post('/secret/credential/delete', { credential_id: items[0].credential_id }).then(async (_) => {
                 await requestCredentialsList();
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
-                    text: 'Selected credentials are successfully deleted.',
+                    text: 'Selected credentials is successfully deleted.',
                     duration: 2000,
                     speed: 1000,
                 });
