@@ -188,6 +188,7 @@ export default {
         const getSelectedCdIds = computed(() => {
             const ids = [];
             getSelectedCdItems.value.forEach((item) => {
+                console.log('test')
                 ids.push(item.credential_id);
             });
             return ids;
@@ -232,7 +233,7 @@ export default {
             checkTableModalState.title = 'Delete Credentials from Credentials Group';
             checkTableModalState.subTitle = 'Are you sure you want to delete selected Credentials below?';
             checkTableModalState.themeColor = 'alert';
-            checkTableModalState.items = null;
+            checkTableModalState.items = undefined;
             checkTableModalState.visible = true;
         };
 
@@ -274,8 +275,6 @@ export default {
 <style lang="scss" scoped>
     .left-toolbox-item{
         margin-right: 1rem;
-        display: inline;
-
     }
 
     .toolbox-table{

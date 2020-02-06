@@ -67,6 +67,10 @@ export const userStateColor = Object.freeze({
         iconColor: styles.alert,
         textColor: styles.alert,
     },
+    UNIDENTIFIED: {
+        iconColor: styles.gray,
+        textColor: styles.gray,
+    },
 });
 
 export const cdgStateColor = Object.freeze({
@@ -95,8 +99,8 @@ export const platformBadgeColor = Object.freeze({
     LINUX: { backgroundColor: styles.other1 },
     WINDOWS: { backgroundColor: styles.secondary },
 });
-
-export const getLocalDatetimeFromTimeStamp = ts => moment.unix(ts).tz(localStorage.getItem('timezone')).format('YYYY-MM-DD HH:MM:SS z');
+const timestamp = localStorage.getItem('timezone') || 'UTC';
+export const getLocalDatetimeFromTimeStamp = ts => moment.unix(ts).tz(timestamp).format('YYYY-MM-DD HH:MM:SS z');
 // formatter
 export const timestampFormatter = value => getLocalDatetimeFromTimeStamp(value.seconds);
 

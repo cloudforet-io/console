@@ -6,7 +6,7 @@
         <div :style="{height: height}"
              :class="{'content-container':true, left: transitionEffect, 'overflow-effect': true}"
         >
-            <slot name="leftContainer" :width="`${leftContainerWidth}px`" />
+            <slot name="leftContainer" :width="`${leftContainerWidth}px`" :widthRaw="leftContainerWidth" />
         </div>
 
         <div class="dragger-container" :class="{ line: line }" :style="{
@@ -48,7 +48,7 @@
              }"
         >
             <div>
-                <slot name="rightContainer" />
+                <slot name="rightContainer" :height="hideFNB ? height : `calc(${height} - ${fnbHeight})`" />
             </div>
             <FNB v-if="!hideFNB" class="fnb" />
         </div>
@@ -58,8 +58,8 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import styles from '@/styles/_variables.scss';
-import FNB from '@/views/containers/fnb/FNB';
-import PI from '@/components/atoms/icons/PI';
+import FNB from '@/views/containers/fnb/FNB.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     name: 'VerticalLayout',
@@ -113,6 +113,7 @@ export default {
             dragging: false,
             mouseOver: false,
             pageX: null,
+            fnbHeight: styles.fnbHeight,
         };
     },
     computed: {

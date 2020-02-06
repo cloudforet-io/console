@@ -92,11 +92,11 @@ export default {
                 // name: _.map(items, 'name'),
                 // tags: _.map(items, 'tags'),
             };
-            console.log('getCdsParam', result)
+            console.log('getCdsParam', result);
             return result;
         };
         const addCd = async (items) => {
-            console.log('addCd test', items)
+            console.log('addCd test', items);
             await context.parent.$http.post('/secret/credential-group/credential/add', getCdsParam(items)).then(async (_) => {
                 await requestCdList();
                 context.root.$notify({

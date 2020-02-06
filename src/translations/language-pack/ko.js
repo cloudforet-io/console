@@ -1,6 +1,7 @@
 export const ko = {
     COMMON: {
         COPY: '복사하기',
+        COUNT: '갯수',
         PROCESSED: '수행되었습니다',
         DR_SERV: '서비스',
         FORGPW: '비밀번호 찾기?',

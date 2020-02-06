@@ -1,6 +1,7 @@
 export const en = {
     COMMON: {
         COPY: 'Copy',
+        COUNT: 'Count',
         PROCESSED: 'processed',
         DR_SERV: 'Services',
         COMMON_USER: 'User',

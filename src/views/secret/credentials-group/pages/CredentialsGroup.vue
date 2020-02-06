@@ -112,10 +112,10 @@ export default {
                 state.loading = false;
             }
         };
-        const requestCdList = async (item) => {
+        const requestCdList = async (cdgId) => {
             state.cdgData.loading = true;
             state.cdgData.items = [];
-            const cdgId = item;
+            state.cdgData.selectIndex = [];
             const param = {
                 query: cdRequestState.query,
                 // eslint-disable-next-line camelcase
@@ -127,7 +127,6 @@ export default {
                 state.cdgData.items = res.data.results;
                 const allPage = Math.ceil(res.data.total_count / state.cdgData.pageSize);
                 state.cdgData.allPage = allPage || 1;
-                state.cdgData.selectIndex = [];
                 state.cdgData.loading = false;
             } catch (e) {
                 console.log(e);
@@ -183,18 +182,21 @@ export default {
                 });
             });
         };
-        const getCdsParam = (items) => {
+        const getCdsParam = (items, cdgId) => {
             console.log('getCdsParam test', items)
             const result = {
                 // eslint-disable-next-line camelcase
                 credentials: _.map(items, 'credential_id'),
-                credential_group_id: items[0].credential_groups[0].credential_group_id,
+                credential_group_id: cdgId,
             };
             return result;
         };
-        const deleteCd = async (items) => {
-            await context.parent.$http.post('/secret/credential-group/credential/remove', getCdsParam(items)).then(async (_) => {
-                await requestCdList();
+        const deleteCd = async (items, cdId, cdgId) => {
+            console.log(cdgId)
+            await context.parent.$http.post('/secret/credential-group/credential/remove', getCdsParam(items, cdgId)).then(async (_) => {
+                console.log('deleteCd success')
+                await requestCdList(cdgId);
+                console.log('requestCd List')
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
@@ -262,11 +264,11 @@ export default {
             });
         };
 
+        mountBusEvent(cdgEventBus, cdgEventNames.deleteCdg, deleteCdg);
+        mountBusEvent(cdgEventBus, cdgEventNames.deleteCd, deleteCd);
         mountBusEvent(cdgEventBus, cdgEventNames.getCdgList, requestCdgList);
         mountBusEvent(cdgEventBus, cdgEventNames.getCdList, requestCdList);
         mountBusEvent(cdgEventBus, cdgEventNames.tagConfirmEvent, CdgTagConfirm);
-        mountBusEvent(cdgEventBus, cdgEventNames.deleteCdg, deleteCdg);
-        mountBusEvent(cdgEventBus, cdgEventNames.deleteCd, deleteCd);
         mountBusEvent(cdgEventBus, cdgEventNames.createCdg, createCdg);
         mountBusEvent(cdgEventBus, cdgEventNames.updateCdg, updateCdg);
 

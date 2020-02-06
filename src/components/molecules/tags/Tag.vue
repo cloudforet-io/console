@@ -11,9 +11,11 @@
     </p-badge>
 </template>
 
-<script>
+<script lang="ts">
 import _ from 'lodash';
-import { ref, reactive } from '@vue/composition-api';
+import {
+    ref, reactive, Ref, createComponent,
+} from '@vue/composition-api';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
@@ -21,27 +23,29 @@ import PI from '@/components/atoms/icons/PI.vue';
  * @description Generate tools for using tag badge as a list
  * @param proxyTags {Array<String>}
  * @param checkDuplicate {Boolean}
- * @param eventBuse {EventBus}
+ * @param eventBus {EventBus}
  * @param eventName {string}
  * @returns {UnwrapRef<{deleteTag: *, tags: *, addTag: *}>}
  */
-export const tagList = (proxyTags, checkDuplicate = true, eventBuse, eventName) => {
-    const tags = proxyTags || ref([]);
+export const tagList = (proxyTags:Ref<string[]>|null|undefined, checkDuplicate:boolean = true, eventBus?:any, eventName?:string, addTagCallBack?:any) => {
+    const tags:Ref<any[]> = proxyTags || ref([]);
     if (!tags.value) tags.value = [];
 
     /**
      * @param idx {Number}
      */
-    const deleteTag = (idx) => {
+    const deleteTag = (idx:number) => {
         const updatedTags = [...tags.value];
         updatedTags.splice(idx, 1);
         tags.value = updatedTags;
-        if (eventBuse) { eventBuse.$emit(eventName, tags.value); }
+        if (eventBus) { eventBus.$emit(eventName, tags.value); }
+        if (addTagCallBack) { addTagCallBack(tags.value); }
     };
 
     const deleteAllTags = () => {
         tags.value = [];
-        if (eventBuse) { eventBuse.$emit(eventName, tags.value); }
+        if (eventBus) { eventBus.$emit(eventName, tags.value); }
+        if (addTagCallBack) { addTagCallBack(tags.value); }
     };
 
     const validation = value => tags.value.every(tag => !_.isEqual(tag, value));
@@ -56,7 +60,8 @@ export const tagList = (proxyTags, checkDuplicate = true, eventBuse, eventName) 
         const updatedTags = [...tags.value];
         updatedTags.push(val);
         tags.value = updatedTags;
-        if (eventBuse) { eventBuse.$emit(eventName, tags.value); }
+        if (eventBus) { eventBus.$emit(eventName, tags.value); }
+        if (addTagCallBack) { addTagCallBack(tags.value); }
     };
 
     return reactive({
@@ -67,9 +72,8 @@ export const tagList = (proxyTags, checkDuplicate = true, eventBuse, eventName) 
     });
 };
 
-export default {
+export default createComponent({
     name: 'PTag',
-    events: ['delete'],
     components: {
         PBadge,
         PI,
@@ -83,7 +87,7 @@ export default {
     setup() {
         return { };
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>
