@@ -13,16 +13,18 @@
                     />
                 </div>
             </template>
-            <template #rightContainer>
+            <template #rightContainer="{height}">
                 <p-toolbox-card-list class="card-list"
                                      :items="plugins"
                                      :mapper="pluginMapper"
+                                     :loading="loading"
                                      title="Plugins"
                                      :sort-menu="sortMenu"
                                      :sort-by-idx.sync="sortByIdx"
                                      :this-page.sync="thisPage"
                                      :page-size="pageSize"
                                      :total-count="totalCount"
+                                     :style="{height}"
                                      @pageChange="listPlugins"
                                      @sortChange="listPlugins"
                 >
@@ -57,7 +59,7 @@
                                         <p-i name="ic_plus" color="transparent inherit"
                                              width="1rem" height="1rem"
                                         />
-                                        {{tr('COMMON.BTN_CRT')}}
+                                        {{ tr('COMMON.BTN_CRT') }}
                                     </p-button>
                                 </p-row>
                             </p-col>
@@ -97,6 +99,7 @@ const repoState = reactive({
 const setPluginList = (router) => {
     const state = reactive({
         plugins: [],
+        loading: true,
         pluginMapper: {
             key: 'plugin_id',
             icon: 'tags.icon',
@@ -234,6 +237,7 @@ export default {
 
 <style lang="scss" scoped>
 .card-list {
+    height: 100%;
     padding-top: 1.625rem;
     padding-bottom: 2.25rem;
 }

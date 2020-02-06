@@ -29,6 +29,8 @@ export default {
         };
 
         const listPlugins = async () => {
+            state.loading = true;
+
             const params = {
                 // eslint-disable-next-line camelcase
                 repository_id: state.selectedRepoId,
@@ -44,6 +46,8 @@ export default {
                 state.plugins = res.data.results;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
