@@ -90,7 +90,7 @@ export default createComponent({
         .select-btn{
             margin-right: 0.5rem;
             min-width: auto;
-            display: inline;
+            display: inline-flex;
         }
 
         .select-next-btn {
