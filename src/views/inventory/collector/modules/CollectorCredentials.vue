@@ -3,7 +3,7 @@
         <p-panel-top>
             {{ tr('PANEL.CREDENTIAL') }}
             <template #head>
-                <router-link class="credential-btn" to="/secret" target="_blank">
+                <router-link class="credential-btn" :to="credentialPath" target="_blank">
                     <p-button outline style-type="dark">
                         {{ tr('INVENTORY.MANAGE_CRD') }}
                     </p-button>
@@ -120,6 +120,8 @@ export default {
             thisPage: 1,
             allPage: computed(() => Math.ceil(props.totalCount / state.pageSize) || 1),
             onClickVerify() { emit('verifyModalVisible:update', true); },
+            credentialPath: computed(() => (_.get(props.collector, 'plugin_info.credential_id')
+                ? '/secret/credentials' : '/secret/credentials-group')),
         });
 
         const query = computed(() => (defaultQuery(

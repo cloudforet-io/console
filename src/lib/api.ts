@@ -344,3 +344,14 @@ export class MockSubDataAPI extends SubDataAPI {
         setTimeout(this.fakeData, 1000);
     }
 }
+
+interface MockData {
+    total_count: number;
+    results: Array<any>;
+}
+
+export const getMockData = (data: any, timeout: number) => new Promise((resolve, reject) => {
+    setTimeout(() => resolve(data), timeout);
+});
+
+export const callApi = ($http: AxiosInstance, url: string, params: object) => $http.post(url, params);

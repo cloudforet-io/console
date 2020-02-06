@@ -96,7 +96,7 @@ export const platformBadgeColor = Object.freeze({
     WINDOWS: { backgroundColor: styles.secondary },
 });
 
-export const getLocalDatetimeFromTimeStamp = ts => moment.unix(ts).tz(localStorage.getItem('timezone')).format('YYYY-MM-DD HH:MM:SS z');
+export const getLocalDatetimeFromTimeStamp = ts => moment.unix(ts).tz(localStorage.getItem('timezone') || 'Asia/Seoul').format('YYYY-MM-DD HH:MM:SS z');
 // formatter
 export const timestampFormatter = value => getLocalDatetimeFromTimeStamp(value.seconds);
 

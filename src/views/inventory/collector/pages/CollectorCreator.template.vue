@@ -24,7 +24,7 @@
                                      @changeValidState="updateTabInvalid(0, $event)"
                 />
             </template>
-            <template #step-append-credentials>
+            <template v-if="crdState.crdType === 'Credentials'" #step-append-credentials>
                 <router-link class="new-crd-btn" to="/secret" target="_blank">
                     <p-button outline style-type="dark">
                         {{ tr('INVENTORY.CRT_CRD') }}

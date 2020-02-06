@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import {
     computed, createComponent, onMounted, reactive, ref, watch,
 } from '@vue/composition-api';

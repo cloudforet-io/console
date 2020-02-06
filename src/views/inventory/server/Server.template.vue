@@ -185,6 +185,7 @@ import {
 } from '@/lib/util';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeTrItems } from '@/lib/view-helper';
+import { TagList, SearchQueryUrlHandler } from '@/components/organisms/search/query-search-bar/searchQueryUrlHandler';
 
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -399,6 +400,8 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
     });
     const queryList = ref([]);
     const queryListTools = tagList(queryList, true, eventBus, eventName.getServerList);
+    // const queryListTools = new TagList(queryList, true, eventBus, eventName.getServerList);
+
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
