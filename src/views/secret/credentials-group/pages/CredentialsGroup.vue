@@ -183,7 +183,6 @@ export default {
             });
         };
         const getCdsParam = (items, cdgId) => {
-            console.log('getCdsParam test', items)
             const result = {
                 // eslint-disable-next-line camelcase
                 credentials: _.map(items, 'credential_id'),
@@ -192,11 +191,8 @@ export default {
             return result;
         };
         const deleteCd = async (items, cdId, cdgId) => {
-            console.log(cdgId)
             await context.parent.$http.post('/secret/credential-group/credential/remove', getCdsParam(items, cdgId)).then(async (_) => {
-                console.log('deleteCd success')
                 await requestCdList(cdgId);
-                console.log('requestCd List')
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',

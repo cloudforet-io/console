@@ -188,7 +188,6 @@ export default {
         const getSelectedCdIds = computed(() => {
             const ids = [];
             getSelectedCdItems.value.forEach((item) => {
-                console.log('test')
                 ids.push(item.credential_id);
             });
             return ids;
@@ -205,7 +204,7 @@ export default {
         const checkTableModalState = reactive({
             visible: false,
             mode: '',
-            item: undefined,
+            item: null,
             confirmEventName: '',
             title: '',
             subTitle: '',
@@ -238,6 +237,7 @@ export default {
         };
 
         const checkModalConfirm = (event) => {
+            state.selectIndex = [];
             cdgEventBus.$emit(checkTableModalState.confirmEventName, event, getFirstSelectedCdId.value, props.credentialGroupId);
             resetCheckTableModalState();
         };
