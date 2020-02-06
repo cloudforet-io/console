@@ -92,6 +92,7 @@ export default {
     font-weight: 400;
     font-size: .875rem;
     line-height: 1rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
     @include btn-color('primary', $primary, $white);
     @include btn-color('primary-dark', $primary-dark, $white);
@@ -119,12 +120,13 @@ export default {
     @include btn-color('other4', $other4, $white);
 
 
-    &.disabled{
+    &.disabled {
         background-color: $gray2;
         background-repeat: no-repeat;
         background-clip: padding-box;
         border: 1px solid $gray3;
-        color: $gray1;}
+        color: $gray1;
+    }
 }
 
 .btn-lg{

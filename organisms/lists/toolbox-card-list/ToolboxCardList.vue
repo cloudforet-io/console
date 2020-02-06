@@ -1,46 +1,56 @@
 <template>
-    <div class="container">
-        <slot name="top">
-            <p-row class="top-row">
-                <p-col>
-                    <slot name="leftTop">
-                        <span class="title">{{ title }}</span>
-                    </slot>
-                </p-col>
-                <p-col :flex-grow="0" align-self="flex-end">
-                    <slot name="rightTop">
-                        <p-text-pagenation class="tool pagination"
-                                           :this-page.sync="proxyThisPage"
+    <p-row class="container" direction="column">
+        <p-col :flex-grow="0">
+            <slot name="top">
+                <p-row class="top-row">
+                    <p-col>
+                        <slot name="leftTop">
+                            <span class="title">{{ title }}</span>
+                        </slot>
+                    </p-col>
+                    <p-col :flex-grow="0" align-self="flex-end">
+                        <slot name="rightTop">
+                            <p-text-pagenation class="tool pagination"
+                                               :this-page.sync="proxyThisPage"
+                                               :all-page="allPage"
+                                               @pageChange="onPageChange"
+                            />
+                            <p-dropdown-menu-btn class="tool"
+                                                 :menu="sortMenu"
+                                                 @clickMenuEvent="onClickSortMenu"
+                            >
+                                Sort by {{ sortMenu[sortByIdx].label }}
+                            </p-dropdown-menu-btn>
+                        </slot>
+                    </p-col>
+                </p-row>
+            </slot>
+        </p-col>
+        <p-col :flex-grow="0">
+            <slot name="filters" />
+        </p-col>
+        <p-col :flex-shrink="0">
+            <p-card-list class="card-container" :items="items" :mapper="mapper"
+                         :loading="loading"
+            >
+                <template v-for="(_, slot) of cardSlots" v-slot:[slot]="scope">
+                    <slot :name="`card-${slot}`" v-bind="scope" :items="items" />
+                </template>
+            </p-card-list>
+        </p-col>
+        <p-col :flex-grow="0">
+            <slot name="bottom">
+                <p-row class="bottom-row" justify-content="center">
+                    <p-col>
+                        <p-text-pagenation :this-page.sync="proxyThisPage"
                                            :all-page="allPage"
                                            @pageChange="onPageChange"
                         />
-                        <p-dropdown-menu-btn class="tool"
-                                             :menu="sortMenu"
-                                             @clickMenuEvent="onClickSortMenu"
-                        >
-                            Sort by {{ sortMenu[sortByIdx].label }}
-                        </p-dropdown-menu-btn>
-                    </slot>
-                </p-col>
-            </p-row>
-        </slot>
-        <slot name="filters" />
-        <p-card-list class="card-container" :items="items" :mapper="mapper">
-            <template v-for="(_, slot) of cardSlots" v-slot:[slot]="scope">
-                <slot :name="`card-${slot}`" v-bind="scope" :items="items" />
-            </template>
-        </p-card-list>
-        <p-row class="bottom-row" justify-content="center">
-            <slot name="bottom">
-                <p-col>
-                    <p-text-pagenation :this-page.sync="proxyThisPage"
-                                       :all-page="allPage"
-                                       @pageChange="onPageChange"
-                    />
-                </p-col>
+                    </p-col>
+                </p-row>
             </slot>
-        </p-row>
-    </div>
+        </p-col>
+    </p-row>
 </template>
 
 <script>
@@ -106,6 +116,10 @@ export default {
     props: {
         items: Array,
         mapper: Object,
+        loading: {
+            type: Boolean,
+            default: false,
+        },
         totalCount: {
             type: Number,
             default: 0,
@@ -145,6 +159,7 @@ export default {
 <style lang="scss" scoped>
 .container {
     width: 100%;
+    height: 100%;
     padding-right: 1rem;
     padding-left: 1rem;
     margin-right: auto;
@@ -165,6 +180,7 @@ export default {
     }
 }
 .card-container {
+    height: 100%;
     margin-top: 1.5rem;
 }
 .bottom-row {
