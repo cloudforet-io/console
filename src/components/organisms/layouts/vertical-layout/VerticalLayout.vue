@@ -48,7 +48,7 @@
              }"
         >
             <div>
-                <slot name="rightContainer" />
+                <slot name="rightContainer" :height="hideFNB ? height : `calc(${height} - ${fnbHeight})`" />
             </div>
             <FNB v-if="!hideFNB" class="fnb" />
         </div>
@@ -113,6 +113,7 @@ export default {
             dragging: false,
             mouseOver: false,
             pageX: null,
+            fnbHeight: styles.fnbHeight,
         };
     },
     computed: {
