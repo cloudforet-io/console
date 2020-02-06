@@ -6,33 +6,36 @@
                        :invalid="typeof invalid === 'boolean' ? invalid : false"
         >
             <slot>
-                <div v-if="formType === 'input'">
-                    <p-text-input v-model="proxyValue"
+                <div class="form-container">
+                    <p-text-input v-if="formType === 'input'"
+                                  v-model="proxyValue"
                                   :type="inputType"
                                   :placeholder="formData.placeholder"
+                                  class="form"
                                   @input="onChange"
                     />
-                </div>
-                <div v-else-if="formType === 'radio'">
-                    <span v-for="(bool) in [true, false]" :key="bool">
-                        <p-radio v-model="proxyValue"
-                                 :value="bool"
-                                 @change="onChange"
-                        />
-                        {{ bool }}
-                    </span>
-                </div>
-                <div v-else-if="formType === 'dropdown'">
-                    <p-dropdown-menu-btn :menu="setDropdownMenu(formData.menu)"
+                    <template v-else-if="formType === 'radio'">
+                        <span v-for="(bool) in [true, false]" :key="bool">
+                            <p-radio v-model="proxyValue"
+                                     :value="bool"
+                                     @change="onChange"
+                            />
+                            {{ bool }}
+                        </span>
+                    </template>
+                    <p-dropdown-menu-btn v-else-if="formType === 'dropdown'"
+                                         :menu="setDropdownMenu(formData.menu)"
+                                         block
+                                         class="form"
                                          @clickMenuEvent="onClickMenu"
                     >
                         {{ value || formData.placeholder }}
                     </p-dropdown-menu-btn>
-                </div>
-                <div v-else-if="formType === 'tags'">
-                    <p-tags-input :tags.sync="proxyValue"
+                    <p-tags-input v-else-if="formType === 'tags'"
+                                  :tags.sync="proxyValue"
                                   :placeholder="formData.placeholder"
                                   :focus="false"
+                                  class="form"
                                   @change="onChange"
                     />
                 </div>
@@ -199,5 +202,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.form-container {
+    display: flex;
+    width: 100%;
+    .form {
+        width: 100%;
+    }
+}
 </style>

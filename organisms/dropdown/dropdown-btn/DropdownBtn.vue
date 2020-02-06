@@ -1,5 +1,5 @@
 <template>
-    <div style="display:inline-flex">
+    <div class="dropdown-btn-container" :class="{block}">
         <p-button
             :disabled="disabled"
             :class="btnClassObject"
@@ -41,10 +41,14 @@ export default {
             type: Boolean,
             default: false,
         },
+        block: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
-            //Consider to specify color according to Jenny's
+            // Consider to specify color according to Jenny's
             colorSets: {
                 disabled: '#A7A9B2',
                 popup: '#0080FB',
@@ -59,6 +63,7 @@ export default {
             return {
                 'dropdown-opened': this.popup,
                 'dropdown-mouseover': this.mouseover,
+                block: this.block,
             };
         },
     },
@@ -83,7 +88,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.dropdown-btn-container {
+    display: inline-flex;
+    &.block {
+        display: flex;
+    }
+}
 .dropdown-btn{
     background-color: $white;
     border-bottom-width: 1px;
@@ -115,6 +125,9 @@ export default {
     text-align: left;
     margin-right: -4px;
     color: $dark;
+    &.block {
+        width: 100%;
+    }
 }
 
 .dropdown-mouseover, .dropdown-opened{
