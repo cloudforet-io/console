@@ -103,7 +103,7 @@ export const en = {
         ADMIN: 'Admin',
         JOBS: 'Jobs',
         SCHEDULE: 'Schedules',
-        NO_ITEM: 'No {0}',
+        NO_ITEM: 'No Items',
         NO_SELECT: 'Select a {0} Above.',
         LOCAL: 'Local',
         OFFICIAL: 'OFFICIAL',

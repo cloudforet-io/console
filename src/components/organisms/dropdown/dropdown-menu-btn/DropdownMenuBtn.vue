@@ -7,6 +7,7 @@
                       class="menu-ctx"
                       :class="{block}"
                       :menu="menu"
+                      :loading="loading"
                       @clickMenuEvent="clickMenuEvent"
         />
     </div>
@@ -25,6 +26,10 @@ export default {
             default: () => [],
         },
         block: {
+            type: Boolean,
+            default: false,
+        },
+        loading: {
             type: Boolean,
             default: false,
         },

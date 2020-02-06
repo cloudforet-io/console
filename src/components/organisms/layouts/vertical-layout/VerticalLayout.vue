@@ -152,7 +152,8 @@ export default {
         },
         initDefaultLeftWidth() {
             if (this.autoSaveLeftWidth) {
-                this.leftContainerWidth = parseFloat(this.verticalLeftWidth) || parseFloat(this.leftWidth);
+                const width = parseFloat(this.verticalLeftWidth) || parseFloat(this.leftWidth);
+                this.leftContainerWidth = width > this.minLeftWidth ? width : this.minLeftWidth;
             }
         },
         finalizeFNB() {

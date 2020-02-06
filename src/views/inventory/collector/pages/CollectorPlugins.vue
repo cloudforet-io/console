@@ -66,7 +66,7 @@ export default {
                     // eslint-disable-next-line camelcase
                     plugin_id: pluginId,
                 });
-                state.versions = { ...state.versions, [pluginId]: res.data.version };
+                state.versions = { ...state.versions, [pluginId]: res.data.version || [] };
             } catch (e) {
                 console.error(e);
             }

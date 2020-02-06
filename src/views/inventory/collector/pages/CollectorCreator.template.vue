@@ -18,6 +18,7 @@
                                      :plugin-id="confState.pluginId"
                                      :plugin="confState.plugin"
                                      :versions="confState.versions"
+                                     :name.sync="confState.name"
                                      :selected-version.sync="confState.selectedVersion"
                                      :options-value.sync="confState.optionsValue"
                                      :priority.sync="confState.priority"
@@ -51,7 +52,9 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed } from '@vue/composition-api';
+import {
+    reactive, toRefs, computed, watch,
+} from '@vue/composition-api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
 import PI from '@/components/atoms/icons/PI.vue';
@@ -73,6 +76,7 @@ const getCrdState = () => reactive({
 const getConfState = root => reactive({
     pluginId: _.get(root, '$route.params.pluginId', ''),
     plugin: null,
+    name: '',
     versions: [],
     selectedVersion: _.get(root, '$route.query.version', ''),
     priority: 10,
@@ -83,11 +87,18 @@ const getConfState = root => reactive({
  * @param root
  * @returns {UnwrapRef<{confState: UnwrapRef<{plugin: null, selectedVersion: *, versions: [], optionsValue: {}, priority: number}>, crdState: UnwrapRef<{crdType: string, selectIndex: [], totalCount: number, loading: boolean, items: []}>, tags: {}}>}
  */
-export const setDataState = root => reactive({
-    tags: {},
-    crdState: getCrdState(),
-    confState: getConfState(root),
-});
+export const setDataState = (root) => {
+    const state = reactive({
+        tags: {},
+        crdState: getCrdState(),
+        confState: getConfState(root),
+    });
+    watch(() => state.confState.plugin, (plugin) => {
+        const icon = _.get(plugin, 'tags.icon');
+        if (icon) state.tags.icon = icon;
+    });
+    return state;
+};
 
 export default {
     name: 'CollectorCreator',
@@ -143,7 +154,7 @@ export default {
         const onChangeStep = async (beforeIdx) => {
             let res = null;
 
-            if (state.tabs[beforeIdx].key === 'conf') res = await refs.conf.vdApi.allValidation();
+            if (state.tabs[beforeIdx].key === 'conf') res = await refs.conf.validate();
             else if (state.tabs[beforeIdx].key === 'credentials') res = refs.crd.validate();
             else return;
 
@@ -153,7 +164,6 @@ export default {
         const goBack = () => {
             root.$router.push('../plugins');
         };
-
 
         return {
             ...toRefs(dataState),
