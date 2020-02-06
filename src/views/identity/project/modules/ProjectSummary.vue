@@ -36,7 +36,7 @@ export default {
     data() {
         return {
             dataMap: {
-                members: {
+                member: {
                     label: 'Members', path: '/identity/project', hover: false,
                 },
                 server: {

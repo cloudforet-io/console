@@ -61,12 +61,8 @@ export default {
         async initSummaryData() {
             const selectedNodeDT = this.selectedNode.node.data;
             try {
-                const summaryData = await this.$http.post('/statistics/summary', { project_id: selectedNodeDT.id });
-                const memberData = await this.$http.post('/identity/project/member/list', { project_id: selectedNodeDT.id });
-                const cardData = summaryData.data;
-                delete cardData.project;
-                cardData.members = memberData.data.total_count;
-                this.summaryData = cardData;
+                const summaryData = await this.$http.post('/statistics/project-summary', { project_id: selectedNodeDT.id });
+                this.summaryData = summaryData.data;
             } catch (e) {
                 console.error(e);
             }
