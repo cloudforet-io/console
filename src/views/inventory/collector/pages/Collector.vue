@@ -3,10 +3,11 @@
 import {
     ref, toRefs, computed, reactive,
 } from '@vue/composition-api';
-import CollectorTemplate, { collectorSetup } from '@/views/inventory/collector/pages/Collector.template.vue';
+import CollectorTemplate, { api, collectorSetup } from '@/views/inventory/collector/pages/Collector.template.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery } from '@/lib/api';
+import { defaultQuery, callApi } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
+
 
 export default {
     name: 'Collector',
@@ -39,6 +40,8 @@ export default {
             }
         };
         mountBusEvent(CollectorEventBus, 'getCollectorList', getCollectorList);
+
+        // api.getCollectorList = params => context.parent.$http.post('/inventory/collector/list', params);
 
 
         const getPlugin = async (params) => {

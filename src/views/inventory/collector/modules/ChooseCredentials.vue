@@ -48,8 +48,15 @@
                     </p-tag>
                 </span>
             </template>
-            <template #col-created_at-format="data">
-                {{ timestampFormatter(data.value) }}
+            <template #col-created_at-format="{value}">
+                {{ timestampFormatter(value) }}
+            </template>
+            <template #col-go_credentials-format="data">
+                <router-link to="/secret/credentials-group" target="_blank">
+                    <p-button outline style-type="dark">
+                        {{ tr('INVENTORY.CRT_CRD') }}
+                    </p-button>
+                </router-link><p-button />
             </template>
         </p-toolbox-table>
     </div>
@@ -69,7 +76,8 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PRadio from '@/components/molecules/forms/radio/Radio.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
-import { makeProxy } from '@/lib/compostion-util.ts';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import { makeProxy } from '@/lib/compostion-util';
 
 export default {
     name: 'ChooseCredentials',
@@ -79,6 +87,7 @@ export default {
         PRadio,
         PSearch,
         PToolboxTable,
+        PButton,
     },
     props: {
         items: Array,
@@ -107,6 +116,7 @@ export default {
                     ['credential_group_id', 'COMMON.ID'],
                     ['name', 'COMMON.NAME'],
                     ['created_at', 'COMMON.CREATE'],
+                    ['go_credentials', ' '],
                 ], parent),
                 Credentials: makeTrItems([
                     ['credential_id', 'COMMON.ID', { size: '400px' }],

@@ -26,7 +26,7 @@
                                  @changeSort="getCollectors"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary" @click="$router.push('/inventory/collector/create/plugins')">
+                        <p-button style-type="primary" @click="$router.push({path: '/inventory/collector/create/plugins'})">
                             Create
                         </p-button>
                         <PDropdownMenuBtn class="left-toolbox-item"
@@ -167,6 +167,10 @@ const CollectorUpdateModal = () => import('@/views/inventory/collector/modules/C
 const CollectDataModal = () => import('@/views/inventory/collector/modules/CollectDataModal.vue');
 const CollectorDetail = () => import('@/views/inventory/collector/modules/CollectorDetail');
 const CollectorCredentials = () => import('@/views/inventory/collector/modules/CollectorCredentials');
+
+export const api = {
+    getCollectorList: undefined,
+};
 
 const collectorState = reactive({
     selectIndex: [],
