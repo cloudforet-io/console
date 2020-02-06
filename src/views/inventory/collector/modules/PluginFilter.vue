@@ -7,7 +7,9 @@
         </p-row>
         <p-row>
             <p-col>
-                <p-search class="p-search" :search-text.sync="search" @onSearch="$emit('search', $event)" />
+                <p-search class="p-search" :search-text.sync="search" search-placeholder="Enter keyword"
+                          @onSearch="onSearch"
+                />
             </p-col>
         </p-row>
         <p-row direction="column">
@@ -22,10 +24,10 @@
         <p-row direction="column">
             <header>Resource Type</header>
             <span v-for="(resource) in resourceOptions" :key="resource"
-                  class="filter" :class="{selected: proxyFilters.includes(resource)}"
+                  class="filter" :class="{selected: filters.includes(resource)}"
             >
-                <p-check-box v-model="proxyFilters" :value="resource"
-                             @change="onResourceChange"
+                <p-check-box :selected="filters" :value="resource"
+                             @change="onResourceChange(resource, ...arguments)"
                 />
                 {{ resource }}
             </span>
@@ -86,8 +88,13 @@ export default {
             context.emit('repoChange', val);
         };
 
-        const onResourceChange = (selected) => {
-            context.emit('filtersChange', selected);
+        const onResourceChange = (...args) => {
+            context.emit('resourceChange', ...args);
+        };
+
+        const onSearch = (e) => {
+            state.search = '';
+            context.emit('search', e);
         };
 
         return {
@@ -95,6 +102,7 @@ export default {
             proxyFilters,
             onRepoChange,
             onResourceChange,
+            onSearch,
         };
     },
 };

@@ -1,15 +1,15 @@
 <template>
     <div>
-        <p-vertical-layout>
+        <p-vertical-layout :min-left-width="260">
             <template #leftContainer="{width}">
                 <div :style="{width: width}">
-                    <plugin-filter :filters.sync="filterTools.tags"
+                    <plugin-filter :filters="resourceFilters"
                                    :repositories="repositories"
                                    :selected-repo-id.sync="selectedRepoId"
                                    @goBack="goBack"
                                    @search="search"
                                    @repoChange="listPlugins"
-                                   @filtersChange="listPlugins"
+                                   @resourceChange="onResourceChange"
                     />
                 </div>
             </template>
@@ -29,10 +29,10 @@
                                      @sortChange="listPlugins"
                 >
                     <template #filters>
-                        <p-tag v-for="(filter, idx) in filterTools.tags" :key="`${idx}-${filter}`"
-                               @delete="onDeleteTag(idx)"
+                        <p-tag v-for="(filter, idx) in filterTools.tags" :key="`${idx}-${filter.name}`"
+                               @delete="onDeleteTag(filter, idx)"
                         >
-                            {{ filter }}
+                            {{ filter.name }}
                         </p-tag>
                     </template>
                     <template #card-extra="{item}">
@@ -50,6 +50,7 @@
                                 <p-row>
                                     <p-dropdown-menu-btn :menu="versionsMenu[item.plugin_id]"
                                                          style="margin-right: 1.25rem;"
+                                                         :loading="versionsMenu[item.plugin_id] ? false : true"
                                                          @openMenu="listVersions(item.plugin_id)"
                                                          @clickMenuEvent="onSelectVersion(item.plugin_id, $event)"
                                     >
@@ -90,6 +91,14 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 
 import PluginFilter from '@/views/inventory/collector/modules/PluginFilter.vue';
+
+class FilterItem {
+    constructor(type, name, idx) {
+        this.type = type;
+        this.name = name;
+    }
+}
+
 
 const repoState = reactive({
     repositories: [],
@@ -164,32 +173,70 @@ const setPluginList = (router) => {
 const setFilters = (pluginListState, router) => {
     const filterTools = tagList();
     const searchText = ref('');
+    const resourceFilters = computed(() => {
+        const res = [];
+        filterTools.tags.forEach((filter) => {
+            if (filter.type === 'resource') res.push(filter.name);
+        });
+        return res;
+    });
+    const deleteFilter = (name) => {
+        filterTools.deleteTag(_.findIndex(filterTools.tags, { name }));
+    };
+    const searchPrefix = 'search: ';
 
     return {
         filterTools,
         searchText,
+        resourceFilters,
+        searchPrefix,
         goBack: () => {
             router.push('/inventory/collector');
         },
         search: (val) => {
-            searchText.value = val;
+            searchText.value = '';
+            filterTools.addTag(new FilterItem('search', `${searchPrefix}${val}`));
             pluginListState.listPlugins();
         },
-        onDeleteTag: (idx) => {
+        onDeleteTag: (filter, idx) => {
             filterTools.deleteTag(idx);
+            pluginListState.listPlugins();
+        },
+        onResourceChange: (resource, items, isUnchecked) => {
+            if (isUnchecked) deleteFilter(resource);
+            else filterTools.addTag(new FilterItem('resource', resource));
             pluginListState.listPlugins();
         },
     };
 };
 
 const setQueryState = (state) => {
+    const keywordKeys = ['tags.description', 'name', 'labels'];
+    const setKeywordQueries = (queries, filter) => {
+        const keyword = _.split(filter.name, state.searchPrefix, 2)[1];
+        keywordKeys.forEach((key) => {
+            queries.push({ k: key, o: 'contain_in', v: [keyword] });
+        });
+    };
+
     const queryState = reactive({
-        query: computed(() => (defaultQuery(
+        defaultQuery: computed(() => (defaultQuery(
             state.thisPage, state.pageSize,
             state.sortBy, true,
-            state.searchText, queryState.searchQueries,
         ))),
-        searchQueries: computed(() => state.filterTools.tags.map(filter => new SearchQuery('labels', '=', filter))),
+        query: computed(() => {
+            const and = [];
+            const or = [];
+            state.filterTools.tags.forEach((filter) => {
+                if (filter.type === 'resource') and.push({ k: 'labels', o: 'in', v: [filter.name] });
+                else setKeywordQueries(or, filter);
+            });
+
+            queryState.defaultQuery.filter = and;
+            // eslint-disable-next-line camelcase
+            queryState.defaultQuery.filter_or = or;
+            return queryState.defaultQuery;
+        }),
         sortBy: computed(() => state.sortMenu[state.sortByIdx].name),
     });
 

@@ -216,6 +216,7 @@ export const defaultQuery = (
     }
     if (searchQueries && searchQueries.length > 0) {
         const filter:Filter[] = [];
+
         // eslint-disable-next-line camelcase
         const mergeOpQuery:{[propName: string]: Filter;} = {};
         searchQueries.forEach((q) => {

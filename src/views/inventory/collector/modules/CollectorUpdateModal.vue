@@ -16,6 +16,7 @@
             <configure-collector ref="confRef"
                                  show-validation
                                  :plugin-id="pluginId"
+                                 :name.sync="name"
                                  :plugin="plugin"
                                  :versions="versions"
                                  :selected-version.sync="selectedVersion"
@@ -82,6 +83,7 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             pluginId: _.get(props.collector, 'plugin_info.plugin_id', ''),
+            name: _.get(props.collector, 'name', ''),
             priority: _.get(props.collector, 'priority', 10),
             options: _.get(props.collector, 'plugin_info.options', {}),
             selectedVersion: _.get(props.collector, 'plugin_info.version', '1.0'),
@@ -97,18 +99,19 @@ export default {
                 return defaultStyle;
             }),
             onClickConfirm: async () => {
-                if (await refs.confRef.vdApi.allValidation()) {
+                if (await refs.confRef.validate()) {
                     const params = {
+                        name: state.name,
                         // eslint-disable-next-line camelcase
                         collector_id: props.collector.collector_id,
                         // eslint-disable-next-line camelcase
                         plugin_info: {
+                            ..._.get(props.collector, 'plugin_info'),
                             version: state.selectedVersion,
+                            options: { ..._.get(props.collector, 'plugin_info.options', {}), ...state.options },
                         },
                         priority: state.priority,
                     };
-
-                    if (!_.isEmpty(state.options)) params.plugin_info.options = state.options;
 
                     CollectorEventBus.$emit('updateCollector', params);
                 }
