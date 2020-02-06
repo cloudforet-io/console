@@ -69,8 +69,8 @@ export default {
                     item: {
                         view_type: 'badge',
                         view_option: {
-                            text_color: 'dark',
-                            background_color: 'gray1',
+                            text_color: '#222532',
+                            background_color: '#DCDDE2',
                         },
                     },
                 },

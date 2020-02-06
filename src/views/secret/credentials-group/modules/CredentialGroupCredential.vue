@@ -48,7 +48,7 @@
                 </p-button>
             </template>
             <template #col-credential_groups-format="{value}">
-                <span v-for="grp in value">{{ grp.name }}</span>
+                <p-badge style-type="gray2" class="group-badge" v-for="grp in value">  {{ grp.name }}</p-badge>
             </template>
             <template #col-created_at-format="{value}">
                 {{ timestampFormatter(value) }}
@@ -91,12 +91,14 @@ import PCdgForm from '@/views/secret/credentials-group/modules/CredentialGroupFo
 import { timestampFormatter } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
 
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable.vue');
 
 export default {
     name: 'PCdgCredential',
     components: {
+        PBadge,
         PI,
         PToolboxTable,
         PTableCheckModal,
@@ -278,5 +280,9 @@ export default {
 
     .toolbox-table{
         padding: 0;
+    }
+
+    .group-badge {
+        margin-right: 0.3rem;
     }
 </style>
