@@ -55,9 +55,8 @@
                                     </div>
                                     <div class="row mt-4">
                                         <div class="col-md-12 col-xs-12 col-sm-12">
-                                            <p-button class="button-cover"
-                                                      :size="'lg'"
-                                                      :style-type="'primary1'"
+                                            <p-button size="lg"
+                                                      style-type="primary1"
                                                       @click="signIn"
                                             >
                                                 {{ $t('SIGNIN.SIGN_IN') }}
@@ -295,17 +294,6 @@ export default {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-    }
-
-    .button-cover{
-        width: 50%;
-        display: inline-block;
-        text-align: center;
-        float: left;
-        font: 16px/18px Arial;
-        letter-spacing: 0;
-        color: #FFFFFF;
-        opacity: 1;
     }
 
     .card-group {
