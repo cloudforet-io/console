@@ -78,15 +78,20 @@ export default {
 }
 
 .btn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
     cursor:pointer;
     border-radius: 2px;
     opacity: 1;
     min-width:6rem;
     height: 2rem;
     text-align: center;
-    font: 14px/16px Arial;
     letter-spacing: 0;
-    line-height: 1.2rem;
+    font-weight: 400;
+    font-size: .875rem;
+    line-height: 1rem;
 
     @include btn-color('primary', $primary, $white);
     @include btn-color('primary-dark', $primary-dark, $white);
@@ -121,17 +126,20 @@ export default {
         border: 1px solid $gray3;
         color: $gray1;}
 }
+
 .btn-lg{
     min-width:7.5rem;
     height: 2.5rem;
     text-align: center;
-    font-size: 16px/18px;
+    font-size: 1rem;
+    line-height: 1.125rem;
 }
 .btn-sm{
     min-width:3.25rem;
     height: 1.5rem;
     text-align: center;
-    font-size: 112px/14px;
+    font-size: .75rem;
+    line-height: .875rem;
 }
 .btn-block {
     width: 100%;
