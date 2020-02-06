@@ -78,10 +78,10 @@ export default {
 }
 
 .btn{
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-    padding: 0;
+    padding: 0 .875rem;
     cursor:pointer;
     border-radius: 2px;
     opacity: 1;
@@ -142,6 +142,7 @@ export default {
     line-height: .875rem;
 }
 .btn-block {
+    display: flex;
     width: 100%;
 }
 </style>
