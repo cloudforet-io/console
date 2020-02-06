@@ -67,6 +67,10 @@ export const userStateColor = Object.freeze({
         iconColor: styles.alert,
         textColor: styles.alert,
     },
+    UNIDENTIFIED: {
+        iconColor: styles.gray,
+        textColor: styles.gray,
+    },
 });
 
 export const cdgStateColor = Object.freeze({
