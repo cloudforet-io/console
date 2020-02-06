@@ -79,6 +79,7 @@ export default {
                 state.loading = false;
             } catch (e) {
                 console.log(e);
+            } finally {
                 state.loading = false;
             }
         };
@@ -106,6 +107,7 @@ export default {
                     duration: 2000,
                     speed: 1000,
                 });
+                context.root.$router.push('/secret/credentials-group');
             }).catch((error) => {
                 console.log(error);
                 context.root.$notify({

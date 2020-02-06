@@ -106,7 +106,7 @@
                 />
             </template>
             <template #rawData="{tabName}">
-                <p-server-raw-data :item="items[selectIndex[0]]" />
+                <p-raw-data :item="items[selectIndex[0]]" />
             </template>
             <template #admin="{tabName}">
                 <p-server-admin :select-index="selectIndex"
@@ -198,7 +198,7 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
-import PServerRawData from '@/views/inventory/server/modules/ServerRawData.vue';
+import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import PServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
@@ -454,7 +454,7 @@ export default {
         PServerDetail,
         PTab,
         PDynamicSubData,
-        PServerRawData,
+        PRawData,
         PServerAdmin,
         PDataTable,
         PQuerySearchBar,

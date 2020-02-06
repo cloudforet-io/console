@@ -3,6 +3,8 @@ const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
 
 const DataCenter = () => import('@/views/inventory/data-center/DataCenter.vue');
 const Server = () => import('@/views/inventory/server/Server.vue');
+const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudService.vue');
+
 const Collector = () => import('@/views/inventory/collector/pages/Collector.vue');
 
 const CollectorPlugins = () => import('@/views/inventory/collector/pages/CollectorPlugins.vue');
@@ -29,6 +31,12 @@ export default {
             name: 'server',
             meta: { label: 'Server', breadcrumb: true },
             component: Server,
+        },
+        {
+            path: 'cloud-service',
+            name: 'cloudService',
+            meta: { label: 'Cloud Service', breadcrumb: true },
+            component: CloudService,
         },
         {
             path: 'collector',

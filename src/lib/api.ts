@@ -1,13 +1,19 @@
 /* eslint-disable camelcase */
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
 import VueCookies from 'vue-cookies';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
-import { VNode } from 'vue';
 import {
     computed, reactive, Ref, ref,
 } from '@vue/composition-api';
-import { VueInstance } from '@vue/composition-api/dist/types/vue';
+
+// @ts-ignore
+import { debug } from 'webpack';
+import { tagList } from '@/components/molecules/tags/Tag.vue';
+
+//  eslint-disable-next-line import/no-cycle
+import { getKeys, getSuggest, baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+
 
 class APIError extends Error {
     public status: number;
@@ -183,11 +189,12 @@ type ValueFormatter = (string, any)=>string|number|Array<string|number>;
  * @param searchText
  * @param searchQueries {Array<SearchQuery>}
  * @param valueFormatter <(key,value)=>value>
+ * @param only
  * @returns {{page: {start: number, limit: *}}}
  */
 export const defaultQuery = (
     thisPage:number, pageSize:number, sortBy?:string, sortDesc?:boolean,
-    searchText?:string, searchQueries?:SearchQuery[], valueFormatter?:ValueFormatter,
+    searchText?:string, searchQueries?:SearchQuery[], valueFormatter?:ValueFormatter, only?:string[],
 ) => {
     const query:ApiQuery = {
         page: {
@@ -201,10 +208,13 @@ export const defaultQuery = (
             desc: sortDesc,
         };
     }
+    if (only && only.length > 0) {
+        query.only = only;
+    }
     if (searchText) {
         query.keyword = searchText || '';
     }
-    if (searchQueries) {
+    if (searchQueries && searchQueries.length > 0) {
         const filter:Filter[] = [];
         // eslint-disable-next-line camelcase
         const mergeOpQuery:{[propName: string]: Filter;} = {};
@@ -279,11 +289,17 @@ export abstract class DynamicAPI {
 
 interface TableState {
     items:any[];
+    selectIndex?:number[];
+    sortBy?:string;
+    sortDesc?:boolean;
+    only?:string[];
     pageSize: number;
     allPage: number;
     thisPage: number;
     searchText: string|null|undefined;
+    fixSearchQuery?:SearchQuery[]|Ref<SearchQuery[]>;
     loading: boolean;
+    acHandler?:Ref<QuerySearchTableACHandler>;
 }
 
 export const getAllPage = (total_count:number, pageSize:number):number => Math.ceil(total_count / pageSize) || 1;
@@ -309,11 +325,16 @@ export class SubDataAPI extends DynamicAPI {
         )));
     }
 
+    public async requestData(data:any) {
+        const res = await this.$http.post(this.url, data);
+        return res;
+    }
+
     public getData = async () => {
         this.state.loading = true;
         this.state.items = [];
 
-        const res = await this.$http.post(this.url, {
+        const res = await this.requestData({
             query: this.query.value,
             key_path: this.keyPath.value,
             [this.idKey]: this.id.value,
@@ -336,12 +357,141 @@ export class MockSubDataAPI extends SubDataAPI {
         this.state.loading = false;
     }
 
-    public getData= async () => {
-        this.state.loading = true;
-        this.state.allPage = 1;
-        this.state.items = [];
+    public async requestData(data:any) {
+        setTimeout(() => {}, 1000);
+        return { data: { results: this.items, total_count: 1 } } as AxiosResponse<any>;
+    }
+}
 
-        setTimeout(this.fakeData, 1000);
+type AutoCompleteData = [string, any[]];
+type ACFunction = ()=>AutoCompleteData
+interface ACHandlerMap {
+    key: ACFunction[];
+    value:ACFunction[];
+
+}
+
+export class QuerySearchTableACHandler extends baseAutocompleteHandler {
+    constructor(public parent:HttpInstance, keys:string[] = [], suggestKeys:string[] = []) {
+        super();
+        (this.handlerMap as ACHandlerMap) = {
+            key: [getKeys(keys) as ACFunction, getSuggest(suggestKeys) as ACFunction],
+            value: [],
+        };
+    }
+}
+
+interface AcState {
+    keys:string[];
+    suggestKeys:string[];
+}
+
+export class BaseQuerySearchTableAPI extends DynamicAPI {
+    public state :TableState;
+
+    public queryListTools ;
+
+    public acState : AcState;
+
+
+    protected query:Ref<object>;
+
+    protected searchQuery:Ref<SearchQuery[]>
+
+
+    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[]) {
+        super();
+        this.acState = reactive({
+            keys: keys || [] as string[],
+            suggestKeys: keys || [] as string[],
+        });
+        const acHandler:Ref<any> = computed(() => {
+            console.log('new handler', this.acState.keys, this.acState.suggestKeys);
+            return new QuerySearchTableACHandler(parent, this.acState.keys, this.acState.keys);
+        });
+
+        this.state = reactive({
+            items: [],
+            selectIndex: [],
+            sortBy: '',
+            sortDesc: true,
+            pageSize: 15,
+            allPage: 1,
+            thisPage: 1,
+            searchText: '',
+            loading: false,
+            only,
+            fixSearchQuery: [],
+            acHandler,
+        });
+        this.queryListTools = tagList(undefined, true, undefined, undefined, this.getData);
+        // this.searchQuery = computed(() => _.flatten([this.state.fixSearchQuery || [], this.queryListTools.tags.value || []]));
+        // @ts-ignore
+        this.searchQuery = computed(() => {
+            const fix:SearchQuery[] = this.state.fixSearchQuery as SearchQuery[] || [] as SearchQuery[];
+            const sq:SearchQuery[] = this.queryListTools.tags;
+            return [...fix, ...sq];
+        });
+        this.query = computed(() => (defaultQuery(
+            this.state.thisPage, this.state.pageSize,
+            this.state.sortBy, this.state.sortDesc, undefined,
+            this.searchQuery.value, undefined, this.state.only,
+        )));
+    }
+
+    public getData = async () => {
+        this.state.loading = true;
+        this.state.items = [];
+        this.state.selectIndex = [];
+
+        try {
+            const res = await this.$http.post(this.url, {
+                query: this.query.value,
+            });
+            this.state.items = res.data.results;
+            this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
+        } catch (e) {
+            console.debug('request fail', e);
+        }
+
+        this.state.loading = false;
+    }
+}
+
+interface tableSelectState {
+    isNotSelected:boolean;
+    isSelectOne:boolean;
+    isSelectMulti:boolean;
+    selectItems:any[];
+    firstSelectItem:any;
+}
+export class QuerySearchTableAPI extends BaseQuerySearchTableAPI {
+    public selectState:tableSelectState
+
+    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[]) {
+        super(parent, url, keys, only);
+        const isNotSelected:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 0 : true));
+        const isSelectOne:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 1 : false));
+        const isSelectMulti:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length > 1 : false));
+        const selectItems:Ref<any[]> = computed(() :any[] => (this.state.selectIndex ? this.state.selectIndex.map(idx => this.state.items[idx]) : []));
+        const firstSelectItem:Ref<any> = computed(():any => (!isNotSelected.value ? this.state.items[(this.state.selectIndex as number[])[0]] : {}));
+        this.selectState = reactive({
+            isNotSelected,
+            isSelectOne,
+            isSelectMulti,
+            selectItems,
+            firstSelectItem,
+        });
+    }
+
+    public resetAll() {
+        this.state.allPage = 1;
+        this.state.thisPage = 1;
+        this.state.selectIndex = [];
+        this.state.items = [];
+        this.state.sortBy = '';
+        this.state.sortDesc = true;
+        this.state.searchText = '';
     }
 }
 
