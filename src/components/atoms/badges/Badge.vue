@@ -35,7 +35,7 @@ export default {
                 ...getBindClass(data.class),
             },
         };
-        newData.class.badge = true;
+        newData.class['p-badge'] = true;
         if (props.backgroundColor || props.textColor) {
             newData.staticStyle = data.staticStyle || {};
             if (props.backgroundColor) {
@@ -53,19 +53,7 @@ export default {
 </script>
 
 <style lang="scss">
-@mixin badge-color($theme, $color, $oposite-color) {
-    &.badge-#{$theme} {
-        background-color: $color;
-        color: $oposite-color;
-    }
-}
-@mixin hover-color($theme, $color, $oposite-color) {
-    &.badge-#{$theme} {
-        background-color: $color;
-        color: $oposite-color;
-    }
-}
-.badge{
+.p-badge {
     all: unset;
     display: inline-block;
     border-radius: 100px;
@@ -77,6 +65,19 @@ export default {
     background-color:$gray;
     letter-spacing: 0;
     padding:  0.1875rem 0.5rem 0.1875rem 0.5rem;
+}
+
+@mixin badge-color($theme, $color, $oposite-color) {
+    &.badge-#{$theme} {
+        background-color: $color;
+        color: $oposite-color;
+    }
+}
+@mixin hover-color($theme, $color, $oposite-color) {
+    &.badge-#{$theme} {
+        background-color: $color;
+        color: $oposite-color;
+    }
 }
 
 @include badge-color('primary', $primary, $white);
