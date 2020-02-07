@@ -9,6 +9,7 @@ import {
 
 // @ts-ignore
 import { debug } from 'webpack';
+// @ts-ignore
 import { tagList } from '@/components/molecules/tags/Tag.vue';
 
 //  eslint-disable-next-line import/no-cycle
@@ -113,8 +114,8 @@ class API {
     }
 
     checkAccessToken=():boolean => {
-        // @ts-ignore
         debugger;
+        // @ts-ignore
         const accessToken = VueCookies.get('accessToken');
         if (accessToken) {
             return true;
