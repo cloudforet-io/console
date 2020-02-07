@@ -17,6 +17,7 @@ export default {
         const listCredentials = async (params) => {
             const url = state.crdState.crdType === 'Credentials'
                 ? '/secret/credential/list' : '/secret/credential-group/list';
+            params.include_credential_group = true;
 
             state.crdState.loading = true;
             state.crdState.items = [];

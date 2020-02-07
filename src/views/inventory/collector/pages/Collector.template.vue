@@ -40,8 +40,29 @@
                             Action
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
-                            <p-search :search-text.sync="searchText" @onSearch="getCollectors" />
+                            <!--                            <p-search :search-text.sync="searchText" @onSearch="getCollectors" />-->
+                            <p-query-search-bar :search-text.sync="searchText"
+                                                :autocomplete-handler="AcHandler"
+                                                @newQuery="queryListTools.addTag"
+                            />
                         </div>
+                    </template>
+                    <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
+                        <p-col :col="12" style="margin-bottom: .5rem;">
+                            <p-hr style="width: 100%;" />
+                            <p-row style="margin-top: .5rem;">
+                                <div style="flex-grow: 0">
+                                    <p-icon-button name="ic_delete" @click="queryListTools.deleteAllTags" />
+                                </div>
+                                <div style="flex-grow: 1;margin-left: 1rem;">
+                                    <p-tag v-for="(tag, idx) in queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
+                                           @delete="queryListTools.deleteTag(idx)"
+                                    >
+                                        {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
+                                    </p-tag>
+                                </div>
+                            </p-row>
+                        </p-col>
                     </template>
                     <template #col-name-format="data">
                         <span class="name">
@@ -144,7 +165,7 @@
 
 <script>
 import {
-    reactive, toRefs, computed,
+    reactive, toRefs, computed, ref,
 } from '@vue/composition-api';
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
@@ -154,13 +175,18 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import config from '@/lib/config';
+import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
 const PDropdownMenuBtn = () => import('@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn');
-const PSearch = () => import('@/components/molecules/search/Search');
+const PQuerySearchBar = () => import('@/components/organisms/search/query-search-bar/QuerySearchBar.vue');
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal.vue');
 
 const CollectorUpdateModal = () => import('@/views/inventory/collector/modules/CollectorUpdateModal.vue');
@@ -214,6 +240,7 @@ const setTableData = (props, context) => {
         collectorStateFormatter,
         defaultImg: config.get('COLLECTOR_IMG'),
         getIcon: data => _.get(data, 'item.tags.icon', config.get('COLLECTOR_IMG')),
+        queryListTools: tagList(ref([]), true, collectorEventBus, 'getCollectorList'),
     });
 
     const nothingSelected = computed(() => collectorState.selectIndex.length === 0);
@@ -300,7 +327,7 @@ const updateModalState = reactive({
     plugin: {},
 });
 
-export const collectorSetup = (props, context, eventNames) => {
+export const collectorSetup = (props, context, AcHandler) => {
     const state = reactive({
         ...setTableData(props, context),
         ...setTabData(props, context),
@@ -310,6 +337,7 @@ export const collectorSetup = (props, context, eventNames) => {
         crdVerifyState,
         checkModalState,
         updateModalState,
+        AcHandler,
     });
 
     const onClickUpdate = () => {
@@ -377,15 +405,19 @@ export const collectorSetup = (props, context, eventNames) => {
 export default {
     name: 'CollectorTemplate',
     components: {
-        PI,
         PStatus,
         PHorizontalLayout,
         PToolboxTable,
         PDataTable,
         PButton,
+        PTag,
+        PRow,
+        PCol,
+        PHr,
+        PIconButton,
         PDropdownMenuBtn,
         PTab,
-        PSearch,
+        PQuerySearchBar,
         CollectorUpdateModal,
         PTableCheckModal,
         CollectDataModal,
