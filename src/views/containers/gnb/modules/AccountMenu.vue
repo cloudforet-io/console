@@ -71,7 +71,8 @@ export default {
             this.$refs.profileModal.showModal();
         },
         oAuthSignOut() {
-            const auth = gapi.auth.getAuthInstance();
+            debugger;
+            const auth = gapi.auth2.getAuthInstance();
             auth.signOut();
         },
     },
