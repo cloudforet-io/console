@@ -16,6 +16,22 @@ module.exports = {
     '@storybook/addon-docs',
   ],
   webpack:  (config) => {
+
+    /* Babel settings */
+    config.module.rules.push({
+      test : /\.js$/,
+      exclude : /node_modules/,
+      use:{
+        loader: "babel-loader",
+        options: {
+          presets: [
+            '@vue/cli-plugin-babel/preset',
+          ],
+        }
+      }
+    });
+
+    /* Typescript settings */
     config.module.rules.push({
       test: /\.(ts|tsx)$/,
       loader: 'ts-loader',
@@ -25,6 +41,8 @@ module.exports = {
       },
     });
     config.resolve.extensions.push('.ts', '.tsx');
+
+    /* SASS settings */
     config.module.rules.push(
       {
         test: /\.s?css$/,
@@ -47,15 +65,20 @@ module.exports = {
 
       }
     );
+
+    /* alis settings */
     config.resolve.alias = {
       node_modules: path.resolve('./node_modules'),
       'vue': 'vue/dist/vue.common.js',
       '@': path.resolve(__dirname, '../src'),
       '@sb': path.resolve(__dirname, './'),
     };
+
+    /* plugins settings */
     config.plugins.push(new MonacoWebpackPlugin({
       languages:['javascript','json','css','html']
     }));
+
     return config;
   },
 };
