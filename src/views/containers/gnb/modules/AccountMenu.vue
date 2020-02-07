@@ -62,6 +62,7 @@ export default {
                 await this.signOut();
                 this.$router.push({ path: '/sign-in' });
             } else {
+                debugger;
                 await this.signOut();
                 this.oAuthSignOut();
                 this.$router.push({ path: '/google-sign-in' });
@@ -71,7 +72,6 @@ export default {
             this.$refs.profileModal.showModal();
         },
         oAuthSignOut() {
-            debugger;
             const auth = gapi.auth2.getAuthInstance();
             auth.signOut();
         },
