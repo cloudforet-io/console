@@ -113,7 +113,6 @@ class API {
     }
 
     checkAccessToken=():boolean => {
-        debugger;
         const accessToken = VueCookies.get('accessToken');
         if (accessToken) {
             return true;
