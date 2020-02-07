@@ -48,7 +48,11 @@
                 </p-button>
             </template>
             <template #col-credential_groups-format="{value}">
-                <p-badge style-type="gray2" class="group-badge" v-for="grp in value">  {{ grp.name }}</p-badge>
+                <p-badge v-for="(grp, index) in value" :key="index" style-type="gray2"
+                         class="group-badge"
+                >
+                    {{ grp.name }}
+                </p-badge>
             </template>
             <template #col-created_at-format="{value}">
                 {{ timestampFormatter(value) }}
