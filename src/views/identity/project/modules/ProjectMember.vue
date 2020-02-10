@@ -29,7 +29,7 @@
                          @clickRefresh="getMembers"
         >
             <template slot="toolbox-left">
-                <p-button style-type="primary" @click="showModals('add')">
+                <p-button style-type="primary-dark" @click="showModals('add')">
                     <p-i :color="'transparent inherit'"
                          :width="'1rem'"
                          :height="'1rem'"
