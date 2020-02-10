@@ -2,7 +2,7 @@
     <p-panel-top panel-title="Tags" class="dict-panel-title">
         <template #head>
             <div class="panel-header" :class="{'edit':editMode}">
-                <p-button v-if="!editMode" style-type="primary" class="header-btn"
+                <p-button v-if="!editMode" style-type="primary-dark" class="header-btn"
                           @click="clickEdit()"
                 >
                     {{ buttonTag }}
