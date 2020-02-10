@@ -83,7 +83,7 @@ export default {
         -ms-transform: translateX(-50%);
         transform: translateX(-50%);
         -webkit-text-fill-color: transparent;
-        background:url('~@/assets/images/redirect/bg.jpg') no-repeat;
+        background:url('~@/assets/images/redirect/error/bg.jpg') no-repeat;
         -webkit-background-clip: text;
         background-size: cover;
         background-position: center;
