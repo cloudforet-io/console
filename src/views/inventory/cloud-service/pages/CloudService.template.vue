@@ -50,7 +50,7 @@
                                                 :data="null"
                                 >
                                     <template #toolbox-left>
-                                        <p-button style-type="primary">
+                                        <p-button style-type="primary-dark">
                                             Collect Data
                                         </p-button>
                                         <div class="left-toolbox-item">
