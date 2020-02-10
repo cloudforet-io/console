@@ -28,7 +28,7 @@
                     @changeSort="getUsers"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary-dark" @click="clickAdd">
+                        <p-button style-type="primary" @click="clickAdd">
                             {{ tr('COMMON.BTN_ADD') }}
                         </p-button>
                         <PDropdownMenuBtn

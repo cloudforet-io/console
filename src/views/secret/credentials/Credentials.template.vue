@@ -37,7 +37,7 @@
                         </div>
                     </template>
                     <template slot="toolbox-left">
-                        <p-button style-type="primary-dark" @click="clickCreate">
+                        <p-button style-type="primary" @click="clickCreate">
                             {{ tr('COMMON.BTN_ADD') }}
                         </p-button>
                         <PDropdownMenuBtn
