@@ -13,9 +13,16 @@ module.exports = {
     '@storybook/addon-storysource',
     '@storybook/addon-viewport',
     '@storybook/addon-a11y',
-    '@storybook/addon-docs',
+    {
+      name: '@storybook/addon-docs',
+      options: {
+        vueDocgenOptions: { alias: { '@': path.resolve(__dirname, '../src') }}
+      }
+    }
   ],
-  webpack:  (config) => {
+  webpackFinal:  async (config) => {
+
+    /* Typescript settings */
     config.module.rules.push({
       test: /\.(ts|tsx)$/,
       loader: 'ts-loader',
@@ -25,6 +32,8 @@ module.exports = {
       },
     });
     config.resolve.extensions.push('.ts', '.tsx');
+
+    /* SASS settings */
     config.module.rules.push(
       {
         test: /\.s?css$/,
@@ -43,19 +52,24 @@ module.exports = {
           },
         ],
         include: path.resolve(__dirname, '../'),
-        exclude:[path.resolve(__dirname, '..', 'node_modules/monaco-editor')]
-
+        exclude:[
+            path.resolve(__dirname, '..', 'node_modules/monaco-editor'),
+        ],
       }
     );
+
+    /* alis settings */
     config.resolve.alias = {
-      node_modules: path.resolve('./node_modules'),
       'vue': 'vue/dist/vue.common.js',
       '@': path.resolve(__dirname, '../src'),
       '@sb': path.resolve(__dirname, './'),
     };
+
+    /* plugins settings */
     config.plugins.push(new MonacoWebpackPlugin({
       languages:['javascript','json','css','html']
     }));
+
     return config;
   },
 };
