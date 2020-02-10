@@ -7,11 +7,13 @@
                         <img class="img" :src="imgUrl">
                     </p-col>
                     <p-col>
-                        <p class="name">
-                            {{ plugin ? plugin.name : '' }}
-                        </p>
+                        <p-field-group label="Collector Name" required>
+                            <br>
+                            <p-text-input v-model="proxyName" :placeholder="namePlaceholder" @input="onChangeName" />
+                        </p-field-group>
                         <p-field-group label="Version">
                             <p-dropdown-menu-btn :menu="versionsInfo"
+                                                 :loading="versionsInfo ? false : true"
                                                  @clickMenuEvent="onSelectVersion"
                             >
                                 {{ selectedVersion }}
@@ -25,7 +27,7 @@
                 </p-row>
             </p-col>
 
-            <p-col class="container options">
+            <p-col v-if="pluginOptions.length > 0" class="container options">
                 <p class="sub-title">
                     Options
                 </p>
@@ -34,7 +36,7 @@
                                 :form="op"
                                 :invalid="showValidation ? vdApi.invalidState[op.key] : false"
                                 :invalid-text="vdApi.invalidMsg[op.key]"
-                                @change="onChange(op.key)"
+                                @change="onChangeOption(op.key)"
                 />
             </p-col>
         </p-row>
@@ -87,6 +89,10 @@ export default {
         /**
          * sync prop
          */
+        name: String,
+        /**
+         * sync prop
+         */
         selectedVersion: String,
         /**
          * sync prop
@@ -101,6 +107,8 @@ export default {
         init(props, root);
 
         const state = reactive({
+            proxyName: makeProxy('name', props, emit),
+            namePlaceholder: computed(() => _.get(props.plugin, 'name', '')),
             pluginOptions: computed(() => _.get(props.plugin, 'template.options', [])),
             proxyOptionsValue: makeProxy('optionsValue', props, emit),
             proxySelectedVersion: makeProxy('selectedVersion', props, emit),
@@ -115,21 +123,28 @@ export default {
             },
             vdApi: setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue),
             isAllValid: undefined,
+            validate: async () => {
+                const res = await state.vdApi.allValidation();
+                return res && props.name;
+            },
+            onChangeName: (val) => {
+                if (!props.showValidation) return;
+                emit('changeValidState', !!val);
+            },
+            onChangeOption: async (key) => {
+                if (!props.showValidation || !props.plugin) return;
+                await state.vdApi.fieldValidation(key);
+                emit('changeValidState', state.vdApi.isAllValid && props.name);
+            },
         });
 
         watch(() => props.plugin, (val) => {
             state.vdApi = setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue);
         });
 
-        const onChange = async (key) => {
-            if (!props.showValidation || !props.plugin) return;
-            await state.vdApi.fieldValidation(key);
-            emit('changeValidState', state.vdApi.isAllValid);
-        };
 
         return {
             ...toRefs(state),
-            onChange,
         };
     },
 };

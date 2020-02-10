@@ -7,7 +7,9 @@
         </p-row>
         <p-row>
             <p-col>
-                <p-search class="p-search" :search-text.sync="search" @onSearch="$emit('search', $event)" />
+                <p-search class="p-search" :search-text.sync="search" search-placeholder="Enter keyword"
+                          @onSearch="$emit('search', $event)"
+                />
             </p-col>
         </p-row>
         <p-row direction="column">

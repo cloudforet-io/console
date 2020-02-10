@@ -9,6 +9,7 @@ import {
 
 // @ts-ignore
 import { debug } from 'webpack';
+// @ts-ignore
 import { tagList } from '@/components/molecules/tags/Tag.vue';
 
 //  eslint-disable-next-line import/no-cycle
@@ -113,6 +114,7 @@ class API {
     }
 
     checkAccessToken=():boolean => {
+        debugger;
         // @ts-ignore
         const accessToken = VueCookies.get('accessToken');
         if (accessToken) {
@@ -216,6 +218,7 @@ export const defaultQuery = (
     }
     if (searchQueries && searchQueries.length > 0) {
         const filter:Filter[] = [];
+
         // eslint-disable-next-line camelcase
         const mergeOpQuery:{[propName: string]: Filter;} = {};
         searchQueries.forEach((q) => {

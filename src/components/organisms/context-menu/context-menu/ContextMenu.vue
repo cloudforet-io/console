@@ -2,7 +2,13 @@
     <div class="p-context-menu" :class="theme"
          @keyup.esc="$emit('onEscKey',$event)"
     >
-        <template v-for="(item, index) in menu">
+        <div v-if="loading" class="context-content context-item no-drag">
+            <p-lottie name="spinner" auto :size="1" />
+        </div>
+        <div v-else-if="menu.length < 0" class="context-content context-item no-drag empty" :class="theme">
+            {{ tr('COMMON.NO_ITEM') }}
+        </div>
+        <template v-for="(item, index) in menu" v-else>
             <a v-if="item.type==='item'" :id="`context-item-${index}-${uuid}`" :key="`${item.name}-${index}`"
                :tabindex="index"
                class="context-content context-item no-drag"
@@ -29,10 +35,12 @@
 
 <script>
 import { computed } from '@vue/composition-api';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 export default {
     name: 'PContextMenu',
     events: ['clickMenuEvent', 'onEndOfUpKey', 'onEndOfDownKey', 'onEscKey'],
+    components: { PLottie },
     props: {
         menu: {
             type: [Array, Object],
@@ -41,6 +49,10 @@ export default {
         theme: {
             type: String,
             default: 'secondary',
+        },
+        loading: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, context) {
@@ -91,12 +103,20 @@ export default {
                 background-color: $hover-bg-color;
                 color: $hover-color !important;
             }
-            &:active{
+            &:active {
                 background-color: $active-bg-color;
                 color: $active-color !important;
             }
-            &.disabled{
+            &.disabled {
                 color: $disabled-color !important;
+            }
+            &.empty {
+                color: $disabled-color !important;
+                cursor: default;
+                &:hover {
+                    background-color: transparent;
+                    color: $disabled-color !important;
+                }
             }
         }
     }
@@ -156,7 +176,8 @@ export default {
         }
         .context-item{
             display: block;
-            font: 14px/16px Arial;
+            font-size: .875rem;
+            line-height: 1rem;
             padding-bottom: 0.5rem;
             padding-top: 0.5rem;
             cursor:pointer;

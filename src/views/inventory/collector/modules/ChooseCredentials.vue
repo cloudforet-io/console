@@ -43,9 +43,12 @@
             </template>
             <template #col-credential_groups-format="{value}">
                 <span>
-                    <p-tag v-for="crdg in value" :key="crdg.credential_group_id" :deletable="false">
-                        {{ crdg }}
-                    </p-tag>
+                    <p-badge v-for="crdg in value"
+                             :key="crdg.credential_group_id"
+                             style-type="gray2"
+                    >
+                        {{ crdg.name }}
+                    </p-badge>
                 </span>
             </template>
             <template #col-created_at-format="{value}">
@@ -71,6 +74,7 @@ import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { makeTrItems } from '@/lib/view-helper';
 import { timestampFormatter, getValue } from '@/lib/util';
 
+import PBadge from '@/components/atoms/badges/Badge.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PRadio from '@/components/molecules/forms/radio/Radio.vue';
@@ -82,6 +86,7 @@ import { makeProxy } from '@/lib/compostion-util';
 export default {
     name: 'ChooseCredentials',
     components: {
+        PBadge,
         PRow,
         PCol,
         PRadio,

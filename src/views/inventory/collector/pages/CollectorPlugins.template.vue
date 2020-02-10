@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-vertical-layout>
+        <p-vertical-layout :min-left-width="260">
             <template #leftContainer="{width}">
                 <div :style="{width: width}">
                     <plugin-filter :filters.sync="filterTools.tags"
@@ -50,6 +50,7 @@
                                 <p-row>
                                     <p-dropdown-menu-btn :menu="versionsMenu[item.plugin_id]"
                                                          style="margin-right: 1.25rem;"
+                                                         :loading="versionsMenu[item.plugin_id] ? false : true"
                                                          @openMenu="listVersions(item.plugin_id)"
                                                          @clickMenuEvent="onSelectVersion(item.plugin_id, $event)"
                                     >

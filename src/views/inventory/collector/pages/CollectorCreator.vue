@@ -17,6 +17,7 @@ export default {
         const listCredentials = async (params) => {
             const url = state.crdState.crdType === 'Credentials'
                 ? '/secret/credential/list' : '/secret/credential-group/list';
+            params.include_credential_group = true;
 
             state.crdState.loading = true;
             state.crdState.items = [];
@@ -50,7 +51,7 @@ export default {
         const listVersionsInfo = async (params) => {
             try {
                 const res = await context.parent.$http.post('/repository/plugin/get-versions', params);
-                state.confState.versions = res.data.version;
+                state.confState.versions = res.data.version || [];
                 if (!state.confState.selectedVersion) {
                     state.confState.selectedVersion = state.confState.versions[0];
                 }
@@ -64,7 +65,7 @@ export default {
         const createCollector = async () => {
             const crdKey = state.crdState.crdType === 'Credentials' ? 'credential_id' : 'credential_group_id';
             const params = {
-                name: state.confState.plugin.name,
+                name: state.confState.name,
                 priority: state.confState.priority,
                 tags: state.tags,
                 // eslint-disable-next-line camelcase

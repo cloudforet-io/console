@@ -102,7 +102,7 @@ export const ko = {
         RAWDATA: 'Raw Data',
         ADMIN: '관리자',
         JOBS: '잡(Jobs)',
-        NO_ITEM: '{0} 없음',
+        NO_ITEM: '항목 없음',
         NO_SELECT: '위에서 {0} 을(를) 선택하세요.',
         LOCAL: 'Local',
         OFFICIAL: 'Official',

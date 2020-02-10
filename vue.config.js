@@ -24,7 +24,6 @@ module.exports = {
         resolve: {
             alias: {
                 // eslint-disable-next-line camelcase
-                node_modules: path.resolve('./node_modules'),
                 '@sb': path.resolve('./.storybook'),
             },
         },

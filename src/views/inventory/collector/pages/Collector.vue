@@ -7,14 +7,57 @@ import CollectorTemplate, { api, collectorSetup } from '@/views/inventory/collec
 import { mountBusEvent } from '@/lib/compostion-util';
 import { defaultQuery, callApi } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
-
+import {
+    defaultAutocompleteHandler,
+    getEnumValues, getFetchValues,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 export default {
     name: 'Collector',
     extends: CollectorTemplate,
     setup(props, context) {
+        class ACHandler extends defaultAutocompleteHandler {
+            // eslint-disable-next-line class-methods-use-this
+            get keys() {
+                return [
+                    'collector_id', 'name', 'state', 'priority',
+                    'plugin_info.options.supported_resource_type',
+                ];
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get suggestKeys() {
+                return ['collector_id', 'name', 'plugin_info.options.supported_resource_type'];
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get parent() {
+                return context.parent;
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get valuesFetchUrl() {
+                return '/inventory/collector/list';
+            }
+
+            // eslint-disable-next-line class-methods-use-this
+            get valuesFetchKeys() {
+                return ['collector_id', 'name'];
+            }
+
+            // eslint-disable-next-line no-shadow
+            constructor() {
+                super();
+                this.handlerMap.value.push(...[
+                    getEnumValues('state', ['ENABLED', 'DISABLED']),
+                    getEnumValues('plugin_info.options.supported_resource_type', ['SERVER', 'NETWORK', 'SUBNET', 'IP_ADDRESS']),
+                ]);
+            }
+        }
+
+
         const state = reactive({
-            ...collectorSetup(props, context),
+            ...collectorSetup(props, context, new ACHandler()),
         });
 
         const collectorTableQuery = computed(() => (defaultQuery(

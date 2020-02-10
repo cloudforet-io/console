@@ -1,12 +1,14 @@
 <template>
     <div class="p-dropdown-menu-btn">
-        <PDropdownBtn :popup.sync="popup" @click="$emit('openMenu')">
+        <PDropdownBtn :popup.sync="popup" :block="block" @click="$emit('openMenu')">
             <slot />
         </PDropdownBtn>
-        <PContextMenu
-            v-if="popup"
-            :menu="menu"
-            @clickMenuEvent="clickMenuEvent"
+        <PContextMenu v-if="popup"
+                      class="menu-ctx"
+                      :class="{block}"
+                      :menu="menu"
+                      :loading="loading"
+                      @clickMenuEvent="clickMenuEvent"
         />
     </div>
 </template>
@@ -22,6 +24,14 @@ export default {
         menu: {
             type: [Array, Object],
             default: () => [],
+        },
+        block: {
+            type: Boolean,
+            default: false,
+        },
+        loading: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {
@@ -50,5 +60,8 @@ export default {
 <style lang="scss" scoped>
     .p-dropdown-menu-btn{
         position: relative;
+    }
+    .menu-ctx.block {
+        width: 100%;
     }
 </style>
