@@ -82,9 +82,9 @@ export default {
               * Do not proceeds if Auth type is not local
               * * */
             if (_.get(credentials, 'user_type') !== 'DOMAIN_OWNER') {
-                if (_.get(VueCookies.get('domainInfo'), 'clientId') !== null) {
+                /*if (_.get(VueCookies.get('domainInfo'), 'clientId') !== null) {
 
-                } else await dispatch('getUser', response.data.user_id);
+                } else*/ await dispatch('getUser', response.data.user_id);
             }
         },
 

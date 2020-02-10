@@ -3,8 +3,7 @@
         <p-menu-list :list-items="menuList"
                      :tooltip="userId"
                      :tooltip-options="{offset: '20px'}"
-                     @select="doAction"
-        >
+                     @select="doAction">
             <template #contents>
                 <p-i name="ic_gnb_profile" width="32px" height="32px"
                      :color="`transparent ${iconColor}`"
@@ -62,7 +61,6 @@ export default {
                 await this.signOut();
                 this.$router.push({ path: '/sign-in' });
             } else {
-                debugger;
                 await this.signOut();
                 this.oAuthSignOut();
                 this.$router.push({ path: '/google-sign-in' });
