@@ -28,7 +28,7 @@
                     @changeSort="getServers"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary" @click="clickCollectData">
+                        <p-button style-type="primary-dark" @click="clickCollectData">
                             Collect Data
                         </p-button>
                         <PDropdownMenuBtn

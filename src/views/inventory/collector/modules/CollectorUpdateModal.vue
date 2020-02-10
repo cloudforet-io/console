@@ -27,7 +27,7 @@
 
         <template #footer-extra>
             <p-button class="reset-btn"
-                      style-type="primary"
+                      style-type="primary-dark"
                       outline
                       @click="onClickReset"
             >

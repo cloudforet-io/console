@@ -29,7 +29,7 @@
             @changeSort="getData"
         >
             <template slot="toolbox-left">
-                <p-button class="left-toolbox-item" style-type="primary"
+                <p-button class="left-toolbox-item" style-type="primary-dark"
                           @click="onClick"
                 >
                     <p-i :color="'transparent inherit'"
