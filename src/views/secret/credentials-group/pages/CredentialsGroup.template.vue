@@ -1,139 +1,141 @@
 <template>
-    <div class="cdg">
-        <p-horizontal-layout>
-            <template #container="{ height }">
-                <p-toolbox-table
-                    ref="toolbox"
-                    :items="items"
-                    :fields="fields"
-                    :selectable="true"
-                    :sortable="true"
-                    :dragable="true"
-                    :hover="true"
-                    :responsive="true"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    :all-page="allPage"
-                    :this-page.sync="thisPage"
-                    :select-index.sync="selectIndex"
-                    :page-size.sync="pageSize"
-                    :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
-                    :setting-visible="false"
-                    :loading="loading"
-                    :use-spinner-loading="true"
-                    :use-cursor-loading="true"
-                    @changePageSize="getCdg"
-                    @changePageNumber="getCdg"
-                    @clickRefresh="getCdg"
-                    @changeSort="getCdg"
-                >
-                    <template slot="toolbox-left">
-                        <p-button style-type="primary" @click="clickCreate">
-                            {{ tr('COMMON.BTN_CRT') }}
-                        </p-button>
-                        <PDropdownMenuBtn
-                            id="cdg-dropdown-btn"
-                            class="left-toolbox-item"
-                            :menu="dropdown"
-                            @click-delete="clickDelete"
-                            @click-update="clickUpdate"
-                        >
-                            Action
-                        </PDropdownMenuBtn>
-                        <div class="left-toolbox-item">
-                            <PQuerySearchBar :search-text.sync="searchText"
-                                             :autocomplete-handler="ACHandler"
-                                             @newQuery="queryListTools.addTag"
-                            />
-                        </div>
-                    </template>
-                    <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
-                        <p-col :col="12" style="margin-bottom: .5rem;">
-                            <p-hr style="width: 100%;" />
-                            <p-row style="margin-top: .5rem;">
-                                <div style="flex-grow: 0">
-                                    <p-icon-button name="ic_delete" @click="queryListTools.deleteAllTags" />
-                                </div>
-                                <div style="flex-grow: 1;margin-left: 1rem;">
-                                    <p-tag v-for="(tag, idx) in queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
-                                           @delete="queryListTools.deleteTag(idx)"
-                                    >
-                                        {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
-                                    </p-tag>
-                                </div>
-                            </p-row>
-                        </p-col>
-                    </template>
-                    <template v-slot:col-created_at-format="data">
-                        {{ timestampFormatter(data.value) }}
-                    </template>
-                </p-toolbox-table>
-            </template>
-        </p-horizontal-layout>
-        <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
-            <template #detail="{tabName}">
-                <p-cdg-detail ref="cdgDetail"
-                              :item="items[selectIndex[0]]"
-                              :tag-confirm-event="tagConfirmEvent"
-                              :tag-reset-event="tagResetEvent"
-                />
-            </template>
-            <template #credential="{tabName}">
-                <PCdgCredential ref="cdgCredential"
-                                :items="cdgData.items"
-                                :sort-by.sync="cdgData.sortBy"
-                                :sort-desc.sync="cdgData.sortDesc"
-                                :page-size.sync="cdgData.pageSize"
-                                :all-page="cdgData.allPage"
-                                :this-page.sync="cdgData.thisPage"
-                                :loading="cdgData.loading"
-                                :col-copy="true"
-                                :get-cd-list="getCdList"
-                                :delete-cd="deleteCd"
-                                :credential-group-id="getFirstSelectedCdgId"
-                />
-            </template>
-        </PTab>
-        <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
-            <template #data="{tabName}">
-                <p-data-table
-                    :fields="multiSelectFields"
-                    :sortable="false"
-                    :selectable="false"
-                    :items="getSelectedCdgItems"
-                    :col-copy="true"
-                />
-            </template>
-        </PTab>
-        <div v-else id="empty-space">
-            Select a Credential Group above for details.
-        </div>
-        <p-table-check-modal
-            v-if="!!checkTableModalState.mode && checkTableModalState.visible"
-            :visible.sync="checkTableModalState.visible"
-            :header-title="checkTableModalState.title"
-            :sub-title="checkTableModalState.subTitle"
-            :theme-color="checkTableModalState.themeColor"
-            :double-confirm="doubleState.doubleConfirm"
-            :double-confirm-origin="doubleState.origin"
-            :double-confirm-title="doubleState.title"
-            :double-confirm-place-holder="doubleState.placeHolder"
-            :fields="multiSelectFields"
-            size="lg"
-            :centered="true"
-            :selectable="false"
-            :items="getSelectedCdgItems"
+    <div>
+        <div class="cdg">
+            <p-horizontal-layout>
+                <template #container="{ height }">
+                    <p-toolbox-table
+                        ref="toolbox"
+                        :items="items"
+                        :fields="fields"
+                        :selectable="true"
+                        :sortable="true"
+                        :dragable="true"
+                        :hover="true"
+                        :responsive="true"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        :all-page="allPage"
+                        :this-page.sync="thisPage"
+                        :select-index.sync="selectIndex"
+                        :page-size.sync="pageSize"
+                        :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
+                        :setting-visible="false"
+                        :loading="loading"
+                        :use-spinner-loading="true"
+                        :use-cursor-loading="true"
+                        @changePageSize="getCdg"
+                        @changePageNumber="getCdg"
+                        @clickRefresh="getCdg"
+                        @changeSort="getCdg"
+                    >
+                        <template slot="toolbox-left">
+                            <p-button style-type="primary" @click="clickCreate">
+                                {{ tr('COMMON.BTN_CRT') }}
+                            </p-button>
+                            <PDropdownMenuBtn
+                                id="cdg-dropdown-btn"
+                                class="left-toolbox-item"
+                                :menu="dropdown"
+                                @click-delete="clickDelete"
+                                @click-update="clickUpdate"
+                            >
+                                Action
+                            </PDropdownMenuBtn>
+                            <div class="left-toolbox-item">
+                                <PQuerySearchBar :search-text.sync="searchText"
+                                                 :autocomplete-handler="ACHandler"
+                                                 @newQuery="queryListTools.addTag"
+                                />
+                            </div>
+                        </template>
+                        <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
+                            <p-col :col="12" style="margin-bottom: .5rem;">
+                                <p-hr style="width: 100%;" />
+                                <p-row style="margin-top: .5rem;">
+                                    <div style="flex-grow: 0">
+                                        <p-icon-button name="ic_delete" @click="queryListTools.deleteAllTags" />
+                                    </div>
+                                    <div style="flex-grow: 1;margin-left: 1rem;">
+                                        <p-tag v-for="(tag, idx) in queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
+                                               @delete="queryListTools.deleteTag(idx)"
+                                        >
+                                            {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
+                                        </p-tag>
+                                    </div>
+                                </p-row>
+                            </p-col>
+                        </template>
+                        <template v-slot:col-created_at-format="data">
+                            {{ timestampFormatter(data.value) }}
+                        </template>
+                    </p-toolbox-table>
+                </template>
+            </p-horizontal-layout>
+            <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
+                <template #detail="{tabName}">
+                    <p-cdg-detail ref="cdgDetail"
+                                  :item="items[selectIndex[0]]"
+                                  :tag-confirm-event="tagConfirmEvent"
+                                  :tag-reset-event="tagResetEvent"
+                    />
+                </template>
+                <template #credential="{tabName}">
+                    <PCdgCredential ref="cdgCredential"
+                                    :items="cdgData.items"
+                                    :sort-by.sync="cdgData.sortBy"
+                                    :sort-desc.sync="cdgData.sortDesc"
+                                    :page-size.sync="cdgData.pageSize"
+                                    :all-page="cdgData.allPage"
+                                    :this-page.sync="cdgData.thisPage"
+                                    :loading="cdgData.loading"
+                                    :col-copy="true"
+                                    :get-cd-list="getCdList"
+                                    :delete-cd="deleteCd"
+                                    :credential-group-id="getFirstSelectedCdgId"
+                    />
+                </template>
+            </PTab>
+            <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
+                <template #data="{tabName}">
+                    <p-data-table
+                        :fields="multiSelectFields"
+                        :sortable="false"
+                        :selectable="false"
+                        :items="getSelectedCdgItems"
+                        :col-copy="true"
+                    />
+                </template>
+            </PTab>
+            <div v-else id="empty-space">
+                Select a Credential Group above for details.
+            </div>
+            <p-table-check-modal
+                v-if="!!checkTableModalState.mode && checkTableModalState.visible"
+                :visible.sync="checkTableModalState.visible"
+                :header-title="checkTableModalState.title"
+                :sub-title="checkTableModalState.subTitle"
+                :theme-color="checkTableModalState.themeColor"
+                :double-confirm="doubleState.doubleConfirm"
+                :double-confirm-origin="doubleState.origin"
+                :double-confirm-title="doubleState.title"
+                :double-confirm-place-holder="doubleState.placeHolder"
+                :fields="multiSelectFields"
+                size="lg"
+                :centered="true"
+                :selectable="false"
+                :items="getSelectedCdgItems"
 
-            @confirm="checkModalConfirm"
-        />
-        <p-cdg-form v-if="cdgFormState.visible"
-                    :header-title="cdgFormState.headerTitle"
-                    :update-mode="cdgFormState.updateMode"
-                    :item="cdgFormState.item"
-                    :visible.sync="cdgFormState.visible"
-                    :cdg-name-validation="cdgNameValidation"
-                    @confirm="cdgFormConfirm"
-        />
+                @confirm="checkModalConfirm"
+            />
+            <p-cdg-form v-if="cdgFormState.visible"
+                        :header-title="cdgFormState.headerTitle"
+                        :update-mode="cdgFormState.updateMode"
+                        :item="cdgFormState.item"
+                        :visible.sync="cdgFormState.visible"
+                        :cdg-name-validation="cdgNameValidation"
+                        @confirm="cdgFormConfirm"
+            />
+        </div>
     </div>
 </template>
 
@@ -141,6 +143,7 @@
 import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
+import { Splitpanes, Pane } from 'splitpanes';
 import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import { timestampFormatter, getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
@@ -419,4 +422,5 @@ export default {
         margin-left: 2rem;
         margin-right: 2rem;
     }
+
 </style>
