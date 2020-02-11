@@ -289,10 +289,11 @@ export default {
                         speed: 1000,
                     });
 
-                    if (this.treeData.length === 1) {
+                    this.$refs.DataCenterTree._data.hasSelected = false;
+                    if (_.isEmpty(tree.getNode([0]))) {
                         this.isInitializing = true;
                         this.treeData = [{
-                            title: '! Please, Right Click me',
+                            title: 'Right-click on your mouse to create a new region.',
                             isLeaf: true,
                             data: {
                                 init: true,

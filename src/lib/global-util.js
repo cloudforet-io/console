@@ -167,8 +167,9 @@ export const Util = {
                     returnTree.push(treeItem);
                 });
             } else {
+                const targetObj = f === 'PROJECT' ? 'project group' : 'region';
                 returnTree = [{
-                    title: 'Click right button to create a new project Group.',
+                    title: `Right-click on your mouse to create a new ${targetObj}.`,
                     isLeaf: true,
                     data: {
                         init: true,
