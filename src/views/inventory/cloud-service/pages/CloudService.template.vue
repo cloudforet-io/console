@@ -12,7 +12,7 @@
                             :shadow="false"
                             :border="false"
                             :padding="true"
-                            :draggable="false"
+                            :dragable="false"
                             :multi-select="false"
                             :setting-visible="false"
                             :sortable="true"

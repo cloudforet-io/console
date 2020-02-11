@@ -1,7 +1,7 @@
 <template>
     <div class="fnb">
         <div class="fnb-contents">
-            <span class="copyright">@2019 Megazone Cloud Inc.</span>
+            <span class="copyright">@2020 Megazone Cloud Inc.</span>
         </div>
     </div>
 </template>

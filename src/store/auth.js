@@ -54,21 +54,26 @@ export default {
         },
 
         async getUser({ commit, dispatch, rootGetters }, userId) {
-            const response = await api.instance.post('/identity/user/get', {
-                domain_id: rootGetters['domain/id'],
-                user_id: userId,
-            });
+            try {
+                const response = await api.instance.post('/identity/user/get', {
+                    domain_id: rootGetters['domain/id'],
+                    user_id: userId,
+                });
 
-            const userInfo = response.data;
-            commit('signIn', {
-                userId: userInfo.user_id,
-                language: userInfo.language,
-                timezone: userInfo.timezone,
-            });
+                const userInfo = _.get(response, 'data', null);
 
-            localStorage.userId = userInfo.user_id;
-            localStorage.language = userInfo.language;
-            localStorage.timezone = Util.methods.isEmpty(userInfo.timezone) ?  'Etc/GMT' : userInfo.timezone;
+                commit('signIn', {
+                    userId: userInfo.user_id,
+                    language: _.get(userInfo, 'language', 'en'),
+                    timezone: _.get(userInfo, 'timezone', 'Asia/Seoul'),
+                });
+
+                localStorage.userId = userInfo.user_id;
+                localStorage.language = _.get(userInfo, 'language', 'en');
+                localStorage.timezone = _.get(userInfo, 'timezone', 'UTC');
+            } catch {
+                console.error(`User select error:${userId}`);
+            }
         },
 
         async signIn({ dispatch, rootGetters }, credentials) {
@@ -82,9 +87,7 @@ export default {
               * Do not proceeds if Auth type is not local
               * * */
             if (_.get(credentials, 'user_type') !== 'DOMAIN_OWNER') {
-                if (_.get(VueCookies.get('domainInfo'), 'clientId') !== null) {
-
-                } else await dispatch('getUser', response.data.user_id);
+                await dispatch('getUser', response.data.user_id);
             }
         },
 
