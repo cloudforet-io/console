@@ -43,6 +43,7 @@ export default {
     getters: {
         isSignedIn: state => state.isSignedIn,
         userId: state => state.userId,
+        userType: state => state.userType,
         timezone: state => state.timezone,
         language: state => state.language,
         nextPath: state => state.nextPath,
@@ -63,21 +64,23 @@ export default {
                 const response = await api.instance.post('/identity/user/get', {
                     domain_id: rootGetters['domain/id'],
                     user_id: userParam.userId,
+                    user_type: userParam.userType,
                 });
-
                 const userInfo = _.get(response, 'data', null);
 
-                commit('signIn', {
-                    userId: userInfo.user_id,
-                    userType: userParam.userType,
-                    language: _.get(userInfo, 'language', 'en'),
-                    timezone: _.get(userInfo, 'timezone', 'Asia/Seoul'),
-                });
+                if (!_.isEmpty(userInfo)) {
+                    commit('signIn', {
+                        userId: userParam.userType === 'GENERAL' ? userInfo.user_id : userInfo.owner_id,
+                        userType: userParam.userType,
+                        language: _.get(userInfo, 'language', 'en'),
+                        timezone: _.get(userInfo, 'timezone', 'Asia/Seoul'),
+                    });
 
-                localStorage.userId = userInfo.user_id;
-                localStorage.userType = userParam.userType;
-                localStorage.language = _.get(userInfo, 'language', 'en');
-                localStorage.timezone = _.get(userInfo, 'timezone', 'UTC');
+                    localStorage.userId = userParam.userType === 'GENERAL' ? userInfo.user_id : userInfo.owner_id,
+                    localStorage.userType = userParam.userType;
+                    localStorage.language = _.get(userInfo, 'language', 'en');
+                    localStorage.timezone = _.get(userInfo, 'timezone', 'UTC');
+                }
             } catch {
                 console.error(`User select error:${userId}`);
             }
@@ -94,12 +97,10 @@ export default {
               * Do not proceeds if Auth type is not local
               * * */
             const userType = _.get(credentials, 'user_type', 'GENERAL');
-            if (userType !== 'DOMAIN_OWNER') {
-                await dispatch('getUser', {
-                    userId: response.data.user_id,
-                    userType,
-                });
-            }
+            await dispatch('getUser', {
+                userId: response.data.user_id,
+                userType,
+            });
         },
 
         signOut({ commit }) {
