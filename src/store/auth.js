@@ -9,6 +9,7 @@ export default {
         nextPath: '/',
         isSignedIn: false,
         userId: null,
+        userType: null,
         timezone: null,
         language: null,
     },
@@ -22,15 +23,19 @@ export default {
         setTimezone(state, timezone) {
             state.timezone = timezone;
         },
-        signIn(state, { userId, language, timezone }) {
+        signIn(state, {
+            userId, userType, language, timezone,
+        }) {
             state.isSignedIn = true;
             state.userId = userId;
+            state.userType = userType;
             state.language = language;
             state.timezone = timezone;
         },
         signOut(state) {
             state.isSignedIn = false;
             state.userId = null;
+            state.userType = null;
             state.timezone = null;
             state.language = null;
         },
@@ -47,28 +52,30 @@ export default {
             localStorage.language = language;
             commit('setLanguage', language);
         },
-
         setTimezone({ commit }, timezone) {
             localStorage.timezone = timezone;
             commit('setTimezone', timezone);
         },
-
-        async getUser({ commit, dispatch, rootGetters }, userId) {
+        async getUser({
+            commit, dispatch, rootGetters, state,
+        }, userParam) {
             try {
                 const response = await api.instance.post('/identity/user/get', {
                     domain_id: rootGetters['domain/id'],
-                    user_id: userId,
+                    user_id: userParam.userId,
                 });
 
                 const userInfo = _.get(response, 'data', null);
 
                 commit('signIn', {
                     userId: userInfo.user_id,
+                    userType: userParam.userType,
                     language: _.get(userInfo, 'language', 'en'),
                     timezone: _.get(userInfo, 'timezone', 'Asia/Seoul'),
                 });
 
                 localStorage.userId = userInfo.user_id;
+                localStorage.userType = userParam.userType;
                 localStorage.language = _.get(userInfo, 'language', 'en');
                 localStorage.timezone = _.get(userInfo, 'timezone', 'UTC');
             } catch {
@@ -76,7 +83,7 @@ export default {
             }
         },
 
-        async signIn({ dispatch, rootGetters }, credentials) {
+        async signIn({ dispatch, rootGetters, commit }, credentials) {
             const response = await api.instance.post('/identity/token/issue', {
                 domain_id: rootGetters['domain/id'],
                 credentials,
@@ -86,8 +93,12 @@ export default {
             /**
               * Do not proceeds if Auth type is not local
               * * */
-            if (_.get(credentials, 'user_type') !== 'DOMAIN_OWNER') {
-                await dispatch('getUser', response.data.user_id);
+            const userType = _.get(credentials, 'user_type', 'GENERAL');
+            if (userType !== 'DOMAIN_OWNER') {
+                await dispatch('getUser', {
+                    userId: response.data.user_id,
+                    userType,
+                });
             }
         },
 
@@ -104,6 +115,7 @@ export default {
                 if (localStorage.userId) {
                     commit('signIn', {
                         userId: localStorage.userId,
+                        userType: localStorage.userType,
                         language: localStorage.language,
                         timezone: localStorage.timezone,
                     });
