@@ -7,22 +7,6 @@
                 </div>
                 <h2>{{ errorMessage }}</h2><br>
                 <p>Error code: {{ errorStatus }}</p><br>
-                <p>Here are some helpful links instead.</p>
-                <br>
-                <div class="router">
-                    <router-link to="/dashboard">
-                        Homepage
-                    </router-link>
-                    <router-link to="/inventory">
-                        Inventory
-                    </router-link>
-                    <router-link to="/identity">
-                        Identity
-                    </router-link>
-                    <router-link to="/secret">
-                        Secret
-                    </router-link>
-                </div>
             </div>
         </div>
     </div>
@@ -92,16 +76,17 @@ export default {
 
     .notfound h2 {
         color: #000;
-        font-size: 24px;
+        font-size: 2rem;
         font-weight: 700;
         text-transform: uppercase;
         margin-top: 0;
     }
 
-    .router {
-        color: #3C2C84;
-        font-weight: 700;
+    .notfound p {
+        font-size: 1.2rem;
+        font-weight: 300;
     }
+
 
     @media only screen and (max-width: 767px) {
         .notfound .notfound-error {
