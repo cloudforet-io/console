@@ -117,6 +117,7 @@ export default {
         });
 
         const getTree = () => (_.isEmpty(context) ? null : _.get(context, 'refs.primeTree.$refs.slVueTree'));
+
         const hasData = computed(() => {
             const initialData = _.get(context, 'refs.primeTree.treeData', null);
             const returnVal = !!((_.isEmpty(initialData) || initialData.length === 0));
