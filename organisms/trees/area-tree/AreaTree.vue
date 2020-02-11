@@ -27,6 +27,7 @@
                     </template>
                     <template #rightContainer>
                         <transition name="panel-trans">
+                            <!--<div v-if="hasData" class="empty" />-->
                             <div v-if="hasSelected" :key="getNodeKeyComputed" class="panel">
                                 <slot name="treeSubPanel" />
                             </div>
@@ -96,7 +97,7 @@ export default {
         },
         treeWidth: {
             type: Number,
-            default: 250,
+            default: 280,
         },
     },
     setup(props, context) {
@@ -115,13 +116,20 @@ export default {
             state.showTree = true;
         });
 
-        const getTree = () => (Util.methods.isEmpty(context) ? null : _.get(context, 'refs.primeTree.$refs.slVueTree'));
+        const getTree = () => (_.isEmpty(context) ? null : _.get(context, 'refs.primeTree.$refs.slVueTree'));
+
+        const hasData = computed(() => {
+            const initialData = _.get(context, 'refs.primeTree.treeData', null);
+            const returnVal = !!((_.isEmpty(initialData) || initialData.length === 0));
+            console.log('return Value', returnVal);
+            return returnVal;
+        });
 
         const getNoSelectMSG = computed(() => [Util.methods.tr(props.noSelectMSG[0], null, context.parent), Util.methods.tr(props.noSelectMSG[1], null, context.parent)]);
         const getNodeKeyComputed = computed(() => state.nodeKey);
         const getCurrentNode = computed(() => {
             const node = getTree();
-            return Util.methods.isEmpty(node) ? null : node;
+            return _.isEmpty(node) ? null : node;
         });
 
         const getNodeEl = node => context.refs.primeTree.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
@@ -240,7 +248,7 @@ export default {
             }
         };
 
-        const beforeEnter = (el) => {
+        /* const beforeEnter = (el) => {
             context.parent.$velocity(el, {
                 translateX: `-${props.treeWidth}px`,
                 opacity: 0,
@@ -256,7 +264,7 @@ export default {
                     },
                 });
             done();
-        };
+        }; */
 
 
         return {
@@ -276,8 +284,9 @@ export default {
             nodeToggled,
             beforeDropped,
             setContextVisible,
-            beforeEnter,
-            enter,
+            hasData,
+            /* beforeEnter,
+            enter, */
         };
     },
 };
