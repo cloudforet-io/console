@@ -27,8 +27,8 @@
                     </template>
                     <template #rightContainer>
                         <transition name="panel-trans">
-                            <!--<div v-if="hasData" class="empty" />-->
-                            <div v-if="hasSelected" :key="getNodeKeyComputed" class="panel">
+                            <div v-if="!isDataExists" class="empty" />
+                            <div v-else-if="hasSelected" :key="getNodeKeyComputed" class="panel">
                                 <slot name="treeSubPanel" />
                             </div>
                             <div v-else class="empty">
@@ -105,6 +105,7 @@ export default {
             showContextFirst: false,
             selectedLeftWidth: 300,
             nodeKey: 0,
+            isDataExists: false,
             hasSelected: false,
             contextMenuIsVisible: false,
             showTree: false,
@@ -117,13 +118,6 @@ export default {
         });
 
         const getTree = () => (_.isEmpty(context) ? null : _.get(context, 'refs.primeTree.$refs.slVueTree'));
-
-        const hasData = computed(() => {
-            const initialData = _.get(context, 'refs.primeTree.treeData', null);
-            const returnVal = !!((_.isEmpty(initialData) || initialData.length === 0));
-            console.log('return Value', returnVal);
-            return returnVal;
-        });
 
         const getNoSelectMSG = computed(() => [Util.methods.tr(props.noSelectMSG[0], null, context.parent), Util.methods.tr(props.noSelectMSG[1], null, context.parent)]);
         const getNodeKeyComputed = computed(() => state.nodeKey);
@@ -284,7 +278,6 @@ export default {
             nodeToggled,
             beforeDropped,
             setContextVisible,
-            hasData,
             /* beforeEnter,
             enter, */
         };
