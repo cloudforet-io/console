@@ -1,52 +1,52 @@
 <template>
     <div>
         <div class="row no-gutters" @click="contextMenuIsVisible=false">
-            <transition appear name="tree-trans"
+            <!--<transition appear name="tree-trans"
                         @before-enter="beforeEnter"
                         @enter="enter"
-            >
-                <div v-if="showTree">
-                    <p-vertical-layout :auto-save-left-width="true">
-                        <template #leftContainer="{ width }">
-                            <div id="rootPanel"
-                                 @click.right.stop="isRootClicked"
+            >-->
+            <div v-if="showTree">
+                <p-vertical-layout :auto-save-left-width="true">
+                    <template #leftContainer="{ width }">
+                        <div id="rootPanel"
+                             @click.right.stop="isRootClicked"
+                        >
+                            <PTree ref="primeTree"
+                                   :tree-data="treeData"
+                                   :initial-tree-width="width"
+                                   @nodeClick="nodeClicked"
+                                   @beforeDrop="beforeDropped"
+                                   @nodeToggle="nodeToggled"
+                                   @nodeContextMenu="showContextMenu"
                             >
-                                <PTree ref="primeTree"
-                                       :tree-data="treeData"
-                                       :initial-tree-width="width"
-                                       @nodeClick="nodeClicked"
-                                       @beforeDrop="beforeDropped"
-                                       @nodeToggle="nodeToggled"
-                                       @nodeContextMenu="showContextMenu"
-                                >
-                                    <template slot="icon" slot-scope="node">
-                                        <slot name="icon" v-bind="node" />
-                                    </template>
-                                </PTree>
+                                <template slot="icon" slot-scope="node">
+                                    <slot name="icon" v-bind="node" />
+                                </template>
+                            </PTree>
+                        </div>
+                    </template>
+                    <template #rightContainer>
+                        <transition name="panel-trans">
+                            <div v-if="hasSelected" :key="getNodeKeyComputed" class="panel">
+                                <slot name="treeSubPanel" />
                             </div>
-                        </template>
-                        <template #rightContainer>
-                            <transition name="panel-trans">
-                                <div v-if="hasSelected" :key="getNodeKeyComputed" class="panel">
-                                    <slot name="treeSubPanel" />
+                            <div v-else class="empty">
+                                <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
+                                <div class="msg">
+                                    {{ getNoSelectMSG[0] }}
+                                </div><br>
+                                <div class="dt">
+                                    {{ getNoSelectMSG[1] }}
                                 </div>
-                                <div v-else class="empty">
-                                    <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
-                                    <div class="msg">
-                                        {{ getNoSelectMSG[0] }}
-                                    </div><br>
-                                    <div class="dt">
-                                        {{ getNoSelectMSG[1] }}
-                                    </div>
-                                </div>
-                            </transition>
-                        </template>
-                    </p-vertical-layout>
-                    <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
-                        <slot name="context" v-bind="getCurrentNode" />
-                    </div>
+                            </div>
+                        </transition>
+                    </template>
+                </p-vertical-layout>
+                <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
+                    <slot name="context" v-bind="getCurrentNode" />
                 </div>
-            </transition>
+            </div>
+            <!--</transition>-->
         </div>
     </div>
 </template>
@@ -277,7 +277,7 @@ export default {
             beforeDropped,
             setContextVisible,
             beforeEnter,
-            enter
+            enter,
         };
     },
 };
