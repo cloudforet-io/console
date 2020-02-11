@@ -123,7 +123,6 @@ export default {
     },
     methods: {
         pNodeClicked(node, tree) {
-
             this.selectedNodeData = { node, tree };
         },
         async pNodeToggled(node, tree) {
@@ -268,10 +267,16 @@ export default {
             }).then((response) => {
                 const responseData = this.treeDataHandler(response.data, 'PROJECT');
                 this.treeData = responseData;
+
+                if (response.data.items.length > 0) {
+                    this.$refs.ProjectTree._data.isDataExists = true;
+                }
+
                 // Note: Initialize Project trees and then display only a context, This must be included as well.
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0], 'data.init'))) {
                     this.isInitializing = true;
                 }
+
             }).catch((error) => {
                 console.error(error);
             });
@@ -296,6 +301,7 @@ export default {
                         is_root: !this.isEmpty(responseData.is_root) ? responseData.is_root : false,
                         name: param.name,
                     };
+
                     const newNode = this.getSelectedNode(InitializingData, 'PROJECT');
 
                     if (flag[1] !== 'RT') {
@@ -307,6 +313,7 @@ export default {
                         tree.remove([tree.getFirstNode()].map(node => node.path));
                         this.isInitializing = false;
                     }
+                    this.$refs.ProjectTree._data.isDataExists = true;
                 }
             }).catch((error) => {
                 console.error(error);
@@ -355,10 +362,12 @@ export default {
                     });
 
                     this.$refs.ProjectTree._data.hasSelected = false;
+
                     if (_.isEmpty(tree.getNode([0]))) {
                         this.isInitializing = true;
+                        this.$refs.ProjectTree._data.isDataExists = false;
                         this.treeData = [{
-                            title: `Right-click on your mouse to create a new project group.`,
+                            title: 'Right-click on your mouse to create a new project group.',
                             isLeaf: true,
                             data: {
                                 init: true,
