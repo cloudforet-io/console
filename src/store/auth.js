@@ -43,6 +43,7 @@ export default {
     getters: {
         isSignedIn: state => state.isSignedIn,
         userId: state => state.userId,
+        userType: state => state.userType,
         timezone: state => state.timezone,
         language: state => state.language,
         nextPath: state => state.nextPath,
