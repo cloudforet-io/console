@@ -1,19 +1,11 @@
 <template>
     <div>
-        <splitpanes class="p-vertical-layout2"
-                    :style="{'height':height, 'width':width}"
-                    :line="true"
-                    :db-click-splitter="true"
-                    :sidebar.sync="sidebar"
-        >
-            <pane v-if="sidebar"
-                  :min-size="minSize"
-                  :max-size="maxSize"
-            >
-                <slot />
+        <splitpanes style="height: 400px">
+            <pane min-size="20">
+                <span>1</span>
             </pane>
             <pane>
-                <slot />
+                <span>5</span>
             </pane>
         </splitpanes>
     </div>
@@ -21,58 +13,39 @@
 
 <script>
 import { Splitpanes, Pane } from 'splitpanes';
-import {
-    reactive, toRefs, ref, computed,
-} from '@vue/composition-api';
-import VerticalSplitpane from '@/components/molecules/layouts/vertical-layout/VerticalSplitpane.vue';
-
 
 export default {
     name: 'PVerticalLayout2',
     components: {
-        Splitpanes: VerticalSplitpane,
+        Splitpanes,
         Pane,
     },
-    props: {
-        height: {
-            type: String,
-            default: '620px',
-        },
-        width: {
-            type: String,
-            default: '600px',
-        },
-        minSize: {
-            type: Number,
-            default: 20,
-        },
-        maxSize: {
-            type: Number,
-            default: 50,
-        },
-    },
     setup() {
-        const state = reactive({
-        });
-
-        return {
-            ...toRefs(state),
-            sidebar: ref(true),
-        };
+    // .splitpanes {
+        //         background: linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB);
+        //     }
+        //
+        // .splitpanes__pane {
+        //         box-shadow: 0 0 5px rgba(0, 0, 0, .2) inset;
+        //         justify-content: center;
+        //         align-items: center;
+        //         display: flex;
+        //     }
+        //
+        // .splitpanes--vertical > .splitpanes__splitter {
+        //         min-width: 6px;
+        //         background: linear-gradient(90deg, #ccc, #111);
+        //     }
+        //
+        // .splitpanes--horizontal > .splitpanes__splitter {
+        //         min-height: 6px;
+        //         background: linear-gradient(0deg, #ccc, #111);
+        //     }
+        return {};
     },
 };
 </script>
 
 <style lang="scss" scoped>
-    @import '~splitpanes/dist/splitpanes.css';
-
-
-    .splitpanes__pane {
-        /*box-shadow: 0 0 5px rgba(0, 0, 0, .2) inset;*/
-        justify-content: center;
-        align-items: center;
-        display: flex;
-    }
-
 
 </style>
