@@ -100,7 +100,6 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 
 export default {
@@ -114,7 +113,6 @@ export default {
         PCol,
         PTextInput,
         PDropdownMenuBtn,
-        PLottie,
     },
     props: {
         collector: Object,

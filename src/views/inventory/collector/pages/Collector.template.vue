@@ -109,6 +109,9 @@
                                        @collectData="collectByCredential"
                 />
             </template>
+            <template #schedules>
+                <collector-schedules />
+            </template>
         </p-tab>
         <p-tab v-else-if="selectIndex.length > 1" :tabs="multiTabs" :active-tab.sync="multiActiveTab">
             <template #selected>
@@ -193,6 +196,7 @@ const CollectorUpdateModal = () => import('@/views/inventory/collector/modules/C
 const CollectDataModal = () => import('@/views/inventory/collector/modules/CollectDataModal.vue');
 const CollectorDetail = () => import('@/views/inventory/collector/modules/CollectorDetail');
 const CollectorCredentials = () => import('@/views/inventory/collector/modules/CollectorCredentials');
+const CollectorSchedules = () => import('@/views/inventory/collector/modules/CollectorSchedules');
 
 const collectorState = reactive({
     selectIndex: [],
@@ -267,6 +271,7 @@ const setTabData = (props, context) => {
         tabs: makeTrItems([
             ['detail', 'PANEL.DETAILS', { keepAlive: true }],
             ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
+            ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
         ], context.parent),
         multiActiveTab: 'selected',
         multiTabs: makeTrItems([
@@ -419,6 +424,7 @@ export default {
         CollectDataModal,
         CollectorDetail,
         CollectorCredentials,
+        CollectorSchedules,
     },
     setup(props, context) {
         return collectorSetup(props, context);
