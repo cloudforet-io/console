@@ -29,6 +29,24 @@ export default {
         };
         mountBusEvent(GNBEventBus, 'getUser', getUser);
 
+        const getOwner = async (params) => {
+            state.loading = true;
+            try {
+                const res = await context.root.$http.post('identity/domain-owner/get', params);
+                state.userState.name = res.data.name;
+                state.userState.email = res.data.email;
+                state.userState.mobile = res.data.mobile;
+                state.userState.group = res.data.group;
+                state.userState.language = res.data.language;
+                state.userState.timezone = res.data.timezone;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+        mountBusEvent(GNBEventBus, 'getOwner', getOwner);
+
         const updateUser = async (params) => {
             state.loading = true;
             try {
@@ -57,6 +75,36 @@ export default {
             }
         };
         mountBusEvent(GNBEventBus, 'updateUser', updateUser);
+
+
+        const updateOwner = async (params) => {
+            state.loading = true;
+            try {
+                const res = await context.root.$http.post('identity/domain-owner/update', params);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Update Profile',
+                    duration: 2000,
+                    speed: 1000,
+                });
+                state.proxyVisible = false;
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            } finally {
+                state.loading = false;
+            }
+        };
+        mountBusEvent(GNBEventBus, 'updateOwner', updateOwner);
 
         return {
             ...toRefs(state),

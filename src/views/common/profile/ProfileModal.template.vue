@@ -25,12 +25,20 @@
                         <br>
                         <p-text-input :value="userState.email" disabled block />
                     </p-field-group>
-                    <p-field-group :label="tr('COMMON.NAME')">
-                        <br>
-                        <p-text-input v-model="userState.name" block />
+                    <p-field-group :label="tr('COMMON.NAME')"
+                                   :invalid-text="invalidMsg.name"
+                                   :invalid="invalidState.name"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input v-model="userState.name" block
+                                          class="form-control"
+                                          :class="{'is-invalid': invalid}"
+                                          :disabled="userType === 'DOMAIN_OWNER'"
+                            />
+                        </template>
                     </p-field-group>
-                    <p-field-group :label="tr('USER.PWD')"
-                                   required
+                    <p-field-group v-if="showPassword"
+                                   :label="tr('USER.PWD')"
                                    :invalid-text="invalidMsg.password"
                                    :invalid="invalidState.password"
                     >
@@ -41,8 +49,8 @@
                             />
                         </template>
                     </p-field-group>
-                    <p-field-group :label="tr('USER.PWD_CHECK')"
-                                   required
+                    <p-field-group v-if="showPassword"
+                                   :label="tr('USER.PWD_CHECK')"
                                    :invalid-text="invalidMsg.passwordCheck"
                                    :invalid="invalidState.passwordCheck"
                     >
@@ -57,17 +65,25 @@
                 <p-col class="form-div" :col="6">
                     <p-field-group :label="tr('COMMON.PHONE')">
                         <br>
-                        <p-text-input v-model="userState.mobile" block />
+                        <p-text-input v-model="userState.mobile" disabled block />
                     </p-field-group>
                     <p-field-group :label="tr('COMMON.GROUP')">
                         <br>
-                        <p-text-input v-model="userState.group" block />
+                        <p-text-input v-model="userState.group" disabled block />
                     </p-field-group>
                     <p-field-group :label="tr('COMMON.LANGUAGE')">
-                        <p-select-dropdown v-model="userState.language" :items="languages" auto-height />
+                        <p-select-dropdown v-model="userState.language"
+                                           :items="languages"
+                                           auto-height
+                                           :disabled="userType === 'DOMAIN_OWNER'"
+                        />
                     </p-field-group>
                     <p-field-group :label="tr('COMMON.TIMEZONE')">
-                        <p-select-dropdown v-model="userState.timezone" :items="timezones" auto-height />
+                        <p-select-dropdown v-model="userState.timezone"
+                                           :items="timezones"
+                                           auto-height
+                                           :disabled="userType === 'DOMAIN_OWNER'"
+                        />
                     </p-field-group>
                 </p-col>
             </p-row>
@@ -76,7 +92,7 @@
 </template>
 
 <script>
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, computed } from '@vue/composition-api';
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import {
@@ -114,6 +130,7 @@ export const profileSetup = (props, context) => {
     });
 
     const updateUserValidations = {
+        name: [requiredValidation('Please enter name')],
         password: [lengthMinValidation(5), lengthMaxValidation(12)],
         passwordCheck: [
             new Validation((value, data) => data.password === value, 'please enter same value again'),
@@ -123,6 +140,7 @@ export const profileSetup = (props, context) => {
     const state = reactive({
         proxyVisible: makeProxy('visible', props, context.emit),
         loading: true,
+        showPassword: computed(() => props.userType === 'DOMAIN_OWNER' || props.authType === 'local'),
         userState,
         languages: context.root.$i18n.availableLocales.map(lang => (new MenuItem(lang, LANGUAGES[lang]))),
         timezones: moment.tz.names().map(tz => new MenuItem(tz, tz)),
@@ -139,8 +157,6 @@ export const profileSetup = (props, context) => {
                 ...userState,
             };
             delete params.passwordCheck;
-            console.log('props.authType', props.authType);
-            debugger;
             GNBEventBus.$emit('updateUser', params);
             state.proxyVisible = false;
         },
@@ -163,11 +179,19 @@ export default {
     props: {
         visible: Boolean,
         userId: String,
+        userType: String,
         authType: String,
     },
     setup(props, context) {
-        // eslint-disable-next-line camelcase
-        GNBEventBus.$emit('getUser', { user_id: props.userId });
+        const params = {};
+        if (props.userType === 'DOMAIN_OWNER') {
+            params.owner_id = props.userId;
+            GNBEventBus.$emit('getOwner', params);
+        } else {
+            params.user_id = props.userId;
+            GNBEventBus.$emit('getUser', params);
+        }
+
         return {
             ...toRefs(profileSetup(props, context)),
         };

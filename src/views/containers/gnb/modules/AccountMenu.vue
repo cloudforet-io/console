@@ -15,6 +15,7 @@
         <profile-modal v-if="profileVisible"
                        :visible.sync="profileVisible"
                        :user-id="userId"
+                       :user-type="userType"
                        :auth-type="authType"
         />
     </div>
@@ -46,6 +47,7 @@ export default {
             userId: computed(() => root.$store.getters['auth/userId']),
             // clientId: computed(() => root.$store.getters['domain/clientId']),
             authType: computed(() => root.$store.getters['domain/authType']),
+            userType: computed(() => root.$store.getters['auth/userType']),
             signOut: () => root.$store.dispatch['auth.signOut'],
             doAction(item) {
                 if (item.key === 'signout') state.signOutAction();
