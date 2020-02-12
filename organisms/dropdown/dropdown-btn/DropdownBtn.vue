@@ -123,6 +123,7 @@ export default {
     padding-right: 1rem;
     border-radius: 2px 0px 0px 2px;
     text-align: left;
+    justify-content: flex-start;
     margin-right: -4px;
     color: $dark;
     &.block {
