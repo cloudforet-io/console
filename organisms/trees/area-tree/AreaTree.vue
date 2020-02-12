@@ -1,52 +1,53 @@
 <template>
     <div>
         <div class="row no-gutters" @click="contextMenuIsVisible=false">
-            <transition appear name="tree-trans"
+            <!--<transition appear name="tree-trans"
                         @before-enter="beforeEnter"
                         @enter="enter"
-            >
-                <div v-if="showTree">
-                    <p-vertical-layout :auto-save-left-width="true">
-                        <template #leftContainer="{ width }">
-                            <div id="rootPanel"
-                                 @click.right.stop="isRootClicked"
+            >-->
+            <div v-if="showTree">
+                <p-vertical-layout :auto-save-left-width="true">
+                    <template #leftContainer="{ width }">
+                        <div id="rootPanel"
+                             @click.right.stop="isRootClicked"
+                        >
+                            <PTree ref="primeTree"
+                                   :tree-data="treeData"
+                                   :initial-tree-width="width"
+                                   @nodeClick="nodeClicked"
+                                   @beforeDrop="beforeDropped"
+                                   @nodeToggle="nodeToggled"
+                                   @nodeContextMenu="showContextMenu"
                             >
-                                <PTree ref="primeTree"
-                                       :tree-data="treeData"
-                                       :initial-tree-width="width"
-                                       @nodeClick="nodeClicked"
-                                       @beforeDrop="beforeDropped"
-                                       @nodeToggle="nodeToggled"
-                                       @nodeContextMenu="showContextMenu"
-                                >
-                                    <template slot="icon" slot-scope="node">
-                                        <slot name="icon" v-bind="node" />
-                                    </template>
-                                </PTree>
+                                <template slot="icon" slot-scope="node">
+                                    <slot name="icon" v-bind="node" />
+                                </template>
+                            </PTree>
+                        </div>
+                    </template>
+                    <template #rightContainer>
+                        <transition name="panel-trans">
+                            <div v-if="!isDataExists" class="empty" />
+                            <div v-else-if="hasSelected" :key="getNodeKeyComputed" class="panel">
+                                <slot name="treeSubPanel" />
                             </div>
-                        </template>
-                        <template #rightContainer>
-                            <transition name="panel-trans">
-                                <div v-if="hasSelected" :key="getNodeKeyComputed" class="panel">
-                                    <slot name="treeSubPanel" />
+                            <div v-else class="empty">
+                                <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
+                                <div class="msg">
+                                    {{ getNoSelectMSG[0] }}
+                                </div><br>
+                                <div class="dt">
+                                    {{ getNoSelectMSG[1] }}
                                 </div>
-                                <div v-else class="empty">
-                                    <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
-                                    <div class="msg">
-                                        {{ getNoSelectMSG[0] }}
-                                    </div><br>
-                                    <div class="dt">
-                                        {{ getNoSelectMSG[1] }}
-                                    </div>
-                                </div>
-                            </transition>
-                        </template>
-                    </p-vertical-layout>
-                    <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
-                        <slot name="context" v-bind="getCurrentNode" />
-                    </div>
+                            </div>
+                        </transition>
+                    </template>
+                </p-vertical-layout>
+                <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
+                    <slot name="context" v-bind="getCurrentNode" />
                 </div>
-            </transition>
+            </div>
+            <!--</transition>-->
         </div>
     </div>
 </template>
@@ -96,7 +97,7 @@ export default {
         },
         treeWidth: {
             type: Number,
-            default: 250,
+            default: 280,
         },
     },
     setup(props, context) {
@@ -104,6 +105,7 @@ export default {
             showContextFirst: false,
             selectedLeftWidth: 300,
             nodeKey: 0,
+            isDataExists: false,
             hasSelected: false,
             contextMenuIsVisible: false,
             showTree: false,
@@ -115,13 +117,13 @@ export default {
             state.showTree = true;
         });
 
-        const getTree = () => (Util.methods.isEmpty(context) ? null : _.get(context, 'refs.primeTree.$refs.slVueTree'));
+        const getTree = () => (_.isEmpty(context) ? null : _.get(context, 'refs.primeTree.$refs.slVueTree'));
 
         const getNoSelectMSG = computed(() => [Util.methods.tr(props.noSelectMSG[0], null, context.parent), Util.methods.tr(props.noSelectMSG[1], null, context.parent)]);
         const getNodeKeyComputed = computed(() => state.nodeKey);
         const getCurrentNode = computed(() => {
             const node = getTree();
-            return Util.methods.isEmpty(node) ? null : node;
+            return _.isEmpty(node) ? null : node;
         });
 
         const getNodeEl = node => context.refs.primeTree.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
@@ -240,7 +242,7 @@ export default {
             }
         };
 
-        const beforeEnter = (el) => {
+        /* const beforeEnter = (el) => {
             context.parent.$velocity(el, {
                 translateX: `-${props.treeWidth}px`,
                 opacity: 0,
@@ -256,7 +258,7 @@ export default {
                     },
                 });
             done();
-        };
+        }; */
 
 
         return {
@@ -276,8 +278,8 @@ export default {
             nodeToggled,
             beforeDropped,
             setContextVisible,
-            beforeEnter,
-            enter
+            /* beforeEnter,
+            enter, */
         };
     },
 };
