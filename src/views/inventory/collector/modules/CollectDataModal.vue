@@ -72,14 +72,13 @@
 
         <template #footer-extra>
             <p-button class="reset-btn"
-                      style-type="primary"
+                      style-type="primary-dark"
                       outline
                       @click="onClickReset"
             >
                 {{ tr('COMMON.BTN_RESET') }}
             </p-button>
         </template>
-
     </p-button-modal>
 </template>
 
@@ -141,7 +140,7 @@ export default {
             filters: {},
             confirmBtnStyle: computed(() => {
                 const defaultStyle = { style: { padding: 0 } };
-                defaultStyle.styleType = props.loading ? 'gray2' : 'primary';
+                defaultStyle.styleType = props.loading ? 'gray2' : 'primary-dark';
                 return defaultStyle;
             }),
             crdsMenu: computed(() => [

@@ -35,7 +35,7 @@
                 <p-i name="ic_plus" color="transparent inherit"
                      width="1rem" height="1rem"
                 />
-                Add
+                {{ tr('COMMON.BTN_ADD') }}
             </p-button>
         </div>
     </div>

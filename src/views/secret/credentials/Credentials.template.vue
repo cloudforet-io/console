@@ -30,15 +30,15 @@
                     <template #col-credential_group_id-format="{item}">
                         <div>
                             <PBadge v-for="(label, idx) in item.credential_groups" :key="idx" class="p-label"
-                                    :style-type="'gray2'"
+                                    style-type="gray2"
                             >
                                 {{ getEmptyString(label.name) }}
                             </PBadge>
                         </div>
                     </template>
                     <template slot="toolbox-left">
-                        <p-button style-type="primary" @click="clickCreate">
-                            {{ tr('COMMON.BTN_ADD') }}
+                        <p-button style-type="primary-dark" @click="clickCreate">
+                            {{ tr('COMMON.BTN_CRT') }}
                         </p-button>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"

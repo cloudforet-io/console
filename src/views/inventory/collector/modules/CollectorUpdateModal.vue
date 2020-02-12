@@ -28,7 +28,7 @@
 
         <template #footer-extra>
             <p-button class="reset-btn"
-                      style-type="primary"
+                      style-type="primary-dark"
                       outline
                       @click="onClickReset"
             >
@@ -82,7 +82,7 @@ export default {
             },
             confirmBtnBind: computed(() => {
                 const defaultStyle = { style: { padding: 0 } };
-                defaultStyle.styleType = props.loading ? 'gray2' : 'primary';
+                defaultStyle.styleType = props.loading ? 'gray2' : 'primary-dark';
                 return defaultStyle;
             }),
             onClickConfirm: async () => {

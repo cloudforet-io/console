@@ -2,7 +2,7 @@
     <p-panel-top panel-title="Tags" class="dict-panel-title">
         <template #head>
             <div class="panel-header" :class="{'edit':editMode}">
-                <p-button v-if="!editMode" style-type="primary" class="header-btn"
+                <p-button v-if="!editMode" style-type="primary-dark" class="header-btn"
                           @click="clickEdit()"
                 >
                     {{ buttonTag }}
@@ -35,9 +35,9 @@
 <script>
 import { reactive, toRefs, computed } from '@vue/composition-api';
 import { Util } from '@/lib/global-util';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup';
-import PButton from '@/components/atoms/buttons/Button';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 import { makeProxy } from '@/lib/compostion-util';
 
 export default {
