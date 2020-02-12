@@ -3,6 +3,7 @@
         class="p-select-dropdown"
         :class="invalidClass"
         :menu="items"
+        :auto-height="autoHeight"
         @clickMenuEvent="changSelectItem"
     >
         {{ selectItemLabel }}
@@ -27,6 +28,10 @@ export default {
             type: String,
         },
         invalid: {
+            type: Boolean,
+            default: false,
+        },
+        autoHeight: {
             type: Boolean,
             default: false,
         },
