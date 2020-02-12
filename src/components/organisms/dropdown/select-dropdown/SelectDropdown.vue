@@ -4,6 +4,7 @@
         :class="invalidClass"
         :menu="items"
         :auto-height="autoHeight"
+        :disabled="disabled"
         @clickMenuEvent="changSelectItem"
     >
         {{ selectItemLabel }}
@@ -32,6 +33,10 @@ export default {
             default: false,
         },
         autoHeight: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
             type: Boolean,
             default: false,
         },
