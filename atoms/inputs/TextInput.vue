@@ -22,6 +22,10 @@ export default {
             default: 'text',
             validator: value => ['text', 'number', 'password'].indexOf(value) !== -1,
         },
+        block: {
+            type: Boolean,
+            default: false,
+        },
     },
     render(h, { data, props, listeners }) {
         return h('input', {
@@ -29,6 +33,7 @@ export default {
             class: {
                 ...getBindClass(data.class),
                 'p-text-input': true,
+                block: props.block,
             },
             attrs: {
                 ...data.attrs,
@@ -74,6 +79,10 @@ export default {
     &:disabled{
         border-color:$gray2;
         background-color: $gray3;
+    }
+    &.block {
+        display: block;
+        width: 100%;
     }
 }
 
