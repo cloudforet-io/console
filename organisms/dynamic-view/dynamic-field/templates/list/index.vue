@@ -25,10 +25,9 @@ export default {
         const option = _.get(props.view_option, ['item'], {});
         let datas: any[] = [];
         const pushData = (data:any):void => {
-            datas.push([data]);
+            datas.push(data);
         };
         const getValue = (data, paths: string[], callback:(any)=>void) => {
-            console.log(data, paths);
             if (Array.isArray(data)) {
                 for (const idx in data) {
                     getValue(data[idx], paths, callback);
