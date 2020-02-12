@@ -18,7 +18,6 @@ export default {
         },
     },
     render(h, { props }) {
-        console.log('dy dictlist', props.data);
         return h(PDictList, {
             props: {
                 dict: props.data,

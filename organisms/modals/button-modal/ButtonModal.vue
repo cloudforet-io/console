@@ -47,16 +47,16 @@
                           :disabled="loading"
                           @click="onConfirmClick"
                 >
-                    <slot name="confirm-button">
-                        <div class="confirm-btn">
-                            <p-lottie v-if="loading" class="spinner"
-                                      name="spinner"
-                                      auto
-                                      :size="1.5"
-                            />
+                    <div class="confirm-btn">
+                        <p-lottie v-if="loading" class="spinner"
+                                  name="spinner"
+                                  auto
+                                  :size="1.5"
+                        />
+                        <slot name="confirm-button">
                             {{ tr('COMMON.BTN_CONFIRM') }}
-                        </div>
-                    </slot>
+                        </slot>
+                    </div>
                 </p-button>
             </slot>
         </template>
