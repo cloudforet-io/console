@@ -151,13 +151,21 @@ export const profileSetup = (props, context) => {
             const result = await state.allValidation();
             if (!result) return;
 
-            const params = {
+            let params = {};
+            if (props.userType === 'DOMAIN_OWNER') {
                 // eslint-disable-next-line camelcase
-                user_id: props.userId,
-                ...userState,
-            };
-            delete params.passwordCheck;
-            GNBEventBus.$emit('updateUser', params);
+                params.owner_id = props.userId;
+                params.password = userState.password;
+                GNBEventBus.$emit('updateOwner', params);
+            } else {
+                params = { ...userState };
+                // eslint-disable-next-line camelcase
+                params.user_id = props.userId;
+                delete params.passwordCheck;
+                if (!state.showPassword) delete params.password;
+                GNBEventBus.$emit('getUser', params);
+            }
+
             state.proxyVisible = false;
         },
 
