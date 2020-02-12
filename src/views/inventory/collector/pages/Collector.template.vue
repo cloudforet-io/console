@@ -194,10 +194,6 @@ const CollectDataModal = () => import('@/views/inventory/collector/modules/Colle
 const CollectorDetail = () => import('@/views/inventory/collector/modules/CollectorDetail');
 const CollectorCredentials = () => import('@/views/inventory/collector/modules/CollectorCredentials');
 
-export const api = {
-    getCollectorList: undefined,
-};
-
 const collectorState = reactive({
     selectIndex: [],
     items: [],

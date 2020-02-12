@@ -1,7 +1,7 @@
 <template>
     <div>
         <p-row class="all-container">
-            <p-col :flex-grow="0" class="container collector-info">
+            <p-col :flex-grow="0" flex-basis="50%" class="container collector-info">
                 <p-row>
                     <p-col :flex-grow="0">
                         <img class="img" :src="imgUrl">
@@ -9,11 +9,16 @@
                     <p-col>
                         <p-field-group label="Collector Name" required>
                             <br>
-                            <p-text-input v-model="proxyName" :placeholder="namePlaceholder" @input="onChangeName" />
+                            <p-text-input v-model="proxyName"
+                                          :placeholder="namePlaceholder"
+                                          style="width: 100%;"
+                                          @input="onChangeName"
+                            />
                         </p-field-group>
                         <p-field-group label="Version">
                             <p-dropdown-menu-btn :menu="versionsInfo"
                                                  :loading="versionsInfo ? false : true"
+                                                 block
                                                  @clickMenuEvent="onSelectVersion"
                             >
                                 {{ selectedVersion }}
@@ -21,7 +26,10 @@
                         </p-field-group>
                         <p-field-group label="Priority">
                             <br>
-                            <p-text-input v-model.number="proxyPriority" type="number" />
+                            <p-text-input v-model.number="proxyPriority"
+                                          type="number"
+                                          style="width: 100%;"
+                            />
                         </p-field-group>
                     </p-col>
                 </p-row>
