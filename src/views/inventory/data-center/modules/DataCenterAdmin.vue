@@ -29,12 +29,8 @@
                          @clickRefresh="getMembers"
         >
             <template slot="toolbox-left">
-                <p-button style-type="primary" @click="showModals('add')">
-                    <p-i :color="'transparent inherit'"
-                         :width="'1rem'"
-                         :height="'1rem'"
-                         :name="'ic_plus'"
-                    />   {{ tr('COMMON.BTN_ADD') }}
+                <p-button style-type="primary-dark" @click="showModals('add')">
+                    {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
                 <p-button style-type="alert" :outline="true"
                           :disabled="isDisabled"
@@ -63,7 +59,7 @@
                 <div>
                     <PBadge v-for="(label, idx) in data.item.labels"
                             :key="idx"
-                            class="p-label" :style-type="'gray2'"
+                            class="p-label" style-type="gray2"
                     >
                         {{ getEmptyString(label) }}
                     </PBadge>

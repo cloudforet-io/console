@@ -90,7 +90,7 @@ const setup = (props, context) => {
         outline: true,
     });
     const footerConfirmButtonBind = computed(() => ({
-        styleType: props.themeColor,
+        styleType: props.themeColor === 'primary' ? 'primary-dark' : props.themeColor,
     }));
 
     const singleItemValidations = {
@@ -137,7 +137,7 @@ const setup = (props, context) => {
 export default {
     name: 'PTableCheckModal',
     components: {
-        PButtonModal, PDataTable, PRow, PCol, PTextInput, PHr, PFieldGroup
+        PButtonModal, PDataTable, PRow, PCol, PTextInput, PHr, PFieldGroup,
     },
     mixins: [propsMixin],
     props: {

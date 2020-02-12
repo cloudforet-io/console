@@ -81,7 +81,7 @@
                     {{ tr('COMMON.BTN_CANCEL') }}
                 </p-button>
 
-                <p-button class="add-btn" style-type="primary" @click="clickAdd">
+                <p-button class="add-btn" style-type="primary-dark" @click="clickAdd">
                     {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
             </p-row>
