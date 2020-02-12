@@ -192,6 +192,10 @@ export default {
             }).then((response) => {
                 const responseData = this.treeDataHandler(response.data, 'DATA_CENTER');
                 this.treeData = responseData;
+
+                if (response.data.items.length > 0) {
+                    this.$refs.DataCenterTree._data.isDataExists = true;
+                }
                 // Note: Initialize Project trees and then display only a context, This must be included as well.
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0], 'data.init'))) {
                     this.isInitializing = true;
@@ -240,6 +244,7 @@ export default {
                         tree.remove([tree.getFirstNode()].map(node => node.path));
                         this.isInitializing = false;
                     }
+                    this.$refs.DataCenterTree._data.isDataExists = true;
                 }
             }).catch((error) => {
                 console.error(error);
@@ -289,10 +294,11 @@ export default {
                         speed: 1000,
                     });
 
-                    if (this.treeData.length === 1) {
+                    this.$refs.DataCenterTree._data.hasSelected = false;
+                    if (_.isEmpty(tree.getNode([0]))) {
                         this.isInitializing = true;
                         this.treeData = [{
-                            title: '! Please, Right Click me',
+                            title: 'Right-click on your mouse to create a new region.',
                             isLeaf: true,
                             data: {
                                 init: true,

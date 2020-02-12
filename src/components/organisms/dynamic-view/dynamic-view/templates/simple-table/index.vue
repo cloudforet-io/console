@@ -1,27 +1,37 @@
 <template>
-    <p-data-table
-        :fields="fields"
-        :items="data"
-        :col-copy="true"
-        :striped="true"
-        :bord="false"
-        :padding="false"
-        :hover="false"
-    >
-        <template v-for="slot of slots" v-slot:[slot.name]="{item}">
-            <p-dynamic-field :key="slot.name" :view_type="slot.view_type" :view_option="slot.view_option"
-                             :data="getValue(item,slot.path)"
-            />
-        </template>
-    </p-data-table>
+    <Fragment>
+        <div class="p-dynamic-view-simple-table-header">
+            <div class="title">
+                {{ name }}
+            </div>
+            <PHr />
+        </div>
+        <p-data-table
+            :fields="fields"
+            :items="data"
+            :col-copy="true"
+            :striped="true"
+            :bord="false"
+            :padding="false"
+            :hover="false"
+        >
+            <template v-for="slot of slots" v-slot:[slot.name]="{item}">
+                <p-dynamic-field :key="slot.name" :view_type="slot.view_type" :view_option="slot.view_option"
+                                 :data="getValue(item,slot.path)"
+                />
+            </template>
+        </p-data-table>
+    </Fragment>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
 import { createComponent, computed, Ref } from '@vue/composition-api';
 import _ from 'lodash';
+import { Fragment } from 'vue-fragment';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
 
 interface DataSourceType {
     name:string;
@@ -54,6 +64,8 @@ export default createComponent({
     components: {
         PDynamicField,
         PDataTable,
+        Fragment,
+        PHr,
     },
     props: {
         name: {
@@ -92,3 +104,21 @@ export default createComponent({
     },
 });
 </script>
+
+<style scoped lang="scss">
+    .p-dynamic-view-simple-table-header{
+        margin-bottom: 1rem;
+        .title{
+            display: flex;
+            text-align: left;
+            font:  18px Arial;
+            letter-spacing: 0;
+            color: #202433;
+            opacity: 1;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-self:center;
+        }
+    }
+
+</style>

@@ -27,7 +27,8 @@
                     </template>
                     <template #rightContainer>
                         <transition name="panel-trans">
-                            <div v-if="hasSelected" :key="getNodeKeyComputed" class="panel">
+                            <div v-if="!isDataExists" class="empty" />
+                            <div v-else-if="hasSelected" :key="getNodeKeyComputed" class="panel">
                                 <slot name="treeSubPanel" />
                             </div>
                             <div v-else class="empty">
@@ -96,7 +97,7 @@ export default {
         },
         treeWidth: {
             type: Number,
-            default: 250,
+            default: 280,
         },
     },
     setup(props, context) {
@@ -104,6 +105,7 @@ export default {
             showContextFirst: false,
             selectedLeftWidth: 300,
             nodeKey: 0,
+            isDataExists: false,
             hasSelected: false,
             contextMenuIsVisible: false,
             showTree: false,
@@ -115,13 +117,13 @@ export default {
             state.showTree = true;
         });
 
-        const getTree = () => (Util.methods.isEmpty(context) ? null : _.get(context, 'refs.primeTree.$refs.slVueTree'));
+        const getTree = () => (_.isEmpty(context) ? null : _.get(context, 'refs.primeTree.$refs.slVueTree'));
 
         const getNoSelectMSG = computed(() => [Util.methods.tr(props.noSelectMSG[0], null, context.parent), Util.methods.tr(props.noSelectMSG[1], null, context.parent)]);
         const getNodeKeyComputed = computed(() => state.nodeKey);
         const getCurrentNode = computed(() => {
             const node = getTree();
-            return Util.methods.isEmpty(node) ? null : node;
+            return _.isEmpty(node) ? null : node;
         });
 
         const getNodeEl = node => context.refs.primeTree.$refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
@@ -240,7 +242,7 @@ export default {
             }
         };
 
-        const beforeEnter = (el) => {
+        /* const beforeEnter = (el) => {
             context.parent.$velocity(el, {
                 translateX: `-${props.treeWidth}px`,
                 opacity: 0,
@@ -256,7 +258,7 @@ export default {
                     },
                 });
             done();
-        };
+        }; */
 
 
         return {
@@ -276,8 +278,8 @@ export default {
             nodeToggled,
             beforeDropped,
             setContextVisible,
-            beforeEnter,
-            enter,
+            /* beforeEnter,
+            enter, */
         };
     },
 };
