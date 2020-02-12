@@ -84,7 +84,7 @@
                     </router-link>
                 </li>
                 <li>
-                    <router-link class="service" to="/identity/project">
+                    <router-link class="service last" to="/identity/project">
                         Project
                     </router-link>
                 </li>
@@ -240,7 +240,7 @@ export default {
         .service {
             padding: .5rem  0 .5rem 4.5rem;
             &.last {
-                padding-bottom: .75rem;
+                margin-bottom: 1rem;
             }
         }
     }
