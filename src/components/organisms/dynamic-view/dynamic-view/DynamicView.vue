@@ -18,7 +18,6 @@
 import {
     computed, createComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { DynamicAPI } from '@/lib/api';
 
 
 interface State {

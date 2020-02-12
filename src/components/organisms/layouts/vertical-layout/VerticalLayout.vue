@@ -76,7 +76,7 @@ export default {
         },
         leftWidth: {
             type: Number,
-            default: 200,
+            default: 278,
         },
         minLeftWidth: {
             type: Number,

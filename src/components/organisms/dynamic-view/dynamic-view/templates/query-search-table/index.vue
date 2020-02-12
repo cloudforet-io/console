@@ -8,7 +8,7 @@
         :shadow="true"
         :border="true"
         :padding="true"
-        :draggable="true"
+        :dragable="true"
         :sort-by.sync="apiHandler.state.sortBy"
         :sort-desc.sync="apiHandler.state.sortDesc"
         :all-page="apiHandler.state.allPage"

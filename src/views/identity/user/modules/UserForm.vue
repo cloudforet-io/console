@@ -35,7 +35,7 @@
                                         />
                                     </p-col>
                                     <p-col>
-                                        <p-button style-type="primary-dark" :disabled="updateMode" class="user-id-check-btn"
+                                        <p-button style-type="primary" :disabled="updateMode" class="user-id-check-btn"
                                                   @click="checkUserID"
                                         >
                                             check user id

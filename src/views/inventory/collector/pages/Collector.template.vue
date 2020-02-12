@@ -26,7 +26,7 @@
                                  @changeSort="getCollectors"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary-dark" @click="$router.push({path: '/inventory/collector/create/plugins'})">
+                        <p-button style-type="primary" @click="$router.push({path: '/inventory/collector/create/plugins'})">
                             Create
                         </p-button>
                         <PDropdownMenuBtn class="left-toolbox-item"

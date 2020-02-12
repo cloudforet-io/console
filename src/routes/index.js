@@ -12,7 +12,7 @@ import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 import SignIn from '@/views/sign-in/local/Local.vue';
 import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth.vue';
 import Admin from '@/views/sign-in/admin/Admin.vue';
-import Redirect404 from '@/views/common/404/Redirect404.vue';
+import ErrorPage from '@/views/common/error/ErrorPage.vue';
 import api from '@/lib/api';
 import store from '@/store';
 
@@ -27,7 +27,7 @@ const router = new VueRouter({
             path: '/error-page',
             name: 'error',
             meta: { label: '', excludeAuth: true },
-            component: Redirect404,
+            component: ErrorPage,
         },
         {
             path: '/sign-in',
@@ -57,10 +57,10 @@ const router = new VueRouter({
                 dashboardRoute,
                 identityRoute,
                 inventoryRoute,
-                secretRoute
+                secretRoute,
             ],
         },
-        { path: '*', component: Redirect404 },
+        { path: '*', component: ErrorPage },
     ],
 });
 

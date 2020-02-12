@@ -7,9 +7,7 @@
         <router-view />
     </div>
     <div v-else class="app-spinner">
-        <p-lottie ref="pageLoading" class="spinner" :auto="true"
-                  :size="25"
-        />
+        <p-lottie ref="pageLoading" :auto="true" :size="45" />
     </div>
 </template>
 <script>
@@ -175,10 +173,5 @@ export default {
 
     .app-spinner {
         height: 100vh;
-        width: 100vw;
-        .spinner {
-            width: 100%;
-            height: 100%;
-        }
     }
 </style>

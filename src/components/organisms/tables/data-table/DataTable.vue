@@ -219,7 +219,7 @@ export const dataTableProps = {
 
 const loadingHandler = (props) => {
     onMounted(() => {
-        if (props.loading) {
+        if (props.useCursorLoading && props.loading) {
             document.body.style.cursor = 'progress';
         }
     });

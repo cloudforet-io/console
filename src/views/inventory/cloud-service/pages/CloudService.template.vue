@@ -12,7 +12,7 @@
                             :shadow="false"
                             :border="false"
                             :padding="true"
-                            :draggable="false"
+                            :dragable="false"
                             :multi-select="false"
                             :setting-visible="false"
                             :sortable="true"
@@ -50,7 +50,7 @@
                                                 :data="null"
                                 >
                                     <template #toolbox-left>
-                                        <p-button style-type="primary-dark">
+                                        <p-button style-type="primary">
                                             Collect Data
                                         </p-button>
                                         <div class="left-toolbox-item">
@@ -66,7 +66,7 @@
                             <template #detail="{tabName}">
                                 <p-dynamic-view v-for="dv in dvApiHandler.selectState.firstSelectItem.metadata.details" :key="dv.name" :name="dv.name"
                                                 :view_type="dv.view_type||'item'"
-                                                :data="dvApiHandler.selectState.firstSelectItem.data||{}"
+                                                :data="detailsData(dvApiHandler.selectState.firstSelectItem,dv.view_type,dv.key_path)"
                                                 :data_source="dv.data_source"
                                 />
                             </template>
@@ -204,6 +204,12 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
         context.parent,
         { type: 'item' }),
     });
+    const detailsData = (item, view_type, key_path) => {
+        if (view_type === 'simple-table') {
+            return _.get(item, key_path.split('.'));
+        }
+        return item.data;
+    };
     return {
         ...toRefs(state),
         apiHandler,
@@ -211,6 +217,7 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
         cstDropdownMenu,
         csDropdownMenu,
         selectTypeDataSource,
+        detailsData,
     };
 };
 

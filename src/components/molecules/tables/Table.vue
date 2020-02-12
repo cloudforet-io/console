@@ -227,6 +227,11 @@ export default {
                     z-index: 0;
                     vertical-align: middle;
                 }
+                &:first-child{
+                    td{
+                        border-top: 0;
+                    }
+                }
             }
         }
     }
