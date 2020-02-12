@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import _ from 'lodash';
+import { reactive, toRefs, watch } from '@vue/composition-api';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 
 import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout.vue';
@@ -60,46 +62,44 @@ export default {
             default: null,
         },
     },
-    data() {
-        return {
-            test: 'test',
+    setup(props, context) {
+        const state = reactive({
             chartData: {
                 vm: { title: 'VM', data: [] },
                 os: { title: 'OS', data: [] },
                 hypervisor: { title: 'Hypervisor', data: [] },
             },
+            onServerTypeLegendClick(key, val) {
+                context.root.$router.push({ path: '/inventory/server', query: { plan: 'private' } });
+            },
+        });
+
+        const setChartData = (type, data) => {
+            if (data instanceof Array) state.chartData[type].data = data;
+            else {
+                const items = _.flatMap(data, (d, k) => ({ key: k, value: d }));
+                state.chartData[type].data = _.sortBy(items, ['key']);
+            }
         };
-    },
-    watch: {
-        vmData(data) {
-            this.setChartData('vm', data);
-        },
-        osData(data) {
-            this.setChartData('os', data);
-        },
-        hypervisorData(data) {
-            this.setChartData('hypervisor', data);
-        },
-    },
-    created() {
+
+        watch(() => props.vmData, (data) => {
+            setChartData('vm', data);
+        });
+        watch(() => props.osData, (data) => {
+            setChartData('os', data);
+        });
+        watch(() => props.hypervisorData, (data) => {
+            setChartData('hypervisor', data);
+        });
+
         DashboardEventBus.$emit('listServerType');
         DashboardEventBus.$emit('listVmType');
         DashboardEventBus.$emit('listOsType');
         DashboardEventBus.$emit('listHypervisorType');
-    },
-    methods: {
-        setChartData(type, data) {
-            if (data instanceof Array) this.chartData[type].data = data;
-            else {
-                this.chartData[type].data = Object.keys(data).map(key => ({
-                    key,
-                    value: data[key],
-                }));
-            }
-        },
-        onServerTypeLegendClick(key, val) {
-            this.$router.push({ path: '/inventory/server', query: { plan: 'private' } });
-        },
+
+        return {
+            ...toRefs(state),
+        };
     },
 };
 </script>
