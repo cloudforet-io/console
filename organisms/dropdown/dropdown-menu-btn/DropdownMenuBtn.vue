@@ -8,6 +8,7 @@
                       :class="{block}"
                       :menu="menu"
                       :loading="loading"
+                      :auto-height="autoHeight"
                       @clickMenuEvent="clickMenuEvent"
         />
     </div>
@@ -30,6 +31,10 @@ export default {
             default: false,
         },
         loading: {
+            type: Boolean,
+            default: false,
+        },
+        autoHeight: {
             type: Boolean,
             default: false,
         },
