@@ -1,12 +1,11 @@
 <template>
     <div class="dropdown-btn-container" :class="{block}">
-        <p-button
-            :disabled="disabled"
-            :class="btnClassObject"
-            class="dropdown-btn menu-btn"
-            @click.stop="onClick"
-            @mouseover="onMouseOver"
-            @mouseout="onMouseOut"
+        <p-button :disabled="disabled"
+                  :class="btnClassObject"
+                  class="dropdown-btn menu-btn"
+                  @click.stop="onClick"
+                  @mouseover="onMouseOver"
+                  @mouseout="onMouseOut"
         >
             <slot />
         </p-button>
