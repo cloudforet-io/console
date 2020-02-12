@@ -1,5 +1,6 @@
 <template>
     <div class="cdg">
+        <p-vertical-layout2></p-vertical-layout2>
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -161,6 +162,7 @@ import PCdgCredential from '@/views/secret/credentials-group/modules/CredentialG
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PCdgForm from '@/views/secret/credentials-group/modules/CredentialGroupForm.vue';
+import PVerticalLayout2 from '@/components/molecules/layouts/vertical-layout/VerticalLayout2.vue';
 
 export const CdgTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -369,6 +371,7 @@ export default {
         getValue,
     },
     components: {
+        PVerticalLayout2,
         PCdgForm,
         PHorizontalLayout,
         PToolboxTable,
