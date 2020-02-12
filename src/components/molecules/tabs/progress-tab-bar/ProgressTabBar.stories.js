@@ -4,9 +4,8 @@ import { autoProps } from '@sb/storybook-util';
 import { action } from '@storybook/addon-actions';
 import _ from 'lodash';
 import { VTooltip } from 'v-tooltip';
-import PProgressTabBar from './ProgressTabBar';
+import PProgressTabBar from './ProgressTabBar.vue';
 import { makeProxy } from '@/lib/compostion-util';
-import BaseDragVertical from '@/components/base/drag/BaseDragVertical';
 
 export default {
     title: 'molecules/tabs/ProgressTabBar',

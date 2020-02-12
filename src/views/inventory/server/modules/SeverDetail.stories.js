@@ -25,7 +25,7 @@ export const detail = () => ({
     setup() {
         const item = ref(casual._server());
         const tags = ref(item.value.tags);
-        console.log('storybook setup',item, tags);
+        console.debug('storybook setup', item, tags);
         return {
             item,
             tags,

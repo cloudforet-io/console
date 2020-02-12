@@ -129,7 +129,7 @@ export default {
                 state.cdgData.allPage = allPage || 1;
                 state.cdgData.loading = false;
             } catch (e) {
-                console.log(e);
+                console.error(e);
                 state.cdgData.loading = false;
             }
         };
@@ -171,7 +171,7 @@ export default {
                     speed: 1000,
                 });
             }).catch((error) => {
-                console.log(error);
+                console.error(error);
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'alert',
@@ -202,7 +202,7 @@ export default {
                     speed: 1000,
                 });
             }).catch((error) => {
-                console.log(error);
+                console.error(error);
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'alert',
@@ -225,7 +225,7 @@ export default {
                     speed: 1000,
                 });
             }).catch((error) => {
-                console.log(error);
+                console.error(error);
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'alert',
@@ -248,7 +248,7 @@ export default {
                     speed: 1000,
                 });
             }).catch((error) => {
-                console.log(error);
+                console.error(error);
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'alert',

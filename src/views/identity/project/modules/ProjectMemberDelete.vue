@@ -202,7 +202,7 @@ export default {
             this.deleteUserOnProject();
         },
         close() {
-            console.log('close Modal');
+            console.debug('close Modal');
         },
     },
 };

@@ -217,7 +217,7 @@ export default {
             await this.$http.post(url, param).then((response) => {
                 const responseData = response.data;
                 if (!this.isEmpty(responseData)) {
-                    console.log('Item successfully moved. ');
+                    console.debug('Item successfully moved. ');
                 }
             }).catch((error) => {
                 console.error(error);
@@ -276,7 +276,6 @@ export default {
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0], 'data.init'))) {
                     this.isInitializing = true;
                 }
-
             }).catch((error) => {
                 console.error(error);
             });

@@ -1,7 +1,6 @@
 import { action } from '@storybook/addon-actions';
 import { toRefs, computed } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status';
-import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
 import PBadge from '@/components/atoms/badges/Badge';
@@ -37,7 +36,6 @@ export const mockPage = () => ({
     template: `${Server.template}`,
     components: {
         PStatus,
-        BaseDragHorizontal,
         PToolboxTable,
         PButton,
         PBadge,
@@ -50,7 +48,7 @@ export const mockPage = () => ({
         serverEventNames.tagResetEvent = 'resetTagEvent';
         serverEventNames.getServerSubData = 'getSubData';
         const state = serverSetup(props, context, serverEventNames);
-        console.log(state);
+        console.debug(state);
         const items = computed(() => arrayOf(state.pageSize, casual._server));
         const getSubDate = (server_id, name) => {
             const mock = {

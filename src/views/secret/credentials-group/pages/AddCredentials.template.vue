@@ -43,7 +43,8 @@
                     <div class="left-toolbox-item">
                         <PQuerySearchBar :search-text.sync="searchText"
                                          :autocomplete-handler="ACHandler"
-                                         @newQuery="queryListTools.addTag" />
+                                         @newQuery="queryListTools.addTag"
+                        />
                     </div>
                 </template>
                 <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
@@ -128,7 +129,7 @@ import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionC
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PCdgForm from '@/views/secret/credentials-group/modules/CredentialGroupForm.vue';
-import PIconButton from "@/components/molecules/buttons/IconButton.vue";
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 
 const PDictList = () => import('@/components/molecules/lists/DictList');
 
@@ -222,7 +223,7 @@ export const cdgSetup = (props, context, eventName, ACHandler) => {
     };
 
     const cdgFormConfirm = (item) => {
-        console.log('cdgFormConfirm test', item)
+        console.debug('cdgFormConfirm test', item);
         eventBus.$emit(cdgFormState.eventName, item);
         cdgFormState.visible = false;
         cdgFormState.mode = '';

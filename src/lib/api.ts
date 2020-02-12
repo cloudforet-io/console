@@ -409,7 +409,6 @@ export class BaseQuerySearchTableAPI extends DynamicAPI {
             suggestKeys: keys || [] as string[],
         });
         const acHandler:Ref<any> = computed(() => {
-            console.log('new handler', this.acState.keys, this.acState.suggestKeys);
             return new QuerySearchTableACHandler(parent, this.acState.keys, this.acState.keys);
         });
 

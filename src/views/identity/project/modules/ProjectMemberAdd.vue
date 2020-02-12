@@ -266,7 +266,7 @@ export default {
             this.addUserOnProject();
         },
         close() {
-            console.log('close Modal');
+            console.debug('close Modal');
         },
     },
 };

@@ -380,7 +380,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
 
 
     const checkModalConfirm = (event) => {
-        console.log(checkTableModalState.confirmEventName, event);
+        console.debug(checkTableModalState.confirmEventName, event);
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
     };
@@ -413,11 +413,11 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         timestampFormatter,
         platformBadgeFormatter,
         clickCollectData() {
-            console.log('add');
+            console.debug('add');
         },
         getServers,
         clickMenuEvent(menuName) {
-            console.log(menuName);
+            console.debug(menuName);
         },
         // todo: need confirm that this is good way - sinsky
         // EventBus Names
