@@ -6,7 +6,7 @@
                           @click="toggle"
         >
             <template #buttonContents>
-                <p-i name="ic_gnb_services" width="32px" height="32px"
+                <p-i name="ic_gnb_services" width="2rem" height="2rem"
                      :color="`transparent ${iconColor}`"
                 />
             </template>
@@ -16,7 +16,7 @@
             <div class="title">
                 <p-button class="back-btn" @click="hide">
                     <template>
-                        <p-i name="ic_back" width="24px" height="24px" />
+                        <p-i name="ic_back" width="2rem" height="2rem" />
                     </template>
                 </p-button>
                 <span class="name">Services</span>
@@ -26,7 +26,7 @@
                 <li>
                     <router-link class="group" to="/dashboard">
                         <span class="icon">
-                            <p-i name="ic_dashboard" width="24px" height="24px"
+                            <p-i name="ic_dashboard"
                                  color="transparent inherit"
                             />
                         </span>
@@ -37,7 +37,7 @@
                 <li>
                     <router-link class="group" to="/inventory">
                         <span class="icon">
-                            <p-i name="ic_inventory" width="24px" height="24px"
+                            <p-i name="ic_inventory"
                                  color="transparent inherit"
                             />
                         </span>
@@ -70,7 +70,7 @@
                 <li>
                     <router-link class="group" to="/identity">
                         <span class="icon">
-                            <p-i name="ic_identity" width="24px" height="24px"
+                            <p-i name="ic_identity"
                                  color="transparent inherit"
                             />
                         </span>
@@ -91,7 +91,7 @@
                 <li>
                     <router-link class="group" to="/secret">
                         <span class="icon">
-                            <p-i name="ic_secret" width="24px" height="24px"
+                            <p-i name="ic_secret"
                                  color="transparent inherit"
                             />
                         </span>
@@ -159,8 +159,8 @@ export default {
         display: inline-block;
         padding: 0;
         border-radius: 2px;
-        min-width: 32px;
-        height: 32px;
+        min-width: 2rem;
+        height: 2rem;
         color: $primary4;
         &:hover, &.active {
             background-color: $primary-dark;
@@ -179,21 +179,23 @@ export default {
         color: $dark;
         text-align: left;
         .title {
+            display: flex;
+            align-items: center;
             font-size: 1rem;
             padding: 1rem 1.75rem;
             color: $gray;
             font-weight: bold;
-            line-height: 24px;
+            line-height: 1.5rem;
             .name {
-                padding-left: 0.43rem;
+                padding-left: .5rem;
             }
             .back-btn {
                 padding: 0;
                 vertical-align: unset;
-                min-width: 24px;
-                height: 24px;
+                min-width: 2rem;
+                height: 2rem;
                 border-radius: 2px;
-                border: 0px;
+                border: 0;
                 &:hover {
                     background-color: $primary3;
                 }
@@ -224,18 +226,19 @@ export default {
             font-weight: bold;
             vertical-align: middle;
             .name {
-                padding-left: 0.43rem;
+                padding-left: .5rem;
             }
             .icon {
                 display: inline-block;
+                margin-left: .5rem;
                 text-align: center;
                 color: inherit;
-                width: 24px;
-                max-height: 24px;
+                width: 1.5rem;
+                max-height: 241.5rem;
             }
         }
         .service {
-            padding: .5rem 3.5rem;
+            padding: .5rem  0 .5rem 4.5rem;
             &.last {
                 padding-bottom: .75rem;
             }

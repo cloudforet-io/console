@@ -5,7 +5,7 @@ import {
 } from '@vue/composition-api';
 import CollectorTemplate, { api, collectorSetup } from '@/views/inventory/collector/pages/Collector.template.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery, callApi } from '@/lib/api';
+import { defaultQuery } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import {
     defaultAutocompleteHandler,
@@ -83,8 +83,6 @@ export default {
             }
         };
         mountBusEvent(CollectorEventBus, 'getCollectorList', getCollectorList);
-
-        // api.getCollectorList = params => context.parent.$http.post('/inventory/collector/list', params);
 
 
         const getPlugin = async (params) => {

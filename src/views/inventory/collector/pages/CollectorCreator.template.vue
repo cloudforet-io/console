@@ -1,8 +1,8 @@
 <template>
     <div class="collector-creator-container">
-        <p-button class="back-btn" @click="goBack">
+        <p-button class="back-btn" @click="goBackToCollectors">
             <p-i name="ic_back" color="transparent inherit" />
-            Back to Plugins
+            Back to Collectors
         </p-button>
         <p-progress-wizard :tabs.sync="tabs"
                            :active-idx.sync="activeIdx"
@@ -138,7 +138,7 @@ export default {
         });
 
         const onCancel = () => {
-            root.$router.push('/inventory/collector');
+            root.$router.go(-1);
         };
         const onConfirm = () => {
             CollectorEventBus.$emit('createCollector');
@@ -161,8 +161,8 @@ export default {
             updateTabInvalid(beforeIdx, res);
         };
 
-        const goBack = () => {
-            root.$router.push('../plugins');
+        const goBackToCollectors = () => {
+            root.$router.push('/inventory/collector');
         };
 
         return {
@@ -173,7 +173,7 @@ export default {
             isAllTabValid,
             updateTabInvalid,
             onChangeStep,
-            goBack,
+            goBackToCollectors,
         };
     },
 };

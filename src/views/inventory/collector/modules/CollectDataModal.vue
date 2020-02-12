@@ -4,6 +4,7 @@
                     size="xl"
                     fade
                     backdrop
+                    :loading="loading"
                     :footer-cancel-button-bind="{
                         styleType: 'dark',
                         outline: true,
@@ -79,19 +80,6 @@
             </p-button>
         </template>
 
-        <template #close-button>
-            {{ tr('COMMON.BTN_CANCEL') }}
-        </template>
-        <template #confirm-button>
-            <div class="confirm-btn">
-                <p-lottie v-if="loading" class="spinner"
-                          name="spinner"
-                          auto
-                          :size="1.5"
-                />
-                <span>{{ tr('COMMON.BTN_CONFIRM') }}</span>
-            </div>
-        </template>
     </p-button-modal>
 </template>
 
