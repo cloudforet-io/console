@@ -185,7 +185,7 @@ export default {
                 this.isInvalid.password = true;
                 this.$refs.userId.focus();
                 this.displayGreetingMSG(false);
-                console.log(e);
+                console.error(e);
             });
         },
         displayGreetingMSG(flag) {

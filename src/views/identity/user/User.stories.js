@@ -2,7 +2,6 @@ import { action } from '@storybook/addon-actions';
 import User from './User.template';
 import casual from '@/views/identity/user/models/user-model';
 import PStatus from '@/components/molecules/status/Status';
-import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
 import PButton from '@/components/atoms/buttons/Button';
 import { arrayOf } from '@/lib/casual';

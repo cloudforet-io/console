@@ -25,7 +25,6 @@ function setI18nLanguage(lang) {
 }
 
 export async function loadLanguageAsync(lang) {
-    console.log('lang', lang);
     if (i18n.locale !== lang) {
         if (!loadedLanguages.includes(lang)) {
         // const url = `${baseURL}/${route.param}/${lang}.json`

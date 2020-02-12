@@ -23,7 +23,7 @@
                 <project-context :context-data="getSelectedData" />
             </template>
             <template #treeSubPanel>
-                <BaseDragHorizontal>
+                <p-horizontal-layout>
                     <template #container="{ height }">
                         <PTab :tabs="tabsData.tabs" :active-tab.sync="tabsData.activeTab">
                             <template #details="{tabName}">
@@ -38,7 +38,7 @@
                             </template>
                         </PTab>
                     </template>
-                </BaseDragHorizontal>
+                </p-horizontal-layout>
                 <div>
                     <template v-if="tabsData.activeTab === 'details'">
                         <project-summary-bottom />
@@ -54,10 +54,10 @@
 
 <script>
 import _ from 'lodash';
-import ProjectContext from '@/views/identity/project/modules/ProjectContext';
-import DefaultTree from '@/components/organisms/trees/area-tree/AreaTree';
-import PTab from '@/components/organisms/tabs/tab/Tab';
-import BaseDragHorizontal from '@/components/base/drag/BaseDragHorizontal';
+import ProjectContext from '@/views/identity/project/modules/ProjectContext.vue';
+import DefaultTree from '@/components/organisms/trees/area-tree/AreaTree.vue';
+import PTab from '@/components/organisms/tabs/tab/Tab.vue';
+import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 
 const projectSummaryTop = () => import('@/views/identity/project/modules/ProjectSummaryTop');
 const projectSummaryBottom = () => import('@/views/identity/project/modules/ProjectSummaryBottom');
@@ -68,7 +68,7 @@ export default {
     components: {
         DefaultTree,
         ProjectContext,
-        BaseDragHorizontal,
+        PHorizontalLayout,
         PTab,
         projectSummaryTop,
         projectSummaryBottom,
@@ -155,7 +155,6 @@ export default {
                 if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0], 'data.init'))) {
                     this.isInitializing = true;
                 }
-                console.log(this.treeData);
             }).catch((error) => {
                 console.error(error);
             });

@@ -182,7 +182,7 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
     const cstIsNotSelected = computed(() => apiHandler.selectState.isNotSelected);
     const cstDropdownMenu = reactive({
         ...makeTrItems([
-            ['add', 'COMMON.BTN_ADD'],
+            ['add', 'COMMON.BTN_CRT'],
             ['update', 'COMMON.BTN_UPT', { disabled: cstIsNotSelected }],
             ['delete', 'COMMON.BTN_DELETE', { disabled: cstIsNotSelected }],
         ],
@@ -194,7 +194,7 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
     const csIsNotSelectedOnlyOne = computed(() => !dvApiHandler.selectState.isSelectOne);
     const csDropdownMenu = reactive({
         ...makeTrItems([
-            ['add', 'COMMON.BTN_ADD'],
+            ['add', 'COMMON.BTN_CRT'],
             ['update', 'COMMON.BTN_UPT', { disabled: csIsNotSelectedOnlyOne }],
             ['delete', 'COMMON.BTN_DELETE', { disabled: csIsNotSelected }],
             [null, null, { type: 'divider' }],

@@ -270,7 +270,7 @@ export default {
             this.addUserOnDataCenter();
         },
         close() {
-            console.log('close Modal');
+            console.debug('close Modal');
         },
     },
 };

@@ -266,7 +266,7 @@ export const userSetup = (props, context, eventName, ACHandler) => {
         userFormState.updateMode = true;
         userFormState.headerTitle = 'Update User';
         const item = getSelectedUserItems.value[0];
-        console.log(item);
+        console.debug(item);
         userFormState.item = {
             userId: item.user_id,
             name: item.name,
@@ -335,7 +335,7 @@ export const userSetup = (props, context, eventName, ACHandler) => {
 
 
     const checkModalConfirm = (event) => {
-        console.log(checkTableModalState.confirmEventName, event);
+        console.debug(checkTableModalState.confirmEventName, event);
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
     };
@@ -365,7 +365,7 @@ export const userSetup = (props, context, eventName, ACHandler) => {
         userStateFormatter,
         timestampFormatter,
         clickCollectData() {
-            console.log('add');
+            console.debug('add');
         },
         getUsers,
         // todo: need confirm that this is good way - sinsky

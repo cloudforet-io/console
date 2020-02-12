@@ -240,10 +240,10 @@ export default {
                 await this.$http.post(url, param);
                 /*     .then((response) => {
                         if (this.isEmpty(response.data)){
-                            console.log('success');
+                            console.debug('success');
                         }
                     }).catch((error) =>{
-                        console.log(error);
+                        console.error(error);
                     }); */
             }
         },

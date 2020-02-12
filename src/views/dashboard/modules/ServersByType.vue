@@ -19,11 +19,12 @@
 </template>
 
 <script>
-import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
-import PHorizontalStackBarChart from '@/components/organisms/charts/horizontal-stack-bar-chart/HorizontalStackBarChart';
-import PHorizontalBarChart from '@/components/organisms/charts/horizontal-bar-chart/HorizontalBarChart';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
-import PCardLayout from '@/components/molecules/layouts/card-layout/CardLayout';
+
+import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout.vue';
+import PHorizontalStackBarChart from '@/components/organisms/charts/horizontal-stack-bar-chart/HorizontalStackBarChart.vue';
+import PHorizontalBarChart from '@/components/organisms/charts/horizontal-bar-chart/HorizontalBarChart.vue';
+import PCardLayout from '@/components/molecules/layouts/card-layout/CardLayout.vue';
 
 export default {
     name: 'ServersByType',
@@ -37,7 +38,6 @@ export default {
         drawBy: {
             type: Object,
             default: null,
-            // default: () => ({ 'region_id': 'region-2a8873d89c8c' })
         },
         serverData: {
             type: Object,

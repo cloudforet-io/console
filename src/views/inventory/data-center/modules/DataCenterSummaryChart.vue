@@ -18,6 +18,7 @@
 </template>
 <script>
 import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
+
 export default {
     name: 'Summary',
     components: {
@@ -70,7 +71,7 @@ export default {
             this.dataMap[key].hover = false;
         },
         onLinkClick(key, val) {
-            console.log('onLinkClick', key, val);
+            console.debug('onLinkClick', key, val);
             if (this.dataMap[key].path) {
                 this.$router.push({ path: this.dataMap[key].path, query: { plan: 'private' } });
             }

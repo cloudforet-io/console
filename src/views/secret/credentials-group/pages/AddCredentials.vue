@@ -78,7 +78,7 @@ export default {
                 state.selectIndex = [];
                 state.loading = false;
             } catch (e) {
-                console.log(e);
+                console.error(e);
             } finally {
                 state.loading = false;
             }
@@ -92,11 +92,11 @@ export default {
                 // name: _.map(items, 'name'),
                 // tags: _.map(items, 'tags'),
             };
-            console.log('getCdsParam', result);
+            console.debug('getCdsParam', result);
             return result;
         };
         const addCd = async (items) => {
-            console.log('addCd test', items);
+            console.debug('addCd test', items);
             await context.parent.$http.post('/secret/credential-group/credential/add', getCdsParam(items)).then(async (_) => {
                 await requestCdList();
                 context.root.$notify({
@@ -109,7 +109,7 @@ export default {
                 });
                 context.root.$router.push('/secret/credentials-group');
             }).catch((error) => {
-                console.log(error);
+                console.error(error);
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'alert',

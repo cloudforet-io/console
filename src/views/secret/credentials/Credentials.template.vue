@@ -206,10 +206,10 @@ export const credentialsSetup = (props, context, eventName) => {
     };
 
     const sortSelectIndex = computed(() => {
-        console.log('temp sortable', tableState.selectIndex);
+        console.debug('temp sortable', tableState.selectIndex);
         const idxs = [...tableState.selectIndex];
         idxs.sort((a, b) => a - b);
-        console.log('idxs', idxs);
+        console.debug('idxs', idxs);
         return idxs;
     });
 
@@ -307,12 +307,12 @@ export const credentialsSetup = (props, context, eventName) => {
     const getEmptyString = object => (_.isEmpty(object) ? '' : object);
 
     const checkModalConfirm = (event) => {
-        console.log(checkTableModalState.confirmEventName, event);
+        console.debug(checkTableModalState.confirmEventName, event);
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
-        console.log('tableState.selectIndex', tableState.selectIndex);
+        console.debug('tableState.selectIndex', tableState.selectIndex);
         tableState.selectIndex = [];
-        console.log('tableState.selectIndex', tableState.selectIndex);
+        console.debug('tableState.selectIndex', tableState.selectIndex);
     };
 
     const dropdownMenu = reactive({
@@ -338,7 +338,7 @@ export const credentialsSetup = (props, context, eventName) => {
         dropdown: dropdownMenu,
         timestampFormatter,
         clickCollectData() {
-            console.log('add');
+            console.debug('add');
         },
         getCredentials,
         ...eventNames,

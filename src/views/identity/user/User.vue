@@ -81,11 +81,11 @@ export default {
             ))),
         });
         const requestUserList = async () => {
-            console.log('before', state.loading);
+            console.debug('before', state.loading);
             state.loading = true;
             state.items = [];
             try {
-                console.log('start', state.loading);
+                console.debug('start', state.loading);
                 const res = await context.parent.$http.post('/identity/user/list', {
                     query: requestState.query,
                 });
@@ -95,7 +95,7 @@ export default {
                 state.selectIndex = [];
                 state.loading = false;
             } catch (e) {
-                console.log(e);
+                console.error(e);
                 state.loading = false;
             }
         };
@@ -116,7 +116,7 @@ export default {
             });
         };
         const getUsersParam = (items) => {
-            console.log(items);
+            console.debug(items);
             const result = { users: _.map(items, 'user_id') };
             return result;
         };
