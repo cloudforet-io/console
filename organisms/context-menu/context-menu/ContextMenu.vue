@@ -1,5 +1,6 @@
 <template>
-    <div class="p-context-menu" :class="theme"
+    <div ref="contextMenu" class="p-context-menu" :class="theme"
+         :style="autoHeightStyle"
          @keyup.esc="$emit('onEscKey',$event)"
     >
         <div v-if="loading" class="context-content context-item no-drag">
@@ -34,8 +35,31 @@
 </template>
 
 <script>
-import { computed } from '@vue/composition-api';
+import { computed, ref, onMounted } from '@vue/composition-api';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
+
+const setAutoHeight = (props) => {
+    const contextMenu = ref(null);
+    const contextMenuHeight = ref(0);
+    const autoHeightStyle = computed(() => {
+        if (props.autoHeight && contextMenuHeight.value) {
+            return {
+                height: `${contextMenuHeight.value}px`,
+                overflowY: 'auto',
+            };
+        } return null;
+    });
+    onMounted(() => {
+        if (!props.autoHeight) return;
+        const winHeight = window.innerHeight;
+        const rects = contextMenu.value.getBoundingClientRect();
+        if (rects.bottom > winHeight) contextMenuHeight.value = winHeight - rects.top;
+    });
+
+    return {
+        contextMenu, contextMenuHeight, autoHeightStyle,
+    };
+};
 
 export default {
     name: 'PContextMenu',
@@ -51,6 +75,10 @@ export default {
             default: 'secondary',
         },
         loading: {
+            type: Boolean,
+            default: false,
+        },
+        autoHeight: {
             type: Boolean,
             default: false,
         },
@@ -83,8 +111,15 @@ export default {
             const pos = itemsIndex.value.indexOf(idx) + 1;
             if (pos !== itemsIndex.value.length) { focus(pos); } else { context.emit('onEndOfDownKey'); }
         };
+
+
         return {
-            menuClick, onDownKey, onUpKey, focus, uuid,
+            menuClick,
+            onDownKey,
+            onUpKey,
+            focus,
+            uuid,
+            ...setAutoHeight(props),
         };
     },
 };
@@ -176,11 +211,11 @@ export default {
         }
         .context-item{
             display: block;
-            font-size: .875rem;
-            line-height: 1rem;
             padding-bottom: 0.5rem;
             padding-top: 0.5rem;
-            cursor:pointer;
+            line-height: 1rem;
+            font-size: .875rem;
+            cursor: pointer;
             &:active{
                 font-weight: bold;
             }
