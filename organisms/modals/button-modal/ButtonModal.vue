@@ -119,14 +119,14 @@ export default {
         footerCancelButtonBind: {
             type: Object,
             default: () => ({
-                styleType: 'primary',
+                styleType: 'dark',
                 outline: true,
             }),
         },
         footerConfirmButtonBind: {
             type: Object,
             default: () => ({
-                styleType: 'primary',
+                styleType: 'primary-dark',
             }),
         },
         hideOnCancel: {
