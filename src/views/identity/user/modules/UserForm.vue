@@ -191,11 +191,7 @@ const setup = (props, context) => {
         timezone: 'UTC',
         tags: {},
         // eslint-disable-next-line camelcase
-        is_local_auth: computed(() => {
-        // return parent.$store.state.atuh.is_local_user
-            console.debug('local auth');
-            return true;
-        }),
+        is_local_auth: computed(() => context.parent.$store.getters['auth/isLocalType']),
         ...props.item,
     });
     const languageSelectItems = [
