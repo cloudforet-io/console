@@ -5,7 +5,7 @@ import { arrayOf } from '@/lib/casual';
 import casual from '@/views/secret/models/credential-model';
 
 export default {
-    title: 'view/secret/credentialsGroup',
+    title: 'views/secret/credentialsGroup',
     component: Cdg,
     parameters: {
         info: {

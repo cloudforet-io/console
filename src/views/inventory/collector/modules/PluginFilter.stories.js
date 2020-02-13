@@ -6,7 +6,7 @@ import PluginFilter from './PluginFilter';
 import { tagList } from '@/components/molecules/tags/Tag';
 
 export default {
-    title: 'view/inventory/collector/modules/PluginFilter',
+    title: 'views/inventory/collector/modules/PluginFilter',
     component: PluginFilter,
     decorators: [withKnobs],
 };

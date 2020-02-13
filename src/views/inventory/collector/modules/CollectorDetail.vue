@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p-info-panel info-title="Base Information" :defs="baseDefs" :item="item">
+        <p-info-panel :info-title="tr('PANEL.BASE_INFO')"
+                      :defs="baseDefs" :item="item"
+        >
             <template #def-name-format="data">
                 <span class="name">
                     <img class="icon" :src="getIcon(data)">
@@ -31,7 +33,7 @@
 
         <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="confirm" />
 
-        <p-info-panel class="last-panel" info-title="Filter Format">
+        <p-info-panel class="last-panel" :info-title="tr('PANEL.FILTER_FORMAT')">
             <p-data-table
                 :fields="fields"
                 :sortable="false"

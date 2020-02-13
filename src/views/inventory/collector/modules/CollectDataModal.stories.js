@@ -9,7 +9,7 @@ import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { arrayOf } from '@/lib/casual';
 
 export default {
-    title: 'view/inventory/collector/modules/CollectDataModal',
+    title: 'views/inventory/collector/modules/CollectDataModal',
     component: CollectDataModal,
     parameters: {
         info: {

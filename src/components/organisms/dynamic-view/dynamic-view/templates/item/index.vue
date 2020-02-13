@@ -4,11 +4,11 @@
             <div class="title">
                 {{ name }}
             </div>
-            <PHr />
+            <p-hr />
         </div>
-        <PDl class="content-container">
+        <p-dl class="content-container">
             <Definition v-for="(bind, idx) in defs" :key="idx" v-bind="bind" />
-        </PDl>
+        </p-dl>
     </Fragment>
 </template>
 

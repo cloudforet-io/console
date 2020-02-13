@@ -9,7 +9,7 @@ import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { arrayOf } from '@/lib/casual';
 
 export default {
-    title: 'view/inventory/collector/pages/Collector',
+    title: 'views/inventory/collector/pages/Collector',
     component: CollectorTemplate,
     decorators: [withKnobs],
 };

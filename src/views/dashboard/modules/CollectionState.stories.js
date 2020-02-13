@@ -5,7 +5,7 @@ import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 
 export default {
-    title: 'view/dashboard/collection-state',
+    title: 'views/dashboard/collection-state',
     component: CollectionState,
 };
 

@@ -5,7 +5,7 @@ import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 
 export default {
-    title: 'view/dashboard/resources-by-region',
+    title: 'views/dashboard/resources-by-region',
     component: ResourcesByRegion,
 };
 

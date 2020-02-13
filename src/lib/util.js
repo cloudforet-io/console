@@ -175,3 +175,18 @@ export const isEmpty = (value) => {
     if (value instanceof Array) return !!value.length;
     return !_.isEmpty(value); // String, Object
 };
+
+/**
+ * @class
+ * @name MenuItem
+ * @param name
+ * @param label
+ * @return {Object}
+ */
+export class MenuItem {
+    constructor(name, label) {
+        this.name = name;
+        this.label = label || name;
+        this.type = 'item';
+    }
+}

@@ -100,6 +100,7 @@ import {
 } from '@/lib/compostion-util';
 import GNBEventBus from '@/views/containers/gnb/GNBEventBus';
 import { LANGUAGES } from '@/lib/global-enums';
+import { MenuItem } from '@/lib/util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
@@ -109,13 +110,6 @@ import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 
-class MenuItem {
-    constructor(name, label) {
-        this.name = name;
-        this.label = label;
-        this.type = 'item';
-    }
-}
 
 export const profileSetup = (props, context) => {
     const userState = reactive({
@@ -163,7 +157,7 @@ export const profileSetup = (props, context) => {
                 params.user_id = props.userId;
                 delete params.passwordCheck;
                 if (!state.showPassword) delete params.password;
-                GNBEventBus.$emit('getUser', params);
+                GNBEventBus.$emit('updateUser', params);
             }
 
             state.proxyVisible = false;

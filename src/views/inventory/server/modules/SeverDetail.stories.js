@@ -4,7 +4,7 @@ import PSeverDetail from '@/views/inventory/server/modules/ServerDetail';
 import casual from '@/views/inventory/server/models/server-model';
 
 export default {
-    title: 'view/inventory/server/modules/detail',
+    title: 'views/inventory/server/modules/detail',
     component: PSeverDetail,
     parameters: {
         info: {

@@ -4,6 +4,7 @@ import {
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
+import { isEmpty } from '@/lib/util';
 
 /**
  * make proxy computed that same name as props
@@ -151,11 +152,7 @@ export const formValidation = (data:any, validation:object) => {
     };
 };
 
-export const requiredValidation = (invalidMessage:message) => new Validation((value) => {
-    if (['boolean', 'number'].includes(typeof value)) return true;
-    if (value instanceof Array) return !!value.length;
-    return !_.isEmpty(value); // String, Object
-}, invalidMessage || 'Required field!');
+export const requiredValidation = (invalidMessage:message) => new Validation(value => !isEmpty(value), invalidMessage || 'Required field!');
 
 export const jsonParseValidation = (invalidMessage:message) => new Validation((value) => {
     try {

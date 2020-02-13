@@ -203,6 +203,7 @@ export const en = {
         FAIL_REASON: 'Reason for Failure',
         ISSUE_TYPE: 'Issue Type',
         ALL: 'All',
+        HOURS: 'Hours',
     },
     ATOM: {
 
@@ -275,6 +276,8 @@ export const en = {
         DISABLE_COL: 'Disable Collectors',
         MANAGE_CRD: 'Manage Credentials',
         CRT_CRD: 'Create new credentials',
+        SCHEDULE: 'Collecting Schedule',
+        COLL_TIME: 'Collecting Time',
     },
     SECRET: {
         JASON_ALERT: 'Please, Check Json Format (Use double quotation( \\" ) mark instead of single quotation (\').',
@@ -321,6 +324,7 @@ export const en = {
         LOCAL: 'Local',
         OFFICIAL: 'OFFICIAL',
         SELECTED: 'Selected Items',
+        FILTER_FORMAT: 'Filter Format',
     },
     FORM: {
         TYPE: {

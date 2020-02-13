@@ -8,7 +8,7 @@ import { mountBusEvent } from '@/lib/compostion-util';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
 export default {
-    title: 'view/inventory/collector/modules/ConfigureCollector',
+    title: 'views/inventory/collector/modules/ConfigureCollector',
     component: ConfigureCollector,
     decorators: [withKnobs],
 };
