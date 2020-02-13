@@ -4,7 +4,7 @@ import {
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
-import { isEmpty } from '@/lib/util';
+import { isNotEmpty } from '@/lib/util';
 
 /**
  * make proxy computed that same name as props
@@ -152,7 +152,7 @@ export const formValidation = (data:any, validation:object) => {
     };
 };
 
-export const requiredValidation = (invalidMessage:message) => new Validation(value => !isEmpty(value), invalidMessage || 'Required field!');
+export const requiredValidation = (invalidMessage:message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
 
 export const jsonParseValidation = (invalidMessage:message) => new Validation((value) => {
     try {
@@ -193,7 +193,7 @@ export const userIDValidation = (parent:any, invalidMessage:message) => new Vali
     return result;
 }, invalidMessage || 'same ID exists!');
 
-const pluginAuthIDValidation = (parent:any) => new Validation(async (value:string) => {
+export const pluginAuthIDValidation = (parent:any) => new Validation(async (value:string) => {
     let result:boolean = true;
     // eslint-disable-next-line camelcase
     await parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: sessionStorage.domainId, query: { count_only: true } }).then((res) => {

@@ -242,24 +242,26 @@ const setup = (props, context) => {
     };
     const confirm = async () => {
         const result = await validateAPI.allValidation();
-        const data = {};
-        if (formState.is_local_auth) {
-            if (result) {
-                if (props.updateMode) {
-                    if (formState.password1) {
+        if (result) {
+            const data = {};
+            if (formState.is_local_auth) {
+                if (result) {
+                    if (props.updateMode) {
+                        if (formState.password1) {
+                            data.password = formState.password1;
+                        }
+                    } else {
                         data.password = formState.password1;
                     }
-                } else {
-                    data.password = formState.password1;
                 }
             }
+            ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone', 'tags'].forEach((key) => {
+                if (formState[key]) {
+                    data[key] = formState[key];
+                }
+            });
+            context.emit('confirm', data);
         }
-        ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone', 'tags'].forEach((key) => {
-            if (formState[key]) {
-                data[key] = formState[key];
-            }
-        });
-        context.emit('confirm', data);
     };
 
     return {

@@ -245,8 +245,9 @@ const setup = (props, context) => {
                         formParam[k] = v;
                     }
                     formState.data = formParam;
+                } else {
+                    formState.data = JSON.parse(formState.data);
                 }
-
                 keyArr.forEach((key) => {
                     if (formState[key]) {
                         params[key] = formState[key];

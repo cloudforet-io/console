@@ -166,11 +166,11 @@ export const selectToCopyToClipboard = (t) => {
 };
 
 /** @function
- * @name isEmpty
+ * @name isNotEmpty
  * @param value
  * @returns {boolean}
  */
-export const isEmpty = (value) => {
+export const isNotEmpty = (value) => {
     if (['boolean', 'number'].includes(typeof value)) return true;
     if (value instanceof Array) return !!value.length;
     return !_.isEmpty(value); // String, Object
