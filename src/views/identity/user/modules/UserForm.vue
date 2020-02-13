@@ -212,7 +212,6 @@ const setup = (props, context) => {
     const defaultValidation = {
         timezone: [checkTimeZoneValidation()],
         // eslint-disable-next-line camelcase
-        user_id: [],
     };
 
     const addUserValidations = defaultValidation;
