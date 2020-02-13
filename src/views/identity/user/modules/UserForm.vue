@@ -194,7 +194,7 @@ const setup = (props, context) => {
         is_local_auth: computed(() => {
         // return parent.$store.state.atuh.is_local_user
             console.debug('local auth');
-            return false;
+            return true;
         }),
         ...props.item,
     });
@@ -232,9 +232,6 @@ const setup = (props, context) => {
             new Validation((value, data) => data.password1 === value, 'please enter same value again'),
         ];
     }
-    console.log(props.updateMode);
-    console.log(updateUserValidations);
-    console.log(addUserValidations);
 
     const validateAPI = formValidation(formState, props.updateMode ? updateUserValidations : addUserValidations);
 
