@@ -42,25 +42,26 @@
             </g>
         </p-chart>
         <div class="legend-container">
-            <p-chart-legend v-for="(val, key, idx) in data" :key="key" class="legend"
-                            :text="key" :count="val" :icon-color="colors(idx)"
+            <p-chart-legend v-for="(d, idx) in sortedData" :key="d.key" class="legend"
+                            :text="d.key" :count="d.val" :icon-color="colors(idx)"
                             :opacity="!hoverState || hoverList[idx] ? 1.0 : 0.3"
                             @mouseenter="onMouseEnter(idx)"
                             @mouseleave="resetHoverList"
-                            @click="$emit('legendClick', key, val)"
+                            @click="$emit('legendClick', d.key, d.val)"
             />
         </div>
     </div>
 </template>
 
 <script>
+import _ from 'lodash';
 import * as d3 from 'd3';
 import {
     reactive, toRefs, computed,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
-import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
-import PChartLegend from '@/components/organisms/legends/ChartLegend';
+import PChart, { setTooltips } from '@/components/molecules/charts/Chart.vue';
+import PChartLegend from '@/components/organisms/legends/ChartLegend.vue';
 import { colorset } from '@/lib/util';
 import styles from '@/styles/_variables.scss';
 
@@ -69,7 +70,7 @@ const setDrawTools = (props, context) => {
         yScale: null,
         xScale: null,
         sum: computed(() => d3.sum(Object.values(props.data))),
-        keys: computed(() => Object.keys(props.data)),
+        keys: computed(() => state.sortedData.map(d => d.key)),
         chartHeight: computed(() => state.barThickness),
         chartData: null,
         hoverList: [],
@@ -78,6 +79,10 @@ const setDrawTools = (props, context) => {
         barThickness: props.thickness,
         empty: false,
         emptyColor: styles.primary3,
+        sortedData: computed(() => {
+            const items = _.flatMap(props.data, (d, k) => ({ key: k, val: d }));
+            return _.sortBy(items, ['key']);
+        }),
     });
 
     const initYScale = (svgTools) => {

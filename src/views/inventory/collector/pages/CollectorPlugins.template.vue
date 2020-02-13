@@ -1,75 +1,73 @@
 <template>
-    <div>
-        <p-vertical-layout :min-left-width="260">
-            <template #leftContainer="{width}">
-                <div :style="{width: width}">
-                    <plugin-filter :filters.sync="filterTools.tags"
-                                   :repositories="repositories"
-                                   :selected-repo-id.sync="selectedRepoId"
-                                   @goBack="goBack"
-                                   @search="search"
-                                   @repoChange="listPlugins"
-                                   @filtersChange="listPlugins"
-                    />
-                </div>
-            </template>
-            <template #rightContainer="{height}">
-                <p-toolbox-card-list class="card-list"
-                                     :items="plugins"
-                                     :mapper="pluginMapper"
-                                     :loading="loading"
-                                     title="Plugins"
-                                     :sort-menu="sortMenu"
-                                     :sort-by-idx.sync="sortByIdx"
-                                     :this-page.sync="thisPage"
-                                     :page-size="pageSize"
-                                     :total-count="totalCount"
-                                     :style="{height}"
-                                     @pageChange="listPlugins"
-                                     @sortChange="listPlugins"
-                >
-                    <template #filters>
-                        <p-tag v-for="(filter, idx) in filterTools.tags" :key="`${idx}-${filter}`"
-                               @delete="onDeleteTag(idx)"
-                        >
-                            {{ filter }}
-                        </p-tag>
-                    </template>
-                    <template #card-extra="{item}">
-                        <p-row style="height: 100%;">
-                            <p-col>
-                                <template v-if="item.labels">
-                                    <p-badge v-for="(label, idx) in item.labels" :key="idx" style-type="gray3"
-                                             style="margin-right: .5rem;"
-                                    >
-                                        {{ label }}
-                                    </p-badge>
-                                </template>
-                            </p-col>
-                            <p-col :flex-grow="0" align-self="flex-end">
-                                <p-row>
-                                    <p-dropdown-menu-btn :menu="versionsMenu[item.plugin_id]"
-                                                         style="margin-right: 1.25rem;"
-                                                         :loading="versionsMenu[item.plugin_id] ? false : true"
-                                                         @openMenu="listVersions(item.plugin_id)"
-                                                         @clickMenuEvent="onSelectVersion(item.plugin_id, $event)"
-                                    >
-                                        {{ selectedVersions[item.plugin_id] || 'Version' }}
-                                    </p-dropdown-menu-btn>
-                                    <p-button style-type="primary-dark" @click="onPluginCreate(item)">
-                                        <p-i name="ic_plus" color="transparent inherit"
-                                             width="1rem" height="1rem"
-                                        />
-                                        {{ tr('COMMON.BTN_CRT') }}
-                                    </p-button>
-                                </p-row>
-                            </p-col>
-                        </p-row>
-                    </template>
-                </p-toolbox-card-list>
-            </template>
-        </p-vertical-layout>
-    </div>
+    <p-vertical-layout :min-left-width="260">
+        <template #leftContainer="{width}">
+            <div :style="{width: width}">
+                <plugin-filter :filters.sync="filterTools.tags"
+                               :repositories="repositories"
+                               :selected-repo-id.sync="selectedRepoId"
+                               @goBack="goBack"
+                               @search="search"
+                               @repoChange="listPlugins"
+                               @filtersChange="listPlugins"
+                />
+            </div>
+        </template>
+        <template #rightContainer="{height}">
+            <p-toolbox-card-list class="card-list"
+                                 :items="plugins"
+                                 :mapper="pluginMapper"
+                                 :loading="loading"
+                                 title="Plugins"
+                                 :sort-menu="sortMenu"
+                                 :sort-by-idx.sync="sortByIdx"
+                                 :this-page.sync="thisPage"
+                                 :page-size="pageSize"
+                                 :total-count="totalCount"
+                                 :style="{height}"
+                                 @pageChange="listPlugins"
+                                 @sortChange="listPlugins"
+            >
+                <template #filters>
+                    <p-tag v-for="(filter, idx) in filterTools.tags" :key="`${idx}-${filter}`"
+                           @delete="onDeleteTag(idx)"
+                    >
+                        {{ filter }}
+                    </p-tag>
+                </template>
+                <template #card-extra="{item}">
+                    <p-row style="height: 100%;">
+                        <p-col>
+                            <template v-if="item.labels">
+                                <p-badge v-for="(label, idx) in item.labels" :key="idx" style-type="gray3"
+                                         style="margin-right: .5rem;"
+                                >
+                                    {{ label }}
+                                </p-badge>
+                            </template>
+                        </p-col>
+                        <p-col :flex-grow="0" align-self="flex-end">
+                            <p-row>
+                                <p-dropdown-menu-btn :menu="versionsMenu[item.plugin_id]"
+                                                     style="margin-right: 1.25rem;"
+                                                     :loading="versionsMenu[item.plugin_id] ? false : true"
+                                                     @openMenu="listVersions(item.plugin_id)"
+                                                     @clickMenuEvent="onSelectVersion(item.plugin_id, $event)"
+                                >
+                                    {{ selectedVersions[item.plugin_id] || 'Version' }}
+                                </p-dropdown-menu-btn>
+                                <p-button style-type="primary-dark" @click="onPluginCreate(item)">
+                                    <p-i name="ic_plus" color="transparent inherit"
+                                         width="1rem" height="1rem"
+                                    />
+                                    {{ tr('COMMON.BTN_CRT') }}
+                                </p-button>
+                            </p-row>
+                        </p-col>
+                    </p-row>
+                </template>
+            </p-toolbox-card-list>
+        </template>
+    </p-vertical-layout>
 </template>
 
 <script>
