@@ -155,6 +155,7 @@ import {
     lengthMaxValidation,
     lengthMinValidation,
     checkTimeZoneValidation,
+    pluginAuthIDValidation,
 } from '@/lib/compostion-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
@@ -205,14 +206,7 @@ const setup = (props, context) => {
         { type: 'item', label: 'UTC', name: 'UTC' },
         { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
     ];
-    const pluginAuthIDValidation = parent => new Validation(async (value) => {
-        let result = true;
-        // eslint-disable-next-line camelcase
-        await parent.$http.post('/identity/user/find', { user_id: value, domain_id: sessionStorage.domainId, query: { count_only: true } }).then((res) => {
-            if (res.data.total_count === 0) { result = true; }
-        }).catch((error) => { console.debug(error); });
-        return result;
-    }, "ID doesn't exists!");
+
 
     const pwdCheckValidation = new Validation((value, data) => data.password1 === value, 'please enter same value again');
     const defaultValidation = {
