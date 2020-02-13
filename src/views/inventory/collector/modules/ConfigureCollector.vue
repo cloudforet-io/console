@@ -9,9 +9,9 @@
                     <p-col>
                         <p-field-group label="Collector Name"
                                        required
+                                       :invalid="showValidation && nameVdApi.invalidState.name"
+                                       :invalid-text="nameVdApi.invalidMsg.name"
                         >
-                            <!--                            :invalid="showValidation && nameInvalidState"-->
-                            <!--                            :invalid-text="nameInvalidMsg"-->
                             <template #default="{invalid}">
                                 <p-text-input v-model="proxyName"
                                               style="width: 100%;"
@@ -64,6 +64,7 @@ import {
 import _ from 'lodash';
 import config from '@/lib/config';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
+import { formValidation, requiredValidation, makeProxy } from '@/lib/compostion-util';
 
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
@@ -71,7 +72,6 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
-import { makeProxy } from '@/lib/compostion-util';
 
 const init = (props, root) => {
     const params = {
@@ -122,7 +122,6 @@ export default {
 
         const state = reactive({
             proxyName: makeProxy('name', props, emit),
-            namePlaceholder: computed(() => _.get(props.plugin, 'name', '')),
             pluginOptions: computed(() => _.get(props.plugin, 'template.options', [])),
             proxyOptionsValue: makeProxy('optionsValue', props, emit),
             proxySelectedVersion: makeProxy('selectedVersion', props, emit),
@@ -136,32 +135,35 @@ export default {
                 state.proxySelectedVersion = item;
             },
             vdApi: setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue),
+            nameVdApi: formValidation({ name: props.name }, { name: [requiredValidation()] }),
             isAllValid: undefined,
+        });
+
+        const actions = {
             validate: async () => {
-                const res = await state.vdApi.allValidation();
+                const res = await state.vdApi.allValidation() && await state.nameVdApi.allValidation();
                 return res && props.name;
             },
-            onChangeName: (val) => {
+            onChangeName: async (val) => {
                 if (!props.showValidation) return;
-                emit('changeValidState', !!val);
+                state.nameVdApi = formValidation({ name: props.name }, { name: [requiredValidation()] });
+                const res = await state.nameVdApi.fieldValidation('name');
+                emit('changeValidState', res);
             },
             onChangeOption: async (key) => {
                 if (!props.showValidation || !props.plugin) return;
                 await state.vdApi.fieldValidation(key);
                 emit('changeValidState', state.vdApi.isAllValid && props.name);
             },
-        });
+        };
 
         watch(() => props.plugin, (val) => {
             state.vdApi = setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue);
         });
-        watch(() => props.name, (val) => {
-            state.vdApi = setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue);
-        });
-
 
         return {
             ...toRefs(state),
+            ...actions,
         };
     },
 };
