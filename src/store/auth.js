@@ -12,8 +12,8 @@ export default {
         userType: null,
         timezone: null,
         language: null,
-        isLocalType: true,
-        isDomainOwner: false,
+        isLocalType: localStorage.isLocalType === 'true',
+        isDomainOwner: localStorage.isDomainOwner === 'true',
     },
     mutations: {
         nextPath(state, nextPath) {
@@ -27,9 +27,11 @@ export default {
         },
         setIsLocalType(state, val) {
             state.isLocalType = val;
+            localStorage.isLocalType = val;
         },
         setIsDomainOwner(state, val) {
             state.isDomainOwner = val;
+            localStorage.isDomainOwner = val;
         },
         signIn(state, {
             userId, userType, language, timezone,
