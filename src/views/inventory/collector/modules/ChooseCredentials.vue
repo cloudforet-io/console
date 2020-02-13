@@ -45,14 +45,12 @@
                 <span>
                     <p-badge v-for="crdg in value"
                              :key="crdg.credential_group_id"
+                             class="badge"
                              style-type="gray2"
                     >
                         {{ crdg.name }}
                     </p-badge>
                 </span>
-            </template>
-            <template #col-created_at-format="{value}">
-                {{ timestampFormatter(value) }}
             </template>
             <template #col-go_credentials-format>
                 <router-link :to="{
@@ -66,6 +64,9 @@
                     </p-button>
                 </router-link><p-button />
             </template>
+            <template #col-tags-format="{value}">
+                <p-dict-list :dict="value" />
+            </template>
         </p-toolbox-table>
     </div>
 </template>
@@ -77,7 +78,7 @@ import {
 import { defaultQuery } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { makeTrItems } from '@/lib/view-helper';
-import { timestampFormatter, getValue } from '@/lib/util';
+import { makeProxy } from '@/lib/compostion-util';
 
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
@@ -86,7 +87,7 @@ import PRadio from '@/components/molecules/forms/radio/Radio.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import { makeProxy } from '@/lib/compostion-util';
+import PDictList from '@/components/molecules/lists/DictList.vue';
 
 export default {
     name: 'ChooseCredentials',
@@ -98,6 +99,7 @@ export default {
         PSearch,
         PToolboxTable,
         PButton,
+        PDictList,
     },
     props: {
         items: Array,
@@ -126,15 +128,14 @@ export default {
                 'Credentials Group': makeTrItems([
                     ['credential_group_id', 'COMMON.ID'],
                     ['name', 'COMMON.NAME'],
-                    ['created_at', 'COMMON.CREATE'],
-                    ['go_credentials', ' '],
+                    ['tags', 'COMMON.TAG'],
+                    ['go_credentials', null, { label: ' ', sortable: false }],
                 ], parent),
                 Credentials: makeTrItems([
                     ['credential_id', 'COMMON.ID', { size: '400px' }],
                     ['name', 'COMMON.NAME', { size: '400px' }],
-                    ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
+                    ['tags', 'COMMON.TAG'],
                     ['credential_groups', 'COMMON.GROUP', { size: '800px', sortable: false }],
-                    ['created_at', 'COMMON.CREATED', { size: '300px' }],
                 ], parent),
             },
             proxySelectIndex: makeProxy('selectIndex', props, emit),
@@ -167,7 +168,6 @@ export default {
             validate,
             allPage,
             listCredentials,
-            timestampFormatter,
         };
     },
 };
@@ -179,5 +179,8 @@ export default {
         .radios {
             margin-right: 1.125rem;
         }
+    }
+    .badge {
+        margin-right: .5rem;
     }
 </style>
