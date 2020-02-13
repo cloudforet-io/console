@@ -42,13 +42,7 @@ export default {
             const subKey = props.view_option.sub_key.split('.');
             getValue(props.data, subKey, pushData);
         } else {
-            datas = props.data.map((value, idx) => {
-                let v:string = value;
-                if ((!option.view_type || option.view_type === 'text') && idx) {
-                    v = `, ${v}`;
-                }
-                return v;
-            });
+            datas = props.data;
         }
         let children = datas.map(data => h(PDynamicField, { props: { ...option, data } }));
 
