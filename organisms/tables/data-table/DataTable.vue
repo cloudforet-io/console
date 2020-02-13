@@ -338,7 +338,9 @@ export default {
                     return;
                 }
                 if (event.shiftKey) {
-                    proxySelectIndex.value = [...proxySelectIndex.value, index];
+                    if (!props.dragable) {
+                        checkboxToggle(index);
+                    }
                     return;
                 }
             }
