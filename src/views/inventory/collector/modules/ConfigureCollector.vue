@@ -7,13 +7,19 @@
                         <img class="img" :src="imgUrl">
                     </p-col>
                     <p-col>
-                        <p-field-group label="Collector Name" required>
-                            <br>
-                            <p-text-input v-model="proxyName"
-                                          :placeholder="namePlaceholder"
-                                          style="width: 100%;"
-                                          @input="onChangeName"
-                            />
+                        <p-field-group label="Collector Name"
+                                       required
+                        >
+                            <!--                            :invalid="showValidation && nameInvalidState"-->
+                            <!--                            :invalid-text="nameInvalidMsg"-->
+                            <template #default="{invalid}">
+                                <p-text-input v-model="proxyName"
+                                              style="width: 100%;"
+                                              class="form-control"
+                                              :class="{'is-invalid': invalid}"
+                                              @input="onChangeName"
+                                />
+                            </template>
                         </p-field-group>
                         <p-field-group label="Version">
                             <p-dropdown-menu-btn :menu="versionsInfo"
@@ -147,6 +153,9 @@ export default {
         });
 
         watch(() => props.plugin, (val) => {
+            state.vdApi = setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue);
+        });
+        watch(() => props.name, (val) => {
             state.vdApi = setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue);
         });
 
