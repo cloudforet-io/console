@@ -23,7 +23,9 @@ export default {
         mountBusEvent(DashboardEventBus, 'listRegionByServer', callApi('/statistics/datacenter-items', 'resourcesByRegionData', {
             item_type: 'server',
         }));
-        // mountBusEvent(DashboardEventBus, 'listRegionByCloudService', callApi('/statistics/datacenter-items', 'resourcesByRegionData'));
+        mountBusEvent(DashboardEventBus, 'listRegionByCloudService', callApi('/statistics/datacenter-items', 'resourcesByRegionData', {
+            item_type: 'cloud_service',
+        }));
 
         // Server State
         mountBusEvent(DashboardEventBus, 'listServerState', callApi('/statistics/server-state', 'serverStateData'));
