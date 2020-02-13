@@ -119,7 +119,6 @@ export default {
     computed: {
         ...mapGetters('layout', [
             'defaultFNB',
-            'verticalLeftWidth',
         ]),
         rightContainerWidth() {
             return `calc(100vw - ${styles.gnbWidth} - ${this.leftContainerWidth + this.draggerWidth}px)`;
@@ -152,7 +151,7 @@ export default {
         },
         initDefaultLeftWidth() {
             if (this.autoSaveLeftWidth) {
-                const width = parseFloat(this.verticalLeftWidth) || parseFloat(this.leftWidth);
+                const width = parseFloat(this.leftWidth);
                 this.leftContainerWidth = width > this.minLeftWidth ? width : this.minLeftWidth;
             }
         },
