@@ -214,8 +214,8 @@ const setup = (props, context) => {
         // eslint-disable-next-line camelcase
     };
 
-    const addUserValidations = defaultValidation;
-    const updateUserValidations = defaultValidation;
+    const addUserValidations = { ...defaultValidation };
+    const updateUserValidations = { ...defaultValidation };
     const userIdVds = [requiredValidation(), userIDValidation(context.parent)];
 
     if (!formState.is_local_auth) { // plugin auth type
@@ -223,7 +223,7 @@ const setup = (props, context) => {
         addUserValidations.user_id = [...userIdVds, pluginAuthIDValidation(context.parent)];
     } else {
         // eslint-disable-next-line camelcase
-        addUserValidations.user_id = userIdVds;
+        addUserValidations.user_id = [...userIdVds];
         addUserValidations.password1 = [requiredValidation(), lengthMinValidation(5), lengthMaxValidation(12)];
         addUserValidations.password2 = [requiredValidation(), pwdCheckValidation];
 
