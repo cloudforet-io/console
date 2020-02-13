@@ -232,6 +232,9 @@ const setup = (props, context) => {
             new Validation((value, data) => data.password1 === value, 'please enter same value again'),
         ];
     }
+    console.log(props.updateMode);
+    console.log(updateUserValidations);
+    console.log(addUserValidations);
 
     const validateAPI = formValidation(formState, props.updateMode ? updateUserValidations : addUserValidations);
 
