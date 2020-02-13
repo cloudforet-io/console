@@ -9,8 +9,8 @@
                     <p-col>
                         <p-field-group label="Collector Name"
                                        required
-                                       :invalid="showValidation && nameVdApi.invalidState.name"
-                                       :invalid-text="nameVdApi.invalidMsg.name"
+                                       :invalid="showValidation && !isNameValid"
+                                       invalid-text="Collector Name is required field!"
                         >
                             <template #default="{invalid}">
                                 <p-text-input v-model="proxyName"
@@ -64,7 +64,7 @@ import {
 import _ from 'lodash';
 import config from '@/lib/config';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
-import { formValidation, requiredValidation, makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/lib/compostion-util';
 
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
@@ -135,20 +135,18 @@ export default {
                 state.proxySelectedVersion = item;
             },
             vdApi: setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue),
-            nameVdApi: formValidation({ name: props.name }, { name: [requiredValidation()] }),
+            isNameValid: computed(() => !!props.name),
             isAllValid: undefined,
         });
 
         const actions = {
             validate: async () => {
-                const res = await state.vdApi.allValidation() && await state.nameVdApi.allValidation();
+                const res = state.isNameValid && await state.vdApi.allValidation();
                 return res && props.name;
             },
-            onChangeName: async (val) => {
+            onChangeName: (val) => {
                 if (!props.showValidation) return;
-                state.nameVdApi = formValidation({ name: props.name }, { name: [requiredValidation()] });
-                const res = await state.nameVdApi.fieldValidation('name');
-                emit('changeValidState', res);
+                emit('changeValidState', !!val);
             },
             onChangeOption: async (key) => {
                 if (!props.showValidation || !props.plugin) return;
