@@ -23,7 +23,6 @@
 
 <script>
 import { reactive, toRefs, computed } from '@vue/composition-api';
-import { mapActions, mapGetters } from 'vuex';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList.vue';
 import ProfileModal from '@/views/common/profile/ProfileModal.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -48,33 +47,35 @@ export default {
             // clientId: computed(() => root.$store.getters['domain/clientId']),
             authType: computed(() => root.$store.getters['domain/authType']),
             userType: computed(() => root.$store.getters['auth/userType']),
-            signOut: () => root.$store.dispatch['auth.signOut'],
-            doAction(item) {
-                if (item.key === 'signout') state.signOutAction();
-                else if (item.key === 'profile') state.openProfile();
-            },
-            async signOutAction() {
-                if (state.authType === 'local') {
-                    await state.signOut();
-                    root.$router.push({ path: '/sign-in' });
-                } else {
-                    debugger;
-                    await state.signOut();
-                    state.oAuthSignOut();
-                    root.$router.push({ path: '/google-sign-in' });
-                }
-            },
-            openProfile() {
-                state.profileVisible = true;
-            },
-            oAuthSignOut() {
-                const auth = gapi.auth2.getAuthInstance();
-                auth.signOut();
-            },
         });
+        const openProfile = () => {
+            state.profileVisible = true;
+        };
+        const oAuthSignOut = () => {
+            gapi.auth2.getAuthInstance().signOut();
+        };
+        const signOut = () => {
+            root.$store.dispatch('auth/signOut');
+        };
+        const signOutAction = async () => {
+            await signOut();
+            if (state.authType === 'local') {
+                root.$router.push({ path: '/sign-in' });
+            } else {
+                oAuthSignOut();
+                root.$router.push({ path: '/google-sign-in' });
+            }
+        };
+        const doAction = (item) => {
+            if (item.key === 'signout') signOutAction();
+            else if (item.key === 'profile') openProfile();
+        };
 
         return {
             ...toRefs(state),
+            signOut,
+            oAuthSignOut,
+            doAction,
         };
     },
 };
