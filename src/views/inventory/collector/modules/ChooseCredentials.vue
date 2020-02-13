@@ -54,8 +54,13 @@
             <template #col-created_at-format="{value}">
                 {{ timestampFormatter(value) }}
             </template>
-            <template #col-go_credentials-format="data">
-                <router-link to="/secret/credentials-group" target="_blank">
+            <template #col-go_credentials-format>
+                <router-link :to="{
+                                 path: '/secret/credentials',
+                                 query: {'plugin_id': pluginId}
+                             }"
+                             target="_blank"
+                >
                     <p-button outline style-type="dark">
                         {{ tr('INVENTORY.CRT_CRD') }}
                     </p-button>
@@ -98,6 +103,7 @@ export default {
         items: Array,
         totalCount: Number,
         loading: Boolean,
+        pluginId: String,
         /**
          * sync prop
          */

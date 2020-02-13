@@ -26,7 +26,7 @@
                 />
             </template>
             <template v-if="crdState.crdType === 'Credentials'" #step-append-credentials>
-                <router-link class="new-crd-btn" to="/secret" target="_blank">
+                <router-link class="new-crd-btn" to="/secret/credentials" target="_blank">
                     <p-button outline style-type="dark">
                         {{ tr('INVENTORY.CRT_CRD') }}
                     </p-button>
@@ -35,6 +35,7 @@
             <template #contents-credentials>
                 <choose-credentials ref="crd"
                                     :items="crdState.items"
+                                    :plugin-id="confState.pluginId"
                                     :total-count="crdState.totalCount"
                                     :loading="crdState.loading"
                                     :crd-type.sync="crdState.crdType"
