@@ -2,7 +2,7 @@ import { action } from '@storybook/addon-actions';
 import PUserForm from './UserForm';
 
 export default {
-    title: 'view/identity/user/form',
+    title: 'views/identity/user/form',
     component: PUserForm,
     parameters: {
         info: {

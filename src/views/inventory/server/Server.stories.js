@@ -11,7 +11,7 @@ import { mountBusEvent } from '@/lib/compostion-util';
 import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 
 export default {
-    title: 'view/inventory/server',
+    title: 'views/inventory/server',
     component: Server,
     parameters: {
         info: {

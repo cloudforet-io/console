@@ -338,6 +338,43 @@ export default {
         };
         mountBusEvent(CollectorEventBus, 'collectData', collectData);
 
+
+        const getCollectorSchedule = async (params) => {
+            try {
+                // await context.parent.$http.post('/inventory/collector/collect', params);
+                state.scheduleState.selectedHours = {};
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'getCollectorSchedule', getCollectorSchedule);
+
+        const updateCollectorSchedule = async (params) => {
+            try {
+                // await context.parent.$http.post('/inventory/collector/collect', params);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Update Schedule',
+                    duration: 2000,
+                    speed: 1000,
+                });
+                state.scheduleState.isEditMode = false;
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'updateCollectorSchedule', updateCollectorSchedule);
+
         return {
             ...toRefs(state),
         };

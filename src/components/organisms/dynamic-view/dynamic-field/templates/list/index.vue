@@ -59,8 +59,10 @@ export default {
         } else {
             delimiterEl = h('span', delimiter);
         }
-        const dim = _.fill(Array(children.length - 1), delimiterEl);
-        children = _.flatten(_.zip(children, dim));
+        if (children.length) {
+            const dim = _.fill(Array(children.length - 1), delimiterEl);
+            children = _.flatten(_.zip(children, dim));
+        }
 
         return h('span', children);
     },

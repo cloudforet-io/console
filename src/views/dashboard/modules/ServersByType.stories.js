@@ -5,7 +5,7 @@ import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 
 export default {
-    title: 'view/dashboard/servers-by-type',
+    title: 'views/dashboard/servers-by-type',
     component: ServersByType,
 };
 

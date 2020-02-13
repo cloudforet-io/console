@@ -8,7 +8,7 @@ import casual from '@/views/dashboard/models/dashboard-model';
 
 
 export default {
-    title: 'view/dashboard/summary',
+    title: 'views/dashboard/summary',
     component: Summary,
     decorators: [withKnobs],
 };

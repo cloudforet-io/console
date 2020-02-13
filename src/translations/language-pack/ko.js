@@ -203,6 +203,7 @@ export const ko = {
         FAIL_REASON: '실패 원인',
         ISSUE_TYPE: '발행 타입',
         ALL: '모두',
+        HOURS: '시간',
     },
     ATOM: {
 
@@ -275,6 +276,8 @@ export const ko = {
         DISABLE_COL: '컬렉터 비활성화',
         MANAGE_CRD: '암호 관리',
         CRT_CRD: '새로운 암호 생성',
+        SCHEDULE: 'Collecting Schedule',
+        COLL_TIME: '수집 시간',
     },
     SECRET: {
         JASON_ALERT: "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (\') )",
@@ -317,6 +320,7 @@ export const ko = {
         LOCAL: 'Local',
         OFFICIAL: 'Official',
         SELECTED: '선택된 항목',
+        FILTER_FORMAT: '필터 포맷',
     },
     FORM: {
         TYPE: {

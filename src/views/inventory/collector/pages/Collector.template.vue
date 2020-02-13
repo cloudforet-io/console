@@ -110,7 +110,10 @@
                 />
             </template>
             <template #schedules>
-                <collector-schedules />
+                <collector-schedules :collector="selectedItem"
+                                     :selected-hours.sync="scheduleState.selectedHours"
+                                     :is-edit-mode.sync="scheduleState.isEditMode"
+                />
             </template>
         </p-tab>
         <p-tab v-else-if="selectIndex.length > 1" :tabs="multiTabs" :active-tab.sync="multiActiveTab">
@@ -328,6 +331,12 @@ const updateModalState = reactive({
     plugin: {},
 });
 
+const scheduleState = reactive({
+    loading: false,
+    selectedHours: {},
+    isEditMode: false,
+});
+
 export const collectorSetup = (props, context, AcHandler) => {
     const state = reactive({
         ...setTableData(props, context),
@@ -338,6 +347,7 @@ export const collectorSetup = (props, context, AcHandler) => {
         crdVerifyState,
         checkModalState,
         updateModalState,
+        scheduleState,
         AcHandler,
     });
 

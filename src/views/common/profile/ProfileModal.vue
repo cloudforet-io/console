@@ -51,6 +51,14 @@ export default {
             state.loading = true;
             try {
                 const res = await context.root.$http.post('identity/user/update', params);
+
+                if (params.timezone) {
+                    context.root.$store.commit('auth/setTimezone', params.timezone);
+                }
+                if (params.language) {
+                    context.root.$store.commit('auth/setLanguage', params.language);
+                }
+
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',

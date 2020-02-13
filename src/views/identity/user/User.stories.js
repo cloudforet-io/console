@@ -8,7 +8,7 @@ import { arrayOf } from '@/lib/casual';
 
 
 export default {
-    title: 'view/identity/user',
+    title: 'views/identity/user',
     component: User,
     parameters: {
         info: {
