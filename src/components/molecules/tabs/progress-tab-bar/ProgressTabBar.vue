@@ -150,6 +150,7 @@ $height: 2.5rem;
         &.invalid {
             font-style: italic;
             border-color: $alert;
+            color: $alert;
             background-color: $white;
             .triangle {
                 @include triangle-color(calc((#{$height} / 2) - 1px), $white);
@@ -160,6 +161,7 @@ $height: 2.5rem;
             &.active {
                 background-color: $alert;
                 border-color: $alert;
+                color: $white;
                 .triangle {
                     @include triangle-color(calc((#{$height} / 2) - 1px), $alert);
                 }
