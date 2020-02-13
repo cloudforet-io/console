@@ -268,9 +268,10 @@ export const userSetup = (props, context, eventName, ACHandler) => {
         const item = getSelectedUserItems.value[0];
         console.debug(item);
         userFormState.item = {
-            userId: item.user_id,
+            // eslint-disable-next-line camelcase
+            user_id: item.user_id,
             name: item.name,
-            email: item.name,
+            email: item.email,
             mobile: item.mobile,
             group: item.group,
             language: item.language,

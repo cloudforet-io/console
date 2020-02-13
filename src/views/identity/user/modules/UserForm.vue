@@ -14,17 +14,17 @@
                     <p-col :col="12">
                         <PFieldGroup
                             label="User ID"
-                            :invalid-text="invalidMsg.userId"
-                            :invalid="invalidState.userId"
+                            :invalid-text="invalidMsg.user_id"
+                            :invalid="invalidState.user_id"
                             valid-text="you can use this ID"
-                            :valid="validState.userId"
+                            :valid="validState.user_id"
                             :required="true"
                         >
                             <template v-slot:default="{invalid}">
                                 <p-row style="width: 100%">
                                     <p-col :style="{'max-width': '19rem'}">
                                         <p-text-input
-                                            v-model="formState.userId"
+                                            v-model="formState.user_id"
                                             v-focus
                                             :disabled="updateMode"
                                             placeholder="Insert User ID here"
@@ -46,7 +46,7 @@
                         </PFieldGroup>
                     </p-col>
                 </p-row>
-                <p-row>
+                <p-row v-if="formState.is_local_auth">
                     <p-col :col="6">
                         <PFieldGroup
                             label="Password"
@@ -140,13 +140,21 @@
     </p-button-modal>
 </template>
 <script>
-import { reactive } from '@vue/composition-api';
+
+import { reactive, computed } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import {
-    formValidation, makeProxy, requiredValidation, userIDValidation, Validation, lengthMaxValidation, lengthMinValidation, checkTimeZoneValidation,
+    formValidation,
+    makeProxy,
+    requiredValidation,
+    userIDValidation,
+    Validation,
+    lengthMaxValidation,
+    lengthMinValidation,
+    checkTimeZoneValidation,
 } from '@/lib/compostion-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
@@ -170,6 +178,7 @@ const components = {
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
     const formState = reactive({
+        // eslint-disable-next-line camelcase
         user_id: '',
         password1: '',
         password2: '',
@@ -180,6 +189,12 @@ const setup = (props, context) => {
         language: 'ko',
         timezone: 'UTC',
         tags: {},
+        // eslint-disable-next-line camelcase
+        is_local_auth: computed(() => {
+        // return parent.$store.state.atuh.is_local_user
+            console.debug('local auth');
+            return false;
+        }),
         ...props.item,
     });
     const languageSelectItems = [
@@ -190,51 +205,67 @@ const setup = (props, context) => {
         { type: 'item', label: 'UTC', name: 'UTC' },
         { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
     ];
+    const pluginAuthIDValidation = parent => new Validation(async (value) => {
+        let result = true;
+        // eslint-disable-next-line camelcase
+        await parent.$http.post('/identity/user/find', { user_id: value, domain_id: sessionStorage.domainId, query: { count_only: true } }).then((res) => {
+            if (res.data.total_count === 0) { result = true; }
+        }).catch((error) => { console.debug(error); });
+        return result;
+    }, "ID doesn't exists!");
 
-    const addUserValidations = {
-        userId: [requiredValidation(), userIDValidation(context.parent)],
-        password1: [requiredValidation(), lengthMinValidation(5), lengthMaxValidation(12)],
-        password2: [
-            requiredValidation(),
-            new Validation((value, data) => data.password1 === value, 'please enter same value again'),
-        ],
+    const pwdCheckValidation = new Validation((value, data) => data.password1 === value, 'please enter same value again');
+    const defaultValidation = {
         timezone: [checkTimeZoneValidation()],
+        // eslint-disable-next-line camelcase
+        user_id: [],
     };
 
-    const updateUserValidations = {
-        password1: [lengthMinValidation(5), lengthMaxValidation(12)],
-        password2: [
+    const addUserValidations = defaultValidation;
+    const updateUserValidations = defaultValidation;
+    const userIdVds = [requiredValidation(), userIDValidation(context.parent)];
+
+    if (!formState.is_local_auth) { // plugin auth type
+        // eslint-disable-next-line camelcase
+        addUserValidations.user_id = [...userIdVds, pluginAuthIDValidation(context.parent)];
+    } else {
+        // eslint-disable-next-line camelcase
+        addUserValidations.user_id = userIdVds;
+        addUserValidations.password1 = [requiredValidation(), lengthMinValidation(5), lengthMaxValidation(12)];
+        addUserValidations.password2 = [requiredValidation(), pwdCheckValidation];
+
+        updateUserValidations.password1 = [lengthMinValidation(5), lengthMaxValidation(12)];
+        updateUserValidations.password2 = [
             new Validation((value, data) => data.password1 === value, 'please enter same value again'),
-        ],
-    };
+        ];
+    }
 
     const validateAPI = formValidation(formState, props.updateMode ? updateUserValidations : addUserValidations);
+
     const checkUserID = async () => {
-        const result = await validateAPI.fieldValidation('userId');
+        const result = await validateAPI.fieldValidation('user_id');
         return result;
     };
     const confirm = async () => {
         const result = await validateAPI.allValidation();
-        if (result) {
-            const data = {
-                user_id: formState.userId,
-            };
-            if (props.updateMode) {
-                if (formState.password1) {
+        const data = {};
+        if (formState.is_local_auth) {
+            if (result) {
+                if (props.updateMode) {
+                    if (formState.password1) {
+                        data.password = formState.password1;
+                    }
+                } else {
                     data.password = formState.password1;
                 }
-            } else {
-                data.password = formState.password1;
             }
-            data.name = formState.name;
-            ['user_id', 'email', 'mobile', 'group', 'language', 'timezone', 'tags'].forEach((key) => {
-                if (formState[key]) {
-                    data[key] = formState[key];
-                }
-            });
-
-            context.emit('confirm', data);
         }
+        ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone', 'tags'].forEach((key) => {
+            if (formState[key]) {
+                data[key] = formState[key];
+            }
+        });
+        context.emit('confirm', data);
     };
 
     return {
@@ -254,7 +285,7 @@ export default {
     components,
     directives: {
         focus: {
-            // 디렉티브 정의
+        // 디렉티브 정의
             inserted(el) {
                 el.focus();
             },
@@ -269,6 +300,7 @@ export default {
         item: {
             type: Object,
             default: () => ({
+                // eslint-disable-next-line camelcase
                 user_id: '',
                 password1: '',
                 password2: '',
@@ -293,28 +325,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .p-table-check-modal-sub-title{
+    .p-table-check-modal-sub-title {
         margin-bottom: 2rem;
     }
-    .p-text-input{
+
+    .p-text-input {
         max-width: 19rem;
     }
-    .p-select-dropdown{
+
+    .p-select-dropdown {
         max-width: 19rem;
         width: 100%;
     }
-    .tag-input{
+
+    .tag-input {
         padding-top: 0.5rem;
         background-color: $primary4;
     }
-    .p-divider{
+
+    .p-divider {
         margin-bottom: 1.5rem;
         margin-top: .5rem;
     }
-    .p-field-group{
+
+    .p-field-group {
         width: 100%;
     }
-    .user-id-check-btn{
+
+    .user-id-check-btn {
         margin-left: 0.5rem;
         min-height: 2rem;
 
