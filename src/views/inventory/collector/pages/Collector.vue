@@ -340,16 +340,20 @@ export default {
 
 
         const getCollectorSchedule = async (params) => {
+            state.scheduleState.loading = true;
             try {
-                // await context.parent.$http.post('/inventory/collector/collect', params);
-                state.scheduleState.selectedHours = {};
+                const res = await context.parent.$http.post('/inventory/collector/schedule/list', params);
+                state.scheduleState.hours = _.get(res, 'data.schedule.hours', ['1', '2']);
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.scheduleState.loading = false;
             }
         };
         mountBusEvent(CollectorEventBus, 'getCollectorSchedule', getCollectorSchedule);
 
         const updateCollectorSchedule = async (params) => {
+            state.scheduleState.loading = true;
             try {
                 // await context.parent.$http.post('/inventory/collector/collect', params);
                 context.root.$notify({
@@ -371,6 +375,8 @@ export default {
                     duration: 2000,
                     speed: 1000,
                 });
+            } finally {
+                state.scheduleState.loading = false;
             }
         };
         mountBusEvent(CollectorEventBus, 'updateCollectorSchedule', updateCollectorSchedule);

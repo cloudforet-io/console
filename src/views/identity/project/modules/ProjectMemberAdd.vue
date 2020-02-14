@@ -52,6 +52,7 @@
             </p-toolbox-table>
             <p-box-layout class="tag-container">
                 <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
+                       class="tag"
                        @delete="tagTools.deleteTag(idx)"
                 >
                     {{ tag }}
@@ -282,13 +283,9 @@ export default {
     .tag-container {
         min-height: 80px;
     }
-    /*.tag-input {
-        height: 20vh;
-        overflow-y: auto;
-        background: $primary4 0% 0% no-repeat padding-box;
-        border: 1px solid $gray3;
-        opacity: 1;
-    }*/
+    .tag {
+        margin-bottom: .5rem;
+    }
     .label-group {
         margin-bottom: 0rem;
     }
