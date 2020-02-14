@@ -35,6 +35,7 @@
                 <slot name="footer-extra" />
                 <p-button
                     v-if="footerCancelButtonVisible"
+                    class="p-btn-modal-btn"
                     v-bind="footerCancelButtonBind"
                     @click="onCancelClick"
                 >
@@ -45,6 +46,8 @@
                 <p-button v-if="footerConfirmButtonVisible"
                           v-bind="footerConfirmButtonBind"
                           :disabled="loading"
+                          class="p-btn-modal-btn"
+
                           @click="onConfirmClick"
                 >
                     <div class="confirm-btn">
@@ -145,6 +148,10 @@ export default {
     .close-modal-btn {
         cursor: pointer;
         color: $dark;
+    }
+    .p-btn-modal-btn{
+        height: 2.5rem;
+        font-size: 1rem;
     }
     .confirm-btn {
         display: flex;
