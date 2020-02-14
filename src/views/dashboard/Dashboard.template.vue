@@ -1,10 +1,10 @@
 <template>
-    <div class="dashboard-container">
-        <main>
-            <div class="flex-row">
+    <general-page-layout>
+        <p-row class="dashboard" wrap="wrap" justify-content="center">
+            <p-col>
                 <Summary class="item" :data="summaryData" />
-            </div>
-            <div class="flex-row">
+            </p-col>
+            <p-col>
                 <div class="item flex">
                     <ResourcesByRegion class="region"
                                        :data="resourcesByRegionData"
@@ -13,25 +13,28 @@
                                  :data="serverStateData"
                     />
                 </div>
-            </div>
-            <div class="flex-row">
+            </p-col>
+            <p-col>
                 <ServersByType class="item"
                                :server-data="serverTypeData"
                                :vm-data="vmTypeData"
                                :os-data="osTypeData"
                                :hypervisor-data="hypervisorTypeData"
                 />
-            </div>
-        </main>
-    </div>
+            </p-col>
+        </p-row>
+    </general-page-layout>
 </template>
 
 <script>
 import { toRefs, reactive } from '@vue/composition-api';
-import Summary from '@/views/dashboard/modules/Summary';
-import ServerState from '@/views/dashboard/modules/ServerState';
-import ResourcesByRegion from '@/views/dashboard/modules/ResourcesByRegion';
-import ServersByType from '@/views/dashboard/modules/ServersByType';
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import Summary from '@/views/dashboard/modules/Summary.vue';
+import ServerState from '@/views/dashboard/modules/ServerState.vue';
+import ResourcesByRegion from '@/views/dashboard/modules/ResourcesByRegion.vue';
+import ServersByType from '@/views/dashboard/modules/ServersByType.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
 
 export const setup = () => {
     const state = reactive({
@@ -52,6 +55,9 @@ export const setup = () => {
 export default {
     name: 'Dashboard',
     components: {
+        PCol,
+        PRow,
+        GeneralPageLayout,
         Summary,
         ServerState,
         ResourcesByRegion,
@@ -64,34 +70,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.dashboard-container {
-    display: flex;
-    padding: 2rem 2rem 1rem 2rem;
-    justify-content: center;
-    main {
-        width: 100%;
+    .dashboard {
+        padding: 2rem 2rem 1rem 2rem;
         min-width: calc(1200px - #{$gnb-width});
         max-width: 1280px;
-        .flex-row {
-            display: flex;
-            padding-bottom: 1rem;
+        width: 100%;
+        .item {
             width: 100%;
-            .item {
+            margin-bottom: 1rem;
+            &.flex {
+                display: flex;
                 width: 100%;
-                &.flex {
-                    display: flex;
-                    width: 100%;
-                    .region {
-                        width: calc(75% + .5rem);
-                        margin-right: 1rem;
-                    }
-                    .server-state {
-                        width: calc(25% - .5rem);
-                    }
+                .region {
+                    width: calc(75% + .5rem);
+                    margin-right: 1rem;
+                }
+                .server-state {
+                    width: calc(25% - .5rem);
                 }
             }
         }
-
     }
-}
 </style>

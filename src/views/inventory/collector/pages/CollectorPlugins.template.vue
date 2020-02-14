@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-layout :min-left-width="260">
+    <vertical-page-layout :min-left-width="260">
         <template #leftContainer="{width}">
             <div :style="{width: width}">
                 <plugin-filter :filters.sync="filterTools.tags"
@@ -67,7 +67,7 @@
                 </template>
             </p-toolbox-card-list>
         </template>
-    </p-vertical-layout>
+    </vertical-page-layout>
 </template>
 
 <script>
@@ -89,6 +89,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 
 import PluginFilter from '@/views/inventory/collector/modules/PluginFilter.vue';
+import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 
 const repoState = reactive({
     repositories: [],
@@ -217,6 +218,7 @@ export const setup = (props, { root }) => {
 export default {
     name: 'CollectorPluginsTemplate',
     components: {
+        VerticalPageLayout,
         PRow,
         PCol,
         PVerticalLayout,

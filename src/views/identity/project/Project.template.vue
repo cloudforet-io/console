@@ -1,6 +1,6 @@
 <template>
     <div div class="animated fadeIn">
-        <default-tree
+        <p-area-tree
             ref="ProjectTree"
             :tree-data="treeData"
             :show-tree="displayTree"
@@ -48,14 +48,14 @@
                     </template>
                 </div>
             </template>
-        </default-tree>
+        </p-area-tree>
     </div>
 </template>
 
 <script>
 import _ from 'lodash';
 import ProjectContext from '@/views/identity/project/modules/ProjectContext.vue';
-import DefaultTree from '@/components/organisms/trees/area-tree/AreaTree.vue';
+import PAreaTree from '@/components/organisms/trees/area-tree/AreaTree.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 
@@ -66,7 +66,7 @@ const projectMember = () => import('@/views/identity/project/modules/ProjectMemb
 export default {
     name: 'Project1',
     components: {
-        DefaultTree,
+        PAreaTree,
         ProjectContext,
         PHorizontalLayout,
         PTab,

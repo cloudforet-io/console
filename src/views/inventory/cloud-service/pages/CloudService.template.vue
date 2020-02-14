@@ -1,6 +1,6 @@
 <template>
     <div class="cloud-service">
-        <p-vertical-layout :min-left-width="450" :left-width="450" :max-left-width="800">
+        <vertical-page-layout :min-left-width="450" :left-width="450" :max-left-width="800">
             <template #leftContainer="{width,widthRaw,height}">
                 <transition name="panel-trans">
                     <div v-show="widthRaw>16" :style="{width:`${widthRaw-16}px`,height:'95%'}" style="padding-left: .5rem;padding-right: .5rem">
@@ -113,7 +113,7 @@
                     </div>
                 </transition>
             </template>
-        </p-vertical-layout>
+        </vertical-page-layout>
     </div>
 </template>
 <script lang="ts">
@@ -140,6 +140,7 @@ import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata
 import { makeTrItems } from '@/lib/view-helper';
 import { QuerySearchTableAPI } from '@/lib/api';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
+import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 
 export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApiHandler:QuerySearchTableAPI) => {
     const state = reactive({
@@ -225,6 +226,7 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
 export default {
     name: 'CloudServiceTemplate',
     components: {
+        VerticalPageLayout,
         PHorizontalLayout,
         PVerticalLayout,
         PDynamicView,

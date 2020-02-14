@@ -1,5 +1,5 @@
 <template>
-    <div class="user">
+    <general-page-layout>
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -114,7 +114,7 @@
                      :visible.sync="userFormState.visible"
                      @confirm="userFormConfirm"
         />
-    </div>
+    </general-page-layout>
 </template>
 
 <script>
@@ -134,6 +134,7 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
@@ -395,6 +396,7 @@ export default {
         getValue,
     },
     components: {
+        GeneralPageLayout,
         PUserForm,
         PStatus,
         PHorizontalLayout,
@@ -440,10 +442,5 @@ export default {
         margin-bottom: 0.5rem;
         color: $primary2;
         font: 24px/32px Arial;
-    }
-    .user{
-        margin-top: 1.5625rem;
-        margin-left: 2rem;
-        margin-right: 2rem;
     }
 </style>

@@ -5,41 +5,29 @@
         <div class="app-body">
             <router-view name="lnb" />
 
-            <main class="main"
-                :style="{minHeight: mainMinHeight}"
-            >
+            <main class="main">
                 <router-view name="main" />
             </main>
-
-            <div
-                v-if="defaultFNB"
-                class="fnb"
-            >
-                <FNB />
-            </div>
         </div>
     </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import styles from '@/styles/_variables.scss';
-import GNB from '@/views/containers/gnb/GNB';
-import FNB from '@/views/containers/fnb/FNB';
+import _ from 'lodash';
+import { reactive, toRefs } from '@vue/composition-api';
+
+import GNB from '@/views/containers/gnb/GNB.vue';
 
 export default {
     name: 'DefaultContainer',
-    components: { GNB, FNB },
-    computed: {
-        ...mapGetters('layout', [
-            'defaultFNB',
-        ]),
-        mainMinHeight() {
-            if (this.defaultFNB) {
-                return `calc(100vh - ${styles.lnbHeight} - ${styles.fnbHeight})`;
-            }
-            return `calc(100vh - ${styles.lnbHeight})`;
-        },
+    components: { GNB },
+    setup(props, { root }) {
+        const state = reactive({
+            disableFNB: _.get(root, '$route.meta.disableFNB', false),
+        });
+        return {
+            ...toRefs(state),
+        };
     },
 };
 </script>
@@ -47,32 +35,31 @@ export default {
 <style lang="scss" scoped>
     $min-width: 1200px;
 .app {
+    display: flex;
+    flex-wrap: wrap;
     overflow-y: hidden;
     min-height: 100vh;
     min-width: $min-width;
+    width: 100vw;
     .gnb {
         display: inline-block;
-        position: fixed;
         height: 100vh;
         width: $gnb-width;
         z-index: 100;
     }
     .app-body {
-        position: fixed;
-        left: $gnb-width;
-        top: 0;
         overflow-y: auto;
-        max-height: 100%;
-        //margin-left: $gnb-width;
+        height: 100vh;
         width: calc(100vw - #{$gnb-width});
         min-width: calc(#{$min-width} - #{$gnb-width});
-        min-height: 100vh;
+
         .main {
+            height: calc(100vh - #{$lnb-height});
             margin: 0;
             width: calc(100vw - #{$gnb-width});
             min-width: calc(#{$min-width} - #{$gnb-width});
             overflow-x: hidden;
-            padding-bottom: 2rem;
+            /*padding-bottom: 2rem;*/
         }
     }
 }
