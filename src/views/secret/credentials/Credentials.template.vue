@@ -1,5 +1,5 @@
 <template>
-    <div class="credential">
+    <general-page-layout>
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -109,7 +109,7 @@
                             @confirm="credentialsFormConfirm"
                             @close="credentialsFormCancel"
         />
-    </div>
+    </general-page-layout>
 </template>
 
 <script>
@@ -123,6 +123,7 @@ import { makeTrItems } from '@/lib/view-helper';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
 import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
@@ -363,6 +364,7 @@ export default {
         getValue,
     },
     components: {
+        GeneralPageLayout,
         PCredentialsForm,
         PButton,
         PHorizontalLayout,
@@ -403,11 +405,6 @@ export default {
         margin-bottom: 0.5rem;
         color: $primary2;
         font: 24px/32px Arial;
-    }
-    .credential{
-        margin-top: 1.5625rem;
-        margin-left: 2rem;
-        margin-right: 2rem;
     }
     .p-label {
         left-margin: 0.5rem;

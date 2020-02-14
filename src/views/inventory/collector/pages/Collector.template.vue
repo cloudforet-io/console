@@ -1,5 +1,5 @@
 <template>
-    <div class="collector-page">
+    <general-page-layout class="collector-page">
         <p-horizontal-layout :line="false">
             <template #container="{ height }">
                 <p-toolbox-table :items="items"
@@ -166,7 +166,7 @@
                              :items="multiItems"
                              @confirm="checkModalState.checkModalConfirm"
         />
-    </div>
+    </general-page-layout>
 </template>
 
 <script>
@@ -177,6 +177,7 @@ import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -416,6 +417,7 @@ export const collectorSetup = (props, context, AcHandler) => {
 export default {
     name: 'CollectorTemplate',
     components: {
+        GeneralPageLayout,
         PStatus,
         PHorizontalLayout,
         PToolboxTable,
@@ -443,11 +445,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.collector-page {
-    margin-top: 1.5625rem;
-    margin-left: 2rem;
-    margin-right: 2rem;
-
     .left-toolbox-item{
         margin-left: 1rem;
         &:last-child {
@@ -469,5 +466,4 @@ export default {
     li {
         display: list-item;
     }
-}
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="cdg">
+    <general-page-layout>
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -134,7 +134,7 @@
                     :cdg-name-validation="cdgNameValidation"
                     @confirm="cdgFormConfirm"
         />
-    </div>
+    </general-page-layout>
 </template>
 
 <script>
@@ -161,6 +161,7 @@ import PCdgCredential from '@/views/secret/credentials-group/modules/CredentialG
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PCdgForm from '@/views/secret/credentials-group/modules/CredentialGroupForm.vue';
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 export const CdgTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -369,6 +370,7 @@ export default {
         getValue,
     },
     components: {
+        GeneralPageLayout,
         PCdgForm,
         PHorizontalLayout,
         PToolboxTable,
@@ -413,10 +415,5 @@ export default {
         margin-bottom: 0.5rem;
         color: $primary2;
         font: 24px/32px Arial;
-    }
-    .cdg{
-        margin-top: 1.5625rem;
-        margin-left: 2rem;
-        margin-right: 2rem;
     }
 </style>

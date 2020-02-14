@@ -1,5 +1,5 @@
 <template>
-    <div class="collector-creator-container">
+    <general-page-layout>
         <p-button class="back-btn" @click="goBackToCollectors">
             <p-i name="ic_back" color="transparent inherit" />
             Back to Collectors
@@ -49,7 +49,7 @@
                 />
             </template>
         </p-progress-wizard>
-    </div>
+    </general-page-layout>
 </template>
 
 <script>
@@ -61,6 +61,7 @@ import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PProgressWizard from '@/components/organisms/wizards/progress-wizard/ProgressWizard.vue';
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup.vue');
 const ConfigureCollector = () => import('@/views/inventory/collector/modules/ConfigureCollector.vue');
@@ -104,6 +105,7 @@ export const setDataState = (root) => {
 export default {
     name: 'CollectorCreator',
     components: {
+        GeneralPageLayout,
         PButton,
         PI,
         PProgressWizard,
@@ -181,8 +183,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.collector-creator-container {
-    padding: 1.75rem 2rem 2rem 2rem;
     .back-btn {
         margin-bottom: .75rem;
         color: $primary2;
@@ -192,5 +192,4 @@ export default {
     .new-crd-btn {
 
     }
-}
 </style>

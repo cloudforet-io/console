@@ -1,5 +1,5 @@
 <template>
-    <div class="server">
+    <general-page-layout>
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -169,7 +169,7 @@
 
             @confirm="checkModalConfirm"
         />
-    </div>
+    </general-page-layout>
 </template>
 
 <script>
@@ -203,6 +203,7 @@ import PServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -445,6 +446,7 @@ export default {
         getValue,
     },
     components: {
+        GeneralPageLayout,
         PStatus,
         PHorizontalLayout,
         PToolboxTable,
@@ -493,10 +495,5 @@ export default {
         margin-bottom: 0.5rem;
         color: $primary2;
         font: 24px/32px Arial;
-    }
-    .server{
-        margin-top: 1.5625rem;
-        margin-left: 2rem;
-        margin-right: 2rem;
     }
 </style>
