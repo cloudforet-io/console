@@ -1,5 +1,17 @@
 <template>
     <div class="animated fadeIn">
+        <p-table-check-modal
+            v-if="!!checkTableModalState.mode"
+            :visible.sync="checkTableModalState.visible"
+            :header-title="checkTableModalState.title"
+            :sub-title="checkTableModalState.subTitle"
+            :theme-color="checkTableModalState.themeColor"
+            :fields="checkTableModalState.fields"
+            :centered="true"
+            :selectable="false"
+            :items="checkTableModalState.item"
+            @confirm="deleteActionProcess"
+        />
         <project-context-action ref="contextPopUp"
                                 :selected-node="getSelectedNodeAndTree"
                                 :action-flag="getContextActionFlag"
@@ -58,22 +70,26 @@
 
 <script>
 import _ from 'lodash';
+import { reactive } from '@vue/composition-api';
 import ProjectContext from '@/views/identity/project/modules/ProjectContext';
 import AreaTree from '@/components/organisms/trees/area-tree/AreaTree';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout';
+import { eventNames } from '@/views/secret/credentials/Credentials.template';
+import { makeTrItems } from '@/lib/view-helper';
 
 const projectSummaryTop = () => import('@/views/identity/project/modules/ProjectSummaryTop');
 const projectSummaryBottom = () => import('@/views/identity/project/modules/ProjectSummaryBottom');
 const projectMember = () => import('@/views/identity/project/modules/ProjectMember');
 const ProjectContextAction = () => import('@/views/identity/project/modules/ProjectContextAction');
-
+const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
 
 export default {
     name: 'Project',
     components: {
         AreaTree,
         ProjectContext,
+        PTableCheckModal,
         ProjectContextAction,
         HorizontalLayout,
         PTab,
@@ -99,6 +115,22 @@ export default {
             contextItem: null,
             contextActionFlag: null,
             isContextMenuVisible: false,
+            multiSelectFields: null,
+            checkTableModalState: {
+                deleteParam: {
+                    flag: null,
+                    tree: null,
+                    nodeData: null,
+                },
+                fields: null,
+                visible: false,
+                mode: '',
+                item: null,
+                confirmEventName: '',
+                title: '',
+                subTitle: '',
+                themeColor: '',
+            },
         };
     },
     computed: {
@@ -287,6 +319,7 @@ export default {
                 tags: this.$refs.contextPopUp._data.tagInput.tags,
             };
 
+            // eslint-disable-next-line no-nested-ternary
             const param = flag[1] === 'RT' ? { is_root: true, ...paramBasic } : flag[1] === 'PR' ? { parent_project_group_id: nodeData.id, ...paramBasic } : { project_group_id: nodeData.id, ...paramBasic };
             const url = flag[1] === 'PJ' ? 'project' : 'project-group';
 
@@ -341,7 +374,30 @@ export default {
             });
             this.$refs.contextPopUp.hideModal();
         },
-        async deleteProjectAndGroup(flag, tree, nodeData) {
+        deleteProjectAndGroup(flag, tree, nodeData) {
+            nodeData.name = tree.getSelected()[0].title;
+            this.checkTableModalState.deleteParam = {
+                flag,
+                tree,
+                nodeData,
+            };
+            const targetIdentity = flag[1] === 'PR' ? 'project group' : 'project';
+            this.checkTableModalState.mode = 'delete';
+            this.checkTableModalState.title = `Delete ${targetIdentity}`;
+            this.checkTableModalState.subTitle = `Are you sure you want to delete selected ${targetIdentity} below?`;
+            this.checkTableModalState.themeColor = 'alert';
+            this.checkTableModalState.item = [nodeData];
+            this.checkTableModalState.visible = true;
+            this.checkTableModalState.fields = makeTrItems([
+                ['id', 'COMMON.ID', { style: { width: '400px' } }],
+                ['name', 'COMMON.NAME', { style: { width: '600px' } }],
+            ],
+            this.$parent);
+        },
+        async deleteActionProcess() {
+            const tree = this.checkTableModalState.deleteParam.tree;
+            const nodeData = this.checkTableModalState.deleteParam.nodeData;
+
             const path = tree.getSelected().map(node => node.path);
             const url = `/identity/${this.replaceAll(nodeData.item_type, '_', '-').toLowerCase()}/delete`;
             const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: nodeData.id } : { project_id: nodeData.id };
@@ -395,6 +451,7 @@ export default {
                     });
                 }
             });
+            this.clearModalData();
         },
         async applyActionOnScreen(tree, data) {
             const selected = tree.getSelected()[0];
@@ -410,6 +467,23 @@ export default {
             } else {
                 tree.insert({ node: tree.getSelected()[0], placement: data.placement }, data.node);
             }
+        },
+        clearModalData() {
+            this.checkTableModalState = {
+                deleteParam: {
+                    flag: null,
+                    tree: null,
+                    nodeData: null,
+                },
+                fields: null,
+                visible: false,
+                mode: '',
+                item: null,
+                confirmEventName: '',
+                title: '',
+                subTitle: '',
+                themeColor: '',
+            };
         },
     },
 };
