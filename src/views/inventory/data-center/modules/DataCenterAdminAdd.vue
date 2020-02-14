@@ -26,6 +26,7 @@
                              :this-page.sync="tablePage.thisPage"
                              :select-index.sync="selectIndex"
                              :page-size.sync="tablePage.pageSize"
+                             :setting-visible="false"
                              @rowLeftClick="onSelect"
                              @changePageSize="getMembers"
                              @changeSort="getMembers"

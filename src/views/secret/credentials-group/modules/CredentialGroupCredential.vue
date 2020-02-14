@@ -16,7 +16,7 @@
             :page-size.sync="proxyPageSize"
             :select-index.sync="selectIndex"
             :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
-            :setting-visible="true"
+            :setting-visible="false"
             :shadow="false"
             :border="false"
             :padding="false"
