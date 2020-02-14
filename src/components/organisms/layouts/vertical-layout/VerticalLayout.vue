@@ -9,16 +9,14 @@
             <slot name="leftContainer" :width="`${leftContainerWidth}px`" :widthRaw="leftContainerWidth" />
         </div>
 
-        <div class="dragger-container" :class="{ line: line }" :style="{
+        <div class="dragger-container" :class="{ line: line, 'prohibit-line': blockHover }" :style="{
                  height: height,
                  width: `${draggerWidth}px`,
              }"
              @mousedown="onMousedown"
         >
             <span class="dragger">
-                <span @mouseenter="mouseOnOver(true)"
-                      @mouseleave="mouseOnOver(false)"
-                >
+                <span @mouseenter="mouseOnOver(true)" @mouseleave="mouseOnOver(false)">
                     <slot name="dragger">
                         <p-i v-if="!isMinimized"
                              class="btn-vertical-dragger"
@@ -76,7 +74,7 @@ export default {
         },
         leftWidth: {
             type: Number,
-            default: 278,
+            default: 300,
         },
         minLeftWidth: {
             type: Number,
@@ -105,9 +103,11 @@ export default {
     },
     data() {
         return {
+            blockHover: false,
             transitionEffect: true,
             leftContainerWidth: parseFloat(this.leftWidth),
             isMinimized: false,
+            tempMinimizing: null,
             draggerWidth: 10,
             previousWidth: null,
             dragging: false,
@@ -147,7 +147,14 @@ export default {
             }
         },
         mouseOnOver(flag) {
-            this.mouseOver = flag;
+            if (this.isMinimized) {
+                this.line = false;
+                this.blockHover = !this.line;
+            } else {
+                this.line = true;
+                this.blockHover = !this.line;
+                this.mouseOver = flag;
+            }
         },
         initDefaultLeftWidth() {
             if (this.autoSaveLeftWidth) {
@@ -267,6 +274,11 @@ export default {
                 cursor: ew-resize;
             }
         }
+        &.prohibit-line {
+            border-left: 1px solid $lightgray;
+            background-color: transparent;
+        }
+
         .dragger {
             display: inline-block;
             cursor: pointer;
