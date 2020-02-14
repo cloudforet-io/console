@@ -24,8 +24,11 @@ export const defaultCase = () => ({
         ...autoProps(CardLayout),
     },
     template: `<CardLayout v-bind="$props">
-                    <template slot="a">aa</template>
-                    <template slot="b">bb</template>
-                    <template slot="c">cc</template>
+                    <template slot="a">
+                        <p>aaaa</p>
+                    </template>
+                    <template slot="b">
+                        <p>bbbb</p>
+                    </template>
                </CardLayout>`,
 });

@@ -114,7 +114,7 @@ class API {
     }
 
     checkAccessToken=():boolean => {
-        //debugger;
+        // debugger;
         // @ts-ignore
         const accessToken = VueCookies.get('accessToken');
         if (accessToken) {
@@ -408,10 +408,7 @@ export class BaseQuerySearchTableAPI extends DynamicAPI {
             keys: keys || [] as string[],
             suggestKeys: keys || [] as string[],
         });
-        const acHandler:Ref<any> = computed(() => {
-            console.log('new handler', this.acState.keys, this.acState.suggestKeys);
-            return new QuerySearchTableACHandler(parent, this.acState.keys, this.acState.keys);
-        });
+        const acHandler:Ref<any> = computed(() => new QuerySearchTableACHandler(parent, this.acState.keys, this.acState.keys));
 
         this.state = reactive({
             items: [],

@@ -37,7 +37,7 @@
                     <template v-slot:col-labels-format="data">
                         <div>
                             <PBadge v-for="(label, idx) in data.item.labels" :key="idx"
-                                    class="p-label" :style-type="'gray2'"
+                                    class="p-label" style-type="gray2"
                             >
                                 {{ getEmptyString(label) }}
                             </PBadge>
@@ -101,9 +101,6 @@ export default {
             },
         };
     },
-    created() {
-
-    },
     computed: {
         getSelectedTypeKey() {
             const currentType = this.$parent.selectedNode.node.data.item_type;
@@ -131,6 +128,9 @@ export default {
                 },
             ];
         },
+    },
+    created() {
+
     },
     methods: {
         getEmptyString(object) {
@@ -202,7 +202,7 @@ export default {
             this.deleteUserOnProject();
         },
         close() {
-            console.log('close Modal');
+            console.debug('close Modal');
         },
     },
 };

@@ -3,23 +3,29 @@
         <p-menu-list :list-items="menuList"
                      :tooltip="userId"
                      :tooltip-options="{offset: '20px'}"
-                     @select="doAction">
+                     @select="doAction"
+        >
             <template #contents>
-                <p-i name="ic_gnb_profile" width="32px" height="32px"
+                <p-i name="ic_gnb_profile" width="2rem" height="2rem"
                      :color="`transparent ${iconColor}`"
                 />
             </template>
         </p-menu-list>
 
-        <profile-modal ref="profileModal" />
+        <profile-modal v-if="profileVisible"
+                       :visible.sync="profileVisible"
+                       :user-id="userId"
+                       :user-type="userType"
+                       :auth-type="authType"
+        />
     </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
-import PMenuList from '@/components/organisms/lists/menu-list/MenuList';
-import ProfileModal from '@/views/common/profile/ProfileModal';
-import PI from '@/components/atoms/icons/PI';
+import { reactive, toRefs, computed } from '@vue/composition-api';
+import PMenuList from '@/components/organisms/lists/menu-list/MenuList.vue';
+import ProfileModal from '@/views/common/profile/ProfileModal.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 import styles from '@/styles/_variables.scss';
 
 export default {
@@ -29,50 +35,48 @@ export default {
         PMenuList,
         ProfileModal,
     },
-    data() {
-        return {
-            visible: false,
+    setup(props, { root }) {
+        const state = reactive({
+            profileVisible: false,
             menuList: [
                 { key: 'profile', contents: 'Profile' },
                 { key: 'signout', contents: 'Sign Out' },
             ],
             iconColor: styles.primary4,
+            userId: computed(() => root.$store.getters['auth/userId']),
+            // clientId: computed(() => root.$store.getters['domain/clientId']),
+            authType: computed(() => root.$store.getters['domain/authType']),
+            userType: computed(() => root.$store.getters['auth/userType']),
+        });
+        const openProfile = () => {
+            state.profileVisible = true;
         };
-    },
-    computed: {
-        ...mapGetters('auth', [
-            'userId',
-        ]),
-        ...mapGetters('domain', [
-            'clientId',
-            'authType',
-        ]),
-    },
-    methods: {
-        ...mapActions('auth', [
-            'signOut',
-        ]),
-        doAction(item) {
-            if (item.key === 'signout') this.signOutAction();
-            else if (item.key === 'profile') this.openProfile();
-        },
-        async signOutAction() {
-            if (this.authType === 'local') {
-                await this.signOut();
-                this.$router.push({ path: '/sign-in' });
+        const oAuthSignOut = () => {
+            gapi.auth2.getAuthInstance().signOut();
+        };
+        const signOut = () => {
+            root.$store.dispatch('auth/signOut');
+        };
+        const signOutAction = async () => {
+            await signOut();
+            if (state.authType === 'local') {
+                root.$router.push({ path: '/sign-in' });
             } else {
-                await this.signOut();
-                this.oAuthSignOut();
-                this.$router.push({ path: '/google-sign-in' });
+                oAuthSignOut();
+                root.$router.push({ path: '/google-sign-in' });
             }
-        },
-        openProfile() {
-            this.$refs.profileModal.showModal();
-        },
-        oAuthSignOut() {
-            const auth = gapi.auth2.getAuthInstance();
-            auth.signOut();
-        },
+        };
+        const doAction = (item) => {
+            if (item.key === 'signout') signOutAction();
+            else if (item.key === 'profile') openProfile();
+        };
+
+        return {
+            ...toRefs(state),
+            signOut,
+            oAuthSignOut,
+            doAction,
+        };
     },
 };
 </script>

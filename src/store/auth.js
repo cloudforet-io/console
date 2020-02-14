@@ -12,6 +12,8 @@ export default {
         userType: null,
         timezone: null,
         language: null,
+        isLocalType: localStorage.isLocalType === 'true',
+        isDomainOwner: localStorage.isDomainOwner === 'true',
     },
     mutations: {
         nextPath(state, nextPath) {
@@ -22,6 +24,14 @@ export default {
         },
         setTimezone(state, timezone) {
             state.timezone = timezone;
+        },
+        setIsLocalType(state, val) {
+            state.isLocalType = val;
+            localStorage.isLocalType = val;
+        },
+        setIsDomainOwner(state, val) {
+            state.isDomainOwner = val;
+            localStorage.isDomainOwner = val;
         },
         signIn(state, {
             userId, userType, language, timezone,
@@ -47,6 +57,8 @@ export default {
         timezone: state => state.timezone,
         language: state => state.language,
         nextPath: state => state.nextPath,
+        isLocalType: state => state.isLocalType,
+        isDomainOwner: state => state.isDomainOwner,
     },
     actions: {
         setLanguage({ commit }, language) {
@@ -59,24 +71,25 @@ export default {
         },
         async getUser({
             commit, dispatch, rootGetters, state,
-        }, userParam) {
+        }, { userParam, url }) {
             try {
-                const response = await api.instance.post('/identity/user/get', {
+                const response = await api.instance.post(url, {
                     domain_id: rootGetters['domain/id'],
-                    user_id: userParam.userId,
+                    [state.isDomainOwner ? 'owner_id' : 'user_id']: userParam.userId,
+                    // eslint-disable-next-line camelcase
                     user_type: userParam.userType,
                 });
                 const userInfo = _.get(response, 'data', null);
 
-                if (!_.isEmpty(userInfo)) {
+                if (userInfo) {
                     commit('signIn', {
-                        userId: userParam.userType === 'GENERAL' ? userInfo.user_id : userInfo.owner_id,
+                        userId: userParam.userId,
                         userType: userParam.userType,
                         language: _.get(userInfo, 'language', 'en'),
                         timezone: _.get(userInfo, 'timezone', 'Asia/Seoul'),
                     });
 
-                    localStorage.userId = userParam.userType === 'GENERAL' ? userInfo.user_id : userInfo.owner_id,
+                    localStorage.userId = userParam.userId;
                     localStorage.userType = userParam.userType;
                     localStorage.language = _.get(userInfo, 'language', 'en');
                     localStorage.timezone = _.get(userInfo, 'timezone', 'UTC');
@@ -86,20 +99,28 @@ export default {
             }
         },
 
-        async signIn({ dispatch, rootGetters, commit }, credentials) {
+        async signIn({
+            dispatch, rootGetters, commit, state,
+        }, credentials) {
             const response = await api.instance.post('/identity/token/issue', {
                 domain_id: rootGetters['domain/id'],
                 credentials,
             });
 
             api.setAccessToken(response.data.access_token);
-            /**
-              * Do not proceeds if Auth type is not local
-              * * */
-            const userType = _.get(credentials, 'user_type', 'GENERAL');
-            await dispatch('getUser', {
+
+            const userParam = {
                 userId: response.data.user_id,
-                userType,
+                userType: _.get(credentials, 'user_type', 'USER'),
+            };
+
+            commit('setIsLocalType', rootGetters['domain/authType'] === 'local');
+            commit('setIsDomainOwner', userParam.userType === 'DOMAIN_OWNER');
+
+            const url = state.isDomainOwner ? '/identity/domain-owner/get' : '/identity/user/get';
+
+            await dispatch('getUser', {
+                userParam, url,
             });
         },
 

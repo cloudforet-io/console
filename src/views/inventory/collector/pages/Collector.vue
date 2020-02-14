@@ -5,7 +5,7 @@ import {
 } from '@vue/composition-api';
 import CollectorTemplate, { api, collectorSetup } from '@/views/inventory/collector/pages/Collector.template.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery, callApi } from '@/lib/api';
+import { defaultQuery } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import {
     defaultAutocompleteHandler,
@@ -83,8 +83,6 @@ export default {
             }
         };
         mountBusEvent(CollectorEventBus, 'getCollectorList', getCollectorList);
-
-        // api.getCollectorList = params => context.parent.$http.post('/inventory/collector/list', params);
 
 
         const getPlugin = async (params) => {
@@ -339,6 +337,43 @@ export default {
             }
         };
         mountBusEvent(CollectorEventBus, 'collectData', collectData);
+
+
+        const getCollectorSchedule = async (params) => {
+            try {
+                // await context.parent.$http.post('/inventory/collector/collect', params);
+                state.scheduleState.selectedHours = {};
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'getCollectorSchedule', getCollectorSchedule);
+
+        const updateCollectorSchedule = async (params) => {
+            try {
+                // await context.parent.$http.post('/inventory/collector/collect', params);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Update Schedule',
+                    duration: 2000,
+                    speed: 1000,
+                });
+                state.scheduleState.isEditMode = false;
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'updateCollectorSchedule', updateCollectorSchedule);
 
         return {
             ...toRefs(state),

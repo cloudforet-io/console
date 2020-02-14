@@ -52,7 +52,6 @@ import {
 import {
     formValidation, makeProxy, requiredValidation,
 } from '@/lib/compostion-util';
-import { isEmpty } from '@/lib/util';
 
 
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';

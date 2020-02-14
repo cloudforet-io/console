@@ -1,12 +1,11 @@
 <template>
     <div class="dropdown-btn-container" :class="{block}">
-        <p-button
-            :disabled="disabled"
-            :class="btnClassObject"
-            class="dropdown-btn menu-btn"
-            @click.stop="onClick"
-            @mouseover="onMouseOver"
-            @mouseout="onMouseOut"
+        <p-button :disabled="disabled"
+                  :class="btnClassObject"
+                  class="dropdown-btn menu-btn"
+                  @click.stop="onClick"
+                  @mouseover="onMouseOver"
+                  @mouseout="onMouseOut"
         >
             <slot />
         </p-button>
@@ -123,6 +122,7 @@ export default {
     padding-right: 1rem;
     border-radius: 2px 0px 0px 2px;
     text-align: left;
+    justify-content: flex-start;
     margin-right: -4px;
     color: $dark;
     &.block {

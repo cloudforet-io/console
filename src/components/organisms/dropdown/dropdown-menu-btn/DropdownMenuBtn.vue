@@ -1,6 +1,10 @@
 <template>
     <div class="p-dropdown-menu-btn">
-        <PDropdownBtn :popup.sync="popup" :block="block" @click="$emit('openMenu')">
+        <PDropdownBtn :popup.sync="popup"
+                      :block="block"
+                      :disabled="disabled"
+                      @click="$emit('openMenu')"
+        >
             <slot />
         </PDropdownBtn>
         <PContextMenu v-if="popup"
@@ -8,6 +12,7 @@
                       :class="{block}"
                       :menu="menu"
                       :loading="loading"
+                      :auto-height="autoHeight"
                       @clickMenuEvent="clickMenuEvent"
         />
     </div>
@@ -30,6 +35,14 @@ export default {
             default: false,
         },
         loading: {
+            type: Boolean,
+            default: false,
+        },
+        autoHeight: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
             type: Boolean,
             default: false,
         },

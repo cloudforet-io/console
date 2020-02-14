@@ -116,13 +116,13 @@ export default {
             fields,
         });
         const getData = () => {
-            console.log('request');
-            console.log(props.selectIndex);
+            console.debug('request');
+            console.debug(props.selectIndex);
             serverEventBus.$emit(props.getServerAdmin, props.selectIndex);
         };
         onMounted(() => {
             watch(() => props.selectIndex, (val) => {
-                console.log(val);
+                console.debug(val);
                 if (val.length > 0) {
                     getData();
                 }

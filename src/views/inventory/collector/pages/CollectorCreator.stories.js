@@ -8,7 +8,7 @@ import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { arrayOf } from '@/lib/casual';
 
 export default {
-    title: 'view/inventory/collector/pages/CollectorCreator',
+    title: 'views/inventory/collector/pages/CollectorCreator',
 };
 
 export const defaultCase = () => ({

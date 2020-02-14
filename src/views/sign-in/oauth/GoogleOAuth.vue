@@ -53,6 +53,7 @@
 <script>
 import url from 'url';
 import { mapGetters } from 'vuex';
+
 const { gapi } = window;
 
 export default {
@@ -147,7 +148,7 @@ export default {
             }).catch((error) => {
                 auth2.disconnect();
                 this.displayGreetingMSG(false);
-                console.log(error);
+                console.error(error);
                 /* if (!this.isEmpty(error.message)) {
                     const errorConfig = JSON.parse(error.message);
                     const errorMSG = errorConfig.error_dt_code;

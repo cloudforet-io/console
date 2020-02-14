@@ -4,6 +4,7 @@ import {
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
+import { isNotEmpty } from '@/lib/util';
 
 /**
  * make proxy computed that same name as props
@@ -151,11 +152,7 @@ export const formValidation = (data:any, validation:object) => {
     };
 };
 
-export const requiredValidation = (invalidMessage:message) => new Validation((value) => {
-    if (['boolean', 'number'].includes(typeof value)) return true;
-    if (value instanceof Array) return !!value.length;
-    return !_.isEmpty(value); // String, Object
-}, invalidMessage || 'Required field!');
+export const requiredValidation = (invalidMessage:message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
 
 export const jsonParseValidation = (invalidMessage:message) => new Validation((value) => {
     try {
@@ -187,6 +184,7 @@ export const credentialsNameValidation = (parent:any, invalidMessage:message) =>
 
 export const userIDValidation = (parent:any, invalidMessage:message) => new Validation(async (value) => {
     let result = false;
+    // eslint-disable-next-line camelcase
     await parent.$http.post('/identity/user/get', { user_id: value, domain_id: sessionStorage.domainId }).then().catch((error) => {
         if (error.code === 'ERROR_NOT_FOUND') {
             result = true;
@@ -194,3 +192,12 @@ export const userIDValidation = (parent:any, invalidMessage:message) => new Vali
     });
     return result;
 }, invalidMessage || 'same ID exists!');
+
+export const pluginAuthIDValidation = (parent:any) => new Validation(async (value:string) => {
+    let result:boolean = true;
+    // eslint-disable-next-line camelcase
+    await parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: sessionStorage.domainId, query: { count_only: true } }).then((res) => {
+        if (res.data.total_count === 0) { result = true; }
+    }).catch((error) => { console.debug(error); });
+    return result;
+}, "ID doesn't exists!");

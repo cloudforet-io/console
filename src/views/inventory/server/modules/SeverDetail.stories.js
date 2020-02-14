@@ -4,7 +4,7 @@ import PSeverDetail from '@/views/inventory/server/modules/ServerDetail';
 import casual from '@/views/inventory/server/models/server-model';
 
 export default {
-    title: 'view/inventory/server/modules/detail',
+    title: 'views/inventory/server/modules/detail',
     component: PSeverDetail,
     parameters: {
         info: {
@@ -25,7 +25,7 @@ export const detail = () => ({
     setup() {
         const item = ref(casual._server());
         const tags = ref(item.value.tags);
-        console.log('storybook setup',item, tags);
+        console.debug('storybook setup', item, tags);
         return {
             item,
             tags,

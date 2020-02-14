@@ -25,7 +25,7 @@ export default {
         },
         setVerticalLeftWidth({ commit }, value) {
             commit('setVerticalLeftWidth', value);
-            localStorage.verticalLeftWidth = value;
+            // localStorage.verticalLeftWidth = value;
         },
     },
 };

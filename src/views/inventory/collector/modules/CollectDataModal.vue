@@ -4,6 +4,7 @@
                     size="xl"
                     fade
                     backdrop
+                    :loading="loading"
                     :footer-cancel-button-bind="{
                         styleType: 'dark',
                         outline: true,
@@ -71,26 +72,12 @@
 
         <template #footer-extra>
             <p-button class="reset-btn"
-                      style-type="primary"
+                      style-type="primary-dark"
                       outline
                       @click="onClickReset"
             >
                 {{ tr('COMMON.BTN_RESET') }}
             </p-button>
-        </template>
-
-        <template #close-button>
-            {{ tr('COMMON.BTN_CANCEL') }}
-        </template>
-        <template #confirm-button>
-            <div class="confirm-btn">
-                <p-lottie v-if="loading" class="spinner"
-                          name="spinner"
-                          auto
-                          :size="1.5"
-                />
-                <span>{{ tr('COMMON.BTN_CONFIRM') }}</span>
-            </div>
         </template>
     </p-button-modal>
 </template>
@@ -113,7 +100,6 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 
 export default {
@@ -127,7 +113,6 @@ export default {
         PCol,
         PTextInput,
         PDropdownMenuBtn,
-        PLottie,
     },
     props: {
         collector: Object,
@@ -153,7 +138,7 @@ export default {
             filters: {},
             confirmBtnStyle: computed(() => {
                 const defaultStyle = { style: { padding: 0 } };
-                defaultStyle.styleType = props.loading ? 'gray2' : 'primary';
+                defaultStyle.styleType = props.loading ? 'gray2' : 'primary-dark';
                 return defaultStyle;
             }),
             crdsMenu: computed(() => [

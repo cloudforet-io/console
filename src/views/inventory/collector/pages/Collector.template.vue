@@ -26,7 +26,7 @@
                                  @changeSort="getCollectors"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary" @click="$router.push({path: '/inventory/collector/create/plugins'})">
+                        <p-button style-type="primary-dark" @click="$router.push({path: '/inventory/collector/create/plugins'})">
                             Create
                         </p-button>
                         <PDropdownMenuBtn class="left-toolbox-item"
@@ -107,6 +107,12 @@
                                        :selected-items="crdState.selectedItems"
                                        :verify-modal-visible.sync="crdState.verifyModalVisible"
                                        @collectData="collectByCredential"
+                />
+            </template>
+            <template #schedules>
+                <collector-schedules :collector="selectedItem"
+                                     :selected-hours.sync="scheduleState.selectedHours"
+                                     :is-edit-mode.sync="scheduleState.isEditMode"
                 />
             </template>
         </p-tab>
@@ -193,10 +199,7 @@ const CollectorUpdateModal = () => import('@/views/inventory/collector/modules/C
 const CollectDataModal = () => import('@/views/inventory/collector/modules/CollectDataModal.vue');
 const CollectorDetail = () => import('@/views/inventory/collector/modules/CollectorDetail');
 const CollectorCredentials = () => import('@/views/inventory/collector/modules/CollectorCredentials');
-
-export const api = {
-    getCollectorList: undefined,
-};
+const CollectorSchedules = () => import('@/views/inventory/collector/modules/CollectorSchedules');
 
 const collectorState = reactive({
     selectIndex: [],
@@ -271,6 +274,7 @@ const setTabData = (props, context) => {
         tabs: makeTrItems([
             ['detail', 'PANEL.DETAILS', { keepAlive: true }],
             ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
+            ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
         ], context.parent),
         multiActiveTab: 'selected',
         multiTabs: makeTrItems([
@@ -327,6 +331,12 @@ const updateModalState = reactive({
     plugin: {},
 });
 
+const scheduleState = reactive({
+    loading: false,
+    selectedHours: {},
+    isEditMode: false,
+});
+
 export const collectorSetup = (props, context, AcHandler) => {
     const state = reactive({
         ...setTableData(props, context),
@@ -337,6 +347,7 @@ export const collectorSetup = (props, context, AcHandler) => {
         crdVerifyState,
         checkModalState,
         updateModalState,
+        scheduleState,
         AcHandler,
     });
 
@@ -423,6 +434,7 @@ export default {
         CollectDataModal,
         CollectorDetail,
         CollectorCredentials,
+        CollectorSchedules,
     },
     setup(props, context) {
         return collectorSetup(props, context);

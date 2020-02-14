@@ -33,7 +33,6 @@ export default {
         companyTitle: state => state.companyTitle,
         authType: state => state.authType,
         clientId: state => state.clientId,
-
     },
     actions: {
         parseHostname({ commit }) {
@@ -64,7 +63,6 @@ export default {
                     authType: getters.authType,
                     clientId: getters.clientId,
                 });
-
             } else {
                 throw new Error(`Domain not found. (${window.location.hostname})`);
             }

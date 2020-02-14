@@ -47,7 +47,7 @@ export default {
                 state.selectIndex = [];
                 state.loading = false;
             } catch (e) {
-                console.log(e);
+                console.error(e);
                 state.loading = false;
             }
         };
@@ -125,7 +125,7 @@ export default {
                 const res = await context.parent.$http.post('/repository/plugin/get', params);
                 state.daynamicForm.form = res.data.template.credentials;
             } catch (e) {
-                console.log(e);
+                console.error(e);
                 state.loading = false;
             }
         };

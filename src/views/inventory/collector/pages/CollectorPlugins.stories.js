@@ -9,7 +9,7 @@ import { mountBusEvent } from '@/lib/compostion-util';
 import { arrayOf } from '@/lib/casual';
 
 export default {
-    title: 'view/inventory/collector/pages/CollectorPlugins',
+    title: 'views/inventory/collector/pages/CollectorPlugins',
 };
 
 export const defaultCase = () => ({

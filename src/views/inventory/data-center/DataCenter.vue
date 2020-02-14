@@ -1,5 +1,17 @@
 <template>
     <div class="animated fadeIn">
+        <p-table-check-modal
+            v-if="!!checkTableModalState.mode"
+            :visible.sync="checkTableModalState.visible"
+            :header-title="checkTableModalState.title"
+            :sub-title="checkTableModalState.subTitle"
+            :theme-color="checkTableModalState.themeColor"
+            :fields="checkTableModalState.fields"
+            :centered="true"
+            :selectable="false"
+            :items="checkTableModalState.item"
+            @confirm="deleteActionProcess"
+        />
         <data-center-context-action ref="contextPopUp"
                                     :selected-node="getSelectedNodeAndTree"
                                     :action-flag="getContextActionFlag"
@@ -84,13 +96,14 @@ import PI from '@/components/atoms/icons/PI';
 import AreaTree from '@/components/organisms/trees/area-tree/AreaTree';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout';
+import { makeTrItems } from '@/lib/view-helper';
 
 const DataCenterSummaryTop = () => import('@/views/inventory/data-center/modules/DataCenterSummaryTop');
 const DataCenterSummaryBottom = () => import('@/views/inventory/data-center/modules/DataCenterSummaryBottom');
 const DataCenterAdmin = () => import('@/views/inventory/data-center/modules/DataCenterAdmin');
 const DataCenterContextAction = () => import('@/views/inventory/data-center/modules/DataCenterContextAction');
 const DataCenterContext = () => import('@/views/inventory/data-center/modules/DataCenterContext');
-
+const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
 export default {
     name: 'DataCenter',
     components: {
@@ -103,6 +116,7 @@ export default {
         DataCenterAdmin,
         DataCenterContextAction,
         DataCenterContext,
+        PTableCheckModal,
     },
     data() {
         return {
@@ -122,6 +136,20 @@ export default {
             contextItem: null,
             contextActionFlag: null,
             isContextMenuVisible: false,
+            checkTableModalState: {
+                deleteParam: {
+                    flag: null,
+                    tree: null,
+                    nodeData: null,
+                },
+                visible: false,
+                mode: '',
+                item: null,
+                confirmEventName: '',
+                title: '',
+                subTitle: '',
+                themeColor: '',
+            },
         };
     },
     computed: {
@@ -273,7 +301,29 @@ export default {
             });
             this.$refs.contextPopUp.hideModal();
         },
-        async deleteOnDataCenter(flag, tree, nodeData) {
+        deleteOnDataCenter(flag, tree, nodeData) {
+            nodeData.name = tree.getSelected()[0].title;
+            this.checkTableModalState.deleteParam = {
+                flag,
+                tree,
+                nodeData,
+            };
+            const targetIdentity = flag[1] === 'RE' ? 'Region' : flag[1] === 'ZN' ? 'Zone' : 'Pool';
+            this.checkTableModalState.mode = 'delete';
+            this.checkTableModalState.title = `Delete ${targetIdentity}`;
+            this.checkTableModalState.subTitle = `Are you sure you want to delete selected ${targetIdentity} below?`;
+            this.checkTableModalState.themeColor = 'alert';
+            this.checkTableModalState.item = [nodeData];
+            this.checkTableModalState.visible = true;
+            this.checkTableModalState.fields = makeTrItems([
+                ['id', 'COMMON.ID', { style: { width: '400px' } }],
+                ['name', 'COMMON.NAME', { style: { width: '600px' } }],
+            ],
+            this.$parent);
+        },
+        async deleteActionProcess() {
+            const tree = this.checkTableModalState.deleteParam.tree;
+            const nodeData = this.checkTableModalState.deleteParam.nodeData;
             const path = tree.getSelected().map(node => node.path);
             const itemType = nodeData.item_type;
             // eslint-disable-next-line no-nested-ternary
@@ -327,6 +377,7 @@ export default {
                     });
                 }
             });
+            this.clearModalData();
         },
         async applyActionOnScreen(tree, data) {
             const selected = tree.getSelected()[0];
@@ -342,6 +393,23 @@ export default {
             } else {
                 tree.insert({ node: tree.getSelected()[0], placement: data.placement }, data.node);
             }
+        },
+        clearModalData() {
+            this.checkTableModalState = {
+                deleteParam: {
+                    flag: null,
+                    tree: null,
+                    nodeData: null,
+                },
+                fields: null,
+                visible: false,
+                mode: '',
+                item: null,
+                confirmEventName: '',
+                title: '',
+                subTitle: '',
+                themeColor: '',
+            };
         },
     },
 };

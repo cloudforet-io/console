@@ -46,15 +46,17 @@ export default {
         }
         let children = datas.map(data => h(PDynamicField, { props: { ...option, data } }));
 
-        const delimiter = props.view_option.delimiter || ' ';
+        const delimiter = props.view_option.delimiter || '<br>';
         let delimiterEl;
         if (delimiter === '<br>') {
             delimiterEl = h('br');
         } else {
             delimiterEl = h('span', delimiter);
         }
-        const dim = _.fill(Array(children.length - 1), delimiterEl);
-        children = _.flatten(_.zip(children, dim));
+        if (children.length) {
+            const dim = _.fill(Array(children.length - 1), delimiterEl);
+            children = _.flatten(_.zip(children, dim));
+        }
 
         return h('span', children);
     },

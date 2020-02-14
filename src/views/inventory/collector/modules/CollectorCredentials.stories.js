@@ -10,7 +10,7 @@ import { arrayOf } from '@/lib/casual';
 
 
 export default {
-    title: 'view/inventory/collector/modules/CollectorCredentials',
+    title: 'views/inventory/collector/modules/CollectorCredentials',
     component: CollectorCredentials,
     parameters: {
         info: {

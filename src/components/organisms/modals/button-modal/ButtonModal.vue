@@ -44,11 +44,19 @@
                 </p-button>
                 <p-button v-if="footerConfirmButtonVisible"
                           v-bind="footerConfirmButtonBind"
+                          :disabled="loading"
                           @click="onConfirmClick"
                 >
-                    <slot name="confirm-button">
-                        {{ tr('COMMON.BTN_CONFIRM') }}
-                    </slot>
+                    <div class="confirm-btn">
+                        <p-lottie v-if="loading" class="spinner"
+                                  name="spinner"
+                                  auto
+                                  :size="1.5"
+                        />
+                        <slot name="confirm-button">
+                            {{ tr('COMMON.BTN_CONFIRM') }}
+                        </slot>
+                    </div>
                 </p-button>
             </slot>
         </template>
@@ -56,8 +64,9 @@
 </template>
 
 <script>
-import PButton from '../../../atoms/buttons/Button';
-import PContentModal, { setup as contentModalSetup } from '../content-modal/ContentModal';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PContentModal, { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 export const setup = (props, context) => {
     const state = contentModalSetup(props, context);
@@ -84,7 +93,7 @@ export const setup = (props, context) => {
 
 export default {
     name: 'PButtonModal',
-    components: { PContentModal, PButton },
+    components: { PContentModal, PButton, PLottie },
     mixins: [PContentModal],
     events: ['close', 'cancel', 'confirm'],
     setup(props, context) {
@@ -110,19 +119,23 @@ export default {
         footerCancelButtonBind: {
             type: Object,
             default: () => ({
-                styleType: 'primary',
+                styleType: 'dark',
                 outline: true,
             }),
         },
         footerConfirmButtonBind: {
             type: Object,
             default: () => ({
-                styleType: 'primary',
+                styleType: 'primary-dark',
             }),
         },
         hideOnCancel: {
             type: Boolean,
             default: true,
+        },
+        loading: {
+            type: Boolean,
+            default: false,
         },
     },
 
@@ -132,5 +145,15 @@ export default {
     .close-modal-btn {
         cursor: pointer;
         color: $dark;
+    }
+    .confirm-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        .spinner {
+            display: inline-flex;
+            padding-right: .25rem;
+        }
     }
 </style>

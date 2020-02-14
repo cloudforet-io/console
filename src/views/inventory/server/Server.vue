@@ -125,11 +125,11 @@ export default {
             ))),
         });
         const requestServerList = async () => {
-            console.log('before', state.loading);
+            console.debug('before', state.loading);
             state.loading = true;
             state.items = [];
             try {
-                console.log('start', state.loading);
+                console.debug('start', state.loading);
                 const res = await context.parent.$http.post('/inventory/server/list', {
                     query: requestState.query,
                 });
@@ -138,7 +138,7 @@ export default {
                 state.selectIndex = [];
                 state.loading = false;
             } catch (e) {
-                console.log(e);
+                console.error(e);
                 state.loading = false;
             }
         };
@@ -173,7 +173,7 @@ export default {
 
 
         const requestServerAdmin = async () => {
-            console.log(state.getSelectServerIds);
+            console.debug(state.getSelectServerIds);
             state.admin.loading = true;
             state.admin.items = [];
             const res = await context.parent.$http.post('/inventory/server/member/list', {
@@ -188,7 +188,7 @@ export default {
 
 
         const getServersParam = (items, changeState) => {
-            console.log(items);
+            console.debug(items);
             const result = { servers: _.map(items, 'server_id') };
             if (changeState) {
                 result.state = changeState;

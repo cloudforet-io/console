@@ -7,7 +7,7 @@
         <!--            <template #def-credential_group_id-format="{item}">-->
         <!--                <div>-->
         <!--                    <PBadge v-for="(label, idx) in item.credential_groups" :key="idx" class="p-label"-->
-        <!--                            :style-type="'gray2'"-->
+        <!--                            style-type="gray2"-->
         <!--                    >-->
         <!--                        {{ getEmptyString(label.name) }}-->
         <!--                    </PBadge>-->

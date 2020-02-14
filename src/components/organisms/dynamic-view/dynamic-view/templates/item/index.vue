@@ -1,25 +1,19 @@
 <template>
-    <Fragment>
-        <div class="p-dynamic-view-item-header">
-            <div class="title">
-                {{ name }}
-            </div>
-            <PHr />
-        </div>
-        <PDl class="content-container">
-            <Definition v-for="(bind, idx) in defs" :key="idx" v-bind="bind" />
-        </PDl>
-    </Fragment>
+    <p-dl v-if="!noData" class="content-container">
+        <Definition v-for="(bind, idx) in defs" :key="idx" v-bind="bind" />
+    </p-dl>
+    <p-empty v-else class="p-emty">
+        No Data
+    </p-empty>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
 import { createComponent, computed, Ref } from '@vue/composition-api';
 import _ from 'lodash';
-import { Fragment } from 'vue-fragment';
 import PDl from '@/components/atoms/lists/dl-list/Dl.vue';
 import Definition from './definition.vue';
-import PHr from '@/components/atoms/hr/Hr.vue';
+import PEmpty from '@/components/atoms/empty/Empty.vue';
 
 interface DataSourceType {
     name:string;
@@ -41,19 +35,12 @@ interface DefinitionBind {
     data:any;
 }
 
-const makeDefinitionBind = (props:Props): Ref<DefinitionBind[]> => computed(():DefinitionBind[] => props.data_source.map((obj) => {
-    let paths:string[] = obj.key.split('.');
-    if (!props.rootMode) {
-        paths = paths.splice(1);
-    }
-
-    return {
-        name: obj.name,
-        view_type: obj.view_type || 'text',
-        view_option: obj.view_option,
-        data: _.get(props.data, paths),
-    };
-}));
+const makeDefinitionBind = (props:Props): Ref<DefinitionBind[]> => computed(():DefinitionBind[] => props.data_source.map(obj => ({
+    name: obj.name,
+    view_type: obj.view_type || 'text',
+    view_option: obj.view_option,
+    data: _.get(props.data, obj.key),
+})));
 
 
 export default createComponent({
@@ -61,8 +48,7 @@ export default createComponent({
     components: {
         PDl,
         Definition,
-        Fragment,
-        PHr,
+        PEmpty,
     },
     props: {
         name: {
@@ -77,40 +63,30 @@ export default createComponent({
             type: Object,
             required: true,
         },
-        rootMode: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props:Props) {
+        const defs = makeDefinitionBind(props);
+        const noData = computed(() => _.every(defs.value, def => !def.data));
         return {
-            defs: makeDefinitionBind(props),
+            defs,
+            noData,
         };
     },
 });
 </script>
 
 <style scoped lang="scss">
-.p-dynamic-view-item-header{
-    margin-bottom: 1rem;
-    .title{
-        display: flex;
-        text-align: left;
-        font:  18px Arial;
-        letter-spacing: 0;
-        color: #202433;
-        opacity: 1;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-        align-self:center;
-    }
-}
+
 .content-container {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     width: 100%;
 
+}
+.p-emty{
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 .content {
     display: flex;

@@ -40,7 +40,7 @@ export default {
     .tab-pane{
         background-color: $white;
         width: 100%;
-        padding: 1rem;
+        padding: 1rem 1rem 2.5rem;
         border: 1px solid $gray3;
         border-radius: 0px 2px 2px 2px;
         box-shadow: 0px 0px 8px #4D49B614;

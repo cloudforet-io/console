@@ -29,14 +29,10 @@
             @changeSort="getData"
         >
             <template slot="toolbox-left">
-                <p-button class="left-toolbox-item" style-type="primary"
+                <p-button class="left-toolbox-item" style-type="primary-dark"
                           @click="onClick"
                 >
-                    <p-i :color="'transparent inherit'"
-                         :width="'1rem'"
-                         :height="'1rem'"
-                         :name="'ic_plus'"
-                    />   {{ tr('COMMON.BTN_ADD') }}
+                    {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
                 <p-button style-type="alert"
                           :disabled="isNotSelected"

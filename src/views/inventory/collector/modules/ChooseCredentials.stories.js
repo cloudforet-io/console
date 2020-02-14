@@ -12,7 +12,7 @@ import { defaultQuery } from '@/lib/api';
 
 
 export default {
-    title: 'view/inventory/collector/modules/ChooseCredentials',
+    title: 'views/inventory/collector/modules/ChooseCredentials',
     component: ChooseCredentials,
     decorators: [withKnobs],
 };

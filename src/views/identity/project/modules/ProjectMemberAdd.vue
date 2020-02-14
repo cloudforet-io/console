@@ -1,89 +1,84 @@
 <template>
-    <div class="animated fadeIn">
-        <p-button-modal
-            ref="modal"
-            :scrollable="true"
-            :centered="true"
-            :size="'xl'"
-            :fade="true"
-            :backdrop="true"
-            :header-title="getMemberModalTitle"
-            :visible.sync="visible"
-            @close="close"
-            @confirm="confirm"
-        >
-            <template #body>
-                <p-toolbox-table :items="users"
-                                 :responsive-style="{'height': '30vh', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
-                                 :fields="selectedFields"
-                                 :selectable="false"
-                                 :sortable="true"
-                                 :shadow="false"
-                                 :border="false"
-                                 :hover="true"
-                                 :padding="false"
-                                 :sort-by.sync="tablePage.sortBy"
-                                 :sort-desc.sync="tablePage.sortDesc"
-                                 :all-page="tablePage.allPage"
-                                 :this-page.sync="tablePage.thisPage"
-                                 :select-index.sync="selectIndex"
-                                 :page-size.sync="tablePage.pageSize"
-                                 @rowLeftClick="onSelect"
-                                 @changePageSize="getMembers"
-                                 @changeSort="getMembers"
-                                 @changePageNumber="getMembers"
-                                 @clickRefresh="getMembers"
+    <p-button-modal
+        ref="modal"
+        :scrollable="true"
+        :centered="true"
+        size="xl"
+        :fade="true"
+        :backdrop="true"
+        :header-title="getMemberModalTitle"
+        :visible.sync="visible"
+        @close="close"
+        @confirm="confirm"
+    >
+        <template #body>
+            <p-toolbox-table :items="users"
+                             :responsive-style="{'height': '30vh', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
+                             :fields="selectedFields"
+                             :selectable="false"
+                             :sortable="true"
+                             :shadow="false"
+                             :border="false"
+                             :hover="true"
+                             :padding="false"
+                             :sort-by.sync="tablePage.sortBy"
+                             :sort-desc.sync="tablePage.sortDesc"
+                             :all-page="tablePage.allPage"
+                             :this-page.sync="tablePage.thisPage"
+                             :select-index.sync="selectIndex"
+                             :page-size.sync="tablePage.pageSize"
+                             @rowLeftClick="onSelect"
+                             @changePageSize="getMembers"
+                             @changeSort="getMembers"
+                             @changePageNumber="getMembers"
+                             @clickRefresh="getMembers"
+            >
+                <template slot="toolbox-left">
+                    <p-search :search-placeholder="getSearchPlaceHolder"
+                              :search-text.sync="searchText"
+                              @onSearch="search"
+                    />
+                </template>
+                <template v-slot:col-user_id-format="data">
+                    {{ data.item.user_id }}
+                </template>
+                <template v-slot:col-name-format="data">
+                    {{ data.item.name }}
+                </template>
+                <template v-slot:col-email-format="data">
+                    {{ data.item.email }}
+                </template>
+            </p-toolbox-table>
+            <p-box-layout class="tag-container">
+                <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
+                       @delete="tagTools.deleteTag(idx)"
                 >
-                    <template slot="toolbox-left">
-                        <p-search :search-placeholder="getSearchPlaceHolder"
-                                  :search-text.sync="searchText"
-                                  @onSearch="search"
-                        />
-                    </template>
-                    <template v-slot:col-user_id-format="data">
-                        {{ data.item.user_id }}
-                    </template>
-                    <template v-slot:col-name-format="data">
-                        {{ data.item.name }}
-                    </template>
-                    <template v-slot:col-email-format="data">
-                        {{ data.item.email }}
-                    </template>
-                </p-toolbox-table>
-                <p-box-layout class="tag-container">
-                    <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
-                           @delete="tagTools.deleteTag(idx)"
-                    >
-                        {{ tag }}
-                    </p-tag>
-                </p-box-layout>
-                <div class="label-group">
-                    <div class="form-group">
-                        <p-label class="input-title">
-                            {{ tr('COMMON.LABELS') }}
-                        </p-label>
-                        <p-text-input ref="labels" v-model="label.input"
-                                      :style="{'border': `${getInvalidityHashTag}`, 'boxShadow': 'none' } "
-                                      class="form-control"
-                                      type="text"
-                                      placeholder="  #Labels,"
-                                      required
-                                      @keyup="removeCSS"
-                        />
-                    </div>
-                    <div v-show="isValidHashTag" style="display:block" class="invalid-feedback">
-                        * {{ tr('IDENTITY.CHECK_HASH') }}
-                    </div>
+                    {{ tag }}
+                </p-tag>
+            </p-box-layout>
+            <div class="label-group">
+                <div class="form-group">
+                    <p-label class="input-title">
+                        {{ tr('COMMON.LABELS') }}
+                    </p-label>
+                    <p-text-input ref="labels" v-model="label.input"
+                                  :style="{'border': `${getInvalidityHashTag}`, 'boxShadow': 'none' } "
+                                  class="form-control"
+                                  type="text"
+                                  placeholder="  #Labels,"
+                                  required
+                                  @keyup="removeCSS"
+                    />
                 </div>
-            </template>
-            <template #close-button>
-                {{ tr('COMMON.BTN_CANCEL') }}
-            </template>
-            <template #confirm-button>
-                {{ tr('COMMON.BTN_OK') }}
-            </template>
-        </p-button-modal>
-    </div>
+                <div v-show="isValidHashTag" style="display:block" class="invalid-feedback">
+                    * {{ tr('IDENTITY.CHECK_HASH') }}
+                </div>
+            </div>
+        </template>
+        <template #confirm-button>
+            {{ tr('COMMON.BTN_ADD') }}
+        </template>
+    </p-button-modal>
 </template>
 <script>
 import _ from 'lodash';
@@ -271,7 +266,7 @@ export default {
             this.addUserOnProject();
         },
         close() {
-            console.log('close Modal');
+            console.debug('close Modal');
         },
     },
 };
