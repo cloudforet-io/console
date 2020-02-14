@@ -3,13 +3,14 @@
         <template v-for="route in routes">
             <span v-if="current.name === route.name || !hasNext" :key="route.name">
 
-                <span v-if="route.meta && route.meta.breadcrumb"
-                      class="menu"
-                      :class="{active: route.name === active.name}"
-                      @click="go(route)"
+                <router-link v-if="route.meta && route.meta.breadcrumb"
+                             class="menu"
+                             :class="{now: route.name === active.name}"
+                             :to="getPath(route)"
                 >
+                    <!--                    @click="go(route)"-->
                     <span class="link">{{ route.meta.label }}</span>
-                </span>
+                </router-link>
 
                 <template v-if="hasNext">
                     <p-i name="ic_breadcrum_arrow" />
@@ -70,6 +71,13 @@ export default {
             }
         };
 
+        const getPath = (route) => {
+            if (hasNext.value) {
+                return { path: current.value.path };
+            }
+            const parent = matched.value[props.currentIdx - 1] || current.value;
+            return `${parent.path}/${route.path}`;
+        };
         return {
             current,
             proxyActiveIdx,
@@ -77,6 +85,7 @@ export default {
             hasNext,
             matched,
             go,
+            getPath,
         };
     },
 };
@@ -92,7 +101,7 @@ export default {
     &:hover {
         color: $secondary;
     }
-    &.active {
+    &.now {
         .link {
             border-bottom: 2px solid $primary;
             color: $primary;
