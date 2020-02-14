@@ -7,7 +7,7 @@
         <p-progress-wizard :tabs.sync="tabs"
                            :active-idx.sync="activeIdx"
                            :show-confirm="isAllTabValid"
-                           title="CreateCollector"
+                           :title="tr('INVENTORY.CRT_COLL')"
                            @cancel="onCancel"
                            @confirm="onConfirm"
                            @changeStep="onChangeStep"

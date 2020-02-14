@@ -9,7 +9,7 @@ export default {
     name: 'ProfileModal',
     extends: ProfileModalTemplate,
     setup(props, context) {
-        const state = profileSetup(props, context);
+        const state = reactive(profileSetup(props, context));
 
         const getUser = async (params) => {
             state.loading = true;

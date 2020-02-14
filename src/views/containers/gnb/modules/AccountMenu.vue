@@ -15,8 +15,6 @@
         <profile-modal v-if="profileVisible"
                        :visible.sync="profileVisible"
                        :user-id="userId"
-                       :user-type="userType"
-                       :auth-type="authType"
         />
     </div>
 </template>
@@ -45,8 +43,8 @@ export default {
             iconColor: styles.primary4,
             userId: computed(() => root.$store.getters['auth/userId']),
             // clientId: computed(() => root.$store.getters['domain/clientId']),
-            authType: computed(() => root.$store.getters['domain/authType']),
-            userType: computed(() => root.$store.getters['auth/userType']),
+            isLocalType: computed(() => root.$store.getters['auth/isLocalType']),
+            isDomainOwner: computed(() => root.$store.getters['auth/isDomainOwner']),
         });
         const openProfile = () => {
             state.profileVisible = true;
@@ -59,7 +57,7 @@ export default {
         };
         const signOutAction = async () => {
             await signOut();
-            if (state.authType === 'local') {
+            if (state.isLocalType) {
                 root.$router.push({ path: '/sign-in' });
             } else {
                 oAuthSignOut();

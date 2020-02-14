@@ -12,6 +12,7 @@
                         styleType: 'primary-dark',
                     }"
                     :visible.sync="proxyVisible"
+                    :loading="loading"
                     @confirm="onClickConfirm"
     >
         <template #body>
@@ -33,7 +34,7 @@
                             <p-text-input v-model="userState.name" block
                                           class="form-control"
                                           :class="{'is-invalid': invalid}"
-                                          :disabled="userType === 'DOMAIN_OWNER'"
+                                          :disabled="isDomainOwner"
                             />
                         </template>
                     </p-field-group>
@@ -75,14 +76,14 @@
                         <p-select-dropdown v-model="userState.language"
                                            :items="languages"
                                            auto-height
-                                           :disabled="userType === 'DOMAIN_OWNER'"
+                                           :disabled="isDomainOwner"
                         />
                     </p-field-group>
                     <p-field-group :label="tr('COMMON.TIMEZONE')">
                         <p-select-dropdown v-model="userState.timezone"
                                            :items="timezones"
                                            auto-height
-                                           :disabled="userType === 'DOMAIN_OWNER'"
+                                           :disabled="isDomainOwner"
                         />
                     </p-field-group>
                 </p-col>
@@ -134,38 +135,54 @@ export const profileSetup = (props, context) => {
     const state = reactive({
         proxyVisible: makeProxy('visible', props, context.emit),
         loading: true,
-        showPassword: computed(() => props.userType === 'DOMAIN_OWNER' || props.authType === 'local'),
+        showPassword: computed(() => state.isDomainOwner || state.isLocalType),
         userState,
         languages: context.root.$i18n.availableLocales.map(lang => (new MenuItem(lang, LANGUAGES[lang]))),
         timezones: moment.tz.names().map(tz => new MenuItem(tz, tz)),
         showValidation: false,
         ...formValidation(userState, updateUserValidations),
-        async onClickConfirm() {
-            state.showValidation = true;
-            const result = await state.allValidation();
-            if (!result) return;
-
-            let params = {};
-            if (props.userType === 'DOMAIN_OWNER') {
-                // eslint-disable-next-line camelcase
-                params.owner_id = props.userId;
-                params.password = userState.password;
-                GNBEventBus.$emit('updateOwner', params);
-            } else {
-                params = { ...userState };
-                // eslint-disable-next-line camelcase
-                params.user_id = props.userId;
-                delete params.passwordCheck;
-                if (!state.showPassword) delete params.password;
-                GNBEventBus.$emit('updateUser', params);
-            }
-
-            state.proxyVisible = false;
-        },
-
+        isLocalType: computed(() => context.root.$store.getters['auth/isLocalType']),
+        isDomainOwner: computed(() => context.root.$store.getters['auth/isDomainOwner']),
     });
 
-    return state;
+    const params = {};
+    if (state.isDomainOwner) {
+        // eslint-disable-next-line camelcase
+        params.owner_id = props.userId;
+        GNBEventBus.$emit('getOwner', params);
+    } else {
+        // eslint-disable-next-line camelcase
+        params.user_id = props.userId;
+        GNBEventBus.$emit('getUser', params);
+    }
+
+    const onClickConfirm = async () => {
+        state.showValidation = true;
+        const result = await state.allValidation();
+        if (!result) return;
+
+        let userParam = {};
+        if (state.isDomainOwner) {
+            // eslint-disable-next-line camelcase
+            userParam.owner_id = props.userId;
+            userParam.password = state.userState.password;
+            GNBEventBus.$emit('updateOwner', userParam);
+        } else {
+            userParam = { ...state.userState };
+            // eslint-disable-next-line camelcase
+            userParam.user_id = props.userId;
+            delete userParam.passwordCheck;
+            if (!state.showPassword) delete userParam.password;
+            GNBEventBus.$emit('updateUser', userParam);
+        }
+
+        state.proxyVisible = false;
+    };
+
+    return {
+        ...toRefs(state),
+        onClickConfirm,
+    };
 };
 
 export default {
@@ -181,22 +198,9 @@ export default {
     props: {
         visible: Boolean,
         userId: String,
-        userType: String,
-        authType: String,
     },
     setup(props, context) {
-        const params = {};
-        if (props.userType === 'DOMAIN_OWNER') {
-            params.owner_id = props.userId;
-            GNBEventBus.$emit('getOwner', params);
-        } else {
-            params.user_id = props.userId;
-            GNBEventBus.$emit('getUser', params);
-        }
-
-        return {
-            ...toRefs(profileSetup(props, context)),
-        };
+        return profileSetup(props, context);
     },
 };
 </script>
