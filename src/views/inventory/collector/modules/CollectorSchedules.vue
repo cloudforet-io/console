@@ -4,14 +4,14 @@
             <template #head>
                 <p-button v-if="!isEditMode"
                           style-type="primary-dark" class="edit-btn"
-                          @click="onClickCancel"
+                          @click="onClickEdit"
                 >
                     {{ tr('COMMON.BTN_EDIT') }}
                 </p-button>
                 <div v-else class="edit-mode-btn-box">
                     <p-button style-type="secondary" outline
                               class="cancel-btn"
-                              @click="proxyIsEditMode = false"
+                              @click="onClickCancel"
                     >
                         {{ tr('COMMON.BTN_CANCEL') }}
                     </p-button>
@@ -48,11 +48,9 @@
 
         <div class="contents-container">
             <p-dynamic-view v-if="!isEditMode"
-                            :name="tr('INVENTORY.SCHEDULE')"
                             view_type="item"
                             :data="data"
                             :data_source="dataSources"
-                            root-mode
             />
         </div>
     </div>
@@ -60,7 +58,9 @@
 
 <script>
 import _ from 'lodash';
-import { reactive, toRefs, computed } from '@vue/composition-api';
+import {
+    reactive, toRefs, computed, watch,
+} from '@vue/composition-api';
 import { MenuItem } from '@/lib/util';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 
@@ -82,16 +82,23 @@ export default {
     },
     props: {
         collector: Object,
-        /**
-         * sync prop
-         */
-        selectedHours: Object,
+        loading: Boolean,
+        hours: Array,
         /**
          * sync prop
          */
         isEditMode: Boolean,
     },
     setup(props, { root, parent, emit }) {
+        const getSelectedHours = () => {
+            const hours = props.hours || [];
+            const res = {};
+            hours.forEach((h) => {
+                res[h] = true;
+            });
+            return res;
+        };
+
         const state = reactive({
             proxyIsEditMode: makeProxy('isEditMode', props, emit),
             timezone: _.get(root, '$store.getters.auth/timezone', 'UTC'),
@@ -101,11 +108,10 @@ export default {
                     new MenuItem('UTC'),
                 ])),
             hoursMatrix: _.range(24),
-            proxySelectedHours: makeProxy('selectedHours', props, emit),
-            formattedHours: computed(() => _.flatMap(state.proxySelectedHours, (val, key) => `${key}:00`)),
+            selectedHours: getSelectedHours(),
             data: computed(() => ({
                 timezone: state.timezone,
-                hours: state.formattedHours,
+                hours: props.hours.map(val => `${val}:00`),
             })),
             dataSources: computed(() => [
                 { name: parent.tr('COMMON.TIMEZONE'), key: 'timezone' },
@@ -119,27 +125,37 @@ export default {
                 },
             ]),
             onClickHour: (hour) => {
-                state.proxySelectedHours[hour] = !state.proxySelectedHours[hour];
-                state.proxySelectedHours = { ...state.proxySelectedHours };
+                state.selectedHours[hour] = !state.selectedHours[hour];
+                state.selectedHours = { ...state.selectedHours };
             },
             isAllHours: false,
             onClickAllHours: () => {
                 state.isAllHours = !state.isAllHours;
                 if (state.isAllHours) {
-                    state.hoursMatrix.forEach((hour) => { state.proxySelectedHours[hour] = true; });
-                    state.proxySelectedHours = { ...state.proxySelectedHours };
-                } else state.proxySelectedHours = {};
+                    state.hoursMatrix.forEach((hour) => { state.selectedHours[hour] = true; });
+                    state.selectedHours = { ...state.selectedHours };
+                } else state.selectedHours = {};
             },
             onClickConfirm: () => {
                 collectorEventBus.$emit('updateCollectorSchedule', {});
             },
             onClickCancel: () => {
-                state.proxySelectedHours = {};
+                state.selectedHours = getSelectedHours();
+                state.proxyIsEditMode = false;
+            },
+            onClickEdit: () => {
                 state.proxyIsEditMode = true;
             },
         });
 
-        collectorEventBus.$emit('getCollectorSchedule');
+        watch(() => props.hours, () => {
+            state.selectedHours = getSelectedHours();
+        });
+        watch(() => props.collector, () => {
+            // eslint-disable-next-line camelcase
+            collectorEventBus.$emit('getCollectorSchedule', { collector_id: props.collector.collector_id });
+        });
+        collectorEventBus.$emit('getCollectorSchedule', { collector_id: props.collector.collector_id });
 
         return {
             ...toRefs(state),

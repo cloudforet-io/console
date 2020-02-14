@@ -111,7 +111,8 @@
             </template>
             <template #schedules>
                 <collector-schedules :collector="selectedItem"
-                                     :selected-hours.sync="scheduleState.selectedHours"
+                                     :loading="scheduleState.loading"
+                                     :hours="scheduleState.hours"
                                      :is-edit-mode.sync="scheduleState.isEditMode"
                 />
             </template>
@@ -334,7 +335,7 @@ const updateModalState = reactive({
 
 const scheduleState = reactive({
     loading: false,
-    selectedHours: {},
+    hours: [],
     isEditMode: false,
 });
 

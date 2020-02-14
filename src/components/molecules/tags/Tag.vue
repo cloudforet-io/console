@@ -103,7 +103,6 @@ export default createComponent({
                 cursor: pointer;
             }
             &:hover {
-                color: $gray2;
                 background-color: $gray3;
                 .icon {
                     color: $alert;
