@@ -261,7 +261,7 @@ export default {
             font-size: 1.5rem;
             font-weight: 600;
             text-align: center;
-            z-index: 9996;
+            z-index: 99;
             cursor: col-resize;
             color: $darkgray;
             > span {
