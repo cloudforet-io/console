@@ -298,6 +298,7 @@ interface TableState {
     fixSearchQuery?:SearchQuery[]|Ref<SearchQuery[]>;
     loading: boolean;
     acHandler?:Ref<QuerySearchTableACHandler>;
+    extraParams?:object;
 }
 
 export const getAllPage = (total_count:number, pageSize:number):number => Math.ceil(total_count / pageSize) || 1;
@@ -397,7 +398,7 @@ export class BaseQuerySearchTableAPI extends DynamicAPI {
     protected searchQuery:Ref<SearchQuery[]>
 
 
-    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[]) {
+    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[], extraParams?:object) {
         super();
         this.acState = reactive({
             keys: keys || [] as string[],
@@ -418,6 +419,7 @@ export class BaseQuerySearchTableAPI extends DynamicAPI {
             only,
             fixSearchQuery: [],
             acHandler,
+            extraParams: extraParams || {}, // for api extra parameters
         });
         this.queryListTools = tagList(undefined, true, undefined, undefined, this.getData);
         // this.searchQuery = computed(() => _.flatten([this.state.fixSearchQuery || [], this.queryListTools.tags.value || []]));
@@ -438,11 +440,22 @@ export class BaseQuerySearchTableAPI extends DynamicAPI {
         this.state.loading = true;
         this.state.items = [];
         this.state.selectIndex = [];
+        console.log('asdf');
 
         try {
-            const res = await this.$http.post(this.url, {
+            let params = {
                 query: this.query.value,
-            });
+            };
+            console.log('before', params);
+            console.log('extra', this.state.extraParams);
+            if (!_.isEmpty(this.state.extraParams)) {
+                params = {
+                    ...params,
+                    ...this.state.extraParams,
+                };
+            }
+            console.log('after', params);
+            const res = await this.$http.post(this.url, params);
             this.state.items = res.data.results;
             this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
         } catch (e) {
@@ -463,8 +476,10 @@ interface tableSelectState {
 export class QuerySearchTableAPI extends BaseQuerySearchTableAPI {
     public selectState:tableSelectState
 
-    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[]) {
-        super(parent, url, keys, only);
+    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[], extraParams?:object) {
+        super(parent, url, keys, only, extraParams);
+        console.log(extraParams);
+        console.log(this.state);
         const isNotSelected:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 0 : true));
         const isSelectOne:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 1 : false));
         const isSelectMulti:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length > 1 : false));

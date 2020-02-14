@@ -70,6 +70,7 @@ export const en = {
         ZE_NM: 'Zone Name',
         PL_ID: 'Pool ID',
         PL_NM: 'Pool Name',
+        PROVIDER: 'Provider',
         DELETE_YN: 'Are you sure to delete those following members from selected {0}?',
         DELETE_SUCC: 'The {0}: {1}  was successfully deleted.',
         DEL_MEM: 'Delete Member',
