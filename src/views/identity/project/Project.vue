@@ -70,12 +70,10 @@
 
 <script>
 import _ from 'lodash';
-import { reactive } from '@vue/composition-api';
 import ProjectContext from '@/views/identity/project/modules/ProjectContext';
 import AreaTree from '@/components/organisms/trees/area-tree/AreaTree';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout';
-import { eventNames } from '@/views/secret/credentials/Credentials.template';
 import { makeTrItems } from '@/lib/view-helper';
 
 const projectSummaryTop = () => import('@/views/identity/project/modules/ProjectSummaryTop');
@@ -381,7 +379,7 @@ export default {
                 tree,
                 nodeData,
             };
-            const targetIdentity = flag[1] === 'PR' ? 'project group' : 'project';
+            const targetIdentity = flag[1] === 'PR' ? 'Project group' : 'Project';
             this.checkTableModalState.mode = 'delete';
             this.checkTableModalState.title = `Delete ${targetIdentity}`;
             this.checkTableModalState.subTitle = `Are you sure you want to delete selected ${targetIdentity} below?`;
