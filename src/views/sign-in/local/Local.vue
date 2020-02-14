@@ -27,7 +27,7 @@
                                                       :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
                                                       class="form-control"
                                                       type="text"
-                                                      placeholder="  User ID"
+                                                      placeholder="User ID"
                                                       required
                                                       @keyup="removeCSS('userId')"
                                                       @keyup.enter="signIn"
@@ -44,7 +44,7 @@
                                                       autocomplete="on"
                                                       :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
                                                       class="form-control"
-                                                      placeholder="  Password"
+                                                      placeholder="Password"
                                                       required
                                                       @keyup="removeCSS('password')"
                                                       @keyup.enter="signIn"
