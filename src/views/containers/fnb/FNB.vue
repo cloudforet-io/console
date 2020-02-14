@@ -25,7 +25,7 @@ export default {
         .fnb-contents {
             height: 100%;
             padding: 2rem 0;
-            margin: 0 1.5rem;
+            margin: 2.5rem 1.5rem 0;
             border-top: 1px solid $primary3;
         }
     }

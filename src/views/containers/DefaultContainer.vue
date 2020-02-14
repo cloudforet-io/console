@@ -72,7 +72,7 @@ export default {
             width: calc(100vw - #{$gnb-width});
             min-width: calc(#{$min-width} - #{$gnb-width});
             overflow-x: hidden;
-            padding-bottom: 2.5rem;
+            padding-bottom: 1rem;
         }
     }
 }
