@@ -18,9 +18,9 @@
                                 <p-col :col="12">
                                     <PFieldGroup
                                         label="Credentials Name"
-                                        :invalid-text="invalidMsg.name"
-                                        :invalid="invalidState.name"
-                                        :valid="validState.name"
+                                        :invalid-text="validateLeftHalfAPI.invalidMsg.name"
+                                        :invalid="validateLeftHalfAPI.invalidState.name"
+                                        :valid="validateLeftHalfAPI.validState.name"
                                         :required="true"
                                     >
                                         <template v-slot:default="{invalid}">
@@ -95,9 +95,9 @@
                             </PFieldGroup>
 
                             <PFieldGroup v-else
-                                         :invalid-text="invalidMsg.data"
-                                         :invalid="invalidState.data"
-                                         :valid="validState.data"
+                                         :invalid-text="validaterightHalfJsonAPI.invalidMsg.data"
+                                         :invalid="validaterightHalfJsonAPI.invalidState.data"
+                                         :valid="validaterightHalfJsonAPI.validState.data"
                             >
                                 <template v-slot:default="{invalid}">
                                     <div>
@@ -270,8 +270,8 @@ const setup = (props, context) => {
         optionType,
         proxyVisible: makeProxy('visible', props, context.emit),
         confirm,
-        ...validateLeftHalfAPI,
-        ...validaterightHalfJsonAPI,
+        validateLeftHalfAPI,
+        validaterightHalfJsonAPI,
     };
 };
 
