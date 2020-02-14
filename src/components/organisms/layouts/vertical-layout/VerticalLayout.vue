@@ -103,12 +103,11 @@ export default {
     },
     data() {
         return {
-            blockHover: false,
             transitionEffect: true,
             leftContainerWidth: parseFloat(this.leftWidth),
             isMinimized: false,
-            tempMinimizing: null,
             draggerWidth: 10,
+            blockHover: false,
             previousWidth: null,
             dragging: false,
             mouseOver: false,
