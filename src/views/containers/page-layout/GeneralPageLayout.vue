@@ -32,9 +32,7 @@ export default {
     .page-contents {
         width: 100%;
         flex-grow: 1;
-        padding-top: 1.5625rem;
-        padding-left: 2rem;
-        padding-right: 2rem;
+        padding: 1.5rem 2rem 2rem 2rem;
     }
     .fnb {
         width: 100%;
