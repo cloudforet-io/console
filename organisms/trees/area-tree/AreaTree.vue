@@ -6,7 +6,7 @@
                         @enter="enter"
             >-->
             <div v-if="showTree">
-                <p-vertical-layout :auto-save-left-width="true">
+                <vertical-page-layout :auto-save-left-width="true">
                     <template #leftContainer="{ width }">
                         <div id="rootPanel"
                              @click.right.stop="isRootClicked"
@@ -42,7 +42,7 @@
                             </div>
                         </transition>
                     </template>
-                </p-vertical-layout>
+                </vertical-page-layout>
                 <div v-show="contextMenuIsVisible" ref="contextmenu" class="contextmenu">
                     <slot name="context" v-bind="getCurrentNode" />
                 </div>
@@ -61,10 +61,13 @@ import PI from '@/components/atoms/icons/PI.vue';
 import styles from '@/styles/_variables.scss';
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
 import { Util } from '@/lib/global-util';
+/* Use VerticalPageLayout temporarily before redesign tree components */
+import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 
 export default {
     name: 'AreaTree',
     components: {
+        VerticalPageLayout,
         PTree,
         PVerticalLayout,
         PI,

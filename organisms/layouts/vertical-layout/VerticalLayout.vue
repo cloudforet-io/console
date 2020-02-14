@@ -48,9 +48,8 @@
              }"
         >
             <div>
-                <slot name="rightContainer" :height="hideFNB ? height : `calc(${height} - ${fnbHeight})`" />
+                <slot name="rightContainer" :height="height" />
             </div>
-            <FNB v-if="!hideFNB" class="fnb" />
         </div>
     </div>
 </template>
@@ -58,12 +57,11 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import styles from '@/styles/_variables.scss';
-import FNB from '@/views/containers/fnb/FNB.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     name: 'VerticalLayout',
-    components: { PI, FNB },
+    components: { PI },
     events: ['start', 'move', 'stop'],
     props: {
         height: {
@@ -90,10 +88,6 @@ export default {
             type: String,
             default: `calc(100vw -${styles.gnbWidth})`,
         },
-        hideFNB: {
-            type: Boolean,
-            default: false,
-        },
         autoSaveLeftWidth: {
             type: Boolean,
             default: true,
@@ -113,13 +107,9 @@ export default {
             dragging: false,
             mouseOver: false,
             pageX: null,
-            fnbHeight: styles.fnbHeight,
         };
     },
     computed: {
-        ...mapGetters('layout', [
-            'defaultFNB',
-        ]),
         rightContainerWidth() {
             return `calc(100vw - ${styles.gnbWidth} - ${this.leftContainerWidth + this.draggerWidth}px)`;
         },
@@ -128,24 +118,15 @@ export default {
         },
     },
     created() {
-        this.initFNB();
         this.initDefaultLeftWidth();
     },
     beforeDestroy() {
-        this.finalizeFNB();
         this.finalizeDefaultLeftWidth();
     },
     methods: {
         ...mapActions('layout', [
-            'showDefaultFNB',
-            'hideDefaultFNB',
             'setVerticalLeftWidth',
         ]),
-        initFNB() {
-            if (!this.hideFNB) {
-                this.hideDefaultFNB();
-            }
-        },
         mouseOnOver(flag) {
             this.mouseOver = flag;
         },
@@ -153,11 +134,6 @@ export default {
             if (this.autoSaveLeftWidth) {
                 const width = parseFloat(this.leftWidth);
                 this.leftContainerWidth = width > this.minLeftWidth ? width : this.minLeftWidth;
-            }
-        },
-        finalizeFNB() {
-            if (!this.hideFNB) {
-                this.showDefaultFNB();
             }
         },
         finalizeDefaultLeftWidth() {
