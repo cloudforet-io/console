@@ -1,13 +1,10 @@
 <template>
     <div>
-        <p-dynamic-view name="Base Information" view_type="item" :data="item||{}"
+        <p-divider-header>Base Information</p-divider-header>
+        <p-dynamic-view view_type="item" :data="item||{}"
                         :data_source="baseDataSource" :root-mode="true"
         />
-        <p-dynamic-view v-for="dv in item.metadata.details" :key="dv.name" :name="dv.name"
-                        :view_type="dv.view_type||'item'"
-                        :data="item.data||{}"
-                        :data_source="dv.data_source"
-        />
+        <p-dynamic-details :details="item.metadata.details" :data="item||{}" />
         <p-dict-panel ref="dictPanel" :dict.sync="dict" @confirm="confirm" />
     </div>
 </template>
@@ -20,11 +17,14 @@ import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
+import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
+import PDividerHeader from '@/components/molecules/divider-header/DividerHeader.vue';
 
 export default {
     name: 'PServerDetail',
     components: {
-        PDictPanel, PDynamicView,
+        PDictPanel, PDynamicView, PDynamicDetails, PDividerHeader,
+
     },
     props: {
         item: {

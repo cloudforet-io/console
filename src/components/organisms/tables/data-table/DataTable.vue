@@ -72,12 +72,12 @@
                     />
                 </p-td>
             </p-tr>
-            <p-tr v-if="showNoData" key="noData" class="no-data-row">
+            <p-tr v-else-if="showNoData" key="noData" class="no-data-row">
                 <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                     No Data
                 </p-td>
             </p-tr>
-            <slot name="body" :items="items">
+            <slot v-else name="body" :items="items">
                 <slot v-for="(item, index) in items" name="row" :fields="fieldsName"
                       :item="item" :index="index"
                 >

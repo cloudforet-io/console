@@ -64,10 +64,9 @@
                         </p-horizontal-layout>
                         <PTab v-if="dvApiHandler.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
                             <template #detail="{tabName}">
-                                <p-dynamic-view v-for="dv in dvApiHandler.selectState.firstSelectItem.metadata.details" :key="dv.name" :name="dv.name"
-                                                :view_type="dv.view_type||'item'"
-                                                :data="detailsData(dvApiHandler.selectState.firstSelectItem,dv.view_type,dv.key_path)"
-                                                :data_source="dv.data_source"
+                                <PDynamicDetails
+                                    :details="dvApiHandler.selectState.firstSelectItem.metadata.details"
+                                    :data="dvApiHandler.selectState.firstSelectItem"
                                 />
                             </template>
                             <template #data="{tabName}">
@@ -126,6 +125,8 @@ import _ from 'lodash';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
+import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
+
 // import { MainTableAPI } from '@/lib/api';
 
 import PTag from '@/components/molecules/tags/Tag.vue';
@@ -237,6 +238,7 @@ export default {
         PDropdownMenuBtn,
         // PTableCheckModal,
         // PTag,
+        PDynamicDetails,
     },
     setup(props, context) {
         const mockAPI = new QuerySearchTableAPI(context.parent, '');
