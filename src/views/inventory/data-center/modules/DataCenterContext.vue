@@ -57,7 +57,7 @@ export default {
                     flag: '', contents: '', indent: 0, divider: true,
                 },
                 { flag: 'UPT_ZN', contents: this.tr('ORGANISMS.UPDATE_ARG', [this.tr('COMMON.ZONE')]), indent: 0 },
-                { flag: 'DEL_ZM', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.ZONE')]), indent: 0 },
+                { flag: 'DEL_ZN', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.ZONE')]), indent: 0 },
             ],
             /**
              * When Pool has Selected
