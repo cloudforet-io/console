@@ -24,7 +24,7 @@
                                         :required="true"
                                     >
                                         <template v-slot:default="{invalid}">
-                                            <p-col :style="{'max-width': '32rem', 'margin-left': 'none'}">
+                                            <p-col :style="{'max-width': '32rem', 'margin-left': 'none', 'align-items':'center'}">
                                                 <p-text-input
                                                     v-model="formState.name"
                                                     v-focus
@@ -67,9 +67,9 @@
                             <p-label class="input-title">
                                 Data Input Type
                             </p-label>
-                            <p-select-btn-group style="margin-bottom: 1rem; min-width: 6rem"
+                            <p-select-btn-group style="min-width: 6rem"
                                                 :space="true"
-                                                :dynamic-style="{'min-width': '96px'}"
+                                                :dynamic-style="{'min-width': '96px', 'display': 'inline-flex'}"
                                                 :buttons="optionType"
                                                 :selected.sync="optionSelected.selected"
                             />
@@ -341,7 +341,6 @@ export default {
             padding-top: 10px;
         }
     }
-
     .form-card-layout{
         border:none;
     }
