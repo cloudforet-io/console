@@ -95,7 +95,7 @@ export default createComponent({
 
         .select-next-btn {
             min-width: auto;
-            display: inline;
+            display: inline-flex;
             border-right: none;
             border-radius: unset;
         }
