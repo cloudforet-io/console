@@ -279,6 +279,7 @@ export const en = {
         CRT_CRD: 'Create new credentials',
         SCHEDULE: 'Collecting Schedule',
         COLL_TIME: 'Collecting Time',
+        CRT_COLL: 'Create Collector',
     },
     SECRET: {
         JASON_ALERT: 'Please, Check Json Format (Use double quotation( \\" ) mark instead of single quotation (\').',

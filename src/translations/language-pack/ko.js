@@ -279,6 +279,7 @@ export const ko = {
         CRT_CRD: '새로운 암호 생성',
         SCHEDULE: 'Collecting Schedule',
         COLL_TIME: '수집 시간',
+        CRT_COLL: '수집기 생성',
     },
     SECRET: {
         JASON_ALERT: "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (\') )",
