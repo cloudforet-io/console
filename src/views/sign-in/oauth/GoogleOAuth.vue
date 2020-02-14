@@ -122,7 +122,7 @@ export default {
             const profile = googleUser.getBasicProfile();
             this.loginId = profile.getEmail();
             const param = {
-                userId: profile.getEmail(),
+                user_id: profile.getEmail(),
                 access_token: googleUser.getAuthResponse().access_token,
             };
             this.oathSignParam = param;

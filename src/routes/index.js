@@ -71,10 +71,9 @@ router.beforeEach(async (to, from, next) => {
     if (store.getters['domain/id']) {
         if (to.meta && !to.meta.excludeAuth && !store.getters['auth/isSignedIn']) {
             console.log('test', store.getters['auth/isSignedIn']);
-            const nextPath = store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
+            const nextPath = store.getters['domain/loginPath'];
             next(nextPath);
         } else {
-            console.log('next');
             next();
         }
     } else {

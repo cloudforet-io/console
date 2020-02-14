@@ -56,10 +56,10 @@ export default {
                 }
 
                 // TODO:: Please Remove this for later when every domian sign in use Config options.
-                // if (this.isPathMissMatch(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
-                //     this.redirectTo('set');
-                //     return;
-                // }
+                if (this.isPathMissMatch(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
+                    this.redirectTo('set');
+                    return;
+                }
                 // if (!excludeAuth) {
                 //     this.redirectTo();
                 //     return;
@@ -92,7 +92,13 @@ export default {
         async syncStores(storeName) {
             await this.$store.dispatch(`${storeName}/sync`);
         },
-
+        redirectTo(set) {
+            const nextPath = this.$store.getters['domain/loginPath'];
+            if (set) {
+                localStorage.setItem('common.toNextPath', nextPath);
+            }
+            this.$router.push(nextPath);
+        },
         getMeta() {
             return this.isEmpty(localStorage.getItem('common.toMeta')) ? null : _.get(JSON.parse(localStorage.getItem('common.toMeta')), 'excludeAuth', null);
         },

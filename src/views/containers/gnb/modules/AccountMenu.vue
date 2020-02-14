@@ -40,7 +40,7 @@ export default {
                 { key: 'profile', contents: 'Profile' },
                 { key: 'signout', contents: 'Sign Out' },
             ],
-            iconColor: styles.primary4,
+            iconColor: computed(() => styles.primary4),
             userId: computed(() => root.$store.getters['auth/userId']),
             // clientId: computed(() => root.$store.getters['domain/clientId']),
             isLocalType: computed(() => root.$store.getters['auth/isLocalType']),
@@ -48,10 +48,6 @@ export default {
         });
         const openProfile = () => {
             state.profileVisible = true;
-        };
-        const oAuthSignOut = () => {
-            const { gapi } = window;
-            gapi.auth2.getAuthInstance().signOut();
         };
         const signOut = () => {
             root.$store.dispatch('auth/signOut');
@@ -61,7 +57,6 @@ export default {
             if (state.isLocalType) {
                 root.$router.push({ path: '/sign-in' });
             } else {
-                oAuthSignOut();
                 root.$router.push({ path: '/google-sign-in' });
             }
         };
@@ -73,7 +68,6 @@ export default {
         return {
             ...toRefs(state),
             signOut,
-            oAuthSignOut,
             doAction,
         };
     },
