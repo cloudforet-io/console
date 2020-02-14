@@ -57,10 +57,6 @@ class API {
 
     public constructor() { this.instance = null; }
 
-    getExpireTimes=(accessToken:string):number => {
-        const decodedToken = jwt.decode(accessToken);
-        return decodedToken.exp - Math.floor(Date.now() / 1000);
-    }
 
     createAxiosInstance=(baseURL:string):void => {
         const axiosConfig = {
@@ -100,9 +96,8 @@ class API {
 
     setAccessToken=(accessToken:string):void => {
         (this.instance as AxiosInstance).defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        const expireTimes:number = this.getExpireTimes(accessToken);
         // @ts-ignore
-        VueCookies.set('accessToken', accessToken, expireTimes);
+        VueCookies.set('accessToken', accessToken);
     }
 
     removeAccessToken=():void => {
