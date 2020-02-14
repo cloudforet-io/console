@@ -17,7 +17,7 @@
                                         {{ $t('SIGNIN.SIGN_FAIL_BODY') }}
                                     </div>
                                 </div>
-                                <form class="form-binder novalidate">
+                                <div class="form-binder novalidate">
                                     <div class="form-group">
                                         <p-label class="input-title">
                                             User ID
@@ -71,7 +71,7 @@
                                             </div>
                                         </b-col>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                             <div class="card card-right-container">
                                 <img class="card-img" src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg" alt="Bologna">
