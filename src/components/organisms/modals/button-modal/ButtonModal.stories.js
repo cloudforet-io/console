@@ -1,11 +1,12 @@
-import { number, select } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
-import { boolean } from '@storybook/addon-knobs';
+import {
+    boolean, number, select, text,
+} from '@storybook/addon-knobs';
+import { autoProps } from '@sb/storybook-util';
 import PContentModal from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
-import { autoProps } from '@sb/storybook-util';
 import { sizeMapping } from '../../../molecules/modals/ModalMapping';
 
 export default {
@@ -105,6 +106,9 @@ export const modal = () => ({
         },
         okDisabled: {
             default: boolean('ok disabled', false),
+        },
+        headerTitle: {
+            default: text('header title', 'this is titel'),
         },
         ...autoProps(PButtonModal, pbmProps),
         ...autoProps(PContentModal, pcmProps),
