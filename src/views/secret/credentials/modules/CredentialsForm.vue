@@ -199,7 +199,7 @@ const setup = (props, context) => {
     const issueTypeSelectItems = [
         /* TODO:: Remove this comment out part when token feature is ready.
         { type: 'item', label: 'Token', name: 'token' }, */
-        { type: 'item', label: 'Credentials', name: 'credential' },
+        { type: 'item', label: 'credential', name: 'credential' },
     ];
 
 

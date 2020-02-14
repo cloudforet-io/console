@@ -46,7 +46,7 @@ export default {
     },
     computed: {
         topPanelTitle() {
-            return this.tr('COMMON.DETAILS');
+            return this.tr('COMMON.BASE_INFO');
         },
         destructTags() {
             return _.toPairsIn(this.tags);

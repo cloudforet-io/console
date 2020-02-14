@@ -186,6 +186,7 @@ export default {
         showModal() {
             this.visible = true;
             this.resetToBlank();
+            this.listMembersOnSearch('x', true);
         },
         hideModal() {
             this.visible = false;
@@ -203,7 +204,7 @@ export default {
                 pageSize: 15,
             };
         },
-        async listMembersOnSearch(text) {
+        async listMembersOnSearch(text, first) {
             const defaultQuery = this.getDefaultQuery();
             const query = {
                 keyword: this.isEmpty(text) ? this.searchText : text,
@@ -212,6 +213,11 @@ export default {
                 ],
                 ...defaultQuery,
             };
+
+            if (first) {
+                delete query.keyword;
+            }
+
             await this.$http.post('/identity/user/list', { query }).then((response) => {
                 this.users = response.data.results;
                 const allPage = Math.ceil(response.data.total_count / this.tablePage.pageSize);
