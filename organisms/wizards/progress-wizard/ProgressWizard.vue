@@ -71,7 +71,8 @@
                     >
                         Next<p-i name="ic_back" color="transparent inherit" dir="down" />
                     </p-button>
-                    <p-button v-if="showConfirm" style-type="secondary" size="lg"
+                    <p-button style-type="secondary" size="lg"
+                              :disabled="!showConfirm"
                               class="txt-btn"
                               @click="$emit('confirm', tabs, $event)"
                     >
