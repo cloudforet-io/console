@@ -189,8 +189,8 @@ export default {
             const coordinateY = event.clientY;
             getTree().select(node.path);
 
-            $contextMenu.style.left = `${coordinateX - parseFloat(styles.gnbWidth)}px`;
-            $contextMenu.style.top = `${coordinateY - parseFloat(styles.lnbHeight)}px`;
+            $contextMenu.style.left = `${coordinateX}px`;
+            $contextMenu.style.top = `${coordinateY}px`;
         };
 
         const isRootClicked = (e) => {
