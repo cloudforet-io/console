@@ -19,7 +19,7 @@
             </span>
         </div>
 
-        <div v-if="editMode" :class="{'dict-input-form': true, 'mr-0': true, 'col-6': !useFullCol, 'col-12': useFullCol}">
+        <div v-if="editMode" class="col-12" :class="{'dict-input-form': true, 'mr-0': true}">
             <!--<p-icon-button
                 class="delete-btn"
                 name="ic_delete"
