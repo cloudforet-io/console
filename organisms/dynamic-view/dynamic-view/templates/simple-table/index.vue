@@ -56,7 +56,7 @@ export default createComponent({
             required: true,
         },
         data: {
-            type: Array,
+            type: [Array, Object],
             required: true,
         },
         // eslint-disable-next-line camelcase
@@ -70,7 +70,7 @@ export default createComponent({
             name: ds.key,
             label: ds.name,
         })));
-        const items = computed(() => _.get(props.data, props.key_path));
+        const items = computed(() => (props.key_path ? _.get(props.data, props.key_path) : props.data));
 
         const slots:Ref<DataSourceType[]> = computed(():DataSourceType[] => props.data_source.map((ds:DataSourceType):DataSourceType => ({
             ...ds,

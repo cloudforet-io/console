@@ -1,10 +1,10 @@
 <template>
     <div>
-        <template v-for="dv in details">
+        <template v-for="dv in dvs">
             <PDividerHeader :key="dv.name">
                 {{ dv.name }}
             </PDividerHeader>
-            <p-dynamic-view :key="dv.name" v-bind="dv" :data="data" />
+            <p-dynamic-view :key="dv.name+'-dv'" v-bind="dv" :data="data" />
         </template>
     </div>
 </template>
@@ -14,18 +14,52 @@ import { computed, createComponent } from '@vue/composition-api';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDividerHeader from '@/components/molecules/divider-header/DividerHeader.vue';
 
+interface DV{
+    // eslint-disable-next-line camelcase
+    data_source:any[]
+    // eslint-disable-next-line camelcase
+    view_type?:string;
+    // eslint-disable-next-line camelcase
+    key_path?:string;
+}
+
 interface Props {
-    details:any[];
+    details:DV[];
     data:any;
 }
+
+
 export default createComponent({
     name: 'PDynamicDetails',
     components: {
         PDynamicView, PDividerHeader,
     },
     props: {
-        details: Array,
-        data: Object,
+        details: {
+            type: Array,
+            required: true,
+        },
+        data: {
+            type: Object,
+            required: true,
+        },
+    },
+    setup(props) {
+        const dvs = computed(() => {
+            const result:DV[] = [];
+            // eslint-disable-next-line no-restricted-syntax
+            for (const dv of props.details as DV[]) {
+                if (!dv.view_type) {
+                    // eslint-disable-next-line camelcase
+                    dv.view_type = 'item';
+                }
+                result.push(dv);
+            }
+            return result;
+        });
+        return {
+            dvs,
+        };
     },
 
 });

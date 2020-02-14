@@ -120,11 +120,11 @@
                                     <slot
                                         :name="'col-'+field+'-format'"
                                         :item="item"
-                                        :value=" item? item[field] :''"
+                                        :value="getValueFunc(item,field)"
                                         :index="index"
                                         :field="field"
                                     >
-                                        {{ item? item[field] :"" }}
+                                        {{ getValueFunc(item,field) }}
                                     </slot>
                                 </p-td>
                             </slot>
@@ -151,7 +151,7 @@ import PTd from '@/components/atoms/table/Td.vue';
 import PTh from '@/components/atoms/table/Th.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { selectToCopyToClipboard } from '@/lib/util';
+import { getValue, selectToCopyToClipboard } from '@/lib/util';
 import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 
 const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox.vue');
@@ -434,6 +434,14 @@ export default {
 
         loadingHandler(props);
 
+
+        const getValueFunc = computed(() => {
+            if (_.every(fieldsName.value, field => !field.includes('.'))) {
+                return (item, field) => item[field] || '';
+            }
+            return (item, field) => _.get(item, field, '');
+        });
+
         return {
             ...toRefs(state),
             proxySelectIndex,
@@ -453,6 +461,7 @@ export default {
             getSelectItem,
             isThOver,
             clickColCopy,
+            getValueFunc,
         };
     },
 

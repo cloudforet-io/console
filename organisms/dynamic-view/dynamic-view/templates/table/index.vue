@@ -76,13 +76,9 @@ export default createComponent({
         PSearch,
     },
     props: {
-        name: {
-            type: String,
-            required: true,
-        },
         data_source: {
             type: Array,
-            required: true,
+            defaults: () => [],
         },
         data: {
             type: [Object],
@@ -91,10 +87,6 @@ export default createComponent({
         apiHandler: {
             type: SubDataAPI,
             required: true,
-        },
-        rootMode: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props:Props) {

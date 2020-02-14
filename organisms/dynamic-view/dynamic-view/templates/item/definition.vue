@@ -34,7 +34,7 @@ export default createComponent({
         },
         data: {
             type: [String, Object, Array, Boolean, Number],
-            required: true,
+            default: undefined,
         },
         view_option: {
             type: Object,

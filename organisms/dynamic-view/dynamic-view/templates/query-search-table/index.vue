@@ -115,25 +115,17 @@ export default createComponent({
         PTag,
     },
     props: {
-        name: {
-            type: String,
-            required: true,
-        },
         data_source: {
             type: Array,
             required: true,
         },
         data: {
-            type: [Object],
+            type: [Array, Object],
             default: () => ({}),
         },
         apiHandler: {
             type: QuerySearchTableAPI,
             required: true,
-        },
-        rootMode: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props:Props) {

@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'toolbox-table': true,'no-padding':!padding,'toolbox-shadow': shadow, 'toolbox-border': border}">
+    <div :class="{'toolbox-table': true,background:toolboxBackground,'no-padding':!padding,'toolbox-shadow': shadow, 'toolbox-border': border}">
         <div class="toolbox">
             <p-row class="toolbox-middle">
                 <div class="left" :style="{width:$slots['toolbox-center'] ? 'auto' : '100%'}">
@@ -153,6 +153,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        toolboxBackground: {
+            type: Boolean,
+            default: true,
+        },
 
     },
     setup(props, { emit }) {
@@ -204,7 +208,10 @@ export default {
     }
 
     .toolbox-table {
-        background-color: $white;
+        &.background{
+            background-color: $white;
+        }
+
         padding: 1rem;
         .toolbox {
             margin-top: 0.5rem;

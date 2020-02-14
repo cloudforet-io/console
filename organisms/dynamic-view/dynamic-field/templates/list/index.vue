@@ -17,7 +17,7 @@ export default {
             default: () => {},
         },
         data: {
-            type: Array,
+            type: [Array, Object, String],
             required: true,
         },
     },
@@ -44,7 +44,11 @@ export default {
         } else {
             datas = props.data;
         }
-        let children = datas.map(data => h(PDynamicField, { props: { ...option, data } }));
+        let children:any[] = [];
+        if (Array.isArray(datas)) {
+            children = datas.map(data => h(PDynamicField, { props: { ...option, data } }));
+        }
+
 
         const delimiter = props.view_option.delimiter || '<br>';
         let delimiterEl;

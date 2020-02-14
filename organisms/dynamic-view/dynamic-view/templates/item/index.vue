@@ -51,9 +51,10 @@ export default createComponent({
         PEmpty,
     },
     props: {
-        name: {
+        // eslint-disable-next-line camelcase
+        key_path: {
             type: String,
-            required: true,
+            default: '',
         },
         data_source: {
             type: Array,
