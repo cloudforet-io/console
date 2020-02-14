@@ -3,7 +3,7 @@
                :name="name"
                :data_source="data_source"
                :data="data"
-               :root-mode="rootMode"
+               :key_path="key_path"
                :api-handler="apiHandler"
     >
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -28,10 +28,6 @@ interface State {
 export default createComponent({
     name: 'PDynamicView',
     props: {
-        name: {
-            type: String,
-            default: '',
-        },
         view_type: {
             type: String,
             required: true,
@@ -44,9 +40,9 @@ export default createComponent({
             type: Object,
             default: () => ({}),
         },
-        rootMode: {
-            type: Boolean,
-            default: false,
+        key_path: {
+            type: String,
+            default: '',
         },
         apiHandler: {
             type: Object,
