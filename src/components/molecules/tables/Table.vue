@@ -208,7 +208,7 @@ export default {
                 th{
                     position: sticky;
                     z-index: 1;
-                    top: 0;
+                    top: 1px;
                     padding: .25rem 0 .25rem .75rem;
                     background-color: $white;
                     border-top: 1px solid $dark;
