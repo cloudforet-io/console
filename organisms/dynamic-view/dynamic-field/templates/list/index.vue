@@ -46,7 +46,7 @@ export default {
         }
         let children = datas.map(data => h(PDynamicField, { props: { ...option, data } }));
 
-        const delimiter = props.view_option.delimiter || ' ';
+        const delimiter = props.view_option.delimiter || '<br>';
         let delimiterEl;
         if (delimiter === '<br>') {
             delimiterEl = h('br');

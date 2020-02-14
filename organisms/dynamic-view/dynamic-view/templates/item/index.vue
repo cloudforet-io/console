@@ -1,7 +1,10 @@
 <template>
-    <p-dl class="content-container">
+    <p-dl v-if="!noData" class="content-container">
         <Definition v-for="(bind, idx) in defs" :key="idx" v-bind="bind" />
     </p-dl>
+    <p-empty v-else class="p-emty">
+        No Data
+    </p-empty>
 </template>
 
 <script lang="ts">
@@ -10,6 +13,7 @@ import { createComponent, computed, Ref } from '@vue/composition-api';
 import _ from 'lodash';
 import PDl from '@/components/atoms/lists/dl-list/Dl.vue';
 import Definition from './definition.vue';
+import PEmpty from '@/components/atoms/empty/Empty.vue';
 
 interface DataSourceType {
     name:string;
@@ -44,6 +48,7 @@ export default createComponent({
     components: {
         PDl,
         Definition,
+        PEmpty,
     },
     props: {
         name: {
@@ -60,8 +65,11 @@ export default createComponent({
         },
     },
     setup(props:Props) {
+        const defs = makeDefinitionBind(props);
+        const noData = computed(() => _.every(defs.value, def => !def.data));
         return {
-            defs: makeDefinitionBind(props),
+            defs,
+            noData,
         };
     },
 });
@@ -75,6 +83,10 @@ export default createComponent({
     align-items: center;
     width: 100%;
 
+}
+.p-emty{
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 .content {
     display: flex;
