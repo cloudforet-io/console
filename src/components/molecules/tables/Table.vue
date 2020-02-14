@@ -175,6 +175,8 @@ export default {
                 return `bg-${tableStyle}`;
             } if (tableStyle) {
                 return `table-${tableStyle}`;
+            } if (bgStyle) {
+                return 'table-background';
             }
             return null;
         },
@@ -194,6 +196,9 @@ export default {
     }
     %striped-hovered-row {
         background-color: $secondary2;
+    }
+    .table-background{
+             background-color: white;
     }
     .table{
         border-collapse: separate;
@@ -245,4 +250,5 @@ export default {
             @extend %hover;
         }
     }
+
 </style>

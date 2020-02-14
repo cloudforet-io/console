@@ -1,6 +1,5 @@
 <template>
     <component :is="component"
-               :name="name"
                :data_source="data_source"
                :data="data"
                :key_path="key_path"
@@ -37,7 +36,7 @@ export default createComponent({
             required: true,
         },
         data: {
-            type: Object,
+            type: [Object, Array],
             default: () => ({}),
         },
         key_path: {

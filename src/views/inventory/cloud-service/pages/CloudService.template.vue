@@ -3,9 +3,9 @@
         <vertical-page-layout :min-left-width="450" :left-width="450" :max-left-width="800">
             <template #leftContainer="{width,widthRaw,height}">
                 <transition name="panel-trans">
-                    <div v-show="widthRaw>16" :style="{width:`${widthRaw-16}px`,height:'95%'}" style="padding-left: .5rem;padding-right: .5rem">
+                    <div v-show="widthRaw>16" :style="{width:width,height:'95%'}" style="padding-left: .5rem;padding-right: .5rem">
                         <p-toolbox-table
-                            :style="{height:'100%'}"
+                            :style="{width: widthRaw <=435 ?'fit-content' : 'auto',height:'100%'}"
                             :items="apiHandler.state.items"
                             :fields="cstFields"
                             :selectable="true"
@@ -16,7 +16,8 @@
                             :multi-select="false"
                             :setting-visible="false"
                             :sortable="true"
-                            :small="true"
+                            :background="true"
+                            :toolbox-background="false"
                             :sort-by.sync="apiHandler.state.sortBy"
                             :sort-desc.sync="apiHandler.state.sortDesc"
                             :all-page="apiHandler.state.allPage"
@@ -84,7 +85,7 @@
                                 <p-dynamic-view
                                     view_type="simple-table"
                                     :data_source="selectTypeDataSource"
-                                    :data="dvApiHandler.state.items"
+                                    :data="dvApiHandler.selectState.selectItems"
                                 />
                             </template>
                             <template #admin="{tabName}">
@@ -229,7 +230,6 @@ export default {
     components: {
         VerticalPageLayout,
         PHorizontalLayout,
-        PVerticalLayout,
         PDynamicView,
         PTab,
         PToolboxTable,
@@ -252,11 +252,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .cloud-service{
-        margin-top: 1.5625rem;
-        margin-left: 2rem;
-        margin-right: 2rem;
-    }
     #cloud-service-type-dropdown-btn{
         >>> div > .dropdown-btn.menu-btn{
             min-width: 4.7rem;
