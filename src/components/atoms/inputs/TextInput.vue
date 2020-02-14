@@ -67,7 +67,7 @@ export default {
     border-radius: 2px;
 
     background-color: $white;
-    color: $gray1;
+    color: $dark;
 
     font-size: .875rem;
     line-height: 1.75rem;
