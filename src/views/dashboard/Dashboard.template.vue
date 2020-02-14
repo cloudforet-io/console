@@ -1,10 +1,10 @@
 <template>
     <general-page-layout>
         <p-row class="dashboard" wrap="wrap" justify-content="center">
-            <p-col>
+            <p-col :flex-grow="0">
                 <Summary class="item" :data="summaryData" />
             </p-col>
-            <p-col>
+            <p-col :flex-grow="0">
                 <div class="item flex">
                     <ResourcesByRegion class="region"
                                        :data="resourcesByRegionData"
@@ -14,7 +14,7 @@
                     />
                 </div>
             </p-col>
-            <p-col>
+            <p-col :flex-grow="0">
                 <ServersByType class="item"
                                :server-data="serverTypeData"
                                :vm-data="vmTypeData"
@@ -71,12 +71,10 @@ export default {
 
 <style lang="scss" scoped>
     .dashboard {
-        padding: 2rem 2rem 1rem 2rem;
-        min-width: calc(1200px - #{$gnb-width});
-        max-width: 1280px;
         width: 100%;
         .item {
-            width: 100%;
+            min-width: calc(1200px - #{$gnb-width});
+            max-width: 1280px;
             margin-bottom: 1rem;
             &.flex {
                 display: flex;

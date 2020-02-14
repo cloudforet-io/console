@@ -26,7 +26,10 @@
                 />
             </template>
             <template v-if="crdState.crdType === 'Credentials'" #step-append-credentials>
-                <router-link class="new-crd-btn" to="/secret/credentials" target="_blank">
+                <router-link class="new-crd-btn"
+                             :to="{path: '/secret/credentials', query: {plugin_id: confState.pluginId}}"
+                             target="_blank"
+                >
                     <p-button outline style-type="dark">
                         {{ tr('INVENTORY.CRT_CRD') }}
                     </p-button>

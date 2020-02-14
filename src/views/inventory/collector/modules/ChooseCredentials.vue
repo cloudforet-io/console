@@ -54,13 +54,12 @@
             </template>
             <template #col-go_credentials-format>
                 <router-link :to="{
-                                 path: '/secret/credentials',
-                                 query: {'plugin_id': pluginId}
+                                 path: '/secret/credentials-group',
                              }"
                              target="_blank"
                 >
                     <p-button outline style-type="dark">
-                        {{ tr('INVENTORY.CRT_CRD') }}
+                        {{ tr('COMMON.MNG') }}
                     </p-button>
                 </router-link><p-button />
             </template>
