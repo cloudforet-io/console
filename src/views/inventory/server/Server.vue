@@ -9,7 +9,7 @@ import _ from 'lodash';
 import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery, getAllPage, SubDataAPI } from '@/lib/api'
+import { defaultQuery, getAllPage, SubDataAPI } from '@/lib/api';
 import {
     defaultAutocompleteHandler,
     getEnumValues, getFetchValues,
@@ -35,10 +35,9 @@ export default {
             get keys() {
                 return [
                     'server_id', 'name', 'state', 'primary_ip_address', 'server_type', 'os_type', 'project_id',
-                    'data.os.os_arch', 'data.os.os_distro',
-                    'data.base.memory', 'data.base.core', 'data.vm.platform_type',
+                    'data.os.os_arch', 'data.os.os_details', 'data.os.os_version',
+                    'data.base.memory', 'data.base.core', 'data.platform.type',
                     'data.compute.instance_name', 'data.compute.keypair', 'data.compute.instance_id',
-                    'data.vm.vm_name', 'data.vm.vm_id',
                     'collection_info.state',
                 ];
             }
