@@ -204,6 +204,7 @@ export const en = {
         ISSUE_TYPE: 'Issue Type',
         ALL: 'All',
         HOURS: 'Hours',
+        MNG: 'Manage',
     },
     ATOM: {
 

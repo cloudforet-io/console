@@ -204,6 +204,7 @@ export const ko = {
         ISSUE_TYPE: '발행 타입',
         ALL: '모두',
         HOURS: '시간',
+        MNG: 'Manage',
     },
     ATOM: {
 
