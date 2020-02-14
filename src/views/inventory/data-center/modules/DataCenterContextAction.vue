@@ -18,7 +18,18 @@
                     <p-label class="input-title">
                         {{ getLabelID }}
                     </p-label>
-                    <p-text-input ref="projectID" v-model="textInput.id"
+                    <p-text-input v-show="getShowHideYN"
+                                  ref="parentsDataCenterName"
+                                  v-model="textInput.parentName"
+                                  :style="{'boxShadow': 'none'} "
+                                  :disabled="true"
+                                  class="form-control col-6"
+                                  type="text"
+                                  required
+                    />
+                    <p-text-input v-show="!getShowHideYN"
+                                  ref="dataCenterID"
+                                  v-model="textInput.id"
                                   :style="{'boxShadow': 'none' } "
                                   :disabled="true"
                                   class="form-control col-6"
@@ -31,7 +42,7 @@
                     <p-label class="input-title">
                         {{ getLabelName }}
                     </p-label>
-                    <p-text-input ref="projectName" v-model="textInput.name"
+                    <p-text-input ref="dataCenterName" v-model="textInput.name"
                                   :style="{'border': `${getIsInvalidProjectName}`, 'boxShadow': 'none' } "
                                   class="form-control"
                                   :placeholder="getPlaceHolderName"
@@ -92,6 +103,7 @@ export default {
     },
     data() {
         return {
+            getShowHideYN: true,
             visible: false,
             projectNameValidity: false,
             styler: {
@@ -108,6 +120,7 @@ export default {
                 editMode: true,
             },
             textInput: {
+                parentName: null,
                 id: null,
                 name: null,
             },
@@ -227,14 +240,18 @@ export default {
 
             await this.$http.post(url, param).then((response) => {
                 const id = response.data[key];
+                const parentName = _.get(response, 'data.name');
                 let name = _.get(response, 'data.name');
                 let tags = _.get(response, 'data.tags');
                 if (reservedActionFlag[0] === 'CRT') {
+                    this.getShowHideYN = true;
                     name = '';
                     tags = {};
+                } else {
+                    this.getShowHideYN = false;
                 }
 
-                this.textInput = { id, name };
+                this.textInput = { parentName, id, name };
                 this.tagInput.tags = tags;
             }).catch((error) => {
                 console.error(error);

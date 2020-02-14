@@ -18,8 +18,20 @@
                     <p-label class="input-title">
                         {{ getLabelID }}
                     </p-label>
-                    <p-text-input ref="projectID" v-model="textInput.id"
-                                  :style="{'boxShadow': 'none' } "
+                    <p-text-input v-show="getShowHideYN"
+                                  ref="parentsProjectName"
+                                  v-model="textInput.parentName"
+                                  :style="{'boxShadow': 'none'} "
+                                  :disabled="true"
+                                  class="form-control col-6"
+                                  type="text"
+                                  required
+                    />
+
+                    <p-text-input v-show="!getShowHideYN"
+                                  ref="projectID"
+                                  v-model="textInput.id"
+                                  :style="{'boxShadow': 'none'} "
                                   :disabled="true"
                                   class="form-control col-6"
                                   type="text"
@@ -93,6 +105,7 @@ export default {
     data() {
         return {
             visible: false,
+            getShowHideYN: true,
             projectNameValidity: false,
             styler: {
                 border: '1px solid #EF3817',
@@ -108,6 +121,7 @@ export default {
                 editMode: true,
             },
             textInput: {
+                parentName: null,
                 id: null,
                 name: null,
             },
@@ -185,7 +199,7 @@ export default {
                 tags: {},
                 editMode: true,
             };
-            this.textInput = { id: null, name: null };
+            this.textInput = { parentName: null, id: null, name: null };
         },
         showModal(actionFlag) {
             const reservedActionFlag = actionFlag.split('_');
@@ -207,15 +221,18 @@ export default {
 
             await this.$http.post(url, param).then((response) => {
                 const id = this.isEmpty(_.get(response, 'data.project_group_id')) ? _.get(response, 'data.project_id') : _.get(response, 'data.project_group_id');
+                const parentName = _.get(response, 'data.name');
                 let name = _.get(response, 'data.name');
                 let tags = _.get(response, 'data.tags');
 
                 if (reservedActionFlag[0] === 'CRT') {
+                    this.getShowHideYN = true;
                     name = '';
                     tags = {};
+                } else {
+                    this.getShowHideYN = false;
                 }
-
-                this.textInput = { id, name };
+                this.textInput = { parentName, id, name };
                 this.tagInput.tags = tags;
             }).catch((error) => {
                 console.error(error);
@@ -237,6 +254,7 @@ export default {
             }
             return actionFlag;
         },
+
         confirm() {
             const actionFlag = this.getSplitActionFlag();
             const treeV = this.selectedNode.tree;
