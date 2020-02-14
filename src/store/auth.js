@@ -7,7 +7,7 @@ export default {
     namespaced: true,
     state: {
         nextPath: '/',
-        isSignedIn: false,
+        isSignedIn: localStorage.isSignedIn === 'true',
         userId: localStorage.userId,
         userType: localStorage.userType,
         timezone: localStorage.timezone,
@@ -41,6 +41,7 @@ export default {
             state.userType = userType;
             state.language = language;
             state.timezone = timezone;
+            localStorage.isSignedIn = true;
         },
         signOut(state) {
             state.isSignedIn = false;
@@ -52,6 +53,7 @@ export default {
             localStorage.removeItem('userType');
             localStorage.removeItem('language');
             localStorage.removeItem('timezone');
+            localStorage.removeItem('isSignedIn');
         },
     },
     getters: {
@@ -106,32 +108,31 @@ export default {
         async signIn({
             dispatch, rootGetters, commit, state,
         }, credentials) {
-            const response = await api.instance.post('/identity/token/issue', {
+            console.log('start');
+            const response = await api.instance.post('/sign-in', {
                 domain_id: rootGetters['domain/id'],
                 credentials,
             });
-
-            api.setAccessToken(response.data.access_token);
+            console.log(response);
 
             const userParam = {
-                userId: response.data.user_id,
+                userId: credentials.user_id,
                 userType: _.get(credentials, 'user_type', 'USER'),
             };
 
             commit('setIsLocalType', rootGetters['domain/authType'] === 'local');
             commit('setIsDomainOwner', userParam.userType === 'DOMAIN_OWNER');
-
             const url = state.isDomainOwner ? '/identity/domain-owner/get' : '/identity/user/get';
 
             await dispatch('getUser', {
                 userParam, url,
             });
         },
-
-        signOut({ commit }) {
-            api.removeAccessToken();
+        async signOut({ commit }) {
+            const response = await api.instance.post('/sign-out');
             commit('signOut');
         },
+
 
         sync({
             commit, dispatch, getters,

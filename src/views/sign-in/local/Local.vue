@@ -182,17 +182,19 @@ export default {
             };
 
             if (this.isEmpty(credentials.user_id) || this.isEmpty(credentials.password)) {
-                this.validateInput(credentials, 'user_id');
-                this.validateInput(credentials, 'password');
+                // this.validateInput(credentials, 'user_id');
+                // this.validateInput(credentials, 'password');
                 return;
             }
 
             await this.$store.dispatch('auth/signIn', credentials).then(() => {
+                console.log('start');
                 if (localStorage.getItem('common.toNextPath') === '/sign-in' || localStorage.getItem('common.toNextPath') === null) {
                     localStorage.setItem('common.toNextPath', '/');
                 }
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
             }).catch(() => {
+                console.log('error');
                 this.isInvalid.userId = true;
                 this.isInvalid.password = true;
                 this.$refs.userId.focus();

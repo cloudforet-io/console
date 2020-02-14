@@ -17,6 +17,7 @@ import api from '@/lib/api';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
+import store from '@/store';
 
 export default {
     name: 'App',
@@ -48,21 +49,21 @@ export default {
 
                 this.isInit = true;
                 const excludeAuth = this.getMeta();
-
-                if (api.checkAccessToken() && this.$route.meta.isSignInPage) {
+                // todo : check logic
+                if (this.$store.getters['auth/isSignedIn'] && this.$route.meta.isSignInPage) {
                     this.$router.push({ path: '/' });
                     return;
                 }
 
                 // TODO:: Please Remove this for later when every domian sign in use Config options.
-                if (this.isPathMissMatch(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
-                    this.redirectTo('set');
-                    return;
-                }
-                if (!api.checkAccessToken() && !excludeAuth) {
-                    this.redirectTo();
-                    return;
-                }
+                // if (this.isPathMissMatch(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
+                //     this.redirectTo('set');
+                //     return;
+                // }
+                // if (!excludeAuth) {
+                //     this.redirectTo();
+                //     return;
+                // }
             } catch (e) {
                 this.$router.push({ path: '/error-page' });
                 console.error(e);
@@ -72,8 +73,7 @@ export default {
             await config.init();
             await api.init(config.get('VUE_APP_API.ENDPOINT'), {
                 authError: () => {
-                    this.$store.dispatch('auth/signOut');
-                    this.$router.push({ path: '/error-page' });
+                    this.$store.commit('auth/signOut');
                 },
             });
 
@@ -92,13 +92,7 @@ export default {
         async syncStores(storeName) {
             await this.$store.dispatch(`${storeName}/sync`);
         },
-        redirectTo(set) {
-            const nextPath = this.$store.getters['domain/authType'] === 'local' ? { path: '/sign-in' } : { path: '/google-sign-in' };
-            if (set) {
-                localStorage.setItem('common.toNextPath', nextPath);
-            }
-            this.$router.push(nextPath);
-        },
+
         getMeta() {
             return this.isEmpty(localStorage.getItem('common.toMeta')) ? null : _.get(JSON.parse(localStorage.getItem('common.toMeta')), 'excludeAuth', null);
         },

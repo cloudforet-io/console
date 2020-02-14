@@ -61,30 +61,25 @@ class API {
     createAxiosInstance=(baseURL:string):void => {
         const axiosConfig = {
             baseURL,
+            withCredentials: true,
             headers: {
                 'Content-Type': 'application/json',
             },
         };
 
         this.instance = axios.create(axiosConfig);
-        // @ts-ignore
-        const accessToken = VueCookies.get('accessToken');
-        if (accessToken) {
-            this.instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        }
+
     }
 
     setResponseInterceptor=(handlers:any):void => {
         (this.instance as AxiosInstance).interceptors.response.use((response) => {
-            const accessToken = response.headers['access-token'];
-            if (accessToken) {
-                this.setAccessToken(accessToken);
-            }
+
             return response;
         }, (e) => {
             const apiError = new APIError(e);
 
             if (apiError.status === 401) {
+                // todo : run sign out && move login page
                 if (handlers.authError) {
                     handlers.authError(apiError);
                 }
@@ -94,29 +89,6 @@ class API {
         });
     }
 
-    setAccessToken=(accessToken:string):void => {
-        (this.instance as AxiosInstance).defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        // @ts-ignore
-        VueCookies.set('accessToken', accessToken);
-    }
-
-    removeAccessToken=():void => {
-        if (this.instance) {
-            delete this.instance.defaults.headers.common.Authorization;
-        }
-        // @ts-ignore
-        VueCookies.remove('accessToken');
-    }
-
-    checkAccessToken=():boolean => {
-        // debugger;
-        // @ts-ignore
-        const accessToken = VueCookies.get('accessToken');
-        if (accessToken) {
-            return true;
-        }
-        return false;
-    }
 
     init=(baseURL:string, handlers:any = {}):void => {
         if (!this.instance) {
@@ -440,21 +412,17 @@ export class BaseQuerySearchTableAPI extends DynamicAPI {
         this.state.loading = true;
         this.state.items = [];
         this.state.selectIndex = [];
-        console.log('asdf');
 
         try {
             let params = {
                 query: this.query.value,
             };
-            console.log('before', params);
-            console.log('extra', this.state.extraParams);
             if (!_.isEmpty(this.state.extraParams)) {
                 params = {
                     ...params,
                     ...this.state.extraParams,
                 };
             }
-            console.log('after', params);
             const res = await this.$http.post(this.url, params);
             this.state.items = res.data.results;
             this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
