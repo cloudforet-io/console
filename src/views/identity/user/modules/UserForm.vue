@@ -104,7 +104,7 @@
                 </p-row>
                 <p-row>
                     <p-col :col="6">
-                        <PFieldGroup label="mobile">
+                        <PFieldGroup label="Mobile">
                             <p-text-input v-model="formState.mobile" class="form-control" />
                         </PFieldGroup>
                     </p-col>
