@@ -320,6 +320,7 @@ export default {
             // eslint-disable-next-line no-nested-ternary
             const param = flag[1] === 'RT' ? { is_root: true, ...paramBasic } : flag[1] === 'PR' ? { parent_project_group_id: nodeData.id, ...paramBasic } : { project_group_id: nodeData.id, ...paramBasic };
             const url = flag[1] === 'PJ' ? 'project' : 'project-group';
+            const arg = flag[1] === 'PJ' ? this.tr('COMMON.PG') : this.tr('COMMON.PG_GR');
 
             await this.$http.post(`/identity/${url}/create`, param).then((response) => {
                 const responseData = !this.isEmpty(response.data) ? response.data : {};
@@ -344,8 +345,25 @@ export default {
                         this.isInitializing = false;
                     }
                     this.$refs.ProjectTree._data.isDataExists = true;
+
+                    this.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Success',
+                        text: this.tr('IDENTITY.CRT_SUCC_ARG', [arg]),
+                        duration: 2000,
+                        speed: 1000,
+                    });
                 }
             }).catch((error) => {
+                this.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: this.tr('IDENTITY.CRT_FAIL_ARG', [arg]),
+                    duration: 2000,
+                    speed: 1000,
+                });
                 console.error(error);
             });
             this.$refs.contextPopUp.hideModal();
@@ -359,6 +377,7 @@ export default {
             const key = `${nodeData.item_type.toLowerCase()}_id`;
             const url = `/identity/${this.replaceAll(nodeData.item_type, '_', '-').toLowerCase()}/update`;
             const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: nodeData.id, ...basicParam } : { project_id: nodeData.id, ...basicParam };
+            const arg = flag[1] === 'PJ' ? this.tr('COMMON.PG') : this.tr('COMMON.PG_GR');
 
             await this.$http.post(url, param).then((response) => {
                 if (response.data[key] === nodeData.id) {
@@ -367,7 +386,23 @@ export default {
                     }
                 }
                 tree.updateNode(tree.getSelected()[0].path, { title: param.name });
+                this.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'Success',
+                    text: this.tr('IDENTITY.UPT_SUCC_ARG', [arg]),
+                    duration: 2000,
+                    speed: 1000,
+                });
             }).catch((error) => {
+                this.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: this.tr('IDENTITY.UPT_FAIL_ARG', [arg]),
+                    duration: 2000,
+                    speed: 1000,
+                });
                 console.error(error);
             });
             this.$refs.contextPopUp.hideModal();

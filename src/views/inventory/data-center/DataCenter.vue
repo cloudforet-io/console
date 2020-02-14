@@ -249,7 +249,10 @@ export default {
                 const key = flag[1] === 'ZN' ? 'region_id' : 'zone_id';
                 param[key] = nodeData.id;
             }
+
             const url = flag[1] === 'RE' ? 'region' : flag[1] === 'ZN' ? 'zone' : 'pool';
+            const arg = flag[1] === 'RE' ? 'Region' : flag[1] === 'ZN' ? 'Zone' : 'Pool';
+
             await this.$http.post(`/inventory/${url}/create`, param).then((response) => {
                 const responseData = !this.isEmpty(response.data) ? response.data : {};
                 if (!this.isEmpty(responseData)) {
@@ -274,9 +277,27 @@ export default {
                     }
                     this.$refs.DataCenterTree._data.isDataExists = true;
                 }
+
+                this.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'Success',
+                    text: this.tr('INVENTORY.CRT_SUCC_ARG', [arg]),
+                    duration: 2000,
+                    speed: 1000,
+                });
             }).catch((error) => {
+                this.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: this.tr('INVENTORY.CRT_FAIL_ARG', [arg]),
+                    duration: 2000,
+                    speed: 1000,
+                });
                 console.error(error);
             });
+
             this.$refs.contextPopUp.hideModal();
         },
         async updateOnDataCenter(flag, tree, nodeData) {
@@ -289,6 +310,8 @@ export default {
             const url = `/inventory/${itemType.toLowerCase()}/update`;
             param[key] = nodeData.id;
 
+            const arg = flag[1] === 'RE' ? 'Region' : flag[1] === 'ZN' ? 'Zone' : 'Pool';
+
             await this.$http.post(url, param).then((response) => {
                 if (response.data[key] === nodeData.id) {
                     if (!this.isEmpty(this.$refs.detailsTop)) {
@@ -296,7 +319,24 @@ export default {
                     }
                 }
                 tree.updateNode(tree.getSelected()[0].path, { title: param.name });
+
+                this.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'Success',
+                    text: this.tr('INVENTORY.UPT_SUCC_ARG', [arg]),
+                    duration: 2000,
+                    speed: 1000,
+                });
             }).catch((error) => {
+                this.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: this.tr('INVENTORY.UPT_FAIL_ARG', [arg]),
+                    duration: 2000,
+                    speed: 1000,
+                });
                 console.error(error);
             });
             this.$refs.contextPopUp.hideModal();
