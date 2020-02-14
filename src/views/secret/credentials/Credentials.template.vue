@@ -83,7 +83,7 @@
             Select a Credentials from above in details.
         </div>
         <p-table-check-modal
-            v-if="!!checkTableModalState.mode"
+            v-if="!!checkTableModalState.mode && checkTableModalState.visible"
             :visible.sync="checkTableModalState.visible"
             :header-title="checkTableModalState.title"
             :sub-title="checkTableModalState.subTitle"
