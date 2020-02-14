@@ -8,10 +8,10 @@ export default {
     state: {
         nextPath: '/',
         isSignedIn: false,
-        userId: null,
-        userType: null,
-        timezone: null,
-        language: null,
+        userId: localStorage.userId,
+        userType: localStorage.userType,
+        timezone: localStorage.timezone,
+        language: localStorage.language,
         isLocalType: localStorage.isLocalType === 'true',
         isDomainOwner: localStorage.isDomainOwner === 'true',
     },
@@ -48,6 +48,10 @@ export default {
             state.userType = null;
             state.timezone = null;
             state.language = null;
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('language');
+            localStorage.removeItem('timezone');
         },
     },
     getters: {
@@ -82,17 +86,17 @@ export default {
                 const userInfo = _.get(response, 'data', null);
 
                 if (userInfo) {
-                    commit('signIn', {
+                    const user = {
                         userId: userParam.userId,
                         userType: userParam.userType,
                         language: _.get(userInfo, 'language', 'en'),
                         timezone: _.get(userInfo, 'timezone', 'Asia/Seoul'),
-                    });
-
-                    localStorage.userId = userParam.userId;
-                    localStorage.userType = userParam.userType;
-                    localStorage.language = _.get(userInfo, 'language', 'en');
-                    localStorage.timezone = _.get(userInfo, 'timezone', 'UTC');
+                    };
+                    localStorage.userId = user.userId;
+                    localStorage.userType = user.userType;
+                    localStorage.language = user.language;
+                    localStorage.timezone = user.timezone;
+                    commit('signIn', user);
                 }
             } catch {
                 console.error(`User select error:${userId}`);
@@ -127,23 +131,22 @@ export default {
         signOut({ commit }) {
             api.removeAccessToken();
             commit('signOut');
-            localStorage.removeItem('userId');
-            localStorage.removeItem('language');
-            localStorage.removeItem('timezone');
         },
 
-        sync({ commit, dispatch, getters }) {
-            if (!getters.userId) {
-                if (localStorage.userId) {
-                    commit('signIn', {
-                        userId: localStorage.userId,
-                        userType: localStorage.userType,
-                        language: localStorage.language,
-                        timezone: localStorage.timezone,
-                    });
-                } else {
-                    dispatch('signOut');
-                }
+        sync({
+            commit, dispatch, getters,
+        }) {
+            if (getters.userId) return;
+
+            if (localStorage.userId) {
+                commit('signIn', {
+                    userId: localStorage.userId,
+                    userType: localStorage.userType,
+                    language: localStorage.language,
+                    timezone: localStorage.timezone,
+                });
+            } else {
+                dispatch('signOut');
             }
         },
     },
