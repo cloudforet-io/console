@@ -1,5 +1,6 @@
 <template>
     <div>
+        <p-divider-header>Base Information</p-divider-header>
         <p-dynamic-view name="Base Information" view_type="item" :data="item||{}"
                         :data_source="baseDataSource" :root-mode="true"
         />
@@ -13,12 +14,13 @@ import { ref, watch } from '@vue/composition-api';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
+import PDividerHeader from '@/components/molecules/divider-header/DividerHeader.vue';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 
 export default {
     name: 'PCdgDetail',
     components: {
-        PDictPanel, PDynamicView,
+        PDictPanel, PDynamicView, PDividerHeader,
     },
     props: {
         item: {
