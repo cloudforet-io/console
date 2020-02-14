@@ -50,6 +50,7 @@ export const ko = {
         COLLECT_CONT: '수집하는',
         CHG_PRO: '프로젝트 변경하기',
         CHG_POOL: '풀 변경하기',
+        CHG_REGION: '리전 변경하기',
         IMPORT: '가져오기(Import)',
         COL_INFO: '정보 수집하기',
         EXPORT: '내보내기(Export)',

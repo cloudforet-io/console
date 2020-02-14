@@ -49,6 +49,7 @@ export const en = {
         COLLECT_PAST: 'Collected',
         COLLECT_CONT: 'Collectting',
         CHG_PRO: 'Change Project',
+        CHG_REGION: 'Change Region',
         IMPORT: 'Import',
         EXPORT: 'Export',
         COL_INFO: 'Collect Info',

@@ -51,7 +51,7 @@
                                                 :data="null"
                                 >
                                     <template #toolbox-left>
-                                        <p-button style-type="primary-dark">
+                                        <p-button style-type="primary-dark" :disabled="true">
                                             Collect Data
                                         </p-button>
                                         <div class="left-toolbox-item">
@@ -182,30 +182,54 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
             dvApiHandler.getData();
         }
     });
-    const cstIsNotSelected = computed(() => apiHandler.selectState.isNotSelected);
+    // todo: CBT 끝나고 홞성화
+    // const cstIsNotSelected = computed(() => apiHandler.selectState.isNotSelected);
+    // const cstDropdownMenu = reactive({
+    //     ...makeTrItems([
+    //         ['add', 'COMMON.BTN_CRT'],
+    //         ['update', 'COMMON.BTN_UPT', { disabled: cstIsNotSelected }],
+    //         ['delete', 'COMMON.BTN_DELETE', { disabled: cstIsNotSelected }],
+    //     ],
+    //     context.parent,
+    //     { type: 'item' }),
+    // });
     const cstDropdownMenu = reactive({
         ...makeTrItems([
             ['add', 'COMMON.BTN_CRT'],
-            ['update', 'COMMON.BTN_UPT', { disabled: cstIsNotSelected }],
-            ['delete', 'COMMON.BTN_DELETE', { disabled: cstIsNotSelected }],
+            ['update', 'COMMON.BTN_UPT'],
+            ['delete', 'COMMON.BTN_DELETE'],
         ],
         context.parent,
-        { type: 'item' }),
+        { type: 'item', disabled: true }),
     });
-
-    const csIsNotSelected = computed(() => dvApiHandler.selectState.isNotSelected);
-    const csIsNotSelectedOnlyOne = computed(() => !dvApiHandler.selectState.isSelectOne);
+    // todo: CBT 끝나고 홞성화
+    // const csIsNotSelected = computed(() => dvApiHandler.selectState.isNotSelected);
+    // const csIsNotSelectedOnlyOne = computed(() => !dvApiHandler.selectState.isSelectOne);
+    // const csDropdownMenu = reactive({
+    //     ...makeTrItems([
+    //         ['add', 'COMMON.BTN_CRT'],
+    //         ['update', 'COMMON.BTN_UPT', { disabled: csIsNotSelectedOnlyOne }],
+    //         ['delete', 'COMMON.BTN_DELETE', { disabled: csIsNotSelected }],
+    //         [null, null, { type: 'divider' }],
+    //         ['project', 'COMMON.CHG_PRO', { disabled: csIsNotSelected }],
+    //         ['region', 'COMMON.CHG_REGION', { disabled: csIsNotSelected }],
+    //     ],
+    //     context.parent,
+    //     { type: 'item' }),
+    // });
     const csDropdownMenu = reactive({
         ...makeTrItems([
             ['add', 'COMMON.BTN_CRT'],
-            ['update', 'COMMON.BTN_UPT', { disabled: csIsNotSelectedOnlyOne }],
-            ['delete', 'COMMON.BTN_DELETE', { disabled: csIsNotSelected }],
+            ['update', 'COMMON.BTN_UPT'],
+            ['delete', 'COMMON.BTN_DELETE'],
             [null, null, { type: 'divider' }],
-            ['project', 'COMMON.CHG_PRO', { disabled: csIsNotSelected }],
-            ['region', 'COMMON.CHG_REGION', { disabled: csIsNotSelected }],
+            ['project', 'COMMON.CHG_PRO'],
+            ['region', 'COMMON.CHG_REGION'],
+            [null, null, { type: 'divider' }],
+            ['console', null, { label: 'console', disabled: false }],
         ],
         context.parent,
-        { type: 'item' }),
+        { type: 'item', disabled: true }),
     });
     const detailsData = (item, view_type, key_path) => {
         if (view_type === 'simple-table') {

@@ -50,6 +50,7 @@ export default {
             state.profileVisible = true;
         };
         const oAuthSignOut = () => {
+            const { gapi } = window;
             gapi.auth2.getAuthInstance().signOut();
         };
         const signOut = () => {
