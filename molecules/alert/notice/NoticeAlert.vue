@@ -2,10 +2,13 @@
     <notifications :group="group"
                    :position="position"
                    :style="dynamicStyle"
+                   close-on-click
                    classes="notice-alert"
     >
         <template #body="notifyParam">
-            <div :class="getThisProp(notifyParam)">
+            <div :class="getThisProp(notifyParam)"
+                 @click="notifyParam.close"
+            >
                 <a class="title">
                     {{ notifyParam.item.title }}
                 </a>
@@ -24,6 +27,7 @@
 <script>
 import PI from '@/components/atoms/icons/PI';
 import styles from '@/styles/_variables.scss';
+
 export default {
     name: 'PNoticeAlert',
     components: {
@@ -47,18 +51,18 @@ export default {
             default: null,
         },
     },
+    data() {
+        return {
+            exclamation: styles.alert,
+        };
+    },
     methods: {
         getThisProp(givenProp) {
             return `notice-alert ${givenProp.item.type}`;
         },
         getItemType(givenProp) {
-            return givenProp.item.type === 'alert' ? true: false;
+            return givenProp.item.type === 'alert';
         },
-    },
-    data () {
-        return {
-            exclamation: styles.alert
-        };
     },
 };
 </script>
