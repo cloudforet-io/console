@@ -23,6 +23,7 @@
                         >
                             <template #default="{invalid}">
                                 <p-text-input v-model="proxyName"
+                                              v-focus
                                               style="width: 100%;"
                                               class="form-control"
                                               :class="{'is-invalid': invalid}"
@@ -94,6 +95,13 @@ const init = (props, root) => {
 
 export default {
     name: 'ConfigureCollector',
+    directives: {
+        focus: {
+            inserted(el) {
+                el.focus();
+            },
+        },
+    },
     components: {
         PLottie,
         PCol,
