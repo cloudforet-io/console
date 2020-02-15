@@ -252,6 +252,10 @@ export default {
         &.prohibit-line {
             border-left: 1px solid $lightgray;
             background-color: transparent;
+            &:hover {
+                border-left: 1px solid $secondary;
+                cursor: ew-resize;
+            }
         }
 
         .dragger {
