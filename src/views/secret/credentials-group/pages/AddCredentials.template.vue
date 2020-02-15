@@ -306,6 +306,7 @@ export default {
 <style lang="scss" scoped>
     .back {
         color: #A5ACCE;
+        cursor: pointer;
     }
 
     .add-cdg-container {
