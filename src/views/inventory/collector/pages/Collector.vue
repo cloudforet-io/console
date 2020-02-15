@@ -343,9 +343,12 @@ export default {
             state.scheduleState.loading = true;
             try {
                 const res = await context.parent.$http.post('/inventory/collector/schedule/list', params);
-                state.scheduleState.hours = _.get(res, 'data.schedule.hours', ['1', '2']);
+                state.scheduleState.scheduleId = _.get(res, 'data.schedule_id', null);
+                state.scheduleState.hours = _.get(res, 'data.schedule.hours', []);
             } catch (e) {
                 console.error(e);
+                state.scheduleState.hours = [1, 2];
+                state.scheduleState.scheduleId = null;
             } finally {
                 state.scheduleState.loading = false;
             }
@@ -354,8 +357,9 @@ export default {
 
         const updateCollectorSchedule = async (params) => {
             state.scheduleState.loading = true;
+            const url = params.schedule_id ? '/inventory/collector/schedule/update' : '/inventory/collector/schedule/add';
             try {
-                // await context.parent.$http.post('/inventory/collector/collect', params);
+                const res = await context.parent.$http.post(url, params);
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
@@ -364,6 +368,7 @@ export default {
                     duration: 2000,
                     speed: 1000,
                 });
+                state.scheduleState.hours = _.get(res, 'data.schedule.hours', []);
                 state.scheduleState.isEditMode = false;
             } catch (e) {
                 console.error(e);

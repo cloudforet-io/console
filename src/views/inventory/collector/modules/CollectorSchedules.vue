@@ -84,6 +84,7 @@ export default {
         collector: Object,
         loading: Boolean,
         hours: Array,
+        scheduleId: String,
         /**
          * sync prop
          */
@@ -137,7 +138,16 @@ export default {
                 } else state.selectedHours = {};
             },
             onClickConfirm: () => {
-                collectorEventBus.$emit('updateCollectorSchedule', {});
+                const params = {
+                    // eslint-disable-next-line camelcase
+                    collector_id: props.collector.collector_id,
+                    schedule: {
+                        hours: _.flatMap(state.selectedHours, (val, key) => Number(key)),
+                    },
+                };
+                // eslint-disable-next-line camelcase
+                if (props.scheduleId) params.schedule_id = props.scheduleId;
+                collectorEventBus.$emit('updateCollectorSchedule', params);
             },
             onClickCancel: () => {
                 state.selectedHours = getSelectedHours();
@@ -155,7 +165,6 @@ export default {
             // eslint-disable-next-line camelcase
             collectorEventBus.$emit('getCollectorSchedule', { collector_id: props.collector.collector_id });
         });
-        collectorEventBus.$emit('getCollectorSchedule', { collector_id: props.collector.collector_id });
 
         return {
             ...toRefs(state),
