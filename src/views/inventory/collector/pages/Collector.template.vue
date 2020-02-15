@@ -113,6 +113,7 @@
                 <collector-schedules :collector="selectedItem"
                                      :loading="scheduleState.loading"
                                      :hours="scheduleState.hours"
+                                     :scheduleId="scheduleState.scheduleId"
                                      :is-edit-mode.sync="scheduleState.isEditMode"
                 />
             </template>
@@ -337,6 +338,7 @@ const scheduleState = reactive({
     loading: false,
     hours: [],
     isEditMode: false,
+    scheduleId: null,
 });
 
 export const collectorSetup = (props, context, AcHandler) => {
