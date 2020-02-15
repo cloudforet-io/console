@@ -22,9 +22,17 @@
                         <br>
                         <p-text-input :value="userId" disabled block />
                     </p-field-group>
-                    <p-field-group :label="tr('COMMON.EMAIL')">
-                        <br>
-                        <p-text-input :value="userState.email" disabled block />
+                    <p-field-group :label="tr('COMMON.EMAIL')"
+                                   :invalid-text="invalidMsg.email"
+                                   :invalid="invalidState.email"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input v-model="userState.email"
+                                          :disabled="isDomainOwner"
+                                          class="form-control"
+                                          :class="{'is-invalid': invalid}"
+                            />
+                        </template>
                     </p-field-group>
                     <p-field-group :label="tr('COMMON.NAME')"
                                    :invalid-text="invalidMsg.name"
@@ -32,9 +40,9 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="userState.name" block
+                                          :disabled="isDomainOwner"
                                           class="form-control"
                                           :class="{'is-invalid': invalid}"
-                                          :disabled="isDomainOwner"
                             />
                         </template>
                     </p-field-group>
@@ -66,11 +74,17 @@
                 <p-col class="form-div" :col="6">
                     <p-field-group :label="tr('COMMON.PHONE')">
                         <br>
-                        <p-text-input v-model="userState.mobile" disabled block />
+                        <p-text-input v-model="userState.mobile"
+                                      :disabled="isDomainOwner"
+                                      block
+                        />
                     </p-field-group>
                     <p-field-group :label="tr('COMMON.GROUP')">
                         <br>
-                        <p-text-input v-model="userState.group" disabled block />
+                        <p-text-input v-model="userState.group"
+                                      :disabled="isDomainOwner"
+                                      block
+                        />
                     </p-field-group>
                     <p-field-group :label="tr('COMMON.LANGUAGE')">
                         <p-select-dropdown v-model="userState.language"
@@ -126,6 +140,7 @@ export const profileSetup = (props, context) => {
 
     const updateUserValidations = {
         name: [requiredValidation('Please enter name')],
+        email: [requiredValidation('Please enter email')],
         password: [lengthMinValidation(5), lengthMaxValidation(12)],
         passwordCheck: [
             new Validation((value, data) => data.password === value, 'please enter same value again'),

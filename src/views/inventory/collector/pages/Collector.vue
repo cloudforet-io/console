@@ -347,7 +347,7 @@ export default {
                 state.scheduleState.hours = _.get(res, 'data.schedule.hours', []);
             } catch (e) {
                 console.error(e);
-                state.scheduleState.hours = [1, 2];
+                state.scheduleState.hours = [];
                 state.scheduleState.scheduleId = null;
             } finally {
                 state.scheduleState.loading = false;
