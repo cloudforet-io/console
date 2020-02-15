@@ -282,7 +282,9 @@ export const en = {
         SCHEDULE: 'Collecting Schedule',
         COLL_TIME: 'Collecting Time',
         CRT_COLL: 'Create Collector',
-        EDIT_SCHEDULE: 'Edit Schedule',
+        ADD_SCHEDULE: 'Add Schedule',
+        UPT_SCHEDULE: 'Update Schedule',
+        DEL_SCHEDULE: 'Delete Schedule',
     },
     SECRET: {
         JASON_ALERT: 'Please, Check Json Format (Use double quotation( \\" ) mark instead of single quotation (\').',

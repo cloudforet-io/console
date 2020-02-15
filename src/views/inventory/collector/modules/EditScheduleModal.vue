@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="tr('INVENTORY.EDIT_SCHEDULE')"
+    <p-button-modal :header-title="collectorId ? tr('INVENTORY.UPT_SCHEDULE') : tr('INVENTORY.ADD_SCHEDULE')"
                     centered
                     fade
                     backdrop
@@ -13,7 +13,10 @@
                 <p-text-input v-model="name" />
             </p-field-group>
             <p-field-group :label="tr('COMMON.TIMEZONE')">
-                <p-select-dropdown v-model="timezone" :items="timezones" class="timezone-selector" />
+                <p-select-dropdown v-model="timezone" :items="timezones"
+                                   class="timezone-selector"
+                                   @input="setSelectedHours"
+                />
             </p-field-group>
             <p-field-group :label="tr('INVENTORY.COLL_TIME')">
                 <div>
@@ -39,6 +42,7 @@
 <script>
 import { reactive, toRefs, computed } from '@vue/composition-api';
 import _ from 'lodash';
+import moment from 'moment';
 import { makeProxy } from '@/lib/compostion-util';
 import { MenuItem } from '@/lib/util';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
@@ -47,7 +51,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PTextInput from '@/components/atoms/inputs/TextInput';
+import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
 
 export default {
@@ -69,28 +73,30 @@ export default {
         schedule: Object,
     },
     setup(props, { emit, root }) {
-        const getSelectedHours = () => {
-            const hours = _.get(props, 'schedule.schedule.hours', []);
-            const res = {};
-            hours.forEach((h) => {
-                res[h] = true;
-            });
-            return res;
-        };
-
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             name: _.get(props, 'schedule.name', ''),
             timezone: _.get(root, '$store.getters.auth/timezone', 'UTC'),
-            timezones: computed(() => (state.timezone === 'UTC'
-                ? [new MenuItem(state.timezone)] : [
-                    new MenuItem(state.timezone),
-                    new MenuItem('UTC'),
-                ])),
             hoursMatrix: _.range(24),
-            selectedHours: getSelectedHours(),
+            selectedHours: undefined,
             isAllHours: false,
         });
+
+        const timezones = state.timezone === 'UTC'
+            ? [new MenuItem(state.timezone)] : [
+                new MenuItem(state.timezone),
+                new MenuItem('UTC'),
+            ];
+
+        const setSelectedHours = () => {
+            const hours = _.get(props, 'schedule.schedule.hours', []);
+            const res = {};
+            hours.forEach((hour) => {
+                res[moment.tz(moment.utc({ hour }), state.timezone).hour()] = true;
+            });
+            state.selectedHours = res;
+        };
+        setSelectedHours();
 
         const onClickHour = (hour) => {
             state.selectedHours[hour] = !state.selectedHours[hour];
@@ -105,14 +111,27 @@ export default {
             } else state.selectedHours = {};
         };
 
+        const getHours = () => {
+            const hours = [];
+            _.forEach(state.selectedHours, (val, hour) => {
+                if (val) hours.push(hour);
+            });
+            return hours;
+        };
+
         const onClickEditConfirm = () => {
+            const hours = [];
+            _.forEach(state.selectedHours, (val, hour) => {
+                if (val) hours.push(moment.utc(moment.tz({ hour }, state.timezone)).hour());
+            });
+
             const params = {
                 // eslint-disable-next-line camelcase
                 collector_id: props.collectorId,
                 name: state.name,
                 schedule: {
                     ..._.get(props, 'schedule.schedule', null),
-                    hours: _.flatMap(state.selectedHours, (val, key) => Number(key)),
+                    hours,
                 },
             };
 
@@ -126,8 +145,11 @@ export default {
 
         return {
             ...toRefs(state),
+            timezones,
+            setSelectedHours,
             onClickHour,
             onClickAllHours,
+            getHours,
             onClickEditConfirm,
         };
     },
