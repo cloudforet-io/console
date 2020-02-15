@@ -30,6 +30,7 @@
             <p-button class="reset-btn"
                       style-type="primary-dark"
                       outline
+                      :disabled="loading"
                       @click="onClickReset"
             >
                 {{ tr('COMMON.BTN_RESET') }}
@@ -54,7 +55,7 @@ import ConfigureCollector from '@/views/inventory/collector/modules/ConfigureCol
 export default {
     name: 'CollectorUpdateModal',
     components: {
-        PButtonModal, PButton, PLottie, ConfigureCollector,
+        PButtonModal, PButton, ConfigureCollector,
     },
     props: {
         /**

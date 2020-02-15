@@ -22,6 +22,8 @@
             <p-button v-if="headerCloseButtonVisible"
                       class="close-modal-btn"
                       :force-class="['close']"
+                      :class="{disabled: loading}"
+                      :disabled="loading"
                       @click="onCloseClick"
             >
                 <span aria-hidden="true">&times;</span>
@@ -37,6 +39,7 @@
                     v-if="footerCancelButtonVisible"
                     class="p-btn-modal-btn"
                     v-bind="footerCancelButtonBind"
+                    :disabled="loading"
                     @click="onCancelClick"
                 >
                     <slot name="close-button">
@@ -148,6 +151,9 @@ export default {
     .close-modal-btn {
         cursor: pointer;
         color: $dark;
+        &.disabled {
+            color: $gray2;
+        }
     }
     .p-btn-modal-btn{
         height: 2.5rem;
