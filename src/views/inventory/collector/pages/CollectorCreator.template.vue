@@ -18,6 +18,7 @@
                                      :plugin-id="confState.pluginId"
                                      :plugin="confState.plugin"
                                      :versions="confState.versions"
+                                     :loading="confState.loading"
                                      :name.sync="confState.name"
                                      :selected-version.sync="confState.selectedVersion"
                                      :options-value.sync="confState.optionsValue"
@@ -81,6 +82,7 @@ const getCrdState = () => reactive({
 const getConfState = root => reactive({
     pluginId: _.get(root, '$route.params.pluginId', ''),
     plugin: null,
+    loading: true,
     name: '',
     versions: [],
     selectedVersion: _.get(root, '$route.query.version', ''),

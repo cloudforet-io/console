@@ -38,11 +38,14 @@ export default {
 
         const getPlugin = async (params) => {
             state.confState.plugin = null;
+            state.confState.loading = true;
             try {
                 const res = await context.parent.$http.post('/repository/plugin/get', params);
                 state.confState.plugin = res.data;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.confState.loading = false;
             }
         };
         mountBusEvent(CollectorEventBus, 'getPlugin', getPlugin);

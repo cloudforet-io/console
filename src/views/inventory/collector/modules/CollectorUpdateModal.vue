@@ -19,6 +19,7 @@
                                  :plugin-id="pluginId"
                                  :name.sync="name"
                                  :plugin="plugin"
+                                 :loading="loading"
                                  :versions="versions"
                                  :selected-version.sync="selectedVersion"
                                  :options-value.sync="options"

@@ -87,11 +87,14 @@ export default {
 
         const getPlugin = async (params) => {
             state.updateModalState.plugin = null;
+            state.updateModalState.loading = true;
             try {
                 const res = await context.parent.$http.post('/repository/plugin/get', params);
                 state.updateModalState.plugin = res.data;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.updateModalState.loading = false;
             }
         };
         mountBusEvent(CollectorEventBus, 'getPlugin', getPlugin);
