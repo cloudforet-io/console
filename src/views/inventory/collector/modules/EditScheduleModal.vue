@@ -18,7 +18,11 @@
                                    @input="setSelectedHours"
                 />
             </p-field-group>
-            <p-field-group :label="tr('INVENTORY.COLL_TIME')">
+            <p-field-group :label="tr('INVENTORY.COLL_TIME')"
+                           required
+                           :invalid="showValidation && !isValid"
+                           invalid-text="Please select time"
+            >
                 <div>
                     <span v-for="hour in hoursMatrix" :key="hour"
                           class="time-block"
@@ -80,6 +84,8 @@ export default {
             hoursMatrix: _.range(24),
             selectedHours: undefined,
             isAllHours: false,
+            showValidation: false,
+            isValid: false,
         });
 
         const timezones = state.timezone === 'UTC'
@@ -120,10 +126,15 @@ export default {
         };
 
         const onClickEditConfirm = () => {
+            state.showValidation = true;
             const hours = [];
             _.forEach(state.selectedHours, (val, hour) => {
                 if (val) hours.push(moment.utc(moment.tz({ hour }, state.timezone)).hour());
             });
+            if (hours.length === 0) {
+                state.isValid = false;
+                return;
+            }
 
             const params = {
                 // eslint-disable-next-line camelcase
