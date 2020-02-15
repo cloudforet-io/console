@@ -4,13 +4,13 @@
             <p-col :flex-grow="0" flex-basis="50%" class="container collector-info">
                 <p-row>
                     <p-col :flex-grow="0">
-                        <p-lottie v-if="loading || imgLoading"
+                        <p-lottie v-if="imgLoading || !plugin"
                                   name="spinner"
                                   auto
                                   :size="2"
                                   class="img"
                         />
-                        <img v-show="!loading && !imgLoading" class="img"
+                        <img v-show="!imgLoading && plugin" class="img"
                              :src="imgUrl"
                              @load="imgLoading = false"
                         >
