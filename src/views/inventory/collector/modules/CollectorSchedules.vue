@@ -38,7 +38,7 @@
             <template #col-schedule-format="{value}">
                 <span>
                     <span v-for="(hour, idx) in value.hours" :key="idx">
-                        {{ hour }}{{ value.hours.length - 1 === idx ? '' : ', ' }}
+                        {{ getUtcHour(hour) }}{{ value.hours.length - 1 === idx ? '' : ', ' }}
                     </span>
                 </span>
             </template>
@@ -58,7 +58,7 @@
         />
 
         <p-table-check-modal :visible.sync="proxyDeleteVisible"
-                             header-title="Delete Schedule"
+                             :header-title="tr('INVENTORY.DEL_SCHEDULE')"
                              sub-title="Are you sure you want to DELETE Selected Schedule(s)?"
                              theme-color="alert"
                              :fields="multiFields"
@@ -76,6 +76,7 @@ import _ from 'lodash';
 import {
     reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
+import moment from 'moment';
 import { MenuItem, timestampFormatter } from '@/lib/util';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { makeTrItems } from '@/lib/view-helper';
@@ -145,6 +146,9 @@ export default {
             ], parent),
         });
 
+        const timezone = _.get(root, '$store.getters.auth/timezone', 'UTC');
+        const getUtcHour = hour => moment.tz(moment.utc({ hour }), timezone).hour();
+
         const openEditModal = (item) => {
             state.schedule = item;
             state.proxyEditVisible = true;
@@ -172,6 +176,7 @@ export default {
 
         return {
             ...toRefs(state),
+            getUtcHour,
             openEditModal,
             listSchedules,
             onConfirmDelete,
