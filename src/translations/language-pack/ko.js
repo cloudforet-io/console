@@ -282,6 +282,7 @@ export const ko = {
         SCHEDULE: 'Collecting Schedule',
         COLL_TIME: '수집 시간',
         CRT_COLL: '수집기 생성',
+        EDIT_SCHEDULE: 'Edit Schedule',
     },
     SECRET: {
         JASON_ALERT: "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (\') )",
