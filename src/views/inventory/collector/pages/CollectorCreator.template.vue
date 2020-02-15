@@ -12,6 +12,9 @@
                            @confirm="onConfirm"
                            @changeStep="onChangeStep"
         >
+            <template #step-append-conf>
+                <div class="empty-step-head" />
+            </template>
             <template #contents-conf="{tab}">
                 <configure-collector ref="conf"
                                      :show-validation="tab.showValidation"
@@ -26,15 +29,17 @@
                                      @changeValidState="updateTabInvalid(0, $event)"
                 />
             </template>
-            <template v-if="crdState.crdType === 'Credentials'" #step-append-credentials>
-                <router-link class="new-crd-btn"
-                             :to="{path: '/secret/credentials', query: {plugin_id: confState.pluginId}}"
-                             target="_blank"
-                >
-                    <p-button outline style-type="dark">
-                        {{ tr('INVENTORY.CRT_CRD') }}
-                    </p-button>
-                </router-link>
+            <template #step-append-credentials>
+                <div class="empty-step-head">
+                    <router-link v-if="crdState.crdType === 'Credentials'" class="new-crd-btn"
+                                 :to="{path: '/secret/credentials', query: {plugin_id: confState.pluginId}}"
+                                 target="_blank"
+                    >
+                        <p-button outline style-type="dark">
+                            {{ tr('INVENTORY.CRT_CRD') }}
+                        </p-button>
+                    </router-link>
+                </div>
             </template>
             <template #contents-credentials>
                 <choose-credentials ref="crd"
@@ -46,6 +51,9 @@
                                     :select-index.sync="crdState.selectIndex"
                                     @changeValidState="updateTabInvalid(1, $event)"
                 />
+            </template>
+            <template #step-append-tags>
+                <div class="empty-step-head" />
             </template>
             <template #contents-tags>
                 <p-dict-input-group :dict.sync="tags" show-empty-input
@@ -194,7 +202,7 @@ export default {
         text-align: left;
         padding-left: 0;
     }
-    .new-crd-btn {
-
+    .empty-step-head {
+        height: 2rem;
     }
 </style>
