@@ -66,22 +66,22 @@ const router = new VueRouter({
 
 
 router.beforeEach(async (to, from, next) => {
-    console.log('isSignedIn', store.getters['auth/isSignedIn']);
-    console.log('domain_id', store.getters['domain/id']);
     if (store.getters['domain/id']) {
         if (to.meta && !to.meta.excludeAuth && !store.getters['auth/isSignedIn']) {
-            console.log('test', store.getters['auth/isSignedIn']);
             const nextPath = store.getters['domain/loginPath'];
             next(nextPath);
         } else {
             next();
         }
     } else {
-        console.log('else');
         localStorage.setItem('common.toMeta', JSON.stringify(to.meta));
         localStorage.setItem('common.toNextPath', to.path);
-        console.log(to.path);
-        next();
+        const signInPath = store.getters['domain/loginPath'];
+        if (!store.getters['auth/isSignedIn'] && signInPath !== to.path) {
+            next(signInPath);
+        } else {
+            next();
+        }
     }
 });
 
