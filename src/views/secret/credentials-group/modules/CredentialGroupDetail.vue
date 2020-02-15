@@ -48,7 +48,9 @@ export default {
 
         const tags = ref({ ...props.tags });
         watch(() => props.item, (value) => {
-            tags.value = value.tags || {};
+            if (value) {
+                tags.value = value.tags || {};
+            }
         });
         const dictPanel = ref(null);
         const resetTag = () => {
