@@ -74,8 +74,8 @@
                                                 :selected.sync="optionSelected.selected"
                             />
                             <PFieldGroup v-if="optionSelected.selected === 'form'"
-                                         :invalid-text="invalidMsg.form"
-                                         :invalid="invalidState.form"
+                                         :invalid-text="validaterightHalfJsonAPI.invalidMsg.form"
+                                         :invalid="validaterightHalfJsonAPI.invalidState.form"
                             >
                                 <template v-slot:default="{invalid}">
                                     <div v-if="dynamicFormExist" class="form-editor">
