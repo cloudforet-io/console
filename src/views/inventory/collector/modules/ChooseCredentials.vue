@@ -28,9 +28,10 @@
                     <p-col :flex-grow="0">
                         <span v-for="type in crdTypes" :key="type"
                               class="radios"
+                              @click.stop="onClickRadioText(type)"
                         >
                             <p-radio v-model="proxyCrdType" :value="type" @change="listCredentials" />
-                            {{ type }}
+                            <span class="radio-text">{{ type }}</span>
                         </span>
                     </p-col>
                     <p-col>
@@ -160,10 +161,16 @@ export default {
             CollectorEventBus.$emit('listCredentials', { query: query.value });
         };
 
+        const onClickRadioText = (type) => {
+            state.proxyCrdType = type;
+            listCredentials();
+        };
+
         listCredentials();
 
         return {
             ...toRefs(state),
+            onClickRadioText,
             validate,
             allPage,
             listCredentials,
@@ -177,6 +184,10 @@ export default {
         width: 100%;
         .radios {
             margin-right: 1.125rem;
+            cursor: pointer;
+            .radio-text {
+                margin-left: 0.5rem;
+            }
         }
     }
     .badge {

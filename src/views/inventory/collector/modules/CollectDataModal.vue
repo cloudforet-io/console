@@ -74,6 +74,7 @@
             <p-button class="reset-btn"
                       style-type="primary-dark"
                       outline
+                      :disabled="loading"
                       @click="onClickReset"
             >
                 {{ tr('COMMON.BTN_RESET') }}

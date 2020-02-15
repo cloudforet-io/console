@@ -4,7 +4,16 @@
             <p-col :flex-grow="0" flex-basis="50%" class="container collector-info">
                 <p-row>
                     <p-col :flex-grow="0">
-                        <img class="img" :src="imgUrl">
+                        <p-lottie v-if="loading || imgLoading"
+                                  name="spinner"
+                                  auto
+                                  :size="2"
+                                  class="img"
+                        />
+                        <img v-show="!loading && !imgLoading" class="img"
+                             :src="imgUrl"
+                             @load="imgLoading = false"
+                        >
                     </p-col>
                     <p-col>
                         <p-field-group label="Collector Name"
@@ -14,6 +23,7 @@
                         >
                             <template #default="{invalid}">
                                 <p-text-input v-model="proxyName"
+                                              v-focus
                                               style="width: 100%;"
                                               class="form-control"
                                               :class="{'is-invalid': invalid}"
@@ -72,6 +82,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+import PLottie from '@/components/molecules/lottie/PLottie';
 
 const init = (props, root) => {
     const params = {
@@ -84,7 +95,15 @@ const init = (props, root) => {
 
 export default {
     name: 'ConfigureCollector',
+    directives: {
+        focus: {
+            inserted(el) {
+                el.focus();
+            },
+        },
+    },
     components: {
+        PLottie,
         PCol,
         PRow,
         PFieldGroup,
@@ -100,6 +119,7 @@ export default {
         pluginId: String,
         plugin: Object,
         versions: Array,
+        loading: Boolean,
         /**
          * sync prop
          */
@@ -137,6 +157,7 @@ export default {
             vdApi: setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue),
             isNameValid: computed(() => !!props.name),
             isAllValid: undefined,
+            imgLoading: true,
         });
 
         const actions = {

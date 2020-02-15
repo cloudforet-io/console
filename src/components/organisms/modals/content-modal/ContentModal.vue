@@ -22,7 +22,7 @@
 
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
-import PModal, { propsMixin } from '@/components/molecules/modals/Modal';
+import PModal, { propsMixin } from '@/components/molecules/modals/Modal.vue';
 import { makeProxy } from '@/lib/compostion-util';
 
 export const setup = (props, context) => {

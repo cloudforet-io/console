@@ -16,6 +16,7 @@
             <header>Repository</header>
             <span v-for="(repo, idx) in repositories" :key="idx"
                   class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"
+                  @click.stop="onClickRepoText(repo.repository_id)"
             >
                 <p-radio v-model="proxySelectedRepoId" :value="repo.repository_id" @change="onRepoChange(repo)" />
                 {{ repo.name }}
@@ -25,6 +26,7 @@
             <header>Resource Type</header>
             <span v-for="(resource) in resourceOptions" :key="resource"
                   class="filter" :class="{selected: proxyFilters.includes(resource)}"
+                  @click.stop="onClickResourceText(resource)"
             >
                 <p-check-box v-model="proxyFilters" :value="resource"
                              @change="onResourceChange"
@@ -88,15 +90,28 @@ export default {
             context.emit('repoChange', val);
         };
 
+        const onClickRepoText = (val) => {
+            state.proxySelectedRepoId = val;
+            onRepoChange(val);
+        };
+
         const onResourceChange = (selected) => {
             context.emit('filtersChange', selected);
+        };
+
+        const onClickResourceText = (val) => {
+            if (proxyFilters.value.includes(val)) _.remove(proxyFilters.value, item => item === val);
+            else proxyFilters.value.push(val);
+            onResourceChange(proxyFilters.value);
         };
 
         return {
             ...toRefs(state),
             proxyFilters,
             onRepoChange,
+            onClickRepoText,
             onResourceChange,
+            onClickResourceText,
         };
     },
 };
@@ -126,11 +141,12 @@ export default {
     .filter {
         line-height: 1.5rem;
         margin-bottom: .5rem;
+        cursor: pointer;
         &.selected {
             color: $secondary;
         }
         .p-radio {
-            margin-right: .5rem;
+            margin-right: .25rem;
         }
     }
 }
