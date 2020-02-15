@@ -37,7 +37,7 @@
                                           @click-delete="onClickDelete"
                                           @click-collectData="onClickCollectData"
                         >
-                            Action
+                            {{ tr('COMMON.BTN_ACTION') }}
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
                             <!--                            <p-search :search-text.sync="searchText" @onSearch="getCollectors" />-->
@@ -115,6 +115,8 @@
                                      :total-count="scheduleState.totalCount"
                                      :loading="scheduleState.loading"
                                      :edit-visible.sync="scheduleState.editVisible"
+                                     :delete-visible.sync="scheduleState.deleteVisible"
+                                     :select-index.sync="scheduleState.selectIndex"
                 />
             </template>
         </p-tab>
@@ -336,11 +338,13 @@ const updateModalState = reactive({
 
 const scheduleState = reactive({
     items: [],
+    selectIndex: [],
     totalCount: 0,
     collector: null,
     loading: true,
     editLoading: true,
     editVisible: false,
+    deleteVisible: false,
 });
 
 export const collectorSetup = (props, context, AcHandler) => {

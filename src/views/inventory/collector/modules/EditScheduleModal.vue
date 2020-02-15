@@ -8,6 +8,10 @@
                     @confirm="onClickEditConfirm"
     >
         <template #body>
+            <p-field-group :label="tr('COMMON.NAME')">
+                <br>
+                <p-text-input v-model="name" />
+            </p-field-group>
             <p-field-group :label="tr('COMMON.TIMEZONE')">
                 <p-select-dropdown v-model="timezone" :items="timezones" class="timezone-selector" />
             </p-field-group>
@@ -43,12 +47,17 @@ import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PTextInput from '@/components/atoms/inputs/TextInput';
 
 
 export default {
     name: 'EditScheduleModal',
     components: {
-        PButton, PSelectDropdown, PFieldGroup, PButtonModal,
+        PTextInput,
+        PButton,
+        PSelectDropdown,
+        PFieldGroup,
+        PButtonModal,
     },
     props: {
         loading: Boolean,
@@ -71,6 +80,7 @@ export default {
 
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
+            name: _.get(props, 'schedule.name', ''),
             timezone: _.get(root, '$store.getters.auth/timezone', 'UTC'),
             timezones: computed(() => (state.timezone === 'UTC'
                 ? [new MenuItem(state.timezone)] : [
@@ -99,6 +109,7 @@ export default {
             const params = {
                 // eslint-disable-next-line camelcase
                 collector_id: props.collectorId,
+                name: state.name,
                 schedule: {
                     ..._.get(props, 'schedule.schedule', null),
                     hours: _.flatMap(state.selectedHours, (val, key) => Number(key)),

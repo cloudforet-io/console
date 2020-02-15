@@ -342,6 +342,7 @@ export default {
         const listSchedules = async (params) => {
             state.scheduleState.loading = true;
             state.scheduleState.items = [];
+            state.scheduleState.selectIndex = [];
             state.scheduleState.totalCount = 0;
             try {
                 const res = await context.parent.$http.post('/inventory/collector/schedule/list', params);
@@ -355,7 +356,7 @@ export default {
         };
         mountBusEvent(CollectorEventBus, 'listSchedules', listSchedules);
 
-        const putCollectorSchedule = url => async (params) => {
+        const putCollectorSchedule = (url, msg) => async (params) => {
             state.scheduleState.editLoading = true;
             try {
                 const res = await context.parent.$http.post(url, params);
@@ -363,12 +364,13 @@ export default {
                     group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
-                    text: 'Update Schedule',
+                    text: msg,
                     duration: 2000,
                     speed: 1000,
                 });
                 state.scheduleState.editVisible = false;
-                await listSchedules();
+                // eslint-disable-next-line camelcase
+                await listSchedules({ collector_id: params.collector_id });
             } catch (e) {
                 console.error(e);
                 context.root.$notify({
@@ -385,10 +387,38 @@ export default {
         };
         mountBusEvent(CollectorEventBus,
             'updateCollectorSchedule',
-            putCollectorSchedule('/inventory/collector/schedule/update'));
+            putCollectorSchedule('/inventory/collector/schedule/update', 'Update Schedule'));
         mountBusEvent(CollectorEventBus,
             'addCollectorSchedule',
-            putCollectorSchedule('/inventory/collector/schedule/add'));
+            putCollectorSchedule('/inventory/collector/schedule/add', 'Add Schedule'));
+
+        const deleteCollectorSchedule = async (params) => {
+            try {
+                const res = await context.parent.$http.post('/inventory/collector/schedule/delete', params);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Delete Schedule',
+                    duration: 2000,
+                    speed: 1000,
+                });
+                state.scheduleState.deleteVisible = false;
+                // eslint-disable-next-line camelcase
+                await listSchedules({ collector_id: params.collector_id });
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'deleteCollectorSchedule', deleteCollectorSchedule);
 
         return {
             ...toRefs(state),
