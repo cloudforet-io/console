@@ -38,7 +38,7 @@
             <template #col-schedule-format="{value}">
                 <span>
                     <span v-for="(hour, idx) in value.hours" :key="idx">
-                        {{ getUtcHour(hour) }}{{ value.hours.length - 1 === idx ? '' : ', ' }}
+                        {{ getUtcHour(hour) }}:00{{ value.hours.length - 1 === idx ? '' : ', ' }}
                     </span>
                 </span>
             </template>
