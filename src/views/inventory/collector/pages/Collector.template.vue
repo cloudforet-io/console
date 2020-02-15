@@ -111,10 +111,10 @@
             </template>
             <template #schedules>
                 <collector-schedules :collector="selectedItem"
+                                     :items="scheduleState.items"
+                                     :total-count="scheduleState.totalCount"
                                      :loading="scheduleState.loading"
-                                     :hours="scheduleState.hours"
-                                     :scheduleId="scheduleState.scheduleId"
-                                     :is-edit-mode.sync="scheduleState.isEditMode"
+                                     :edit-visible.sync="scheduleState.editVisible"
                 />
             </template>
         </p-tab>
@@ -335,10 +335,12 @@ const updateModalState = reactive({
 });
 
 const scheduleState = reactive({
-    loading: false,
-    hours: [],
-    isEditMode: false,
-    scheduleId: null,
+    items: [],
+    totalCount: 0,
+    collector: null,
+    loading: true,
+    editLoading: true,
+    editVisible: false,
 });
 
 export const collectorSetup = (props, context, AcHandler) => {
