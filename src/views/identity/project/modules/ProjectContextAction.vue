@@ -13,7 +13,7 @@
         @confirm="confirm"
     >
         <template #body>
-            <form class="form-binder novalidate">
+            <div class="form-binder novalidate">
                 <div v-if="getVisible" class="form-group">
                     <p-label class="input-title">
                         {{ getLabelID }}
@@ -35,7 +35,7 @@
                                   :disabled="true"
                                   class="form-control col-6"
                                   type="text"
-                                  placeholder="  Project ID"
+                                  placeholder="Project ID"
                                   required
                     />
                 </div>
@@ -46,14 +46,14 @@
                     <p-text-input ref="projectName" v-model="textInput.name"
                                   :style="{'border': `${getIsInvalidProjectName}`, 'boxShadow': 'none' } "
                                   class="form-control"
-                                  placeholder="  Project Name"
+                                  placeholder="Project Name"
                                   required
                     />
                     <div v-show="false" style="display:block" class="invalid-feedback">
                         * {{ $t('SIGNIN.PASS_EMPTY') }}
                     </div>
                 </div>
-            </form>
+            </div>
             <div class="input-title">
                 {{ tr('COMMON.TAG') }}
             </div>

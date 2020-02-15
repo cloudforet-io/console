@@ -339,32 +339,38 @@ export default {
         mountBusEvent(CollectorEventBus, 'collectData', collectData);
 
 
-        const getCollectorSchedule = async (params) => {
+        const listSchedules = async (params) => {
             state.scheduleState.loading = true;
+            state.scheduleState.items = [];
+            state.scheduleState.selectIndex = [];
+            state.scheduleState.totalCount = 0;
             try {
                 const res = await context.parent.$http.post('/inventory/collector/schedule/list', params);
-                state.scheduleState.hours = _.get(res, 'data.schedule.hours', ['1', '2']);
+                state.scheduleState.items = res.data.results;
+                state.scheduleState.totalCount = res.data.total_count;
             } catch (e) {
                 console.error(e);
             } finally {
                 state.scheduleState.loading = false;
             }
         };
-        mountBusEvent(CollectorEventBus, 'getCollectorSchedule', getCollectorSchedule);
+        mountBusEvent(CollectorEventBus, 'listSchedules', listSchedules);
 
-        const updateCollectorSchedule = async (params) => {
-            state.scheduleState.loading = true;
+        const putCollectorSchedule = (url, msg) => async (params) => {
+            state.scheduleState.editLoading = true;
             try {
-                // await context.parent.$http.post('/inventory/collector/collect', params);
+                const res = await context.parent.$http.post(url, params);
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
-                    text: 'Update Schedule',
+                    text: msg,
                     duration: 2000,
                     speed: 1000,
                 });
-                state.scheduleState.isEditMode = false;
+                state.scheduleState.editVisible = false;
+                // eslint-disable-next-line camelcase
+                await listSchedules({ collector_id: params.collector_id });
             } catch (e) {
                 console.error(e);
                 context.root.$notify({
@@ -376,10 +382,43 @@ export default {
                     speed: 1000,
                 });
             } finally {
-                state.scheduleState.loading = false;
+                state.scheduleState.editLoading = false;
             }
         };
-        mountBusEvent(CollectorEventBus, 'updateCollectorSchedule', updateCollectorSchedule);
+        mountBusEvent(CollectorEventBus,
+            'updateCollectorSchedule',
+            putCollectorSchedule('/inventory/collector/schedule/update', 'Update Schedule'));
+        mountBusEvent(CollectorEventBus,
+            'addCollectorSchedule',
+            putCollectorSchedule('/inventory/collector/schedule/add', 'Add Schedule'));
+
+        const deleteCollectorSchedule = async (params) => {
+            try {
+                const res = await context.parent.$http.post('/inventory/collector/schedule/delete', params);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Delete Schedule',
+                    duration: 2000,
+                    speed: 1000,
+                });
+                state.scheduleState.deleteVisible = false;
+                // eslint-disable-next-line camelcase
+                await listSchedules({ collector_id: params.collector_id });
+            } catch (e) {
+                console.error(e);
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }
+        };
+        mountBusEvent(CollectorEventBus, 'deleteCollectorSchedule', deleteCollectorSchedule);
 
         return {
             ...toRefs(state),

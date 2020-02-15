@@ -432,6 +432,14 @@ export default {
             }
         });
 
+        watch(() => props.selectIndex, () => {
+            if (props.items.length && props.items.length === props.selectIndex.length) {
+                state.allState = true;
+            } else {
+                state.allState = false;
+            }
+        });
+
         loadingHandler(props);
 
 

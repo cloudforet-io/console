@@ -61,30 +61,25 @@ class API {
     createAxiosInstance=(baseURL:string):void => {
         const axiosConfig = {
             baseURL,
+            withCredentials: true,
             headers: {
                 'Content-Type': 'application/json',
             },
         };
 
         this.instance = axios.create(axiosConfig);
-        // @ts-ignore
-        const accessToken = VueCookies.get('accessToken');
-        if (accessToken) {
-            this.instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        }
+
     }
 
     setResponseInterceptor=(handlers:any):void => {
         (this.instance as AxiosInstance).interceptors.response.use((response) => {
-            const accessToken = response.headers['access-token'];
-            if (accessToken) {
-                this.setAccessToken(accessToken);
-            }
+
             return response;
         }, (e) => {
             const apiError = new APIError(e);
 
             if (apiError.status === 401) {
+                // todo : run sign out && move login page
                 if (handlers.authError) {
                     handlers.authError(apiError);
                 }
@@ -94,29 +89,6 @@ class API {
         });
     }
 
-    setAccessToken=(accessToken:string):void => {
-        (this.instance as AxiosInstance).defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        // @ts-ignore
-        VueCookies.set('accessToken', accessToken);
-    }
-
-    removeAccessToken=():void => {
-        if (this.instance) {
-            delete this.instance.defaults.headers.common.Authorization;
-        }
-        // @ts-ignore
-        VueCookies.remove('accessToken');
-    }
-
-    checkAccessToken=():boolean => {
-        // debugger;
-        // @ts-ignore
-        const accessToken = VueCookies.get('accessToken');
-        if (accessToken) {
-            return true;
-        }
-        return false;
-    }
 
     init=(baseURL:string, handlers:any = {}):void => {
         if (!this.instance) {
@@ -298,6 +270,7 @@ interface TableState {
     fixSearchQuery?:SearchQuery[]|Ref<SearchQuery[]>;
     loading: boolean;
     acHandler?:Ref<QuerySearchTableACHandler>;
+    extraParams?:object;
 }
 
 export const getAllPage = (total_count:number, pageSize:number):number => Math.ceil(total_count / pageSize) || 1;
@@ -397,7 +370,7 @@ export class BaseQuerySearchTableAPI extends DynamicAPI {
     protected searchQuery:Ref<SearchQuery[]>
 
 
-    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[]) {
+    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[], extraParams?:object) {
         super();
         this.acState = reactive({
             keys: keys || [] as string[],
@@ -418,6 +391,7 @@ export class BaseQuerySearchTableAPI extends DynamicAPI {
             only,
             fixSearchQuery: [],
             acHandler,
+            extraParams: extraParams || {}, // for api extra parameters
         });
         this.queryListTools = tagList(undefined, true, undefined, undefined, this.getData);
         // this.searchQuery = computed(() => _.flatten([this.state.fixSearchQuery || [], this.queryListTools.tags.value || []]));
@@ -440,9 +414,16 @@ export class BaseQuerySearchTableAPI extends DynamicAPI {
         this.state.selectIndex = [];
 
         try {
-            const res = await this.$http.post(this.url, {
+            let params = {
                 query: this.query.value,
-            });
+            };
+            if (!_.isEmpty(this.state.extraParams)) {
+                params = {
+                    ...params,
+                    ...this.state.extraParams,
+                };
+            }
+            const res = await this.$http.post(this.url, params);
             this.state.items = res.data.results;
             this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
         } catch (e) {
@@ -463,8 +444,10 @@ interface tableSelectState {
 export class QuerySearchTableAPI extends BaseQuerySearchTableAPI {
     public selectState:tableSelectState
 
-    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[]) {
-        super(parent, url, keys, only);
+    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[], extraParams?:object) {
+        super(parent, url, keys, only, extraParams);
+        console.log(extraParams);
+        console.log(this.state);
         const isNotSelected:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 0 : true));
         const isSelectOne:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 1 : false));
         const isSelectMulti:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length > 1 : false));

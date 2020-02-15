@@ -33,6 +33,7 @@ export default {
         companyTitle: state => state.companyTitle,
         authType: state => state.authType,
         clientId: state => state.clientId,
+        loginPath: state => (state.authType === 'local' ? '/sign-in' : '/google-sign-in'),
     },
     actions: {
         parseHostname({ commit }) {

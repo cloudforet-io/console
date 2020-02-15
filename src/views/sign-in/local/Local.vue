@@ -17,7 +17,7 @@
                                         {{ $t('SIGNIN.SIGN_FAIL_BODY') }}
                                     </div>
                                 </div>
-                                <form class="form-binder novalidate">
+                                <div class="form-binder novalidate">
                                     <div class="form-group">
                                         <p-label class="input-title">
                                             User ID
@@ -71,7 +71,7 @@
                                             </div>
                                         </b-col>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                             <div class="card card-right-container">
                                 <img class="card-img" src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg" alt="Bologna">
@@ -182,17 +182,19 @@ export default {
             };
 
             if (this.isEmpty(credentials.user_id) || this.isEmpty(credentials.password)) {
-                this.validateInput(credentials, 'user_id');
-                this.validateInput(credentials, 'password');
+                // this.validateInput(credentials, 'user_id');
+                // this.validateInput(credentials, 'password');
                 return;
             }
 
             await this.$store.dispatch('auth/signIn', credentials).then(() => {
+                console.log('start');
                 if (localStorage.getItem('common.toNextPath') === '/sign-in' || localStorage.getItem('common.toNextPath') === null) {
                     localStorage.setItem('common.toNextPath', '/');
                 }
                 this.$router.push({ path: localStorage.getItem('common.toNextPath') });
             }).catch(() => {
+                console.log('error');
                 this.isInvalid.userId = true;
                 this.isInvalid.password = true;
                 this.$refs.userId.focus();

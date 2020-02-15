@@ -147,10 +147,10 @@ import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayou
 export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApiHandler:QuerySearchTableAPI) => {
     const state = reactive({
         cstFields: makeTrItems([
-            ['provider', 'COMMON.NAME'],
+            ['provider', 'COMMON.PROVIDER'],
             ['group', 'COMMON.GROUP'],
             ['name', 'COMMON.NAME'],
-            ['count', 'COMMON.COUNT', { sortable: false }],
+            ['cloud_service_count', 'COMMON.COUNT', { sortable: false }],
         ], context.parent, {}),
         tabs: makeTrItems([
             ['detail', 'COMMON.DETAILS'],

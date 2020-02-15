@@ -1,58 +1,73 @@
 <template>
     <div>
-        <p-panel-top :panel-title="tr('INVENTORY.SCHEDULE')">
-            <template #head>
-                <p-button v-if="!isEditMode"
-                          style-type="primary-dark" class="edit-btn"
-                          @click="onClickEdit"
-                >
-                    {{ tr('COMMON.BTN_EDIT') }}
+        <p-toolbox-table :items="items"
+                         :fields="fields"
+                         sortable
+                         hover
+                         :border="false"
+                         :shadow="false"
+                         :sort-by.sync="sortBy"
+                         :sort-desc.sync="sortDesc"
+                         :all-page="allPage"
+                         :this-page.sync="thisPage"
+                         :page-size.sync="pageSize"
+                         :setting-visible="false"
+                         :loading="loading"
+                         :selectable="true"
+                         :multi-select="false"
+                         :select-index.sync="proxySelectIndex"
+                         use-spinner-loading
+                         use-cursor-loading
+                         @changePageSize="listSchedules"
+                         @changePageNumber="listSchedules"
+                         @clickRefresh="listSchedules"
+                         @changeSort="listSchedules"
+        >
+            <template slot="toolbox-left">
+                <p-button style-type="primary-dark" @click="openEditModal(null)">
+                    {{ tr('COMMON.BTN_ADD') }}
                 </p-button>
-                <div v-else class="edit-mode-btn-box">
-                    <p-button style-type="secondary" outline
-                              class="cancel-btn"
-                              @click="onClickCancel"
-                    >
-                        {{ tr('COMMON.BTN_CANCEL') }}
-                    </p-button>
-                    <p-button style-type="secondary"
-                              @click="onClickConfirm"
-                    >
-                        {{ tr('COMMON.BTN_CONFIRM') }}
-                    </p-button>
-                </div>
+                <p-dropdown-menu-btn :menu="dropdown"
+                                     class="left-toolbox-item"
+                                     @click-update="openEditModal(items[selectIndex[0]])"
+                                     @click-delete="proxyDeleteVisible = true"
+                >
+                    {{ tr('COMMON.BTN_ACTION') }}
+                </p-dropdown-menu-btn>
             </template>
-
-            <template v-if="isEditMode" #body>
-                <p-field-group :label="tr('COMMON.TIMEZONE')">
-                    <p-select-dropdown v-model="timezone" :items="timezones" class="timezone-selector" />
-                </p-field-group>
-                <p-field-group :label="tr('INVENTORY.COLL_TIME')">
-                    <div>
-                        <span v-for="hour in hoursMatrix" :key="hour"
-                              class="time-block"
-                              :class="{active: selectedHours[hour]}"
-                              @click="onClickHour(hour)"
-                        >
-                            {{ hour }}
-                        </span>
-                        <p-button style-type="dark" :outline="!isAllHours"
-                                  @click="onClickAllHours"
-                        >
-                            {{ tr('COMMON.ALL') }}
-                        </p-button>
-                    </div>
-                </p-field-group>
+            <template #col-schedule-format="{value}">
+                <span>
+                    <span v-for="(hour, idx) in value.hours" :key="idx">
+                        {{ hour }}{{ value.hours.length - 1 === idx ? '' : ', ' }}
+                    </span>
+                </span>
             </template>
-        </p-panel-top>
+            <template #col-created_at-format="{value}">
+                {{ timestampFormatter(value) }}
+            </template>
+            <template #col-last_schedule_at-format="{value}">
+                {{ value ? timestampFormatter(value): '' }}
+            </template>
+        </p-toolbox-table>
 
-        <div class="contents-container">
-            <p-dynamic-view v-if="!isEditMode"
-                            view_type="item"
-                            :data="data"
-                            :data_source="dataSources"
-            />
-        </div>
+        <edit-schedule-modal v-if="proxyEditVisible"
+                             :visible.sync="proxyEditVisible"
+                             :loading="editLoading"
+                             :schedule="schedule"
+                             :collector-id="collector.collector_id"
+        />
+
+        <p-table-check-modal :visible.sync="proxyDeleteVisible"
+                             header-title="Delete Schedule"
+                             sub-title="Are you sure you want to DELETE Selected Schedule(s)?"
+                             theme-color="alert"
+                             :fields="multiFields"
+                             size="lg"
+                             centered
+                             :selectable="false"
+                             :items="multiItems"
+                             @confirm="onConfirmDelete"
+        />
     </div>
 </template>
 
@@ -61,145 +76,116 @@ import _ from 'lodash';
 import {
     reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
-import { MenuItem } from '@/lib/util';
+import { MenuItem, timestampFormatter } from '@/lib/util';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
+import { makeTrItems } from '@/lib/view-helper';
+import { makeProxy } from '@/lib/compostion-util';
+
 
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import { makeProxy } from '@/lib/compostion-util';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import EditScheduleModal from '@/views/inventory/collector/modules/EditScheduleModal.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 
 export default {
     name: 'CollectorSchedules',
     components: {
-        PFieldGroup,
-        PPanelTop,
+        PTableCheckModal,
+        PDropdownMenuBtn,
+        PToolboxTable,
         PButton,
-        PSelectDropdown,
-        PDynamicView,
+        EditScheduleModal,
     },
     props: {
+        items: Array,
+        totalCount: Number,
         collector: Object,
         loading: Boolean,
-        hours: Array,
         /**
          * sync prop
          */
-        isEditMode: Boolean,
+        editVisible: Boolean,
+        /**
+        sync prop
+         */
+        selectIndex: Array,
+        /**
+         * sync prop
+         */
+        deleteVisible: Boolean,
+        editLoading: Boolean,
     },
     setup(props, { root, parent, emit }) {
-        const getSelectedHours = () => {
-            const hours = props.hours || [];
-            const res = {};
-            hours.forEach((h) => {
-                res[h] = true;
-            });
-            return res;
+        const state = reactive({
+            proxyEditVisible: makeProxy('editVisible', props, emit),
+            proxyDeleteVisible: makeProxy('deleteVisible', props, emit),
+            proxySelectIndex: makeProxy('selectIndex', props, emit),
+            fields: makeTrItems([
+                ['scheduler_id', 'COMMON.ID'],
+                ['name', 'COMMON.NAME'],
+                ['schedule', 'COMMON.SCHEDULE', { sortable: false }],
+                ['last_schedule_at', 'COMMON.LAST_SCHEDULED'],
+                ['created_at', 'COMMON.CREATED'],
+            ], parent),
+            dropdown: computed(() => makeTrItems([
+                ['update', 'COMMON.BTN_UPT', { disabled: props.selectIndex.length !== 1 }],
+                ['delete', 'COMMON.BTN_DELETE', { disabled: props.selectIndex.length === 0 }],
+            ], parent, { type: 'item' })),
+            sortBy: '',
+            sortDesc: '',
+            pageSize: 10,
+            thisPage: 1,
+            allPage: computed(() => Math.ceil(props.totalCount / state.pageSize) || 1),
+            schedule: null,
+            multiItems: computed(() => props.selectIndex.map(idx => props.items[idx])),
+            multiFields: makeTrItems([
+                ['scheduler_id', 'COMMON.ID'],
+                ['name', 'COMMON.NAME'],
+            ], parent),
+        });
+
+        const openEditModal = (item) => {
+            state.schedule = item;
+            state.proxyEditVisible = true;
         };
 
-        const state = reactive({
-            proxyIsEditMode: makeProxy('isEditMode', props, emit),
-            timezone: _.get(root, '$store.getters.auth/timezone', 'UTC'),
-            timezones: computed(() => (state.timezone === 'UTC'
-                ? [new MenuItem(state.timezone)] : [
-                    new MenuItem(state.timezone),
-                    new MenuItem('UTC'),
-                ])),
-            hoursMatrix: _.range(24),
-            selectedHours: getSelectedHours(),
-            data: computed(() => ({
-                timezone: state.timezone,
-                hours: props.hours.map(val => `${val}:00`),
-            })),
-            dataSources: computed(() => [
-                { name: parent.tr('COMMON.TIMEZONE'), key: 'timezone' },
-                {
-                    name: parent.tr('INVENTORY.COLL_TIME'),
-                    key: 'hours',
-                    // eslint-disable-next-line camelcase
-                    view_type: 'list',
-                    // eslint-disable-next-line camelcase
-                    view_option: { item: { view_type: 'text' } },
-                },
-            ]),
-            onClickHour: (hour) => {
-                state.selectedHours[hour] = !state.selectedHours[hour];
-                state.selectedHours = { ...state.selectedHours };
-            },
-            isAllHours: false,
-            onClickAllHours: () => {
-                state.isAllHours = !state.isAllHours;
-                if (state.isAllHours) {
-                    state.hoursMatrix.forEach((hour) => { state.selectedHours[hour] = true; });
-                    state.selectedHours = { ...state.selectedHours };
-                } else state.selectedHours = {};
-            },
-            onClickConfirm: () => {
-                collectorEventBus.$emit('updateCollectorSchedule', {});
-            },
-            onClickCancel: () => {
-                state.selectedHours = getSelectedHours();
-                state.proxyIsEditMode = false;
-            },
-            onClickEdit: () => {
-                state.proxyIsEditMode = true;
-            },
+        const listSchedules = () => {
+            // eslint-disable-next-line camelcase
+            collectorEventBus.$emit('listSchedules', { collector_id: props.collector.collector_id });
+        };
+
+        const onConfirmDelete = () => {
+            const params = {
+                // eslint-disable-next-line camelcase
+                collector_id: props.collector.collector_id,
+                // eslint-disable-next-line camelcase
+                scheduler_id: props.items[props.selectIndex[0]].scheduler_id, // state.multiItems,
+            };
+            collectorEventBus.$emit('deleteCollectorSchedule', params);
+        };
+
+        watch(() => props.collector, () => {
+            listSchedules();
         });
 
-        watch(() => props.hours, () => {
-            state.selectedHours = getSelectedHours();
-        });
-        watch(() => props.collector, () => {
-            // eslint-disable-next-line camelcase
-            collectorEventBus.$emit('getCollectorSchedule', { collector_id: props.collector.collector_id });
-        });
-        collectorEventBus.$emit('getCollectorSchedule', { collector_id: props.collector.collector_id });
 
         return {
             ...toRefs(state),
+            openEditModal,
+            listSchedules,
+            onConfirmDelete,
+            timestampFormatter,
         };
     },
 };
 </script>
 
 <style lang="scss" scoped>
-    .edit-btn {
+    .left-toolbox-item {
         margin-left: 1rem;
-    }
-    .edit-mode-btn-box {
-        display: inline-block;
-        margin-left: auto;
-    }
-    .cancel-btn {
-        margin-right: 1rem;
-    }
-    .contents-container {
-        min-height: 196px;
-    }
-    .timezone-selector {
-        width: 30%;
-        min-width: 260px;
-    }
-    .time-block {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2rem;
-        height: 2rem;
-        border: 1px solid $gray2;
-        border-radius: 2px;
-        margin-right: .5rem;
-        font-size: .875rem;
-        cursor: pointer;
-        &:hover {
-            background-color: $other4;
-            color: $white;
-        }
-        &.active {
-            background-color: $safe;
-            color: $white;
+        &:last-child {
+            flex-grow: 1;
         }
     }
 </style>

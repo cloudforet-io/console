@@ -70,6 +70,7 @@ export const ko = {
         ZE_NM: '존(Zone) 명',
         PL_ID: '풀(Pool) 아이디',
         PL_NM: '풀(Pool) 명',
+        PROVIDER: '프로바이더',
         DELETE_YN: '선택하신 {0} 의 아래에 멤버들을 삭제 하시겠습니까?',
         DELETE_SUCC: ' {0}: {1} 을/를 성곡적으로 삭제 하였습니다.',
         DEL_MEM: '멤버 삭제',
@@ -281,6 +282,7 @@ export const ko = {
         SCHEDULE: 'Collecting Schedule',
         COLL_TIME: '수집 시간',
         CRT_COLL: '수집기 생성',
+        EDIT_SCHEDULE: 'Edit Schedule',
     },
     SECRET: {
         JASON_ALERT: "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (\') )",
