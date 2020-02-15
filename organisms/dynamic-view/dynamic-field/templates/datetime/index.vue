@@ -1,5 +1,7 @@
 <script lang="ts">
-import moment, { Moment } from 'moment-timezone';
+import { DateTime as dt } from 'luxon';
+
+import { getTimezone } from '@/lib/util';
 
 export default {
     name: 'PDynamicFieldDatetime',
@@ -18,26 +20,24 @@ export default {
     render(h, { props, data }) {
         let result:String = '';
         if (props.data) {
-            let time:Moment;
+            let time:dt;
             if (props.view_option.source_type === 'iso861') {
-                const args = [props.data];
                 if (props.view_option.source_format) {
-                    args.push(props.view_option.source_format);
+                    time = dt.fromFormat(props.data, props.view_option.source_format);
+                } else {
+                    time = dt.fromISO(props.data);
                 }
-                time = moment(...args);
             } else if (props.view_option.source_format === 'seconds') {
-                time = moment.unix(Number(props.data));
+                time = dt.fromSeconds(Number(props.data));
             } else {
-                time = moment(Number(props.data));
+                time = dt.fromISO(props.data);
             }
-            const tz:string|null = localStorage.getItem('timezone');
-            if (tz) {
-                time = time.tz(tz);
-            }
+
+            time = time.setZone(getTimezone());
             if (props.view_option.display_format) {
-                result = time.format(props.view_option.display_format);
+                result = time.toFormat(props.view_option.display_format);
             } else {
-                result = time.format();
+                result = time.toFormat('yyyy-LL-dd HH:mm:ss ZZZZ');
             }
         }
         return h('span', data, result);
