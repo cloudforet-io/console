@@ -154,8 +154,10 @@ export default {
                 removeClickedClass(state.clickedNode);
             }
             state.clickedNode = node;
-            addClickedClass(node);
-            context.emit('nodeClick', node);
+            if (_.get(node, 'data.init') !== true) {
+                addClickedClass(node);
+                context.emit('nodeClick', node);
+            }
         };
 
         const setClickedNodeItem = (node) => {
