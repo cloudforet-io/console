@@ -32,7 +32,7 @@ export default {
             languages: this.$i18n.availableLocales.map(lang => ({
                 key: lang,
                 contents: LANGUAGES[lang],
-                selected: localStorage.language ? localStorage.language === lang : lang === 'en'
+                selected: localStorage.language ? localStorage.language === lang : lang === 'en',
             })),
             iconColor: styles.primary4,
         };
@@ -54,6 +54,7 @@ export default {
         ]),
         init() {
             this.setLanguage(localStorage.language || 'en');
+            this.$i18n.locale = this.language;
         },
         changeLanguage(item) {
             this.setLanguage(item.key);
