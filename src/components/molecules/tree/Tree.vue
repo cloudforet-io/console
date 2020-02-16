@@ -127,7 +127,10 @@ export default {
         };
 
         const getNodeEl = (node) => {
-            context.refs.slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
+            const slVueTree = context.refs.slVueTree;
+            if (!_.isEmpty(slVueTree)) {
+                return slVueTree.$el.querySelector(`[path="${node.pathStr}"]`);
+            }
         };
 
         const addClickedClass = (node) => {
