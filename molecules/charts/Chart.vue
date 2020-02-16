@@ -245,6 +245,39 @@ export default {
         height: 100%;
         display: flex;
         justify-content: center;
+
+        .spinner-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 99;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: rgba($white, .5);
+            .spinner {
+                position: absolute;
+                display: inline-flex;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            &.fade-in-enter-active {
+                transition: opacity .3s, visibility .3s;
+            }
+            &.fade-in-leave-active {
+                transition: opacity .3s, visibility .3s;
+            }
+            &.fade-in-enter, &.fade-in-leave-to {
+                visibility: hidden;
+                opacity: 0;
+            }
+            &.fade-in-leave, &.fade-in-enter-to {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
     }
 
     .tooltip-title {
@@ -263,36 +296,5 @@ export default {
         }
     }
 
-    .spinner-container {
-        position: absolute;
-        left: 0;
-        top: 0;
-        z-index: 99;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: rgba($white, .5);
-        .spinner {
-            position: absolute;
-            display: inline-flex;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
 
-        &.fade-in-enter-active {
-            transition: opacity .3s, visibility .3s;
-        }
-        &.fade-in-leave-active {
-            transition: opacity .3s, visibility .3s;
-        }
-        &.fade-in-enter, &.fade-in-leave-to {
-            visibility: hidden;
-            opacity: 0;
-        }
-        &.fade-in-leave, &.fade-in-enter-to {
-            visibility: visible;
-            opacity: 1;
-        }
-    }
 </style>
