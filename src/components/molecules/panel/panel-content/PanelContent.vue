@@ -1,10 +1,10 @@
 <template>
     <p-dl class="content-container">
-        <template v-for="(def, idx) in defs" >
+        <template v-for="(def, idx) in defs">
             <div :key="idx" :class="{'content-list': !getFullLengthUsability(def), 'content-full-list': getFullLengthUsability(def)}">
                 <slot name="details">
                     <span class="content">
-                        <p-dt  :class="{'label':true, 'label-common': !getFullLengthUsability(def), 'label-full': getFullLengthUsability(def)}">
+                        <p-dt :class="{'label':true, 'label-common': !getFullLengthUsability(def), 'label-full': getFullLengthUsability(def)}">
                             {{ def.label }}
                         </p-dt>
                         <span class="data"
@@ -14,11 +14,11 @@
                                   @mouseenter="mouseInOut(idx, true)"
                             >
                                 <slot :name="`def-${def.name}-format`"
-                                      :value="getValue(def.name)"
+                                      :value="item[def.name] || ''"
                                       :item="item"
                                       :def="def"
                                 >
-                                    {{ getValue(def.name) }}
+                                    {{ item[def.name] || '' }}
                                 </slot>
                             </p-dd>
                             <p-copy-button v-if="activeArr(idx, def) && isCopyFlagged(def)"
@@ -35,10 +35,10 @@
 
 <script>
 import _ from 'lodash';
-import PDt from '@/components/atoms/lists/dl-list/Dt';
-import PDl from '@/components/atoms/lists/dl-list/Dl';
-import PDd from '@/components/atoms/lists/dl-list/Dd';
-import PCopyButton from '@/components/molecules/buttons/CopyButton';
+import PDt from '@/components/atoms/lists/dl-list/Dt.vue';
+import PDl from '@/components/atoms/lists/dl-list/Dl.vue';
+import PDd from '@/components/atoms/lists/dl-list/Dd.vue';
+import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
 
 export default {
     name: 'PPanelContent',
@@ -87,8 +87,25 @@ export default {
         mouseInOut(idx, flag) {
             this.$set(this.active, idx, flag);
         },
+        getTextContent(el, text = '') {
+            if (el.childElementCount === 0) {
+                if (text && el.textContent) return `${text}, ${el.textContent}`;
+                return text || el.textContent;
+            }
+            if (el.childElementCount > 1) {
+                console.log('el.childElementCount > 1');
+                let res = '';
+                el.children.forEach((child) => {
+                    res += this.getTextContent(child, res);
+                });
+                console.log('res', res);
+                return res;
+            }
+            return this.getTextContent(el.firstElementChild);
+        },
         getValue(name) {
-            return this.item[name] ? this.item[name] : '';
+            const ref = this.$refs[`dd-${name}`];
+            return ref ? this.getTextContent(ref[0]).trim() : '';
         },
     },
 };

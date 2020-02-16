@@ -100,8 +100,10 @@ export default {
         };
 
         const onClickResourceText = (val) => {
-            if (proxyFilters.value.includes(val)) _.remove(proxyFilters.value, item => item === val);
-            else proxyFilters.value.push(val);
+            if (proxyFilters.value.includes(val)) {
+                _.remove(proxyFilters.value, item => item === val);
+                proxyFilters.value = [...proxyFilters.value];
+            } else proxyFilters.value.push(val);
             onResourceChange(proxyFilters.value);
         };
 

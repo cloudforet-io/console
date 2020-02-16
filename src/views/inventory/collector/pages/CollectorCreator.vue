@@ -17,6 +17,7 @@ export default {
         const listCredentials = async (params) => {
             const url = state.crdState.crdType === 'Credentials'
                 ? '/secret/credential/list' : '/secret/credential-group/list';
+            // eslint-disable-next-line camelcase
             params.include_credential_group = true;
 
             state.crdState.loading = true;
@@ -96,6 +97,21 @@ export default {
                     speed: 1000,
                 });
             } catch (e) {
+                /**
+                 * temporary codes before verify function developed
+                 */
+                if (e.message.includes('ERROR_AUTHENTICATION_FAILURE_PLUGIN')) {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'warning',
+                        title: 'Wrong Credentials',
+                        text: 'Please choose credentials or credentials group that matches the selected plugin.',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                    return;
+                }
+
                 console.error(e);
                 context.root.$notify({
                     group: 'noticeBottomRight',
