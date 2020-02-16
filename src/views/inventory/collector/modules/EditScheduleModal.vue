@@ -15,7 +15,7 @@
             <p-field-group :label="tr('COMMON.TIMEZONE')">
                 <p-select-dropdown v-model="timezone" :items="timezones"
                                    class="timezone-selector"
-                                   @input="setSelectedHours"
+                                   @input="changeTimezone"
                 />
             </p-field-group>
             <p-field-group :label="tr('INVENTORY.COLL_TIME')"
@@ -24,9 +24,9 @@
                            invalid-text="Please select time"
             >
                 <div>
-                    <span v-for="hour in hoursMatrix" :key="hour"
+                    <span v-for="(hour) in hoursMatrix" :key="hour"
                           class="time-block"
-                          :class="{active: selectedHours[hour]}"
+                          :class="{active: selectedHours[hour] }"
                           @click="onClickHour(hour)"
                     >
                         {{ hour }}
@@ -82,10 +82,11 @@ export default {
             name: _.get(props, 'schedule.name', ''),
             timezone: _.get(root, '$store.getters.auth/timezone', 'UTC'),
             hoursMatrix: _.range(24),
-            selectedHours: undefined,
-            isAllHours: false,
+            selectedHours: {},
+            selectedUTCHoursList: computed(() => _.flatMap(state.selectedHours, time => moment.utc(time).hour())),
+            isAllHours: computed(() => state.selectedUTCHoursList.length === 24),
             showValidation: false,
-            isValid: false,
+            isValid: computed(() => state.selectedUTCHoursList.length !== 0),
         });
 
         const timezones = state.timezone === 'UTC'
@@ -94,47 +95,44 @@ export default {
                 new MenuItem('UTC'),
             ];
 
-        const setSelectedHours = () => {
-            const hours = _.get(props, 'schedule.schedule.hours', []);
+        const initSelectedHours = () => {
             const res = {};
-            hours.forEach((hour) => {
-                res[moment.tz(moment.utc({ hour }), state.timezone).hour()] = true;
+            _.get(props, 'schedule.schedule.hours', []).forEach((hour) => {
+                const time = moment.tz(moment.utc({ hour }), state.timezone);
+                res[time.hour()] = time;
             });
             state.selectedHours = res;
         };
-        setSelectedHours();
+        initSelectedHours();
+
+        const changeTimezone = () => {
+            const res = {};
+            _.forEach(state.selectedHours, (time) => {
+                const newTime = moment.tz(time, state.timezone);
+                res[newTime.hour()] = newTime;
+            });
+            state.selectedHours = res;
+        };
 
         const onClickHour = (hour) => {
-            state.selectedHours[hour] = !state.selectedHours[hour];
+            if (state.selectedHours[hour]) delete state.selectedHours[hour];
+            else state.selectedHours[hour] = moment.tz({ hour }, state.timezone);
             state.selectedHours = { ...state.selectedHours };
         };
 
         const onClickAllHours = () => {
-            state.isAllHours = !state.isAllHours;
-            if (state.isAllHours) {
-                state.hoursMatrix.forEach((hour) => { state.selectedHours[hour] = true; });
+            if (state.isAllHours) state.selectedHours = {};
+            else {
+                state.hoursMatrix.forEach((hour) => {
+                    state.selectedHours[hour] = moment.tz({ hour }, state.timezone);
+                });
                 state.selectedHours = { ...state.selectedHours };
-            } else state.selectedHours = {};
-        };
-
-        const getHours = () => {
-            const hours = [];
-            _.forEach(state.selectedHours, (val, hour) => {
-                if (val) hours.push(hour);
-            });
-            return hours;
+            }
         };
 
         const onClickEditConfirm = () => {
             state.showValidation = true;
-            const hours = [];
-            _.forEach(state.selectedHours, (val, hour) => {
-                if (val) hours.push(moment.utc(moment.tz({ hour }, state.timezone)).hour());
-            });
-            if (hours.length === 0) {
-                state.isValid = false;
-                return;
-            }
+            if (!state.isValid) return;
 
             const params = {
                 // eslint-disable-next-line camelcase
@@ -142,7 +140,7 @@ export default {
                 name: state.name,
                 schedule: {
                     ..._.get(props, 'schedule.schedule', null),
-                    hours,
+                    hours: state.selectedUTCHoursList,
                 },
             };
 
@@ -157,10 +155,9 @@ export default {
         return {
             ...toRefs(state),
             timezones,
-            setSelectedHours,
+            changeTimezone,
             onClickHour,
             onClickAllHours,
-            getHours,
             onClickEditConfirm,
         };
     },

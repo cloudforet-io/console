@@ -3,8 +3,6 @@
         <p-row class="dashboard" wrap="wrap" justify-content="center">
             <p-col :flex-grow="0">
                 <Summary class="item" :data="summaryData" />
-            </p-col>
-            <p-col :flex-grow="0">
                 <div class="item flex">
                     <ResourcesByRegion class="region"
                                        :data="resourcesByRegionData"
@@ -13,8 +11,6 @@
                                  :data="serverStateData"
                     />
                 </div>
-            </p-col>
-            <p-col :flex-grow="0">
                 <ServersByType class="item"
                                :server-data="serverTypeData"
                                :vm-data="vmTypeData"
