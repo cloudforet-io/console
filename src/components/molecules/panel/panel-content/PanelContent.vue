@@ -93,12 +93,10 @@ export default {
                 return text || el.textContent;
             }
             if (el.childElementCount > 1) {
-                console.log('el.childElementCount > 1');
                 let res = '';
                 el.children.forEach((child) => {
                     res += this.getTextContent(child, res);
                 });
-                console.log('res', res);
                 return res;
             }
             return this.getTextContent(el.firstElementChild);
