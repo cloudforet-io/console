@@ -71,7 +71,7 @@ export default {
         },
         onLinkClick(key ) {
             if (this.dataMap[key].path) {
-                this.$router.push({ path: this.dataMap[key].path, query: { plan: 'private' } });
+                this.$router.push({ path: this.dataMap[key].path  });
             }
         },
     },
