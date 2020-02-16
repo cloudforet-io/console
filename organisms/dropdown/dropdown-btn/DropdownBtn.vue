@@ -17,8 +17,8 @@
                        :hover-color="iconHoverColor"
                        button-style="white"
                        @click.stop="onClick"
-                       @mouseover="onMouseOver"
-                       @mouseout="onMouseOut"
+                       @mouseenter="onMouseOver"
+                       @mouseleave="onMouseOut"
         />
     </div>
 </template>
