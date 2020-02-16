@@ -219,6 +219,7 @@ export default {
             &:active{
                 font-weight: bold;
             }
+            white-space: nowrap;
             @include context-item-them('secondary',$secondary,$secondary,$white, $secondary2,$secondary, $gray2);
             @include context-item-them('dark',$dark,$gray3,$dark, $white,$dark, $gray2);
         }

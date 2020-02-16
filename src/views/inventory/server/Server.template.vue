@@ -389,8 +389,8 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         ...makeTrItems([
             ['delete', 'COMMON.BTN_DELETE'],
             [null, null, { type: 'divider' }],
-            ['maintenance', 'COMMON.BTN_S_MANT'],
             ['in-service', 'COMMON.BTN_S_SERV'],
+            ['maintenance', 'COMMON.BTN_S_MANT'],
             ['closed', 'COMMON.BTN_S_CLOSE'],
             [null, null, { type: 'divider' }],
             ['project', 'COMMON.CHG_PRO', { disabled: true }],
