@@ -1,5 +1,5 @@
 <template>
-    <div class="row summary-padding" :style="responsiveStyle">
+    <div class="summary-padding" :style="responsiveStyle">
         <p-info-panel v-show="isVisible"
                       :info-title="topPanelTitle"
                       :item="item"
