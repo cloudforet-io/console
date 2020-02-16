@@ -101,7 +101,6 @@ export default {
                     };
                     this.tags = response.data.tags;
                     this.isVisible = true;
-                    console.debug('this.item', this.item);
                 }
             }).catch((error) => {
                 console.error(error);
