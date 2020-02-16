@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="loading" class="spinner-container">
+        <div v-if="loading" class="card-list-spinner-container">
             <p-lottie name="spinner"
                       auto
                       :size="1.5"
@@ -66,7 +66,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .spinner-container {
+    .card-list-spinner-container {
         display: flex;
         height: 100%;
         width: 100%;
