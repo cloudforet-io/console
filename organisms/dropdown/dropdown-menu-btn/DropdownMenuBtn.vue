@@ -1,5 +1,7 @@
 <template>
-    <div class="p-dropdown-menu-btn">
+    <div v-click-outside="outsideClick"
+         class="p-dropdown-menu-btn"
+    >
         <PDropdownBtn :popup.sync="popup"
                       :block="block"
                       :disabled="disabled"
@@ -18,12 +20,17 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import vClickOutside from 'v-click-outside';
+import { createComponent, ref } from '@vue/composition-api';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
 import PDropdownBtn from '@/components/organisms/dropdown/dropdown-btn/DropdownBtn.vue';
 
-export default {
+export default createComponent({
     name: 'PDropdownMenuBtn',
+    directives: {
+        clickOutside: vClickOutside.directive,
+    },
     components: { PDropdownBtn, PContextMenu },
     props: {
         menu: {
@@ -47,28 +54,22 @@ export default {
             default: false,
         },
     },
-    data() {
+    setup(props, { emit }) {
+        const popup = ref(false);
+        const outsideClick = ():void => { popup.value = false; };
+        const clickMenuEvent = (eventName:string, idx:number) => {
+            emit('clickMenuEvent', eventName, idx);
+            emit(`click-${eventName}`, idx);
+            popup.value = false;
+        };
+
         return {
-            popup: false,
+            popup,
+            outsideClick,
+            clickMenuEvent,
         };
     },
-    mounted() {
-        window.addEventListener('click', this.windowClick);
-    },
-    destroyed() {
-        window.removeEventListener('click', this.windowClick);
-    },
-    methods: {
-        windowClick(event) {
-            this.popup = false;
-        },
-        clickMenuEvent(eventName, idx) {
-            this.$emit('clickMenuEvent', eventName, idx);
-            this.$emit(`click-${eventName}`, idx);
-            this.popup = false;
-        },
-    },
-};
+});
 </script>
 <style lang="scss" scoped>
     .p-dropdown-menu-btn{
