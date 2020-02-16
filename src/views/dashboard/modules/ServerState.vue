@@ -64,7 +64,7 @@ export default {
             });
         },
         onLegendClick(key, val) {
-            this.$router.push({ path: '/inventory/server', query: { plan: 'private' } });
+            this.$router.push({ path: '/inventory/server' });
         },
     },
 };

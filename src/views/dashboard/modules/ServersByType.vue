@@ -70,7 +70,7 @@ export default {
                 hypervisor: { title: 'Hypervisor', data: [] },
             },
             onServerTypeLegendClick(key, val) {
-                context.root.$router.push({ path: '/inventory/server', query: { plan: 'private' } });
+                context.root.$router.push({ path: '/inventory/server' });
             },
         });
 

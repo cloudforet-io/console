@@ -81,7 +81,7 @@ export default {
             DashboardEventBus.$emit(`listRegionBy${name}`);
         },
         onLegendClick(key, val) {
-            this.$router.push({ path: '/inventory/data-center', query: { plan: 'private' } });
+            this.$router.push({ path: '/inventory/data-center'  });
         },
     },
 };
