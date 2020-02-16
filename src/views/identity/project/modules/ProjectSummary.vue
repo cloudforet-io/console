@@ -17,7 +17,8 @@
     </div>
 </template>
 <script>
-import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
+import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout.vue';
+
 export default {
     name: 'Summary',
     components: {

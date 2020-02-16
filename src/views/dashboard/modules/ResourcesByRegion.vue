@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
-import PBubbleChart from '@/components/organisms/charts/bubble-chart/BubbleChart';
+import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout.vue';
+import PBubbleChart from '@/components/organisms/charts/bubble-chart/BubbleChart.vue';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 
 export default {
@@ -76,7 +76,7 @@ export default {
     methods: {
         onClickMenu(name, idx) {
             this.selectedIdx = idx;
-            this.loading = true;
+            this.loading = false;
             DashboardEventBus.$emit(`listRegionBy${name}`);
         },
         onLegendClick(key, val) {
