@@ -44,6 +44,7 @@
                         {{ getLabelName }}
                     </p-label>
                     <p-text-input ref="projectName" v-model="textInput.name"
+                                  v-focus
                                   :style="{'border': `${getIsInvalidProjectName}`, 'boxShadow': 'none' } "
                                   class="form-control"
                                   placeholder="Project Name"
@@ -91,6 +92,13 @@ export default {
         PLabel,
         PTextInput,
         PDictInputGroup,
+    },
+    directives: {
+        focus: {
+            inserted(el) {
+                el.focus();
+            },
+        },
     },
     props: {
         selectedNode: {
