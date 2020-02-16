@@ -514,6 +514,9 @@ export default {
                 &.fix-width {
                     min-width: 4.75rem;
                 }
+                &:last-child{
+                    padding-right: 1rem;
+                }
             }
         }
     }
