@@ -49,9 +49,10 @@
                                   class="form-control"
                                   placeholder="Project Name"
                                   required
+                                  @keyup="removeMessage"
                     />
-                    <div v-show="false" style="display:block" class="invalid-feedback">
-                        * {{ $t('SIGNIN.PASS_EMPTY') }}
+                    <div v-show="isValid.valid" style="display:block" class="invalid-feedback">
+                        * {{ isValid.errorMessage }}
                     </div>
                 </div>
             </div>
@@ -113,6 +114,10 @@ export default {
             visible: false,
             getShowHideYN: true,
             projectNameValidity: false,
+            isValid: {
+                valid: false,
+                errorMessage: null,
+            },
             styler: {
                 border: '1px solid #EF3817',
             },
@@ -200,6 +205,9 @@ export default {
         },
     },
     methods: {
+        removeMessage() {
+            this.isValid.valid = false;
+        },
         cleanModal() {
             this.tagInput = {
                 tags: {},
@@ -248,7 +256,14 @@ export default {
             this.$emit('create', flag, tree, nodeData);
         },
         async updateProjectAndGroup(flag, tree, nodeData) {
-            this.$emit('update', flag, tree, nodeData);
+            const vm = this.textInput;
+            if (!_.isEmpty(vm.name)) {
+                this.$emit('update', flag, tree, nodeData);
+            } else {
+                this.isValid.valid = true;
+                const target = flag[1] === 'PR' ? this.tr('COMMON.PG_GR') : this.tr('COMMON.PG');
+                this.isValid.errorMessage = this.tr('IDENTITY.REQ_FIELD', [target]);
+            }
         },
         async deletedSelectedOnTree(flag, tree, nodeData) {
             this.$emit('delete', flag, tree, nodeData);

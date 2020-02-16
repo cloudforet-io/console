@@ -253,6 +253,7 @@ export const ko = {
         UPT_ARG: '{0} 갱신하기',
         SELECT_ARG: '선택된 {0}',
         PARENT_ARG: '부모 {0}',
+        REQ_FIELD: '{0} 은/는 필수항목입니다!.',
         CHECK_HASH: ' 잘못된 해시태그 포맷입니다.',
         CRT_SUCC_ARG: '새로운 {0} 을/를 생성에 성공하였습니다.',
         CRT_FAIL_ARG: '{0} 을/를 생성에 실패하였습니다.',
@@ -267,6 +268,7 @@ export const ko = {
         DEL_MEMBER_PRJ: '{0} 에서 다음 회원을 제거 하시겠습니까? ',
     },
     INVENTORY: {
+        REQ_FIELD: '{0} 은/는 필수항목입니다!.',
         CRT_SUCC_ARG: '새로운 {0} 을/를 생성에 성공하였습니다.',
         CRT_FAIL_ARG: '{0} 을/를 생성에 실패하였습니다.',
         UPT_SUCC_ARG: '{0} 을/를 갱신였습니다.',

@@ -94,9 +94,10 @@
 
 <script>
 import url from 'url';
-import PLabel from '@/components/atoms/labels/Label';
-import PButton from '@/components/atoms/buttons/Button';
-import PTextInput from '@/components/atoms/inputs/TextInput';
+import _ from 'lodash';
+import PLabel from '@/components/atoms/labels/Label.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
 export default {
     name: 'LocalSignIn',
@@ -182,8 +183,8 @@ export default {
             };
 
             if (this.isEmpty(credentials.user_id) || this.isEmpty(credentials.password)) {
-                // this.validateInput(credentials, 'user_id');
-                // this.validateInput(credentials, 'password');
+                this.validateInput(credentials, 'user_id');
+                this.validateInput(credentials, 'password');
                 return;
             }
 
