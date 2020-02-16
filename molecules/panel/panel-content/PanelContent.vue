@@ -88,7 +88,6 @@ export default {
             this.$set(this.active, idx, flag);
         },
         getTextContent(el, text = '') {
-            debugger;
             if (el.childElementCount === 0) {
                 if (text && el.textContent) return `${text}, ${el.textContent}`;
                 return text || el.textContent;
