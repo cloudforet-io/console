@@ -1,5 +1,5 @@
 <template>
-    <p-panel-top panel-title="Tags" class="dict-panel-title">
+    <p-panel-top :panel-title="tr('ORGANISMS.TAG')" class="dict-panel-title">
         <template #head>
             <div class="panel-header" :class="{'edit':editMode}">
                 <p-button v-if="!editMode" style-type="primary-dark" class="header-btn"
@@ -26,7 +26,7 @@
                                 :edit-mode="editMode"
             />
             <div v-if="isEmpty(proxyTags) && !editMode" class="no-dict">
-                No Tags
+                {{ tr('ORGANISMS.NO_TAG') }}
             </div>
         </template>
     </p-panel-top>
