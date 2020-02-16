@@ -9,7 +9,7 @@
             <slot name="leftContainer" :width="`${leftContainerWidth}px`" :widthRaw="leftContainerWidth" />
         </div>
 
-        <div class="dragger-container" :class="{ line: line, 'prohibit-line': blockHover }" :style="{
+        <div class="dragger-container" :class="{ line: lineCass, 'prohibit-line': blockHover }" :style="{
                  height: height,
                  width: `${draggerWidth}px`,
              }"
@@ -97,6 +97,7 @@ export default {
     },
     data() {
         return {
+            lineCass: this.line,
             transitionEffect: true,
             leftContainerWidth: parseFloat(this.leftWidth),
             isMinimized: false,
@@ -128,11 +129,11 @@ export default {
         ]),
         mouseOnOver(flag) {
             if (this.isMinimized) {
-                this.line = false;
-                this.blockHover = !this.line;
+                this.lineCass = false;
+                this.blockHover = !this.lineCass;
             } else {
-                this.line = true;
-                this.blockHover = !this.line;
+                this.lineCass = true;
+                this.blockHover = !this.lineCass;
                 this.mouseOver = flag;
             }
         },
@@ -221,6 +222,7 @@ export default {
             }
         }
         &.left{
+            overflow:auto;
             > div {
                 transition:  width 0.5s;
                 > div {
@@ -254,7 +256,6 @@ export default {
             background-color: transparent;
             &:hover {
                 border-left: 1px solid $secondary;
-                cursor: ew-resize;
             }
         }
 
