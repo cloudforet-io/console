@@ -3,7 +3,7 @@
         <p-button :disabled="disabled"
                   :class="btnClassObject"
                   class="dropdown-btn menu-btn"
-                  @click.stop="onClick"
+                  @click="onClick"
                   @mouseover="onMouseOver"
                   @mouseout="onMouseOut"
         >
@@ -16,7 +16,7 @@
                        :color="`transparent ${ disabled ? colorSets.disabled : popup||mouseover ? colorSets.popup : colorSets.mouseover}`"
                        :hover-color="iconHoverColor"
                        button-style="white"
-                       @click.stop="onClick"
+                       @click="onClick"
                        @mouseenter="onMouseOver"
                        @mouseleave="onMouseOut"
         />
