@@ -38,7 +38,10 @@ export default {
             type: String,
             default: 'left',
         },
-
+        loading: {
+            type: Boolean,
+            default: true,
+        },
     },
     data() {
         return {
@@ -52,7 +55,6 @@ export default {
                 tagConfirmEvent: 'ServerTagConfirmEvent',
                 tagResetEvent: 'resetTagEvent',
             },
-            loading: true,
         };
     },
     computed: {
@@ -65,18 +67,17 @@ export default {
             }));
         },
     },
-    watch: {
-        data() {
-            if (this.loading) this.loading = false;
-        },
-    },
+    // watch: {
+    //     data() {
+    //         if (this.loading) this.loading = false;
+    //     },
+    // },
     created() {
         DashboardEventBus.$emit('listRegionByServer');
     },
     methods: {
         onClickMenu(name, idx) {
             this.selectedIdx = idx;
-            this.loading = false;
             DashboardEventBus.$emit(`listRegionBy${name}`);
         },
         onLegendClick(key, val) {

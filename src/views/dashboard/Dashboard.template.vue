@@ -6,6 +6,7 @@
                 <div class="item flex">
                     <ResourcesByRegion class="region"
                                        :data="resourcesByRegionData"
+                                       :loading="resourcesByRegionLoading"
                     />
                     <ServerState class="server-state"
                                  :data="serverStateData"
@@ -41,11 +42,10 @@ export const setup = () => {
         vmTypeData: {},
         osTypeData: {},
         hypervisorTypeData: {},
+        resourcesByRegionLoading: true,
     });
 
-    return {
-        ...toRefs(state),
-    };
+    return state;
 };
 
 export default {
@@ -60,7 +60,9 @@ export default {
         ServersByType,
     },
     setup(props, context) {
-        return setup(props, context);
+        return {
+            ...toRefs(setup(props, context)),
+        };
     },
 };
 </script>
