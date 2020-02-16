@@ -11,6 +11,7 @@
         />
         <resources-by-region class="col region"
                              :data="resourcesByRegionData"
+                             :loading="regionLoading"
                              legend-position="bottom"
                              :draw-by="drawBy"
         />
@@ -45,6 +46,7 @@ export default {
                 hypervisorTypeData: {},
             },
             resourcesByRegionData: {},
+            regionLoading: true,
         };
     },
     computed: {
@@ -68,6 +70,7 @@ export default {
             }
         },
         async getResourcesByRegionData() {
+            this.regionLoading = true;
             const selectedNodeDT = this.selectedNode.node.data;
             try {
                 const serverDT = await this.$http.post('/statistics/server-type', { project_id: selectedNodeDT.id, item_type: 'server_type' });
@@ -75,24 +78,28 @@ export default {
                 const osTypeDT = await this.$http.post('/statistics/server-type', { project_id: selectedNodeDT.id, item_type: 'os_type' });
                 const hypervisorTypeDT = await this.$http.post('/statistics/server-type', { project_id: selectedNodeDT.id, item_type: 'hypervisor_type' });
 
-                this.serverByType =  {
+                this.serverByType = {
                     serverTypeData: serverDT.data,
                     vmTypeData: vmTypeDT.data,
                     osTypeData: osTypeDT.data,
                     hypervisorTypeData: hypervisorTypeDT.data,
                 };
-
             } catch (e) {
                 console.error(e);
+            } finally {
+                this.regionLoading = false;
             }
         },
         async getServerByTypeData() {
+            this.regionLoading = true;
             const selectedNodeDT = this.selectedNode.node.data;
             try {
-                const resourceTypeDT = await this.$http.post('/statistics/datacenter-items', { project_id: selectedNodeDT.id, item_type: 'server'  });
+                const resourceTypeDT = await this.$http.post('/statistics/datacenter-items', { project_id: selectedNodeDT.id, item_type: 'server' });
                 this.resourcesByRegionData = resourceTypeDT.data;
             } catch (e) {
                 console.error(e);
+            } finally {
+                this.regionLoading = false;
             }
         },
     },
