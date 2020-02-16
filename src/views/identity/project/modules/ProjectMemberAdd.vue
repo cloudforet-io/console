@@ -195,6 +195,7 @@ export default {
             this.label.input = '';
             this.searchText = null;
             this.users = [];
+            this.tagTools.tags = [];
             this.tablePage = {
                 sortBy: 'name',
                 sortDesc: true,
