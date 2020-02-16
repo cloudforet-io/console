@@ -228,7 +228,8 @@ export default {
             });
         },
         checkValidity() {
-            const targets = this.label.input.split(',');
+            let targets = this.label.input;
+            targets = targets.replace(/,/gi, '').split(' ');
             const labelArr = [];
             targets.forEach((value) => {
                 const current = this.replaceAll(value, ' ', '');
