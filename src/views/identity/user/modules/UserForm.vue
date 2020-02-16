@@ -155,7 +155,6 @@ import {
     lengthMaxValidation,
     lengthMinValidation,
     checkTimeZoneValidation,
-    pluginAuthIDValidation,
 } from '@/lib/compostion-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
@@ -213,6 +212,24 @@ const setup = (props, context) => {
     const addUserValidations = { ...defaultValidation };
     const updateUserValidations = { ...defaultValidation };
     const userIdVds = [requiredValidation(), userIDValidation(context.parent)];
+
+    const pluginAuthIDValidation = parent => new Validation(async (value) => {
+        let result = false;
+        // eslint-disable-next-line camelcase
+        await parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: sessionStorage.domainId }).then((res) => {
+            if (res.data.total_count >= 1) {
+                result = true;
+                if (res.data.total_count === 1) {
+                    const data = res.data.results[0];
+                    if (!formState.name) { formState.name = data.name; }
+                    if (!formState.email) { formState.email = data.email; }
+                    if (!formState.mobile) { formState.mobile = data.mobile; }
+                    if (!formState.group) { formState.group = data.group; }
+                }
+            }
+        }).catch((error) => { console.debug(error); });
+        return result;
+    }, "ID doesn't exists!");
 
     if (!formState.is_local_auth) { // plugin auth type
         // eslint-disable-next-line camelcase
