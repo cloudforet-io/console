@@ -160,6 +160,7 @@ export const eventNames = {
     getCdData: '',
     addCd: '',
     deleteCd: '',
+    duplicateCheckEvent: '',
 };
 
 export const cdgSetup = (props, context, eventName, ACHandler) => {
@@ -208,8 +209,39 @@ export const cdgSetup = (props, context, eventName, ACHandler) => {
         searchText: '',
     });
 
-    const onSelect = (item) => {
-        tableState.tagTools.addTag(item);
+    const onSelect = async (item) => {
+        let credentialId = item.credential_id;
+        let result = false;
+        await context.parent.$http.post('/secret/credential/list', {
+            query: {
+                minimal: true,
+                filter: [{
+                    k: 'credential_id',
+                    v: [credentialId],
+                    o: 'in',
+                }],
+            },
+            include_credential_group: true,
+            credential_group_id: context.root.$route.params.id,
+            count_only: true,
+        }).then((res) => {
+            if (res.data.total_count === 1) {
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'Duplicate credentials',
+                    duration: 2000,
+                    speed: 1000,
+                });
+                result = false;
+            } else {
+                result = true;
+            }
+        });
+        if (result === true) {
+            tableState.tagTools.addTag(item);
+        }
     };
 
     const clickAdd = () => {
@@ -223,7 +255,6 @@ export const cdgSetup = (props, context, eventName, ACHandler) => {
     };
 
     const cdgFormConfirm = (item) => {
-        console.debug('cdgFormConfirm test', item);
         eventBus.$emit(cdgFormState.eventName, item);
         cdgFormState.visible = false;
         cdgFormState.mode = '';

@@ -52,6 +52,7 @@ export default {
         cdEventNames.tagConfirmEvent = 'CdTagConfirmEvent';
         cdEventNames.tagResetEvent = 'resetTagEvent';
         cdEventNames.addCd = 'addCd';
+        // cdEventNames.dupliacteCheckEvent = 'duplicateCheck';
 
         const state = cdgSetup(props, context, cdEventNames, new ACHandler());
         const requestState = reactive({
@@ -84,6 +85,39 @@ export default {
             }
         };
 
+        // const duplicateCheck = async (item) => {
+        //     console.debug('duplicateCheck', item)
+        //     let result = false;
+        //     await context.parent.$http.post('/secret/credential-group/list', {
+        //         query: {
+        //             minimal: true,
+        //             filter: [{
+        //                 k: 'credential_id',
+        //                 v: item.credential_id,
+        //                 o: 'in',
+        //             }],
+        //         },
+        //         include_credential_group: true,
+        //         credential_group_id: context.root.$route.params.id,
+        //         count_only: true,
+        //     }).then((res) => {
+        //         if (res.data.total_count === 1) {
+        //             context.root.$notify({
+        //                 group: 'noticeBottomRight',
+        //                 type: 'alert',
+        //                 title: 'Fail',
+        //                 text: 'Duplicate credentials',
+        //                 duration: 2000,
+        //                 speed: 1000,
+        //             });
+        //             result = false;
+        //         } else {
+        //             result = true;
+        //         }
+        //     });
+        //     return result;
+        // };
+
         const getCdsParam = (items) => {
             const result = {
                 // eslint-disable-next-line camelcase
@@ -92,11 +126,9 @@ export default {
                 // name: _.map(items, 'name'),
                 // tags: _.map(items, 'tags'),
             };
-            console.debug('getCdsParam', result);
             return result;
         };
         const addCd = async (items) => {
-            console.debug('addCd test', items);
             await context.parent.$http.post('/secret/credential-group/credential/add', getCdsParam(items)).then(async (_) => {
                 await requestCdList();
                 context.root.$notify({
@@ -122,6 +154,7 @@ export default {
         };
 
         mountBusEvent(cdgEventBus, cdEventNames.getCdList, requestCdList);
+        // mountBusEvent(cdgEventBus, cdEventNames.dupliacteCheckEvent, duplicateCheck);
         mountBusEvent(cdgEventBus, cdEventNames.addCd, addCd);
 
         requestCdList();
