@@ -31,7 +31,7 @@ export const GlobalEnum = {
                 type: 'POOL',
                 root_able: false,
                 accept: [],
-                isLeaf: false,
+                isLeaf: true,
             },
         },
     }),

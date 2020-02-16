@@ -219,6 +219,10 @@ export default {
             const reservedActionFlag = actionFlag.split('_');
             if (!this.isEmpty(reservedActionFlag) && reservedActionFlag[0] !== 'DEL') {
                 this.visible = true;
+                this.isValid = {
+                    valid: false,
+                    errorMessage: null,
+                };
                 this.selectProjectMetas(reservedActionFlag);
             } else {
                 this.deletedSelectedOnTree(reservedActionFlag, this.selectedNode.tree, this.selectedNode.node.data);

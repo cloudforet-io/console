@@ -48,13 +48,13 @@
             <span v-if="!node.data.init" class="item-title" @mousedown="setTitle">{{ node.title }}</span>
         </template>
         <template #toggle="{ node }">
-            <p-i v-if="node.isExpanded"
+            <p-i v-if="node.isExpanded && !node.isLeaf"
                  :color="'transparent inherit'"
                  :width="'1rem'"
                  :height="'1rem'"
                  :name="'ic_tree_arrow--opened'"
             />
-            <p-i v-else
+            <p-i v-else-if="!node.isExpanded && !node.isLeaf"
                  :color="'transparent inherit'"
                  :width="'1rem'"
                  :height="'1rem'"
