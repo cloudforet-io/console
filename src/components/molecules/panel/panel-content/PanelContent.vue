@@ -87,8 +87,21 @@ export default {
         mouseInOut(idx, flag) {
             this.$set(this.active, idx, flag);
         },
-        getTextContent(el) {
-            if (el.childElementCount === 0) return el.textContent;
+        getTextContent(el, text = '') {
+            debugger;
+            if (el.childElementCount === 0) {
+                if (text && el.textContent) return `${text}, ${el.textContent}`;
+                return text || el.textContent;
+            }
+            if (el.childElementCount > 1) {
+                console.log('el.childElementCount > 1');
+                let res = '';
+                el.children.forEach((child) => {
+                    res += this.getTextContent(child, res);
+                });
+                console.log('res', res);
+                return res;
+            }
             return this.getTextContent(el.firstElementChild);
         },
         getValue(name) {
