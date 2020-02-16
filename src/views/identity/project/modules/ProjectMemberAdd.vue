@@ -37,6 +37,7 @@
                 <template slot="toolbox-left">
                     <p-search :search-placeholder="getSearchPlaceHolder"
                               :search-text.sync="searchText"
+                              focused
                               @onSearch="search"
                     />
                 </template>
@@ -195,6 +196,7 @@ export default {
             this.label.input = '';
             this.searchText = null;
             this.users = [];
+            this.tagTools.tags = [];
             this.tablePage = {
                 sortBy: 'name',
                 sortDesc: true,
@@ -226,7 +228,8 @@ export default {
             });
         },
         checkValidity() {
-            const targets = this.label.input.split(',');
+            let targets = this.label.input;
+            targets = targets.replace(/,/gi, '').split(' ');
             const labelArr = [];
             targets.forEach((value) => {
                 const current = this.replaceAll(value, ' ', '');

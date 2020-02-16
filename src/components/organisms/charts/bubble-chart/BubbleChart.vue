@@ -126,8 +126,8 @@ const setDrawTools = (props, context) => {
         hoverState: false,
     });
 
-    const max = computed(() => _.maxBy(props.data, d => d.value).value);
-    const min = computed(() => _.minBy(props.data, d => d.value).value);
+    const max = computed(() => (props.data.length > 0 ? _.maxBy(props.data, d => d.value).value : 0));
+    const min = computed(() => (props.data.length > 0 ? _.minBy(props.data, d => d.value).value : 0));
 
     const initRScale = () => {
         state.rScale = d3.scaleLinear()

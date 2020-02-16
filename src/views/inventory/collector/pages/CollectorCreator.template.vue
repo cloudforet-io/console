@@ -2,9 +2,10 @@
     <general-page-layout>
         <p-button class="back-btn" @click="goBackToCollectors">
             <p-i name="ic_back" color="transparent inherit" />
-            Back to Collectors
+            {{ tr('INVENTORY.BACK_COL') }}
         </p-button>
         <p-progress-wizard :tabs.sync="tabs"
+                           :labels="tabLabels"
                            :active-idx.sync="activeIdx"
                            :show-confirm="isAllTabValid"
                            :title="tr('INVENTORY.CRT_COLL')"
@@ -126,29 +127,31 @@ export default {
         ChooseCredentials,
         PDictInputGroup,
     },
-    setup(props, { refs, root }) {
+    setup(props, { refs, root, parent }) {
         const dataState = setDataState(root);
 
         const state = reactive({
             tabs: [
                 {
                     key: 'conf',
-                    label: 'Configure Collector',
                     showValidation: false,
                     invalid: true,
                 },
                 {
                     key: 'credentials',
-                    label: 'Choose Credentials',
                     showValidation: false,
                     invalid: true,
                 },
                 {
                     key: 'tags',
-                    label: 'Add Tags',
                     optional: true,
                 },
             ],
+            tabLabels: computed(() => ({
+                conf: parent.tr('INVENTORY.CONF_COL', parent),
+                credentials: parent.tr('INVENTORY.CHOOSE_CRD'),
+                tags: parent.tr('INVENTORY.ADD_TAG'),
+            })),
             activeIdx: 0,
             showConfirm: false,
         });

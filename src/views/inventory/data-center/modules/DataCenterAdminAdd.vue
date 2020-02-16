@@ -37,6 +37,7 @@
                     <p-search
                         :search-placeholder="getSearchPlaceHolder"
                         :search-text.sync="searchText"
+                        focused
                         @onSearch="search"
                     />
                 </template>
@@ -67,7 +68,7 @@
                                   :style="{'border': `${getInvalidityHashTag}`, 'boxShadow': 'none' } "
                                   class="form-control"
                                   type="text"
-                                  placeholder="  #Labels,"
+                                  placeholder="#Labels "
                                   required
                                   @keyup="removeCSS"
                     />
@@ -229,7 +230,8 @@ export default {
             });
         },
         checkValidity() {
-            const targets = this.label.input.split(',');
+            let targets = this.label.input;
+            targets = targets.replace(/,/gi, '').split(' ');
             const labelArr = [];
             targets.forEach((value) => {
                 const current = this.replaceAll(value, ' ', '');
@@ -306,5 +308,8 @@ export default {
     }
     .tag {
         margin-bottom: .5rem;
+    }
+    .tag-container {
+        min-height: 80px;
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <p-board-layout title="Server States">
+    <p-board-layout :title="tr('DASHBOARD.SERVER_STATE')">
         <div class="chart">
             <p-donut-chart
                 :data="chartData"

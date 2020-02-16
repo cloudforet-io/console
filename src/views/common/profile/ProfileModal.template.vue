@@ -28,7 +28,6 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="userState.email"
-                                          :disabled="isDomainOwner"
                                           class="form-control"
                                           :class="{'is-invalid': invalid}"
                             />
@@ -40,7 +39,6 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="userState.name" block
-                                          :disabled="isDomainOwner"
                                           class="form-control"
                                           :class="{'is-invalid': invalid}"
                             />
@@ -75,14 +73,12 @@
                     <p-field-group :label="tr('COMMON.PHONE')">
                         <br>
                         <p-text-input v-model="userState.mobile"
-                                      :disabled="isDomainOwner"
                                       block
                         />
                     </p-field-group>
                     <p-field-group :label="tr('COMMON.GROUP')">
                         <br>
                         <p-text-input v-model="userState.group"
-                                      :disabled="isDomainOwner"
                                       block
                         />
                     </p-field-group>
@@ -90,14 +86,12 @@
                         <p-select-dropdown v-model="userState.language"
                                            :items="languages"
                                            auto-height
-                                           :disabled="isDomainOwner"
                         />
                     </p-field-group>
                     <p-field-group :label="tr('COMMON.TIMEZONE')">
                         <p-select-dropdown v-model="userState.timezone"
                                            :items="timezones"
                                            auto-height
-                                           :disabled="isDomainOwner"
                         />
                     </p-field-group>
                 </p-col>
@@ -176,18 +170,17 @@ export const profileSetup = (props, context) => {
         const result = await state.allValidation();
         if (!result) return;
 
-        let userParam = {};
+        const userParam = { ...state.userState };
+        delete userParam.passwordCheck;
+        if (!state.showPassword) delete userParam.password;
+
         if (state.isDomainOwner) {
             // eslint-disable-next-line camelcase
             userParam.owner_id = props.userId;
-            userParam.password = state.userState.password;
             GNBEventBus.$emit('updateOwner', userParam);
         } else {
-            userParam = { ...state.userState };
             // eslint-disable-next-line camelcase
             userParam.user_id = props.userId;
-            delete userParam.passwordCheck;
-            if (!state.showPassword) delete userParam.password;
             GNBEventBus.$emit('updateUser', userParam);
         }
 

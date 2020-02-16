@@ -188,7 +188,6 @@ export default {
             }
 
             await this.$store.dispatch('auth/signIn', credentials).then(() => {
-                console.log('start');
                 if (localStorage.getItem('common.toNextPath') === '/sign-in' || localStorage.getItem('common.toNextPath') === null) {
                     localStorage.setItem('common.toNextPath', '/');
                 }

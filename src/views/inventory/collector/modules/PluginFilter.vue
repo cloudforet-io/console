@@ -80,7 +80,7 @@ export default {
             search: '',
             proxySelectedRepoId: makeProxy('selectedRepoId', props, context.emit),
             resourceOptions: [
-                'Server', 'Network', 'Subnet', 'IP Address',
+                'Server', 'Network', 'Subnet', 'IP Address', 'Cloud Service',
             ],
         });
 
@@ -100,8 +100,10 @@ export default {
         };
 
         const onClickResourceText = (val) => {
-            if (proxyFilters.value.includes(val)) _.remove(proxyFilters.value, item => item === val);
-            else proxyFilters.value.push(val);
+            if (proxyFilters.value.includes(val)) {
+                _.remove(proxyFilters.value, item => item === val);
+                proxyFilters.value = [...proxyFilters.value];
+            } else proxyFilters.value.push(val);
             onResourceChange(proxyFilters.value);
         };
 

@@ -2,6 +2,7 @@
     <div class="p-dict-input" v-on="$listeners">
         <div class="dict-input-box dict-key-input">
             <p-input-text
+                v-focus
                 class="dict-input"
                 :value="name"
                 :disabled="disabled"
@@ -30,6 +31,13 @@ import PInputText from '@/components/atoms/inputs/TextInput.vue';
 export default {
     name: 'PDictInput',
     components: { PInputText },
+    directives: {
+        focus: {
+            inserted(el) {
+                el.focus();
+            },
+        },
+    },
     props: {
         name: String,
         value: {

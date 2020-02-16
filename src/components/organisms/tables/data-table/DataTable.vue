@@ -74,7 +74,7 @@
             </p-tr>
             <p-tr v-else-if="showNoData" key="noData" class="no-data-row">
                 <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
-                    No Data
+                    {{ tr('ORGANISMS.NO_DATA') }}
                 </p-td>
             </p-tr>
             <slot v-else name="body" :items="items">
@@ -513,6 +513,9 @@ export default {
                 }
                 &.fix-width {
                     min-width: 4.75rem;
+                }
+                &:last-child{
+                    padding-right: 1rem;
                 }
             }
         }

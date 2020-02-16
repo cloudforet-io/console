@@ -446,8 +446,6 @@ export class QuerySearchTableAPI extends BaseQuerySearchTableAPI {
 
     constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[], extraParams?:object) {
         super(parent, url, keys, only, extraParams);
-        console.log(extraParams);
-        console.log(this.state);
         const isNotSelected:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 0 : true));
         const isSelectOne:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 1 : false));
         const isSelectMulti:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length > 1 : false));

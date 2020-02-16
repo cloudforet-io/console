@@ -7,17 +7,17 @@
                             :style="{ width: `${100 / dataLength}%` }"
                             @mouseenter="onMouseEnter(key)"
                             @mouseleave="onMouseLeave(key)"
+                            @click="onLinkClick(key, )"
             >
                 <span class="label">{{ d.label }}</span>
-                <span class="count"
-                      @click="onLinkClick(key, data[key])"
-                >{{ data[key] || 0 }}</span>
+                <span class="count">{{ data[key] || 0 }}</span>
             </p-board-layout>
         </div>
     </div>
 </template>
 <script>
-import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
+import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout.vue';
+
 export default {
     name: 'Summary',
     components: {
@@ -43,7 +43,7 @@ export default {
                     label: 'Server', path: '/inventory/server', hover: false,
                 },
                 // eslint-disable-next-line camelcase
-                cloud_service: { label: 'Cloud Service', hover: false },
+                cloud_service: { label: 'Cloud Service', path: '/inventory/cloud-service', hover: false },
                 network: { label: 'Network', hover: false },
             },
         };
@@ -69,10 +69,9 @@ export default {
         onMouseLeave(key) {
             this.dataMap[key].hover = false;
         },
-        onLinkClick(key, val) {
-            console.debug('onLinkClick', key, val);
+        onLinkClick(key ) {
             if (this.dataMap[key].path) {
-                this.$router.push({ path: this.dataMap[key].path, query: { plan: 'private' } });
+                this.$router.push({ path: this.dataMap[key].path  });
             }
         },
     },
@@ -101,6 +100,7 @@ export default {
         justify-content: space-between;
         padding: 2rem 1rem;
         margin-right: 1rem;
+        cursor: pointer;
         &:last-child {
             margin-right: 0;
         }
@@ -120,7 +120,6 @@ export default {
             font-size: 2rem;
             color: $primary-dark;
             font-weight: bold;
-            cursor: pointer;
         }
     }
 

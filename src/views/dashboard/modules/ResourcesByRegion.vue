@@ -1,5 +1,5 @@
 <template>
-    <p-board-layout title="Resources by Region"
+    <p-board-layout :title="tr('DASHBOARD.RES_REGION')"
                     :dropdown-menu="dropdownMenu"
                     :dropdown-selected="dropdownMenu[selectedIdx].label"
                     @clickMenuEvent="onClickMenu"
@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
-import PBubbleChart from '@/components/organisms/charts/bubble-chart/BubbleChart';
+import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout.vue';
+import PBubbleChart from '@/components/organisms/charts/bubble-chart/BubbleChart.vue';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 
 export default {
@@ -38,7 +38,10 @@ export default {
             type: String,
             default: 'left',
         },
-
+        loading: {
+            type: Boolean,
+            default: true,
+        },
     },
     data() {
         return {
@@ -52,7 +55,6 @@ export default {
                 tagConfirmEvent: 'ServerTagConfirmEvent',
                 tagResetEvent: 'resetTagEvent',
             },
-            loading: true,
         };
     },
     computed: {
@@ -65,18 +67,17 @@ export default {
             }));
         },
     },
-    watch: {
-        data() {
-            if (this.loading) this.loading = false;
-        },
-    },
+    // watch: {
+    //     data() {
+    //         if (this.loading) this.loading = false;
+    //     },
+    // },
     created() {
         DashboardEventBus.$emit('listRegionByServer');
     },
     methods: {
         onClickMenu(name, idx) {
             this.selectedIdx = idx;
-            this.loading = true;
             DashboardEventBus.$emit(`listRegionBy${name}`);
         },
         onLegendClick(key, val) {

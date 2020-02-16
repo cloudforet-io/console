@@ -44,7 +44,7 @@
                             <template #details="{tabName}">
                                 <project-summary-top ref="detailsTop"
                                                      :selected-node="getSelectedNodeAndTree"
-                                                     :responsive-style="{'height': height-100+'px', 'overflow-y':'auto'}"
+                                                     :responsive-style="{'height': height+'px', 'overflow-y':'auto'}"
                                 />
                             </template>
                             <template #member="{tabName}">

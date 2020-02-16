@@ -27,7 +27,7 @@ export default {
 
             // eslint-disable-next-line class-methods-use-this
             get suggestKeys() {
-                return ['collector_id', 'name', 'plugin_info.options.supported_resource_type'];
+                return ['collector_id', 'name'];
             }
 
             // eslint-disable-next-line class-methods-use-this
@@ -63,7 +63,7 @@ export default {
         const collectorTableQuery = computed(() => (defaultQuery(
             state.thisPage, state.pageSize,
             state.sortBy, state.sortDesc,
-            state.searchText,
+            null, state.queryListTools.tags,
         )));
 
         const getCollectorList = async () => {

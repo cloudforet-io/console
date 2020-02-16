@@ -6,6 +6,7 @@
         <slot name="top">
             <slot name="progress">
                 <p-progress-tab-bar :tabs="proxyTabs"
+                                    :labels="labels"
                                     :active-idx.sync="proxyActiveIdx"
                                     @changeTab="onChangeTab"
                 >
@@ -33,8 +34,8 @@
 
         <template v-if="activeTab">
             <p-panel-top class="step-title">
-                Step {{ activeIdx + 1 }}. {{ activeTab.label }}
-                <span v-if="activeTab.optional" class="optional"> (optional)</span>
+                Step {{ activeIdx + 1 }}. {{ labels[activeTab.key] || activeTab.key }}
+                <span v-if="activeTab.optional" class="optional"> ({{ tr('COMMON.OPTIONAL') }})</span>
                 <template #head>
                     <div class="step-appendix">
                         <slot :name="`step-append-${activeTab.key}`" :tab="activeTab" />
@@ -54,7 +55,7 @@
                     <p-button outline style-type="dark" size="lg"
                               class="txt-btn" @click="$emit('cancel', $event)"
                     >
-                        Cancel
+                        {{ tr('COMMON.BTN_CANCEL') }}
                     </p-button>
                 </p-col>
                 <p-col :flex-grow="0" class="nav-btn-box">
@@ -62,21 +63,21 @@
                               outline style-type="secondary" size="lg"
                               @click="onClickPrev"
                     >
-                        <p-i name="ic_back" color="transparent inherit" />Prev
+                        <p-i name="ic_back" color="transparent inherit" />{{ tr('COMMON.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
                               outline style-type="secondary"
                               size="lg"
                               @click="onClickNext"
                     >
-                        Next<p-i name="ic_back" color="transparent inherit" dir="down" />
+                        {{ tr('COMMON.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
                     </p-button>
                     <p-button style-type="secondary" size="lg"
                               :disabled="!showConfirm"
                               class="txt-btn"
                               @click="$emit('confirm', tabs, $event)"
                     >
-                        Confirm
+                        {{ tr('COMMON.BTN_CONFIRM') }}
                     </p-button>
                 </p-col>
             </p-row>
@@ -146,6 +147,10 @@ export default {
     },
     props: {
         tabs: Array,
+        labels: {
+            type: Object,
+            default: () => ({}),
+        },
         activeIdx: {
             type: Number,
             default: 0,

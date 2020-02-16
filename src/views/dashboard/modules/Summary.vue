@@ -1,7 +1,7 @@
 <template>
     <div class="summary">
         <p class="title">
-            Summary
+            {{ tr('DASHBOARD.SUMMARY') }}
         </p>
         <div class="card-container">
             <p-board-layout v-for="(d, key) in dataMap" :key="key"

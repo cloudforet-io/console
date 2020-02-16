@@ -16,22 +16,22 @@
                         >
                     </p-col>
                     <p-col>
-                        <p-field-group label="Collector Name"
+                        <p-field-group :label="tr('INVENTORY.COL_NAME')"
                                        required
-                                       :invalid="showValidation && !isNameValid"
-                                       invalid-text="Collector Name is required field!"
+                                       :invalid="showValidation && fieldVdApi.invalidState.name"
+                                       :invalid-text="tr('INVENTORY.COL_NAME_VD')"
                         >
                             <template #default="{invalid}">
-                                <p-text-input v-model="proxyName"
+                                <p-text-input v-model="fieldState.name"
                                               v-focus
                                               style="width: 100%;"
                                               class="form-control"
                                               :class="{'is-invalid': invalid}"
-                                              @input="onChangeName"
+                                              @input="onChangeFields('name')"
                                 />
                             </template>
                         </p-field-group>
-                        <p-field-group label="Version">
+                        <p-field-group :label="tr('INVENTORY.VERSION')">
                             <p-dropdown-menu-btn :menu="versionsInfo"
                                                  :loading="versionsInfo ? false : true"
                                                  block
@@ -40,12 +40,18 @@
                                 {{ selectedVersion }}
                             </p-dropdown-menu-btn>
                         </p-field-group>
-                        <p-field-group label="Priority">
-                            <br>
-                            <p-text-input v-model.number="proxyPriority"
-                                          type="number"
-                                          style="width: 100%;"
-                            />
+                        <p-field-group :label="tr('INVENTORY.PRIORITY')"
+                                       :invalid="showValidation && fieldVdApi.invalidState.priority"
+                                       :invalid-text="tr('INVENTORY.COL_PRIORITY_VD')"
+                        >
+                            <template #default="{invalid}">
+                                <p-text-input v-model.number="fieldState.priority"
+                                              type="number"
+                                              class="form-control"
+                                              :class="{'is-invalid': invalid}"
+                                              @input="onChangeFields('priority')"
+                                />
+                            </template>
                         </p-field-group>
                     </p-col>
                 </p-row>
@@ -53,7 +59,7 @@
 
             <p-col v-if="pluginOptions.length > 0" class="container options">
                 <p class="sub-title">
-                    Options
+                    {{ tr('INVENTORY.OPTIONS') }}
                 </p>
                 <p-dynamic-form v-for="(op) in pluginOptions" :key="op.key"
                                 v-model="proxyOptionsValue[op.key]"
@@ -74,7 +80,9 @@ import {
 import _ from 'lodash';
 import config from '@/lib/config';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
-import { makeProxy } from '@/lib/compostion-util';
+import {
+    formValidation, makeProxy, requiredValidation, Validation,
+} from '@/lib/compostion-util';
 
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
@@ -82,7 +90,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
-import PLottie from '@/components/molecules/lottie/PLottie';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 const init = (props, root) => {
     const params = {
@@ -140,12 +148,20 @@ export default {
     setup(props, { emit, root }) {
         init(props, root);
 
+        const fieldState = reactive({
+            name: props.name,
+            priority: props.priority,
+        });
+
+        const fieldValidation = {
+            name: [requiredValidation()],
+            priority: [new Validation(p => p > 0 && p <= 1000)],
+        };
+
         const state = reactive({
-            proxyName: makeProxy('name', props, emit),
             pluginOptions: computed(() => _.get(props.plugin, 'template.options', [])),
             proxyOptionsValue: makeProxy('optionsValue', props, emit),
             proxySelectedVersion: makeProxy('selectedVersion', props, emit),
-            proxyPriority: makeProxy('priority', props, emit),
             imgUrl: computed(() => _.get(props.plugin, 'tags.icon', config.get('COLLECTOR_IMG'))),
             versionsInfo: computed(() => {
                 if (!props.selectedVersion) state.proxySelectedVersion = props.versions[0];
@@ -155,24 +171,27 @@ export default {
                 state.proxySelectedVersion = item;
             },
             vdApi: setValidation(_.get(props.plugin, 'template.options', []), props.optionsValue),
-            isNameValid: computed(() => !!props.name),
-            isAllValid: undefined,
+            fieldState,
+            fieldVdApi: formValidation(fieldState, fieldValidation),
             imgLoading: true,
         });
 
         const actions = {
             validate: async () => {
-                const res = state.isNameValid && await state.vdApi.allValidation();
-                return res && props.name;
+                const options = await state.vdApi.allValidation();
+                const fields = await state.fieldVdApi.allValidation();
+                return options && fields;
             },
-            onChangeName: (val) => {
+            onChangeFields: async (key) => {
+                emit(`update:${key}`, fieldState[key]);
                 if (!props.showValidation) return;
-                emit('changeValidState', !!val);
+                await state.fieldVdApi.fieldValidation(key);
+                emit('changeValidState', state.fieldVdApi.isAllValid);
             },
             onChangeOption: async (key) => {
-                if (!props.showValidation || !props.plugin) return;
+                if (!props.showValidation) return;
                 await state.vdApi.fieldValidation(key);
-                emit('changeValidState', state.vdApi.isAllValid && props.name);
+                emit('changeValidState', state.vdApi.isAllValid);
             },
         };
 

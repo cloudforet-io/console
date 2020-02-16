@@ -16,7 +16,7 @@
             <span class="triangle" />
             <slot :name="`progress-${tab.key}`" :tab="tab">
                 <span>{{ Number(idx) + 1 }}.
-                    {{ tab.label || tab.key }}
+                    {{ labels[tab.key] || tab.key }}
                 </span>
             </slot>
 
@@ -50,6 +50,10 @@ export default {
     },
     props: {
         tabs: [Array],
+        labels: {
+            type: Object,
+            default: () => ({}),
+        },
         activeIdx: {
             type: Number,
             default: 0,
