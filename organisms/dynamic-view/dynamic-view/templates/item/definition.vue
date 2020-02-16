@@ -4,9 +4,11 @@
             <p-dt class="label">{{ name }}</p-dt>
             <span class="data" @mouseleave="onMouseOut">
                 <p-dd @mouseenter="onMouseOver">
-                    <p-dynamic-field :view_type="view_type" :view_option="view_option" :data="data" />
+                    <p-dynamic-field ref="field" :view_type="view_type" :view_option="view_option"
+                                     :data="data"
+                    />
                 </p-dd>
-                <p-copy-button v-if="isMouseOver" class="copy-btn" :value="data" />
+                <p-copy-button v-if="isMouseOver" class="copy-btn" :value="value" />
             </span>
         </span>
     </div>
@@ -15,7 +17,10 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 
-import { createComponent } from '@vue/composition-api';
+import {
+    computed, createComponent, Ref, ref,
+} from '@vue/composition-api';
+
 import { mouseOverState } from '@/lib/compostion-util';
 import PDt from '@/components/atoms/lists/dl-list/Dt.vue';
 import PDd from '@/components/atoms/lists/dl-list/Dd.vue';
@@ -45,8 +50,13 @@ export default createComponent({
             default: 'text',
         },
     },
-    setup() {
+    setup(props) {
+        const field = ref(null);
+        // @ts-ignore
+        const value = computed(() => field.value.$el.innerText);
         return {
+            field,
+            value,
             ...mouseOverState(),
         };
     },
