@@ -108,7 +108,6 @@ export default {
         async signIn({
             dispatch, rootGetters, commit, state,
         }, credentials) {
-            console.log('start');
             const response = await api.instance.post('/sign-in', {
                 domain_id: rootGetters['domain/id'],
                 credentials,

@@ -294,9 +294,8 @@ export const credentialsSetup = (props, context, eventName) => {
     const clickDelete = () => {
         const selectedItemName = tableState.items[tableState.selectIndex].name;
         doubleState.origin = selectedItemName;
-        doubleState.title = 'Delete Credentials confirmation.';
+        doubleState.title = `Type ${selectedItemName} to confirm`;
         doubleState.placeHolder = `Please, enter the name from above to delete selected item: ${selectedItemName} .`;
-
         checkTableModalState.mode = 'delete';
         checkTableModalState.confirmEventName = eventNames.deleteCredentials;
         checkTableModalState.title = 'Delete Credentials';

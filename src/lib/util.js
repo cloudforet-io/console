@@ -1,6 +1,6 @@
 import moment from 'moment-timezone';
 import _ from 'lodash';
-import { Util } from '@/lib/global-util';
+import { DateTime } from 'luxon';
 import styles from '@/styles/_variables.scss';
 import { ColorBindFactory } from '@/lib/view-helper';
 
@@ -99,8 +99,9 @@ export const platformBadgeColor = Object.freeze({
     LINUX: { backgroundColor: styles.other1 },
     WINDOWS: { backgroundColor: styles.secondary },
 });
-const getTimestamp = () => localStorage.getItem('timezone') || 'UTC';
-export const getLocalDatetimeFromTimeStamp = ts => moment.unix(ts).tz(getTimestamp()).format('YYYY-MM-DD HH:MM:SS z');
+export const getTimezone = () => localStorage.getItem('timezone') || 'UTC';
+export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(ts)).setZone(getTimezone()).toFormat('yyyy-LL-dd HH:mm:ss ZZZZ');
+
 // formatter
 export const timestampFormatter = value => getLocalDatetimeFromTimeStamp(value.seconds);
 

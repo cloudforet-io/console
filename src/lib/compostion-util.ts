@@ -192,12 +192,3 @@ export const userIDValidation = (parent:any, invalidMessage:message) => new Vali
     });
     return result;
 }, invalidMessage || 'same ID exists!');
-
-export const pluginAuthIDValidation = (parent:any) => new Validation(async (value:string) => {
-    let result:boolean = true;
-    // eslint-disable-next-line camelcase
-    await parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: sessionStorage.domainId, query: { count_only: true } }).then((res) => {
-        if (res.data.total_count === 0) { result = true; }
-    }).catch((error) => { console.debug(error); });
-    return result;
-}, "ID doesn't exists!");

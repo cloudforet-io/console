@@ -155,7 +155,6 @@ import {
     lengthMaxValidation,
     lengthMinValidation,
     checkTimeZoneValidation,
-    pluginAuthIDValidation,
 } from '@/lib/compostion-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
@@ -190,6 +189,7 @@ const setup = (props, context) => {
         language: 'ko',
         timezone: 'UTC',
         tags: {},
+        isLastCheck: false,
         // eslint-disable-next-line camelcase
         is_local_auth: computed(() => context.parent.$store.getters['auth/isLocalType']),
         ...props.item,
@@ -214,6 +214,24 @@ const setup = (props, context) => {
     const updateUserValidations = { ...defaultValidation };
     const userIdVds = [requiredValidation(), userIDValidation(context.parent)];
 
+    const pluginAuthIDValidation = parent => new Validation(async (value) => {
+        let result = false;
+        // eslint-disable-next-line camelcase
+        await parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: sessionStorage.domainId }).then((res) => {
+            if (res.data.total_count >= 1) {
+                result = true;
+                if (!formState.isLastCheck && res.data.total_count === 1) {
+                    const data = res.data.results[0];
+                    if (!formState.name) { formState.name = data.name; }
+                    if (!formState.email) { formState.email = data.email; }
+                    if (!formState.mobile) { formState.mobile = data.mobile; }
+                    if (!formState.group) { formState.group = data.group; }
+                }
+            }
+        }).catch((error) => { console.debug(error); });
+        return result;
+    }, "ID doesn't exists!");
+
     if (!formState.is_local_auth) { // plugin auth type
         // eslint-disable-next-line camelcase
         addUserValidations.user_id = [...userIdVds, pluginAuthIDValidation(context.parent)];
@@ -236,7 +254,10 @@ const setup = (props, context) => {
         return result;
     };
     const confirm = async () => {
+        formState.isLastCheck = true;
         const result = await validateAPI.allValidation();
+        formState.isLastCheck = false;
+
         if (result) {
             const data = {};
             if (formState.is_local_auth) {

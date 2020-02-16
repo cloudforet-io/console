@@ -41,14 +41,15 @@ export default {
                 view_option: {
                     source_type: 'timestamp',
                     source_format: 'seconds',
-                    display_format: 'YYYY-MM-DD HH:MM:SS z',
                 },
             },
         ];
 
         const tags = ref({ ...props.tags });
         watch(() => props.item, (value) => {
-            tags.value = value.tags || {};
+            if (value) {
+                tags.value = value.tags || {};
+            }
         });
         const dictPanel = ref(null);
         const resetTag = () => {

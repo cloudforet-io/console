@@ -22,7 +22,7 @@
                                     <p-col>
                                         <p-text-input
                                             v-model="formState.name"
-                                            type="name"
+                                            label="name"
                                             :class="{
                                                 'form-control':true,
                                                 'is-invalid':invalid
@@ -109,7 +109,7 @@ const setup = (props, context) => {
                     data.name = formState.name;
                 }
             }
-            ['name', 'tags'].forEach((key) => {
+            ['credential_group_id', 'name', 'tags'].forEach((key) => {
                 if (formState[key]) {
                     data[key] = formState[key];
                 }

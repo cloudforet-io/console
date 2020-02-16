@@ -1,6 +1,6 @@
 <script>
 import { toRefs } from '@vue/composition-api';
-import DashboardTemplate, { setup } from '@/views/dashboard/Dashboard.template';
+import DashboardTemplate, { setup } from '@/views/dashboard/Dashboard.template.vue';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 

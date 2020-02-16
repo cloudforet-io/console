@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 
 export default {
     name: 'PBoardLayout',
