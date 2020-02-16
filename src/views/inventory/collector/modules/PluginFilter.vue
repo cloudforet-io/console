@@ -80,7 +80,7 @@ export default {
             search: '',
             proxySelectedRepoId: makeProxy('selectedRepoId', props, context.emit),
             resourceOptions: [
-                'Server', 'Network', 'Subnet', 'IP Address',
+                'Server', 'Network', 'Subnet', 'IP Address', 'Cloud Service',
             ],
         });
 

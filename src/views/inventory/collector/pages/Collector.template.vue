@@ -27,7 +27,7 @@
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" @click="$router.push({path: '/inventory/collector/create/plugins'})">
-                            Create
+                            {{ tr('COMMON.BTN_CRT') }}
                         </p-button>
                         <PDropdownMenuBtn class="left-toolbox-item"
                                           :menu="dropdown"

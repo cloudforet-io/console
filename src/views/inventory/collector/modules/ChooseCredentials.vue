@@ -31,7 +31,7 @@
                               @click.stop="onClickRadioText(type)"
                         >
                             <p-radio v-model="proxyCrdType" :value="type" @change="listCredentials" />
-                            <span class="radio-text">{{ type }}</span>
+                            <span class="radio-text">{{ crdTypeLabels[type] }}</span>
                         </span>
                     </p-col>
                     <p-col>
@@ -60,9 +60,9 @@
                              target="_blank"
                 >
                     <p-button outline style-type="dark">
-                        {{ tr('COMMON.MNG') }}
+                        {{ tr('INVENTORY.MANAGE_CRD') }}
                     </p-button>
-                </router-link><p-button />
+                </router-link>
             </template>
             <template #col-tags-format="{value}">
                 <p-dict-list :dict="value" />
@@ -123,6 +123,10 @@ export default {
             thisPage: 1,
             searchText: '',
             crdTypes: ['Credentials Group', 'Credentials'],
+            crdTypeLabels: computed(() => ({
+                'Credentials Group': parent.tr('COMMON.CREDENTIAL_GRP'),
+                Credentials: parent.tr('COMMON.CREDENTIALS'),
+            })),
             proxyCrdType: makeProxy('crdType', props, emit),
             fields: {
                 'Credentials Group': makeTrItems([

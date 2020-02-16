@@ -207,6 +207,9 @@ export const en = {
         ALL: 'All',
         HOURS: 'Hours',
         MNG: 'Manage',
+        NEXT: 'Next',
+        PREV: 'Prev',
+        OPTIONAL: 'Optional',
     },
     ATOM: {
 
@@ -220,6 +223,9 @@ export const en = {
         DELETE_ARG: 'Delete {0}',
         CLICK_RIGHT: 'Please, Click a item from left tree Panel.',
         TAG_EMPTY: 'Tag\'s key can\' be blank. Please, input your key.',
+        NO_TAG: 'No Tags',
+        TAG: 'Tags',
+        NO_DATA: 'No Data',
     },
     SIGNIN: {
         WELCOME_MSG: 'Welcome to {0}',
@@ -234,6 +240,12 @@ export const en = {
         ROOT_CREDENTIALS: 'Sign-in using root account credentials',
         USER_EMPTY: 'User ID can\'t be blank.',
         PASS_EMPTY: 'Password can\'t be blank.',
+    },
+    DASHBOARD: {
+        SUMMARY: 'Summary',
+        RES_REGION: 'Resources by Region',
+        SERVER_STATE: 'Server States',
+        SERVER_TYPE: 'Servers by Type',
     },
     IDENTITY: {
         ADD_ARG: 'Add {0}',
@@ -271,7 +283,6 @@ export const en = {
         POOL_NM: 'Pool Name',
         COL_OPS: 'Collect Options',
         FILTERS: 'Filters',
-        CHOOSE_CRD: 'Choose Credential',
         VERIFY_CRD: 'Verify Credentials',
         DEL_COL: 'Delete Collectors',
         UPT_COL: 'Update Collector',
@@ -285,6 +296,16 @@ export const en = {
         ADD_SCHEDULE: 'Add Schedule',
         UPT_SCHEDULE: 'Update Schedule',
         DEL_SCHEDULE: 'Delete Schedule',
+        COL_NAME: 'Collector Name',
+        PRIORITY: 'Priority',
+        VERSION: 'Version',
+        OPTIONS: 'Options',
+        COL_PRIORITY_VD: ' Priority must be greater than 0 and less than or equal to 1000.',
+        COL_NAME_VD: 'Please enter Collector name.',
+        BACK_COL: 'Back to Collectors',
+        CONF_COL: 'Configure Collector',
+        CHOOSE_CRD: 'Choose Credentials',
+        ADD_TAG: 'Add Tags',
     },
     SECRET: {
         JASON_ALERT: 'Please, Check Json Format (Use double quotation( \\" ) mark instead of single quotation (\').',
