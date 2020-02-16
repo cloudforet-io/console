@@ -41,7 +41,6 @@ export default {
                 view_option: {
                     source_type: 'timestamp',
                     source_format: 'seconds',
-                    display_format: 'YYYY-MM-DD HH:MM:SS z',
                 },
             },
         ];
