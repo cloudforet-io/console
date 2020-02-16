@@ -307,4 +307,7 @@ export default {
     .tag {
         margin-bottom: .5rem;
     }
+    .tag-container {
+        min-height: 80px;
+    }
 </style>
