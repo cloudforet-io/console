@@ -189,6 +189,7 @@ const setup = (props, context) => {
         language: 'ko',
         timezone: 'UTC',
         tags: {},
+        isLastCheck: false,
         // eslint-disable-next-line camelcase
         is_local_auth: computed(() => context.parent.$store.getters['auth/isLocalType']),
         ...props.item,
@@ -219,7 +220,7 @@ const setup = (props, context) => {
         await parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: sessionStorage.domainId }).then((res) => {
             if (res.data.total_count >= 1) {
                 result = true;
-                if (res.data.total_count === 1) {
+                if (!formState.isLastCheck && res.data.total_count === 1) {
                     const data = res.data.results[0];
                     if (!formState.name) { formState.name = data.name; }
                     if (!formState.email) { formState.email = data.email; }
@@ -253,7 +254,10 @@ const setup = (props, context) => {
         return result;
     };
     const confirm = async () => {
+        formState.isLastCheck = true;
         const result = await validateAPI.allValidation();
+        formState.isLastCheck = false;
+
         if (result) {
             const data = {};
             if (formState.is_local_auth) {

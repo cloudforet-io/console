@@ -228,8 +228,6 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
         return undefined;
     });
     const openLink = () => {
-        console.log('start');
-        console.log(link.value);
         if (link.value) {
             window.open(link.value);
         }
