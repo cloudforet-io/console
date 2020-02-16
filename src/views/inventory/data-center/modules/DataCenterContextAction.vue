@@ -57,15 +57,13 @@
                 {{ tr('COMMON.TAG') }}
             </div>
             <div class="input-tag-card">
-                <div>
-                    <p-dict-input-group ref="tagPanel"
-                                        :use-full-col="true"
-                                        :tag-key-placeholder="'key'"
-                                        :tag-value-placeholder="'value'"
-                                        :edit-mode="tagInput.editMode"
-                                        :dict.sync="tagInput.tags"
-                    />
-                </div>
+                <p-dict-input-group ref="tagPanel"
+                                    :use-full-col="true"
+                                    :tag-key-placeholder="'key'"
+                                    :tag-value-placeholder="'value'"
+                                    :edit-mode="tagInput.editMode"
+                                    :dict.sync="tagInput.tags"
+                />
             </div>
         </template>
         <template #close-button>
@@ -308,14 +306,7 @@ export default {
     }
 
     .input-tag-card{
-        background: #F8F8FC 0% 0% no-repeat padding-box !important;
-        border: 1px solid #F2F2F2 !important;
-        opacity: 1;
-     > div {
-         margin-top: 8px;
-         height: 15vh;
-         max-height: 20vh;
-         overflow-y: auto;
-     }
+        padding-top: 0.5rem;
+        background-color: $primary4;
     }
 </style>
