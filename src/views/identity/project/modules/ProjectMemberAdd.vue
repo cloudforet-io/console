@@ -37,6 +37,7 @@
                 <template slot="toolbox-left">
                     <p-search :search-placeholder="getSearchPlaceHolder"
                               :search-text.sync="searchText"
+                              focused
                               @onSearch="search"
                     />
                 </template>

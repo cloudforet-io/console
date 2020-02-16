@@ -22,6 +22,7 @@
                                     <p-col>
                                         <p-text-input
                                             v-model="formState.name"
+                                            v-focus
                                             label="name"
                                             :class="{
                                                 'form-control':true,
