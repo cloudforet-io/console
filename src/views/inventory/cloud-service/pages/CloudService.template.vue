@@ -55,7 +55,9 @@
                                             Collect Data
                                         </p-button>
                                         <div class="left-toolbox-item">
-                                            <PDropdownMenuBtn :menu="csDropdownMenu">
+                                            <PDropdownMenuBtn :menu="csDropdownMenu"
+                                                              @click-link="openLink"
+                                            >
                                                 Action
                                             </PDropdownMenuBtn>
                                         </div>
@@ -170,16 +172,18 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
     watch(() => apiHandler.selectState.firstSelectItem, (type, preType) => {
         if (preType && type !== preType) {
             const selectType = apiHandler.selectState.firstSelectItem;
-            dvApiHandler.resetAll();
-            dvApiHandler.state.fixSearchQuery = [
-                { key: 'provider', operator: '', value: selectType.provider },
-                { key: 'cloud_service_type', operator: '', value: selectType.name },
-                { key: 'cloud_service_group', operator: '', value: selectType.group },
-            ];
-            const keys = selectTypeDataSource.value.map(v => v.key);
-            dvApiHandler.acState.keys = keys;
-            dvApiHandler.acState.suggestKeys = keys;
-            dvApiHandler.getData();
+            if (selectType) {
+                dvApiHandler.resetAll();
+                dvApiHandler.state.fixSearchQuery = [
+                    { key: 'provider', operator: '=', value: selectType.provider },
+                    { key: 'cloud_service_type', operator: '=', value: selectType.name },
+                    { key: 'cloud_service_group', operator: '=', value: selectType.group },
+                ];
+                const keys = selectTypeDataSource.value.map(v => v.key);
+                dvApiHandler.acState.keys = keys;
+                dvApiHandler.acState.suggestKeys = keys;
+                dvApiHandler.getData();
+            }
         }
     });
     // todo: CBT 끝나고 홞성화
@@ -217,6 +221,22 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
     //     context.parent,
     //     { type: 'item' }),
     // });
+    const link = computed(() => {
+        if (dvApiHandler.selectState.isSelectOne) {
+            return _.get(dvApiHandler.selectState.firstSelectItem, 'data.reference.link');
+        }
+        return undefined;
+    });
+    const openLink = () => {
+        console.log('start');
+        console.log(link.value);
+        if (link.value) {
+            window.open(link.value);
+        }
+    };
+
+    const noLink = computed(() => !link.value);
+
     const csDropdownMenu = reactive({
         ...makeTrItems([
             ['add', 'COMMON.BTN_CRT'],
@@ -226,7 +246,7 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
             ['project', 'COMMON.CHG_PRO'],
             ['region', 'COMMON.CHG_REGION'],
             [null, null, { type: 'divider' }],
-            ['console', null, { label: 'console', disabled: false }],
+            ['link', null, { label: 'console', disabled: noLink }],
         ],
         context.parent,
         { type: 'item', disabled: true }),
@@ -245,6 +265,7 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
         csDropdownMenu,
         selectTypeDataSource,
         detailsData,
+        openLink,
     };
 };
 
