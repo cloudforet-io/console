@@ -66,13 +66,13 @@ export default createComponent({
         },
     },
     setup(props:Props) {
-        const fields:Ref<Field[]> = computed(():Field[] => props.data_source.map((ds:DataSourceType):Field => ({
+        const fields:Ref<Readonly<Field[]> > = computed(():Field[] => props.data_source.map((ds:DataSourceType):Field => ({
             name: ds.key,
             label: ds.name,
         })));
         const items = computed(() => (props.key_path ? _.get(props.data, props.key_path) : props.data));
 
-        const slots:Ref<DataSourceType[]> = computed(():DataSourceType[] => props.data_source.map((ds:DataSourceType):DataSourceType => ({
+        const slots:Ref<Readonly<DataSourceType[]>> = computed(():DataSourceType[] => props.data_source.map((ds:DataSourceType):DataSourceType => ({
             ...ds,
             name: `col-${ds.key}-format`,
         })));

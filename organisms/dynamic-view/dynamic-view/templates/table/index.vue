@@ -90,11 +90,11 @@ export default createComponent({
         },
     },
     setup(props:Props) {
-        const fields:Ref<Field[]> = computed(():Field[] => props.data_source.map((ds:DataSourceType):Field => ({
+        const fields:Ref<Readonly<Field[]>> = computed(():Field[] => props.data_source.map((ds:DataSourceType):Field => ({
             name: ds.key,
             label: ds.name,
         })));
-        const slots:Ref<SlotBind[]> = computed(():SlotBind[] => props.data_source.map((ds:DataSourceType):SlotBind => ({
+        const slots:Ref<Readonly<SlotBind[]>> = computed(():SlotBind[] => props.data_source.map((ds:DataSourceType):SlotBind => ({
             name: `col-${ds.key}-format`,
             view_type: ds.view_type || 'text',
             view_option: ds.view_option,
