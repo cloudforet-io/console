@@ -1,18 +1,17 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
 import axios from 'axios';
-import { en } from '@/translations/language-pack/en';
-import { ko } from '@/translations/language-pack/ko';
+
+
+import ko from '@/translations/language-pack/ko.json';
+import en from '@/translations/language-pack/en.json';
 
 Vue.use(VueI18n);
 
 export const i18n = new VueI18n({
     locale: 'en', // set locale
     fallbackLocale: 'en',
-    messages: {
-        en,
-        ko,
-    },
+    messages: { en, ko },
 });
 
 const loadedLanguages = ['en', 'ko']; // our default language that is preloaded
