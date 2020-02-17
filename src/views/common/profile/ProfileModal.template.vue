@@ -45,7 +45,7 @@
                         </template>
                     </p-field-group>
                     <p-field-group v-if="showPassword"
-                                   :label="$t('USER.PWD')"
+                                   :label="$t('FORM.LABEL.PWD')"
                                    :invalid-text="invalidMsg.password"
                                    :invalid="invalidState.password"
                     >
@@ -57,7 +57,7 @@
                         </template>
                     </p-field-group>
                     <p-field-group v-if="showPassword"
-                                   :label="$t('USER.PWD_CHECK')"
+                                   :label="$t('FORM.LABEL.PWD_CHECK')"
                                    :invalid-text="invalidMsg.passwordCheck"
                                    :invalid="invalidState.passwordCheck"
                     >
