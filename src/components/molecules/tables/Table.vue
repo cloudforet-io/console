@@ -67,7 +67,6 @@ export const tableProps = {
         type: Object,
         default: null,
     },
-
     striped: {
         type: Boolean,
         default: true,

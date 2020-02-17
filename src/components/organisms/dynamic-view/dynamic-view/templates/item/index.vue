@@ -35,7 +35,7 @@ interface DefinitionBind {
     data:any;
 }
 
-const makeDefinitionBind = (props:Props): Ref<DefinitionBind[]> => computed(():DefinitionBind[] => props.data_source.map(obj => ({
+const makeDefinitionBind = (props:Props): Ref<Readonly<DefinitionBind[]>> => computed(():DefinitionBind[] => props.data_source.map(obj => ({
     name: obj.name,
     view_type: obj.view_type || 'text',
     view_option: obj.view_option,

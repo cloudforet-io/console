@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import {
-    onMounted, reactive, toRefs, watch, computed, createComponent,
+    onMounted, reactive, toRefs, watch, computed, createComponent, Ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import { Fragment } from 'vue-fragment';
@@ -46,7 +46,7 @@ export default createComponent({
 
         // eslint-disable-next-line camelcase
         const selectData = computed(() => ({ view_type: 'table', ...state.dvs[state.selected] }));
-        const selectKeyPath = computed(() => selectData.value.key_path);
+        const selectKeyPath = computed(():string => selectData.value.key_path);
         const selectId = computed(() => props.selectId);
         const apiHandler = new SubDataAPI(
             parent as HttpInstance, props.url, props.idKey,

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { getCurrentInstance } from '@vue/composition-api';
 
 export const makeItem = (parent, commonOption, name, trLabel, extra) => {
     let item = extra ? { ...extra, name } : { name };
@@ -7,7 +8,8 @@ export const makeItem = (parent, commonOption, name, trLabel, extra) => {
     }
     if (trLabel) {
         const label = (typeof trLabel === 'string') ? [trLabel, null] : trLabel;
-        item.label = parent.tr(...label, parent);
+        const vm = getCurrentInstance();
+        item.label = vm.tr(...label, vm);
     }
     return item;
 };
@@ -49,7 +51,7 @@ export const makeItem = (parent, commonOption, name, trLabel, extra) => {
 export const makeTrItems = (items, parent, commonOption = {}) => {
     const result = [];
     items.forEach((item) => {
-        result.push(makeItem(parent, commonOption, ...item));
+        result.push(makeItem(null, commonOption, ...item));
     });
     return result;
 };
