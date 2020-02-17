@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="tr('COMMON.COL_DATA')"
+    <p-button-modal :header-title="$t('COMMON.COL_DATA')"
                     centered
                     size="xl"
                     fade
@@ -36,9 +36,9 @@
                         {{ description }}
                     </p>
                     <p class="sub-header">
-                        {{ tr('INVENTORY.COL_OPS') }}
+                        {{$t('INVENTORY.COL_OPS') }}
                     </p>
-                    <p-field-group :label="isCredentialType ? tr('COMMON.CREDENTIAL') : tr('COMMON.CREDENTIAL_GRP')">
+                    <p-field-group :label="isCredentialType ?$t('COMMON.CREDENTIAL') :$t('COMMON.CREDENTIAL_GRP')">
                         <div v-if="isCredentialType">
                             <p-text-input :value="selectedCrd ? selectedCrd.name : ''"
                                           disabled
@@ -50,7 +50,7 @@
                             </p-dropdown-menu-btn>
                         </div>
                     </p-field-group>
-                    <p-field-group :label="tr('COMMON.COL_MODE')">
+                    <p-field-group :label="$t('COMMON.COL_MODE')">
                         <p-dropdown-menu-btn :menu="collectModeMenu">
                             {{ collectModeMenu[collectModeIdx].label }}
                         </p-dropdown-menu-btn>
@@ -58,7 +58,7 @@
                 </p-col>
                 <p-col class="right-container">
                     <p class="sub-header">
-                        {{ tr('INVENTORY.FILTERS') }}
+                        {{$t('INVENTORY.FILTERS') }}
                     </p>
                     <p-dynamic-form v-for="(form, idx) in filterFormats" :key="idx"
                                     v-model="filters[form.key]"
@@ -77,7 +77,7 @@
                       :disabled="loading"
                       @click="onClickReset"
             >
-                {{ tr('COMMON.BTN_RESET') }}
+                {{$t('COMMON.BTN_RESET') }}
             </p-button>
         </template>
     </p-button-modal>
@@ -143,7 +143,7 @@ export default {
                 return defaultStyle;
             }),
             crdsMenu: computed(() => [
-                { type: 'item', label: context.parent.tr('COMMON.ALL'), name: 'all' },
+                { type: 'item', label: context.parent.$t('COMMON.ALL'), name: 'all' },
                 ...props.credentials.map(crd => ({ type: 'item', label: crd.name, name: crd.credential_id })),
             ]),
             crdMenuIdx: 0,

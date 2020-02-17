@@ -35,36 +35,36 @@ export default {
              * When Back panel or Root has clicked
             */
             selectRT: [
-                { flag: 'CRT_RE', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.REGION')]), indent: 0 },
+                { flag: 'CRT_RE', contents: this.$t('ORGANISMS.CREATE_ARG', [this.$t('COMMON.REGION')]), indent: 0 },
             ],
             /**
              * When Region has Selected
              */
             selectRE: [
-                { flag: 'CRT_ZN', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.ZONE')]), indent: 0 },
+                { flag: 'CRT_ZN', contents: this.$t('ORGANISMS.CREATE_ARG', [this.$t('COMMON.ZONE')]), indent: 0 },
                 {
                     flag: '', contents: '', indent: 0, divider: true,
                 },
-                { flag: 'UPT_RE', contents: this.tr('ORGANISMS.UPDATE_ARG', [this.tr('COMMON.REGION')]), indent: 0 },
-                { flag: 'DEL_RE', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.REGION')]), indent: 0 },
+                { flag: 'UPT_RE', contents: this.$t('ORGANISMS.UPDATE_ARG', [this.$t('COMMON.REGION')]), indent: 0 },
+                { flag: 'DEL_RE', contents: this.$t('ORGANISMS.DELETE_ARG', [this.$t('COMMON.REGION')]), indent: 0 },
             ],
             /**
              * When Zone has Selected
              */
             selectZN: [
-                { flag: 'CRT_PL', contents: this.tr('ORGANISMS.CREATE_ARG', [this.tr('COMMON.POOL')]), indent: 0 },
+                { flag: 'CRT_PL', contents: this.$t('ORGANISMS.CREATE_ARG', [this.$t('COMMON.POOL')]), indent: 0 },
                 {
                     flag: '', contents: '', indent: 0, divider: true,
                 },
-                { flag: 'UPT_ZN', contents: this.tr('ORGANISMS.UPDATE_ARG', [this.tr('COMMON.ZONE')]), indent: 0 },
-                { flag: 'DEL_ZN', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.ZONE')]), indent: 0 },
+                { flag: 'UPT_ZN', contents: this.$t('ORGANISMS.UPDATE_ARG', [this.$t('COMMON.ZONE')]), indent: 0 },
+                { flag: 'DEL_ZN', contents: this.$t('ORGANISMS.DELETE_ARG', [this.$t('COMMON.ZONE')]), indent: 0 },
             ],
             /**
              * When Pool has Selected
              */
             selectPL: [
-                { flag: 'UPT_PL', contents: this.tr('ORGANISMS.UPDATE_ARG', [this.tr('COMMON.POOL')]), indent: 0 },
-                { flag: 'DEL_PL', contents: this.tr('ORGANISMS.DELETE_ARG', [this.tr('COMMON.POOL')]), indent: 0 },
+                { flag: 'UPT_PL', contents: this.$t('ORGANISMS.UPDATE_ARG', [this.$t('COMMON.POOL')]), indent: 0 },
+                { flag: 'DEL_PL', contents: this.$t('ORGANISMS.DELETE_ARG', [this.$t('COMMON.POOL')]), indent: 0 },
             ],
         };
     },

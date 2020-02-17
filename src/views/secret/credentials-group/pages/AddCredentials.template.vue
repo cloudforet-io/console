@@ -79,11 +79,11 @@
                 <p-button class="cancel-btn" style-type="dark" outline
                           @click="goBack"
                 >
-                    {{ tr('COMMON.BTN_CANCEL') }}
+                    {{ $t('COMMON.BTN_CANCEL') }}
                 </p-button>
 
                 <p-button class="add-btn" style-type="primary-dark" @click="clickAdd">
-                    {{ tr('COMMON.BTN_ADD') }}
+                    {{ $t('COMMON.BTN_ADD') }}
                 </p-button>
             </p-row>
         </p-pane-layout>

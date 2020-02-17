@@ -31,14 +31,14 @@
         >
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark" @click="showModals('add')">
-                    {{ tr('COMMON.BTN_ADD') }}
+                    {{$t('COMMON.BTN_ADD') }}
                 </p-button>
                 <p-button style-type="alert" :outline="true"
                           :disabled="isDisabled"
                           class="btn-margin"
                           @click="showModals('del')"
                 >
-                    {{ tr('COMMON.BTN_DELETE') }}
+                    {{$t('COMMON.BTN_DELETE') }}
                 </p-button>
             </template>
             <template v-slot:col-user_id-format="data">
@@ -139,19 +139,19 @@ export default {
         fields() {
             return [
                 {
-                    name: 'user_id', label: this.tr('COMMON.UID'), style: { width: '145px' },
+                    name: 'user_id', label: this.$t('COMMON.UID'), style: { width: '145px' },
                 },
                 {
-                    name: 'name', label: this.tr('COMMON.NAME'), style: { width: '200px' },
+                    name: 'name', label: this.$t('COMMON.NAME'), style: { width: '200px' },
                 },
                 {
-                    name: 'email', label: this.tr('COMMON.EMAIL'), style: { width: '150px' },
+                    name: 'email', label: this.$t('COMMON.EMAIL'), style: { width: '150px' },
                 },
                 {
-                    name: 'group', label: this.tr('COMMON.GROUP'), style: { width: '120px' },
+                    name: 'group', label: this.$t('COMMON.GROUP'), style: { width: '120px' },
                 },
                 {
-                    name: 'labels', label: this.tr('COMMON.LABELS'), style: { width: '120px' },
+                    name: 'labels', label: this.$t('COMMON.LABELS'), style: { width: '120px' },
                 },
             ];
         },
@@ -252,12 +252,12 @@ export default {
             }
         },
         actionCommand() {
-            const itemType = this.getSelectedInfo('item_type') === 'PROJECT_GROUP' ? this.tr('PG_GR') : this.tr('PG');
+            const itemType = this.getSelectedInfo('item_type') === 'PROJECT_GROUP' ? this.$t('PG_GR') : this.$t('PG');
             if (this.actionFlag === 'delete') {
                 const obj = {};
-                obj.title = this.tr('DEL_MEM');
+                obj.title = this.$t('DEL_MEM');
                 obj.type = 'danger';
-                obj.text = this.tr('DELETE_YN', [itemType]);
+                obj.text = this.$t('DELETE_YN', [itemType]);
                 this.actionCommandData = obj;
             }
             this.$refs.IDPJ005_DeleteUser.showModal();

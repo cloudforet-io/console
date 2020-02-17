@@ -62,7 +62,7 @@
             <div class="label-group">
                 <div class="form-group">
                     <p-label class="input-title">
-                        {{ tr('COMMON.LABELS') }}
+                        {{$t('COMMON.LABELS') }}
                     </p-label>
                     <p-text-input ref="labels" v-model="label.input"
                                   :style="{'border': `${getInvalidityHashTag}`, 'boxShadow': 'none' } "
@@ -74,12 +74,12 @@
                     />
                 </div>
                 <div v-show="isValidHashTag" style="display:block" class="invalid-feedback">
-                    * {{ tr('IDENTITY.CHECK_HASH') }}
+                    * {{$t('IDENTITY.CHECK_HASH') }}
                 </div>
             </div>
         </template>
         <template #confirm-button>
-            {{ tr('COMMON.BTN_ADD') }}
+            {{$t('COMMON.BTN_ADD') }}
         </template>
     </p-button-modal>
 </template>
@@ -143,21 +143,21 @@ export default {
             return this.label.hashTagInvalidity;
         },
         getMemberModalTitle() {
-            return this.tr('IDENTITY.ADD_ARG', [this.tr('COMMON.MEMBER')]);
+            return this.$t('IDENTITY.ADD_ARG', [this.$t('COMMON.MEMBER')]);
         },
         getSearchPlaceHolder() {
-            return this.tr('IDENTITY.SCH_PAC_DT');
+            return this.$t('IDENTITY.SCH_PAC_DT');
         },
         selectedFields() {
             return [
                 {
-                    name: 'user_id', label: this.tr('COMMON.UID'),
+                    name: 'user_id', label: this.$t('COMMON.UID'),
                 },
                 {
-                    name: 'name', label: this.tr('COMMON.NAME'),
+                    name: 'name', label: this.$t('COMMON.NAME'),
                 },
                 {
-                    name: 'email', label: this.tr('COMMON.EMAIL'),
+                    name: 'email', label: this.$t('COMMON.EMAIL'),
                 },
             ];
         },

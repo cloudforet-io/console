@@ -16,10 +16,10 @@
                         >
                     </p-col>
                     <p-col>
-                        <p-field-group :label="tr('INVENTORY.COL_NAME')"
+                        <p-field-group :label="$t('INVENTORY.COL_NAME')"
                                        required
                                        :invalid="showValidation && fieldVdApi.invalidState.name"
-                                       :invalid-text="tr('INVENTORY.COL_NAME_VD')"
+                                       :invalid-text="$t('INVENTORY.COL_NAME_VD')"
                         >
                             <template #default="{invalid}">
                                 <p-text-input v-model="fieldState.name"
@@ -31,7 +31,7 @@
                                 />
                             </template>
                         </p-field-group>
-                        <p-field-group :label="tr('INVENTORY.VERSION')">
+                        <p-field-group :label="$t('INVENTORY.VERSION')">
                             <p-dropdown-menu-btn :menu="versionsInfo"
                                                  :loading="versionsInfo ? false : true"
                                                  block
@@ -40,9 +40,9 @@
                                 {{ selectedVersion }}
                             </p-dropdown-menu-btn>
                         </p-field-group>
-                        <p-field-group :label="tr('INVENTORY.PRIORITY')"
+                        <p-field-group :label="$t('INVENTORY.PRIORITY')"
                                        :invalid="showValidation && fieldVdApi.invalidState.priority"
-                                       :invalid-text="tr('INVENTORY.COL_PRIORITY_VD')"
+                                       :invalid-text="$t('INVENTORY.COL_PRIORITY_VD')"
                         >
                             <template #default="{invalid}">
                                 <p-text-input v-model.number="fieldState.priority"
@@ -59,7 +59,7 @@
 
             <p-col v-if="pluginOptions.length > 0" class="container options">
                 <p class="sub-title">
-                    {{ tr('INVENTORY.OPTIONS') }}
+                    {{$t('INVENTORY.OPTIONS') }}
                 </p>
                 <p-dynamic-form v-for="(op) in pluginOptions" :key="op.key"
                                 v-model="proxyOptionsValue[op.key]"

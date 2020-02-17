@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="collectorId ? tr('INVENTORY.UPT_SCHEDULE') : tr('INVENTORY.ADD_SCHEDULE')"
+    <p-button-modal :header-title="collectorId ?$t('INVENTORY.UPT_SCHEDULE') :$t('INVENTORY.ADD_SCHEDULE')"
                     centered
                     fade
                     backdrop
@@ -8,17 +8,17 @@
                     @confirm="onClickEditConfirm"
     >
         <template #body>
-            <p-field-group :label="tr('COMMON.NAME')">
+            <p-field-group :label="$t('COMMON.NAME')">
                 <br>
                 <p-text-input v-model="name" />
             </p-field-group>
-            <p-field-group :label="tr('COMMON.TIMEZONE')">
+            <p-field-group :label="$t('COMMON.TIMEZONE')">
                 <p-select-dropdown v-model="timezone" :items="timezones"
                                    class="timezone-selector"
                                    @input="changeTimezone"
                 />
             </p-field-group>
-            <p-field-group :label="tr('INVENTORY.COLL_TIME')"
+            <p-field-group :label="$t('INVENTORY.COLL_TIME')"
                            required
                            :invalid="showValidation && !isValid"
                            invalid-text="Please select time"
@@ -35,7 +35,7 @@
                               class="all-btn"
                               @click="onClickAllHours"
                     >
-                        {{ tr('COMMON.ALL') }}
+                        {{$t('COMMON.ALL') }}
                     </p-button>
                 </div>
             </p-field-group>

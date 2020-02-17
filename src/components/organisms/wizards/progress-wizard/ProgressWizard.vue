@@ -35,7 +35,7 @@
         <template v-if="activeTab">
             <p-panel-top class="step-title">
                 Step {{ activeIdx + 1 }}. {{ labels[activeTab.key] || activeTab.key }}
-                <span v-if="activeTab.optional" class="optional"> ({{ tr('COMMON.OPTIONAL') }})</span>
+                <span v-if="activeTab.optional" class="optional"> ({{ $t('COMMON.OPTIONAL') }})</span>
                 <template #head>
                     <div class="step-appendix">
                         <slot :name="`step-append-${activeTab.key}`" :tab="activeTab" />
@@ -55,7 +55,7 @@
                     <p-button outline style-type="dark" size="lg"
                               class="txt-btn" @click="$emit('cancel', $event)"
                     >
-                        {{ tr('COMMON.BTN_CANCEL') }}
+                        {{ $t('COMMON.BTN_CANCEL') }}
                     </p-button>
                 </p-col>
                 <p-col :flex-grow="0" class="nav-btn-box">
@@ -63,21 +63,21 @@
                               outline style-type="secondary" size="lg"
                               @click="onClickPrev"
                     >
-                        <p-i name="ic_back" color="transparent inherit" />{{ tr('COMMON.PREV') }}
+                        <p-i name="ic_back" color="transparent inherit" />{{$t('COMMON.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
                               outline style-type="secondary"
                               size="lg"
                               @click="onClickNext"
                     >
-                        {{ tr('COMMON.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
+                        {{$t('COMMON.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
                     </p-button>
                     <p-button style-type="secondary" size="lg"
                               :disabled="!showConfirm"
                               class="txt-btn"
                               @click="$emit('confirm', tabs, $event)"
                     >
-                        {{ tr('COMMON.BTN_CONFIRM') }}
+                        {{$t('COMMON.BTN_CONFIRM') }}
                     </p-button>
                 </p-col>
             </p-row>

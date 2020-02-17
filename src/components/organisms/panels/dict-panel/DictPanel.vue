@@ -1,5 +1,5 @@
 <template>
-    <p-panel-top :panel-title="tr('ORGANISMS.TAG')" class="dict-panel-title">
+    <p-panel-top :panel-title="$t('ORGANISMS.TAG')" class="dict-panel-title">
         <template #head>
             <div class="panel-header" :class="{'edit':editMode}">
                 <p-button v-if="!editMode" style-type="primary-dark" class="header-btn"
@@ -11,12 +11,12 @@
                           class="header-btn"
                           @click="clickCancel()"
                 >
-                    {{ tr('COMMON.BTN_CANCEL') }}
+                    {{ $t('COMMON.BTN_CANCEL') }}
                 </p-button>
                 <p-button v-if="editMode" style-type="secondary" class="header-btn"
                           @click="clickConfirm()"
                 >
-                    {{ tr('COMMON.BTN_SAVE') }}
+                    {{ $t('COMMON.BTN_SAVE') }}
                 </p-button>
             </div>
         </template>
@@ -26,7 +26,7 @@
                                 :edit-mode="editMode"
             />
             <div v-if="isEmpty(proxyTags) && !editMode" class="no-dict">
-                {{ tr('ORGANISMS.NO_TAG') }}
+                {{ $t('ORGANISMS.NO_TAG') }}
             </div>
         </template>
     </p-panel-top>
@@ -53,7 +53,7 @@ export default {
     },
     setup(props, context) {
         const state = reactive({
-            buttonTag: computed(() => ((Util.methods.isEmpty(state.proxyTags)) ? Util.methods.tr('COMMON.BTN_ADD', null, context.parent) : Util.methods.tr('COMMON.BTN_EDIT', null, context.parent))),
+            buttonTag: computed(() => ((Util.methods.isEmpty(state.proxyTags)) ? context.parent.$t('COMMON.BTN_ADD') : context.parent.$t('COMMON.BTN_EDIT'))),
             editMode: false,
             originTags: undefined,
             proxyTags: makeProxy('dict', props, context.emit),

@@ -1,14 +1,10 @@
 /* eslint-disable camelcase */
 import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
-import VueCookies from 'vue-cookies';
-import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import {
-    computed, reactive, Ref, ref,
+    computed, getCurrentInstance, reactive, Ref, ref,
 } from '@vue/composition-api';
 
-// @ts-ignore
-import { debug } from 'webpack';
 // @ts-ignore
 import { tagList } from '@/components/molecules/tags/Tag.vue';
 
@@ -68,14 +64,10 @@ class API {
         };
 
         this.instance = axios.create(axiosConfig);
-
     }
 
     setResponseInterceptor=(handlers:any):void => {
-        (this.instance as AxiosInstance).interceptors.response.use((response) => {
-
-            return response;
-        }, (e) => {
+        (this.instance as AxiosInstance).interceptors.response.use(response => response, (e) => {
             const apiError = new APIError(e);
 
             if (apiError.status === 401) {
@@ -280,7 +272,7 @@ export class SubDataAPI extends DynamicAPI {
 
     private query:Ref<object>;
 
-    constructor(public parent:HttpInstance, private url, private idKey:string, private keyPath:Ref<string>, private id:Ref<string>) {
+    constructor(public parent:HttpInstance, private url, private idKey:string, private keyPath:Ref<string>|Ref<Readonly<string>>, private id:Ref<string>) {
         super();
         this.state = reactive({
             items: [],
@@ -438,7 +430,7 @@ interface tableSelectState {
     isNotSelected:boolean;
     isSelectOne:boolean;
     isSelectMulti:boolean;
-    selectItems:any[];
+    selectItems:readonly any[];
     firstSelectItem:any;
 }
 export class QuerySearchTableAPI extends BaseQuerySearchTableAPI {
@@ -449,7 +441,7 @@ export class QuerySearchTableAPI extends BaseQuerySearchTableAPI {
         const isNotSelected:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 0 : true));
         const isSelectOne:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 1 : false));
         const isSelectMulti:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length > 1 : false));
-        const selectItems:Ref<any[]> = computed(() :any[] => (this.state.selectIndex ? this.state.selectIndex.map(idx => this.state.items[idx]) : []));
+        const selectItems:Ref<readonly any[]> = computed(() :any[] => (this.state.selectIndex ? this.state.selectIndex.map(idx => this.state.items[idx]) : []));
         const firstSelectItem:Ref<any> = computed(():any => (!isNotSelected.value ? this.state.items[(this.state.selectIndex as number[])[0]] : {}));
         this.selectState = reactive({
             isNotSelected,

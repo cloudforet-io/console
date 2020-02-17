@@ -320,7 +320,7 @@ export default {
             // eslint-disable-next-line no-nested-ternary
             const param = flag[1] === 'RT' ? { is_root: true, ...paramBasic } : flag[1] === 'PR' ? { parent_project_group_id: nodeData.id, ...paramBasic } : { project_group_id: nodeData.id, ...paramBasic };
             const url = flag[1] === 'PJ' ? 'project' : 'project-group';
-            const arg = flag[1] === 'PJ' ? this.tr('COMMON.PG') : this.tr('COMMON.PG_GR');
+            const arg = flag[1] === 'PJ' ? this.$t('COMMON.PG') : this.$t('COMMON.PG_GR');
 
             await this.$http.post(`/identity/${url}/create`, param).then((response) => {
                 const responseData = !this.isEmpty(response.data) ? response.data : {};
@@ -350,7 +350,7 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'success',
                         title: 'Success',
-                        text: this.tr('IDENTITY.CRT_SUCC_ARG', [arg]),
+                        text: this.$t('IDENTITY.CRT_SUCC_ARG', [arg]),
                         duration: 2000,
                         speed: 1000,
                     });
@@ -360,7 +360,7 @@ export default {
                     group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
-                    text: this.tr('IDENTITY.CRT_FAIL_ARG', [arg]),
+                    text: this.$t('IDENTITY.CRT_FAIL_ARG', [arg]),
                     duration: 2000,
                     speed: 1000,
                 });
@@ -377,7 +377,7 @@ export default {
             const key = `${nodeData.item_type.toLowerCase()}_id`;
             const url = `/identity/${this.replaceAll(nodeData.item_type, '_', '-').toLowerCase()}/update`;
             const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: nodeData.id, ...basicParam } : { project_id: nodeData.id, ...basicParam };
-            const arg = flag[1] === 'PJ' ? this.tr('COMMON.PG') : this.tr('COMMON.PG_GR');
+            const arg = flag[1] === 'PJ' ? this.$t('COMMON.PG') : this.$t('COMMON.PG_GR');
 
             await this.$http.post(url, param).then((response) => {
                 if (response.data[key] === nodeData.id) {
@@ -390,7 +390,7 @@ export default {
                     group: 'noticeBottomRight',
                     type: 'success',
                     title: 'Success',
-                    text: this.tr('IDENTITY.UPT_SUCC_ARG', [arg]),
+                    text: this.$t('IDENTITY.UPT_SUCC_ARG', [arg]),
                     duration: 2000,
                     speed: 1000,
                 });
@@ -399,7 +399,7 @@ export default {
                     group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
-                    text: this.tr('IDENTITY.UPT_FAIL_ARG', [arg]),
+                    text: this.$t('IDENTITY.UPT_FAIL_ARG', [arg]),
                     duration: 2000,
                     speed: 1000,
                 });
@@ -434,7 +434,7 @@ export default {
             const path = tree.getSelected().map(node => node.path);
             const url = `/identity/${this.replaceAll(nodeData.item_type, '_', '-').toLowerCase()}/delete`;
             const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: nodeData.id } : { project_id: nodeData.id };
-            const arg = (nodeData.item_type === 'PROJECT_GROUP') ? this.tr('COMMON.PG_GR') : this.tr('COMMON.PG');
+            const arg = (nodeData.item_type === 'PROJECT_GROUP') ? this.$t('COMMON.PG_GR') : this.$t('COMMON.PG');
 
             await this.$http.post(url, param).then((response) => {
                 const responseData = response.data;
@@ -444,7 +444,7 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'success',
                         title: 'Success',
-                        text: this.tr('IDENTITY.DEL_SUCC_ARG', [arg]),
+                        text: this.$t('IDENTITY.DEL_SUCC_ARG', [arg]),
                         duration: 2000,
                         speed: 1000,
                     });
@@ -469,7 +469,7 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'alert',
                         title: 'Fail',
-                        text: this.tr('IDENTITY.DEL_FAIL_CHI_ARG', [arg]),
+                        text: this.$t('IDENTITY.DEL_FAIL_CHI_ARG', [arg]),
                         duration: 2000,
                         speed: 1000,
                     });
@@ -478,7 +478,7 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'alert',
                         title: 'Fail',
-                        text: this.tr('IDENTITY.DEL_FAIL_ARG', [arg]),
+                        text: this.$t('IDENTITY.DEL_FAIL_ARG', [arg]),
                         duration: 2000,
                         speed: 1000,
                     });

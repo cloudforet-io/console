@@ -142,7 +142,7 @@ export default {
             const companyTitle = this.$store.getters['domain/companyTitle'];
             const companyDesc = this.$store.getters['domain/description'];
             const hostName = this.getWindowHostName();
-            return !this.isEmpty(companyTitle) ? companyDesc : !this.isEmpty(companyTitle) ? this.tr('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.tr('SIGNIN.WELCOME_MSG_P', [hostName]);
+            return !this.isEmpty(companyTitle) ? companyDesc : !this.isEmpty(companyTitle) ? this.$t('SIGNIN.WELCOME_MSG_P', [companyTitle]) : this.$t('SIGNIN.WELCOME_MSG_P', [hostName]);
         },
         getCurrentHostname() {
             const companyTitle = this.$store.getters['domain/companyTitle'];

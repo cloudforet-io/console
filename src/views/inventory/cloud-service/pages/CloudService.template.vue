@@ -221,7 +221,7 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
     //     context.parent,
     //     { type: 'item' }),
     // });
-    const link = computed(() => {
+    const link = computed(():string|unknown => {
         if (dvApiHandler.selectState.isSelectOne) {
             return _.get(dvApiHandler.selectState.firstSelectItem, 'data.reference.link');
         }
@@ -229,7 +229,7 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
     });
     const openLink = () => {
         if (link.value) {
-            window.open(link.value);
+            window.open((link.value as string));
         }
     };
 

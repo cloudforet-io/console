@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="tr('INVENTORY.UPT_COL')"
+    <p-button-modal :header-title="$t('INVENTORY.UPT_COL')"
                     centered
                     size="xl"
                     fade
@@ -34,7 +34,7 @@
                       :disabled="loading"
                       @click="onClickReset"
             >
-                {{ tr('COMMON.BTN_RESET') }}
+                {{$t('COMMON.BTN_RESET') }}
             </p-button>
         </template>
     </p-button-modal>

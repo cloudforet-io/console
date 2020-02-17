@@ -38,7 +38,7 @@
                     </template>
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" @click="clickCreate">
-                            {{ tr('COMMON.BTN_CRT') }}
+                            {{ $t('COMMON.BTN_CRT') }}
                         </p-button>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"

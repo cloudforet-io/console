@@ -32,7 +32,7 @@
                 <p-button class="left-toolbox-item" style-type="primary-dark"
                           @click="onClick"
                 >
-                    {{ tr('COMMON.BTN_ADD') }}
+                    {{$t('COMMON.BTN_ADD') }}
                 </p-button>
                 <p-button style-type="alert"
                           :disabled="isNotSelected"
@@ -40,7 +40,7 @@
                           class="left-toolbox-item"
                           @click="clickDelete"
                 >
-                    {{ tr('COMMON.BTN_DELETE') }}
+                    {{$t('COMMON.BTN_DELETE') }}
                 </p-button>
             </template>
             <template #col-credential_groups-format="{value}">

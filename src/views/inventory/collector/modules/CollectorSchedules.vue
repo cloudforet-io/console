@@ -25,14 +25,14 @@
         >
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark" @click="openEditModal(null)">
-                    {{ tr('COMMON.BTN_ADD') }}
+                    {{$t('COMMON.BTN_ADD') }}
                 </p-button>
                 <p-dropdown-menu-btn :menu="dropdown"
                                      class="left-toolbox-item"
                                      @click-update="openEditModal(items[selectIndex[0]])"
                                      @click-delete="proxyDeleteVisible = true"
                 >
-                    {{ tr('COMMON.BTN_ACTION') }}
+                    {{$t('COMMON.BTN_ACTION') }}
                 </p-dropdown-menu-btn>
             </template>
             <template #col-schedule-format="{value}">
@@ -58,7 +58,7 @@
         />
 
         <p-table-check-modal :visible.sync="proxyDeleteVisible"
-                             :header-title="tr('INVENTORY.DEL_SCHEDULE')"
+                             :header-title="$t('INVENTORY.DEL_SCHEDULE')"
                              sub-title="Are you sure you want to DELETE Selected Schedule(s)?"
                              theme-color="alert"
                              :fields="multiFields"

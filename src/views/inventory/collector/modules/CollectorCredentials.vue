@@ -1,11 +1,11 @@
 <template>
     <div>
         <p-panel-top>
-            {{ tr('PANEL.CREDENTIAL') }}
+            {{$t('PANEL.CREDENTIAL') }}
             <template #head>
                 <router-link class="credential-btn" :to="credentialPath" target="_blank">
                     <p-button outline style-type="dark">
-                        {{ tr('INVENTORY.MANAGE_CRD') }}
+                        {{$t('INVENTORY.MANAGE_CRD') }}
                     </p-button>
                 </router-link>
             </template>
@@ -35,7 +35,7 @@
                 <!--                <p-button style-type="safe" :disabled="selectedItems.length === 0"-->
                 <!--                          @click="onClickVerify"-->
                 <!--                >-->
-                <!--                    {{ tr('COMMON.VERIFY') }}-->
+                <!--                    {{$t('COMMON.VERIFY') }}-->
                 <!--                </p-button>-->
             </template>
             <template #col-credential_groups-format="{value}">
@@ -53,7 +53,7 @@
             </template>
             <template #col-collect-format="{item}">
                 <p-button outline style-type="dark" @click.stop="$emit('collectData', item)">
-                    {{ tr('COMMON.COL_DATA') }}
+                    {{$t('COMMON.COL_DATA') }}
                 </p-button>
             </template>
         </p-toolbox-table>

@@ -17,7 +17,7 @@
         >
             <template #body>
                 <div class="delete-alert">
-                    {{ tr('IDENTITY.DEL_MEMBER_PRJ', [tr(getSelectedTypeKey)] ) }}
+                    {{$t('IDENTITY.DEL_MEMBER_PRJ', [$t(getSelectedTypeKey)] ) }}
                 </div>
                 <p-data-table
                     :responsive-style="{'height': '35vh', 'overflow-y':'auto', 'box-shadow': 'none', 'border':'none'}"
@@ -47,10 +47,10 @@
                 </p-data-table>
             </template>
             <template #close-button>
-                {{ tr('COMMON.BTN_CANCEL') }}
+                {{$t('COMMON.BTN_CANCEL') }}
             </template>
             <template #confirm-button>
-                {{ tr('COMMON.BTN_DELETE') }}
+                {{$t('COMMON.BTN_DELETE') }}
             </template>
         </p-button-modal>
     </div>
@@ -108,24 +108,24 @@ export default {
             return (currentType === 'REGION') ? 'COMMON.REGION' : (currentType === 'ZONE') ? 'COMMON.ZONE' : 'COMMON.POOL';
         },
         getMemberModalTitle() {
-            return this.tr('IDENTITY.DEL_ARG', [this.tr('COMMON.MEMBER')]);
+            return this.$t('IDENTITY.DEL_ARG', [this.$t('COMMON.MEMBER')]);
         },
         getSearchPlaceHolder() {
-            return this.tr('IDENTITY.SCH_PAC_DT');
+            return this.$t('IDENTITY.SCH_PAC_DT');
         },
         selectedFields() {
             return [
                 {
-                    name: 'user_id', label: this.tr('COMMON.UID'),
+                    name: 'user_id', label: this.$t('COMMON.UID'),
                 },
                 {
-                    name: 'name', label: this.tr('COMMON.NAME'),
+                    name: 'name', label: this.$t('COMMON.NAME'),
                 },
                 {
-                    name: 'email', label: this.tr('COMMON.EMAIL'),
+                    name: 'email', label: this.$t('COMMON.EMAIL'),
                 },
                 {
-                    name: 'labels', label: this.tr('COMMON.LABELS'),
+                    name: 'labels', label: this.$t('COMMON.LABELS'),
                 },
             ];
         },

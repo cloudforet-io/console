@@ -7,7 +7,7 @@
             <p-lottie name="spinner" auto :size="1" />
         </div>
         <div v-else-if="menu.length < 0" class="context-content context-item no-drag empty" :class="theme">
-            {{ tr('COMMON.NO_ITEM') }}
+            {{ $t('COMMON.NO_ITEM') }}
         </div>
         <template v-for="(item, index) in menu" v-else>
             <a v-if="item.type==='item'" :id="`context-item-${index}-${uuid}`" :key="`${item.name}-${index}`"
