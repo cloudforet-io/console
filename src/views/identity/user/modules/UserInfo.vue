@@ -4,7 +4,7 @@
                    @edit="showTagEditModal"
         />
         <BaseModal ref="IDUS003_TagEditModal"
-                   :title="tr('TITLE', [tr('BTN_EDIT'), tr('TAG')])"
+                   :title="$t('TITLE', [$t('BTN_EDIT'), $t('TAG')])"
                    :centered="true"
                    size="md"
                    type="primary"
@@ -57,17 +57,17 @@ export default {
     computed: {
         user() {
             return [
-                { title: this.tr('COL_NM.ID'), contents: this.userData.user_id, copyFlag: true },
-                { title: this.tr('COL_NM.NAME'), contents: this.userData.name, copyFlag: true },
-                { title: this.tr('COL_NM.EMAIL'), contents: this.userData.email, copyFlag: true },
-                { title: this.tr('COL_NM.PHONE'), contents: this.userData.mobile, copyFlag: true },
-                { title: this.tr('COL_NM.GROUP'), contents: this.userData.group, copyFlag: true },
+                { title: this.$t('COL_NM.ID'), contents: this.userData.user_id, copyFlag: true },
+                { title: this.$t('COL_NM.NAME'), contents: this.userData.name, copyFlag: true },
+                { title: this.$t('COL_NM.EMAIL'), contents: this.userData.email, copyFlag: true },
+                { title: this.$t('COL_NM.PHONE'), contents: this.userData.mobile, copyFlag: true },
+                { title: this.$t('COL_NM.GROUP'), contents: this.userData.group, copyFlag: true },
                 {
-                    title: this.tr('COL_NM.STATE'), state: this.userData.state, stateType: 'MEMBER_STATE', copyFlag: true,
+                    title: this.$t('COL_NM.STATE'), state: this.userData.state, stateType: 'MEMBER_STATE', copyFlag: true,
                 },
-                { title: this.tr('COL_NM.LANGUAGE'), contents: this.userData.language, copyFlag: true },
-                { title: this.tr('COL_NM.DOMAIN_ID'), contents: this.userData.domain_id, copyFlag: true },
-                { title: this.tr('COL_NM.TIMEZONE'), contents: this.userData.timezone, copyFlag: true },
+                { title: this.$t('COL_NM.LANGUAGE'), contents: this.userData.language, copyFlag: true },
+                { title: this.$t('COL_NM.DOMAIN_ID'), contents: this.userData.domain_id, copyFlag: true },
+                { title: this.$t('COL_NM.TIMEZONE'), contents: this.userData.timezone, copyFlag: true },
             ];
         },
         tag() {
@@ -87,14 +87,14 @@ export default {
         panelData() {
             return [
                 {
-                    panelTitle: this.tr('PANEL.BASE_INFO'),
+                    panelTitle: this.$t('PANEL.BASE_INFO'),
                     panelIcon: {
                         icon: 'fa-hashtag', type: 'l', size: 1, color: 'primary',
                     },
                     data: this.user,
                 },
                 {
-                    panelTitle: this.tr('PANEL.TAG'),
+                    panelTitle: this.$t('PANEL.TAG'),
                     panelIcon: {
                         icon: 'fa-tags', type: 'l', size: 1, color: 'danger',
                     },

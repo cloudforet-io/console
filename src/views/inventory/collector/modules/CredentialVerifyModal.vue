@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="tr('INVENTORY.VERIFY_CRD')"
+    <p-button-modal :header-title="$t('INVENTORY.VERIFY_CRD')"
                     theme-color="safe"
                     centered
                     size="lg"
@@ -38,7 +38,7 @@
                           auto
                           :size="1.5"
                 />
-                <span>{{ tr('COMMON.BTN_CONFIRM') }}</span>
+                <span>{{$t('COMMON.BTN_CONFIRM') }}</span>
             </div>
         </template>
     </p-button-modal>

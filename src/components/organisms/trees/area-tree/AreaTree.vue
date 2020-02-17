@@ -122,7 +122,7 @@ export default {
 
         const getTree = () => (_.isEmpty(context) ? null : _.get(context, 'refs.primeTree.$refs.slVueTree'));
 
-        const getNoSelectMSG = computed(() => [Util.methods.tr(props.noSelectMSG[0], null, context.parent), Util.methods.tr(props.noSelectMSG[1], null, context.parent)]);
+        const getNoSelectMSG = computed(() => [context.parent.$t(props.noSelectMSG[0]), context.parent.$t(props.noSelectMSG[1])]);
         const getNodeKeyComputed = computed(() => state.nodeKey);
         const getCurrentNode = computed(() => {
             const node = getTree();

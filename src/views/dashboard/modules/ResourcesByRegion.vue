@@ -1,5 +1,5 @@
 <template>
-    <p-board-layout :title="tr('DASHBOARD.RES_REGION')"
+    <p-board-layout :title="$t('DASHBOARD.RES_REGION')"
                     :dropdown-menu="dropdownMenu"
                     :dropdown-selected="dropdownMenu[selectedIdx].label"
                     @clickMenuEvent="onClickMenu"

@@ -1,5 +1,5 @@
 <template>
-    <p-board-layout :title="tr('DASHBOARD.SERVER_TYPE')">
+    <p-board-layout :title="$t('DASHBOARD.SERVER_TYPE')">
         <div class="server-type-chart">
             <p-horizontal-stack-bar-chart :data="serverData"
                                           @legendClick="onServerTypeLegendClick"

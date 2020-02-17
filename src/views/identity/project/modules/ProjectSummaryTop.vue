@@ -46,7 +46,7 @@ export default {
     },
     computed: {
         topPanelTitle() {
-            return this.tr('COMMON.BASE_INFO');
+            return this.$t('COMMON.BASE_INFO');
         },
         destructTags() {
             return _.toPairsIn(this.tags);
@@ -55,17 +55,17 @@ export default {
             return [
                 {
                     name: 'id',
-                    label: this.tr('COMMON.ID'),
+                    label: this.$t('COMMON.ID'),
                     copyFlag: true,
                 },
                 {
                     name: 'name',
-                    label: this.tr('COMMON.NAME'),
+                    label: this.$t('COMMON.NAME'),
                     copyFlag: true,
                 },
                 {
                     name: 'create',
-                    label: this.tr('COMMON.CREAT'),
+                    label: this.$t('COMMON.CREAT'),
                     copyFlag: true,
                 },
             ];

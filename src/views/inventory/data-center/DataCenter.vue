@@ -282,7 +282,7 @@ export default {
                     group: 'noticeBottomRight',
                     type: 'success',
                     title: 'Success',
-                    text: this.tr('INVENTORY.CRT_SUCC_ARG', [arg]),
+                    text: this.$t('INVENTORY.CRT_SUCC_ARG', [arg]),
                     duration: 2000,
                     speed: 1000,
                 });
@@ -291,7 +291,7 @@ export default {
                     group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
-                    text: this.tr('INVENTORY.CRT_FAIL_ARG', [arg]),
+                    text: this.$t('INVENTORY.CRT_FAIL_ARG', [arg]),
                     duration: 2000,
                     speed: 1000,
                 });
@@ -324,7 +324,7 @@ export default {
                     group: 'noticeBottomRight',
                     type: 'success',
                     title: 'Success',
-                    text: this.tr('INVENTORY.UPT_SUCC_ARG', [arg]),
+                    text: this.$t('INVENTORY.UPT_SUCC_ARG', [arg]),
                     duration: 2000,
                     speed: 1000,
                 });
@@ -333,7 +333,7 @@ export default {
                     group: 'noticeBottomRight',
                     type: 'alert',
                     title: 'Fail',
-                    text: this.tr('INVENTORY.UPT_FAIL_ARG', [arg]),
+                    text: this.$t('INVENTORY.UPT_FAIL_ARG', [arg]),
                     duration: 2000,
                     speed: 1000,
                 });
@@ -368,7 +368,7 @@ export default {
             const itemType = nodeData.item_type;
             // eslint-disable-next-line no-nested-ternary
             const param = itemType === 'REGION' ? { region_id: nodeData.id } : itemType === 'ZONE' ? { zone_id: nodeData.id } : { pool_id: nodeData.id };
-            const arg = itemType === 'REGION' ? this.tr('COMMON.REGION') : itemType === 'ZONE' ? this.tr('COMMON.ZONE') : this.tr('COMMON.POOL');
+            const arg = itemType === 'REGION' ? this.$t('COMMON.REGION') : itemType === 'ZONE' ? this.$t('COMMON.ZONE') : this.$t('COMMON.POOL');
             const url = `/inventory/${itemType.toLowerCase()}/delete`;
 
             await this.$http.post(url, param).then((response) => {
@@ -379,7 +379,7 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'success',
                         title: 'Success',
-                        text: this.tr('INVENTORY.DEL_SUCC_ARG', [arg]),
+                        text: this.$t('INVENTORY.DEL_SUCC_ARG', [arg]),
                         duration: 2000,
                         speed: 1000,
                     });
@@ -402,7 +402,7 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'alert',
                         title: 'Fail',
-                        text: this.tr('IDENTITY.DEL_FAIL_CHI_ARG', [arg]),
+                        text: this.$t('IDENTITY.DEL_FAIL_CHI_ARG', [arg]),
                         duration: 2000,
                         speed: 1000,
                     });
@@ -411,7 +411,7 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'alert',
                         title: 'Fail',
-                        text: this.tr('IDENTITY.DEL_FAIL_ARG', [arg]),
+                        text: this.$t('IDENTITY.DEL_FAIL_ARG', [arg]),
                         duration: 2000,
                         speed: 1000,
                     });

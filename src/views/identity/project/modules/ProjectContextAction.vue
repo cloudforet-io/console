@@ -57,7 +57,7 @@
                 </div>
             </div>
             <div class="input-title">
-                {{ tr('COMMON.TAG') }}
+                {{$t('COMMON.TAG') }}
             </div>
             <div class="input-tag-card">
                 <p-dict-input-group ref="tagPanel"
@@ -70,10 +70,10 @@
             </div>
         </template>
         <template #close-button>
-            {{ tr('COMMON.BTN_CANCEL') }}
+            {{$t('COMMON.BTN_CANCEL') }}
         </template>
         <template #confirm-button>
-            {{ tr('COMMON.BTN_OK') }}
+            {{$t('COMMON.BTN_OK') }}
         </template>
     </p-button-modal>
 </template>
@@ -169,13 +169,13 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                const targetObj = actionFlag[1] === 'PJ' ? this.tr('COMMON.PG') : this.tr('COMMON.PG_GR');
+                const targetObj = actionFlag[1] === 'PJ' ? this.$t('COMMON.PG') : this.$t('COMMON.PG_GR');
                 if (actionFlag[0] === 'CRT') {
-                    selectedLabel = this.tr('ORGANISMS.CREATE_ARG', [targetObj]);
+                    selectedLabel = this.$t('ORGANISMS.CREATE_ARG', [targetObj]);
                 } else if (actionFlag[0] === 'UPT') {
-                    selectedLabel = this.tr('ORGANISMS.UPDATE_ARG', [targetObj]);
+                    selectedLabel = this.$t('ORGANISMS.UPDATE_ARG', [targetObj]);
                 } else {
-                    selectedLabel = this.tr('ORGANISMS.DELETE_ARG', [targetObj]);
+                    selectedLabel = this.$t('ORGANISMS.DELETE_ARG', [targetObj]);
                 }
             }
             return selectedLabel;
@@ -184,13 +184,13 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                const targetObj = actionFlag[1] === 'PJ' ? this.tr('COMMON.PG') : this.tr('COMMON.PG_GR');
+                const targetObj = actionFlag[1] === 'PJ' ? this.$t('COMMON.PG') : this.$t('COMMON.PG_GR');
                 if (actionFlag[0] === 'CRT') {
-                    selectedLabel = this.tr('IDENTITY.PARENT_ARG', [this.tr('COMMON.PG_GR')]);
+                    selectedLabel = this.$t('IDENTITY.PARENT_ARG', [this.$t('COMMON.PG_GR')]);
                 } else if (actionFlag[0] === 'UPT') {
-                    selectedLabel = this.tr('IDENTITY.SELECT_ARG', [targetObj]);
+                    selectedLabel = this.$t('IDENTITY.SELECT_ARG', [targetObj]);
                 } else {
-                    selectedLabel = this.tr('ORGANISMS.DELETE_ARG', [targetObj]);
+                    selectedLabel = this.$t('ORGANISMS.DELETE_ARG', [targetObj]);
                 }
             }
             return selectedLabel;
@@ -199,7 +199,7 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                selectedLabel = actionFlag[1] === 'PJ' ? this.tr('COMMON.PG_NM') : this.tr('COMMON.PG_GR_NM');
+                selectedLabel = actionFlag[1] === 'PJ' ? this.$t('COMMON.PG_NM') : this.$t('COMMON.PG_GR_NM');
             }
             return selectedLabel;
         },
@@ -265,8 +265,8 @@ export default {
                 this.$emit('update', flag, tree, nodeData);
             } else {
                 this.isValid.valid = true;
-                const target = flag[1] === 'PR' ? this.tr('COMMON.PG_GR') : this.tr('COMMON.PG');
-                this.isValid.errorMessage = this.tr('IDENTITY.REQ_FIELD', [target]);
+                const target = flag[1] === 'PR' ? this.$t('COMMON.PG_GR') : this.$t('COMMON.PG');
+                this.isValid.errorMessage = this.$t('IDENTITY.REQ_FIELD', [target]);
             }
         },
         async deletedSelectedOnTree(flag, tree, nodeData) {

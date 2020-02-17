@@ -7,7 +7,7 @@
             size="sm"
             @click="copyText"
         >
-            {{ tr('COMMON.COPY') }}
+            {{ $t('COMMON.COPY') }}
         </p-button>
     </span>
 </template>

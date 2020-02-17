@@ -60,7 +60,7 @@
                              target="_blank"
                 >
                     <p-button outline style-type="dark">
-                        {{ tr('INVENTORY.MANAGE_CRD') }}
+                        {{ $t('INVENTORY.MANAGE_CRD') }}
                     </p-button>
                 </router-link>
             </template>
@@ -115,7 +115,7 @@ export default {
          */
         selectIndex: Array,
     },
-    setup(props, { emit, root, parent }) {
+    setup(props, { emit, parent }) {
         const state = reactive({
             sortBy: '',
             sortDesc: '',
@@ -124,8 +124,8 @@ export default {
             searchText: '',
             crdTypes: ['Credentials Group', 'Credentials'],
             crdTypeLabels: computed(() => ({
-                'Credentials Group': parent.tr('COMMON.CREDENTIAL_GRP'),
-                Credentials: parent.tr('COMMON.CREDENTIALS'),
+                'Credentials Group': parent.$t('COMMON.CREDENTIAL_GRP'),
+                Credentials: parent.$t('COMMON.CREDENTIALS'),
             })),
             proxyCrdType: makeProxy('crdType', props, emit),
             fields: {

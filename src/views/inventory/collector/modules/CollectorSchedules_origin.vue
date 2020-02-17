@@ -1,33 +1,33 @@
 <template>
     <div>
-        <p-panel-top :panel-title="tr('INVENTORY.SCHEDULE')">
+        <p-panel-top :panel-title="$t('INVENTORY.SCHEDULE')">
             <template #head>
                 <p-button v-if="!isEditMode"
                           style-type="primary-dark" class="edit-btn"
                           @click="onClickEdit"
                 >
-                    {{ tr('COMMON.BTN_EDIT') }}
+                    {{ $t('COMMON.BTN_EDIT') }}
                 </p-button>
                 <div v-else class="edit-mode-btn-box">
                     <p-button style-type="secondary" outline
                               class="cancel-btn"
                               @click="onClickCancel"
                     >
-                        {{ tr('COMMON.BTN_CANCEL') }}
+                        {{ $t('COMMON.BTN_CANCEL') }}
                     </p-button>
                     <p-button style-type="secondary"
                               @click="onClickConfirm"
                     >
-                        {{ tr('COMMON.BTN_CONFIRM') }}
+                        {{ $t('COMMON.BTN_CONFIRM') }}
                     </p-button>
                 </div>
             </template>
 
             <template v-if="isEditMode" #body>
-                <p-field-group :label="tr('COMMON.TIMEZONE')">
+                <p-field-group :label="$t('COMMON.TIMEZONE')">
                     <p-select-dropdown v-model="timezone" :items="timezones" class="timezone-selector" />
                 </p-field-group>
-                <p-field-group :label="tr('INVENTORY.COLL_TIME')">
+                <p-field-group :label="$t('INVENTORY.COLL_TIME')">
                     <div>
                         <span v-for="hour in hoursMatrix" :key="hour"
                               class="time-block"
@@ -39,7 +39,7 @@
                         <p-button style-type="dark" :outline="!isAllHours"
                                   @click="onClickAllHours"
                         >
-                            {{ tr('COMMON.ALL') }}
+                            {{ $t('COMMON.ALL') }}
                         </p-button>
                     </div>
                 </p-field-group>
@@ -115,9 +115,9 @@ export default {
                 hours: props.hours.map(val => `${val}:00`),
             })),
             dataSources: computed(() => [
-                { name: parent.tr('COMMON.TIMEZONE'), key: 'timezone' },
+                { name: parent.$t('COMMON.TIMEZONE'), key: 'timezone' },
                 {
-                    name: parent.tr('INVENTORY.COLL_TIME'),
+                    name: parent.$t('INVENTORY.COLL_TIME'),
                     key: 'hours',
                     // eslint-disable-next-line camelcase
                     view_type: 'list',

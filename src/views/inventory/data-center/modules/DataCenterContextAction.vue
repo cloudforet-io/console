@@ -55,7 +55,7 @@
                 </div>
             </form>
             <div class="input-title">
-                {{ tr('COMMON.TAG') }}
+                {{$t('COMMON.TAG') }}
             </div>
             <div class="input-tag-card">
                 <p-dict-input-group ref="tagPanel"
@@ -68,10 +68,10 @@
             </div>
         </template>
         <template #close-button>
-            {{ tr('COMMON.BTN_CANCEL') }}
+            {{$t('COMMON.BTN_CANCEL') }}
         </template>
         <template #confirm-button>
-            {{ tr('COMMON.BTN_OK') }}
+            {{$t('COMMON.BTN_OK') }}
         </template>
     </p-button-modal>
 </template>
@@ -153,7 +153,7 @@ export default {
                     msg = 'INVENTORY.POOL_NM';
                 }
             }
-            return this.tr(msg);
+            return this.$t(msg);
         },
         getIsInvalidProjectName() {
             return this.projectNameValidity ? this.styler.border : '';
@@ -178,13 +178,13 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                const targetObj = actionFlag[1] === 'RE' ? this.tr('COMMON.REGION') : actionFlag[1] === 'ZN' ? this.tr('COMMON.ZONE') : this.tr('COMMON.POOL');
+                const targetObj = actionFlag[1] === 'RE' ? this.$t('COMMON.REGION') : actionFlag[1] === 'ZN' ? this.$t('COMMON.ZONE') : this.$t('COMMON.POOL');
                 if (actionFlag[0] === 'CRT') {
-                    selectedLabel = this.tr('ORGANISMS.CREATE_ARG', [targetObj]);
+                    selectedLabel = this.$t('ORGANISMS.CREATE_ARG', [targetObj]);
                 } else if (actionFlag[0] === 'UPT') {
-                    selectedLabel = this.tr('ORGANISMS.UPDATE_ARG', [targetObj]);
+                    selectedLabel = this.$t('ORGANISMS.UPDATE_ARG', [targetObj]);
                 } else {
-                    selectedLabel = this.tr('ORGANISMS.DELETE_ARG', [targetObj]);
+                    selectedLabel = this.$t('ORGANISMS.DELETE_ARG', [targetObj]);
                 }
             }
             return selectedLabel;
@@ -193,19 +193,19 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                const targetObj = actionFlag[1] === 'RE' ? this.tr('COMMON.REGION') : actionFlag[1] === 'ZN' ? this.tr('COMMON.ZONE') : this.tr('COMMON.POOL');
+                const targetObj = actionFlag[1] === 'RE' ? this.$t('COMMON.REGION') : actionFlag[1] === 'ZN' ? this.$t('COMMON.ZONE') : this.$t('COMMON.POOL');
                 if (actionFlag[0] === 'CRT') {
                     if (actionFlag[1] === 'ZN') {
-                        selectedLabel = this.tr('INVENTORY.PARENT_ARG', [this.tr('COMMON.REGION')]);
+                        selectedLabel = this.$t('INVENTORY.PARENT_ARG', [this.$t('COMMON.REGION')]);
                     } else if (actionFlag[1] === 'PL') {
-                        selectedLabel = this.tr('INVENTORY.PARENT_ARG', [this.tr('COMMON.ZONE')]);
+                        selectedLabel = this.$t('INVENTORY.PARENT_ARG', [this.$t('COMMON.ZONE')]);
                     } else {
-                        selectedLabel = this.tr('INVENTORY.PARENT_ARG', [this.tr('COMMON.POOL')]);
+                        selectedLabel = this.$t('INVENTORY.PARENT_ARG', [this.$t('COMMON.POOL')]);
                     }
                 } else if (actionFlag[0] === 'UPT') {
-                    selectedLabel = this.tr('INVENTORY.SELECT_ARG', [targetObj]);
+                    selectedLabel = this.$t('INVENTORY.SELECT_ARG', [targetObj]);
                 } else {
-                    selectedLabel = this.tr('ORGANISMS.DELETE_ARG', [targetObj]);
+                    selectedLabel = this.$t('ORGANISMS.DELETE_ARG', [targetObj]);
                 }
             }
             return selectedLabel;
@@ -214,7 +214,7 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                selectedLabel = actionFlag[1] === 'RE' ? this.tr('INVENTORY.REGION_NM') : actionFlag[1] === 'ZN' ? this.tr('INVENTORY.ZONE_NM') : this.tr('INVENTORY.POOL_NM');
+                selectedLabel = actionFlag[1] === 'RE' ? this.$t('INVENTORY.REGION_NM') : actionFlag[1] === 'ZN' ? this.$t('INVENTORY.ZONE_NM') : this.$t('INVENTORY.POOL_NM');
             }
             return selectedLabel;
         },
@@ -283,8 +283,8 @@ export default {
             } else {
                 this.isValid.valid = true;
                 // eslint-disable-next-line no-nested-ternary
-                const target = flag[1] === 'RE' ? this.tr('COMMON.REGION') : flag[1] === 'ZN' ? this.tr('COMMON.ZONE') : this.tr('COMMON.POOL');
-                this.isValid.errorMessage = this.tr('INVENTORY.REQ_FIELD', [target]);
+                const target = flag[1] === 'RE' ? this.$t('COMMON.REGION') : flag[1] === 'ZN' ? this.$t('COMMON.ZONE') : this.$t('COMMON.POOL');
+                this.isValid.errorMessage = this.$t('INVENTORY.REQ_FIELD', [target]);
             }
         },
         async deletedSelectedOnTree(flag, tree, nodeData) {

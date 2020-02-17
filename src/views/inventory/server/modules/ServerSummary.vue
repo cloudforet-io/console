@@ -4,7 +4,7 @@
                    @edit="showTagEditModal"
         />
         <BaseModal ref="IVSV002_TagEditModal"
-                   :title="tr('TITLE', [tr('BTN_EDIT'), tr('TAG')])"
+                   :title="$t('TITLE', [$t('BTN_EDIT'), $t('TAG')])"
                    centered
                    size="md"
                    type="primary"
@@ -100,51 +100,51 @@ export default {
         },
         serverInfo() {
             return [
-                { title: `${this.tr('COMMON.SERVER')} ${this.tr('COMMON.ID')}`, contents: this.serverData.server_id, copyFlag: true },
-                { title: this.tr('COL_NM.NAME'), contents: this.serverData.name, copyFlag: true },
+                { title: `${this.$t('COMMON.SERVER')} ${this.$t('COMMON.ID')}`, contents: this.serverData.server_id, copyFlag: true },
+                { title: this.$t('COL_NM.NAME'), contents: this.serverData.name, copyFlag: true },
                 {
-                    title: this.tr('COL_NM.STATE'), state: this.serverData.state, stateType: 'SERVER_STATE', copyFlag: true,
+                    title: this.$t('COL_NM.STATE'), state: this.serverData.state, stateType: 'SERVER_STATE', copyFlag: true,
                 },
-                { title: this.tr('COL_NM.PRI_IP'), contents: this.serverData.primary_ip_address, copyFlag: true },
+                { title: this.$t('COL_NM.PRI_IP'), contents: this.serverData.primary_ip_address, copyFlag: true },
                 {
-                    title: this.tr('COL_NM.SE_TYPE'), badge: this.serverData.server_type, badgeType: 'SERVER_TYPE', copyFlag: true,
+                    title: this.$t('COL_NM.SE_TYPE'), badge: this.serverData.server_type, badgeType: 'SERVER_TYPE', copyFlag: true,
                 },
-                { title: this.tr('COL_NM.CORE'), contents: this.base.core, copyFlag: true },
-                { title: this.tr('COL_NM.FQDN'), contents: this.domain.fqdn, copyFlag: true },
-                { title: this.tr('COL_NM.MEMORY'), contents: this.base.memory, copyFlag: true },
-                { title: this.tr('COL_NM.O_TYPE'), contents: this.serverData.os_type, copyFlag: true },
-                { title: this.tr('COL_NM.O_DIS'), contents: this.os.os_distro, copyFlag: true },
-                { title: this.tr('COL_NM.PROJ'), contents: this.serverData.project_id, copyFlag: true },
-                { title: this.tr('COL_NM.O_DETAIL'), contents: this.os.os_details, copyFlag: true },
-                { title: this.tr('COL_NM.REGION'), contents: this.regionInfo.region_id, copyFlag: true },
-                { title: this.tr('COL_NM.O_ARCH'), contents: this.os.os_arch, copyFlag: true },
-                { title: this.tr('COL_NM.ZONE'), contents: this.zoneInfo.zone_id, copyFlag: true },
-                { title: this.tr('COL_NM.KERNEL'), contents: this.base.kernel, copyFlag: true },
-                { title: this.tr('COL_NM.POOL'), contents: this.poolInfo.pool_id, copyFlag: true },
-                { title: this.tr('COL_NM.LT_BOOT'), contents: this.getDate(this.base.booted_at), copyFlag: true },
-                { title: this.tr('COL_NM.CREATE'), contents: this.getDate(this.base.created_at), copyFlag: true },
-                { title: this.tr('COL_NM.UPDATE'), contents: this.getDate(this.base.updated_at), copyFlag: true },
-                { title: this.tr('COL_NM.DELETE'), contents: this.getDate(this.base.deleted_at), copyFlag: true },
+                { title: this.$t('COL_NM.CORE'), contents: this.base.core, copyFlag: true },
+                { title: this.$t('COL_NM.FQDN'), contents: this.domain.fqdn, copyFlag: true },
+                { title: this.$t('COL_NM.MEMORY'), contents: this.base.memory, copyFlag: true },
+                { title: this.$t('COL_NM.O_TYPE'), contents: this.serverData.os_type, copyFlag: true },
+                { title: this.$t('COL_NM.O_DIS'), contents: this.os.os_distro, copyFlag: true },
+                { title: this.$t('COL_NM.PROJ'), contents: this.serverData.project_id, copyFlag: true },
+                { title: this.$t('COL_NM.O_DETAIL'), contents: this.os.os_details, copyFlag: true },
+                { title: this.$t('COL_NM.REGION'), contents: this.regionInfo.region_id, copyFlag: true },
+                { title: this.$t('COL_NM.O_ARCH'), contents: this.os.os_arch, copyFlag: true },
+                { title: this.$t('COL_NM.ZONE'), contents: this.zoneInfo.zone_id, copyFlag: true },
+                { title: this.$t('COL_NM.KERNEL'), contents: this.base.kernel, copyFlag: true },
+                { title: this.$t('COL_NM.POOL'), contents: this.poolInfo.pool_id, copyFlag: true },
+                { title: this.$t('COL_NM.LT_BOOT'), contents: this.getDate(this.base.booted_at), copyFlag: true },
+                { title: this.$t('COL_NM.CREATE'), contents: this.getDate(this.base.created_at), copyFlag: true },
+                { title: this.$t('COL_NM.UPDATE'), contents: this.getDate(this.base.updated_at), copyFlag: true },
+                { title: this.$t('COL_NM.DELETE'), contents: this.getDate(this.base.deleted_at), copyFlag: true },
             ];
         },
         vmInfo() {
             return [
-                { title: `${this.tr('VM')} ${this.tr('COL_NM.ID')}`, contents: this.vm.vm_id, copyFlag: true },
-                { title: `${this.tr('VM')} ${this.tr('COL_NM.NAME')}`, contents: this.vm.vm_name, copyFlag: true },
+                { title: `${this.$t('VM')} ${this.$t('COL_NM.ID')}`, contents: this.vm.vm_id, copyFlag: true },
+                { title: `${this.$t('VM')} ${this.$t('COL_NM.NAME')}`, contents: this.vm.vm_name, copyFlag: true },
                 {
-                    title: this.tr('COL_NM.PLATFORM'), badge: this.vm.platform_type, badgeType: 'PLATFORM_TYPE', copyFlag: true,
+                    title: this.$t('COL_NM.PLATFORM'), badge: this.vm.platform_type, badgeType: 'PLATFORM_TYPE', copyFlag: true,
                 },
-                { title: this.tr('COL_NM.IMAGE'), contents: this.vm.image, copyFlag: true },
-                { title: this.tr('COL_NM.CREATE'), contents: this.getDate(this.vm.created_at), copyFlag: true },
+                { title: this.$t('COL_NM.IMAGE'), contents: this.vm.image, copyFlag: true },
+                { title: this.$t('COL_NM.CREATE'), contents: this.getDate(this.vm.created_at), copyFlag: true },
             ];
         },
         computeInfo() {
             return [
-                { title: this.tr('COL_NM.INST_ID'), contents: this.compute.instance_id, copyFlag: true },
-                { title: this.tr('COL_NM.KEY_PAIR'), contents: this.compute.keypair, copyFlag: true },
-                { title: this.tr('COL_NM.INST_TYPE'), contents: this.compute.instance_type, copyFlag: true },
-                { title: this.tr('COL_NM.CREATE_BY'), contents: this.compute.created_by_user_id, copyFlag: true },
-                { title: this.tr('COL_NM.SEC_GROUP'), contents: this.compute.security_groups, copyFlag: true },
+                { title: this.$t('COL_NM.INST_ID'), contents: this.compute.instance_id, copyFlag: true },
+                { title: this.$t('COL_NM.KEY_PAIR'), contents: this.compute.keypair, copyFlag: true },
+                { title: this.$t('COL_NM.INST_TYPE'), contents: this.compute.instance_type, copyFlag: true },
+                { title: this.$t('COL_NM.CREATE_BY'), contents: this.compute.created_by_user_id, copyFlag: true },
+                { title: this.$t('COL_NM.SEC_GROUP'), contents: this.compute.security_groups, copyFlag: true },
             ];
         },
         tag() {
@@ -164,28 +164,28 @@ export default {
         panelData() {
             return [
                 {
-                    panelTitle: this.tr('PANEL.BASE_INFO'),
+                    panelTitle: this.$t('PANEL.BASE_INFO'),
                     panelIcon: {
                         icon: 'fa-hashtag', type: 'l', size: 1, color: 'primary',
                     },
                     data: this.serverInfo,
                 },
                 {
-                    panelTitle: this.tr('PANEL.VM'),
+                    panelTitle: this.$t('PANEL.VM'),
                     panelIcon: {
                         icon: 'fa-hashtag', type: 'l', size: 1, color: 'primary',
                     },
                     data: this.vmInfo,
                 },
                 {
-                    panelTitle: this.tr('PANEL.COMPUTE'),
+                    panelTitle: this.$t('PANEL.COMPUTE'),
                     panelIcon: {
                         icon: 'fa-hashtag', type: 'l', size: 1, color: 'primary',
                     },
                     data: this.computeInfo,
                 },
                 {
-                    panelTitle: this.tr('PANEL.TAG'),
+                    panelTitle: this.$t('PANEL.TAG'),
                     panelIcon: {
                         icon: 'fa-tags', type: 'l', size: 1, color: 'danger',
                     },
