@@ -35,7 +35,7 @@
                 <p-i name="ic_plus" color="transparent inherit"
                      width="1rem" height="1rem"
                 />
-                {{ tr('COMMON.BTN_ADD') }}
+                {{ $t('COMMON.BTN_ADD') }}
             </p-button>
         </div>
     </div>
@@ -82,7 +82,7 @@ const useDictBuffer = (props, context) => {
     };
     const copyText = (event) => {
         const rawText = event.target.parentElement.innerText;
-        const copyLength = this.tr('COMMON.COPY').length;
+        const copyLength = this.$t('COMMON.COPY').length;
         const text = rawText.slice(0, -copyLength).trim();
         this.selectToCopyToClipboard(text);
     };

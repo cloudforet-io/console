@@ -74,7 +74,7 @@
             </p-tr>
             <p-tr v-else-if="showNoData" key="noData" class="no-data-row">
                 <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
-                    {{ tr('ORGANISMS.NO_DATA') }}
+                    {{ $t('ORGANISMS.NO_DATA') }}
                 </p-td>
             </p-tr>
             <slot v-else name="body" :items="items">
