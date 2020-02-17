@@ -44,16 +44,16 @@ export const DefaultCase = () => ({
             renderData: [
                 {
                     name: 'id',
-                    label: this.tr('COMMON.ID'),
+                    label: this.$t('COMMON.ID'),
                     copyFlag: true,
                 },
                 {
                     name: 'name',
-                    label: this.tr('COMMON.NAME'),
+                    label: this.$t('COMMON.NAME'),
                 },
                 {
                     name: 'state',
-                    label: this.tr('COMMON.STATE'),
+                    label: this.$t('COMMON.STATE'),
                     copyFlag: true,
                 },
             ],

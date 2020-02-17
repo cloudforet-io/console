@@ -17,7 +17,7 @@ const makeMockItem = (parent, commonOption, name, trLabel, extra) => {
     }
     if (trLabel) {
         const label = (typeof trLabel === 'string') ? [trLabel, 'null'] : trLabel;
-        item.label = `parent.tr(${_.join(label)}, parent)`;
+        item.label = `parent.$t(${_.join(label)}, parent)`;
     }
     return item;
 };

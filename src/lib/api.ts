@@ -1,14 +1,10 @@
 /* eslint-disable camelcase */
 import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
-import VueCookies from 'vue-cookies';
-import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import {
     computed, getCurrentInstance, reactive, Ref, ref,
 } from '@vue/composition-api';
 
-// @ts-ignore
-import { debug } from 'webpack';
 // @ts-ignore
 import { tagList } from '@/components/molecules/tags/Tag.vue';
 

@@ -135,23 +135,23 @@ export const Util = {
             returnHtml = `<i class="${defaultClass}"> </i>`;
             return c ? defaultClass : returnHtml;
         },
-        /** ********************************************************************************
-         * Name       : tr
-         * Input   => (m: message   =>  String
-         *             a: argument  =>  String or  Array)
-         * Output  => String translation Message
-         * Description:  translation of i18n
-         ********************************************************************************* */
-        tr(m, a, parent) {
-            let vm = this;
-            if (parent) {
-                vm = parent;
-            }
-            if (vm.$i18n.te(m)) {
-                return vm.isEmpty(a) ? vm.$i18n.t(m) : vm.$i18n.t(m, a);
-            }
-            return 'No Message';
-        },
+        // /** ********************************************************************************
+        //  * Name       : tr
+        //  * Input   => (m: message   =>  String
+        //  *             a: argument  =>  String or  Array)
+        //  * Output  => String translation Message
+        //  * Description:  translation of i18n
+        //  ********************************************************************************* */
+        // tr(m, a, parent) {
+        //     let vm = this;
+        //     if (parent) {
+        //         vm = parent;
+        //     }
+        //     if (vm.$i18n.te(m)) {
+        //         return vm.isEmpty(a) ? vm.$i18n.t(m) : vm.$i18n.t(m, a);
+        //     }
+        //     return 'No Message';
+        // },
         /** ********************************************************************************
          * Name       : treeDataHandler
          * Input   => (d: data                         =>  Array of data Object

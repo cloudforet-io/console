@@ -9,7 +9,7 @@ export const makeItem = (parent, commonOption, name, trLabel, extra) => {
     if (trLabel) {
         const label = (typeof trLabel === 'string') ? [trLabel, null] : trLabel;
         const vm = getCurrentInstance();
-        item.label = vm.tr(...label, vm);
+        item.label = vm.$t(...label, vm);
     }
     return item;
 };
