@@ -2,13 +2,13 @@
     <general-page-layout>
         <p-button class="back-btn" @click="goBackToCollectors">
             <p-i name="ic_back" color="transparent inherit" />
-            {{ tr('INVENTORY.BACK_COL') }}
+            {{ $t('INVENTORY.BACK_COL') }}
         </p-button>
         <p-progress-wizard :tabs.sync="tabs"
                            :labels="tabLabels"
                            :active-idx.sync="activeIdx"
                            :show-confirm="isAllTabValid"
-                           :title="tr('INVENTORY.CRT_COLL')"
+                           :title="$t('INVENTORY.CRT_COLL')"
                            @cancel="onCancel"
                            @confirm="onConfirm"
                            @changeStep="onChangeStep"
@@ -37,7 +37,7 @@
                                  target="_blank"
                     >
                         <p-button outline style-type="dark">
-                            {{ tr('INVENTORY.CRT_CRD') }}
+                            {{ $t('INVENTORY.CRT_CRD') }}
                         </p-button>
                     </router-link>
                 </div>
@@ -148,9 +148,9 @@ export default {
                 },
             ],
             tabLabels: computed(() => ({
-                conf: parent.tr('INVENTORY.CONF_COL', parent),
-                credentials: parent.tr('INVENTORY.CHOOSE_CRD'),
-                tags: parent.tr('INVENTORY.ADD_TAG'),
+                conf: parent.$t('INVENTORY.CONF_COL'),
+                credentials: parent.$t('INVENTORY.CHOOSE_CRD'),
+                tags: parent.$t('INVENTORY.ADD_TAG'),
             })),
             activeIdx: 0,
             showConfirm: false,

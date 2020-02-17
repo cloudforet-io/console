@@ -27,7 +27,7 @@
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" @click="$router.push({path: '/inventory/collector/create/plugins'})">
-                            {{ tr('COMMON.BTN_CRT') }}
+                            {{ $t('COMMON.BTN_CRT') }}
                         </p-button>
                         <PDropdownMenuBtn class="left-toolbox-item"
                                           :menu="dropdown"
@@ -37,7 +37,7 @@
                                           @click-delete="onClickDelete"
                                           @click-collectData="onClickCollectData"
                         >
-                            {{ tr('COMMON.BTN_ACTION') }}
+                            {{ $t('COMMON.BTN_ACTION') }}
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
                             <!--                            <p-search :search-text.sync="searchText" @onSearch="getCollectors" />-->

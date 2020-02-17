@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="tr('COMMON.PROFILE')"
+    <p-button-modal :header-title="$t('COMMON.PROFILE')"
                     centered
                     fade
                     backdrop
@@ -18,11 +18,11 @@
         <template #body>
             <p-row class="profile-form" wrap="wrap">
                 <p-col class="form-div" :col="6">
-                    <p-field-group :label="tr('COMMON.ID')">
+                    <p-field-group :label="$t('COMMON.ID')">
                         <br>
                         <p-text-input :value="userId" disabled block />
                     </p-field-group>
-                    <p-field-group :label="tr('COMMON.EMAIL')"
+                    <p-field-group :label="$t('COMMON.EMAIL')"
                                    :invalid-text="invalidMsg.email"
                                    :invalid="invalidState.email"
                     >
@@ -33,7 +33,7 @@
                             />
                         </template>
                     </p-field-group>
-                    <p-field-group :label="tr('COMMON.NAME')"
+                    <p-field-group :label="$t('COMMON.NAME')"
                                    :invalid-text="invalidMsg.name"
                                    :invalid="invalidState.name"
                     >
@@ -45,7 +45,7 @@
                         </template>
                     </p-field-group>
                     <p-field-group v-if="showPassword"
-                                   :label="tr('USER.PWD')"
+                                   :label="$t('USER.PWD')"
                                    :invalid-text="invalidMsg.password"
                                    :invalid="invalidState.password"
                     >
@@ -57,7 +57,7 @@
                         </template>
                     </p-field-group>
                     <p-field-group v-if="showPassword"
-                                   :label="tr('USER.PWD_CHECK')"
+                                   :label="$t('USER.PWD_CHECK')"
                                    :invalid-text="invalidMsg.passwordCheck"
                                    :invalid="invalidState.passwordCheck"
                     >
@@ -70,25 +70,25 @@
                     </p-field-group>
                 </p-col>
                 <p-col class="form-div" :col="6">
-                    <p-field-group :label="tr('COMMON.PHONE')">
+                    <p-field-group :label="$t('COMMON.PHONE')">
                         <br>
                         <p-text-input v-model="userState.mobile"
                                       block
                         />
                     </p-field-group>
-                    <p-field-group :label="tr('COMMON.GROUP')">
+                    <p-field-group :label="$t('COMMON.GROUP')">
                         <br>
                         <p-text-input v-model="userState.group"
                                       block
                         />
                     </p-field-group>
-                    <p-field-group :label="tr('COMMON.LANGUAGE')">
+                    <p-field-group :label="$t('COMMON.LANGUAGE')">
                         <p-select-dropdown v-model="userState.language"
                                            :items="languages"
                                            auto-height
                         />
                     </p-field-group>
-                    <p-field-group :label="tr('COMMON.TIMEZONE')">
+                    <p-field-group :label="$t('COMMON.TIMEZONE')">
                         <p-select-dropdown v-model="userState.timezone"
                                            :items="timezones"
                                            auto-height
