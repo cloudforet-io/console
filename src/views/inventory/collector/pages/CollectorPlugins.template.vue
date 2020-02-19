@@ -34,6 +34,9 @@
                         {{ filter }}
                     </p-tag>
                 </template>
+                <template #card-title="{item}">
+                    <span class="plugin-name">{{ item.name }}</span><span class="beta">{{ isBeta(item) ? 'BETA': '' }}</span>
+                </template>
                 <template #card-extra="{item}">
                     <p-row style="height: 100%;">
                         <p-col>
@@ -119,6 +122,8 @@ const setPluginList = (router) => {
         selectedVersions: {},
     });
 
+    const isBeta = item => _.get(item, 'tags.beta', '');
+
     const makeVersionMenu = v => (typeof v === 'object' ? v : { type: 'item', label: v, name: v });
     const versionsMenu = computed(() => {
         const res = {};
@@ -152,6 +157,7 @@ const setPluginList = (router) => {
 
     return {
         ...toRefs(state),
+        isBeta,
         versionsMenu,
         listPlugins,
         onPluginCreate,
@@ -241,5 +247,12 @@ export default {
     height: 100%;
     padding-top: 1.625rem;
     padding-bottom: 2.25rem;
+    .beta {
+        font-size: .5rem;
+        font-weight: bold;
+        color: $other1;
+        vertical-align: super;
+        margin-left: .2rem;
+    }
 }
 </style>

@@ -35,7 +35,7 @@ export default {
         {
             path: 'cloud-service',
             name: 'cloudService',
-            meta: { label: 'Cloud Service', breadcrumb: true },
+            meta: { label: 'Cloud Service', breadcrumb: true, beta: true },
             component: CloudService,
         },
         {

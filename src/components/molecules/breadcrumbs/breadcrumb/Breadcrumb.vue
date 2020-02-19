@@ -8,8 +8,8 @@
                              :class="{now: route.name === active.name}"
                              :to="getPath(route)"
                 >
-                    <!--                    @click="go(route)"-->
                     <span class="link">{{ route.meta.label }}</span>
+                    <span v-if="route.meta && route.meta.beta" class="beta">BETA</span>
                 </router-link>
 
                 <template v-if="hasNext">
@@ -62,15 +62,6 @@ export default {
         const active = computed(() => matched.value[proxyActiveIdx.value]);
         const hasNext = computed(() => props.currentIdx < proxyActiveIdx.value);
 
-        const go = (route) => {
-            if (hasNext.value) {
-                context.root.$router.push({ path: current.value.path });
-            } else {
-                const parent = matched.value[props.currentIdx - 1] || current.value;
-                context.root.$router.push(`${parent.path}/${route.path}`);
-            }
-        };
-
         const getPath = (route) => {
             if (hasNext.value) {
                 return { path: current.value.path };
@@ -84,7 +75,6 @@ export default {
             active,
             hasNext,
             matched,
-            go,
             getPath,
         };
     },
@@ -110,6 +100,13 @@ export default {
                 color: $secondary;
             }
         }
+    }
+    .beta {
+        font-size: .5rem;
+        font-weight: bold;
+        color: $other1;
+        vertical-align: super;
+        margin-left: .2rem;
     }
 }
 </style>
