@@ -5,7 +5,7 @@
 <script>
 import * as monaco from 'monaco-editor';
 import {
-    onMounted, reactive, toRefs, watch,
+    onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 
@@ -59,6 +59,12 @@ export default {
                     state.editor.setValue(value);
                 }
             });
+        });
+        onUnmounted(() => {
+            if (state.editor) {
+                state.editor.getModel().dispose();
+                state.editor.dispose();
+            }
         });
         return {
             ...toRefs(state),
