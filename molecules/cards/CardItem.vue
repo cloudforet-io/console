@@ -11,7 +11,9 @@
                     <p-col :col="12">
                         <slot name="body">
                             <header class="title">
-                                {{ title }}
+                                <slot name="title">
+                                    {{ title }}
+                                </slot>
                             </header>
                             <span class="contents">
                                 {{ contents }}
