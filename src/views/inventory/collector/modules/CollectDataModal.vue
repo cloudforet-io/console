@@ -77,7 +77,7 @@
                       :disabled="loading"
                       @click="onClickReset"
             >
-                {{$t('COMMON.BTN_RESET') }}
+                {{$t('BTN.RESET') }}
             </p-button>
         </template>
     </p-button-modal>
@@ -129,8 +129,8 @@ export default {
             collectModeIdx: 0,
             collectModeMenu: makeTrItems([
                 ['ALL', 'COMMON.ALL'],
-                ['CREATE', 'COMMON.BTN_CRT'],
-                ['UPDATE', 'COMMON.BTN_UPT'],
+                ['CREATE', 'BTN.CREATE'],
+                ['UPDATE', 'BTN.UPDATE'],
             ], context.parent, { type: 'item' }),
             image: computed(() => _.get(props.collector, 'tags.icon', config.get('COLLECTOR_IMG'))),
             version: computed(() => _.get(props.collector, 'plugin_info.version', '')),

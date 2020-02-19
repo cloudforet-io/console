@@ -25,14 +25,14 @@
         >
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark" @click="openEditModal(null)">
-                    {{$t('COMMON.BTN_ADD') }}
+                    {{$t('BTN.ADD') }}
                 </p-button>
                 <p-dropdown-menu-btn :menu="dropdown"
                                      class="left-toolbox-item"
                                      @click-update="openEditModal(items[selectIndex[0]])"
                                      @click-delete="proxyDeleteVisible = true"
                 >
-                    {{$t('COMMON.BTN_ACTION') }}
+                    {{$t('BTN.ACTION') }}
                 </p-dropdown-menu-btn>
             </template>
             <template #col-schedule-format="{value}">
@@ -130,8 +130,8 @@ export default {
                 ['created_at', 'COMMON.CREATED'],
             ], parent),
             dropdown: computed(() => makeTrItems([
-                ['update', 'COMMON.BTN_UPT', { disabled: props.selectIndex.length !== 1 }],
-                ['delete', 'COMMON.BTN_DELETE', { disabled: props.selectIndex.length === 0 }],
+                ['update', 'BTN.UPDATE', { disabled: props.selectIndex.length !== 1 }],
+                ['delete', 'BTN.DELETE', { disabled: props.selectIndex.length === 0 }],
             ], parent, { type: 'item' })),
             sortBy: '',
             sortDesc: '',

@@ -157,13 +157,13 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
         tabs: makeTrItems([
             ['detail', 'COMMON.DETAILS'],
             ['data', 'COMMON.DATA'],
-            ['rawData', 'COMMON.RAWDATA', { keepAlive: true }],
-            ['admin', 'COMMON.ADMIN'],
+            ['rawData', 'TAB.RAWDATA', { keepAlive: true }],
+            ['admin', 'TAB.ADMIN'],
         ], context.parent),
         activeTab: 'detail',
         multiTabs: makeTrItems([
             ['data', 'COMMON.DATA', { keepAlive: true }],
-            ['admin', 'COMMON.ADMIN'],
+            ['admin', 'TAB.ADMIN'],
         ], context.parent),
         activeMultiTab: 'data',
     });
@@ -190,18 +190,18 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
     // const cstIsNotSelected = computed(() => apiHandler.selectState.isNotSelected);
     // const cstDropdownMenu = reactive({
     //     ...makeTrItems([
-    //         ['add', 'COMMON.BTN_CRT'],
-    //         ['update', 'COMMON.BTN_UPT', { disabled: cstIsNotSelected }],
-    //         ['delete', 'COMMON.BTN_DELETE', { disabled: cstIsNotSelected }],
+    //         ['add', 'BTN.CREATE'],
+    //         ['update', 'BTN.UPDATE', { disabled: cstIsNotSelected }],
+    //         ['delete', 'BTN.DELETE', { disabled: cstIsNotSelected }],
     //     ],
     //     context.parent,
     //     { type: 'item' }),
     // });
     const cstDropdownMenu = reactive({
         ...makeTrItems([
-            ['add', 'COMMON.BTN_CRT'],
-            ['update', 'COMMON.BTN_UPT'],
-            ['delete', 'COMMON.BTN_DELETE'],
+            ['add', 'BTN.CREATE'],
+            ['update', 'BTN.UPDATE'],
+            ['delete', 'BTN.DELETE'],
         ],
         context.parent,
         { type: 'item', disabled: true }),
@@ -211,12 +211,12 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
     // const csIsNotSelectedOnlyOne = computed(() => !dvApiHandler.selectState.isSelectOne);
     // const csDropdownMenu = reactive({
     //     ...makeTrItems([
-    //         ['add', 'COMMON.BTN_CRT'],
-    //         ['update', 'COMMON.BTN_UPT', { disabled: csIsNotSelectedOnlyOne }],
-    //         ['delete', 'COMMON.BTN_DELETE', { disabled: csIsNotSelected }],
+    //         ['add', 'BTN.CREATE'],
+    //         ['update', 'BTN.UPDATE', { disabled: csIsNotSelectedOnlyOne }],
+    //         ['delete', 'BTN.DELETE', { disabled: csIsNotSelected }],
     //         [null, null, { type: 'divider' }],
     //         ['project', 'COMMON.CHG_PRO', { disabled: csIsNotSelected }],
-    //         ['region', 'COMMON.CHG_REGION', { disabled: csIsNotSelected }],
+    //         ['region', 'BTN.CHG_REGION', { disabled: csIsNotSelected }],
     //     ],
     //     context.parent,
     //     { type: 'item' }),
@@ -237,12 +237,12 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
 
     const csDropdownMenu = reactive({
         ...makeTrItems([
-            ['add', 'COMMON.BTN_CRT'],
-            ['update', 'COMMON.BTN_UPT'],
-            ['delete', 'COMMON.BTN_DELETE'],
+            ['add', 'BTN.CREATE'],
+            ['update', 'BTN.UPDATE'],
+            ['delete', 'BTN.DELETE'],
             [null, null, { type: 'divider' }],
             ['project', 'COMMON.CHG_PRO'],
-            ['region', 'COMMON.CHG_REGION'],
+            ['region', 'BTN.CHG_REGION'],
             [null, null, { type: 'divider' }],
             ['link', null, { label: 'console', disabled: noLink }],
         ],

@@ -27,7 +27,7 @@
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" @click="$router.push({path: '/inventory/collector/create/plugins'})">
-                            {{ $t('COMMON.BTN_CRT') }}
+                            {{ $t('BTN.CREATE') }}
                         </p-button>
                         <PDropdownMenuBtn class="left-toolbox-item"
                                           :menu="dropdown"
@@ -37,7 +37,7 @@
                                           @click-delete="onClickDelete"
                                           @click-collectData="onClickCollectData"
                         >
-                            {{ $t('COMMON.BTN_ACTION') }}
+                            {{ $t('BTN.ACTION') }}
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
                             <!--                            <p-search :search-text.sync="searchText" @onSearch="getCollectors" />-->
@@ -255,11 +255,11 @@ const setTableData = (props, context) => {
     const onlyOneSelected = computed(() => collectorState.selectIndex.length !== 1);
     const dropdown = reactive({
         ...makeTrItems([
-            ['update', 'COMMON.BTN_UPT', { disabled: onlyOneSelected }],
+            ['update', 'BTN.UPDATE', { disabled: onlyOneSelected }],
             [null, null, { type: 'divider' }],
             ['enable', 'COMMON.BTN_ENABLE', { disabled: nothingSelected }],
             ['disable', 'COMMON.BTN_DISABLE', { disabled: nothingSelected }],
-            ['delete', 'COMMON.BTN_DELETE', { disabled: nothingSelected }],
+            ['delete', 'BTN.DELETE', { disabled: nothingSelected }],
             [null, null, { type: 'divider' }],
             ['collectData', 'COMMON.COLLECT', { disabled: onlyOneSelected }],
         ],

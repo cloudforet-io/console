@@ -34,7 +34,7 @@
                       :disabled="loading"
                       @click="onClickReset"
             >
-                {{$t('COMMON.BTN_RESET') }}
+                {{$t('BTN.RESET') }}
             </p-button>
         </template>
     </p-button-modal>

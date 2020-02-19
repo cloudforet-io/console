@@ -43,7 +43,7 @@
                     @click="onCancelClick"
                 >
                     <slot name="close-button">
-                        {{ $t('COMMON.BTN_CANCEL') }}
+                        {{ $t('BTN.CANCEL') }}
                     </slot>
                 </p-button>
                 <p-button v-if="footerConfirmButtonVisible"
@@ -60,7 +60,7 @@
                                   :size="1.5"
                         />
                         <slot name="confirm-button">
-                            {{ $t('COMMON.BTN_CONFIRM') }}
+                            {{ $t('BTN.CONFIRM') }}
                         </slot>
                     </div>
                 </p-button>

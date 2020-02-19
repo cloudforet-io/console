@@ -29,7 +29,7 @@
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" @click="clickAdd">
-                            {{ $t('COMMON.BTN_CRT') }}
+                            {{ $t('BTN.CREATE') }}
                         </p-button>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
@@ -344,8 +344,8 @@ export const userSetup = (props, context, eventName, ACHandler) => {
 
     const dropdownMenu = reactive({
         ...makeTrItems([
-            ['update', 'COMMON.BTN_UPT', { disabled: isNotOnlyOneSelected }],
-            ['delete', 'COMMON.BTN_DELETE', { disabled: isNotSelected }],
+            ['update', 'BTN.UPDATE', { disabled: isNotOnlyOneSelected }],
+            ['delete', 'BTN.DELETE', { disabled: isNotSelected }],
             [null, null, { type: 'divider' }],
             ['enable', 'COMMON.BTN_ENABLE', { disabled: isNotSelected }],
             ['disable', 'COMMON.BTN_DISABLE', { disabled: isNotSelected }],

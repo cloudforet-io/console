@@ -6,19 +6,19 @@
                           style-type="primary-dark" class="edit-btn"
                           @click="onClickEdit"
                 >
-                    {{ $t('COMMON.BTN_EDIT') }}
+                    {{ $t('BTN.EDIT') }}
                 </p-button>
                 <div v-else class="edit-mode-btn-box">
                     <p-button style-type="secondary" outline
                               class="cancel-btn"
                               @click="onClickCancel"
                     >
-                        {{ $t('COMMON.BTN_CANCEL') }}
+                        {{ $t('BTN.CANCEL') }}
                     </p-button>
                     <p-button style-type="secondary"
                               @click="onClickConfirm"
                     >
-                        {{ $t('COMMON.BTN_CONFIRM') }}
+                        {{ $t('BTN.CONFIRM') }}
                     </p-button>
                 </div>
             </template>

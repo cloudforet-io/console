@@ -38,7 +38,7 @@
                     </template>
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" @click="clickCreate">
-                            {{ $t('COMMON.BTN_CRT') }}
+                            {{ $t('BTN.CREATE') }}
                         </p-button>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
@@ -317,7 +317,7 @@ export const credentialsSetup = (props, context, eventName) => {
 
     const dropdownMenu = reactive({
         ...makeTrItems([
-            ['delete', 'COMMON.BTN_DELETE', { disabled: isNotOnlyOneSelected }],
+            ['delete', 'BTN.DELETE', { disabled: isNotOnlyOneSelected }],
         ],
         context.parent,
         { type: 'item' }),

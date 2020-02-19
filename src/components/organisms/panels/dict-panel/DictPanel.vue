@@ -11,12 +11,12 @@
                           class="header-btn"
                           @click="clickCancel()"
                 >
-                    {{ $t('COMMON.BTN_CANCEL') }}
+                    {{ $t('BTN.CANCEL') }}
                 </p-button>
                 <p-button v-if="editMode" style-type="secondary" class="header-btn"
                           @click="clickConfirm()"
                 >
-                    {{ $t('COMMON.BTN_SAVE') }}
+                    {{ $t('BTN.SAVE') }}
                 </p-button>
             </div>
         </template>
@@ -53,7 +53,7 @@ export default {
     },
     setup(props, context) {
         const state = reactive({
-            buttonTag: computed(() => ((Util.methods.isEmpty(state.proxyTags)) ? context.parent.$t('COMMON.BTN_ADD') : context.parent.$t('COMMON.BTN_EDIT'))),
+            buttonTag: computed(() => ((Util.methods.isEmpty(state.proxyTags)) ? context.parent.$t('BTN.ADD') : context.parent.$t('BTN.EDIT'))),
             editMode: false,
             originTags: undefined,
             proxyTags: makeProxy('dict', props, context.emit),

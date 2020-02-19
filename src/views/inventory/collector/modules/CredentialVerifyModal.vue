@@ -38,7 +38,7 @@
                           auto
                           :size="1.5"
                 />
-                <span>{{$t('COMMON.BTN_CONFIRM') }}</span>
+                <span>{{$t('BTN.CONFIRM') }}</span>
             </div>
         </template>
     </p-button-modal>

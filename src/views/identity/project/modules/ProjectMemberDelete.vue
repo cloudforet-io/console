@@ -46,10 +46,10 @@
                 </p-data-table>
             </template>
             <template #close-button>
-                {{$t('COMMON.BTN_CANCEL') }}
+                {{$t('BTN.CANCEL') }}
             </template>
             <template #confirm-button>
-                {{$t('COMMON.BTN_DELETE') }}
+                {{$t('BTN.DELETE') }}
             </template>
         </p-button-modal>
     </div>

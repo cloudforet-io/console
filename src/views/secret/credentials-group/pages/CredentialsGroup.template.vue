@@ -29,7 +29,7 @@
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" @click="clickCreate">
-                            {{ $t('COMMON.BTN_CRT') }}
+                            {{ $t('BTN.CREATE') }}
                         </p-button>
                         <PDropdownMenuBtn
                             id="cdg-dropdown-btn"
@@ -167,7 +167,7 @@ export const CdgTableReactive = parent => reactive({
     fields: makeTrItems([
         ['credential_group_id', 'COMMON.ID'],
         ['name', 'COMMON.NAME'],
-        ['created_at', 'COMMON.CREATE'],
+        ['created_at', 'COMMON.CREAT'],
     ],
     parent),
     multiSelectFields: makeTrItems([
@@ -329,8 +329,8 @@ export const cdgSetup = (props, context, eventName, cdgNameValidation, ACHandler
 
     const dropdownMenu = reactive({
         ...makeTrItems([
-            ['update', 'COMMON.BTN_UPT', { disabled: isNotOnlyOneSelected }],
-            ['delete', 'COMMON.BTN_DELETE', { disabled: isNotOnlyOneSelected }],
+            ['update', 'BTN.UPDATE', { disabled: isNotOnlyOneSelected }],
+            ['delete', 'BTN.DELETE', { disabled: isNotOnlyOneSelected }],
         ],
         context.parent,
         { type: 'item' }),

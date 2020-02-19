@@ -271,14 +271,14 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         tabs: makeTrItems([
             ['detail', 'COMMON.DETAILS'],
             ['data', 'COMMON.DATA'],
-            ['rawData', 'COMMON.RAWDATA', { keepAlive: true }],
-            ['admin', 'COMMON.ADMIN'],
+            ['rawData', 'TAB.RAWDATA', { keepAlive: true }],
+            ['admin', 'TAB.ADMIN'],
         ],
         context.parent),
         activeTab: 'detail',
         multiSelectTabs: makeTrItems([
             ['data', 'COMMON.DATA', { keepAlive: true }],
-            ['admin', 'COMMON.ADMIN'],
+            ['admin', 'TAB.ADMIN'],
         ], context.parent),
         multiSelectActiveTab: 'data',
     });
@@ -387,14 +387,14 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
     };
     const dropdown = reactive({
         ...makeTrItems([
-            ['delete', 'COMMON.BTN_DELETE'],
+            ['delete', 'BTN.DELETE'],
             [null, null, { type: 'divider' }],
             ['in-service', 'COMMON.BTN_S_SERV'],
             ['maintenance', 'COMMON.BTN_S_MANT'],
             ['closed', 'COMMON.BTN_S_CLOSE'],
             [null, null, { type: 'divider' }],
             ['project', 'COMMON.CHG_PRO', { disabled: true }],
-            ['pool', 'COMMON.CHG_POOL', { disabled: true }],
+            ['pool', 'BTN.CHG_POOL', { disabled: true }],
         ],
         context.parent,
         { type: 'item', disabled: isNotSelected }),

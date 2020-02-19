@@ -79,7 +79,7 @@
             </div>
         </template>
         <template #confirm-button>
-            {{$t('COMMON.BTN_ADD') }}
+            {{$t('BTN.ADD') }}
         </template>
     </p-button-modal>
 </template>

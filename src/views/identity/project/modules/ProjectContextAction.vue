@@ -70,10 +70,10 @@
             </div>
         </template>
         <template #close-button>
-            {{$t('COMMON.BTN_CANCEL') }}
+            {{$t('BTN.CANCEL') }}
         </template>
         <template #confirm-button>
-            {{$t('COMMON.BTN_OK') }}
+            {{$t('BTN.OK') }}
         </template>
     </p-button-modal>
 </template>

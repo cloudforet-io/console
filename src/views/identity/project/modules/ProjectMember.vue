@@ -31,14 +31,14 @@
         >
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark" @click="showModals('add')">
-                    {{$t('COMMON.BTN_ADD') }}
+                    {{$t('BTN.ADD') }}
                 </p-button>
                 <p-button style-type="alert" :outline="true"
                           :disabled="isDisabled"
                           class="btn-margin"
                           @click="showModals('del')"
                 >
-                    {{$t('COMMON.BTN_DELETE') }}
+                    {{$t('BTN.DELETE') }}
                 </p-button>
             </template>
             <template v-slot:col-user_id-format="data">
