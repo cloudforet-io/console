@@ -109,7 +109,7 @@ export const withTrHelper = () => ({
         const state = reactive({
             btns: makeTrItems([
                 ['ip', 'COMMON.IP'],
-                ['cidr', 'COMMON.CIDR'],
+                ['cidr', 'WORD.CIDR'],
                 ['mac', 'COMMON.MAC'],
                 ['network', 'COMMON.NETWORK'],
                 ['project', 'COMMON.PROJ'],
@@ -152,7 +152,7 @@ export const scroll = () => ({
         const state = reactive({
             btns: makeTrItems([
                 ['ip', 'COMMON.IP'],
-                ['cidr', 'COMMON.CIDR'],
+                ['cidr', 'WORD.CIDR'],
                 ['mac', 'COMMON.MAC'],
                 ['network', 'COMMON.NETWORK'],
                 ['project', 'COMMON.PROJ'],

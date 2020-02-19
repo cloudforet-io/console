@@ -55,7 +55,7 @@
                     <p-button outline style-type="dark" size="lg"
                               class="txt-btn" @click="$emit('cancel', $event)"
                     >
-                        {{ $t('COMMON.BTN_CANCEL') }}
+                        {{ $t('BTN.CANCEL') }}
                     </p-button>
                 </p-col>
                 <p-col :flex-grow="0" class="nav-btn-box">
@@ -77,7 +77,7 @@
                               class="txt-btn"
                               @click="$emit('confirm', tabs, $event)"
                     >
-                        {{$t('COMMON.BTN_CONFIRM') }}
+                        {{$t('BTN.CONFIRM') }}
                     </p-button>
                 </p-col>
             </p-row>
