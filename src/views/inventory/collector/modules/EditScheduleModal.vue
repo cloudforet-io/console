@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="collectorId ?$t('INVENTORY.UPT_SCHEDULE') :$t('INVENTORY.ADD_SCHEDULE')"
+    <p-button-modal :header-title="schedule ?$t('INVENTORY.UPT_SCHEDULE') :$t('INVENTORY.ADD_SCHEDULE')"
                     centered
                     fade
                     backdrop
@@ -35,7 +35,7 @@
                               class="all-btn"
                               @click="onClickAllHours"
                     >
-                        {{$t('COMMON.ALL') }}
+                        {{ $t('COMMON.ALL') }}
                     </p-button>
                 </div>
             </p-field-group>
