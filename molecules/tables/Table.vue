@@ -22,126 +22,67 @@
     </div>
 </template>
 
-<script>
-const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
-export const tableProps = {
-    tableStyleType: {
-        type: String,
-        default: null,
-        validator(value) {
-            return [null, ...color].indexOf(value) !== -1;
-        },
-    },
-    theadStyleType: {
-        type: String,
-        default: null,
-        validator(value) {
-            return [null, 'light', 'dark'].indexOf(value) !== -1;
-        },
-    },
-    responsiveStyle: {
-        type: Object,
-        default: null,
-    },
-    tableStyle: {
-        type: Object,
-        default: null,
-    },
-    theadStyle: {
-        type: Object,
-        default: null,
-    },
-    tbodyStyle: {
-        type: Object,
-        default: null,
-    },
-    tfootStyle: {
-        type: Object,
-        default: null,
-    },
-    tbodyClass: {
-        type: Object,
-        default: null,
-    },
-    tfootClass: {
-        type: Object,
-        default: null,
-    },
-    striped: {
-        type: Boolean,
-        default: true,
-    },
-    bord: {
-        type: Boolean,
-        default: null,
-    },
-    hover: {
-        type: Boolean,
-        default: false,
-    },
-    small: {
-        type: Boolean,
-        default: false,
-    },
-    background: {
-        type: Boolean,
-        default: false,
-    },
-    responsive: {
-        type: [String, Boolean],
-        default: false,
-        validator(value) {
-            return [false, true, 'sm', 'md', 'lg', 'xl'].indexOf(value) !== -1;
-        },
-    },
-};
-export default {
+<script lang="ts">
+import {computed, createComponent, getCurrentInstance, reactive, Ref} from '@vue/composition-api';
+import {tableProps, TablePropsType} from './toolset';
+
+export default createComponent( {
     name: 'PTable',
     props: tableProps,
-    computed: {
-        classObject() {
-            const obj = [
-                { 'table-sm': !!this.small },
-                { 'table-striped': !!this.striped },
-                { 'table-hover': this.hover },
+    setup: function (props: TablePropsType, context) {
+        const getStyle = (tableStyle: object | unknown, bgStyle: object | unknown): string | null => {
+            if (bgStyle && tableStyle) {
+                return `bg-${tableStyle}`;
+            }
+            if (tableStyle) {
+                return `table-${tableStyle}`;
+            }
+            if (bgStyle) {
+                return 'table-background';
+            }
+            return null;
+        };
+        const classObject = computed(() => {
+            const obj: Array<object | string> = [
+                {'table-sm': props.small},
+                {'table-striped': props.striped},
+                {'table-hover': props.hover},
             ];
-            if (this.bord !== null) {
+            if (props.bord !== null) {
                 obj.push({
-                    'table-bordered': this.bord,
-                    'table-borderless': !this.bord,
+                    'table-bordered': props.bord,
+                    'table-borderless': !props.bord,
                 });
             }
-            if (this.tableStyleType || this.background) {
-                obj.push(this.getStyle(this.tableStyleType, this.background));
+            if (props.tableStyleType || props.background) {
+                obj.push(<string>getStyle(props.tableStyleType, props.background));
             }
-
             return obj;
-        },
-        theadClassObject() {
-            if (this.theadStyleType) {
-                return [`thead-${this.theadStyleType}`];
+        });
+        const theadClassObject:Readonly<Ref<Readonly<string[] | null>>> = computed(():string[] | null=>{
+            if (props.theadStyleType){
+                return [`thead-${props.theadStyleType}`];
             }
-            return null;
-        },
-        responsiveClassObject() {
-            if (this.responsive) {
-                if (this.responsive === true) {
+            return null
+        });
+
+        const responsiveClassObject = computed((): string | null => {
+            if (props.responsive) {
+                if (props.responsive === true) {
                     return 'table-responsive';
                 }
-                return `table-responsive-${this.responsive}`;
+                return `table-responsive-${props.responsive}`;
             }
             return null;
-        },
-    },
-    methods: {
-        beforRowEnter(el) {
+        });
+        const beforRowEnter = (el)=> {
             el.style.opacity = 0;
             el.style.transform = 'translateY(30px)';
-        },
-        rowEnter(el, done) {
+        };
+        const rowEnter = (el, done)=> {
             const delay = el.dataset.index * 100;
-            const vm = this;
-            setTimeout(() => {
+            const vm:any = getCurrentInstance();
+            const handler = ()=>{
                 vm.$velocity(el, { translateY: '0px', opacity: 1 },
                     {
                         duration: 100,
@@ -150,9 +91,10 @@ export default {
                         },
                     });
                 done();
-            }, delay);
-        },
-        rowLeave(el, done) {
+            }
+            setTimeout(handler, delay);
+        };
+        const rowLeave = (el, done)=> {
             el.style.opacity = 0;
             el.style.transform = 'translateY(30px)';
             done();
@@ -168,19 +110,17 @@ export default {
             //         });
             //     done();
             // }, delay);
-        },
-        getStyle(tableStyle, bgStyle) {
-            if (bgStyle && tableStyle) {
-                return `bg-${tableStyle}`;
-            } if (tableStyle) {
-                return `table-${tableStyle}`;
-            } if (bgStyle) {
-                return 'table-background';
-            }
-            return null;
-        },
+        };
+        return {
+            classObject,
+            theadClassObject,
+            responsiveClassObject,
+            beforRowEnter,
+            rowEnter,
+            rowLeave,
+        };
     },
-};
+});
 </script>
 
 <style lang="scss">
