@@ -1,13 +1,5 @@
 <template>
-    <p-data-table
-        :fields="fields"
-        :items="items"
-        :col-copy="true"
-        :striped="true"
-        :bord="false"
-        :padding="false"
-        :hover="false"
-    >
+    <p-data-table v-bind="ts.state">
         <template v-for="slot of slots" v-slot:[slot.name]="{value}">
             <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
         </template>
@@ -19,6 +11,7 @@ import { createComponent, computed, Ref } from '@vue/composition-api';
 import _ from 'lodash';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
+import { DataTableToolSet } from '@/components/organisms/tables/data-table/toolset';
 
 interface DataSourceType {
     name:string;
@@ -72,14 +65,23 @@ export default createComponent({
         })));
         const items = computed(() => (props.key_path ? _.get(props.data, props.key_path) : props.data));
 
+        const ts = new DataTableToolSet({
+            fields,
+            items,
+            colCopy: true,
+            striped: true,
+            bord: false,
+            padding: false,
+            hover: false,
+        });
+
         const slots:Ref<Readonly<DataSourceType[]>> = computed(():DataSourceType[] => props.data_source.map((ds:DataSourceType):DataSourceType => ({
             ...ds,
             name: `col-${ds.key}-format`,
         })));
         return {
-            fields,
             slots,
-            items,
+            ts,
         };
     },
 });

@@ -73,7 +73,6 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PTag from '@/components/molecules/tags/Tag.vue';
-import { makeTrItems } from '@/lib/view-helper';
 
 interface DataSourceType {
     name:string;

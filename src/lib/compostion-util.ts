@@ -4,6 +4,7 @@ import {
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
+import { debug } from 'webpack';
 import { isNotEmpty } from '@/lib/util';
 
 /**
@@ -19,16 +20,23 @@ export const makeProxy = <T extends any>(name:string, props:any = null, emit:any
     let _emit = emit;
     if (!_props && !_emit) {
         const vm = getCurrentInstance();
+        console.debug(vm);
         if (vm) {
             _props = vm.$props;
-            _emit = vm.$emit;
+            _emit = vm.$listeners[`update:${name}`];
         } else {
             console.error('unsupported get current instance method');
         }
     }
     return computed({
         get: () => _props[name],
-        set: val => _emit(`update:${name}`, val),
+        set: val => {
+            if (emit) {
+                emit(`update:${name}`, val);
+            } else {
+                _emit(val);
+            }
+        },
     });
 };
 

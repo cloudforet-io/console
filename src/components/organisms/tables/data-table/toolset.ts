@@ -67,19 +67,39 @@ export interface DataTablePropsType extends TablePropsType {
     dragable?: boolean;
     rowClickMultiSelectMode?: boolean;
     selectable?: boolean;
-    selectIndex?: any[]|Number;
-    sortBy?: string;
-    sortDesc?:boolean;
+    selectIndex?: any[]|number;
     colCopy?:boolean;
     loading?:boolean;
     useSpinnerLoading?:boolean;
     useCursorLoading?:boolean;
     multiSelect?:boolean;
 }
+export interface DataTableSyncType {
+    sortBy?: string;
+    sortDesc?:boolean;
+}
+export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncType{
+    fields:any[];
+    items: any[];
+    sortable:boolean;
+    dragable: boolean;
+    rowClickMultiSelectMode: boolean;
+    selectable: boolean;
+    selectIndex: any[]|number;
+    colCopy:boolean;
+    loading:boolean;
+    useSpinnerLoading:boolean;
+    useCursorLoading:boolean;
+    multiSelect:boolean;
+    sortBy: string;
+    sortDesc:boolean;
+}
 
 
 export class DataTableState extends TableState {
     public state:DataTablePropsType;
+
+    public syncState:DataTableSyncType;
 
     static initDataTableState:DataTablePropsType ={
         fields: [],
@@ -89,8 +109,7 @@ export class DataTableState extends TableState {
         rowClickMultiSelectMode: false,
         selectable: false,
         selectIndex: [],
-        sortBy: undefined,
-        sortDesc: true,
+
         colCopy: false,
         loading: false,
         useSpinnerLoading: true,
@@ -98,12 +117,21 @@ export class DataTableState extends TableState {
         multiSelect: true,
     };
 
-    constructor(public initData:object = {}) {
+    static initDataTableSyncState:DataTableSyncType = {
+        sortBy: undefined,
+        sortDesc: true,
+    }
+
+    constructor(public initData:object = {}, public initSyncData:object = {}) {
         super();
         this.state = reactive({
             ...TableState.initTableState,
             ...DataTableState.initDataTableState,
             ...this.initData,
+        });
+        this.syncState = reactive({
+            ...DataTableState.initDataTableSyncState,
+            ...this.initSyncData,
         });
     }
 }
@@ -136,8 +164,8 @@ export const initSelectState = (state:DataTablePropsType):DataTableSelectState =
 export class DataTableToolSet extends DataTableState {
     public selectState:DataTableSelectState;
 
-    constructor(public initData:object = {}) {
-        super(initData);
+    constructor(public initData:object = {}, public initSyncData:object = {}) {
+        super(initData, initSyncData);
         this.selectState = initSelectState(this.state);
     }
 }
