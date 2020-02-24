@@ -142,10 +142,9 @@
 <script lang="ts">
 import DragSelect from 'dragselect';
 import {
-    toRefs, computed, reactive, watch, onMounted, Ref,
+    toRefs, computed, reactive, watch, onMounted, Ref, createComponent,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import { number } from '@storybook/addon-knobs';
 import PTable from '@/components/molecules/tables/Table.vue';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
@@ -155,7 +154,7 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { selectToCopyToClipboard } from '@/lib/util';
 import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 // eslint-disable-next-line import/named
-import { dataTableProps } from './toolset';
+import { dataTableProps, DataTableSetupProps } from './toolset';
 
 const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox.vue');
 const PRadio = () => import('@/components/molecules/forms/radio/Radio.vue');
@@ -180,17 +179,13 @@ const loadingHandler = (props) => {
 };
 
 
-export default {
+export default createComponent({
     name: 'PDataTable',
     components: {
         PTable, PTd, PTh, PTr, PI, PCheckBox, PCopyButton, PLottie, PRadio,
     },
-    events: [
-        'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
-        'changeSort', 'theadClick',
-    ],
     props: dataTableProps,
-    setup(props, context) {
+    setup(props:DataTableSetupProps, context) {
         const state = reactive({
             table: null,
             allState: false,
@@ -199,8 +194,8 @@ export default {
             thHoverIndex: null,
         });
         const proxySelectIndex = makeProxy('selectIndex', props, context.emit);
-        const fieldsData = computed(() => {
-            const data = _.flatMap(props.fields, (value) => {
+        const fieldsData:Ref<any> = computed(() => {
+            const data = _.flatMap(props.fields, (value:string|object) => {
                 if (typeof value === 'string') { return { name: value, label: value, sortable: true }; }
                 return { sortable: true, ...value };
             });
@@ -257,11 +252,13 @@ export default {
             if (!hasSelectData()) {
                 if (!props.multiSelect) return;
 
-                if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && props.selectIndex.length > 0) {
+                if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && (props.selectIndex as Array<any>).length > 0) {
                     let result = '';
-                    props.selectIndex.forEach((td) => {
-                        result += makeTableText(dragSelectAbles.value[td]);
-                    });
+                    if (typeof props.selectIndex === 'object') {
+                        props.selectIndex.forEach((td) => {
+                            result += makeTableText(dragSelectAbles.value[td]);
+                        });
+                    }
                     selectToCopyToClipboard(result);
                 }
             }
@@ -389,7 +386,7 @@ export default {
         });
 
         watch(() => props.selectIndex, () => {
-            if (props.items.length && props.items.length === props.selectIndex.length) {
+            if (props.items.length && props.items.length === (props.selectIndex as any[]).length) {
                 state.allState = true;
             } else {
                 state.allState = false;
@@ -429,7 +426,7 @@ export default {
         };
     },
 
-};
+});
 </script>
 
 <style lang="scss" scoped>

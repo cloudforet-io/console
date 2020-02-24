@@ -197,3 +197,64 @@ export const tableType = () => ({
         };
     },
 });
+
+export const simpleTable = () => ({
+    components: { PDynamicView },
+    template: '<div style="width: 80vw"><PDynamicView view_type="simple-table" :data_source="data_source"  :data="data.GlobalSecondaryIndexes"/></div>',
+    setup(props, { parent }) {
+        return {
+            data,
+            data_source: [
+                {
+                    name: 'Index Name',
+                    key: 'IndexName',
+                },
+                {
+                    name: 'Projection Type',
+                    key: 'Projection.ProjectionType',
+                },
+                {
+                    name: 'Item Count',
+                    key: 'ItemCount',
+                },
+                {
+                    name: 'status',
+                    key: 'IndexStatus',
+                    view_type: 'enum',
+                    view_option: {
+                        DEACTIVE: {
+                            view_option: {
+                                text_color: '#FF7750',
+                                icon: {
+                                    image: 'aws-ec2',
+                                    color: '#FF7750',
+                                },
+                            },
+                            view_type: 'state',
+                        },
+                        ACTIVE: {
+                            view_option: {
+                                text_color: '#60B731',
+                                icon: {
+                                    image: 'aws-ec2',
+                                    color: '#60B731',
+                                },
+                            },
+                            view_type: 'state',
+                        },
+
+                    },
+                },
+                {
+                    name: 'Write capacity units',
+                    key: 'ProvisionedThroughput.WriteCapacityUnits',
+                },
+                {
+                    name: 'Read capacity units',
+                    key: 'ProvisionedThroughput.ReadCapacityUnits',
+                },
+            ],
+
+        };
+    },
+});

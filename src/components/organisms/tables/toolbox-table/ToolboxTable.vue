@@ -96,7 +96,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import { makeProxy } from '@/lib/compostion-util';
 // eslint-disable-next-line import/named
-import { ToolBoxTablePropsType } from '@/components/organisms/tables/toolbox-table/toolset';
+import { ToolBoxTablePropsType, ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/toolset';
 
 
 export default createComponent({
@@ -160,7 +160,7 @@ export default createComponent({
         },
 
     },
-    setup(props:ToolBoxTablePropsType, { emit }) {
+    setup(props:ToolBoxTableSetupProps, { emit }) {
         const pageSizeOptions = computed(() => (_.flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size }))));
         const proxyPageSize = makeProxy('pageSize');
         const proxyThisPage = makeProxy('thisPage');
