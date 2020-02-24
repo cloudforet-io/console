@@ -96,7 +96,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import { makeProxy } from '@/lib/compostion-util';
 // eslint-disable-next-line import/named
-import { ToolBoxTablePropsType, ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/toolset';
+import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/toolset';
 
 
 export default createComponent({

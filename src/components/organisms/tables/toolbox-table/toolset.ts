@@ -8,6 +8,7 @@ import {
     DataTableToolSet, initSelectState,
 } from '@/components/organisms/tables/data-table/toolset';
 import { TableState } from '@/components/molecules/tables/toolset';
+import { getAllPage } from '../../pagenations/toolset';
 
 export interface ToolBoxTablePropsType extends DataTablePropsType{
     pagenationVisible?: boolean;
@@ -90,6 +91,6 @@ export class ToolboxTableToolSet extends ToolboxTableState implements DataTableT
     }
 
     setAllPage(totalCount:number) {
-        this.state.allPage = Math.ceil(totalCount / (this.syncState.pageSize as number)) || 1;
+        this.state.allPage = getAllPage(totalCount, (this.syncState.pageSize as number));
     }
 }

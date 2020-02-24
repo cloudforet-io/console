@@ -21,7 +21,7 @@
     </nav>
 </template>
 <script>
-import PIconButton from '@/components/molecules/buttons/IconButton';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import { secondary1 } from '@/styles/_variables.scss';
 
 export default {

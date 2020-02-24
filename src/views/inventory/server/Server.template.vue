@@ -185,8 +185,6 @@ import {
 } from '@/lib/util';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeTrItems } from '@/lib/view-helper';
-import { TagList, SearchQueryUrlHandler } from '@/components/organisms/search/query-search-bar/searchQueryUrlHandler';
-
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';

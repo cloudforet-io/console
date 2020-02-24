@@ -38,6 +38,9 @@ module.exports = {
         "allowFirstLine": true
       },
     }],
+    "no-this-before-super":["off"],
+    "no-useless-constructor":["off"],
+    "no-empty-function":["error", { "allow": ["constructors"] }],
     "no-param-reassign": ["error", { "props": false }],
     "no-underscore-dangle": ["off"],
     "import/no-extraneous-dependencies": ["error", {

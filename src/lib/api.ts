@@ -10,6 +10,7 @@ import { tagList } from '@/components/molecules/tags/Tag.vue';
 
 //  eslint-disable-next-line import/no-cycle
 import { getKeys, getSuggest, baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { QuerySearchTableToolSet } from '@/components/organisms/tables/query-search-table/toolset';
 
 
 class APIError extends Error {
@@ -155,7 +156,7 @@ type ValueFormatter = (string, any)=>string|number|Array<string|number>;
  */
 export const defaultQuery = (
     thisPage:number, pageSize:number, sortBy?:string, sortDesc?:boolean,
-    searchText?:string, searchQueries?:SearchQuery[], valueFormatter?:ValueFormatter, only?:string[],
+    searchText?:string, searchQueries?:SearchQuery[]|readonly SearchQuery[], valueFormatter?:ValueFormatter, only?:string[],
 ) => {
     const query:ApiQuery = {
         page: {
@@ -244,9 +245,9 @@ export interface HttpInstance {
 export abstract class DynamicAPI {
     abstract getData();
 
-    public abstract parent:HttpInstance;
+    public abstract parent?:HttpInstance;
 
-    get $http() { return this.parent.$http; }
+    get $http() { return (this.parent as HttpInstance).$http; }
 }
 
 interface TableState {
@@ -473,3 +474,68 @@ export const getMockData = (data: any, timeout: number) => new Promise((resolve,
 });
 
 export const callApi = ($http: AxiosInstance, url: string, params: object) => $http.post(url, params);
+
+export class BaseQuerySearchTableTSAPI extends QuerySearchTableToolSet implements DynamicAPI {
+    public acState : AcState;
+
+    public apiState:any;
+
+    public queryTags:Readonly<Ref<readonly SearchQuery[]>>;
+
+    // eslint-disable-next-line class-methods-use-this
+    get $http() {
+        // @ts-ignore
+        return getCurrentInstance().$http;
+    }
+
+    protected paramQuery:Ref<object>;
+
+    // @ts-ignore
+    constructor(protected url:string, keys?:string[], only?:string[], public extraParams?:object, fixSearchQuery : SearchQuery[] = [], initData:object = {}, initSyncData:object = {}) {
+        //  @ts-ignore
+        this.acState = reactive({
+            keys: keys || [] as string[],
+            suggestKeys: keys || [] as string[],
+        });
+        const acHandler:Ref<any> = computed(() => new QuerySearchTableACHandler(getCurrentInstance()as HttpInstance, this.acState.keys, this.acState.keys));
+        super(acHandler, initData, initSyncData);
+
+        this.apiState = reactive({
+            only,
+            fixSearchQuery: fixSearchQuery || [],
+            acHandler,
+            extraParams: extraParams || {}, // for api extra parameters
+        });
+        this.queryTags = computed(() => {
+            const fix:SearchQuery[] = this.apiState.fixSearchQuery;
+            const sq:SearchQuery[] = this.querySearch.tags.value;
+            return [...fix, ...sq];
+        });
+        this.paramQuery = computed(() => (defaultQuery(
+            (this.syncState.thisPage as number), (this.syncState.pageSize as number),
+            this.syncState.sortBy, this.syncState.sortDesc, undefined,
+            this.queryTags.value, undefined, this.apiState.only,
+        )));
+    }
+
+    public getData = async () => {
+        this.state.loading = true;
+        this.state.items = [];
+        this.state.selectIndex = [];
+
+        try {
+            const params = {
+                query: this.paramQuery.value,
+                ...this.apiState.extraParams,
+
+            };
+            const res = await this.$http.post(this.url, params);
+            this.state.items = res.data.results;
+            this.setAllPage(res.data.total_count);
+        } catch (e) {
+            console.debug('request fail', e);
+        }
+
+        this.state.loading = false;
+    }
+}
