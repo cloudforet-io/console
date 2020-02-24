@@ -1,7 +1,11 @@
 <template>
     <div class="container" :style="{height:height, width: '100%'}">
-        <div class="sidebar" :style="{width:`${width}px`}">
-            <slot name="sidebar" :width="width"></slot>
+        <div v-show="width >= minWidth" class="sidebar" :style="{width:`${width}px`}"
+             :class="{ sidebarTransition:!resizeFlag }"
+        >
+            <slot name="sidebar" :width="width">
+                left container
+            </slot>
         </div>
         <div class="dragger-container line"
              @mousedown="startResizing"
@@ -9,9 +13,9 @@
              @mouseup="endResizing"
         >
             <span class="dragger">
-                <span @mouseenter="mouseOnOver(true)" @mouseleave="mouseOnOver(false)">
+                <span @click="hideSidebar">
                     <slot name="dragger">
-                        <p-i v-if="true"
+                        <p-i v-if="!hideFlag"
                              class="btn-vertical-dragger"
                              :width="'1rem'"
                              :height="'1rem'"
@@ -28,7 +32,7 @@
             </span>
         </div>
         <div class="main" style="width: 100%;">
-            <slot></slot>
+            <slot>right container</slot>
         </div>
     </div>
 </template>
@@ -39,9 +43,13 @@ import {
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import { documentEventMount } from '@/lib/compostion-util';
+import styles from '@/styles/_variables.scss';
 
 export default {
     name: 'VerticalLayout2',
+    components: {
+        PI,
+    },
     props: {
         height: {
             type: String,
@@ -60,42 +68,48 @@ export default {
             default: 500,
         },
     },
-    components: {
-        PI,
-    },
     setup(props, context) {
         const state = reactive({
             width: props.initWidth,
             resizeFlag: false,
+            hideFlag: false,
             before: props.initWidth,
         });
+        // const shiftColorWhenMouseOver = computed(() => (state.hideFlag ? `white ${styles.secondary}` : 'white primary3'));
 
         const isResizing = (event) => {
-            if (props.resizeFlag) {
-                const delta = event.clientX - state.before;
+            if (state.resizeFlag) {
+                const delta = event.pageX - state.before;
                 const width = state.width + delta;
-                state.before = event.clientX;
-
+                state.before = event.pageX;
                 if (!(width <= props.minWidth || width > props.maxWidth)) {
                     state.width = width;
                 }
-
-                console.debug('isResizing', event);
+                console.debug('isResizing', event.pageX);
             }
         };
         const endResizing = (event) => {
-            props.resizeFlag = false;
-            console.debug('endResizing', event);
+            state.resizeFlag = false;
+            console.debug('endResizing');
         };
-
         const startResizing = (event) => {
-            props.resizeFlag = true;
-            console.debug('startResizing', event.clientX);
+            state.resizeFlag = true;
+            console.debug('startResizing');
+        };
+        const hideSidebar = () => {
+            if (!state.hideFlag) {
+                state.hideFlag = true;
+                state.width = 0;
+            } else {
+                state.hideFlag = false;
+                state.width = props.initWidth;
+            }
         };
         documentEventMount('mousemove', isResizing);
         documentEventMount('mouseup', endResizing);
         return {
             ...toRefs(state),
+            hideSidebar,
             startResizing,
             isResizing,
             endResizing,
@@ -113,6 +127,9 @@ export default {
         z-index: 1;
     }
     .sidebar {
+        .sidebarTransition {
+            transition: width 0.5s;
+        }
         /*flex: 1; prevents resize!*/
     }
     .resizer {
@@ -121,7 +138,7 @@ export default {
         z-index: 2;
     }
     .main {
-        /*flex-grow: 1;*/
+        flex-grow: 1;
     }
 
     .dragger-container {
@@ -164,6 +181,9 @@ export default {
             margin-left: 1.5rem;
             justify-content: center;
             color: $darkgray;
+            &:hover {
+                color: $secondary;
+            }
         }
     }
 </style>
