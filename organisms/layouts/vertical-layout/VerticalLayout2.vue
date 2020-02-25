@@ -1,11 +1,11 @@
 <template>
-    <div class="container" :style="{height:height, width: '100%'}">
-        <div v-show="width >= minWidth" class="sidebar" :style="{width:`${width}px`}"
-             :class="{ sidebarTransition:!resizeFlag }"
+    <div class="container" :style="{height:height}">
+        <div class="sidebar-container" :style="{width:`${width}px`}"
+             :class="{transition:transitionFlag}"
         >
-            <slot name="sidebar" :width="width">
-                left container
-            </slot>
+            <div v-show="width >= minWidth && !transitionFlag">
+                <slot name="sidebar" :width="width" />
+            </div>
         </div>
         <div class="dragger-container line"
              @mousedown="startResizing"
@@ -31,8 +31,8 @@
                 </span>
             </span>
         </div>
-        <div class="main" style="width: 100%;">
-            <slot>right container</slot>
+        <div class="main">
+            <slot />
         </div>
     </div>
 </template>
@@ -74,35 +74,40 @@ export default {
             resizeFlag: false,
             hideFlag: false,
             before: props.initWidth,
+            transitionFlag: false,
         });
-        // const shiftColorWhenMouseOver = computed(() => (state.hideFlag ? `white ${styles.secondary}` : 'white primary3'));
 
         const isResizing = (event) => {
             if (state.resizeFlag) {
-                const delta = event.pageX - state.before;
+                const delta = event.screenX - state.before;
                 const width = state.width + delta;
-                state.before = event.pageX;
+                state.before = event.screenX;
                 if (!(width <= props.minWidth || width > props.maxWidth)) {
                     state.width = width;
                 }
-                console.debug('isResizing', event.pageX);
             }
         };
         const endResizing = (event) => {
             state.resizeFlag = false;
-            console.debug('endResizing');
         };
         const startResizing = (event) => {
             state.resizeFlag = true;
-            console.debug('startResizing');
         };
         const hideSidebar = () => {
             if (!state.hideFlag) {
                 state.hideFlag = true;
+                state.transitionFlag = true;
                 state.width = 0;
+                setTimeout(() => {
+                    state.transitionFlag = false;
+                }, 300);
             } else {
-                state.hideFlag = false;
                 state.width = props.initWidth;
+                state.transitionFlag = true;
+                state.hideFlag = false;
+                setTimeout(() => {
+                    state.transitionFlag = false;
+                }, 300);
             }
         };
         documentEventMount('mousemove', isResizing);
@@ -116,22 +121,23 @@ export default {
         };
     },
 };
-
 </script>
 
 <style lang="scss" scoped>
     .container {
         display: flex;
         height: 100%;
+        width: 100%;
         flex-direction: row;
         z-index: 1;
     }
-    .sidebar {
-        .sidebarTransition {
-            transition: width 0.5s;
-        }
+    .sidebar-container {
         /*flex: 1; prevents resize!*/
+        &.transition {
+            transition:  width 0.3s;
+        }
     }
+
     .resizer {
         cursor: col-resize;
         border-left: 10px solid $gray;
@@ -139,6 +145,7 @@ export default {
     }
     .main {
         flex-grow: 1;
+        width: 100%;
     }
 
     .dragger-container {
