@@ -2,7 +2,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import {
-    computed, getCurrentInstance, reactive, Ref, ref,
+    computed, getCurrentInstance, reactive, Ref, ref, watch,
 } from '@vue/composition-api';
 // @ts-ignore
 import { tagList } from '@/components/molecules/tags/Tag.vue';
@@ -423,6 +423,13 @@ export class BaseQuerySearchTableTSAPI extends QuerySearchTableToolSet {
 
             this.syncState.loading = false;
         };
+
+        watch(this.querySearch.tags, (tags, preTags) => {
+            if (tags !== preTags) {
+                this.getData();
+            }
+        });
+
         this.resetAll = () => {
             this.state.allPage = 1;
             this.state.items = [];
