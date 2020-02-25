@@ -112,7 +112,6 @@ export default defineComponent({
         });
         windowEventMount('click', hideAC);
         const getACData = async (text, forceContextType) => {
-            console.log(props.autocompleteHandler);
             const handler = isRef(props.autocompleteHandler) ? props.autocompleteHandler.value : props.autocompleteHandler;
             const result = await handler.getAutoCompleteData(forceContextType || contextType.value, text, contextState);
             acState.items = result;
@@ -143,7 +142,6 @@ export default defineComponent({
             if (!!contextState.key && !!contextState.value) {
                 const query = new SearchQuery(contextState.key, contextState.operator, contextState.value);
                 context.emit('newQuery', query);
-                console.debug('newQuery', query);
                 cleanSearchText();
             }
         };
