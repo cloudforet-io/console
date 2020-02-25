@@ -7,6 +7,7 @@ import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import PTh from '@/components/atoms/table/Th.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import { DataTableToolSet } from '@/components/organisms/tables/data-table/toolset';
 
 export default {
     title: 'organisms/tables/datatable',
@@ -28,6 +29,7 @@ const data = {
     sortBy: null,
     sortDesc: true,
 };
+
 
 const mockupMixin = {
     methods: {
@@ -72,6 +74,29 @@ export const datatable = () => ({
     },
     methods: {
         ...actions,
+    },
+});
+
+export const usingToolSet = () => ({
+    components: { PDataTable },
+    mixins: [mockupMixin],
+    template: `
+<PDataTable 
+    v-bind="ts.state"
+    @rowLeftClick="rowLeftClick"
+    @rowRightClick="rowRightClick"
+    @rowMiddleClick="rowMiddleClick"
+    @rowMouseOver="rowMouseOver"
+    @rowMouseOut="rowMouseOut"
+>
+</PDataTable>
+`,
+    setup() {
+        const ts = new DataTableToolSet(data);
+        return {
+            ts,
+            ...actions,
+        };
     },
 });
 
