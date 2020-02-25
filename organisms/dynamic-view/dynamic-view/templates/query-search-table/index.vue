@@ -61,12 +61,13 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    createComponent, computed, Ref, reactive,
+    defineComponent, computed, Ref, reactive,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
+
 import { BaseQuerySearchTableTSAPI } from '@/lib/api';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -101,7 +102,7 @@ interface Field {
 }
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicViewQuerySearchTable',
     components: {
         PDynamicField,

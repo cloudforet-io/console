@@ -8,10 +8,10 @@
     </div>
 </template>
 <script lang="ts">
-import { createComponent } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 import PHr from '@/components/atoms/hr/Hr.vue';
 
-export default createComponent({
+export default defineComponent({
     name: 'DividerHeader',
     components: { PHr },
 });

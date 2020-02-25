@@ -18,7 +18,7 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, createComponent, Ref, ref,
+    computed, defineComponent, Ref, ref,
 } from '@vue/composition-api';
 
 import { mouseOverState } from '@/lib/compostion-util';
@@ -27,7 +27,7 @@ import PDd from '@/components/atoms/lists/dl-list/Dd.vue';
 import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 
-export default createComponent({
+export default defineComponent({
     name: 'Definition',
     components: {
         PDt, PDd, PCopyButton, PDynamicField,
