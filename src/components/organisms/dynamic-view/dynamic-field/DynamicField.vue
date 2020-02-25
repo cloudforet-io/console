@@ -24,10 +24,10 @@ export default createComponent({
         // eslint-disable-next-line camelcase,vue/prop-name-casing
         view_option: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
+            type: [String, Object, Array, Boolean, Number, null],
             default: '',
         },
     },

@@ -67,9 +67,7 @@ export interface DataTablePropsType extends TablePropsType {
     dragable?: boolean;
     rowClickMultiSelectMode?: boolean;
     selectable?: boolean;
-    selectIndex?: any[]|number;
     colCopy?:boolean;
-    loading?:boolean;
     useSpinnerLoading?:boolean;
     useCursorLoading?:boolean;
     multiSelect?:boolean;
@@ -77,6 +75,8 @@ export interface DataTablePropsType extends TablePropsType {
 export interface DataTableSyncType {
     sortBy?: string;
     sortDesc?:boolean;
+    selectIndex?: any[]|number;
+    loading?:boolean;
 }
 export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncType{
     fields:any[];
@@ -108,10 +108,8 @@ export class DataTableState extends TableState {
         dragable: false,
         rowClickMultiSelectMode: false,
         selectable: false,
-        selectIndex: [],
 
         colCopy: false,
-        loading: false,
         useSpinnerLoading: true,
         useCursorLoading: true,
         multiSelect: true,
@@ -120,18 +118,20 @@ export class DataTableState extends TableState {
     static initDataTableSyncState:DataTableSyncType = {
         sortBy: undefined,
         sortDesc: true,
-    }
+        selectIndex: [],
+        loading: false,
+    };
 
-    constructor(public initData:object = {}, public initSyncData:object = {}) {
+    constructor(initData:object = {}, initSyncData:object = {}) {
         super();
         this.state = reactive({
             ...TableState.initTableState,
             ...DataTableState.initDataTableState,
-            ...this.initData,
+            ...initData,
         });
         this.syncState = reactive({
             ...DataTableState.initDataTableSyncState,
-            ...this.initSyncData,
+            ...initSyncData,
         });
     }
 }
@@ -145,12 +145,12 @@ export interface DataTableSelectState {
 }
 
 
-export const initSelectState = (state:DataTablePropsType):DataTableSelectState => {
-    const isNotSelected:Ref<boolean> = computed(() => (state.selectIndex ? (state.selectIndex as Array<any>).length === 0 : true));
-    const isSelectOne:Ref<boolean> = computed(() => (state.selectIndex ? (state.selectIndex as Array<any>).length === 1 : false));
-    const isSelectMulti:Ref<boolean> = computed(() => (state.selectIndex ? (state.selectIndex as Array<any>).length > 1 : false));
-    const selectItems:Ref<readonly any[]> = computed(() => (state.selectIndex ? (state.selectIndex as Array<any>).map(idx => (state.items as Array<any>)[idx]) : []));
-    const firstSelectItem:Ref<any> = computed(() => (!isNotSelected.value ? (state.items as Array<any>)[(state.selectIndex as number[])[0]] : {}));
+export const initSelectState = (state:DataTablePropsType, syncState:DataTableSyncType):DataTableSelectState => {
+    const isNotSelected:Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 0 : true));
+    const isSelectOne:Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 1 : false));
+    const isSelectMulti:Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length > 1 : false));
+    const selectItems:Ref<readonly any[]> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).map(idx => (state.items as Array<any>)[idx]) : []));
+    const firstSelectItem:Ref<any> = computed(() => (!isNotSelected.value ? (state.items as Array<any>)[(syncState.selectIndex as number[])[0]] : {}));
     return reactive({
         isNotSelected,
         isSelectOne,
@@ -164,8 +164,8 @@ export const initSelectState = (state:DataTablePropsType):DataTableSelectState =
 export class DataTableToolSet extends DataTableState {
     public selectState:DataTableSelectState;
 
-    constructor(public initData:object = {}, public initSyncData:object = {}) {
+    constructor(initData:object = {}, initSyncData:object = {}) {
         super(initData, initSyncData);
-        this.selectState = initSelectState(this.state);
+        this.selectState = initSelectState(this.state, this.syncState);
     }
 }

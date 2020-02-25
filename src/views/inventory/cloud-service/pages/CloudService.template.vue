@@ -18,13 +18,13 @@
                             :sortable="true"
                             :background="true"
                             :toolbox-background="false"
-                            :sort-by.sync="apiHandler.state.sortBy"
-                            :sort-desc.sync="apiHandler.state.sortDesc"
                             :all-page="apiHandler.state.allPage"
-                            :this-page.sync="apiHandler.state.thisPage"
-                            :select-index.sync="apiHandler.state.selectIndex"
-                            :page-size.sync="apiHandler.state.pageSize"
-                            :loading.sync="apiHandler.state.loading"
+                            :sort-by.sync="apiHandler.syncState.sortBy"
+                            :sort-desc.sync="apiHandler.syncState.sortDesc"
+                            :this-page.sync="apiHandler.syncState.thisPage"
+                            :select-index.sync="apiHandler.syncState.selectIndex"
+                            :page-size.sync="apiHandler.syncState.pageSize"
+                            :loading.sync="apiHandler.syncState.loading"
                             @changePageSize="apiHandler.getData"
                             @changePageNumber="apiHandler.getData"
                             @clickRefresh="apiHandler.getData"
@@ -142,11 +142,11 @@ import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionC
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { makeTrItems } from '@/lib/view-helper';
-import { QuerySearchTableAPI } from '@/lib/api';
+import { BaseQuerySearchTableTSAPI, HttpInstance } from '@/lib/api';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 
-export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApiHandler:QuerySearchTableAPI) => {
+export const cloudServiceSetup = (context, apiHandler:BaseQuerySearchTableTSAPI, dvApiHandler:BaseQuerySearchTableTSAPI) => {
     const state = reactive({
         cstFields: makeTrItems([
             ['provider', 'COMMON.PROVIDER'],
@@ -174,14 +174,14 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
             const selectType = apiHandler.selectState.firstSelectItem;
             if (selectType) {
                 dvApiHandler.resetAll();
-                dvApiHandler.state.fixSearchQuery = [
+                dvApiHandler.apiState.fixSearchQuery = [
                     { key: 'provider', operator: '=', value: selectType.provider },
                     { key: 'cloud_service_type', operator: '=', value: selectType.name },
                     { key: 'cloud_service_group', operator: '=', value: selectType.group },
                 ];
                 const keys = selectTypeDataSource.value.map(v => v.key);
-                dvApiHandler.acState.keys = keys;
-                dvApiHandler.acState.suggestKeys = keys;
+                dvApiHandler.querySearch.acHandlerArgs.keys = keys;
+                dvApiHandler.querySearch.acHandlerArgs.suggestKeys = keys;
                 dvApiHandler.getData();
             }
         }
@@ -286,7 +286,7 @@ export default {
         PDynamicDetails,
     },
     setup(props, context) {
-        const mockAPI = new QuerySearchTableAPI(context.parent, '');
+        const mockAPI = new BaseQuerySearchTableTSAPI('', undefined, undefined, undefined, undefined, undefined, undefined, context.parent);
         return {
             ...cloudServiceSetup(context, mockAPI, mockAPI),
         };

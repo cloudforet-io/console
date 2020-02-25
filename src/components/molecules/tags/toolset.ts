@@ -26,15 +26,15 @@ export class TagToolSet {
     };
 
     public deleteAllTags = () => {
-         this.setTags([]);
-     };
+        this.setTags([]);
+    };
 
     public validation = value => this.tags.value.every(tag => !_.isEqual(tag, value));
 
     public addTag = (value) => {
-         const val = (typeof value === 'string') ? value.trim() : value;
-         if (!val || val === '') return;
-         if (this.checkDuplicate && !this.validation(val)) return;
-         this.setTags([...this.tags.value, val]);
-     };
+        const val = (typeof value === 'string') ? value.trim() : value;
+        if (!val || val === '') return;
+        if (this.checkDuplicate && !this.validation(val)) return;
+        this.setTags([...this.tags.value, val]);
+    };
 }

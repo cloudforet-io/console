@@ -105,10 +105,10 @@ export class TableState {
         responsive: false,
     };
 
-    constructor(public initData:object = {}) {
+    constructor(initData:object = {}) {
         this.state = reactive({
             ...TableState.initTableState,
-            ...this.initData,
+            ...initData,
         });
     }
 }

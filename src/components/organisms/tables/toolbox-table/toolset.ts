@@ -65,18 +65,18 @@ export class ToolboxTableState extends DataTableState {
         thisPage: 1,
     };
 
-    constructor(public initData:object = {}, public initSyncData:object = {}) {
+    constructor(initData:object = {}, initSyncData:object = {}) {
         super();
         this.state = reactive({
             ...TableState.initTableState,
             ...DataTableState.initDataTableState,
             ...ToolboxTableState.initToolBoxState,
-            ...this.initData,
+            ...initData,
         });
         this.syncState = reactive({
             ...DataTableState.initDataTableSyncState,
             ...ToolboxTableState.initToolBoxSyncState,
-            ...this.initSyncData,
+            ...initSyncData,
         });
     }
 }
@@ -85,9 +85,9 @@ export class ToolboxTableState extends DataTableState {
 export class ToolboxTableToolSet extends ToolboxTableState implements DataTableToolSet {
     public selectState:DataTableSelectState;
 
-    constructor(public initData:object = {}, public initSyncData:object = {}) {
+    constructor(initData:object = {}, initSyncData:object = {}) {
         super(initData, initSyncData);
-        this.selectState = initSelectState(this.state);
+        this.selectState = initSelectState(this.state, this.syncState);
     }
 
     setAllPage(totalCount:number) {
