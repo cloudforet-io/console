@@ -77,6 +77,7 @@ export default {
             transitionFlag: false,
         });
 
+        /* Resizing */
         const isResizing = (event) => {
             if (state.resizeFlag) {
                 const delta = event.screenX - state.before;
@@ -93,21 +94,22 @@ export default {
         const startResizing = (event) => {
             state.resizeFlag = true;
         };
+
+        /* Toggle Sidebar */
+        const updateProperty = (obj, key, value) => () => {
+            obj[key] = value;
+        };
         const hideSidebar = () => {
             if (!state.hideFlag) {
                 state.hideFlag = true;
                 state.transitionFlag = true;
                 state.width = 0;
-                setTimeout(() => {
-                    state.transitionFlag = false;
-                }, 300);
+                setTimeout(updateProperty(state, 'transitionFlag', false), 500);
             } else {
                 state.width = props.initWidth;
                 state.transitionFlag = true;
                 state.hideFlag = false;
-                setTimeout(() => {
-                    state.transitionFlag = false;
-                }, 300);
+                setTimeout(updateProperty(state, 'transitionFlag', false), 500);
             }
         };
         documentEventMount('mousemove', isResizing);
@@ -134,7 +136,7 @@ export default {
     .sidebar-container {
         /*flex: 1; prevents resize!*/
         &.transition {
-            transition:  width 0.3s;
+            transition:  width 0.5s;
         }
     }
 
