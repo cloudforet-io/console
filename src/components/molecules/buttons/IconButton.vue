@@ -25,8 +25,8 @@
 
 <script>
 import { reactive, computed, toRefs } from '@vue/composition-api';
-import PI from '@/components/atoms/icons/PI';
-import PButton from '@/components/atoms/buttons/Button';
+import PI from '@/components/atoms/icons/PI.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 import { white, gray1 } from '@/styles/_variables.scss';
 
 export default {

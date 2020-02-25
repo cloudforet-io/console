@@ -17,6 +17,7 @@ import VueLodash from 'vue-lodash';
 import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
+import LiquorTree from 'liquor-tree';
 import "@/styles/style.scss";
 
 Vue.use(Notifications, { velocity });
@@ -30,6 +31,7 @@ Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i'
 })
+Vue.component('liquor-tree', LiquorTree)
 
 Vue.prototype.$velocity = velocity;
 

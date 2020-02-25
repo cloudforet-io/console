@@ -1,10 +1,10 @@
 import { action } from '@storybook/addon-actions';
 import { toRefs, computed } from '@vue/composition-api';
-import PStatus from '@/components/molecules/status/Status';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
-import PButton from '@/components/atoms/buttons/Button';
-import PBadge from '@/components/atoms/badges/Badge';
-import Server, { serverSetup, eventNames } from '@/views/inventory/server/Server.template';
+import PStatus from '@/components/molecules/status/Status.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
+import Server, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
 import { arrayOf } from '@/lib/casual';
 import casual from '@/views/inventory/server/models/server-model';
 import { mountBusEvent } from '@/lib/compostion-util';

@@ -7,7 +7,7 @@ import { autoProps } from '@sb/storybook-util';
 import PContentModal from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
-import { sizeMapping } from '../../../molecules/modals/ModalMapping';
+import { sizeMapping } from '@/components/molecules/modals/ModalMapping';
 
 export default {
     title: 'organisms/modals/button-modal',

@@ -1,9 +1,9 @@
 import { action } from '@storybook/addon-actions';
-import User from './User.template';
+import User from './User.template.vue';
 import casual from '@/views/identity/user/models/user-model';
-import PStatus from '@/components/molecules/status/Status';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable';
-import PButton from '@/components/atoms/buttons/Button';
+import PStatus from '@/components/molecules/status/Status.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 import { arrayOf } from '@/lib/casual';
 
 
