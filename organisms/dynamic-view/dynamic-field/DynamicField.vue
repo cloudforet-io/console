@@ -27,7 +27,7 @@ export default createComponent({
             default: () => ({}),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number, null],
+            type: [String, Object, Array, Boolean, Number],
             default: '',
         },
     },
