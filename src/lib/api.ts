@@ -373,6 +373,11 @@ export class BaseQuerySearchTableTSAPI extends QuerySearchTableToolSet {
 
     public acState:any;
 
+    public getData:Function;
+
+    public resetAll:Function;
+
+
     // @ts-ignore
     constructor(url:string, keys?:string[], only?:string[], extraParams?:object, fixSearchQuery : SearchQueryType[] = [], initData:object = {}, initSyncData:object = {}, parent:HttpInstance) {
         const args = {
@@ -398,36 +403,34 @@ export class BaseQuerySearchTableTSAPI extends QuerySearchTableToolSet {
             this.syncState.sortBy, this.syncState.sortDesc, undefined,
             this.queryTags.value, undefined, this.apiState.only,
         )));
-    }
+        this.getData = async () => {
+            this.syncState.loading = true;
+            this.state.items = [];
+            this.syncState.selectIndex = [];
 
-    public async getData() {
-        this.syncState.loading = true;
-        this.state.items = [];
-        this.syncState.selectIndex = [];
+            try {
+                const params = {
+                    query: this.paramQuery.value,
+                    ...this.apiState.extraParams,
 
-        try {
-            const params = {
-                query: this.paramQuery.value,
-                ...this.apiState.extraParams,
+                };
+                const res = await this.$http.post(this.apiState.url, params);
+                this.state.items = res.data.results;
+                this.setAllPage(res.data.total_count);
+            } catch (e) {
+                console.debug('request fail', e);
+            }
 
-            };
-            const res = await this.$http.post(this.apiState.url, params);
-            this.state.items = res.data.results;
-            this.setAllPage(res.data.total_count);
-        } catch (e) {
-            console.debug('request fail', e);
-        }
-
-        this.syncState.loading = false;
-    }
-
-    public resetAll() {
-        this.state.allPage = 1;
-        this.state.items = [];
-        this.syncState.thisPage = 1;
-        this.syncState.selectIndex = [];
-        this.syncState.sortBy = '';
-        this.syncState.sortDesc = true;
-        this.querySearch.state.searchText = '';
+            this.syncState.loading = false;
+        };
+        this.resetAll = () => {
+            this.state.allPage = 1;
+            this.state.items = [];
+            this.syncState.thisPage = 1;
+            this.syncState.selectIndex = [];
+            this.syncState.sortBy = '';
+            this.syncState.sortDesc = true;
+            this.querySearch.state.searchText = '';
+        };
     }
 }

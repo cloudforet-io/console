@@ -1,5 +1,4 @@
 import { reactive } from '@vue/composition-api';
-import { number } from '@storybook/addon-knobs';
 import {
     // eslint-disable-next-line import/named
     DataTablePropsType,
