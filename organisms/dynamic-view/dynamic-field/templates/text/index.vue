@@ -6,15 +6,16 @@ export default {
         // eslint-disable-next-line camelcase,vue/prop-name-casing
         view_option: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
+            type: [String, Object, Array, Boolean, Number, typeof null],
             default: '',
         },
     },
     render(h, { props, data }) {
-        const text:string = (typeof props.data === 'string') ? props.data : JSON.stringify(props.data);
+        let text:string = (typeof props.data === 'string') ? props.data : JSON.stringify(props.data);
+        text = text === 'null' ? '' : text;
         return h('span', data, text);
     },
 };
