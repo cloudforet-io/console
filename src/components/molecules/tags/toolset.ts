@@ -1,4 +1,5 @@
 import {
+    computed,
     isRef, ref, Ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
@@ -10,12 +11,11 @@ export class TagToolSet {
         public eventBus?:any,
         public eventName?:string,
         public changeTagCallBack?:any,
-    ) {
-    }
+    ) { }
 
     public setTags = (tags:any[]):void => {
         this.tags.value = tags;
-        if (this.eventBus) { this.eventBus.$emit(this.eventName, this.tags.value); }
+        if (this.eventBus && this.eventName) { this.eventBus.$emit(this.eventName, this.tags.value); }
         if (this.changeTagCallBack) { this.changeTagCallBack(this.tags.value); }
     };
 

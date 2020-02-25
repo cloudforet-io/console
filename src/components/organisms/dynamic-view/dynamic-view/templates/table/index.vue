@@ -35,7 +35,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { createComponent, computed, Ref } from '@vue/composition-api';
+import { defineComponent, computed, Ref } from '@vue/composition-api';
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
@@ -68,7 +68,7 @@ interface Field {
 }
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicViewTable',
     components: {
         PDynamicField,

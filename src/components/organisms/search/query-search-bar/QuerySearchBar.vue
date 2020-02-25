@@ -23,7 +23,7 @@
 <script>
 import _ from 'lodash';
 import {
-    computed, createComponent, isRef, onMounted, reactive, ref, watch,
+    computed, defineComponent, isRef, onMounted, reactive, ref, watch,
 } from '@vue/composition-api';
 import { windowEventMount } from '@/lib/compostion-util';
 
@@ -36,7 +36,7 @@ const keyRegx = new RegExp('^(?<key>.+?):');
 const operatorRegx = new RegExp('^.+?:(?<operator>[=|<|>|!|$]=?)?');
 // const valueRegx = new RegExp('^.+?:(?:[=|<|>|!]=?)?(?<value>.+)');
 
-export default createComponent({
+export default defineComponent({
     name: 'PQuerySearchBar',
     components: { PSearch, PContextMenu },
     props: {
