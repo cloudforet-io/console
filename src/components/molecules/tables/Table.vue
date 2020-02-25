@@ -23,10 +23,10 @@
 </template>
 
 <script lang="ts">
-import {computed, createComponent, getCurrentInstance, reactive, Ref} from '@vue/composition-api';
+import {computed, defineComponent, getCurrentInstance, reactive, Ref} from '@vue/composition-api';
 import {tableProps, TablePropsType} from './toolset';
 
-export default createComponent( {
+export default defineComponent( {
     name: 'PTable',
     props: tableProps,
     setup: function (props: TablePropsType, context) {

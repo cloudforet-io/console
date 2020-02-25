@@ -15,7 +15,7 @@
 /* eslint-disable camelcase,vue/prop-name-casing */
 
 import {
-    computed, createComponent, onMounted, reactive, toRefs,
+    computed, defineComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 
 
@@ -24,7 +24,7 @@ interface State {
     loader:()=>Promise<any>
 }
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicView',
     props: {
         view_type: {

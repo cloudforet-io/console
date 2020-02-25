@@ -142,7 +142,7 @@
 <script lang="ts">
 import DragSelect from 'dragselect';
 import {
-    toRefs, computed, reactive, watch, onMounted, Ref, createComponent,
+    toRefs, computed, reactive, watch, onMounted, Ref, defineComponent,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PTable from '@/components/molecules/tables/Table.vue';
@@ -179,7 +179,7 @@ const loadingHandler = (props) => {
 };
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PDataTable',
     components: {
         PTable, PTd, PTh, PTr, PI, PCheckBox, PCopyButton, PLottie, PRadio,

@@ -13,10 +13,10 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, computed, toRefs,
-    createComponent,
-} from '@vue/composition-api';
+    import {
+        reactive, computed, toRefs,
+         defineComponent,
+    } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 
     interface BtnType{
@@ -31,7 +31,7 @@ import PButton from '@/components/atoms/buttons/Button.vue';
     }
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PSelectBtnGroup',
     components: { PButton },
     props: {

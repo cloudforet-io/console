@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import {
-    computed, createComponent, onMounted, reactive, toRefs,
+    computed, defineComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 
 
@@ -13,7 +13,7 @@ interface State {
     loader:()=>Promise<any>
 }
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicField',
     props: {
         // eslint-disable-next-line camelcase
