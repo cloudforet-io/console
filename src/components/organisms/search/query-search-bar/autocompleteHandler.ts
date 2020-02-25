@@ -2,12 +2,14 @@ import Fuse from 'fuse.js';
 import _ from 'lodash';
 import { autoCompleteQuery } from '@/lib/api';
 
-export class SearchQuery {
-    constructor(key, operator, value) {
-        this.key = key; // string
-        this.operator = operator; // string
-        this.value = value; // any type except object
-    }
+export interface SearchQueryType {
+    key: string,
+    operator: string,
+    value: string | number | Array<string | number>;
+}
+
+export class SearchQuery implements SearchQueryType {
+    constructor(public key, public operator, public value) { }
 }
 
 export const searchContextType = Object.freeze({
@@ -16,8 +18,15 @@ export const searchContextType = Object.freeze({
     None: Symbol('None'),
 });
 
+interface handlerMap {
+    key:any[];
+    value:any[];
+}
+
 // todo: TS 도입시 인터페이스로 대체
 export class baseAutocompleteHandler {
+    public handlerMap:handlerMap;
+
     constructor() {
         this.handlerMap = {
             key: [],
@@ -26,14 +35,15 @@ export class baseAutocompleteHandler {
     }
 
     async getAutoCompleteData(contextType, inputText, searchQuery) {
-        const result = [];
-        let handlers = [];
+        const result:any[] = [];
+        let handlers:any[] = [];
         // const txt = isRef(inputText) ? inputText.value : inputText;
         if (contextType === searchContextType.Key) {
             handlers = this.handlerMap.key;
         } else if (contextType === searchContextType.Value) {
             handlers = this.handlerMap.value;
         }
+        // eslint-disable-next-line no-plusplus
         for (let i = 0; i < handlers.length; i++) {
             const handler = handlers[i];
             // eslint-disable-next-line no-await-in-loop
@@ -116,7 +126,7 @@ export const getKeys = (rawKeys) => {
     };
 };
 export const getSuggest = suggestKeys => (contextType, inputText) => {
-    const result = [];
+    const result:string[] = [];
     suggestKeys.forEach((key) => { result.push(`${key}:${inputText}`); });
     return ['Suggest', result];
 };
@@ -130,7 +140,7 @@ export const getSuggest = suggestKeys => (contextType, inputText) => {
  * @param matchKey
  * @returns {function(...[*]=)}
  */
-export const getFetchValues = (key, urlPath, parent, limit = 10, matchKey) => async (contextType, inputText, searchQuery) => {
+export const getFetchValues = (key:string, urlPath:string, parent:any, limit:number = 10, matchKey?:string) => async (contextType, inputText, searchQuery) => {
     if (searchQuery.key === key) {
         const realKey = matchKey || searchQuery.key;
         const res = await parent.$http.post(urlPath, {
@@ -152,7 +162,7 @@ export const getFetchValues = (key, urlPath, parent, limit = 10, matchKey) => as
  * @param valuesFetchKeys
  * @returns {Array|*[]}
  */
-export const makeValuesFetchHandler = (parent, valuesFetchUrl, valuesFetchKeys) => {
+export const makeValuesFetchHandler = (parent:any, valuesFetchUrl:string, valuesFetchKeys:string[]) => {
     if (parent && valuesFetchUrl && valuesFetchKeys.length > 0) {
         return _.flatMap(valuesFetchKeys, key => getFetchValues(key, valuesFetchUrl, parent));
     }
@@ -171,14 +181,17 @@ export class defaultAutocompleteHandler extends baseAutocompleteHandler {
     }
 
     // todo: api 요청용 클라이언트를 import 방식으로 가져오게 변경하기 - sinsky
+    // eslint-disable-next-line class-methods-use-this
     get parent() {
         return null;
     }
 
+    // eslint-disable-next-line class-methods-use-this
     get valuesFetchUrl() {
         return '';
     }
 
+    // eslint-disable-next-line class-methods-use-this
     get valuesFetchKeys() {
         return [];
     }

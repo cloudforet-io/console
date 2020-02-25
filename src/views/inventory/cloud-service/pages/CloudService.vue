@@ -1,7 +1,7 @@
 
 <script>
 import CloudServiceTemplate, { cloudServiceSetup } from '@/views/inventory/cloud-service/pages/CloudService.template.vue';
-import { QuerySearchTableAPI } from '@/lib/api';
+import { BaseQuerySearchTableTSAPI } from '@/lib/api';
 
 export default {
     name: 'CloudService',
@@ -9,12 +9,16 @@ export default {
     setup(props, context) {
         const keyAutoCompletes = ['name', 'group', 'provider'];
         const onlyFields = [...keyAutoCompletes, 'data_source'];
-        const apiHandler = new QuerySearchTableAPI(
-            context.parent, '/inventory/cloud-service-type/list',
+        const apiHandler = new BaseQuerySearchTableTSAPI(
+            '/inventory/cloud-service-type/list',
             // eslint-disable-next-line camelcase
             keyAutoCompletes, onlyFields, { include_cloud_service_count: true },
+            undefined, undefined, undefined, context.parent,
         );
-        const dvApiHandler = new QuerySearchTableAPI(context.parent, '/inventory/cloud-service/list');
+        const dvApiHandler = new BaseQuerySearchTableTSAPI('/inventory/cloud-service/list',
+            undefined, undefined, undefined, undefined, undefined, undefined,
+            context.parent);
+
         apiHandler.getData();
         return {
             ...cloudServiceSetup(context, apiHandler, dvApiHandler),

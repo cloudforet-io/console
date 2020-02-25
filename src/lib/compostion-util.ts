@@ -20,7 +20,6 @@ export const makeProxy = <T extends any>(name:string, props:any = null, emit:any
     let _emit = emit;
     if (!_props && !_emit) {
         const vm = getCurrentInstance();
-        console.debug(vm);
         if (vm) {
             _props = vm.$props;
             _emit = vm.$listeners[`update:${name}`];
