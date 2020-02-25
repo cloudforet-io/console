@@ -54,10 +54,11 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import { createComponent } from '@vue/composition-api';
 import styles from '@/styles/_variables.scss';
 import PI from '@/components/atoms/icons/PI.vue';
 
-export default {
+export default createComponent({
     name: 'VerticalLayout',
     components: { PI },
     events: ['start', 'move', 'stop'],
@@ -202,7 +203,7 @@ export default {
             this.$emit('minimize', flag);
         },
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>

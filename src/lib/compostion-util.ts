@@ -1,9 +1,10 @@
 import {
-    computed, onUnmounted, reactive, ref, onMounted,
+    computed, onUnmounted, reactive, ref, onMounted, getCurrentInstance, Ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
+import { debug } from 'webpack';
 import { isNotEmpty } from '@/lib/util';
 
 /**
@@ -13,10 +14,31 @@ import { isNotEmpty } from '@/lib/util';
  * @param emit
  * @return {Ref<*>}
  */
-export const makeProxy = (name:string, props:any, emit:any) => computed({
-    get: () => props[name],
-    set: val => emit(`update:${name}`, val),
-});
+/* eslint-disable arrow-parens */
+export const makeProxy = <T extends any>(name:string, props:any = null, emit:any = null):Ref<T> => {
+    let _props = props;
+    let _emit = emit;
+    if (!_props && !_emit) {
+        const vm = getCurrentInstance();
+        if (vm) {
+            _props = vm.$props;
+            _emit = vm.$listeners[`update:${name}`];
+        } else {
+            console.error('unsupported get current instance method');
+        }
+    }
+    return computed({
+        get: () => _props[name],
+        set: val => {
+            if (emit) {
+                emit(`update:${name}`, val);
+            } else {
+                _emit(val);
+            }
+        },
+    });
+};
+
 
 /**
  * event by pass

@@ -1,15 +1,20 @@
 /* eslint-disable camelcase */
-import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import {
     computed, getCurrentInstance, reactive, Ref, ref,
 } from '@vue/composition-api';
-
 // @ts-ignore
 import { tagList } from '@/components/molecules/tags/Tag.vue';
-
-//  eslint-disable-next-line import/no-cycle
-import { getKeys, getSuggest, baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+// eslint-disable-next-line import/no-cycle
+import {
+    baseAutocompleteHandler,
+    getKeys,
+    getSuggest,
+    SearchQueryType,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+// eslint-disable-next-line import/no-cycle
+import { QuerySearchTableToolSet } from '@/components/organisms/tables/query-search-table/toolset';
 
 
 class APIError extends Error {
@@ -133,11 +138,6 @@ interface ApiQuery {
     only?:string[];
 }
 
-interface SearchQuery {
-    key:string,
-    operator:string,
-    value:string|number|Array<string|number>;
-}
 type ValueFormatter = (string, any)=>string|number|Array<string|number>;
 
 /**
@@ -148,14 +148,14 @@ type ValueFormatter = (string, any)=>string|number|Array<string|number>;
  * @param sortBy
  * @param sortDesc
  * @param searchText
- * @param searchQueries {Array<SearchQuery>}
+ * @param searchQueries {Array<SearchQueryType>}
  * @param valueFormatter <(key,value)=>value>
  * @param only
  * @returns {{page: {start: number, limit: *}}}
  */
 export const defaultQuery = (
     thisPage:number, pageSize:number, sortBy?:string, sortDesc?:boolean,
-    searchText?:string, searchQueries?:SearchQuery[], valueFormatter?:ValueFormatter, only?:string[],
+    searchText?:string, searchQueries?:SearchQueryType[]|readonly SearchQueryType[], valueFormatter?:ValueFormatter, only?:string[],
 ) => {
     const query:ApiQuery = {
         page: {
@@ -244,9 +244,9 @@ export interface HttpInstance {
 export abstract class DynamicAPI {
     abstract getData();
 
-    public abstract parent:HttpInstance;
+    public abstract parent?:HttpInstance;
 
-    get $http() { return this.parent.$http; }
+    get $http() { return (this.parent as HttpInstance).$http; }
 }
 
 interface TableState {
@@ -259,7 +259,7 @@ interface TableState {
     allPage: number;
     thisPage: number;
     searchText: string|null|undefined;
-    fixSearchQuery?:SearchQuery[]|Ref<SearchQuery[]>;
+    fixSearchQuery?:SearchQueryType[]|Ref<SearchQueryType[]>;
     loading: boolean;
     acHandler?:Ref<QuerySearchTableACHandler>;
     extraParams?:object;
@@ -335,7 +335,7 @@ interface ACHandlerMap {
 }
 
 export class QuerySearchTableACHandler extends baseAutocompleteHandler {
-    constructor(public parent:HttpInstance, keys:string[] = [], suggestKeys:string[] = []) {
+    constructor(keys:string[] = [], suggestKeys:string[] = []) {
         super();
         (this.handlerMap as ACHandlerMap) = {
             key: [getKeys(keys) as ACFunction, getSuggest(suggestKeys) as ACFunction],
@@ -344,124 +344,6 @@ export class QuerySearchTableACHandler extends baseAutocompleteHandler {
     }
 }
 
-interface AcState {
-    keys:string[];
-    suggestKeys:string[];
-}
-
-export class BaseQuerySearchTableAPI extends DynamicAPI {
-    public state :TableState;
-
-    public queryListTools ;
-
-    public acState : AcState;
-
-
-    protected query:Ref<object>;
-
-    protected searchQuery:Ref<SearchQuery[]>
-
-
-    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[], extraParams?:object) {
-        super();
-        this.acState = reactive({
-            keys: keys || [] as string[],
-            suggestKeys: keys || [] as string[],
-        });
-        const acHandler:Ref<any> = computed(() => new QuerySearchTableACHandler(parent, this.acState.keys, this.acState.keys));
-
-        this.state = reactive({
-            items: [],
-            selectIndex: [],
-            sortBy: '',
-            sortDesc: true,
-            pageSize: 15,
-            allPage: 1,
-            thisPage: 1,
-            searchText: '',
-            loading: false,
-            only,
-            fixSearchQuery: [],
-            acHandler,
-            extraParams: extraParams || {}, // for api extra parameters
-        });
-        this.queryListTools = tagList(undefined, true, undefined, undefined, this.getData);
-        // this.searchQuery = computed(() => _.flatten([this.state.fixSearchQuery || [], this.queryListTools.tags.value || []]));
-        // @ts-ignore
-        this.searchQuery = computed(() => {
-            const fix:SearchQuery[] = this.state.fixSearchQuery as SearchQuery[] || [] as SearchQuery[];
-            const sq:SearchQuery[] = this.queryListTools.tags;
-            return [...fix, ...sq];
-        });
-        this.query = computed(() => (defaultQuery(
-            this.state.thisPage, this.state.pageSize,
-            this.state.sortBy, this.state.sortDesc, undefined,
-            this.searchQuery.value, undefined, this.state.only,
-        )));
-    }
-
-    public getData = async () => {
-        this.state.loading = true;
-        this.state.items = [];
-        this.state.selectIndex = [];
-
-        try {
-            let params = {
-                query: this.query.value,
-            };
-            if (!_.isEmpty(this.state.extraParams)) {
-                params = {
-                    ...params,
-                    ...this.state.extraParams,
-                };
-            }
-            const res = await this.$http.post(this.url, params);
-            this.state.items = res.data.results;
-            this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
-        } catch (e) {
-            console.debug('request fail', e);
-        }
-
-        this.state.loading = false;
-    }
-}
-
-interface tableSelectState {
-    isNotSelected:boolean;
-    isSelectOne:boolean;
-    isSelectMulti:boolean;
-    selectItems:readonly any[];
-    firstSelectItem:any;
-}
-export class QuerySearchTableAPI extends BaseQuerySearchTableAPI {
-    public selectState:tableSelectState
-
-    constructor(public parent:HttpInstance, protected url:string, keys?:string[], only?:string[], extraParams?:object) {
-        super(parent, url, keys, only, extraParams);
-        const isNotSelected:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 0 : true));
-        const isSelectOne:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length === 1 : false));
-        const isSelectMulti:Ref<boolean> = computed(():boolean => (this.state.selectIndex ? this.state.selectIndex.length > 1 : false));
-        const selectItems:Ref<readonly any[]> = computed(() :any[] => (this.state.selectIndex ? this.state.selectIndex.map(idx => this.state.items[idx]) : []));
-        const firstSelectItem:Ref<any> = computed(():any => (!isNotSelected.value ? this.state.items[(this.state.selectIndex as number[])[0]] : {}));
-        this.selectState = reactive({
-            isNotSelected,
-            isSelectOne,
-            isSelectMulti,
-            selectItems,
-            firstSelectItem,
-        });
-    }
-
-    public resetAll() {
-        this.state.allPage = 1;
-        this.state.thisPage = 1;
-        this.state.selectIndex = [];
-        this.state.items = [];
-        this.state.sortBy = '';
-        this.state.sortDesc = true;
-        this.state.searchText = '';
-    }
-}
 
 interface MockData {
     total_count: number;
@@ -473,3 +355,82 @@ export const getMockData = (data: any, timeout: number) => new Promise((resolve,
 });
 
 export const callApi = ($http: AxiosInstance, url: string, params: object) => $http.post(url, params);
+
+export class BaseQuerySearchTableTSAPI extends QuerySearchTableToolSet {
+    public apiState:any;
+
+    public queryTags:Readonly<Ref<readonly SearchQueryType[]>>;
+
+    public parent:HttpInstance;
+
+    // eslint-disable-next-line class-methods-use-this
+    get $http() {
+        // @ts-ignore
+        return this.parent.$http;
+    }
+
+    protected paramQuery:Ref<object>;
+
+    public acState:any;
+
+    public getData:Function;
+
+    public resetAll:Function;
+
+
+    // @ts-ignore
+    constructor(url:string, keys?:string[], only?:string[], extraParams?:object, fixSearchQuery : SearchQueryType[] = [], initData:object = {}, initSyncData:object = {}, parent:HttpInstance) {
+        const args = {
+            keys: keys || [],
+            suggestKeys: keys || [],
+        };
+        const argsOrders = ['keys', 'suggestKeys'];
+        super(QuerySearchTableACHandler, args, argsOrders, initData, initSyncData);
+        this.parent = parent;
+        this.apiState = reactive({
+            url,
+            only,
+            fixSearchQuery: fixSearchQuery || [],
+            extraParams: extraParams || {}, // for api extra parameters
+        });
+        this.queryTags = computed(() => {
+            const fix:SearchQueryType[] = this.apiState.fixSearchQuery;
+            const sq:SearchQueryType[] = this.querySearch.tags.value;
+            return [...fix, ...sq];
+        });
+        this.paramQuery = computed(() => (defaultQuery(
+            (this.syncState.thisPage as number), (this.syncState.pageSize as number),
+            this.syncState.sortBy, this.syncState.sortDesc, undefined,
+            this.queryTags.value, undefined, this.apiState.only,
+        )));
+        this.getData = async () => {
+            this.syncState.loading = true;
+            this.state.items = [];
+            this.syncState.selectIndex = [];
+
+            try {
+                const params = {
+                    query: this.paramQuery.value,
+                    ...this.apiState.extraParams,
+
+                };
+                const res = await this.$http.post(this.apiState.url, params);
+                this.state.items = res.data.results;
+                this.setAllPage(res.data.total_count);
+            } catch (e) {
+                console.debug('request fail', e);
+            }
+
+            this.syncState.loading = false;
+        };
+        this.resetAll = () => {
+            this.state.allPage = 1;
+            this.state.items = [];
+            this.syncState.thisPage = 1;
+            this.syncState.selectIndex = [];
+            this.syncState.sortBy = '';
+            this.syncState.sortDesc = true;
+            this.querySearch.state.searchText = '';
+        };
+    }
+}

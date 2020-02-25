@@ -23,7 +23,7 @@
 <script>
 import _ from 'lodash';
 import {
-    computed, createComponent, onMounted, reactive, ref, watch,
+    computed, createComponent, isRef, onMounted, reactive, ref, watch,
 } from '@vue/composition-api';
 import { windowEventMount } from '@/lib/compostion-util';
 
@@ -49,7 +49,7 @@ export default createComponent({
             default: null,
         },
         autocompleteHandler: {
-            type: baseAutocompleteHandler,
+            type: Object,
         },
     },
     event: ['newQuery'],
@@ -112,7 +112,9 @@ export default createComponent({
         });
         windowEventMount('click', hideAC);
         const getACData = async (text, forceContextType) => {
-            const result = await props.autocompleteHandler.getAutoCompleteData(forceContextType || contextType.value, text, contextState);
+            console.log(props.autocompleteHandler);
+            const handler = isRef(props.autocompleteHandler) ? props.autocompleteHandler.value : props.autocompleteHandler;
+            const result = await handler.getAutoCompleteData(forceContextType || contextType.value, text, contextState);
             acState.items = result;
         };
         watch(proxySearchText, async (text, preText) => {

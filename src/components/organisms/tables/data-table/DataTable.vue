@@ -139,82 +139,26 @@
     </p-table>
 </template>
 
-<script>
+<script lang="ts">
 import DragSelect from 'dragselect';
 import {
-    toRefs, computed, reactive, watch, onMounted,
+    toRefs, computed, reactive, watch, onMounted, Ref, createComponent,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import PTable, { tableProps } from '@/components/molecules/tables/Table.vue';
+import PTable from '@/components/molecules/tables/Table.vue';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import PTh from '@/components/atoms/table/Th.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { getValue, selectToCopyToClipboard } from '@/lib/util';
+import { selectToCopyToClipboard } from '@/lib/util';
 import { makeProxy, windowEventMount } from '@/lib/compostion-util';
+// eslint-disable-next-line import/named
+import { dataTableProps, DataTableSetupProps } from './toolset';
 
 const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox.vue');
 const PRadio = () => import('@/components/molecules/forms/radio/Radio.vue');
 const PCopyButton = () => import('@/components/molecules/buttons/CopyButton.vue');
-
-export const dataTableProps = {
-    ...tableProps,
-    fields: Array,
-    items: Array,
-    sortable: {
-        type: Boolean,
-        default: false,
-    },
-    dragable: {
-        type: Boolean,
-        default: false,
-    },
-    rowClickMultiSelectMode: {
-        type: Boolean,
-        default: false,
-    },
-    selectable: {
-        type: Boolean,
-        default: false,
-    },
-    selectIndex: {
-        type: [Array, Number],
-        default: () => [],
-    },
-    sortBy: {
-        type: String,
-        default: null,
-    },
-    sortDesc: {
-        type: Boolean,
-        default: true,
-    },
-    colCopy: {
-        type: Boolean,
-        default: false,
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
-    useSpinnerLoading: {
-        type: Boolean,
-        default: false,
-    },
-    useCursorLoading: {
-        type: Boolean,
-        default: false,
-    },
-    /**
-   * @name multiSelect
-   * @description When it's 'false', should NOT give value 'true' to 'dragable' prop.
-   */
-    multiSelect: {
-        type: Boolean,
-        default: true,
-    },
-};
 
 
 const loadingHandler = (props) => {
@@ -234,17 +178,14 @@ const loadingHandler = (props) => {
     });
 };
 
-export default {
+
+export default createComponent({
     name: 'PDataTable',
     components: {
         PTable, PTd, PTh, PTr, PI, PCheckBox, PCopyButton, PLottie, PRadio,
     },
-    events: [
-        'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
-        'changeSort', 'theadClick',
-    ],
     props: dataTableProps,
-    setup(props, context) {
+    setup(props:DataTableSetupProps, context) {
         const state = reactive({
             table: null,
             allState: false,
@@ -253,8 +194,8 @@ export default {
             thHoverIndex: null,
         });
         const proxySelectIndex = makeProxy('selectIndex', props, context.emit);
-        const fieldsData = computed(() => {
-            const data = _.flatMap(props.fields, (value) => {
+        const fieldsData:Ref<any> = computed(() => {
+            const data = _.flatMap(props.fields, (value:string|object) => {
                 if (typeof value === 'string') { return { name: value, label: value, sortable: true }; }
                 return { sortable: true, ...value };
             });
@@ -263,9 +204,11 @@ export default {
 
         const fieldsName = computed(() => _.flatMap(fieldsData.value, field => field.name));
         const sortIcon = computed(() => (props.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'));
+        // @ts-ignore
         const selectArea = computed(() => state.table.$el);
         const dragSelectAbles = computed(() => selectArea.value.children[0].children[1].children);
         const showNoData = computed(() => {
+            // eslint-disable-next-line no-prototype-builtins
             if (!props.items || !props.items.hasOwnProperty('length') || props.items.length === 0) {
                 if (props.useSpinnerLoading && props.loading) {
                     return false;
@@ -277,7 +220,8 @@ export default {
         const dragSelectItems = (items) => {
             const select = [];
             if (items.length > 1) {
-                items.forEach((item) => {
+                items.forEach((item:any) => {
+                    // @ts-ignore
                     select.push(Number(item.attributes['data-index'].value));
                 });
                 proxySelectIndex.value = select;
@@ -308,11 +252,13 @@ export default {
             if (!hasSelectData()) {
                 if (!props.multiSelect) return;
 
-                if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && props.selectIndex.length > 0) {
+                if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && (props.selectIndex as Array<any>).length > 0) {
                     let result = '';
-                    props.selectIndex.forEach((td) => {
-                        result += makeTableText(dragSelectAbles.value[td]);
-                    });
+                    if (typeof props.selectIndex === 'object') {
+                        props.selectIndex.forEach((td) => {
+                            result += makeTableText(dragSelectAbles.value[td]);
+                        });
+                    }
                     selectToCopyToClipboard(result);
                 }
             }
@@ -389,7 +335,9 @@ export default {
         const getSelectItem = (sortable) => {
             const selectedIndex = sortable ? proxySelectIndex.value : proxySelectIndex.value.sort((a, b) => a - b);
             const selectItem = [];
+            // @ts-ignore
             selectedIndex.forEach((index) => {
+                // @ts-ignore
                 selectItem.push(props.items[index]);
             });
             return selectItem;
@@ -399,9 +347,11 @@ export default {
             let result = '';
             const arr = Array.from(dragSelectAbles.value);
             arr.forEach((el) => {
+                // @ts-ignore
                 const children = Array.from(el.children);
                 children.forEach((td, colIdx) => {
                     if (colIdx === idx) {
+                        // @ts-ignore
                         result += `${td.innerText}\t`;
                     }
                 });
@@ -412,6 +362,7 @@ export default {
         let dragSelect = null;
         onMounted(() => {
             if (props.selectable && props.dragable) {
+                // @ts-ignore
                 dragSelect = new DragSelect({
                     selectables: dragSelectAbles.value,
                     area: selectArea.value,
@@ -426,14 +377,16 @@ export default {
         watch(() => props.items, () => {
             if (props.selectable && props.dragable && props.items) {
                 context.root.$nextTick((() => {
+                    // @ts-ignore
                     dragSelect.setSelectables(dragSelectAbles.value);
+                    // @ts-ignore
                     dragSelect.clearSelection();
                 }));
             }
         });
 
         watch(() => props.selectIndex, () => {
-            if (props.items.length && props.items.length === props.selectIndex.length) {
+            if (props.items.length && props.items.length === (props.selectIndex as any[]).length) {
                 state.allState = true;
             } else {
                 state.allState = false;
@@ -473,7 +426,7 @@ export default {
         };
     },
 
-};
+});
 </script>
 
 <style lang="scss" scoped>

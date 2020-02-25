@@ -82,27 +82,28 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import _ from 'lodash';
-import { computed, ref } from '@vue/composition-api';
-import PDataTable, { dataTableProps } from '@/components/organisms/tables/data-table/DataTable.vue';
+import {
+    computed, reactive, Ref, ref, createComponent,
+} from '@vue/composition-api';
+import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+// eslint-disable-next-line import/named
+import { dataTableProps } from '@/components/organisms/tables/data-table/toolset';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import { makeProxy } from '@/lib/compostion-util';
+// eslint-disable-next-line import/named
+import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/toolset';
 
-export default {
+
+export default createComponent({
     name: 'PToolboxTable',
     components: {
         PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn, PRow,
     },
-    events: [
-        'rowLeftClick', 'rowMiddleClick', 'rowMouseOver', 'rowMouseOut',
-        'changeSort', 'theadClick',
-        'clickSetting', 'clickRefresh',
-        'changePageSize', 'changePageNumber',
-    ],
     props: {
         ...dataTableProps,
         pagenationVisible: {
@@ -159,13 +160,13 @@ export default {
         },
 
     },
-    setup(props, { emit }) {
+    setup(props:ToolBoxTableSetupProps, { emit }) {
         const pageSizeOptions = computed(() => (_.flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size }))));
-        const proxyPageSize = makeProxy('pageSize', props, emit);
-        const proxyThisPage = makeProxy('thisPage', props, emit);
-        const proxySelectIndex = makeProxy('selectIndex', props, emit);
-        const proxySortBy = makeProxy('sortBy', props, emit);
-        const proxySortDesc = makeProxy('sortDesc', props, emit);
+        const proxyPageSize = makeProxy('pageSize');
+        const proxyThisPage = makeProxy('thisPage');
+        const proxySelectIndex = makeProxy('selectIndex');
+        const proxySortBy = makeProxy('sortBy');
+        const proxySortDesc = makeProxy('sortDesc');
         const changePageSize = (size) => {
             const sizeNum = Number(size);
             if (props.pageSize !== sizeNum) {
@@ -178,6 +179,7 @@ export default {
             emit('changePageNumber', page);
         };
         const table = ref(null);
+        // @ts-ignore
         const getSelectItem = () => table.getSelectItem();
         const changeSort = () => {
             proxyThisPage.value = 1;
@@ -195,7 +197,7 @@ export default {
             changeSort,
         };
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>

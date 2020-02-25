@@ -9,15 +9,15 @@
         :border="true"
         :padding="true"
         :dragable="true"
-        :sort-by.sync="apiHandler.state.sortBy"
-        :sort-desc.sync="apiHandler.state.sortDesc"
         :all-page="apiHandler.state.allPage"
-        :this-page.sync="apiHandler.state.thisPage"
-        :page-size.sync="apiHandler.state.pageSize"
-        :select-index.sync="apiHandler.state.selectIndex"
+        :sort-by.sync="apiHandler.syncState.sortBy"
+        :sort-desc.sync="apiHandler.syncState.sortDesc"
+        :this-page.sync="apiHandler.syncState.thisPage"
+        :page-size.sync="apiHandler.syncState.pageSize"
+        :select-index.sync="apiHandler.syncState.selectIndex"
+        :loading.sync="apiHandler.syncState.loading"
         :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
         :setting-visible="false"
-        :loading.sync="apiHandler.state.loading"
         :use-spinner-loading="true"
         :use-cursor-loading="true"
         @changePageSize="apiHandler.getData"
@@ -28,21 +28,21 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item" style="width: 50%">
-                <PQuerySearchBar :search-text.sync="apiHandler.state.searchText" :autocomplete-handler="apiHandler.state.acHandler"
-                                 @newQuery="apiHandler.queryListTools.addTag"
+                <PQuerySearchBar :search-text.sync="apiHandler.querySearch.state.searchText" :autocomplete-handler="apiHandler.querySearch.acHandler"
+                                 @newQuery="apiHandler.querySearch.addTag"
                 />
             </div>
         </template>
-        <template v-if="apiHandler.queryListTools.tags.length !== 0" slot="toolbox-bottom">
+        <template v-if="apiHandler.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
             <p-col :col="12" style="margin-bottom: .5rem;">
                 <p-hr style="width: 100%;" />
                 <p-row style="margin-top: .5rem;">
                     <div style="flex-grow: 0">
-                        <p-icon-button name="ic_delete" @click="apiHandler.queryListTools.deleteAllTags" />
+                        <p-icon-button name="ic_delete" @click="apiHandler.querySearch.deleteAllTags" />
                     </div>
                     <div style="flex-grow: 1;margin-left: 1rem;">
-                        <p-tag v-for="(tag, idx) in apiHandler.queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
-                               @delete="apiHandler.queryListTools.deleteTag(idx)"
+                        <p-tag v-for="(tag, idx) in apiHandler.querySearch.tags.value" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
+                               @delete="apiHandler.querySearch.deleteTag(idx)"
                         >
                             {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
                         </p-tag>
@@ -67,13 +67,12 @@ import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import { QuerySearchTableAPI, SubDataAPI } from '@/lib/api';
+import { BaseQuerySearchTableTSAPI } from '@/lib/api';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PTag from '@/components/molecules/tags/Tag.vue';
-import { makeTrItems } from '@/lib/view-helper';
 
 interface DataSourceType {
     name:string;
@@ -86,7 +85,7 @@ interface Props {
     data_source: DataSourceType[];
     data: any;
     rootMode:boolean;
-    apiHandler:QuerySearchTableAPI;
+    apiHandler:BaseQuerySearchTableTSAPI;
 }
 
 interface SlotBind {
@@ -124,7 +123,7 @@ export default createComponent({
             default: () => ({}),
         },
         apiHandler: {
-            type: QuerySearchTableAPI,
+            type: BaseQuerySearchTableTSAPI,
             required: true,
         },
     },
