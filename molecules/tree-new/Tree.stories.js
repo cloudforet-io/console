@@ -21,6 +21,13 @@ const getState = (props, context) => {
     const state = reactive({
         data: [],
         options: {},
+        loading: false,
+        nodeRightClick(node) {
+            console.log('nodeRightClick', node);
+        },
+        emptyRightClick() {
+            console.log('emptyRightClick');
+        },
     });
 
     return state;
@@ -105,9 +112,8 @@ export const redefineData = () => ({
 export const asyncData = () => ({
     components: { PTreeNew: PTree },
     template: `<div>
-        <p-tree-new :data.sync="data" 
-                    :options.sync="options"
-        >
+        <p-tree-new :options="options" :loading="loading" 
+                    @nodeRightClick="nodeRightClick" @emptyRightClick="emptyRightClick">
         </p-tree-new>
         <br>
         <hr>
@@ -127,40 +133,40 @@ export const asyncData = () => ({
     setup(props, context) {
         const state = getState(props, context);
 
-        state.data = [
-            { item: 'Item 1' },
-            { item: 'Item 2', kids: [] },
-        ];
+        let count = 0;
 
-        let count = state.data.length;
-        const getData = (node) => {
-            console.log('getData');
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    console.log('resolve', node);
-                    // eslint-disable-next-line no-plusplus
-                    resolve([{ item: `Item ${++count}` }]); // Yay! Everything went well!
-                }, 1000);
-            });
-        };
-
-        // const dt = getData();
+        const getData = () => new Promise((resolve) => {
+            setTimeout(() => {
+                state.data = [{
+                    id: `pg-e1c7d31869a${count}`,
+                    name: `pg ${count}`,
+                    // eslint-disable-next-line camelcase
+                    has_child: true,
+                }, {
+                    id: `project-e1c7d31869a${count}`,
+                    name: `project ${count}`,
+                    // eslint-disable-next-line camelcase
+                    has_child: false,
+                }];
+                count += 1;
+                resolve(state.data);
+            }, 1000);
+        });
 
         state.options = {
-            fetchData: node => getData(node).then((r) => {
-                console.log('r', r);
-                state.data = r;
-                state.options = { ...state.options, checkbox: true };
-                return r;
-            }),
+            async fetchData(node) {
+                state.loading = true;
+                const res = await getData();
+                state.loading = false;
+                return res;
+            },
             propertyNames: {
-                text: 'item',
+                id: 'id',
+                text: 'name',
                 children: 'kids',
+                isBatch: 'has_child',
             },
         };
-
-        state.options.fetchData('root');
-
 
         return {
             ...toRefs(state),
