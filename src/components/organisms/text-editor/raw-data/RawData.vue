@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import {
-    computed, createComponent, ref, watch, Ref, onMounted,
+    computed, defineComponent, ref, watch, Ref, onMounted,
 } from '@vue/composition-api';
 import { editor } from 'monaco-editor';
 import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEditor.vue';
@@ -16,7 +16,7 @@ interface MEComponent{
 }
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PRawData',
     components: {
         PMonacoEditor,

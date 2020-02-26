@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { computed, createComponent } from '@vue/composition-api';
+import { computed, defineComponent } from '@vue/composition-api';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDividerHeader from '@/components/molecules/divider-header/DividerHeader.vue';
 
@@ -29,7 +29,7 @@ interface Props {
 }
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicDetails',
     components: {
         PDynamicView, PDividerHeader,

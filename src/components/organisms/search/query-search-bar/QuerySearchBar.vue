@@ -23,7 +23,7 @@
 <script>
 import _ from 'lodash';
 import {
-    computed, createComponent, isRef, onMounted, reactive, ref, watch,
+    computed, defineComponent, isRef, onMounted, reactive, ref, watch,
 } from '@vue/composition-api';
 import { windowEventMount } from '@/lib/compostion-util';
 
@@ -36,7 +36,7 @@ const keyRegx = new RegExp('^(?<key>.+?):');
 const operatorRegx = new RegExp('^.+?:(?<operator>[=|<|>|!|$]=?)?');
 // const valueRegx = new RegExp('^.+?:(?:[=|<|>|!]=?)?(?<value>.+)');
 
-export default createComponent({
+export default defineComponent({
     name: 'PQuerySearchBar',
     components: { PSearch, PContextMenu },
     props: {
@@ -112,7 +112,6 @@ export default createComponent({
         });
         windowEventMount('click', hideAC);
         const getACData = async (text, forceContextType) => {
-            console.log(props.autocompleteHandler);
             const handler = isRef(props.autocompleteHandler) ? props.autocompleteHandler.value : props.autocompleteHandler;
             const result = await handler.getAutoCompleteData(forceContextType || contextType.value, text, contextState);
             acState.items = result;
@@ -143,7 +142,6 @@ export default createComponent({
             if (!!contextState.key && !!contextState.value) {
                 const query = new SearchQuery(contextState.key, contextState.operator, contextState.value);
                 context.emit('newQuery', query);
-                console.debug('newQuery', query);
                 cleanSearchText();
             }
         };

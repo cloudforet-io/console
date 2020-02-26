@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import {
-    onMounted, reactive, toRefs, watch, computed, createComponent, Ref,
+    onMounted, reactive, toRefs, watch, computed, defineComponent, Ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import { Fragment } from 'vue-fragment';
@@ -24,7 +24,7 @@ interface Props {
     subData:any[];
     url:string,
 }
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicSubData',
     components: {
         PSelectBtnGroup, PDynamicView, Fragment,
