@@ -16,7 +16,7 @@
         :page-size.sync="apiHandler.syncState.pageSize"
         :select-index.sync="apiHandler.syncState.selectIndex"
         :loading.sync="apiHandler.syncState.loading"
-        :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
+        :responsive-style="responsiveStyle"
         :setting-visible="false"
         :use-spinner-loading="true"
         :use-cursor-loading="true"
@@ -63,11 +63,8 @@ import PQuerySearchBar from '@/components/organisms/search/query-search-bar/Quer
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 
 import { BaseQuerySearchTableTSAPI } from '@/lib/api';
-import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-import PTag from '@/components/molecules/tags/Tag.vue';
 
 interface DataSourceType {
     name:string;
@@ -118,6 +115,10 @@ export default defineComponent({
         apiHandler: {
             type: BaseQuerySearchTableTSAPI,
             required: true,
+        },
+        responsiveStyle: {
+            type: Object,
+            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
         },
     },
     setup(props:Props) {

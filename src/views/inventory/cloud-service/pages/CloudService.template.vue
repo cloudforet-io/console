@@ -38,16 +38,37 @@
                                     Action
                                 </PDropdownMenuBtn>
                             </template>
+
+                            <template #toolbox-bottom>
+                                <p-row direction="column">
+                                    <div style="margin-bottom: .5rem;">
+                                        <p-query-search-bar :search-text.sync="apiHandler.querySearch.state.searchText" :autocomplete-handler="apiHandler.querySearch.acHandler"
+                                                            @newQuery="apiHandler.querySearch.addTag"
+                                        />
+                                    </div>
+                                    <div v-if="apiHandler.querySearch.tags.value.length !== 0" style="margin-bottom: .5rem; ">
+                                        <p-hr style="width: 100%;" />
+                                        <p-query-search-tags style="margin-top: .5rem;"
+                                                             :tags="apiHandler.querySearch.tags.value"
+                                                             @deleteTag="apiHandler.querySearch.deleteTag"
+                                                             @deleteAllTags="apiHandler.querySearch.deleteAllTags"
+                                        />
+                                    </div>
+                                </p-row>
+                            </template>
                         </p-toolbox-table>
                     </div>
                 </transition>
             </template>
             <template #rightContainer>
                 <transition name="panel-trans">
-                    <div>
-                        <p-horizontal-layout v-if="apiHandler.selectState.isSelectOne">
+                    <div v-if="apiHandler.selectState.isSelectOne">
+                        <p-horizontal-layout>
                             <template #container="{ height }">
-                                <p-dynamic-view view_type="query-search-table" :data_source="selectTypeDataSource" :api-handler="dvApiHandler"
+                                <p-dynamic-view view_type="query-search-table"
+                                                :api-handler="dvApiHandler"
+                                                :data_source="selectTypeDataSource"
+                                                :vbind="{responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}}"
                                                 :data="null"
                                 >
                                     <template #toolbox-left>
@@ -94,25 +115,31 @@
                                 <div>admin</div>
                             </template>
                         </PTab>
-
-                        <div v-else id="empty-space">
-                            Select a  above for details.
-                        </div>
-                        <!--                <p-table-check-modal-->
-                        <!--                        v-if="!!checkTableModalState.mode"-->
-                        <!--                        :visible.sync="checkTableModalState.visible"-->
-                        <!--                        :header-title="checkTableModalState.title"-->
-                        <!--                        :sub-title="checkTableModalState.subTitle"-->
-                        <!--                        :theme-color="checkTableModalState.themeColor"-->
-                        <!--                        :fields="multiSelectFields"-->
-                        <!--                        size="lg"-->
-                        <!--                        :centered="true"-->
-                        <!--                        :selectable="false"-->
-                        <!--                        :items="getSelectServerItems"-->
-
-                        <!--                        @confirm="checkModalConfirm"-->
-                        <!--                />-->
                     </div>
+                    <div v-else class="empty-msg">
+                        <p-empty class="header">
+                            No Selected Item
+                        </p-empty>
+                        <p-empty class="msg">
+                            Please, Click an item from left table.
+                        </p-empty>
+                    </div>
+
+
+                    <!--                <p-table-check-modal-->
+                    <!--                        v-if="!!checkTableModalState.mode"-->
+                    <!--                        :visible.sync="checkTableModalState.visible"-->
+                    <!--                        :header-title="checkTableModalState.title"-->
+                    <!--                        :sub-title="checkTableModalState.subTitle"-->
+                    <!--                        :theme-color="checkTableModalState.themeColor"-->
+                    <!--                        :fields="multiSelectFields"-->
+                    <!--                        size="lg"-->
+                    <!--                        :centered="true"-->
+                    <!--                        :selectable="false"-->
+                    <!--                        :items="getSelectServerItems"-->
+
+                    <!--                        @confirm="checkModalConfirm"-->
+                    <!--                />-->
                 </transition>
             </template>
         </vertical-page-layout>
@@ -126,25 +153,27 @@ import {
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
-import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 
-// import { MainTableAPI } from '@/lib/api';
 
-import PTag from '@/components/molecules/tags/Tag.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
+import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import { BaseQuerySearchTableTSAPI, HttpInstance } from '@/lib/api';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PEmpty from '@/components/atoms/empty/Empty.vue';
+
 
 export const cloudServiceSetup = (context, apiHandler:BaseQuerySearchTableTSAPI, dvApiHandler:BaseQuerySearchTableTSAPI) => {
     const state = reactive({
@@ -276,14 +305,17 @@ export default {
         PDynamicView,
         PTab,
         PToolboxTable,
-        // PQuerySearchBar,
+        PQuerySearchBar,
         PDynamicSubData,
         PButton,
         PRawData,
         PDropdownMenuBtn,
         // PTableCheckModal,
-        // PTag,
+        PHr,
+        PQuerySearchTags,
         PDynamicDetails,
+        PRow,
+        PEmpty,
     },
     setup(props, context) {
         const mockAPI = new BaseQuerySearchTableTSAPI('', undefined, undefined, undefined, undefined, undefined, undefined, context.parent);
@@ -304,6 +336,15 @@ export default {
     }
     .left-toolbox-item{
         margin-left: 1rem;
+    }
+    .empty-msg{
+        margin-top: 1rem;
+        .header{
+            font-weight: bold;
+        }
+        .msg{
+
+        }
     }
 
 </style>
