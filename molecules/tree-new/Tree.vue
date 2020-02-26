@@ -1,6 +1,7 @@
 <template>
     <div class="p-tree-container">
-        <liquor-tree :data="data"
+        <liquor-tree ref="tree"
+                     :data="data"
                      :options="options"
         >
             <template #default="{node}">
@@ -33,12 +34,15 @@
  * Reference: https://amsik.github.io/liquor-tree
  */
 
-import { reactive, toRefs, createComponent } from '@vue/composition-api';
+import {
+    ref, reactive, toRefs, watch, defineComponent, onMounted,
+} from '@vue/composition-api';
 import _ from 'lodash';
 import TreeItem, { TreeOptionsType } from './TreeData';
 import PI from '@/components/atoms/icons/PI.vue';
+import { makeProxy } from '@/lib/compostion-util';
 
-export default createComponent({
+export default defineComponent({
     name: 'PTreeNew',
     components: {
         PI,
@@ -53,9 +57,26 @@ export default createComponent({
             default: () => ({}),
         },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
+            // proxyData: makeProxy('data', props, emit),
+            // proxyOptions: makeProxy('options', props, emit),
+            tree: null,
         });
+
+        /**
+         * LiquorTree's data & options are not reactive.
+         */
+        watch(() => props.data, (data) => {
+            // @ts-ignore
+            if (state.tree) state.tree.tree.setModel(data);
+        });
+        watch(() => props.options, (options) => {
+            // @ts-ignore
+            if (state.tree) state.tree.tree.options = options;
+            // if (state.tree) state.tree.tree.setOptions(options);
+        });
+
         return { ...toRefs(state) };
     },
 });

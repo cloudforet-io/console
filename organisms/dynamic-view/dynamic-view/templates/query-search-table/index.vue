@@ -36,18 +36,11 @@
         <template v-if="apiHandler.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
             <p-col :col="12" style="margin-bottom: .5rem;">
                 <p-hr style="width: 100%;" />
-                <p-row style="margin-top: .5rem;">
-                    <div style="flex-grow: 0">
-                        <p-icon-button name="ic_delete" @click="apiHandler.querySearch.deleteAllTags" />
-                    </div>
-                    <div style="flex-grow: 1;margin-left: 1rem;">
-                        <p-tag v-for="(tag, idx) in apiHandler.querySearch.tags.value" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
-                               @delete="apiHandler.querySearch.deleteTag(idx)"
-                        >
-                            {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
-                        </p-tag>
-                    </div>
-                </p-row>
+                <p-query-search-tags style="margin-top: .5rem;"
+                                     :tags="apiHandler.querySearch.tags.value"
+                                     @deleteTag="apiHandler.querySearch.deleteTag"
+                                     @deleteAllTags="apiHandler.querySearch.deleteAllTags"
+                />
             </p-col>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{item}">
@@ -61,12 +54,14 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    createComponent, computed, Ref, reactive,
+    defineComponent, computed, Ref, reactive,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
+import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
+
 import { BaseQuerySearchTableTSAPI } from '@/lib/api';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -101,17 +96,15 @@ interface Field {
 }
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicViewQuerySearchTable',
     components: {
         PDynamicField,
         PToolboxTable,
         PQuerySearchBar,
-        PRow,
         PCol,
         PHr,
-        PIconButton,
-        PTag,
+        PQuerySearchTags,
     },
     props: {
         data_source: {

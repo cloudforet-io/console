@@ -105,7 +105,10 @@ export const redefineData = () => ({
 export const asyncData = () => ({
     components: { PTreeNew: PTree },
     template: `<div>
-        <p-tree-new :data="data" :options="options"></p-tree-new>
+        <p-tree-new :data.sync="data" 
+                    :options.sync="options"
+        >
+        </p-tree-new>
         <br>
         <hr>
         <br>
@@ -117,7 +120,6 @@ export const asyncData = () => ({
             <div>
                 <h4>options</h4>
                 <pre>{{options}}</pre>
-                {{options.fetchData}}
             </div>
         </div>
     </div>
@@ -131,22 +133,34 @@ export const asyncData = () => ({
         ];
 
         let count = state.data.length;
-        const getData = () => new Promise((resolve, reject) => {
-            setTimeout(() => {
-                console.log('resolve');
-                // eslint-disable-next-line no-plusplus
-                resolve([{ item: `Item ${++count}` }]); // Yay! Everything went well!
-            }, 1000);
-        });
+        const getData = (node) => {
+            console.log('getData');
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    console.log('resolve', node);
+                    // eslint-disable-next-line no-plusplus
+                    resolve([{ item: `Item ${++count}` }]); // Yay! Everything went well!
+                }, 1000);
+            });
+        };
+
+        // const dt = getData();
 
         state.options = {
-            abc: 'abc',
-            fetchData: node => Promise.resolve([{ item: `Item ${++count}` }]),
+            fetchData: node => getData(node).then((r) => {
+                console.log('r', r);
+                state.data = r;
+                state.options = { ...state.options, checkbox: true };
+                return r;
+            }),
             propertyNames: {
                 text: 'item',
                 children: 'kids',
             },
         };
+
+        state.options.fetchData('root');
+
 
         return {
             ...toRefs(state),

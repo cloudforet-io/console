@@ -17,7 +17,7 @@
 
 <script>
 import {
-    computed, createComponent, onMounted, reactive, ref, watch, toRefs,
+    computed, defineComponent, onMounted, reactive, ref, watch, toRefs,
 } from '@vue/composition-api';
 import { windowEventMount, makeProxy } from '@/lib/compostion-util';
 
@@ -26,7 +26,7 @@ import PContextMenu from '@/components/organisms/context-menu/context-menu/Conte
 import { baseAutocompleteHandler, searchContextType, SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PAutocompleteInput',
     components: {
         PTextInput,
