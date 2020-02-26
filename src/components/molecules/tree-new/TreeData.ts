@@ -4,7 +4,7 @@ interface TreeItemInterface {
     data?: object;
     children?: TreeItemInterface[];
     state?: object;
-};
+}
 
 export declare type TreeOptionsType = {
     multiple?: boolean;
@@ -15,7 +15,7 @@ export declare type TreeOptionsType = {
     keyboardNavigation?: boolean;
     propertyNames?: object;
     deletion?: [boolean, object];
-    fetchData?: object;
+    fetchData?: Function;
     dnd?: object;
     editing?: object;
 };

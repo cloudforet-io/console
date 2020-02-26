@@ -34,7 +34,7 @@ export const defaultCase = () => ({
 
         const arr = _.range(5);
         arr.forEach((i) => {
-            state.data.push(new TreeItem(`item${i}`));
+            state.data.push(new TreeItem(`Item ${i}`));
         });
 
         return {
@@ -43,40 +43,113 @@ export const defaultCase = () => ({
     },
 });
 
-//
-// export const redefineData = () => ({
-//     components: { PTreeNew: PTree },
-//     template: `<div>
-//         <p-tree-new :tree-data="treeData"></p-tree-new>
-//         <br>
-//         <br>
-//         <pre>{{sample}}</pre>
-//     </div>
-//     `,
-//     setup(props, context) {
-//         const state = getState(props, context);
-//
-//         const sample = [
-//             { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 1' },
-//             { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 2' },
-//             {
-//                 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3',
-//                 kids: [
-//                     { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3.1' },
-//                     { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3.2' },
-//                 ],
-//             },
-//         ];
-//
-//         state.tree = new Tree(sample, {
-//             propertyNames: {
-//                 text: 'SOME-AWESOME-PROPERTY-FOR-TEXT',
-//                 children: 'kids',
-//             },
-//         });
-//         return {
-//             ...toRefs(state),
-//             sample,
-//         };
-//     },
-// });
+export const redefineData = () => ({
+    components: { PTreeNew: PTree },
+    template: `<div>
+        <p-tree-new :data="data" :options="options"></p-tree-new>
+        <br>
+        <hr>
+        <br>
+        <div style="display: flex;">
+            <div>
+                <h4>data</h4>
+                <pre>{{data}}</pre>
+            </div>
+            <div>
+                <h4>options</h4>
+                <pre>{{options}}</pre>
+            </div>
+        </div>
+    </div>
+    `,
+    setup(props, context) {
+        const state = getState(props, context);
+
+        state.data = [
+            { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 1' },
+            { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 2' },
+            {
+                'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3',
+                kids: [
+                    { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3.1' },
+                    {
+                        'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3.2',
+                        kids: [
+                            { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3.2.1' },
+                            { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3.2.2' },
+                            {
+                                'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3.2.3',
+                                kids: [
+                                    { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3.2.3.1' },
+                                    { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3.2.3.2' },
+                                    { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 3.2.3.3' },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+        state.options = {
+            propertyNames: {
+                text: 'SOME-AWESOME-PROPERTY-FOR-TEXT',
+                children: 'kids',
+            },
+        };
+        return {
+            ...toRefs(state),
+        };
+    },
+});
+
+export const asyncData = () => ({
+    components: { PTreeNew: PTree },
+    template: `<div>
+        <p-tree-new :data="data" :options="options"></p-tree-new>
+        <br>
+        <hr>
+        <br>
+        <div style="display: flex;">
+            <div>
+                <h4>data</h4>
+                <pre>{{data}}</pre>
+            </div>
+            <div>
+                <h4>options</h4>
+                <pre>{{options}}</pre>
+                {{options.fetchData}}
+            </div>
+        </div>
+    </div>
+    `,
+    setup(props, context) {
+        const state = getState(props, context);
+
+        state.data = [
+            { item: 'Item 1' },
+            { item: 'Item 2', kids: [] },
+        ];
+
+        let count = state.data.length;
+        const getData = () => new Promise((resolve, reject) => {
+            setTimeout(() => {
+                console.log('resolve');
+                // eslint-disable-next-line no-plusplus
+                resolve([{ item: `Item ${++count}` }]); // Yay! Everything went well!
+            }, 1000);
+        });
+
+        state.options = {
+            abc: 'abc',
+            fetchData: node => Promise.resolve([{ item: `Item ${++count}` }]),
+            propertyNames: {
+                text: 'item',
+                children: 'kids',
+            },
+        };
+
+        return {
+            ...toRefs(state),
+        };
+    },
+});

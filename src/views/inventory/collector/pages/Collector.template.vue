@@ -2,7 +2,6 @@
     <general-page-layout class="collector-page">
         <p-horizontal-layout :line="false">
             <template #container="{ height }">
-                <p-tree-new />
                 <p-toolbox-table :items="items"
                                  :fields="fields"
                                  :selectable="true"
@@ -192,8 +191,6 @@ import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-
-import PTreeNew from '@/components/molecules/tree-new/Tree.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
@@ -429,7 +426,6 @@ export const collectorSetup = (props, context, AcHandler) => {
 export default {
     name: 'CollectorTemplate',
     components: {
-        PTreeNew,
         GeneralPageLayout,
         PStatus,
         PHorizontalLayout,
