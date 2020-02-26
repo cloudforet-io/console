@@ -68,18 +68,16 @@ export default {
             resizeFlag: false,
             hideFlag: false,
             transitionFlag: false,
-            sbWidth: undefined,
             sbContainerStyle: computed(() => ({
                 width: `${state.width}px`,
-                overflow: state.transitionFlag ? 'hidden' : 'visible',
+                overflow: 'auto',
             })),
             sbStyle: computed(() => ({
-                width: state.transitionFlag ? `${state.sbWidth}px` : 'auto', // state.width <= props.minWidth && state.transitionFlag ? 'fit-content' : 'auto',
+                width: 'auto',
                 height: '100%',
                 minWidth: `${props.minWidth}px`,
                 maxWidth: `${props.maxWidth}px`,
                 opacity: state.hideFlag && !state.transitionFlag ? 0 : 1,
-                border: '1px solid red',
             })),
         });
 
@@ -112,11 +110,9 @@ export default {
             if (!state.hideFlag) {
                 state.hideFlag = true;
                 state.transitionFlag = true;
-                state.sbWidth = state.width;
                 state.width = 16;
                 setTimeout(offTransition, 500);
             } else {
-                state.sbWidth = props.initWidth;
                 state.width = props.initWidth;
                 state.transitionFlag = true;
                 state.hideFlag = false;
