@@ -1,25 +1,25 @@
 <template>
     <div class="container" :style="{height: height + 'px'}">
         <div class="sidebar-container" :style="sbContainerStyle"
-             :class="{transition:transitionFlag}"
+             :class="{transition:transition}"
         >
             <div :style="sbStyle">
                 <slot name="sidebar" :width="width" />
             </div>
         </div>
-        <div class="dragger-container line"
+        <div class="resizer-container line"
              @mousedown="startResizing"
              @mousemove="isResizing"
              @mouseup="endResizing"
         >
-            <span class="dragger">
+            <span class="resizer">
                 <span @click="hideSidebar">
-                    <slot name="dragger-button">
-                        <p-i class="btn-vertical-dragger"
+                    <slot name="hide-button">
+                        <p-i class="btn-vertical-hide"
                              width="1rem"
                              height="1rem"
-                             :name="hideFlag ? 'btn_ic_tree_hidden—folded' : 'btn_ic_tree_hidden'"
-                             :color="hideFlag ? undefined : 'white primary3'"
+                             :name="hide ? 'btn_ic_tree_hidden—folded' : 'btn_ic_tree_hidden'"
+                             :color="hide ? undefined : 'white primary3'"
                         />
                     </slot>
                 </span>
@@ -37,7 +37,6 @@ import {
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import { documentEventMount } from '@/lib/compostion-util';
-import styles from '@/styles/_variables.scss';
 
 export default {
     name: 'VerticalLayout2',
@@ -65,9 +64,10 @@ export default {
     setup(props, context) {
         const state = reactive({
             width: props.initWidth,
-            resizeFlag: false,
-            hideFlag: false,
-            transitionFlag: false,
+            resizing: false,
+            clientX: null,
+            hide: false,
+            transition: false,
             sbContainerStyle: computed(() => ({
                 width: `${state.width}px`,
                 overflow: 'auto',
@@ -77,45 +77,46 @@ export default {
                 height: '100%',
                 minWidth: `${props.minWidth}px`,
                 maxWidth: `${props.maxWidth}px`,
-                opacity: state.hideFlag && !state.transitionFlag ? 0 : 1,
+                opacity: state.hide && !state.transition ? 0 : 1,
             })),
         });
 
-        let before = props.initWidth;
-
         /* Resizing */
         const isResizing = (event) => {
-            if (state.resizeFlag) {
-                const delta = event.screenX - before;
-                const width = state.width + delta;
-                before = event.screenX;
+            if (state.resizing) {
+                if (state.clientX === null) {
+                    state.clientX = event.clientX;
+                    return;
+                }
+                const delta = state.clientX - event.clientX;
+                const width = state.width - delta;
                 if (!(width <= props.minWidth || width > props.maxWidth)) {
                     state.width = width;
                 }
+                state.clientX = event.clientX;
             }
+            event.preventDefault();
         };
-        const endResizing = (event) => {
-            state.resizeFlag = false;
+        const endResizing = () => {
+            state.resizing = false;
+            state.clientX = null;
         };
-        const startResizing = (event) => {
-            state.resizeFlag = true;
+        const startResizing = () => {
+            state.resizing = true;
         };
 
-        /* Toggle Sidebar */
-        const updateProperty = (obj, key, value) => () => {
-            obj[key] = value;
-        };
-        const offTransition = () => { state.transitionFlag = false; };
+        /* Toggle hide Sidebar */
+        const offTransition = () => { state.transition = false; };
         const hideSidebar = () => {
-            if (!state.hideFlag) {
-                state.hideFlag = true;
-                state.transitionFlag = true;
+            if (!state.hide) {
+                state.hide = true;
+                state.transition = true;
                 state.width = 16;
                 setTimeout(offTransition, 500);
             } else {
                 state.width = props.initWidth;
-                state.transitionFlag = true;
-                state.hideFlag = false;
+                state.transition = true;
+                state.hide = false;
                 setTimeout(offTransition, 500);
             }
         };
@@ -143,23 +144,15 @@ export default {
         margin: unset;
     }
     .sidebar-container {
-        /*flex: 1; prevents resize!*/
         &.transition {
             transition: width 0.5s;
         }
-    }
-
-    .resizer {
-        cursor: col-resize;
-        border-left: 10px solid $gray;
-        z-index: 2;
     }
     .main {
         flex-grow: 1;
         width: 100%;
     }
-
-    .dragger-container {
+    .resizer-container {
         display: flex;
         align-items: flex-start;
         justify-content: center;
@@ -179,7 +172,7 @@ export default {
                 border-left: 1px solid $secondary;
             }
         }
-        .dragger {
+        .resizer {
             display: inline-block;
             font-size: 1.5rem;
             font-weight: 600;
@@ -192,7 +185,7 @@ export default {
                 cursor: pointer;
             }
         }
-        .btn-vertical-dragger{
+        .btn-vertical-hide{
             margin-top: 1rem;
             margin-left: .5rem;
             justify-content: center;
