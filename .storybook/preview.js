@@ -31,7 +31,8 @@ Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i'
 })
-Vue.component('liquor-tree', LiquorTree)
+Vue.use(LiquorTree);
+// Vue.component('liquor-tree', LiquorTree)
 
 Vue.prototype.$velocity = velocity;
 

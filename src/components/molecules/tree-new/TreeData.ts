@@ -4,6 +4,7 @@ interface TreeItemInterface {
     data?: object;
     children?: TreeItemInterface[];
     state?: object;
+    isBatch?: boolean; // does it have child nodes
 }
 
 export declare type TreeOptionsType = {
@@ -18,6 +19,7 @@ export declare type TreeOptionsType = {
     fetchData?: Function;
     dnd?: object;
     editing?: object;
+    nodeIndent?: number;
 };
 
 export default class TreeItem implements TreeItemInterface {
