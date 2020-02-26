@@ -4,9 +4,7 @@
              :class="{transition:transitionFlag}"
         >
             <div :style="sbStyle">
-                <slot name="sidebar" :width="width">
-                    Left Layout~~~~~~~~~~~~~~~~~~~~~~
-                </slot>
+                <slot name="sidebar" :width="width" />
             </div>
         </div>
         <div class="dragger-container line"
@@ -28,9 +26,7 @@
             </span>
         </div>
         <div class="main">
-            <slot>
-                Right Layout
-            </slot>
+            <slot />
         </div>
     </div>
 </template>
@@ -72,10 +68,18 @@ export default {
             resizeFlag: false,
             hideFlag: false,
             transitionFlag: false,
-            sbContainerStyle: computed(() => ({ width: `${state.width}px`, overflow: state.transitionFlag ? 'hidden' : 'auto' })),
+            sbWidth: undefined,
+            sbContainerStyle: computed(() => ({
+                width: `${state.width}px`,
+                overflow: state.transitionFlag ? 'hidden' : 'visible',
+            })),
             sbStyle: computed(() => ({
-                width: state.width <= props.minWidth && state.transitionFlag ? 'fit-content' : 'auto',
+                width: state.transitionFlag ? `${state.sbWidth}px` : 'auto', // state.width <= props.minWidth && state.transitionFlag ? 'fit-content' : 'auto',
                 height: '100%',
+                minWidth: `${props.minWidth}px`,
+                maxWidth: `${props.maxWidth}px`,
+                opacity: state.hideFlag && !state.transitionFlag ? 0 : 1,
+                border: '1px solid red',
             })),
         });
 
@@ -108,9 +112,11 @@ export default {
             if (!state.hideFlag) {
                 state.hideFlag = true;
                 state.transitionFlag = true;
-                state.width = 0;
+                state.sbWidth = state.width;
+                state.width = 16;
                 setTimeout(offTransition, 500);
             } else {
+                state.sbWidth = props.initWidth;
                 state.width = props.initWidth;
                 state.transitionFlag = true;
                 state.hideFlag = false;
@@ -137,6 +143,8 @@ export default {
         width: 100%;
         flex-direction: row;
         z-index: 1;
+        padding: 0;
+        margin: unset;
     }
     .sidebar-container {
         /*flex: 1; prevents resize!*/
@@ -159,7 +167,7 @@ export default {
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        width: 0.1rem;
+        width: 1rem;
         &.line {
             border-left: 1px solid $gray2;
             background-color: transparent;
@@ -177,7 +185,6 @@ export default {
         }
         .dragger {
             display: inline-block;
-            height: 30;
             font-size: 1.5rem;
             font-weight: 600;
             text-align: center;
@@ -191,7 +198,7 @@ export default {
         }
         .btn-vertical-dragger{
             margin-top: 1rem;
-            margin-left: 1.5rem;
+            margin-left: .5rem;
             justify-content: center;
             &:hover {
                 color: $secondary;

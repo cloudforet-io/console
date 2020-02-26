@@ -19,7 +19,16 @@ export const defaultCase = () => ({
     components: { PVerticalLayout2 },
     props: {
     },
-    template: '<div style="width: 80vw"><p-vertical-layout2></p-vertical-layout2></div>',
+    template: `<div style="width: 100vw; border: 1px solid gray;">
+        <p-vertical-layout2>
+            <template #sidebar>
+                Left Layout~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            </template>
+            <template #default>
+                Right Layout
+            </template>
+        </p-vertical-layout2>
+    </div>`,
     setup() {
 
     },
@@ -30,8 +39,8 @@ export const tableCase = () => ({
     props: {
     },
     template: `
-        <div style="width: 80vw">
-            <p-vertical-layout2 :minWidth="435" :initWidth="500">
+        <div style="width: 100vw; border: 1px solid gray;">
+            <p-vertical-layout2 :minWidth="435" :max-width="700" :initWidth="500">
                 <template #sidebar={width}>
                     <p-toolbox-table
                             style="width:100%;"
@@ -47,14 +56,17 @@ export const tableCase = () => ({
                             :sortable="true"
                             :background="true"
                             :toolbox-background="false"
-                    /></template>
+                    />
+                </template>
+                <template #default>
+                    Right Layout
+                </template>
 
             </p-vertical-layout2>
         </div>`,
     setup() {
         return {
 
-        }
-
+        };
     },
 });
