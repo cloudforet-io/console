@@ -1,10 +1,12 @@
 <template>
-    <div class="container" :style="{height:height}">
-        <div class="sidebar-container" :style="{width:`${width}px`}"
+    <div class="container" :style="{height: height + 'px'}">
+        <div class="sidebar-container" :style="sbContainerStyle"
              :class="{transition:transitionFlag}"
         >
-            <div v-show="width >= minWidth && !transitionFlag">
-                <slot name="sidebar" :width="width" />
+            <div :style="sbStyle">
+                <slot name="sidebar" :width="width">
+                    Left Layout~~~~~~~~~~~~~~~~~~~~~~
+                </slot>
             </div>
         </div>
         <div class="dragger-container line"
@@ -14,25 +16,21 @@
         >
             <span class="dragger">
                 <span @click="hideSidebar">
-                    <slot name="dragger">
-                        <p-i v-if="!hideFlag"
-                             class="btn-vertical-dragger"
-                             :width="'1rem'"
-                             :height="'1rem'"
-                             :name="'btn_ic_tree_hidden'"
-                        />
-                        <p-i v-else
-                             class="btn-vertical-dragger"
-                             :width="'1rem'"
-                             :height="'1rem'"
-                             :name="'btn_ic_tree_hidden—folded'"
+                    <slot name="dragger-button">
+                        <p-i class="btn-vertical-dragger"
+                             width="1rem"
+                             height="1rem"
+                             :name="hideFlag ? 'btn_ic_tree_hidden—folded' : 'btn_ic_tree_hidden'"
+                             :color="hideFlag ? undefined : 'white primary3'"
                         />
                     </slot>
                 </span>
             </span>
         </div>
         <div class="main">
-            <slot />
+            <slot>
+                Right Layout
+            </slot>
         </div>
     </div>
 </template>
@@ -52,8 +50,8 @@ export default {
     },
     props: {
         height: {
-            type: String,
-            default: '620px',
+            type: Number,
+            default: 620,
         },
         initWidth: {
             type: Number,
@@ -73,16 +71,22 @@ export default {
             width: props.initWidth,
             resizeFlag: false,
             hideFlag: false,
-            before: props.initWidth,
             transitionFlag: false,
+            sbContainerStyle: computed(() => ({ width: `${state.width}px`, overflow: state.transitionFlag ? 'hidden' : 'auto' })),
+            sbStyle: computed(() => ({
+                width: state.width <= props.minWidth && state.transitionFlag ? 'fit-content' : 'auto',
+                height: '100%',
+            })),
         });
+
+        let before = props.initWidth;
 
         /* Resizing */
         const isResizing = (event) => {
             if (state.resizeFlag) {
-                const delta = event.screenX - state.before;
+                const delta = event.screenX - before;
                 const width = state.width + delta;
-                state.before = event.screenX;
+                before = event.screenX;
                 if (!(width <= props.minWidth || width > props.maxWidth)) {
                     state.width = width;
                 }
@@ -99,17 +103,18 @@ export default {
         const updateProperty = (obj, key, value) => () => {
             obj[key] = value;
         };
+        const offTransition = () => { state.transitionFlag = false; };
         const hideSidebar = () => {
             if (!state.hideFlag) {
                 state.hideFlag = true;
                 state.transitionFlag = true;
                 state.width = 0;
-                setTimeout(updateProperty(state, 'transitionFlag', false), 500);
+                setTimeout(offTransition, 500);
             } else {
                 state.width = props.initWidth;
                 state.transitionFlag = true;
                 state.hideFlag = false;
-                setTimeout(updateProperty(state, 'transitionFlag', false), 500);
+                setTimeout(offTransition, 500);
             }
         };
         documentEventMount('mousemove', isResizing);
@@ -136,7 +141,7 @@ export default {
     .sidebar-container {
         /*flex: 1; prevents resize!*/
         &.transition {
-            transition:  width 0.5s;
+            transition: width 0.5s;
         }
     }
 
@@ -156,7 +161,7 @@ export default {
         justify-content: center;
         width: 0.1rem;
         &.line {
-            border-left: 1px solid $lightgray;
+            border-left: 1px solid $gray2;
             background-color: transparent;
             &:hover {
                 border-left: 1px solid $secondary;
@@ -164,22 +169,21 @@ export default {
             }
         }
         &.prohibit-line {
-            border-left: 1px solid $lightgray;
+            border-left: 1px solid $gray2;
             background-color: transparent;
             &:hover {
                 border-left: 1px solid $secondary;
             }
         }
-
         .dragger {
             display: inline-block;
-            height: 30px;
+            height: 30;
             font-size: 1.5rem;
             font-weight: 600;
             text-align: center;
             z-index: 99;
             cursor: col-resize;
-            color: $darkgray;
+            color: $gray1;
             > span {
                 margin-right: 26px;
                 cursor: pointer;
@@ -189,7 +193,6 @@ export default {
             margin-top: 1rem;
             margin-left: 1.5rem;
             justify-content: center;
-            color: $darkgray;
             &:hover {
                 color: $secondary;
             }
