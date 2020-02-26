@@ -1,31 +1,25 @@
 <template>
-    <div class="container" :style="{height:height}">
-        <div class="sidebar-container" :style="{width:`${width}px`}"
-             :class="{transition:transitionFlag}"
+    <div class="container" :style="{height: height + 'px'}">
+        <div class="sidebar-container" :style="sbContainerStyle"
+             :class="{transition:transition}"
         >
-            <div v-show="width >= minWidth && !transitionFlag">
+            <div :style="sbStyle">
                 <slot name="sidebar" :width="width" />
             </div>
         </div>
-        <div class="dragger-container line"
+        <div class="resizer-container line"
              @mousedown="startResizing"
              @mousemove="isResizing"
              @mouseup="endResizing"
         >
-            <span class="dragger">
+            <span class="resizer">
                 <span @click="hideSidebar">
-                    <slot name="dragger">
-                        <p-i v-if="!hideFlag"
-                             class="btn-vertical-dragger"
-                             :width="'1rem'"
-                             :height="'1rem'"
-                             :name="'btn_ic_tree_hidden'"
-                        />
-                        <p-i v-else
-                             class="btn-vertical-dragger"
-                             :width="'1rem'"
-                             :height="'1rem'"
-                             :name="'btn_ic_tree_hidden—folded'"
+                    <slot name="hide-button">
+                        <p-i class="btn-vertical-hide"
+                             width="1rem"
+                             height="1rem"
+                             :name="hide ? 'btn_ic_tree_hidden—folded' : 'btn_ic_tree_hidden'"
+                             :color="hide ? undefined : 'white primary3'"
                         />
                     </slot>
                 </span>
@@ -43,7 +37,6 @@ import {
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import { documentEventMount } from '@/lib/compostion-util';
-import styles from '@/styles/_variables.scss';
 
 export default {
     name: 'VerticalLayout2',
@@ -52,8 +45,8 @@ export default {
     },
     props: {
         height: {
-            type: String,
-            default: '620px',
+            type: Number,
+            default: 620,
         },
         initWidth: {
             type: Number,
@@ -71,45 +64,60 @@ export default {
     setup(props, context) {
         const state = reactive({
             width: props.initWidth,
-            resizeFlag: false,
-            hideFlag: false,
-            before: props.initWidth,
-            transitionFlag: false,
+            resizing: false,
+            clientX: null,
+            hide: false,
+            transition: false,
+            sbContainerStyle: computed(() => ({
+                width: `${state.width}px`,
+                overflow: 'auto',
+            })),
+            sbStyle: computed(() => ({
+                width: 'auto',
+                height: '100%',
+                minWidth: `${props.minWidth}px`,
+                maxWidth: `${props.maxWidth}px`,
+                opacity: state.hide && !state.transition ? 0 : 1,
+            })),
         });
 
         /* Resizing */
         const isResizing = (event) => {
-            if (state.resizeFlag) {
-                const delta = event.screenX - state.before;
-                const width = state.width + delta;
-                state.before = event.screenX;
+            if (state.resizing) {
+                if (state.clientX === null) {
+                    state.clientX = event.clientX;
+                    return;
+                }
+                const delta = state.clientX - event.clientX;
+                const width = state.width - delta;
                 if (!(width <= props.minWidth || width > props.maxWidth)) {
                     state.width = width;
                 }
+                state.clientX = event.clientX;
             }
+            event.preventDefault();
         };
-        const endResizing = (event) => {
-            state.resizeFlag = false;
+        const endResizing = () => {
+            state.resizing = false;
+            state.clientX = null;
         };
-        const startResizing = (event) => {
-            state.resizeFlag = true;
+        const startResizing = () => {
+            state.resizing = true;
         };
 
-        /* Toggle Sidebar */
-        const updateProperty = (obj, key, value) => () => {
-            obj[key] = value;
-        };
+        /* Toggle hide Sidebar */
+        const offTransition = () => { state.transition = false; };
         const hideSidebar = () => {
-            if (!state.hideFlag) {
-                state.hideFlag = true;
-                state.transitionFlag = true;
-                state.width = 0;
-                setTimeout(updateProperty(state, 'transitionFlag', false), 500);
+            if (!state.hide) {
+                state.hide = true;
+                state.transition = true;
+                state.width = 16;
+                setTimeout(offTransition, 500);
             } else {
                 state.width = props.initWidth;
-                state.transitionFlag = true;
-                state.hideFlag = false;
-                setTimeout(updateProperty(state, 'transitionFlag', false), 500);
+                state.transition = true;
+                state.hide = false;
+                setTimeout(offTransition, 500);
             }
         };
         documentEventMount('mousemove', isResizing);
@@ -132,31 +140,25 @@ export default {
         width: 100%;
         flex-direction: row;
         z-index: 1;
+        padding: 0;
+        margin: unset;
     }
     .sidebar-container {
-        /*flex: 1; prevents resize!*/
         &.transition {
-            transition:  width 0.5s;
+            transition: width 0.5s;
         }
-    }
-
-    .resizer {
-        cursor: col-resize;
-        border-left: 10px solid $gray;
-        z-index: 2;
     }
     .main {
         flex-grow: 1;
         width: 100%;
     }
-
-    .dragger-container {
+    .resizer-container {
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        width: 0.1rem;
+        width: 1rem;
         &.line {
-            border-left: 1px solid $lightgray;
+            border-left: 1px solid $gray2;
             background-color: transparent;
             &:hover {
                 border-left: 1px solid $secondary;
@@ -164,32 +166,29 @@ export default {
             }
         }
         &.prohibit-line {
-            border-left: 1px solid $lightgray;
+            border-left: 1px solid $gray2;
             background-color: transparent;
             &:hover {
                 border-left: 1px solid $secondary;
             }
         }
-
-        .dragger {
+        .resizer {
             display: inline-block;
-            height: 30px;
             font-size: 1.5rem;
             font-weight: 600;
             text-align: center;
             z-index: 99;
             cursor: col-resize;
-            color: $darkgray;
+            color: $gray1;
             > span {
                 margin-right: 26px;
                 cursor: pointer;
             }
         }
-        .btn-vertical-dragger{
+        .btn-vertical-hide{
             margin-top: 1rem;
-            margin-left: 1.5rem;
+            margin-left: .5rem;
             justify-content: center;
-            color: $darkgray;
             &:hover {
                 color: $secondary;
             }
