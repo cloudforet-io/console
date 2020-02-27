@@ -1,4 +1,4 @@
-import { reactive } from '@vue/composition-api';
+import { reactive, Ref, ref } from '@vue/composition-api';
 import {
     // eslint-disable-next-line import/named
     DataTablePropsType,
@@ -92,4 +92,8 @@ export class ToolboxTableToolSet extends ToolboxTableState implements DataTableT
     setAllPage(totalCount:number) {
         this.state.allPage = getAllPage(totalCount, (this.syncState.pageSize as number));
     }
+}
+
+export class SearchTableToolSet extends ToolboxTableToolSet {
+    public searchText:Ref<string> = ref('')
 }
