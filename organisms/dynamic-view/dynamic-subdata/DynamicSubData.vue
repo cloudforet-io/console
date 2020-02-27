@@ -16,7 +16,7 @@ import {
     onMounted, reactive, toRefs, watch, computed, defineComponent, Ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import { SubDataAPI, HttpInstance } from '@/lib/api';
+import { SubDataAPI } from '@/lib/api';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
@@ -51,13 +51,16 @@ export default defineComponent({
         });
 
         // eslint-disable-next-line camelcase
-        const selectData = computed(() => ({ view_type: 'table', ...state.dvs[state.selected] }));
+        const selectData = computed(() => {
+            if (!state.dvs[state.selected]) {
+                state.selected = buttons.value[0].name;
+            }
+            // eslint-disable-next-line camelcase
+            return { view_type: 'table', ...state.dvs[state.selected] };
+        });
         const selectKeyPath = computed(():string => selectData.value.key_path);
         const selectId = computed(() => props.selectId);
-        const apiHandler = new SubDataAPI(
-            parent as HttpInstance, props.url, props.idKey,
-            selectKeyPath, selectId,
-        );
+        const apiHandler = new SubDataAPI(props.url, undefined, props.idKey, selectKeyPath, selectId);
 
         onMounted(() => {
             watch(() => props.selectId, (val) => {

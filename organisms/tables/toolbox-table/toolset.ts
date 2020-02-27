@@ -1,13 +1,16 @@
 import { reactive, Ref, ref } from '@vue/composition-api';
 import {
-    // eslint-disable-next-line import/named
     DataTablePropsType,
     DataTableSelectState,
-    DataTableState, DataTableSyncType,
-    DataTableToolSet, initSelectState,
+    DataTableState,
+    DataTableSyncType,
+    DataTableToolSet,
+    initSelectState,
 } from '@/components/organisms/tables/data-table/toolset';
 import { TableState } from '@/components/molecules/tables/toolset';
 import { getAllPage } from '../../pagenations/toolset';
+import { QuerySearchToolSet } from '@/components/organisms/search/query-search-bar/toolset';
+import { baseAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 export interface ToolBoxTablePropsType extends DataTablePropsType{
     pagenationVisible?: boolean;
@@ -96,4 +99,20 @@ export class ToolboxTableToolSet extends ToolboxTableState implements DataTableT
 
 export class SearchTableToolSet extends ToolboxTableToolSet {
     public searchText:Ref<string> = ref('')
+}
+
+export class QuerySearchTableToolSet extends ToolboxTableToolSet {
+    public querySearch: QuerySearchToolSet;
+
+    public acState: any;
+
+    constructor(
+        ACHandlerClass: typeof baseAutocompleteHandler = baseAutocompleteHandler,
+        acHandlerArgs: object = {},
+        public initData: object = {},
+        public initSyncData: object = {},
+    ) {
+        super(initData, initSyncData);
+        this.querySearch = new QuerySearchToolSet(ACHandlerClass, acHandlerArgs);
+    }
 }
