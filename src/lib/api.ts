@@ -5,6 +5,7 @@ import {
     computed, getCurrentInstance, reactive, Ref, ref, watch,
 } from '@vue/composition-api';
 // @ts-ignore
+import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { tagList } from '@/components/molecules/tags/Tag.vue';
 // eslint-disable-next-line import/no-cycle
 import {
@@ -15,6 +16,9 @@ import {
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 // eslint-disable-next-line import/no-cycle
 import { QuerySearchTableToolSet } from '@/components/organisms/tables/query-search-table/toolset';
+import { SearchTableToolSet, ToolboxTableToolSet } from '@/components/organisms/tables/toolbox-table/toolset';
+
+import construct = Reflect.construct;
 
 
 class APIError extends Error {
@@ -242,12 +246,15 @@ export interface HttpInstance {
 }
 
 export abstract class DynamicAPI {
-    abstract getData();
+    public abstract vm:ComponentInstance ;
 
-    public abstract parent?:HttpInstance;
+    get $http() { return (this.vm as HttpInstance).$http; }
 
-    get $http() { return (this.parent as HttpInstance).$http; }
+    protected abstract requestData(data?:any):Promise<AxiosResponse<any>> ;
+
+    public abstract getData():void;
 }
+
 
 interface TableState {
     items:any[];
@@ -272,7 +279,7 @@ export class SubDataAPI extends DynamicAPI {
 
     private query:Ref<object>;
 
-    constructor(public parent:HttpInstance, private url, private idKey:string, private keyPath:Ref<string>|Ref<Readonly<string>>, private id:Ref<string>) {
+    constructor(public vm:HttpInstance, private url, private idKey:string, private keyPath:Ref<string>|Ref<Readonly<string>>, private id:Ref<string>) {
         super();
         this.state = reactive({
             items: [],
@@ -288,10 +295,10 @@ export class SubDataAPI extends DynamicAPI {
         )));
     }
 
-    public async requestData(data:any) {
+    protected requestData = async (data?:any) => {
         const res = await this.$http.post(this.url, data);
         return res;
-    }
+    };
 
     public getData = async () => {
         this.state.loading = true;
@@ -320,7 +327,8 @@ export class MockSubDataAPI extends SubDataAPI {
         this.state.loading = false;
     }
 
-    public async requestData(data:any) {
+    // @ts-ignore
+    protected async requestData(data?:any) {
         setTimeout(() => {}, 1000);
         return { data: { results: this.items, total_count: 1 } } as AxiosResponse<any>;
     }
@@ -355,6 +363,64 @@ export const getMockData = (data: any, timeout: number) => new Promise((resolve,
 });
 
 export const callApi = ($http: AxiosInstance, url: string, params: object) => $http.post(url, params);
+
+abstract class BaseTableAPI extends DynamicAPI {
+    public tableTS:ToolboxTableToolSet;
+
+    public vm:ComponentInstance ;
+
+    public apiState:any
+
+
+    protected constructor(url:string, only?:string[], extraParams?:object, fixSearchQuery : SearchQueryType[] = []) {
+        super();
+        // @ts-ignore
+        this.vm = getCurrentInstance();
+        this.apiState = reactive({
+            url,
+            only,
+            fixSearchQuery: fixSearchQuery || [],
+            extraParams: extraParams || {}, // for api extra parameters
+        });
+        this.tableTS = new ToolboxTableToolSet();
+    }
+
+    protected abstract paramQuery:Ref< defaultQuery>;
+
+    protected requestData=async (data?:any) => {
+        const params = {
+            query: this.paramQuery.value,
+            ...this.apiState.extraParams,
+        };
+        const res = await this.$http.post(this.apiState.url, params);
+        return res;
+    };
+
+
+    public getData = async () => {
+        this.tableTS.syncState.loading = true;
+        this.tableTS.state.items = [];
+        this.tableTS.syncState.selectIndex = [];
+
+        const res = await this.requestData();
+        this.tableTS.state.items = res.data.results;
+        this.tableTS.setAllPage(res.data.total_count);
+        this.tableTS.syncState.loading = false;
+    }
+}
+
+export class SearchTableAPI extends BaseTableAPI {
+    public tableTS:SearchTableToolSet;
+
+    protected constructor(url:string, only?:string[], extraParams?:object, fixSearchQuery : SearchQueryType[] = [], initData:object = {}, initSyncData:object = {}) {
+        super(url, only, extraParams, fixSearchQuery);
+        this.tableTS = new SearchTableToolSet(initData, initSyncData);
+    }
+
+    protected paramQuery = computed(() => defaultQuery((this.tableTS.syncState.thisPage as number), (this.tableTS.syncState.pageSize as number),
+        this.tableTS.syncState.sortBy, this.tableTS.syncState.sortDesc, this.tableTS.searchText.value,
+        this.apiState.fixSearchQuery, undefined, this.apiState.only))
+}
 
 export class BaseQuerySearchTableTSAPI extends QuerySearchTableToolSet {
     public apiState:any;
@@ -440,4 +506,8 @@ export class BaseQuerySearchTableTSAPI extends QuerySearchTableToolSet {
             this.querySearch.state.searchText = '';
         };
     }
+}
+
+export class InventoryQuerySearchTableTSAPI extends BaseQuerySearchTableTSAPI {
+    public projectIds:Ref<readonly any[]> = computed(() => (this.state.items as any[]).map(v => v.project_id))
 }

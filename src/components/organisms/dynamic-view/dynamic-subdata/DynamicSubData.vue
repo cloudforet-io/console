@@ -1,11 +1,14 @@
 <template>
-    <div>
+    <div v-if="subData.length >= 1">
         <p-select-btn-group
             style="margin-bottom: 1rem"
             :buttons="buttons" :selected.sync="selected" @clickButton="apiHandler.getData"
         />
         <p-dynamic-view :api-handler="apiHandler" v-bind="selectData" />
     </div>
+    <p-empty v-else style="margin-top: 1rem">
+        No data
+    </p-empty>
 </template>
 
 <script lang="ts">
@@ -13,10 +16,10 @@ import {
     onMounted, reactive, toRefs, watch, computed, defineComponent, Ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import { Fragment } from 'vue-fragment';
 import { SubDataAPI, HttpInstance } from '@/lib/api';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
+import PEmpty from '@/components/atoms/empty/Empty.vue';
 
 interface Props {
     selectId:string;
@@ -27,12 +30,15 @@ interface Props {
 export default defineComponent({
     name: 'PDynamicSubData',
     components: {
-        PSelectBtnGroup, PDynamicView, Fragment,
+        PSelectBtnGroup, PDynamicView, PEmpty,
     },
     props: {
         selectId: String,
         idKey: String,
-        subData: Array,
+        subData: {
+            type: Array,
+            default: () => ([]),
+        },
         url: String,
     },
     setup(props:Props, { parent }) {
