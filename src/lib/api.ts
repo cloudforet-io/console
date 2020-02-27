@@ -25,6 +25,7 @@ import {
 import construct = Reflect.construct;
 type cnaRefArgs<T> = T|Ref<T>|Ref<Readonly<T>>
 type readonlyArgs<T> = T|Readonly<T>
+type readonlyRefArg<T> = readonlyArgs<cnaRefArgs<T>>
 
 class APIError extends Error {
     public status: number;
@@ -300,7 +301,7 @@ abstract class BaseTableAPI extends DynamicAPI {
     public apiState:UnwrapRef<BaseApiState>
 
 
-    protected constructor(url:cnaRefArgs<string>, only:cnaRefArgs<string[]> = [], extraParams:cnaRefArgs<any> = {}, fixSearchQuery : SearchQueryType[] = []) {
+    protected constructor(url:readonlyRefArg<string>, only:readonlyRefArg<string[]> = [], extraParams:readonlyRefArg<any> = {}, fixSearchQuery : SearchQueryType[] = []) {
         super();
         // @ts-ignore
         this.vm = getCurrentInstance();
@@ -354,9 +355,9 @@ export class SearchTableAPI extends BaseTableAPI {
     public tableTS:SearchTableToolSet;
 
     public constructor(
-        url:cnaRefArgs<string>,
-        only:cnaRefArgs<string[]> = [],
-        extraParams:cnaRefArgs<any> = {},
+        url:readonlyRefArg<string>,
+        only:readonlyRefArg<string[]> = [],
+        extraParams:readonlyRefArg<any> = {},
         fixSearchQuery : SearchQueryType[] = [],
         initData:object = {}, initSyncData:object = {},
     ) {
@@ -380,7 +381,15 @@ export class SearchTableAPI extends BaseTableAPI {
 
 export class SubDataAPI extends SearchTableAPI {
     // @ts-ignore
-    public constructor(url:string, only?:cnaRefArgs<string[]>, idKey:string, private keyPath:cnaRefArgs<string>, private id:cnaRefArgs<string>, initData:object = {}, initSyncData:object = {}) {
+    public constructor(
+        url:readonlyRefArg<string>,
+        only:readonlyRefArg<string[]>,
+        idKey:string,
+        private keyPath:readonlyRefArg<string>,
+        private id:readonlyRefArg<string>,
+        initData:object = {},
+        initSyncData:object = {},
+    ) {
         super(url, only, undefined, undefined, initData, initSyncData);
         this.apiState.extraParams = computed(() => ({
             key_path: isRef(this.keyPath) ? this.keyPath.value : this.keyPath,

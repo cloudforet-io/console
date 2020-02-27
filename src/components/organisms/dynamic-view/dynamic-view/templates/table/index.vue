@@ -35,7 +35,9 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { defineComponent, computed, Ref } from '@vue/composition-api';
+import {
+    defineComponent, computed, Ref, watch,
+} from '@vue/composition-api';
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
@@ -95,8 +97,6 @@ export default defineComponent({
             name: ds.key,
             label: ds.name,
         })));
-        // @ts-ignore
-        props.apiHandler.apiState.only = computed(() => fields.value.map(value => value.name));
         const slots:Ref<Readonly<SlotBind[]>> = computed(():SlotBind[] => props.data_source.map((ds:DataSourceType):SlotBind => ({
             name: `col-${ds.key}-format`,
             view_type: ds.view_type || 'text',

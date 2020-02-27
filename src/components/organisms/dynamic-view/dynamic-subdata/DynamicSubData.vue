@@ -60,8 +60,8 @@ export default defineComponent({
         });
         const selectKeyPath = computed(():string => selectData.value.key_path);
         const selectId = computed(() => props.selectId);
-        const apiHandler = new SubDataAPI(props.url, undefined, props.idKey, selectKeyPath, selectId);
-
+        const only:Readonly<Ref<readonly string[]>> = computed(():string[] => selectData.value.data_source.map((ds):string => (ds.key)));
+        const apiHandler = new SubDataAPI(props.url, only, props.idKey, selectKeyPath, selectId);
         onMounted(() => {
             watch(() => props.selectId, (val) => {
                 if (val) {
