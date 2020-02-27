@@ -56,3 +56,9 @@ export default {
     },
 };
 </script>
+
+<style lang="scss">
+    .p-row{
+        width: 100%;
+    }
+</style>
