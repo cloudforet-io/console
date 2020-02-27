@@ -4,6 +4,9 @@
               v-model="selectedNode"
               :options="treeOptions"
               @tree:data:fetch="onFetch"
+              @node:clicked="$emit('nodeClick', $event)"
+              @node:dragging:start="$emit('dragStart', $event)"
+              @node:dragging:finish="$emit('dragFinish', $event)"
         >
             <template #default="{node}">
                 <span class="tree-scope" @click.right.stop.prevent="onNodeRightClick(node)">
@@ -32,13 +35,15 @@
  */
 
 import {
-    ref, reactive, toRefs, watch, defineComponent, computed,
+    reactive, toRefs, defineComponent, computed,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import TreeItem, { TreeOptionsType } from './TreeData';
+import {
+    TreePropsInterface, getTreeProps, TreeOptionsInterface, TreeItemInterface,
+} from './TreeData';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { makeProxy } from '@/lib/compostion-util';
+import { isNotEmpty } from '@/lib/util';
 
 export default defineComponent({
     name: 'PTreeNew',
@@ -46,44 +51,18 @@ export default defineComponent({
         PI,
         PLottie,
     },
-    props: {
-        data: {
-            type: Array,
-            default: undefined,
-        },
-        /**
-         * @type {TreeOptionsType}
-         * @description it's not reactive.
-         * */
-        options: {
-            type: Object as () => TreeOptionsType,
-            default: () => ({}),
-        },
-        icons: {
-            type: Object,
-            default: () => ({
-                leaf: 'ic_tree_project',
-                expanded: 'ic_tree_folder--opened',
-                collapsed: 'ic_tree_folder',
-            }),
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
+    props: getTreeProps(),
+    setup(props: TreePropsInterface, { emit }) {
+        const state:any = reactive({
             tree: null,
             selectedNode: null,
             fetchingNodeId: null,
             treeOptions: computed(() => {
-                const result = {
-                    ...props.options,
+                const result: TreeOptionsInterface = {
                     nodeIndent: 8,
+                    ...props.options,
                 };
-                if (props.data) {
-                    // @ts-ignore
+                if (isNotEmpty(props.data) && !result.fetchData) {
                     result.fetchData = () => new Promise((resolve) => {
                         resolve(props.data);
                     });
@@ -91,15 +70,6 @@ export default defineComponent({
                 return result;
             }),
         });
-
-        // watch(() => props.data, (data) => {
-        //     // @ts-ignore
-        //     if (state.tree) state.tree.tree.setModel(data);
-        // });
-
-        // watch(() => state.selectedNode, (data) => {
-        //     console.log('data', data);
-        // });
 
         const onFetch = (node) => {
             state.fetchingNodeId = node.id;
@@ -115,11 +85,24 @@ export default defineComponent({
             emit('nodeRightClick', node);
         };
 
+        const deleteNode = (node, propagation: boolean = true, multiple: boolean = false) => {
+            if (!state.tree) return;
+            if (propagation) node.children = [];
+            state.tree.remove({ text: node.data.text }, multiple);
+        };
+
+        type addType = 'append' | 'prepend' | 'before' | 'after';
+        const addNode = (node, newItem:string | TreeItemInterface = { text: '' }, type: addType = 'append') => {
+            node[type](newItem);
+        };
+
         return {
             ...toRefs(state),
             onFetch,
             onTreeRightClick,
             onNodeRightClick,
+            deleteNode,
+            addNode,
         };
     },
 });

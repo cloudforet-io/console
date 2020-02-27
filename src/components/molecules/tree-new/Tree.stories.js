@@ -1,10 +1,11 @@
 import {
-    toRefs, reactive, ref, computed,
+    toRefs, reactive, ref, computed, Ref,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
 import _ from 'lodash';
+import { number, select, object } from '@storybook/addon-knobs/vue';
 import PTree from './Tree.vue';
-import TreeItem from '@/components/molecules/tree-new/TreeData';
+import TreeItem, { TreeState } from '@/components/molecules/tree-new/TreeData';
 
 export default {
     title: 'molecules/tree-new/Tree',
@@ -14,30 +15,15 @@ export default {
             summary: '',
             components: { PTree },
         },
+        knobs: { escapeHTML: false },
     },
-};
-
-const getState = (props, context) => {
-    const state = reactive({
-        data: [],
-        options: {},
-        loading: false,
-        nodeRightClick(node) {
-            console.log('nodeRightClick', node);
-        },
-        emptyRightClick() {
-            console.log('emptyRightClick');
-        },
-    });
-
-    return state;
 };
 
 export const defaultCase = () => ({
     components: { PTreeNew: PTree },
-    template: '<p-tree-new :data="data" :options="options"></p-tree-new>',
+    template: '<p-tree-new v-bind="state"></p-tree-new>',
     setup(props, context) {
-        const state = getState(props, context);
+        const state = new TreeState().state;
 
         const arr = _.range(5);
         arr.forEach((i) => {
@@ -45,7 +31,7 @@ export const defaultCase = () => ({
         });
 
         return {
-            ...toRefs(state),
+            state,
         };
     },
 });
@@ -53,24 +39,24 @@ export const defaultCase = () => ({
 export const redefineData = () => ({
     components: { PTreeNew: PTree },
     template: `<div>
-        <p-tree-new :data="data" :options="options"></p-tree-new>
+        <p-tree-new v-bind="state"></p-tree-new>
         <br>
         <hr>
         <br>
         <div style="display: flex;">
             <div>
                 <h4>data</h4>
-                <pre>{{data}}</pre>
+                <pre>{{state.data}}</pre>
             </div>
             <div>
                 <h4>options</h4>
-                <pre>{{options}}</pre>
+                <pre>{{state.options}}</pre>
             </div>
         </div>
     </div>
     `,
     setup(props, context) {
-        const state = getState(props, context);
+        const state = new TreeState().state;
 
         state.data = [
             { 'SOME-AWESOME-PROPERTY-FOR-TEXT': 'Item 1' },
@@ -104,7 +90,7 @@ export const redefineData = () => ({
             },
         };
         return {
-            ...toRefs(state),
+            state,
         };
     },
 });
@@ -112,26 +98,23 @@ export const redefineData = () => ({
 export const asyncData = () => ({
     components: { PTreeNew: PTree },
     template: `<div>
-        <p-tree-new :options="options" :loading="loading" 
-                    @nodeRightClick="nodeRightClick" @emptyRightClick="emptyRightClick">
+        <p-tree-new v-bind="state"
+                    @nodeRightClick="nodeRightClick" @emptyRightClick="emptyRightClick"
+        >
         </p-tree-new>
         <br>
         <hr>
         <br>
         <div style="display: flex;">
             <div>
-                <h4>data</h4>
-                <pre>{{data}}</pre>
-            </div>
-            <div>
                 <h4>options</h4>
-                <pre>{{options}}</pre>
+                <pre>{{state.options}}</pre>
             </div>
         </div>
     </div>
     `,
     setup(props, context) {
-        const state = getState(props, context);
+        const state = new TreeState().state;
 
         let count = 0;
 
@@ -163,13 +146,269 @@ export const asyncData = () => ({
             propertyNames: {
                 id: 'id',
                 text: 'name',
-                children: 'kids',
                 isBatch: 'has_child',
             },
         };
 
         return {
-            ...toRefs(state),
+            state,
+            nodeRightClick: action('nodeRightClick'),
+            emptyRightClick: action('emptyRightClick'),
+        };
+    },
+});
+
+
+export const dragAndDrop = () => ({
+    components: { PTreeNew: PTree },
+    template: `<div>
+        <p-tree-new v-bind="state"
+                    @nodeRightClick="nodeRightClick" @emptyRightClick="emptyRightClick"
+                    @dragStart="dragStart" @dragFinish="dragFinish"
+        >
+        </p-tree-new>
+        <br>
+        <hr>
+        <br>
+        <div style="display: flex;">
+            <div>
+                <h4>options</h4>
+                <pre>{{state.options}}</pre>
+            </div>
+        </div>
+    </div>
+    `,
+    setup(props, context) {
+        const state = new TreeState().state;
+
+        let count = 0;
+
+        const getData = () => new Promise((resolve) => {
+            setTimeout(() => {
+                state.data = [{
+                    id: `pg-e1c7d31869a${count}`,
+                    name: `pg ${count}`,
+                    // eslint-disable-next-line camelcase
+                    has_child: true,
+                    item_type: 'PROJECT_GROUP',
+                }, {
+                    id: `project-e1c7d31869a${count}`,
+                    name: `project ${count}`,
+                    // eslint-disable-next-line camelcase
+                    has_child: false,
+                    item_type: 'PROJECT',
+                }];
+                count += 1;
+                resolve(state.data);
+            }, 1000);
+        });
+
+        state.options = {
+            async fetchData(node) {
+                state.loading = true;
+                const res = await getData();
+                res.forEach((d) => {
+                    d.data = { type: d.item_type };
+                });
+                state.loading = false;
+                return res;
+            },
+            propertyNames: {
+                id: 'id',
+                text: 'name',
+                isBatch: 'has_child',
+                data: 'data',
+            },
+            dnd: {
+                onDragStart(node) {
+                    return node.depth !== 0;
+                },
+                onDragOn(targetNode, destinationNode) {
+                    return true;
+                },
+                onDragFinish(targetNode, destinationNode) {
+                    if (destinationNode.data.type === 'PROJECT') {
+                        window.alert('can not drag to project type');
+                        return false;
+                    }
+                    if (destinationNode.depth === 0) {
+                        window.alert('can not drag to root');
+                        return false;
+                    }
+                    return true;
+                },
+            },
+        };
+
+        return {
+            state,
+            nodeRightClick: action('nodeRightClick'),
+            emptyRightClick: action('emptyRightClick'),
+            dragStart: action('dragStart'),
+            dragFinish: action('dragFinish'),
+        };
+    },
+});
+
+
+export const deletion = () => ({
+    components: { PTreeNew: PTree },
+    template: `<div>
+        <p-tree-new ref="tree" 
+                    v-bind="state"
+                    @nodeClick="nodeClick"
+        >
+        </p-tree-new>
+        <br>
+        <hr>
+        <br>
+        <h3>Click the tree node for deletion</h3>
+        <div style="display: flex;">
+            <div>
+                <h4>options</h4>
+                <pre>{{state.options}}</pre>
+            </div>
+        </div>
+    </div>
+    `,
+    setup(props, context) {
+        const state = new TreeState().state;
+
+        let count = 0;
+
+        const getData = () => new Promise((resolve) => {
+            setTimeout(() => {
+                state.data = [{
+                    id: `pg-e1c7d31869a${count}`,
+                    name: `pg ${count}`,
+                    // eslint-disable-next-line camelcase
+                    has_child: true,
+                    item_type: 'PROJECT_GROUP',
+                }, {
+                    id: `project-e1c7d31869a${count}`,
+                    name: `project ${count}`,
+                    // eslint-disable-next-line camelcase
+                    has_child: false,
+                    item_type: 'PROJECT',
+                }];
+                count += 1;
+                resolve(state.data);
+            }, 1000);
+        });
+
+        state.options = {
+            async fetchData(node) {
+                state.loading = true;
+                const res = await getData();
+                res.forEach((d) => {
+                    d.data = { type: d.item_type };
+                });
+                state.loading = false;
+                return res;
+            },
+            propertyNames: {
+                id: 'id',
+                text: 'name',
+                isBatch: 'has_child',
+                data: 'data',
+            },
+        };
+
+        const tree = ref(null);
+        const nodeClick = (node) => {
+            if (node.depth === 0) {
+                window.alert('can not remove root node');
+                return;
+            }
+
+            tree.value.deleteNode(node);
+        };
+
+        return {
+            state,
+            tree,
+            nodeClick,
+        };
+    },
+});
+
+
+export const add = () => ({
+    components: { PTreeNew: PTree },
+    template: `<div>
+        <p-tree-new ref="tree" 
+                    v-bind="state"
+                    @nodeClick="nodeClick"
+        >
+        </p-tree-new>
+        <br>
+        <hr>
+        <br>
+        <h3>Click the target node where you want to add</h3>
+        <h3>Select add mode below: </h3>
+        <span v-for="(mode, idx) in addMode"
+              :style="{backgroundColor: addModeIdx === idx ? 'pink' : 'transparent'}"
+              style="padding: 15px; display: inline-block; cursor: pointer;"
+              @click="addModeIdx = idx"
+        >{{mode}}</span>
+    </div>
+    `,
+    setup(props, context) {
+        const state = new TreeState().state;
+
+        let count = 0;
+
+        const getData = () => new Promise((resolve) => {
+            setTimeout(() => {
+                state.data = [{
+                    id: `pg-e1c7d31869a${count}`,
+                    name: `pg ${count}`,
+                    // eslint-disable-next-line camelcase
+                    has_child: true,
+                    item_type: 'PROJECT_GROUP',
+                }, {
+                    id: `project-e1c7d31869a${count}`,
+                    name: `project ${count}`,
+                    // eslint-disable-next-line camelcase
+                    has_child: false,
+                    item_type: 'PROJECT',
+                }];
+                count += 1;
+                resolve(state.data);
+            }, 1000);
+        });
+
+        state.options = {
+            async fetchData(node) {
+                state.loading = true;
+                const res = await getData();
+                res.forEach((d) => {
+                    d.data = { type: d.item_type };
+                });
+                state.loading = false;
+                return res;
+            },
+            propertyNames: {
+                id: 'id',
+                text: 'name',
+                isBatch: 'has_child',
+                data: 'data',
+            },
+        };
+
+        const tree = ref(null);
+        const addMode = ['append', 'prepend', 'before', 'after'];
+        const addModeIdx = ref(0);
+        const nodeClick = (node) => {
+            tree.value.addNode(node, 'new Node!', addMode[addModeIdx.value]);
+        };
+
+        return {
+            state,
+            tree,
+            addMode,
+            addModeIdx,
+            nodeClick,
         };
     },
 });
