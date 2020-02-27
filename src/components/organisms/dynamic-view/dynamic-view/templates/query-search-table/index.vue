@@ -1,6 +1,6 @@
 <template>
     <p-toolbox-table
-        :items="apiHandler.state.items"
+        :items="apiHandler.tableTS.state.items"
         :fields="fields"
         :selectable="true"
         :sortable="true"
@@ -9,13 +9,13 @@
         :border="true"
         :padding="true"
         :dragable="true"
-        :all-page="apiHandler.state.allPage"
-        :sort-by.sync="apiHandler.syncState.sortBy"
-        :sort-desc.sync="apiHandler.syncState.sortDesc"
-        :this-page.sync="apiHandler.syncState.thisPage"
-        :page-size.sync="apiHandler.syncState.pageSize"
-        :select-index.sync="apiHandler.syncState.selectIndex"
-        :loading.sync="apiHandler.syncState.loading"
+        :all-page="apiHandler.tableTS.state.allPage"
+        :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
+        :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
+        :this-page.sync="apiHandler.tableTS.syncState.thisPage"
+        :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+        :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
+        :loading.sync="apiHandler.tableTS.syncState.loading"
         :responsive-style="responsiveStyle"
         :setting-visible="false"
         :use-spinner-loading="true"
@@ -28,18 +28,18 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item" style="width: 50%">
-                <PQuerySearchBar :search-text.sync="apiHandler.querySearch.state.searchText" :autocomplete-handler="apiHandler.querySearch.acHandler"
-                                 @newQuery="apiHandler.querySearch.addTag"
+                <p-query-search-bar :search-text.sync="apiHandler.tableTS.querySearch.state.searchText" :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler.value"
+                                    @newQuery="apiHandler.tableTS.querySearch.addTag"
                 />
             </div>
         </template>
-        <template v-if="apiHandler.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
+        <template v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
             <p-col :col="12" style="margin-bottom: .5rem;">
                 <p-hr style="width: 100%;" />
                 <p-query-search-tags style="margin-top: .5rem;"
-                                     :tags="apiHandler.querySearch.tags.value"
-                                     @deleteTag="apiHandler.querySearch.deleteTag"
-                                     @deleteAllTags="apiHandler.querySearch.deleteAllTags"
+                                     :tags="apiHandler.tableTS.querySearch.tags.value"
+                                     @deleteTag="apiHandler.tableTS.querySearch.deleteTag"
+                                     @deleteAllTags="apiHandler.tableTS.querySearch.deleteAllTags"
                 />
             </p-col>
         </template>
@@ -62,7 +62,7 @@ import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/Dyn
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 
-import { BaseQuerySearchTableTSAPI } from '@/lib/api';
+import { QuerySearchTableAPI } from '@/lib/api';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 
@@ -77,7 +77,7 @@ interface Props {
     data_source: DataSourceType[];
     data: any;
     rootMode:boolean;
-    apiHandler:BaseQuerySearchTableTSAPI;
+    apiHandler:QuerySearchTableAPI;
 }
 
 interface SlotBind {
@@ -113,7 +113,7 @@ export default defineComponent({
             default: () => ({}),
         },
         apiHandler: {
-            type: BaseQuerySearchTableTSAPI,
+            type: Object,
             required: true,
         },
         responsiveStyle: {

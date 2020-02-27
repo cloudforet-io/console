@@ -1,19 +1,19 @@
 <template>
     <p-toolbox-table
-        :items="apiHandler.state.items"
+        :items="apiHandler.tableTS.state.items"
         :fields="fields"
         :selectable="false"
         :sortable="false"
         :hover="true"
-        :all-page="apiHandler.state.allPage"
-        :this-page.sync="apiHandler.state.thisPage"
-        :page-size.sync="apiHandler.state.pageSize"
+        :all-page="apiHandler.tableTS.state.allPage"
+        :this-page.sync="apiHandler.tableTS.syncState.thisPage"
+        :page-size.sync="apiHandler.tableTS.syncState.pageSize"
         :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
         :setting-visible="false"
         :shadow="false"
         :border="false"
         :padding="false"
-        :loading="apiHandler.state.loading"
+        :loading="apiHandler.tableTS.syncState.loading"
         :use-spinner-loading="true"
         :use-cursor-loading="true"
         @changePageSize="apiHandler.getData"
@@ -22,7 +22,7 @@
     >
         <template #toolbox-left>
             <div style="width: 50vw">
-                <p-search :search-text.sync="apiHandler.state.searchText" @onSearch="apiHandler.getData" />
+                <p-search :search-text.sync="apiHandler.tableTS.searchText.value" @onSearch="apiHandler.getData" />
             </div>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{item}">
@@ -53,6 +53,7 @@ interface Props {
     data_source: DataSourceType[];
     data: any;
     rootMode:boolean;
+    apiHandler:SubDataAPI;
 }
 
 interface SlotBind {
@@ -94,6 +95,8 @@ export default defineComponent({
             name: ds.key,
             label: ds.name,
         })));
+        // @ts-ignore
+        props.apiHandler.apiState.only = computed(() => fields.value.map(value => value.name));
         const slots:Ref<Readonly<SlotBind[]>> = computed(():SlotBind[] => props.data_source.map((ds:DataSourceType):SlotBind => ({
             name: `col-${ds.key}-format`,
             view_type: ds.view_type || 'text',

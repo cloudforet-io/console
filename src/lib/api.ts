@@ -2,11 +2,12 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import {
-    computed, getCurrentInstance, reactive, Ref, ref, watch,
+    computed, getCurrentInstance, reactive, Ref, ref, watch, isRef,
 } from '@vue/composition-api';
 // @ts-ignore
+// eslint-disable-next-line import/extensions
 import { ComponentInstance } from '@vue/composition-api/dist/component';
-import { tagList } from '@/components/molecules/tags/Tag.vue';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 // eslint-disable-next-line import/no-cycle
 import {
     baseAutocompleteHandler,
@@ -15,11 +16,15 @@ import {
     SearchQueryType,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 // eslint-disable-next-line import/no-cycle
-import { QuerySearchTableToolSet } from '@/components/organisms/tables/query-search-table/toolset';
-import { SearchTableToolSet, ToolboxTableToolSet } from '@/components/organisms/tables/toolbox-table/toolset';
+import {
+    QuerySearchTableToolSet,
+    SearchTableToolSet,
+    ToolboxTableToolSet,
+} from '@/components/organisms/tables/toolbox-table/toolset';
 
 import construct = Reflect.construct;
-
+type cnaRefArgs<T> = T|Ref<T>|Ref<Readonly<T>>
+type readonlyArgs<T> = T|Readonly<T>
 
 class APIError extends Error {
     public status: number;
@@ -139,7 +144,7 @@ interface ApiQuery {
     sort?:Sort;
     keyword?:string;
     filter?:Filter[];
-    only?:string[];
+    only?:readonlyArgs<string[]>;
 }
 
 type ValueFormatter = (string, any)=>string|number|Array<string|number>;
@@ -159,8 +164,8 @@ type ValueFormatter = (string, any)=>string|number|Array<string|number>;
  */
 export const defaultQuery = (
     thisPage:number, pageSize:number, sortBy?:string, sortDesc?:boolean,
-    searchText?:string, searchQueries?:SearchQueryType[]|readonly SearchQueryType[], valueFormatter?:ValueFormatter, only?:string[],
-) => {
+    searchText?:string, searchQueries?:SearchQueryType[]|readonly SearchQueryType[], valueFormatter?:ValueFormatter, only?:string[]|readonly string[],
+):ApiQuery => {
     const query:ApiQuery = {
         page: {
             start: ((thisPage - 1) * pageSize) + 1,
@@ -256,84 +261,6 @@ export abstract class DynamicAPI {
 }
 
 
-interface TableState {
-    items:any[];
-    selectIndex?:number[];
-    sortBy?:string;
-    sortDesc?:boolean;
-    only?:string[];
-    pageSize: number;
-    allPage: number;
-    thisPage: number;
-    searchText: string|null|undefined;
-    fixSearchQuery?:SearchQueryType[]|Ref<SearchQueryType[]>;
-    loading: boolean;
-    acHandler?:Ref<QuerySearchTableACHandler>;
-    extraParams?:object;
-}
-
-export const getAllPage = (total_count:number, pageSize:number):number => Math.ceil(total_count / pageSize) || 1;
-
-export class SubDataAPI extends DynamicAPI {
-    public state :TableState;
-
-    private query:Ref<object>;
-
-    constructor(public vm:HttpInstance, private url, private idKey:string, private keyPath:Ref<string>|Ref<Readonly<string>>, private id:Ref<string>) {
-        super();
-        this.state = reactive({
-            items: [],
-            pageSize: 15,
-            allPage: 1,
-            thisPage: 1,
-            searchText: '',
-            loading: false,
-        });
-        this.query = computed(() => (defaultQuery(
-            this.state.thisPage, this.state.pageSize,
-            undefined, undefined, this.state.searchText || '',
-        )));
-    }
-
-    protected requestData = async (data?:any) => {
-        const res = await this.$http.post(this.url, data);
-        return res;
-    };
-
-    public getData = async () => {
-        this.state.loading = true;
-        this.state.items = [];
-
-        const res = await this.requestData({
-            query: this.query.value,
-            key_path: this.keyPath.value,
-            [this.idKey]: this.id.value,
-        });
-        this.state.items = res.data.results;
-        this.state.allPage = getAllPage(res.data.total_count, this.state.pageSize);
-        this.state.loading = false;
-    }
-}
-
-
-export class MockSubDataAPI extends SubDataAPI {
-    constructor(private items:any[]) {
-        super(({ } as HttpInstance), '', '', ref(''), ref(''));
-    }
-
-    private fakeData=() => {
-        this.state.items = this.items;
-        this.state.allPage = 1;
-        this.state.loading = false;
-    }
-
-    // @ts-ignore
-    protected async requestData(data?:any) {
-        setTimeout(() => {}, 1000);
-        return { data: { results: this.items, total_count: 1 } } as AxiosResponse<any>;
-    }
-}
-
 type AutoCompleteData = [string, any[]];
 type ACFunction = ()=>AutoCompleteData
 interface ACHandlerMap {
@@ -342,52 +269,53 @@ interface ACHandlerMap {
 
 }
 
+export interface QSTableACHandlerArgs{
+    keys:string[];
+    suggestKeys:string[];
+}
+
 export class QuerySearchTableACHandler extends baseAutocompleteHandler {
-    constructor(keys:string[] = [], suggestKeys:string[] = []) {
+    constructor(args:QSTableACHandlerArgs = { keys: [], suggestKeys: [] }) {
         super();
         (this.handlerMap as ACHandlerMap) = {
-            key: [getKeys(keys) as ACFunction, getSuggest(suggestKeys) as ACFunction],
+            key: [getKeys(args.keys) as ACFunction, getSuggest(args.suggestKeys) as ACFunction],
             value: [],
         };
     }
 }
 
 
-interface MockData {
-    total_count: number;
-    results: Array<any>;
+interface BaseApiState{
+    url:readonlyArgs<string>;
+    only:readonlyArgs<string[]>;
+    extraParams:readonlyArgs<any>;
+    fixSearchQuery:SearchQueryType[];
 }
-
-export const getMockData = (data: any, timeout: number) => new Promise((resolve, reject) => {
-    setTimeout(() => resolve(data), timeout);
-});
-
-export const callApi = ($http: AxiosInstance, url: string, params: object) => $http.post(url, params);
 
 abstract class BaseTableAPI extends DynamicAPI {
     public tableTS:ToolboxTableToolSet;
 
     public vm:ComponentInstance ;
 
-    public apiState:any
+    public apiState:UnwrapRef<BaseApiState>
 
 
-    protected constructor(url:string, only?:string[], extraParams?:object, fixSearchQuery : SearchQueryType[] = []) {
+    protected constructor(url:cnaRefArgs<string>, only:cnaRefArgs<string[]> = [], extraParams:cnaRefArgs<any> = {}, fixSearchQuery : SearchQueryType[] = []) {
         super();
         // @ts-ignore
         this.vm = getCurrentInstance();
         this.apiState = reactive({
             url,
             only,
-            fixSearchQuery: fixSearchQuery || [],
-            extraParams: extraParams || {}, // for api extra parameters
+            fixSearchQuery,
+            extraParams, // for api extra parameters
         });
         this.tableTS = new ToolboxTableToolSet();
     }
 
-    protected abstract paramQuery:Ref< defaultQuery>;
+    protected abstract paramQuery:Ref<ApiQuery>;
 
-    protected requestData=async (data?:any) => {
+    protected requestData=async () => {
         const params = {
             query: this.paramQuery.value,
             ...this.apiState.extraParams,
@@ -406,108 +334,106 @@ abstract class BaseTableAPI extends DynamicAPI {
         this.tableTS.state.items = res.data.results;
         this.tableTS.setAllPage(res.data.total_count);
         this.tableTS.syncState.loading = false;
+    };
+
+    protected defaultReset = () => {
+        this.tableTS.state.allPage = 1;
+        this.tableTS.state.items = [];
+        this.tableTS.syncState.thisPage = 1;
+        this.tableTS.syncState.selectIndex = [];
+        this.tableTS.syncState.sortBy = '';
+        this.tableTS.syncState.sortDesc = true;
+    };
+
+    public resetAll = () => {
+        this.defaultReset();
     }
 }
 
 export class SearchTableAPI extends BaseTableAPI {
     public tableTS:SearchTableToolSet;
 
-    protected constructor(url:string, only?:string[], extraParams?:object, fixSearchQuery : SearchQueryType[] = [], initData:object = {}, initSyncData:object = {}) {
+    public constructor(
+        url:cnaRefArgs<string>,
+        only:cnaRefArgs<string[]> = [],
+        extraParams:cnaRefArgs<any> = {},
+        fixSearchQuery : SearchQueryType[] = [],
+        initData:object = {}, initSyncData:object = {},
+    ) {
         super(url, only, extraParams, fixSearchQuery);
         this.tableTS = new SearchTableToolSet(initData, initSyncData);
     }
 
-    protected paramQuery = computed(() => defaultQuery((this.tableTS.syncState.thisPage as number), (this.tableTS.syncState.pageSize as number),
+    protected paramQuery = computed(() => defaultQuery(
+        (this.tableTS.syncState.thisPage as number), (this.tableTS.syncState.pageSize as number),
         this.tableTS.syncState.sortBy, this.tableTS.syncState.sortDesc, this.tableTS.searchText.value,
-        this.apiState.fixSearchQuery, undefined, this.apiState.only))
+        // @ts-ignore
+        this.apiState.fixSearchQuery, undefined, this.apiState.only,
+    ))
+
+    public resetAll = () => {
+        this.defaultReset();
+        this.tableTS.searchText.value = '';
+    }
 }
 
-export class BaseQuerySearchTableTSAPI extends QuerySearchTableToolSet {
-    public apiState:any;
 
-    public queryTags:Readonly<Ref<readonly SearchQueryType[]>>;
-
-    public parent:HttpInstance;
-
-    // eslint-disable-next-line class-methods-use-this
-    get $http() {
-        // @ts-ignore
-        return this.parent.$http;
-    }
-
-    protected paramQuery:Ref<object>;
-
-    public acState:any;
-
-    public getData:Function;
-
-    public resetAll:Function;
-
-
+export class SubDataAPI extends SearchTableAPI {
     // @ts-ignore
-    constructor(url:string, keys?:string[], only?:string[], extraParams?:object, fixSearchQuery : SearchQueryType[] = [], initData:object = {}, initSyncData:object = {}, parent:HttpInstance) {
-        const args = {
-            keys: keys || [],
-            suggestKeys: keys || [],
-        };
-        const argsOrders = ['keys', 'suggestKeys'];
-        super(QuerySearchTableACHandler, args, argsOrders, initData, initSyncData);
-        this.parent = parent;
-        this.apiState = reactive({
-            url,
-            only,
-            fixSearchQuery: fixSearchQuery || [],
-            extraParams: extraParams || {}, // for api extra parameters
-        });
-        this.queryTags = computed(() => {
-            const fix:SearchQueryType[] = this.apiState.fixSearchQuery;
-            const sq:SearchQueryType[] = this.querySearch.tags.value;
-            return [...fix, ...sq];
-        });
-        this.paramQuery = computed(() => (defaultQuery(
-            (this.syncState.thisPage as number), (this.syncState.pageSize as number),
-            this.syncState.sortBy, this.syncState.sortDesc, undefined,
-            this.queryTags.value, undefined, this.apiState.only,
-        )));
-        this.getData = async () => {
-            this.syncState.loading = true;
-            this.state.items = [];
-            this.syncState.selectIndex = [];
+    public constructor(url:string, only?:cnaRefArgs<string[]>, idKey:string, private keyPath:cnaRefArgs<string>, private id:cnaRefArgs<string>, initData:object = {}, initSyncData:object = {}) {
+        super(url, only, undefined, undefined, initData, initSyncData);
+        this.apiState.extraParams = computed(() => ({
+            key_path: isRef(this.keyPath) ? this.keyPath.value : this.keyPath,
+            [idKey]: isRef(this.id) ? this.id.value : this.id,
+        }));
+    }
+}
 
-            try {
-                const params = {
-                    query: this.paramQuery.value,
-                    ...this.apiState.extraParams,
+export interface ACHandlerMeta {
+    handlerClass:typeof baseAutocompleteHandler;
+    args:any;
+}
+export const defaultACHandler:ACHandlerMeta = {
+    handlerClass: QuerySearchTableACHandler,
+    args: {
+        keys: [],
+        suggestKeys: [],
+    },
+};
 
-                };
-                const res = await this.$http.post(this.apiState.url, params);
-                this.state.items = res.data.results;
-                this.setAllPage(res.data.total_count);
-            } catch (e) {
-                console.debug('request fail', e);
-            }
+export class QuerySearchTableAPI extends BaseTableAPI {
+    public tableTS:QuerySearchTableToolSet;
 
-            this.syncState.loading = false;
-        };
-
-        watch(this.querySearch.tags, (tags, preTags) => {
+    public constructor(
+        url:string, only?:string[], extraParams?:object, fixSearchQuery : SearchQueryType[] = [],
+        initData:object = {}, initSyncData:object = {},
+        acHandlerMeta:ACHandlerMeta = defaultACHandler,
+    ) {
+        super(url, only, extraParams, fixSearchQuery);
+        this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData);
+        watch(this.tableTS.querySearch.tags, (tags, preTags) => {
             if (tags !== preTags) {
                 this.getData();
             }
         });
-
-        this.resetAll = () => {
-            this.state.allPage = 1;
-            this.state.items = [];
-            this.syncState.thisPage = 1;
-            this.syncState.selectIndex = [];
-            this.syncState.sortBy = '';
-            this.syncState.sortDesc = true;
-            this.querySearch.state.searchText = '';
-        };
     }
-}
 
-export class InventoryQuerySearchTableTSAPI extends BaseQuerySearchTableTSAPI {
-    public projectIds:Ref<readonly any[]> = computed(() => (this.state.items as any[]).map(v => v.project_id))
+    protected queryTags:Ref<readonly SearchQueryType[]> = computed(() => {
+        // @ts-ignore
+        const fix = (this.apiState.fixSearchQuery as SearchQueryType[]);
+        const sq:SearchQueryType[] = this.tableTS.querySearch.tags.value;
+        return [...fix, ...sq];
+    });
+
+    protected paramQuery = computed(() => defaultQuery(
+        (this.tableTS.syncState.thisPage as number), (this.tableTS.syncState.pageSize as number),
+        this.tableTS.syncState.sortBy, this.tableTS.syncState.sortDesc, undefined,
+        this.queryTags.value, undefined, this.apiState.only,
+    ));
+
+
+    public resetAll = () => {
+        this.defaultReset();
+        this.tableTS.querySearch.state.searchText = '';
+    };
 }

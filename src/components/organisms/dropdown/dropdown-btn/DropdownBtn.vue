@@ -24,11 +24,12 @@
 </template>
 
 <script>
+import { defineComponent } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import { secondary } from '@/styles/_variables.scss';
 
-export default {
+export default defineComponent({
     name: 'PDropdownBtn',
     components: { PButton, PIconButton },
     props: {
@@ -83,7 +84,7 @@ export default {
         },
     },
 
-};
+});
 </script>
 
 <style lang="scss" scoped>

@@ -6,7 +6,7 @@
                     <div v-show="widthRaw>16" :style="{width:width,height:'95%'}" style="padding-left: .5rem;padding-right: .5rem">
                         <p-toolbox-table
                             :style="{width: widthRaw <=435 ?'fit-content' : 'auto',height:'100%'}"
-                            :items="apiHandler.state.items"
+                            :items="apiHandler.tableTS.state.items"
                             :fields="cstFields"
                             :selectable="true"
                             :shadow="false"
@@ -18,13 +18,13 @@
                             :sortable="true"
                             :background="true"
                             :toolbox-background="false"
-                            :all-page="apiHandler.state.allPage"
-                            :sort-by.sync="apiHandler.syncState.sortBy"
-                            :sort-desc.sync="apiHandler.syncState.sortDesc"
-                            :this-page.sync="apiHandler.syncState.thisPage"
-                            :select-index.sync="apiHandler.syncState.selectIndex"
-                            :page-size.sync="apiHandler.syncState.pageSize"
-                            :loading.sync="apiHandler.syncState.loading"
+                            :all-page="apiHandler.tableTS.state.allPage"
+                            :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
+                            :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
+                            :this-page.sync="apiHandler.tableTS.syncState.thisPage"
+                            :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
+                            :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+                            :loading.sync="apiHandler.tableTS.syncState.loading"
                             @changePageSize="apiHandler.getData"
                             @changePageNumber="apiHandler.getData"
                             @clickRefresh="apiHandler.getData"
@@ -42,16 +42,16 @@
                             <template #toolbox-bottom>
                                 <p-row direction="column">
                                     <div style="margin-bottom: .5rem;">
-                                        <p-query-search-bar :search-text.sync="apiHandler.querySearch.state.searchText" :autocomplete-handler="apiHandler.querySearch.acHandler"
-                                                            @newQuery="apiHandler.querySearch.addTag"
+                                        <p-query-search-bar :search-text.sync="apiHandler.tableTS.querySearch.state.searchText" :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler"
+                                                            @newQuery="apiHandler.tableTS.querySearch.addTag"
                                         />
                                     </div>
-                                    <div v-if="apiHandler.querySearch.tags.value.length !== 0" style="margin-bottom: .5rem; ">
+                                    <div v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" style="margin-bottom: .5rem; ">
                                         <p-hr style="width: 100%;" />
                                         <p-query-search-tags style="margin-top: .5rem;"
-                                                             :tags="apiHandler.querySearch.tags.value"
-                                                             @deleteTag="apiHandler.querySearch.deleteTag"
-                                                             @deleteAllTags="apiHandler.querySearch.deleteAllTags"
+                                                             :tags="apiHandler.tableTS.querySearch.tags.value"
+                                                             @deleteTag="apiHandler.tableTS.querySearch.deleteTag"
+                                                             @deleteAllTags="apiHandler.tableTS.querySearch.deleteAllTags"
                                         />
                                     </div>
                                 </p-row>
@@ -62,7 +62,7 @@
             </template>
             <template #rightContainer>
                 <transition name="panel-trans">
-                    <div v-if="apiHandler.selectState.isSelectOne">
+                    <div v-if="apiHandler.tableTS.selectState.isSelectOne">
                         <p-horizontal-layout>
                             <template #container="{ height }">
                                 <p-dynamic-view view_type="query-search-table"
@@ -86,29 +86,29 @@
                                 </p-dynamic-view>
                             </template>
                         </p-horizontal-layout>
-                        <PTab v-if="dvApiHandler.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
+                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
                             <template #detail="{tabName}">
                                 <PDynamicDetails
-                                    :details="dvApiHandler.selectState.firstSelectItem.metadata.details"
-                                    :data="dvApiHandler.selectState.firstSelectItem"
+                                    :details="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.details"
+                                    :data="dvApiHandler.tableTS.selectState.firstSelectItem"
                                 />
                             </template>
                             <template #data="{tabName}">
                                 <PDynamicSubData
-                                    :select-id="dvApiHandler.selectState.firstSelectItem.cloud_service_id" :sub-data="dvApiHandler.selectState.firstSelectItem.metadata.sub_data"
+                                    :select-id="dvApiHandler.tableTS.selectState.firstSelectItem.cloud_service_id" :sub-data="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
                                     url="/inventory/cloud-service/get-data" id-key="cloud_service_id"
                                 />
                             </template>
                             <template #rawData="{tabName}">
-                                <p-raw-data :item="dvApiHandler.selectState.firstSelectItem" />
+                                <p-raw-data :item="dvApiHandler.tableTS.selectState.firstSelectItem" />
                             </template>
                         </PTab>
-                        <PTab v-else-if="dvApiHandler.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="activeMultiTab">
+                        <PTab v-else-if="dvApiHandler.tableTS.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="activeMultiTab">
                             <template #data="{tabName}">
                                 <p-dynamic-view
                                     view_type="simple-table"
                                     :data_source="selectTypeDataSource"
-                                    :data="dvApiHandler.selectState.selectItems"
+                                    :data="dvApiHandler.tableTS.selectState.selectItems"
                                 />
                             </template>
                             <template #admin="{tabName}">
@@ -166,16 +166,17 @@ import PQuerySearchTags from '@/components/organisms/search/query-search-tags/Qu
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { makeTrItems } from '@/lib/view-helper';
-import { BaseQuerySearchTableTSAPI, HttpInstance } from '@/lib/api';
+import { QuerySearchTableAPI } from '@/lib/api';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
+import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 
-export const cloudServiceSetup = (context, apiHandler:BaseQuerySearchTableTSAPI, dvApiHandler:BaseQuerySearchTableTSAPI) => {
+export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApiHandler:QuerySearchTableAPI) => {
     const state = reactive({
         cstFields: makeTrItems([
             ['provider', 'COMMON.PROVIDER'],
@@ -197,10 +198,10 @@ export const cloudServiceSetup = (context, apiHandler:BaseQuerySearchTableTSAPI,
         activeMultiTab: 'data',
     });
 
-    const selectTypeDataSource = computed(() => (_.get(apiHandler.selectState.firstSelectItem, ['data_source'], [])));
-    watch(() => apiHandler.selectState.firstSelectItem, (type, preType) => {
+    const selectTypeDataSource = computed(() => (_.get(apiHandler.tableTS.selectState.firstSelectItem, ['data_source'], [])));
+    watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
         if (preType && type !== preType) {
-            const selectType = apiHandler.selectState.firstSelectItem;
+            const selectType = apiHandler.tableTS.selectState.firstSelectItem;
             if (selectType) {
                 dvApiHandler.resetAll();
                 dvApiHandler.apiState.fixSearchQuery = [
@@ -209,8 +210,8 @@ export const cloudServiceSetup = (context, apiHandler:BaseQuerySearchTableTSAPI,
                     { key: 'cloud_service_group', operator: '=', value: selectType.group },
                 ];
                 const keys = selectTypeDataSource.value.map(v => v.key);
-                dvApiHandler.querySearch.acHandlerArgs.keys = keys;
-                dvApiHandler.querySearch.acHandlerArgs.suggestKeys = keys;
+                dvApiHandler.tableTS.querySearch.acHandlerArgs.keys = keys;
+                dvApiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
                 dvApiHandler.getData();
             }
         }
@@ -251,8 +252,8 @@ export const cloudServiceSetup = (context, apiHandler:BaseQuerySearchTableTSAPI,
     //     { type: 'item' }),
     // });
     const link = computed(():string|unknown => {
-        if (dvApiHandler.selectState.isSelectOne) {
-            return _.get(dvApiHandler.selectState.firstSelectItem, 'data.reference.link');
+        if (dvApiHandler.tableTS.selectState.isSelectOne) {
+            return _.get(dvApiHandler.tableTS.selectState.firstSelectItem, 'data.reference.link');
         }
         return undefined;
     });
@@ -318,7 +319,8 @@ export default {
         PEmpty,
     },
     setup(props, context) {
-        const mockAPI = new BaseQuerySearchTableTSAPI('', undefined, undefined, undefined, undefined, undefined, undefined, context.parent);
+        // @ts-ignore
+        const mockAPI = new QuerySearchTableAPI('', undefined, undefined, undefined, undefined, undefined, undefined);
         return {
             ...cloudServiceSetup(context, mockAPI, mockAPI),
         };
