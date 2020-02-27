@@ -4,6 +4,7 @@
                :data="data"
                :key_path="key_path"
                :api-handler="apiHandler"
+               v-bind="vbind"
     >
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" />
@@ -46,6 +47,10 @@ export default defineComponent({
         apiHandler: {
             type: Object,
             default: null,
+        },
+        vbind: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup(props:any) {
