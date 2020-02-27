@@ -174,7 +174,7 @@
 
 <script>
 import {
-    reactive, toRefs, ref, computed, readonly,
+    reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';

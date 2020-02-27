@@ -5,7 +5,7 @@ import { autoCompleteQuery } from '@/lib/api';
 export interface SearchQueryType {
     key: string,
     operator: string,
-    value: string | number | Array<string | number>;
+    value: any;
 }
 
 export class SearchQuery implements SearchQueryType {
@@ -27,7 +27,7 @@ interface handlerMap {
 export class baseAutocompleteHandler {
     public handlerMap:handlerMap;
 
-    constructor() {
+    constructor(args?:any) {
         this.handlerMap = {
             key: [],
             value: [],
