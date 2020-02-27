@@ -9,11 +9,12 @@ import _ from 'lodash';
 import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery, getAllPage, SubDataAPI } from '@/lib/api';
+import { defaultQuery } from '@/lib/api';
 import {
     defaultAutocompleteHandler,
     getEnumValues, getFetchValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { getAllPage } from '@/components/organisms/pagenations/toolset';
 
 export default {
     name: 'Server',
