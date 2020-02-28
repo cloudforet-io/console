@@ -14,7 +14,7 @@
 <script>
 import _ from 'lodash';
 import Vue from 'vue';
-import api from '@/lib/api';
+import api,{ApiInstance} from '@/lib/api';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
@@ -75,13 +75,17 @@ export default {
         },
         async configInit() {
             await config.init();
+            // todo: 인증로직 변경시 삭제
             await api.init(config.get('VUE_APP_API.ENDPOINT'), {
-                authError: () => {
-                    this.$store.commit('auth/signOut');
-                },
-            });
-
-            Vue.prototype.$http = api.instance;
+              authError: () => {
+                this.$store.commit('auth/signOut');
+              },
+            })
+            Vue.prototype.$http = new ApiInstance(config.get('VUE_APP_API.ENDPOINT'),this, {
+              authError: () => {
+                this.$store.commit('auth/signOut');
+              },
+            }).instance;
         },
         async domainInit() {
             if (!this.$store.getters['domain/id']) {
