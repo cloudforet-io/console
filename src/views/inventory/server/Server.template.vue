@@ -29,7 +29,7 @@
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" :disabled="true" @click="clickCollectData">
-                            Collect Data
+                            {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
@@ -251,16 +251,16 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
     const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
         tabs: makeTrItems([
-            ['detail', 'COMMON.DETAILS'],
-            ['data', 'COMMON.DATA'],
-            ['rawData', 'TAB.RAWDATA', { keepAlive: true }],
+            ['detail', 'TAB.DETAILS'],
+            ['data', 'TAB.DATA'],
+            ['rawData', 'TAB.RAW_DATA', { keepAlive: true }],
             ['admin', 'TAB.ADMIN'],
-            ['history', null, { label: 'History' }],
+            ['history', 'TAB.HISTORY'],
         ],
         context.parent),
         activeTab: 'detail',
         multiSelectTabs: makeTrItems([
-            ['data', 'COMMON.DATA', { keepAlive: true }],
+            ['data', 'TAB.DATA', { keepAlive: true }],
             ['admin', 'TAB.ADMIN'],
         ], context.parent),
         multiSelectActiveTab: 'data',
@@ -299,9 +299,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         });
         return items;
     });
-    const getSelectServerIds = computed(() => {
-        return getSelectServerItems.value.map(v => v.server_id);
-    });
+    const getSelectServerIds = computed(() => getSelectServerItems.value.map(v => v.server_id));
     const getFirstSelectServerItem = computed(() => (getSelectServerItems.value.length >= 1 ? getSelectServerItems.value[0] : {}));
     const getSubData = computed(() => _.get(getFirstSelectServerItem.value, ['metadata', 'sub_data'], []));
     const getFirstSelectServerId = computed(() => (getSelectServerIds.value.length >= 1 ? getSelectServerIds.value[0] : ''));
@@ -368,9 +366,9 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         ...makeTrItems([
             ['delete', 'BTN.DELETE'],
             [null, null, { type: 'divider' }],
-            ['in-service', 'COMMON.BTN_S_SERV'],
-            ['maintenance', 'COMMON.BTN_S_MANT'],
-            ['closed', 'COMMON.BTN_S_CLOSE'],
+            ['in-service', 'INVENTORY.BTN.SET_INSERVICE'],
+            ['maintenance', 'INVENTORY.BTN.SET_MAINTENANCE'],
+            ['closed', 'INVENTORY.BTN.SET_CLOSE'],
             [null, null, { type: 'divider' }],
             ['project', 'COMMON.CHG_PRO', { disabled: true }],
             ['pool', 'BTN.CHG_POOL', { disabled: true }],

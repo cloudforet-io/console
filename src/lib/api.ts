@@ -423,12 +423,15 @@ export class TabSearchTableAPI extends SearchTableAPI {
     }
 }
 const defaultAdminDataSource = [
-    { name: 'id', key: 'user_info.user_id' },
-    { name: 'name', key: 'user_info.name' },
-    { name: 'email', key: 'user_info.email' },
+    { name: 'Resource Type', key: 'resource_type' },
+    { name: 'Resource ID', key: 'resource_id' },
+    { name: 'Resource Name', key: 'name' },
     {
         name: 'labels', key: 'labels', view_type: 'list', view_option: { item: { view_type: 'badge' } },
     },
+    { name: 'User ID', key: 'user_info.user_id' },
+    { name: 'Name', key: 'user_info.name' },
+    { name: 'Email', key: 'user_info.email' },
 ];
 export class AdminTableAPI extends TabSearchTableAPI {
     public constructor(

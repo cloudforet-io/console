@@ -8,7 +8,7 @@
 		"CANCEL": "Cancel",
 		"CHG_POOL": "Change Pool",
 		"CHG_REGION": "Change Region",
-		"COL_DATA": "Collect Data",
+		"COLLECT_DATA": "Collect Data",
 		"CONFIRM": "Confirm",
 		"COPY": "Copy",
 		"CREATE": "Create",
@@ -253,8 +253,9 @@
 		"BACK_COL": "Back to Collectors",
 		"BTN": {
 			"None": "",
-			"SET_INSERVICE": "",
-			"SET_MAINTENANCE": ""
+			"SET_CLOSE": "Set Close",
+			"SET_INSERVICE": "Set In-Service",
+			"SET_MAINTENANCE": "Set Maintenance"
 		},
 		"CHOOSE_CRD": "Choose Credentials",
 		"COLL_TIME": "Collecting Time",
@@ -355,7 +356,10 @@
 	},
 	"TAB": {
 		"ADMIN": "admin",
-		"RAWDATA": "Raw Data"
+		"DATA": "Data",
+		"DETAILS": "Details",
+		"HISTORY": "History",
+		"RAW_DATA": "Raw Data"
 	},
 	"TREE_TYPE": {
 		"CREATE": "Create {0}",
