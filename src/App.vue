@@ -10,15 +10,6 @@
         <p-lottie ref="pageLoading" :auto="true" :size="45" />
     </div>
 </template>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-159327743-1"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'UA-159327743-1');
-</script>
 
 <script>
 import _ from 'lodash';
@@ -28,6 +19,7 @@ import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
 import store from '@/store';
+import { GTag } from '@/lib/gtag';
 
 export default {
     name: 'App',
@@ -53,6 +45,7 @@ export default {
         async preparationTo() {
             try {
                 await this.configInit();
+                new GTag();
                 await this.syncStores('auth');
                 await this.domainInit();
                 await this.syncStores('domain');

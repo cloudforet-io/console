@@ -60,6 +60,7 @@
     "vue-cookies": "^1.6.1",
     "vue-focus": "^2.1.0",
     "vue-fragment": "^1.5.1",
+    "vue-gtag": "^1.6.2",
     "vue-i18n": "^8.11.2",
     "vue-input-autowidth": "^1.0.5",
     "vue-json-pretty": "^1.6.0",
