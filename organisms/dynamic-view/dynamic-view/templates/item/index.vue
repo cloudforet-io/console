@@ -51,11 +51,12 @@ export default defineComponent({
         PEmpty,
     },
     props: {
-        // eslint-disable-next-line camelcase
+        // eslint-disable-next-line
         key_path: {
             type: String,
             default: '',
         },
+        // eslint-disable-next-line
         data_source: {
             type: Array,
             required: true,
