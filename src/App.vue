@@ -40,6 +40,7 @@ export default {
     },
     created() {
         this.preparationTo();
+        new GTag();
     },
     methods: {
         async preparationTo() {
