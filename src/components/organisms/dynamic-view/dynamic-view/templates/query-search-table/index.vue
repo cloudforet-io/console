@@ -104,6 +104,7 @@ export default {
         PQuerySearchTags,
     },
     props: {
+        // eslint-disable-next-line
         data_source: {
             type: Array,
             required: true,

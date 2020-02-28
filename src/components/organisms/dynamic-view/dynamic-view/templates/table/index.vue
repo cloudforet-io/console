@@ -77,7 +77,8 @@ export default {
         PSearch,
     },
     props: {
-        dataSource: {
+        // eslint-disable-next-line
+        data_source: {
             type: Array,
             defaults: () => [],
         },

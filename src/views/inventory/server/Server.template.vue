@@ -299,7 +299,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         });
         return items;
     });
-    const getSelectServerIds = computed(() => getSelectServerItems.value.map(v => v.server_id));
+    const getSelectServerIds = computed(() => (getSelectServerItems.value ? getSelectServerItems.value.map(v => v.server_id) : []));
     const getFirstSelectServerItem = computed(() => (getSelectServerItems.value.length >= 1 ? getSelectServerItems.value[0] : {}));
     const getSubData = computed(() => _.get(getFirstSelectServerItem.value, ['metadata', 'sub_data'], []));
     const getFirstSelectServerId = computed(() => (getSelectServerIds.value.length >= 1 ? getSelectServerIds.value[0] : ''));
