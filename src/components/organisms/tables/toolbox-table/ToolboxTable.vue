@@ -99,7 +99,7 @@ import { makeProxy } from '@/lib/compostion-util';
 import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/toolset';
 
 
-export default defineComponent({
+export default {
     name: 'PToolboxTable',
     components: {
         PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn, PRow,
@@ -139,12 +139,14 @@ export default defineComponent({
             validator(value) {
                 return value > 0;
             },
+            default: 1,
         },
         thisPage: {
             type: Number,
             validator(value) {
                 return value > 0;
             },
+            default: 1,
         },
         pageNationValues: {
             type: Array,
@@ -197,7 +199,7 @@ export default defineComponent({
             changeSort,
         };
     },
-});
+};
 </script>
 
 <style lang="scss" scoped>

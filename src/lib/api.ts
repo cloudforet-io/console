@@ -23,9 +23,12 @@ import {
 } from '@/components/organisms/tables/toolbox-table/toolset';
 
 import construct = Reflect.construct;
-type cnaRefArgs<T> = T|Ref<T>|Ref<Readonly<T>>
+type RefArgs<T> = Ref<T>|Ref<Readonly<T>>
+type cnaRefArgs<T> = T|RefArgs<T>
 type readonlyArgs<T> = T|Readonly<T>
 type readonlyRefArg<T> = readonlyArgs<cnaRefArgs<T>>
+
+type forceRefArg<T> = readonlyArgs<RefArgs<T>>
 
 class APIError extends Error {
     public status: number;
@@ -293,7 +296,7 @@ interface BaseApiState{
     fixSearchQuery:SearchQueryType[];
 }
 
-abstract class BaseTableAPI extends DynamicAPI {
+export abstract class BaseTableAPI extends DynamicAPI {
     public tableTS:ToolboxTableToolSet;
 
     public vm:ComponentInstance ;
@@ -330,10 +333,14 @@ abstract class BaseTableAPI extends DynamicAPI {
         this.tableTS.syncState.loading = true;
         this.tableTS.state.items = [];
         this.tableTS.syncState.selectIndex = [];
-
-        const res = await this.requestData();
-        this.tableTS.state.items = res.data.results;
-        this.tableTS.setAllPage(res.data.total_count);
+        try {
+            const res = await this.requestData();
+            this.tableTS.state.items = res.data.results;
+            this.tableTS.setAllPage(res.data.total_count);
+        } catch (e) {
+            this.tableTS.state.items = [];
+            this.tableTS.state.allPage = 1;
+        }
         this.tableTS.syncState.loading = false;
     };
 
@@ -370,11 +377,70 @@ export class SearchTableAPI extends BaseTableAPI {
         this.tableTS.syncState.sortBy, this.tableTS.syncState.sortDesc, this.tableTS.searchText.value,
         // @ts-ignore
         this.apiState.fixSearchQuery, undefined, this.apiState.only,
-    ))
+    ));
 
     public resetAll = () => {
         this.defaultReset();
         this.tableTS.searchText.value = '';
+    }
+}
+interface DataSource {
+    name:string;
+    key:string;
+    view_type?:string;
+    view_option?:any;
+
+}
+
+
+export class TabSearchTableAPI extends SearchTableAPI {
+    public tableTS:SearchTableToolSet;
+
+    protected isShow: forceRefArg<boolean>;
+
+    public constructor(
+        url:readonlyRefArg<string>,
+        extraParams:forceRefArg<any>,
+        fixSearchQuery : SearchQueryType[] = [],
+        initData:object = {}, initSyncData:object = {},
+        public dataSource:DataSource[] = [],
+        isShow : forceRefArg<boolean>,
+    ) {
+        super(
+            url,
+            undefined, // sub api can't support only query
+            extraParams,
+            fixSearchQuery,
+        );
+        this.tableTS = new SearchTableToolSet(initData, initSyncData);
+        this.isShow = isShow;
+        const params = computed(() => this.apiState.extraParams);
+        watch([this.isShow, params], ([show, parm], [preShow, preParm]) => {
+            if (show && parm && (show !== preShow || parm !== preParm)) {
+                this.getData();
+            }
+        });
+    }
+}
+const defaultAdminDataSource = [
+    { name: 'id', key: 'user_info.user_id' },
+    { name: 'name', key: 'user_info.name' },
+    { name: 'email', key: 'user_info.email' },
+    {
+        name: 'labels', key: 'labels', view_type: 'list', view_option: { item: { view_type: 'badge' } },
+    },
+];
+export class AdminTableAPI extends TabSearchTableAPI {
+    public constructor(
+        url:readonlyRefArg<string>,
+        extraParams:forceRefArg<any>,
+        fixSearchQuery : SearchQueryType[] = [],
+        initData:object = {},
+        initSyncData:object = {},
+        public dataSource:DataSource[] = defaultAdminDataSource,
+        isShow : forceRefArg<boolean>,
+    ) {
+        super(url, extraParams, fixSearchQuery, initData, initSyncData, dataSource, isShow);
     }
 }
 
@@ -383,21 +449,52 @@ export class SubDataAPI extends SearchTableAPI {
     // @ts-ignore
     public constructor(
         url:readonlyRefArg<string>,
-        only:readonlyRefArg<string[]>,
         idKey:string,
         private keyPath:readonlyRefArg<string>,
         private id:readonlyRefArg<string>,
         initData:object = {},
         initSyncData:object = {},
     ) {
-        super(url, only, undefined, undefined, initData, initSyncData);
+        super(url, undefined, undefined, undefined, initData, initSyncData);
         this.apiState.extraParams = computed(() => ({
             key_path: isRef(this.keyPath) ? this.keyPath.value : this.keyPath,
             [idKey]: isRef(this.id) ? this.id.value : this.id,
         }));
     }
 }
+const defaultHistoryDataSource = [
+    { name: 'Update By', key: 'updated_by' },
+    { name: 'Key', key: 'key' },
+    {
+        name: 'Update At',
+        key: 'updated_at',
+        view_type: 'datetime',
+        view_option: {
+            source_type: 'timestamp',
+            source_format: 'seconds',
+        },
+    },
 
+];
+
+export class HistoryAPI extends TabSearchTableAPI {
+    // @ts-ignore
+    public constructor(
+        url:readonlyRefArg<string>,
+        idKey:string,
+        private id:readonlyRefArg<string>,
+        initData:object = {},
+        initSyncData:object = {},
+        public dataSource:DataSource[] = defaultHistoryDataSource,
+        isShow : forceRefArg<boolean>,
+    ) {
+        super(url, computed(() => ({})), undefined, initData, initSyncData, dataSource, isShow);
+        this.apiState.extraParams = computed(() => ({
+            key_path: 'collection_info.update_history',
+            [idKey]: isRef(this.id) ? this.id.value : this.id,
+        }));
+    }
+}
 export interface ACHandlerMeta {
     handlerClass:typeof baseAutocompleteHandler;
     args:any;

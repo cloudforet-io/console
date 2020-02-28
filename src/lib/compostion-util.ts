@@ -6,6 +6,7 @@ import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
 import { debug } from 'webpack';
 import { isNotEmpty } from '@/lib/util';
+import { BaseTableAPI } from '@/lib/api';
 
 /**
  * make proxy computed that same name as props
@@ -224,3 +225,18 @@ export const userIDValidation = (parent:any, invalidMessage:message) => new Vali
     });
     return result;
 }, invalidMessage || 'same ID exists!');
+
+interface tabState {
+    activeTab:Ref<string>;
+    activeMultiTab:Ref<string>
+}
+
+export const tabIsShow = (handler:BaseTableAPI, state:tabState, tabName:string) => computed(() => {
+    let result = false;
+    if (handler.tableTS.selectState.isSelectOne) {
+        result = state.activeTab.value === tabName;
+    } if (handler.tableTS.selectState.isSelectMulti) {
+        result = state.activeMultiTab.value === tabName;
+    }
+    return result;
+});
