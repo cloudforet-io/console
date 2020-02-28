@@ -8,6 +8,7 @@ import VueLodash from 'vue-lodash';
 import SvgIcon from 'vue-svgicon';
 import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
+import LiquorTree from 'liquor-tree';
 import App from './App.vue';
 import router from '@/routes/index';
 import store from '@/store';
@@ -27,6 +28,8 @@ Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i',
 });
+
+Vue.component('liquor-tree', LiquorTree);
 
 Vue.prototype.$velocity = velocity;
 

@@ -1,19 +1,19 @@
 <template>
     <p-toolbox-table
-        :items="apiHandler.state.items"
+        :items="apiHandler.tableTS.state.items"
         :fields="fields"
         :selectable="false"
         :sortable="false"
         :hover="true"
-        :all-page="apiHandler.state.allPage"
-        :this-page.sync="apiHandler.state.thisPage"
-        :page-size.sync="apiHandler.state.pageSize"
+        :all-page="apiHandler.tableTS.state.allPage"
+        :this-page.sync="apiHandler.tableTS.syncState.thisPage"
+        :page-size.sync="apiHandler.tableTS.syncState.pageSize"
         :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
         :setting-visible="false"
         :shadow="false"
         :border="false"
         :padding="false"
-        :loading="apiHandler.state.loading"
+        :loading="apiHandler.tableTS.syncState.loading"
         :use-spinner-loading="true"
         :use-cursor-loading="true"
         @changePageSize="apiHandler.getData"
@@ -22,7 +22,7 @@
     >
         <template #toolbox-left>
             <div style="width: 50vw">
-                <p-search :search-text.sync="apiHandler.state.searchText" @onSearch="apiHandler.getData" />
+                <p-search :search-text.sync="apiHandler.tableTS.searchText.value" @onSearch="apiHandler.getData" />
             </div>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{item}">
@@ -35,7 +35,9 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { createComponent, computed, Ref } from '@vue/composition-api';
+import {
+    defineComponent, computed, Ref, watch,
+} from '@vue/composition-api';
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
@@ -53,6 +55,7 @@ interface Props {
     data_source: DataSourceType[];
     data: any;
     rootMode:boolean;
+    apiHandler:SubDataAPI;
 }
 
 interface SlotBind {
@@ -68,7 +71,7 @@ interface Field {
 }
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicViewTable',
     components: {
         PDynamicField,

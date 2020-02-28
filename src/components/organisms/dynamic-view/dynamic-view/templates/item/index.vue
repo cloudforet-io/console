@@ -9,7 +9,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { createComponent, computed, Ref } from '@vue/composition-api';
+import { defineComponent, computed, Ref } from '@vue/composition-api';
 import _ from 'lodash';
 import PDl from '@/components/atoms/lists/dl-list/Dl.vue';
 import Definition from './definition.vue';
@@ -43,7 +43,7 @@ const makeDefinitionBind = (props:Props): Ref<Readonly<DefinitionBind[]>> => com
 })));
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicViewItem',
     components: {
         PDl,

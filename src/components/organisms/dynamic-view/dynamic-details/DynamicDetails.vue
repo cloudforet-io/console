@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="dvs.length >= 1">
         <template v-for="dv in dvs">
             <PDividerHeader :key="dv.name">
                 {{ dv.name }}
@@ -7,12 +7,16 @@
             <p-dynamic-view :key="dv.name+'-dv'" v-bind="dv" :data="data" />
         </template>
     </div>
+    <p-empty v-else style="margin-top: 1rem">
+        No data
+    </p-empty>
 </template>
 
 <script lang="ts">
-import { computed, createComponent } from '@vue/composition-api';
+import { computed, defineComponent } from '@vue/composition-api';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDividerHeader from '@/components/molecules/divider-header/DividerHeader.vue';
+import PEmpty from '@/components/atoms/empty/Empty.vue';
 
 interface DV{
     // eslint-disable-next-line camelcase
@@ -29,10 +33,10 @@ interface Props {
 }
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicDetails',
     components: {
-        PDynamicView, PDividerHeader,
+        PDynamicView, PDividerHeader, PEmpty,
     },
     props: {
         details: {

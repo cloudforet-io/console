@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { createComponent, computed, Ref } from '@vue/composition-api';
+import { defineComponent, computed, Ref } from '@vue/composition-api';
 import _ from 'lodash';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
@@ -36,7 +36,7 @@ interface Field {
 }
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicViewSimpleTable',
     components: {
         PDynamicField,

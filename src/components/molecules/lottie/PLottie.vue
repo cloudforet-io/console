@@ -1,8 +1,8 @@
 <template>
     <div class="aligner">
         <div ref="loading" class="aligner-item" :style="{
-            height: `${size}rem`,
-            width: `${size}rem`
+            height: height || `${size}rem`,
+            width: width || `${size}rem`
         }"
         />
     </div>
@@ -24,6 +24,14 @@ export default {
         auto: {
             type: Boolean,
             default: false,
+        },
+        height: {
+            type: String,
+            default: undefined,
+        },
+        width: {
+            type: String,
+            default: undefined,
         },
     },
     data() {

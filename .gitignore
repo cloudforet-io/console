@@ -20,3 +20,5 @@ dist
 *.bak
 
 src/assets
+
+node_modules.nosync/
