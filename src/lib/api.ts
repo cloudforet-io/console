@@ -1,9 +1,13 @@
 /* eslint-disable camelcase */
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import axios, {
+    AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
+} from 'axios';
 import _ from 'lodash';
 import {
     computed, getCurrentInstance, reactive, Ref, ref, watch, isRef,
 } from '@vue/composition-api';
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
+
 // @ts-ignore
 // eslint-disable-next-line import/extensions
 import { ComponentInstance } from '@vue/composition-api/dist/component';
@@ -82,7 +86,7 @@ class API {
         };
 
         this.instance = axios.create(axiosConfig);
-    }
+    };
 
     setResponseInterceptor=(handlers:any):void => {
         (this.instance as AxiosInstance).interceptors.response.use(response => response, (e) => {
@@ -97,7 +101,7 @@ class API {
 
             return Promise.reject(apiError);
         });
-    }
+    };
 
 
     init=(baseURL:string, handlers:any = {}):void => {
@@ -107,8 +111,60 @@ class API {
         }
     }
 }
-
 export default new API();
+
+export class ApiInstance {
+    public instance:AxiosInstance;
+
+    public constructor(baseURL:string, protected vm:any, handlers?:any) {
+        this.instance = axios.create({
+            baseURL,
+            withCredentials: true, // todo: 인증로직 추가시 삭
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (this.vm) {
+            // todo: 인증 로직 추가시 활성화 시키기
+            // this.setRequestInterceptor((request) => {
+            //     if (this.vm.$ls.user.state.isSignedIn) {
+            //         request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
+            //     }
+            //     return request;
+            // });
+            // const refreshAuthLogic = failedRequest => this.instance.post('/auth/token/refresh').then((resp) => {
+            //     this.vm.$ls.user.setToken(resp.data.refreshToken, resp.data.accessToken);
+            //     failedRequest.response.config.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
+            //     return Promise.resolve();
+            // }, (error) => {
+            //     this.vm.$le.authReset();
+            //     this.vm.$router.push('/sign-in');
+            // });
+            // createAuthRefreshInterceptor(this.instance, refreshAuthLogic);
+        }
+
+
+        // todo: 호환성 테스트를 위해 임시로 유지함, 로직 변경시 삭제
+        this.setResponseInterceptor(response => response, (e) => {
+            const apiError = new APIError(e);
+            if (apiError.status === 401) {
+                if (handlers.authError) {
+                    handlers.authError(apiError);
+                }
+            }
+
+            return Promise.reject(apiError);
+        });
+    }
+
+    protected setRequestInterceptor(handler:(request:AxiosRequestConfig)=>AxiosRequestConfig):void {
+        this.instance.interceptors.request.use(handler);
+    }
+
+    protected setResponseInterceptor(responseHandler:(response:AxiosResponse)=>AxiosResponse|Promise<AxiosResponse>, errorHandler?:(error:AxiosError)=>AxiosError|Promise<AxiosError>):void {
+        this.instance.interceptors.response.use(responseHandler, errorHandler);
+    }
+}
 
 export const operatorMap = Object.freeze({
     '': 'contain_in', // merge operator

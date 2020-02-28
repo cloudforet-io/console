@@ -15,6 +15,7 @@ import store from '@/store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
 import { Util } from '@/lib/global-util';
+import LocalStorageStore from '@/store/toolset';
 
 Vue.mixin(Util);
 Vue.use(VueCookies);
@@ -40,6 +41,7 @@ Vue.prototype.$velocity = velocity;
  **************************************************************** */
 
 Vue.prototype.$bus = new Vue({});
+Vue.prototype.$ls = new Vue(LocalStorageStore);
 directive(Vue);
 
 new Vue({
