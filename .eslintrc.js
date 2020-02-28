@@ -46,7 +46,8 @@ module.exports = {
     "import/no-extraneous-dependencies": ["error", {
       "devDependencies": true,
     }],
-    "import/prefer-default-export":["off"]
+    "import/prefer-default-export":["off"],
+    'no-new': ['off']
   },
 
   parserOptions: {
