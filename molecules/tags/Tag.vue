@@ -14,7 +14,7 @@
 <script lang="ts">
 import _ from 'lodash';
 import {
-    ref, reactive, Ref, createComponent,
+    ref, reactive, Ref, defineComponent,
 } from '@vue/composition-api';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -72,7 +72,7 @@ export const tagList = (proxyTags:Ref<string[]>|null|undefined, checkDuplicate:b
     });
 };
 
-export default createComponent({
+export default defineComponent({
     name: 'PTag',
     components: {
         PBadge,

@@ -54,11 +54,11 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { createComponent } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 import styles from '@/styles/_variables.scss';
 import PI from '@/components/atoms/icons/PI.vue';
 
-export default createComponent({
+export default defineComponent({
     name: 'VerticalLayout',
     components: { PI },
     events: ['start', 'move', 'stop'],

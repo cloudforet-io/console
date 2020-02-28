@@ -4,6 +4,7 @@
                :data="data"
                :key_path="key_path"
                :api-handler="apiHandler"
+               v-bind="vbind"
     >
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" />
@@ -15,7 +16,7 @@
 /* eslint-disable camelcase,vue/prop-name-casing */
 
 import {
-    computed, createComponent, onMounted, reactive, toRefs,
+    computed, defineComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 
 
@@ -24,7 +25,7 @@ interface State {
     loader:()=>Promise<any>
 }
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicView',
     props: {
         view_type: {
@@ -46,6 +47,10 @@ export default createComponent({
         apiHandler: {
             type: Object,
             default: null,
+        },
+        vbind: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup(props:any) {

@@ -85,7 +85,7 @@
 <script lang="ts">
 import _ from 'lodash';
 import {
-    computed, reactive, Ref, ref, createComponent,
+    computed, reactive, Ref, ref, defineComponent,
 } from '@vue/composition-api';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 // eslint-disable-next-line import/named
@@ -99,7 +99,7 @@ import { makeProxy } from '@/lib/compostion-util';
 import { ToolBoxTableSetupProps } from '@/components/organisms/tables/toolbox-table/toolset';
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PToolboxTable',
     components: {
         PDataTable, PTextPagenation, PIconButton, PDropdownMenuBtn, PRow,

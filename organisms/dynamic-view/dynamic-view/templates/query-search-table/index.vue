@@ -1,6 +1,6 @@
 <template>
     <p-toolbox-table
-        :items="apiHandler.state.items"
+        :items="apiHandler.tableTS.state.items"
         :fields="fields"
         :selectable="true"
         :sortable="true"
@@ -9,14 +9,14 @@
         :border="true"
         :padding="true"
         :dragable="true"
-        :all-page="apiHandler.state.allPage"
-        :sort-by.sync="apiHandler.syncState.sortBy"
-        :sort-desc.sync="apiHandler.syncState.sortDesc"
-        :this-page.sync="apiHandler.syncState.thisPage"
-        :page-size.sync="apiHandler.syncState.pageSize"
-        :select-index.sync="apiHandler.syncState.selectIndex"
-        :loading.sync="apiHandler.syncState.loading"
-        :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
+        :all-page="apiHandler.tableTS.state.allPage"
+        :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
+        :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
+        :this-page.sync="apiHandler.tableTS.syncState.thisPage"
+        :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+        :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
+        :loading.sync="apiHandler.tableTS.syncState.loading"
+        :responsive-style="responsiveStyle"
         :setting-visible="false"
         :use-spinner-loading="true"
         :use-cursor-loading="true"
@@ -28,26 +28,19 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item" style="width: 50%">
-                <PQuerySearchBar :search-text.sync="apiHandler.querySearch.state.searchText" :autocomplete-handler="apiHandler.querySearch.acHandler"
-                                 @newQuery="apiHandler.querySearch.addTag"
+                <p-query-search-bar :search-text.sync="apiHandler.tableTS.querySearch.state.searchText" :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler.value"
+                                    @newQuery="apiHandler.tableTS.querySearch.addTag"
                 />
             </div>
         </template>
-        <template v-if="apiHandler.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
+        <template v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
             <p-col :col="12" style="margin-bottom: .5rem;">
                 <p-hr style="width: 100%;" />
-                <p-row style="margin-top: .5rem;">
-                    <div style="flex-grow: 0">
-                        <p-icon-button name="ic_delete" @click="apiHandler.querySearch.deleteAllTags" />
-                    </div>
-                    <div style="flex-grow: 1;margin-left: 1rem;">
-                        <p-tag v-for="(tag, idx) in apiHandler.querySearch.tags.value" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
-                               @delete="apiHandler.querySearch.deleteTag(idx)"
-                        >
-                            {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
-                        </p-tag>
-                    </div>
-                </p-row>
+                <p-query-search-tags style="margin-top: .5rem;"
+                                     :tags="apiHandler.tableTS.querySearch.tags.value"
+                                     @deleteTag="apiHandler.tableTS.querySearch.deleteTag"
+                                     @deleteAllTags="apiHandler.tableTS.querySearch.deleteAllTags"
+                />
             </p-col>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{item}">
@@ -61,18 +54,17 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    createComponent, computed, Ref, reactive,
+    defineComponent, computed, Ref, reactive,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
-import { BaseQuerySearchTableTSAPI } from '@/lib/api';
-import PRow from '@/components/atoms/grid/row/Row.vue';
+import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
+
+import { QuerySearchTableAPI } from '@/lib/api';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-import PTag from '@/components/molecules/tags/Tag.vue';
 
 interface DataSourceType {
     name:string;
@@ -85,7 +77,7 @@ interface Props {
     data_source: DataSourceType[];
     data: any;
     rootMode:boolean;
-    apiHandler:BaseQuerySearchTableTSAPI;
+    apiHandler:QuerySearchTableAPI;
 }
 
 interface SlotBind {
@@ -101,17 +93,15 @@ interface Field {
 }
 
 
-export default createComponent({
+export default defineComponent({
     name: 'PDynamicViewQuerySearchTable',
     components: {
         PDynamicField,
         PToolboxTable,
         PQuerySearchBar,
-        PRow,
         PCol,
         PHr,
-        PIconButton,
-        PTag,
+        PQuerySearchTags,
     },
     props: {
         data_source: {
@@ -123,8 +113,12 @@ export default createComponent({
             default: () => ({}),
         },
         apiHandler: {
-            type: BaseQuerySearchTableTSAPI,
+            type: Object,
             required: true,
+        },
+        responsiveStyle: {
+            type: Object,
+            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
         },
     },
     setup(props:Props) {
