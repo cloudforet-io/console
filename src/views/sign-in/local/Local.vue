@@ -1,5 +1,6 @@
 <template>
     <div class="background-cover">
+        <signin></signin>
         <div class="row">
             <div class="container">
                 <div class="row d-flex justify-content-center">
@@ -98,6 +99,7 @@ import _ from 'lodash';
 import PLabel from '@/components/atoms/labels/Label.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
+import Signin from '@/views/sign-in/Signin.vue';
 
 export default {
     name: 'LocalSignIn',
@@ -105,6 +107,7 @@ export default {
         PLabel,
         PButton,
         PTextInput,
+        Signin,
     },
     data() {
         return {

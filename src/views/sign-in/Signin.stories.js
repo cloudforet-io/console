@@ -1,28 +1,28 @@
-import PSignin from './Signin.vue';
-import md from './Signin.md';
-import {autoProps} from '@/setup/storybook-util';
-import {toRefs, reactive, ref, computed} from '@vue/composition-api';
-import {action} from '@storybook/addon-actions';
+import { withKnobs, text } from '@storybook/addon-knobs/vue';
+import { action } from '@storybook/addon-actions';
+import PSignIn from '@/views/sign-in/Signin.vue';
 
 export default {
-    title: '$3Title$',
-    component: PSignin,
+    title: 'views/sign-in/Singin',
+    component: PSignIn,
+    decorators: [withKnobs],
     parameters: {
-        notes: md,
         info: {
-            summary: md,
-            components: {PSignin}
-        }
-    }
+            summary: '',
+            components: { PSignIn },
+        },
+    },
 };
-const actions = {};
-const getState = () => reactive({});
+
 export const defaultCase = () => ({
-    components: {PSignin},
-    template: "<PSignin $END$></PSignin>",
-    setup(props, context) {
-        return {
-            ...actions,
-        };
+    components: { PSignIn },
+    props: {
+    },
+    template: `<div>
+        <p-sign-in>
+        </p-sign-in>
+    </div>`,
+    setup() {
+
     },
 });
