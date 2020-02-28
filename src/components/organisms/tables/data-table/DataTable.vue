@@ -386,7 +386,7 @@ export default defineComponent({
         });
 
         watch(() => props.selectIndex, () => {
-            if (props.items.length && props.items.length === (props.selectIndex as any[]).length) {
+            if (props.items && props.items.length && props.items.length === (props.selectIndex as any[]).length) {
                 state.allState = true;
             } else {
                 state.allState = false;

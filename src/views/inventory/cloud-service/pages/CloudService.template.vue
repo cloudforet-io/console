@@ -73,7 +73,7 @@
                                 >
                                     <template #toolbox-left>
                                         <p-button style-type="primary-dark" :disabled="true">
-                                            Collect Data
+                                            {{ $t('BTN.COLLECT_DATA') }}
                                         </p-button>
                                         <div class="left-toolbox-item">
                                             <PDropdownMenuBtn :menu="csDropdownMenu"
@@ -207,15 +207,15 @@ export const cloudServiceSetup = (
             ['cloud_service_count', 'COMMON.COUNT', { sortable: false }],
         ], context.parent, {}),
         tabs: makeTrItems([
-            ['detail', 'COMMON.DETAILS'],
-            ['data', 'COMMON.DATA'],
-            ['rawData', 'TAB.RAWDATA', { keepAlive: true }],
+            ['detail', 'TAB.DETAILS'],
+            ['data', 'TAB.DATA'],
+            ['rawData', 'TAB.RAW_DATA', { keepAlive: true }],
             ['admin', 'TAB.ADMIN'],
-            ['history', null, { label: 'History' }],
+            ['history', 'TAB.HISTORY'],
         ], context.parent),
         activeTab: 'detail',
         multiTabs: makeTrItems([
-            ['data', 'COMMON.DATA', { keepAlive: true }],
+            ['data', 'TAB.DATA', { keepAlive: true }],
             ['admin', 'TAB.ADMIN'],
         ], context.parent),
         activeMultiTab: 'data',
