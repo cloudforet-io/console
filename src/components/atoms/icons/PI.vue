@@ -1,10 +1,11 @@
 <template>
-    <svgicon v-bind="$props"  v-on="$listeners" />
+    <svgicon v-bind="$props" v-on="$listeners" />
 </template>
 <script>
 import '@/components/atoms/icons/p-icons';
 
 /**
+ * Vue Plugin 'SvgIcon'
  * Reference: https://github.com/MMF-FE/vue-svgicon
  */
 export default {

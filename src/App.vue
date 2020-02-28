@@ -10,6 +10,16 @@
         <p-lottie ref="pageLoading" :auto="true" :size="45" />
     </div>
 </template>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-159327743-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-159327743-1');
+</script>
+
 <script>
 import _ from 'lodash';
 import Vue from 'vue';
