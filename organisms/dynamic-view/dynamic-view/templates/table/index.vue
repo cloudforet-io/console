@@ -42,7 +42,8 @@ import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
-import { SubDataAPI } from '@/lib/api';
+import { AdminTableAPI, SearchTableAPI, SubDataAPI } from '@/lib/api';
+import {object} from "@storybook/addon-knobs";
 
 interface DataSourceType {
     name:string;
@@ -71,7 +72,7 @@ interface Field {
 }
 
 
-export default defineComponent({
+export default {
     name: 'PDynamicViewTable',
     components: {
         PDynamicField,
@@ -109,5 +110,5 @@ export default defineComponent({
             getValue: (item, path) => _.get(item, path),
         };
     },
-});
+};
 </script>

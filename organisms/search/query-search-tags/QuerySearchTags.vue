@@ -14,22 +14,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
 import { makeByPass } from '@/lib/compostion-util';
 import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import PTag from '@/components/molecules/tags/Tag.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 
 interface Props {
-    tags:SearchQuery[]
+    tags:SearchQuery[];
 }
 
-export default defineComponent({
+export default {
     name: 'QuerySearchTags',
     components: { PTag, PIconButton },
     props: {
         tags: {
             type: Array,
+            required: true,
         },
     },
     setup(props:Props, { emit }) {
@@ -38,7 +38,7 @@ export default defineComponent({
             emitDeleteAllTags: makeByPass(emit, 'deleteAllTags'),
         };
     },
-});
+};
 </script>
 
 <style lang="scss" scoped>
