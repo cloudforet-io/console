@@ -8,8 +8,8 @@ import {
 import _ from 'lodash';
 import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
-import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery } from '@/lib/api';
+import { mountBusEvent, tabIsShow } from '@/lib/compostion-util';
+import { AdminTableAPI, defaultQuery, HistoryAPI } from '@/lib/api';
 import {
     defaultAutocompleteHandler,
     getEnumValues, getFetchValues,
@@ -297,8 +297,35 @@ export default {
 
         requestProjectList();
         requestServerList();
+
+        const adminParams = computed(() => ({
+            servers: state.getSelectServerIds,
+        }));
+        // todo: move server.vue
+        const adminIsShow = computed(() => {
+            let result = false;
+            if (state.isSelectedOne) {
+                result = state.activeTab === 'admin';
+            } if (state.isSelectedMulti) {
+                result = state.multiSelectActiveTab === 'admin';
+            }
+            return result;
+        });
+        const adminApiHandler = new AdminTableAPI('/inventory/server/member/list', adminParams, undefined, undefined, undefined, undefined, adminIsShow);
+
+        const historyIsShow = computed(() => {
+            let result = false;
+            if (state.isSelectedOne && state.activeTab === 'history') {
+                result = true;
+            }
+            return result;
+        });
+        const selectId = computed(() => state.getFirstSelectServerId);
+        const historyAPIHandler = new HistoryAPI('/inventory/server/get-data', 'server_id', selectId, undefined, undefined, undefined, historyIsShow);
         return {
             ...toRefs(state),
+            adminApiHandler,
+            historyAPIHandler,
         };
     },
 };

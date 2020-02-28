@@ -96,34 +96,27 @@
             </template>
         </p-horizontal-layout>
         <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
-            <template #detail="{tabName}">
+            <template #detail>
                 <p-server-detail :item="items[selectIndex[0]]" :tag-confirm-event="tagConfirmEvent" :tag-reset-event="tagResetEvent" />
             </template>
-            <template #data="{tabName}">
+            <template #data>
                 <PDynamicSubData
                     :select-id="getFirstSelectServerId" :sub-data="getSubData"
                     url="/inventory/server/get-data" id-key="server_id"
                 />
             </template>
-            <template #rawData="{tabName}">
+            <template #rawData>
                 <p-raw-data :item="items[selectIndex[0]]" />
             </template>
-            <template #admin="{tabName}">
-                <p-server-admin :select-index="selectIndex"
-                                :items="admin.items"
-                                :sort-by.sync="admin.sortBy"
-                                :sort-desc.sync="admin.sortDesc"
-                                :page-size.sync="admin.pageSize"
-                                :all-page="admin.allPage"
-                                :this-page.sync="admin.thisPage"
-                                :search-text.sync="admin.searchText"
-                                :loading="admin.loading"
-                                :get-server-admin="getServerAdmin"
-                />
+            <template #admin>
+                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
+            </template>
+            <template #history>
+                <p-dynamic-view :api-handler="historyAPIHandler" view_type="table" :data_source="historyAPIHandler.dataSource" />
             </template>
         </PTab>
         <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
-            <template #data="{tabName}">
+            <template #data>
                 <p-data-table
                     :fields="multiSelectFields"
                     :sortable="false"
@@ -137,18 +130,8 @@
                     <template />
                 </p-data-table>
             </template>
-            <template #admin="{tabName}">
-                <p-server-admin :select-index="selectIndex"
-                                :items="admin.items"
-                                :sort-by.sync="admin.sortBy"
-                                :sort-desc.sync="admin.sortDesc"
-                                :page-size.sync="admin.pageSize"
-                                :all-page="admin.allPage"
-                                :this-page.sync="admin.thisPage"
-                                :search-text.sync="admin.searchText"
-                                :loading="admin.loading"
-                                :get-server-admin="getServerAdmin"
-                />
+            <template #admin>
+                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
             </template>
         </PTab>
 
@@ -197,11 +180,12 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
-import PServerAdmin from '@/views/inventory/server/modules/ServerAdmin.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
+import { AdminTableAPI, HistoryAPI } from '@/lib/api';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -271,6 +255,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
             ['data', 'COMMON.DATA'],
             ['rawData', 'TAB.RAWDATA', { keepAlive: true }],
             ['admin', 'TAB.ADMIN'],
+            ['history', null, { label: 'History' }],
         ],
         context.parent),
         activeTab: 'detail',
@@ -315,11 +300,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         return items;
     });
     const getSelectServerIds = computed(() => {
-        const ids = [];
-        getSelectServerItems.value.forEach((item) => {
-            ids.push(item.server_id);
-        });
-        return ids;
+        return getSelectServerItems.value.map(v => v.server_id);
     });
     const getFirstSelectServerItem = computed(() => (getSelectServerItems.value.length >= 1 ? getSelectServerItems.value[0] : {}));
     const getSubData = computed(() => _.get(getFirstSelectServerItem.value, ['metadata', 'sub_data'], []));
@@ -399,8 +380,6 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
     });
     const queryList = ref([]);
     const queryListTools = tagList(queryList, true, eventBus, eventName.getServerList);
-    // const queryListTools = new TagList(queryList, true, eventBus, eventName.getServerList);
-
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
@@ -455,7 +434,6 @@ export default {
         PTab,
         PDynamicSubData,
         PRawData,
-        PServerAdmin,
         PDataTable,
         PQuerySearchBar,
         PTag,
@@ -464,16 +442,21 @@ export default {
         PCol,
         PHr,
         PIconButton,
+        PDynamicView,
     },
     setup(props, context) {
         const dataBind = reactive({
             items: computed(() => []),
         });
         const state = serverSetup(props, context, dataBind.items);
+        const mockAdminAPI = new AdminTableAPI('', computed(() => ({})), undefined, undefined, undefined, undefined, computed(() => false));
+        const mockHistoryAPIHandler = new HistoryAPI('', '', computed(() => ''), undefined, undefined, undefined, computed(() => false));
 
         return {
             ...toRefs(state),
             ...toRefs(dataBind),
+            adminApiHandler: mockAdminAPI,
+            historyAPIHandler: mockHistoryAPIHandler,
         };
     },
 };

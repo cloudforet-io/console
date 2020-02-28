@@ -87,32 +87,50 @@
                             </template>
                         </p-horizontal-layout>
                         <PTab v-if="dvApiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
-                            <template #detail="{tabName}">
+                            <template #detail>
                                 <PDynamicDetails
                                     :details="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.details"
                                     :data="dvApiHandler.tableTS.selectState.firstSelectItem"
                                 />
                             </template>
-                            <template #data="{tabName}">
+                            <template #data>
                                 <PDynamicSubData
                                     :select-id="dvApiHandler.tableTS.selectState.firstSelectItem.cloud_service_id" :sub-data="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
                                     url="/inventory/cloud-service/get-data" id-key="cloud_service_id"
                                 />
                             </template>
-                            <template #rawData="{tabName}">
+                            <template #rawData>
                                 <p-raw-data :item="dvApiHandler.tableTS.selectState.firstSelectItem" />
+                            </template>
+                            <template #admin>
+                                <p-dynamic-view
+                                    view_type="table"
+                                    :api-handler="adminApiHandler"
+                                    :data_source="adminApiHandler.dataSource"
+                                />
+                            </template>
+                            <template #history>
+                                <p-dynamic-view
+                                    view_type="table"
+                                    :api-handler="historyAPIHandler"
+                                    :data_source="historyAPIHandler.dataSource"
+                                />
                             </template>
                         </PTab>
                         <PTab v-else-if="dvApiHandler.tableTS.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="activeMultiTab">
-                            <template #data="{tabName}">
+                            <template #data>
                                 <p-dynamic-view
                                     view_type="simple-table"
                                     :data_source="selectTypeDataSource"
                                     :data="dvApiHandler.tableTS.selectState.selectItems"
                                 />
                             </template>
-                            <template #admin="{tabName}">
-                                <div>admin</div>
+                            <template #admin>
+                                <p-dynamic-view
+                                    view_type="table"
+                                    :api-handler="adminApiHandler"
+                                    :data_source="adminApiHandler.dataSource"
+                                />
                             </template>
                         </PTab>
                     </div>
@@ -166,7 +184,7 @@ import PQuerySearchTags from '@/components/organisms/search/query-search-tags/Qu
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { makeTrItems } from '@/lib/view-helper';
-import { QuerySearchTableAPI } from '@/lib/api';
+import { AdminTableAPI, HistoryAPI, QuerySearchTableAPI } from '@/lib/api';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
@@ -176,7 +194,11 @@ import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 
-export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApiHandler:QuerySearchTableAPI) => {
+export const cloudServiceSetup = (
+    context,
+    apiHandler:QuerySearchTableAPI,
+    dvApiHandler:QuerySearchTableAPI,
+) => {
     const state = reactive({
         cstFields: makeTrItems([
             ['provider', 'COMMON.PROVIDER'],
@@ -189,6 +211,7 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
             ['data', 'COMMON.DATA'],
             ['rawData', 'TAB.RAWDATA', { keepAlive: true }],
             ['admin', 'TAB.ADMIN'],
+            ['history', null, { label: 'History' }],
         ], context.parent),
         activeTab: 'detail',
         multiTabs: makeTrItems([
@@ -251,7 +274,7 @@ export const cloudServiceSetup = (context, apiHandler:QuerySearchTableAPI, dvApi
     //     context.parent,
     //     { type: 'item' }),
     // });
-    const link = computed(():string|unknown => {
+    const link = computed(():string|undefined => {
         if (dvApiHandler.tableTS.selectState.isSelectOne) {
             return _.get(dvApiHandler.tableTS.selectState.firstSelectItem, 'data.reference.link');
         }
@@ -321,8 +344,13 @@ export default {
     setup(props, context) {
         // @ts-ignore
         const mockAPI = new QuerySearchTableAPI('', undefined, undefined, undefined, undefined, undefined, undefined);
+        const mockAdminAPI = new AdminTableAPI('', computed(() => ({})), undefined, undefined, undefined, undefined, computed(() => false));
+        const mockHistoryAPIHandler = new HistoryAPI('', '', computed(() => ''), undefined, undefined, undefined, computed(() => false));
+
         return {
             ...cloudServiceSetup(context, mockAPI, mockAPI),
+            adminApiHandler: mockAdminAPI,
+            historyAPIHandler: mockHistoryAPIHandler,
         };
     },
 };
