@@ -136,7 +136,7 @@ export default {
                 return;
             }
 
-            await this.$store.dispatch('auth/signIn', this.oathSignParam).then((response) => {
+            await this.$store.dispatch('auth/signIn', 에this.oathSignParam).then((response) => {
                 if (!auth2.isSignedIn.get()) {
                     return;
                 }
