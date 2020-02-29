@@ -75,6 +75,7 @@
   },
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.6.0",
+    "@fullhuman/postcss-purgecss": "^2.1.0",
     "@storybook/addon-a11y": "^5.3.1",
     "@storybook/addon-actions": "^5.3.1",
     "@storybook/addon-centered": "^5.3.1",
@@ -98,6 +99,7 @@
     "@vue/cli-service": "^3.5.3",
     "@vue/eslint-config-airbnb": "^4.0.0",
     "@vue/eslint-config-typescript": "^4.0.0",
+    "autoprefixer": "^9.7.4",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^23.6.0",
@@ -113,6 +115,7 @@
     "sass-loader": "^7.3.1",
     "storybook-addon-vue-info": "^1.4.1",
     "style-loader": "^1.0.0",
+    "tailwindcss": "^1.2.0",
     "typescript": "~3.7.2",
     "vue-loader": "^15.8.3",
     "vue-template-compiler": "^2.6.10",
