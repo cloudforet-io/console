@@ -1,10 +1,8 @@
 <template>
     <div>
-        <div class="wrapper video-theme">
-            <div id="login-container" class="md:flex bg-white rounded-lg p-6">
-                <p id="logo">
-                    <img src="@/assets/images/brand/brand_logo.png">
-                </p><br>
+        <div class="flex items-center h-screen w-full wrapper image-theme">
+            <div id="login-container" class="w-full bg-white shadow-lg md:max-w-sm md:mx-auto">
+                <img src="@/assets/images/brand/brand_logo.png">
                 <div class="header">
                     <p id="title">
                         Sign in to SPACEONE
@@ -15,7 +13,7 @@
                 </div>
                 <div class="user-info">
                     <component :is="component" />
-                    <div class="login-info">
+                    <div id="login-info" class="field-group mb-4 md:w-1/2">
                         <p class="input-title">
                             User ID
                         </p>
@@ -34,13 +32,25 @@
                                       required
                         />
                         <br>
-                        <p-button style-type="primary"
-                                  type="submit"
-                                  size="lg"
-                        >
-                            Login
-                        </p-button>
                     </div>
+                    <p-button style-type="primary"
+                              type="submit"
+                              size="lg"
+                              class="mx-auto"
+                    >
+                        Login
+                    </p-button> <br>
+                    <div class="btn-divider">
+                        OR
+                    </div>
+                    <p-button outline
+                              style-type="gray"
+                              type="submit"
+                              size="lg"
+                              class="mx-auto"
+                    >
+                        Sign-in using root account credentials
+                    </p-button>
                 </div>
             </div>
         </div>
@@ -135,7 +145,7 @@ export default createComponent({
     }
 
     #login-container {
-        margin: 0 auto;
+        /*margin: 0 auto;*/
         background-color: white;
         padding: 24px 16px;
     }
@@ -166,4 +176,24 @@ export default createComponent({
         padding-bottom: 4px;
     }
 
+    .btn-divider {
+        display: flex;
+        flex-basis: 100%;
+        align-items: center;
+        color: $gray2;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 14px;
+        margin: 8px 0px;
+    }
+    .btn-divider::before,
+    .btn-divider::after {
+        content: "";
+        flex-grow: 1;
+        background: $gray2;
+        height: 1px;
+        font-size: 0px;
+        line-height: 0px;
+        margin: 0px 16px;
+    }
 </style>
