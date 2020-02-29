@@ -10,6 +10,7 @@ import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 
 // Views
 import SignIn from '@/views/sign-in/local/Local.vue';
+// import SignIn from '@/views/sign-in/Signin.vue';
 import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth.vue';
 import Admin from '@/views/sign-in/admin/Admin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';

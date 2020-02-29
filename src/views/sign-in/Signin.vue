@@ -1,44 +1,46 @@
 <template>
-    <div class="wrapper default-theme">
-        <div class="container w-16 md:w-32 lg:w-48 ">
-            <p id="logo">
-                <img src="@/assets/images/brand/brand_logo.png">
-            </p>
-            <div class="header">
-                <p id="title">
-                    Sign in to SPACEONE
-                </p>
-                <p id="subtitle">
-                    Welcome to SPACEONE Console
-                </p>
-            </div>
-            <div class="user-info">
-                <component :is="component" />
-                <div class="login-info">
-                    <p class="input-title">
-                        User ID
+    <div>
+        <div class="wrapper video-theme">
+            <div id="login-container" class="md:flex bg-white rounded-lg p-6">
+                <p id="logo">
+                    <img src="@/assets/images/brand/brand_logo.png">
+                </p><br>
+                <div class="header">
+                    <p id="title">
+                        Sign in to SPACEONE
                     </p>
-                    <p-text-input ref="userId"
-                                  class="form-control"
-                                  placeholder="User ID"
-                                  required
-                    /><br>
-                    <p class="input-title">
-                        Password
+                    <p id="subtitle">
+                        Welcome to SPACEONE Console
                     </p>
-                    <p-text-input ref="password"
-                                  type="password"
-                                  class="form-control"
-                                  placeholder="Password"
-                                  required
-                    />
-                    <br>
-                    <p-button style-type="primary"
-                              type="submit"
-                              size="lg"
-                    >
-                        Login
-                    </p-button>
+                </div>
+                <div class="user-info">
+                    <component :is="component" />
+                    <div class="login-info">
+                        <p class="input-title">
+                            User ID
+                        </p>
+                        <p-text-input ref="userId"
+                                      class="form-control"
+                                      placeholder="User ID"
+                                      required
+                        /><br>
+                        <p class="input-title">
+                            Password
+                        </p>
+                        <p-text-input ref="password"
+                                      type="password"
+                                      class="form-control"
+                                      placeholder="Password"
+                                      required
+                        />
+                        <br>
+                        <p-button style-type="primary"
+                                  type="submit"
+                                  size="lg"
+                        >
+                            Login
+                        </p-button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -53,13 +55,13 @@ import {
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
-interface State {
-    component: any,
-    loader: () => Promise<any>
-}
+    interface State {
+        component: any,
+        loader: () => Promise<any>
+    }
 
 export default createComponent({
-    name: 'SignIn',
+    name: 'Login',
     components: {
         PButton,
         PTextInput,
@@ -111,22 +113,29 @@ export default createComponent({
 </script>
 
 <style lang="scss" scoped>
+
     @mixin background-theme($theme, $background) {
         &.#{$theme} {
             background: $background;
+            background-size: cover;
+            /*background-position: center center;*/
         }
     }
 
     .wrapper {
-        margin: auto;
-        background-size: cover;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
         @include background-theme('default-theme', $white);
         @include background-theme('color-theme', $gray);
         @include background-theme('image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg'));
-        @include background-theme('video-theme', url('https://www.pexels.com/video/changes-in-form-and-appearance-of-a-submerged-material-3163534/'));
+        @include background-theme('video-theme', url('https://thumbs.gfycat.com/SpotlessUnfitCoral-size_restricted.gif'));
     }
 
-    .container {
+    #login-container {
+        margin: 0 auto;
         background-color: white;
         padding: 24px 16px;
     }
