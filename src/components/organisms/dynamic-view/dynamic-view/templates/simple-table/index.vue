@@ -43,7 +43,7 @@ export default defineComponent({
         PDataTable,
     },
     props: {
-        // eslint-disable-next-line camelcase
+        // eslint-disable-next-line
         data_source: {
             type: Array,
             required: true,
@@ -52,7 +52,7 @@ export default defineComponent({
             type: [Array, Object],
             required: true,
         },
-        // eslint-disable-next-line camelcase
+        // eslint-disable-next-line
         key_path: {
             type: String,
             default: '',

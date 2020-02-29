@@ -8,7 +8,7 @@
 		"CANCEL": "취소",
 		"CHG_POOL": "풀 변경하기",
 		"CHG_REGION": "리전 변경하기",
-		"COL_DATA": "데이터 수집",
+		"COLLECT_DATA": "데이터 수집",
 		"CONFIRM": "확인",
 		"COPY": "복사하기",
 		"CREATE": "생성",
@@ -253,6 +253,7 @@
 		"BACK_COL": "컬렉터로 돌아가기",
 		"BTN": {
 			"None": "",
+			"SET_CLOSE": "",
 			"SET_INSERVICE": "",
 			"SET_MAINTENANCE": ""
 		},
@@ -355,7 +356,10 @@
 	},
 	"TAB": {
 		"ADMIN": "관리자",
-		"RAWDATA": "원본 데이터"
+		"DATA": "데이터",
+		"DETAILS": "상세 정보",
+		"HISTORY": "수집 기록",
+		"RAW_DATA": "원본 데이터"
 	},
 	"TREE_TYPE": {
 		"CREATE": "{0} 생성하기",

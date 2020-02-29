@@ -14,10 +14,11 @@ import SignIn from '@/views/sign-in/local/Local.vue';
 import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth.vue';
 import Admin from '@/views/sign-in/admin/Admin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';
-import api from '@/lib/api';
 import store from '@/store';
 
 Vue.use(VueRouter);
+
+const nextPath = route => ({ nextPath: route.query.nextPath });
 
 const router = new VueRouter({
     mode: 'history',
@@ -31,9 +32,25 @@ const router = new VueRouter({
             component: ErrorPage,
         },
         {
+            path: '/sign-in/admin',
+            name: 'SignIn-Admin',
+            meta: {
+                label: 'Sign In',
+                excludeAuth: true,
+                isSignInPage: true,
+                props: route => ({
+                    admin: true,
+                    ...nextPath(route),
+                }),
+            },
+            component: SignIn,
+        },
+        {
             path: '/sign-in',
             name: 'SignIn',
-            meta: { label: 'Sign In', excludeAuth: true, isSignInPage: true },
+            meta: {
+                label: 'Sign In', excludeAuth: true, isSignInPage: true, props: nextPath,
+            },
             component: SignIn,
         },
         {
@@ -65,8 +82,10 @@ const router = new VueRouter({
     ],
 });
 
+const hasSiginIn = () => !!sessionStorage.getItem('user/refreshToken');
 
 router.beforeEach(async (to, from, next) => {
+    // todo: 라우터 로직 변경시 제거
     if (store.getters['domain/id']) {
         if (to.meta && !to.meta.excludeAuth && !store.getters['auth/isSignedIn']) {
             const nextPath = store.getters['domain/loginPath'];
@@ -84,6 +103,19 @@ router.beforeEach(async (to, from, next) => {
             next();
         }
     }
+    // todo: 라우터 로직 변경시 활성화
+    // if (to.meta && to.meta.excludeAuth) {
+    //     if (to.meta.isSignInPage) {
+    //         if (hasSiginIn()) {
+    //             next(to.meta.query.nextPath || '/');
+    //         }
+    //     }
+    //     next();
+    // } else if (hasSiginIn()) {
+    //     next();
+    // } else {
+    //     next(`/sign-in?nextPath=${to.path}`);
+    // }
 });
 
 export default router;

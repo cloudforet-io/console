@@ -35,14 +35,12 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import {
-    defineComponent, computed, Ref, watch,
-} from '@vue/composition-api';
+import { computed, Ref } from '@vue/composition-api';
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
-import { SubDataAPI } from '@/lib/api';
+import { SearchTableAPI } from '@/lib/api';
 
 interface DataSourceType {
     name:string;
@@ -55,7 +53,7 @@ interface Props {
     data_source: DataSourceType[];
     data: any;
     rootMode:boolean;
-    apiHandler:SubDataAPI;
+    apiHandler:SearchTableAPI;
 }
 
 interface SlotBind {
@@ -71,7 +69,7 @@ interface Field {
 }
 
 
-export default defineComponent({
+export default {
     name: 'PDynamicViewTable',
     components: {
         PDynamicField,
@@ -79,6 +77,7 @@ export default defineComponent({
         PSearch,
     },
     props: {
+        // eslint-disable-next-line
         data_source: {
             type: Array,
             defaults: () => [],
@@ -88,7 +87,7 @@ export default defineComponent({
             required: true,
         },
         apiHandler: {
-            type: SubDataAPI,
+            type: Object,
             required: true,
         },
     },
@@ -109,5 +108,5 @@ export default defineComponent({
             getValue: (item, path) => _.get(item, path),
         };
     },
-});
+};
 </script>

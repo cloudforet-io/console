@@ -93,7 +93,7 @@ interface Field {
 }
 
 
-export default defineComponent({
+export default {
     name: 'PDynamicViewQuerySearchTable',
     components: {
         PDynamicField,
@@ -104,6 +104,7 @@ export default defineComponent({
         PQuerySearchTags,
     },
     props: {
+        // eslint-disable-next-line
         data_source: {
             type: Array,
             required: true,
@@ -138,7 +139,7 @@ export default defineComponent({
             getValue: (item, path) => _.get(item, path),
         };
     },
-});
+};
 </script>
 <style lang="scss" scoped>
     .left-toolbox-item{
