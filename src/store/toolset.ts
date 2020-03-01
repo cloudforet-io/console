@@ -1,31 +1,21 @@
 import { computed, reactive, Ref } from '@vue/composition-api';
-import Vue from 'vue';
+import Lockr from 'lockr';
 
-const bindLocalStorage = (prefix:string, name:string, state:any) => {
-    const path = `${prefix}/${name}`;
-    return computed({
-        get: () => state[path],
-        set: (val) => {
-            state[path] = val;
-            if (val) {
-                localStorage.setItem(path, JSON.stringify(val));
-            } else {
-                localStorage.removeItem(path);
-            }
-        },
-    });
-};
+const bindLocalStorage = (prefix:string, name:string, state:any) => computed({
+    get: () => state[name],
+    set: (val) => {
+        state[name] = val;
+        Lockr.prefix = prefix;
+        Lockr.set(name, val);
+    },
+});
 
 
 const initData = (prefix:string, names:string[]) => {
     const init :any = {};
+    Lockr.prefix = prefix;
     names.forEach((name) => {
-        const path = `${prefix}/${name}`;
-        let data = localStorage.getItem(path);
-        if (data) {
-            data = JSON.parse(data);
-        }
-        init[path] = data;
+        init[name] = Lockr.get(name);
     });
     return init;
 };
@@ -33,8 +23,7 @@ const initData = (prefix:string, names:string[]) => {
 const initState = (prefix:string, names:string[], data:any) => {
     const state :any = {};
     names.forEach((name) => {
-        const path = `${prefix}/${name}`;
-        state[path] = bindLocalStorage(prefix, name, data);
+        state[name] = bindLocalStorage(prefix, name, data);
     });
     return state;
 };
@@ -44,15 +33,18 @@ abstract class Store<T> {
 
     protected data:any;
 
-    protected constructor(prefix:string, protected names: string[]) {
-        this.data = reactive({ ...initData(prefix, this.names) });
+    protected constructor(protected prefix:string, protected names: string[]) {
+        this.data = reactive({ ...initData(this.prefix, this.names) });
         this.state = reactive({}) as T;
     }
 
+    protected getLockr = () => {
+        Lockr.prefix = this.prefix;
+        return Lockr;
+    };
+
     public reset() {
-        this.names.forEach((name) => {
-            this.state[name] = null;
-        });
+        this.getLockr().flush();
     }
 }
 
@@ -97,7 +89,7 @@ class DomainStore extends Store<DomainState> {
             'domainId',
         ]);
         this.state = reactive({
-            ...initState(prefix, this.names, this.data),
+            ...initState(this.prefix, this.names, this.data),
         });
     }
 }
