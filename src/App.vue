@@ -14,7 +14,7 @@
 <script>
 import _ from 'lodash';
 import Vue from 'vue';
-import api,{ApiInstance} from '@/lib/api';
+import api, { ApiInstance } from '@/lib/api';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
@@ -40,13 +40,12 @@ export default {
     },
     created() {
         this.preparationTo();
-        new GTag();
     },
     methods: {
         async preparationTo() {
             try {
                 await this.configInit();
-                new GTag();
+                new GTag(config.get('GTAG_ID'), this);
                 await this.syncStores('auth');
                 await this.domainInit();
                 await this.syncStores('domain');
@@ -77,14 +76,14 @@ export default {
             await config.init();
             // todo: 인증로직 변경시 삭제
             await api.init(config.get('VUE_APP_API.ENDPOINT'), {
-              authError: () => {
-                this.$store.commit('auth/signOut');
-              },
-            })
-            Vue.prototype.$http = new ApiInstance(config.get('VUE_APP_API.ENDPOINT'),this, {
-              authError: () => {
-                this.$store.commit('auth/signOut');
-              },
+                authError: () => {
+                    this.$store.commit('auth/signOut');
+                },
+            });
+            Vue.prototype.$http = new ApiInstance(config.get('VUE_APP_API.ENDPOINT'), this, {
+                authError: () => {
+                    this.$store.commit('auth/signOut');
+                },
             }).instance;
         },
         async domainInit() {
