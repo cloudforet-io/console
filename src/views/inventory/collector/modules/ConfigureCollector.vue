@@ -1,7 +1,7 @@
 <template>
     <div>
         <p-row class="all-container">
-            <p-col :flex-grow="0" flex-basis="50%" class="container collector-info">
+            <p-col :flex-grow="0" flex-basis="50%" class="container mx-auto collector-info">
                 <p-row>
                     <p-col :flex-grow="0">
                         <p-lottie v-if="imgLoading || !plugin"
@@ -25,7 +25,7 @@
                                 <p-text-input v-model="fieldState.name"
                                               v-focus
                                               style="width: 100%;"
-                                              class="form-control"
+                                              class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                               :class="{'is-invalid': invalid}"
                                               @input="onChangeFields('name')"
                                 />
@@ -47,7 +47,7 @@
                             <template #default="{invalid}">
                                 <p-text-input v-model.number="fieldState.priority"
                                               type="number"
-                                              class="form-control"
+                                              class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                               :class="{'is-invalid': invalid}"
                                               @input="onChangeFields('priority')"
                                 />
@@ -56,7 +56,7 @@
                     </p-col>
                 </p-row>
             </p-col>
-
+            <p-col v-if="pluginOptions.length > 0" class="container mx-auto options">
             <p-col v-if="pluginOptions.length > 0" class="container options">
                 <p class="sub-title">
                     {{$t('INVENTORY.OPTIONS') }}
