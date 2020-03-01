@@ -1,13 +1,25 @@
 import Vue from 'vue';
 import VueGtag from 'vue-gtag';
-import config from '@/lib/config';
+
 
 export class GTag {
-    constructor() {
-        const id:string = config.get('GTAG_ID') || 'DISABLED';
-        if (id === 'DISABLED') return;
+    public gtag: any;
+
+    constructor(id:string, vm:Vue) {
+        const gtagId:string = id || 'DISABLED';
+
+        if (gtagId === 'DISABLED') return;
         Vue.use(VueGtag, {
-            config: { id },
+            config: { id: gtagId },
+        });
+
+        this.gtag = vm.$gtag;
+
+        vm.$router.afterEach((to, from) => {
+            this.gtag.pageview({
+                // eslint-disable-next-line camelcase
+                page_path: to.path,
+            });
         });
     }
 }
