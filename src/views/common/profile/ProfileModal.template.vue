@@ -28,7 +28,7 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="userState.email"
-                                          class="form-control"
+                                          class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>
@@ -39,7 +39,7 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="userState.name" block
-                                          class="form-control"
+                                          class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>
@@ -51,7 +51,7 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="userState.password" block type="password"
-                                          class="form-control"
+                                          class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>
@@ -63,7 +63,7 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="userState.passwordCheck" block type="password"
-                                          class="form-control"
+                                          class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>

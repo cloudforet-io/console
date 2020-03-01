@@ -1,7 +1,7 @@
 <template>
-    <div class="row no-gutters">
+    <div class="flex flex-wrap no-gutters">
         <project-summary class="item" :selected-node="selectedNode" :data="summaryData" />
-        <servers-by-type class="col"
+        <servers-by-type class="flex-grow"
                          :server-data="serverByType.serverTypeData"
                          :vm-data="serverByType.vmTypeData"
                          :os-data="serverByType.osTypeData"
@@ -9,7 +9,7 @@
                          :col-max="2"
                          :draw-by="drawBy"
         />
-        <resources-by-region class="col region"
+        <resources-by-region class="flex-grow region"
                              :data="resourcesByRegionData"
                              legend-position="bottom"
                              :draw-by="drawBy"

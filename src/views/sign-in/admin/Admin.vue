@@ -1,11 +1,11 @@
 <template>
     <div class="background-cover">
-        <div class="row">
-            <div class="container fade-in">
-                <div class="row d-flex justify-content-center">
-                    <div class="col-md-8">
-                        <div class="card-group">
-                            <div class="card col-7 card-left-container">
+        <div class="flex flex-wrap">
+            <div class="container mx-auto fade-in">
+                <div class="flex flex-wrap flex justify-content-center">
+                    <div class="md:w-2/3 pr-4 pl-4">
+                        <div class="flex flex-col">
+                            <div class="relative flex flex-col min-w-0 rounded break-words border bg-white border-1 border-grey-light w-3/5 card-left-container">
                                 <div class="signIn-title">
                                     Admin Sign In
                                 </div>
@@ -18,14 +18,14 @@
                                     </div>
                                 </div>
                                 <form class="form-binder">
-                                    <div class="form-group">
+                                    <div class="mb-4">
                                         <p-label class="input-title">
                                             User ID
                                         </p-label>
                                         <p-text-input ref="userId" v-model="adminUserId"
                                                       :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none', 'border-radius': '2px' } "
                                                       autocomplete="on"
-                                                      class="form-control"
+                                                      class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                                       type="text"
                                                       placeholder="  User ID"
                                                       required
@@ -36,14 +36,14 @@
                                     <div v-show="validatorUser" style="display:block" class="invalid-feedback">
                                         * {{ $t('SIGNIN.USER_EMPTY') }}
                                     </div>
-                                    <div class="form-group">
+                                    <div class="mb-4">
                                         <p-label class="input-title">
                                             Password
                                         </p-label>
                                         <p-text-input ref="password" v-model="password" type="password"
                                                       autocomplete="on"
                                                       :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none', 'border-radius': '2px' } "
-                                                      class="form-control"
+                                                      class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                                       placeholder="  Password"
                                                       required
                                                       @keyup="removeCSS('password')"
@@ -53,8 +53,8 @@
                                             * {{ $t('SIGNIN.PASS_EMPTY') }}
                                         </div>
                                     </div>
-                                    <div class="row mt-4">
-                                        <div class="col-md-12 col-xs-12 col-sm-12">
+                                    <div class="flex flex-wrap mt-4">
+                                        <div class="md:w-1/6 pr-4 pl-42 sm:w-1/6 pr-4 pl-42 sm:w-1/6 pr-4 pl-42">
                                             <p-button size="lg"
                                                       style-type="primary1"
                                                       @click="signIn"
@@ -65,9 +65,9 @@
                                     </div>
                                 </form>
                             </div>
-                            <div class="card card-right-container">
-                                <img class="card-img" src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg" alt="Bologna">
-                                <div class="card-img-overlay text-white d-flex flex-column justify-content-center">
+                            <div class="relative flex flex-col min-w-0 rounded break-words border bg-white border-1 border-grey-light card-right-container">
+                                <img class="w-full rounded" src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg" alt="Bologna">
+                                <div class="absolute pin-y pin-x p-6 text-white flex flex-column justify-content-center">
                                     <div class="text-center">
                                         <p style="margin-bottom: 10px">
                                             <img src="@/assets/images/brand/brand_logo.png" width="100vh" height="100vh">

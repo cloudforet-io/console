@@ -1,11 +1,11 @@
 <template>
     <div class="background-cover">
-        <div class="row">
-            <div class="container fade-in">
-                <div class="row d-flex justify-content-center">
-                    <div class="col-md-8">
-                        <div class="card-group">
-                            <div class="card col-7 card-left-container">
+        <div class="flex flex-wrap">
+            <div class="container mx-auto fade-in">
+                <div class="flex flex-wrap flex justify-content-center">
+                    <div class="md:w-2/3 pr-4 pl-4">
+                        <div class="flex flex-col">
+                            <div class="relative flex flex-col min-w-0 rounded break-words border bg-white border-1 border-grey-light w-3/5 card-left-container">
                                 <div class="signIn-title">
                                     {{ $t('SIGNIN.SIGN_IN') }}
                                 </div>
@@ -18,13 +18,13 @@
                                     </div>
                                 </div>
                                 <form class="form-binder">
-                                    <div class="row">
+                                    <div class="flex flex-wrap">
                                         <div class="g-signin2">
                                             <div id="g-signin-btn" style="width: 70%;" @click="login" />
                                         </div>
                                     </div>
-                                    <div class="row mt-4">
-                                        <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
+                                    <div class="flex flex-wrap mt-4">
+                                        <b-col class="w-1/61 sm:w-1/6 pr-4 pl-41 sm:w-1/6 pr-4 pl-41 md:w-1/6 pr-4 pl-40 lg:w-1/6 pr-4 pl-42 xl:w-1/6 pr-4 pl-42">
                                             <div @click="directToAdmin">
                                                 <span class="root-sign">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
                                             </div>
@@ -32,9 +32,9 @@
                                     </div>
                                 </form>
                             </div>
-                            <div class="card card-right-container embed-responsive-16by9">
-                                <img class="card-img-top embed-responsive-item" src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg">
-                                <div class="card-img-overlay text-white d-flex flex-column justify-content-center">
+                            <div class="relative flex flex-col min-w-0 rounded break-words border bg-white border-1 border-grey-light card-right-container ">
+                                <img class="w-full rounded rounded-t " src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg">
+                                <div class="absolute pin-y pin-x p-6 text-white flex flex-column justify-content-center">
                                     <div class="text-center">
                                         <p style="margin-bottom: 10px">
                                             <img src="@/assets/images/brand/brand_logo.png" width="100vh" height="100vh">

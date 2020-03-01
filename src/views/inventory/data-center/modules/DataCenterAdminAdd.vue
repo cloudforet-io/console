@@ -60,13 +60,13 @@
                 </p-tag>
             </p-box-layout>
             <div class="label-group">
-                <div class="form-group">
+                <div class="mb-4">
                     <p-label class="input-title">
                         {{$t('COMMON.LABELS') }}
                     </p-label>
                     <p-text-input ref="labels" v-model="label.input"
                                   :style="{'border': `${getInvalidityHashTag}`, 'boxShadow': 'none' } "
-                                  class="form-control"
+                                  class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                   type="text"
                                   placeholder="#Labels "
                                   required
