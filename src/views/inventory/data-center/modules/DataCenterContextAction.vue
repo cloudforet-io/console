@@ -14,7 +14,7 @@
     >
         <template #body>
             <form class="form-binder novalidate">
-                <div v-if="getVisible" class="form-group">
+                <div v-if="getVisible" class="mb-4">
                     <p-label class="input-title">
                         {{ getLabelID }}
                     </p-label>
@@ -23,7 +23,7 @@
                                   v-model="textInput.parentName"
                                   :style="{'boxShadow': 'none'} "
                                   :disabled="true"
-                                  class="form-control col-6"
+                                  class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded w-1/2"
                                   type="text"
                                   required
                     />
@@ -32,20 +32,20 @@
                                   v-model="textInput.id"
                                   :style="{'boxShadow': 'none' } "
                                   :disabled="true"
-                                  class="form-control col-6"
+                                  class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded w-1/2"
                                   type="text"
                                   placeholder="  Project ID"
                                   required
                     />
                 </div>
-                <div class="form-group">
+                <div class="mb-4">
                     <p-label class="input-title">
                         {{ getLabelName }}
                     </p-label>
                     <p-text-input ref="dataCenterName" v-model="textInput.name"
                                   v-focus
                                   :style="{'border': `${getIsInvalidProjectName}`, 'boxShadow': 'none' } "
-                                  class="form-control"
+                                  class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                   :placeholder="getPlaceHolderName"
                                   @keyup="removeMessage"
                     />
