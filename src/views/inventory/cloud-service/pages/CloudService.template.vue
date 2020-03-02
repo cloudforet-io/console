@@ -209,7 +209,7 @@ export const cloudServiceSetup = (
         tabs: makeTrItems([
             ['detail', 'TAB.DETAILS'],
             ['data', 'TAB.DATA'],
-            ['rawData', 'TAB.RAW_DATA', { keepAlive: true }],
+            ['rawData', 'TAB.RAW_DATA'],
             ['admin', 'TAB.ADMIN'],
             ['history', 'TAB.HISTORY'],
         ], context.parent),
