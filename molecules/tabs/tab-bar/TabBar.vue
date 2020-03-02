@@ -1,5 +1,5 @@
 <template>
-    <ul class="nav nav-tabs">
+    <ul class="p-nav-tabs">
         <li
             v-for="tab in tabData"
             :key="tab.name"
@@ -7,8 +7,10 @@
             @click="tabClick(tab.name)"
         >
             <a
-                class="nav-link"
-                :class="{active: activeTab === tab.name, disabled: tab.disabled,'one-tab':isOne }"
+                class="p-nav-link inline-block py-2 px-4 no-underline"
+                :class="{active: activeTab === tab.name,
+                         'opacity-75': tab.disabled,
+                         'one-tab':isOne }"
             >
                 {{ tab.label }}
             </a>
@@ -68,41 +70,39 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.nav-tabs{
+.p-nav-tabs {
+    @apply flex flex-wrap pl-0 mb-0;
     > li {
         cursor: pointer;
     }
-    .nav-item{
-        .nav-link{
-            border: 1px solid $gray3;
-            background-color: $white;
-            font: 14px/16px Arial;
-            min-width: 7.5rem;
-            min-height: 2rem;
-            max-height: 2rem;
-            border-radius: 2px 2px 0px 0px;
-            text-align: center;
-            margin-bottom: -1px;
-            &:hover{
-                color: $secondary;
+    .p-nav-link {
+        border: 1px solid $gray3;
+        background-color: $white;
+        font: 14px/16px Arial;
+        min-width: 7.5rem;
+        min-height: 2rem;
+        max-height: 2rem;
+        border-radius: 2px 2px 0px 0px;
+        text-align: center;
+        margin-bottom: -1px;
+        &:hover {
+            color: $secondary;
+        }
+        &.active {
+            font-weight: bold;
+            box-shadow: 0.25rem -0.25rem 0.75rem -0.25rem  #4D49B614,
+                        -0.25rem -0.25rem 0.75rem -0.25rem #4D49B614;
+            color: $primary;
+            &:not(.one-tab) {
+                border-bottom: 2px solid $primary;
             }
-            &.active{
-                font-weight: bold;
-                box-shadow: 0.25rem -0.25rem 0.75rem -0.25rem  #4D49B614,
-                            -0.25rem -0.25rem 0.75rem -0.25rem #4D49B614;
-                color: $primary;
-                &:not(.one-tab){
-                    border-bottom: 2px solid $primary;
-                }
-                &.one-tab{
-                    border-bottom: 2px solid $white;
-                }
-            }
-            &:not(.active){
-                box-shadow: inset 0px -8px 8px -8px #4D49B614;
+            &.one-tab {
+                border-bottom: 2px solid $white;
             }
         }
-
+        &:not(.active) {
+            box-shadow: inset 0px -8px 8px -8px #4D49B614;
+        }
     }
 }
 </style>

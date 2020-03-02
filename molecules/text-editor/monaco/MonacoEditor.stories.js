@@ -201,13 +201,12 @@ const value = {
 const data = {
     code: JSON.stringify(value, undefined, 4),
 };
-
 export const editorMode = () => ({
     components: { PMonacoEditor },
     template: `
-<div style="width: 80vw; height:80vh" class="row">
-    <PMonacoEditor  :code.sync="code" class="col-sm-6"/>
-    <pre class="col-sm-6">{{code}}</pre>
+<div style="width: 80vw; height:80vh" class="flex flex-wrap">
+    <PMonacoEditor  :code.sync="code" class="sm:w-1/2 pr-4 pl-4"/>
+    <pre class="sm:w-1/2 pr-4 pl-4">{{code}}</pre>
 </div>`,
     data() {
         return {
@@ -215,13 +214,12 @@ export const editorMode = () => ({
         };
     },
 });
-
 export const readOnlyMode = () => ({
     components: { PMonacoEditor },
     template: `
-<div style="width: 80vw; height:80vh" class="row">
-    <PMonacoEditor  :code.sync="code" :readOnly="true" class="col-sm-6"/>
-    <pre class="col-sm-6">{{code}}</pre>
+<div style="width: 80vw; height:80vh" class="flex flex-wrap">
+    <PMonacoEditor  :code.sync="code" :readOnly="true" class="sm:w-1/2 pr-4 pl-4"/>
+    <pre class="sm:w-1/2 pr-4 pl-4">{{code}}</pre>
 </div>`,
     data() {
         return {

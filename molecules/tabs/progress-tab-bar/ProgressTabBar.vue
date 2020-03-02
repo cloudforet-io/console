@@ -3,7 +3,7 @@
         <div
             v-for="(tab, idx) in tabs"
             :key="tab.key"
-            class="nav-item"
+            class="tab-nav-item"
             :class="{
                 active: idx == activeIdx,
                 done: tab.done,
@@ -99,7 +99,7 @@ $height: 2.5rem;
     height: $height;
     align-items: center;
     justify-content: center;
-    .nav-item {
+    .tab-nav-item {
         position: relative;
         display: flex;
         align-items: center;
