@@ -1,21 +1,31 @@
 <template>
-    <p-box-layout class="p-tags-input" :box-style="boxStyle" @click="onBoxClick">
+    <p-box-layout ref="box" class="p-tags-input"
+                  :box-style="boxStyle"
+                  :style="{maxWidth: maxWidth ? `${maxWidth}px` : undefined}"
+                  @click="onBoxClick"
+    >
         <p-tag v-for="(tag, idx) in tagTools.tags" :key="`${idx}-${tag}`"
-               class="item" @delete="onDelete(idx)"
+               class="item"
+               @delete="onDelete(idx)"
         >
             {{ tag }}
         </p-tag>
         <p-text-input ref="input" v-model="value" v-focus="focus"
-                      class="item input"
+                      class="input"
+                      :style="{width: autoWidth ? `${inputWidth}px` : undefined}"
                       :placeholder="placeholder"
+                      @input="setWidth"
                       @keyup.enter="add"
                       @blur="proxyFocus = false"
         />
+        <span v-if="autoWidth"
+              ref="fake" class="fake"
+        > {{ value || placeholder }}</span>
     </p-box-layout>
 </template>
 
 <script>
-import { ref } from '@vue/composition-api';
+import { ref, onMounted, getCurrentInstance } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
@@ -54,16 +64,14 @@ export default {
             type: Boolean,
             default: true,
         },
+        autoWidth: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props, { emit, refs }) {
         const tagTools = tagList(makeProxy('tags', props, emit), props.noDuplicate);
         const value = ref(props.placeholder);
-
-        const add = () => {
-            tagTools.addTag(value.value);
-            emit('change', tagTools.tags);
-            value.value = '';
-        };
 
         const onBoxClick = () => {
             refs.input.focus();
@@ -74,12 +82,44 @@ export default {
             emit('change', tagTools.tags);
         };
 
+        const vm = getCurrentInstance();
+
+        const box = ref(null);
+        const fake = ref(null);
+        const inputWidth = ref(0);
+        const maxWidth = ref(0);
+
+        const setWidth = () => {
+            if (!props.autoWidth) return;
+            vm.$nextTick(() => {
+                inputWidth.value = maxWidth.value > fake.value.offsetWidth
+                    ? fake.value.offsetWidth : maxWidth.value;
+            });
+        };
+
+        const add = () => {
+            tagTools.addTag(value.value);
+            emit('change', tagTools.tags);
+            value.value = '';
+            setWidth();
+        };
+
+        onMounted(() => {
+            maxWidth.value = box.value.$el.clientWidth;
+            setWidth();
+        });
+
         return {
             value,
             tagTools,
             add,
             onBoxClick,
             onDelete,
+            box,
+            fake,
+            inputWidth,
+            maxWidth,
+            setWidth,
         };
     },
 };
@@ -90,20 +130,35 @@ export default {
     cursor: text;
     vertical-align: middle;
     &.p-box-layout {
+        padding-top: 0;
         padding-bottom: 0;
+    }
+    .input.p-text-input {
+        border: none;
+        background-color: transparent;
+        min-height: unset;
+        line-height: unset;
+        padding: 0;
+        min-width: 3rem;
+        max-width: 100%;
+    }
+    .fake {
+        position: absolute;
+        visibility: hidden;
+        font-size: .875rem;
+        border: 1px solid transparent;
+        white-space: nowrap;
+    }
+    .tag-container {
+        display: inline-block;
+        width: 100%;
     }
     .item {
         display: inline-block;
-        margin-bottom: .5rem;
+        margin: .25rem;
+        white-space: normal;
         &.p-tag:last-child {
             margin-right: 0;
-        }
-        &.p-text-input {
-            border: none;
-            background-color: transparent;
-            padding-left: 0;
-            min-height: unset;
-            line-height: unset;
         }
     }
 }
