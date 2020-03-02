@@ -147,28 +147,6 @@ class DomainStore extends Store<DomainState> {
     }
 }
 
-interface DisplayState {
-    loading:boolean;
-}
-class DisplayStore extends Store<DisplayState> {
-    public constructor(prefix:string) {
-        super(prefix, [
-            'loading',
-        ]);
-        this.state = reactive({
-            ...initState(this.prefix, this.names, this.data),
-        });
-    }
-
-    public loadingStart() {
-        this.state.loading = true;
-    }
-
-    public loadingEnd() {
-        this.state.loading = false;
-    }
-}
-
 
 export default {
     name: 'LocalStorage',
@@ -176,7 +154,6 @@ export default {
         const state = {
             user: new UserStore('user/'),
             domain: new DomainStore('domain/'),
-            display: new DisplayStore('display/'),
         };
         return {
             ...state,
