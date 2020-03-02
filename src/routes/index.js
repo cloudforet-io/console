@@ -97,26 +97,6 @@ const router = new VueRouter({
 const hasLogIn = () => !!localStorage.getItem('user/refreshToken');
 
 router.beforeEach(async (to, from, next) => {
-    // todo: 라우터 로직 변경시 제거
-    // if (store.getters['domain/id']) {
-    //     if (to.meta && !to.meta.excludeAuth && !store.getters['auth/isSignedIn']) {
-    //         const nextPath = store.getters['domain/loginPath'];
-    //         next(nextPath);
-    //     } else {
-    //         next();
-    //     }
-    // } else {
-    //     localStorage.setItem('common.toMeta', JSON.stringify(to.meta));
-    //     localStorage.setItem('common.toNextPath', to.path);
-    //     const signInPath = store.getters['domain/loginPath'];
-    //     if (!store.getters['auth/isSignedIn'] && signInPath !== to.path) {
-    //         next(signInPath);
-    //     } else {
-    //         next();
-    //     }
-    // }
-    // todo: 라우터 로직 변경시 활성화
-    console.debug(to, from, hasLogIn());
     if (to.meta && to.meta.excludeAuth) {
         if (to.meta.isSignInPage) {
             if (hasLogIn()) {
