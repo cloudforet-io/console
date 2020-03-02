@@ -148,6 +148,7 @@ export default {
 <style lang="scss" scoped>
     .name {
         .icon {
+            display: inline-block;
             width: 1.5rem;
             height: 1.5rem;
             margin-right: .5rem;

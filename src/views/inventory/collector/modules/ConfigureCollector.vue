@@ -1,7 +1,7 @@
 <template>
     <div>
         <p-row class="all-container">
-            <p-col :flex-grow="0" flex-basis="50%" class="container mx-auto collector-info">
+            <p-col :flex-grow="0" flex-basis="50%" class="container collector-info">
                 <p-row>
                     <p-col :flex-grow="0">
                         <p-lottie v-if="imgLoading || !plugin"
