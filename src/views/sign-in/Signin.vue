@@ -23,8 +23,9 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, ref, computed, defineComponent, onMounted, Ref, getCurrentInstance,
+    toRefs, reactive, ref, computed, defineComponent, onMounted, Ref, getCurrentInstance, onBeforeMount, watch,
 } from '@vue/composition-api';
+import { Route } from 'vue-router';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
@@ -57,25 +58,47 @@ export default defineComponent({
         },
     },
     setup(props:any, context:any) {
-        const authType:Ref<'admin'|'local'|'google_oauth2'> = ref('local');
         const vm = (getCurrentInstance() as any);
+
         // todo: remove when router props function mode is work
         const routeProps = vm.$route.meta.props(vm.$route);
         const state = reactive<any>({
             // todo: remove when router props function mode is work
             tempAdmin: routeProps.admin,
             tempNextPath: routeProps.nextPath,
+            authType: computed(() => {
+                if (state.tempAdmin) {
+                    return 'admin';
+                }
+                return vm.$ls.domain.state.authType;
+            }),
             component: null,
             userType: computed(() => (state.tempAdmin ? 'DOMAIN_OWNER' : 'USER')),
-            loader: computed<()=>Promise<any>>(() => () => import(`./templates/${authType.value}/index.vue`)),
+            loader: computed<()=>Promise<any>>(() => () => import(`./templates/${state.authType}/index.vue`)),
         });
-        if (state.admin) {
-            authType.value = 'admin';
-        } else {
-            authType.value = vm.$ls.domain.state.authType;
-        }
-        onMounted(async () => {
-            console.log('test');
+
+        watch(() => vm.$route, (route: Route, preRoute:Route) => {
+            if (route !== preRoute) {
+                const parseProps = vm.$route.meta.props(route);
+                state.tempAdmin = parseProps.admin;
+                state.tempNextPath = parseProps.nextPath;
+            }
+        });
+        watch(() => state.authType, (authType: any, preAuthType:any) => {
+            if (authType !== preAuthType) {
+                state.loader()
+                    .then(() => {
+                        state.component = () => state.loader();
+                    })
+                    .catch(() => {
+                        // eslint-disable-next-line import/no-unresolved
+                        state.component = () => import('./templates/local/index.vue');
+                    });
+            }
+        });
+        onBeforeMount(async () => {
+            await vm.$ls.domain.getDomain(vm);
+
             state.loader()
                 .then(() => {
                     state.component = () => state.loader();

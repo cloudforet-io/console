@@ -51,11 +51,13 @@
 </template>
 
 <script lang="ts">
-import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+import {
+    getCurrentInstance, reactive, toRefs, defineComponent,
+} from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
-export default {
+export default defineComponent({
     name: 'Local',
     components: {
         PButton,
@@ -90,7 +92,7 @@ export default {
             goToAdmin,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

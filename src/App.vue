@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!$ls.display.state.loading" id="app">
+    <div v-if="!loading" id="app">
         <p-notice-alert group="noticeTopLeft" position="top left" />
         <p-notice-alert group="noticeTopRight" position="top right" />
         <p-notice-alert group="noticeBottomLeft" position="bottom left" />
@@ -11,16 +11,18 @@
     </div>
 </template>
 
-<script>
-import _ from 'lodash';
+<script lang="ts">
 import Vue from 'vue';
-import api, { ApiInstance } from '@/lib/api';
+import {
+    defineComponent, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { ApiInstance } from '@/lib/api';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
 import { GTag } from '@/lib/gtag';
 
-export default {
+export default defineComponent({
     name: 'App',
     components: {
         PLottie,
@@ -32,45 +34,33 @@ export default {
             default: process.env.NODE_ENV,
         },
     },
-    // setup(props,context){
-    //     const vm = getCurrentInstance() as any''
-    //
-    //     try {
-    //         vm.$ls.display.loadingStart();
-    //         await vm.configInit();
-    //         new GTag(config.get('GTAG_ID'), this);
-    //     } catch (e) {
-    //         vm.$router.push({ path: '/error-page' });
-    //         console.error(e);
-    //     }
-    //     vm.$ls.display.loadingEnd();
-    //
-    //     return{
-    //
-    //     }
-    //
-    // }
-    created() {
-        this.preparationTo();
-    },
-    methods: {
-        async preparationTo() {
+    setup(props, context) {
+        const vm = getCurrentInstance() as any;
+        const state = reactive({
+            loading: true,
+        });
+        const configInit = async () => {
+            await config.init();
+            Vue.prototype.$http = new ApiInstance(config.get('VUE_APP_API.ENDPOINT'), vm).instance;
+        };
+        const preparationTo = async () => {
             try {
-                await this.configInit();
-                new GTag(config.get('GTAG_ID'), this);
-                await this.$ls.domain.getDomain(this);
+                await configInit();
+                new GTag(config.get('GTAG_ID'), vm);
             } catch (e) {
                 console.error(e);
-                this.$router.push({ path: '/error-page' });
+                vm.$router.push({ path: '/error-page' });
             }
-        },
-        async configInit() {
-            await config.init();
-            Vue.prototype.$http = new ApiInstance(config.get('VUE_APP_API.ENDPOINT'), this).instance;
-            console.log('set $http');
-        },
+            state.loading = false;
+        };
+        preparationTo();
+
+        return {
+            ...toRefs(state),
+        };
     },
-};
+
+});
 
 </script>
 
