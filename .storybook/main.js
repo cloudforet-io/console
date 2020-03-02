@@ -1,7 +1,21 @@
  // { INITIAL_VIEWPORTS } from '@storybook/addon-viewport'
  const path = require('path');
  const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-
+const postCssLoader = {
+        loader: 'postcss-loader',
+        options: {
+            plugins: () => [
+                require('tailwindcss'),
+                require('autoprefixer'),
+                require('postcss-mixins'),
+                require('postcss-simple-vars'),
+                require('postcss-easy-import')({
+                    path: ['src', 'node_modules'],
+                }),
+                require('postcss-preset-env')({ stage: 3 }),
+            ],
+        }
+    }
 module.exports = {
   stories: [
     '../src/**/*.stories.js',
@@ -37,13 +51,7 @@ module.exports = {
     config.module.rules.push(
       {
         test: /\.s?css$/,
-        use: ['style-loader', 'css-loader',
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: () => [require('autoprefixer')]
-            }
-          },
+        use: ['style-loader', 'css-loader',postCssLoader,
           {
             loader: 'sass-loader',
             options: {
@@ -54,8 +62,24 @@ module.exports = {
         include: path.resolve(__dirname, '../'),
         exclude:[
             path.resolve(__dirname, '..', 'node_modules/monaco-editor'),
+          path.resolve(__dirname, '..', 'node_modules.nosync/monaco-editor'),
+
         ],
       }
+    );
+
+    /* SASS settings */
+    config.module.rules.push(
+        {
+          test: /\.postcss$/,
+          use: ['style-loader', 'css-loader',postCssLoader,],
+          include: path.resolve(__dirname, '../'),
+          exclude:[
+            path.resolve(__dirname, '..', 'node_modules/monaco-editor'),
+            path.resolve(__dirname, '..', 'node_modules.nosync/monaco-editor'),
+
+          ],
+        }
     );
 
     /* alis settings */
