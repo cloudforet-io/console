@@ -171,6 +171,7 @@ export default defineComponent( {
                 @extend %row;
                 td{
                     height: 2.5rem;
+                    padding-left: .75rem;
                     z-index: 0;
                     vertical-align: middle;
                 }

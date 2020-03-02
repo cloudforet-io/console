@@ -59,6 +59,7 @@ export default {
 <style lang="scss">
 @mixin setInput() {
     min-height: 2rem;
+    height: 2rem;
 
     padding-left: 1rem;
     padding-right: 1rem;

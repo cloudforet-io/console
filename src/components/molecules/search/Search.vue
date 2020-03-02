@@ -1,8 +1,7 @@
 <template>
-    <div class="p-search">
+    <div class="p-search" :class="bindClass">
         <p-input-text v-focus.lazy="proxyFocused"
                       class="p-search-input"
-                      :class="bindClass"
                       :value="searchText"
                       :disabled="disabled"
                       :placeholder="searchPlaceholder"
@@ -16,11 +15,12 @@
                       @mouseout="onMouseOut"
         />
         <div class="p-search-btn"
-             :class="bindClass"
              @mouseover="onMouseOver"
              @mouseout="onMouseOut"
         >
-            <p-button class="search-btn" @click="onSearch">
+            <p-button class="search-btn"
+                      @click="onSearch"
+            >
                 <p-i color="transparent inherit"
                      width="1.3rem"
                      height="1.3rem"
@@ -67,7 +67,7 @@ export default {
     setup(props, context) {
         const proxyFocused = (typeof props.focused === 'boolean') ? makeProxy('focused', props, context.emit) : ref(false);
         const { isMouseOver, onMouseOver, onMouseOut } = mouseOverState(props.disabled);
-        const bindClass = computed(() => ({ 'p-search-board': isMouseOver.value, 'p-search-focus': proxyFocused.value }));
+        const bindClass = computed(() => ({ hovered: isMouseOver.value, focused: proxyFocused.value }));
         return {
             proxyFocused,
             onSearch() {
@@ -82,34 +82,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .p-search{
+    .p-search {
         position: relative;
         display: inline-flex;
         flex-wrap: nowrap;
         width: 100%;
-        .p-search-input{
-            flex-grow: 1;
-            border-right-width: 0px;
-            border-top-right-radius:0;
-            border-bottom-right-radius:0;
-        }
-        .p-search-btn{
-            flex-grow: 0;
-            border-radius: 0px 2px 2px 0px;
-            border: 1px solid $gray2;
-            border-left-width: 0px;
-            .search-btn {
-                min-width: 32px;
-                background-color: white;
-
-            }
-        }
-        .p-search-board{
+        height: 2rem;
+        border: 1px solid $gray2;
+        border-radius: 2px;
+        background-color: $white;
+        &.hovered {
             border-color: $dark;
         }
-        .p-search-focus{
+        &.focused {
             color: $dark;
             border-color: $dark;
         }
+        .p-search-input {
+            flex-grow: 1;
+            border: 0;
+            background: transparent;
+        }
+        .p-search-btn {
+            flex-grow: 0;
+            .search-btn {
+                min-width: 2rem;
+            }
+        }
     }
+
+
 </style>
