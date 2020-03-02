@@ -56,10 +56,10 @@
                     </p-col>
                 </p-row>
             </p-col>
-            <p-col v-if="pluginOptions.length > 0" class="container mx-auto options">
+<!--            <p-col v-if="pluginOptions.length > 0" class="container mx-auto options">-->
             <p-col v-if="pluginOptions.length > 0" class="container options">
                 <p class="sub-title">
-                    {{$t('INVENTORY.OPTIONS') }}
+                    {{ $t('INVENTORY.OPTIONS') }}
                 </p>
                 <p-dynamic-form v-for="(op) in pluginOptions" :key="op.key"
                                 v-model="proxyOptionsValue[op.key]"
