@@ -23,7 +23,7 @@
                                   v-model="textInput.parentName"
                                   :style="{'boxShadow': 'none'} "
                                   :disabled="true"
-                                  class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded w-1/2"
+                                  class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm w-1/2"
                                   type="text"
                                   required
                     />
@@ -32,7 +32,7 @@
                                   v-model="textInput.id"
                                   :style="{'boxShadow': 'none' } "
                                   :disabled="true"
-                                  class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded w-1/2"
+                                  class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm w-1/2"
                                   type="text"
                                   placeholder="  Project ID"
                                   required
@@ -45,7 +45,7 @@
                     <p-text-input ref="dataCenterName" v-model="textInput.name"
                                   v-focus
                                   :style="{'border': `${getIsInvalidProjectName}`, 'boxShadow': 'none' } "
-                                  class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
+                                  class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                   :placeholder="getPlaceHolderName"
                                   @keyup="removeMessage"
                     />

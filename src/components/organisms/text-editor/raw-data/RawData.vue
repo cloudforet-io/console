@@ -24,7 +24,7 @@ export default defineComponent({
     props: {
         item: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
     },
     setup(props) {

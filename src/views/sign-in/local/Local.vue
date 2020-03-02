@@ -25,7 +25,7 @@
                                         <p-text-input ref="userId" v-model="userId"
                                                       autocomplete="on"
                                                       :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
-                                                      class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
+                                                      class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                                       type="text"
                                                       placeholder="User ID"
                                                       required
@@ -43,7 +43,7 @@
                                         <p-text-input ref="password" v-model="password" type="password"
                                                       autocomplete="on"
                                                       :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
-                                                      class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
+                                                      class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                                       placeholder="Password"
                                                       required
                                                       @keyup="removeCSS('password')"
