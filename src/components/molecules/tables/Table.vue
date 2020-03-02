@@ -1,7 +1,7 @@
 <template>
     <div :class="responsiveClassObject" :style="responsiveStyle">
         <table
-            class="table"
+            class="p-table"
             :class="classObject"
             :style="tableStyle"
         >
@@ -139,7 +139,9 @@ export default defineComponent( {
     .table-background{
              background-color: white;
     }
-    .table{
+    .p-table{
+        @apply w-full max-w-full mb-4;
+        background: transparent;
         border-collapse: separate;
         border-spacing: 0;
         thead{
@@ -168,6 +170,7 @@ export default defineComponent( {
             tr{
                 @extend %row;
                 td{
+                    height: 2.5rem;
                     z-index: 0;
                     vertical-align: middle;
                 }

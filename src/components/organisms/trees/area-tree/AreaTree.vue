@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="row no-gutters" @click="contextMenuIsVisible=false">
+        <div class="flex flex-wrap no-gutters" @click="contextMenuIsVisible=false">
             <!--<transition appear name="tree-trans"
                         @before-enter="beforeEnter"
                         @enter="enter"

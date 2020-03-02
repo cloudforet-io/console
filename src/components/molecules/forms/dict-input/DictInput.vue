@@ -11,7 +11,7 @@
             />
         </div>
         &nbsp;
-        <span class="dict-input-split" :class="{disabled}">{{ disabled? '': ':' }}</span>
+        <span class="dict-input-split" :class="{disabled: disabled}">{{ disabled? '': ':' }}</span>
         &nbsp;
         <div class="dict-input-box dict-value-input">
             <p-input-text

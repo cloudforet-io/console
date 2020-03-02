@@ -30,7 +30,7 @@ export const defaultCase = () => ({
             <template v-slot:default="{invalid}">
             <p-text-input
               v-model="value"
-              class="form-control"
+              class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
               :disabled="disabled"
               :class="{
                 'is-invalid':invalid

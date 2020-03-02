@@ -95,7 +95,7 @@
                 </p-toolbox-table>
             </template>
         </p-horizontal-layout>
-        <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
+        <p-tab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
             <template #detail>
                 <p-server-detail :item="items[selectIndex[0]]" :tag-confirm-event="tagConfirmEvent" :tag-reset-event="tagResetEvent" />
             </template>
@@ -114,7 +114,7 @@
             <template #history>
                 <p-dynamic-view :api-handler="historyAPIHandler" view_type="table" :data_source="historyAPIHandler.dataSource" />
             </template>
-        </PTab>
+        </p-tab>
         <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
             <template #data>
                 <p-data-table

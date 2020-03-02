@@ -6,7 +6,7 @@
                     <img :src="icon" class="icon">
                 </slot>
             </p-col>
-            <p-col class="card-body">
+            <p-col class="p-card-body">
                 <p-row wrap="wrap">
                     <p-col :col="12">
                         <slot name="body">
@@ -73,7 +73,7 @@ export default {
         width: 4.5rem;
         height: 4.5rem;
     }
-    .card-body {
+    .p-card-body {
         all: unset;
         width: 100%;
         padding-left: 1.5rem;
