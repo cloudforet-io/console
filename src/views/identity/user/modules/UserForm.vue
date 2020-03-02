@@ -93,24 +93,24 @@
                 <p-row>
                     <p-col :col="6">
                         <PFieldGroup label="Name">
-                            <p-text-input v-model="formState.name" class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded" />
+                            <p-text-input v-model="formState.name" class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm" />
                         </PFieldGroup>
                     </p-col>
                     <p-col :col="6">
                         <PFieldGroup label="E-mail">
-                            <p-text-input v-model="formState.email" class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded" />
+                            <p-text-input v-model="formState.email" class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm" />
                         </PFieldGroup>
                     </p-col>
                 </p-row>
                 <p-row>
                     <p-col :col="6">
                         <PFieldGroup label="Mobile">
-                            <p-text-input v-model="formState.mobile" class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded" />
+                            <p-text-input v-model="formState.mobile" class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm" />
                         </PFieldGroup>
                     </p-col>
                     <p-col :col="6">
                         <PFieldGroup label="Group">
-                            <p-text-input v-model="formState.group" class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded" />
+                            <p-text-input v-model="formState.group" class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm" />
                         </PFieldGroup>
                     </p-col>
                 </p-row>

@@ -1,6 +1,6 @@
 <template>
-    <div class="col-sm-12 p-panel-top" :style="panelTitleStyle">
-        <div class="card panel-card">
+    <div class="p-panel-top" :style="panelTitleStyle">
+        <div class="panel-card">
             <div class="p-panel-top-header">
                 <div class="p-panel-top-header-title">
                     <slot>
@@ -39,6 +39,7 @@ export default {
     }
     .panel-card{
         border:none;
+        @apply relative flex flex-col min-w-0 break-words;
     }
     hr{
         margin-top: 0rem;

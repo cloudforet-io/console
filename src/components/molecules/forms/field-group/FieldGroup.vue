@@ -1,8 +1,8 @@
 <template>
-    <div class="form-group p-field-group">
+    <div class="mb-4 p-field-group">
         <label class="form-label">{{ label }}</label><span v-if="required" class="required-mark">*</span>
         <slot :invalid="invalid" />
-        <small v-if="helpText&&!invalid&&!valid" class="form-text text-muted">
+        <small v-if="helpText&&!invalid&&!valid" class="block mt-1 text-grey">
             {{ helpText }}
         </small>
         <div v-if="invalidText" class="invalid-feedback" :style="{display: invalid? 'block':'none'}">
@@ -51,32 +51,32 @@ export default {
 
 <style lang="scss" scoped>
 
-    .form-group{
-        .form-label{
+    .p-field-group {
+        margin-bottom: 1rem;
+        .form-label {
             font: Bold 14px Arial;
             letter-spacing: 0;
             color: $dark;
             margin-bottom: 0.25rem;
             margin-right: 0.375rem;
         }
-        .invalid-feedback{
+        .invalid-feedback {
             color: $alert;
             font: 12px Arial;
         }
-        .valid-feedback{
+        .valid-feedback {
             color: $safe;
             font: 12px Arial;
         }
-        .required-mark{
+        .required-mark {
             color: $alert;
         }
-        small{
+        small {
             font: 12px Arial;
         }
-        .is-invalid{
+        .is-invalid {
             border: 1px solid $alert;
         }
-        margin-bottom: 1rem;
     }
 
 </style>

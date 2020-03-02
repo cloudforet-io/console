@@ -19,7 +19,7 @@ const data = {
 export const defaultCase = () => ({
     components: { PDictInput },
     template: `
-<div class="row" style="width: 80vw">
+<div class="flex flex-wrap" style="width: 80vw">
 <p-dict-input
 style="width: 100%" 
     :name.sync="key" 

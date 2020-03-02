@@ -5,7 +5,7 @@
           @click.stop.prevent="onClick"
     >
         <input type="checkbox">
-        <p-i class="checkmark" width="1.25rem" height="1.25rem"
+        <p-i class="check" width="1.25rem" height="1.25rem"
              v-bind="checkBoxBind"
         />
     </span>

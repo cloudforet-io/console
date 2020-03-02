@@ -25,7 +25,7 @@
                                 <p-text-input v-model="fieldState.name"
                                               v-focus
                                               style="width: 100%;"
-                                              class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
+                                              class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm-sm"
                                               :class="{'is-invalid': invalid}"
                                               @input="onChangeFields('name')"
                                 />
@@ -47,7 +47,7 @@
                             <template #default="{invalid}">
                                 <p-text-input v-model.number="fieldState.priority"
                                               type="number"
-                                              class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
+                                              class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                               :class="{'is-invalid': invalid}"
                                               @input="onChangeFields('priority')"
                                 />
