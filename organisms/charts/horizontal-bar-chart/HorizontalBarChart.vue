@@ -9,7 +9,7 @@
            @mouseleave="onMouseLeave(idx)"
            @click="$emit('legendClick', d.key, d.value)"
         >
-            <rect class="container" :class="{hover: hoverList[idx]}"
+            <rect class="container mx-auto" :class="{hover: hoverList[idx]}"
                   x="0" :y="yScale(d.key) + textPadTop - 2"
                   :height="hoverBarHeight" :width="xScale(max)"
             />
