@@ -1,8 +1,10 @@
 <template>
     <div>
-        <div class="flex items-center h-screen w-full wrapper image-theme">
-            <div id="login-container" class="w-full bg-white shadow-lg md:max-w-sm md:mx-auto">
-                <img src="@/assets/images/brand/brand_logo.png">
+        <div class="flex items-center text-center h-screen w-full wrapper color-theme">
+            <div id="login-container" class="w-auto justify-center bg-white lg sm:w-auto md:max-w-sm md:mx-auto">
+                <div class="logo">
+                    <img src="@/assets/images/brand/brand_logo.png">
+                </div>
                 <div class="header">
                     <p id="title">
                         Sign in to SPACEONE
@@ -13,44 +15,49 @@
                 </div>
                 <div class="user-info">
                     <component :is="component" />
-                    <div id="login-info" class="field-group mb-4 md:w-1/2">
+                    <div id="login-info" class="field-group text-left mb-4 md:flex md:flex-wrap md:justify-between">
                         <p class="input-title">
                             User ID
                         </p>
-                        <p-text-input ref="userId"
-                                      class="form-control"
-                                      placeholder="User ID"
-                                      required
-                        /><br>
+                        <div class="flex flex-col mb-4 md:w-full">
+                            <p-text-input ref="userId"
+                                          class="form-control"
+                                          placeholder="User ID"
+                                          required
+                            /><br>
+                        </div>
                         <p class="input-title">
                             Password
                         </p>
-                        <p-text-input ref="password"
-                                      type="password"
-                                      class="form-control"
-                                      placeholder="Password"
-                                      required
-                        />
-                        <br>
+                        <div class="flex flex-col mb-4 md:w-full">
+                            <p-text-input ref="password"
+                                          type="password"
+                                          class="form-control"
+                                          placeholder="Password"
+                                          required
+                            />
+                        </div>
                     </div>
-                    <p-button style-type="primary"
-                              type="submit"
-                              size="lg"
-                              class="mx-auto"
-                    >
-                        Login
-                    </p-button> <br>
+                    <div class="flex flex-col mb-4 md:w-full">
+                        <p-button style-type="primary"
+                                  type="submit"
+                                  size="lg"
+                        >
+                            Login
+                        </p-button>
+                    </div>
                     <div class="btn-divider">
                         OR
                     </div>
-                    <p-button outline
-                              style-type="gray"
-                              type="submit"
-                              size="lg"
-                              class="mx-auto"
-                    >
-                        Sign-in using root account credentials
-                    </p-button>
+                    <div class="flex flex-col mb-4 md:w-full">
+                        <p-button outline
+                                  style-type="gray"
+                                  type="submit"
+                                  size="lg"
+                        >
+                            Sign-in using root account credentials
+                        </p-button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -137,7 +144,6 @@ export default createComponent({
         width: 100%;
         height: 100%;
         top: 0;
-        left: 0;
         @include background-theme('default-theme', $white);
         @include background-theme('color-theme', $gray);
         @include background-theme('image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg'));
@@ -145,9 +151,15 @@ export default createComponent({
     }
 
     #login-container {
-        /*margin: 0 auto;*/
         background-color: white;
         padding: 24px 16px;
+    }
+
+    .logo {
+        display:inline-block;
+        text-align: center;
+        vertical-align: middle;
+        margin: 0 auto;
     }
 
     .header{
@@ -163,10 +175,6 @@ export default createComponent({
             font-size: 0.875rem;
             padding-bottom: 8px;
         }
-    }
-
-    #logo {
-        text-align: center;
     }
 
     .input-title {
