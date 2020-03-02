@@ -22,6 +22,7 @@
         </template>
         <template #body>
             <p-dict-input-group ref="tagInputGroup"
+                                class="panel-contents"
                                 :dict.sync="proxyTags"
                                 :edit-mode="editMode"
             />
@@ -98,21 +99,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .dict-panel-title{
+    .panel-contents {
+        margin-top: 1rem;
+    }
+    .dict-panel-title {
         min-height: 100px;
     };
-    .panel-header{
+    .panel-header {
         display: inline-flex;
         width: 100%;
 
-        &.edit{
+        &.edit {
             justify-content: flex-end;
         }
-        .header-btn{
+        .header-btn {
             margin-left: 1rem;
         }
     }
-    .no-dict{
+    .no-dict {
         text-align: center;
         font: 24px/32px Arial;
         letter-spacing: 0;

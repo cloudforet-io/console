@@ -2,7 +2,7 @@
     <p-panel-top :panel-title="infoTitle" :panel-title-style="infoTitleStyle" class="info-panel-basic">
         <template #body>
             <slot>
-                <p-panel-content :defs="defs" :item="item">
+                <p-panel-content class="panel-contents" :defs="defs" :item="item">
                     <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                         <slot :name="slot" v-bind="scope" />
                     </template>
@@ -48,5 +48,9 @@ export default {
 
 <style lang="scss" scoped>
     .info-panel-basic {
-    min-height: 100px}
+        min-height: 100px;
+    }
+    .panel-contents {
+        margin-top: 1rem;
+    }
 </style>

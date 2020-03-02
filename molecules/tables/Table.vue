@@ -171,8 +171,12 @@ export default defineComponent( {
                 @extend %row;
                 td{
                     height: 2.5rem;
-                    padding-left: .75rem;
+                    max-width: 200px;
+                    padding: 0 .75rem;
                     z-index: 0;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                     vertical-align: middle;
                 }
                 &:first-child{
