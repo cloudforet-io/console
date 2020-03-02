@@ -63,7 +63,7 @@ export default {
             }
             let result = false;
             await context.parent.$http.post('/secret/credential-group/list', {
-                domain_id: sessionStorage.domainId,
+                domain_id: context.parent.$ls.domain.state.domainId,
                 query: {
                     minimal: true,
                     filter: [{

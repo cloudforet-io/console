@@ -217,7 +217,7 @@ const setup = (props, context) => {
     const pluginAuthIDValidation = parent => new Validation(async (value) => {
         let result = false;
         // eslint-disable-next-line camelcase
-        await parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: sessionStorage.domainId }).then((res) => {
+        await parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: parent.$ls.domain.state.domainId }).then((res) => {
             if (res.data.total_count >= 1) {
                 result = true;
                 if (!formState.isLastCheck && res.data.total_count === 1) {
