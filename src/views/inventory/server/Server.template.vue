@@ -253,7 +253,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         tabs: makeTrItems([
             ['detail', 'TAB.DETAILS'],
             ['data', 'TAB.DATA'],
-            ['rawData', 'TAB.RAW_DATA', { keepAlive: true }],
+            ['rawData', 'TAB.RAW_DATA'],
             ['admin', 'TAB.ADMIN'],
             ['history', 'TAB.HISTORY'],
         ],
@@ -461,7 +461,7 @@ export default {
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .left-toolbox-item{
         margin-left: 1rem;
         &:last-child {
@@ -472,7 +472,8 @@ export default {
     #empty-space{
         text-align: center;
         margin-bottom: 0.5rem;
-        color: $primary2;
-        font: 24px/32px Arial;
+        @apply text-primary2;
+        /*color: $primary2;*/
+        /*font: 24px/32px Arial;*/
     }
 </style>
