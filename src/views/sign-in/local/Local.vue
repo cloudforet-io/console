@@ -1,11 +1,11 @@
 <template>
     <div class="background-cover">
-        <div class="row">
-            <div class="container">
-                <div class="row d-flex justify-content-center">
-                    <div class="col-md-8">
-                        <div class="card-group">
-                            <div class="card col-7 card-left-container">
+        <div class="flex flex-wrap">
+            <div class="container mx-auto">
+                <div class="flex flex-wrap flex justify-content-center">
+                    <div class="md:w-2/3 pr-4 pl-4">
+                        <div class="flex flex-col">
+                            <div class="relative flex flex-col min-w-0 rounded break-words border bg-white border-1 border-grey-light w-3/5 card-left-container">
                                 <div class="signIn-title">
                                     {{ $t('SIGNIN.SIGN_IN') }}
                                 </div>
@@ -18,14 +18,14 @@
                                     </div>
                                 </div>
                                 <div class="form-binder novalidate">
-                                    <div class="form-group">
+                                    <div class="mb-4">
                                         <p-label class="input-title">
                                             User ID
                                         </p-label>
                                         <p-text-input ref="userId" v-model="userId"
                                                       autocomplete="on"
                                                       :style="{'border': `${getIsInvalidUser}`, 'boxShadow': 'none' } "
-                                                      class="form-control"
+                                                      class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                                       type="text"
                                                       placeholder="User ID"
                                                       required
@@ -36,14 +36,14 @@
                                             * {{ $t('SIGNIN.USER_EMPTY') }}
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="mb-4">
                                         <p-label class="input-title">
                                             Password
                                         </p-label>
                                         <p-text-input ref="password" v-model="password" type="password"
                                                       autocomplete="on"
                                                       :style="{'border': `${getIsInvalidPassword}`, 'boxShadow': 'none' } "
-                                                      class="form-control"
+                                                      class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded"
                                                       placeholder="Password"
                                                       required
                                                       @keyup="removeCSS('password')"
@@ -53,9 +53,9 @@
                                             * {{ $t('SIGNIN.PASS_EMPTY') }}
                                         </div>
                                     </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-12 col-xs-12 col-sm-12">
-                                            <p-button class="btn-lg"
+                                    <div class="flex flex-wrap mt-3">
+                                        <div class="md:w-1/6 pr-4 pl-42 sm:w-1/6 pr-4 pl-42 sm:w-1/6 pr-4 pl-42">
+                                            <p-button class="py-3 px-4 text-xl leading-tight"
                                                       size="lg"
                                                       style-type="primary"
                                                       @click="signIn"
@@ -64,8 +64,8 @@
                                             </p-button>
                                         </div>
                                     </div>
-                                    <div class="row mt-4">
-                                        <b-col class="col-11 col-xs-11 col-sm-11 col-md-10 col-lg-12 col-xl-12">
+                                    <div class="flex flex-wrap mt-4">
+                                        <b-col class="w-1/61 sm:w-1/6 pr-4 pl-41 sm:w-1/6 pr-4 pl-41 md:w-1/6 pr-4 pl-40 lg:w-1/6 pr-4 pl-42 xl:w-1/6 pr-4 pl-42">
                                             <div @click="directToAdmin">
                                                 <span class="root-sign">{{ $t('SIGNIN.ROOT_CREDENTIALS') }}</span>
                                             </div>
@@ -73,9 +73,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card card-right-container">
-                                <img class="card-img" src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg" alt="Bologna">
-                                <div class="card-img-overlay text-white d-flex flex-column justify-content-center">
+                            <div class="relative flex flex-col min-w-0 rounded break-words border bg-white border-1 border-grey-light card-right-container">
+                                <img class="w-full rounded" src="@/assets/images/landing/cloudone_console_sign-in_bg--sm.svg" alt="Bologna">
+                                <div class="absolute pin-y pin-x p-6 text-white flex flex-column justify-content-center">
                                     <div class="text-center">
                                         <p style="margin-bottom: 10px">
                                             <img src="@/assets/images/brand/brand_logo.png" width="100vh" height="100vh">
