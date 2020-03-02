@@ -14,50 +14,7 @@
                     </p>
                 </div>
                 <div class="user-info">
-                    <component :is="component" />
-                    <div id="login-info" class="field-group text-left mb-4 md:flex md:flex-wrap md:justify-between">
-                        <p class="input-title">
-                            User ID
-                        </p>
-                        <div class="flex flex-col mb-4 md:w-full">
-                            <p-text-input ref="userId"
-                                          class="form-control"
-                                          placeholder="User ID"
-                                          required
-                            /><br>
-                        </div>
-                        <p class="input-title">
-                            Password
-                        </p>
-                        <div class="flex flex-col mb-4 md:w-full">
-                            <p-text-input ref="password"
-                                          type="password"
-                                          class="form-control"
-                                          placeholder="Password"
-                                          required
-                            />
-                        </div>
-                    </div>
-                    <div class="flex flex-col mb-4 md:w-full">
-                        <p-button style-type="primary"
-                                  type="submit"
-                                  size="lg"
-                        >
-                            Login
-                        </p-button>
-                    </div>
-                    <div class="btn-divider">
-                        OR
-                    </div>
-                    <div class="flex flex-col mb-4 md:w-full">
-                        <p-button outline
-                                  style-type="gray"
-                                  type="submit"
-                                  size="lg"
-                        >
-                            Sign-in using root account credentials
-                        </p-button>
-                    </div>
+                    <component :is="component" @onLogin="login" />
                 </div>
             </div>
         </div>
@@ -65,53 +22,60 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase, vue/prop-name-casing */
 import {
-    toRefs, reactive, ref, computed, createComponent, onMounted,
+    toRefs, reactive, ref, computed, defineComponent, onMounted, Ref, getCurrentInstance,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
-    interface State {
+
+interface State {
         component: any,
         loader: () => Promise<any>
-    }
+}
 
-export default createComponent({
+interface Credentials {
+    // eslint-disable-next-line camelcase
+        access_token:string;
+    // eslint-disable-next-line camelcase
+        refresh_token:string;
+}
+export default defineComponent({
     name: 'Login',
     components: {
         PButton,
         PTextInput,
     },
     props: {
-        view_type: {
+        admin: {
+            type: Boolean,
+            default: false,
+        },
+        nextPath: {
             type: String,
-            required: true,
-        },
-        data_source: {
-            type: Array,
-            required: true,
-        },
-        data: {
-            type: [Object, Array],
-            default: () => ({}),
-        },
-        key_path: {
-            type: String,
-            default: '',
-        },
-        apiHandler: {
-            type: Object,
-            default: null,
+            default: '/',
         },
     },
-    setup(props:any) {
-        // noinspection TypeScriptCheckImport
+    setup(props:any, context:any) {
+        const authType:Ref<'admin'|'local'|'google_oauth2'> = ref('local');
+        const vm = (getCurrentInstance() as any);
+        // todo: remove when router props function mode is work
+        const routeProps = vm.$route.meta.props(vm.$route);
         const state = reactive<any>({
+            // todo: remove when router props function mode is work
+            tempAdmin: routeProps.admin,
+            tempNextPath: routeProps.nextPath,
             component: null,
-            loader: computed<()=>Promise<any>>(() => () => import(`./templates/${props.view_type}/index.vue`)),
+            userType: computed(() => (state.tempAdmin ? 'DOMAIN_OWNER' : 'USER')),
+            loader: computed<()=>Promise<any>>(() => () => import(`./templates/${authType.value}/index.vue`)),
         });
-        onMounted(():void => {
+        if (state.admin) {
+            authType.value = 'admin';
+        } else {
+            authType.value = vm.$ls.domain.state.authType;
+        }
+        onMounted(async () => {
+            console.log('test');
             state.loader()
                 .then(() => {
                     state.component = () => state.loader();
@@ -121,8 +85,14 @@ export default createComponent({
                     state.component = () => import('./templates/local/index.vue');
                 });
         });
+        const login = async (userId:string, credentials:Credentials) => {
+            vm.$ls.user.setToken(credentials.refresh_token, credentials.access_token);
+            await vm.$ls.user.setUser(state.userType, userId, vm);
+            vm.$router.push(state.tempNextPath);
+        };
         return {
             ...toRefs(state),
+            login,
         };
     },
 });

@@ -5,21 +5,23 @@
                 User ID
             </p>
             <div class="flex flex-col mb-4 md:w-full">
-                <p-text-input ref="userId"
-                              class="form-control"
-                              placeholder="User ID"
-                              required
+                <p-text-input
+                    v-model="userId"
+                    class="form-control"
+                    placeholder="User ID"
+                    required
                 /><br>
             </div>
             <p class="input-title">
                 Password
             </p>
             <div class="flex flex-col mb-4 md:w-full">
-                <p-text-input ref="password"
-                              type="password"
-                              class="form-control"
-                              placeholder="Password"
-                              required
+                <p-text-input
+                    v-model="password"
+                    type="password"
+                    class="form-control"
+                    placeholder="Password"
+                    required
                 />
             </div>
         </div>
@@ -27,6 +29,7 @@
             <p-button style-type="primary"
                       type="submit"
                       size="lg"
+                      @click="login"
             >
                 Login
             </p-button>
@@ -39,6 +42,7 @@
                       style-type="gray"
                       type="submit"
                       size="lg"
+                      @click="goToAdmin"
             >
                 Sign-in using root account credentials
             </p-button>
@@ -46,7 +50,8 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
@@ -55,6 +60,35 @@ export default {
     components: {
         PButton,
         PTextInput,
+    },
+    setup(props, context) {
+        const vm = getCurrentInstance() as any;
+        const state = reactive({
+            userId: '',
+            password: '',
+        });
+        const login = async () => {
+            console.log('start login');
+            const response = await vm.$http.post('/identity/token/issue', {
+                credentials: {
+                    // eslint-disable-next-line camelcase
+                    user_type: 'USER',
+                    // eslint-disable-next-line camelcase
+                    user_id: state.userId,
+                    password: state.password,
+                },
+                domain_id: vm.$ls.domain.state.domainId,
+            });
+            context.emit('onLogin', state.userId, response.data);
+        };
+        const goToAdmin = () => {
+            vm.$router.push({ name: 'AdminLogin' });
+        };
+        return {
+            ...toRefs(state),
+            login,
+            goToAdmin,
+        };
     },
 };
 </script>

@@ -40,25 +40,16 @@ export default {
                 { key: 'profile', contents: 'Profile' },
                 { key: 'signout', contents: 'Sign Out' },
             ],
-            iconColor: computed(() => styles.primary4),
-            userId: computed(() => root.$store.getters['auth/userId']),
+            iconColor: computed(() => '#F8F8FC'),
+            userId: computed(() => root.$ls.user.state.userId),
             // clientId: computed(() => root.$store.getters['domain/clientId']),
-            isLocalType: computed(() => root.$store.getters['auth/isLocalType']),
-            isDomainOwner: computed(() => root.$store.getters['auth/isDomainOwner']),
         });
         const openProfile = () => {
             state.profileVisible = true;
         };
-        const signOut = () => {
-            root.$store.dispatch('auth/signOut');
-        };
         const signOutAction = async () => {
-            await signOut();
-            if (state.isLocalType) {
-                root.$router.push({ path: '/sign-in' });
-            } else {
-                root.$router.push({ path: '/google-sign-in' });
-            }
+            root.$ls.logout();
+            root.$router.push({ name: 'Login' });
         };
         const doAction = (item) => {
             if (item.key === 'signout') signOutAction();
@@ -67,7 +58,6 @@ export default {
 
         return {
             ...toRefs(state),
-            signOut,
             doAction,
         };
     },

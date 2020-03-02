@@ -2,7 +2,7 @@
     <div class="user-info">
         <div id="login-info" class="field-group text-left mb-4 md:flex md:flex-wrap md:justify-between">
             <p class="input-title">
-                User ID
+                Admin User ID
             </p>
             <div class="flex flex-col mb-4 md:w-full">
                 <p-text-input ref="userId"
