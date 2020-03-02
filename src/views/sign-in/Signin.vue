@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex items-center text-center h-screen w-full wrapper color-theme">
+        <div class="flex items-center text-center h-screen w-full wrapper default-theme">
             <div id="login-container" class="w-auto justify-center bg-white lg sm:w-auto md:max-w-sm md:mx-auto">
                 <div class="logo">
                     <img src="@/assets/images/brand/brand_logo.png">
@@ -15,49 +15,6 @@
                 </div>
                 <div class="user-info">
                     <component :is="component" />
-                    <div id="login-info" class="field-group text-left mb-4 md:flex md:flex-wrap md:justify-between">
-                        <p class="input-title">
-                            User ID
-                        </p>
-                        <div class="flex flex-col mb-4 md:w-full">
-                            <p-text-input ref="userId"
-                                          class="form-control"
-                                          placeholder="User ID"
-                                          required
-                            /><br>
-                        </div>
-                        <p class="input-title">
-                            Password
-                        </p>
-                        <div class="flex flex-col mb-4 md:w-full">
-                            <p-text-input ref="password"
-                                          type="password"
-                                          class="form-control"
-                                          placeholder="Password"
-                                          required
-                            />
-                        </div>
-                    </div>
-                    <div class="flex flex-col mb-4 md:w-full">
-                        <p-button style-type="primary"
-                                  type="submit"
-                                  size="lg"
-                        >
-                            Login
-                        </p-button>
-                    </div>
-                    <div class="btn-divider">
-                        OR
-                    </div>
-                    <div class="flex flex-col mb-4 md:w-full">
-                        <p-button outline
-                                  style-type="gray"
-                                  type="submit"
-                                  size="lg"
-                        >
-                            Sign-in using root account credentials
-                        </p-button>
-                    </div>
                 </div>
             </div>
         </div>
