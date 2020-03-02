@@ -113,34 +113,43 @@ class API {
 }
 export default new API();
 
+const refreshUrl = '/identity/token/refresh';
+
 export class ApiInstance {
     public instance:AxiosInstance;
 
     public constructor(baseURL:string, protected vm:any, handlers?:any) {
         this.instance = axios.create({
             baseURL,
-            withCredentials: true, // todo: 인증로직 추가시 삭
             headers: {
                 'Content-Type': 'application/json',
             },
         });
         if (this.vm) {
-            // todo: 인증 로직 추가시 활성화 시키기
-            // this.setRequestInterceptor((request) => {
-            //     if (this.vm.$ls.user.state.isSignedIn) {
-            //         request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
-            //     }
-            //     return request;
-            // });
-            // const refreshAuthLogic = failedRequest => this.instance.post('/auth/token/refresh').then((resp) => {
-            //     this.vm.$ls.user.setToken(resp.data.refreshToken, resp.data.accessToken);
-            //     failedRequest.response.config.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
-            //     return Promise.resolve();
-            // }, (error) => {
-            //     this.vm.$le.authReset();
-            //     this.vm.$router.push('/sign-in');
-            // });
-            // createAuthRefreshInterceptor(this.instance, refreshAuthLogic);
+            this.setRequestInterceptor((request) => {
+                console.debug('axios interceptor url', request.url);
+
+                if (this.vm.$ls.user.state.isSignedIn) {
+                    let token:string;
+                    if (request.url === refreshUrl) {
+                        token = this.vm.$ls.user.state.refreshToken;
+                    } else {
+                        token = this.vm.$ls.user.state.accessToken;
+                    }
+                    request.headers.Authorization = `Bearer ${token}`;
+                }
+                return request;
+            });
+            const refreshAuthLogic = failedRequest => this.instance.post(refreshUrl).then((resp) => {
+                console.debug('request refresh token');
+                this.vm.$ls.user.setToken(resp.data.refreshToken, resp.data.accessToken);
+                failedRequest.response.config.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
+                return Promise.resolve();
+            }, (error) => {
+                this.vm.$ls.logout();
+                this.vm.$router.push({ name: 'Login' });
+            });
+            createAuthRefreshInterceptor(this.instance, refreshAuthLogic);
         }
 
 

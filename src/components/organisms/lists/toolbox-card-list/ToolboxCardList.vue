@@ -10,7 +10,7 @@
                     </p-col>
                     <p-col :flex-grow="0" align-self="flex-end">
                         <slot name="rightTop">
-                            <p-text-pagenation class="tool pagination"
+                            <p-text-pagenation class="tool t-pagination"
                                                :this-page.sync="proxyThisPage"
                                                :all-page="allPage"
                                                @pageChange="onPageChange"
@@ -174,7 +174,7 @@ export default {
     }
     .tool {
         display: inline-block;
-        &.pagination {
+        &.t-pagination {
             margin-right: 1.75rem;
         }
     }

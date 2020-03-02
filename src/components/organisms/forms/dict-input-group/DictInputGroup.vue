@@ -1,8 +1,8 @@
 <template>
-    <div :class="{'p-dict-input-group': true, 'row': !removeRowEffect }">
+    <div :class="{'p-dict-input-group': true, 'flex flex-wrap': !removeRowEffect }">
         <div v-for="(pair, index) in destructDict"
              :key="index"
-             :class="{'dict-input-form': true, 'mr-0': true, 'col-6': !useFullCol, 'col-12': useFullCol}"
+             :class="{'dict-input-form': true, 'mr-0': true, 'w-1/2': !useFullCol, 'w-full': useFullCol}"
         >
             <p-icon-button v-if="editMode" class="delete-btn" name="ic_delete"
                            @click="deletePair(index)"
@@ -18,8 +18,7 @@
                 <p-copy-button v-if="getActiveState(index) && !editMode" class="copy-btn" :value="pair.value" />
             </span>
         </div>
-
-        <div v-if="editMode" class="col-12" :class="{'dict-input-form': true, 'mr-0': true}">
+        <div v-if="editMode" class="w-full" :class="{'dict-input-form': true, 'mr-0': true}">
             <!--<p-icon-button
                 class="delete-btn"
                 name="ic_delete"

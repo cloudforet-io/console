@@ -6,8 +6,9 @@
                 <div v-if="tab.keepAlive || tab.name === proxyActiveTab"
                      v-show="tab.name === proxyActiveTab"
                      :key="tab.name"
-                     class="tab-pane fade"
-                     :class="{show:isActive(tab.name),active:isActive(tab.name)}"
+                     class="tab-pane opacity-0"
+                     :class="{'opacity-100 block':isActive(tab.name),
+                              active:isActive(tab.name)}"
                      role="tabpanel"
                 >
                     <slot :name="tab.name" :tabName="tab.name" :label="tab.label" />

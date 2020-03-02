@@ -9,8 +9,8 @@ import secretRoute from '@/routes/secret/secret-route';
 import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 
 // Views
-import SignIn from '@/views/sign-in/local/Local.vue';
-// import SignIn from '@/views/sign-in/Signin.vue';
+// import SignIn from '@/views/sign-in/local/Local.vue';
+import SignIn from '@/views/sign-in/Signin.vue';
 import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth.vue';
 import Admin from '@/views/sign-in/admin/Admin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';
@@ -18,7 +18,6 @@ import store from '@/store';
 
 Vue.use(VueRouter);
 
-const nextPath = route => ({ nextPath: route.query.nextPath });
 
 const router = new VueRouter({
     mode: 'history',
@@ -32,26 +31,39 @@ const router = new VueRouter({
             component: ErrorPage,
         },
         {
-            path: '/sign-in/admin',
-            name: 'SignIn-Admin',
+            path: '/sign-in',
+            component: { template: '<router-view />' },
             meta: {
-                label: 'Sign In',
                 excludeAuth: true,
                 isSignInPage: true,
-                props: route => ({
-                    admin: true,
-                    ...nextPath(route),
-                }),
             },
-            component: SignIn,
-        },
-        {
-            path: '/sign-in',
-            name: 'SignIn',
-            meta: {
-                label: 'Sign In', excludeAuth: true, isSignInPage: true, props: nextPath,
-            },
-            component: SignIn,
+            children: [
+                {
+                    path: '/',
+                    name: 'Login',
+                    meta: {
+                        excludeAuth: true,
+                        isSignInPage: true,
+                        props: route => ({
+                            nextPath: route.query.nextPath || '/',
+                        }),
+                    },
+                    component: SignIn,
+                },
+                {
+                    path: 'admin',
+                    name: 'AdminLogin',
+                    meta: {
+                        excludeAuth: true,
+                        isSignInPage: true,
+                        props: route => ({
+                            admin: true,
+                            nextPath: route.query.nextPath || '/',
+                        }),
+                    },
+                    component: SignIn,
+                },
+            ],
         },
         {
             path: '/google-sign-in',
@@ -82,40 +94,45 @@ const router = new VueRouter({
     ],
 });
 
-const hasSiginIn = () => !!sessionStorage.getItem('user/refreshToken');
+const hasLogIn = () => !!localStorage.getItem('user/refreshToken');
 
 router.beforeEach(async (to, from, next) => {
     // todo: 라우터 로직 변경시 제거
-    if (store.getters['domain/id']) {
-        if (to.meta && !to.meta.excludeAuth && !store.getters['auth/isSignedIn']) {
-            const nextPath = store.getters['domain/loginPath'];
-            next(nextPath);
-        } else {
-            next();
-        }
-    } else {
-        localStorage.setItem('common.toMeta', JSON.stringify(to.meta));
-        localStorage.setItem('common.toNextPath', to.path);
-        const signInPath = store.getters['domain/loginPath'];
-        if (!store.getters['auth/isSignedIn'] && signInPath !== to.path) {
-            next(signInPath);
-        } else {
-            next();
-        }
-    }
-    // todo: 라우터 로직 변경시 활성화
-    // if (to.meta && to.meta.excludeAuth) {
-    //     if (to.meta.isSignInPage) {
-    //         if (hasSiginIn()) {
-    //             next(to.meta.query.nextPath || '/');
-    //         }
+    // if (store.getters['domain/id']) {
+    //     if (to.meta && !to.meta.excludeAuth && !store.getters['auth/isSignedIn']) {
+    //         const nextPath = store.getters['domain/loginPath'];
+    //         next(nextPath);
+    //     } else {
+    //         next();
     //     }
-    //     next();
-    // } else if (hasSiginIn()) {
-    //     next();
     // } else {
-    //     next(`/sign-in?nextPath=${to.path}`);
+    //     localStorage.setItem('common.toMeta', JSON.stringify(to.meta));
+    //     localStorage.setItem('common.toNextPath', to.path);
+    //     const signInPath = store.getters['domain/loginPath'];
+    //     if (!store.getters['auth/isSignedIn'] && signInPath !== to.path) {
+    //         next(signInPath);
+    //     } else {
+    //         next();
+    //     }
     // }
+    // todo: 라우터 로직 변경시 활성화
+    console.debug(to, from, hasLogIn());
+    if (to.meta && to.meta.excludeAuth) {
+        if (to.meta.isSignInPage) {
+            if (hasLogIn()) {
+                try {
+                    next({ path: to.meta.query.nextPath });
+                } catch (e) {
+                    next('/');
+                }
+            }
+        }
+        next();
+    } else if (hasLogIn()) {
+        next();
+    } else {
+        next({ name: 'Login', query: { nextPath: to.path } });
+    }
 });
 
 export default router;

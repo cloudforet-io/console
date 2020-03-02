@@ -21,7 +21,7 @@
             </slot>
             <p-button v-if="headerCloseButtonVisible"
                       class="close-modal-btn"
-                      :force-class="['close']"
+                      :force-class="['absolute pin-t pin-b pin-r px-4 py-3']"
                       :class="{disabled: loading}"
                       :disabled="loading"
                       @click="onCloseClick"

@@ -9,7 +9,7 @@
             <a
                 class="p-nav-link inline-block py-2 px-4 no-underline"
                 :class="{active: activeTab === tab.name,
-                         'opacity-75': tab.disabled,
+                         disabled: tab.disabled,
                          'one-tab':isOne }"
             >
                 {{ tab.label }}
