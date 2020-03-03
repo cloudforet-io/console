@@ -1,6 +1,6 @@
 <template>
     <div class="user-info">
-        <div id="login-info" class="field-group text-left mb-4 md:flex md:flex-wrap md:justify-between">
+        <div id="login-info" class="field-group text-left mb-8 md:flex md:flex-wrap md:justify-between">
             <p class="input-title">
                 User ID
             </p>
@@ -10,12 +10,12 @@
                     class="form-control"
                     placeholder="User ID"
                     required
-                /><br>
+                />
             </div>
             <p class="input-title">
                 Password
             </p>
-            <div class="flex flex-col mb-4 md:w-full">
+            <div class="flex flex-col md:w-full">
                 <p-text-input
                     v-model="password"
                     type="password"
@@ -25,7 +25,7 @@
                 />
             </div>
         </div>
-        <div class="flex flex-col mb-4 md:w-full">
+        <div class="flex flex-col mb-10 md:w-full">
             <p-button style-type="primary"
                       type="submit"
                       size="lg"
@@ -99,28 +99,28 @@ export default defineComponent({
     .input-title {
         font-size: 0.875rem;
         font-weight: bold;
-        padding-top: 16px;
-        padding-bottom: 4px;
+        padding: 4px;
     }
 
     .btn-divider {
         display: flex;
         flex-basis: 100%;
         align-items: center;
-        color: #A5ACCE;
+        color: #DCDDE2;
         font-style: normal;
         font-weight: bold;
         font-size: 14px;
-        margin: 8px 0px;
+        /*padding-top: 41px;*/
+        margin-bottom: 1.5rem;
     }
     .btn-divider::before,
     .btn-divider::after {
         content: "";
         flex-grow: 1;
-        background: #A5ACCE;
+        background: #DCDDE2;
         height: 1px;
         font-size: 0px;
         line-height: 0px;
-        margin: 0px 16px;
+        margin: 0px 8px;
     }
 </style>
