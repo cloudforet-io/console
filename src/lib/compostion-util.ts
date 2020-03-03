@@ -205,7 +205,7 @@ export const checkTimeZoneValidation = (invalidMessage:message) => new Validatio
 
 export const credentialsNameValidation = (parent:any, invalidMessage:message) => new Validation(async (value) => {
     let result = false;
-    await parent.$http.post('/secret/credential/list', { name: value, domain_id: sessionStorage.domainId }).then((res) => {
+    await parent.$http.post('/secret/credential/list', { name: value, domain_id: parent.$ls.domain.state.domainId }).then((res) => {
         if (res.data.total_count === 0) {
             result = true;
         }
@@ -218,7 +218,7 @@ export const credentialsNameValidation = (parent:any, invalidMessage:message) =>
 export const userIDValidation = (parent:any, invalidMessage:message) => new Validation(async (value) => {
     let result = false;
     // eslint-disable-next-line camelcase
-    await parent.$http.post('/identity/user/get', { user_id: value, domain_id: sessionStorage.domainId }).then().catch((error) => {
+    await parent.$http.post('/identity/user/get', { user_id: value, domain_id: parent.$ls.domain.state.domainId }).then().catch((error) => {
         if (error.code === 'ERROR_NOT_FOUND') {
             result = true;
         }

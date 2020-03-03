@@ -118,7 +118,7 @@ export default {
             const param = {
                 item_type: 'PROJECT_GROUP',
                 item_id: _.get(node, 'data.id'),
-                domain_id: sessionStorage.domainId,
+                domain_id: this.$ls.domain.state.domainId,
             };
             await this.$http.post(url, param).then((response) => {
                 childrenNode = this.getSelectedNodeArr(response.data.items, 'PROJECT');

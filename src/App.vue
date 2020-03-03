@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isInit" id="app">
+    <div v-if="!loading" id="app">
         <p-notice-alert group="noticeTopLeft" position="top left" />
         <p-notice-alert group="noticeTopRight" position="top right" />
         <p-notice-alert group="noticeBottomLeft" position="bottom left" />
@@ -11,17 +11,18 @@
     </div>
 </template>
 
-<script>
-import _ from 'lodash';
+<script lang="ts">
 import Vue from 'vue';
-import api, { ApiInstance } from '@/lib/api';
+import {
+    defineComponent, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { ApiInstance } from '@/lib/api';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
-import store from '@/store';
 import { GTag } from '@/lib/gtag';
 
-export default {
+export default defineComponent({
     name: 'App',
     components: {
         PLottie,
@@ -33,88 +34,33 @@ export default {
             default: process.env.NODE_ENV,
         },
     },
-    data() {
+    setup(props, context) {
+        const vm = getCurrentInstance() as any;
+        const state = reactive({
+            loading: true,
+        });
+        const configInit = async () => {
+            await config.init();
+            Vue.prototype.$http = new ApiInstance(config.get('VUE_APP_API.ENDPOINT'), vm).instance;
+        };
+        const preparationTo = async () => {
+            try {
+                await configInit();
+                new GTag(config.get('GTAG_ID'), vm);
+            } catch (e) {
+                console.error(e);
+                vm.$router.push({ path: '/error-page' });
+            }
+            state.loading = false;
+        };
+        preparationTo();
+
         return {
-            isInit: false,
+            ...toRefs(state),
         };
     },
-    created() {
-        this.preparationTo();
-    },
-    methods: {
-        async preparationTo() {
-            try {
-                await this.configInit();
-                new GTag(config.get('GTAG_ID'), this);
-                await this.syncStores('auth');
-                await this.domainInit();
-                await this.syncStores('domain');
 
-                this.isInit = true;
-                const excludeAuth = this.getMeta();
-                // todo : check logic
-                if (this.$store.getters['auth/isSignedIn'] && this.$route.meta.isSignInPage) {
-                    this.$router.push({ path: '/' });
-                    return;
-                }
-
-                // TODO:: Please Remove this for later when every domian sign in use Config options.
-                if (this.isPathMissMatch(this.$store.getters['domain/authType'], localStorage.getItem('common.toNextPath'))) {
-                    this.redirectTo('set');
-                    return;
-                }
-                // if (!excludeAuth) {
-                //     this.redirectTo();
-                //     return;
-                // }
-            } catch (e) {
-                this.$router.push({ path: '/error-page' });
-                console.error(e);
-            }
-        },
-        async configInit() {
-            await config.init();
-            // todo: 인증로직 변경시 삭제
-            await api.init(config.get('VUE_APP_API.ENDPOINT'), {
-                authError: () => {
-                    this.$store.commit('auth/signOut');
-                },
-            });
-            Vue.prototype.$http = new ApiInstance(config.get('VUE_APP_API.ENDPOINT'), this, {
-                authError: () => {
-                    this.$store.commit('auth/signOut');
-                },
-            }).instance;
-        },
-        async domainInit() {
-            if (!this.$store.getters['domain/id']) {
-                try {
-                    await this.$store.dispatch('domain/load');
-                } catch (e) {
-                    console.error(e);
-                    this.$router.push({ path: '/error-page' });
-                }
-            }
-        },
-        async syncStores(storeName) {
-            await this.$store.dispatch(`${storeName}/sync`);
-        },
-        redirectTo(set) {
-            const nextPath = this.$store.getters['domain/loginPath'];
-            if (set) {
-                localStorage.setItem('common.toNextPath', nextPath);
-            }
-            this.$router.push(nextPath);
-        },
-        getMeta() {
-            return this.isEmpty(localStorage.getItem('common.toMeta')) ? null : _.get(JSON.parse(localStorage.getItem('common.toMeta')), 'excludeAuth', null);
-        },
-        isPathMissMatch(type, path) {
-            return (path === '/sign-in' && type !== 'local')
-                || (path === '/google-sign-in' && type !== 'google_oauth2');
-        },
-    },
-};
+});
 
 </script>
 
