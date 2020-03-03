@@ -100,9 +100,10 @@
     </p-button-modal>
 </template>
 
-<script>
-import { reactive, toRefs, computed } from '@vue/composition-api';
-import _ from 'lodash';
+<script lang="ts">
+import {
+    reactive, toRefs, computed, getCurrentInstance, defineComponent,
+} from '@vue/composition-api';
 import moment from 'moment-timezone';
 import {
     makeProxy, formValidation, lengthMinValidation, lengthMaxValidation, Validation, requiredValidation,
@@ -116,11 +117,12 @@ import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
 
 
 export const profileSetup = (props, context) => {
+    const vm:any = getCurrentInstance();
+
     const userState = reactive({
         password: '',
         passwordCheck: '',
@@ -150,11 +152,11 @@ export const profileSetup = (props, context) => {
         timezones: moment.tz.names().map(tz => new MenuItem(tz, tz)),
         showValidation: false,
         ...formValidation(userState, updateUserValidations),
-        isLocalType: computed(() => context.root.$store.getters['auth/isLocalType']),
-        isDomainOwner: computed(() => context.root.$store.getters['auth/isDomainOwner']),
+        isLocalType: computed(() => vm.$ls.domain.state.isLocalType),
+        isDomainOwner: computed(() => vm.$ls.user.state.isDomainOwner),
     });
 
-    const params = {};
+    const params:any = {};
     if (state.isDomainOwner) {
         // eslint-disable-next-line camelcase
         params.owner_id = props.userId;
@@ -193,7 +195,7 @@ export const profileSetup = (props, context) => {
     };
 };
 
-export default {
+export default defineComponent({
     name: 'ProfileModalTemplate',
     components: {
         PSelectDropdown,
@@ -210,7 +212,7 @@ export default {
     setup(props, context) {
         return profileSetup(props, context);
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>

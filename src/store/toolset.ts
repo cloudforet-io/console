@@ -121,6 +121,7 @@ class DomainStore extends Store<DomainState> {
         ]);
         this.state = reactive({
             ...initState(this.prefix, this.names, this.data),
+            isLocalType: computed(() => this.state.authType === 'local'),
         });
     }
 
