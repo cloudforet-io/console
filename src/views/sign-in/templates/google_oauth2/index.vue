@@ -1,7 +1,7 @@
 <template>
     <div class="user-info">
         <div class="g-signin2">
-            <div id="g-signin-btn" style="width: 70%;"  />
+            <div id="g-signin-btn" style="width: 70%;" />
         </div>
         <div class="btn-divider">
             OR
@@ -92,24 +92,30 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 
+    #g-signin-btn {
+        padding-top: 1.5rem;
+        padding-bottom: 3.5rem;
+    }
+
     .btn-divider {
         display: flex;
         flex-basis: 100%;
         align-items: center;
-        color: #A5ACCE;
+        color: #DCDDE2;
         font-style: normal;
         font-weight: bold;
         font-size: 14px;
-        margin: 8px 0px;
+        /*padding-top: 41px;*/
+        margin-bottom: 1.5rem;
     }
     .btn-divider::before,
     .btn-divider::after {
         content: "";
         flex-grow: 1;
-        background: #A5ACCE;
+        background: #DCDDE2;
         height: 1px;
         font-size: 0px;
         line-height: 0px;
-        margin: 0px 16px;
+        margin: 0px 8px;
     }
 </style>

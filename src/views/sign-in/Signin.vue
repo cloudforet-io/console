@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex items-center text-center h-screen w-full wrapper default-theme">
+        <div class="flex items-center text-center h-screen w-full wrapper image-theme">
             <div id="login-container" class="w-auto justify-center bg-white lg sm:w-auto md:max-w-sm md:mx-auto">
                 <div class="logo">
                     <img src="@/assets/images/brand/brand_logo.png">
@@ -145,7 +145,7 @@ export default defineComponent({
 
     #login-container {
         background-color: white;
-        padding: 24px 16px;
+        padding: 24px 16px 10px;
     }
 
     .logo {
@@ -166,35 +166,14 @@ export default defineComponent({
             padding-top: 0.5rem;
             font-weight: normal;
             font-size: 0.875rem;
-            padding-bottom: 8px;
+            padding-bottom: 24px;
         }
     }
 
     .input-title {
         font-size: 0.875rem;
         font-weight: bold;
-        padding-top: 16px;
-        padding-bottom: 4px;
-    }
-
-    .btn-divider {
-        display: flex;
-        flex-basis: 100%;
-        align-items: center;
-        color: $gray2;
-        font-style: normal;
-        font-weight: bold;
-        font-size: 14px;
-        margin: 8px 0px;
-    }
-    .btn-divider::before,
-    .btn-divider::after {
-        content: "";
-        flex-grow: 1;
-        background: $gray2;
-        height: 1px;
-        font-size: 0px;
-        line-height: 0px;
-        margin: 0px 16px;
+        /*padding-top: 16px;*/
+        /*padding-bottom: 4px;*/
     }
 </style>
