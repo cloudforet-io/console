@@ -149,7 +149,6 @@ export default defineComponent({
     .input-title {
       font-size: 0.875rem;
       font-weight: bold;
-      padding: 4px;
     }
 
     .subtitle {
@@ -161,6 +160,10 @@ export default defineComponent({
 
     #errorMsg {
         color: red;
+    }
+
+    .w-full {
+        width: 22rem;
     }
 
     .btn-divider {
@@ -180,8 +183,6 @@ export default defineComponent({
       flex-grow: 1;
       background: #dcdde2;
       height: 1px;
-      font-size: 0px;
-      line-height: 0px;
       margin: 0px 8px;
     }
 </style>
