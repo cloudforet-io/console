@@ -13,7 +13,7 @@
 <script>
 import { ref, watch } from '@vue/composition-api';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
 import PStatus from '@/components/molecules/status/Status.vue';
 import { timestampFormatter, arrayFormatter, userStateFormatter } from '@/lib/util';
 import { mountBusEvent } from '@/lib/compostion-util';

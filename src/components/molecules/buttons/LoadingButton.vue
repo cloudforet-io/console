@@ -1,6 +1,6 @@
 <template>
     <p-button v-bind="buttonBind"
-              :disabled="loading"
+              :disabled="loading || disabled"
               v-on="$listeners"
     >
         <div class="loading-btn">
@@ -21,6 +21,10 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 export default defineComponent({
     name: 'PLoadingButton',
     props: {
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
         loading: {
             type: Boolean,
             required: true,

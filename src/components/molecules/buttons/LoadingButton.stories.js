@@ -28,6 +28,9 @@ const getProps = () => ({
     loading: {
         default: boolean('loading', true),
     },
+    disabled: {
+        default: boolean('disabled', false),
+    },
     buttonBind: {
         default: object('buttonBind', { styleType: 'primary-dark' }),
     },

@@ -1,5 +1,5 @@
 import { boolean, text } from '@storybook/addon-knobs/vue';
-import PDictInput from './DictInput_origin.vue';
+import PDictInput from '@/components/molecules/forms/dict-input/DictInput_origin.vue';
 
 export default {
     title: 'molecules/forms/DictInputOrigin',

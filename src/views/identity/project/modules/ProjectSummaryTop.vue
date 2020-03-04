@@ -16,7 +16,7 @@
 <script>
 import _ from 'lodash';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
 
 export default {
     name: 'ProjectSummary',
