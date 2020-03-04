@@ -41,7 +41,7 @@ export default defineComponent({
             const response = await vm.$http.post('/identity/token/issue', {
                 credentials: param,
                 domain_id: vm.$ls.domain.state.domainId,
-            });
+            },{ skipAuthRefresh: true });
             context.emit('onLogin', userId, response.data);
         };
         const onLogIn = async (googleUser) => {
