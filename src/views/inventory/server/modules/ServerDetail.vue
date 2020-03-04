@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-divider-header>Base Information</p-divider-header>
+        <p-panel-top>Base Information</p-panel-top>
         <p-dynamic-view view_type="item" :data="item||{}"
                         :data_source="baseDataSource" :root-mode="true"
         />
@@ -18,12 +18,12 @@ import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
-import PDividerHeader from '@/components/molecules/divider-header/DividerHeader.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 
 export default {
     name: 'PServerDetail',
     components: {
-        PDictPanel, PDynamicView, PDynamicDetails, PDividerHeader,
+        PDictPanel, PDynamicView, PDynamicDetails, PPanelTop,
 
     },
     props: {

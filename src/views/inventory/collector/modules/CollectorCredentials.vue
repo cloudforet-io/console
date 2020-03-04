@@ -1,11 +1,13 @@
 <template>
     <div>
         <p-panel-top>
-            {{$t('PANEL.CREDENTIAL') }}
-            <template #head>
+            <template>
+                {{ $t('PANEL.CREDENTIAL') }}
+            </template>
+            <template #extra>
                 <router-link class="credential-btn" :to="credentialPath" target="_blank">
                     <p-button outline style-type="dark">
-                        {{$t('INVENTORY.MANAGE_CRD') }}
+                        {{ $t('INVENTORY.MANAGE_CRD') }}
                     </p-button>
                 </router-link>
             </template>
@@ -53,7 +55,7 @@
             </template>
             <template #col-collect-format="{item}">
                 <p-button outline style-type="dark" @click.stop="$emit('collectData', item)">
-                    {{$t('COMMON.COL_DATA') }}
+                    {{ $t('COMMON.COL_DATA') }}
                 </p-button>
             </template>
         </p-toolbox-table>
@@ -151,6 +153,6 @@ export default {
 
 <style lang="scss" scoped>
 .credential-btn {
-    margin-left: auto;
+    float: right;
 }
 </style>

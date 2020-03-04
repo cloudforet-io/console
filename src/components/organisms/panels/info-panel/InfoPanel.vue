@@ -1,22 +1,24 @@
 <template>
-    <p-panel-top :panel-title="infoTitle" :panel-title-style="infoTitleStyle" class="info-panel-basic">
-        <template #body>
-            <slot>
-                <p-panel-content class="panel-contents" :defs="defs" :item="item">
-                    <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                        <slot :name="slot" v-bind="scope" />
-                    </template>
-                </p-panel-content>
-            </slot>
-        </template>
-    </p-panel-top>
+    <div class="info-panel-basic">
+        <p-panel-top>
+            {{ infoTitle }}
+        </p-panel-top>
+        <slot>
+            <p-panel-content :defs="defs" :item="item">
+                <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                    <slot :name="slot" v-bind="scope" />
+                </template>
+            </p-panel-content>
+        </slot>
+    </div>
 </template>
 
-<script>
-import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop';
-import PPanelContent from '@/components/molecules/panel/panel-content/PanelContent';
+<script lang="ts">
+import { defineComponent } from '@vue/composition-api';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import PPanelContent from '@/components/molecules/panel/panel-content/PanelContent.vue';
 
-export default {
+export default defineComponent({
     name: 'PInfoPanel',
     components: {
         PPanelContent,
@@ -27,30 +29,20 @@ export default {
             type: String,
             default: 'NoTitle',
         },
-        infoTitleStyle: {
-            type: Object,
-            default: null,
-        },
         defs: {
             type: Array,
             default: () => [],
         },
         item: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
     },
-    methods: {
-
-    },
-};
+});
 </script>
 
 <style lang="scss" scoped>
     .info-panel-basic {
         min-height: 100px;
-    }
-    .panel-contents {
-        margin-top: 1rem;
     }
 </style>

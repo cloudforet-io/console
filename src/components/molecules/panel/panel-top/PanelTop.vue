@@ -1,60 +1,41 @@
 <template>
-    <div class="p-panel-top" :style="panelTitleStyle">
-        <div class="panel-card">
-            <div class="p-panel-top-header">
-                <div class="p-panel-top-header-title">
-                    <slot>
-                        {{ panelTitle }}
-                    </slot>
-                </div>
-                <slot name="head" />
+    <div class="p-panel-top">
+        <div class="top-contents">
+            <span class="title">
+                <slot />
+            </span>
+            <div class="extra">
+                <slot name="extra" />
             </div>
-            <hr>
-            <slot name="body" />
         </div>
+        <p-hr />
     </div>
 </template>
+<script lang="ts">
+import { defineComponent } from '@vue/composition-api';
+import PHr from '@/components/atoms/hr/Hr.vue';
 
-<script>
-export default {
+export default defineComponent({
     name: 'PPanelTop',
-    props: {
-        panelTitle: {
-            type: String,
-            default: 'Title',
-        },
-        panelTitleStyle: {
-            type: Object,
-            default: null,
-        },
-    },
-
-};
+    components: { PHr },
+});
 </script>
 
 <style lang="scss" scoped>
-    .p-panel-top{
-        padding-left: 0;
-        padding-right: 0;
+    .p-panel-top {
+        margin-bottom: 1rem;
+        .top-contents {
+            display: flex;
+            width: 100%;
+            height: 3rem;
+            align-items: center;
+        }
+        .title {
+            font-size: 1.125rem;
+            padding-right: 1rem;
+        }
+        .extra {
+            flex-grow: 1;
+        }
     }
-    .panel-card{
-        border:none;
-        @apply relative flex flex-col min-w-0 break-words;
-    }
-    hr{
-        margin-top: 0rem;
-    }
-    .p-panel-top-header{
-        text-align: left;
-        font:  18px Arial;
-        letter-spacing: 0;
-        color: #202433;
-        opacity: 1;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-        display: flex;
-    }
-    .p-panel-top-header-title{
-        align-self:center;
-            }
 </style>
