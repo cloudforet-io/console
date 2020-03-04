@@ -3,6 +3,7 @@ import {
 } from '@vue/composition-api';
 import Lockr from 'lockr';
 import _ from 'lodash';
+import { AxiosRequestConfig } from 'axios';
 
 const bindLocalStorage = (prefix:string, name:string, state:any) => computed({
     get: () => state[name],
@@ -125,24 +126,25 @@ class DomainStore extends Store<DomainState> {
     }
 
     public getDomain= async (vm:any) => {
-        const { hostname } = window.location;
-        this.state.domainName = hostname.split('.')[0];
-        const resp = await vm.$http.post('/identity/domain/list', {
-            name: this.state.domainName,
-        }).catch(() => {
-            vm.$router.push({ name: 'error' });
-        });
-        const domain = _.get(resp, 'data.results.0', null);
-        if (domain) {
-            this.state.domainId = domain.domain_id;
-            if (domain.plugin_info) {
-                this.state.pluginOption = domain.plugin_info.options;
-                this.state.authType = domain.plugin_info.options.auth_type;
+        if (!this.state.domainId) {
+            const { hostname } = window.location;
+            this.state.domainName = hostname.split('.')[0];
+            const resp = await vm.$http.post('/identity/domain/list', {
+                name: this.state.domainName,
+            });
+            const domain = _.get(resp, 'data.results.0', null);
+            if (domain) {
+                this.state.domainId = domain.domain_id;
+                if (domain.plugin_info) {
+                    this.state.pluginOption = domain.plugin_info.options;
+                    this.state.authType = domain.plugin_info.options.auth_type;
+                } else {
+                    this.state.authType = 'local';
+                }
             } else {
-                this.state.authType = 'local';
+                console.debug('no domain');
+                vm.$router.push({ name: 'error' });
             }
-        } else {
-            vm.$router.push({ name: 'error' });
         }
     }
 }
@@ -159,7 +161,7 @@ export default {
             ...state,
             logout(vm?:any) {
                 state.user.reset();
-                state.domain.reset();
+                // state.domain.reset();
                 if (vm) {
                     vm.$router.push({ name: 'LogIn' });
                 }

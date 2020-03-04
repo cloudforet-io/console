@@ -44,10 +44,11 @@ const router = new VueRouter({
                     meta: {
                         excludeAuth: true,
                         isSignInPage: true,
-                        props: route => ({
-                            nextPath: route.query.nextPath || '/',
-                        }),
+
                     },
+                    props: route => ({
+                        nextPath: route.query.nextPath || '/',
+                    }),
                     component: SignIn,
                 },
                 {
@@ -56,12 +57,13 @@ const router = new VueRouter({
                     meta: {
                         excludeAuth: true,
                         isSignInPage: true,
-                        props: route => ({
-                            admin: true,
-                            nextPath: route.query.nextPath || '/',
-                        }),
+
                     },
                     component: SignIn,
+                    props: route => ({
+                        admin: true,
+                        nextPath: route.query.nextPath || '/',
+                    }),
                 },
             ],
         },

@@ -76,38 +76,50 @@ const refreshUrl = '/identity/token/refresh';
 export class ApiInstance {
     public instance:AxiosInstance;
 
-    public constructor(baseURL:string, protected vm:any, handlers?:any) {
-        this.instance = axios.create({
+    protected refreshInstance :AxiosInstance;
+
+
+    public constructor(baseURL:string, protected vm:any) {
+        const axiosOptions = {
             baseURL,
             headers: {
                 'Content-Type': 'application/json',
             },
-        });
+        };
+        this.instance = axios.create(axiosOptions);
+        this.refreshInstance = axios.create(axiosOptions);
+
+
         if (this.vm) {
-            this.setRequestInterceptor((request) => {
+            this.setRefreshRequestInterceptor((request) => {
                 if (this.vm.$ls.user.state.isSignedIn) {
-                    let token:string;
-                    if (request.url === refreshUrl) {
-                        token = this.vm.$ls.user.state.refreshToken;
-                    } else {
-                        token = this.vm.$ls.user.state.accessToken;
-                    }
-                    request.headers.Authorization = `Bearer ${token}`;
+                    request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.refreshToken}`;
                 }
                 return request;
             });
-            const refreshAuthLogic = failedRequest => this.instance.post(refreshUrl).then((resp) => {
+            this.setRequestInterceptor((request) => {
+                if (this.vm.$ls.user.state.isSignedIn && request.url !== '/identity/domain/list') {
+                    request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
+                }
+                return request;
+            });
+            const refreshAuthLogic = failedRequest => this.refreshInstance.post(refreshUrl).then((resp) => {
                 console.debug('request refresh token');
                 this.vm.$ls.user.setToken(resp.data.refresh_token, resp.data.access_token);
                 failedRequest.response.config.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
                 return Promise.resolve();
-            }, error => Promise.reject()).catch((reason) => {
-                console.debug('catch', reason);
-                this.vm.$ls.logout();
-                this.vm.$router.push({ name: 'Login' });
+            }, (error) => {
+                console.debug('fail refresh', error);
+                this.vm.$ls.logout(vm);
+                return Promise.reject();
             });
+
             createAuthRefreshInterceptor(this.instance, refreshAuthLogic);
         }
+    }
+
+    protected setRefreshRequestInterceptor(handler:(request:AxiosRequestConfig)=>AxiosRequestConfig):void {
+        this.refreshInstance.interceptors.request.use(handler);
     }
 
     protected setRequestInterceptor(handler:(request:AxiosRequestConfig)=>AxiosRequestConfig):void {
@@ -320,7 +332,7 @@ export abstract class BaseTableAPI extends DynamicAPI {
         this.apiState = reactive({
             url,
             only,
-            fixSearchQuery,
+            fixSearchQuery, // default fix query
             extraParams, // for api extra parameters
         });
         this.tableTS = new ToolboxTableToolSet();
@@ -403,8 +415,6 @@ interface DataSource {
 
 
 export class TabSearchTableAPI extends SearchTableAPI {
-    public tableTS:SearchTableToolSet;
-
     protected isShow: forceRefArg<boolean>;
 
     public constructor(
