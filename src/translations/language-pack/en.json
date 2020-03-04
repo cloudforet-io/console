@@ -1,5 +1,12 @@
 {
 	"ACTION": {
+		"DICT": {
+			"INVALID": {
+				"KEY_DUPL": "Keys cannot be duplicated.",
+				"KEY_EMPTY": "Enter the Key.",
+				"VAL_EMPTY": "Enter the Value."
+			}
+		},
 		"None": ""
 	},
 	"BTN": {
@@ -374,9 +381,12 @@
 	"WORD": {
 		"CIDR": "CIDR",
 		"CLOUDSERVICE": "cloud service",
+		"KEY": "Key",
 		"SERVER": "server",
 		"TAG": "tag",
+		"TAGS": "Tags",
 		"USER": "user",
+		"VALUE": "Value",
 		"VM": "vm"
 	}
 }
