@@ -9,12 +9,8 @@ import secretRoute from '@/routes/secret/secret-route';
 import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 
 // Views
-// import SignIn from '@/views/sign-in/local/Local.vue';
 import SignIn from '@/views/sign-in/Signin.vue';
-import GoolgeSignIn from '@/views/sign-in/oauth/GoogleOAuth.vue';
-import Admin from '@/views/sign-in/admin/Admin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';
-import store from '@/store';
 
 Vue.use(VueRouter);
 
@@ -44,10 +40,11 @@ const router = new VueRouter({
                     meta: {
                         excludeAuth: true,
                         isSignInPage: true,
-                        props: route => ({
-                            nextPath: route.query.nextPath || '/',
-                        }),
+
                     },
+                    props: route => ({
+                        nextPath: route.query.nextPath || '/',
+                    }),
                     component: SignIn,
                 },
                 {
@@ -56,26 +53,15 @@ const router = new VueRouter({
                     meta: {
                         excludeAuth: true,
                         isSignInPage: true,
-                        props: route => ({
-                            admin: true,
-                            nextPath: route.query.nextPath || '/',
-                        }),
+
                     },
                     component: SignIn,
+                    props: route => ({
+                        admin: true,
+                        nextPath: route.query.nextPath || '/',
+                    }),
                 },
             ],
-        },
-        {
-            path: '/google-sign-in',
-            name: 'GoogleOauthSignIn',
-            meta: { label: 'google_oauth2', excludeAuth: true, isSignInPage: true },
-            component: GoolgeSignIn,
-        },
-        {
-            path: '/admin-sign-in',
-            name: 'Admin-SignIn',
-            meta: { label: 'admin_sign', excludeAuth: true, isSignInPage: true },
-            component: Admin,
         },
         {
             path: '/',
