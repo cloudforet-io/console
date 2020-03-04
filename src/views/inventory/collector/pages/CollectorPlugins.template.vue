@@ -1,6 +1,6 @@
 <template>
-    <vertical-page-layout :min-left-width="260">
-        <template #leftContainer="{width}">
+    <vertical-page-layout2 :min-left-width="260">
+        <template #sidebar-container="{width}">
             <div :style="{width: width}">
                 <plugin-filter :filters.sync="filterTools.tags"
                                :repositories="repositories"
@@ -12,7 +12,7 @@
                 />
             </div>
         </template>
-        <template #rightContainer="{height}">
+        <template #main="{height}">
             <p-toolbox-card-list class="card-list"
                                  :items="plugins"
                                  :mapper="pluginMapper"
@@ -70,7 +70,7 @@
                 </template>
             </p-toolbox-card-list>
         </template>
-    </vertical-page-layout>
+    </vertical-page-layout2>
 </template>
 
 <script>
@@ -83,7 +83,7 @@ import { SearchQuery } from '@/components/organisms/search/query-search-bar/auto
 
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
-import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
+import PVerticalLayout2 from '@/components/organisms/layouts/vertical-layout/VerticalLayout2.vue';
 import PToolboxCardList from '@/components/organisms/lists/toolbox-card-list/ToolboxCardList.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -92,7 +92,7 @@ import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 
 import PluginFilter from '@/views/inventory/collector/modules/PluginFilter.vue';
-import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
+import VerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 
 const repoState = reactive({
     repositories: [],
@@ -224,10 +224,10 @@ export const setup = (props, { root }) => {
 export default {
     name: 'CollectorPluginsTemplate',
     components: {
-        VerticalPageLayout,
+        VerticalPageLayout2,
         PRow,
         PCol,
-        PVerticalLayout,
+        PVerticalLayout2,
         PToolboxCardList,
         PBadge,
         PButton,
