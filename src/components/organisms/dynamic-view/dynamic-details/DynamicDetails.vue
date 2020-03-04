@@ -1,9 +1,9 @@
 <template>
     <div v-if="dvs.length >= 1">
         <template v-for="dv in dvs">
-            <PDividerHeader :key="dv.name">
+            <p-panel-top :key="dv.name">
                 {{ dv.name }}
-            </PDividerHeader>
+            </p-panel-top>
             <p-dynamic-view :key="dv.name+'-dv'" v-bind="dv" :data="data" />
         </template>
     </div>
@@ -15,7 +15,7 @@
 <script lang="ts">
 import { computed, defineComponent } from '@vue/composition-api';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import PDividerHeader from '@/components/molecules/divider-header/DividerHeader.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 
 interface DV{
@@ -36,7 +36,7 @@ interface Props {
 export default defineComponent({
     name: 'PDynamicDetails',
     components: {
-        PDynamicView, PDividerHeader, PEmpty,
+        PDynamicView, PPanelTop, PEmpty,
     },
     props: {
         details: {
