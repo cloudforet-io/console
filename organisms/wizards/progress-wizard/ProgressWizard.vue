@@ -34,9 +34,11 @@
 
         <template v-if="activeTab">
             <p-panel-top class="step-title">
-                Step {{ activeIdx + 1 }}. {{ labels[activeTab.key] || activeTab.key }}
-                <span v-if="activeTab.optional" class="optional"> ({{ $t('COMMON.OPTIONAL') }})</span>
-                <template #head>
+                <template>
+                    Step {{ activeIdx + 1 }}. {{ labels[activeTab.key] || activeTab.key }}
+                    <span v-if="activeTab.optional" class="optional"> ({{ $t('COMMON.OPTIONAL') }})</span>
+                </template>
+                <template #extra>
                     <div class="step-appendix">
                         <slot :name="`step-append-${activeTab.key}`" :tab="activeTab" />
                     </div>
@@ -63,21 +65,21 @@
                               outline style-type="secondary" size="lg"
                               @click="onClickPrev"
                     >
-                        <p-i name="ic_back" color="transparent inherit" />{{$t('COMMON.PREV') }}
+                        <p-i name="ic_back" color="transparent inherit" />{{ $t('COMMON.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
                               outline style-type="secondary"
                               size="lg"
                               @click="onClickNext"
                     >
-                        {{$t('COMMON.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
+                        {{ $t('COMMON.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
                     </p-button>
                     <p-button style-type="secondary" size="lg"
                               :disabled="!showConfirm"
                               class="txt-btn"
                               @click="$emit('confirm', tabs, $event)"
                     >
-                        {{$t('BTN.CONFIRM') }}
+                        {{ $t('BTN.CONFIRM') }}
                     </p-button>
                 </p-col>
             </p-row>
@@ -193,8 +195,7 @@ export default {
         padding-bottom: 1rem;
     }
     .step-title {
-        padding: 2.375rem 0 0 0;
-        font-size: 1.125rem;
+        margin-top: 2.375rem;
         .optional {
             font-style: italic;
         }
