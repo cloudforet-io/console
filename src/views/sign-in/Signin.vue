@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex items-center text-center h-screen w-full wrapper default-theme">
-            <div id="login-container" class="w-auto justify-center bg-white lg sm:w-auto md:max-w-sm md:mx-auto">
+            <div id="login-container" class="max-w-md mx-auto justify-center bg-white lg sm:max-w-xl md:max-w-sm md:mx-auto">
                 <div class="logo">
                     <img src="@/assets/images/brand/brand_logo.png">
                 </div>

@@ -197,10 +197,10 @@ export const jsonParseValidation = (invalidMessage:message) => new Validation((v
     return true;
 },
 invalidMessage || 'Invalid Json string format!');
-export const numberMinValidation = (min:number, invalidMessage:message) => new Validation(value => (value ? Number(value) >= min : true), invalidMessage || `value must bigger then ${min}`);
-export const numberMaxValidation = (max:number, invalidMessage:message) => new Validation(value => (value ? Number(value) <= max : true), invalidMessage || `value must smaller then ${max}`);
-export const lengthMinValidation = (min:number, invalidMessage:message) => new Validation(value => (value ? value.length >= min : true), invalidMessage || `value length must bigger then ${min}`);
-export const lengthMaxValidation = (max:number, invalidMessage:message) => new Validation(value => (value ? value.length <= max : true), invalidMessage || `value length must smaller then ${max}`);
+export const numberMinValidation = (min:number, invalidMessage?:message) => new Validation(value => (value ? Number(value) >= min : true), invalidMessage || `value must bigger then ${min}`);
+export const numberMaxValidation = (max:number, invalidMessage?:message) => new Validation(value => (value ? Number(value) <= max : true), invalidMessage || `value must smaller then ${max}`);
+export const lengthMinValidation = (min:number, invalidMessage?:message) => new Validation(value => (value ? value.length >= min : true), invalidMessage || `value length must bigger then ${min}`);
+export const lengthMaxValidation = (max:number, invalidMessage?:message) => new Validation(value => (value ? value.length <= max : true), invalidMessage || `value length must smaller then ${max}`);
 export const checkTimeZoneValidation = (invalidMessage:message) => new Validation(value => (value ? moment.tz.names().indexOf(value) !== -1 : true), invalidMessage || 'can not find timezone');
 
 export const credentialsNameValidation = (parent:any, invalidMessage:message) => new Validation(async (value) => {

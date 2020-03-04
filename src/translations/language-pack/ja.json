@@ -1,5 +1,12 @@
 {
 	"ACTION": {
+		"DICT": {
+			"INVALID": {
+				"KEY_DUPL": "",
+				"KEY_EMPTY": "",
+				"VAL_EMPTY": ""
+			}
+		},
 		"None": ""
 	},
 	"BTN": {
@@ -374,9 +381,12 @@
 	"WORD": {
 		"CIDR": "",
 		"CLOUDSERVICE": "",
+		"KEY": "",
 		"SERVER": "",
 		"TAG": "",
+		"TAGS": "",
 		"USER": "",
+		"VALUE": "",
 		"VM": ""
 	}
 }

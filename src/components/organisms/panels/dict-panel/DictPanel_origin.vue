@@ -1,38 +1,36 @@
 <template>
-    <div class="dict-panel">
-        <p-panel-top>
-            <template>
-                {{ $t('ORGANISMS.TAG') }}
-            </template>
-            <template #extra>
-                <div class="panel-header" :class="{'edit':editMode}">
-                    <p-button v-if="!editMode" style-type="primary-dark"
-                              @click="clickEdit()"
-                    >
-                        {{ buttonTag }}
-                    </p-button>
-                    <p-button v-if="editMode" style-type="secondary" :outline="true"
-                              class="header-btn"
-                              @click="clickCancel()"
-                    >
-                        {{ $t('BTN.CANCEL') }}
-                    </p-button>
-                    <p-button v-if="editMode" style-type="secondary" class="header-btn"
-                              @click="clickConfirm()"
-                    >
-                        {{ $t('BTN.SAVE') }}
-                    </p-button>
-                </div>
-            </template>
-        </p-panel-top>
-        <p-dict-input-group ref="tagInputGroup"
-                            :dict.sync="proxyTags"
-                            :edit-mode="editMode"
-        />
-        <div v-if="isEmpty(proxyTags) && !editMode" class="no-dict">
-            {{ $t('ORGANISMS.NO_TAG') }}
-        </div>
-    </div>
+    <p-panel-top :panel-title="$t('ORGANISMS.TAG')" class="dict-panel-title">
+        <template #head>
+            <div class="panel-header" :class="{'edit':editMode}">
+                <p-button v-if="!editMode" style-type="primary-dark" class="header-btn"
+                          @click="clickEdit()"
+                >
+                    {{ buttonTag }}
+                </p-button>
+                <p-button v-if="editMode" style-type="secondary" :outline="true"
+                          class="header-btn"
+                          @click="clickCancel()"
+                >
+                    {{ $t('BTN.CANCEL') }}
+                </p-button>
+                <p-button v-if="editMode" style-type="secondary" class="header-btn"
+                          @click="clickConfirm()"
+                >
+                    {{ $t('BTN.SAVE') }}
+                </p-button>
+            </div>
+        </template>
+        <template #body>
+            <p-dict-input-group ref="tagInputGroup"
+                                class="panel-contents"
+                                :dict.sync="proxyTags"
+                                :edit-mode="editMode"
+            />
+            <div v-if="isEmpty(proxyTags) && !editMode" class="no-dict">
+                {{ $t('ORGANISMS.NO_TAG') }}
+            </div>
+        </template>
+    </p-panel-top>
 </template>
 
 <script>
@@ -101,12 +99,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .dict-panel {
+    .panel-contents {
+        margin-top: 1rem;
+    }
+    .dict-panel-title {
         min-height: 100px;
     };
     .panel-header {
         display: inline-flex;
         width: 100%;
+
         &.edit {
             justify-content: flex-end;
         }

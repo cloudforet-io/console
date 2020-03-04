@@ -6,63 +6,62 @@
                      @select="changeLanguage"
         >
             <template #contents>
-                <p-i name="ic_gnb_language" width="32px" height="32px"
-                     :color="`transparent ${iconColor}`"
+                <p-i name="ic_gnb_language" width="2rem" height="2rem"
+                     class="icon" color="transparent inherit"
                 />
             </template>
         </p-menu-list>
     </div>
 </template>
 
-<script>
-import { mapActions, mapGetters } from 'vuex';
-import PI from '@/components/atoms/icons/PI';
-import PMenuList from '@/components/organisms/lists/menu-list/MenuList';
+<script lang="ts">
+import {
+    reactive, toRefs, computed, getCurrentInstance, defineComponent,
+} from '@vue/composition-api';
+import PI from '@/components/atoms/icons/PI.vue';
+import PMenuList from '@/components/organisms/lists/menu-list/MenuList.vue';
 import { LANGUAGES } from '@/lib/global-enums';
-import styles from '@/styles/_variables.scss';
 
-export default {
+export default defineComponent({
     name: 'LanguageMenu',
     components: {
         PI,
         PMenuList,
     },
-    data() {
-        return {
-            languages: this.$i18n.availableLocales.map(lang => ({
+    setup() {
+        const vm:any = getCurrentInstance();
+        const state = reactive({
+            language: computed({
+                set(val) { vm.$ls.user.state.language = val; },
+                get() {
+                    return vm.$ls.user.state.language;
+                },
+            }),
+            languages: computed(() => vm.$i18n.availableLocales.map(lang => ({
                 key: lang,
                 contents: LANGUAGES[lang],
-                selected: localStorage.language ? localStorage.language === lang : lang === 'en',
-            })),
-            iconColor: styles.primary4,
+                selected: state.language === lang,
+            }))),
+            tooltip: computed(() => `Language: ${LANGUAGES[state.language]}`),
+        });
+
+        const changeLanguage = (item) => {
+            state.language = item.key;
+            vm.$i18n.locale = state.language;
+        };
+
+        vm.$i18n.locale = state.language;
+
+        return {
+            ...toRefs((state)),
+            changeLanguage,
         };
     },
-    computed: {
-        ...mapGetters('auth', [
-            'language',
-        ]),
-        tooltip() {
-            return `Language: ${LANGUAGES[this.language]}`;
-        },
-    },
-    created() {
-        this.init();
-    },
-    methods: {
-        ...mapActions('auth', [
-            'setLanguage',
-        ]),
-        init() {
-            this.setLanguage(localStorage.language || 'en');
-            this.$i18n.locale = this.language;
-        },
-        changeLanguage(item) {
-            this.setLanguage(item.key);
-            this.$i18n.locale = this.language;
-        },
-    },
-};
+});
 </script>
 
 <style lang="scss" scoped>
+    .icon {
+        color: $primary4;
+    }
 </style>

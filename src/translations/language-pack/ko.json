@@ -1,5 +1,12 @@
 {
 	"ACTION": {
+		"DICT": {
+			"INVALID": {
+				"KEY_DUPL": "키는 중복될 수 없습니다.",
+				"KEY_EMPTY": "키를 입력해주세요.",
+				"VAL_EMPTY": "값을 입력해주세요."
+			}
+		},
 		"None": ""
 	},
 	"BTN": {
@@ -374,9 +381,12 @@
 	"WORD": {
 		"CIDR": "CIDR",
 		"CLOUDSERVICE": "클라우드 서비스",
+		"KEY": "키",
 		"SERVER": "서버",
 		"TAG": "태그",
+		"TAGS": "태그",
 		"USER": "사용자",
+		"VALUE": "값",
 		"VM": "가상머신"
 	}
 }
