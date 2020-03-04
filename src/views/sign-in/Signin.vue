@@ -9,8 +9,11 @@
                     <p id="title">
                         Sign in to SPACEONE
                     </p>
-                    <p id="subtitle">
+                    <p v-if="login" class="subtitle">
                         Welcome to SPACEONE Console
+                    </p>
+                    <p v-else-if="!login" class="subtitle">
+                        Confirm your ID
                     </p>
                 </div>
                 <div class="user-info">
@@ -161,8 +164,9 @@ export default defineComponent({
         #title {
             font-weight: bold;
             font-size: 1.5rem;
+            padding-bottom: 8px;
         }
-        #subtitle {
+        .subtitle {
             padding-top: 0.5rem;
             font-weight: normal;
             font-size: 0.875rem;
