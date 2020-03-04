@@ -82,7 +82,7 @@ import _ from 'lodash';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PLabel from '@/components/atoms/labels/Label';
 import PTextInput from '@/components/atoms/inputs/TextInput';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup_origin';
 
 export default {
     name: 'ProjectContextAction',
