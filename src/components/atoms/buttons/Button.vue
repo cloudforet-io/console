@@ -135,6 +135,7 @@ export default {
     text-align: center;
     font-size: 1rem;
     line-height: 1.125rem;
+    -webkit-appearance:none;
 }
 .btn-sm{
     min-width:3.25rem;
@@ -142,9 +143,11 @@ export default {
     text-align: center;
     font-size: .75rem;
     line-height: .875rem;
+    -webkit-appearance:none;
 }
 .btn-block {
     display: flex;
     width: 100%;
+    -webkit-appearance:none;
 }
 </style>
