@@ -45,7 +45,7 @@ import _ from 'lodash';
 import {
     toRefs, reactive, ref, watch, computed,
 } from '@vue/composition-api';
-import PDictInput from '@/components/molecules/forms/dict-input/DictInput.vue';
+import PDictInput from '@/components/molecules/forms/dict-input/DictInput_origin.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
