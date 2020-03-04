@@ -55,60 +55,32 @@ export default defineComponent({
         },
     },
     setup(props:any, context:any) {
+        console.debug('login!!');
         const vm = (getCurrentInstance() as any);
+        vm.$ls.domain.getDomain(vm);
 
-        // todo: remove when router props function mode is work
-        const routeProps = vm.$route.meta.props(vm.$route);
         const state = reactive<any>({
-            // todo: remove when router props function mode is work
-            tempAdmin: routeProps.admin,
-            tempNextPath: routeProps.nextPath,
-            authType: computed(() => {
-                if (state.tempAdmin) {
-                    return 'admin';
+            userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
+            component: computed(() => {
+                let authType;
+                if (props.admin) {
+                    authType = 'admin';
+                } else {
+                    authType = vm.$ls.domain.state.authType;
                 }
-                return vm.$ls.domain.state.authType;
+                let component;
+                try {
+                    component = () => import(`./templates/${authType}/index.vue`);
+                } catch (e) {
+                    component = () => import('./templates/local/index.vue');
+                }
+                return component;
             }),
-            component: null,
-            userType: computed(() => (state.tempAdmin ? 'DOMAIN_OWNER' : 'USER')),
-            loader: computed<()=>Promise<any>>(() => () => import(`./templates/${state.authType}/index.vue`)),
-        });
-
-        watch(() => vm.$route, (route: Route, preRoute:Route) => {
-            if (route !== preRoute) {
-                const parseProps = vm.$route.meta.props(route);
-                state.tempAdmin = parseProps.admin;
-                state.tempNextPath = parseProps.nextPath;
-            }
-        });
-        watch(() => state.authType, (authType: any, preAuthType:any) => {
-            if (authType !== preAuthType) {
-                state.loader()
-                    .then(() => {
-                        state.component = () => state.loader();
-                    })
-                    .catch(() => {
-                        // eslint-disable-next-line import/no-unresolved
-                        state.component = () => import('./templates/local/index.vue');
-                    });
-            }
-        });
-        onBeforeMount(async () => {
-            await vm.$ls.domain.getDomain(vm);
-
-            state.loader()
-                .then(() => {
-                    state.component = () => state.loader();
-                })
-                .catch(() => {
-                    // eslint-disable-next-line import/no-unresolved
-                    state.component = () => import('./templates/local/index.vue');
-                });
         });
         const login = async (userId:string, credentials:Credentials) => {
             vm.$ls.user.setToken(credentials.refresh_token, credentials.access_token);
             await vm.$ls.user.setUser(state.userType, userId, vm);
-            vm.$router.push(state.tempNextPath);
+            vm.$router.push(props.nextPath);
         };
         return {
             ...toRefs(state),
