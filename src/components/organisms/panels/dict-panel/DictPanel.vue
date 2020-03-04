@@ -107,9 +107,11 @@ export default {
     .panel-header {
         display: inline-flex;
         width: 100%;
-
         &.edit {
             justify-content: flex-end;
+        }
+        .header-btn {
+            margin-left: 1rem;
         }
     }
     .no-dict {
