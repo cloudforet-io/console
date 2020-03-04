@@ -73,49 +73,63 @@ class APIError extends Error {
 
 const refreshUrl = '/identity/token/refresh';
 
-export class ApiInstance {
-    public instance:AxiosInstance;
+export class Api {
+    public instance: AxiosInstance ;
 
-    protected refreshInstance :AxiosInstance;
+    protected refreshInstance : AxiosInstance ;
+
+    protected axiosOptions:any;
+
+    private vm: any;
+
+    public newInstance() {
+        return axios.create(this.axiosOptions);
+    }
+
+    constructor() {
+        this.instance = axios.create();
+        this.refreshInstance = axios.create();
+        this.vm = null;
+    }
 
 
-    public constructor(baseURL:string, protected vm:any) {
-        const axiosOptions = {
+    public init(baseURL:string, vm:any) {
+        this.axiosOptions = {
             baseURL,
             headers: {
                 'Content-Type': 'application/json',
             },
         };
-        this.instance = axios.create(axiosOptions);
-        this.refreshInstance = axios.create(axiosOptions);
+        this.vm = vm;
+        this.instance = this.newInstance();
+        this.refreshInstance = this.newInstance();
 
 
-        if (this.vm) {
-            this.setRefreshRequestInterceptor((request) => {
-                if (this.vm.$ls.user.state.isSignedIn) {
-                    request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.refreshToken}`;
-                }
-                return request;
-            });
-            this.setRequestInterceptor((request) => {
-                if (this.vm.$ls.user.state.isSignedIn && request.url !== '/identity/domain/list') {
-                    request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
-                }
-                return request;
-            });
-            const refreshAuthLogic = failedRequest => this.refreshInstance.post(refreshUrl).then((resp) => {
-                console.debug('request refresh token');
-                this.vm.$ls.user.setToken(resp.data.refresh_token, resp.data.access_token);
-                failedRequest.response.config.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
-                return Promise.resolve();
-            }, (error) => {
-                console.debug('fail refresh', error);
-                this.vm.$ls.logout(vm);
-                return Promise.reject();
-            });
+        this.setRefreshRequestInterceptor((request) => {
+            if (this.vm.$ls.user.state.isSignedIn) {
+                request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.refreshToken}`;
+            }
+            return request;
+        });
+        this.setRequestInterceptor((request) => {
+            if (this.vm.$ls.user.state.isSignedIn && request.url !== '/identity/domain/list') {
+                request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
+            }
+            return request;
+        });
+        const refreshAuthLogic = failedRequest => this.refreshInstance.post(refreshUrl).then((resp) => {
+            console.debug('request refresh token');
+            this.vm.$ls.user.setToken(resp.data.refresh_token, resp.data.access_token);
+            failedRequest.response.config.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
+            return Promise.resolve();
+        }, (error) => {
+            this.vm.$ls.logout(vm);
+            return Promise.reject(error);
+        });
 
-            createAuthRefreshInterceptor(this.instance, refreshAuthLogic);
-        }
+        createAuthRefreshInterceptor(this.instance, refreshAuthLogic);
+
+        return this.instance;
     }
 
     protected setRefreshRequestInterceptor(handler:(request:AxiosRequestConfig)=>AxiosRequestConfig):void {
@@ -130,6 +144,8 @@ export class ApiInstance {
         this.instance.interceptors.response.use(responseHandler, errorHandler);
     }
 }
+// DO NOT USE THIS IN CONFIG REQUEST
+export const api:Api = new Api();
 
 export const operatorMap = Object.freeze({
     '': 'contain_in', // merge operator

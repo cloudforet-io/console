@@ -16,7 +16,7 @@ import Vue from 'vue';
 import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { ApiInstance } from '@/lib/api';
+import { api } from '@/lib/api';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
@@ -41,7 +41,7 @@ export default defineComponent({
         });
         const configInit = async () => {
             await config.init();
-            Vue.prototype.$http = new ApiInstance(config.get('VUE_APP_API.ENDPOINT'), vm).instance;
+            Vue.prototype.$http = api.init(config.get('VUE_APP_API.ENDPOINT'), vm);
         };
         const preparationTo = async () => {
             try {

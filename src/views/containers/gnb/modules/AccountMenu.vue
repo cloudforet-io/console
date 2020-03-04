@@ -20,13 +20,15 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed } from '@vue/composition-api';
+import {
+    reactive, toRefs, computed, defineComponent,
+} from '@vue/composition-api';
 import PMenuList from '@/components/organisms/lists/menu-list/MenuList.vue';
 import ProfileModal from '@/views/common/profile/ProfileModal.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import styles from '@/styles/_variables.scss';
+import { useStore } from '@/store/toolset';
 
-export default {
+export default defineComponent({
     name: 'AccountMenu',
     components: {
         PI,
@@ -34,6 +36,7 @@ export default {
         ProfileModal,
     },
     setup(props, { root }) {
+        const { logout } = useStore();
         const state = reactive({
             profileVisible: false,
             menuList: [
@@ -48,8 +51,7 @@ export default {
             state.profileVisible = true;
         };
         const signOutAction = async () => {
-            root.$ls.logout();
-            root.$router.push({ name: 'Login' });
+            logout(root);
         };
         const doAction = (item) => {
             if (item.key === 'signout') signOutAction();
@@ -61,7 +63,7 @@ export default {
             doAction,
         };
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>
