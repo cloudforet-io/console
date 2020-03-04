@@ -482,6 +482,8 @@ export class AdminTableAPI extends TabSearchTableAPI {
     }
 }
 
+export const MockAdminTableAPI =()=> new AdminTableAPI('', computed(() => ({})), [], undefined, undefined, [], computed(() => false));
+
 
 export class SubDataAPI extends SearchTableAPI {
     // @ts-ignore
@@ -533,6 +535,9 @@ export class HistoryAPI extends TabSearchTableAPI {
         }));
     }
 }
+
+export const MockHistoryAPI =()=> new HistoryAPI('', '', '', undefined, undefined, [], computed(() => false));
+
 export interface ACHandlerMeta {
     handlerClass:typeof baseAutocompleteHandler;
     args:any;
