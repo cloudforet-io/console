@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex items-center text-center h-screen w-full wrapper image-theme">
+        <div class="flex items-center text-center h-screen w-full wrapper default-theme">
             <div id="login-container" class="w-auto justify-center bg-white lg sm:w-auto md:max-w-sm md:mx-auto">
                 <div class="logo">
                     <img src="@/assets/images/brand/brand_logo.png">
@@ -8,12 +8,6 @@
                 <div class="header">
                     <p id="title">
                         Sign in to SPACEONE
-                    </p>
-                    <p v-if="login" class="subtitle">
-                        Welcome to SPACEONE Console
-                    </p>
-                    <p v-else-if="!login" class="subtitle">
-                        Confirm your ID
                     </p>
                 </div>
                 <div class="user-info">
@@ -165,12 +159,6 @@ export default defineComponent({
             font-weight: bold;
             font-size: 1.5rem;
             padding-bottom: 8px;
-        }
-        .subtitle {
-            padding-top: 0.5rem;
-            font-weight: normal;
-            font-size: 0.875rem;
-            padding-bottom: 24px;
         }
     }
 
