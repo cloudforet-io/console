@@ -1,6 +1,5 @@
-import { select } from '@storybook/addon-knobs/vue';
+import { select, boolean } from '@storybook/addon-knobs/vue';
 import faker from 'faker';
-import { autoProps } from '@sb/storybook-util';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import PTh from '@/components/atoms/table/Th.vue';
@@ -62,12 +61,18 @@ export const table = () => ({
         bord: {
             default: select('responsive', ['', true, false], ''),
         },
-        ...autoProps(PTable, [
-            { name: 'striped' },
-            { name: 'hover' },
-            { name: 'small' },
-            { name: 'background' },
-        ]),
+        striped: {
+            default: boolean('striped', true),
+        },
+        hover: {
+            default: boolean('hover', true),
+        },
+        small: {
+            default: boolean('small', true),
+        },
+        background: {
+            default: boolean('background', true),
+        },
     },
     created() {
         this.getUsers();

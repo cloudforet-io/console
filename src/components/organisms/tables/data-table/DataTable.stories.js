@@ -55,6 +55,7 @@ export const datatable = () => ({
     components: { PDataTable },
     mixins: [mockupMixin],
     template: `
+        <div style="background-color: white;">
 <PDataTable 
     :items="items" 
     :fields="fields"
@@ -66,6 +67,7 @@ export const datatable = () => ({
     @rowMouseOut="rowMouseOut"
 >
 </PDataTable>
+        </div>
 `,
     data() {
         return {
@@ -81,6 +83,7 @@ export const usingToolSet = () => ({
     components: { PDataTable },
     mixins: [mockupMixin],
     template: `
+        <div style="background-color: white;">
 <PDataTable 
     v-bind="ts.state"
     @rowLeftClick="rowLeftClick"
@@ -90,6 +93,7 @@ export const usingToolSet = () => ({
     @rowMouseOut="rowMouseOut"
 >
 </PDataTable>
+        </div>
 `,
     setup() {
         const ts = new DataTableToolSet(data);
@@ -105,7 +109,6 @@ export const dataTableWithSortFunctionality = () => ({
     mixins: [mockupMixin],
     template: `
 <div>
-ㅈ
 <p>sort by : {{sortBy}}, sort desc : {{sortDesc}}</p>
 </div>
 `,
@@ -123,7 +126,7 @@ export const selectTable = () => ({
     components: { PDataTable, PButton },
     mixins: [mockupMixin],
     template: `
-<div>
+<div style="background-color: white;">
 <PDataTable 
     ref="table"
     :items="items" 
@@ -279,6 +282,7 @@ export const customColSlot = () => ({
     },
     mixins: [mockupMixin],
     template: `
+        <div style="background-color: white;">
 <PDataTable 
     :items="items" 
     :fields="fields"
@@ -293,8 +297,8 @@ export const customColSlot = () => ({
         <p-button styleType="primary" @click.stop="sendEmail(data.item,data.index,$event)">send email</p-button>
     </p-td>
 </template>
-</p-tr>
 </PDataTable>
+        </div>
 `,
     data() {
         return {
