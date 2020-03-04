@@ -23,13 +23,16 @@
     </p-button>
 </template>
 
-<script>
-import { reactive, computed, toRefs } from '@vue/composition-api';
+<script lang="ts">
+import {
+    reactive, computed, toRefs, defineComponent,
+} from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import { white, gray1 } from '@/styles/_variables.scss';
+// @ts-ignore
+// import { white, gray1 } from '@/styles/_variables.scss';
 
-export default {
+export default defineComponent({
     name: 'PIconButton',
     components: { PButton, PI },
     mixins: [PI],
@@ -45,15 +48,15 @@ export default {
         },
         hoverColor: {
             type: String,
-            default: `transparent ${white}`,
+            default: 'transparent inherit',
         },
         disabledColor: {
             type: String,
-            default: `transparent ${gray1}`,
+            default: 'transparent inherit',
         },
     },
-    setup(props) {
-        const state = reactive({
+    setup(props: any) {
+        const state: any = reactive({
             isHover: false,
             classObject: computed(() => [props.buttonStyle]),
         });
@@ -75,7 +78,7 @@ export default {
 
         };
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>
@@ -89,6 +92,7 @@ export default {
         max-width: 32px;
         min-height: 32px;
         max-height: 32px;
+        color: $gray1;
         &.disabled{
             background-color: $gray2;
         }
@@ -108,6 +112,9 @@ export default {
                 border-color: transparent;
                 background-color: transparent;
             }
+        }
+        &:hover {
+            color: $white;
         }
     }
     .p-i-icon{
