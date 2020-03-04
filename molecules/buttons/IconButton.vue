@@ -93,12 +93,21 @@ export default defineComponent({
         min-height: 32px;
         max-height: 32px;
         color: $gray1;
+        &:hover {
+            color: $white;
+        }
         &.disabled{
             background-color: $gray2;
+            &:hover {
+                color: inherit;
+            }
         }
         &.white{
             background-color: $white;
             border-color: $gray2;
+            &:hover {
+                color: $gray2;
+            }
         }
         &.dark{
             background-color: $dark;
@@ -112,9 +121,6 @@ export default defineComponent({
                 border-color: transparent;
                 background-color: transparent;
             }
-        }
-        &:hover {
-            color: $white;
         }
     }
     .p-i-icon{
