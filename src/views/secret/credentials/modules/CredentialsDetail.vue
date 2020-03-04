@@ -26,7 +26,7 @@
 /* eslint-disable camelcase */
 
 import { ref, watch } from '@vue/composition-api';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';

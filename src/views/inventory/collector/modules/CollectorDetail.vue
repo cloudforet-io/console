@@ -51,7 +51,7 @@ import {
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
 import PStatus from '@/components/molecules/status/Status.vue';
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
