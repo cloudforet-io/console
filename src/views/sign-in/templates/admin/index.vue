@@ -135,7 +135,6 @@ export default defineComponent({
     .input-title {
         font-size: 0.875rem;
         font-weight: bold;
-        padding-bottom: 4px;
     }
     .subtitle {
         padding-top: 0.5rem;
@@ -146,5 +145,9 @@ export default defineComponent({
 
     #errorMsg {
         color: red;
+    }
+
+    .w-full {
+        width: 22rem;
     }
 </style>
