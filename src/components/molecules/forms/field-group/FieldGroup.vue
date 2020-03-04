@@ -1,6 +1,7 @@
 <template>
-    <div class="mb-3 p-field-group">
-        <label class="form-label">{{ label }}</label><span v-if="required" class="required-mark">*</span>
+    <div class="p-field-group">
+        <label v-if="label" class="form-label">{{ label }}</label>
+        <span v-if="required" class="required-mark">*</span>
         <slot :invalid="invalid" />
         <small v-if="helpText&&!invalid&&!valid" class="block mt-1 text-grey">
             {{ helpText }}
