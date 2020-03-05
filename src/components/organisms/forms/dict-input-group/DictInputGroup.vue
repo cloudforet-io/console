@@ -1,235 +1,167 @@
 <template>
-    <div :class="{'p-dict-input-group': true, 'flex flex-wrap': !removeRowEffect }">
-        <div v-for="(pair, index) in destructDict"
-             :key="index"
-             :class="{'dict-input-form': true, 'mr-0': true, 'w-1/2': !useFullCol, 'w-full': useFullCol}"
+    <div>
+        <p-button class="add-btn" style-type="primary-dark"
+                  :disabled="disabled"
+                  @click="addPair"
         >
-            <p-icon-button v-if="editMode" class="delete-btn" name="ic_delete"
-                           @click="deletePair(index)"
+            <p-i name="ic_plus" color="transparent inherit"
+                 width="1rem" height="1rem"
             />
-            <span class="data" @mouseleave="mouseInOut(index, false)">
-                <p-dict-input :name="pair.name"
-                              :value="pair.value"
-                              :disabled="!editMode"
-                              @mouseenter="mouseInOut(index, true)"
-                              @update:name="updatePair(index, 'name', $event)"
-                              @update:value="updatePair(index, 'value', $event)"
-                />
-                <p-copy-button v-if="getActiveState(index) && !editMode" class="copy-btn" :value="pair.value" />
-            </span>
-        </div>
-        <div v-if="editMode" class="w-full" :class="{'dict-input-form': true, 'mr-0': true}">
-            <!--<p-icon-button
-                class="delete-btn"
-                name="ic_delete"
-                @click="reset"
-            />-->
-            <!--<div v-show="validateTag" style="display:block" class="invalid-feedback">
-                 * {{ $t('ORGANISMS.TAG_EMPTY') }}
-            </div>-->
-            <!-- <p-dict-input :name.sync="newPair.name" :value.sync="newPair.value" />-->
-            <p-button class="add-btn" style-type="primary-dark"
-                      @click="addPair"
-            >
-                <p-i name="ic_plus" color="transparent inherit"
-                     width="1rem" height="1rem"
-                />
-                {{ $t('BTN.ADD') }}
-            </p-button>
-        </div>
+            {{ $t('BTN.ADD') }}
+        </p-button>
+        <span v-for="(d, idx) in pairList" :key="d.id" class="dict-group">
+            <p-dict-input :name.sync="d.key" :value.sync="d.value"
+                          :key-invalid="enableValidation && d.keyInvalid"
+                          :value-invalid="enableValidation && d.valueInvalid"
+                          :key-invalid-text="d.keyInvalidText"
+                          :value-invalid-text="d.valueInvalidText"
+                          :disabled="disabled"
+                          @change:key="onChangeKey(idx, d, $event)"
+                          @change:value="onChangeValue(idx, d, $event)"
+                          @blur:key="onBlurKey(idx, d)"
+                          @blur:value="onBlurValue(idx, d)"
+                          @focus:key="onFocusKey(idx, d)"
+            />
+            <p-icon-button name="ic_delete" :disabled="disabled"
+                           @click="deletePair(idx, d)"
+            />
+        </span>
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import _ from 'lodash';
 import {
-    toRefs, reactive, ref, watch, computed,
+    toRefs, reactive, watch, computed, getCurrentInstance, defineComponent, Ref,
 } from '@vue/composition-api';
-import PDictInput from '@/components/molecules/forms/dict-input/DictInput.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
+import {
+    InputPair, dictToArray, getProps, DictIGPropsType,
+} from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
 
-const mergeDict = dict => _.transform(dict, (result, pair) => {
-    result[pair.name] = pair.value;
-}, {});
+const PDictInput = () => import('@/components/molecules/forms/dict-input/DictInput.vue');
+const PIconButton = () => import('@/components/molecules/buttons/IconButton.vue');
+const PButton = () => import('@/components/atoms/buttons/Button.vue');
+const PI = () => import('@/components/atoms/icons/PI.vue');
 
-const destruct = dict => _.transform(dict, (result, value, name) => {
-    result.push(({ name, value }));
-}, []);
 
-const useDictBuffer = (props, context) => {
-    const destructDict = ref(destruct(props.dict));
-    const state = reactive({
-        validatePassWord: false,
-    });
-
-    const syncDict = () => {
-        context.emit('update:dict', mergeDict(destructDict.value));
-        context.emit('change');
-    };
-
-    const updatePair = (index, position, value) => {
-        destructDict.value[index][position] = value;
-        syncDict();
-    };
-
-    const deletePair = (index) => {
-        destructDict.value.splice(index, 1);
-        syncDict();
-    };
-    const copyText = (event) => {
-        const rawText = event.target.parentElement.innerText;
-        const copyLength = this.$t('BTN.COPY').length;
-        const text = rawText.slice(0, -copyLength).trim();
-        this.selectToCopyToClipboard(text);
-    };
-    watch(() => props.dict, (dict) => {
-        if (dict !== mergeDict(destructDict.value)) {
-            destructDict.value = destruct(dict);
-        }
-    });
-    return {
-        destructDict,
-        syncDict,
-        updatePair,
-        deletePair,
-        copyText,
-    };
-};
-const useNewPair = (props, context, dictBuffer) => {
-    const newPair = reactive({
-        name: '',
-        value: '',
-    });
-    const reset = () => {
-        newPair.name = '';
-        newPair.value = '';
-    };
-    const addPair = (idx) => {
-        dictBuffer.destructDict.value.push(reactive({ ...newPair }));
-        dictBuffer.syncDict();
-        reset();
-    };
-
-    if (props.showEmptyInput) addPair();
-
-    return {
-        newPair,
-        addPair,
-        reset,
-    };
-};
-
-const setPairCopy = () => {
-    const state = reactive({
-        currentIdx: null,
-    });
-
-    const mouseInOut = (idx, flag) => {
-        if (flag) {
-            state.currentIdx = idx;
-        } else {
-            state.currentIdx = null;
-        }
-    };
-
-    const getActiveState = idx => state.currentIdx === idx;
-
-    return {
-        ...toRefs(state),
-        mouseInOut,
-        getActiveState,
-    };
-};
-
-export const setup = (props, context) => {
-    const dictBuffer = useDictBuffer(props, context);
-    const newPairState = useNewPair(props, context, dictBuffer);
-    const pairCopyState = setPairCopy();
-
-    return {
-        ...dictBuffer,
-        ...newPairState,
-        ...pairCopyState,
-    };
-};
-
-export default {
+export default defineComponent({
     name: 'PDictInputGroup',
     components: {
-        PDictInput, PIconButton, PCopyButton, PI, PButton,
+        PIconButton,
+        PDictInput,
+        PButton,
+        PI,
     },
-    events: ['update:dict', 'change'],
-    props: {
-        editMode: {
-            type: Boolean,
-            default: false,
-        },
-        useFullCol: {
-            type: Boolean,
-            default: false,
-        },
-        dict: {
-            type: Object,
-        },
-        removeRowEffect: {
-            type: Boolean,
-            default: false,
-        },
-        showEmptyInput: {
-            type: Boolean,
-            defulat: false,
-        },
+    props: getProps(),
+    setup(props: DictIGPropsType) {
+        const vm: any = getCurrentInstance();
+
+        const state: any = reactive({
+            pairList: dictToArray(props.dict, vm),
+            newDict: {},
+            isAllValid: computed(() => state.pairList.every(pair => pair.isValid.value)),
+        });
+
+        const setNewDict = (pair: InputPair) => { state.newDict[pair.key] = pair.value || null; };
+
+        const emitValidate = () => {
+            vm.$emit('validate', state.isAllValid, state.newDict);
+        };
+
+        const onChangeKey = (idx: number, pair: InputPair) => {
+            if (!props.enableValidation) return;
+            pair.validateKey(state.newDict);
+        };
+
+        const onChangeValue = (idx: number, pair: InputPair) => {
+            if (!props.enableValidation) return;
+            pair.validateValue();
+        };
+
+        const onFocusKey = (idx: number, pair: InputPair) => {
+            if (!props.enableValidation) return;
+            if (!pair.keyInvalid) delete state.newDict[pair.key];
+        };
+        const onBlurKey = (idx: number, pair: InputPair) => {
+            if (!props.enableValidation) return;
+            if (!pair.keyInvalid) setNewDict(pair);
+            emitValidate();
+        };
+        const onBlurValue = (idx: number, pair: InputPair) => {
+            if (!props.enableValidation) return;
+            if (pair.isValid.value) setNewDict(pair);
+            emitValidate();
+        };
+
+        /**
+         * @public
+         */
+        const validateAll = () => {
+            state.newDict = {};
+            let res = true;
+            _.forEach(state.pairList, (pair) => {
+                res = pair.validate(state.newDict) && res;
+                if (res) setNewDict(pair);
+            });
+            emitValidate();
+            return res;
+        };
+
+        const deletePair = (idx: number, pair: InputPair) => {
+            state.pairList.splice(idx, 1);
+            if (!props.enableValidation) return;
+
+            if (!pair.keyInvalid) {
+                delete state.newDict[pair.key];
+                state.pairList.some((p) => {
+                    if (p.key === pair.key) {
+                        if (p.validateKey(state.newDict)) setNewDict(p);
+                    }
+                    return p.key === pair.key;
+                });
+            }
+            emitValidate();
+        };
+
+        const addPair = () => {
+            const pair = new InputPair(vm);
+            state.pairList.push(pair);
+            if (props.enableValidation) pair.validate(state.newDict);
+            emitValidate();
+        };
+
+        watch(() => props.enableValidation, (val, prevVal) => {
+            console.debug('props.enablevalidation', val, prevVal);
+            if (val && val !== prevVal) validateAll();
+        });
+
+        if (props.showEmptyInput) state.pairList.push(new InputPair(vm));
+
+        return {
+            ...toRefs(state),
+            onChangeKey,
+            onChangeValue,
+            onFocusKey,
+            onBlurKey,
+            onBlurValue,
+            deletePair,
+            addPair,
+            validateAll,
+        };
     },
-    setup(...args) {
-        return setup(...args);
-    },
-};
+});
 </script>
 
 <style lang="scss" scoped>
-    p-dict-input-group{
-        display: flex;
-        flex-wrap:  wrap;
-    }
-    .btn{
-        flex: none;
-    }
-    .delete-btn{
-        margin-left: 0.5rem;
-    }
-    .add-btn{
-        margin-left: 0.5rem;
+    .add-btn {
+        margin-bottom: .5rem;
         color: $white;
-    }
-    p-dict-input{
-        flex-grow: 1;
-        flex-shrink: 1;
-        flex-basis: auto;
-    }
-    .new-dict-input-form{
-        flex-wrap: nowrap;
-        white-space: nowrap;
-    }
-    .dict-input-form{
-        display: inline-flex;
-        flex-wrap: nowrap;
-        white-space: nowrap;
-        flex-shrink: 1;
-        margin-bottom: 0.5rem;
-        &:not(.new-form){
-            margin-right: 2.5rem;
+        .p-i-icon {
+            margin-right: .5rem;
         }
     }
-    .data{
-        display: block;
-        width: 100%;
-    }
-    .copy-btn::v-deep{
-        .p-copy-btn{top:-.3rem;
-            margin-bottom: 8px;
-        }
+    .dict-group {
+        display: flex;
+        margin-bottom: .5rem;
     }
 </style>

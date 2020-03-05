@@ -76,7 +76,7 @@ import PButton from '@/components/atoms/buttons/Button.vue';
 import PProgressWizard from '@/components/organisms/wizards/progress-wizard/ProgressWizard.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
-const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup.vue');
+const PDictInputGroup = () => import('@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue');
 const ConfigureCollector = () => import('@/views/inventory/collector/modules/ConfigureCollector.vue');
 const ChooseCredentials = () => import('@/views/inventory/collector/modules/ChooseCredentials.vue');
 

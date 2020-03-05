@@ -185,7 +185,9 @@ import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import { AdminTableAPI, HistoryAPI } from '@/lib/api';
+import {
+    AdminTableAPI, HistoryAPI, MockAdminTableAPI, MockHistoryAPI,
+} from '@/lib/api';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -447,8 +449,8 @@ export default {
             items: computed(() => []),
         });
         const state = serverSetup(props, context, dataBind.items);
-        const mockAdminAPI = new AdminTableAPI('', computed(() => ({})), undefined, undefined, undefined, undefined, computed(() => false));
-        const mockHistoryAPIHandler = new HistoryAPI('', '', computed(() => ''), undefined, undefined, undefined, computed(() => false));
+        const mockAdminAPI = MockAdminTableAPI();
+        const mockHistoryAPIHandler = MockHistoryAPI();
 
         return {
             ...toRefs(state),

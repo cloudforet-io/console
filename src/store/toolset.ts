@@ -1,9 +1,9 @@
 import {
-    computed, getCurrentInstance, reactive, Ref,
+    computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 import Lockr from 'lockr';
 import _ from 'lodash';
-import { AxiosRequestConfig } from 'axios';
+import { api } from '@/lib/api';
 
 const bindLocalStorage = (prefix:string, name:string, state:any) => computed({
     get: () => state[name],
@@ -127,25 +127,23 @@ class DomainStore extends Store<DomainState> {
     }
 
     public getDomain= async (vm:any) => {
-        if (!this.state.domainId) {
-            const { hostname } = window.location;
-            this.state.domainName = hostname.split('.')[0];
-            const resp = await vm.$http.post('/identity/domain/list', {
-                name: this.state.domainName,
-            });
-            const domain = _.get(resp, 'data.results.0', null);
-            if (domain) {
-                this.state.domainId = domain.domain_id;
-                if (domain.plugin_info) {
-                    this.state.pluginOption = domain.plugin_info.options;
-                    this.state.authType = domain.plugin_info.options.auth_type;
-                } else {
-                    this.state.authType = 'local';
-                }
+        const { hostname } = window.location;
+        this.state.domainName = hostname.split('.')[0];
+        const resp = await api.newInstance().post('/identity/domain/list', {
+            name: this.state.domainName,
+        });
+        const domain = _.get(resp, 'data.results.0', null);
+        if (domain) {
+            this.state.domainId = domain.domain_id;
+            if (domain.plugin_info) {
+                this.state.pluginOption = domain.plugin_info.options;
+                this.state.authType = domain.plugin_info.options.auth_type;
             } else {
-                console.debug('no domain');
-                vm.$router.push({ name: 'error' });
+                this.state.authType = 'local';
             }
+        } else {
+            console.debug('no domain');
+            vm.$router.push({ name: 'error' });
         }
     }
 }
@@ -161,10 +159,20 @@ export default {
         return {
             ...state,
             logout(vm?:any) {
-                state.user.reset();
-                // state.domain.reset();
+                let routerMeta:any = null;
                 if (vm) {
-                    vm.$router.push({ name: 'LogIn' });
+                    routerMeta = {
+                        name: vm.$ls.user.state.isDomainOwner ? 'AdminLogin' : 'Login',
+                    };
+                    if (vm.$route && vm.$route.path) {
+                        routerMeta.query = { nextPath: vm.$route.path };
+                    }
+                }
+                state.user.reset();
+                state.domain.reset();
+                if (vm) {
+                    console.debug(routerMeta);
+                    vm.$router.push(routerMeta);
                 }
             },
             resetAll() {
@@ -173,4 +181,9 @@ export default {
         };
     },
 
+};
+
+export const useStore = () => {
+    const vm = getCurrentInstance() as any;
+    return vm.$ls;
 };

@@ -125,7 +125,7 @@ import PMonacoEditor from '@/components/molecules/text-editor/monaco/MonacoEdito
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';

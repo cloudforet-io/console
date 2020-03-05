@@ -1,123 +1,139 @@
 <template>
-    <div class="dict-panel">
+    <div>
         <p-panel-top>
-            <template>
-                {{ $t('ORGANISMS.TAG') }}
-            </template>
+            <template>{{ $t('WORD.TAGS') }}</template>
             <template #extra>
-                <div class="panel-header" :class="{'edit':editMode}">
-                    <p-button v-if="!editMode" style-type="primary-dark"
-                              @click="clickEdit()"
-                    >
-                        {{ buttonTag }}
-                    </p-button>
-                    <p-button v-if="editMode" style-type="secondary" :outline="true"
-                              class="header-btn"
-                              @click="clickCancel()"
+                <p-button v-if="!editMode" style-type="primary-dark"
+                          @click="editMode = true"
+                >
+                    {{ $t('BTN.EDIT') }}
+                </p-button>
+                <div v-else class="extra-btns">
+                    <p-button style-type="secondary" outline
+                              :disabled="loading"
+                              @click="onCancel"
                     >
                         {{ $t('BTN.CANCEL') }}
                     </p-button>
-                    <p-button v-if="editMode" style-type="secondary" class="header-btn"
-                              @click="clickConfirm()"
+                    <p-loading-button :loading="loading"
+                                      :disabled="enableValidation && !isValid"
+                                      :button-bind="{styleType: 'secondary'}"
+                                      @click="onSave"
                     >
                         {{ $t('BTN.SAVE') }}
-                    </p-button>
+                    </p-loading-button>
                 </div>
             </template>
         </p-panel-top>
-        <p-dict-input-group ref="tagInputGroup"
-                            :dict.sync="proxyTags"
-                            :edit-mode="editMode"
+        <p-dict-input-group v-if="editMode"
+                            ref="DIG"
+                            :dict="dict"
+                            :disabled="loading"
+                            :enable-validation="enableValidation"
+                            :show-empty-input="showEmptyInput"
+                            @validate="onDictValidate"
         />
-        <div v-if="isEmpty(proxyTags) && !editMode" class="no-dict">
-            {{ $t('ORGANISMS.NO_TAG') }}
+        <div v-else>
+            <p-data-table v-bind="tableState" />
         </div>
     </div>
 </template>
 
-<script>
-import { reactive, toRefs, computed } from '@vue/composition-api';
-import { Util } from '@/lib/global-util';
+<script lang="ts">
+import {
+    reactive, toRefs, getCurrentInstance, defineComponent, computed,
+} from '@vue/composition-api';
+import { DataTableState } from '@/components/organisms/tables/data-table/toolset';
+import { makeTrItems } from '@/lib/view-helper';
+import { dictToArray } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
+import { getDictPanelProps, DictPanelPropsType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
+
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import { makeProxy } from '@/lib/compostion-util';
+import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
 
-export default {
+const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
+
+export default defineComponent({
     name: 'PDictPanel',
     components: {
         PPanelTop,
         PDictInputGroup,
         PButton,
+        PLoadingButton,
+        PDataTable,
     },
-    events: ['confirm'],
-    props: {
-        dict: Object,
-    },
-    setup(props, context) {
-        const state = reactive({
-            buttonTag: computed(() => ((Util.methods.isEmpty(state.proxyTags)) ? context.parent.$t('BTN.ADD') : context.parent.$t('BTN.EDIT'))),
+    props: getDictPanelProps(),
+    setup(props: DictPanelPropsType, context) {
+        const vm: any = getCurrentInstance();
+
+        const state: any = reactive({
+            loading: false,
             editMode: false,
-            originTags: undefined,
-            proxyTags: makeProxy('dict', props, context.emit),
-            tagInputGroup: null, // template refs
+            tableState: new DataTableState({
+                fields: makeTrItems([
+                    ['key', 'WORD.KEY'],
+                    ['value', 'WORD.VALUE'],
+                ], vm),
+                items: computed(() => dictToArray(props.dict, vm)),
+                colCopy: true,
+            }).state,
+            newDict: props.dict,
+            isValid: false,
+            enableValidation: false,
+            DIG: null,
         });
 
-        const clickEdit = () => {
-            state.editMode = true;
-            state.originTags = {
-                ...props.dict,
-            };
-        };
-        const clickCancel = () => {
-            state.editMode = false;
-            state.proxyTags = {
-                ...state.originTags,
-            };
-            state.tagInputGroup.reset();
-        };
-        const clickConfirm = () => {
-            state.editMode = false;
-            if (JSON.stringify(state.originTags) !== JSON.stringify(state.proxyTags)) {
-                context.emit('confirm', state.proxyTags);
-            }
-            state.tagInputGroup.reset();
+        const onDictValidate = (isValid: boolean, newDict: object) => {
+            state.isValid = isValid;
+            if (isValid) state.newDict = newDict;
         };
 
+        const onCancel = () => {
+            state.editMode = false;
+            state.showValidation = false;
+        };
+
+        const onSave = async () => {
+            if (!state.enableValidation) {
+                state.enableValidation = true;
+                if (!state.DIG || !state.DIG.validateAll()) return;
+            }
+
+            if (props.fetchApi) {
+                try {
+                    state.loading = true;
+                    await props.fetchApi(state.newDict);
+                } catch (e) {
+                    console.error(e);
+                    vm.$emit('fail', e);
+                    return;
+                } finally {
+                    state.loading = false;
+                }
+            }
+            vm.$emit('update:dict', state.newDict);
+            vm.$emit('save', state.newDict);
+            state.editMode = false;
+        };
 
         return {
             ...toRefs(state),
-            clickEdit,
-            clickCancel,
-            clickConfirm,
-            // if tag confirm fail, you can reset dict to before edit value
-            reset: () => {
-                state.proxyTags = state.originTags;
-            },
+            onDictValidate,
+            onCancel,
+            onSave,
         };
     },
 
-};
+});
 </script>
 
 <style lang="scss" scoped>
-    .dict-panel {
-        min-height: 100px;
-    };
-    .panel-header {
-        display: inline-flex;
-        width: 100%;
-        &.edit {
-            justify-content: flex-end;
-        }
-        .header-btn {
+    .extra-btns {
+        float: right;
+        .btn {
             margin-left: 1rem;
         }
-    }
-    .no-dict {
-        text-align: center;
-        font: 24px/32px Arial;
-        letter-spacing: 0;
-        color: #A5ACCE;
     }
 </style>

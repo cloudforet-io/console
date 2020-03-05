@@ -16,7 +16,7 @@
 <script>
 import _ from 'lodash';
 import InfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin';
 
 export default {
     name: 'ProjectSummary',

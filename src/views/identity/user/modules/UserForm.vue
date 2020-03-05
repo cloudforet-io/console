@@ -156,7 +156,7 @@ import {
     lengthMinValidation,
     checkTimeZoneValidation,
 } from '@/lib/compostion-util';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
