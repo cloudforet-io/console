@@ -47,7 +47,14 @@ const getState = (props, context) => {
                 key3: 'value3',
             },
             fetchApi: mockApi,
-        }).state,
+        }, {
+            dict: {
+                key1: 'value1',
+                key2: 'value2',
+                key3: 'value3',
+            },
+            editMode: false,
+        }),
     });
 
     return state;
@@ -59,7 +66,7 @@ export const defaultCase = () => ({
     template: `
     <div style="width: 80vw; padding: 2rem; background-color: white;">
         <p-dict-panel v-bind="$props"
-                      :dict="dpState.dict"
+                      :dict="dpState.state.dict"
                       @save="onSave"></p-dict-panel>
     </div>`,
     setup(props, context) {
@@ -68,7 +75,7 @@ export const defaultCase = () => ({
         return {
             ...toRefs(state),
             onSave(newDict) {
-                state.dpState.dict = newDict;
+                state.dpState.state.dict = newDict;
                 state.actions.save(newDict);
             },
         };
@@ -81,7 +88,8 @@ export const useDictSync = () => ({
     template: `
         <div style="width: 80vw; padding: 2rem; background-color: white;">
             <p-dict-panel v-bind="$props"
-                          :dict.sync="dpState.dict"
+                          :dict.sync="dpState.syncState.dict"
+                          :edit-mode.sync="dpState.syncState.editMode"
                           v-on="actions"></p-dict-panel>
         </div>`,
     setup(props, context) {
@@ -99,8 +107,9 @@ export const fetchApi = () => ({
     template: `
     <div style="width: 80vw; padding: 2rem; background-color: white;">
         <p-dict-panel v-bind="$props"
-                      :dict.sync="dpState.dict"
-                      :fetch-api="dpState.fetchApi"
+                      :dict.sync="dpState.syncState.dict"
+                      :edit-mode.sync="dpState.syncState.editMode"
+                      :fetch-api="dpState.state.fetchApi"
                       v-on="actions"></p-dict-panel>
     </div>`,
     setup(props, context) {
@@ -118,14 +127,15 @@ export const fetchApiFail = () => ({
     template: `
     <div style="width: 80vw; padding: 2rem; background-color: white;">
         <p-dict-panel v-bind="$props"
-                      :dict.sync="dpState.dict"
-                      :fetch-api="dpState.fetchApi"
+                      :dict.sync="dpState.syncState.dict"
+                      :edit-mode.sync="dpState.syncState.editMode"
+                      :fetch-api="dpState.state.fetchApi"
                       v-on="actions"></p-dict-panel>
     </div>`,
     setup(props, context) {
         const state = getState(props, context);
 
-        state.dpState.fetchApi = data => new Promise((resolve, reject) => {
+        state.dpState.state.fetchApi = data => new Promise((resolve, reject) => {
             setTimeout(() => { reject(new Error('This is test error')); }, 1000);
         });
         return {

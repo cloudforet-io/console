@@ -31,7 +31,10 @@
             </template>
         </p-info-panel>
 
-        <p-dict-panel :dict.sync="tags" :fetch-api="tagsFetchApi" />
+        <p-dict-panel :dict.sync="tags"
+                      :edit-mode.sync="tagEdit"
+                      :fetch-api="tagsFetchApi"
+        />
 
         <p-info-panel class="last-panel" :info-title="$t('PANEL.FILTER_FORMAT')">
             <p-data-table
@@ -84,26 +87,12 @@ const setBaseInfoStates = (props, parent) => {
 const setTagStates = (props) => {
     const state = reactive({
         tags: _.get(props.item, 'tags', {}),
-        // confirm(tags) {
-        //     CollectorEventBus.$emit('confirmTags', {
-        //         // eslint-disable-next-line camelcase
-        //         collector_id: props.item.collector_id,
-        //         tags,
-        //     });
-        // },
-        // dictPanel: null,
-        tagsFetchApi: props.getTagsFetchApi({
-            // eslint-disable-next-line camelcase
-            collector_id: props.item.collector_id,
-        }),
+        tagEdit: false,
     });
 
     watch(() => props.item, (val) => {
         state.tags = _.get(val, 'tags', {});
-        state.tagsFetchApi = props.getTagsFetchApi({
-            // eslint-disable-next-line camelcase
-            collector_id: props.item.collector_id,
-        });
+        state.tagEdit = false;
     });
 
     return {
@@ -140,7 +129,7 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        getTagsFetchApi: {
+        tagsFetchApi: {
             type: Function,
             required: true,
         },

@@ -3,8 +3,8 @@
         <p-panel-top>
             <template>{{ $t('WORD.TAGS') }}</template>
             <template #extra>
-                <p-button v-if="!editMode" style-type="primary-dark"
-                          @click="editMode = true"
+                <p-button v-if="!proxyEditMode" style-type="primary-dark"
+                          @click="onClickEditMode"
                 >
                     {{ $t('BTN.EDIT') }}
                 </p-button>
@@ -25,7 +25,7 @@
                 </div>
             </template>
         </p-panel-top>
-        <p-dict-input-group v-if="editMode"
+        <p-dict-input-group v-if="proxyEditMode"
                             ref="DIG"
                             :dict="dict"
                             :disabled="loading"
@@ -52,6 +52,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
+import { makeProxy } from '@/lib/compostion-util';
 
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
 
@@ -65,12 +66,12 @@ export default defineComponent({
         PDataTable,
     },
     props: getDictPanelProps(),
-    setup(props: DictPanelPropsType) {
+    setup(props: DictPanelPropsType, { emit }) {
         const vm: any = getCurrentInstance();
 
         const state: any = reactive({
             loading: false,
-            editMode: false,
+            proxyEditMode: makeProxy('editMode', props, emit),
             tableState: new DataTableState({
                 fields: makeTrItems([
                     ['key', 'WORD.KEY'],
@@ -85,14 +86,25 @@ export default defineComponent({
             DIG: null,
         });
 
+        const onClickEditMode = () => {
+            state.proxyEditMode = true;
+        };
+
         const onDictValidate = (isValid: boolean, newDict: object) => {
             state.isValid = isValid;
             if (isValid) state.newDict = newDict;
         };
 
-        const onCancel = () => {
-            state.editMode = false;
+
+        const reset = () => {
             state.enableValidation = false;
+            state.newDict = props.dict;
+            state.isValid = false;
+        };
+
+        const onCancel = () => {
+            state.proxyEditMode = false;
+            reset();
         };
 
         const onSave = async () => {
@@ -115,11 +127,13 @@ export default defineComponent({
             }
             vm.$emit('update:dict', state.newDict);
             vm.$emit('save', state.newDict);
-            state.editMode = false;
+            state.proxyEditMode = false;
+            reset();
         };
 
         return {
             ...toRefs(state),
+            onClickEditMode,
             onDictValidate,
             onCancel,
             onSave,
