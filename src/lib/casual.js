@@ -60,7 +60,7 @@ const provider = {
         return tag;
     },
     defaultImg() {
-        return 'https://assets-console-cloudone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/ic_collector_tags.svg';
+        return 'https://assets-console-spaceone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/ic_collector_tags.svg';
     },
 
 };

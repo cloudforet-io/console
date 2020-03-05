@@ -13,7 +13,7 @@ export default {
 
 const value = {
     server_id: 'server-283cd170d17d',
-    name: 'cloudone-dev-eks-cluster_kubectl',
+    name: 'spaceone-dev-eks-cluster_kubectl',
     state: 'INSERVICE',
     primary_ip_address: '172.16.1.205',
     ip_addresses: [
@@ -28,7 +28,7 @@ const value = {
             image: 'ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20190212.1',
             host_vm_id: '',
             vm_id: 'i-0ec8d5289d9662156',
-            vm_name: 'cloudone-dev-eks-cluster_kubectl',
+            vm_name: 'spaceone-dev-eks-cluster_kubectl',
         },
         os: {
             os_distro: 'ubuntu',
@@ -41,7 +41,7 @@ const value = {
         compute: {
             security_group_rules: [
                 {
-                    security_group_name: 'cloudone-dev-eks-admin-access-sg',
+                    security_group_name: 'spaceone-dev-eks-admin-access-sg',
                     port_range_min: 22,
                     port_range_max: 22,
                     security_group_id: 'sg-086347e970cb3bd7b',
@@ -56,12 +56,12 @@ const value = {
                     direction: 'inbound',
                     protocol: 'tcp',
                     remote_group_id: null,
-                    security_group_name: 'cloudone-dev-eks-admin-access-sg',
+                    security_group_name: 'spaceone-dev-eks-admin-access-sg',
                     port_range_min: 22,
                     port_range_max: 22,
                 },
                 {
-                    security_group_name: 'cloudone-dev-eks-admin-access-sg',
+                    security_group_name: 'spaceone-dev-eks-admin-access-sg',
                     port_range_min: 22,
                     port_range_max: 22,
                     security_group_id: 'sg-086347e970cb3bd7b',
@@ -72,7 +72,7 @@ const value = {
                 },
                 {
                     remote_group_id: null,
-                    security_group_name: 'cloudone-dev-eks-admin-access-sg',
+                    security_group_name: 'spaceone-dev-eks-admin-access-sg',
                     port_range_min: 22,
                     port_range_max: 22,
                     security_group_id: 'sg-086347e970cb3bd7b',
@@ -83,7 +83,7 @@ const value = {
                 {
                     protocol: 'tcp',
                     remote_group_id: null,
-                    security_group_name: 'cloudone-dev-eks-admin-access-sg',
+                    security_group_name: 'spaceone-dev-eks-admin-access-sg',
                     port_range_min: 3000,
                     port_range_max: 3000,
                     security_group_id: 'sg-086347e970cb3bd7b',
@@ -93,7 +93,7 @@ const value = {
                 {
                     protocol: 'all',
                     remote_group_id: null,
-                    security_group_name: 'cloudone-dev-eks-admin-access-sg',
+                    security_group_name: 'spaceone-dev-eks-admin-access-sg',
                     port_range_min: 'all',
                     port_range_max: 'all',
                     security_group_id: 'sg-086347e970cb3bd7b',
@@ -105,13 +105,13 @@ const value = {
             image: 'ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20190212.1',
             created_by_user_id: '072548720675',
             instance_id: 'i-0ec8d5289d9662156',
-            keypair: 'cloudone-dev-kubectl-ec2-key',
-            instance_name: 'cloudone-dev-eks-cluster_kubectl',
+            keypair: 'spaceone-dev-kubectl-ec2-key',
+            instance_name: 'spaceone-dev-eks-cluster_kubectl',
             static_nat: [
                 '13.125.167.139',
             ],
             security_groups: [
-                'cloudone-dev-eks-admin-access-sg',
+                'spaceone-dev-eks-admin-access-sg',
             ],
         },
     },
@@ -146,7 +146,7 @@ const value = {
     template_data: {},
     pool_info: {
         pool_id: 'pool-04876e16da9d',
-        name: 'KR01-DEV-CLOUDONE',
+        name: 'KR01-DEV-spaceone',
         state: 'ACTIVE',
         tags: {},
         domain_id: '',

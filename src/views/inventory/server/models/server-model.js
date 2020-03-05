@@ -23,8 +23,8 @@ casual.define('serverData', () => ({
     compute: {
         created_by_user_id: casual._uuid().slice(-12),
         instance_id: casual.make_id('i'),
-        keypair: 'cloudone-dev-kubectl-ec2-key',
-        instance_name: 'cloudone-dev-eks-cluster_kubectl-test',
+        keypair: 'spaceone-dev-kubectl-ec2-key',
+        instance_name: 'spaceone-dev-eks-cluster_kubectl-test',
         static_nat: arrayOf(casual.integer(1, 3), casual._ip),
         security_groups: arrayOf(casual.integer(1, 6), casual._security_group_name),
         security_group_rules: arrayOf(casual.integer(1, 6), casual._security_group_rule),
@@ -36,7 +36,7 @@ casual.define('serverData', () => ({
         image: 'amzn2-ami-hvm-2.0.20190823.1-x86_64-gp2',
         host_vm_id: casual.make_id('i'),
         vm_id: casual.make_id('i'),
-        vm_name: 'cloudone-dev-eks-cluster_kubectl-test',
+        vm_name: 'spaceone-dev-eks-cluster_kubectl-test',
         platform_type: casual.random_element(['AWS', 'AZURE', 'GCP']),
     },
 }));
