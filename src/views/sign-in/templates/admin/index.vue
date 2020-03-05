@@ -21,7 +21,7 @@
                                 :class="{
                                     'is-invalid':invalid
                                 }"
-                                @input="allValidation"
+                                @input="checkUserId"
                             />
                         </template>
                     </PFieldGroup>
@@ -40,7 +40,8 @@
                                 :class="{
                                     'is-invalid':invalid
                                 }"
-                                @input="allValidation"
+                                @input="checkPassword"
+                                @keyup.enter="login"
                             />
                         </template>
                     </PFieldGroup>
@@ -92,7 +93,14 @@ export default defineComponent({
             password: [requiredValidation('Please enter password')],
         };
         const validateAPI = formValidation(state, requireFieldValidations);
-
+        const checkUserId = async () => {
+            const result = await validateAPI.fieldValidation('userId');
+            return result;
+        };
+        const checkPassword = async () => {
+            const result = await validateAPI.fieldValidation('password');
+            return result;
+        };
         const login = async () => {
             state.loginFail = false;
             const data = {};
@@ -126,6 +134,8 @@ export default defineComponent({
             ...validateAPI,
             login,
             goToSignIn,
+            checkUserId,
+            checkPassword,
         };
     },
 });
@@ -135,6 +145,7 @@ export default defineComponent({
     .input-title {
         font-size: 0.875rem;
         font-weight: bold;
+        padding-bottom: 0.25rem;
     }
     .subtitle {
         padding-top: 0.5rem;
