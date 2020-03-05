@@ -1,5 +1,5 @@
 <template>
-    <p-row class="container" direction="column">
+    <p-row class="card-list-container" direction="column">
         <p-col :flex-grow="0">
             <slot name="top">
                 <p-row class="top-row">
@@ -157,7 +157,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.card-list-container {
     width: 100%;
     height: 100%;
     padding-right: 1rem;
