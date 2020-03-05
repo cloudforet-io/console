@@ -6,7 +6,7 @@
                       :width="prop.width"
                 />
             </template>
-            <template #default="prop">
+            <template #default>
                 <slot />
                 <div class="fnb">
                     <FNB />
@@ -27,8 +27,8 @@ export default {
     components: { PVerticalLayout2, FNB },
     props: {
         height: {
-            type: Number,
-            default: 620,
+            type: String,
+            default: `calc(100vh - ${styles.lnbHeight})`,
         },
         initWidth: {
             type: Number,
