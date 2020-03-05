@@ -163,5 +163,8 @@ export default defineComponent({
     .dict-group {
         display: flex;
         margin-bottom: .5rem;
+        .p-dict-input {
+            margin-right: .5rem;
+        }
     }
 </style>

@@ -65,7 +65,7 @@ export default defineComponent({
         PDataTable,
     },
     props: getDictPanelProps(),
-    setup(props: DictPanelPropsType, context) {
+    setup(props: DictPanelPropsType) {
         const vm: any = getCurrentInstance();
 
         const state: any = reactive({
@@ -92,7 +92,7 @@ export default defineComponent({
 
         const onCancel = () => {
             state.editMode = false;
-            state.showValidation = false;
+            state.enableValidation = false;
         };
 
         const onSave = async () => {
