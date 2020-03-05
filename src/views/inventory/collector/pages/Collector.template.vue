@@ -96,7 +96,7 @@
                :active-tab.sync="activeTab"
         >
             <template #detail>
-                <collector-detail :item="selectedItem" />
+                <collector-detail :item="selectedItem" :get-tags-fetch-api="getTagsFetchApi" />
             </template>
             <template #credentials>
                 <collector-credentials :collector="selectedItem"
@@ -180,6 +180,7 @@ import {
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
+import { fetchApiType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -347,7 +348,7 @@ const scheduleState = reactive({
     deleteVisible: false,
 });
 
-export const collectorSetup = (props, context, AcHandler) => {
+export const collectorSetup = (props, context, AcHandler, getTagsFetchApi) => {
     const state = reactive({
         ...setTableData(props, context),
         ...setTabData(props, context),
@@ -359,6 +360,7 @@ export const collectorSetup = (props, context, AcHandler) => {
         updateModalState,
         scheduleState,
         AcHandler,
+        getTagsFetchApi,
     });
 
     const onClickUpdate = () => {

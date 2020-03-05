@@ -31,7 +31,7 @@
             </template>
         </p-info-panel>
 
-        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="confirm" />
+        <p-dict-panel :dict.sync="tags" :fetch-api="tagsFetchApi" />
 
         <p-info-panel class="last-panel" :info-title="$t('PANEL.FILTER_FORMAT')">
             <p-data-table
@@ -50,15 +50,16 @@ import {
     watch, computed, reactive, toRefs,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
-import PStatus from '@/components/molecules/status/Status.vue';
+import { DictIGState } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
-import { mountBusEvent } from '@/lib/compostion-util';
 import { makeTrItems } from '@/lib/view-helper';
-import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import config from '@/lib/config';
+
+import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import PStatus from '@/components/molecules/status/Status.vue';
+import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 
 const setBaseInfoStates = (props, parent) => {
     const state = reactive({
@@ -83,18 +84,26 @@ const setBaseInfoStates = (props, parent) => {
 const setTagStates = (props) => {
     const state = reactive({
         tags: _.get(props.item, 'tags', {}),
-        confirm(tags) {
-            CollectorEventBus.$emit('confirmTags', {
-                // eslint-disable-next-line camelcase
-                collector_id: props.item.collector_id,
-                tags,
-            });
-        },
-        dictPanel: null,
+        // confirm(tags) {
+        //     CollectorEventBus.$emit('confirmTags', {
+        //         // eslint-disable-next-line camelcase
+        //         collector_id: props.item.collector_id,
+        //         tags,
+        //     });
+        // },
+        // dictPanel: null,
+        tagsFetchApi: props.getTagsFetchApi({
+            // eslint-disable-next-line camelcase
+            collector_id: props.item.collector_id,
+        }),
     });
 
     watch(() => props.item, (val) => {
         state.tags = _.get(val, 'tags', {});
+        state.tagsFetchApi = props.getTagsFetchApi({
+            // eslint-disable-next-line camelcase
+            collector_id: props.item.collector_id,
+        });
     });
 
     return {
@@ -129,7 +138,11 @@ export default {
     props: {
         item: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
+        },
+        getTagsFetchApi: {
+            type: Function,
+            required: true,
         },
     },
     setup(props, { parent }) {

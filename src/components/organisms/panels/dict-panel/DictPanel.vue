@@ -133,7 +133,7 @@ export default defineComponent({
     .extra-btns {
         float: right;
         .btn {
-            margin-left: 1rem;
+            margin-left: .5rem;
         }
     }
 </style>
