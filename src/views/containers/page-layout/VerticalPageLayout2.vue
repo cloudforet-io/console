@@ -1,19 +1,17 @@
 <template>
-    <div>
-        <p-vertical-layout2 v-bind="$props" v-on="$listeners">
-            <template #sidebar="prop">
-                <slot name="sidebar"
-                      :width="prop.width"
-                />
-            </template>
-            <template #default>
-                <slot />
-                <div class="fnb">
-                    <FNB />
-                </div>
-            </template>
-        </p-vertical-layout2>
-    </div>
+    <p-vertical-layout2 v-bind="$props" v-on="$listeners">
+        <template #sidebar="prop">
+            <slot name="sidebar"
+                  :width="prop.width"
+            />
+        </template>
+        <template #default>
+            <slot />
+            <div class="fnb">
+                <FNB />
+            </div>
+        </template>
+    </p-vertical-layout2>
 </template>
 
 <script>
