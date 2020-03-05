@@ -1,5 +1,5 @@
 <template>
-    <div class="container" :style="{height: height}">
+    <div class="vertical-container" :style="{height: height}">
         <div class="sidebar-container" :style="sbContainerStyle"
              :class="{transition:transition}"
         >
@@ -135,7 +135,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .container {
+    .vertical-container {
         display: flex;
         width: 100%;
         flex-direction: row;
