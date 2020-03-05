@@ -20,7 +20,8 @@ export const getDictPanelProps = () => ({
     },
 });
 
-type fetchApiType = (data: object) => Promise<any>;
+// export type fetchApiType = (param?: object) => (dict: object) => Promise<any>;
+export type fetchApiType = (dict: object) => Promise<any>;
 
 export const mockApi: fetchApiType = (data: any) => new Promise((resolve) => {
     setTimeout(() => { resolve(data); }, 1000);

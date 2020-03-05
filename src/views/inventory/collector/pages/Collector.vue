@@ -1,9 +1,9 @@
 
 <script>
 import {
-    ref, toRefs, computed, reactive,
+    ref, toRefs, computed, reactive, getCurrentInstance,
 } from '@vue/composition-api';
-import CollectorTemplate, { api, collectorSetup } from '@/views/inventory/collector/pages/Collector.template.vue';
+import CollectorTemplate, { collectorSetup } from '@/views/inventory/collector/pages/Collector.template.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
 import { defaultQuery } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
@@ -11,6 +11,7 @@ import {
     defaultAutocompleteHandler,
     getEnumValues, getFetchValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { fetchApiType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
 
 export default {
     name: 'Collector',
@@ -55,9 +56,20 @@ export default {
             }
         }
 
+        // const vm = getCurrentInstance();
+        const getTagsFetchApi = params => data => context.root.$http.post(
+            '/inventory/collector/update', {
+                // eslint-disable-next-line camelcase
+                // collector_id: state.selectedItem.collector_id,
+                ...params,
+                tags: data,
+            },
+        );
 
         const state = reactive({
-            ...collectorSetup(props, context, new ACHandler()),
+            ...collectorSetup(props,
+                context,
+                new ACHandler(), getTagsFetchApi),
         });
 
         const collectorTableQuery = computed(() => (defaultQuery(

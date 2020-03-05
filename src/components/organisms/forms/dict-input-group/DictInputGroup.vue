@@ -38,7 +38,7 @@ import {
     InputPair, dictToArray, getProps, DictIGPropsType,
 } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
 
-const PDictInput = () => import('@/components/molecules/forms/dict-input/DictInput_origin.vue');
+const PDictInput = () => import('@/components/molecules/forms/dict-input/DictInput.vue');
 const PIconButton = () => import('@/components/molecules/buttons/IconButton.vue');
 const PButton = () => import('@/components/atoms/buttons/Button.vue');
 const PI = () => import('@/components/atoms/icons/PI.vue');
@@ -77,6 +77,7 @@ export default defineComponent({
             if (!props.enableValidation) return;
             pair.validateValue();
         };
+
         const onFocusKey = (idx: number, pair: InputPair) => {
             if (!props.enableValidation) return;
             if (!pair.keyInvalid) delete state.newDict[pair.key];
@@ -92,6 +93,9 @@ export default defineComponent({
             emitValidate();
         };
 
+        /**
+         * @public
+         */
         const validateAll = () => {
             state.newDict = {};
             let res = true;
@@ -127,6 +131,7 @@ export default defineComponent({
         };
 
         watch(() => props.enableValidation, (val, prevVal) => {
+            console.debug('props.enablevalidation', val, prevVal);
             if (val && val !== prevVal) validateAll();
         });
 
@@ -158,5 +163,8 @@ export default defineComponent({
     .dict-group {
         display: flex;
         margin-bottom: .5rem;
+        .p-dict-input {
+            margin-right: .5rem;
+        }
     }
 </style>
