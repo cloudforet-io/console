@@ -89,7 +89,7 @@ export default {
 
 input[type="text"].p-text-input{
     @include setInput();
-    -webkit-border-radius: 0;
+    -webkit-border-radius: 0px;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -98,7 +98,7 @@ input[type="text"].p-text-input{
 
 input[type="number"].p-text-input{
     @include setInput();
-    -webkit-border-radius: 0;
+    -webkit-border-radius: 2px;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -106,7 +106,7 @@ input[type="number"].p-text-input{
 
 input[type="password"].p-text-input{
     @include setInput();
-    -webkit-border-radius: 0;
+    -webkit-border-radius: 2px;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
