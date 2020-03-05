@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-layout2 min-width="200" :initWidth="260" :height="{height}">
+    <p-vertical-page-layout2 min-width="200" :initWidth="260" :height="{height}">
         <template #sidebar="{width}">
             <div :style="{width: width}">
                 <plugin-filter :filters.sync="filterTools.tags"
@@ -70,7 +70,7 @@
                 </template>
             </p-toolbox-card-list>
         </template>
-    </p-vertical-layout2>
+    </p-vertical-page-layout2>
 </template>
 
 <script>

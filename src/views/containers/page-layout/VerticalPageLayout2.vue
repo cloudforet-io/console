@@ -1,20 +1,15 @@
 <template>
     <div>
         <p-vertical-layout2 v-bind="$props" v-on="$listeners">
-            <template #sidebarContainer="prop">
-                <slot name="sidebar-container"
+            <template #sidebar="prop">
+                <slot name="sidebar"
                       :width="prop.width"
                 />
             </template>
-            <template #dragger>
-                <slot name="resizer" />
-            </template>
-            <template #main="prop">
-                <div class="right-container" :style="{height: prop.height}">
-                    <slot name="main" />
-                    <div class="fnb">
-                        <FNB />
-                    </div>
+            <template #default="prop">
+                <slot />
+                <div class="fnb">
+                    <FNB />
                 </div>
             </template>
         </p-vertical-layout2>
