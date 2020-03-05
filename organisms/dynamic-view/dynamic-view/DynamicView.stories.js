@@ -20,7 +20,7 @@ const data = {
     table_name: 'TableA',
     ItemCount: 10,
     TableStatus: 'ACTIVE',
-    TableArn: 'arn:aws:dynamodb:ap-northeast-2:072548720675:table/cloudone-terraform-table',
+    TableArn: 'arn:aws:dynamodb:ap-northeast-2:072548720675:table/spaceone-terraform-table',
     TableId: 'b82487c6-6980-4b51-86d4-cef2497613e7',
     ProvisionedThroughput: { NumberOfDecreasesToday: 0, ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
     GlobalSecondaryIndexes: [
