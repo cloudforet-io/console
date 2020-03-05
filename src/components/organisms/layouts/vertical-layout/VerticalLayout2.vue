@@ -1,5 +1,5 @@
 <template>
-    <div class="container" :style="{height: height + 'px'}">
+    <div class="vertical-container" :style="{height: height}">
         <div class="sidebar-container" :style="sbContainerStyle"
              :class="{transition:transition}"
         >
@@ -37,6 +37,7 @@ import {
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import { documentEventMount } from '@/lib/compostion-util';
+import styles from '@/styles/_variables.scss';
 
 export default {
     name: 'VerticalLayout2',
@@ -45,8 +46,8 @@ export default {
     },
     props: {
         height: {
-            type: Number,
-            default: 620,
+            type: String,
+            default: `calc(100vh - ${styles.lnbHeight})`,
         },
         initWidth: {
             type: Number,
@@ -74,7 +75,7 @@ export default {
             })),
             sbStyle: computed(() => ({
                 width: 'auto',
-                height: '100%',
+                height: `${props.height}px`,
                 minWidth: `${props.minWidth}px`,
                 maxWidth: `${props.maxWidth}px`,
                 opacity: state.hide && !state.transition ? 0 : 1,
@@ -134,9 +135,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .container {
+    .vertical-container {
         display: flex;
-        height: 100%;
         width: 100%;
         flex-direction: row;
         z-index: 1;

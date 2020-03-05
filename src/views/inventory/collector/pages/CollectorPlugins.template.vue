@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout2 min-width="200" :initWidth="260" :height="{height}">
+    <p-vertical-page-layout2 :min-width="200" :initWidth="260">
         <template #sidebar="{width}">
             <div :style="{width: width}">
                 <plugin-filter :filters.sync="filterTools.tags"
@@ -12,7 +12,7 @@
                 />
             </div>
         </template>
-        <template #default="{height}">
+        <template #default>
             <p-toolbox-card-list class="card-list"
                                  :items="plugins"
                                  :mapper="pluginMapper"
@@ -23,7 +23,6 @@
                                  :this-page.sync="thisPage"
                                  :page-size="pageSize"
                                  :total-count="totalCount"
-                                 :style="{height}"
                                  @pageChange="listPlugins"
                                  @sortChange="listPlugins"
             >
@@ -245,6 +244,7 @@ export default {
 <style lang="scss" scoped>
 .card-list {
     height: 100%;
+    overflow-y: scroll;
     padding-top: 1.625rem;
     padding-bottom: 2.25rem;
     .beta {

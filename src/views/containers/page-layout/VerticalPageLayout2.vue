@@ -1,19 +1,19 @@
 <template>
-    <div>
-        <p-vertical-layout2 v-bind="$props" v-on="$listeners">
-            <template #sidebar="prop">
-                <slot name="sidebar"
-                      :width="prop.width"
-                />
-            </template>
-            <template #default="prop">
+    <p-vertical-layout2 v-bind="$props" v-on="$listeners">
+        <template #sidebar="prop">
+            <slot name="sidebar"
+                  :width="prop.width"
+            />
+        </template>
+        <template #default>
+            <div class="right-container">
                 <slot />
                 <div class="fnb">
                     <FNB />
                 </div>
-            </template>
-        </p-vertical-layout2>
-    </div>
+            </div>
+        </template>
+    </p-vertical-layout2>
 </template>
 
 <script>
@@ -27,8 +27,8 @@ export default {
     components: { PVerticalLayout2, FNB },
     props: {
         height: {
-            type: Number,
-            default: 620,
+            type: String,
+            default: `calc(100vh - ${styles.lnbHeight})`,
         },
         initWidth: {
             type: Number,
@@ -48,6 +48,7 @@ export default {
 
 <style lang="scss" scoped>
     .right-container {
+        height: calc(100vh - #{$lnb-height});
         display: flex;
         flex-direction: column;
         justify-content: stretch;
