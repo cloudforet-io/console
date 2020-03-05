@@ -5,7 +5,7 @@ import { action } from '@storybook/addon-actions';
 import {
     number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 
 export default {
     title: 'organisms/forms/DictInputGroup',

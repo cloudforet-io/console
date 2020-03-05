@@ -16,7 +16,7 @@
                         {{ $t('BTN.CANCEL') }}
                     </p-button>
                     <p-loading-button :loading="loading"
-                                      :disabled="!isValid"
+                                      :disabled="enableValidation && !isValid"
                                       :button-bind="{styleType: 'secondary'}"
                                       @click="onSave"
                     >
@@ -26,9 +26,10 @@
             </template>
         </p-panel-top>
         <p-dict-input-group v-if="editMode"
+                            ref="DIG"
                             :dict="dict"
                             :disabled="loading"
-                            enable-validation
+                            :enable-validation="enableValidation"
                             :show-empty-input="showEmptyInput"
                             @validate="onDictValidate"
         />
@@ -48,7 +49,7 @@ import { dictToArray } from '@/components/organisms/forms/dict-input-group/DictI
 import { getDictPanelProps, DictPanelPropsType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
-import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
 
@@ -80,6 +81,8 @@ export default defineComponent({
             }).state,
             newDict: props.dict,
             isValid: false,
+            enableValidation: false,
+            DIG: null,
         });
 
         const onDictValidate = (isValid: boolean, newDict: object) => {
@@ -89,9 +92,15 @@ export default defineComponent({
 
         const onCancel = () => {
             state.editMode = false;
+            state.showValidation = false;
         };
 
         const onSave = async () => {
+            if (!state.enableValidation) {
+                state.enableValidation = true;
+                if (!state.DIG || !state.DIG.validateAll()) return;
+            }
+
             if (props.fetchApi) {
                 try {
                     state.loading = true;
