@@ -113,7 +113,7 @@ export default defineComponent({
 <style lang="scss" scoped>
     .p-dict-input {
         display: inline-flex;
-        align-items: start;
+        align-items: flex-start;
         .input-box {
             margin-bottom: 0;
             &.key {
