@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout2 min-width="200" :initWidth="260">
+    <p-vertical-page-layout2 :min-width="200" :initWidth="260">
         <template #sidebar="{width}">
             <div :style="{width: width}">
                 <plugin-filter :filters.sync="filterTools.tags"
@@ -23,7 +23,6 @@
                                  :this-page.sync="thisPage"
                                  :page-size="pageSize"
                                  :total-count="totalCount"
-                                 :style="{height}"
                                  @pageChange="listPlugins"
                                  @sortChange="listPlugins"
             >

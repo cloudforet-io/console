@@ -6,9 +6,11 @@
             />
         </template>
         <template #default>
-            <slot />
-            <div class="fnb">
-                <FNB />
+            <div class="right-container">
+                <slot />
+                <div class="fnb">
+                    <FNB />
+                </div>
             </div>
         </template>
     </p-vertical-layout2>
@@ -46,6 +48,7 @@ export default {
 
 <style lang="scss" scoped>
     .right-container {
+        height: calc(100vh - #{$lnb-height});
         display: flex;
         flex-direction: column;
         justify-content: stretch;
