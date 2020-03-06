@@ -1,4 +1,6 @@
 import { reactive } from '@vue/composition-api';
+import { AxiosInstance } from 'axios';
+import { api } from '@/lib/api';
 
 
 export const getDictPanelProps = () => ({
@@ -27,13 +29,14 @@ export const getDictPanelProps = () => ({
     },
 });
 
-type paramsFormatterType = (data?: any, params?: any) => any;
+type paramsFormatterType = (data?: any, state?: any) => any;
 type callbackType = (res?: any, data?: any, state?: any) => void;
+type methodType = 'post' | 'get';
 
 export type fetchApiType = (data?: any) => Promise<any>;
 
 export class ApiHandler {
-    public caller: any;
+    static apiCaller: AxiosInstance = api.instance;
 
     public url: string;
 
@@ -43,21 +46,15 @@ export class ApiHandler {
 
     public callback: callbackType;
 
-    private _api: fetchApiType;
-
-    /**
-     * TODO: change caller to static axios instance
-     */
+    private readonly _api: fetchApiType;
 
     constructor(
-        caller: any,
         url: string,
         paramsFormatter: paramsFormatterType = ((data, state) => ({ ...state, ...data })),
         // eslint-disable-next-line no-empty-function
         callback: callbackType = (() => {}),
         state: any = {},
     ) {
-        this.caller = caller;
         this.url = url;
         this.paramsFormatter = paramsFormatter;
         this.callback = callback;
@@ -65,14 +62,11 @@ export class ApiHandler {
 
         this._api = (data?: any) => new Promise(async (resolve, reject) => {
             try {
-                const res = await this.caller(this.url, this.paramsFormatter(data, this.state));
-                if (this.callback) this.callback(res, data, this.state);
+                const res = await ApiHandler.apiCaller.post(this.url, this.paramsFormatter(data, this.state));
+                this.callback(res, data, this.state);
                 resolve(res);
             } catch (e) {
                 reject(e);
-                /**
-                 * TODO: default error case, default success case (notification)
-                 */
             }
         });
     }

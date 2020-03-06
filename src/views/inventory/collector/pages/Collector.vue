@@ -57,7 +57,6 @@ export default {
         }
 
         const tagsApi = new ApiHandler(
-            context.root.$http.post,
             '/inventory/collector/update',
             (data, state) => ({
                 // eslint-disable-next-line camelcase

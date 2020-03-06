@@ -1,6 +1,6 @@
 <script>
 import _ from 'lodash';
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, getCurrentInstance } from '@vue/composition-api';
 import { makeProxy, mountBusEvent } from '@/lib/compostion-util';
 import ProfileModalTemplate, { profileSetup } from '@/views/common/profile/ProfileModal.template.vue';
 import GNBEventBus from '@/views/containers/gnb/GNBEventBus';
@@ -9,6 +9,7 @@ export default {
     name: 'ProfileModal',
     extends: ProfileModalTemplate,
     setup(props, context) {
+        const vm = getCurrentInstance();
         const state = reactive(profileSetup(props, context));
 
         const getUser = async (params) => {
@@ -53,10 +54,10 @@ export default {
                 const res = await context.root.$http.post('identity/user/update', params);
 
                 if (params.timezone) {
-                    context.root.$store.commit('auth/setTimezone', params.timezone);
+                    vm.$ls.user.state.timezone = params.timezone;
                 }
                 if (params.language) {
-                    context.root.$store.commit('auth/setLanguage', params.language);
+                    vm.$ls.user.state.language = params.language;
                 }
 
                 context.root.$notify({

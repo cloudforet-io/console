@@ -117,6 +117,9 @@ export default defineComponent({
                 try {
                     state.loading = true;
                     await props.fetchApi(state.newDict);
+                    /**
+                     * Notification
+                     */
                 } catch (e) {
                     console.error(e);
                     vm.$emit('fail', e);

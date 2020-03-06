@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const casual = require('casual-browserify');
 
 /**
@@ -8,6 +9,7 @@ const casual = require('casual-browserify');
  */
 export const arrayOf = (times, generator, ...args) => {
     const result = [];
+    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < times; ++i) {
         const pushItem = args ? generator(...args) : generator();
         result.push(pushItem);
@@ -43,6 +45,13 @@ const provider = {
         const randomTimes = casual.integer(1, 4);
         return arrayOf(randomTimes, casual._ip);
     },
+    label() {
+        return `#${casual.word}`;
+    },
+    labels() {
+        const randomTimes = casual.integer(0, 4);
+        return arrayOf(randomTimes, casual._label);
+    },
     cidr() {
         return `${casual.ip}/${casual.random_element([24, 16, 20])}`;
     },
@@ -54,6 +63,7 @@ const provider = {
     },
     tags() {
         const tag = {};
+        // eslint-disable-next-line no-plusplus
         for (let i = 0; i < casual.integer(3, 5); i++) {
             tag[casual._word()] = casual._word();
         }

@@ -32,7 +32,6 @@ Vue.use(SvgIcon, {
     classPrefix: 'p-i'
 })
 Vue.use(LiquorTree);
-// Vue.component('liquor-tree', LiquorTree)
 
 Vue.prototype.$velocity = velocity;
 
