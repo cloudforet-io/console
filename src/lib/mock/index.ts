@@ -1,6 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import { AxiosInstance } from 'axios';
-import { MockData } from '@/lib/mock/toolset';
+import { makeArrayResults, MockData } from '@/lib/mock/toolset';
 import identity from '@/lib/mock/identity';
 
 // Match ALL requests
@@ -11,11 +11,8 @@ class MockUp {
         this.mock.onAny().reply((config) => {
             // eslint-disable-next-line no-restricted-syntax
             for (const mockData of responses) {
-                if (config.method?.toUpperCase() === mockData.method) {
-                    if (config.url === mockData.path || config.url?.search(mockData.path) !== -1) {
-                        console.debug('response', config.url, mockData.path, config.url?.search(mockData.path), mockData.response);
-                        return mockData.response;
-                    }
+                if (mockData.isMatch(config)) {
+                    return mockData.makeResponse(config);
                 }
             }
             return [200, {}];
@@ -25,7 +22,7 @@ class MockUp {
 
 const defaultMockData = [
     // eslint-disable-next-line camelcase
-    new MockData(RegExp('.*?/list.*'), { results: [], total_count: 0 }),
+    new MockData(RegExp('.*?/list.*'), () => makeArrayResults()),
 ];
 
 

@@ -4,7 +4,7 @@ import axios, {
 } from 'axios';
 import _ from 'lodash';
 import {
-    computed, getCurrentInstance, reactive, Ref, ref, watch, isRef,
+    computed, getCurrentInstance, reactive, Ref, ref, watch, isRef, onMounted,
 } from '@vue/composition-api';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 // @ts-ignore
@@ -457,10 +457,22 @@ export class TabSearchTableAPI extends SearchTableAPI {
         this.tableTS = new SearchTableToolSet(initData, initSyncData);
         this.isShow = isShow;
         const params = computed(() => this.apiState.extraParams);
-        watch([this.isShow, params], ([show, parm], [preShow, preParm]) => {
-            if (show && parm && (show !== preShow || parm !== preParm)) {
-                this.getData();
-            }
+        onMounted(() => {
+            watch([isShow, params], (origine, before) => {
+                let show; let parm; let preShow; let preParm = [null, null, null, null];
+                if (origine) {
+                    show = origine[0];
+                    parm = origine[1];
+                }
+                if (before) {
+                    preShow = before[0];
+                    preParm = before[1];
+                }
+
+                if (show && parm && (show !== preShow || parm !== preParm)) {
+                    this.getData();
+                }
+            });
         });
     }
 }
