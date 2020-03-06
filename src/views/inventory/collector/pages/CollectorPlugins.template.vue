@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout2 :min-width="200" :initWidth="260">
+    <p-vertical-page-layout2 :min-width="200" :init-width="260">
         <template #sidebar="{width}">
             <div :style="{width: width}">
                 <plugin-filter :filters.sync="filterTools.tags"
@@ -82,7 +82,6 @@ import { SearchQuery } from '@/components/organisms/search/query-search-bar/auto
 
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
-import PVerticalLayout2 from '@/components/organisms/layouts/vertical-layout/VerticalLayout2.vue';
 import PToolboxCardList from '@/components/organisms/lists/toolbox-card-list/ToolboxCardList.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -226,7 +225,6 @@ export default {
         PVerticalPageLayout2,
         PRow,
         PCol,
-        PVerticalLayout2,
         PToolboxCardList,
         PBadge,
         PButton,
