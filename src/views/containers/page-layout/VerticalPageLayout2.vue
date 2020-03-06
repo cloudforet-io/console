@@ -8,9 +8,9 @@
         <template #default>
             <div class="right-container">
                 <slot />
-                <div class="fnb">
-                    <FNB />
-                </div>
+            </div>
+            <div class="fnb">
+                <FNB />
             </div>
         </template>
     </p-vertical-layout2>
