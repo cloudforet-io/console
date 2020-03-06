@@ -4,10 +4,9 @@ import axios, {
 } from 'axios';
 import _ from 'lodash';
 import {
-    computed, getCurrentInstance, reactive, Ref, ref, watch, isRef,
+    computed, getCurrentInstance, reactive, Ref, ref, watch, isRef, onMounted,
 } from '@vue/composition-api';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
-
 // @ts-ignore
 // eslint-disable-next-line import/extensions
 import { ComponentInstance } from '@vue/composition-api/dist/component';
@@ -25,6 +24,10 @@ import {
     SearchTableToolSet,
     ToolboxTableToolSet,
 } from '@/components/organisms/tables/toolbox-table/toolset';
+import config from '@/lib/config';
+import { setMockData } from '@/lib/mock';
+
+const MockAdapter = require('axios-mock-adapter');
 
 import construct = Reflect.construct;
 type RefArgs<T> = Ref<T>|Ref<Readonly<T>>
@@ -83,7 +86,12 @@ export class Api {
     private vm: any;
 
     public newInstance() {
-        return axios.create(this.axiosOptions);
+        const instance = axios.create(this.axiosOptions);
+        if (config.get('NO_SERVER_MODE')) {
+            console.warn('YOU ARE USE NO SERVER MODE!!!!!');
+            setMockData(instance);
+        }
+        return instance;
     }
 
     constructor() {
@@ -104,7 +112,6 @@ export class Api {
         this.instance = this.newInstance();
         this.refreshInstance = this.newInstance();
 
-
         this.setRefreshRequestInterceptor((request) => {
             if (this.vm.$ls.user.state.isSignedIn) {
                 request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.refreshToken}`;
@@ -112,7 +119,7 @@ export class Api {
             return request;
         });
         this.setRequestInterceptor((request) => {
-            if (this.vm.$ls.user.state.isSignedIn && request.url !== '/identity/domain/list') {
+            if (this.vm.$ls.user.state.isSignedIn) {
                 request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
             }
             return request;
@@ -450,10 +457,22 @@ export class TabSearchTableAPI extends SearchTableAPI {
         this.tableTS = new SearchTableToolSet(initData, initSyncData);
         this.isShow = isShow;
         const params = computed(() => this.apiState.extraParams);
-        watch([this.isShow, params], ([show, parm], [preShow, preParm]) => {
-            if (show && parm && (show !== preShow || parm !== preParm)) {
-                this.getData();
-            }
+        onMounted(() => {
+            watch([isShow, params], (origine, before) => {
+                let show; let parm; let preShow; let preParm = [null, null, null, null];
+                if (origine) {
+                    show = origine[0];
+                    parm = origine[1];
+                }
+                if (before) {
+                    preShow = before[0];
+                    preParm = before[1];
+                }
+
+                if (show && parm && (show !== preShow || parm !== preParm)) {
+                    this.getData();
+                }
+            });
         });
     }
 }
@@ -482,7 +501,7 @@ export class AdminTableAPI extends TabSearchTableAPI {
     }
 }
 
-export const MockAdminTableAPI =()=> new AdminTableAPI('', computed(() => ({})), [], undefined, undefined, [], computed(() => false));
+export const MockAdminTableAPI = () => new AdminTableAPI('', computed(() => ({})), [], undefined, undefined, [], computed(() => false));
 
 
 export class SubDataAPI extends SearchTableAPI {
@@ -536,7 +555,7 @@ export class HistoryAPI extends TabSearchTableAPI {
     }
 }
 
-export const MockHistoryAPI =()=> new HistoryAPI('', '', '', undefined, undefined, [], computed(() => false));
+export const MockHistoryAPI = () => new HistoryAPI('', '', '', undefined, undefined, [], computed(() => false));
 
 export interface ACHandlerMeta {
     handlerClass:typeof baseAutocompleteHandler;

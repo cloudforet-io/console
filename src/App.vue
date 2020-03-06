@@ -49,7 +49,9 @@ export default defineComponent({
                 new GTag(config.get('GTAG_ID'), vm);
             } catch (e) {
                 console.error(e);
-                vm.$router.push({ path: '/error-page' });
+                if (!config.config.NO_SERVER_MODE) {
+                    vm.$router.push({ path: '/error-page' });
+                }
             }
             state.loading = false;
         };

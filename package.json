@@ -1,8 +1,8 @@
 {
   "name": "webconsole-client",
   "version": "0.0.1",
-  "description": "CloudOne web console client",
-  "author": "CloudOne",
+  "description": "SpaceOne web console client",
+  "author": "SpaceOne",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -106,6 +106,7 @@
     "@vue/eslint-config-airbnb": "^4.0.0",
     "@vue/eslint-config-typescript": "^4.0.0",
     "autoprefixer": "^9.7.4",
+    "axios-mock-adapter": "^1.17.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^23.6.0",

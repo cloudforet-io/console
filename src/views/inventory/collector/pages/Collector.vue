@@ -11,7 +11,7 @@ import {
     defaultAutocompleteHandler,
     getEnumValues, getFetchValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import { fetchApiType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
+import { ApiHandler } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
 
 export default {
     name: 'Collector',
@@ -56,21 +56,29 @@ export default {
             }
         }
 
-        // const vm = getCurrentInstance();
-        const getTagsFetchApi = params => data => context.root.$http.post(
-            '/inventory/collector/update', {
+        const tagsApi = new ApiHandler(
+            context.root.$http.post,
+            '/inventory/collector/update',
+            (data, state) => ({
                 // eslint-disable-next-line camelcase
-                // collector_id: state.selectedItem.collector_id,
-                ...params,
+                collector_id: state.selectedItem.collector_id,
                 tags: data,
+            }),
+            (res, data, state) => {
+                state.items[state.selectIndex[0]].tags = data;
             },
         );
 
         const state = reactive({
-            ...collectorSetup(props,
+            ...collectorSetup(
+                props,
                 context,
-                new ACHandler(), getTagsFetchApi),
+                new ACHandler(),
+                tagsApi,
+            ),
         });
+
+        state.tagsApi.state = state;
 
         const collectorTableQuery = computed(() => (defaultQuery(
             state.thisPage, state.pageSize,
