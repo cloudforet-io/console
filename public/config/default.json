@@ -8,5 +8,5 @@
   },
   "COLLECTOR_IMG": "https://assets-console-cloudone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/ic_collector_tags.svg",
   "GTAG_ID": "UA-159327743-1",
-  "NO_SERVER_MODE":false
+  "NO_SERVER_MODE": true
 }

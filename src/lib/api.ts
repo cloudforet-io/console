@@ -298,12 +298,13 @@ export interface HttpInstance {
     $http:AxiosInstance
 }
 
+
 export abstract class DynamicAPI {
-    public abstract vm:ComponentInstance ;
+    public abstract vm:ComponentInstance;
 
-    get $http() { return (this.vm as HttpInstance).$http; }
+    get $http() { return api.instance };
 
-    protected abstract requestData(data?:any):Promise<AxiosResponse<any>> ;
+    protected abstract requestData(data?:any):Promise<AxiosResponse<any>>;
 
     public abstract getData():void;
 }

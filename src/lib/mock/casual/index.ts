@@ -1,9 +1,10 @@
+/* eslint-disable no-restricted-syntax */
 import originCasual from '@/lib/casual';
 
 import serverModels from '@/lib/mock/casual/server';
+import memberModels from '@/lib/mock/casual/member';
 
-
-const models = [serverModels];
+const models = [serverModels, memberModels];
 
 const getModels = (origin) => {
     let casual = origin;
