@@ -2,6 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { AxiosInstance } from 'axios';
 import { makeArrayResults, MockData } from '@/lib/mock/toolset';
 import identity from '@/lib/mock/identity';
+import inventory from '@/lib/mock/inventory';
 
 // Match ALL requests
 
@@ -30,6 +31,7 @@ export const setMockData = (instance:AxiosInstance) => {
     const mock = new MockAdapter(instance);
     new MockUp(mock, [
         ...identity,
+        ...inventory,
         ...defaultMockData,
     ]);
 };

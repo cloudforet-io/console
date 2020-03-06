@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
-import { MockData } from '@/lib/mock/toolset';
+import { makeArrayResults, MockData } from '@/lib/mock/toolset';
+import { arrayOf } from '@/lib/casual';
+import casual from '@/lib/mock/casual';
 
 export const DOMAIN_INFO = {
     domain_id: 'domain_test_id',
@@ -7,8 +9,5 @@ export const DOMAIN_INFO = {
 
 
 export default [
-    new MockData('/inventory/server/list', () => ({
-        results: [DOMAIN_INFO],
-        total_count: 1,
-    })),
+    new MockData('/inventory/server/list', () => makeArrayResults(arrayOf(15, casual._server), 80)),
 ];
