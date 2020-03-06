@@ -87,8 +87,6 @@ export class TreeState {
     public state: TreePropsInterface;
 
     static initTreeState: TreePropsInterface = {
-        data: [],
-        options: {},
         icons: {
             leaf: 'ic_tree_project',
             expanded: 'ic_tree_folder--opened',
@@ -97,9 +95,11 @@ export class TreeState {
         loading: false,
     }
 
-    constructor(initData:object = {}) {
+    constructor(initData:any = {}) {
         this.state = reactive({
             ...TreeState.initTreeState,
+            data: initData.data || [],
+            options: initData.options || {},
             ...initData,
         });
     }
