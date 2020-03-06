@@ -152,7 +152,7 @@ export class Api {
     }
 }
 // DO NOT USE THIS IN CONFIG REQUEST
-export const api:Api = new Api();
+export const api: Api = new Api();
 
 export const operatorMap = Object.freeze({
     '': 'contain_in', // merge operator
