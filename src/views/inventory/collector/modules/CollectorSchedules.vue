@@ -25,14 +25,14 @@
         >
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark" @click="openEditModal(null)">
-                    {{$t('BTN.ADD') }}
+                    {{ $t('BTN.ADD') }}
                 </p-button>
                 <p-dropdown-menu-btn :menu="dropdown"
                                      class="left-toolbox-item"
                                      @click-update="openEditModal(items[selectIndex[0]])"
                                      @click-delete="proxyDeleteVisible = true"
                 >
-                    {{$t('BTN.ACTION') }}
+                    {{ $t('BTN.ACTION') }}
                 </p-dropdown-menu-btn>
             </template>
             <template #col-schedule-format="{value}">
@@ -74,7 +74,7 @@
 <script>
 import _ from 'lodash';
 import {
-    reactive, toRefs, computed, watch,
+    reactive, toRefs, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
 import moment from 'moment';
 import { MenuItem, timestampFormatter } from '@/lib/util';
@@ -118,6 +118,7 @@ export default {
         editLoading: Boolean,
     },
     setup(props, { root, parent, emit }) {
+        const vm = getCurrentInstance();
         const state = reactive({
             proxyEditVisible: makeProxy('editVisible', props, emit),
             proxyDeleteVisible: makeProxy('deleteVisible', props, emit),
@@ -146,7 +147,7 @@ export default {
             ], parent),
         });
 
-        const timezone = _.get(root, '$store.getters.auth/timezone', 'UTC');
+        const timezone = vm.$ls.user.state.timezone || 'UTC';
         const getUtcHour = hour => moment.tz(moment.utc({ hour }), timezone).hour();
 
         const openEditModal = (item) => {

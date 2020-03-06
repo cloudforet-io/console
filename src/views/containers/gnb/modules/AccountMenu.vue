@@ -45,7 +45,6 @@ export default defineComponent({
             ],
             iconColor: computed(() => '#F8F8FC'),
             userId: computed(() => root.$ls.user.state.userId),
-            // clientId: computed(() => root.$store.getters['domain/clientId']),
         });
         const openProfile = () => {
             state.profileVisible = true;

@@ -44,7 +44,9 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed } from '@vue/composition-api';
+import {
+    reactive, toRefs, computed, getCurrentInstance,
+} from '@vue/composition-api';
 import _ from 'lodash';
 import moment from 'moment';
 import { makeProxy } from '@/lib/compostion-util';
@@ -77,10 +79,11 @@ export default {
         schedule: Object,
     },
     setup(props, { emit, root }) {
+        const vm = getCurrentInstance();
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             name: _.get(props, 'schedule.name', ''),
-            timezone: _.get(root, '$store.getters.auth/timezone', 'UTC'),
+            timezone: vm.$ls.user.state.timezone || 'UTC',
             hoursMatrix: _.range(24),
             selectedHours: {},
             selectedUTCHoursList: computed(() => _.flatMap(state.selectedHours, time => moment.utc(time).hour())),
