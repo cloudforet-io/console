@@ -92,6 +92,7 @@ export default {
     font-weight: 400;
     font-size: .875rem;
     line-height: 1rem;
+    border-width: 1px;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
     @include btn-color('primary', $primary, $white);
