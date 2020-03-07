@@ -99,6 +99,7 @@ export default {
             border-color: $dark;
         }
         .p-search-input {
+            width: 100%;
             flex-grow: 1;
             border: 0;
             background: transparent;
