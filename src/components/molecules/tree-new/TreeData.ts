@@ -81,6 +81,7 @@ export interface TreePropsInterface {
     options?: TreeOptionsInterface;
     icons?: TreeIconsType;
     loading?: boolean;
+    selectMode?: boolean;
 }
 
 export class TreeState {
@@ -93,6 +94,7 @@ export class TreeState {
             collapsed: 'ic_tree_folder',
         },
         loading: false,
+        selectMode: false,
     }
 
     constructor(initData:any = {}) {
@@ -106,7 +108,7 @@ export class TreeState {
 }
 
 
-export const getTreeProps = () => ({
+export const treeProps = {
     /**
      * tree data for initiation and it's not reactive.
      * @type {Array, Object}
@@ -139,4 +141,8 @@ export const getTreeProps = () => ({
         type: Boolean,
         default: false,
     },
-});
+    selectMode: {
+        type: Boolean,
+        default: false,
+    },
+};

@@ -19,9 +19,15 @@ export default {
     },
 };
 
+const actions = {
+    nodeClick: action('nodeClick'),
+    emptyRightClick: action('emptyRightClick'),
+    nodeRightClick: action('nodeRightClick'),
+};
+
 export const defaultCase = () => ({
     components: { PTreeNew: PTree },
-    template: '<p-tree-new v-bind="state"></p-tree-new>',
+    template: '<p-tree-new v-bind="state" v-on="actions"></p-tree-new>',
     setup(props, context) {
         const state = new TreeState().state;
 
@@ -32,6 +38,7 @@ export const defaultCase = () => ({
 
         return {
             state,
+            actions,
         };
     },
 });
@@ -39,7 +46,7 @@ export const defaultCase = () => ({
 export const redefineData = () => ({
     components: { PTreeNew: PTree },
     template: `<div>
-        <p-tree-new v-bind="state"></p-tree-new>
+        <p-tree-new v-bind="state"  v-on="actions"></p-tree-new>
         <br>
         <hr>
         <br>
@@ -91,6 +98,7 @@ export const redefineData = () => ({
         };
         return {
             state,
+            actions,
         };
     },
 });
@@ -409,6 +417,66 @@ export const add = () => ({
             addMode,
             addModeIdx,
             nodeClick,
+        };
+    },
+});
+
+
+export const selectMode = () => ({
+    components: { PTreeNew: PTree },
+    template: `<div>
+        <p-tree-new v-bind="state"></p-tree-new>
+        <br>
+        <hr>
+        <br>
+        <div style="display: flex;">
+            <div>
+                <h4>data</h4>
+                <pre>{{state.data}}</pre>
+            </div>
+            <div>
+                <h4>options</h4>
+                <pre>{{state.options}}</pre>
+            </div>
+        </div>
+    </div>
+    `,
+    setup(props, context) {
+        const state = new TreeState().state;
+
+        state.data = [
+            { text: 'Item 1' },
+            { text: 'Item 2' },
+            {
+                text: 'Item 3',
+                kids: [
+                    { text: 'Item 3.1' },
+                    {
+                        text: 'Item 3.2',
+                        kids: [
+                            { text: 'Item 3.2.1' },
+                            { text: 'Item 3.2.2' },
+                            {
+                                text: 'Item 3.2.3',
+                                kids: [
+                                    { text: 'Item 3.2.3.1' },
+                                    { text: 'Item 3.2.3.2' },
+                                    { text: 'Item 3.2.3.3' },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+        state.options = {
+            propertyNames: {
+                text: 'text',
+                children: 'kids',
+            },
+        };
+        return {
+            state,
         };
     },
 });
