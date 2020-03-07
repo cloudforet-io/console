@@ -4,12 +4,12 @@ import originCasual from '@/lib/casual';
 import serverModels, { serverCasual } from '@/lib/mock/casual/server';
 import memberModels, { memberCasual } from '@/lib/mock/casual/member';
 import collectorModels, { collectorCasual } from '@/lib/mock/casual/collector';
-import secretModels, { secretCasual } from '@/lib/mock/casual/secret';
+import credentialModels, { credentialsCasual } from '@/lib/mock/casual/credentials';
 
 type originCasualType = Casual.Generators & Casual.Casual;
 type casualType = originCasualType &
     collectorCasual & serverCasual &
-    memberCasual & secretCasual;
+    memberCasual & credentialsCasual;
 
 export type modelType = (casual: casualType) => casualType;
 
@@ -17,7 +17,7 @@ const models: modelType[][] = [
     serverModels,
     memberModels,
     collectorModels,
-    secretModels,
+    credentialModels,
 ];
 
 const getModels = (origin: originCasualType): casualType => {
