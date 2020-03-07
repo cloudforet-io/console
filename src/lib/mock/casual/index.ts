@@ -5,19 +5,26 @@ import serverModels, { serverCasual } from '@/lib/mock/casual/server';
 import memberModels, { memberCasual } from '@/lib/mock/casual/member';
 import collectorModels, { collectorCasual } from '@/lib/mock/casual/collector';
 import credentialModels, { credentialsCasual } from '@/lib/mock/casual/credentials';
+import repositoryModels, { repositoryCasual } from '@/lib/mock/casual/repository';
+import pluginModels, { pluginCasual } from '@/lib/mock/casual/plugin';
 
 type originCasualType = Casual.Generators & Casual.Casual;
 type casualType = originCasualType &
     collectorCasual & serverCasual &
-    memberCasual & credentialsCasual;
+    memberCasual & credentialsCasual &
+    repositoryCasual & pluginCasual;
 
 export type modelType = (casual: casualType) => casualType;
 
+
+/* DO NOT CHANGE the order of models */
 const models: modelType[][] = [
     serverModels,
     memberModels,
     collectorModels,
     credentialModels,
+    repositoryModels,
+    pluginModels,
 ];
 
 const getModels = (origin: originCasualType): casualType => {
