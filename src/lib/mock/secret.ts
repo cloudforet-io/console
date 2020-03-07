@@ -4,6 +4,6 @@ import { arrayOf } from '@/lib/casual';
 import casual from '@/lib/mock/casual';
 
 export default [
-    new MockData('/secret/credential/list', () => makeArrayResults(arrayOf(15, casual._credentials), 80)),
-    new MockData('/secret/credential-group/list', () => makeArrayResults(arrayOf(15, casual._credentialsGroup), 80)),
+    new MockData('/secret/credential/list', () => makeArrayResults(arrayOf(10, casual._credential), 80)),
+    new MockData('/secret/credential-group/list', () => makeArrayResults(arrayOf(10, casual._credentialGroup), 80)),
 ];
