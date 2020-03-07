@@ -1,47 +1,44 @@
 <template>
     <div class="plugin-filter-container">
-        <p-row>
+        <div class="rows">
             <p-button class="back-btn" @click="$emit('goBack')">
-                <p-i name="ic_back" color="transparent inherit" />Back
+                <p-i name="ic_back" color="transparent inherit" />
+                {{ $t('BTN.BACK') }}
             </p-button>
-        </p-row>
-        <p-row>
-            <p-col>
-                <p-search class="p-search" :search-text.sync="search" search-placeholder="Enter keyword"
-                          @onSearch="$emit('search', $event)"
-                />
-            </p-col>
-        </p-row>
-        <p-row direction="column">
+        </div>
+        <div class="rows">
+            <p-search class="p-search" :search-text.sync="search" search-placeholder="Enter keyword"
+                      @onSearch="$emit('search', $event)"
+            />
+        </div>
+        <div class="rows">
             <header>Repository</header>
-            <span v-for="(repo, idx) in repositories" :key="idx"
-                  class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"
-                  @click.stop="onClickRepoText(repo.repository_id)"
+            <div v-for="(repo, idx) in repositories" :key="idx"
+                 class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"
+                 @click.stop="onClickRepoText(repo.repository_id)"
             >
                 <p-radio v-model="proxySelectedRepoId" :value="repo.repository_id" @change="onRepoChange(repo)" />
                 {{ repo.name }}
-            </span>
-        </p-row>
-        <p-row direction="column">
+            </div>
+        </div>
+        <div class="rows">
             <header>Resource Type</header>
-            <span v-for="(resource) in resourceOptions" :key="resource"
-                  class="filter" :class="{selected: proxyFilters.includes(resource)}"
-                  @click.stop="onClickResourceText(resource)"
+            <div v-for="(resource) in resourceOptions" :key="resource"
+                 class="filter" :class="{selected: proxyFilters.includes(resource)}"
+                 @click.stop="onClickResourceText(resource)"
             >
                 <p-check-box v-model="proxyFilters" :value="resource"
                              @change="onResourceChange"
                 />
                 {{ resource }}
-            </span>
-        </p-row>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import { toRefs, reactive, computed } from '@vue/composition-api';
 
-import PRow from '@/components/atoms/grid/row/Row.vue';
-import PCol from '@/components/atoms/grid/col/Col.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
@@ -53,8 +50,6 @@ export default {
     name: 'PluginFilter',
     events: ['goBack', 'search', 'repoChange', 'filtersChange'],
     components: {
-        PRow,
-        PCol,
         PI,
         PButton,
         PSearch,
@@ -122,7 +117,7 @@ export default {
 <style lang="scss" scoped>
 .plugin-filter-container {
     padding: 0 1rem;
-    .p-row {
+    .rows {
          margin-top: 1.25rem;
      }
     .back-btn {
@@ -130,7 +125,7 @@ export default {
         font-size: .875rem;
         height: 1.5rem;
         padding: 0;
-        text-align: left;
+        justify-content: flex-start;
     }
     .p-search {
         width: 100%;

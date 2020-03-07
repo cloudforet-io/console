@@ -12,6 +12,7 @@
 	"BTN": {
 		"ACTION": "Actions",
 		"ADD": "Add",
+		"BACK": "Back",
 		"CANCEL": "Cancel",
 		"CHG_POOL": "Change Pool",
 		"CHG_REGION": "Change Region",
