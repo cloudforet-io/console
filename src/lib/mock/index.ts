@@ -3,6 +3,7 @@ import { AxiosInstance } from 'axios';
 import { makeArrayResults, MockData } from '@/lib/mock/toolset';
 import identity from '@/lib/mock/identity';
 import inventory from '@/lib/mock/inventory';
+import secret from '@/lib/mock/secret';
 
 // Match ALL requests
 
@@ -32,6 +33,7 @@ export const setMockData = (instance:AxiosInstance) => {
     new MockUp(mock, [
         ...identity,
         ...inventory,
+        ...secret,
         ...defaultMockData,
     ]);
 };
