@@ -19,9 +19,15 @@ export default {
     },
 };
 
+const actions = {
+    nodeClick: action('nodeClick'),
+    emptyRightClick: action('emptyRightClick'),
+    nodeRightClick: action('nodeRightClick'),
+};
+
 export const defaultCase = () => ({
     components: { PTreeNew: PTree },
-    template: '<p-tree-new v-bind="state"></p-tree-new>',
+    template: '<p-tree-new v-bind="state" v-on="actions"></p-tree-new>',
     setup(props, context) {
         const state = new TreeState().state;
 
@@ -32,6 +38,7 @@ export const defaultCase = () => ({
 
         return {
             state,
+            actions,
         };
     },
 });
@@ -39,7 +46,7 @@ export const defaultCase = () => ({
 export const redefineData = () => ({
     components: { PTreeNew: PTree },
     template: `<div>
-        <p-tree-new v-bind="state"></p-tree-new>
+        <p-tree-new v-bind="state"  v-on="actions"></p-tree-new>
         <br>
         <hr>
         <br>
@@ -91,6 +98,7 @@ export const redefineData = () => ({
         };
         return {
             state,
+            actions,
         };
     },
 });
