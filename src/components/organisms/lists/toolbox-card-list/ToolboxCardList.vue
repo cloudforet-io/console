@@ -1,56 +1,53 @@
 <template>
-    <p-row class="card-list-container" direction="column">
-        <p-col :flex-grow="0">
+    <div class="card-list-container">
+        <div class="top">
             <slot name="top">
-                <p-row class="top-row">
-                    <p-col>
-                        <slot name="leftTop">
-                            <span class="title">{{ title }}</span>
-                        </slot>
-                    </p-col>
-                    <p-col :flex-grow="0" align-self="flex-end">
-                        <slot name="rightTop">
-                            <p-text-pagenation class="tool t-pagination"
-                                               :this-page.sync="proxyThisPage"
+                <slot name="leftTop">
+                    <span class="title">{{ title }}</span>
+                </slot>
+
+                <slot name="rightTop">
+                    <div class="right-top">
+                        <span>
+                            <p-text-pagenation :this-page.sync="proxyThisPage"
                                                :all-page="allPage"
                                                @pageChange="onPageChange"
                             />
-                            <p-dropdown-menu-btn class="tool"
-                                                 :menu="sortMenu"
-                                                 @clickMenuEvent="onClickSortMenu"
-                            >
-                                Sort by {{ sortMenu[sortByIdx].label }}
-                            </p-dropdown-menu-btn>
-                        </slot>
-                    </p-col>
-                </p-row>
+                        </span>
+                        <p-dropdown-menu-btn class="sort"
+                                             :menu="sortMenu"
+                                             @clickMenuEvent="onClickSortMenu"
+                        >
+                            Sort by {{ sortMenu[sortByIdx].label }}
+                        </p-dropdown-menu-btn>
+                    </div>
+                </slot>
             </slot>
-        </p-col>
-        <p-col :flex-grow="0">
+        </div>
+
+        <div class="filters">
             <slot name="filters" />
-        </p-col>
-        <p-col :flex-shrink="0">
-            <p-card-list class="card-container" :items="items" :mapper="mapper"
-                         :loading="loading"
-            >
-                <template v-for="(_, slot) of cardSlots" v-slot:[slot]="scope">
-                    <slot :name="`card-${slot}`" v-bind="scope" :items="items" />
-                </template>
-            </p-card-list>
-        </p-col>
-        <p-col :flex-grow="0">
+        </div>
+
+        <p-card-list class="card-container" :items="items" :mapper="mapper"
+                     :loading="loading"
+        >
+            <template v-for="(_, slot) of cardSlots" v-slot:[slot]="scope">
+                <slot :name="`card-${slot}`" v-bind="scope" :items="items" />
+            </template>
+        </p-card-list>
+
+        <div class="bottom">
             <slot name="bottom">
-                <p-row class="bottom-row" justify-content="center">
-                    <p-col>
-                        <p-text-pagenation :this-page.sync="proxyThisPage"
-                                           :all-page="allPage"
-                                           @pageChange="onPageChange"
-                        />
-                    </p-col>
-                </p-row>
+                <div class="bottom-page">
+                    <p-text-pagenation :this-page.sync="proxyThisPage"
+                                       :all-page="allPage"
+                                       @pageChange="onPageChange"
+                    />
+                </div>
             </slot>
-        </p-col>
-    </p-row>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -58,8 +55,6 @@ import {
     computed, toRefs, reactive,
 } from '@vue/composition-api';
 import PCardList from '@/components/organisms/lists/card-list/CardList.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
-import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import { makeProxy } from '@/lib/compostion-util';
@@ -108,8 +103,6 @@ export default {
     events: ['pageChange', 'sortChange'],
     components: {
         PCardList,
-        PRow,
-        PCol,
         PTextPagenation,
         PDropdownMenuBtn,
     },
@@ -158,33 +151,41 @@ export default {
 
 <style lang="scss" scoped>
 .card-list-container {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100%;
     padding-right: 1rem;
     padding-left: 1rem;
-    margin-right: auto;
-    margin-left: auto;
     max-width: 916px;
 }
-.top-row {
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding-bottom: 1.125rem;
+    .right-top {
+        display: inline-flex;
+        align-items: center;
+    }
     .title {
         font-size: 1.5rem;
         line-height: 1.75rem;
     }
-    .tool {
+    .sort {
+        margin-left: 1.75rem;
         display: inline-block;
-        &.t-pagination {
-            margin-right: 1.75rem;
-        }
     }
 }
 .card-container {
-    height: 100%;
+    flex-grow: 1;
     margin-top: 1.5rem;
 }
-.bottom-row {
+.bottom {
     margin-top: 1rem;
     text-align: center;
+    .bottom-page {
+
+    }
 }
 </style>
