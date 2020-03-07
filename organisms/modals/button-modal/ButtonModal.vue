@@ -16,67 +16,62 @@
         :footer-visible="footerVisible"
     >
         <template #header>
-            <slot name="header">
-                {{ headerTitle }}
-            </slot>
-            <p-button v-if="headerCloseButtonVisible"
-                      class="close-modal-btn"
-                      :force-class="['absolute pin-t pin-b pin-r px-4 py-3']"
-                      :class="{disabled: loading}"
-                      :disabled="loading"
-                      @click="onCloseClick"
-            >
-                <span aria-hidden="true">&times;</span>
-            </p-button>
+            <div class="header">
+                <slot name="header">
+                    {{ headerTitle }}
+                </slot>
+                <p-i v-if="headerCloseButtonVisible"
+                     name="ic_delete" color="transparent inherit"
+                     class="close-btn"
+                     :class="{disabled: loading}"
+                     @click="onCloseClick"
+                />
+            </div>
         </template>
         <template #body>
             <slot name="body" />
         </template>
         <template #footer>
             <slot name="footer">
-                <slot name="footer-extra" />
-                <p-button
-                    v-if="footerCancelButtonVisible"
-                    class="p-btn-modal-btn"
-                    v-bind="footerCancelButtonBind"
-                    :disabled="loading"
-                    @click="onCancelClick"
-                >
-                    <slot name="close-button">
-                        {{ $t('BTN.CANCEL') }}
-                    </slot>
-                </p-button>
-                <p-button v-if="footerConfirmButtonVisible"
-                          v-bind="footerConfirmButtonBind"
-                          :disabled="loading"
-                          class="p-btn-modal-btn"
-
-                          @click="onConfirmClick"
-                >
-                    <div class="confirm-btn">
-                        <p-lottie v-if="loading" class="spinner"
-                                  name="spinner"
-                                  auto
-                                  :size="1.5"
-                        />
+                <div class="footer">
+                    <slot name="footer-extra" />
+                    <p-button
+                        v-if="footerCancelButtonVisible"
+                        class="modal-btn cancel-btn"
+                        v-bind="footerCancelButtonBind"
+                        :disabled="loading"
+                        @click="onCancelClick"
+                    >
+                        <slot name="close-button">
+                            {{ $t('BTN.CANCEL') }}
+                        </slot>
+                    </p-button>
+                    <p-loading-button v-if="footerConfirmButtonVisible"
+                                      class="modal-btn"
+                                      :button-bind="footerConfirmButtonBind"
+                                      :loading="loading"
+                                      @click="onConfirmClick"
+                    >
                         <slot name="confirm-button">
                             {{ $t('BTN.CONFIRM') }}
                         </slot>
-                    </div>
-                </p-button>
+                    </p-loading-button>
+                </div>
             </slot>
         </template>
     </p-content-modal>
 </template>
 
 <script>
-import PButton from '@/components/atoms/buttons/Button.vue';
 import PContentModal, { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 
 export const setup = (props, context) => {
     const state = contentModalSetup(props, context);
     const onCloseClick = () => {
+        if (props.disabled) return;
         context.emit('close');
         state.proxyVisible.value = false;
     };
@@ -99,7 +94,9 @@ export const setup = (props, context) => {
 
 export default {
     name: 'PButtonModal',
-    components: { PContentModal, PButton, PLottie },
+    components: {
+        PI, PContentModal, PButton, PLoadingButton,
+    },
     mixins: [PContentModal],
     events: ['close', 'cancel', 'confirm'],
     setup(props, context) {
@@ -148,25 +145,37 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-    .close-modal-btn {
-        cursor: pointer;
-        color: $dark;
-        &.disabled {
-            color: $gray2;
-        }
-    }
-    .p-btn-modal-btn{
-        height: 2.5rem;
-        font-size: 1rem;
-    }
-    .confirm-btn {
+    .header {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        height: 100%;
-        .spinner {
-            display: inline-flex;
-            padding-right: .25rem;
+        width: 100%;
+        .close-btn {
+            cursor: pointer;
+            color: $dark;
+            &:hover {
+                color: $secondary;
+            }
+            &.disabled {
+                color: $gray2;
+            }
         }
     }
+
+    .footer {
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        .modal-btn {
+            height: 2.5rem;
+            font-size: 1rem;
+        }
+
+        .cancel-btn {
+            margin-left: auto;
+            margin-right: 1rem;
+        }
+    }
+
 </style>
