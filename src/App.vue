@@ -46,7 +46,7 @@ export default defineComponent({
         const preparationTo = async () => {
             try {
                 await configInit();
-                new GTag(config.get('GTAG_ID'), vm);
+                if (config.get('GTAG_ID')) new GTag(config.get('GTAG_ID'), vm);
             } catch (e) {
                 console.error(e);
                 if (!config.config.NO_SERVER_MODE) {

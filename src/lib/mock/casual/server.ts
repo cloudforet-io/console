@@ -1,8 +1,10 @@
 /* eslint-disable camelcase */
 import { arrayOf } from '@/lib/casual';
+// eslint-disable-next-line import/no-cycle
+import { modelType } from '@/lib/mock/casual/index';
 
 const securityGroupRule = (casual) => {
-    casual.define('security_group_rule', () => ({
+    casual.define('securityGroupRule', () => ({
         port_range_min: casual.integer(0, 1000),
         port_range_max: casual.integer(28200, 65535),
         security_group_id: casual.make_id('sg'),
@@ -35,7 +37,7 @@ const serverData = (casual) => {
             instance_name: 'spaceone-dev-eks-cluster_kubectl-test',
             static_nat: arrayOf(casual.integer(1, 3), casual._ip),
             security_groups: arrayOf(casual.integer(1, 6), casual._security_group_name),
-            security_group_rules: arrayOf(casual.integer(1, 6), casual._security_group_rule),
+            security_group_rules: arrayOf(casual.integer(1, 6), casual._securityGroupRule),
             instance_type: 'unknown',
             image: 'amzn2-ami-hvm-2.0.20190823.1-x86_64-gp2',
         },
@@ -50,7 +52,6 @@ const serverData = (casual) => {
     }));
     return casual;
 };
-
 
 const nic = (casual) => {
     casual.define('nic', () => ({
@@ -129,6 +130,7 @@ const collectInfo = (casual) => {
     }));
     return casual;
 };
+
 const server = (casual) => {
     casual.define('server', () => ({
         server_id: casual.make_id('server'),
@@ -148,7 +150,7 @@ const server = (casual) => {
         project_id: casual.make_id('project'),
         domain_id: casual.make_id('domain'),
         tags: casual.tags,
-        collection_info: casual.collection_info,
+        collection_info: casual.collectInfo,
         created_at: casual.timestamp,
         updated_at: casual.timestamp,
         deleted_at: null,
@@ -156,9 +158,32 @@ const server = (casual) => {
     return casual;
 };
 
+export interface serverCasual {
+    securityGroupRule?: any;
+    _securityGroupRule?: any;
+    serverData?: any;
+    _serverData?: any;
+    nic?: any;
+    _nic?: any;
+    disk?: any;
+    _disk?: any;
+    zoneInfo?: any;
+    _zoneInfo?: any;
+    poolInfo?: any;
+    _poolInfo?: any;
+    regionInfo?: any;
+    _regionInfo?: any;
+    collectInfo?: any;
+    _collectInfo?: any;
+    server?: any;
+    _server?: any;
+}
 
-export default [
+
+const result: modelType[] = [
     securityGroupRule, serverData, nic, disk,
     zoneInfo, poolInfo, regionInfo, collectInfo,
     server,
 ];
+
+export default result;

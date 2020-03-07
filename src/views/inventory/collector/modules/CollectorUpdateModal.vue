@@ -30,6 +30,7 @@
         <template #footer-extra>
             <p-button class="reset-btn"
                       style-type="primary-dark"
+                      size="lg"
                       outline
                       :disabled="loading"
                       @click="onClickReset"

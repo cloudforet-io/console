@@ -36,7 +36,7 @@
                         {{ description }}
                     </p>
                     <p class="sub-header">
-                        {{$t('INVENTORY.COL_OPS') }}
+                        {{ $t('INVENTORY.COL_OPS') }}
                     </p>
                     <p-field-group :label="isCredentialType ?$t('COMMON.CREDENTIAL') :$t('COMMON.CREDENTIAL_GRP')">
                         <div v-if="isCredentialType">
@@ -58,7 +58,7 @@
                 </p-col>
                 <p-col class="right-container">
                     <p class="sub-header">
-                        {{$t('INVENTORY.FILTERS') }}
+                        {{ $t('INVENTORY.FILTERS') }}
                     </p>
                     <p-dynamic-form v-for="(form, idx) in filterFormats" :key="idx"
                                     v-model="filters[form.key]"
@@ -74,10 +74,11 @@
             <p-button class="reset-btn"
                       style-type="primary-dark"
                       outline
+                      size="lg"
                       :disabled="loading"
                       @click="onClickReset"
             >
-                {{$t('BTN.RESET') }}
+                {{ $t('BTN.RESET') }}
             </p-button>
         </template>
     </p-button-modal>
