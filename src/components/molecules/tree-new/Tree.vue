@@ -9,7 +9,26 @@
               @node:dragging:finish="$emit('dragFinish', $event)"
         >
             <template #default="{node}">
-                <span class="tree-scope" @click.right.stop.prevent="onNodeRightClick(node)">
+                <span v-if="!selectMode" class="tree-scope"
+                      @click.right.stop.prevent="onNodeRightClick(node)"
+                >
+                    <span>
+                        <p-i :name="!node.hasChildren() ? icons.leaf :
+                                 node.expanded() ? icons.expanded : icons.collapsed"
+                             color="transparent inherit"
+                             width="1rem" height="1rem"
+                        />
+                        {{ node.text }}
+                    </span>
+                    <p-lottie v-if="loading && fetchingNodeId === node.id"
+                              name="spinner" auto
+                              height="auto" width="1rem"
+                    />
+                </span>
+                <span v-else-if="selectMode" class="tree-scope"
+                      @click.right.stop.prevent="onNodeRightClick(node)"
+                      @click.left.stop="node.select(false)"
+                >
                     <span>
                         <p-i :name="!node.hasChildren() ? icons.leaf :
                                  node.expanded() ? icons.expanded : icons.collapsed"
@@ -51,7 +70,13 @@ export default defineComponent({
         PI,
         PLottie,
     },
-    props: getTreeProps(),
+    props: {
+        getTreeProps,
+        selectMode: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup(props: TreePropsInterface, { emit }) {
         const state:any = reactive({
             tree: null,
