@@ -25,7 +25,7 @@
                 </span>
             </span>
         </div>
-        <div class="main">
+        <div class="main" :style="{height: height}">
             <slot />
         </div>
     </div>
@@ -149,6 +149,10 @@ export default {
         }
     }
     .main {
+        height: calc(100vh - #{$lnb-height});
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
         flex-grow: 1;
         width: 100%;
     }

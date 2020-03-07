@@ -4,12 +4,14 @@
               v-model="selectedNode"
               :options="treeOptions"
               @tree:data:fetch="onFetch"
-              @node:clicked="$emit('nodeClick', $event)"
               @node:dragging:start="$emit('dragStart', $event)"
               @node:dragging:finish="$emit('dragFinish', $event)"
         >
             <template #default="{node}">
-                <span class="tree-scope" @click.right.stop.prevent="onNodeRightClick(node)">
+                <span class="tree-scope"
+                      @click="onNodeClick(node, $event)"
+                      @click.right.stop.prevent="onNodeRightClick(node)"
+                >
                     <span>
                         <p-i :name="!node.hasChildren() ? icons.leaf :
                                  node.expanded() ? icons.expanded : icons.collapsed"
@@ -39,7 +41,7 @@ import {
 } from '@vue/composition-api';
 import _ from 'lodash';
 import {
-    TreePropsInterface, getTreeProps, TreeOptionsInterface, TreeItemInterface,
+    TreePropsInterface, treeProps, TreeOptionsInterface, TreeItemInterface,
 } from './TreeData';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
@@ -51,7 +53,7 @@ export default defineComponent({
         PI,
         PLottie,
     },
-    props: getTreeProps(),
+    props: treeProps,
     setup(props: TreePropsInterface, { emit }) {
         const state:any = reactive({
             tree: null,
@@ -73,6 +75,14 @@ export default defineComponent({
 
         const onFetch = (node) => {
             state.fetchingNodeId = node.id;
+        };
+
+        const onNodeClick = (node, e) => {
+            if (!props.selectMode) {
+                e.stopPropagation();
+                node.select();
+            }
+            emit('nodeClick', node);
         };
 
         const onTreeRightClick = (e) => {
@@ -99,6 +109,7 @@ export default defineComponent({
         return {
             ...toRefs(state),
             onFetch,
+            onNodeClick,
             onTreeRightClick,
             onNodeRightClick,
             deleteNode,
