@@ -193,10 +193,6 @@ export interface collectorCasual {
     _pluginVersions?: any;
     pluginInfo?: any;
     _pluginInfo?: any;
-    credentialGroup?: any;
-    _credentialGroup?: any;
-    credential?: any;
-    _credential?: any;
     collector?: any;
     _collector?: any;
     repository?: any;
@@ -205,7 +201,7 @@ export interface collectorCasual {
 
 const result: modelType[] = [
     pluginOption, pluginVersions, pluginInfo,
-    credentialGroup, credential, collector, repository,
+    collector, repository,
 ];
 
 export default result;
