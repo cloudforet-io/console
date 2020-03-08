@@ -6,6 +6,7 @@
               @tree:data:fetch="onFetch"
               @node:dragging:start="$emit('dragStart', $event)"
               @node:dragging:finish="$emit('dragFinish', $event)"
+              v-on="$listeners"
         >
             <template #default="{node}">
                 <span class="tree-scope"
@@ -47,7 +48,7 @@ import {
 } from '@vue/composition-api';
 import {
     TreePropsInterface, treeProps, TreeOptionsInterface, TreeItemInterface,
-} from './TreeData';
+} from './ToolSet';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { isNotEmpty } from '@/lib/util';

@@ -26,7 +26,7 @@ import {
 } from '@/components/organisms/tables/toolbox-table/toolset';
 import config from '@/lib/config';
 import { setMockData } from '@/lib/mock';
-import TreeItem, { TreeState } from '@/components/molecules/tree-new/TreeData';
+import TreeItem, { TreeState } from '@/components/molecules/tree-new/ToolSet';
 
 const MockAdapter = require('axios-mock-adapter');
 
