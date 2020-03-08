@@ -13,11 +13,17 @@
                       @click.right.stop.prevent="onNodeRightClick(node)"
                 >
                     <span>
-                        <p-i :name="!node.hasChildren() ? icons.leaf :
-                                 node.expanded() ? icons.expanded : icons.collapsed"
-                             color="transparent inherit"
-                             width="1rem" height="1rem"
-                        />
+                        <slot name="icon"
+                              :node="node"
+                              :hasChildren="node.hasChildren()"
+                              :isExpanded="node.expanded()"
+                        >
+                            <p-i :name="!node.hasChildren() ? icons.leaf :
+                                     node.expanded() ? icons.expanded : icons.collapsed"
+                                 color="transparent inherit"
+                                 width="1rem" height="1rem"
+                            />
+                        </slot>
                         {{ node.text }}
                     </span>
                     <p-lottie v-if="loading && fetchingNodeId === node.id"
@@ -39,7 +45,6 @@
 import {
     reactive, toRefs, defineComponent, computed,
 } from '@vue/composition-api';
-import _ from 'lodash';
 import {
     TreePropsInterface, treeProps, TreeOptionsInterface, TreeItemInterface,
 } from './TreeData';
