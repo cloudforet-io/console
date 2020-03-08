@@ -23,7 +23,7 @@ import _ from 'lodash';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
-import TreeItem, { TreeState } from '@/components/molecules/tree-new/TreeData';
+import TreeItem, { TreeState } from '@/components/molecules/tree-new/ToolSet';
 
 export default {
     name: 'ProjectTemplate',

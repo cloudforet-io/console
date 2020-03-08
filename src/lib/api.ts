@@ -26,6 +26,7 @@ import {
 } from '@/components/organisms/tables/toolbox-table/toolset';
 import config from '@/lib/config';
 import { setMockData } from '@/lib/mock';
+import TreeItem, { TreeState } from '@/components/molecules/tree-new/ToolSet';
 
 const MockAdapter = require('axios-mock-adapter');
 
@@ -302,11 +303,11 @@ export interface HttpInstance {
 export abstract class DynamicAPI {
     public abstract vm:ComponentInstance;
 
-    get $http() { return api.instance };
+    get $http() { return api.instance; }
 
     protected abstract requestData(data?:any):Promise<AxiosResponse<any>>;
 
-    public abstract getData():void;
+    public abstract getData(data?: any):void|any;
 }
 
 
@@ -332,7 +333,30 @@ export class QuerySearchTableACHandler extends baseAutocompleteHandler {
         };
     }
 }
-
+//
+// export class BaseTreeApi extends DynamicAPI {
+//     public treeTS:TreeState
+//
+//     public constructor(initData:any) {
+//         super();
+//         this.treeTS = new TreeState(initData);
+//         this.treeTS.state.options?.fetchData = this.getData;
+//     }
+//
+//
+//     public async getData(data: TreeItem):any {
+//         this.treeTS.state.loading = true;
+//         const response = Promise.resolve({});
+//         try {
+//             response = await this.requestData();
+//         } catch (e) {
+//             console.error(e);
+//         }
+//         this.treeTS.state.loading = false;
+//         return response;
+//     }
+// }
+//
 
 interface BaseApiState{
     url:readonlyArgs<string>;

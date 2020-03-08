@@ -6,6 +6,7 @@
               @tree:data:fetch="onFetch"
               @node:dragging:start="$emit('dragStart', $event)"
               @node:dragging:finish="$emit('dragFinish', $event)"
+              v-on="$listeners"
         >
             <template #default="{node}">
                 <span class="tree-scope"
@@ -13,11 +14,17 @@
                       @click.right.stop.prevent="onNodeRightClick(node)"
                 >
                     <span>
-                        <p-i :name="!node.hasChildren() ? icons.leaf :
-                                 node.expanded() ? icons.expanded : icons.collapsed"
-                             color="transparent inherit"
-                             width="1rem" height="1rem"
-                        />
+                        <slot name="icon"
+                              :node="node"
+                              :hasChildren="node.hasChildren()"
+                              :isExpanded="node.expanded()"
+                        >
+                            <p-i :name="!node.hasChildren() ? icons.leaf :
+                                     node.expanded() ? icons.expanded : icons.collapsed"
+                                 color="transparent inherit"
+                                 width="1rem" height="1rem"
+                            />
+                        </slot>
                         {{ node.text }}
                     </span>
                     <p-lottie v-if="loading && fetchingNodeId === node.id"
@@ -39,10 +46,9 @@
 import {
     reactive, toRefs, defineComponent, computed,
 } from '@vue/composition-api';
-import _ from 'lodash';
 import {
     TreePropsInterface, treeProps, TreeOptionsInterface, TreeItemInterface,
-} from './TreeData';
+} from './ToolSet';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { isNotEmpty } from '@/lib/util';

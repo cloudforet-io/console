@@ -5,7 +5,7 @@ import { action } from '@storybook/addon-actions';
 import _ from 'lodash';
 import { number, select, object } from '@storybook/addon-knobs/vue';
 import PTree from './Tree.vue';
-import TreeItem, { TreeState } from '@/components/molecules/tree-new/TreeData';
+import TreeItem, { TreeState, TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
 
 export default {
     title: 'molecules/tree-new/Tree',
@@ -477,6 +477,67 @@ export const selectMode = () => ({
         };
         return {
             state,
+        };
+    },
+});
+
+export const useToolSet = () => ({
+    components: { PTree },
+    template: `<div>
+        <p-tree
+                ref="treeApi"
+                v-bind="treeTs.state"
+                @node:selected="update"
+                @node:unselected="update"
+        ></p-tree>
+        <br>
+        <hr>
+        <br>
+        <div style="display: flex;">
+            <div>
+                <h4>select node</h4>
+                <pre>{{treeTs.metaState.selectedNode}}</pre>
+            </div>
+            <div>
+                <h4>first select node</h4>
+                <pre>{{treeTs.metaState.firstSelectedNode}}</pre>
+            </div>
+        </div>
+    </div>
+    `,
+    setup(props, context) {
+        const treeTs = new TreeToolSet();
+
+        treeTs.state.data = [
+            { text: 'Item 1' },
+            { text: 'Item 2' },
+            {
+                text: 'Item 3',
+                kids: [
+                    { text: 'Item 3.1' },
+                    {
+                        text: 'Item 3.2',
+                        kids: [
+                            { text: 'Item 3.2.1' },
+                            { text: 'Item 3.2.2' },
+                        ],
+                    },
+                ],
+            },
+        ];
+        treeTs.state.options = {
+            propertyNames: {
+                text: 'text',
+                children: 'kids',
+            },
+        };
+        console.log(treeTs);
+        return {
+            treeTs,
+            treeApi: treeTs.treeApi,
+            update: (event) => {
+                treeTs.getSelectedNode();
+            },
         };
     },
 });
