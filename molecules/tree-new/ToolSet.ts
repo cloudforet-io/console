@@ -1,4 +1,6 @@
-import { reactive } from '@vue/composition-api';
+import {
+    computed, reactive, Ref, ref,
+} from '@vue/composition-api';
 
 type TreeNode = any;
 
@@ -146,3 +148,24 @@ export const treeProps = {
         default: false,
     },
 };
+
+export class TreeToolSet extends TreeState {
+    public metaState = reactive({
+        selectedNode: null,
+        firstSelectedNode: computed(() => {
+            try {
+                return this.metaState.selectedNode[0];
+            } catch (e) {
+                return null;
+            }
+        }),
+    });
+
+    constructor(initData:any = {}, public treeApi:Ref<any> = ref(null)) {
+        super({ ...initData });
+    }
+
+    public getSelectedNode() {
+        this.metaState.selectedNode = this.treeApi.value.$refs.tree.selected();
+    }
+}
