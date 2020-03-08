@@ -84,11 +84,12 @@ export default defineComponent({
         };
 
         const onNodeClick = (node, e) => {
-            if (!props.selectMode) {
+            if (props.selectMode) {
                 e.stopPropagation();
                 node.select();
+            } else {
+                emit('click', e);
             }
-            emit('nodeClick', node);
         };
 
         const onTreeRightClick = (e) => {

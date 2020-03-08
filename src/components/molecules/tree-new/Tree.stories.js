@@ -425,7 +425,7 @@ export const add = () => ({
 export const selectMode = () => ({
     components: { PTreeNew: PTree },
     template: `<div>
-        <p-tree-new v-bind="state"></p-tree-new>
+        <p-tree-new v-bind="state" :selectMode="true"></p-tree-new>
         <br>
         <hr>
         <br>

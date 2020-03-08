@@ -97,7 +97,7 @@ export class TreeState {
         },
         loading: false,
         selectMode: false,
-    }
+    };
 
     constructor(initData:any = {}) {
         this.state = reactive({
