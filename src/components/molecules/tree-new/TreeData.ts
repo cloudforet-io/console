@@ -81,32 +81,34 @@ export interface TreePropsInterface {
     options?: TreeOptionsInterface;
     icons?: TreeIconsType;
     loading?: boolean;
+    selectMode?: boolean;
 }
 
 export class TreeState {
     public state: TreePropsInterface;
 
     static initTreeState: TreePropsInterface = {
-        data: [],
-        options: {},
         icons: {
             leaf: 'ic_tree_project',
             expanded: 'ic_tree_folder--opened',
             collapsed: 'ic_tree_folder',
         },
         loading: false,
+        selectMode: false,
     }
 
-    constructor(initData:object = {}) {
+    constructor(initData:any = {}) {
         this.state = reactive({
             ...TreeState.initTreeState,
+            data: initData.data || [],
+            options: initData.options || {},
             ...initData,
         });
     }
 }
 
 
-export const getTreeProps = () => ({
+export const treeProps = {
     /**
      * tree data for initiation and it's not reactive.
      * @type {Array, Object}
@@ -139,4 +141,8 @@ export const getTreeProps = () => ({
         type: Boolean,
         default: false,
     },
-});
+    selectMode: {
+        type: Boolean,
+        default: false,
+    },
+};

@@ -1,18 +1,39 @@
-/* eslint-disable no-restricted-syntax */
+/* eslint-disable import/no-cycle */
+import Casual from 'casual-browserify';
 import originCasual from '@/lib/casual';
+import serverModels, { serverCasual } from '@/lib/mock/casual/server';
+import memberModels, { memberCasual } from '@/lib/mock/casual/member';
+import collectorModels, { collectorCasual } from '@/lib/mock/casual/collector';
+import credentialModels, { credentialsCasual } from '@/lib/mock/casual/credentials';
+import repositoryModels, { repositoryCasual } from '@/lib/mock/casual/repository';
+import pluginModels, { pluginCasual } from '@/lib/mock/casual/plugin';
 
-import serverModels from '@/lib/mock/casual/server';
-import memberModels from '@/lib/mock/casual/member';
+type originCasualType = Casual.Generators & Casual.Casual;
+type casualType = originCasualType &
+    collectorCasual & serverCasual &
+    memberCasual & credentialsCasual &
+    repositoryCasual & pluginCasual;
 
-const models = [serverModels, memberModels];
+export type modelType = (casual: casualType) => casualType;
 
-const getModels = (origin) => {
+
+/* DO NOT CHANGE the order of models */
+const models: modelType[][] = [
+    serverModels,
+    memberModels,
+    collectorModels,
+    credentialModels,
+    repositoryModels,
+    pluginModels,
+];
+
+const getModels = (origin: originCasualType): casualType => {
     let casual = origin;
-    for (const model of models) {
-        for (const func of model) {
+    models.forEach((model) => {
+        model.forEach((func) => {
             casual = func(casual);
-        }
-    }
+        });
+    });
     return casual;
 };
 

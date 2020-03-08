@@ -82,16 +82,16 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-    .icon-button{
+    .icon-button {
         border-radius: 2px;
         padding: 0px;
         display: inline-flex;
         justify-content: center;
         align-content: center;
-        min-width: 32px;
-        max-width: 32px;
-        min-height: 32px;
-        max-height: 32px;
+        min-width: 2rem;
+        max-width: 2rem;
+        min-height: 2rem;
+        max-height: 2rem;
         color: $gray1;
         &:hover {
             color: $white;
@@ -102,29 +102,25 @@ export default defineComponent({
                 color: inherit;
             }
         }
-        &.white{
+        &.white {
             background-color: $white;
             border-color: $gray2;
             &:hover {
                 color: $gray2;
             }
         }
-        &.dark{
+        &.dark {
             background-color: $dark;
         }
-        &:not(:disabled):not(.disabled):hover{
+        &:not(:disabled):not(.disabled):hover {
             background-color: $secondary;
             border-color: $secondary;
         }
-        &.transparent{
-            &.disabled{
+        &.transparent {
+            &.disabled {
                 border-color: transparent;
                 background-color: transparent;
             }
         }
     }
-    .p-i-icon{
-        margin: auto;
-    }
-
 </style>

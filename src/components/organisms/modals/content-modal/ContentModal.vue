@@ -1,27 +1,28 @@
 <template>
     <p-modal ref="modal"
              :fade="fade"
-             :scrollable="scrollable"
              :size="size"
              :centered="centered"
              :backdrop="backdrop"
              :visible.sync="proxyVisible"
              :class="[`modal-${themeColor}`]"
     >
-        <div v-if="headerVisible" class="modal-header" :class="headerClass">
-            <slot name="header" />
-        </div>
-        <div v-if="bodyVisible" class="modal-body" :class="bodyClass">
-            <slot name="body" />
-        </div>
-        <div v-if="footerVisible" class="modal-footer" :class="footerClass">
-            <slot name="footer" />
+        <div class="modal-content">
+            <div v-if="headerVisible" class="modal-header" :class="headerClass">
+                <slot name="header" />
+            </div>
+            <div v-if="bodyVisible" class="modal-body" :class="allBodyClass">
+                <slot name="body" />
+            </div>
+            <div v-if="footerVisible" class="modal-footer" :class="footerClass">
+                <slot name="footer" />
+            </div>
         </div>
     </p-modal>
 </template>
 
 <script>
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, computed } from '@vue/composition-api';
 import PModal, { propsMixin } from '@/components/molecules/modals/Modal.vue';
 import { makeProxy } from '@/lib/compostion-util';
 
@@ -29,6 +30,12 @@ export const setup = (props, context) => {
     const state = reactive({
         proxyVisible: makeProxy('visible', props, context.emit),
         modal: null,
+        allBodyClass: computed(() => {
+            const res = props.bodyClass ? [...props.bodyClass] : [];
+            if (props.size) res.push(props.size);
+            if (props.scrollable) res.push('scrollable');
+            return res;
+        }),
     });
     return {
         ...toRefs(state),
@@ -80,25 +87,53 @@ export default {
             type: Boolean,
             default: true,
         },
+        scrollable: {
+            type: Boolean,
+            default: true,
+        },
     },
 
 };
 </script>
 
 <style lang="scss" scoped>/* b-modal */
-.modal-dialog {
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    border-radius: 2px;
+    background: $white;
+    box-shadow: 0 0 1rem rgba($gray3, .22);
+    border: 1px solid $gray3;
+    transition: all .3s ease;
+    justify-content: space-between;
+
+    $header-height: 3.5rem;
+    $footer-height: 5.5rem;
+    $wrapper-margin: 4rem;
+    $body-max-height: calc(100vh - #{$header-height} - #{$footer-height} - #{$wrapper-margin});
+
     .modal-header {
-        padding: 1rem 1.5rem 1rem 1.5rem;
-        font:  22px Arial;
+        height: $header-height;
+        padding: .875rem 1.5rem;
+        font-size: 1.375rem;
     }
-    .modal-body{
-        padding: 2rem 1.5rem 1.5rem 1.5rem;
+    .modal-body {
+        flex-grow: 1;
+        padding:  2rem 1.5rem;
+        max-height: $body-max-height;
+        &.scrollable {
+            overflow: auto;
+        }
     }
-    .modal-footer{
+    .modal-footer {
+        height: $footer-height;
         padding: 1.5rem;
         border: none;
     }
 }
+
 
 @mixin modal-color($color) {
     .modal-header {
