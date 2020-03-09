@@ -23,8 +23,8 @@ module.exports = {
                 plugins: () => [
                     require('tailwindcss'),
                     require('autoprefixer'),
-                    require('postcss-mixins'),
                     require('postcss-simple-vars'),
+                    require('postcss-mixins'),
                     require('postcss-easy-import')({
                         path: ['src', 'node_modules'],
                     }),

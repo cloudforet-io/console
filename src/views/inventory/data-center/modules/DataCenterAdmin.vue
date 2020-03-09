@@ -281,11 +281,7 @@ export default {
     .p-label {
         margin-bottom:5px;
         margin-right: 0.5rem;
-        color:$dark;
-    }
-    .base-table {
-        box-shadow: 0px 0 10px 0px rgba($black, 0.1);
-  border-radius: 7px;
+        color:$gray;
     }
     .btn-margin{
         margin-left: 1rem;
