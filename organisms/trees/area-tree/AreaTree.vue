@@ -304,13 +304,13 @@ export default {
     .contextmenu {
         position: absolute;
         background-color: $secondary2;
-        color: $lightgray;
+        color: $gray;
         cursor: pointer;
         z-index: 99999;
     }
 
     .panel {
-        padding: 20px $side-pad $bottom-pad $side-pad;
+        padding: 20px;
     }
     .empty {
         text-align: center;
