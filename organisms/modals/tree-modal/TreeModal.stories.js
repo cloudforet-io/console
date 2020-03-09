@@ -1,13 +1,10 @@
 import { action } from '@storybook/addon-actions';
-import { boolean } from '@storybook/addon-knobs';
 import {
     toRefs, reactive, ref, computed, Ref,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTreeModal from './TreeModal.vue';
-import { sizeMapping } from '@/components/molecules/modals/ModalMapping';
-import TreeItem, { TreeState } from '@/components/molecules/tree-new/TreeData';
-import PTree from "@/components/molecules/tree-new/Tree";
+import TreeItem, { TreeState } from '@/components/molecules/tree-new/ToolSet';
 
 export default {
     title: 'organisms/modals/tree-modal',
@@ -175,3 +172,4 @@ export const asyncData = () => ({
         };
     },
 });
+
