@@ -91,8 +91,8 @@ export default {
 @include badge-color('secondary1', $secondary1,$white);
 @include badge-color('secondary2', $secondary2,$white);
 
-@include badge-color('alert', $danger, $white);
-@include badge-color('safe', $success, $white);
+@include badge-color('alert', $alert, $white);
+@include badge-color('safe', $safe, $white);
 @include badge-color('dark', $dark, $white);
 
 @include badge-color('gray', $gray, $white);

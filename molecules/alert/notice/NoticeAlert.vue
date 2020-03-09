@@ -81,7 +81,7 @@ export default {
 
         &.alert {
             border-radius: 2px;
-            background: #FFFFFF 0% 0% no-repeat padding-box;
+            background: $white 0% 0% no-repeat padding-box;
             box-shadow: 0px 0px 8px #4D49B629;
             border: 1px solid $alert !important;
             opacity: 1;

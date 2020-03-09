@@ -106,8 +106,8 @@ export default {
     @include btn-color('secondary1', $secondary1,$white);
     @include btn-color('secondary2', $secondary2,$white);
 
-    @include btn-color('alert', $danger, $white);
-    @include btn-color('safe', $success, $white);
+    @include btn-color('alert', $alert, $white);
+    @include btn-color('safe', $safe, $white);
     @include btn-color('dark', $dark, $white);
 
     @include btn-color('gray', $gray, $white);

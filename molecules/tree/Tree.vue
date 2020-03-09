@@ -263,7 +263,7 @@ export default {
                     border-radius: 2px;
                     cursor: pointer;
                     margin: 5px 0;
-                    color: darken($dark, 20%);
+                    color: $gray;
                     &:hover {
                         color: $black;
                         font-weight: 500;

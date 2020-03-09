@@ -245,7 +245,7 @@ export default defineComponent({
         align-items: flex-start;
         justify-content: center;
         &.line {
-            border-left: 1px solid $gray;
+            border-left: 1px solid $gray1;
             background-color: transparent;
             &:hover {
                 border-left: 1px solid $secondary;
