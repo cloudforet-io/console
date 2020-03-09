@@ -77,7 +77,7 @@ export default {
     }
 }
 
-.btn{
+.btn {
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -92,7 +92,7 @@ export default {
     font-weight: 400;
     font-size: .875rem;
     line-height: 1rem;
-    border-width: 1px;
+    border: 1px solid transparent;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
     @include btn-color('primary', $primary, $white);
@@ -130,7 +130,7 @@ export default {
     }
 }
 
-.btn-lg{
+.btn-lg {
     min-width:7.5rem;
     height: 2.5rem;
     text-align: center;
@@ -138,7 +138,7 @@ export default {
     line-height: 1.125rem;
     -webkit-appearance:none;
 }
-.btn-sm{
+.btn-sm {
     min-width:3.25rem;
     height: 1.5rem;
     text-align: center;
