@@ -42,7 +42,6 @@
                                                 v-model="singleState.input"
                                                 :placeholder="doubleConfirmPlaceHolder"
                                                 :class="{
-                                                    'form-control':true,
                                                     'is-invalid':invalid
                                                 }"
                                             />

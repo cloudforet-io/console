@@ -67,6 +67,8 @@ export default {
 };
 </script>
 <style lang="scss">
+    @import '~@/styles/vendors/notice';
+
     .vue-notification-group{
         width: 24rem !important;
     }

@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import PTabBar, { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar';
+import PTabBar, { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar.vue';
 import { makeProxy } from '@/lib/compostion-util';
 
 
