@@ -263,7 +263,7 @@ export default {
                     border-radius: 2px;
                     cursor: pointer;
                     margin: 5px 0;
-                    color: darken($darkgray, 20%);
+                    color: darken($dark, 20%);
                     &:hover {
                         color: $black;
                         font-weight: 500;
@@ -319,10 +319,11 @@ export default {
 
 <style lang="scss" scoped>
 
-    $main-height: calc(100vh - #{$header-height} - 30px);
+    $main-height: calc(100vh - #{lnb-height});
 
     .main-tree-col {
-        @extend %sheet;
+        box-shadow: 0px 0 10px 0px rgba($black, 0.1);
+  border-radius: 7px;
         border-radius: 0;
         padding: 15px 8px;
         background-color: $primary4;
