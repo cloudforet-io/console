@@ -30,7 +30,6 @@
                                                     v-focus
                                                     placeholder="Credentials Name"
                                                     :class="{
-                                                        'form-control':true,
                                                         'is-invalid':invalid
                                                     }"
                                                 />

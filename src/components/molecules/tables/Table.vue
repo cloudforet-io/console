@@ -26,6 +26,9 @@
 import {computed, defineComponent, getCurrentInstance, reactive, Ref} from '@vue/composition-api';
 import {tableProps, TablePropsType} from './toolset';
 
+/**
+ * TODO: Add custom width of each field
+ */
 export default defineComponent( {
     name: 'PTable',
     props: tableProps,
@@ -171,7 +174,6 @@ export default defineComponent( {
                 @extend %row;
                 td{
                     height: 2.5rem;
-                    max-width: 200px;
                     padding: 0 .75rem;
                     z-index: 0;
                     white-space: nowrap;

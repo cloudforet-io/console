@@ -25,7 +25,6 @@
                                             v-focus
                                             label="name"
                                             :class="{
-                                                'form-control':true,
                                                 'is-invalid':invalid
                                             }"
 

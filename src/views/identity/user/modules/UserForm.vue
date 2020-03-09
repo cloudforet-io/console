@@ -29,7 +29,6 @@
                                             :disabled="updateMode"
                                             placeholder="Insert User ID here"
                                             :class="{
-                                                'form-control':true,
                                                 'is-invalid':invalid
                                             }"
                                         />
@@ -60,7 +59,6 @@
                                     v-model="formState.password1"
                                     type="password"
                                     :class="{
-                                        'form-control':true,
                                         'is-invalid':invalid
                                     }"
                                 />
@@ -79,7 +77,6 @@
                                     v-model="formState.password2"
                                     type="password"
                                     :class="{
-                                        'form-control':true,
                                         'is-invalid':invalid
                                     }"
                                 />

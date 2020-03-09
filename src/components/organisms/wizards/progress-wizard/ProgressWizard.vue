@@ -52,15 +52,13 @@
         </template>
 
         <slot name="bottom">
-            <p-row>
-                <p-col>
-                    <p-button outline style-type="dark" size="lg"
-                              class="txt-btn" @click="$emit('cancel', $event)"
-                    >
-                        {{ $t('BTN.CANCEL') }}
-                    </p-button>
-                </p-col>
-                <p-col :flex-grow="0" class="nav-btn-box">
+            <div class="bottom">
+                <p-button outline style-type="dark" size="lg"
+                          class="txt-btn" @click="$emit('cancel', $event)"
+                >
+                    {{ $t('BTN.CANCEL') }}
+                </p-button>
+                <div class="nav-btn-box">
                     <p-button v-if="!isFirstTab"
                               outline style-type="secondary" size="lg"
                               @click="onClickPrev"
@@ -81,8 +79,8 @@
                     >
                         {{ $t('BTN.CONFIRM') }}
                     </p-button>
-                </p-col>
-            </p-row>
+                </div>
+            </div>
         </slot>
     </p-pane-layout>
 </template>
@@ -98,8 +96,6 @@ import PProgressTabBar from '@/components/molecules/tabs/progress-tab-bar/Progre
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
-import PCol from '@/components/atoms/grid/col/Col.vue';
 
 
 const setPagination = (props, state, emit) => {
@@ -144,8 +140,6 @@ export default {
         PPanelTop,
         PI,
         PButton,
-        PRow,
-        PCol,
     },
     props: {
         tabs: Array,
@@ -223,9 +217,16 @@ export default {
         flex-grow: 1;
         justify-content: flex-end;
     }
-    .nav-btn-box {
-        .btn {
-            margin-left: 1.5rem;
+    .bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .nav-btn-box {
+            display: inline-flex;
+            align-items: center;
+            .btn {
+                margin-left: 1.5rem;
+            }
         }
     }
 }
