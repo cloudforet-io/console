@@ -164,6 +164,10 @@ export default defineComponent({
             }
         }
         .tree-arrow {
+            /**
+             * This is for override liquor tree's css.
+             * DO NOT CHANGE belows from px to rem system.
+             */
             height: 16px;
             margin-left: 24px;
             &.has-child {
