@@ -1,39 +1,81 @@
 const { colors } = require('tailwindcss/defaultTheme');
 
+const customColors = {
+    black: '#000000',
+    white: '#FFFFFF',
+    gray: {
+        100: '#F2F2F2',
+        200: '#DCDDE2',
+        300: '#BBBCC4',
+        400: '#A7A9B2',
+        500: '#858895',
+        600: '#6B6E7B',
+        700: '#5F616D',
+        800: '#474952',
+        900: '#222532',
+    },
+    red: {
+        100: '#FFE8E8',
+        200: '#FFC4C4',
+        300: '#FF8F8F',
+        400: '#FF6A6A',
+        500: '#EF3817',
+        600: '#CC2C00',
+        700: '#C53030',
+        800: '#9B2C2C',
+        900: '#742A2A',
+    },
+    coral: {
+        500: '#FF7750',
+    },
+    yellow: {
+        500: '#FFCE02',
+    },
+    green: {
+        400: '#C2E01E',
+        500: '#60B731',
+        600: '#3F7B1A',
+    },
+    blue: {
+        100: '#F5F9FD',
+        400: '#43BEFF',
+        500: '#0080FB',
+    },
+    violet: {
+        100: '#F8F8FC',
+        200: '#EBEAF6',
+        300: '#A8A5CE',
+        400: '#8C81D1',
+        500: '#6638B6',
+        800: '#3C2C84',
+    },
+};
+
 module.exports = {
     theme: {
         colors: {
-            black: '#000000',
-            white: '#FFFFFF',
-            primary: {
-                default: '#6638B6',
-                dark: '#3C2C84',
-            },
-            primary1: '#8185D1',
-            primary2: '#A5ACCE',
-            primary3: '#EBEAF6',
-            primary4: '#F8F8FC',
-
-            secondary: '#0080FB',
-            secondary1: '#43BEFF',
-            secondary2: '#F5F9FD',
-
-            dark: '#222532',
-            gray: {
-                ...colors.gray,
-                default: '#858895',
-            },
-            gray1: '#A7A9B2',
-            gray2: '#DCDDE2',
-            gray3: '#F2F2F2',
-
-            alert: '#EF3817',
-            safe: '#60B731',
-
-            other1: '#FF7750',
-            other2: '#FFCE02',
-            other3: '#C2E01E',
-            other4: '#3F7B1A',
+            primary: customColors.violet[500],
+            'primary-dark': customColors.violet[800],
+            primary1: customColors.violet[400],
+            primary2: customColors.violet[300],
+            primary3: customColors.violet[200],
+            primary4: customColors.violet[100],
+            secondary: customColors.blue[500],
+            secondary1: customColors.blue[400],
+            secondary2: customColors.blue[100],
+            alert: customColors.red[500],
+            safe: customColors.green[500],
+            dark: customColors.gray[900],
+            gray: customColors.gray[500],
+            gray1: customColors.gray[400],
+            gray2: customColors.gray[200],
+            gray3: customColors.gray[100],
+            other1: customColors.coral[500],
+            other2: customColors.yellow[500],
+            other3: customColors.green[400],
+            other4: customColors.green[600],
+            black: customColors.black,
+            white: customColors.white,
         },
         maxHeight: {
             0: '0',
