@@ -8,9 +8,8 @@ import {
 } from '@vue/composition-api';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 // @ts-ignore
-// eslint-disable-next-line import/extensions
-import { ComponentInstance } from '@vue/composition-api/dist/component';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { Vue } from 'vue/types/vue';
 // eslint-disable-next-line import/no-cycle
 import {
     baseAutocompleteHandler,
@@ -301,8 +300,9 @@ export interface HttpInstance {
 
 
 export abstract class DynamicAPI {
-    public abstract vm:ComponentInstance;
+    public abstract vm:Vue;
 
+    // eslint-disable-next-line class-methods-use-this
     get $http() { return api.instance; }
 
     protected abstract requestData(data?:any):Promise<AxiosResponse<any>>;
@@ -365,10 +365,13 @@ interface BaseApiState{
     fixSearchQuery:SearchQueryType[];
 }
 
-export abstract class BaseTableAPI extends DynamicAPI {
-    public tableTS:ToolboxTableToolSet;
+export abstract class BaseTableAPI<
+        initData=any, initSyncData=any,
+        T extends ToolboxTableToolSet<initData, initSyncData> = ToolboxTableToolSet<initData, initSyncData>
+    > extends DynamicAPI {
+    public tableTS: T;
 
-    public vm:ComponentInstance ;
+    public vm:Vue ;
 
     public apiState:UnwrapRef<BaseApiState>
 
@@ -383,7 +386,7 @@ export abstract class BaseTableAPI extends DynamicAPI {
             fixSearchQuery, // default fix query
             extraParams, // for api extra parameters
         });
-        this.tableTS = new ToolboxTableToolSet();
+        this.tableTS = new ToolboxTableToolSet<initData, initSyncData>() as T;
     }
 
     protected abstract paramQuery:Ref<ApiQuery>;
@@ -427,18 +430,19 @@ export abstract class BaseTableAPI extends DynamicAPI {
     }
 }
 
-export class SearchTableAPI extends BaseTableAPI {
-    public tableTS:SearchTableToolSet;
-
+export class SearchTableAPI<
+        initData=any, initSyncData=any,
+        T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>
+    > extends BaseTableAPI<initData, initSyncData, T> {
     public constructor(
         url:readonlyRefArg<string>,
         only:readonlyRefArg<string[]> = [],
         extraParams:readonlyRefArg<any> = {},
         fixSearchQuery : SearchQueryType[] = [],
-        initData:object = {}, initSyncData:object = {},
+        initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{},
     ) {
         super(url, only, extraParams, fixSearchQuery);
-        this.tableTS = new SearchTableToolSet(initData, initSyncData);
+        this.tableTS = new SearchTableToolSet(initData, initSyncData) as T;
     }
 
     protected paramQuery = computed(() => defaultQuery(
@@ -462,14 +466,14 @@ interface DataSource {
 }
 
 
-export class TabSearchTableAPI extends SearchTableAPI {
+export class TabSearchTableAPI<initData=any, initSyncData=any> extends SearchTableAPI<initData, initSyncData> {
     protected isShow: forceRefArg<boolean>;
 
     public constructor(
         url:readonlyRefArg<string>,
         extraParams:forceRefArg<any>,
         fixSearchQuery : SearchQueryType[] = [],
-        initData:object = {}, initSyncData:object = {},
+        initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{},
         public dataSource:DataSource[] = [],
         isShow : forceRefArg<boolean>,
     ) {
@@ -512,13 +516,12 @@ const defaultAdminDataSource = [
     { name: 'Name', key: 'user_info.name' },
     { name: 'Email', key: 'user_info.email' },
 ];
-export class AdminTableAPI extends TabSearchTableAPI {
+export class AdminTableAPI<initData, initSyncData> extends TabSearchTableAPI<initData, initSyncData> {
     public constructor(
         url:readonlyRefArg<string>,
         extraParams:forceRefArg<any>,
         fixSearchQuery : SearchQueryType[] = [],
-        initData:object = {},
-        initSyncData:object = {},
+        initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{},
         public dataSource:DataSource[] = defaultAdminDataSource,
         isShow : forceRefArg<boolean>,
     ) {
@@ -529,15 +532,14 @@ export class AdminTableAPI extends TabSearchTableAPI {
 export const MockAdminTableAPI = () => new AdminTableAPI('', computed(() => ({})), [], undefined, undefined, [], computed(() => false));
 
 
-export class SubDataAPI extends SearchTableAPI {
+export class SubDataAPI<initData=any, initSyncData=any> extends SearchTableAPI<initData, initSyncData> {
     // @ts-ignore
     public constructor(
         url:readonlyRefArg<string>,
         idKey:string,
         private keyPath:readonlyRefArg<string>,
         private id:readonlyRefArg<string>,
-        initData:object = {},
-        initSyncData:object = {},
+        initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{},
     ) {
         super(url, undefined, undefined, undefined, initData, initSyncData);
         this.apiState.extraParams = computed(() => ({
@@ -561,14 +563,13 @@ const defaultHistoryDataSource = [
 
 ];
 
-export class HistoryAPI extends TabSearchTableAPI {
+export class HistoryAPI<initData=any, initSyncData=any> extends TabSearchTableAPI<initData, initSyncData> {
     // @ts-ignore
     public constructor(
         url:readonlyRefArg<string>,
         idKey:string,
         private id:readonlyRefArg<string>,
-        initData:object = {},
-        initSyncData:object = {},
+        initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{},
         public dataSource:DataSource[] = defaultHistoryDataSource,
         isShow : forceRefArg<boolean>,
     ) {
@@ -594,16 +595,17 @@ export const defaultACHandler:ACHandlerMeta = {
     },
 };
 
-export class QuerySearchTableAPI extends BaseTableAPI {
-    public tableTS:QuerySearchTableToolSet;
-
+export class QuerySearchTableAPI<
+        initData=any, initSyncData=any,
+        T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>
+    > extends BaseTableAPI<initData, initSyncData, T> {
     public constructor(
         url:string, only?:string[], extraParams?:object, fixSearchQuery : SearchQueryType[] = [],
-        initData:object = {}, initSyncData:object = {},
+        initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{},
         acHandlerMeta:ACHandlerMeta = defaultACHandler,
     ) {
         super(url, only, extraParams, fixSearchQuery);
-        this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData);
+        this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
         watch(this.tableTS.querySearch.tags, (tags, preTags) => {
             if (tags !== preTags) {
                 this.getData();

@@ -196,8 +196,8 @@ import { SearchQuery } from '@/components/organisms/search/query-search-bar/auto
 
 export const cloudServiceSetup = (
     context,
-    apiHandler:QuerySearchTableAPI,
-    dvApiHandler:QuerySearchTableAPI,
+    apiHandler:QuerySearchTableAPI<any, any>,
+    dvApiHandler:QuerySearchTableAPI<any, any>,
 ) => {
     const state = reactive({
         cstFields: makeTrItems([

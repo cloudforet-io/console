@@ -10,7 +10,7 @@
 
 <script>
 import { computed } from '@vue/composition-api';
-import { sizeMapping } from './ModalMapping';
+import { sizeMapping } from './toolset';
 
 const setup = (props, { emit }) => {
     const dialogClassObject = computed(() => [

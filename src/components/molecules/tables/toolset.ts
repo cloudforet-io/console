@@ -1,4 +1,5 @@
 import { reactive } from '@vue/composition-api';
+import { optionalType, StateToolSet } from '@/lib/toolset';
 
 
 const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
@@ -92,23 +93,29 @@ export interface TablePropsType {
     tbodyClass?: object;
     tfootClass?: object;
 }
+@StateToolSet<TablePropsType>()
+export class TableState< initData, initSate extends TablePropsType=TablePropsType> {
+    public state:optionalType<initSate, initData>;
 
-export class TableState {
-    public state:TablePropsType;
+    static initState() {
+        return {
+            striped: true,
+            bord: null,
+            hover: true,
+            small: false,
+            background: false,
+            responsive: false,
+        };
+    }
 
-    static initTableState:TablePropsType ={
-        striped: true,
-        bord: null,
-        hover: true,
-        small: false,
-        background: false,
-        responsive: false,
-    };
-
-    constructor(initData:object = {}) {
-        this.state = reactive({
-            ...TableState.initTableState,
-            ...initData,
-        });
+    constructor(initData:initData = {} as initData, lazy = false) {
+        if (lazy) {
+            this.state = null as unknown as initSate;
+        } else {
+            this.state = reactive({
+                ...TableState.initState(),
+                ...initData,
+            }) as optionalType<initSate, initData>;
+        }
     }
 }
