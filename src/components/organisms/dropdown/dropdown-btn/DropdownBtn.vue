@@ -87,7 +87,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .dropdown-btn-container {
     display: inline-flex;
     &.block {
@@ -95,20 +95,15 @@ export default defineComponent({
     }
 }
 .dropdown-btn{
-    background-color: $white;
+    @apply bg-white border-gray2;
     border-bottom-width: 1px;
     border-style: solid;
-    border-color: $gray2;
     min-width: 2rem;
     &.disabled{
-        border-color: $gray2;
-        background-color: $gray2;
-        color: $gray1;
+        @apply border-gray2 bg-gray2 text-gray1;
     }
     &:not(:disabled):not(.disabled):hover{
-        background-color: $white;
-        border-color: $secondary;
-        color: $secondary;
+        @apply border-secondary bg-white text-secondary;
     }
 }
 .dropdown-toggle-split{
@@ -117,6 +112,7 @@ export default defineComponent({
     border-radius: 0px 2px 2px 0px;
 }
 .menu-btn{
+    @apply text-dark;
     min-width: 6.5rem;
     width: auto;
     padding-left: 1rem;
@@ -125,15 +121,14 @@ export default defineComponent({
     text-align: left;
     justify-content: flex-start;
     margin-right: -4px;
-    color: $dark;
     &.block {
         width: 100%;
     }
 }
 
 .dropdown-mouseover, .dropdown-opened{
-    border-color: $secondary !important;
-    color: $secondary !important;
+    border-color: theme('colors.secondary') !important;
+    color: theme('colors.secondary') !important;
 }
 
 

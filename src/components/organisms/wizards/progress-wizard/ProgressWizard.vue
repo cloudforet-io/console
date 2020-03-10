@@ -181,7 +181,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .p-progress-wizard {
     padding: 1.5rem 1rem 1rem 1rem;
     .title {
@@ -203,7 +203,7 @@ export default {
             margin-right: .5rem;
         }
         &.warning {
-            color: $other1;
+            @apply text-other1;
         }
     }
     .txt-btn {

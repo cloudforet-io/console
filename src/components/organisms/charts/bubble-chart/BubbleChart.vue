@@ -230,14 +230,14 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .bubble-chart-container {
         display: flex;
         width: 100%;
         .p-chart {
             overflow: hidden;
             .map-path {
-                fill: $primary3;
+                fill: theme('colors.primary3');
             }
         }
         &.left {

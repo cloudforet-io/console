@@ -192,7 +192,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-donut-chart {
         height: 100%;
         display: flex;
@@ -214,7 +214,7 @@ export default {
             }
         }
         .empty-text {
-            fill: $primary2;
+            fill: theme('colors.primary2');
         }
     }
 </style>

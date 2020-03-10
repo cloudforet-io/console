@@ -41,7 +41,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .info-panel-basic {
         min-height: 100px;
     }

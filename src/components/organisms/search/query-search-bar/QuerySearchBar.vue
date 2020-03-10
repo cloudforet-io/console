@@ -173,7 +173,7 @@ export default defineComponent({
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-query-search-bar{
         width: 100%;
         position: relative;

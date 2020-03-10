@@ -172,32 +172,32 @@ export default {
         .container {
             fill: transparent;
             &.hover {
-                fill: $primary3;
+                fill: theme('colors.primary3');
             }
         }
         .key-label {
-            fill: $dark;
+            fill: theme('colors.dark');
             font-size: 12px;
         }
         .value-label {
-            fill: $dark;
+            fill: theme('colors.dark');
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
         }
         .bar {
-            fill: $primary1;
+            fill: theme('colors.primary1');
         }
         .back-bar {
-            fill: $primary3;
+            fill: theme('colors.primary3');
         }
         &.hover {
             cursor: pointer;
             .key-label {
-                fill: $primary-dark;
+                fill: theme('colors.primary-dark');
             }
             .bar {
-                fill: $primary-dark;
+                fill: theme('colors.primary-dark');
             }
         }
     }

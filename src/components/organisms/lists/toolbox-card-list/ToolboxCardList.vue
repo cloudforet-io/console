@@ -149,7 +149,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .card-list-container {
     display: flex;
     flex-direction: column;
@@ -184,8 +184,5 @@ export default {
 .bottom {
     margin-top: 1rem;
     text-align: center;
-    .bottom-page {
-
-    }
 }
 </style>

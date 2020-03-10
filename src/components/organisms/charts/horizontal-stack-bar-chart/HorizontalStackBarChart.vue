@@ -187,7 +187,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .hs-chart-container {
         width: 100%;
         .bar {
@@ -195,11 +195,11 @@ export default {
         }
         .percent-label {
             font-size: .875rem;
-            fill: $white;
+            fill: theme('colors.white');
         }
         .empty {
             font-size: 1rem;
-            fill: $primary2;
+            fill: theme('colors.primary2');
             font-weight: 100;
         }
         .legend-container {
