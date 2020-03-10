@@ -118,6 +118,7 @@
     "https-proxy-agent": "^2.2.4",
     "node-sass": "^4.13.1",
     "postcss-loader": "^3.0.0",
+    "postcss-nested": "^4.2.1",
     "postcss-preset-env": "^6.7.0",
     "resolve-url-loader": "^3.1.0",
     "sass-loader": "^7.3.1",
