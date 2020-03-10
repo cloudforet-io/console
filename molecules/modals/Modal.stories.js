@@ -3,7 +3,7 @@ import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import PModal from './Modal.vue';
-import { sizeMapping } from './ModalMapping';
+import { sizeMapping } from './toolset';
 
 export default {
     title: 'molecules/modals',
