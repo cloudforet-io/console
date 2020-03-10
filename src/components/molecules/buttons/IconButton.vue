@@ -81,7 +81,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .icon-button {
         border-radius: 2px;
         padding: 0px;
@@ -92,29 +92,27 @@ export default defineComponent({
         max-width: 2rem;
         min-height: 2rem;
         max-height: 2rem;
-        color: $gray1;
+        @apply text-gray1;
         &:hover {
-            color: $white;
+            @apply text-white;
         }
         &.disabled{
-            background-color: $gray2;
+            @apply bg-gray2;
             &:hover {
                 color: inherit;
             }
         }
         &.white {
-            background-color: $white;
-            border-color: $gray2;
+            @apply bg-white border-gray2;
             &:hover {
-                color: $gray2;
+                @apply text-gray2;
             }
         }
         &.dark {
-            background-color: $dark;
+            @Qapply bg-dark;
         }
         &:not(:disabled):not(.disabled):hover {
-            background-color: $secondary;
-            border-color: $secondary;
+            @apply bg-secondary border-secondary;
         }
         &.transparent {
             &.disabled {

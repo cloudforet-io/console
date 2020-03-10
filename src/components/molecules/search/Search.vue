@@ -81,22 +81,20 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-search {
+        @apply border border-gray2 bg-white;
         position: relative;
         display: inline-flex;
         flex-wrap: nowrap;
         width: 100%;
         height: 2rem;
-        border: 1px solid $gray2;
         border-radius: 2px;
-        background-color: $white;
         &.hovered {
-            border-color: $dark;
+            @apply border-dark;
         }
         &.focused {
-            color: $dark;
-            border-color: $dark;
+            @apply text-dark border-dark;
         }
         .p-search-input {
             width: 100%;

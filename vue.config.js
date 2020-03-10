@@ -1,5 +1,6 @@
 const path = require('path');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+// const StyleLintPlugin = require('stylelint-webpack-plugin');
 const postcssConfig = require('./postcss.config');
 
 module.exports = {
@@ -34,6 +35,9 @@ module.exports = {
             new MonacoWebpackPlugin({
                 languages: ['json', 'html', 'python', 'javascript', 'css'],
             }),
+            // new StyleLintPlugin({
+            //     files: ['src/**/*.{vue}'],
+            // }),
         ],
     },
 

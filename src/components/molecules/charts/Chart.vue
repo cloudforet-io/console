@@ -238,7 +238,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss">
     .p-chart-container {
         position: relative;
         width: 100%;
@@ -254,7 +254,7 @@ export default {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: rgba($white, .5);
+            background: rgba(theme('colors.white'), .5);
             .spinner {
                 position: absolute;
                 display: inline-flex;
@@ -290,9 +290,9 @@ export default {
             border-radius: 50%;
         }
         .text {
+            @apply text-white;
             padding-left: 4px;
             font-size: 14px;
-            color: $white;
         }
     }
 

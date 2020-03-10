@@ -122,20 +122,20 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-    @mixin tree-arrow($url) {
+<style lang="postcss">
+    @define-mixin tree-arrow $url {
         border: 0;
         width: 1rem;
         height: 1rem;
         left: 0;
-        background: $gray;
+        background: theme('colors.gray');
         background-repeat: no-repeat;
         transition: background-image .25s;
         transform: rotate(0deg) translateY(-50%) translateX(0);
-        mask-image: url(#{$url});
+        mask-image: url($(url));
     }
 
-    @mixin tree-selected($bg-color, $color) {
+    @define-mixin tree-selected $bg-color, $color {
         background: $bg-color;
 
         .tree-arrow.has-child {
@@ -160,7 +160,7 @@ export default defineComponent({
             font-size: .875rem;
             border-radius: 2px;
             .tree-anchor {
-                color: $gray;
+                @apply text-gray;
             }
         }
         .tree-arrow {
@@ -174,10 +174,10 @@ export default defineComponent({
                 margin-left: 8px;
                 width: 16px;
                 &:after {
-                    @include tree-arrow("~@/assets/icons/ic_tree_arrow.svg");
+                    @mixin tree-arrow "~@/assets/icons/ic_tree_arrow.svg";
                 }
                 &.expanded:after {
-                    @include tree-arrow("~@/assets/icons/ic_tree_arrow--opened.svg");
+                    @mixin tree-arrow "~@/assets/icons/ic_tree_arrow--opened.svg";
                 }
             }
         }
@@ -186,13 +186,13 @@ export default defineComponent({
         }
         .tree-node {
             &.selected > .tree-content {
-                @include tree-selected($primary2, $white);
+                @mixin tree-selected theme('colors.primary2'), theme('colors.white');
                 &:hover {
-                    @include tree-selected($primary2, $dark);
+                    @mixin tree-selected theme('colors.primary2'), theme('colors.dark');
                 }
             }
             > .tree-content:hover {
-                @include tree-selected(transparent, $dark);
+                @mixin tree-selected transparent, theme('colors.dark');
             }
         }
     }

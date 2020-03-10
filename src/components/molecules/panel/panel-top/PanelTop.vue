@@ -21,7 +21,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-panel-top {
         margin-bottom: 1rem;
         .top-contents {
