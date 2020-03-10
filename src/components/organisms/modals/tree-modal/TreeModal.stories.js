@@ -1,7 +1,5 @@
 import { action } from '@storybook/addon-actions';
-import {
-    toRefs, reactive, ref, computed, Ref,
-} from '@vue/composition-api';
+import { ref } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PTreeModal from './TreeModal.vue';
 import { TreeModalToolSet } from '@/components/organisms/modals/tree-modal/toolset';
@@ -235,13 +233,13 @@ export const useToolSet = () => ({
                 treeTs.getSelectedNode(event);
             },
             click() {
-                treeTs.syncState.visible = true;
+                treeTs.open();
             },
             close() {
-                treeTs.syncState.visible = false;
+                treeTs.close();
             },
             confirm() {
-                treeTs.syncState.visible = false;
+                treeTs.close();
             },
         };
     },

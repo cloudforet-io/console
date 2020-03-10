@@ -4,7 +4,6 @@ import {
 import {
     HelperToolSet, initReactive, optionalType, StateToolSet,
 } from '@/lib/toolset';
-import { DataTablePropsType, initSelectState } from '@/components/organisms/tables/data-table/toolset';
 
 type TreeNode = any;
 
@@ -91,8 +90,8 @@ export interface TreePropsInterface {
 }
 
 @StateToolSet<TreePropsInterface>()
-export class TreeState<initDataType> {
-    public state:optionalType<TreePropsInterface, initDataType>
+export class TreeState<initData, initState extends TreePropsInterface = TreePropsInterface> {
+    public state:optionalType<initState, initData>
 
     static initState() {
         return {
@@ -108,8 +107,8 @@ export class TreeState<initDataType> {
         };
     }
 
-    constructor(initData:initDataType = {} as initDataType, lazy:boolean = false) {
-        this.state = initReactive<optionalType<TreePropsInterface, initDataType>>(lazy, TreeState.initState(), initData);
+    constructor(initData:initData = <initData>{}, lazy:boolean = false) {
+        this.state = initReactive(lazy, TreeState.initState(), initData);
     }
 }
 
@@ -161,6 +160,9 @@ export interface TreeMetaState {
 @HelperToolSet()
 export class TreeToolSet<initDataType> extends TreeState<initDataType> {
     public metaState:TreeMetaState = null as unknown as TreeMetaState;
+
+    // eslint-disable-next-line no-empty-function
+    public getSelectedNode:(evnet?:any)=>void=() => {};
 
     static initToolSet(_this:any, treeApi:Ref<any> = ref(null)) {
         _this.treeApi = treeApi;

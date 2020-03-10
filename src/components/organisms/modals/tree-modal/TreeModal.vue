@@ -40,7 +40,7 @@ import {
 } from '@/lib/compostion-util';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
 import { treeProps } from '@/components/molecules/tree-new/ToolSet';
-import { sizeMapping } from '@/components/molecules/modals/toolset';
+import { modalSizeValidator } from '@/components/molecules/modals/toolset';
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
@@ -74,7 +74,7 @@ export default {
         size: {
             type: String,
             default: 'md',
-            validator: value => value in sizeMapping,
+            validator: modalSizeValidator,
         },
         visible: { // sync
             type: Boolean,

@@ -10,7 +10,8 @@
 
 <script>
 import { computed } from '@vue/composition-api';
-import { sizeMapping } from './toolset';
+import { modalSizeValidator } from './toolset';
+
 
 const setup = (props, { emit }) => {
     const dialogClassObject = computed(() => [
@@ -47,7 +48,7 @@ export const propsMixin = {
         size: {
             type: String,
             default: 'md',
-            validator: value => value in sizeMapping,
+            validator: modalSizeValidator,
         },
         centered: {
             type: Boolean,
