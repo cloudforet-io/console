@@ -29,12 +29,12 @@ export default {
 <style lang="scss" scoped>
     .lnb {
         position: relative;
-        z-index: 10;
         display: flex;
         align-items: center;
+        z-index: 10;
         height: $lnb-height;
-        box-shadow: 0px 4px 8px rgba($dark, 0.08);
+        box-shadow: 0px .25rem .5rem rgba($dark, 0.08);
         background-color: $white;
-        padding: 12px 18px;
+        padding: 0 1.125rem;
     }
 </style>

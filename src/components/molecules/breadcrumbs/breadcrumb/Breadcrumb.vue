@@ -1,9 +1,9 @@
 <template>
-    <span>
+    <span class="p-breadcrumb">
         <template v-for="route in routes">
-            <span v-if="current.name === route.name || !hasNext" :key="route.name">
+            <template v-if="current.name === route.name || !hasNext">
 
-                <router-link v-if="route.meta && route.meta.breadcrumb"
+                <router-link v-if="route.meta && route.meta.breadcrumb" :key="route.name"
                              class="menu"
                              :class="{now: route.name === active.name}"
                              :to="getPath(route)"
@@ -13,15 +13,15 @@
                 </router-link>
 
                 <template v-if="hasNext">
-                    <p-i name="ic_breadcrum_arrow" />
-                    <p-breadcrumb v-if="current.name === route.name" :key="route.name"
+                    <p-i :key="`${route.name}-arrow`" name="ic_breadcrum_arrow" />
+                    <p-breadcrumb v-if="current.name === route.name" :key="`${route.name}-bc`"
                                   :current-idx="currentIdx + 1"
                                   :active-idx="proxyActiveIdx"
                                   :routes="route.children"
                     />
                 </template>
 
-            </span>
+            </template>
         </template>
     </span>
 </template>
@@ -86,7 +86,7 @@ export default {
     padding: 0 1rem .1rem 1rem;
     color: $gray;
     font-size: 0.875rem;
-    line-height: 1rem;
+    line-height: 2rem;
     cursor: pointer;
     &:hover {
         color: $secondary;

@@ -20,9 +20,31 @@ export default {
 };
 
 const actions = {
-    nodeClick: action('nodeClick'),
-    emptyRightClick: action('emptyRightClick'),
-    nodeRightClick: action('nodeRightClick'),
+    'node:clicked': action('node:clicked'),
+    'node:clicked:right': action('node:clicked:right'), // added event
+    'node:selected': action('node:selected'),
+    'node:unselected': action('node:unselected'),
+    'node:checked': action('node:checked'),
+    'node:unchecked': action('node:unchecked'),
+    'node:expanded': action('node:expanded'),
+    'node:collapsed': action('node:collapsed'),
+    'node:added': action('node:added'),
+    'node:removed': action('node:removed'),
+    'node:text:changed': action('node:text:changed'),
+    'node:editing:start': action('node:editing:start'),
+    'node:editing:stop': action('node:editing:stop'),
+    'node:dragging:start': action('node:dragging:start'),
+    'node:dragging:finish': action('node:dragging:finish'),
+    'node:disabled': action('node:disabled'),
+    'node:enabled': action('node:enabled'),
+    'node:shown': action('node:shown'),
+    'node:hidden': action('node:hidden'),
+    'node:dblclick': action('node:dblclick'),
+    'tree:mounted': action('tree:mounted'),
+    'tree:filtered': action('tree:filtered'),
+    'tree:data:fetch': action('tree:data:fetch'),
+    'tree:data:received': action('tree:data:received'),
+    'tree:clicked:right': action('tree:clicked:right'), // added event
 };
 
 export const defaultCase = () => ({
@@ -107,7 +129,7 @@ export const asyncData = () => ({
     components: { PTreeNew: PTree },
     template: `<div>
         <p-tree-new v-bind="state"
-                    @nodeRightClick="nodeRightClick" @emptyRightClick="emptyRightClick"
+                    v-on="actions"
         >
         </p-tree-new>
         <br>
@@ -160,8 +182,7 @@ export const asyncData = () => ({
 
         return {
             state,
-            nodeRightClick: action('nodeRightClick'),
-            emptyRightClick: action('emptyRightClick'),
+            actions,
         };
     },
 });
@@ -171,8 +192,7 @@ export const dragAndDrop = () => ({
     components: { PTreeNew: PTree },
     template: `<div>
         <p-tree-new v-bind="state"
-                    @nodeRightClick="nodeRightClick" @emptyRightClick="emptyRightClick"
-                    @dragStart="dragStart" @dragFinish="dragFinish"
+                    v-on="actions"
         >
         </p-tree-new>
         <br>
@@ -250,10 +270,7 @@ export const dragAndDrop = () => ({
 
         return {
             state,
-            nodeRightClick: action('nodeRightClick'),
-            emptyRightClick: action('emptyRightClick'),
-            dragStart: action('dragStart'),
-            dragFinish: action('dragFinish'),
+            actions,
         };
     },
 });
@@ -264,7 +281,8 @@ export const deletion = () => ({
     template: `<div>
         <p-tree-new ref="tree" 
                     v-bind="state"
-                    @nodeClick="nodeClick"
+                    v-on="actions"
+                    @node:clicked="nodeClick"
         >
         </p-tree-new>
         <br>
@@ -335,6 +353,7 @@ export const deletion = () => ({
         return {
             state,
             tree,
+            actions,
             nodeClick,
         };
     },
@@ -346,7 +365,8 @@ export const add = () => ({
     template: `<div>
         <p-tree-new ref="tree" 
                     v-bind="state"
-                    @nodeClick="nodeClick"
+                    v-on="actions"
+                    @node:clicked="nodeClick"
         >
         </p-tree-new>
         <br>
@@ -416,6 +436,7 @@ export const add = () => ({
             tree,
             addMode,
             addModeIdx,
+            actions,
             nodeClick,
         };
     },
@@ -425,7 +446,7 @@ export const add = () => ({
 export const selectMode = () => ({
     components: { PTreeNew: PTree },
     template: `<div>
-        <p-tree-new v-bind="state" :selectMode="true"></p-tree-new>
+        <p-tree-new v-bind="state" :selectMode="true" v-on="actions"></p-tree-new>
         <br>
         <hr>
         <br>
@@ -477,6 +498,7 @@ export const selectMode = () => ({
         };
         return {
             state,
+            actions,
         };
     },
 });
@@ -487,6 +509,7 @@ export const useToolSet = () => ({
         <p-tree
                 ref="treeApi"
                 v-bind="treeTs.state"
+                v-on="actions"
                 @node:selected="update"
                 @node:unselected="update"
         ></p-tree>
@@ -531,12 +554,12 @@ export const useToolSet = () => ({
                 children: 'kids',
             },
         };
-        console.log(treeTs);
         return {
+            actions,
             treeTs,
             treeApi: treeTs.treeApi,
             update: (event) => {
-                treeTs.getSelectedNode();
+                treeTs.getSelectedNode(event);
             },
         };
     },

@@ -81,9 +81,8 @@ export default {
         border-color:$gray2;
         background-color: $gray3;
     }
-    &.block {
-        display: block;
-        width: 100%;
+    &.is-invalid {
+        border-color: $alert;
     }
 }
 

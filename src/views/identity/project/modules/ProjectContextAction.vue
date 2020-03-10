@@ -299,7 +299,8 @@ export default {
 
 <style lang="scss" scoped>
     .base-table {
-        @extend %sheet;
+        box-shadow: 0px 0 10px 0px rgba($black, 0.1);
+  border-radius: 7px;
     }
     .btn-margin{
         margin-left: 1rem;

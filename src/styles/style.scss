@@ -1,12 +1,12 @@
 /* Main styles for this application */
 
-// Import vendor css
-@import "vendors/vendors";
+// Reset
+@import "reset";
 
-// If you want to add something do it here
-@import "global";
-
-// ie fixes
-@import "ie-fix";
-
+// Import auto generated icons based on assets
 @import "~@/styles/icon-fonts.scss";
+
+/* Tailwind */
+@import '~tailwindcss/base';
+@import '~tailwindcss/components';
+@import '~tailwindcss/utilities';

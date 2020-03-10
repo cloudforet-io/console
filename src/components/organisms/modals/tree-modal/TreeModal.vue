@@ -16,32 +16,34 @@
         @close="close"
         @confirm="confirm"
     >
-        <template #body>
-            <div class="p-tree-modal-block">
-                <p-tree :data="data" :options="options" :loading="loading"
-                        :icons="icons"
-                />
-            </div>
-        </template>
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" />
+        </template>
+        <template #body>
+            <div class="p-tree-modal-block">
+                <p-tree ref="p-tree" :data="data" :options="options"
+                        :loading="loading"
+                        :icons="icons" :select-mode="true"
+                        v-on="$listeners"
+                />
+            </div>
+            <slot name="default" />
         </template>
     </p-button-modal>
 </template>
 <script>
-import { reactive, computed,  } from '@vue/composition-api';
+import { reactive, computed, ref } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
-import { setup as contentModalSetup } from '../content-modal/ContentModal.vue';
+import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import {
     makeByPass, makeProxy,
 } from '@/lib/compostion-util';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
-import { sizeMapping } from '@/components/molecules/modals/ModalMapping';
+import { treeProps } from '@/components/molecules/tree-new/ToolSet';
+import { modalSizeValidator } from '@/components/molecules/modals/toolset';
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
-
-
     const footerCancelButtonBind = reactive({
         styleType: 'dark',
         outline: true,
@@ -51,26 +53,15 @@ const setup = (props, context) => {
     }));
 
 
-    const confirm = async () => {
-        if (props.doubleConfirm) {
-            const result = await validateAPI.allValidation();
-            if (result) {
-                context.emit('confirm', props.items);
-            }
-        } else {
-            context.emit('confirm', props.items);
-        }
-    };
-
     return {
         ...state,
+        'p-tree': ref(null),
         footerCancelButtonBind,
         footerConfirmButtonBind,
-
-        proxyVisible: makeProxy('visible', props, context.emit),
+        proxyVisible: makeProxy('visible'),
         cancel: makeByPass(context.emit, 'cancel'),
         close: makeByPass(context.emit, 'close'),
-        confirm,
+        confirm: makeByPass(context.emit, 'confirm'),
     };
 };
 
@@ -82,8 +73,8 @@ export default {
     props: {
         size: {
             type: String,
-            default: null,
-            validator: value => value in sizeMapping,
+            default: 'md',
+            validator: modalSizeValidator,
         },
         visible: { // sync
             type: Boolean,
@@ -101,22 +92,10 @@ export default {
             type: String,
             default: 'Tree Modal',
         },
-        data: {
-            type: [Array, Object],
-            default: undefined,
-        },
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
-        icons: {
-            type: Object,
-            default: undefined,
-        },
-        loading: {
-            type: Boolean,
-            default: true,
-        },
+        data: treeProps.data,
+        options: treeProps.options,
+        icons: treeProps.icons,
+        loading: treeProps.loading,
     },
     setup(props, context) {
         return setup(props, context);
@@ -126,8 +105,8 @@ export default {
 
 <style lang="postcss" scoped>
     .p-tree-modal-block{
-        @apply bg-primary4 border border-gray2 rounded-sm overflow-auto;
-        height: 50vh;
+        @apply bg-primary4 border border-gray2 rounded-sm overflow-auto h-auto;
+        max-height: 50vh;
     }
 
 </style>

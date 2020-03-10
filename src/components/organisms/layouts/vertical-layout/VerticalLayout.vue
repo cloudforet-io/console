@@ -245,7 +245,7 @@ export default defineComponent({
         align-items: flex-start;
         justify-content: center;
         &.line {
-            border-left: 1px solid $lightgray;
+            border-left: 1px solid $gray1;
             background-color: transparent;
             &:hover {
                 border-left: 1px solid $secondary;
@@ -253,7 +253,7 @@ export default defineComponent({
             }
         }
         &.prohibit-line {
-            border-left: 1px solid $lightgray;
+            border-left: 1px solid $gray;
             background-color: transparent;
             &:hover {
                 border-left: 1px solid $secondary;
@@ -269,7 +269,7 @@ export default defineComponent({
             text-align: center;
             z-index: 99;
             cursor: col-resize;
-            color: $darkgray;
+            color: $dark;
             > span {
                 margin-right: 26px;
                 cursor: pointer;
@@ -279,7 +279,7 @@ export default defineComponent({
             margin-top: 1rem;
             margin-left: 1rem;
             justify-content: center;
-            color: $darkgray;
+            color: $dark;
         }
     }
 </style>

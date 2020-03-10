@@ -55,7 +55,9 @@ export default {
     .p-field-group {
         margin-bottom: 1rem;
         .form-label {
-            font: Bold 14px Arial;
+            display: inline-block;
+            font-size: .875rem;
+            font-weight: bold;
             letter-spacing: 0;
             color: $dark;
             margin-bottom: 0.25rem;
@@ -63,17 +65,21 @@ export default {
         }
         .invalid-feedback {
             color: $alert;
-            font: 12px Arial;
+            font-size: .75rem;
+            line-height: .875rem;;
+            margin-top: .25rem;
         }
         .valid-feedback {
             color: $safe;
-            font: 12px Arial;
+            font-size: .75rem;
+            line-height: .875rem;;
+            margin-top: .25rem;
         }
         .required-mark {
             color: $alert;
         }
         small {
-            font: 12px Arial;
+            font-size: .75rem;
         }
         .is-invalid {
             border: 1px solid $alert;

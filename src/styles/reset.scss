@@ -1,0 +1,60 @@
+/*************************
+ ****** GLOBAL CSS *******
+ *************************/
+
+/* INIT */
+html, body {
+    font-family: $font-basic;
+    background-color: $primary4;
+    font-size: 16px;
+    font-weight: 400;
+    width: 100vw;
+    height: 100vh;
+    word-wrap: break-word;
+    word-break: keep-all;
+    overflow: hidden;
+}
+
+body {
+    font-size: 14px; //0.875rem
+    line-height: 16.8px; //120%, 1.2
+    color: $dark;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+
+i, span, div, input, textarea, article, main, ul, li {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  word-spacing: inherit;
+  letter-spacing: inherit;
+  vertical-align: inherit;
+  text-align: inherit;
+}
+textarea:focus, input:focus {
+  outline: none;
+}
+:focus {
+  outline: none;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-basic;
+  margin: 0;
+  color: inherit;
+  word-spacing: inherit;
+  letter-spacing: inherit;
+  vertical-align: inherit;
+  text-align: inherit;
+}
+a {
+  color: inherit;
+  &:hover {
+    color: inherit;
+    text-decoration: unset;
+  }
+}
+p {
+    margin: 0;
+}

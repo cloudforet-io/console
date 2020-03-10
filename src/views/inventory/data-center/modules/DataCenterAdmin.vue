@@ -281,10 +281,7 @@ export default {
     .p-label {
         margin-bottom:5px;
         margin-right: 0.5rem;
-        color:$dark;
-    }
-    .base-table {
-        @extend %sheet;
+        color:$gray;
     }
     .btn-margin{
         margin-left: 1rem;

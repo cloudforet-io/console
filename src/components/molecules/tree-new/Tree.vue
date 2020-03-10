@@ -4,8 +4,6 @@
               v-model="selectedNode"
               :options="treeOptions"
               @tree:data:fetch="onFetch"
-              @node:dragging:start="$emit('dragStart', $event)"
-              @node:dragging:finish="$emit('dragFinish', $event)"
               v-on="$listeners"
         >
             <template #default="{node}">
@@ -87,19 +85,17 @@ export default defineComponent({
             if (props.selectMode) {
                 e.stopPropagation();
                 node.select();
-            } else {
-                emit('click', e);
             }
         };
 
         const onTreeRightClick = (e) => {
             if (e.currentTarget.className.includes('tree-root') || e.currentTarget.className.includes('p-tree-container')) {
-                emit('emptyRightClick');
+                emit('tree:clicked:right');
             }
         };
 
         const onNodeRightClick = (node) => {
-            emit('nodeRightClick', node);
+            emit('node:clicked:right', node);
         };
 
         const deleteNode = (node, propagation: boolean = true, multiple: boolean = false) => {
@@ -168,6 +164,10 @@ export default defineComponent({
             }
         }
         .tree-arrow {
+            /**
+             * This is for override liquor tree's css.
+             * DO NOT CHANGE belows from px to rem system.
+             */
             height: 16px;
             margin-left: 24px;
             &.has-child {

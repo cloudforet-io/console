@@ -1,5 +1,6 @@
 const path = require('path');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const postcssConfig = require('./postcss.config');
 
 module.exports = {
     lintOnSave: false,
@@ -18,26 +19,13 @@ module.exports = {
                 excludePaths: [path.resolve(__dirname, '..', 'node_modules/monaco-text-editor')],
 
             },
-            postcss: {
-                parser: 'postcss-scss',
-                plugins: () => [
-                    require('tailwindcss'),
-                    require('autoprefixer'),
-                    require('postcss-mixins'),
-                    require('postcss-simple-vars'),
-                    require('postcss-easy-import')({
-                        path: ['src', 'node_modules'],
-                    }),
-                    require('postcss-preset-env')({ stage: 3 }),
-                ],
-            },
+            postcss: postcssConfig,
         },
     },
 
     configureWebpack: {
         resolve: {
             alias: {
-                // eslint-disable-next-line camelcase
                 '@sb': path.resolve('./.storybook'),
             },
         },
