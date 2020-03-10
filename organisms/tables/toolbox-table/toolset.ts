@@ -93,7 +93,7 @@ export class ToolboxTableToolSet<initData=any, initSyncData=any> extends Toolbox
 
     public setAllPage:(totalCount:number)=>void = null as unknown as (totalCount:number)=>void;
 
-    static initToolSet(_this:any) {
+    static initToolSet(_this:any,...args:any[]) {
         DataTableToolSet.initToolSet(_this);
         _this.setAllPage = (totalCount:number) => {
             _this.state.allPage = getAllPage(totalCount, (_this.syncState.pageSize));
@@ -127,7 +127,6 @@ export class SearchTableToolSet<initData=any, initSyncData=any> extends ToolboxT
 }
 
 @HelperToolSet()
-// @ts-ignore
 export class QuerySearchTableToolSet<initData, initSyncData> extends ToolboxTableToolSet<initData, initSyncData> {
     public querySearch: QuerySearchToolSet=null as unknown as QuerySearchToolSet;
 
