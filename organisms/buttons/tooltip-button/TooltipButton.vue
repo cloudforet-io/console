@@ -67,16 +67,16 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="postcss">
     .tooltip-btn {
+        @apply text-primary4;
         display: inline-block;
         padding: 0;
         border-radius: 2px;
         border: 0px;
         min-width: 32px;
-        color: $primary4;
         &:hover, &.active {
-            background-color: $primary-dark;
+            @apply bg-primary-dark;
         }
     }
 </style>

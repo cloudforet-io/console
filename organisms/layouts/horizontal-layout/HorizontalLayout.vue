@@ -103,7 +103,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .dragger-container {
         position: relative;
         margin-top: 13px;
@@ -114,7 +114,7 @@ export default {
             border-bottom: 1px solid;
             border-color: transparent;
             &.colored {
-                border-color: $gray;
+                @apply border-gray;
             }
             &.left {
                 left: 0;

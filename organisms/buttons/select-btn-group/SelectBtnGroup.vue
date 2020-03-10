@@ -75,16 +75,16 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-select-btn-group{
         white-space:nowrap;
         overflow-x:auto;
         scroll-snap-type: x mandatory;
         display: flex;
         justify-content: flex-start ;
-        -ms-overflow-style: none; // scroll hide in IE
+        -ms-overflow-style: none; /* scroll hide in IE */
         &::-webkit-scrollbar {
-            display: none !important; //scroll hide in window,chrome
+            display: none !important; /* scroll hide in window,chrome */
         }
 
         .select-btn{

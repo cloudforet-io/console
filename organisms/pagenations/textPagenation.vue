@@ -53,7 +53,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .text-pagenation{
         display: inline-flex;
         justify-content: space-between;
@@ -78,7 +78,7 @@ export default {
     }
     .icon-button{
         &:not(:disabled):not(.disabled):hover{
-            background-color: $white;
+            @apply bg-white;
             border-color:transparent ;
         }
     }
