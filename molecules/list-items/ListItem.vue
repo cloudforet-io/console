@@ -2,7 +2,7 @@
     <div :class="typeChecker" v-on="$listeners">
         <pre class="indent-text">{{ indentText }}</pre>
         <span v-if="selected" class="selected">
-            <p-i name="ic_check" height=".875rem" width=".875rem"/>
+            <p-i name="ic_check" height=".875rem" width=".875rem" />
         </span>
         <slot>
             <span>{{ contents }}</span>
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import PI from '@/components/atoms/icons/PI';
+import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     name: 'PListItem',
@@ -45,54 +45,40 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .list-item-GNB {
-        text-align: left;
-        border: 1px solid $primary-dark;
+        @apply text-left border border-primary-dark text-primary;
         padding: .5rem 1rem;
         font-size: .875rem;
         min-width: 137px;
-        color: $primary;
         margin-top: -1px;
         cursor: pointer;
         &:hover {
-            background-color: $primary-dark;
-            color: $primary4;
+            @apply bg-primary-dark text-primary4;
         }
 
         .indent-text {
             display: inline;
             margin: 0;
             font-size: 1rem;
-        }
-        .icon-box {
-            margin-right: 5px;
-            border: 1px solid blue;
         }
     }
 
     .list-item-CON {
-        text-align: left;
-        border: 1px solid $secondary;
+        @apply text-left border border-secondary text-secondary;
         padding: 0px 14px 0px 14px;
         font: 14px/32px Arial;
         min-width: 137px;
-        color: $secondary;
         margin-top: -1px;
         cursor: pointer;
         &:hover {
-            background-color: $secondary;
-            color: $primary4;
+            @apply bg-secondary text-primary4;
         }
 
         .indent-text {
             display: inline;
             margin: 0;
             font-size: 1rem;
-        }
-        .icon-box {
-            margin-right: 5px;
-            border: 1px solid blue;
         }
     }
 

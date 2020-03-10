@@ -69,15 +69,14 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .p-nav-tabs {
     @apply flex flex-wrap pl-0 mb-0;
     > li {
         cursor: pointer;
     }
     .p-nav-link {
-        border: 1px solid $gray3;
-        background-color: $white;
+        @apply border-b border-gray3 bg-white;
         font: 14px/16px Arial;
         min-width: 7.5rem;
         min-height: 2rem;
@@ -86,18 +85,18 @@ export default {
         text-align: center;
         margin-bottom: -1px;
         &:hover {
-            color: $secondary;
+            @apply text-secondary;
         }
         &.active {
+            @apply text-primary;
             font-weight: bold;
             box-shadow: 0.25rem -0.25rem 0.75rem -0.25rem  #4D49B614,
                         -0.25rem -0.25rem 0.75rem -0.25rem #4D49B614;
-            color: $primary;
             &:not(.one-tab) {
-                border-bottom: 2px solid $primary;
+                @apply border-b-2 border-primary;
             }
             &.one-tab {
-                border-bottom: 2px solid $white;
+                @apply border-b-2 border-white;
             }
         }
         &:not(.active) {

@@ -10,11 +10,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .p-pane-layout {
-    background-color: $white;
-    box-shadow: 0 0 8px rgba($primary, 0.08);
-    border: 1px solid $gray3;
+    @apply bg-white border border-gray3;
+    box-shadow: 0 0 8px rgba(theme('colors.primary'), 0.08);
     border-radius: 2px;
 }
 </style>

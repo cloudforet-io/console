@@ -206,11 +206,11 @@ export default {
     },
 };
 </script>
-<style lang="scss">
+<style lang="postcss">
     @import '~@/styles/vendors/sl-vue-tree.scss';
 
     /* sl-vue-tree */
-    @mixin node-item-background($bg-color) {
+    @define-mixin node-item-background $bg-color {
         > .sl-vue-tree-node-item {
             background-color: $bg-color;
             &:hover {
@@ -223,20 +223,20 @@ export default {
     }
 
     .sl-vue-tree-cursor {
+        @apply border border-secondary;
         position: absolute;
-        border: 1px solid $secondary;
         height: 1px;
         width: 100%;
     }
 
 
     .sl-vue-tree-drag-info {
+        @apply text-secondary;
         position: absolute;
         min-width: 120px;
         text-align: left;
         font: 14px/16px Arial;
         letter-spacing: 0;
-        color: $secondary;
         margin-left: 10px;
         background: #FFFFFF 0% 0% no-repeat padding-box;
         box-shadow: 0px 0px 8px #4D49B629;
@@ -248,34 +248,32 @@ export default {
         border: none;
         .sl-vue-tree-nodes-list {
             .sl-vue-tree-node {
-                @include node-item-background(transparent);
+                @mixin node-item-background transparent;
                 &.sl-vue-tree-selected {
 
                     > span {
-                        color: $primary4;
+                        @apply text-primary4;
                         font-weight: 500;
                     }
 
-                    @include node-item-background(transparent);
+                    @mixin node-item-background transparent;
                 }
 
                 .sl-vue-tree-node-item {
+                    @apply text-gray;
                     border-radius: 2px;
                     cursor: pointer;
                     margin: 5px 0;
-                    color: $gray;
                     &:hover {
-                        color: $black;
+                        @apply text-black;
                         font-weight: 500;
                     }
                     &.sl-vue-node-clicked {
-                        color: $primary4;
+                        @apply text-primary4 bg-primary2;
                         font-weight: 500;
-                        background-color: $primary2;
                         &:hover {
-                            color: $primary4;
+                            @apply text-primary4 bg-primary2;
                             font-weight: 500;
-                            background-color: $primary2;
                         }
 
                     }
@@ -288,7 +286,7 @@ export default {
                         /*  border-top: none;
                           border-left: none;
                           border-right: none;*/
-                        border: 1px solid $secondary;
+                        @apply border border-secondary;
                     }
 
                     .sl-vue-tree-title {
@@ -317,16 +315,16 @@ export default {
     }
 </style>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 
     $main-height: calc(100vh - #{lnb-height});
 
     .main-tree-col {
-        box-shadow: 0px 0 10px 0px rgba($black, 0.1);
-  border-radius: 7px;
+        @apply bg-primary4;
+        box-shadow: 0px 0 10px 0px rgba(theme('colors.black'), 0.1);
+        border-radius: 7px;
         border-radius: 0;
         padding: 15px 8px;
-        background-color: $primary4;
         height: $main-height;
         overflow: scroll;
 

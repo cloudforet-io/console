@@ -77,20 +77,20 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 $height: 2.5rem;
-@mixin triangle-color($size, $color) {
+@define-mixin triangle-color $size, $color {
     border-left: $size solid $color;
 }
-@mixin triangle($size, $z-idx, $color) {
+@define-mixin triangle $size, $z-idx, $color {
     position: absolute;
-    right: calc(#{$size} * -1);
+    right: calc($(size) * -1);
     z-index: $z-idx;
     width: 0;
     height: 0;
     border-top: $size solid transparent;
     border-bottom: $size solid transparent;
-    @include triangle-color($size, $color);
+    @mixin triangle-color $size, $color;
 }
 
 .progress-tab-nav {
@@ -100,6 +100,7 @@ $height: 2.5rem;
     align-items: center;
     justify-content: center;
     .tab-nav-item {
+        @apply bg-gray3 border-t border-b border-gray2 text-gray;
         position: relative;
         display: flex;
         align-items: center;
@@ -107,75 +108,64 @@ $height: 2.5rem;
         flex: 1 1 auto;
         height: 100%;
         padding: 0;
-        background-color: $gray3;
-        border-top: 1px solid $gray2;
-        border-bottom: 1px solid $gray2;
-        color: $gray;
         font-size: .875rem;
         cursor: pointer;
         &:last-child {
-            border-right: 1px solid $gray2;
+            @apply border-r border-gray2;
             .triangle, .triangle-bg {
                 display: none;
             }
         }
         &:first-child {
-            border-left: 1px solid $gray2;
+            @apply border-l border-gray2;
         }
         &.active {
-            background-color: $dark;
-            border-color: $dark;
-            color: $white;
+            @apply bg-dark border-dark text-white;
             font-size: 1rem;
             font-weight: bold;
             .triangle {
-                @include triangle-color(calc((#{$height} / 2) - 1px), $dark);
+                @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.dark');
             }
             .triangle-bg {
-                @include triangle-color(calc(#{$height} / 2), $dark);
+                @mixin triangle-color calc($(height) / 2), theme('colors.dark');
             }
         }
         &.done {
-            border-color: $dark;
-            background-color: $white;
+            @apply border-dark bg-white;
             .triangle {
-                @include triangle-color(calc((#{$height} / 2) - 1px), $white);
+                @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.white');
             }
             .triangle-bg {
-                @include triangle-color(calc(#{$height} / 2), $dark);
+                @mixin triangle-color calc($(height) / 2), theme('colors.dark');
             }
             &.active {
-                background-color: $dark;
+                @apply bg-dark;
                 .triangle {
-                    @include triangle-color(calc((#{$height} / 2) - 1px), $dark);
+                    @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.dark');
                 }
             }
         }
         &.invalid {
+            @apply border-alert text-alert bg-white;
             font-style: italic;
-            border-color: $alert;
-            color: $alert;
-            background-color: $white;
             .triangle {
-                @include triangle-color(calc((#{$height} / 2) - 1px), $white);
+                @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.white');
             }
             .triangle-bg {
-                @include triangle-color(calc(#{$height} / 2), $alert);
+                @mixin triangle-color calc($(height) / 2), theme('colors.alert');
             }
             &.active {
-                background-color: $alert;
-                border-color: $alert;
-                color: $white;
+                @apply bg-alert border-alert text-white;
                 .triangle {
-                    @include triangle-color(calc((#{$height} / 2) - 1px), $alert);
+                    @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.alert');
                 }
             }
         }
         .triangle {
-            @include triangle(calc((#{$height} / 2) - 1px), 2, $gray3);
+            @mixin triangle calc(($(height) / 2) - 1px), 2, theme('colors.gray3');
         }
         .triangle-bg {
-            @include triangle(calc(#{$height} / 2), 1, $gray2);
+            @mixin triangle calc($(height) / 2), 1, theme('colors.gray2');
         }
         .help {
             margin-left: .5rem;
