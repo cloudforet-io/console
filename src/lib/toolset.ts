@@ -53,7 +53,7 @@ export function initReactive<T>(lazy:boolean, ...args:any[]):T {
 // }
 // @StateToolSet<tempStateType>() // ok
 // class Boo<initData> {
-//     public state:InitType<tempStateType, initData>
+//     public state:optionalType<tempStateType, initData>
 //
 //     static initState() {
 //         return {

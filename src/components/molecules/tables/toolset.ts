@@ -94,7 +94,7 @@ export interface TablePropsType {
     tfootClass?: object;
 }
 @StateToolSet<TablePropsType>()
-export class TableState< initData, initSate extends TablePropsType=TablePropsType> {
+export class TableState<initData, initSate extends TablePropsType = TablePropsType> {
     public state:optionalType<initSate, initData>;
 
     static initState() {
