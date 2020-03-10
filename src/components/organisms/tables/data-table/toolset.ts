@@ -1,5 +1,8 @@
 import { computed, reactive, Ref } from '@vue/composition-api';
 import { TableState, tableProps, TablePropsType } from '@/components/molecules/tables/toolset';
+import {
+    HelperToolSet, initReactive, optionalType, StateToolSet, SyncStateToolSet,
+} from '@/lib/toolset';
 
 
 export const dataTableProps = {
@@ -73,10 +76,10 @@ export interface DataTablePropsType extends TablePropsType {
     multiSelect?:boolean;
 }
 export interface DataTableSyncType {
-    sortBy?: string;
-    sortDesc?:boolean;
-    selectIndex?: any[]|number;
-    loading?:boolean;
+    sortBy: string;
+    sortDesc:boolean;
+    selectIndex: any[]|number;
+    loading:boolean;
 }
 export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncType{
     fields:any[];
@@ -95,44 +98,46 @@ export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncTy
     sortDesc:boolean;
 }
 
+@StateToolSet<DataTablePropsType>()
+@SyncStateToolSet<DataTableSyncType>()
+export class DataTableState<
+        initData,
+        initSyncData,
+        initState extends DataTablePropsType = DataTablePropsType,
+        initSync extends DataTableSyncType= DataTableSyncType
+    > extends TableState< initData, initState> {
+    public syncState:optionalType<initSync, initSyncData>;
 
-export class DataTableState extends TableState {
-    public state:DataTablePropsType;
+    static initState() {
+        return {
+            ...TableState.initState(),
+            fields: [],
+            items: [],
+            sortable: false,
+            dragable: false,
+            rowClickMultiSelectMode: false,
+            selectable: false,
 
-    public syncState:DataTableSyncType;
+            colCopy: false,
+            useSpinnerLoading: true,
+            useCursorLoading: true,
+            multiSelect: true,
+        };
+    }
 
-    static initDataTableState:DataTablePropsType ={
-        fields: [],
-        items: [],
-        sortable: false,
-        dragable: false,
-        rowClickMultiSelectMode: false,
-        selectable: false,
+    static initSyncState() {
+        return {
+            sortBy: '',
+            sortDesc: true,
+            selectIndex: [],
+            loading: false,
+        };
+    }
 
-        colCopy: false,
-        useSpinnerLoading: true,
-        useCursorLoading: true,
-        multiSelect: true,
-    };
-
-    static initDataTableSyncState:DataTableSyncType = {
-        sortBy: undefined,
-        sortDesc: true,
-        selectIndex: [],
-        loading: false,
-    };
-
-    constructor(initData:object = {}, initSyncData:object = {}) {
-        super();
-        this.state = reactive({
-            ...TableState.initTableState,
-            ...DataTableState.initDataTableState,
-            ...initData,
-        });
-        this.syncState = reactive({
-            ...DataTableState.initDataTableSyncState,
-            ...initSyncData,
-        });
+    constructor(initData:initData = {} as initData, initSyncData:initSyncData = {} as initSyncData, lazy = false) {
+        super(initData, true);
+        this.state = initReactive<optionalType<initState, initData>>(lazy, DataTableState.initState(), initData);
+        this.syncState = initReactive<optionalType<initSync, initSyncData>>(lazy, DataTableState.initSyncState(), initSyncData);
     }
 }
 
@@ -160,12 +165,16 @@ export const initSelectState = (state:DataTablePropsType, syncState:DataTableSyn
     });
 };
 
+@HelperToolSet()
+export class DataTableToolSet<initData, initSyncData> extends DataTableState< initData, initSyncData> {
+    public selectState:DataTableSelectState= null as unknown as DataTableSelectState;
 
-export class DataTableToolSet extends DataTableState {
-    public selectState:DataTableSelectState;
+    static initToolSet(_this:any) {
+        _this.selectState = initSelectState(_this.state, _this.syncState);
+    }
 
-    constructor(initData:object = {}, initSyncData:object = {}) {
+    constructor(initData:initData = {} as initData, initSyncData:initSyncData = {} as initSyncData) {
         super(initData, initSyncData);
-        this.selectState = initSelectState(this.state, this.syncState);
+        DataTableToolSet.initToolSet(this);
     }
 }

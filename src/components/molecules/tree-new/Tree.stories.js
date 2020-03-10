@@ -559,7 +559,7 @@ export const useToolSet = () => ({
             treeTs,
             treeApi: treeTs.treeApi,
             update: (event) => {
-                treeTs.getSelectedNode();
+                treeTs.getSelectedNode(event);
             },
         };
     },
