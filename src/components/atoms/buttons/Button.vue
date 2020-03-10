@@ -50,20 +50,14 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss">
 
-@mixin btn-color($theme, $color, $oposite-color) {
-    &.btn-#{$theme} {
+@define-mixin btn-color $theme, $color, $opposite-color {
+    &.btn-$(theme) {
         background-color: $color;
-        background-repeat: no-repeat;
-        background-clip: padding-box;
-        border: 1px solid $color;
-        color: $oposite-color;
-        &:not(:disabled):not(.disabled):hover {
-            text-decoration: underline;
-        }
+        color: $opposite-color;
     }
-    &.btn-outline-#{$theme} {
+    &.btn-outline-$(theme) {
         border: 1px solid $color;
         color: $color;
         background-color: transparent;
@@ -71,7 +65,7 @@ export default {
             background-color: $color;
             background-repeat: no-repeat;
             background-clip: padding-box;
-            color: $oposite-color;
+            color: $opposite-color;
             text-decoration: underline;
         }
     }
@@ -95,39 +89,38 @@ export default {
     border: 1px solid transparent;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
-    @include btn-color('primary', $primary, $white);
-    @include btn-color('primary-dark', $primary-dark, $white);
-    @include btn-color('primary1', $primary1, $white);
-    @include btn-color('primary2', $primary2, $white);
-    @include btn-color('primary3', $primary3, $white);
-    @include btn-color('primary4', $primary4, $white);
-
-    @include btn-color('secondary', $secondary,$white);
-    @include btn-color('secondary1', $secondary1,$white);
-    @include btn-color('secondary2', $secondary2,$white);
-
-    @include btn-color('alert', $alert, $white);
-    @include btn-color('safe', $safe, $white);
-    @include btn-color('dark', $dark, $white);
-
-    @include btn-color('gray', $gray, $white);
-    @include btn-color('gray1', $gray1, $white);
-    @include btn-color('gray2', $gray2, $white);
-    @include btn-color('gray3', $gray3, $white);
-
-    @include btn-color('other1', $other1, $white);
-    @include btn-color('other2', $other2, $white);
-    @include btn-color('other3', $other3, $white);
-    @include btn-color('other4', $other4, $white);
-
-
     &.disabled {
-        background-color: $gray2;
+        @apply bg-gray2 text-gray1 border-gray3;
         background-repeat: no-repeat;
         background-clip: padding-box;
-        border: 1px solid $gray3;
-        color: $gray1;
+        border-width: 1px;
+        border-style: solid;
     }
+
+    @mixin btn-color primary, theme('colors.primary'), theme('colors.white');
+    @mixin btn-color primary-dark, theme('colors.primary-dark'), theme('colors.white');
+    @mixin btn-color primary1, theme('colors.primary1'), theme('colors.white');
+    @mixin btn-color primary2, theme('colors.primary2'), theme('colors.white');
+    @mixin btn-color primary3, theme('colors.primary3'), theme('colors.white');
+    @mixin btn-color primary4, theme('colors.primary4'), theme('colors.white');
+
+    @mixin btn-color secondary, theme('colors.secondary'), theme('colors.white');
+    @mixin btn-color secondary1, theme('colors.secondary1'), theme('colors.white');
+    @mixin btn-color secondary2, theme('colors.secondary2'), theme('colors.white');
+
+    @mixin btn-color alert, theme('colors.alert'), theme('colors.white');
+    @mixin btn-color safe, theme('colors.safe'), theme('colors.white');
+    @mixin btn-color dark, theme('colors.dark'), theme('colors.white');
+
+    @mixin btn-color gray, theme('colors.gray'), theme('colors.white');
+    @mixin btn-color gray1, theme('colors.gray1'), theme('colors.white');
+    @mixin btn-color gray2, theme('colors.gray2'), theme('colors.white');
+    @mixin btn-color gray3, theme('colors.gray3'), theme('colors.white');
+
+    @mixin btn-color other1, theme('colors.other1'), theme('colors.white');
+    @mixin btn-color other2, theme('colors.other2'), theme('colors.white');
+    @mixin btn-color other3, theme('colors.other3'), theme('colors.white');
+    @mixin btn-color other4, theme('colors.other4'), theme('colors.white');
 }
 
 .btn-lg {
