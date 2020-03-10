@@ -17,13 +17,12 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss">
     .p-hr {
         width: 100%;
         border: none;
         height: 1px;
-        color: $gray2;
-        background-color: $gray2;
+        @apply text-gray2 bg-gray2;
         margin-top: 0px;
         margin-bottom: 0px;
     }

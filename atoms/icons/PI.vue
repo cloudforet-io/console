@@ -76,7 +76,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     /**
         Class Prefix is defined in main.js
      */
