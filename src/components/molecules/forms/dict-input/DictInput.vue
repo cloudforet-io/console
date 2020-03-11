@@ -110,7 +110,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-dict-input {
         display: inline-flex;
         align-items: flex-start;
@@ -125,7 +125,7 @@ export default defineComponent({
             .p-text-input {
                 width: 100%;
                 &.invalid {
-                    border: 1px solid $alert;
+                    @apply border border-alert;
                 }
             }
         }

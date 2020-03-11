@@ -48,6 +48,6 @@ export default defineComponent({
 
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 
 </style>

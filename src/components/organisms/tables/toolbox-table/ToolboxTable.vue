@@ -202,7 +202,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .toolbox-shadow {
         box-shadow: 0px 0px 8px #4D49B614;
     }
@@ -213,7 +213,7 @@ export default {
 
     .toolbox-table {
         &.background{
-            background-color: $white;
+            @apply bg-white;
         }
 
         padding: 1rem;

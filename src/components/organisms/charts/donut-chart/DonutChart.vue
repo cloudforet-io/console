@@ -61,10 +61,10 @@ import {
     reactive, toRefs, computed, onMounted,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
-import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
-import PChartLegend from '@/components/organisms/legends/ChartLegend';
+import PChart, { setTooltips } from '@/components/molecules/charts/Chart.vue';
+import PChartLegend from '@/components/organisms/legends/ChartLegend.vue';
 import { colorset } from '@/lib/util';
-import styles from '@/styles/_variables.scss';
+import colorStyles from '@/styles/colors';
 
 
 const setDrawTools = (props, context) => {
@@ -98,7 +98,7 @@ const setDrawTools = (props, context) => {
         hoverState: false,
         chartEl: undefined,
         empty: computed(() => !d3.sum(props.data, d => d.value)),
-        emptyColor: styles.primary3,
+        emptyColor: colorStyles.primary3,
     });
 
 
@@ -192,7 +192,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-donut-chart {
         height: 100%;
         display: flex;
@@ -214,7 +214,7 @@ export default {
             }
         }
         .empty-text {
-            fill: $primary2;
+            fill: theme('colors.primary2');
         }
     }
 </style>

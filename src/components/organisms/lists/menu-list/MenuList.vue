@@ -120,25 +120,25 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .p-menu-list {
     position: relative;
     .activator {
+        @apply text-primary4;
         display: inline-block;
         padding: 0;
         border-radius: 2px;
         border: 0px;
         min-width: 32px;
-        color: $primary4;
         &:hover, &.active {
-            background-color: $primary-dark;
+            @apply bg-primary-dark;
         }
     }
     .menu-container {
+        @apply bg-white;
         position: absolute;
         bottom: 0;
-        background-color: $white;
-        box-shadow: 4px 0px 8px rgba($dark, 0.52);
+        box-shadow: 4px 0px 8px rgba(theme('colors.dark'), 0.52);
         &.fade-in-enter-active {
             transition: opacity .15s, visibility .15s;
         }

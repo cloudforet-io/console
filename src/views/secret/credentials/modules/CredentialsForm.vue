@@ -30,7 +30,6 @@
                                                     v-focus
                                                     placeholder="Credentials Name"
                                                     :class="{
-                                                        'form-control':true,
                                                         'is-invalid':invalid
                                                     }"
                                                 />
@@ -304,7 +303,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-table-check-modal-sub-title{
         margin-bottom: 2rem;
     }
@@ -312,8 +311,8 @@ export default {
         width: 100%;
     }
     .tag-input{
+        @apply bg-primary4;
         padding-top: 0.5rem;
-        background-color: $primary4;
     }
     .p-divider{
         margin-bottom: 1.5rem;

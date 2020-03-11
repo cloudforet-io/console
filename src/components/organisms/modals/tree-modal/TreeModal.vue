@@ -21,16 +21,18 @@
         </template>
         <template #body>
             <div class="p-tree-modal-block">
-                <p-tree :data="data" :options="options" :loading="loading"
+                <p-tree ref="p-tree" :data="data" :options="options"
+                        :loading="loading"
                         :icons="icons" :select-mode="true"
                         v-on="$listeners"
                 />
             </div>
+            <slot name="default" />
         </template>
     </p-button-modal>
 </template>
 <script>
-import { reactive, computed } from '@vue/composition-api';
+import { reactive, computed, ref } from '@vue/composition-api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import {
@@ -38,7 +40,7 @@ import {
 } from '@/lib/compostion-util';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
 import { treeProps } from '@/components/molecules/tree-new/ToolSet';
-import { sizeMapping } from '@/components/molecules/modals/ModalMapping';
+import { modalSizeValidator } from '@/components/molecules/modals/toolset';
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
@@ -53,9 +55,10 @@ const setup = (props, context) => {
 
     return {
         ...state,
+        'p-tree': ref(null),
         footerCancelButtonBind,
         footerConfirmButtonBind,
-        proxyVisible: makeProxy('visible', props, context.emit),
+        proxyVisible: makeProxy('visible'),
         cancel: makeByPass(context.emit, 'cancel'),
         close: makeByPass(context.emit, 'close'),
         confirm: makeByPass(context.emit, 'confirm'),
@@ -70,8 +73,8 @@ export default {
     props: {
         size: {
             type: String,
-            default: null,
-            validator: value => value in sizeMapping,
+            default: 'md',
+            validator: modalSizeValidator,
         },
         visible: { // sync
             type: Boolean,
@@ -103,6 +106,7 @@ export default {
 <style lang="postcss" scoped>
     .p-tree-modal-block{
         @apply bg-primary4 border border-gray2 rounded-sm overflow-auto h-auto;
+        max-height: 50vh;
     }
 
 </style>

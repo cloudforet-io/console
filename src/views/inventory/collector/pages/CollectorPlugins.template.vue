@@ -77,7 +77,6 @@ import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
-import { defaultQuery } from '@/lib/api';
 import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 import PRow from '@/components/atoms/grid/row/Row.vue';
@@ -91,6 +90,7 @@ import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 
 import PluginFilter from '@/views/inventory/collector/modules/PluginFilter.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
+import {defaultQuery} from "@/lib/api/query";
 
 const repoState = reactive({
     repositories: [],
@@ -239,16 +239,16 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .card-list {
     height: 100%;
     overflow-y: scroll;
     padding-top: 1.625rem;
     padding-bottom: 2.25rem;
     .beta {
+        @apply text-other1;
         font-size: .5rem;
         font-weight: bold;
-        color: $other1;
         vertical-align: super;
         margin-left: .2rem;
     }

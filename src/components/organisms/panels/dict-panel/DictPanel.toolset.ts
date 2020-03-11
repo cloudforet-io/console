@@ -1,6 +1,6 @@
 import { reactive } from '@vue/composition-api';
 import { AxiosInstance } from 'axios';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api/axios';
 
 
 export const getDictPanelProps = () => ({

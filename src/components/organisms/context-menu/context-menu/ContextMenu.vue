@@ -125,10 +125,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 
-    @mixin context-item-them($theme,$color,$hover-bg-color,$hover-color,$active-bg-color,$active-color,$disabled-color){
-        &.#{$theme}{
+    @define-mixin context-item-them $theme, $color, $hover-bg-color, $hover-color, $active-bg-color, $active-color, $disabled-color {
+        &.$(theme){
             color: $color;
             &:hover {
                 background-color: $hover-bg-color;
@@ -156,14 +156,14 @@ export default {
         }
     }
 
-    @mixin context-header-theme($theme,$color){
-        &.#{$theme} {
+    @define-mixin context-header-theme $theme, $color {
+        &.$(theme) {
             color: $color;
         }
     }
 
-    @mixin context-menu-color($theme,$bg-color, $border-color) {
-        &.#{$theme} {
+    @define-mixin context-menu-color $theme, $bg-color, $border-color {
+        &.$(theme) {
             background-color: $bg-color;
             border: 1px solid $border-color;
             .context-divider{
@@ -173,7 +173,7 @@ export default {
     }
     .no-drag {-ms-user-select: none; -moz-user-select: none; -webkit-user-select: none; -khtml-user-select: none; user-select:none;}
 
-    .p-context-menu{
+    .p-context-menu {
         padding: 0px;
         border-radius: 2px;
         margin: 0px;
@@ -194,8 +194,8 @@ export default {
             border-top-width: 1px;
             border-top-style: solid;
         }
-        @include context-menu-color('secondary',$secondary2,$secondary);
-        @include context-menu-color('dark',$white,$dark);
+        @mixin context-menu-color secondary, theme('colors.secondary2'), theme('colors.secondary');
+        @mixin context-menu-color dark, theme('colors.white'), theme('colors.dark');
 
         .context-content{
             padding-left: 1rem;
@@ -206,8 +206,8 @@ export default {
             margin-top: 0.875rem;
             margin-bottom: 0.25rem;
             font: Bold 12px Arial;
-            @include context-header-theme('secondary',$dark);
-            @include context-header-theme('dark',$gray1);
+            @mixin context-header-theme secondary, theme('colors.dark');
+            @mixin context-header-theme dark, theme('colors.gray1');
         }
         .context-item{
             display: block;
@@ -220,8 +220,9 @@ export default {
                 font-weight: bold;
             }
             white-space: nowrap;
-            @include context-item-them('secondary',$secondary,$secondary,$white, $secondary2,$secondary, $gray2);
-            @include context-item-them('dark',$dark,$gray3,$dark, $white,$dark, $gray2);
+            @mixin context-item-them secondary, theme('colors.secondary'), theme('colors.secondary'), theme('colors.white'), theme('colors.secondary2'),
+                                     theme('colors.secondary'), theme('colors.gray2');
+            @mixin context-item-them dark, theme('colors.dark'), theme('colors.gray3'), theme('colors.dark'), theme('colors.white'), theme('colors.dark'), theme('colors.gray2');
         }
 
     }

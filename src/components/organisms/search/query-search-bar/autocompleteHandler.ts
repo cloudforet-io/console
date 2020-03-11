@@ -1,6 +1,6 @@
 import Fuse from 'fuse.js';
 import _ from 'lodash';
-import { autoCompleteQuery } from '@/lib/api';
+import {autoCompleteQuery} from "@/lib/api/query";
 
 export interface SearchQueryType {
     key: string,

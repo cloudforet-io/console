@@ -74,9 +74,9 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button';
 import ProjectMemberAdd from '@/views/identity/project/modules/ProjectMemberAdd';
 import ProjectMemberDelete from '@/views/identity/project/modules/ProjectMemberDelete';
-import { defaultQuery } from '@/lib/api';
 import PI from '@/components/atoms/icons/PI';
 import PBadge from '@/components/atoms/badges/Badge';
+import {defaultQuery} from "@/lib/api/query";
 
 export default {
     name: 'ProjectMember',
@@ -274,14 +274,15 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-label {
+        @apply text-dark;
         margin-bottom:5px;
         margin-right: 0.5rem;
-        color:$dark;
     }
     .base-table {
-        @extend %sheet;
+        box-shadow: 0px 0 10px 0px rgba(theme('colors.black'), 0.1);
+  border-radius: 7px;
     }
     .btn-margin{
         margin-left: 1rem;

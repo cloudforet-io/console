@@ -57,8 +57,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
-    .p-row{
+<style lang="postcss">
+    .p-row {
         width: 100%;
     }
 </style>

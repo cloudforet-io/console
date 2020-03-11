@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
 import { debug } from 'webpack';
 import { isNotEmpty } from '@/lib/util';
-import { BaseTableAPI } from '@/lib/api';
+import {BaseTableAPI} from "@/lib/api/table";
 
 /**
  * make proxy computed that same name as props
@@ -148,6 +148,7 @@ export const formValidation = (data:any, validation:object) => {
         const vds = validation[name];
         for (let i = 0; i < vds.length; i++) {
             const vd = vds[i];
+            // eslint-disable-next-line no-await-in-loop
             const check = await vd.func(data[name], data);
             if (!check) {
                 invalidMsg[name] = vd.invalidMessage;
@@ -231,7 +232,7 @@ interface tabState {
     activeMultiTab:Ref<string>
 }
 
-export const tabIsShow = (handler:BaseTableAPI, state:tabState, tabName:string) => computed(() => {
+export const tabIsShow = (handler:BaseTableAPI<any, any>, state:tabState, tabName:string) => computed(() => {
     let result = false;
     if (handler.tableTS.selectState.isSelectOne) {
         result = state.activeTab.value === tabName;

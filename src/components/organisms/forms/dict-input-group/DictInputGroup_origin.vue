@@ -189,7 +189,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     p-dict-input-group{
         display: flex;
         flex-wrap:  wrap;
@@ -201,8 +201,8 @@ export default {
         margin-left: 0.5rem;
     }
     .add-btn{
+        @apply text-white;
         margin-left: 0.5rem;
-        color: $white;
     }
     p-dict-input{
         flex-grow: 1;

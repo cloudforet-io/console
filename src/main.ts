@@ -16,6 +16,7 @@ import directive from '@/directives';
 import { i18n } from '@/translations';
 import { Util } from '@/lib/global-util';
 import LocalStorageStore from '@/store/toolset';
+import '@/styles/style.scss';
 
 Vue.mixin(Util);
 Vue.use(VueCookies);

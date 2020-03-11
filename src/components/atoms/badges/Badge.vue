@@ -52,57 +52,49 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss" scoped>
 .p-badge {
-    all: unset;
     display: inline-block;
     border-radius: 100px;
     background-clip: padding-box;
     text-align: center;
     font-size: .75rem;
     line-height: .875rem;
-    color: $white;
-    background-color:$gray;
     letter-spacing: 0;
     padding:  0.1875rem 0.5rem 0.1875rem 0.5rem;
+    @apply text-white bg-gray;
 }
 
-@mixin badge-color($theme, $color, $oposite-color) {
-    &.badge-#{$theme} {
+@define-mixin badge-color $theme, $color, $opposite-color {
+    .badge-$(theme) {
         background-color: $color;
-        color: $oposite-color;
-    }
-}
-@mixin hover-color($theme, $color, $oposite-color) {
-    &.badge-#{$theme} {
-        background-color: $color;
-        color: $oposite-color;
+        color: $opposite-color;
     }
 }
 
-@include badge-color('primary', $primary, $white);
-@include badge-color('primary-dark', $primary-dark, $white);
-@include badge-color('primary1', $primary1, $white);
-@include badge-color('primary2', $primary2, $white);
-@include badge-color('primary3', $primary3, $white);
-@include badge-color('primary4', $primary4, $white);
+@mixin badge-color primary, theme('colors.primary'), theme('colors.white');
+@mixin badge-color primary-dark, theme('colors.primary-dark'), theme('colors.white');
+@mixin badge-color primary1, theme('colors.primary1'), theme('colors.white');
+@mixin badge-color primary2, theme('colors.primary2'), theme('colors.white');
+@mixin badge-color primary3, theme('colors.primary3'), theme('colors.white');
+@mixin badge-color primary4, theme('colors.primary4'), theme('colors.white');
 
-@include badge-color('secondary', $secondary,$white);
-@include badge-color('secondary1', $secondary1,$white);
-@include badge-color('secondary2', $secondary2,$white);
+@mixin badge-color secondary, theme('colors.secondary'), theme('colors.white');
+@mixin badge-color secondary1, theme('colors.secondary1'), theme('colors.white');
+@mixin badge-color secondary2, theme('colors.secondary2'), theme('colors.white');
 
-@include badge-color('alert', $danger, $white);
-@include badge-color('safe', $success, $white);
-@include badge-color('dark', $dark, $white);
+@mixin badge-color alert, theme('colors.alert'), theme('colors.white');
+@mixin badge-color safe, theme('colors.safe'), theme('colors.white');
+@mixin badge-color dark, theme('colors.dark'), theme('colors.white');
 
-@include badge-color('gray', $gray, $white);
-@include badge-color('gray1', $gray1, $white);
-@include badge-color('gray2', $gray2, $dark);
-@include badge-color('gray3', $gray3, $gray);
+@mixin badge-color gray, theme('colors.gray'), theme('colors.white');
+@mixin badge-color gray1, theme('colors.gray1'), theme('colors.white');
+@mixin badge-color gray2, theme('colors.gray2'), theme('colors.dark');
+@mixin badge-color gray3, theme('colors.gray3'), theme('colors.gray');
 
-@include badge-color('other1', $other1, $white);
-@include badge-color('other2', $other2, $white);
-@include badge-color('other3', $other3, $white);
-@include badge-color('other4', $other4, $white);
+@mixin badge-color other1, theme('colors.other1'), theme('colors.white');
+@mixin badge-color other2, theme('colors.other2'), theme('colors.white');
+@mixin badge-color other3, theme('colors.other3'), theme('colors.white');
+@mixin badge-color other4, theme('colors.other4'), theme('colors.white');
 
 </style>

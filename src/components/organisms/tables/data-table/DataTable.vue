@@ -429,14 +429,15 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 
-    %selected-row {
-        background-color: $primary3 !important;
+    @define-mixin selected-row {
+        background-color: theme('colors.primary3') !important;
         td {
-            color: $secondary;
+            @apply text-secondary;
         }
     }
+
     .select-checkbox{
         cursor:pointer;
     }
@@ -444,7 +445,7 @@ export default defineComponent({
         display: block;
         tr{
             &.tr-selected {
-                @extend %selected-row;
+                @mixin selected-row;
             }
             td{
                 vertical-align: middle;
@@ -461,8 +462,8 @@ export default defineComponent({
                     justify-content: space-between;
                 }
                 .sort-icon{
+                    @apply text-gray2;
                     float: right;
-                    color: $gray2;
                 }
                 &.fix-width {
                     min-width: 4.75rem;
@@ -490,10 +491,10 @@ export default defineComponent({
             background-color: initial !important;
         }
         .no-data{
+            @apply text-primary2;
             text-align: center;
             padding-top: 2rem;
             padding-bottom: 2rem;
-            color: $primary2;
             font: 24px/32px Arial;
         }
     }

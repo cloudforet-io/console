@@ -1,6 +1,9 @@
 import {
     computed, reactive, Ref, ref,
 } from '@vue/composition-api';
+import {
+    HelperToolSet, initReactive, optionalType, StateToolSet,
+} from '@/lib/toolset';
 
 type TreeNode = any;
 
@@ -86,26 +89,26 @@ export interface TreePropsInterface {
     selectMode?: boolean;
 }
 
-export class TreeState {
-    public state: TreePropsInterface;
+@StateToolSet<TreePropsInterface>()
+export class TreeState<initData, initState extends TreePropsInterface = TreePropsInterface> {
+    public state:optionalType<initState, initData>
 
-    static initTreeState: TreePropsInterface = {
-        icons: {
-            leaf: 'ic_tree_project',
-            expanded: 'ic_tree_folder--opened',
-            collapsed: 'ic_tree_folder',
-        },
-        loading: false,
-        selectMode: false,
-    };
+    static initState() {
+        return {
+            icons: {
+                leaf: 'ic_tree_project',
+                expanded: 'ic_tree_folder--opened',
+                collapsed: 'ic_tree_folder',
+            },
+            loading: false,
+            selectMode: false,
+            data: [],
+            options: {},
+        };
+    }
 
-    constructor(initData:any = {}) {
-        this.state = reactive({
-            ...TreeState.initTreeState,
-            data: initData.data || [],
-            options: initData.options || {},
-            ...initData,
-        });
+    constructor(initData:initData = <initData>{}, lazy:boolean = false) {
+        this.state = initReactive(lazy, TreeState.initState(), initData);
     }
 }
 
@@ -149,23 +152,38 @@ export const treeProps = {
     },
 };
 
-export class TreeToolSet extends TreeState {
-    public metaState = reactive({
-        selectedNode: null,
-        firstSelectedNode: computed(() => {
-            try {
-                return this.metaState.selectedNode[0];
-            } catch (e) {
-                return null;
-            }
-        }),
-    });
+export interface TreeMetaState {
+    selectedNode:any[];
+    firstSelectedNode:Ref<any>;
+}
 
-    constructor(initData:any = {}, public treeApi:Ref<any> = ref(null)) {
-        super({ ...initData });
+@HelperToolSet()
+export class TreeToolSet<initDataType> extends TreeState<initDataType> {
+    public metaState:TreeMetaState = null as unknown as TreeMetaState;
+
+    // eslint-disable-next-line no-empty-function
+    public getSelectedNode:(evnet?:any)=>void=() => {};
+
+    static initToolSet(_this:any, treeApi:Ref<any> = ref(null)) {
+        _this.treeApi = treeApi;
+        _this.metaState = reactive({
+            selectedNode: null,
+            firstSelectedNode: computed(() => {
+                try {
+                    return _this.metaState.selectedNode[0];
+                } catch (e) {
+                    return null;
+                }
+            }),
+        });
+        _this.getSelectedNode = (event?:any) => {
+            console.debug('getSelectedNode', event);
+            _this.metaState.selectedNode = _this.treeApi.value.$refs.tree.selected();
+        };
     }
 
-    public getSelectedNode() {
-        this.metaState.selectedNode = this.treeApi.value.$refs.tree.selected();
+    constructor(initData:initDataType = {} as initDataType, public treeApi:Ref<any> = ref(null)) {
+        super(initData);
+        TreeToolSet.initToolSet(this, treeApi);
     }
 }

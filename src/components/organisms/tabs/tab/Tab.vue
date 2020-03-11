@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import PTabBar, { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar';
+import PTabBar, { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar.vue';
 import { makeProxy } from '@/lib/compostion-util';
 
 
@@ -37,12 +37,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .tab-pane{
-        background-color: $white;
+        @apply bg-white border border-gray3;
         width: 100%;
         padding: 1rem 1rem 2.5rem;
-        border: 1px solid $gray3;
         border-radius: 0px 2px 2px 2px;
         box-shadow: 0px 0px 8px #4D49B614;
     }

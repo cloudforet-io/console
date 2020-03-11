@@ -167,7 +167,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .timezone-selector {
         width: 30%;
         min-width: 260px;
@@ -178,24 +178,22 @@ export default {
         vertical-align: unset;
     }
     .time-block {
+        @apply border border-gray2;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         width: 2rem;
         height: 2rem;
-        border: 1px solid $gray2;
         border-radius: 2px;
         margin-right: .5rem;
         margin-bottom: .5rem;
         font-size: .875rem;
         cursor: pointer;
         &:hover {
-            background-color: $other4;
-            color: $white;
+            @apply bg-other4 text-white;
         }
         &.active {
-            background-color: $safe;
-            color: $white;
+            @apply bg-safe text-white;
         }
     }
 </style>

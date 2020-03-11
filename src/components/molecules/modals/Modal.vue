@@ -10,7 +10,8 @@
 
 <script>
 import { computed } from '@vue/composition-api';
-import { sizeMapping } from './ModalMapping';
+import { modalSizeValidator } from './toolset';
+
 
 const setup = (props, { emit }) => {
     const dialogClassObject = computed(() => [
@@ -47,7 +48,7 @@ export const propsMixin = {
         size: {
             type: String,
             default: 'md',
-            validator: value => value in sizeMapping,
+            validator: modalSizeValidator,
         },
         centered: {
             type: Boolean,
@@ -75,7 +76,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 
 .modal-mask {
     position: fixed;
@@ -86,11 +87,11 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, .5);
+    background-color: rgba(theme('colors.white'), .5);
     transition: opacity .3s ease;
 
     &.no-backdrop {
-        background-color: rgba(0, 0, 0, 0);
+        background-color: rgba(theme('colors.white'), 0);
     }
 }
 .modal-wrapper {

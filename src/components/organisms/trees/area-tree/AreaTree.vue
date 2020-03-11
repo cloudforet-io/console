@@ -58,7 +58,6 @@ import {
 } from '@vue/composition-api';
 import PTree from '@/components/molecules/tree/Tree.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import styles from '@/styles/_variables.scss';
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
 import { Util } from '@/lib/global-util';
 /* Use VerticalPageLayout temporarily before redesign tree components */
@@ -288,7 +287,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .panel-trans-enter-active {
         transition: all .4s ease-in-out;
     }
@@ -296,21 +295,20 @@ export default {
         opacity: 0;
     }
 
-    $main-height: calc(100vh - #{$lnb-height});
+    $main-height: calc(100vh - $(lnb-height));
     .main-tree-col {
         height: $main-height;
     }
 
     .contextmenu {
+        @apply bg-secondary2 text-gray;
         position: absolute;
-        background-color: $secondary2;
-        color: $lightgray;
         cursor: pointer;
         z-index: 99999;
     }
 
     .panel {
-        padding: 20px $side-pad $bottom-pad $side-pad;
+        padding: 20px;
     }
     .empty {
         text-align: center;

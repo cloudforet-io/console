@@ -1,9 +1,9 @@
 <template>
-    <span>
+    <span class="p-breadcrumb">
         <template v-for="route in routes">
-            <span v-if="current.name === route.name || !hasNext" :key="route.name">
+            <template v-if="current.name === route.name || !hasNext">
 
-                <router-link v-if="route.meta && route.meta.breadcrumb"
+                <router-link v-if="route.meta && route.meta.breadcrumb" :key="route.name"
                              class="menu"
                              :class="{now: route.name === active.name}"
                              :to="getPath(route)"
@@ -13,15 +13,15 @@
                 </router-link>
 
                 <template v-if="hasNext">
-                    <p-i name="ic_breadcrum_arrow" />
-                    <p-breadcrumb v-if="current.name === route.name" :key="route.name"
+                    <p-i :key="`${route.name}-arrow`" name="ic_breadcrum_arrow" />
+                    <p-breadcrumb v-if="current.name === route.name" :key="`${route.name}-bc`"
                                   :current-idx="currentIdx + 1"
                                   :active-idx="proxyActiveIdx"
                                   :routes="route.children"
                     />
                 </template>
 
-            </span>
+            </template>
         </template>
     </span>
 </template>
@@ -81,30 +81,29 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .menu {
+    @apply text-gray ;
     padding: 0 1rem .1rem 1rem;
-    color: $gray;
     font-size: 0.875rem;
-    line-height: 1rem;
+    line-height: 2rem;
     cursor: pointer;
     &:hover {
-        color: $secondary;
+        @apply text-secondary;
     }
     &.now {
         .link {
-            border-bottom: 2px solid $primary;
-            color: $primary;
+            @apply border-b-2 border-primary text-primary;
             font-weight: bold;
             &:hover {
-                color: $secondary;
+                @apply text-secondary;
             }
         }
     }
     .beta {
+        @apply text-other1;
         font-size: .5rem;
         font-weight: bold;
-        color: $other1;
         vertical-align: super;
         margin-left: .2rem;
     }

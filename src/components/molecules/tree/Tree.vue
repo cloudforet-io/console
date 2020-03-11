@@ -206,16 +206,125 @@ export default {
     },
 };
 </script>
+<style lang="postcss">
+    @import './sl-vue-tree.css';
 
-<style lang="scss" scoped>
+    /* sl-vue-tree */
+    @define-mixin node-item-background $bg-color {
+        > .sl-vue-tree-node-item {
+            background-color: $bg-color;
+            &:hover {
+                background-color: $bg-color;
+            }
+            &:focus {
+                border: 1px solid red;
+            }
+        }
+    }
 
-    $main-height: calc(100vh - #{$header-height} - 30px);
+    .sl-vue-tree-cursor {
+        @apply border border-secondary;
+        position: absolute;
+        height: 1px;
+        width: 100%;
+    }
+
+
+    .sl-vue-tree-drag-info {
+        @apply text-secondary;
+        position: absolute;
+        min-width: 120px;
+        text-align: left;
+        font: 14px/16px Arial;
+        letter-spacing: 0;
+        margin-left: 10px;
+        background: #FFFFFF 0% 0% no-repeat padding-box;
+        box-shadow: 0px 0px 8px #4D49B629;
+        border-radius: 2px;
+    }
+
+    .sl-vue-tree.sl-vue-tree-root {
+        background-color: transparent;
+        border: none;
+        .sl-vue-tree-nodes-list {
+            .sl-vue-tree-node {
+                @mixin node-item-background transparent;
+                &.sl-vue-tree-selected {
+
+                    > span {
+                        @apply text-primary4;
+                        font-weight: 500;
+                    }
+
+                    @mixin node-item-background transparent;
+                }
+
+                .sl-vue-tree-node-item {
+                    @apply text-gray;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    margin: 5px 0;
+                    &:hover {
+                        @apply text-black;
+                        font-weight: 500;
+                    }
+                    &.sl-vue-node-clicked {
+                        @apply text-primary4 bg-primary2;
+                        font-weight: 500;
+                        &:hover {
+                            @apply text-primary4 bg-primary2;
+                            font-weight: 500;
+                        }
+
+                    }
+                    &.sl-vue-tree-node-is-leaf {
+                        .item-icon {
+                            font-size: 0.87em;
+                        }
+                    }
+                    &.sl-vue-tree-cursor-inside {
+                        /*  border-top: none;
+                          border-left: none;
+                          border-right: none;*/
+                        @apply border border-secondary;
+                    }
+
+                    .sl-vue-tree-title {
+                        display: flex;
+                        width: 100%;
+                        .sl-vue-tree-toggle {
+                            text-align: center;
+                            width: 20px;
+                        }
+                        .item-icon {
+                            vertical-align: baseline;
+                        }
+                        .item-title {
+                            display: inline-block;
+                            padding-left: 5px;
+                            width: calc(100% - 25px);
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            vertical-align: middle;
+                        }
+                    }
+                }
+            }
+        }
+    }
+</style>
+
+<style lang="postcss" scoped>
+
+    $main-height: calc(100vh - #{lnb-height});
 
     .main-tree-col {
-        @extend %sheet;
+        @apply bg-primary4;
+        box-shadow: 0px 0 10px 0px rgba(theme('colors.black'), 0.1);
+        border-radius: 7px;
         border-radius: 0;
         padding: 15px 8px;
-        background-color: $primary4;
         height: $main-height;
         overflow: scroll;
 

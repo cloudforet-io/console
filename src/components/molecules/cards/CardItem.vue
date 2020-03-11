@@ -60,10 +60,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .p-card-item-container {
     &:hover {
-        box-shadow: 0px 0px 8px rgba($primary, 0.22);
+        box-shadow: 0px 0px 8px rgba(theme('colors.primary'), .22);
     }
 }
 .p-card-item {

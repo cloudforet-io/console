@@ -4,8 +4,8 @@ import {
 } from '@vue/composition-api';
 import CollectorPluginsTemplate, { setup } from '@/views/inventory/collector/pages/CollectorPlugins.template.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
+import {defaultQuery} from "@/lib/api/query";
 
 export default {
     name: 'CollectorPlugins',

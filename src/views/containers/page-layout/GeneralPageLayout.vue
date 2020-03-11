@@ -22,7 +22,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .general-page-layout {
     display: flex;
     flex-direction: column;

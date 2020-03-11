@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import styles from '@/styles/_variables.scss';
+import styles from '@/styles/variables';
 
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/VerticalLayout.vue';
 import FNB from '@/views/containers/fnb/FNB.vue';
@@ -36,7 +36,7 @@ export default {
     props: {
         height: {
             type: String,
-            default: `calc(100vh - ${styles.lnbHeight})`,
+            default: `calc(100vh - ${styles['lnb-height']})`,
         },
         line: {
             type: Boolean,
@@ -56,7 +56,7 @@ export default {
         },
         totalWidth: {
             type: String,
-            default: `calc(100vw -${styles.gnbWidth})`,
+            default: `calc(100vw -${styles['gnb-width']})`,
         },
         autoSaveLeftWidth: {
             type: Boolean,
@@ -70,7 +70,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .right-container {
     display: flex;
     flex-direction: column;

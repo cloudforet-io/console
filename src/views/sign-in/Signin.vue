@@ -89,10 +89,10 @@ export default defineComponent({
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 
-    @mixin background-theme($theme, $background) {
-        &.#{$theme} {
+    @define-mixin background-theme $theme, $background {
+        &.$(theme) {
             background: $background;
             background-size: cover;
             /*background-position: center center;*/
@@ -107,10 +107,10 @@ export default defineComponent({
         bottom: 0;
         overflow: no-display;
         -webkit-overflow-scrolling: touch;
-        @include background-theme('default-theme', $white);
-        @include background-theme('color-theme', $gray);
-        @include background-theme('image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg'));
-        @include background-theme('video-theme', url('https://thumbs.gfycat.com/SpotlessUnfitCoral-size_restricted.gif'));
+        @mixin background-theme 'default-theme', theme('colors.white');
+        @mixin background-theme 'color-theme', theme('colors.gray');
+        @mixin background-theme 'image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg');
+        @mixin background-theme 'video-theme', url('https://thumbs.gfycat.com/SpotlessUnfitCoral-size_restricted.gif'));
     }
 
     #login-container {

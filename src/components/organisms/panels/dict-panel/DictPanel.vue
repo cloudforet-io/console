@@ -146,7 +146,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .extra-btns {
         float: right;
         .btn {

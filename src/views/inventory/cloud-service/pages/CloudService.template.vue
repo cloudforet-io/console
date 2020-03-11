@@ -184,20 +184,19 @@ import PQuerySearchTags from '@/components/organisms/search/query-search-tags/Qu
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { makeTrItems } from '@/lib/view-helper';
-import { AdminTableAPI, HistoryAPI, QuerySearchTableAPI } from '@/lib/api';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
-import PCol from '@/components/atoms/grid/col/Col.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import {AdminTableAPI, HistoryAPI, QuerySearchTableAPI} from "@/lib/api/table";
 
 
 export const cloudServiceSetup = (
     context,
-    apiHandler:QuerySearchTableAPI,
-    dvApiHandler:QuerySearchTableAPI,
+    apiHandler:QuerySearchTableAPI<any, any>,
+    dvApiHandler:QuerySearchTableAPI<any, any>,
 ) => {
     const state = reactive({
         cstFields: makeTrItems([
@@ -356,7 +355,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     #cloud-service-type-dropdown-btn{
         >>> div > .dropdown-btn.menu-btn{
             min-width: 4.7rem;

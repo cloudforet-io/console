@@ -3,7 +3,7 @@ import {
 } from '@vue/composition-api';
 import Lockr from 'lockr';
 import _ from 'lodash';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api/axios';
 
 const bindLocalStorage = (prefix:string, name:string, state:any) => computed({
     get: () => state[name],

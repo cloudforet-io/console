@@ -42,7 +42,6 @@
                                                 v-model="singleState.input"
                                                 :placeholder="doubleConfirmPlaceHolder"
                                                 :class="{
-                                                    'form-control':true,
                                                     'is-invalid':invalid
                                                 }"
                                             />
@@ -181,7 +180,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-table-check-modal-sub-title{
         margin-bottom: 2rem;
     }

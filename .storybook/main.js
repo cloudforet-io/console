@@ -3,19 +3,9 @@
  const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const postCssLoader = {
         loader: 'postcss-loader',
-        options: {
-            plugins: () => [
-                require('tailwindcss'),
-                require('autoprefixer'),
-                require('postcss-mixins'),
-                require('postcss-simple-vars'),
-                require('postcss-easy-import')({
-                    path: ['src', 'node_modules'],
-                }),
-                require('postcss-preset-env')({ stage: 3 }),
-            ],
-        }
-    }
+        options: require('../postcss.config'),
+    };
+
 module.exports = {
   stories: [
     '../src/**/*.stories.js',

@@ -22,7 +22,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss">
     .p-empty {
         display: flex;
         width: 100%;
@@ -31,6 +31,6 @@ export default {
         align-items: center;
         font-size: 1.5rem;
         line-height: 2rem;
-        color: $primary2;
+        @apply text-primary2;
     }
 </style>

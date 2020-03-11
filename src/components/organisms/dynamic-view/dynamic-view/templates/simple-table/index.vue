@@ -87,7 +87,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="postcss">
     .p-dynamic-view-simple-table-header{
         margin-bottom: 1rem;
         .title{

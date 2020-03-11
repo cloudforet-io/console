@@ -49,8 +49,8 @@ import {
     reactive, toRefs, computed,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
-import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
-import styles from '@/styles/_variables.scss';
+import PChart, { setTooltips } from '@/components/molecules/charts/Chart.vue';
+import colorStyles from '@/styles/colors';
 
 const LABELS = {
     PAD: { TOP: 8, BOTTOM: 4 },
@@ -59,7 +59,7 @@ const LABELS = {
 const BARS = {
     THICKNESS: 8,
     HEIGHT: 14,
-    COLOR: styles.primary1,
+    COLOR: colorStyles.primary1,
 };
 
 const setDrawTools = (props, context) => {
@@ -167,37 +167,37 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss">
     .horizontal-bar-g {
         .container {
             fill: transparent;
             &.hover {
-                fill: $primary3;
+                fill: theme('colors.primary3');
             }
         }
         .key-label {
-            fill: $dark;
+            fill: theme('colors.dark');
             font-size: 12px;
         }
         .value-label {
-            fill: $dark;
+            fill: theme('colors.dark');
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
         }
         .bar {
-            fill: $primary1;
+            fill: theme('colors.primary1');
         }
         .back-bar {
-            fill: $primary3;
+            fill: theme('colors.primary3');
         }
         &.hover {
             cursor: pointer;
             .key-label {
-                fill: $primary-dark;
+                fill: theme('colors.primary-dark');
             }
             .bar {
-                fill: $primary-dark;
+                fill: theme('colors.primary-dark');
             }
         }
     }

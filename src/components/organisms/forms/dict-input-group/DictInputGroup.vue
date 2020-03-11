@@ -152,10 +152,10 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .add-btn {
+        @apply text-white;
         margin-bottom: .5rem;
-        color: $white;
         .p-i-icon {
             margin-right: .5rem;
         }

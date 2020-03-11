@@ -75,9 +75,9 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button';
 import DataCenterMemberAdd from '@/views/inventory/data-center/modules/DataCenterAdminAdd';
 import DataCenterMemberDelete from '@/views/inventory/data-center/modules/DataCenterAdminDelete';
-import { defaultQuery } from '@/lib/api';
 import PI from '@/components/atoms/icons/PI';
 import PBadge from '@/components/atoms/badges/Badge';
+import {defaultQuery} from "@/lib/api/query";
 
 export default {
     name: 'DataCenterMember',
@@ -277,14 +277,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-label {
+        @apply text-gray;
         margin-bottom:5px;
         margin-right: 0.5rem;
-        color:$dark;
-    }
-    .base-table {
-        @extend %sheet;
     }
     .btn-margin{
         margin-left: 1rem;

@@ -56,59 +56,33 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@mixin setInput() {
-    min-height: 2rem;
-    height: 2rem;
+<style lang="postcss">
 
-    padding-left: 1rem;
-    padding-right: 1rem;
+@define-mixin setInput {
+    &.p-text-input {
+        @apply border border-gray2 bg-white text-dark;
+        min-height: 2rem;
+        height: 2rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        border-radius: 2px;
+        font-size: .875rem;
+        line-height: 1.75rem;
+        appearance: none;
 
-    border: 1px solid $gray2;
-    border-radius: 2px;
-
-    background-color: $white;
-    color: $dark;
-
-    font-size: .875rem;
-    line-height: 1.75rem;
-
-    &:focus{
-        border-color:$dark;
-        color: $dark;
-    }
-    &:disabled{
-        border-color:$gray2;
-        background-color: $gray3;
-    }
-    &.block {
-        display: block;
-        width: 100%;
+        &:focus {
+            @apply border-dark text-dark;
+        }
+        &:disabled {
+            @apply border-gray2 bg-gray3;
+        }
+        &.is-invalid {
+            @apply border-alert;
+        }
     }
 }
 
-input[type="text"].p-text-input{
-    @include setInput();
-    -webkit-border-radius: 2px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-
-input[type="number"].p-text-input{
-    @include setInput();
-    -webkit-border-radius: 2px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-input[type="password"].p-text-input{
-    @include setInput();
-    -webkit-border-radius: 2px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+input {
+    @mixin setInput;
 }
 </style>

@@ -297,9 +297,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .base-table {
-        @extend %sheet;
+        box-shadow: 0px 0 10px 0px rgba(theme('colors.black'), 0.1);
+  border-radius: 7px;
     }
     .btn-margin{
         margin-left: 1rem;
@@ -315,7 +316,7 @@ export default {
     }
 
     .input-tag-card{
+        @apply bg-primary4;
         padding-top: 0.5rem;
-        background-color: $primary4;
     }
 </style>

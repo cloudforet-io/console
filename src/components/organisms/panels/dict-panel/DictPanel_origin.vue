@@ -100,10 +100,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .dict-panel {
         min-height: 100px;
-    };
+    }
     .panel-header {
         display: inline-flex;
         width: 100%;

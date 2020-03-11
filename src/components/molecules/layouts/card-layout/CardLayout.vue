@@ -48,15 +48,15 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .card-layout {
         display: flex;
         flex-wrap: wrap;
         width: 100%;
         table-layout: fixed;
         .card-container {
+            @apply border-r border-gray2;
             vertical-align: top;
-            border-right: 1px solid $gray2;
             &.no-border {
                 border-right: 0;
             }

@@ -207,7 +207,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .all-container {
     padding: 2.4rem 0;
     .container {
@@ -216,7 +216,7 @@ export default {
         width: unset;
     }
     .collector-info {
-        border-right: 1px solid $gray2;
+        @apply border-r border-gray2;
         .img {
             height: 5.5rem;
             width: 5.5rem;
@@ -228,7 +228,7 @@ export default {
         }
     }
     .sub-title {
-        color: $gray1;
+        @apply text-gray1;
         font-weight: bold;
         font-size: .875rem;
         line-height: 1rem;

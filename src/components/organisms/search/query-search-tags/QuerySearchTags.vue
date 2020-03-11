@@ -41,7 +41,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .p-query-search-tags{
     display: flex;
     flex-direction: row;

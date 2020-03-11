@@ -30,7 +30,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="css" scoped>
     * {
         -webkit-box-sizing: border-box;
         box-sizing: border-box;

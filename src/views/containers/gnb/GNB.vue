@@ -47,25 +47,23 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .menu-container {
-    all: unset;
+    @apply bg-primary text-primary4;
     display: flex !important;
     flex-flow: column;
-    background-color: $primary;
-    color: $primary4;
     li {
         all: unset;
         list-style: none;
         flex-grow: 1;
-        padding: 12px 0;
+        padding: .75rem 0;
         text-align: center;
         &:first-child {
-            padding-top: 16px;
+            padding-top: 1rem;
             flex-grow: 0;
         }
         &:last-child {
-            padding-bottom: 16px;
+            padding-bottom: 1rem;
             flex-grow: 0;
         }
         &.menu-3 {
