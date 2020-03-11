@@ -42,6 +42,9 @@ export interface ApiQuery {
     only?: readonlyArgs<string[]>;
 }
 
+export interface APIParameter{
+    query?:ApiQuery
+}
 type ValueFormatter = (string, any) => string | number | Array<string | number>;
 /**
  * @name defaultQuery
@@ -57,15 +60,16 @@ type ValueFormatter = (string, any) => string | number | Array<string | number>;
  * @returns {{page: {start: number, limit: *}}}
  */
 export const defaultQuery = (
-    thisPage: number, pageSize: number, sortBy?: string, sortDesc?: boolean,
+    thisPage?: number, pageSize?: number, sortBy?: string, sortDesc?: boolean,
     searchText?: string, searchQueries?: SearchQueryType[] | readonly SearchQueryType[], valueFormatter?: ValueFormatter, only?: string[] | readonly string[],
 ): ApiQuery => {
-    const query: ApiQuery = {
-        page: {
+    const query: ApiQuery = { };
+    if (typeof thisPage === 'number' && typeof pageSize === 'number') {
+        query.page = {
             start: ((thisPage - 1) * pageSize) + 1,
             limit: pageSize,
-        },
-    };
+        };
+    }
     if (sortBy) {
         query.sort = {
             key: sortBy,
