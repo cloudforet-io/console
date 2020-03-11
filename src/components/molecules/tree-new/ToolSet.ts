@@ -47,7 +47,7 @@ export interface TreeOptionsInterface {
 }
 
 export interface TreeItemInterface {
-    id?: number;
+    id?: number|string;
     text: string;
     data?: object;
     children?: TreeItemInterface[];
@@ -56,23 +56,14 @@ export interface TreeItemInterface {
 }
 
 export default class TreeItem implements TreeItemInterface {
-    public id?: number;
-
-    public text: string;
-
-    public data?: object;
-
-    public children?: TreeItemInterface[];
-
-    public state?: TreeStateType;
-
-    constructor(text: string, data?: object, children?: TreeItemInterface[], state?: TreeStateType, id?: number) {
-        this.text = text;
-        this.data = data;
-        this.children = children;
-        this.state = state;
-        this.id = id;
-    }
+    constructor(
+        public text: string,
+        public data?: object,
+        public children?: TreeItemInterface[],
+        public state?: TreeStateType,
+        public id?: number|string,
+        public isBatch?:boolean,
+    ) { }
 }
 
 interface TreeIconsType {
@@ -177,7 +168,6 @@ export class TreeToolSet<initDataType> extends TreeState<initDataType> {
             }),
         });
         _this.getSelectedNode = (event?:any) => {
-            console.debug('getSelectedNode', event);
             _this.metaState.selectedNode = _this.treeApi.value.$refs.tree.selected();
         };
     }

@@ -1,6 +1,6 @@
-import { reactive } from '@vue/composition-api';
+import {reactive} from '@vue/composition-api';
 import _ from 'lodash';
-import { supportsProjectReferences } from 'ts-loader/dist/utils';
+import {ClassTypeOf} from "@/lib/type";
 
 export type optionalType<T1, T2> = T1|T1&T2
 export interface StateType<T1, T2> {
@@ -8,10 +8,6 @@ export interface StateType<T1, T2> {
 }
 export interface SyncStateType<T1, T2> {
     syncState:optionalType<T1, T2>
-}
-
-interface ClassTypeOf<T> {
-    new (...args: any[]): T
 }
 
 type StateToolSetStatic<T>=ClassTypeOf<StateType<T, any>>& { initState:()=>T };

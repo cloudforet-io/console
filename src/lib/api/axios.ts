@@ -92,6 +92,9 @@ export class API {
         this.setRequestInterceptor((request) => {
             if (this.vm.$ls.user.state.isSignedIn) {
                 request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
+                if (request.method?.toUpperCase() === 'POST' && !!request.data) {
+                    request.data.domain_id = this.vm.$ls.domain.state.domainId;
+                }
             }
             return request;
         });
