@@ -91,6 +91,9 @@ export default {
 
     &.disabled {
         @apply bg-gray2 text-gray1 border-gray3;
+        background-color: theme('colors.gray2') !important;
+        border-color: theme('colors.gray3') !important;
+        color: theme('colors.gray1') !important;
         background-repeat: no-repeat;
         background-clip: padding-box;
         border-width: 1px;
