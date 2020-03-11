@@ -63,12 +63,12 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .p-select-dropdown::v-deep{
     &.is-invalid{
         div{
             .dropdown-btn{
-                border: 1px solid $alert;
+                @apply border border-alert;
             }
         }
     }

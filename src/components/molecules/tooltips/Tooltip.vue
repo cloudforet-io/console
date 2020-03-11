@@ -47,7 +47,7 @@ export default {
 
 </script>
 
-<style lang="scss">
+<style lang="postcss">
     $space: 8px;
     .p-tooltip-target {
         display: inline-block;
@@ -75,7 +75,7 @@ export default {
         }
 
         &[x-placement^="top"] {
-            margin-bottom: calc(#{$space});
+            margin-bottom: calc($(space));
 
             .tooltip-arrow {
                 border-width: 11px 7.5px 0 7.5px;
@@ -90,7 +90,7 @@ export default {
         }
 
         &[x-placement^="bottom"] {
-            margin-top: calc(#{$space});
+            margin-top: calc($(space));
 
             .tooltip-arrow {
                 border-width: 0 7.5px 11px 7.5px;
@@ -105,7 +105,7 @@ export default {
         }
 
         &[x-placement^="right"] {
-            margin-left: calc(#{$space});
+            margin-left: calc($(space));
 
             .tooltip-arrow {
                 border-width: 7.5px 11px 7.5px 0px;
@@ -120,7 +120,7 @@ export default {
         }
 
         &[x-placement^="left"] {
-            margin-right: calc(#{$space});
+            margin-right: calc($(space));
 
             .tooltip-arrow {
                 border-width: 7.5px 0 7.5px 11px;
@@ -135,14 +135,14 @@ export default {
         }
 
         &.popover {
-            $color: $dark;
+            $color: theme('colors.dark');
 
             .popover-inner {
                 background: $color;
                 color: $color;
                 padding: 24px;
                 border-radius: 5px;
-                box-shadow: 0 5px 30px rgba(black, .1);
+                box-shadow: 0 5px 30px rgba(theme('colors.black'), .1);
             }
 
             .popover-arrow {

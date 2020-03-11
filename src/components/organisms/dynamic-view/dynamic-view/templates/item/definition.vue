@@ -63,7 +63,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="postcss">
 .content-container {
     display: flex;
     flex-wrap: wrap;
@@ -76,6 +76,7 @@ export default defineComponent({
         align-items: center;
         padding-bottom: 1rem;
         .label {
+            @apply text-gray1;
             float: left;
             overflow: hidden;
             clear: left;
@@ -84,7 +85,6 @@ export default defineComponent({
             padding: 0 1rem;
             text-align: left;
             font-weight: bold;
-            color: $gray1;
             min-width: 10rem;
 
         }

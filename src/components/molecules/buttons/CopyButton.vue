@@ -38,7 +38,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .copy-btn-container {
         position: relative;
         min-width: 55px;

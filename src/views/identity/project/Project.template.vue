@@ -164,7 +164,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     #scrollspy-example {
         position: relative;
         height: 200px;

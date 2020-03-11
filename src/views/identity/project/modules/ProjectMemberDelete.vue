@@ -207,11 +207,11 @@ export default {
     },
 };
 </script>
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-label {
+        @apply text-dark;
         margin-bottom:5px;
         margin-right: 0.5rem;
-        color:$dark;
     }
     .delete-alert{
         margin-bottom: 2rem;
@@ -223,10 +223,9 @@ export default {
     }
 
     .tag-input {
+        @bg-primary4 border border-gray3;
         height: 20vh;
         overflow-y: auto;
-        background: $primary4 0% 0% no-repeat padding-box;
-        border: 1px solid $gray3;
         opacity: 1;
     }
 </style>

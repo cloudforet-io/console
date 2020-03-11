@@ -50,39 +50,39 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 
     .p-field-group {
         margin-bottom: 1rem;
         .form-label {
+            @apply text-dark;
             display: inline-block;
             font-size: .875rem;
             font-weight: bold;
             letter-spacing: 0;
-            color: $dark;
             margin-bottom: 0.25rem;
             margin-right: 0.375rem;
         }
         .invalid-feedback {
-            color: $alert;
+            @apply text-alert;
             font-size: .75rem;
             line-height: .875rem;;
             margin-top: .25rem;
         }
         .valid-feedback {
-            color: $safe;
+            @apply text-safe;
             font-size: .75rem;
             line-height: .875rem;;
             margin-top: .25rem;
         }
         .required-mark {
-            color: $alert;
+            @apply text-alert;
         }
         small {
             font-size: .75rem;
         }
         .is-invalid {
-            border: 1px solid $alert;
+            @apply border border-alert;
         }
     }
 

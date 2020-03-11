@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import styles from '@/styles/_variables.scss';
+import styles from '@/styles/variables';
 
 import PVerticalLayout2 from '@/components/organisms/layouts/vertical-layout/VerticalLayout2.vue';
 import FNB from '@/views/containers/fnb/FNB.vue';
@@ -28,7 +28,7 @@ export default {
     props: {
         height: {
             type: String,
-            default: `calc(100vh - ${styles.lnbHeight})`,
+            default: `calc(100vh - ${styles['lnb-height']})`,
         },
         initWidth: {
             type: Number,
@@ -46,9 +46,9 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .right-container {
-        height: calc(100vh - #{$lnb-height});
+        height: calc(100vh - $(lnb-height));
         display: flex;
         flex-direction: column;
         justify-content: stretch;

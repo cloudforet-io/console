@@ -230,9 +230,9 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .left-container {
-    border-right: 1px solid $gray2;
+    @apply border-r border-gray2;
     padding-right: 2.5rem;
     .img-container {
         padding-right: 2.5rem;
@@ -258,10 +258,10 @@ export default {
     padding-left: 2.5rem;
 }
 .sub-header {
+    @apply text-gray1;
     margin-bottom: .875rem;
     font-size: .875rem;
     font-weight: bold;
-    color: $gray1;
 }
 .reset-btn {
     margin-right: auto;

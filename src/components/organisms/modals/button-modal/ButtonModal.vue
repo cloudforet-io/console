@@ -144,20 +144,20 @@ export default {
 
 };
 </script>
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
         .close-btn {
+            @apply text-dark;
             cursor: pointer;
-            color: $dark;
             &:hover {
-                color: $secondary;
+                @apply text-secondary;
             }
             &.disabled {
-                color: $gray2;
+                @apply text-gray2;
             }
         }
     }

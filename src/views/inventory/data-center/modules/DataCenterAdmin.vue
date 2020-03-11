@@ -277,11 +277,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-label {
+        @apply text-gray;
         margin-bottom:5px;
         margin-right: 0.5rem;
-        color:$gray;
     }
     .btn-margin{
         margin-left: 1rem;

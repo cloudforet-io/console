@@ -32,7 +32,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     $min-width: 1200px;
 .app {
     display: flex;
@@ -50,14 +50,14 @@ export default {
     .app-body {
         overflow-y: auto;
         height: 100vh;
-        width: calc(100vw - #{$gnb-width});
-        min-width: calc(#{$min-width} - #{$gnb-width});
+        width: calc(100vw - $(gnb-width));
+        min-width: calc($(min-width) - $(gnb-width));
 
         .main {
-            height: calc(100vh - #{$lnb-height});
+            height: calc(100vh - $(lnb-height));
             margin: 0;
-            width: calc(100vw - #{$gnb-width});
-            min-width: calc(#{$min-width} - #{$gnb-width});
+            width: calc(100vw - $(gnb-width));
+            min-width: calc($(min-width) - $(gnb-width));
             overflow-x: hidden;
             /*padding-bottom: 2rem;*/
         }

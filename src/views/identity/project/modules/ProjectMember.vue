@@ -274,14 +274,14 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-label {
+        @apply text-dark;
         margin-bottom:5px;
         margin-right: 0.5rem;
-        color:$dark;
     }
     .base-table {
-        box-shadow: 0px 0 10px 0px rgba($black, 0.1);
+        box-shadow: 0px 0 10px 0px rgba(theme('colors.black'), 0.1);
   border-radius: 7px;
     }
     .btn-margin{

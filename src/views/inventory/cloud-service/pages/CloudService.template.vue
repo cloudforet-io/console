@@ -355,7 +355,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     #cloud-service-type-dropdown-btn{
         >>> div > .dropdown-btn.menu-btn{
             min-width: 4.7rem;

@@ -239,16 +239,16 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .card-list {
     height: 100%;
     overflow-y: scroll;
     padding-top: 1.625rem;
     padding-bottom: 2.25rem;
     .beta {
+        @apply text-other1;
         font-size: .5rem;
         font-weight: bold;
-        color: $other1;
         vertical-align: super;
         margin-left: .2rem;
     }

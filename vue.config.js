@@ -12,12 +12,8 @@ module.exports = {
     css: {
         loaderOptions: {
             sass: {
-                data: `
-                @import "~@/styles/_variables.scss";
-                `,
                 includePaths: ['./node_modules'],
                 excludePaths: [path.resolve(__dirname, '..', 'node_modules/monaco-text-editor')],
-
             },
             postcss: postcssConfig,
         },
@@ -34,6 +30,9 @@ module.exports = {
             new MonacoWebpackPlugin({
                 languages: ['json', 'html', 'python', 'javascript', 'css'],
             }),
+            // new StyleLintPlugin({
+            //     files: ['src/**/*.{vue}'],
+            // }),
         ],
     },
 

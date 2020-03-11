@@ -20,17 +20,17 @@
                     <slot name="dragger">
                         <p-i v-if="!isMinimized"
                              class="btn-vertical-dragger"
-                             :color="shiftColorWhenMouseOver"
                              :width="'1rem'"
                              :height="'1rem'"
+                             color="white inherit"
                              :name="'btn_ic_tree_hidden'"
                              @click="setMinimizeAndRevert(true)"
                         />
                         <p-i v-else
                              class="btn-vertical-dragger"
-                             :color="shiftColorWhenMouseOver"
                              :width="'1rem'"
                              :height="'1rem'"
+                             color="white inherit"
                              :name="'btn_ic_tree_hidden—folded'"
                              @click="setMinimizeAndRevert(false)"
                         />
@@ -55,7 +55,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import { defineComponent } from '@vue/composition-api';
-import styles from '@/styles/_variables.scss';
+import styles from '@/styles/variables';
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default defineComponent({
@@ -65,7 +65,7 @@ export default defineComponent({
     props: {
         height: {
             type: String,
-            default: `calc(100vh - ${styles.lnbHeight})`,
+            default: `calc(100vh - ${styles['lnb-height']})`,
         },
         line: {
             type: Boolean,
@@ -85,7 +85,7 @@ export default defineComponent({
         },
         totalWidth: {
             type: String,
-            default: `calc(100vw -${styles.gnbWidth})`,
+            default: `calc(100vw -${styles['gnb-height']})`,
         },
         autoSaveLeftWidth: {
             type: Boolean,
@@ -112,10 +112,7 @@ export default defineComponent({
     },
     computed: {
         rightContainerWidth() {
-            return `calc(100vw - ${styles.gnbWidth} - ${this.leftContainerWidth + this.draggerWidth}px)`;
-        },
-        shiftColorWhenMouseOver() {
-            return this.mouseOver ? `white ${styles.secondary}` : 'white primary3';
+            return `calc(100vw - ${styles['gnb-height']} - ${this.leftContainerWidth + this.draggerWidth}px)`;
         },
     },
     created() {
@@ -206,7 +203,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .box-container {
         display: flex;
         flex-grow: 1;
@@ -218,8 +215,8 @@ export default defineComponent({
             flex-direction: column;
             justify-content: space-between;
             .fnb {
-                min-height: $fnb-height;
-                max-height: $fnb-height;
+                min-height: $(fnb-height);
+                max-height: $(fnb-height);
             }
         }
         &.left{
@@ -245,22 +242,23 @@ export default defineComponent({
         align-items: flex-start;
         justify-content: center;
         &.line {
-            border-left: 1px solid $gray1;
+            @apply border-l border-gray1;
             background-color: transparent;
             &:hover {
-                border-left: 1px solid $secondary;
+                @apply border-l border-secondary;
                 cursor: ew-resize;
             }
         }
         &.prohibit-line {
-            border-left: 1px solid $gray;
+            @apply border-l border-gray;
             background-color: transparent;
             &:hover {
-                border-left: 1px solid $secondary;
+                @apply border-l border-secondary;
             }
         }
 
         .dragger {
+            @apply text-dark;
             display: inline-block;
             cursor: pointer;
             height: 30px;
@@ -269,7 +267,6 @@ export default defineComponent({
             text-align: center;
             z-index: 99;
             cursor: col-resize;
-            color: $dark;
             > span {
                 margin-right: 26px;
                 cursor: pointer;
@@ -279,7 +276,10 @@ export default defineComponent({
             margin-top: 1rem;
             margin-left: 1rem;
             justify-content: center;
-            color: $dark;
+            @apply text-gray1;
+            &:hover {
+                @apply text-secondary;
+            }
         }
     }
 </style>

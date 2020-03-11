@@ -402,7 +402,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .left-toolbox-item{
         margin-left: 1rem;
         &:last-child {
@@ -411,9 +411,9 @@ export default {
     }
 
     #empty-space{
+        @apply text-primary2;
         text-align: center;
         margin-bottom: 0.5rem;
-        color: $primary2;
         font: 24px/32px Arial;
     }
 </style>

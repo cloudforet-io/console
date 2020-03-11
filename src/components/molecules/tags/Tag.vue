@@ -90,7 +90,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-tag {
         margin-right: .5rem;
         vertical-align: middle;
@@ -99,13 +99,13 @@ export default defineComponent({
         &.deletable {
             padding-right: 0.15rem;
             .icon {
-                color: $gray1;
+                @apply text-gray1;
                 cursor: pointer;
             }
             &:hover {
-                background-color: $gray3;
+                @apply bg-gray3;
                 .icon {
-                    color: $alert;
+                    @apply text-alert;
                 }
             }
         }

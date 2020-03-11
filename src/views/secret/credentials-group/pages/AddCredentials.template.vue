@@ -334,7 +334,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .back {
         color: #A5ACCE;
         cursor: pointer;

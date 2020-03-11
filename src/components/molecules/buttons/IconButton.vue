@@ -29,8 +29,6 @@ import {
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-// @ts-ignore
-// import { white, gray1 } from '@/styles/_variables.scss';
 
 export default defineComponent({
     name: 'PIconButton',
@@ -81,7 +79,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .icon-button {
         border-radius: 2px;
         padding: 0px;
@@ -92,34 +90,38 @@ export default defineComponent({
         max-width: 2rem;
         min-height: 2rem;
         max-height: 2rem;
-        color: $gray1;
+        @apply text-gray1;
         &:hover {
-            color: $white;
+            @apply text-white;
         }
-        &.disabled{
-            background-color: $gray2;
+        &.disabled {
+            @apply bg-gray2;
+            cursor: unset;
             &:hover {
                 color: inherit;
             }
         }
         &.white {
-            background-color: $white;
-            border-color: $gray2;
+            @apply bg-white border-gray2;
             &:hover {
-                color: $gray2;
+                @apply text-gray2;
             }
         }
         &.dark {
-            background-color: $dark;
+            @Qapply bg-dark;
         }
         &:not(:disabled):not(.disabled):hover {
-            background-color: $secondary;
-            border-color: $secondary;
+            @apply bg-secondary border-secondary;
         }
         &.transparent {
             &.disabled {
+                @apply text-gray2;
                 border-color: transparent;
                 background-color: transparent;
+                cursor: unset;
+                &:hover {
+                    @apply text-gray2;
+                }
             }
         }
     }

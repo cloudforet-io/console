@@ -110,7 +110,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .summary-padding {
         padding-left: 15px;
         padding-right: 15px;
@@ -140,7 +140,7 @@ export default {
       z-index: 99;
       height: 50%;
       overflow: hidden;
-      background: rgba($white, .5);
+      background: rgba(theme('colors.white'), .5);
       .spinner {
           position: relative;
           display: inline-flex;

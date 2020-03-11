@@ -19,19 +19,19 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .p-box-layout {
     padding: .5rem;
     border: 1px solid;
     border-radius: 2px;
 
-    @mixin box-color($theme, $bg-color, $line-color) {
-        &.#{$theme} {
+    @define-mixin box-color $theme, $bg-color, $line-color {
+        &.$(theme) {
             background-color: $bg-color;
             border-color: $line-color;
         }
     }
 
-    @include box-color('primary4', $primary4, $gray3);
+    @mixin box-color primary4, theme('colors.primary4'), theme('colors.gray3');
 }
 </style>

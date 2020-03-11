@@ -18,15 +18,15 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .fnb {
+        @apply text-gray2;
         height: $fnb-height;
-        color: $gray2;
         .fnb-contents {
+            @apply border-t border-primary3;
             height: 100%;
             padding: .5rem 0;
             margin: 0rem 1.5rem;
-            border-top: 1px solid $primary3;
         }
     }
 </style>

@@ -65,7 +65,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .card-list-spinner-container {
         display: flex;
         height: 100%;

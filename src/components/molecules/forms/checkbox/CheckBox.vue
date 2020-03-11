@@ -13,8 +13,7 @@
 
 <script>
 import _ from 'lodash';
-import PI from '@/components/atoms/icons/PI';
-import { dark } from '@/styles/_variables.scss';
+import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     name: 'PCheckBox',
@@ -50,7 +49,7 @@ export default {
             if (this.isSelected) {
                 name += '--checked';
             } else if (this.hovered || this.mouseover) {
-                color = `transparent ${dark}`;
+                color = 'transparent inherit';
                 fill = false;
             }
             return {
@@ -79,7 +78,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-checkbox {
         input{
             position: absolute;
@@ -87,6 +86,9 @@ export default {
             cursor: pointer;
             height: 0;
             width: 0;
+        }
+        .check {
+            @apply text-dark;
         }
     }
 </style>

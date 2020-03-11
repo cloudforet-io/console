@@ -126,21 +126,9 @@ export default defineComponent( {
 });
 </script>
 
-<style lang="scss">
-    %row {
-        background-color: $white;
-    }
-    %hover{
-        background-color: $secondary2;
-    }
-    %striped-row {
-        background-color: $primary4;
-    }
-    %striped-hovered-row {
-        background-color: $secondary2;
-    }
-    .table-background{
-             background-color: white;
+<style lang="postcss">
+    .table-background {
+        @apply bg-white;
     }
     .p-table{
         @apply w-full max-w-full mb-4;
@@ -150,28 +138,25 @@ export default defineComponent( {
         thead{
             tr{
                 th{
+                    @apply bg-white border-t border-dark border-b text-gray1;
                     position: sticky;
                     z-index: 1;
                     top: 0;
                     padding: .25rem 0 .25rem .75rem;
-                    background-color: $white;
-                    border-top: 1px solid $dark;
-                    border-bottom: 1px solid $dark;
                     line-height: 1.5rem;
                     text-align: left;
                     letter-spacing: 0;
-                    color: $gray1;
                 }
             }
         }
         &.table-hover{
             tbody tr:hover {
-                @extend %hover
+                @apply bg-secondary2;
             }
         }
         tbody{
             tr{
-                @extend %row;
+                @apply bg-white;
                 td{
                     height: 2.5rem;
                     padding: 0 .75rem;
@@ -194,9 +179,9 @@ export default defineComponent( {
         background-color: transparent;
     }
     .table-striped tbody tr:nth-of-type(even) {
-        @extend %striped-row;
+        @apply bg-primary4;
         &:hover {
-            @extend %hover;
+            @apply bg-secondary2;
         }
     }
 

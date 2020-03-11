@@ -81,30 +81,29 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .menu {
+    @apply text-gray ;
     padding: 0 1rem .1rem 1rem;
-    color: $gray;
     font-size: 0.875rem;
     line-height: 2rem;
     cursor: pointer;
     &:hover {
-        color: $secondary;
+        @apply text-secondary;
     }
     &.now {
         .link {
-            border-bottom: 2px solid $primary;
-            color: $primary;
+            @apply border-b-2 border-primary text-primary;
             font-weight: bold;
             &:hover {
-                color: $secondary;
+                @apply text-secondary;
             }
         }
     }
     .beta {
+        @apply text-other1;
         font-size: .5rem;
         font-weight: bold;
-        color: $other1;
         vertical-align: super;
         margin-left: .2rem;
     }

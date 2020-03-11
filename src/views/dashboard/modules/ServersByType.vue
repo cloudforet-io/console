@@ -104,7 +104,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .server-type-chart {
         padding: 1.375rem 0;
     }
@@ -114,7 +114,7 @@ export default {
         padding-bottom: 1rem;
     }
     .card-layout {
-        border: 1px solid $gray2;
+        @apply border border-gray2;
         border-radius: 2px;
     }
 </style>

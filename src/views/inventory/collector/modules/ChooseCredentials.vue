@@ -183,7 +183,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .left-toolbox {
         width: 100%;
         .radios {

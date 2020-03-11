@@ -71,7 +71,7 @@ export default defineComponent({
     },
 });
 </script>
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .p-dropdown-menu-btn{
         position: relative;
     }

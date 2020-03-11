@@ -96,23 +96,22 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>/* b-modal */
+<style lang="postcss" scoped>/* b-modal */
 .modal-content {
+    @apply bg-white border border-gray3;
     display: flex;
     flex-direction: column;
     width: 100%;
     pointer-events: auto;
     border-radius: 2px;
-    background: $white;
-    box-shadow: 0 0 1rem rgba($gray3, .22);
-    border: 1px solid $gray3;
+    box-shadow: 0 0 1rem rgba(theme('colors.gray3'), .22);
     transition: all .3s ease;
     justify-content: space-between;
 
     $header-height: 3.5rem;
     $footer-height: 5.5rem;
     $wrapper-margin: 4rem;
-    $body-max-height: calc(100vh - #{$header-height} - #{$footer-height} - #{$wrapper-margin});
+    $body-max-height: calc(100vh - $(header-height) - $(footer-height) - $(wrapper-margin));
 
     .modal-header {
         height: $header-height;
@@ -135,25 +134,25 @@ export default {
 }
 
 
-@mixin modal-color($color) {
+@define-mixin modal-color $color {
     .modal-header {
         border-bottom: 2px solid $color;
         color: $color;
     }
 }
 
-.modal-primary { @include modal-color($primary); }
-.modal-primary-dark { @include modal-color($primary-dark); }
-.modal-primary1 { @include modal-color($primary1); }
-.modal-primary2 { @include modal-color($primary2); }
-.modal-secondary { @include modal-color($secondary); }
-.modal-secondary1 { @include modal-color($secondary1); }
-.modal-safe { @include modal-color($safe); }
-.modal-alert { @include modal-color($alert); }
-.modal-other1 { @include modal-color($other1); }
-.modal-other2 { @include modal-color($other2); }
-.modal-other3 { @include modal-color($other3); }
-.modal-other4 { @include modal-color($other4); }
-.modal-dark { @include modal-color($dark); }
-.modal-gray { @include modal-color($gray); }
+.modal-primary { @mixin modal-color theme('colors.primary'); }
+.modal-primary-dark { @mixin modal-color theme('colors.primary-dark'); }
+.modal-primary1 { @mixin modal-color theme('colors.primary1'); }
+.modal-primary2 { @mixin modal-color theme('colors.primary2'); }
+.modal-secondary { @mixin modal-color theme('colors.secondary'); }
+.modal-secondary1 { @mixin modal-color theme('colors.secondary1'); }
+.modal-safe { @mixin modal-color theme('colors.safe'); }
+.modal-alert { @mixin modal-color theme('colors.alert'); }
+.modal-other1 { @mixin modal-color theme('colors.other1'); }
+.modal-other2 { @mixin modal-color theme('colors.other2'); }
+.modal-other3 { @mixin modal-color theme('colors.other3'); }
+.modal-other4 { @mixin modal-color theme('colors.other4'); }
+.modal-dark { @mixin modal-color theme('colors.dark'); }
+.modal-gray { @mixin modal-color theme('colors.gray'); }
 </style>
