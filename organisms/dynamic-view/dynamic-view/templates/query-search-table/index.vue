@@ -62,9 +62,9 @@ import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/Dyn
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 
-import { QuerySearchTableAPI } from '@/lib/api';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
+import {QuerySearchTableAPI} from "@/lib/api/table";
 
 interface DataSourceType {
     name:string;
