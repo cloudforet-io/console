@@ -54,7 +54,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss">
     .vue-notification-group {
         overflow: unset;
         margin: 0 2rem;

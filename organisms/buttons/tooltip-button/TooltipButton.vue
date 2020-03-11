@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import PTooltip from '@/components/molecules/tooltips/Tooltip';
-import PButton from '@/components/atoms/buttons/Button';
+import PTooltip from '@/components/molecules/tooltips/Tooltip.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 
 export default {
     name: 'PTooltipButton',

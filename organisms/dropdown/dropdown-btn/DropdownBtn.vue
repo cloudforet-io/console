@@ -27,7 +27,6 @@
 import { defineComponent } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-import { secondary } from '@/styles/_variables.scss';
 
 export default defineComponent({
     name: 'PDropdownBtn',
@@ -55,7 +54,7 @@ export default defineComponent({
                 mouseover: '#222532',
             },
             mouseover: false,
-            iconHoverColor: `transparent ${secondary}`,
+            iconHoverColor: 'transparent inherit',
         };
     },
     computed: {
@@ -99,6 +98,9 @@ export default defineComponent({
     border-bottom-width: 1px;
     border-style: solid;
     min-width: 2rem;
+    &:hover {
+        @apply text-secondary;
+    }
     &.disabled{
         @apply border-gray2 bg-gray2 text-gray1;
     }

@@ -49,8 +49,8 @@ import {
     reactive, toRefs, computed,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
-import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
-import styles from '@/styles/_variables.scss';
+import PChart, { setTooltips } from '@/components/molecules/charts/Chart.vue';
+import colorStyles from '@/styles/colors';
 
 const LABELS = {
     PAD: { TOP: 8, BOTTOM: 4 },
@@ -59,7 +59,7 @@ const LABELS = {
 const BARS = {
     THICKNESS: 8,
     HEIGHT: 14,
-    COLOR: styles.primary1,
+    COLOR: colorStyles.primary1,
 };
 
 const setDrawTools = (props, context) => {
@@ -167,7 +167,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="postcss">
     .horizontal-bar-g {
         .container {
             fill: transparent;

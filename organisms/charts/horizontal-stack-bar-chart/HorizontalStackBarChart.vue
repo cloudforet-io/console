@@ -63,7 +63,7 @@ import { VTooltip } from 'v-tooltip';
 import PChart, { setTooltips } from '@/components/molecules/charts/Chart.vue';
 import PChartLegend from '@/components/organisms/legends/ChartLegend.vue';
 import { colorset } from '@/lib/util';
-import styles from '@/styles/_variables.scss';
+import colorStyles from '@/styles/colors';
 
 const setDrawTools = (props, context) => {
     const state = reactive({
@@ -78,7 +78,7 @@ const setDrawTools = (props, context) => {
         colors: d3.scaleOrdinal().range(colorset),
         barThickness: props.thickness,
         empty: false,
-        emptyColor: styles.primary3,
+        emptyColor: colorStyles.primary3,
         sortedData: computed(() => {
             const items = _.flatMap(props.data, (d, k) => ({ key: k, val: d }));
             return _.sortBy(items, ['key']);
