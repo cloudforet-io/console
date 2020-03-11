@@ -71,7 +71,7 @@ export default {
             transition: false,
             sbContainerStyle: computed(() => ({
                 width: `${state.width}px`,
-                overflow: 'auto',
+                overflow: 'hidden',
             })),
             sbStyle: computed(() => ({
                 width: 'auto',
