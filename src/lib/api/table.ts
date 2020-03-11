@@ -42,6 +42,7 @@ export abstract class BaseTableAPI<initData = any, initSyncData = any,
 
     protected abstract paramQuery: Ref<ApiQuery>;
 
+    // @ts-ignore
     protected requestData = async () => {
         const params = {
             query: this.paramQuery.value,

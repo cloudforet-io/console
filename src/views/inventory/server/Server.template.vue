@@ -39,6 +39,7 @@
                             @click-maintenance="clickMaintenance"
                             @click-closed="clickClosed"
                             @click-delete="clickDelete"
+                            @click-project="clickProject"
                         >
                             Action
                         </PDropdownMenuBtn>
@@ -152,6 +153,7 @@
 
             @confirm="checkModalConfirm"
         />
+        <s-project-tree-modal :visible.sync="projectModalVisible" />
     </general-page-layout>
 </template>
 
@@ -185,7 +187,10 @@ import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import {AdminTableAPI, HistoryAPI, MockAdminTableAPI, MockHistoryAPI} from "@/lib/api/table";
+import {
+    MockAdminTableAPI, MockHistoryAPI,
+} from '@/lib/api/table';
+import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -370,7 +375,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
             ['maintenance', 'INVENTORY.BTN.SET_MAINTENANCE'],
             ['closed', 'INVENTORY.BTN.SET_CLOSE'],
             [null, null, { type: 'divider' }],
-            ['project', 'COMMON.CHG_PRO', { disabled: true }],
+            ['project', 'COMMON.CHG_PRO'],
             ['pool', 'BTN.CHG_POOL', { disabled: true }],
         ],
         context.parent,
@@ -378,6 +383,11 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
     });
     const queryList = ref([]);
     const queryListTools = tagList(queryList, true, eventBus, eventName.getServerList);
+
+    const projectModalVisible = ref(false);
+    const clickProject = () => {
+        projectModalVisible.value = true;
+    };
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
@@ -412,6 +422,8 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         checkModalConfirm,
         ACHandler,
         queryListTools,
+        projectModalVisible,
+        clickProject,
     });
 };
 
@@ -441,6 +453,7 @@ export default {
         PHr,
         PIconButton,
         PDynamicView,
+        SProjectTreeModal,
     },
     setup(props, context) {
         const dataBind = reactive({
