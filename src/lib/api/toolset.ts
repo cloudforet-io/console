@@ -1,18 +1,23 @@
 import Vue from 'vue';
 import { AxiosResponse } from 'axios';
+import { getCurrentInstance } from '@vue/composition-api';
 import { readonlyArgs } from '@/lib/type';
 import { SearchQueryType } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { api } from './axios';
 
 export abstract class DynamicAPI {
-    public abstract vm: Vue;
+    public vm: any;
 
     // eslint-disable-next-line class-methods-use-this
     get $http() {
         return api.instance;
     }
 
-    protected abstract requestData(data?: any, ...args:any[]): Promise<AxiosResponse<any>>;
+    protected abstract requestData(data?: any, ...args:any[]): Promise<any[]>;
+
+    constructor() {
+        this.vm = getCurrentInstance();
+    }
 }
 
 export abstract class getDataAPI extends DynamicAPI {
