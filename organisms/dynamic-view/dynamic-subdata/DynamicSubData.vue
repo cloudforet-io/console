@@ -16,10 +16,10 @@ import {
     onMounted, reactive, toRefs, watch, computed, defineComponent, Ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import { SubDataAPI } from '@/lib/api';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
+import {SubDataAPI} from "@/lib/api/table";
 
 interface Props {
     selectId:string;
