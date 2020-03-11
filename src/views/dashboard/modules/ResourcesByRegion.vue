@@ -87,7 +87,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .chart {
     padding: 1.5rem 0 0 0;
     height: 312px;

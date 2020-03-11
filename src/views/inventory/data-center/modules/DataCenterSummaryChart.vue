@@ -80,11 +80,12 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .summary {
         width: 100%;
     }
     .title {
+        @apply text-primary2;
         color: $primary2;
         font-size: 1rem;
         font-weight: bold;
@@ -106,10 +107,9 @@ export default {
             margin-right: 0;
         }
         &.hover {
-            border: 1px solid $secondary;
-            color: $secondary;
+            @apply border border-secondary text-secondary;
             .count {
-                color: $secondary;
+                @apply text-secondary;
             }
         }
         .label {
@@ -118,8 +118,8 @@ export default {
             max-width: 45%;
         }
         .count {
+            @apply text-primary-dark;
             font-size: 2rem;
-            color: $primary-dark;
             font-weight: bold;
             cursor: pointer;
         }

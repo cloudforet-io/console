@@ -1,14 +1,15 @@
 <template>
     <svgicon v-bind="$props" v-on="$listeners" />
 </template>
-<script>
+<script lang="ts">
+import { defineComponent } from '@vue/composition-api';
 import '@/components/atoms/icons/p-icons';
 
 /**
  * Vue Plugin 'SvgIcon'
  * Reference: https://github.com/MMF-FE/vue-svgicon
  */
-export default {
+export default defineComponent({
     name: 'PI',
     props: {
         /** @type {string} */
@@ -73,7 +74,7 @@ export default {
             default: undefined,
         },
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

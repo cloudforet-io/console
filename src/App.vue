@@ -66,8 +66,7 @@ export default defineComponent({
 
 </script>
 
-<style lang="scss">
-    @import 'styles/style';
+<style lang="postcss">
     #loading {
         background-color: transparent;
         /*lottie image size*/

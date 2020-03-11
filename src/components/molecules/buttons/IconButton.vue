@@ -29,8 +29,6 @@ import {
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-// @ts-ignore
-// import { white, gray1 } from '@/styles/_variables.scss';
 
 export default defineComponent({
     name: 'PIconButton',
@@ -96,8 +94,9 @@ export default defineComponent({
         &:hover {
             @apply text-white;
         }
-        &.disabled{
+        &.disabled {
             @apply bg-gray2;
+            cursor: unset;
             &:hover {
                 color: inherit;
             }
@@ -116,8 +115,13 @@ export default defineComponent({
         }
         &.transparent {
             &.disabled {
+                @apply text-gray2;
                 border-color: transparent;
                 background-color: transparent;
+                cursor: unset;
+                &:hover {
+                    @apply text-gray2;
+                }
             }
         }
     }

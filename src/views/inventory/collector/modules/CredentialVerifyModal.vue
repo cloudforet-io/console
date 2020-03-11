@@ -104,7 +104,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .confirm-btn {
         display: flex;
         justify-content: center;
@@ -116,8 +116,8 @@ export default {
         }
     }
     .verified-col {
+        @apply text-safe;
         display: flex;
-        color: $safe;
         justify-content: center;
     }
 </style>

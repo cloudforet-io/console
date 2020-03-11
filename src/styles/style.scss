@@ -1,10 +1,10 @@
 /* Main styles for this application */
 
-// Reset
+/* Reset */
 @import "reset";
 
-// Import auto generated icons based on assets
-@import "~@/styles/icon-fonts.scss";
+/* Import auto generated icons based on assets */
+@import "~@/styles/icon-fonts";
 
 /* Tailwind */
 @import '~tailwindcss/base';

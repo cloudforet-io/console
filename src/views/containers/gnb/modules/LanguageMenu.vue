@@ -60,8 +60,8 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .icon {
-        color: $primary4;
+        @apply text-primary4;
     }
 </style>

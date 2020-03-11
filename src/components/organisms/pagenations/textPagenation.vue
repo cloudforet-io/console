@@ -1,10 +1,10 @@
 <template>
     <nav class="text-pagenation">
-        <p-icon-button
-            name="ic_arrow_left"
-            :disabled="thisPage === 1"
-            :hover-color="iconHoverColor"
-            @click="update(thisPage-1)"
+        <p-icon-button class="text"
+                       name="ic_arrow_left"
+                       :disabled="thisPage === 1"
+                       color="transparent inherit"
+                       @click="update(thisPage-1)"
         />
         <div class="page-number">
             <div class="page-number-text">
@@ -12,17 +12,16 @@
             </div>
         </div>
 
-        <p-icon-button
-            name="ic_arrow_right"
-            :disabled="thisPage === allPage"
-            :hover-color="iconHoverColor"
-            @click="update(thisPage+1)"
+        <p-icon-button class="text"
+                       name="ic_arrow_right"
+                       :disabled="thisPage === allPage"
+                       color="transparent inherit"
+                       @click="update(thisPage+1)"
         />
     </nav>
 </template>
 <script>
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
-import { secondary1 } from '@/styles/_variables.scss';
 
 export default {
     name: 'PTextButton',
@@ -33,7 +32,7 @@ export default {
                 emit('update:thisPage', page);
                 emit('pageChange', page);
             },
-            iconHoverColor: `transparent ${secondary1}`,
+            iconHoverColor: 'transparent inherit',
         };
     },
     props: {
@@ -54,32 +53,38 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .text-pagenation{
+    .text-pagenation {
         display: inline-flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap:nowrap;
         min-width: 64px;
+        .text {
+            color: inherit;
+            &:hover {
+                color: theme('colors.secondary1')
+            }
+        }
     }
-    .page-number{
+    .page-number {
         display: inline-flex;
         justify-content: center;
         min-width: 64px;
         min-height: 32px;
         align-items: center;
         cursor: default;
-        .page-number-text{
+        .page-number-text {
             line-height: 1.2rem;
-            .this-page{
+            .this-page {
                 font-weight: bold;
             }
         }
 
     }
-    .icon-button{
-        &:not(:disabled):not(.disabled):hover{
+    .icon-button {
+        &:not(:disabled):not(.disabled):hover {
             @apply bg-white;
-            border-color:transparent ;
+            border-color:transparent;
         }
     }
 

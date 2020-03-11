@@ -7,12 +7,12 @@
             @click="tabClick(tab.name)"
         >
             <a
-                class="p-nav-link inline-block py-2 px-4 no-underline"
+                class="p-nav-link"
                 :class="{active: activeTab === tab.name,
                          disabled: tab.disabled,
                          'one-tab':isOne }"
             >
-                {{ tab.label }}
+                <span class="label">{{ tab.label }}</span>
             </a>
         </li>
     </ul>
@@ -76,7 +76,7 @@ export default {
         cursor: pointer;
     }
     .p-nav-link {
-        @apply border-b border-gray3 bg-white;
+        @apply flex no-underline border border-gray3 bg-white;
         font: 14px/16px Arial;
         min-width: 7.5rem;
         min-height: 2rem;
@@ -84,6 +84,10 @@ export default {
         border-radius: 2px 2px 0px 0px;
         text-align: center;
         margin-bottom: -1px;
+        .label {
+            line-height: 2rem;
+            width: 100%;
+        }
         &:hover {
             @apply text-secondary;
         }
@@ -92,10 +96,10 @@ export default {
             font-weight: bold;
             box-shadow: 0.25rem -0.25rem 0.75rem -0.25rem  #4D49B614,
                         -0.25rem -0.25rem 0.75rem -0.25rem #4D49B614;
-            &:not(.one-tab) {
+            &:not(.one-tab) .label {
                 @apply border-b-2 border-primary;
             }
-            &.one-tab {
+            &.one-tab .label {
                 @apply border-b-2 border-white;
             }
         }

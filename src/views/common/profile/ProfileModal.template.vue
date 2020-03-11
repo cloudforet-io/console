@@ -215,7 +215,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .profile-form {
     text-align: left;
     .form-div {

@@ -141,7 +141,7 @@ export default {
     },
 };
 </script>
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .left-toolbox-item{
         margin-left: 1rem;
         &:last-child {

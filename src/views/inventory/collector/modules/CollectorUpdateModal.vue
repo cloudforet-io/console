@@ -116,7 +116,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .reset-btn {
         margin-right: auto;
     }

@@ -114,14 +114,14 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .plugin-filter-container {
     padding: 0 1rem;
     .rows {
          margin-top: 1.25rem;
      }
     .back-btn {
-        color: $primary2;
+        @apply text-primary2;
         font-size: .875rem;
         height: 1.5rem;
         padding: 0;
@@ -140,7 +140,7 @@ export default {
         margin-bottom: .5rem;
         cursor: pointer;
         &.selected {
-            color: $secondary;
+            @apply text-secondary;
         }
         .p-radio {
             margin-right: .25rem;

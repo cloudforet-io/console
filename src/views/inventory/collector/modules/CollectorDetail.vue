@@ -147,7 +147,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .name {
         .icon {
             display: inline-block;

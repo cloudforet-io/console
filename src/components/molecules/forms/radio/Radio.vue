@@ -15,7 +15,6 @@
 import { ref, computed } from '@vue/composition-api';
 import _ from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
-import { dark } from '@/styles/_variables.scss';
 
 export default {
     name: 'PRadio',
@@ -56,7 +55,7 @@ export default {
             if (isSelected.value) {
                 name += '--checked';
             } else if (props.hovered || mouseover.value) {
-                color = `transparent ${dark}`;
+                color = 'transparent inherit';
                 fill = false;
             }
             return {
@@ -83,6 +82,7 @@ export default {
         width: 0;
     }
     .radio-icon {
+        @apply text-dark;
         cursor: pointer;
     }
 }

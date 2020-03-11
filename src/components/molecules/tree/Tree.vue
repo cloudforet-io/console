@@ -207,7 +207,7 @@ export default {
 };
 </script>
 <style lang="postcss">
-    @import '~@/styles/vendors/sl-vue-tree.scss';
+    @import './sl-vue-tree.css';
 
     /* sl-vue-tree */
     @define-mixin node-item-background $bg-color {

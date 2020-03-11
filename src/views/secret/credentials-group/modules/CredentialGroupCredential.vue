@@ -272,7 +272,7 @@ export default {
     },
 };
 </script>
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .left-toolbox-item{
         margin-right: 1rem;
     }

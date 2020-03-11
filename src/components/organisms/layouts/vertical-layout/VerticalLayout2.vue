@@ -37,7 +37,7 @@ import {
 } from '@vue/composition-api';
 import PI from '@/components/atoms/icons/PI.vue';
 import { documentEventMount } from '@/lib/compostion-util';
-import styles from '@/styles/_variables.scss';
+import styles from '@/styles/variables';
 
 export default {
     name: 'VerticalLayout2',
@@ -47,7 +47,7 @@ export default {
     props: {
         height: {
             type: String,
-            default: `calc(100vh - ${styles.lnbHeight})`,
+            default: `calc(100vh - ${styles['lnb-height']})`,
         },
         initWidth: {
             type: Number,
@@ -134,7 +134,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .vertical-container {
         display: flex;
         width: 100%;
@@ -149,7 +149,7 @@ export default {
         }
     }
     .main {
-        height: calc(100vh - #{$lnb-height});
+        height: calc(100vh - $(lnb-height));
         display: flex;
         flex-direction: column;
         justify-content: stretch;
@@ -162,28 +162,28 @@ export default {
         justify-content: center;
         width: 1rem;
         &.line {
-            border-left: 1px solid $gray2;
+            @apply border-l border-gray2;
             background-color: transparent;
             &:hover {
-                border-left: 1px solid $secondary;
+                @apply border-l border-secondary;
                 cursor: ew-resize;
             }
         }
         &.prohibit-line {
-            border-left: 1px solid $gray2;
+            @apply border-l border-gray2;
             background-color: transparent;
             &:hover {
-                border-left: 1px solid $secondary;
+                @apply border-l border-secondary;
             }
         }
         .resizer {
+            @apply text-gray1;
             display: inline-block;
             font-size: 1.5rem;
             font-weight: 600;
             text-align: center;
             z-index: 99;
             cursor: col-resize;
-            color: $gray1;
             > span {
                 margin-right: 26px;
                 cursor: pointer;
@@ -194,7 +194,7 @@ export default {
             margin-left: .5rem;
             justify-content: center;
             &:hover {
-                color: $secondary;
+                @apply text-secondary;
             }
         }
     }

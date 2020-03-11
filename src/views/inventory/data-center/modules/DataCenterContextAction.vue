@@ -314,9 +314,9 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .base-table {
-        box-shadow: 0px 0 10px 0px rgba($black, 0.1);
+        box-shadow: 0px 0 10px 0px rgba(theme('coclors.black'), 0.1);
   border-radius: 7px;
     }
     .btn-margin{
@@ -333,7 +333,7 @@ export default {
     }
 
     .input-tag-card{
+        @apply bg-primary4;
         padding-top: 0.5rem;
-        background-color: $primary4;
     }
 </style>

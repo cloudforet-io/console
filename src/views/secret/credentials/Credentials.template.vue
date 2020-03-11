@@ -391,7 +391,7 @@ export default {
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .left-toolbox-item{
         margin-left: 1rem;
         &:last-child {
@@ -400,15 +400,15 @@ export default {
     }
 
     #empty-space{
+        @apply text-primary2;
         text-align: center;
         margin-bottom: 0.5rem;
-        color: $primary2;
         font: 24px/32px Arial;
     }
     .p-label {
+        @apply text-dark;
         left-margin: 0.5rem;
         margin-bottom:5px;
         margin-right: 0.5rem;
-        color:$dark;
     }
 </style>

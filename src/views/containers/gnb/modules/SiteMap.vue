@@ -6,8 +6,9 @@
                           @click="toggle"
         >
             <template #buttonContents>
-                <p-i name="ic_gnb_services" width="2rem" height="2rem"
-                     :color="`transparent ${iconColor}`"
+                <p-i class="service-icon" name="ic_gnb_services"
+                     width="2rem" height="2rem"
+                     color="transparent inherit"
                 />
             </template>
         </p-tooltip-button>
@@ -120,10 +121,10 @@
 </template>
 
 <script>
-import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton';
-import PButton from '@/components/atoms/buttons/Button';
-import PI from '@/components/atoms/icons/PI';
-import styles from '@/styles/_variables.scss';
+import { reactive, toRefs, defineComponent } from '@vue/composition-api';
+import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     name: 'SiteMap',
@@ -132,58 +133,55 @@ export default {
         PI,
         PTooltipButton,
     },
-    data() {
-        return {
+    setup(props) {
+        const state = reactive({
             visible: false,
-            iconColor: styles.primary4,
+        });
+
+        return {
+            ...toRefs(state),
+            show() { state.visible = true; },
+            hide() { state.visible = false; },
+            toggle() { state.visible = !state.visible; },
         };
-    },
-    methods: {
-        show() {
-            this.visible = true;
-        },
-        hide() {
-            this.visible = false;
-        },
-        toggle() {
-            this.visible = !this.visible;
-        },
     },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     $sitemap-width: 260px;
 .sitemap-container {
+    .service-icon {
+        @apply text-primary4;
+    }
     .activator {
+        @apply text-primary4;
         display: inline-block;
         padding: 0;
         border-radius: 2px;
         min-width: 2rem;
         height: 2rem;
-        color: $primary4;
         &:hover, &.active {
-            background-color: $primary-dark;
+            @apply bg-primary-dark;
         }
     }
 
     .sitemap {
+        @apply bg-primary4 text-dark;
         position: fixed;
         left: $gnb-width;
         top: 0;
         height: 100vh;
         width: $sitemap-width;
-        background-color: $primary4;
         overflow: hidden;
-        box-shadow: 4px 0 8px rgba($dark, 0.32);
-        color: $dark;
+        box-shadow: 4px 0 8px rgba(theme('colors.dark'), 0.32);
         text-align: left;
         .title {
+            @apply text-gray;
             display: flex;
             align-items: center;
             font-size: 1rem;
             padding: 1rem 1.75rem;
-            color: $gray;
             font-weight: bold;
             line-height: 1.5rem;
             .name {
@@ -197,7 +195,7 @@ export default {
                 border-radius: 2px;
                 border: 0;
                 &:hover {
-                    background-color: $primary3;
+                    @apply bg-primary3;
                 }
             }
         }
@@ -209,9 +207,9 @@ export default {
             display: block;
             cursor: pointer;
             &:hover {
-                background: $primary3;
+                @apply bg-primary3;
                 .icon {
-                    color: $primary;
+                    @apply text-primary;
                 }
             }
             a {
@@ -220,7 +218,7 @@ export default {
         }
 
         .group {
-            border-top: 1px solid $gray3;
+            @apply border-t border-gray3;
             padding: 1rem 1.75rem;
             font-size: 1rem;
             font-weight: bold;
@@ -246,11 +244,11 @@ export default {
     }
     .backdrop {
         position: fixed;
-        left: calc(#{$gnb-width} + #{$sitemap-width});
+        left: calc($(gnb-width) + $(sitemap-width));
         top: 0;
         height: 100vh;
-        width: calc(100vw - #{$gnb-width} - #{$sitemap-width});
-        background-color: rgba($dark, 0.32);
+        width: calc(100vw - $(gnb-width) - $(sitemap-width));
+        background-color: rgba(theme('colors.dark'), 0.32);
         overflow: hidden;
     }
 }

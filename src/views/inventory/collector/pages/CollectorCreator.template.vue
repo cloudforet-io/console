@@ -198,10 +198,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .back-btn {
+        @apply text-primary2;
         margin-bottom: .75rem;
-        color: $primary2;
         text-align: left;
         padding-left: 0;
     }

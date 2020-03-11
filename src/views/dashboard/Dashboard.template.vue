@@ -67,11 +67,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .dashboard {
         width: 100%;
         .item {
-            min-width: calc(1200px - #{$gnb-width});
+            min-width: calc(1200px - $(gnb-width));
             max-width: 1280px;
             margin-bottom: 1rem;
             &.flex {

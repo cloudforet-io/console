@@ -151,7 +151,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .credential-btn {
     float: right;
 }

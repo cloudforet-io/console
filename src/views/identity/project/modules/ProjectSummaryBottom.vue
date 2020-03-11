@@ -106,7 +106,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
     .summary {
     margin-bottom: 1rem;
     }
