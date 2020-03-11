@@ -46,7 +46,7 @@ export class TreeModalState<
 }
 
 @HelperToolSet()
-export class TreeModalToolSet<initData, initSyncData>
+export class TreeModalToolSet<initData=any, initSyncData=any>
     extends TreeModalState<initData, initSyncData>
     implements ModalToolSet<initData, initSyncData>, TreeToolSet<initData> {
     public metaState:TreeMetaState = null as unknown as TreeMetaState;
