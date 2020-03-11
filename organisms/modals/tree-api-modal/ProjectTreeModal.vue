@@ -1,49 +1,22 @@
 <template>
-    <p-tree-modal />
+    <p-tree-modal ref="treeApi"
+                  :scrollable="false"
+                  :visible.sync="treeAPITS.ts.syncState.visible"
+                  theme-color="primary"
+                  v-bind="treeAPITS.ts.state"
+                  @cancel="close"
+                  @close="close"
+                  @node:selected="update"
+                  @node:unselected="update"
+    />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 import PTreeModal from '@/components/organisms/modals/tree-modal/TreeModal.vue';
-import TreeItem, { treeProps, TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
-import { readonlyRefArg } from '@/lib/type';
-import { SearchQueryType } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import { defaultQuery } from '@/lib/api/query';
-import { BaseTreeAPI } from '@/lib/api/tree';
-
-class ProjectTreeAPI<
-        initData = any,
-        node extends TreeItem = TreeItem,
-        responses =any,
-        T extends TreeToolSet<initData > = TreeToolSet<initData >
-        > extends BaseTreeAPI {
-        public treeTS: T;
-
-
-        protected constructor() {
-            super( '',only, fixSearchQuery, extraParams);
-            // @ts-ignore
-            this.treeTS = new TreeToolSet();
-            this.setFetchData();
-        }
-
-        protected paramQuery = computed(() => defaultQuery(
-            undefined, undefined,
-            'name', true, undefined,
-            // @ts-ignore
-            this.apiState.fixSearchQuery, undefined, this.apiState.only,
-        ));
-
-        protected requestData = async (node?:node) => {
-            if (!node) { // root tree
-                return
-
-            }
-            return '';
-        };
-
-        protected toNode:(data: any)=>Promise<node[]>;
-}
+import { ProjectNode, ProjectTreeAPI } from '@/lib/api/tree';
+import { TreeModalToolSet } from '@/components/organisms/modals/tree-modal/toolset';
+import { makeProxy } from '@/lib/compostion-util';
 
 
 export default defineComponent({
@@ -56,17 +29,28 @@ export default defineComponent({
         },
         headerTitle: {
             type: String,
-            default: 'Tree Modal',
+            default: 'Change Project',
         },
-        data: treeProps.data,
-        options: treeProps.options,
-        icons: treeProps.icons,
-        loading: treeProps.loading,
     },
-    setup(props, context) {
-        const treeTs = new TreeToolSet();
-        return {
+    setup() {
+        const visible = makeProxy<boolean>('visible');
+        const treeAPITS = new ProjectTreeAPI<any, any, ProjectNode, any, TreeModalToolSet>(
+            TreeModalToolSet, {}, { visible },
+        );
 
+
+        return {
+            treeAPITS,
+            treeApi: treeAPITS.ts.treeApi,
+            update: (event) => {
+                treeAPITS.ts.getSelectedNode(event);
+            },
+            click() {
+                treeAPITS.ts.open();
+            },
+            close() {
+                treeAPITS.ts.close();
+            },
         };
     },
 });
