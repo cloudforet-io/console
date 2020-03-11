@@ -1,7 +1,7 @@
 import moment from 'moment-timezone';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
-import styles from '@/styles/_variables.scss';
+import styles from '@/styles/colors';
 import { ColorBindFactory } from '@/lib/view-helper';
 
 // color set
