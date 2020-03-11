@@ -2,10 +2,9 @@
 <script>
 import { computed, toRefs } from '@vue/composition-api';
 import CloudServiceTemplate, { cloudServiceSetup } from '@/views/inventory/cloud-service/pages/CloudService.template.vue';
-import {
-    AdminTableAPI, HistoryAPI, QuerySearchTableACHandler, QuerySearchTableAPI, SubDataAPI,
-} from '@/lib/api';
 import { tabIsShow } from '@/lib/compostion-util';
+import {AdminTableAPI, HistoryAPI, QuerySearchTableAPI} from "@/lib/api/table";
+import {QuerySearchTableACHandler} from "@/lib/api/auto-complete";
 
 export default {
     name: 'CloudService',

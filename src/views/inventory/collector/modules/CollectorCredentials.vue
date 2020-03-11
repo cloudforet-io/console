@@ -71,7 +71,6 @@ import {
     reactive, toRefs, computed, ref, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import { defaultQuery } from '@/lib/api';
 import { makeTrItems } from '@/lib/view-helper';
 import { timestampFormatter } from '@/lib/util';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
@@ -81,6 +80,7 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import { makeProxy } from '@/lib/compostion-util';
+import {defaultQuery} from "@/lib/api/query";
 
 const CredentialVerifyModal = () => import('@/views/inventory/collector/modules/CredentialVerifyModal.vue');
 

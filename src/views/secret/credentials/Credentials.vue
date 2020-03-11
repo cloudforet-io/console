@@ -6,7 +6,7 @@ import {
 import CredentialsTemplate, { credentialsSetup, eventNames } from '@/views/secret/credentials/Credentials.template.vue';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery } from '@/lib/api';
+import {defaultQuery} from "@/lib/api/query";
 
 
 export default {

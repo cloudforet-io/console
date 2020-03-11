@@ -8,11 +8,11 @@ import moment from 'moment-timezone';
 import CdgTemplate, { cdgSetup, eventNames } from '@/views/secret/credentials-group/pages/CredentialsGroup.template.vue';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import { mountBusEvent, Validation } from '@/lib/compostion-util';
-import { defaultQuery } from '@/lib/api';
 import {
     defaultAutocompleteHandler,
     getEnumValues, getSearchEnumValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import {defaultQuery} from "@/lib/api/query";
 
 export default {
     name: 'Cdg',

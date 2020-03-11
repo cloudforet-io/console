@@ -57,10 +57,10 @@
 </template>
 <script>
 import _ from 'lodash';
-import { defaultQuery } from '@/lib/api';
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable';
 import PBadge from '@/components/atoms/badges/Badge';
+import {defaultQuery} from "@/lib/api/query";
 
 export default {
     name: 'ProjectMemberDelete',

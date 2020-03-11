@@ -7,11 +7,11 @@ import moment from 'moment-timezone';
 import UserTemplate, { userSetup, eventNames } from '@/views/identity/user/User.template.vue';
 import userEventBus from '@/views/identity/user/UserEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery } from '@/lib/api';
 import {
     defaultAutocompleteHandler,
     getEnumValues, getSearchEnumValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import {defaultQuery} from "@/lib/api/query";
 
 export default {
     name: 'User',
