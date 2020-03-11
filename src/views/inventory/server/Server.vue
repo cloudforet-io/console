@@ -9,12 +9,13 @@ import _ from 'lodash';
 import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent, tabIsShow } from '@/lib/compostion-util';
-import { AdminTableAPI, defaultQuery, HistoryAPI } from '@/lib/api';
 import {
     defaultAutocompleteHandler,
     getEnumValues, getFetchValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { getAllPage } from '@/components/organisms/pagenations/toolset';
+import {defaultQuery} from "@/lib/api/query";
+import {AdminTableAPI, HistoryAPI} from "@/lib/api/table";
 
 export default {
     name: 'Server',

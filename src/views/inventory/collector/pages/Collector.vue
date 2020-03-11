@@ -5,13 +5,13 @@ import {
 } from '@vue/composition-api';
 import CollectorTemplate, { collectorSetup } from '@/views/inventory/collector/pages/Collector.template.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import {
     defaultAutocompleteHandler,
     getEnumValues, getFetchValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { ApiHandler } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
+import {defaultQuery} from "@/lib/api/query";
 
 export default {
     name: 'Collector',

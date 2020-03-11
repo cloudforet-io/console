@@ -75,9 +75,9 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button';
 import DataCenterMemberAdd from '@/views/inventory/data-center/modules/DataCenterAdminAdd';
 import DataCenterMemberDelete from '@/views/inventory/data-center/modules/DataCenterAdminDelete';
-import { defaultQuery } from '@/lib/api';
 import PI from '@/components/atoms/icons/PI';
 import PBadge from '@/components/atoms/badges/Badge';
+import {defaultQuery} from "@/lib/api/query";
 
 export default {
     name: 'DataCenterMember',

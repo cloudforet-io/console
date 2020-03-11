@@ -75,7 +75,6 @@
 import {
     reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
-import { defaultQuery } from '@/lib/api';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
@@ -88,6 +87,7 @@ import PSearch from '@/components/molecules/search/Search.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PDictList from '@/components/molecules/lists/DictList.vue';
+import {defaultQuery} from "@/lib/api/query";
 
 export default {
     name: 'ChooseCredentials',

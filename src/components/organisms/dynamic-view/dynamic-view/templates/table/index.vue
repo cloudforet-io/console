@@ -40,7 +40,7 @@ import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
-import { SearchTableAPI } from '@/lib/api';
+import {SearchTableAPI} from "@/lib/api/table";
 
 interface DataSourceType {
     name:string;

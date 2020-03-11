@@ -8,7 +8,7 @@ import casual from '@/views/inventory/collector/models/collector-model';
 import { mountBusEvent } from '@/lib/compostion-util';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { arrayOf } from '@/lib/casual';
-import { defaultQuery } from '@/lib/api';
+import {defaultQuery} from "@/lib/api/query";
 
 
 export default {

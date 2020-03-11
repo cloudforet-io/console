@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
 import { debug } from 'webpack';
 import { isNotEmpty } from '@/lib/util';
-import { BaseTableAPI } from '@/lib/api';
+import {BaseTableAPI} from "@/lib/api/table";
 
 /**
  * make proxy computed that same name as props
