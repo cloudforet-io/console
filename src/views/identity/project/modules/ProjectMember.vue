@@ -74,9 +74,9 @@ import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTa
 import PButton from '@/components/atoms/buttons/Button';
 import ProjectMemberAdd from '@/views/identity/project/modules/ProjectMemberAdd';
 import ProjectMemberDelete from '@/views/identity/project/modules/ProjectMemberDelete';
-import { defaultQuery } from '@/lib/api';
 import PI from '@/components/atoms/icons/PI';
 import PBadge from '@/components/atoms/badges/Badge';
+import {defaultQuery} from "@/lib/api/query";
 
 export default {
     name: 'ProjectMember',

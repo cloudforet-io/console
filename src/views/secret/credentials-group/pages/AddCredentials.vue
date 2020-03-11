@@ -1,16 +1,16 @@
 <script>
 import {
-    ref, toRefs, computed, reactive, onMounted, watch,
+    toRefs, computed, reactive,
 } from '@vue/composition-api';
-import moment from 'moment-timezone';
 import AddCdgTemplate, { cdgSetup, eventNames } from '@/views/secret/credentials-group/pages/AddCredentials.template.vue';
 import cdgEventBus from '@/views/secret/credentials-group/CredentialsGroupEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
-import { defaultQuery, Validation } from '@/lib/api';
+import { defaultQuery } from '@/lib/api/query';
 import {
     defaultAutocompleteHandler,
     getEnumValues, getSearchEnumValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+
 
 export default {
     name: 'AddCdg',

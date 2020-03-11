@@ -6,7 +6,7 @@ import {
 import { action } from '@storybook/addon-actions';
 import PDynamicView from './DynamicView.vue';
 import md from './DynamicView.md';
-import { MockSubDataAPI } from '@/lib/api';
+import { MockSubDataAPI } from '@/lib/api/table';
 
 export default {
     title: 'organisms/dynamic-view/dynamic-view',

@@ -16,7 +16,7 @@ import Vue from 'vue';
 import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api/axios';
 import config from '@/lib/config';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/NoticeAlert.vue';
