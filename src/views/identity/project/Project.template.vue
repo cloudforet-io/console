@@ -1,5 +1,5 @@
 <template>
-    <div div class="animated fadeIn">
+    <div class="animated fadeIn">
         <p-area-tree
             ref="ProjectTree"
             :tree-data="treeData"

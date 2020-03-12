@@ -13,7 +13,7 @@ export abstract class DynamicAPI {
         return api.instance;
     }
 
-    protected abstract requestData(data?: any, ...args:any[]): Promise<any[]>;
+    protected abstract async requestData(data?: any, ...args:any[]): Promise<any[]>;
 
     constructor() {
         this.vm = getCurrentInstance();
@@ -25,7 +25,7 @@ export abstract class getDataAPI extends DynamicAPI {
 }
 
 export abstract class fetchDataAPI extends DynamicAPI {
-    public abstract fetchData(data?: any, ...args:any[]): void | any;
+    public abstract async fetchData(data?: any, ...args:any[]): Promise<void | any>;
 }
 
 
