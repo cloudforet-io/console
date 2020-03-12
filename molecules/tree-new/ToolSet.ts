@@ -94,7 +94,7 @@ export class TreeState<initData, initState extends TreePropsInterface = TreeProp
             },
             loading: false,
             selectMode: false,
-            cacheMode: false,
+            cacheMode: true,
             data: [],
             options: {},
         };
@@ -145,7 +145,7 @@ export const treeProps = {
     },
     cacheMode: {
         type: Boolean,
-        default: false,
+        default: true,
     },
 };
 
