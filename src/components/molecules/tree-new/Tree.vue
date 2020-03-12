@@ -114,7 +114,7 @@ export default defineComponent({
             if (!props.cacheMode) {
                 node.children = [];
                 node.isBatch = true;
-            };
+            }
             emit('node:collapsed', node);
         };
 
