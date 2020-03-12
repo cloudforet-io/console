@@ -1,7 +1,7 @@
 import { select, text, color } from '@storybook/addon-knobs/vue';
-import PStatus from './Status.vue';
-import {safe} from '@/styles/_variables.scss';
 import { autoProps } from '@sb/storybook-util';
+import PStatus from './Status.vue';
+import { safe } from '@/styles/colors';
 import { ColorBindFactory } from '@/lib/util';
 
 export default {

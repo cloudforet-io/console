@@ -1,4 +1,4 @@
-const colorSet = {
+const palette = {
     black: '#000000',
     white: '#FFFFFF',
     gray: {
@@ -24,20 +24,48 @@ const colorSet = {
         900: '#742A2A',
     },
     coral: {
+        100: '#FFEBE6',
+        200: '#FFD3C8',
+        300: '#FFB39E',
+        400: '#FF9476',
         500: '#FF7750',
+        600: '#F55A2F',
+        700: '#DD470F',
+        800: '#B93E0F',
+        900: '#8E3311',
     },
     yellow: {
+        100: '#FFFAE6',
+        200: '#FFEB99',
+        300: '#FFE066',
+        400: '#FFD633',
         500: '#FFCE02',
+        600: '#E6B800',
+        700: '#CCA300',
+        800: '#806600',
+        900: '#4D3D00',
     },
     green: {
+        100: '#F9FCE9',
+        200: '#E7F3A5',
+        300: '#D5EA62',
         400: '#C2E01E',
         500: '#60B731',
         600: '#3F7B1A',
+        700: '#366916',
+        800: '#203F0D',
+        900: '#162A09',
     },
     blue: {
         100: '#F5F9FD',
+        200: '#CCE6FF',
+        300: '#66B5FF',
         400: '#43BEFF',
         500: '#0080FB',
+        600: '#0069CC',
+        700: '#005CB3',
+        800: '#004F99',
+        900: '#003566',
     },
     violet: {
         100: '#F8F8FC',
@@ -45,32 +73,75 @@ const colorSet = {
         300: '#A8A5CE',
         400: '#8C81D1',
         500: '#6638B6',
+        600: '#58309C',
+        700: '#4D2A89',
         800: '#3C2C84',
+        900: '#371E62',
+    },
+};
+
+const colorSet = {
+    black: palette.black,
+    white: palette.white,
+    gray: {
+        ...palette.gray,
+        default: palette.gray[500],
+        dark: palette.gray[900],
+    },
+    red: {
+        ...palette.red,
+        default: palette.red[500],
+    },
+    coral: {
+        ...palette.coral,
+        default: palette.coral[500],
+    },
+    yellow: {
+        ...palette.yellow,
+        default: palette.yellow[500],
+    },
+    green: {
+        ...palette.green,
+        default: palette.green[500],
+    },
+    blue: {
+        ...palette.blue,
+        default: palette.blue[500],
+    },
+    violet: {
+        ...palette.violet,
+        default: palette.violet[500],
     },
 };
 
 
+const semanticColors = {
+    primary: palette.violet[500],
+    'primary-dark': palette.violet[800],
+    primary1: palette.violet[400],
+    primary2: palette.violet[300],
+    primary3: palette.violet[200],
+    primary4: palette.violet[100],
+    secondary: palette.blue[500],
+    secondary1: palette.blue[400],
+    secondary2: palette.blue[100],
+    alert: palette.red[500],
+    safe: palette.green[500],
+};
+
 module.exports = {
-    primary: colorSet.violet[500],
-    'primary-dark': colorSet.violet[800],
-    primary1: colorSet.violet[400],
-    primary2: colorSet.violet[300],
-    primary3: colorSet.violet[200],
-    primary4: colorSet.violet[100],
-    secondary: colorSet.blue[500],
-    secondary1: colorSet.blue[400],
-    secondary2: colorSet.blue[100],
-    alert: colorSet.red[500],
-    safe: colorSet.green[500],
-    dark: colorSet.gray[900],
-    gray: colorSet.gray[500],
-    gray1: colorSet.gray[400],
-    gray2: colorSet.gray[200],
-    gray3: colorSet.gray[100],
-    other1: colorSet.coral[500],
-    other2: colorSet.yellow[500],
-    other3: colorSet.green[400],
-    other4: colorSet.green[600],
-    black: colorSet.black,
-    white: colorSet.white,
+    ...semanticColors,
+    ...colorSet,
+    /* temporary */
+    dark: palette.gray[900],
+    gray: palette.gray[500],
+    gray1: palette.gray[400],
+    gray2: palette.gray[200],
+    gray3: palette.gray[100],
+    other1: palette.coral[500],
+    other2: palette.yellow[500],
+    other3: palette.green[400],
+    other4: palette.green[600],
+    black: palette.black,
+    white: palette.white,
 };

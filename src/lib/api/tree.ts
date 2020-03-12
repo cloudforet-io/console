@@ -2,6 +2,7 @@
 import { AxiosResponse } from 'axios';
 import { ref } from '@vue/composition-api';
 import { getDataAPI } from '@/lib/api/toolset';
+// @ts-ignore
 import { ClassTypeOf } from '@/lib/type';
 import TreeItem, { TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
 

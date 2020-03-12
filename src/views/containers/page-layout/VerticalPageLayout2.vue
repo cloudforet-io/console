@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import styles from '@/styles/variables';
+import styles from '@/styles/colors';
 
 import PVerticalLayout2 from '@/components/organisms/layouts/vertical-layout/VerticalLayout2.vue';
 import FNB from '@/views/containers/fnb/FNB.vue';
