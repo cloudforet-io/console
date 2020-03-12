@@ -261,9 +261,9 @@
 		"BACK_COL": "컬렉터로 돌아가기",
 		"BTN": {
 			"None": "",
-			"SET_CLOSE": "",
-			"SET_INSERVICE": "",
-			"SET_MAINTENANCE": ""
+			"SET_CLOSE": "종료 상태로 변경",
+			"SET_INSERVICE": "서비스 상태로 변경",
+			"SET_MAINTENANCE": "유지관리 상태로 변경"
 		},
 		"CHOOSE_CRD": "암호 선택하기",
 		"COLL_TIME": "수집 시간",

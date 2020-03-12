@@ -153,14 +153,15 @@
 
             @confirm="checkModalConfirm"
         />
-        <s-project-tree-modal :visible.sync="projectModalVisible" />
+        <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
     </general-page-layout>
 </template>
 
-<script>
+<script lang="ts">
 import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
+import _ from 'lodash';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
@@ -191,6 +192,8 @@ import {
     MockAdminTableAPI, MockHistoryAPI,
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
+import { ProjectNode } from '@/lib/api/tree';
+import { ChangeServerProject, MockChangeProject } from '@/lib/api/fetch';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -251,7 +254,7 @@ export const eventNames = {
     deleteServer: '',
 };
 
-export const serverSetup = (props, context, eventName, ACHandler) => {
+export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectAPI:ChangeServerProject) => {
     const eventBus = serverEventBus;
     const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
@@ -275,7 +278,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         isSelectedOne: computed(() => tableState.selectIndex.length === 1),
         isSelectedMulti: computed(() => tableState.selectIndex.length > 1),
     });
-    const state = requestToolboxTableMetaReactive();
+    const state:any = requestToolboxTableMetaReactive();
     state.sortBy = 'name';
     const getServers = () => {
         eventBus.$emit(eventName.getServerList);
@@ -304,7 +307,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         });
         return items;
     });
-    const getSelectServerIds = computed(() => (getSelectServerItems.value ? getSelectServerItems.value.map(v => v.server_id) : []));
+    const getSelectServerIds = computed(() => (getSelectServerItems.value ? getSelectServerItems.value.map((v:any) => v.server_id) : []));
     const getFirstSelectServerItem = computed(() => (getSelectServerItems.value.length >= 1 ? getSelectServerItems.value[0] : {}));
     const getSubData = computed(() => _.get(getFirstSelectServerItem.value, ['metadata', 'sub_data'], []));
     const getFirstSelectServerId = computed(() => (getSelectServerIds.value.length >= 1 ? getSelectServerIds.value[0] : ''));
@@ -388,6 +391,11 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
     const clickProject = () => {
         projectModalVisible.value = true;
     };
+    const changeProject = async (node?:ProjectNode|null) => {
+        await ChangeProjectAPI.fetchData(getSelectServerIds.value, node ? node.data.id : undefined);
+        getServers();
+        projectModalVisible.value = false;
+    };
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
@@ -424,6 +432,7 @@ export const serverSetup = (props, context, eventName, ACHandler) => {
         queryListTools,
         projectModalVisible,
         clickProject,
+        changeProject,
     });
 };
 
@@ -459,7 +468,13 @@ export default {
         const dataBind = reactive({
             items: computed(() => []),
         });
-        const state = serverSetup(props, context, dataBind.items);
+        const state:any = serverSetup(
+            props,
+            context,
+            dataBind.items,
+            null,
+            new MockChangeProject(),
+        );
         const mockAdminAPI = MockAdminTableAPI();
         const mockHistoryAPIHandler = MockHistoryAPI();
 

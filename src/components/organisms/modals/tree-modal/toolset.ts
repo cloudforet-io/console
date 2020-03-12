@@ -1,4 +1,6 @@
 import {
+    computed,
+    getCurrentInstance,
     onMounted, reactive, ref, Ref, watch,
 } from '@vue/composition-api';
 import {
@@ -42,6 +44,7 @@ export class TreeModalState<
         super(initData, initSyncData, true);
         this.state = initReactive(lazy, TreeModalState.initState(), initData);
         this.syncState = initReactive(lazy, TreeModalState.initSyncState(), initSyncData);
+        console.debug(initData, this.state.selectMode);
     }
 }
 
@@ -49,6 +52,8 @@ export class TreeModalState<
 export class TreeModalToolSet<initData=any, initSyncData=any>
     extends TreeModalState<initData, initSyncData>
     implements ModalToolSet<initData, initSyncData>, TreeToolSet<initData> {
+    public tree: Ref<any> = null as unknown as Ref<any>;
+
     public metaState:TreeMetaState = null as unknown as TreeMetaState;
 
     // eslint-disable-next-line no-empty-function
@@ -60,10 +65,24 @@ export class TreeModalToolSet<initData=any, initSyncData=any>
     // eslint-disable-next-line no-empty-function
     public open:()=>void=() => {};
 
+    public vm = getCurrentInstance();
 
-    static initToolSet(_this:any, treeApi:Ref<any> = ref(null)) {
+    public confirm:()=>void = () => {
+        // @ts-ignore
+        let result:any|any[];
+        if (this.state.options?.multiple) {
+            result = this.metaState.selectedNode;
+        } else {
+            result = this.metaState.firstSelectedNode;
+        }
+        // @ts-ignore
+        this.vm.$listeners.confirm(result);
+    };
+
+
+    static initToolSet(_this:any, treeRef:Ref<any> = ref(null)) {
         ModalToolSet.initToolSet(_this);
-        TreeToolSet.initToolSet(_this, treeApi);
+        TreeToolSet.initToolSet(_this, treeRef, ['treeRef', 'value', '$refs', 'p-tree', '$refs', 'tree']);
         onMounted(() => {
             watch(() => _this.syncState.visible, (now, pre) => {
                 if (now && now !== pre) {
@@ -71,16 +90,12 @@ export class TreeModalToolSet<initData=any, initSyncData=any>
                 }
             });
         });
-        _this.getSelectedNode = () => {
-            console.debug('this api', _this.treeApi);
-            _this.metaState.selectedNode = _this.treeApi.value.$refs['p-tree'].$refs.tree.selected();
-        };
     }
 
-    constructor(initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{}, public treeApi:Ref<any> = ref(null), lazy :boolean = false) {
+    constructor(initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{}, public treeRef:Ref<any> = ref(null), lazy :boolean = false) {
         super(initData, initSyncData);
         if (!lazy) {
-            TreeModalToolSet.initToolSet(this);
+            TreeModalToolSet.initToolSet(this, treeRef);
         }
     }
 }
