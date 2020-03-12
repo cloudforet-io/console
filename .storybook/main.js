@@ -44,9 +44,6 @@ module.exports = {
         use: ['style-loader', 'css-loader',postCssLoader,
           {
             loader: 'sass-loader',
-            options: {
-              data: `@import "~@/styles/_variables.scss";`
-            }
           },
         ],
         include: path.resolve(__dirname, '../'),
