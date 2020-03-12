@@ -5,11 +5,7 @@
                 <div>
                     <p-tree
                         ref="treeApi"
-                        v-bind="treeTs.state"
-                        style="{
-                            width: `${width}px`,
-                            overflowX: 'hidden',
-                        }"
+                        v-bind="ts"
                         @node:selected="update"
                         @node:unselected="update"
                     />
@@ -107,6 +103,7 @@ import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
+import {ProjectNode, ProjectTreeAPI} from '@/lib/api/tree';
 import PI from '@/components/atoms/icons/PI.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import TreeItem, { TreeState, TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
@@ -118,7 +115,7 @@ import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/Dynam
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-import { QuerySearchTableAPI } from '@/lib/api';
+import { QuerySearchTableAPI } from '@/lib/api/table';
 import { makeTrItems } from '@/lib/view-helper/index';
 
 export const projectSetup = (
@@ -141,6 +138,11 @@ export const projectSetup = (
             ['member', 'Member'],
         ], context.parent),
         activeTab: 'summary',
+        multiTabs: makeTrItems([
+            ['detail', 'TAB.DETAILS'],
+            ['data', 'TAB.DATA'],
+        ], context.parent),
+        activeMultiTab: '',
         summaryData: {},
         resourcesByRegionData: {},
         serverStateData: {},
@@ -149,6 +151,9 @@ export const projectSetup = (
         osTypeData: {},
         hypervisorTypeData: {},
         resourcesByRegionLoading: true,
+        ts: new ProjectTreeAPI<any, any,ProjectNode, any, TreeToolSet<any>>(
+            TreeToolSet,
+        ).ts,
     });
     const selectTypeDataSource = computed(() => (_.get(apiHandler.tableTS.selectState.firstSelectItem, ['data_source'], [])));
     watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
@@ -240,29 +245,29 @@ export default defineComponent({
             },
         ];
 
-        treeTs.state.data = [
-            { text: 'Item 1' },
-            { text: 'Item 2' },
-            {
-                text: 'Item 3',
-                kids: [
-                    { text: 'Item 3.1' },
-                    {
-                        text: 'Item 3.2',
-                        kids: [
-                            { text: 'Item 3.2.1' },
-                            { text: 'Item 3.2.2' },
-                        ],
-                    },
-                ],
-            },
-        ];
-        treeTs.state.options = {
-            propertyNames: {
-                text: 'text',
-                children: 'kids',
-            },
-        };
+        // treeTs.state.data = [
+        //     { text: 'Item 1' },
+        //     { text: 'Item 2' },
+        //     {
+        //         text: 'Item 3',
+        //         kids: [
+        //             { text: 'Item 3.1' },
+        //             {
+        //                 text: 'Item 3.2',
+        //                 kids: [
+        //                     { text: 'Item 3.2.1' },
+        //                     { text: 'Item 3.2.2' },
+        //                 ],
+        //             },
+        //         ],
+        //     },
+        // ];
+        // treeTs.state.options = {
+        //     propertyNames: {
+        //         text: 'text',
+        //         children: 'kids',
+        //     },
+        // };
         return {
             ...projectSetup(context, mockAPI, mockAPI),
             ...toRefs(state),
