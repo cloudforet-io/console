@@ -14,8 +14,9 @@ import {
     getEnumValues, getFetchValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { getAllPage } from '@/components/organisms/pagenations/toolset';
-import {defaultQuery} from "@/lib/api/query";
-import {AdminTableAPI, HistoryAPI} from "@/lib/api/table";
+import { defaultQuery } from '@/lib/api/query';
+import { AdminTableAPI, HistoryAPI } from '@/lib/api/table';
+import { ChangeServerProject } from '@/lib/api/fetch';
 
 export default {
     name: 'Server',
@@ -81,7 +82,13 @@ export default {
             }
         }
 
-        const state = serverSetup(props, context, serverEventNames, new ACHandler());
+        const state = serverSetup(
+            props,
+            context,
+            serverEventNames,
+            new ACHandler(),
+            new ChangeServerProject(),
+        );
         const projectNameList = ref({});
         const matchProject = (items) => {
             for (let i = 0; i < items.length; i++) {

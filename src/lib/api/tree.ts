@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import { AxiosResponse } from 'axios';
+import { ref } from '@vue/composition-api';
 import { getDataAPI } from '@/lib/api/toolset';
 import { ClassTypeOf } from '@/lib/type';
 import TreeItem, { TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
@@ -63,11 +64,10 @@ export class ProjectTreeAPI<
         public ts: T;
 
 
-        public constructor(ToolSet:ClassTypeOf<T> = null as unknown as ClassTypeOf<T>, initData?:initData, initSyncData?:initSyncData) {
+        public constructor(ToolSet:ClassTypeOf<T> = null as unknown as ClassTypeOf<T>, initData?:initData, initSyncData?:initSyncData, treeRef = ref(null)) {
             super();
             // @ts-ignore
-            this.ts = ToolSet ? new ToolSet(initData, initSyncData) : TreeToolSet(initData);
-            console.log(this.ts);
+            this.ts = ToolSet ? new ToolSet(initData, initSyncData, treeRef) : TreeToolSet(initData, treeRef);
             this.setFetchData();
         }
 
