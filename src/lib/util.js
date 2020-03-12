@@ -11,8 +11,8 @@ import { ColorBindFactory } from '@/lib/view-helper';
  * @description default color order
  */
 export const colorset = Object.freeze([
-    styles.primary,
-    styles.primary2,
+    colors.primary,
+    colors.primary2,
     styles.other1,
     styles.secondary,
     styles.secondary1,
