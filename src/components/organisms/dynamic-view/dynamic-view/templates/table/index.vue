@@ -21,7 +21,7 @@
         @clickRefresh="apiHandler.getData"
     >
         <template #toolbox-left>
-            <div style="width: 50vw">
+            <div class="w-full">
                 <p-search :search-text.sync="apiHandler.tableTS.searchText.value" @onSearch="apiHandler.getData" />
             </div>
         </template>
