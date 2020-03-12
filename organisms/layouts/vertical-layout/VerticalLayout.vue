@@ -112,6 +112,7 @@ export default defineComponent({
     },
     computed: {
         rightContainerWidth() {
+            console.debug(`calc(100vw - ${styles['gnb-width']} - ${this.leftContainerWidth + this.draggerWidth}px)`);
             return `calc(100vw - ${styles['gnb-width']} - ${this.leftContainerWidth + this.draggerWidth}px)`;
         },
     },

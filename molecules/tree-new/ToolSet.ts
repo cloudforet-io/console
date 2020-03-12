@@ -79,6 +79,7 @@ export interface TreePropsInterface {
     icons?: TreeIconsType;
     loading?: boolean;
     selectMode?: boolean;
+    cacheMode?: boolean;
 }
 
 @StateToolSet<TreePropsInterface>()
@@ -94,6 +95,7 @@ export class TreeState<initData, initState extends TreePropsInterface = TreeProp
             },
             loading: false,
             selectMode: false,
+            cacheMode: true,
             data: [],
             options: {},
         };
@@ -141,6 +143,10 @@ export const treeProps = {
     selectMode: {
         type: Boolean,
         default: false,
+    },
+    cacheMode: {
+        type: Boolean,
+        default: true,
     },
 };
 

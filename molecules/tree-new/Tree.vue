@@ -3,8 +3,7 @@
         <tree ref="tree"
               v-model="selectedNode"
               :options="treeOptions"
-              @tree:data:fetch="onFetch"
-              v-on="$listeners"
+              v-on="treeListeners"
         >
             <template #default="{node}">
                 <span class="tree-scope"
@@ -42,7 +41,7 @@
  */
 
 import {
-    reactive, toRefs, defineComponent, computed,
+    reactive, toRefs, defineComponent, computed, getCurrentInstance,
 } from '@vue/composition-api';
 import {
     TreePropsInterface, treeProps, TreeOptionsInterface, TreeItemInterface,
@@ -59,7 +58,8 @@ export default defineComponent({
     },
     props: treeProps,
     setup(props: TreePropsInterface, { emit }) {
-        const state:any = reactive({
+        const vm: any = getCurrentInstance();
+        const state: any = reactive({
             tree: null,
             selectedNode: null,
             fetchingNodeId: null,
@@ -76,10 +76,6 @@ export default defineComponent({
                 return result;
             }),
         });
-
-        const onFetch = (node) => {
-            state.fetchingNodeId = node.id;
-        };
 
         const onNodeClick = (node, e) => {
             if (props.selectMode) {
@@ -109,14 +105,33 @@ export default defineComponent({
             node[type](newItem);
         };
 
+        const onFetch = (node) => {
+            state.fetchingNodeId = node.id;
+            emit('tree:data:fetch', node);
+        };
+
+        const onNodeCollapsed = (node) => {
+            if (!props.cacheMode) {
+                node.children = [];
+                node.isBatch = true;
+            }
+            emit('node:collapsed', node);
+        };
+
+        const treeListeners = {
+            ...vm.$listeners,
+            'tree:data:fetch': onFetch,
+            'node:collapsed': onNodeCollapsed,
+        };
+
         return {
             ...toRefs(state),
-            onFetch,
             onNodeClick,
             onTreeRightClick,
             onNodeRightClick,
             deleteNode,
             addNode,
+            treeListeners,
         };
     },
 });
