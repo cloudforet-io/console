@@ -74,3 +74,9 @@ export class ChangeServerProject extends ChangeProjectAPI {
         super('/inventory/server/change-project', 'servers');
     }
 }
+
+export class ChangeCloudServiceProject extends ChangeProjectAPI {
+    constructor() {
+        super('/inventory/cloud-service/change-project', 'cloud_services');
+    }
+}
