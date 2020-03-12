@@ -159,6 +159,24 @@ export class TabSearchTableAPI<initData = any, initSyncData = any> extends Searc
     }
 }
 
+export class TabQuerySearchTableAPI<initData = any, initSyncData = any> extends TabSearchTableAPI<initData, initSyncData> {
+    public constructor(
+        url: readonlyRefArg<string>,
+        tabKey: string,
+        private tab: readonlyRefArg<string>,
+        fixSearchQuery: SearchQueryType[] = [],
+        initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
+        public dataSource: DataSource[] = [],
+        isShow: forceRefArg<boolean>,
+    ) {
+        super(url, computed(() => ({})), fixSearchQuery, initData, initSyncData, dataSource, isShow);
+        this.apiState.extraParams = computed(() => ({
+            [tabKey]: isRef(this.tab) ? this.tab.value : this.tab,
+        }));
+    }
+}
+
+
 const defaultAdminDataSource = [
     { name: 'Resource Type', key: 'resource_type' },
     { name: 'Resource ID', key: 'resource_id' },
