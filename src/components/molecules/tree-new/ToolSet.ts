@@ -1,6 +1,7 @@
 import {
     computed, reactive, Ref, ref,
 } from '@vue/composition-api';
+import _ from 'lodash';
 import {
     HelperToolSet, initReactive, optionalType, StateToolSet,
 } from '@/lib/toolset';
@@ -46,10 +47,10 @@ export interface TreeOptionsInterface {
     nodeIndent?: number;
 }
 
-export interface TreeItemInterface {
+export interface TreeItemInterface<data = object> {
     id?: number|string;
     text: string;
-    data?: object;
+    data?: data;
     children?: TreeItemInterface[];
     state?: TreeStateType;
     isBatch?: boolean; // does it have child nodes
@@ -158,11 +159,13 @@ export interface TreeMetaState {
 export class TreeToolSet<initDataType> extends TreeState<initDataType> {
     public metaState:TreeMetaState = null as unknown as TreeMetaState;
 
-    // eslint-disable-next-line no-empty-function
-    public getSelectedNode:(evnet?:any)=>void=() => {};
+    public tree:Ref<any>=null as unknown as Ref<any>;
 
-    static initToolSet(_this:any, treeApi:Ref<any> = ref(null)) {
-        _this.treeApi = treeApi;
+    // eslint-disable-next-line no-empty-function
+    public getSelectedNode:(event?:any)=>void=() => {};
+
+    static initToolSet(_this:any, treeRef:Ref<any> = ref(null), treePath:string[] = ['treeRef', 'value', '$refs', 'tree']) {
+        _this.treeRef = treeRef;
         _this.metaState = reactive({
             selectedNode: null,
             firstSelectedNode: computed(() => {
@@ -173,13 +176,15 @@ export class TreeToolSet<initDataType> extends TreeState<initDataType> {
                 }
             }),
         });
+        _this.tree = computed(() => _.get(_this, treePath));
         _this.getSelectedNode = (event?:any) => {
-            _this.metaState.selectedNode = _this.treeApi.value.$refs.tree.selected();
+            console.debug('getSelectedNode', event, _this.tree.value.selected());
+            _this.metaState.selectedNode = event ? [event] : [];
         };
     }
 
-    constructor(initData:initDataType = {} as initDataType, public treeApi:Ref<any> = ref(null)) {
+    constructor(initData:initDataType = {} as initDataType, public treeRef:Ref<any> = ref(null)) {
         super(initData);
-        TreeToolSet.initToolSet(this, treeApi);
+        TreeToolSet.initToolSet(this, treeRef);
     }
 }
