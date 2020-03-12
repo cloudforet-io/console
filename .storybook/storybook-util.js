@@ -1,6 +1,41 @@
 import {
     text, boolean, number, object, array, select, color,
 } from '@storybook/addon-knobs/vue';
+import _ from 'lodash'
+
+const knobMapper = {
+    String: text,
+    Boolean: boolean,
+    Number: number,
+    Object: object,
+}
+
+export const getKnobProps = (props, data = {}, knobs = {}, options = {}) => {
+    const res = {};
+
+    if(props instanceof Array) {
+        throw new Error('prop MUST be an object.');
+        return res;
+    };
+
+    _.forEach(props, (v, k) => {
+        res[k] = {};
+
+        let type = v.type || v;
+        if (type instanceof Array) { type = type[0]};
+        const knob = knobs[k] || knobMapper[type.name];
+        const defaultVal = data[k] || v.default;
+        const option = options[k];
+
+        if (knob === select) {
+            res[k].default = knob(k, option, defaultVal);
+        } else if (knob === number || knob === array) {
+            res[k].default = knob(k, defaultVal, option);
+        } else res[k].default = knob(k, defaultVal);
+    })
+
+    return res;
+}
 
 const propsTypeMapping = {
     string: text,
