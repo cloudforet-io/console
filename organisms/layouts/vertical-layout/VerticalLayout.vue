@@ -85,7 +85,7 @@ export default defineComponent({
         },
         totalWidth: {
             type: String,
-            default: `calc(100vw -${styles['gnb-height']})`,
+            default: `calc(100vw -${styles['gnb-width']})`,
         },
         autoSaveLeftWidth: {
             type: Boolean,
@@ -112,7 +112,7 @@ export default defineComponent({
     },
     computed: {
         rightContainerWidth() {
-            return `calc(100vw - ${styles['gnb-height']} - ${this.leftContainerWidth + this.draggerWidth}px)`;
+            return `calc(100vw - ${styles['gnb-width']} - ${this.leftContainerWidth + this.draggerWidth}px)`;
         },
     },
     created() {
