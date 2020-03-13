@@ -2,6 +2,7 @@
     <p-tree-modal ref="treeRef"
                   :scrollable="false"
                   :visible.sync="treeAPITS.ts.syncState.visible"
+                  :header-title="headerTitle"
                   theme-color="primary"
                   v-bind="treeAPITS.ts.state"
                   @cancel="close"
@@ -11,8 +12,14 @@
                   @node:unselected="update"
     >
         <template #default>
-            <div v-show="error" class="text-alert mt-2">
-                Please Choice Project or check release project
+            <div class="mt-2">
+                <span @click.stop.capture="release= !release"><p-check-box v-model="release" /> release project</span>
+            </div>
+            <div v-show="error" class="alert">
+                <span class="alert-msg">
+                    <p-i name="ic_alert" width="1rem" height="1rem" />
+                </span>
+                <span>Please select a project or release the project</span>
             </div>
         </template>
         <template #icon="{node,isExpanded}">
@@ -22,9 +29,7 @@
                  width="1rem" height="1rem"
             />
         </template>
-        <template #footer-extra>
-            <span @click.stop.capture="release= !release"><p-check-box v-model="release" /> release project</span>
-        </template>
+        <template #footer-extra />
     </p-tree-modal>
 </template>
 
@@ -100,6 +105,11 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
+<style lang="postcss" scoped>
+.alert{
+    @apply text-alert mt-4 align-middle;
+    .alert-msg{
+        @apply align-middle;
+    }
+}
 </style>
