@@ -17,6 +17,7 @@ import { getAllPage } from '@/components/organisms/pagenations/toolset';
 import { defaultQuery } from '@/lib/api/query';
 import { AdminTableAPI, HistoryAPI } from '@/lib/api/table';
 import { ChangeServerProject } from '@/lib/api/fetch';
+import { useStore } from '@/store/toolset';
 
 export default {
     name: 'Server',
@@ -89,29 +90,21 @@ export default {
             new ACHandler(),
             new ChangeServerProject(),
         );
-        const projectNameList = ref({});
+        const projectStore = context.parent.$ls.project;
+
+        projectStore.getProject();
         const matchProject = (items) => {
-            for (let i = 0; i < items.length; i++) {
-                if (!Object.keys(projectNameList.value).length) {
-                    items[i].project = items[i].project_id;
-                } else {
-                    items[i].project = projectNameList.value[items[i].project_id] || items[i].project_id;
+            const result = items.map((item) => {
+                try {
+                    item.project = item.project_id ? projectStore.state.projects[item.project_id] || item.project_id : '';
+                } catch (e) {
+                    item.project = item.project_id;
                 }
-            }
-            return items;
+                return item;
+            });
+            return result;
         };
 
-        // request project list
-        const requestProjectList = async () => {
-            try {
-                const res = await context.parent.$http.post('/identity/project/list');
-                res.data.results.forEach((project) => {
-                    projectNameList.value[project.project_id] = `${project.project_group_info.name} ${project.name}`;
-                });
-            } catch (e) {
-                console.error(e);
-            }
-        };
         const numberTypeKeys = new Set(['data.base.memory', 'data.base.core']);
         const valueFormatter = (key, value) => {
             if (numberTypeKeys.has(key)) {
@@ -303,7 +296,6 @@ export default {
         };
         mountBusEvent(serverEventBus, serverEventNames.deleteServer, deleteServer);
 
-        requestProjectList();
         requestServerList();
 
         const adminParams = computed(() => ({
