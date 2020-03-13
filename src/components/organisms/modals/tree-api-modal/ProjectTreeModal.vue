@@ -15,6 +15,13 @@
                 Please Choice Project or check release project
             </div>
         </template>
+        <template #icon="{node,isExpanded}">
+            <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' :
+                     isExpanded ? 'ic_tree_folder--opened' : 'ic_tree_folder'"
+                 color="transparent inherit"
+                 width="1rem" height="1rem"
+            />
+        </template>
         <template #footer-extra>
             <span @click.stop.capture="release= !release"><p-check-box v-model="release" /> release project</span>
         </template>
@@ -31,10 +38,11 @@ import { TreeModalToolSet } from '@/components/organisms/modals/tree-modal/tools
 import { makeProxy } from '@/lib/compostion-util';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import { Computed } from '@/lib/type';
+import PI from '@/components/atoms/icons/PI.vue';
 
 export default defineComponent({
     name: 'SProjectTreeModal',
-    components: { PTreeModal, PCheckBox },
+    components: { PTreeModal, PCheckBox, PI },
     props: {
         visible: { // sync
             type: Boolean,
