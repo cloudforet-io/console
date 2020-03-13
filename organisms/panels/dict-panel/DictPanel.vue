@@ -45,8 +45,7 @@ import {
 } from '@vue/composition-api';
 import { DataTableState } from '@/components/organisms/tables/data-table/toolset';
 import { makeTrItems } from '@/lib/view-helper';
-import { dictToArray } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
-import { getDictPanelProps, DictPanelPropsType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
+import { DictPanelProps, DictPanelPropsType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
@@ -65,7 +64,7 @@ export default defineComponent({
         PLoadingButton,
         PDataTable,
     },
-    props: getDictPanelProps(),
+    props: DictPanelProps,
     setup(props: DictPanelPropsType, { emit }) {
         const vm: any = getCurrentInstance();
 
@@ -77,7 +76,7 @@ export default defineComponent({
                     ['key', 'WORD.KEY'],
                     ['value', 'WORD.VALUE'],
                 ], vm),
-                items: computed(() => dictToArray(props.dict, vm)),
+                items: computed(() => []), // dictToArray(props.dict, vm)),
                 colCopy: true,
             }).state,
             newDict: props.dict,
@@ -113,21 +112,21 @@ export default defineComponent({
                 if (!state.DIG || !state.DIG.validateAll()) return;
             }
 
-            if (props.fetchApi) {
-                try {
-                    state.loading = true;
-                    await props.fetchApi(state.newDict);
-                    /**
-                     * Notification
-                     */
-                } catch (e) {
-                    console.error(e);
-                    vm.$emit('fail', e);
-                    return;
-                } finally {
-                    state.loading = false;
-                }
-            }
+            // if (props.fetchApi) {
+            //     try {
+            //         state.loading = true;
+            //         await props.fetchApi(state.newDict);
+            //         /**
+            //          * Notification
+            //          */
+            //     } catch (e) {
+            //         console.error(e);
+            //         vm.$emit('fail', e);
+            //         return;
+            //     } finally {
+            //         state.loading = false;
+            //     }
+            // }
             vm.$emit('update:dict', state.newDict);
             vm.$emit('save', state.newDict);
             state.proxyEditMode = false;

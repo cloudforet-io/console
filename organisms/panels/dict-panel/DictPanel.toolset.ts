@@ -1,9 +1,17 @@
 import { reactive } from '@vue/composition-api';
 import { AxiosInstance } from 'axios';
 import { api } from '@/lib/api/axios';
+import {
+    HelperToolSet, initReactive, optionalType, StateToolSet,
+} from '@/lib/toolset';
 
+export interface DictPanelPropsType {
+    dict?: object,
+    showEmptyInput?: boolean;
+    editMode?: boolean;
+}
 
-export const getDictPanelProps = () => ({
+export const DictPanelProps = {
     dict: {
         type: Object,
         default: () => ({}),
@@ -15,11 +23,6 @@ export const getDictPanelProps = () => ({
         type: Boolean,
         default: false,
     },
-    fetchApi: {
-        type: Function,
-        // eslint-disable-next-line no-empty-function
-        default: () => {},
-    },
     /**
      * edit mode controller. sync prop.
      */
@@ -27,7 +30,7 @@ export const getDictPanelProps = () => ({
         type: Boolean,
         default: false,
     },
-});
+};
 
 type paramsFormatterType = (data?: any, state?: any) => any;
 type callbackType = (res?: any, data?: any, state?: any) => void;
@@ -81,14 +84,6 @@ export const mockApi: fetchApiType = (data: any) => new Promise((resolve) => {
 });
 
 
-export interface DictPanelPropsType {
-    dict?: object,
-    showEmptyInput?: boolean;
-    fetchApi?: fetchApiType;
-    editMode?: boolean;
-}
-
-
 export class DictPanelState {
     public state: DictPanelPropsType;
 
@@ -96,7 +91,6 @@ export class DictPanelState {
 
     static initState: DictPanelPropsType = {
         showEmptyInput: false,
-        fetchApi: undefined,
     }
 
     static initSyncState: DictPanelPropsType = {
