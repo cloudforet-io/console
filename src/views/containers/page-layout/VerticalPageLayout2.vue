@@ -2,14 +2,14 @@
     <p-vertical-layout2 v-bind="$props" v-on="$listeners">
         <template #sidebar="prop">
             <slot name="sidebar"
-                :width="prop.width"
+                  :width="prop.width"
             />
         </template>
         <template #default>
             <div class="right-container">
-                    <div class="page-contents">
-                        <slot name="default" />
-                    </div>
+                <div class="page-contents">
+                    <slot name="default" />
+                </div>
                 <div class="fnb">
                     <FNB />
                 </div>
@@ -68,5 +68,4 @@ export default {
     .fnb {
         width: 100%;
     }
-}
 </style>

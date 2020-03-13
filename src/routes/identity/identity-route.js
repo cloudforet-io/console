@@ -1,7 +1,7 @@
 const Identity = () => import('@/views/identity/Identity');
 const IdentityNavBar = () => import('@/views/identity/IdentityNavBar');
 const User = () => import('@/views/identity/user/User');
-const Project = () => import('@//views/identity/project/Project');
+const Project = () => import('@/views/identity/project/pages/Project2');
 
 export default {
     path: 'identity',

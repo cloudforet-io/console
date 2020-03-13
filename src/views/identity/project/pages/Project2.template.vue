@@ -6,8 +6,7 @@
                     <p-tree
                         ref="treeApi"
                         v-bind="ts.state"
-                        @node:selected="update"
-                        @node:unselected="update"
+                        @node:selected="selected"
                     />
                     <br>
                 </div>
@@ -22,10 +21,10 @@
                                         <p-dynamic-view name="Base Information" view_type="item" :data="item||{}"
                                                         :data_source="baseDataSource" :root-mode="true"
                                         />
-<!--                                        <p-dict-panel :dict.sync="tags"-->
-<!--                                                      :edit-mode.sync="tagEdit"-->
-<!--                                                      :fetch-api="tagsFetchApi"-->
-<!--                                        />-->
+                                        <p-dict-panel :dict.sync="tags"
+                                                      :edit-mode.sync="tagEdit"
+                                                      :fetch-api="tagsFetchApi"
+                                        />
                                     </div>
                                 </template>
                                 <template #member>
@@ -45,49 +44,48 @@
                             </p-tab>
                         </template>
                     </p-horizontal-layout>
-<!--                    <div v-if="activeTab === 'summary'">-->
-<!--                        <div class="item flex flex-wrap">-->
-<!--                            <Summary class="item" :data="summaryData" />-->
-<!--                            <ServersByType class="item"-->
-<!--                                           :server-data="serverTypeData"-->
-<!--                                           :vm-data="vmTypeData"-->
-<!--                                           :os-data="osTypeData"-->
-<!--                                           :hypervisor-data="hypervisorTypeData"-->
-<!--                            />-->
-<!--                            <ResourcesByRegion class="region"-->
-<!--                                               :data="resourcesByRegionData"-->
-<!--                                               :loading="resourcesByRegionLoading"-->
-<!--                            />-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div v-else-if="activeTab === 'member'">-->
-<!--                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">-->
-<!--                            <template #detail>-->
-<!--                                <PDynamicDetails-->
-<!--                                    :details="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.details"-->
-<!--                                    :data="dvApiHandler.tableTS.selectState.firstSelectItem"-->
-<!--                                />-->
-<!--                            </template>-->
-<!--                        </PTab>-->
-<!--                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="activeMultiTab">-->
-<!--                            <template #data>-->
-<!--                                <p-dynamic-view-->
-<!--                                    view_type="simple-table"-->
-<!--                                    :data_source="selectTypeDataSource"-->
-<!--                                    :data="dvApiHandler.tableTS.selectState.selectItems"-->
-<!--                                />-->
-<!--                            </template>-->
-<!--                        </PTab>-->
-<!--                    </div>-->
+                    <!--                    <div v-if="activeTab === 'summary'">-->
+                    <!--                        <div class="item flex flex-wrap">-->
+                    <!--                            <Summary class="item" :data="summaryData" />-->
+                    <!--                            <ServersByType class="item"-->
+                    <!--                                           :server-data="serverTypeData"-->
+                    <!--                                           :vm-data="vmTypeData"-->
+                    <!--                                           :os-data="osTypeData"-->
+                    <!--                                           :hypervisor-data="hypervisorTypeData"-->
+                    <!--                            />-->
+                    <!--                            <ResourcesByRegion class="region"-->
+                    <!--                                               :data="resourcesByRegionData"-->
+                    <!--                                               :loading="resourcesByRegionLoading"-->
+                    <!--                            />-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                    <!--                    <div v-else-if="activeTab === 'member'">-->
+                    <!--                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">-->
+                    <!--                            <template #detail>-->
+                    <!--                                <PDynamicDetails-->
+                    <!--                                    :details="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.details"-->
+                    <!--                                    :data="dvApiHandler.tableTS.selectState.firstSelectItem"-->
+                    <!--                                />-->
+                    <!--                            </template>-->
+                    <!--                        </PTab>-->
+                    <!--                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="activeMultiTab">-->
+                    <!--                            <template #data>-->
+                    <!--                                <p-dynamic-view-->
+                    <!--                                    view_type="simple-table"-->
+                    <!--                                    :data_source="selectTypeDataSource"-->
+                    <!--                                    :data="dvApiHandler.tableTS.selectState.selectItems"-->
+                    <!--                                />-->
+                    <!--                            </template>-->
+                    <!--                        </PTab>-->
+                    <!--                    </div>-->
                 </div>
-                <div v-else class="empty-msg">
-                    <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" /><br>
-                    <p-empty class="header">
-                        No Selected Project
-                    <br>
+                <p-empty v-else class="empty">
+                    <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
+                    <div class="empty-msg">
+                        No Selected Project<br>
                         Please, Click an item from left table.
-                    </p-empty>
-                </div>
+                    </div>
+                </p-empty>
             </template>
         </p-vertical-page-layout2>
     </div>
@@ -95,14 +93,16 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
+import { AxiosInstance } from 'axios';
+import { nodeModules } from 'ts-loader/dist/constants';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
-import {ProjectNode, ProjectTreeAPI} from '@/lib/api/tree';
+import { ProjectNode, ProjectTreeAPI } from '@/lib/api/tree';
 import PI from '@/components/atoms/icons/PI.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import TreeItem, { TreeState, TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
@@ -116,13 +116,46 @@ import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import { QuerySearchTableAPI } from '@/lib/api/table';
 import { makeTrItems } from '@/lib/view-helper/index';
+import { api } from '@/lib/api/axios';
+import { getDataAPI } from '@/lib/api/toolset';
+import { datatable } from '@/components/organisms/tables/data-table/DataTable.stories';
+
+export class APIHandler {
+    static $http: AxiosInstance;
+
+    public url: string;
+
+    public callback: any;
+
+    public paramsFormatter: any;
+
+    constructor(url: string, paramsFormatter?: any, callback?: any) {
+        APIHandler.$http = api.instance;
+        this.url = url;
+        this.paramsFormatter = paramsFormatter || (() => ({}));
+        // eslint-disable-next-line no-empty-function
+        this.callback = callback || (() => {});
+    }
+
+    async fetch(data?: any) { // .vue에서 정의하고 template.vue에서 원하는 시점에서 api를 실행하기 위한 함수
+        try {
+            const res = await APIHandler.$http.post(this.url, this.paramsFormatter(data));
+            this.callback(res, data);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+}
 
 export const projectSetup = (
+    vm,
     context,
     apiHandler:QuerySearchTableAPI,
     dvApiHandler:QuerySearchTableAPI,
 ) => {
     const state = reactive({
+        item: {},
+        tagsFetchApi: () => {},
         selectTypeFields: makeTrItems([
             ['ID', 'COMMON.ID'],
             ['Name', 'COMMON.NAME'],
@@ -150,7 +183,7 @@ export const projectSetup = (
         osTypeData: {},
         hypervisorTypeData: {},
         resourcesByRegionLoading: true,
-        ts: new ProjectTreeAPI<any, any,ProjectNode, any, TreeToolSet<any>>(
+        ts: new ProjectTreeAPI<any, any, ProjectNode, any, TreeToolSet<any>>(
             TreeToolSet,
         ).ts,
     });
@@ -171,11 +204,17 @@ export const projectSetup = (
             }
         }
     });
-
+    const treeTs = new TreeToolSet();
     return {
         ...toRefs(state),
         apiHandler,
         dvApiHandler,
+        treeTs,
+        treeApi: treeTs.treeRef,
+        selected: async (event) => {
+            await vm.getApi.fetch(event);
+            treeTs.getSelectedNode(event);
+        },
     };
 };
 
@@ -213,20 +252,10 @@ export default defineComponent({
         ResourcesByRegion,
         ServersByType,
     },
-    props: {
-        item: {
-            type: Object,
-            default: () => ({}),
-        },
-        tagsFetchApi: {
-            type: Function,
-            required: true,
-        },
-    },
     setup(props, context) {
+        const vm: any = getCurrentInstance();
         const state: any = new TreeState().state;
         const tagStates = setTagStates(props);
-        const treeTs = new TreeToolSet();
         const mockAPI = new QuerySearchTableAPI('', undefined, undefined, undefined, undefined, undefined, undefined);
 
         const baseDataSource = [
@@ -242,17 +271,12 @@ export default defineComponent({
                 },
             },
         ];
+
         return {
-            ...projectSetup(context, mockAPI, mockAPI),
+            ...projectSetup(vm, context, mockAPI, mockAPI),
             ...toRefs(state),
             ...tagStates,
-            treeTs,
             baseDataSource,
-            treeApi: treeTs.treeRef,
-            update: (event) => {
-                console.log('test', treeTs.getSelectedNode(event))
-                treeTs.getSelectedNode(event);
-            },
         };
     },
 });
@@ -260,8 +284,9 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .empty-msg {
+    .empty {
+        flex-direction: column;
         text-align: center;
-        margin-top: 5%;
+        justify-content: flex-start;
     }
 </style>
