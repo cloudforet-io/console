@@ -1,73 +1,11 @@
 import { computed, reactive, Ref } from '@vue/composition-api';
-import VueI18n from 'vue-i18n';
 import _ from 'lodash';
+import {
+    HelperToolSet, initReactive, optionalType, StateToolSet,
+} from '@/lib/toolset';
+import { DictInputToolSet, toDictInputTSList } from '@/components/molecules/forms/dict-input/DictInput.toolset';
 
-let pairId: number = 0;
-
-export class InputPair {
-    public key: string | number;
-
-    public value: string | number;
-
-    public id: number;
-
-    public keyInvalid: boolean = true;
-
-    public valueInvalid: boolean = true;
-
-    public keyInvalidText: Ref<VueI18n.TranslateResult> | string = '';
-
-    public valueInvalidText: Ref<VueI18n.TranslateResult> | string = '';
-
-    public isValid: any = computed(() => !this.keyInvalid && !this.valueInvalid);
-
-    protected vm: any;
-
-    public constructor(
-        vm: any, key?: string | number, value?: string | number,
-    ) {
-        // eslint-disable-next-line no-plusplus
-        this.id = pairId++;
-        this.key = key || '';
-        this.value = value || '';
-        this.vm = vm;
-    }
-
-    validateKey(newDict: object) {
-        if (!this.key) {
-            this.keyInvalid = true;
-            this.keyInvalidText = this.vm.$t('ACTION.DICT.INVALID.KEY_EMPTY');
-        } else if (newDict[this.key] !== undefined) {
-            this.keyInvalid = true;
-            this.keyInvalidText = this.vm.$t('ACTION.DICT.INVALID.KEY_DUPL');
-        } else this.keyInvalid = false;
-        return !this.keyInvalid;
-    }
-
-    validateValue() {
-        if (!this.value) {
-            this.valueInvalid = true;
-            this.valueInvalidText = this.vm.$t('ACTION.DICT.INVALID.VAL_EMPTY');
-        } else this.valueInvalid = false;
-        return !this.valueInvalid;
-    }
-
-    validate(newDict: object) {
-        this.validateKey(newDict);
-        this.validateValue();
-        return !this.keyInvalid && !this.valueInvalid;
-    }
-}
-
-export const dictToArray = (dict: object = {}, vm: any): any[] => {
-    const res: any = [];
-    _.forEach(dict, (v, k) => {
-        res.push(new InputPair(vm, k, v));
-    });
-    return res;
-};
-
-export const getProps = () => ({
+export const dictIGProps = {
     /**
      * Default dict.
      */
@@ -96,7 +34,7 @@ export const getProps = () => ({
         type: Boolean,
         default: false,
     },
-});
+};
 
 
 export interface DictIGPropsType {
@@ -106,20 +44,61 @@ export interface DictIGPropsType {
     enableValidation?: boolean;
 }
 
-export class DictIGState {
-    public state: DictIGPropsType;
+@StateToolSet<DictIGPropsType>()
+export class DictIGState<D, S extends DictIGPropsType = DictIGPropsType> {
+    public state: optionalType<S, D>;
 
-    static initState: DictIGPropsType = {
-        dict: {},
-        disabled: false,
-        showEmptyInput: false,
-        enableValidation: false,
+    static initState() {
+        return {
+            dict: {},
+            disabled: false,
+            showEmptyInput: false,
+            enableValidation: false,
+        };
     }
 
-    constructor(initData: object = {}) {
-        this.state = reactive({
-            ...DictIGState.initState,
-            ...initData,
+    constructor(initData: D = <D>{}, lazy: boolean = false) {
+        this.state = initReactive(lazy, DictIGState.initState(), initData);
+    }
+}
+
+export interface DictIGMetaStateType {
+    pairList: DictInputToolSet[];
+    newDict: object;
+    isAllValid: boolean;
+}
+
+@HelperToolSet()
+export class DictIGToolSet<D=any, SyncD=any> extends DictIGState<D, SyncD> {
+    public metaState: DictIGMetaStateType = null as unknown as DictIGMetaStateType;
+
+    static initToolSet(_this: DictIGToolSet, initMetaData) {
+        _this.metaState = reactive({
+            newDict: {},
+            pairList: toDictInputTSList(_this.state.dict),
+            isAllValid: computed(() => _this.metaState.pairList.every((pair: DictInputToolSet) => pair.metaState.isValid)),
+            ...initMetaData,
         });
+    }
+
+    constructor(initData: D = <D>{}, initMetaData?: object, lazy: boolean = false) {
+        super(initData);
+        if (!lazy) {
+            DictIGToolSet.initToolSet(this, initMetaData);
+        }
+    }
+
+    setNewDict(pair: DictInputToolSet) {
+        this.metaState.newDict[pair.syncState.name] = pair.syncState.value || null;
+    }
+
+    validateAll(): boolean {
+        this.metaState.newDict = {};
+        let res: boolean = true;
+        _.forEach(this.metaState.pairList, (pair) => {
+            res = pair.validate(this.metaState.newDict) && res;
+            if (res) this.setNewDict(pair);
+        });
+        return res;
     }
 }
