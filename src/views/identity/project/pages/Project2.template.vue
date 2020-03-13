@@ -5,7 +5,7 @@
                 <div>
                     <p-tree
                         ref="treeApi"
-                        v-bind="ts"
+                        v-bind="ts.state"
                         @node:selected="update"
                         @node:unselected="update"
                     />
@@ -22,10 +22,10 @@
                                         <p-dynamic-view name="Base Information" view_type="item" :data="item||{}"
                                                         :data_source="baseDataSource" :root-mode="true"
                                         />
-                                        <p-dict-panel :dict.sync="tags"
-                                                      :edit-mode.sync="tagEdit"
-                                                      :fetch-api="tagsFetchApi"
-                                        />
+<!--                                        <p-dict-panel :dict.sync="tags"-->
+<!--                                                      :edit-mode.sync="tagEdit"-->
+<!--                                                      :fetch-api="tagsFetchApi"-->
+<!--                                        />-->
                                     </div>
                                 </template>
                                 <template #member>
@@ -45,47 +45,46 @@
                             </p-tab>
                         </template>
                     </p-horizontal-layout>
-                    <div v-if="activeTab === ''">
-                        <div class="item flex flex-wrap">
-                            <Summary class="item" :data="summaryData" />
-                            <ServersByType class="item"
-                                           :server-data="serverTypeData"
-                                           :vm-data="vmTypeData"
-                                           :os-data="osTypeData"
-                                           :hypervisor-data="hypervisorTypeData"
-                            />
-                            <ResourcesByRegion class="region"
-                                               :data="resourcesByRegionData"
-                                               :loading="resourcesByRegionLoading"
-                            />
-                        </div>
-                    </div>
-                    <div v-else-if="!selectSummary">
-                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
-                            <template #detail>
-                                <PDynamicDetails
-                                    :details="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.details"
-                                    :data="dvApiHandler.tableTS.selectState.firstSelectItem"
-                                />
-                            </template>
-                        </PTab>
-                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="activeMultiTab">
-                            <template #data>
-                                <p-dynamic-view
-                                    view_type="simple-table"
-                                    :data_source="selectTypeDataSource"
-                                    :data="dvApiHandler.tableTS.selectState.selectItems"
-                                />
-                            </template>
-                        </PTab>
-                    </div>
+<!--                    <div v-if="activeTab === 'summary'">-->
+<!--                        <div class="item flex flex-wrap">-->
+<!--                            <Summary class="item" :data="summaryData" />-->
+<!--                            <ServersByType class="item"-->
+<!--                                           :server-data="serverTypeData"-->
+<!--                                           :vm-data="vmTypeData"-->
+<!--                                           :os-data="osTypeData"-->
+<!--                                           :hypervisor-data="hypervisorTypeData"-->
+<!--                            />-->
+<!--                            <ResourcesByRegion class="region"-->
+<!--                                               :data="resourcesByRegionData"-->
+<!--                                               :loading="resourcesByRegionLoading"-->
+<!--                            />-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div v-else-if="activeTab === 'member'">-->
+<!--                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">-->
+<!--                            <template #detail>-->
+<!--                                <PDynamicDetails-->
+<!--                                    :details="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.details"-->
+<!--                                    :data="dvApiHandler.tableTS.selectState.firstSelectItem"-->
+<!--                                />-->
+<!--                            </template>-->
+<!--                        </PTab>-->
+<!--                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="activeMultiTab">-->
+<!--                            <template #data>-->
+<!--                                <p-dynamic-view-->
+<!--                                    view_type="simple-table"-->
+<!--                                    :data_source="selectTypeDataSource"-->
+<!--                                    :data="dvApiHandler.tableTS.selectState.selectItems"-->
+<!--                                />-->
+<!--                            </template>-->
+<!--                        </PTab>-->
+<!--                    </div>-->
                 </div>
                 <div v-else class="empty-msg">
                     <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" /><br>
                     <p-empty class="header">
                         No Selected Project
-                    </p-empty><br>
-                    <p-empty class="msg">
+                    <br>
                         Please, Click an item from left table.
                     </p-empty>
                 </div>
@@ -163,8 +162,7 @@ export const projectSetup = (
                 dvApiHandler.resetAll();
                 dvApiHandler.apiState.fixSearchQuery = [
                     { key: 'id', operator: '=', value: selectType.id },
-                    { key: 'cloud_service_type', operator: '=', value: selectType.name },
-                    { key: 'cloud_service_group', operator: '=', value: selectType.group },
+                    { key: 'name', operator: '=', value: selectType.name },
                 ];
                 const keys = selectTypeDataSource.value.map(v => v.key);
                 dvApiHandler.tableTS.querySearch.acHandlerArgs.keys = keys;
@@ -244,39 +242,16 @@ export default defineComponent({
                 },
             },
         ];
-
-        // treeTs.state.data = [
-        //     { text: 'Item 1' },
-        //     { text: 'Item 2' },
-        //     {
-        //         text: 'Item 3',
-        //         kids: [
-        //             { text: 'Item 3.1' },
-        //             {
-        //                 text: 'Item 3.2',
-        //                 kids: [
-        //                     { text: 'Item 3.2.1' },
-        //                     { text: 'Item 3.2.2' },
-        //                 ],
-        //             },
-        //         ],
-        //     },
-        // ];
-        // treeTs.state.options = {
-        //     propertyNames: {
-        //         text: 'text',
-        //         children: 'kids',
-        //     },
-        // };
         return {
             ...projectSetup(context, mockAPI, mockAPI),
             ...toRefs(state),
             ...tagStates,
             treeTs,
             baseDataSource,
-            treeApi: treeTs.treeApi,
+            treeApi: treeTs.treeRef,
             update: (event) => {
-                treeTs.getSelectedNode();
+                console.log('test', treeTs.getSelectedNode(event))
+                treeTs.getSelectedNode(event);
             },
         };
     },
