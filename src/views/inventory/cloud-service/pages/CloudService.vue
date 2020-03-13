@@ -3,8 +3,9 @@
 import { computed, toRefs } from '@vue/composition-api';
 import CloudServiceTemplate, { cloudServiceSetup } from '@/views/inventory/cloud-service/pages/CloudService.template.vue';
 import { tabIsShow } from '@/lib/compostion-util';
-import {AdminTableAPI, HistoryAPI, QuerySearchTableAPI} from "@/lib/api/table";
-import {QuerySearchTableACHandler} from "@/lib/api/auto-complete";
+import { AdminTableAPI, HistoryAPI, QuerySearchTableAPI } from '@/lib/api/table';
+import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import { ChangeCloudServiceProject } from '@/lib/api/fetch';
 
 export default {
     name: 'CloudService',
@@ -28,8 +29,8 @@ export default {
         );
         const dvApiHandler = new QuerySearchTableAPI('/inventory/cloud-service/list');
         apiHandler.getData();
-
-        const state = cloudServiceSetup(context, apiHandler, dvApiHandler);
+        const changeProjectAPI = new ChangeCloudServiceProject();
+        const state = cloudServiceSetup(context, apiHandler, dvApiHandler, changeProjectAPI);
 
         // eslint-disable-next-line camelcase
         const adminParams = computed(() => ({ cloud_services: dvApiHandler.tableTS.selectState.selectItems.map(v => v.cloud_service_id) }));

@@ -78,6 +78,7 @@
                                         <div class="left-toolbox-item">
                                             <PDropdownMenuBtn :menu="csDropdownMenu"
                                                               @click-link="openLink"
+                                                              @click-project="clickProject"
                                             >
                                                 Action
                                             </PDropdownMenuBtn>
@@ -161,13 +162,14 @@
                 </transition>
             </template>
         </vertical-page-layout>
+        <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
     </div>
 </template>
 <script lang="ts">
 /* eslint-disable camelcase */
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
@@ -190,13 +192,17 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import {AdminTableAPI, HistoryAPI, QuerySearchTableAPI} from "@/lib/api/table";
+import { AdminTableAPI, HistoryAPI, QuerySearchTableAPI } from '@/lib/api/table';
+import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
+import { ProjectNode } from '@/lib/api/tree';
+import { ChangeCloudServiceProject, MockChangeProject } from '@/lib/api/fetch';
 
 
 export const cloudServiceSetup = (
     context,
     apiHandler:QuerySearchTableAPI<any, any>,
     dvApiHandler:QuerySearchTableAPI<any, any>,
+    ChangeProjectAPI:ChangeCloudServiceProject,
 ) => {
     const state = reactive({
         cstFields: makeTrItems([
@@ -259,8 +265,7 @@ export const cloudServiceSetup = (
         { type: 'item', disabled: true }),
     });
     // todo: CBT 끝나고 홞성화
-    // const csIsNotSelected = computed(() => dvApiHandler.selectState.isNotSelected);
-    // const csIsNotSelectedOnlyOne = computed(() => !dvApiHandler.selectState.isSelectOne);
+
     // const csDropdownMenu = reactive({
     //     ...makeTrItems([
     //         ['add', 'BTN.CREATE'],
@@ -275,7 +280,8 @@ export const cloudServiceSetup = (
     // });
     const link = computed(():string|undefined => {
         if (dvApiHandler.tableTS.selectState.isSelectOne) {
-            return _.get(dvApiHandler.tableTS.selectState.firstSelectItem, 'data.reference.link');
+            return _.get(dvApiHandler.tableTS.selectState.firstSelectItem, 'data.reference.link')
+                || _.get(dvApiHandler.tableTS.selectState.firstSelectItem, 'reference.external_link');
         }
         return undefined;
     });
@@ -286,14 +292,15 @@ export const cloudServiceSetup = (
     };
 
     const noLink = computed(() => !link.value);
-
+    const csIsNotSelected = computed(() => dvApiHandler.tableTS.selectState.isNotSelected);
+    const csIsNotSelectedOnlyOne = computed(() => !dvApiHandler.tableTS.selectState.isSelectOne);
     const csDropdownMenu = reactive({
         ...makeTrItems([
             ['add', 'BTN.CREATE'],
             ['update', 'BTN.UPDATE'],
             ['delete', 'BTN.DELETE'],
             [null, null, { type: 'divider' }],
-            ['project', 'COMMON.CHG_PRO'],
+            ['project', 'COMMON.CHG_PRO', { disabled: csIsNotSelected }],
             ['region', 'BTN.CHG_REGION'],
             [null, null, { type: 'divider' }],
             ['link', null, { label: 'console', disabled: noLink }],
@@ -307,6 +314,16 @@ export const cloudServiceSetup = (
         }
         return item.data;
     };
+
+    const projectModalVisible = ref(false);
+    const clickProject = () => {
+        projectModalVisible.value = true;
+    };
+    const changeProject = async (node?:ProjectNode|null) => {
+        await ChangeProjectAPI.fetchData(dvApiHandler.tableTS.selectState.selectItems.map(item => item.cloud_service_id), node ? node.data.id : undefined);
+        await dvApiHandler.getData();
+        projectModalVisible.value = false;
+    };
     return {
         ...toRefs(state),
         apiHandler,
@@ -316,6 +333,9 @@ export const cloudServiceSetup = (
         selectTypeDataSource,
         detailsData,
         openLink,
+        projectModalVisible,
+        clickProject,
+        changeProject,
     };
 };
 
@@ -339,15 +359,16 @@ export default {
         PDynamicDetails,
         PRow,
         PEmpty,
+        SProjectTreeModal,
     },
     setup(props, context) {
         // @ts-ignore
         const mockAPI = new QuerySearchTableAPI('', undefined, undefined, undefined, undefined, undefined, undefined);
         const mockAdminAPI = new AdminTableAPI('', computed(() => ({})), undefined, undefined, undefined, undefined, computed(() => false));
         const mockHistoryAPIHandler = new HistoryAPI('', '', computed(() => ''), undefined, undefined, undefined, computed(() => false));
-
+        const mockChangeProject = new MockChangeProject();
         return {
-            ...cloudServiceSetup(context, mockAPI, mockAPI),
+            ...cloudServiceSetup(context, mockAPI, mockAPI, mockChangeProject),
             adminApiHandler: mockAdminAPI,
             historyAPIHandler: mockHistoryAPIHandler,
         };
