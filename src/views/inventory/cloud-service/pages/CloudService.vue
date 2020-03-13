@@ -6,11 +6,14 @@ import { tabIsShow } from '@/lib/compostion-util';
 import { AdminTableAPI, HistoryAPI, QuerySearchTableAPI } from '@/lib/api/table';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import { ChangeCloudServiceProject } from '@/lib/api/fetch';
+import { useStore } from '@/store/toolset';
 
 export default {
     name: 'CloudService',
     extends: CloudServiceTemplate,
     setup(props, context) {
+        const { project } = useStore();
+        project.getProject();
         const keyAutoCompletes = ['name', 'group', 'provider'];
         const onlyFields = [...keyAutoCompletes, 'data_source'];
 
@@ -28,6 +31,16 @@ export default {
             undefined, undefined, csTypeACHandlerMeta,
         );
         const dvApiHandler = new QuerySearchTableAPI('/inventory/cloud-service/list');
+        dvApiHandler.apiState.transformHandler = (resp) => {
+            const result = resp;
+            result.data.results = resp.data.results.map((item) => {
+                // eslint-disable-next-line camelcase
+                item.console_force_data = { project: item.project_id ? project.state.projects[item.project_id] || item.project_id : '' };
+                return item;
+            });
+            console.log(resp);
+            return result;
+        };
         apiHandler.getData();
         const changeProjectAPI = new ChangeCloudServiceProject();
         const state = cloudServiceSetup(context, apiHandler, dvApiHandler, changeProjectAPI);
