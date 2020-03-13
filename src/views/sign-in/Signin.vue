@@ -107,6 +107,7 @@ export default defineComponent({
         bottom: 0;
         overflow: no-display;
         -webkit-overflow-scrolling: touch;
+        background-color: theme('colors.white');
         @mixin background-theme 'default-theme', theme('colors.white');
         @mixin background-theme 'color-theme', theme('colors.gray');
         @mixin background-theme 'image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg');
