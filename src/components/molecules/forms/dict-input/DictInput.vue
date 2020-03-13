@@ -35,8 +35,6 @@
 import { defineComponent } from '@vue/composition-api';
 import PInputText from '@/components/atoms/inputs/TextInput.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
-import { dictInputProps, DictInputPropsInterface }
-    from '@/components/molecules/forms/dict-input/DictInput.toolset';
 
 export default defineComponent({
     name: 'PDictInput',
@@ -48,8 +46,60 @@ export default defineComponent({
             },
         },
     },
-    props: dictInputProps,
-    setup(props: DictInputPropsInterface, { emit }) {
+    props: {
+        /**
+         * Key of dict. This is sync prop.
+         */
+        name: {
+            type: String,
+            default: undefined,
+            required: true,
+        },
+        /**
+         * Value of dict. This is sync prop.
+         */
+        value: {
+            type: [String, Number],
+            default: undefined,
+            required: true,
+        },
+        /**
+         * Key invalid.
+         */
+        keyInvalid: {
+            type: Boolean,
+            default: false,
+        },
+        /**
+         * Value invalid.
+         */
+        valueInvalid: {
+            type: Boolean,
+            default: false,
+        },
+        /**
+         * Key invalid message.
+         */
+        keyInvalidText: {
+            type: String,
+            default: undefined,
+        },
+        /**
+         * Value invalid message.
+         */
+        valueInvalidText: {
+            type: String,
+            default: undefined,
+        },
+        /**
+         * Disable key, value input boxes.
+         */
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props, { emit }) {
         return {
             onInput(type, val) {
                 emit(`update:${type}`, val);

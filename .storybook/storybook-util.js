@@ -10,14 +10,6 @@ const knobMapper = {
     Object: object,
 }
 
-const getKnobProp = (k, v, knob, option) => {
-    if (knob === select) {
-        return knob(k, option, v);
-    } else if (knob === number || knob === array) {
-        return knob(k, v, option);
-    } else return knob(k, v);
-};
-
 export const getKnobProps = (props, data = {}, knobs = {}, options = {}) => {
     const res = {};
 
@@ -30,17 +22,20 @@ export const getKnobProps = (props, data = {}, knobs = {}, options = {}) => {
         res[k] = {};
 
         let type = v.type || v;
-        if (type instanceof Array) { type = type[0] };
+        if (type instanceof Array) { type = type[0]};
         const knob = knobs[k] || knobMapper[type.name];
         const defaultVal = data[k] || v.default;
         const option = options[k];
 
-        res[k].default = getKnobProp(k, defaultVal, knob, option);
+        if (knob === select) {
+            res[k].default = knob(k, option, defaultVal);
+        } else if (knob === number || knob === array) {
+            res[k].default = knob(k, defaultVal, option);
+        } else res[k].default = knob(k, defaultVal);
     })
 
     return res;
 }
-
 
 const propsTypeMapping = {
     string: text,
@@ -68,8 +63,6 @@ function makeKnobProp(prop, value, knobType) {
 }
 
 /**
- * DEPRECATED
- *
  * prop info
  * @typedef {Object} propInfo
  * @property {string} name - prop name
