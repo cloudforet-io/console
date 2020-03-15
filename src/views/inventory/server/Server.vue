@@ -18,11 +18,19 @@ import { defaultQuery } from '@/lib/api/query';
 import { AdminTableAPI, HistoryAPI } from '@/lib/api/table';
 import { ChangeServerProject } from '@/lib/api/fetch';
 import { useStore } from '@/store/toolset';
+import fluentApi from '@/lib/fluent-api';
 
 export default {
     name: 'Server',
     extends: ServerTemplate,
     setup(props, context) {
+        // const inventory = fluentApi.inventory();
+        // const cst = inventory.cloudServiceType().list();
+        // console.debug(cst.debug());
+        // console.debug(cst.execute());
+        // const another = cst.setThisPage(2);
+        // console.debug(another.execute());
+
         const serverEventNames = eventNames;
         serverEventNames.getServerList = 'getServerData';
         serverEventNames.tagConfirmEvent = 'ServerTagConfirmEvent';
@@ -118,22 +126,23 @@ export default {
         };
 
         // request server list
-        const requestState = reactive({
-            query: computed(() => (defaultQuery(
-                state.thisPage, state.pageSize,
-                state.sortBy, state.sortDesc, null,
-                state.queryListTools.tags, valueFormatter,
-            ))),
-        });
+        // const requestState = reactive({
+        //     query: computed(() => (defaultQuery(
+        //         state.thisPage, state.pageSize,
+        //         state.sortBy, state.sortDesc, null,
+        //         state.queryListTools.tags, valueFormatter,
+        //     ))),
+        // });
         const requestServerList = async () => {
             console.debug('before', state.loading);
             state.loading = true;
             state.items = [];
+            let api = fluentApi.inventory().server().list();
+            api = api.setThisPage(state.thisPage).setPageSize(state.pageSize).setSortBy(state.sortBy).setSortDesc(state.sortDesc);
+            api = api.setFilter(...state.queryListTools.tags);
             try {
-                console.debug('start', state.loading);
-                const res = await context.parent.$http.post('/inventory/server/list', {
-                    query: requestState.query,
-                });
+                api.debug();
+                const res = await api.execute();
                 state.items = matchProject(res.data.results);
                 state.allPage = getAllPage(res.data.total_count, state.pageSize);
                 state.selectIndex = [];

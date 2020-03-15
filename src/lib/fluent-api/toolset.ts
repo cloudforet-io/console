@@ -13,6 +13,7 @@ import {
     FilterItem,
     ShortFilterType,
 } from '@/lib/fluent-api/type';
+import identity from '@/lib/mock/identity';
 
 export abstract class ActionAPI<parameter, resp> {
     protected abstract path: string;
@@ -62,92 +63,141 @@ export const operatorMap = Object.freeze({
 const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 
 export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
-    protected apiState: UnwrapRef<QueryActionState<parameter>> = reactive(<QueryActionState<parameter>><unknown>{
-        filter: [] as unknown as FilterItem[],
-        only: [] as unknown as string[],
-        thisPage: 1,
-        pageSize: 15,
-        sortBy: '',
-        sortDesc: true,
-        keyword: '',
-        query: computed(() => {
-            const query:Query = {};
-            if (this.apiState.thisPage !== 0) {
-                query.page = {
-                    start: ((this.apiState.thisPage - 1) * this.apiState.pageSize) + 1,
-                    limit: this.apiState.pageSize,
-                };
-            }
-            if (this.apiState.sortBy) {
-                query.sort = {
-                    key: this.apiState.sortBy,
-                    desc: this.apiState.sortDesc,
-                };
-            }
-            if (this.apiState.only.length > 0) {
-                query.only = this.apiState.only;
-            }
-            if (this.apiState.keyword) {
-                query.keyword = this.apiState.keyword;
-            }
-            if (this.apiState.filter.length > 0) {
-                const filter: FilterType[] = [];
-                // eslint-disable-next-line camelcase
-                const mergeOpQuery: {
-                    [propName: string]: FilterType;
-                } = {};
-                // @ts-ignore
-                this.apiState.filter.forEach((q:FilterItem) => {
-                    const op = operatorMap[q.operator];
-                    if (mergeOperatorSet.has(op)) {
-                        const prefix = `${q.key}:${op}`;
-                        // if operation is ['contain_in', 'not_contain_in', 'in', 'not_in'] then merge filter
-                        if (mergeOpQuery[prefix]) {
-                            ((mergeOpQuery[prefix] as ShortFilterType).v as string[]).push(q.value);
-                        } else {
-                            mergeOpQuery[prefix] = {
-                                k: q.key,
-                                v: [q.value],
-                                o: op,
-                            };
-                        }
-                    } else {
-                        filter.push({
-                            k: q.key,
-                            v: q.value,
-                            o: op,
-                        });
-                    }
-                });
-                // eslint-disable-next-line camelcase
-                if (filter.length > 0 || !_.isEmpty(mergeOpQuery)) {
-                    query.filter = [...filter, ...Object.values(mergeOpQuery)];
+    protected apiState: UnwrapRef<QueryActionState<parameter>> ;
+
+    public constructor(baseUrl: string, initState:QueryActionState<parameter> = {} as unknown as QueryActionState<parameter>) {
+        super(baseUrl);
+        this.apiState = reactive(<QueryActionState<parameter>><unknown>{
+            filter: [] as unknown as FilterItem[],
+            only: [] as unknown as string[],
+            thisPage: 1,
+            pageSize: 15,
+            sortBy: '',
+            sortDesc: true,
+            keyword: '',
+            ...initState,
+            query: computed(() => {
+                const query:Query = {};
+                if (this.apiState.thisPage !== 0) {
+                    query.page = {
+                        start: ((this.apiState.thisPage - 1) * this.apiState.pageSize) + 1,
+                        limit: this.apiState.pageSize,
+                    };
                 }
-            }
-            return <Query>query;
-        }),
-        extraParameter: {},
-        parameter: computed(() => ({
-            query: this.apiState.query,
-            ...this.apiState.extraParameter,
-        })),
-    });
-
-    addOnly(field:string) {
-        this.apiState.only.push('field');
-        return this;
+                if (this.apiState.sortBy) {
+                    query.sort = {
+                        key: this.apiState.sortBy,
+                        desc: this.apiState.sortDesc,
+                    };
+                }
+                if (this.apiState.only.length > 0) {
+                    query.only = this.apiState.only;
+                }
+                if (this.apiState.keyword) {
+                    query.keyword = this.apiState.keyword;
+                }
+                if (this.apiState.filter.length > 0) {
+                    const filter: FilterType[] = [];
+                    // eslint-disable-next-line camelcase
+                    const mergeOpQuery: {
+                        [propName: string]: FilterType;
+                    } = {};
+                    // @ts-ignore
+                    this.apiState.filter.forEach((q:FilterItem) => {
+                        const op = operatorMap[q.operator];
+                        if (mergeOperatorSet.has(op)) {
+                            const prefix = `${q.key}:${op}`;
+                            // if operation is ['contain_in', 'not_contain_in', 'in', 'not_in'] then merge filter
+                            if (mergeOpQuery[prefix]) {
+                                ((mergeOpQuery[prefix] as ShortFilterType).v as string[]).push(q.value);
+                            } else {
+                                mergeOpQuery[prefix] = {
+                                    k: q.key,
+                                    v: [q.value],
+                                    o: op,
+                                };
+                            }
+                        } else {
+                            filter.push({
+                                k: q.key,
+                                v: q.value,
+                                o: op,
+                            });
+                        }
+                    });
+                    // eslint-disable-next-line camelcase
+                    if (filter.length > 0 || !_.isEmpty(mergeOpQuery)) {
+                        query.filter = [...filter, ...Object.values(mergeOpQuery)];
+                    }
+                }
+                return <Query>query;
+            }),
+            extraParameter: {},
+            parameter: computed(() => ({
+                query: this.apiState.query,
+                ...this.apiState.extraParameter,
+            })),
+        });
     }
 
-    setOnly(fieldOrFields:string|string[]) {
-        if (Array.isArray(fieldOrFields)) {
-            this.apiState.only = fieldOrFields;
-        } else {
-            this.apiState.only = [fieldOrFields];
-        }
+
+    protected clone() :QueryAPI<parameter, resp> {
+        return this.constructor(this.baseUrl, this.apiState);
     }
 
-    addFilter()
+    addOnly(...args:string[]) {
+        this.apiState.only.push(...args);
+        return this.clone();
+    }
+
+    setOnly(...args:string[]) {
+        this.apiState.only = args;
+        return this.clone();
+    }
+
+    setOnlyTotalCount() {
+        this.apiState.only = ['total_count'];
+        return this.clone();
+    }
+
+    addFilter(...args:FilterItem[]) {
+        // @ts-ignore
+        this.apiState.filter.push(...args);
+        return this.clone();
+    }
+
+    setFilter(...args:FilterItem[]) {
+        // @ts-ignore
+        this.apiState.filter = args;
+        return this.clone();
+    }
+
+    setThisPage(thisPage:number) {
+        this.apiState.thisPage = thisPage;
+        return this.clone();
+    }
+
+    setPageSize(pageSize:number) {
+        this.apiState.pageSize = pageSize;
+        return this.clone();
+    }
+
+    setSortBy(sortBy:string) {
+        this.apiState.sortBy = sortBy;
+        return this.clone();
+    }
+
+    setSortDesc(sortDesc:boolean) {
+        this.apiState.sortDesc = sortDesc;
+        return this.clone();
+    }
+
+    setKeyword(keyword:string) {
+        this.apiState.keyword = keyword;
+        return this.clone();
+    }
 }
+
 
 export abstract class GetAction<parameter, resp> extends ActionAPI<parameter, resp> {
     protected path = 'get';
@@ -174,7 +224,23 @@ export abstract class ListAction<parameter, resp> extends QueryAPI<parameter, re
     protected path = 'list';
 }
 
-export type ResourceActions<actions extends string> = { [key in actions]?: (...args: any[]) => ActionAPI<any, any> };
+export abstract class GetDataAction<parameter, resp> extends QueryAPI<parameter, resp> {
+    protected path = 'get-data';
+
+    protected abstract idField: string;
+
+    public setId(id:string) {
+        this.apiState.extraParameter[this.idField] = id;
+        return this.clone();
+    }
+
+    public setKeyPath(keyPath:string) {
+        this.apiState.extraParameter.key_path = keyPath;
+        return this.clone();
+    }
+}
+
+export type ResourceActions<actions extends string> = { [key in actions]: (...args: any[]) => ActionAPI<any, any> };
 
 export abstract class Resource {
     protected abstract name: string;

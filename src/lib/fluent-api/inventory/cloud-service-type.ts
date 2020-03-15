@@ -1,10 +1,12 @@
 /* eslint-disable camelcase */
 import {
-    GetAction,
+    GetAction, ListAction,
     Resource,
     ResourceActions,
 } from '@/lib/fluent-api/toolset';
-import { CollectionInfo, DataSourceItem, timestamp } from '@/lib/fluent-api/type';
+import {
+    CollectionInfo, DataSourceItem, ListType, timestamp,
+} from '@/lib/fluent-api/type';
 
 
 interface CloudServiceTypeModel {
@@ -28,12 +30,24 @@ interface CstGetParameter {
     cloud_service_type_id :string
 }
 
-class CstGet extends GetAction<CstGetParameter, CloudServiceTypeModel> {
+class Get extends GetAction<CstGetParameter, CloudServiceTypeModel> {
     protected idField = 'cloud_service_type_id'
 }
 
-export default class CloudServiceType extends Resource implements ResourceActions<'get'> {
+interface CstListParameter {
+    include_cloud_service_count?:boolean
+}
+
+class List extends ListAction<CstListParameter, ListType<CloudServiceTypeModel>> {
+    public setCloudServiceCount(isShow:boolean = true) {
+        this.apiState.extraParameter.include_cloud_service_count = isShow;
+        return this.clone();
+    }
+}
+export default class CloudServiceType extends Resource implements ResourceActions<'get'| 'list'> {
     protected name = 'cloud-service';
 
-    get(id:string) { return new CstGet(this.baseUrl, id); }
+    get(id:string) { return new Get(this.baseUrl, id); }
+
+    list() { return new List(this.baseUrl); }
 }
