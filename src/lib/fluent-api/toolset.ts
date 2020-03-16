@@ -197,10 +197,8 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
         return this.clone();
     }
 }
-
-
-export abstract class GetAction<parameter, resp> extends ActionAPI<parameter, resp> {
-    protected path = 'get';
+export abstract class SingleItemAction<parameter, resp> extends ActionAPI<parameter, resp> {
+    protected abstract path;
 
     protected abstract idField: string;
 
@@ -217,6 +215,14 @@ export abstract class GetAction<parameter, resp> extends ActionAPI<parameter, re
         console.debug(this.idField);
         this.apiState.parameter[this.idField] = id;
     }
+}
+
+export abstract class SingleDeleteAction<parameter, resp> extends SingleItemAction<parameter, resp> {
+    protected path = 'delete';
+}
+
+export abstract class GetAction<parameter, resp> extends SingleItemAction<parameter, resp> {
+    protected path = 'get';
 }
 
 
