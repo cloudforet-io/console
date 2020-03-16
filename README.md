@@ -1,25 +1,97 @@
-# Steamug's WCF (Web-Console Front-End) 
+<h1 align="center">SpaceONE Console</h1>
 
-Cloud One WCF - https://git.pyengine.net/cloudone/wconsole-client. 
-This project consists of Vue'js Front-End, which implements following features .... 
+<br/>
+<div align="center" style="display:flex;">
+  <img width="245" src="https://user-images.githubusercontent.com/35549653/76694897-de236300-66bb-11ea-9ace-b9edde9c12da.png">
+  <p>
+<img  alt="Version"  src="https://img.shields.io/badge/version-0.9-blue.svg?cacheSeconds=2592000"  />
+<a  href="https://spaceone-dev.gitbook.io/user-guide/"  target="_blank">
+<img  alt="Documentation"  src="https://img.shields.io/badge/documentation-yes-brightgreen.svg"  />
+</a>
+<a  href="https://www.apache.org/licenses/LICENSE-2.0"  target="_blank">
+<img  alt="License: Apache 2.0"  src="https://img.shields.io/badge/License-Apache 2.0-yellow.svg"  />
+</a>
+</p>
 
+</div>
 
-If you use Steamugs product for your cloud management system, you might find some of these components useful!
+&nbsp;
 
-[View the complete list of available components](https://git.pyengine.net/)
+> Front-end Project for SpaceONE project. Components made with Vue3 Composition API.
+&nbsp;
+&nbsp;
 
+  
 
-### other available components in Steamugs: 
+## ⚙️ Install
 
-##### WCF will use Vue.js + etc, for improved performance across all browsers and devices.
+```sh
 
-### Instructions of Usage 
-#### Step 1 : 
+  git clone github.com/spaceone-dev/console-client
+  cd spaceone-dev/console-client
+  npm install
 
-#### Step 2:
+```
+&nbsp;
+&nbsp;
 
-#### Step 3 :
+  
+
+## 🚀 Usage
+
+  
+### Demo Server
+```
+  npm run serve 
+```
+&nbsp;
+
+### Storybook
+```
+  npm run storybook
+```
+&nbsp;
+&nbsp;
  
-##### If you have any further queries that you may have on please contact: `mzc_tnc_com_cloudone@megazone.com`
+## 💻 No server mode & Server mode
+SpaceONE Console project provides 'No server mode'(default) with mock data for demo.
+If you want real server, you can change the mode.
 
-hello world
+&nbsp;
+
+```
+(development.json)
+
+"NO_SERVER_MODE": false
+```
+&nbsp;
+&nbsp;
+
+
+## 👨‍👩‍👧 Author
+
+See our [OWNERS](github.com/spaceone-dev/console-client/OWNERS.md) file. 
+
+&nbsp;
+&nbsp;
+  
+  
+
+## 👋 Show your support
+
+ 
+Give a ⭐️ if this project helped you!
+Also, We provide [Contributing Guide](github.com/spaceone-dev/console-client/contributing-guide.md) for you. 
+
+&nbsp;
+&nbsp;
+ 
+  
+
+## 📝 License
+
+  
+
+This project is [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) licensed.
+
+  

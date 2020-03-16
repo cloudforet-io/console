@@ -3,6 +3,7 @@ import {
 } from '@vue/composition-api';
 import Lockr from 'lockr';
 import _ from 'lodash';
+import { DateTime } from 'luxon';
 import { api } from '@/lib/api/axios';
 
 const bindLocalStorage = (prefix:string, name:string, state:any) => computed({
@@ -149,12 +150,64 @@ class DomainStore extends Store<DomainState> {
 }
 
 
+interface ProjectState {
+    projects:any;
+    ttl:DateTime;
+}
+
+class ProjectStore extends Store<ProjectState> {
+    public constructor(prefix:string) {
+        super(prefix, [
+            'projects',
+            'ttl',
+        ]);
+        this.state = reactive({
+            ...initState(this.prefix, this.names, this.data),
+        });
+    }
+
+    public isExpiration():boolean {
+        let result:boolean = true;
+        if (this.state.ttl) {
+            result = this.state.ttl < DateTime.local();
+        }
+        return result;
+    }
+
+    public getProject= async () => {
+        console.debug('isEXP?', this.isExpiration());
+        if (this.isExpiration()) {
+            const result = {};
+            try {
+                console.debug('request project names');
+                const res = await api.instance.post(
+                    '/identity/project/list',
+                    {
+                        query: {
+                            only: ['project_id', 'name', 'project_group'],
+                        },
+                    },
+                );
+                res.data.results.forEach((project) => {
+                    result[project.project_id] = `${project.project_group_info.name}/${project.name}`;
+                });
+                this.state.ttl = DateTime.local().plus({ hours: 1 });
+            } catch (e) {
+                console.debug(e);
+            }
+            this.state.projects = result;
+        }
+    }
+}
+
+
 export default {
     name: 'LocalStorage',
     setup() {
         const state = {
             user: new UserStore('user/'),
             domain: new DomainStore('domain/'),
+            project: new ProjectStore('project/'),
         };
         return {
             ...state,
@@ -170,6 +223,7 @@ export default {
                 }
                 state.user.reset();
                 state.domain.reset();
+                state.project.reset();
                 if (vm) {
                     console.debug(routerMeta);
                     vm.$router.push(routerMeta);

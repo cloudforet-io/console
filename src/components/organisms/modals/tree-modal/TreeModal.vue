@@ -21,11 +21,17 @@
         </template>
         <template #body>
             <div class="p-tree-modal-block">
-                <p-tree ref="p-tree" :data="data" :options="options"
+                <p-tree ref="p-tree"
+                        :data="data"
+                        :options="options"
                         :loading="loading"
-                        :icons="icons" :select-mode="true"
+                        :icons="icons"
                         v-on="$listeners"
-                />
+                >
+                    <template #icon="scope">
+                        <slot name="icon" v-bind="scope" />
+                    </template>
+                </p-tree>
             </div>
             <slot name="default" />
         </template>
