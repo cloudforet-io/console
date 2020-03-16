@@ -1,21 +1,43 @@
 <template>
     <div class="project">
         <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
-            <template #sidebar="{width}">
-                <div>
+            <template #sidebar="{height}">
+                <div class="treeSidebar" :style="sidebarStyle" @click.right.stop.prevent="treeClickedRight"
+                     @click="hideContextMenu"
+                >
                     <p-tree
                         ref="treeApi"
                         v-bind="ts.state"
+                        :select-mode="true"
                         @node:selected="selected"
+                        @node:clicked:right="nodeClickedRight"
                     />
                     <br>
+                    <div v-if="clickedRightFlag">
+                        <PContextMenu
+                            ref="contextRef"
+                            style="position:static"
+                            @clickMenuEvent="clickMenuEvent"
+                            :menu="menu"
+                            @click-add="clickAdd"
+                            :theme="theme"
+                            @click-hello="clickHello"
+                            @click-delete="clickDelete"
+                            @click-update="clickUpdate"
+                            @click-collect="clickCollect"
+                            @click-remove="clickRemove"
+                            @onEndOfUpKey="onEndOfUpKey"
+                            @onEndOfDownKey="onEndOfDownKey"
+                            @onEscKey="onEscKey"
+                        />
+                    </div>
                 </div>
             </template>
             <template #default>
                 <div v-if="treeTs.metaState.firstSelectedNode">
                     <p-horizontal-layout>
                         <template #container="{ height }">
-                            <p-tab :tabs="tabs" :active-tab.sync="activeTab" :style="{height:`${height}px`}">
+                            <p-tab :tabs="tabs" :active-tab.sync="activeTab" :style="{'height': height+'px','overflow-x':'auto'}">
                                 <template #summary>
                                     <div style="height: 100%;">
                                         <p-dynamic-view name="Base Information" view_type="item" :data="item||{}"
@@ -44,40 +66,40 @@
                             </p-tab>
                         </template>
                     </p-horizontal-layout>
-                    <!--                    <div v-if="activeTab === 'summary'">-->
-                    <!--                        <div class="item flex flex-wrap">-->
-                    <!--                            <Summary class="item" :data="summaryData" />-->
-                    <!--                            <ServersByType class="item"-->
-                    <!--                                           :server-data="serverTypeData"-->
-                    <!--                                           :vm-data="vmTypeData"-->
-                    <!--                                           :os-data="osTypeData"-->
-                    <!--                                           :hypervisor-data="hypervisorTypeData"-->
-                    <!--                            />-->
-                    <!--                            <ResourcesByRegion class="region"-->
-                    <!--                                               :data="resourcesByRegionData"-->
-                    <!--                                               :loading="resourcesByRegionLoading"-->
-                    <!--                            />-->
-                    <!--                        </div>-->
-                    <!--                    </div>-->
-                    <!--                    <div v-else-if="activeTab === 'member'">-->
-                    <!--                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">-->
-                    <!--                            <template #detail>-->
-                    <!--                                <PDynamicDetails-->
-                    <!--                                    :details="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.details"-->
-                    <!--                                    :data="dvApiHandler.tableTS.selectState.firstSelectItem"-->
-                    <!--                                />-->
-                    <!--                            </template>-->
-                    <!--                        </PTab>-->
-                    <!--                        <PTab v-if="dvApiHandler.tableTS.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="activeMultiTab">-->
-                    <!--                            <template #data>-->
-                    <!--                                <p-dynamic-view-->
-                    <!--                                    view_type="simple-table"-->
-                    <!--                                    :data_source="selectTypeDataSource"-->
-                    <!--                                    :data="dvApiHandler.tableTS.selectState.selectItems"-->
-                    <!--                                />-->
-                    <!--                            </template>-->
-                    <!--                        </PTab>-->
-                    <!--                    </div>-->
+                </div>
+                <div v-if="activeTab">
+                    <div class="item flex flex-wrap">
+                        <Summary class="item" :data="summaryData" />
+                        <ServersByType class="item"
+                                       :server-data="serverTypeData"
+                                       :vm-data="vmTypeData"
+                                       :os-data="osTypeData"
+                                       :hypervisor-data="hypervisorTypeData"
+                        />
+                        <ResourcesByRegion class="region"
+                                           :data="resourcesByRegionData"
+                                           :loading="resourcesByRegionLoading"
+                        />
+                    </div>
+                </div>
+                <div v-if="activeTab">
+                    <PTab v-if="dvApiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
+                        <template #detail>
+                            <PDynamicDetails
+                                :details="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.details"
+                                :data="dvApiHandler.tableTS.selectState.firstSelectItem"
+                            />
+                        </template>
+                    </PTab>
+                    <PTab v-if="dvApiHandler.tableTS.selectState.isSelectMulti" :tabs="multiTabs" :active-tab.sync="activeMultiTab">
+                        <template #data>
+                            <p-dynamic-view
+                                view_type="simple-table"
+                                :data_source="selectTypeDataSource"
+                                :data="dvApiHandler.tableTS.selectState.selectItems"
+                            />
+                        </template>
+                    </PTab>
                 </div>
                 <p-empty v-else class="empty">
                     <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
@@ -166,8 +188,8 @@ export const projectSetup = (
             ['Language', 'COMMON.LANGUAGE'],
         ], context.parent, {}),
         tabs: makeTrItems([
-            ['summary', 'Summary'],
-            ['member', 'Member'],
+            ['summary', 'COMMON.SUMMARY'],
+            ['member', 'COMMON.MEMBER'],
         ], context.parent),
         activeTab: 'summary',
         multiTabs: makeTrItems([
@@ -186,6 +208,10 @@ export const projectSetup = (
         ts: new ProjectTreeAPI<any, any, ProjectNode, any, TreeToolSet<any>>(
             TreeToolSet,
         ).ts,
+        clickedRightFlag: false,
+        sidebarStyle: computed(() => ({
+            height: '1000px', // TODO : props에서 height을 받아오는 대신 Right container의 height을 넣어주
+        })),
     });
     const selectTypeDataSource = computed(() => (_.get(apiHandler.tableTS.selectState.firstSelectItem, ['data_source'], [])));
     watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
@@ -214,6 +240,18 @@ export const projectSetup = (
         selected: async (event) => {
             await vm.getApi.fetch(event);
             treeTs.getSelectedNode(event);
+            state.clickedRightFlag = false;
+        },
+        treeClickedRight: (event) => {
+            state.clickedRightFlag = true;
+            console.debug('tree clicked event', event, state.clickedRightFlag);
+        },
+        nodeClickedRight: (event) => {
+            state.clickedRightFlag = true;
+            console.debug('clicked event', event, state.clickedRightFlag);
+        },
+        hideContextMenu: (event) => {
+            state.clickedRightFlag = false;
         },
     };
 };
