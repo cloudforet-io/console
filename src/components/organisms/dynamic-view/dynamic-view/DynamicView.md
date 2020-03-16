@@ -1,3 +1,3 @@
 # support view-type
 - [x] item (default)
-- [ ] table
+- [x] table
