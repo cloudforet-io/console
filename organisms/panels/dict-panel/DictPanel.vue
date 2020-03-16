@@ -45,7 +45,7 @@ import {
 } from '@vue/composition-api';
 import { DataTableState } from '@/components/organisms/tables/data-table/toolset';
 import { makeTrItems } from '@/lib/view-helper';
-import { dictToArray } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
+import { toDictInputTSList } from '@/components/molecules/forms/dict-input/DictInput.toolset';
 import { getDictPanelProps, DictPanelPropsType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
@@ -74,10 +74,10 @@ export default defineComponent({
             proxyEditMode: makeProxy('editMode', props, emit),
             tableState: new DataTableState({
                 fields: makeTrItems([
-                    ['key', 'WORD.KEY'],
+                    ['name', 'WORD.KEY'],
                     ['value', 'WORD.VALUE'],
                 ], vm),
-                items: computed(() => dictToArray(props.dict, vm)),
+                items: computed(() => _.map(props.dict, (v, k) => ({ name: k, value: v }))),
                 colCopy: true,
             }).state,
             newDict: props.dict,
