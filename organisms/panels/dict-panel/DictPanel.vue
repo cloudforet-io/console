@@ -40,6 +40,7 @@
 </template>
 
 <script lang="ts">
+import _ from 'lodash';
 import {
     reactive, toRefs, getCurrentInstance, defineComponent, computed,
 } from '@vue/composition-api';
