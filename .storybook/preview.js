@@ -34,7 +34,7 @@ Vue.use(SvgIcon, {
 Vue.use(LiquorTree);
 
 Vue.prototype.$velocity = velocity;
-
+window.STORYBOOK_GA_ID='UA-159327743-4'
 /*****************************************************************
  * This is a Global Bus Event;
  * Please, name your '$emit' event name as action + Event such as
