@@ -10,11 +10,16 @@ jobs:
       - name: git clone
         uses: actions/checkout@v2
 
-      - name: yarn install
-        run: yarn install
+      - name: Checkout submodules
+        uses: srt32/git-actions@v0.0.3
+        with:
+          args: git submodule update --init --recursive
+
+      - name: npm install
+        run: npm install
 
       - name: build
-        run: yarn run build-storybook
+        run: npm run build:storybook:github
 
       - name: deploy
         env:
