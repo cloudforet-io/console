@@ -15,9 +15,11 @@
 
 </div>
 
+![StoryBook CD](https://github.com/spaceone-dev/console/workflows/StoryBook%20CD/badge.svg?branch=master)
+
 &nbsp;
 
-> Front-end Project for SpaceONE project. Components made with Vue3 Composition API.
+> Front-end Project for SpaceONE project. Components made with Vue2 Composition API.
 &nbsp;
 &nbsp;
 
@@ -29,6 +31,7 @@
 
   git clone github.com/spaceone-dev/console-client
   cd spaceone-dev/console-client
+  git submodule init && git submodule update
   npm install
 
 ```

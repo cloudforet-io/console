@@ -252,7 +252,7 @@ export abstract class Resource {
     protected abstract name: string;
 
     get baseUrl() {
-        return `${this.service}/${this.name}/`;
+        return `/${this.service}/${this.name}/`;
     }
 
     public constructor(protected service: string) {
