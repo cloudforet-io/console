@@ -317,7 +317,6 @@ export default {
 
 <style lang="postcss" scoped>
 
-    $main-height: calc(100vh - #{lnb-height});
 
     .main-tree-col {
         @apply bg-primary4;
@@ -325,7 +324,7 @@ export default {
         border-radius: 7px;
         border-radius: 0;
         padding: 15px 8px;
-        height: $main-height;
+        height: calc(100vh - 40px);
         overflow: scroll;
 
         .leaf-space {

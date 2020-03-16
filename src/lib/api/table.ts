@@ -9,7 +9,7 @@ import {
     SearchTableToolSet,
     ToolboxTableToolSet,
 } from '@/components/organisms/tables/toolbox-table/toolset';
-import { BaseApiState, DynamicAPI, getDataAPI } from '@/lib/api/toolset';
+import { BaseApiState, transformHandlerType, getDataAPI } from '@/lib/api/toolset';
 import { forceRefArg, readonlyRefArg } from '@/lib/type';
 import {
     baseAutocompleteHandler,
@@ -18,8 +18,11 @@ import {
 import { ApiQuery, defaultQuery } from '@/lib/api/query';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 
-export abstract class BaseTableAPI<initData = any, initSyncData = any,
-    T extends ToolboxTableToolSet<initData, initSyncData> = ToolboxTableToolSet<initData, initSyncData>> extends getDataAPI {
+export abstract class BaseTableAPI<
+        initData = any,
+        initSyncData = any,
+        T extends ToolboxTableToolSet<initData, initSyncData> = ToolboxTableToolSet<initData, initSyncData>
+    > extends getDataAPI {
     public tableTS: T;
 
     public vm: Vue;
@@ -27,7 +30,13 @@ export abstract class BaseTableAPI<initData = any, initSyncData = any,
     public apiState: UnwrapRef<BaseApiState>
 
 
-    protected constructor(url: readonlyRefArg<string>, only: readonlyRefArg<string[]> = [], extraParams: readonlyRefArg<any> = {}, fixSearchQuery: SearchQueryType[] = []) {
+    protected constructor(
+        url: readonlyRefArg<string>,
+        only: readonlyRefArg<string[]> = [],
+        extraParams: readonlyRefArg<any> = {},
+        fixSearchQuery: SearchQueryType[] = [],
+        transformHandler:transformHandlerType|null = null,
+    ) {
         super();
         // @ts-ignore
         this.vm = getCurrentInstance();
@@ -36,6 +45,7 @@ export abstract class BaseTableAPI<initData = any, initSyncData = any,
             only,
             fixSearchQuery, // default fix query
             extraParams, // for api extra parameters
+            transformHandler,
         });
         this.tableTS = new ToolboxTableToolSet<initData, initSyncData>() as T;
     }
@@ -48,8 +58,18 @@ export abstract class BaseTableAPI<initData = any, initSyncData = any,
             query: this.paramQuery.value,
             ...this.apiState.extraParams,
         };
-        const res = await this.$http.post(this.apiState.url, params);
-        return res;
+        const resp = await this.$http.post(this.apiState.url, params).then((response) => {
+            let result = response;
+            if (this.apiState.transformHandler) {
+                try {
+                    result = this.apiState.transformHandler(response);
+                } catch (e) {
+                    console.debug(e);
+                }
+            }
+            return result;
+        });
+        return resp;
     };
 
 

@@ -84,7 +84,8 @@ export class ProjectTreeAPI<
                     item_id: node.data.id,
                     item_type: node.data.item_type,
                     sort: {
-                        key: 'name',
+                        key: 'item_type',
+                        desc: true,
                     },
                 };
                 cb = resp => Promise.resolve(resp.data.items);

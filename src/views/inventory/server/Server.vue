@@ -17,11 +17,20 @@ import { getAllPage } from '@/components/organisms/pagenations/toolset';
 import { defaultQuery } from '@/lib/api/query';
 import { AdminTableAPI, HistoryAPI } from '@/lib/api/table';
 import { ChangeServerProject } from '@/lib/api/fetch';
+import { useStore } from '@/store/toolset';
+import fluentApi from '@/lib/fluent-api';
 
 export default {
     name: 'Server',
     extends: ServerTemplate,
     setup(props, context) {
+        // const inventory = fluentApi.inventory();
+        // const cst = inventory.cloudServiceType().list();
+        // console.debug(cst.debug());
+        // console.debug(cst.execute());
+        // const another = cst.setThisPage(2);
+        // console.debug(another.execute());
+
         const serverEventNames = eventNames;
         serverEventNames.getServerList = 'getServerData';
         serverEventNames.tagConfirmEvent = 'ServerTagConfirmEvent';
@@ -89,29 +98,21 @@ export default {
             new ACHandler(),
             new ChangeServerProject(),
         );
-        const projectNameList = ref({});
+        const projectStore = context.parent.$ls.project;
+
+        projectStore.getProject();
         const matchProject = (items) => {
-            for (let i = 0; i < items.length; i++) {
-                if (!Object.keys(projectNameList.value).length) {
-                    items[i].project = items[i].project_id;
-                } else {
-                    items[i].project = projectNameList.value[items[i].project_id] || items[i].project_id;
+            const result = items.map((item) => {
+                try {
+                    item.project = item.project_id ? projectStore.state.projects[item.project_id] || item.project_id : '';
+                } catch (e) {
+                    item.project = item.project_id;
                 }
-            }
-            return items;
+                return item;
+            });
+            return result;
         };
 
-        // request project list
-        const requestProjectList = async () => {
-            try {
-                const res = await context.parent.$http.post('/identity/project/list');
-                res.data.results.forEach((project) => {
-                    projectNameList.value[project.project_id] = `${project.project_group_info.name} ${project.name}`;
-                });
-            } catch (e) {
-                console.error(e);
-            }
-        };
         const numberTypeKeys = new Set(['data.base.memory', 'data.base.core']);
         const valueFormatter = (key, value) => {
             if (numberTypeKeys.has(key)) {
@@ -125,22 +126,23 @@ export default {
         };
 
         // request server list
-        const requestState = reactive({
-            query: computed(() => (defaultQuery(
-                state.thisPage, state.pageSize,
-                state.sortBy, state.sortDesc, null,
-                state.queryListTools.tags, valueFormatter,
-            ))),
-        });
+        // const requestState = reactive({
+        //     query: computed(() => (defaultQuery(
+        //         state.thisPage, state.pageSize,
+        //         state.sortBy, state.sortDesc, null,
+        //         state.queryListTools.tags, valueFormatter,
+        //     ))),
+        // });
         const requestServerList = async () => {
             console.debug('before', state.loading);
             state.loading = true;
             state.items = [];
+            let api = fluentApi.inventory().server().list();
+            api = api.setThisPage(state.thisPage).setPageSize(state.pageSize).setSortBy(state.sortBy).setSortDesc(state.sortDesc);
+            api = api.setFilter(...state.queryListTools.tags);
             try {
-                console.debug('start', state.loading);
-                const res = await context.parent.$http.post('/inventory/server/list', {
-                    query: requestState.query,
-                });
+                api.debug();
+                const res = await api.execute();
                 state.items = matchProject(res.data.results);
                 state.allPage = getAllPage(res.data.total_count, state.pageSize);
                 state.selectIndex = [];
@@ -303,7 +305,6 @@ export default {
         };
         mountBusEvent(serverEventBus, serverEventNames.deleteServer, deleteServer);
 
-        requestProjectList();
         requestServerList();
 
         const adminParams = computed(() => ({

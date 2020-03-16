@@ -196,6 +196,7 @@ import { AdminTableAPI, HistoryAPI, QuerySearchTableAPI } from '@/lib/api/table'
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { ChangeCloudServiceProject, MockChangeProject } from '@/lib/api/fetch';
+import { Computed } from '@/lib/type';
 
 
 export const cloudServiceSetup = (
@@ -226,7 +227,13 @@ export const cloudServiceSetup = (
         activeMultiTab: 'data',
     });
 
-    const selectTypeDataSource = computed(() => (_.get(apiHandler.tableTS.selectState.firstSelectItem, ['data_source'], [])));
+    const originDataSource :Computed<any[]> = computed(() => _.get(apiHandler.tableTS.selectState.firstSelectItem, ['data_source'], []) as any[]);
+    const selectTypeDataSource:Computed<any[]> = computed(() => [
+        {
+            name: 'project', key: 'console_force_data.project', view_type: 'text', view_option: {},
+        },
+        ...originDataSource.value,
+    ]);
     watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
         if (preType && type !== preType) {
             const selectType = apiHandler.tableTS.selectState.firstSelectItem;
@@ -237,7 +244,7 @@ export const cloudServiceSetup = (
                     { key: 'cloud_service_type', operator: '=', value: selectType.name },
                     { key: 'cloud_service_group', operator: '=', value: selectType.group },
                 ];
-                const keys = selectTypeDataSource.value.map(v => v.key);
+                const keys = originDataSource.value.map(v => v.key);
                 dvApiHandler.tableTS.querySearch.acHandlerArgs.keys = keys;
                 dvApiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
                 dvApiHandler.getData();
