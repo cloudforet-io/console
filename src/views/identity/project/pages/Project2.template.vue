@@ -12,25 +12,11 @@
                         @node:selected="selected"
                         @node:clicked:right="nodeClickedRight"
                     />
-                    <br>
-                    <div v-if="clickedRightFlag">
-                        <PContextMenu
-                            ref="contextRef"
-                            style="position:static"
-                            @clickMenuEvent="clickMenuEvent"
-                            :menu="menu"
-                            @click-add="clickAdd"
-                            :theme="theme"
-                            @click-hello="clickHello"
-                            @click-delete="clickDelete"
-                            @click-update="clickUpdate"
-                            @click-collect="clickCollect"
-                            @click-remove="clickRemove"
-                            @onEndOfUpKey="onEndOfUpKey"
-                            @onEndOfDownKey="onEndOfDownKey"
-                            @onEscKey="onEscKey"
-                        />
-                    </div>
+                    <p-context-menu v-if="showContextMenu" ref="contextMenuRef"
+                                    theme="secondary"
+                                    :menu="menu"
+                                    @clickMenuEvent="clickMenuEvent"
+                    />
                 </div>
             </template>
             <template #default>
@@ -120,6 +106,7 @@ import {
 import _ from 'lodash';
 import { AxiosInstance } from 'axios';
 import { nodeModules } from 'ts-loader/dist/constants';
+import { object, select } from '@storybook/addon-knobs';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
@@ -139,8 +126,9 @@ import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import { QuerySearchTableAPI } from '@/lib/api/table';
 import { makeTrItems } from '@/lib/view-helper/index';
 import { api } from '@/lib/api/axios';
-import { getDataAPI } from '@/lib/api/toolset';
-import { datatable } from '@/components/organisms/tables/data-table/DataTable.stories';
+import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
+import { searchContextType } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import { windowEventMount } from '@/lib/compostion-util';
 
 export class APIHandler {
     static $http: AxiosInstance;
@@ -208,10 +196,21 @@ export const projectSetup = (
         ts: new ProjectTreeAPI<any, any, ProjectNode, any, TreeToolSet<any>>(
             TreeToolSet,
         ).ts,
-        clickedRightFlag: false,
+        showContextMenu: false,
         sidebarStyle: computed(() => ({
             height: '1000px', // TODO : props에서 height을 받아오는 대신 Right container의 height을 넣어주
         })),
+        menu: [{
+            type: 'item', label: 'add', name: 'add', disabled: false,
+        },
+        {
+            type: 'item', label: 'hello', name: 'hello', disabled: false,
+        },
+        { type: 'divider' },
+        { type: 'header', label: 'this is header' },
+        {
+            type: 'item', label: 'update', name: 'update', disabled: false,
+        }],
     });
     const selectTypeDataSource = computed(() => (_.get(apiHandler.tableTS.selectState.firstSelectItem, ['data_source'], [])));
     watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
@@ -231,28 +230,41 @@ export const projectSetup = (
         }
     });
     const treeTs = new TreeToolSet();
+    const contextRef = ref(null);
+
+    const selected = async (event) => {
+        await vm.getApi.fetch(event);
+        treeTs.getSelectedNode(event);
+        state.showContextMenu = false;
+    };
+    const treeClickedRight = (event) => {
+        state.showContextMenu = true;
+    };
+    const nodeClickedRight = (event) => {
+        state.showContextMenu = true;
+    };
+
+    const clickMenuEvent = (event) => {
+        console.debug('clickMenuEvent')
+    };
+
+    const hideContextMenu = (event) => {
+        state.showContextMenu = false;
+    };
+    windowEventMount('click', hideContextMenu);
+
     return {
         ...toRefs(state),
         apiHandler,
         dvApiHandler,
         treeTs,
         treeApi: treeTs.treeRef,
-        selected: async (event) => {
-            await vm.getApi.fetch(event);
-            treeTs.getSelectedNode(event);
-            state.clickedRightFlag = false;
-        },
-        treeClickedRight: (event) => {
-            state.clickedRightFlag = true;
-            console.debug('tree clicked event', event, state.clickedRightFlag);
-        },
-        nodeClickedRight: (event) => {
-            state.clickedRightFlag = true;
-            console.debug('clicked event', event, state.clickedRightFlag);
-        },
-        hideContextMenu: (event) => {
-            state.clickedRightFlag = false;
-        },
+        contextRef,
+        selected,
+        treeClickedRight,
+        nodeClickedRight,
+        clickMenuEvent,
+        hideContextMenu,
     };
 };
 
@@ -276,6 +288,7 @@ export default defineComponent({
     name: 'ProjectTemplate',
     components: {
         PVerticalPageLayout2,
+        PContextMenu,
         PHorizontalLayout,
         PToolboxTable,
         PDictPanel,
@@ -293,6 +306,9 @@ export default defineComponent({
     setup(props, context) {
         const vm: any = getCurrentInstance();
         const state: any = new TreeState().state;
+        const sidebarState = reactive({
+            items: [],
+        });
         const tagStates = setTagStates(props);
         const mockAPI = new QuerySearchTableAPI('', undefined, undefined, undefined, undefined, undefined, undefined);
 
