@@ -37,8 +37,13 @@
 ## ⚙️ Install  
   
 ```sh  
-  
- git clone github.com/spaceone-dev/console-client cd spaceone-dev/console-client git submodule init && git submodule update npm install  
+ git clone github.com/spaceone-dev/console-client 
+
+ cd spaceone-dev/console-client 
+
+ git submodule init && git submodule update 
+
+ npm install  
 ```  
 &nbsp;  
 &nbsp;  
@@ -49,12 +54,14 @@
   
   ### Demo Server  
 ```  
- npm run serve ```  
+ npm run serve 
+```  
 &nbsp;  
   
 ### Storybook  
 ```  
- npm run storybook```  
+ npm run storybook
+```  
 &nbsp;  
 &nbsp;  
    
