@@ -6,7 +6,6 @@ module.exports = {
   },
 
   extends: [
-    'plugin:@typescript-eslint/recommended',
     'plugin:vue/recommended',
     '@vue/airbnb',
     '@vue/typescript',
@@ -63,6 +62,13 @@ module.exports = {
     },
   parserOptions: {
     parser: '@typescript-eslint/parser',
+    project: './tsconfig.json',
+    sourceType: 'module',
     ecmaVersion: 2018,
   },
+  settings: {
+    'import/resolver': {
+        typescript: {}
+    }
+  }
 }
