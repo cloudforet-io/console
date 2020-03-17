@@ -99,7 +99,7 @@ If you want real server, you can change the mode.
   
 ## 👨‍👩‍👧 Author  
   
-See our [OWNERS](github.com/spaceone-dev/console/AUTHORS) file.   
+See our [OWNERS](https://github.com/spaceone-dev/console/blob/master/AUTHORS) file.   
   
 &nbsp;  
 &nbsp;  
