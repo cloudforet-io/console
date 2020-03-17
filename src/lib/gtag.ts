@@ -5,8 +5,8 @@ import VueGtag from 'vue-gtag';
 export class GTag {
     public gtag: any;
 
-    constructor(id:string, vm:Vue) {
-        const gtagId:string = id || 'DISABLED';
+    constructor(id: string, vm: Vue) {
+        const gtagId: string = id || 'DISABLED';
 
         if (gtagId === 'DISABLED') return;
         Vue.use(VueGtag, {

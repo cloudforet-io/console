@@ -6,9 +6,10 @@ module.exports = {
   },
 
   extends: [
+    'plugin:@typescript-eslint/recommended',
     'plugin:vue/recommended',
     '@vue/airbnb',
-    '@vue/typescript'
+    '@vue/typescript',
   ],
 
   rules: {
@@ -47,9 +48,19 @@ module.exports = {
       "devDependencies": true,
     }],
     "import/prefer-default-export":["off"],
-    'no-new': ['off']
-  },
+    'no-new': ['off'],
 
+    // typescript rules
+    '@typescript-eslint/explicit-member-accessibility': ["error", {
+      accessibility: 'explicit',
+      overrides: {
+        accessors: 'no-public',
+        methods: 'explicit',
+        properties: 'explicit',
+        parameterProperties: 'explicit'
+      }
+    }]
+    },
   parserOptions: {
     parser: '@typescript-eslint/parser',
     ecmaVersion: 2018,

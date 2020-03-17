@@ -4,14 +4,14 @@ import { ClassTypeOf } from '@/lib/type';
 
 export type optionalType<T1, T2> = T1 | T1 & T2
 export interface StateType<T1, T2> {
-    state:optionalType<T1, T2>
+    state: optionalType<T1, T2>;
 }
 export interface SyncStateType<T1, T2> {
-    syncState:optionalType<T1, T2>
+    syncState: optionalType<T1, T2>;
 }
 
 type StateToolSetStatic<T> = ClassTypeOf<StateType<T, any>>
-    & { initState: () => T };
+& { initState: () => T };
 /**
  * @description Use it as decorator for state class.
  */
@@ -22,7 +22,7 @@ export function StateToolSet<stateType>() {
 }
 
 type SyncStateToolSetStatic<T> = ClassTypeOf<SyncStateType<T, any>>
-    & { initSyncState: () => T };
+& { initSyncState: () => T };
 /**
  * @description Use it as decorator for sync state class.
  */
@@ -34,7 +34,7 @@ export function SyncStateToolSet<syncStateType>() {
 
 
 type HelperToolSetStatic = ClassTypeOf<any>
-    & { initToolSet: (_this: any, ...args: any[]) => void };
+& { initToolSet: (_this: any, ...args: any[]) => void };
 /**
  * @description Use it as decorator for toolset class.
  */
