@@ -19,6 +19,8 @@ jobs:
         run: npm install
 
       - name: build
+        env:
+          STORYBOOK_GA_ID: 'UA-159327743-4'
         run: npm run build:storybook:github
 
       - name: deploy
