@@ -68,6 +68,7 @@
 ## 💻 No server mode & Server mode  
 SpaceONE Console project provides 'No server mode'(default) with mock data for demo.  
 If you want real server, you can change the mode.  
+You can log in with any ID/PW in no server mode. (ex. ID: admin, PW: admin)
   
 &nbsp;  
   
