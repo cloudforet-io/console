@@ -11,6 +11,10 @@
 <a  href="https://www.apache.org/licenses/LICENSE-2.0"  target="_blank">
 <img  alt="License: Apache 2.0"  src="https://img.shields.io/badge/License-Apache 2.0-yellow.svg"  />
 </a>
+<a href="http://storybook.developer.spaceone.dev/" target="_blank">
+    <img alt="spaceone storybook" src="https://img.shields.io/badge/DesginSystem-SpaceOne-blueviolet.svg?logo=storybook" />
+</a>
+
 </p>
 
 </div>
@@ -23,7 +27,12 @@
 &nbsp;
 &nbsp;
 
-  
+
+## 🧩 SpaceOne Design System
+[SpaceOne stoybook](http://storybook.developer.spaceone.dev/)
+
+ &nbsp;
+ &nbsp; 
 
 ## ⚙️ Install
 
@@ -73,7 +82,7 @@ If you want real server, you can change the mode.
 
 ## 👨‍👩‍👧 Author
 
-See our [OWNERS](github.com/spaceone-dev/console-client/OWNERS.md) file. 
+See our [OWNERS](github.com/spaceone-dev/console-client/AUTHORS) file. 
 
 &nbsp;
 &nbsp;
@@ -82,10 +91,9 @@ See our [OWNERS](github.com/spaceone-dev/console-client/OWNERS.md) file.
 
 ## 👋 Show your support
 
+Give a ⭐️ if this project helped you! 
+We are preparing Contributing Guide!
  
-Give a ⭐️ if this project helped you!
-Also, We provide [Contributing Guide](github.com/spaceone-dev/console-client/contributing-guide.md) for you. 
-
 &nbsp;
 &nbsp;
  
