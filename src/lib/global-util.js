@@ -1,6 +1,7 @@
 import VueLodash from 'vue-lodash';
 import timezone from 'countries-and-timezones';
 import { GlobalEnum } from '@/lib/enum';
+import _ from 'lodash'
 
 export const Util = {
     methods: {
@@ -328,8 +329,8 @@ export const Util = {
             const returnArray = [];
             if (data.length > 0) {
                 data.forEach((currentItem, index) => {
-                    if (!this.isEmpty(this._.get(currentItem, path))) {
-                        returnArray.push(this._.get(currentItem, path));
+                    if (!this.isEmpty(_.get(currentItem, path))) {
+                        returnArray.push(_.get(currentItem, path));
                     }
                 });
             }
@@ -399,7 +400,7 @@ export const Util = {
                 } else if (this.isSelectedType(tag, 's')) {
                     key = 'file_name';
                 }
-                allowedIcon = iconVal.toUpperCase().includes('AWS') ? this._.get(GlobalEnum, 'COLLECTOR.AWS') : allowedIcon;
+                allowedIcon = iconVal.toUpperCase().includes('AWS') ? _.get(GlobalEnum, 'COLLECTOR.AWS') : allowedIcon;
                 returnVal = !this.isEmpty(allowedIcon) ? allowedIcon.some(icon => icon[key] === iconVal) : returnVal;
             }
             return returnVal;

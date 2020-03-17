@@ -4,7 +4,6 @@ import BootstrapVue from 'bootstrap-vue';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
-import VueLodash from 'vue-lodash';
 import SvgIcon from 'vue-svgicon';
 import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
@@ -24,7 +23,6 @@ Vue.use(VueCompositionApi);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
-Vue.use(VueLodash, { name: 'lodash' });
 Vue.use(Notifications, { velocity });
 Vue.use(SvgIcon, {
     tagName: 'svgicon',

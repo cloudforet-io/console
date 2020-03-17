@@ -92,10 +92,10 @@
 <script>
 
 import _ from 'lodash';
-import PI from '@/components/atoms/icons/PI';
-import AreaTree from '@/components/organisms/trees/area-tree/AreaTree';
-import PTab from '@/components/organisms/tabs/tab/Tab';
-import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout';
+import PI from '@/components/atoms/icons/PI.vue';
+import AreaTree from '@/components/organisms/trees/area-tree/AreaTree.vue';
+import PTab from '@/components/organisms/tabs/tab/Tab.vue';
+import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import { makeTrItems } from '@/lib/view-helper';
 
 const DataCenterSummaryTop = () => import('@/views/inventory/data-center/modules/DataCenterSummaryTop');
@@ -225,7 +225,7 @@ export default {
                     this.$refs.DataCenterTree._data.isDataExists = true;
                 }
                 // Note: Initialize Project trees and then display only a context, This must be included as well.
-                if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0], 'data.init'))) {
+                if (this.treeData.length === 1 && !this.isEmpty(_.get(this.treeData[0], 'data.init'))) {
                     this.isInitializing = true;
                 }
             }).catch((error) => {

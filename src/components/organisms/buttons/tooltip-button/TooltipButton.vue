@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import PTooltip from '@/components/molecules/tooltips/Tooltip.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 
@@ -55,7 +56,7 @@ export default {
     },
     computed: {
         options() {
-            return this._.merge({
+            return _.merge({
                 hideOnTargetClick: true,
             }, this.tooltipOptions);
         },
