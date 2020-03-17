@@ -82,7 +82,7 @@ If you want real server, you can change the mode.
 
 ## 👨‍👩‍👧 Author
 
-See our [OWNERS](github.com/spaceone-dev/console-client/AUTHORS) file. 
+See our [OWNERS](github.com/spaceone-dev/console/AUTHORS) file. 
 
 &nbsp;
 &nbsp;
