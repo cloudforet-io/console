@@ -6,6 +6,7 @@ module.exports = {
   },
 
   extends: [
+    'plugin:@typescript-eslint/recommended',
     'plugin:vue/recommended',
     '@vue/airbnb',
     '@vue/typescript',
@@ -58,7 +59,10 @@ module.exports = {
         properties: 'explicit',
         parameterProperties: 'explicit'
       }
-    }]
+    }],
+    '@typescript-eslint/await-thenable': ["error"],
+    '@typescript-eslint/no-object-literal-type-assertion': ["off"],
+    '@typescript-eslint/no-parameter-properties': ["error", {"allows": ["protected"]}]
     },
   parserOptions: {
     parser: '@typescript-eslint/parser',
