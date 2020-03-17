@@ -1,7 +1,6 @@
-import VueLodash from 'vue-lodash';
 import timezone from 'countries-and-timezones';
 import { GlobalEnum } from '@/lib/enum';
-import _ from 'lodash'
+import _ from 'lodash';
 
 export const Util = {
     methods: {
@@ -456,8 +455,6 @@ export const Util = {
         },
     },
     data() {
-        return {
-            _: VueLodash,
-        };
+        return { };
     },
 };
