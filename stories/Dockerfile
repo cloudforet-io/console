@@ -1,9 +1,9 @@
 FROM node:10
 
 ENV PORT 80
-ENV BUILD_PATH /tmp/cloudone/build
+ENV BUILD_PATH /tmp/spaceone/build
 ENV ROOT_PATH /var/www
-ENV LOG_PATH /var/log/cloudone
+ENV LOG_PATH /var/log/spaceone
 ENV NGINX_CONF_PATH /etc/nginx/conf.d
 
 RUN mkdir -p ${BUILD_PATH}
@@ -12,7 +12,7 @@ WORKDIR ${BUILD_PATH}
 RUN apt-get update && apt-get install -y nginx \
     && rm -f /etc/nginx/sites-enabled/default \
     && mkdir -p ${BUILD_PATH} && mkdir -p ${LOG_PATH}/nginx
-COPY pkg/nginx.conf ${NGINX_CONF_PATH}/cloudone-wconsole-client.conf
+COPY pkg/nginx.conf ${NGINX_CONF_PATH}/spaceone_console_storybook.conf
 
 COPY package.json package-lock.json *.js ${BUILD_PATH}/
 RUN npm install

@@ -1,15 +1,16 @@
 {
-  "name": "webconsole-client",
+  "name": "spaceone-console",
   "version": "0.0.1",
-  "description": "SpaceOne web console client",
-  "author": "SpaceOne",
+  "description": "SpaceONE Web Console",
+  "author": "SpaceONE",
+  "license": "Apache-2.0",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src",
     "build-storybook": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook -s ./public -o .out",
     "build:storybook:github": "build-storybook -s ./public -o .out",
-    "serve:docker": "docker build --tag wconsole-client . && docker run -p 80:80 wconsole-client",
+    "serve:docker": "docker build --tag spaceone/console . && docker run -p 80:80 spaceone/console",
     "storybook": "start-storybook -p 6006 -s ./public",
     "svg": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6"
   },
@@ -144,5 +145,5 @@
   "engines": {
     "node": ">= 8.10.x",
     "npm": ">= 5.6.0"
-  }
+  },
 }
