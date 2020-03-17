@@ -38,7 +38,7 @@ export const dictIGProps = {
 
 
 export interface DictIGPropsType {
-    dict?: object,
+    dict?: object;
     disabled?: boolean;
     showEmptyInput?: boolean;
     enableValidation?: boolean;
@@ -57,7 +57,7 @@ export class DictIGState<D, S extends DictIGPropsType = DictIGPropsType> {
         };
     }
 
-    constructor(initData: D = <D>{}, lazy: boolean = false) {
+    constructor(initData: D = {} as any as D, lazy: boolean = false) {
         this.state = initReactive(lazy, DictIGState.initState(), initData);
     }
 }
@@ -81,7 +81,7 @@ export class DictIGToolSet<D=any, SyncD=any> extends DictIGState<D, SyncD> {
         });
     }
 
-    constructor(initData: D = <D>{}, initMetaData?: object, lazy: boolean = false) {
+    constructor(initData: D = {} as any as D, initMetaData?: object, lazy: boolean = false) {
         super(initData);
         if (!lazy) {
             DictIGToolSet.initToolSet(this, initMetaData);
@@ -94,7 +94,7 @@ export class DictIGToolSet<D=any, SyncD=any> extends DictIGState<D, SyncD> {
 
     validateAll(): boolean {
         this.metaState.newDict = {};
-        let res: boolean = true;
+        let res = true;
         _.forEach(this.metaState.pairList, (pair) => {
             res = pair.validate(this.metaState.newDict) && res;
             if (res) this.setNewDict(pair);

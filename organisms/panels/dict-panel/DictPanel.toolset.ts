@@ -36,7 +36,7 @@ type methodType = 'post' | 'get';
 export type fetchApiType = (data?: any) => Promise<any>;
 
 export class ApiHandler {
-    static apiCaller: AxiosInstance = api.instance;
+    public static apiCaller: AxiosInstance = api.instance;
 
     public url: string;
 
@@ -48,7 +48,7 @@ export class ApiHandler {
 
     private readonly _api: fetchApiType;
 
-    constructor(
+    public constructor(
         url: string,
         paramsFormatter: paramsFormatterType = ((data, state) => ({ ...state, ...data })),
         // eslint-disable-next-line no-empty-function
@@ -82,7 +82,7 @@ export const mockApi: fetchApiType = (data: any) => new Promise((resolve) => {
 
 
 export interface DictPanelPropsType {
-    dict?: object,
+    dict?: object;
     showEmptyInput?: boolean;
     fetchApi?: fetchApiType;
     editMode?: boolean;
@@ -94,17 +94,17 @@ export class DictPanelState {
 
     public syncState: DictPanelPropsType;
 
-    static initState: DictPanelPropsType = {
+    public static initState: DictPanelPropsType = {
         showEmptyInput: false,
         fetchApi: undefined,
     }
 
-    static initSyncState: DictPanelPropsType = {
+    public static initSyncState: DictPanelPropsType = {
         dict: {},
         editMode: false,
     }
 
-    constructor(initData: object = {}, initSyncData: object = {}) {
+    public constructor(initData: object = {}, initSyncData: object = {}) {
         this.state = reactive({
             ...DictPanelState.initState,
             ...initData,
