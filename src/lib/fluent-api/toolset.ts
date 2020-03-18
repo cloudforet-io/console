@@ -222,7 +222,6 @@ export abstract class UpdateAction<parameter, resp> extends SetParameterAction<p
     protected path = 'update'
 }
 
-
 export abstract class SingleItemAction<parameter, resp> extends RawParameterAction<parameter, resp> implements SingleItemActionInterface {
     protected abstract idField: string;
 
@@ -232,6 +231,7 @@ export abstract class SingleItemAction<parameter, resp> extends RawParameterActi
         return this.clone();
     }
 }
+
 export abstract class GetAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'get';
 }
@@ -243,6 +243,7 @@ export abstract class SingleDeleteAction<parameter, resp> extends SingleItemActi
 export abstract class SingleEnableAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'enable';
 }
+
 export abstract class SingleDisableAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'disable';
 }
@@ -282,7 +283,6 @@ export abstract class MultiEnableAction<parameter, resp> extends MultiItemAction
 export abstract class MultiDisableAction<parameter, resp> extends MultiItemAction<parameter, resp> {
     protected path = 'disable';
 }
-
 
 export abstract class MultiDeleteAction<parameter, resp> extends MultiItemAction<parameter, resp> {
     protected path = 'delete';

@@ -8,6 +8,7 @@ import {
 import { getKnobProps } from '@sb/storybook-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import { dictIGProps, DictIGState } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
+import { DictInputListState, toDictInputTSList } from '@/components/molecules/forms/dict-input/DictInput.toolset';
 
 export default {
     title: 'organisms/forms/DictInputGroup',
@@ -35,6 +36,41 @@ const getState = (props, context) => {
 };
 
 export const defaultCase = () => ({
+    components: { PDictInputGroup },
+    props: getKnobProps(dictIGProps, {
+        dict: {
+            key1: 'value1',
+            key2: 'value2',
+            key3: 'value3',
+        },
+    }),
+    template: `<div style="width: 80vw; background-color: white;">
+        <p-dict-input-group v-bind="$props"
+                            @validate="onValidate"
+        >
+        </p-dict-input-group>
+        <br><br>
+        <div style="margin: 1rem 0; padding: 1rem; border-radius: 5px; background-color: slateblue;">
+            <strong>new dict:</strong>
+            <br><br>
+            <pre>{{result}}</pre>
+        </div>
+    </div>`,
+    setup(props, context) {
+        const state = getState(props, context);
+
+        return {
+            ...toRefs(state),
+            onValidate(isValid, newDict) {
+                action('validate')(isValid, newDict);
+                if (isValid) state.result = { ...newDict };
+            },
+        };
+    },
+});
+
+
+export const useListState = () => ({
     components: { PDictInputGroup },
     props: getKnobProps(dictIGProps, {
         dict: {
@@ -98,6 +134,37 @@ export const useState = () => ({
         };
     },
 });
+
+// export const useListState = () => ({
+//     components: { PDictInputGroup },
+//     template: `<div style="width: 80vw; background-color: white;">
+//         <p-dict-input-group v-bind="dictIG.state"
+//                             @validate="onValidate"
+//         >
+//         </p-dict-input-group>
+//         <br><br>
+//         <div style="margin: 1rem 0; padding: 1rem; border-radius: 5px; background-color: slateblue;">
+//             <strong>new dict:</strong>
+//             <br><br>
+//             <pre>{{result}}</pre>
+//         </div>
+//     </div>`,
+//     setup(props, context) {
+//         const dictIG = new DictIGState({
+//             enableValidation: true,
+//             listState: new DictInputListState({ pairList: toDictInputTSList(props.dict) }),
+//         });
+//         const result = ref({});
+//         return {
+//             dictIG,
+//             result,
+//             onValidate(isValid, newDict) {
+//                 action('validate')(isValid, newDict);
+//                 if (isValid) result.value = { ...newDict };
+//             },
+//         };
+//     },
+// });
 
 
 export const useToolSet = () => ({
