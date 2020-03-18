@@ -28,6 +28,7 @@
                                             v-focus
                                             :disabled="updateMode"
                                             placeholder="Insert User ID here"
+                                            class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                             :class="{
                                                 'is-invalid':invalid
                                             }"
@@ -58,6 +59,7 @@
                                 <p-text-input
                                     v-model="formState.password1"
                                     type="password"
+                                    class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                     :class="{
                                         'is-invalid':invalid
                                     }"
@@ -76,6 +78,7 @@
                                 <p-text-input
                                     v-model="formState.password2"
                                     type="password"
+                                    class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                     :class="{
                                         'is-invalid':invalid
                                     }"
@@ -188,7 +191,7 @@ const setup = (props, context) => {
         tags: {},
         isLastCheck: false,
         // eslint-disable-next-line camelcase
-        is_local_auth: computed(() => context.parent.$store.getters['auth/isLocalType']),
+        is_local_auth: computed(() => context.parent.$ls.domain.state.isLocalType),
         ...props.item,
     });
     const languageSelectItems = [
@@ -213,6 +216,7 @@ const setup = (props, context) => {
 
     const pluginAuthIDValidation = parent => new Validation(async (value) => {
         let result = false;
+
         // eslint-disable-next-line camelcase
         await parent.$http.post('/identity/user/find', { search: { user_id: value }, domain_id: parent.$ls.domain.state.domainId }).then((res) => {
             if (res.data.total_count >= 1) {
