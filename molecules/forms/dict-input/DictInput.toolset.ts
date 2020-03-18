@@ -1,5 +1,5 @@
 import {
-    computed, reactive, Ref, getCurrentInstance,
+    computed, Ref,
 } from '@vue/composition-api';
 import VueI18n from 'vue-i18n';
 
@@ -32,63 +32,59 @@ export class DictInputState<
     D, SyncD,
     S extends DictInputType = DictInputType,
     SyncS extends DictInputSyncType = DictInputSyncType
-    > {
+> {
     public state: optionalType<S, D>;
 
     public syncState: optionalType<SyncS, SyncD>;
 
-    static initState() {
+    public static initState(): DictInputType {
         return {
             keyInvalid: false,
             valueInvalid: false,
             keyInvalidText: undefined,
             valueInvalidText: undefined,
             disabled: false,
-        };
+        } as DictInputType;
     }
 
-    static initSyncState() {
+    public static initSyncState(): DictInputSyncType {
         return {
             name: '',
             value: '',
-        };
+        } as DictInputSyncType;
     }
 
-    constructor(initData: D = <D>{}, initSyncData: SyncD = <SyncD>{}, lazy: boolean = false) {
+    public constructor(initData: D = {} as D, initSyncData: SyncD = {} as SyncD, lazy: boolean = false) {
         this.state = initReactive(lazy, DictInputState.initState(), initData);
         this.syncState = initReactive(lazy, DictInputState.initSyncState(), initSyncData);
     }
 }
 
-interface metaStateType {
-    id: number;
-    isValid: boolean;
-}
-
 @HelperToolSet()
-export class DictInputToolSet<D = any, SyncD = any> extends DictInputState<D, SyncD> {
-    public metaState: metaStateType = null as unknown as metaStateType;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export class DictInputToolSet<D=any, SyncD=any> extends DictInputState<D, SyncD> {
+    public id: number = 0;
 
-    static i18n: VueI18n = i18n;
+    public isValid: Ref<boolean> = null as unknown as Ref<boolean>;
 
-    static count: number = 0;
+    private static i18n: VueI18n = i18n;
 
-    static initToolSet(_this: DictInputToolSet) {
-        _this.metaState = reactive({
-            isValid: computed(() => !_this.state.keyInvalid && !_this.state.valueInvalid),
-            // eslint-disable-next-line no-plusplus
-            id: DictInputToolSet.count++,
-        });
+    private static count: number = 0;
+
+    public static initToolSet(_this: DictInputToolSet): void {
+        _this.id = DictInputToolSet.count;
+        _this.isValid = computed((): boolean => !_this.state.keyInvalid && !_this.state.valueInvalid);
+        DictInputToolSet.count += 1;
     }
 
-    constructor(initData: D | any = <D>{}, initSyncData: SyncD = <SyncD>{}, lazy = false) {
+    public constructor(initData: D = {} as D, initSyncData: SyncD = {} as SyncD, lazy = false) {
         super(initData, initSyncData);
         if (!lazy) {
             DictInputToolSet.initToolSet(this);
         }
     }
 
-    validateKey(newDict: object) {
+    public validateKey(newDict: object): boolean {
         if (!this.syncState.name) {
             this.state.keyInvalid = true;
             this.state.keyInvalidText = DictInputToolSet.i18n.t('ACTION.DICT.INVALID.KEY_EMPTY');
@@ -99,7 +95,7 @@ export class DictInputToolSet<D = any, SyncD = any> extends DictInputState<D, Sy
         return !this.state.keyInvalid;
     }
 
-    validateValue() {
+    public validateValue(): boolean {
         if (!this.syncState.value) {
             this.state.valueInvalid = true;
             this.state.valueInvalidText = DictInputToolSet.i18n.t('ACTION.DICT.INVALID.VAL_EMPTY');
@@ -107,7 +103,7 @@ export class DictInputToolSet<D = any, SyncD = any> extends DictInputState<D, Sy
         return !this.state.valueInvalid;
     }
 
-    validate(newDict: object) {
+    public validate(newDict: object): boolean {
         this.validateKey(newDict);
         this.validateValue();
         return !this.state.keyInvalid && !this.state.valueInvalid;
@@ -116,7 +112,7 @@ export class DictInputToolSet<D = any, SyncD = any> extends DictInputState<D, Sy
 
 export const toDictInputTSList = (dict: object = {}): DictInputToolSet[] => {
     const res: DictInputToolSet[] = [];
-    _.forEach(dict, (v, k) => {
+    _.forEach(dict, (v, k): void => {
         res.push(new DictInputToolSet(undefined, {
             name: k, value: v,
         }));

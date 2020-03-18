@@ -46,7 +46,6 @@ import {
 } from '@vue/composition-api';
 import { DataTableState } from '@/components/organisms/tables/data-table/toolset';
 import { makeTrItems } from '@/lib/view-helper';
-import { toDictInputTSList } from '@/components/molecules/forms/dict-input/DictInput.toolset';
 import { getDictPanelProps, DictPanelPropsType } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
