@@ -138,7 +138,8 @@ export default defineComponent( {
         thead{
             tr{
                 th{
-                    @apply bg-white border-t border-dark border-b text-gray1;
+                    @apply bg-white border-0 text-gray1;
+                    box-shadow: inset 0 1px 0 theme('colors.dark'), inset 0 -1px 0 theme('colors.dark');
                     position: sticky;
                     z-index: 1;
                     top: 0;

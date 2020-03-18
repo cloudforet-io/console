@@ -9,12 +9,12 @@
             />
             {{ $t('BTN.ADD') }}
         </p-button>
-        <span v-for="(d, idx) in pairList" :key="d.id" class="dict-group">
-            <p-dict-input :name.sync="d.key" :value.sync="d.value"
-                          :key-invalid="enableValidation && d.keyInvalid"
-                          :value-invalid="enableValidation && d.valueInvalid"
-                          :key-invalid-text="d.keyInvalidText"
-                          :value-invalid-text="d.valueInvalidText"
+        <span v-for="(d, idx) in metaState.pairList" :key="d.syncState.name" class="dict-group">
+            <p-dict-input v-bind.sync="d.syncState"
+                          :key-invalid="enableValidation && d.state.keyInvalid"
+                          :value-invalid="enableValidation && d.state.valueInvalid"
+                          :key-invalid-text="d.state.keyInvalidText"
+                          :value-invalid-text="d.state.valueInvalidText"
                           :disabled="disabled"
                           @change:key="onChangeKey(idx, d, $event)"
                           @change:value="onChangeValue(idx, d, $event)"
@@ -34,9 +34,11 @@ import _ from 'lodash';
 import {
     toRefs, reactive, watch, computed, getCurrentInstance, defineComponent, Ref,
 } from '@vue/composition-api';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
-    InputPair, dictToArray, getProps, DictIGPropsType,
+    dictIGProps, DictIGPropsType, DictIGToolSet,
 } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
+import { DictInputToolSet, toDictInputTSList } from '@/components/molecules/forms/dict-input/DictInput.toolset';
 
 const PDictInput = () => import('@/components/molecules/forms/dict-input/DictInput.vue');
 const PIconButton = () => import('@/components/molecules/buttons/IconButton.vue');
@@ -52,93 +54,81 @@ export default defineComponent({
         PButton,
         PI,
     },
-    props: getProps(),
-    setup(props: DictIGPropsType) {
+    props: dictIGProps,
+    setup(props: DictIGPropsType): any {
         const vm: any = getCurrentInstance();
 
-        const state: any = reactive({
-            pairList: dictToArray(props.dict, vm),
-            newDict: {},
-            isAllValid: computed(() => state.pairList.every(pair => pair.isValid.value)),
-        });
-
-        const setNewDict = (pair: InputPair) => { state.newDict[pair.key] = pair.value || null; };
+        const ts: UnwrapRef<DictIGToolSet> = new DictIGToolSet({ dict: props.dict });
 
         const emitValidate = () => {
-            vm.$emit('validate', state.isAllValid, state.newDict);
+            vm.$emit('validate', ts.metaState.isAllValid, ts.metaState.newDict);
         };
 
-        const onChangeKey = (idx: number, pair: InputPair) => {
+        const onChangeKey = (idx: number, pair: DictInputToolSet) => {
             if (!props.enableValidation) return;
-            pair.validateKey(state.newDict);
+            pair.validateKey(ts.metaState.newDict);
         };
 
-        const onChangeValue = (idx: number, pair: InputPair) => {
+        const onChangeValue = (idx: number, pair: DictInputToolSet) => {
             if (!props.enableValidation) return;
             pair.validateValue();
         };
 
-        const onFocusKey = (idx: number, pair: InputPair) => {
+        const onFocusKey = (idx: number, pair: DictInputToolSet) => {
             if (!props.enableValidation) return;
-            if (!pair.keyInvalid) delete state.newDict[pair.key];
+            if (!pair.state.keyInvalid) delete ts.metaState.newDict[pair.syncState.name];
         };
-        const onBlurKey = (idx: number, pair: InputPair) => {
+        const onBlurKey = (idx: number, pair: DictInputToolSet) => {
             if (!props.enableValidation) return;
-            if (!pair.keyInvalid) setNewDict(pair);
+            if (!pair.state.keyInvalid) ts.setNewDict(pair);
             emitValidate();
         };
-        const onBlurValue = (idx: number, pair: InputPair) => {
+        const onBlurValue = (idx: number, pair: DictInputToolSet) => {
             if (!props.enableValidation) return;
-            if (pair.isValid.value) setNewDict(pair);
+            if (pair.metaState.isValid) ts.setNewDict(pair);
             emitValidate();
         };
 
         /**
-         * @public
-         */
+             * @public
+             */
         const validateAll = () => {
-            state.newDict = {};
-            let res = true;
-            _.forEach(state.pairList, (pair) => {
-                res = pair.validate(state.newDict) && res;
-                if (res) setNewDict(pair);
-            });
+            const res: boolean = ts.validateAll();
             emitValidate();
             return res;
         };
 
-        const deletePair = (idx: number, pair: InputPair) => {
-            state.pairList.splice(idx, 1);
+        const deletePair = (idx: number, pair: DictInputToolSet) => {
+            ts.metaState.pairList.splice(idx, 1);
             if (!props.enableValidation) return;
 
-            if (!pair.keyInvalid) {
-                delete state.newDict[pair.key];
-                state.pairList.some((p) => {
-                    if (p.key === pair.key) {
-                        if (p.validateKey(state.newDict)) setNewDict(p);
+            if (!pair.state.keyInvalid) {
+                delete ts.metaState.newDict[pair.syncState.name];
+                ts.metaState.pairList.some((p) => {
+                    if (p.syncState.name === pair.syncState.name) {
+                        if (p.validateKey(ts.metaState.newDict)) ts.setNewDict(p);
                     }
-                    return p.key === pair.key;
+                    return p.syncState.name === pair.syncState.name;
                 });
             }
             emitValidate();
         };
 
         const addPair = () => {
-            const pair = new InputPair(vm);
-            state.pairList.push(pair);
-            if (props.enableValidation) pair.validate(state.newDict);
+            const pair: DictInputToolSet = new DictInputToolSet();
+            ts.metaState.pairList.push(pair);
+            if (props.enableValidation) pair.validate(ts.metaState.newDict);
             emitValidate();
         };
 
         watch(() => props.enableValidation, (val, prevVal) => {
-            console.debug('props.enablevalidation', val, prevVal);
             if (val && val !== prevVal) validateAll();
         });
 
-        if (props.showEmptyInput) state.pairList.push(new InputPair(vm));
+        if (props.showEmptyInput) ts.metaState.pairList.push(new DictInputToolSet());
 
         return {
-            ...toRefs(state),
+            ...toRefs(ts),
             onChangeKey,
             onChangeValue,
             onFocusKey,

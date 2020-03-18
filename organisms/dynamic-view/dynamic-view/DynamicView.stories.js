@@ -6,7 +6,6 @@ import {
 import { action } from '@storybook/addon-actions';
 import PDynamicView from './DynamicView.vue';
 import md from './DynamicView.md';
-import { MockSubDataAPI } from '@/lib/api/table';
 
 export default {
     title: 'organisms/dynamic-view/dynamic-view',
@@ -136,67 +135,67 @@ const subData = [
         ItemCount: 1000,
     },
 ];
-
-export const tableType = () => ({
-    components: { PDynamicView },
-    template: '<div style="width: 80vw"><PDynamicView view_type="table" :data_source="data_source" :apiHandler="apiHandler" :data="null"/></div>',
-    setup(props, { parent }) {
-        return {
-            apiHandler: new MockSubDataAPI(subData),
-            data_source: [
-                {
-                    name: 'Index Name',
-                    key: 'IndexName',
-                },
-                {
-                    name: 'Projection Type',
-                    key: 'Projection.ProjectionType',
-                },
-                {
-                    name: 'Item Count',
-                    key: 'ItemCount',
-                },
-                {
-                    name: 'status',
-                    key: 'IndexStatus',
-                    view_type: 'enum',
-                    view_option: {
-                        DEACTIVE: {
-                            view_option: {
-                                text_color: '#FF7750',
-                                icon: {
-                                    image: 'aws-ec2',
-                                    color: '#FF7750',
-                                },
-                            },
-                            view_type: 'state',
-                        },
-                        ACTIVE: {
-                            view_option: {
-                                text_color: '#60B731',
-                                icon: {
-                                    image: 'aws-ec2',
-                                    color: '#60B731',
-                                },
-                            },
-                            view_type: 'state',
-                        },
-
-                    },
-                },
-                {
-                    name: 'Write capacity units',
-                    key: 'ProvisionedThroughput.WriteCapacityUnits',
-                },
-                {
-                    name: 'Read capacity units',
-                    key: 'ProvisionedThroughput.ReadCapacityUnits',
-                },
-            ],
-
-        };
-    },
-});
+//
+// export const tableType = () => ({
+//     components: { PDynamicView },
+//     template: '<div style="width: 80vw"><PDynamicView view_type="table" :data_source="data_source" :apiHandler="apiHandler" :data="null"/></div>',
+//     setup(props, { parent }) {
+//         return {
+//             apiHandler: new MockSubDataAPI(subData),
+//             data_source: [
+//                 {
+//                     name: 'Index Name',
+//                     key: 'IndexName',
+//                 },
+//                 {
+//                     name: 'Projection Type',
+//                     key: 'Projection.ProjectionType',
+//                 },
+//                 {
+//                     name: 'Item Count',
+//                     key: 'ItemCount',
+//                 },
+//                 {
+//                     name: 'status',
+//                     key: 'IndexStatus',
+//                     view_type: 'enum',
+//                     view_option: {
+//                         DEACTIVE: {
+//                             view_option: {
+//                                 text_color: '#FF7750',
+//                                 icon: {
+//                                     image: 'aws-ec2',
+//                                     color: '#FF7750',
+//                                 },
+//                             },
+//                             view_type: 'state',
+//                         },
+//                         ACTIVE: {
+//                             view_option: {
+//                                 text_color: '#60B731',
+//                                 icon: {
+//                                     image: 'aws-ec2',
+//                                     color: '#60B731',
+//                                 },
+//                             },
+//                             view_type: 'state',
+//                         },
+//
+//                     },
+//                 },
+//                 {
+//                     name: 'Write capacity units',
+//                     key: 'ProvisionedThroughput.WriteCapacityUnits',
+//                 },
+//                 {
+//                     name: 'Read capacity units',
+//                     key: 'ProvisionedThroughput.ReadCapacityUnits',
+//                 },
+//             ],
+//
+//         };
+//     },
+// });
 
 export const simpleTable = () => ({
     components: { PDynamicView },
