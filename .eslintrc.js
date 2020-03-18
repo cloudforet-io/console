@@ -62,7 +62,7 @@ module.exports = {
     }],
     '@typescript-eslint/await-thenable': ["error"],
     '@typescript-eslint/no-object-literal-type-assertion': ["off"],
-    '@typescript-eslint/no-parameter-properties': ["error", {"allows": ["protected"]}]
+    '@typescript-eslint/no-parameter-properties': ["error", {"allows": ["protected"]}],
     '@typescript-eslint/ban-ts-ignore':["off"],
     },
   parserOptions: {
