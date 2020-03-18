@@ -48,7 +48,7 @@ export interface DictIGPropsType {
 export class DictIGState<D, S extends DictIGPropsType = DictIGPropsType> {
     public state: optionalType<S, D>;
 
-    static initState() {
+    public static initState() {
         return {
             dict: {},
             disabled: false,
@@ -57,7 +57,7 @@ export class DictIGState<D, S extends DictIGPropsType = DictIGPropsType> {
         };
     }
 
-    constructor(initData: D = {} as any as D, lazy: boolean = false) {
+    public constructor(initData: D = {} as any as D, lazy: boolean = false) {
         this.state = initReactive(lazy, DictIGState.initState(), initData);
     }
 }
@@ -72,27 +72,27 @@ export interface DictIGMetaStateType {
 export class DictIGToolSet<D=any, SyncD=any> extends DictIGState<D, SyncD> {
     public metaState: DictIGMetaStateType = null as unknown as DictIGMetaStateType;
 
-    static initToolSet(_this: DictIGToolSet, initMetaData) {
+    public static initToolSet(_this: DictIGToolSet, initMetaData) {
         _this.metaState = reactive({
             newDict: {},
             pairList: toDictInputTSList(_this.state.dict),
-            isAllValid: computed(() => _this.metaState.pairList.every((pair: DictInputToolSet) => pair.metaState.isValid)),
+            isAllValid: computed(() => _this.metaState.pairList.every((pair: DictInputToolSet) => pair.isValid.value)),
             ...initMetaData,
         });
     }
 
-    constructor(initData: D = {} as any as D, initMetaData?: object, lazy: boolean = false) {
+    public constructor(initData: D = {} as any, initMetaData?: object, lazy: boolean = false) {
         super(initData);
         if (!lazy) {
             DictIGToolSet.initToolSet(this, initMetaData);
         }
     }
 
-    setNewDict(pair: DictInputToolSet) {
+    public setNewDict(pair: DictInputToolSet) {
         this.metaState.newDict[pair.syncState.name] = pair.syncState.value || null;
     }
 
-    validateAll(): boolean {
+    public validateAll(): boolean {
         this.metaState.newDict = {};
         let res = true;
         _.forEach(this.metaState.pairList, (pair) => {
