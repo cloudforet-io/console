@@ -10,18 +10,18 @@ import {
 
 
 interface ServerModel {
-    server_id:string
+    server_id: string;
 
-    tags:any
-    data:any
-    collection_info: CollectionInfo
+    tags: any;
+    data: any;
+    collection_info: CollectionInfo;
 
-    created_at: timestamp
-    updated_at:timestamp
+    created_at: timestamp;
+    updated_at: timestamp;
 }
 
 interface ServerGetParameter {
-    server_id :string
+    server_id: string;
 }
 
 class Get extends GetAction<ServerGetParameter, ServerModel> {
@@ -37,9 +37,9 @@ class GetData extends GetDataAction<any, ListType<any>> {
 export default class Server extends Resource implements ResourceActions<'get'| 'list'|'getData'> {
     protected name = 'server';
 
-    get(id:string) { return new Get(this.baseUrl, id); }
+    public get(): Get { return new Get(this.baseUrl); }
 
-    list() { return new List(this.baseUrl); }
+    public list(): List { return new List(this.baseUrl); }
 
-    getData() { return new GetData(this.baseUrl); }
+    public getData(): GetData { return new GetData(this.baseUrl); }
 }
