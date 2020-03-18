@@ -49,16 +49,16 @@ export interface QueryApiState {
     filter: FilterItem[];
     only: string[];
     thisPage: number;
-    pageSize:number;
-    sortBy:string;
-    sortDesc:boolean;
+    pageSize: number;
+    sortBy: string;
+    sortDesc: boolean;
     keyword: string;
-    extraParameter:any;
-    query:Readonly<Ref<Query>>;
+    extraParameter: any;
+    query: Readonly<Ref<Query>>;
 }
 
 
-export interface QueryActionState<T> extends BaseActionState<T & {query:Query}>, QueryApiState {}
+export interface QueryActionState<T> extends BaseActionState<T & {query: Query}>, QueryApiState {}
 
 export interface DataSourceItem {
     name: string;
@@ -68,25 +68,25 @@ export interface DataSourceItem {
 }
 
 export interface historyItem {
-    update_at: number
-    key: string
-    update_by: string
+    update_at: number;
+    key: string;
+    update_by: string;
 }
 
 export interface CollectionInfo {
-    update_history: historyItem[]
-    state: string
-    collectors: string[]
-    pinned_keys: string[]
+    update_history: historyItem[];
+    state: string;
+    collectors: string[];
+    pinned_keys: string[];
 
 }
 
 export interface timestamp {
-    seconds: string
-    nanos: number
+    seconds: string;
+    nanos: number;
 }
 
 export interface ListType<T> {
-    results:T[],
-    total_count:number
+    results: T[];
+    total_count: number;
 }

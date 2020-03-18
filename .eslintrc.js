@@ -6,9 +6,10 @@ module.exports = {
   },
 
   extends: [
+    'plugin:@typescript-eslint/recommended',
     'plugin:vue/recommended',
     '@vue/airbnb',
-    '@vue/typescript'
+    '@vue/typescript',
   ],
 
   rules: {
@@ -47,11 +48,32 @@ module.exports = {
       "devDependencies": true,
     }],
     "import/prefer-default-export":["off"],
-    'no-new': ['off']
-  },
+    'no-new': ['off'],
 
+    // typescript rules
+    '@typescript-eslint/explicit-member-accessibility': ["error", {
+      accessibility: 'explicit',
+      overrides: {
+        accessors: 'no-public',
+        methods: 'explicit',
+        properties: 'explicit',
+        parameterProperties: 'explicit'
+      }
+    }],
+    '@typescript-eslint/await-thenable': ["error"],
+    '@typescript-eslint/no-object-literal-type-assertion': ["off"],
+    '@typescript-eslint/no-parameter-properties': ["error", {"allows": ["protected"]}]
+    '@typescript-eslint/ban-ts-ignore':["off"],
+    },
   parserOptions: {
     parser: '@typescript-eslint/parser',
+    project: './tsconfig.json',
+    sourceType: 'module',
     ecmaVersion: 2018,
   },
+  settings: {
+    'import/resolver': {
+        typescript: {}
+    }
+  }
 }

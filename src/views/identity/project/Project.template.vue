@@ -152,7 +152,7 @@ export default {
                 const responseData = this.treeDataHandler(response.data, 'PROJECT');
                 this.treeData = responseData;
                 // Note: Initialize Project trees and then display only a context, This must be included as well.
-                if (this.treeData.length === 1 && !this.isEmpty(this._.get(this.treeData[0], 'data.init'))) {
+                if (this.treeData.length === 1 && !this.isEmpty(_.get(this.treeData[0], 'data.init'))) {
                     this.isInitializing = true;
                 }
             }).catch((error) => {

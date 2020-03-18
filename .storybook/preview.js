@@ -13,7 +13,6 @@ import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
 import { Util } from '@/lib/global-util';
-import VueLodash from 'vue-lodash';
 import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
@@ -26,7 +25,6 @@ Vue.mixin(Util);
 Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
-Vue.use(VueLodash, { name: 'lodash' });
 Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i'
@@ -34,7 +32,6 @@ Vue.use(SvgIcon, {
 Vue.use(LiquorTree);
 
 Vue.prototype.$velocity = velocity;
-
 /*****************************************************************
  * This is a Global Bus Event;
  * Please, name your '$emit' event name as action + Event such as

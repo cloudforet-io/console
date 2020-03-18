@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import {
     reactive, toRefs, computed, defineComponent,
 } from '@vue/composition-api';

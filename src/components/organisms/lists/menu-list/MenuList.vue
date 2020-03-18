@@ -34,9 +34,10 @@
 </template>
 
 <script>
-import PListItem from '@/components/molecules/list-items/ListItem';
-import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton';
-import PButton from '@/components/atoms/buttons/Button';
+import _ from 'lodash';
+import PListItem from '@/components/molecules/list-items/ListItem.vue';
+import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 
 const ACTIVATOR_MENU_SPACE = -8;
 

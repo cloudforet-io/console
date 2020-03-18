@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import { VTooltip } from 'v-tooltip';
 import TooltipMap from './Tooltip.map';
 
@@ -36,7 +37,7 @@ export default {
     },
     computed: {
         tooltipOptions() {
-            return this._.merge({
+            return _.merge({
                 content: this.contents,
                 placement: this.position,
                 classes: ['p-tooltip'],

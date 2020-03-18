@@ -22,7 +22,8 @@ module.exports = {
       options: {
         vueDocgenOptions: { alias: { '@': path.resolve(__dirname, '../src') }}
       }
-    }
+    },
+    '@storybook/addon-google-analytics',
   ],
   webpackFinal:  async (config) => {
 

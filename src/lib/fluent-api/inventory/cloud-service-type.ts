@@ -10,24 +10,24 @@ import {
 
 
 interface CloudServiceTypeModel {
-    provider:string
-    group:string
-    name: string
+    provider: string;
+    group: string;
+    name: string;
 
-    data_source:DataSourceItem[];
+    data_source: DataSourceItem[];
     labels?: string[];
-    cloud_service_type_id:string;
-    tags:any
+    cloud_service_type_id: string;
+    tags: any;
 
-    collection_info: CollectionInfo
-    cloud_service_count?:number
+    collection_info: CollectionInfo;
+    cloud_service_count?: number;
 
-    created_at: timestamp
-    updated_at:timestamp
+    created_at: timestamp;
+    updated_at: timestamp;
 }
 
 interface CstGetParameter {
-    cloud_service_type_id :string
+    cloud_service_type_id: string;
 }
 
 class Get extends GetAction<CstGetParameter, CloudServiceTypeModel> {
@@ -35,11 +35,12 @@ class Get extends GetAction<CstGetParameter, CloudServiceTypeModel> {
 }
 
 interface CstListParameter {
-    include_cloud_service_count?:boolean
+    include_cloud_service_count?: boolean;
 }
 
 class List extends ListAction<CstListParameter, ListType<CloudServiceTypeModel>> {
-    public setCloudServiceCount(isShow:boolean = true) {
+    public setCloudServiceCount(isShow = true) {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         this.apiState.extraParameter.include_cloud_service_count = isShow;
         return this.clone();
     }
@@ -47,7 +48,9 @@ class List extends ListAction<CstListParameter, ListType<CloudServiceTypeModel>>
 export default class CloudServiceType extends Resource implements ResourceActions<'get'| 'list'> {
     protected name = 'cloud-service';
 
-    get(id:string) { return new Get(this.baseUrl, id); }
+    public get(): Get {
+        return new Get(this.baseUrl);
+    }
 
-    list() { return new List(this.baseUrl); }
+    public list(): List { return new List(this.baseUrl); }
 }
