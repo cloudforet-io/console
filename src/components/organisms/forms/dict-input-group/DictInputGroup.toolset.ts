@@ -4,6 +4,8 @@ import {
     HelperToolSet, initReactive, optionalType, StateToolSet,
 } from '@/lib/toolset';
 import { DictInputToolSet, toDictInputTSList } from '@/components/molecules/forms/dict-input/DictInput.toolset';
+import { DataTablePropsType, DataTableState } from '@/components/organisms/tables/data-table/toolset';
+import { makeProxy } from '@/lib/compostion-util';
 
 export const dictIGProps = {
     /**
@@ -63,9 +65,8 @@ export class DictIGState<D, S extends DictIGPropsType = DictIGPropsType> {
 }
 
 export interface DictIGMetaStateType {
-    pairList: DictInputToolSet[];
     newDict: object;
-    isAllValid: boolean;
+    isValid: boolean;
 }
 
 @HelperToolSet()
@@ -75,8 +76,7 @@ export class DictIGToolSet<D=any, SyncD=any> extends DictIGState<D, SyncD> {
     public static initToolSet(_this: DictIGToolSet, initMetaData) {
         _this.metaState = reactive({
             newDict: {},
-            pairList: toDictInputTSList(_this.state.dict),
-            isAllValid: computed(() => _this.metaState.pairList.every((pair: DictInputToolSet) => pair.isValid.value)),
+            isValid: false,
             ...initMetaData,
         });
     }
@@ -88,17 +88,17 @@ export class DictIGToolSet<D=any, SyncD=any> extends DictIGState<D, SyncD> {
         }
     }
 
-    public setNewDict(pair: DictInputToolSet) {
-        this.metaState.newDict[pair.syncState.name] = pair.syncState.value || null;
+    public onDictValidate(isValid: boolean, newDict: object) {
+        this.metaState.isValid = isValid;
+        if (isValid) this.metaState.newDict = newDict;
     }
 
-    public validateAll(): boolean {
-        this.metaState.newDict = {};
-        let res = true;
-        _.forEach(this.metaState.pairList, (pair) => {
-            res = pair.validate(this.metaState.newDict) && res;
-            if (res) this.setNewDict(pair);
-        });
-        return res;
+    public reset(dict: object = {}) {
+        this.metaState.newDict = dict;
+        this.metaState.isValid = false;
+    }
+
+    public validateAll() {
+
     }
 }
