@@ -110,7 +110,6 @@ export class DictInputToolSet<D=any, SyncD=any> extends DictInputState<D, SyncD>
     }
 }
 
-
 export const toDictInputTSList = (dict: object = {}): DictInputToolSet[] => {
     const res: DictInputToolSet[] = [];
     _.forEach(dict, (v, k): void => {
@@ -121,51 +120,71 @@ export const toDictInputTSList = (dict: object = {}): DictInputToolSet[] => {
     return res;
 };
 
-export class DictInputListToolSet {
-    public pairList: DictInputToolSet[];
+export interface DictInputListStateType {
+    pairList: DictInputToolSet[];
+    newDict: object;
+    isAllValid: boolean;
+}
 
-    public newDict: object;
+@StateToolSet<DictInputListStateType>()
+export class DictInputListState<D, S extends DictInputListStateType = DictInputListStateType> {
+    public state: optionalType<S, D>;
 
-    public isAllValid: boolean;
-
-    public constructor(dict: object) {
-        this.pairList = toDictInputTSList(dict);
-        this.newDict = {};
-        this.isAllValid = false;
+    public static initState(): DictInputListStateType {
+        return {
+            pairList: [],
+            newDict: {},
+            isAllValid: false,
+        } as DictInputListStateType;
     }
 
-    public setNewDict(pair: DictInputToolSet) {
-        this.newDict[pair.syncState.name] = pair.syncState.value || null;
-    }
-
-    public validateAll(): boolean {
-        this.newDict = {};
-        let res = true;
-        this.pairList.forEach((pair: any) => {
-            res = pair.validate(this.newDict) && res;
-            if (res) this.setNewDict(pair);
-        });
-        return res;
-    }
-
-    public addPair(dict: object = {}) {
-        this.pairList.push(new DictInputToolSet({ dict }));
-    }
-
-    public deletePair(idx: number, pair: DictInputToolSet) {
-        this.pairList.splice(idx, 1);
-
-        if (!pair.state.keyInvalid) {
-            delete this.newDict[pair.syncState.name];
-            this.pairList.some((p: any) => {
-                if (p.syncState.name === pair.syncState.name) {
-                    if (p.validateKey(this.newDict)) this.setNewDict(p);
-                }
-                return p.syncState.name === pair.syncState.name;
-            });
-        }
+    public constructor(initData: D = {} as D, lazy: boolean = false) {
+        this.state = initReactive(lazy, DictInputState.initState(), initData);
     }
 }
+
+// @HelperToolSet()
+// export class DictInputListToolSet<D> extends DictInputListState<D> {
+//     public ts: DictInputListStateType
+//
+//     public constructor(dict: object) {
+//         this.pairList = toDictInputTSList(dict);
+//         this.newDict = {};
+//         this.isAllValid = false;
+//     }
+
+// public setNewDict(pair: DictInputToolSet) {
+//     this.newDict[pair.syncState.name] = pair.syncState.value || null;
+// }
+//
+// public validateAll(): boolean {
+//     this.newDict = {};
+//     let res = true;
+//     this.pairList.forEach((pair: any) => {
+//         res = pair.validate(this.newDict) && res;
+//         if (res) this.setNewDict(pair);
+//     });
+//     return res;
+// }
+//
+// public addPair(dict: object = {}) {
+//     this.pairList.push(new DictInputToolSet({ dict }));
+// }
+//
+// public deletePair(idx: number, pair: DictInputToolSet) {
+//     this.pairList.splice(idx, 1);
+//
+//     if (!pair.state.keyInvalid) {
+//         delete this.newDict[pair.syncState.name];
+//         this.pairList.some((p: any) => {
+//             if (p.syncState.name === pair.syncState.name) {
+//                 if (p.validateKey(this.newDict)) this.setNewDict(p);
+//             }
+//             return p.syncState.name === pair.syncState.name;
+//         });
+//     }
+// }
+// }
 
 export const dictInputProps = {
     name: {

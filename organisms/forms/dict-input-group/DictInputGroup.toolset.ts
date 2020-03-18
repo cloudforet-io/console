@@ -3,7 +3,7 @@ import _ from 'lodash';
 import {
     HelperToolSet, initReactive, optionalType, StateToolSet,
 } from '@/lib/toolset';
-import { DictInputToolSet, toDictInputTSList } from '@/components/molecules/forms/dict-input/DictInput.toolset';
+import { DictInputListState, DictInputToolSet, toDictInputTSList } from '@/components/molecules/forms/dict-input/DictInput.toolset';
 import { DataTablePropsType, DataTableState } from '@/components/organisms/tables/data-table/toolset';
 import { makeProxy } from '@/lib/compostion-util';
 
@@ -36,6 +36,10 @@ export const dictIGProps = {
         type: Boolean,
         default: false,
     },
+    listState: {
+        type: Object,
+        default: null,
+    },
 };
 
 
@@ -44,6 +48,7 @@ export interface DictIGPropsType {
     disabled?: boolean;
     showEmptyInput?: boolean;
     enableValidation?: boolean;
+    listState?: DictInputListState<any> | null;
 }
 
 @StateToolSet<DictIGPropsType>()
@@ -56,6 +61,7 @@ export class DictIGState<D, S extends DictIGPropsType = DictIGPropsType> {
             disabled: false,
             showEmptyInput: false,
             enableValidation: false,
+            listState: null,
         };
     }
 
@@ -98,7 +104,7 @@ export class DictIGToolSet<D=any, SyncD=any> extends DictIGState<D, SyncD> {
         this.metaState.isValid = false;
     }
 
-    public validateAll() {
-
-    }
+    // public validateAll() {
+    //
+    // }
 }

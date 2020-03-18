@@ -39,7 +39,7 @@ import {
     dictIGProps, DictIGPropsType,
 } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
 import {
-    DictInputToolSet, toDictInputTSList,
+    DictInputToolSet, toDictInputTSList, DictInputListState, DictInputListStateType,
 } from '@/components/molecules/forms/dict-input/DictInput.toolset';
 
 const PDictInput = () => import('@/components/molecules/forms/dict-input/DictInput.vue');
@@ -60,17 +60,12 @@ export default defineComponent({
     setup(props: DictIGPropsType): any {
         const vm: any = getCurrentInstance();
 
-        interface StateType {
-            pairList: DictInputToolSet[];
-            newDict: object;
-            isAllValid: boolean;
-        }
-
-        const state: UnwrapRef<StateType> = reactive({
-            pairList: toDictInputTSList(props.dict),
-            newDict: {},
-            isAllValid: false,
-        });
+        const state: UnwrapRef<DictInputListStateType> = props.listState
+            ? props.listState.state : reactive({
+                pairList: toDictInputTSList(props.dict),
+                newDict: {},
+                isAllValid: false,
+            });
 
         const setNewDict = (pair: DictInputToolSet) => {
             state.newDict[pair.syncState.name] = pair.syncState.value || null;
