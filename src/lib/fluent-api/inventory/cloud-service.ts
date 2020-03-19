@@ -1,56 +1,65 @@
 /* eslint-disable camelcase */
 import {
+    CreateAction,
     GetAction, ListAction,
     Resource,
-    ResourceActions,
+    ResourceActions, SingleDeleteAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
-    CollectionInfo, DataSourceItem, ListType, timestamp,
+    CollectionInfo, DefaultMetaData,
+    ListType, ReferenceInfo, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
+import Li from '@/components/atoms/lists/orun-list/Li.vue';
 
+const idField = 'cloud_service_id';
+interface IdParameter {
+    cloud_service_id: string;
+}
 
-interface CloudServiceTypeModel {
+export interface CloudServiceModel extends IdParameter, Tags {
+    cloud_service_type: string;
     provider: string;
-    group: string;
-    name: string;
-
-    data_source: DataSourceItem[];
-    labels?: string[];
-    cloud_service_type_id: string;
-    tags: any;
-
+    cloud_service_group: string;
+    data: any;
+    metadata: DefaultMetaData;
+    reference: ReferenceInfo;
     collection_info: CollectionInfo;
-    cloud_service_count?: number;
-
-    created_at: timestamp;
-    updated_at: timestamp;
+    region_info: any;
+    project_id: string;
+    domain_id: string;
+    created_at: TimeStamp;
+    updated_at: TimeStamp;
+    console_force_data?:any
 }
 
-interface CstGetParameter {
-    cloud_service_type_id: string;
+export type CloudServiceListResp = ListType<CloudServiceModel>
+
+interface CreateParameter extends Tags{
+    name: string;
+}
+interface UpdateParameter extends Tags, IdParameter{
+    name: string;
 }
 
-class Get extends GetAction<CstGetParameter, CloudServiceTypeModel> {
-    protected idField = 'cloud_service_type_id'
+class Create extends CreateAction<CreateParameter, any> {}
+class Update extends UpdateAction<UpdateParameter, any> {}
+class Delete extends SingleDeleteAction<IdParameter, any> {
+    protected idField = idField;
 }
-
-interface CstListParameter {
-    include_cloud_service_count?: boolean;
+class Get extends GetAction<IdParameter, CloudServiceModel> {
+    protected idField = idField;
 }
+class List extends ListAction<any, CloudServiceListResp> {}
+export default class CloudService extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
+    protected name = 'cloud-service';
 
-class List extends ListAction<CstListParameter, ListType<CloudServiceTypeModel>> {
-    setCloudServiceCount(isShow = true): this{
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        this.apiState.extraParameter.include_cloud_service_count = isShow;
-        return this.clone();
-    }
-}
-export default class CloudServiceType extends Resource implements ResourceActions<'get'| 'list'> {
-    protected name = 'cloud-service-type';
+    create() { return new Create(this.baseUrl); }
 
-    get(): Get {
-        return new Get(this.baseUrl);
-    }
+    update() { return new Update(this.baseUrl); }
 
-    list(): List { return new List(this.baseUrl); }
+    delete() { return new Delete(this.baseUrl); }
+
+    get() { return new Get(this.baseUrl); }
+
+    list() { return new List(this.baseUrl); }
 }

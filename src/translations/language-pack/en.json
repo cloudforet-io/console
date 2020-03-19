@@ -330,6 +330,14 @@
 		"TAG": "Tags",
 		"VM": "VM"
 	},
+	"PLUGIN": {
+		"BTN": {
+			"RECOVERY": "recovery"
+		},
+		"TAB": {
+			"PLUGIN": "Plugin"
+		}
+	},
 	"SECRET": {
 		"BTN": {
 			"None": ""

@@ -25,11 +25,7 @@ export abstract class DynamicFluentAPIToolSet<
     > extends DynamicAPI implements GetDataAPI {
     abstract getData: (...args: any[]) => void;
 
-    setAction(action: action) {
-        this.action = action;
-    }
-
-    protected constructor(protected action: action) { super(); }
+    protected constructor(public action: action) { super(); }
 
     protected abstract getAction: () => action
 }

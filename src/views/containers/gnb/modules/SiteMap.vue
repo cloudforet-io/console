@@ -110,6 +110,22 @@
                         Credentials
                     </router-link>
                 </li>
+                <li>
+                    <router-link class="group" to="/plugin">
+                        <span class="icon">
+                            <p-i name="ic_identity"
+                                 color="transparent inherit"
+                            />
+                        </span>
+                        <span class="name">Plugin</span>
+                    </router-link>
+                </li>
+
+                <li>
+                    <router-link class="service" to="/plugin/supervisor">
+                        Supervisor
+                    </router-link>
+                </li>
             </ul>
         </div>
         <div

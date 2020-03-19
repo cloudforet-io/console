@@ -5,7 +5,7 @@ import {
     ResourceActions,
 } from '@/lib/fluent-api/toolset';
 import {
-    CollectionInfo, DataSourceItem, ListType, timestamp,
+    CollectionInfo, DataSourceItem, ListType, TimeStamp,
 } from '@/lib/fluent-api/type';
 
 
@@ -16,8 +16,8 @@ interface ServerModel {
     data: any;
     collection_info: CollectionInfo;
 
-    created_at: timestamp;
-    updated_at: timestamp;
+    created_at: TimeStamp;
+    updated_at: TimeStamp;
 }
 
 interface ServerGetParameter {

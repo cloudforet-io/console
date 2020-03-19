@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
 import { debug } from 'webpack';
 import { isNotEmpty } from '@/lib/util';
-import {BaseTableAPI} from "@/lib/api/table";
+import {BaseTableAPI, BaseTableFluentAPI} from "@/lib/api/table";
 
 /**
  * make proxy computed that same name as props
@@ -232,7 +232,7 @@ interface tabState {
     activeMultiTab:Ref<string>
 }
 
-export const tabIsShow = (handler:BaseTableAPI<any, any>, state:tabState, tabName:string) => computed(() => {
+export const tabIsShow = (handler:BaseTableAPI<any, any>|BaseTableFluentAPI, state:tabState, tabName:string) => computed(() => {
     let result = false;
     if (handler.tableTS.selectState.isSelectOne) {
         result = state.activeTab.value === tabName;
