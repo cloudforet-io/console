@@ -24,7 +24,7 @@ export interface ShortFilterType {
 export type FilterType = LongFilterType | ShortFilterType;
 
 export interface BaseActionState<T> {
-    parameter: T;
+    parameter: T ;
 }
 
 export interface Sort {
@@ -47,6 +47,7 @@ export interface Query {
 
 export interface QueryApiState {
     filter: FilterItem[];
+    fixFilter: FilterItem[];
     only: string[];
     thisPage: number;
     pageSize: number;
@@ -54,11 +55,12 @@ export interface QueryApiState {
     sortDesc: boolean;
     keyword: string;
     extraParameter: any;
-    query: Readonly<Ref<Query>>;
+    count_only: boolean;
+    query: () => Query;
 }
 
 
-export interface QueryActionState<T> extends BaseActionState<T & {query: Query}>, QueryApiState {}
+export interface QueryActionState<T> extends BaseActionState<T & {query: () => Query}>, QueryApiState {}
 
 export interface DataSourceItem {
     name: string;
