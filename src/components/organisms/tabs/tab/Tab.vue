@@ -18,23 +18,24 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import PTabBar, { tabBarProps, isActive, tabData } from '@/components/molecules/tabs/tab-bar/TabBar.vue';
 import { makeProxy } from '@/lib/compostion-util';
+import { defineComponent } from '@vue/composition-api';
 
 
-export default {
+export default defineComponent({
     name: 'PTab',
     components: { PTabBar },
     mixins: [tabBarProps],
     setup(props, { emit }) {
         return {
-            proxyActiveTab: makeProxy('activeTab', props, emit),
+            proxyActiveTab: makeProxy('activeTab'),
             tabData: tabData(props),
             isActive: isActive(props),
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
