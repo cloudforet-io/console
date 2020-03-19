@@ -7,7 +7,7 @@ import identityRoute from '@/routes/identity/identity-route';
 import inventoryRoute from '@/routes/inventory/inventory-route';
 import secretRoute from '@/routes/secret/secret-route';
 import DefaultContainer from '@/views/containers/DefaultContainer.vue';
-
+import pluginRoute from  '@/routes/plugin/plugin-route';
 // Views
 import SignIn from '@/views/sign-in/Signin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';
@@ -74,6 +74,7 @@ const router = new VueRouter({
                 identityRoute,
                 inventoryRoute,
                 secretRoute,
+                pluginRoute,
             ],
         },
         { path: '*', component: ErrorPage },

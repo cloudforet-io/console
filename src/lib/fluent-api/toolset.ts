@@ -44,6 +44,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
 
     setTransformer(func: (any) => any|Promise<any>) {
         this.transformer = func;
+        return this.clone();
     }
 
 

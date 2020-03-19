@@ -192,7 +192,7 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import { AdminTableAPI, HistoryAPI, QuerySearchTableAPI } from '@/lib/api/table';
+import {AdminTableAPI, HistoryAPI, QuerySearchTableAPI, QuerySearchTableFluentAPI} from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { ChangeCloudServiceProject, MockChangeProject } from '@/lib/api/fetch';
@@ -201,9 +201,9 @@ import { Computed } from '@/lib/type';
 
 export const cloudServiceSetup = (
     context,
-    apiHandler:QuerySearchTableAPI<any, any>,
-    dvApiHandler:QuerySearchTableAPI<any, any>,
-    ChangeProjectAPI:ChangeCloudServiceProject,
+    apiHandler: QuerySearchTableFluentAPI<any, any>,
+    dvApiHandler: QuerySearchTableFluentAPI<any, any>,
+    ChangeProjectAPI: ChangeCloudServiceProject,
 ) => {
     const state = reactive({
         cstFields: makeTrItems([
@@ -239,14 +239,16 @@ export const cloudServiceSetup = (
             const selectType = apiHandler.tableTS.selectState.firstSelectItem;
             if (selectType) {
                 dvApiHandler.resetAll();
-                dvApiHandler.apiState.fixSearchQuery = [
+                dvApiHandler.action = dvApiHandler.action.setFixFilter(
                     { key: 'provider', operator: '=', value: selectType.provider },
                     { key: 'cloud_service_type', operator: '=', value: selectType.name },
                     { key: 'cloud_service_group', operator: '=', value: selectType.group },
-                ];
+                );
+
                 const keys = originDataSource.value.map(v => v.key);
                 dvApiHandler.tableTS.querySearch.acHandlerArgs.keys = keys;
                 dvApiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
+                dvApiHandler.action.debug('')
                 dvApiHandler.getData();
             }
         }
@@ -375,6 +377,7 @@ export default {
         const mockHistoryAPIHandler = new HistoryAPI('', '', computed(() => ''), undefined, undefined, undefined, computed(() => false));
         const mockChangeProject = new MockChangeProject();
         return {
+            // @ts-ignore
             ...cloudServiceSetup(context, mockAPI, mockAPI, mockChangeProject),
             adminApiHandler: mockAdminAPI,
             historyAPIHandler: mockHistoryAPIHandler,
