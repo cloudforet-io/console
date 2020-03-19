@@ -1,5 +1,15 @@
 <template>
-    <general-page-layout>
+    <p-vertical-page-layout2 :min-width="200" :init-width="260">
+        <template #sidebar="{width}">
+            <div :style="{width: width}">
+                <schema-filter
+                               :schema="schema"
+                               :selected-schema-id.sync="selectedSchemaId"
+                               @schemaChange="listSchema"
+                />
+            </div>
+        </template>
+        <template #default>
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -109,7 +119,8 @@
                             @confirm="credentialsFormConfirm"
                             @close="credentialsFormCancel"
         />
-    </general-page-layout>
+        </template>
+    </p-vertical-page-layout2>
 </template>
 
 <script>
@@ -123,7 +134,8 @@ import { makeTrItems } from '@/lib/view-helper';
 import credentialsEventBus from '@/views/secret/credentials/CredentialsEventBus';
 import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
+import SchemaFilter from '@/views/secret/credentials/modules/SchemaFilter.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
@@ -169,6 +181,7 @@ export const eventNames = {
     getCredentialsList: '',
     deleteCredentials: '',
     createCredentials: '',
+    getSchemaList: '',
 };
 
 export const credentialsSetup = (props, context, eventName) => {
@@ -363,9 +376,9 @@ export default {
         getValue,
     },
     components: {
-        GeneralPageLayout,
         PCredentialsForm,
         PButton,
+        PVerticalPageLayout2,
         PHorizontalLayout,
         PToolboxTable,
         PDropdownMenuBtn,
@@ -375,6 +388,7 @@ export default {
         PSearch,
         PBadge,
         PTableCheckModal,
+        SchemaFilter,
     },
     setup(props, context) {
         const dataBind = reactive({
@@ -382,9 +396,23 @@ export default {
         });
         const state = credentialsSetup(props, context, dataBind.items);
 
+        const schemaState = reactive({
+            schema: [],
+            selectedSchemaId: undefined,
+        });
+
+        const listSchema = () => {
+            console.log('listSchema')
+            credentialsEventBus.$emit('getSchemaList');
+        };
+
+        listSchema();
+
         return {
             ...toRefs(state),
             ...toRefs(dataBind),
+            ...toRefs(schemaState),
+            listSchema,
         };
     },
 };

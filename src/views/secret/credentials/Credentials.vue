@@ -14,6 +14,7 @@ export default {
     extends: CredentialsTemplate,
     setup(props, context) {
         const credentialsEventNames = eventNames;
+        credentialsEventNames.getSchemaList = 'getSchemaList';
         credentialsEventNames.getCredentialsList = 'getCredentialsData';
         credentialsEventNames.tagConfirmEvent = 'credentialsTagConfirmEvent';
         credentialsEventNames.createCredentials = 'createCredentials';
@@ -31,6 +32,27 @@ export default {
                 state.searchText,
             ))),
         });
+
+        const getSchemaList = async () => {
+            console.log('get schema success')
+            state.schema = [];
+            try {
+                const res = await context.parent.$http.post('/repository/schema/list');
+                state.schema = res.data.results;
+                if (!state.selectedSchemaId) {
+                    console.log('schema test', state.schema[0])
+                    state.selectedSchemaId = state.schema[0].schema_id;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const getSchemaInit = async () => {
+            await getSchemaList();
+        };
+
+        mountBusEvent(credentialsEventBus, 'getSchemaInit', getSchemaInit);
 
         const requestCredentialsList = async () => {
             state.loading = true;
@@ -130,6 +152,7 @@ export default {
             }
         };
 
+        mountBusEvent(credentialsEventBus, credentialsEventNames.getSchemaList, getSchemaList);
         mountBusEvent(credentialsEventBus, credentialsEventNames.getCredentialsList, requestCredentialsList);
         mountBusEvent(credentialsEventBus, credentialsEventNames.tagConfirmEvent, credentialsTagConfirm);
         mountBusEvent(credentialsEventBus, credentialsEventNames.createCredentials, createCredentials);
