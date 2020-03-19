@@ -71,11 +71,11 @@ export default {
             transition: false,
             sbContainerStyle: computed(() => ({
                 width: `${state.width}px`,
-                overflow: 'auto',
+                overflow: 'hidden',
             })),
             sbStyle: computed(() => ({
                 width: 'auto',
-                height: `${props.height}px`,
+                height: '100%',
                 minWidth: `${props.minWidth}px`,
                 maxWidth: `${props.maxWidth}px`,
                 opacity: state.hide && !state.transition ? 0 : 1,
