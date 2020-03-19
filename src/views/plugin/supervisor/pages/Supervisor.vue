@@ -84,7 +84,7 @@ import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
 import GeneralPageLayout from "@/views/containers/page-layout/GeneralPageLayout.vue";
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
 
-export default defineComponent({
+export default {
     name: 'Supervisor',
     components: {
         VerticalPageLayout,
@@ -110,7 +110,7 @@ export default defineComponent({
             default:''
         }
     },
-    setup() {
+    setup(props) {
         const keyAutoCompletes = ['name','hostname','state','is_public'];
         // const onlyFields = [...keyAutoCompletes];
 
@@ -205,7 +205,7 @@ export default defineComponent({
             multiItemTab,
         };
     },
-});
+};
 </script>
 
 <style scoped>
