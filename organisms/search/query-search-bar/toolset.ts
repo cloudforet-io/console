@@ -6,24 +6,24 @@ import { baseAutocompleteHandler } from './autocompleteHandler';
 
 
 interface QuerySearchState {
-    searchText:string;
+    searchText: string;
 }
 
 export class QuerySearchToolSet extends TagToolSet {
-    public state:QuerySearchState = reactive({ searchText: '' });
+    state: QuerySearchState = reactive({ searchText: '' });
 
-    public acHandler:Ref<baseAutocompleteHandler>;
+    acHandler: Ref<baseAutocompleteHandler>;
 
-    public acHandlerArgs :any;
+    acHandlerArgs: any;
 
     constructor(
-        public ACHandlerClass:typeof baseAutocompleteHandler,
-        acHandlerArgs:object = {},
-        tags:Ref<any[]> = ref([]),
-        checkDuplicate:boolean = true,
-        eventBus?:any,
-        eventName?:string,
-        changeTagCallBack?:any,
+        public ACHandlerClass: typeof baseAutocompleteHandler,
+        acHandlerArgs: object = {},
+        tags: Ref<any[]> = ref([]),
+        checkDuplicate = true,
+        eventBus?: any,
+        eventName?: string,
+        changeTagCallBack?: any,
     ) {
         super(tags, checkDuplicate, eventBus, eventName, changeTagCallBack);
         this.acHandlerArgs = reactive({ ...acHandlerArgs });

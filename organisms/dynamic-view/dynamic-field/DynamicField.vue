@@ -9,19 +9,19 @@ import {
 
 
 interface State {
-    component:any,
-    loader:()=>Promise<any>
+    component: any;
+    loader: () => Promise<any>;
 }
 
 export default defineComponent({
     name: 'PDynamicField',
     props: {
-        // eslint-disable-next-line camelcase
+        // eslint-disable-next-line @typescript-eslint/camelcase,camelcase
         view_type: {
             type: String,
             required: true,
         },
-        // eslint-disable-next-line camelcase,vue/prop-name-casing
+        // eslint-disable-next-line camelcase,@typescript-eslint/camelcase
         view_option: {
             type: Object,
             default: () => ({}),
@@ -31,12 +31,12 @@ export default defineComponent({
             default: '',
         },
     },
-    setup(props:any) {
+    setup(props: any) {
         const state = reactive<any>({
             component: null,
-            loader: computed<()=>Promise<any>>(() => () => import(`./templates/${props.view_type}/index.vue`)),
+            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.view_type}/index.vue`)),
         });
-        onMounted(():void => {
+        onMounted((): void => {
             state.loader()
                 .then(() => {
                     state.component = () => state.loader();

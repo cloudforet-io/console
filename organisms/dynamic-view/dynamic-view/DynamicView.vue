@@ -13,16 +13,18 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase,vue/prop-name-casing */
+/* eslint-disable camelcase,vue/prop-name-casing,@typescript-eslint/camelcase */
 
 import {
     computed, defineComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
+import { Computed } from '@/lib/type';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
 interface State {
-    component:any,
-    loader:()=>Promise<any>
+    component: any;
+    loader: Computed<() => Promise<any>>;
 }
 
 export default defineComponent({
@@ -53,17 +55,18 @@ export default defineComponent({
             default: () => ({}),
         },
     },
-    setup(props:any) {
+    setup(props: any) {
         // noinspection TypeScriptCheckImport
-        const state = reactive<any>({
+        const state = reactive<State>({
             component: null,
-            loader: computed<()=>Promise<any>>(() => () => import(`./templates/${props.view_type}/index.vue`)),
+            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.view_type}/index.vue`)),
         });
-        onMounted(():void => {
-            state.loader()
-                .then(() => {
-                    state.component = () => state.loader();
-                })
+        onMounted((): void => {
+            // @ts-ignore
+            state.loader().then(() => {
+                // @ts-ignore
+                state.component = () => state.loader();
+            })
                 .catch(() => {
                     // eslint-disable-next-line import/no-unresolved
                     state.component = () => import('./templates/item/index.vue');
