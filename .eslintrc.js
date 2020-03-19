@@ -52,17 +52,17 @@ module.exports = {
 
     // typescript rules
     '@typescript-eslint/explicit-member-accessibility': ["error", {
-      accessibility: 'explicit',
+      accessibility: 'no-public',
       overrides: {
         accessors: 'no-public',
-        methods: 'explicit',
-        properties: 'explicit',
+        methods: 'no-public',
+        properties: 'no-public',
         parameterProperties: 'explicit'
       }
     }],
     '@typescript-eslint/await-thenable': ["error"],
     '@typescript-eslint/no-object-literal-type-assertion': ["off"],
-    '@typescript-eslint/no-parameter-properties': ["error", {"allows": ["protected"]}]
+    '@typescript-eslint/no-parameter-properties': ["error", {"allows": ["protected","public"]}],
     '@typescript-eslint/ban-ts-ignore':["off"],
     },
   parserOptions: {

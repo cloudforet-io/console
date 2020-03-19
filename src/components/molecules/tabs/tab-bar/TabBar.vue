@@ -18,8 +18,9 @@
     </ul>
 </template>
 
-<script>
+<script lang="ts">
 import { computed } from '@vue/composition-api';
+import {TabItem} from "@/components/molecules/tabs/tab-bar/toolset";
 
 export const tabBarProps = {
     props: {
@@ -32,18 +33,15 @@ export const tabBarProps = {
         },
     },
 };
-export const tabData = props => computed(() => {
-    const tab = [];
-    props.tabs.forEach((value) => {
-        if (typeof value === 'string') {
-            tab.push({ name: value, label: value });
-        } else {
-            value.label = value.label || value.name;
-            tab.push(value);
-        }
-    });
-    return tab;
-});
+
+
+export const tabData = props => computed<TabItem[]>(() => props.tabs.map((value: string|TabItem) => {
+    if (typeof value === 'string') {
+        return { name: value, label: value };
+    }
+    value.label = value.label || value.name;
+    return value;
+}));
 export const isOne = props => computed(() => props.tabs.length === 1);
 
 export const tabClick = (props, emit) => (name) => {

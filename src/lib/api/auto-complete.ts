@@ -21,7 +21,7 @@ export interface QSTableACHandlerArgs {
 export class QuerySearchTableACHandler extends baseAutocompleteHandler {
     constructor(args: QSTableACHandlerArgs = { keys: [], suggestKeys: [] }) {
         super();
-        (this.handlerMap as ACHandlerMap) = {
+        this.handlerMap = {
             key: [getKeys(args.keys) as ACFunction, getSuggest(args.suggestKeys) as ACFunction],
             value: [],
         };
