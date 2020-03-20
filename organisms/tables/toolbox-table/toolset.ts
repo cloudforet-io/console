@@ -6,7 +6,6 @@ import {
     DataTableSyncType,
     DataTableToolSet,
 } from '@/components/organisms/tables/data-table/toolset';
-import { getAllPage } from '../../pagenations/toolset';
 // eslint-disable-next-line import/no-cycle
 import { QuerySearchToolSet } from '@/components/organisms/search/query-search-bar/toolset';
 // eslint-disable-next-line import/no-cycle
@@ -15,6 +14,7 @@ import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';
+import { getAllPage } from '../../pagenations/toolset';
 
 export interface ToolBoxTablePropsType extends DataTablePropsType{
     pagenationVisible?: boolean;
@@ -69,6 +69,10 @@ export class ToolboxTableState<
             pageNationValues: undefined,
             padding: true,
             toolboxBackground: true,
+            sortable: true,
+            dragable: true,
+            rowClickMultiSelectMode: true,
+            selectable: true,
         };
     }
 
@@ -80,7 +84,7 @@ export class ToolboxTableState<
         };
     }
 
-    constructor(initData:initData = {} as initData, initSyncData:initSyncData = {}as initSyncData, lazy = false) {
+    constructor(initData: initData = {} as initData, initSyncData: initSyncData = {}as initSyncData, lazy = false) {
         super(initData, initSyncData, true);
         this.state = initReactive(lazy, ToolboxTableState.initState(), initData);
         this.syncState = initReactive(lazy, ToolboxTableState.initSyncState(), initSyncData);
@@ -89,36 +93,36 @@ export class ToolboxTableState<
 
 @HelperToolSet()
 export class ToolboxTableToolSet<initData=any, initSyncData=any> extends ToolboxTableState<initData, initSyncData> implements DataTableToolSet<initData, initSyncData> {
-    public selectState:DataTableSelectState= {} as DataTableSelectState;
+     selectState: DataTableSelectState= {} as DataTableSelectState;
 
-    public setAllPage:(totalCount:number)=>void = null as unknown as (totalCount:number)=>void;
+     setAllPage: (totalCount: number) => void = null as unknown as (totalCount: number) => void;
 
-    static initToolSet(_this:any,...args:any[]) {
-        DataTableToolSet.initToolSet(_this);
-        _this.setAllPage = (totalCount:number) => {
-            _this.state.allPage = getAllPage(totalCount, (_this.syncState.pageSize));
-        };
-    }
+     static initToolSet(_this: any, ...args: any[]) {
+         DataTableToolSet.initToolSet(_this);
+         _this.setAllPage = (totalCount: number) => {
+             _this.state.allPage = getAllPage(totalCount, (_this.syncState.pageSize));
+         };
+     }
 
-    constructor(initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{}, lazy = false) {
-        super(initData, initSyncData);
-        if (!lazy) {
-            ToolboxTableToolSet.initToolSet(this);
-        }
-    }
+     constructor(initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{}, lazy = false) {
+         super(initData, initSyncData);
+         if (!lazy) {
+             ToolboxTableToolSet.initToolSet(this);
+         }
+     }
 }
 
 
 @HelperToolSet()
 export class SearchTableToolSet<initData=any, initSyncData=any> extends ToolboxTableToolSet<initData, initSyncData> {
-    public searchText:Ref<string> = null as unknown as Ref<string>;
+    searchText: Ref<string> = null as unknown as Ref<string>;
 
-    static initToolSet(_this:any) {
+    static initToolSet(_this: any) {
         ToolboxTableToolSet.initToolSet(_this);
         _this.searchText = ref('');
     }
 
-    constructor(initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{}, lazy = false) {
+    constructor(initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{}, lazy = false) {
         super(initData, initSyncData, true);
         if (!lazy) {
             SearchTableToolSet.initToolSet(this);
@@ -128,23 +132,24 @@ export class SearchTableToolSet<initData=any, initSyncData=any> extends ToolboxT
 
 @HelperToolSet()
 export class QuerySearchTableToolSet<initData, initSyncData> extends ToolboxTableToolSet<initData, initSyncData> {
-    public querySearch: QuerySearchToolSet=null as unknown as QuerySearchToolSet;
+    querySearch: QuerySearchToolSet=null as unknown as QuerySearchToolSet;
 
-    static initToolSet(_this:any, ACHandlerClass:typeof baseAutocompleteHandler, acHandlerArgs:any) {
+    static initToolSet(_this: any, ACHandlerClass: typeof baseAutocompleteHandler, acHandlerArgs: any, changeTagCallBack?: any) {
         ToolboxTableToolSet.initToolSet(_this);
-        _this.querySearch = new QuerySearchToolSet(ACHandlerClass, acHandlerArgs);
+        _this.querySearch = new QuerySearchToolSet(ACHandlerClass, acHandlerArgs, undefined, undefined, undefined, undefined, changeTagCallBack);
     }
 
     constructor(
         ACHandlerClass: typeof baseAutocompleteHandler = baseAutocompleteHandler,
         acHandlerArgs: any = {},
-        initData: initData = <initData>{},
-        initSyncData: initSyncData = <initSyncData>{},
-        lazy:boolean = false,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+        lazy = false,
+        changeTagCallBack?: any,
     ) {
         super(initData, initSyncData, true);
         if (!lazy) {
-            QuerySearchTableToolSet.initToolSet(this, ACHandlerClass, acHandlerArgs);
+            QuerySearchTableToolSet.initToolSet(this, ACHandlerClass, acHandlerArgs, changeTagCallBack);
         }
     }
 }
