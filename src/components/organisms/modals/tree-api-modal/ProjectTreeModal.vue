@@ -68,7 +68,7 @@ export default defineComponent({
             release: ref(false),
             error: ref(false),
         });
-        const selectNode:Computed<null|ProjectNode> = computed(() => (treeAPITS.ts.metaState.firstSelectedNode as unknown as null|ProjectNode));
+        const selectNode: Computed<null|ProjectNode> = computed(() => (treeAPITS.ts.metaState.firstSelectedNode as unknown as null|ProjectNode));
         watch(visible, (show, preShow) => {
             if (!show && show !== preShow) {
                 state.error = false;

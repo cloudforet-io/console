@@ -5,7 +5,7 @@ import {
     ResourceActions,
 } from '@/lib/fluent-api/toolset';
 import {
-    CollectionInfo, DataSourceItem, ListType, timestamp,
+    CollectionInfo, DataSourceItem, ListType, TimeStamp,
 } from '@/lib/fluent-api/type';
 
 
@@ -22,8 +22,8 @@ interface CloudServiceTypeModel {
     collection_info: CollectionInfo;
     cloud_service_count?: number;
 
-    created_at: timestamp;
-    updated_at: timestamp;
+    created_at: TimeStamp;
+    updated_at: TimeStamp;
 }
 
 interface CstGetParameter {
@@ -39,18 +39,18 @@ interface CstListParameter {
 }
 
 class List extends ListAction<CstListParameter, ListType<CloudServiceTypeModel>> {
-    public setCloudServiceCount(isShow = true) {
+    setCloudServiceCount(isShow = true): this{
         // eslint-disable-next-line @typescript-eslint/camelcase
         this.apiState.extraParameter.include_cloud_service_count = isShow;
         return this.clone();
     }
 }
 export default class CloudServiceType extends Resource implements ResourceActions<'get'| 'list'> {
-    protected name = 'cloud-service';
+    protected name = 'cloud-service-type';
 
-    public get(): Get {
+    get(): Get {
         return new Get(this.baseUrl);
     }
 
-    public list(): List { return new List(this.baseUrl); }
+    list(): List { return new List(this.baseUrl); }
 }

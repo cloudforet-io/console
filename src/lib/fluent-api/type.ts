@@ -24,7 +24,7 @@ export interface ShortFilterType {
 export type FilterType = LongFilterType | ShortFilterType;
 
 export interface BaseActionState<T> {
-    parameter: T;
+    parameter: T ;
 }
 
 export interface Sort {
@@ -47,6 +47,7 @@ export interface Query {
 
 export interface QueryApiState {
     filter: FilterItem[];
+    fixFilter: FilterItem[];
     only: string[];
     thisPage: number;
     pageSize: number;
@@ -54,11 +55,12 @@ export interface QueryApiState {
     sortDesc: boolean;
     keyword: string;
     extraParameter: any;
-    query: Readonly<Ref<Query>>;
+    count_only: boolean;
+    query: () => Query;
 }
 
 
-export interface QueryActionState<T> extends BaseActionState<T & {query: Query}>, QueryApiState {}
+export interface QueryActionState<T> extends BaseActionState<T & {query: () => Query}>, QueryApiState {}
 
 export interface DataSourceItem {
     name: string;
@@ -67,21 +69,31 @@ export interface DataSourceItem {
     view_option?: any;
 }
 
-export interface historyItem {
+export interface DynamicViewMetaData {
+    name: string;
+    data_source: DataSourceItem[];
+}
+
+export interface DefaultMetaData{
+    details?: DynamicViewMetaData;
+    sub_data?: DynamicViewMetaData;
+}
+
+export interface HistoryItem {
     update_at: number;
     key: string;
     update_by: string;
 }
 
 export interface CollectionInfo {
-    update_history: historyItem[];
+    update_history: HistoryItem[];
     state: string;
     collectors: string[];
     pinned_keys: string[];
 
 }
 
-export interface timestamp {
+export interface TimeStamp {
     seconds: string;
     nanos: number;
 }
@@ -89,4 +101,15 @@ export interface timestamp {
 export interface ListType<T> {
     results: T[];
     total_count: number;
+}
+
+export interface ReferenceInfo {
+    resource_id?: string;
+    external_link?: string;
+}
+
+export interface Tags {
+    tags?: {
+        [key: string]: string | null;
+    };
 }

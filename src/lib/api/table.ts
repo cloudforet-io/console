@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+/* eslint-disable camelcase,@typescript-eslint/camelcase */
 import Vue from 'vue';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
@@ -9,25 +9,128 @@ import {
     SearchTableToolSet,
     ToolboxTableToolSet,
 } from '@/components/organisms/tables/toolbox-table/toolset';
-import { BaseApiState, transformHandlerType, getDataAPI } from '@/lib/api/toolset';
-import { forceRefArg, readonlyRefArg } from '@/lib/type';
+import {
+    BaseApiState, transformHandlerType, getDataAPI, DynamicFluentAPIToolSet,
+} from '@/lib/api/toolset';
+import {cnaRefArgs, forceRefArg, readonlyRefArg} from '@/lib/type';
 import {
     baseAutocompleteHandler,
     SearchQueryType,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { ApiQuery, defaultQuery } from '@/lib/api/query';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import { ListType, QueryAPI } from '@/lib/fluent-api';
+
+
+export abstract class BaseTableFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends ToolboxTableToolSet<initData, initSyncData> = ToolboxTableToolSet<initData, initSyncData>,
+    action extends QueryAPI<any, any> = QueryAPI<parameter, resp>,
+    > extends DynamicFluentAPIToolSet<parameter, resp, action> {
+    tableTS: T;
+
+
+    protected constructor(action: action) {
+        super(action);
+        this.tableTS = new ToolboxTableToolSet<initData, initSyncData>() as T;
+    }
+
+    protected getDefaultAction(): action {
+        return this.action
+            .setSortBy(this.tableTS.syncState.sortBy)
+            .setSortDesc(this.tableTS.syncState.sortDesc)
+            .setThisPage(this.tableTS.syncState.thisPage as number)
+            .setPageSize(this.tableTS.syncState.pageSize as number);
+    }
+
+    protected getAction = () => this.getDefaultAction()
+
+    getData = async () => {
+        this.tableTS.syncState.loading = true;
+        this.tableTS.state.items = [];
+        this.tableTS.syncState.selectIndex = [];
+        try {
+            const res = await this.getAction().execute();
+            this.tableTS.state.items = res.data.results;
+            this.tableTS.setAllPage(res.data.total_count);
+        } catch (e) {
+            this.tableTS.state.items = [];
+            this.tableTS.state.allPage = 1;
+        }
+        this.tableTS.syncState.loading = false;
+    };
+
+    protected defaultReset = () => {
+        this.tableTS.state.allPage = 1;
+        this.tableTS.state.items = [];
+        this.tableTS.syncState.thisPage = 1;
+        this.tableTS.syncState.selectIndex = [];
+        this.tableTS.syncState.sortBy = '';
+        this.tableTS.syncState.sortDesc = true;
+    };
+
+    resetAll = () => {
+        this.defaultReset();
+    }
+}
+export interface ACHandlerMeta {
+    handlerClass: typeof baseAutocompleteHandler;
+    args: any;
+}
+
+export const defaultACHandler: ACHandlerMeta = {
+    handlerClass: QuerySearchTableACHandler,
+    args: {
+        keys: [],
+        suggestKeys: [],
+    },
+};
+
+export class QuerySearchTableFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>,
+    action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
+    > extends BaseTableFluentAPI<parameter, resp, initData, initSyncData, T, action> {
+    constructor(
+        action: action,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+        acHandlerMeta: ACHandlerMeta = defaultACHandler,
+    ) {
+        super(action);
+        this.tableTS = new QuerySearchTableToolSet(acHandlerMeta.handlerClass, acHandlerMeta.args, initData, initSyncData) as T;
+        watch(this.tableTS.querySearch.tags, async (tags, preTags) => {
+            if (tags !== preTags) {
+                await this.getData();
+            }
+        });
+    }
+
+    protected getAction = () => this.getDefaultAction().setFilter(...this.tableTS.querySearch.tags.value);
+
+    resetAll = () => {
+        this.defaultReset();
+        this.tableTS.querySearch.state.searchText = '';
+    };
+}
+
 
 export abstract class BaseTableAPI<
         initData = any,
         initSyncData = any,
         T extends ToolboxTableToolSet<initData, initSyncData> = ToolboxTableToolSet<initData, initSyncData>
     > extends getDataAPI {
-    public tableTS: T;
+    tableTS: T;
 
-    public vm: Vue;
+    vm: Vue;
 
-    public apiState: UnwrapRef<BaseApiState>
+    apiState: UnwrapRef<BaseApiState>
 
 
     protected constructor(
@@ -35,7 +138,7 @@ export abstract class BaseTableAPI<
         only: readonlyRefArg<string[]> = [],
         extraParams: readonlyRefArg<any> = {},
         fixSearchQuery: SearchQueryType[] = [],
-        transformHandler:transformHandlerType|null = null,
+        transformHandler: transformHandlerType|null = null,
     ) {
         super();
         // @ts-ignore
@@ -73,7 +176,7 @@ export abstract class BaseTableAPI<
     };
 
 
-    public getData = async () => {
+    getData = async () => {
         this.tableTS.syncState.loading = true;
         this.tableTS.state.items = [];
         this.tableTS.syncState.selectIndex = [];
@@ -97,14 +200,14 @@ export abstract class BaseTableAPI<
         this.tableTS.syncState.sortDesc = true;
     };
 
-    public resetAll = () => {
+    resetAll = () => {
         this.defaultReset();
     }
 }
 
 export class SearchTableAPI<initData = any, initSyncData = any,
     T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>> extends BaseTableAPI<initData, initSyncData, T> {
-    public constructor(
+    constructor(
         url: readonlyRefArg<string>,
         only: readonlyRefArg<string[]> = [],
         extraParams: readonlyRefArg<any> = {},
@@ -122,7 +225,7 @@ export class SearchTableAPI<initData = any, initSyncData = any,
         this.apiState.fixSearchQuery, undefined, this.apiState.only,
     ));
 
-    public resetAll = () => {
+    resetAll = () => {
         this.defaultReset();
         this.tableTS.searchText.value = '';
     }
@@ -139,11 +242,11 @@ interface DataSource {
 export class TabSearchTableAPI<initData = any, initSyncData = any> extends SearchTableAPI<initData, initSyncData> {
     protected isShow: forceRefArg<boolean>;
 
-    public constructor(
+    constructor(
         url: readonlyRefArg<string>,
         extraParams: forceRefArg<any>,
         fixSearchQuery: SearchQueryType[] = [],
-        initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
+        initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData,
         public dataSource: DataSource[] = [],
         isShow: forceRefArg<boolean>,
     ) {
@@ -192,7 +295,7 @@ const defaultAdminDataSource = [
 ];
 
 export class AdminTableAPI<initData, initSyncData> extends TabSearchTableAPI<initData, initSyncData> {
-    public constructor(
+    constructor(
         url: readonlyRefArg<string>,
         extraParams: forceRefArg<any>,
         fixSearchQuery: SearchQueryType[] = [],
@@ -208,7 +311,7 @@ export const MockAdminTableAPI = () => new AdminTableAPI('', computed(() => ({})
 
 export class SubDataAPI<initData = any, initSyncData = any> extends SearchTableAPI<initData, initSyncData> {
     // @ts-ignore
-    public constructor(
+    constructor(
         url: readonlyRefArg<string>,
         idKey: string,
         private keyPath: readonlyRefArg<string>,
@@ -240,10 +343,10 @@ const defaultHistoryDataSource = [
 
 export class HistoryAPI<initData = any, initSyncData = any> extends TabSearchTableAPI<initData, initSyncData> {
     // @ts-ignore
-    public constructor(
+    constructor(
         url: readonlyRefArg<string>,
         idKey: string,
-        private id: readonlyRefArg<string>,
+        private id: readonlyRefArg<cnaRefArgs<string>>,
         initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
         public dataSource: DataSource[] = defaultHistoryDataSource,
         isShow: forceRefArg<boolean>,
@@ -258,22 +361,10 @@ export class HistoryAPI<initData = any, initSyncData = any> extends TabSearchTab
 
 export const MockHistoryAPI = () => new HistoryAPI('', '', '', undefined, undefined, [], computed(() => false));
 
-export interface ACHandlerMeta {
-    handlerClass: typeof baseAutocompleteHandler;
-    args: any;
-}
-
-export const defaultACHandler: ACHandlerMeta = {
-    handlerClass: QuerySearchTableACHandler,
-    args: {
-        keys: [],
-        suggestKeys: [],
-    },
-};
 
 export class QuerySearchTableAPI<initData = any, initSyncData = any,
     T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>> extends BaseTableAPI<initData, initSyncData, T> {
-    public constructor(
+    constructor(
         url: string, only?: string[], extraParams?: object, fixSearchQuery: SearchQueryType[] = [],
         initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
         acHandlerMeta: ACHandlerMeta = defaultACHandler,
@@ -301,7 +392,7 @@ export class QuerySearchTableAPI<initData = any, initSyncData = any,
     ));
 
 
-    public resetAll = () => {
+    resetAll = () => {
         this.defaultReset();
         this.tableTS.querySearch.state.searchText = '';
     };

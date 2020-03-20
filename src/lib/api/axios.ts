@@ -4,6 +4,7 @@ import axios, {
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import config from '@/lib/config';
 import { setMockData } from '@/lib/mock';
+import {dataTableProps} from "@/components/organisms/tables/data-table/toolset";
 
 const MockAdapter = require('axios-mock-adapter');
 
@@ -93,7 +94,19 @@ export class API {
             if (this.vm.$ls.user.state.isSignedIn) {
                 request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
                 if (request.method?.toUpperCase() === 'POST' && !!request.data) {
-                    request.data.domain_id = this.vm.$ls.domain.state.domainId;
+                    if (typeof request.data ==='string'){
+                        try {
+                            const data = JSON.parse(request.data)
+                            data.domain_id = this.vm.$ls.domain.state.domainId;
+                            request.data = JSON.stringify(data)
+                        } catch (e) {
+                           console.debug(e)
+                        }
+
+                    } else {
+                        request.data.domain_id = this.vm.$ls.domain.state.domainId;
+                    }
+
                 }
             }
             return request;

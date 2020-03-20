@@ -1,12 +1,19 @@
 
-<script>
+<script lang="ts">
+/* eslint-disable camelcase,@typescript-eslint/camelcase */
+
 import { computed, toRefs } from '@vue/composition-api';
 import CloudServiceTemplate, { cloudServiceSetup } from '@/views/inventory/cloud-service/pages/CloudService.template.vue';
 import { tabIsShow } from '@/lib/compostion-util';
-import { AdminTableAPI, HistoryAPI, QuerySearchTableAPI } from '@/lib/api/table';
+import {
+    AdminTableAPI, HistoryAPI, QuerySearchTableAPI, QuerySearchTableFluentAPI,
+} from '@/lib/api/table';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import { ChangeCloudServiceProject } from '@/lib/api/fetch';
 import { useStore } from '@/store/toolset';
+import { fluentApi } from '@/lib/fluent-api';
+import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
+import { AxiosResponse } from 'axios';
 
 export default {
     name: 'CloudService',
@@ -24,23 +31,32 @@ export default {
                 suggestKeys: keyAutoCompletes,
             },
         };
+        const cstListAction = fluentApi.inventory().cloudServiceType().list()
+            .setOnly(...onlyFields)
+            .setCloudServiceCount();
 
-        const apiHandler = new QuerySearchTableAPI(
-            // eslint-disable-next-line camelcase
-            '/inventory/cloud-service-type/list', onlyFields, { include_cloud_service_count: true },
-            undefined, undefined, csTypeACHandlerMeta,
+        const apiHandler = new QuerySearchTableFluentAPI(
+            cstListAction,
+            undefined,
+            undefined,
+            csTypeACHandlerMeta,
         );
-        const dvApiHandler = new QuerySearchTableAPI('/inventory/cloud-service/list');
-        dvApiHandler.apiState.transformHandler = (resp) => {
-            const result = resp;
-            result.data.results = resp.data.results.map((item) => {
-                // eslint-disable-next-line camelcase
-                item.console_force_data = { project: item.project_id ? project.state.projects[item.project_id] || item.project_id : '' };
-                return item;
+
+
+        const csListAction = fluentApi.inventory().cloudService().list()
+            .setTransformer((resp: AxiosResponse<CloudServiceListResp>) => {
+                const result = resp;
+                result.data.results = resp.data.results.map((item) => {
+                    item.console_force_data = { project: item.project_id ? project.state.projects[item.project_id] || item.project_id : '' };
+                    return item;
+                });
+                return result;
             });
-            console.log(resp);
-            return result;
-        };
+
+
+        const dvApiHandler = new QuerySearchTableFluentAPI(csListAction);
+
+
         apiHandler.getData();
         const changeProjectAPI = new ChangeCloudServiceProject();
         const state = cloudServiceSetup(context, apiHandler, dvApiHandler, changeProjectAPI);

@@ -1,7 +1,8 @@
 import InventoryService from './inventory';
-
+import PluginService from './plugin';
 export class FluentApi {
-    public inventory = () => new InventoryService()
+    inventory = () => new InventoryService();
+    plugin = ()=> new PluginService();
 }
 
 export const fluentApi = new FluentApi();
