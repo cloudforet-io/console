@@ -21,6 +21,7 @@ export default {
         credentialsEventNames.updateCredentials = 'updateCredentials';
         credentialsEventNames.deleteCredentials = 'deleteCredentials';
         credentialsEventNames.getPluginCredentialsForm = 'getPluginCredentialsForm';
+        credentialsEventNames.getSchemaTypeForm = 'getSchemaTypeForm';
 
         const state = credentialsSetup(props, context, credentialsEventNames);
 
@@ -32,13 +33,6 @@ export default {
                 state.searchText, state.searchQueries,
             ))),
         });
-
-
-        const getSchemaInit = async () => {
-            await getSchemaList();
-        };
-
-        mountBusEvent(credentialsEventBus, 'getSchemaInit', getSchemaInit);
 
         const requestCredentialsList = async () => {
             state.loading = true;
@@ -141,27 +135,26 @@ export default {
             });
         };
 
-        const getPluginCredentialsForm = async (items) => {
-            const params = {
-                plugin_id: items.plugin_id,
-            };
-
-            try {
-                const res = await context.parent.$http.post('/repository/plugin/get', params);
-                state.daynamicForm.form = res.data.template.credentials;
-            } catch (e) {
-                console.error(e);
-                state.loading = false;
-            }
-        };
+        // const getPluginCredentialsForm = async (items) => {
+        //     const params = {
+        //         plugin_id: items.plugin_id,
+        //     };
+        //
+        //     try {
+        //         const res = await context.parent.$http.post('/repository/plugin/get', params);
+        //         state.dynamicFormState.form = res.data.template.credentials;
+        //     } catch (e) {
+        //         console.error(e);
+        //         state.loading = false;
+        //     }
+        // };
 
         mountBusEvent(credentialsEventBus, credentialsEventNames.getSchemaList, getSchemaList);
         mountBusEvent(credentialsEventBus, credentialsEventNames.getCredentialsList, requestCredentialsList);
         mountBusEvent(credentialsEventBus, credentialsEventNames.tagConfirmEvent, credentialsTagConfirm);
         mountBusEvent(credentialsEventBus, credentialsEventNames.createCredentials, createCredentials);
         mountBusEvent(credentialsEventBus, credentialsEventNames.deleteCredentials, deleteCredentials);
-        mountBusEvent(credentialsEventBus, credentialsEventNames.getPluginCredentialsForm, getPluginCredentialsForm);
-
+        // mountBusEvent(credentialsEventBus, credentialsEventNames.getPluginCredentialsForm, getPluginCredentialsForm);
         // requestCredentialsList();
         return {
             ...toRefs(state),

@@ -3,122 +3,124 @@
         <template #sidebar="{width}">
             <div :style="{width: width}">
                 <schema-filter
-                               :schema="schema"
-                               :selected-schema-id.sync="selectedSchemaId"
-                               @schemaChange="schemaChange"
+                        :schema="schema"
+                        :selected-schema-id.sync="selectedSchemaId"
+                        @schemaChange="schemaChange"
                 />
             </div>
         </template>
         <template #default>
-        <p-horizontal-layout>
-            <template #container="{ height }">
-                <p-toolbox-table
-                    ref="toolbox"
-                    :items="items"
-                    :fields="fields"
-                    :selectable="true"
-                    :sortable="true"
-                    :dragable="true"
-                    :hover="true"
-                    :responsive="true"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    :all-page="allPage"
-                    :this-page.sync="thisPage"
-                    :select-index.sync="selectIndex"
-                    :page-size.sync="pageSize"
-                    :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
-                    :setting-visible="false"
-                    :loading="loading"
-                    :use-spinner-loading="true"
-                    :use-cursor-loading="true"
-                    @changePageSize="getCredentials"
-                    @changePageNumber="getCredentials"
-                    @clickRefresh="getCredentials"
-                    @changeSort="getCredentials"
-                >
-                    <template #col-credential_group_id-format="{item}">
-                        <div>
-                            <PBadge v-for="(label, idx) in item.credential_groups" :key="idx" class="p-label"
-                                    style-type="gray2"
+            <p-horizontal-layout>
+                <template #container="{ height }">
+                    <p-toolbox-table
+                        ref="toolbox"
+                        :items="items"
+                        :fields="fields"
+                        :selectable="true"
+                        :sortable="true"
+                        :dragable="true"
+                        :hover="true"
+                        :responsive="true"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        :all-page="allPage"
+                        :this-page.sync="thisPage"
+                        :select-index.sync="selectIndex"
+                        :page-size.sync="pageSize"
+                        :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
+                        :setting-visible="false"
+                        :loading="loading"
+                        :use-spinner-loading="true"
+                        :use-cursor-loading="true"
+                        @changePageSize="getCredentials"
+                        @changePageNumber="getCredentials"
+                        @clickRefresh="getCredentials"
+                        @changeSort="getCredentials"
+                    >
+                        <template #col-credential_group_id-format="{item}">
+                            <div>
+                                <PBadge v-for="(label, idx) in item.credential_groups" :key="idx" class="p-label"
+                                        style-type="gray2"
+                                >
+                                    {{ getEmptyString(label.name) }}
+                                </PBadge>
+                            </div>
+                        </template>
+                        <template slot="toolbox-left">
+                            <p-button style-type="primary-dark" @click="clickCreate">
+                                {{ $t('BTN.CREATE') }}
+                            </p-button>
+                            <PDropdownMenuBtn
+                                id="server-dropdown-btn"
+                                class="left-toolbox-item"
+                                :menu="dropdown"
+                                @click-delete="clickDelete"
                             >
-                                {{ getEmptyString(label.name) }}
-                            </PBadge>
-                        </div>
-                    </template>
-                    <template slot="toolbox-left">
-                        <p-button style-type="primary-dark" @click="clickCreate">
-                            {{ $t('BTN.CREATE') }}
-                        </p-button>
-                        <PDropdownMenuBtn
-                            id="server-dropdown-btn"
-                            class="left-toolbox-item"
-                            :menu="dropdown"
-                            @click-delete="clickDelete"
-                        >
-                            Action
-                        </PDropdownMenuBtn>
-                        <div class="left-toolbox-item">
-                            <p-search :search-text.sync="searchText" @onSearch="getCredentials" />
-                        </div>
-                    </template>
-                    <template #col-created_at-format="data">
-                        {{ timestampFormatter(data.value) }}
-                    </template>
-                </p-toolbox-table>
-            </template>
-        </p-horizontal-layout>
-        <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
-            <template #detail="{tabName}">
-                <p-credentials-detail ref="credentialsDetail"
-                                      :item="items[selectIndex[0]]"
-                                      :tag-confirm-event="tagConfirmEvent"
-                                      :tag-reset-event="tagResetEvent"
-                />
-            </template>
-        </PTab>
-        <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
-            <template #data="{tabName}">
-                <p-data-table
-                    :fields="multiSelectFields"
-                    :sortable="false"
-                    :selectable="false"
-                    :items="getSelectedCredentialsItems"
-                    :col-copy="true"
-                />
-            </template>
-        </PTab>
+                                Action
+                            </PDropdownMenuBtn>
+                            <div class="left-toolbox-item">
+                                <p-search :search-text.sync="searchText" @onSearch="getCredentials" />
+                            </div>
+                        </template>
+                        <template #col-created_at-format="data">
+                            {{ timestampFormatter(data.value) }}
+                        </template>
+                    </p-toolbox-table>
+                </template>
+            </p-horizontal-layout>
+            <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
+                <template #detail="{tabName}">
+                    <p-credentials-detail ref="credentialsDetail"
+                                          :item="items[selectIndex[0]]"
+                                          :tag-confirm-event="tagConfirmEvent"
+                                          :tag-reset-event="tagResetEvent"
+                    />
+                </template>
+            </PTab>
+            <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
+                <template #data="{tabName}">
+                    <p-data-table
+                        :fields="multiSelectFields"
+                        :sortable="false"
+                        :selectable="false"
+                        :items="getSelectedCredentialsItems"
+                        :col-copy="true"
+                    />
+                </template>
+            </PTab>
 
-        <div v-else id="empty-space">
-            Select a Credentials from above in details.
-        </div>
-        <p-table-check-modal
-            v-if="!!checkTableModalState.mode && checkTableModalState.visible"
-            :visible.sync="checkTableModalState.visible"
-            :header-title="checkTableModalState.title"
-            :sub-title="checkTableModalState.subTitle"
-            :theme-color="checkTableModalState.themeColor"
-            :fields="multiSelectFields"
-            size="lg"
-            :centered="true"
-            :selectable="false"
-            :double-confirm="doubleState.doubleConfirm"
-            :double-confirm-origin="doubleState.origin"
-            :double-confirm-title="doubleState.title"
-            :double-confirm-place-holder="doubleState.placeHolder"
-            :items="getSelectedCredentialsItems"
-            @confirm="checkModalConfirm"
-        />
-        <p-credentials-form v-if="credentialsFormState.visible"
-                            ref="CREDENTIAL_FORM"
-                            :header-title="credentialsFormState.headerTitle"
-                            :update-mode="credentialsFormState.updateMode"
-                            :item="credentialsFormState.item"
-                            :visible.sync="credentialsFormState.visible"
-                            :dynamic-form-state="dynamicFormTemp"
-                            @confirm="credentialsFormConfirm"
-                            @close="credentialsFormCancel"
-        />
+            <div v-else id="empty-space">
+                Select a Credentials from above in details.
+            </div>
+            <p-table-check-modal
+                v-if="!!checkTableModalState.mode && checkTableModalState.visible"
+                :visible.sync="checkTableModalState.visible"
+                :header-title="checkTableModalState.title"
+                :sub-title="checkTableModalState.subTitle"
+                :theme-color="checkTableModalState.themeColor"
+                :fields="multiSelectFields"
+                size="lg"
+                :centered="true"
+                :selectable="false"
+                :double-confirm="doubleState.doubleConfirm"
+                :double-confirm-origin="doubleState.origin"
+                :double-confirm-title="doubleState.title"
+                :double-confirm-place-holder="doubleState.placeHolder"
+                :items="getSelectedCredentialsItems"
+                @confirm="checkModalConfirm"
+            />
+            <p-credentials-form v-if="credentialsFormState.visible"
+                                ref="CREDENTIAL_FORM"
+                                :header-title="credentialsFormState.headerTitle"
+                                :update-mode="credentialsFormState.updateMode"
+                                :item="credentialsFormState.item"
+                                :visible.sync="credentialsFormState.visible"
+                                :dynamic-form-state="dynamicFormState"
+                                :schema-list="schema"
+                                :selected-schema-id="selectedSchemaId"
+                                @confirm="credentialsFormConfirm"
+                                @close="credentialsFormCancel"
+            />
         </template>
     </p-vertical-page-layout2>
 </template>
@@ -159,7 +161,7 @@ export const CredentialsTableReactive = parent => reactive({
     fields: makeTrItems([
         ['credential_id', 'COMMON.ID', { style: { width: '400px' } }],
         ['name', 'COMMON.NAME', { style: { width: '400px' } }],
-        ['issue_type', 'COMMON.ISSUE_TYPE', { style: { width: '400px' } }],
+        ['secret_type', 'COMMON.ISSUE_TYPE', { style: { width: '400px' } }], //todo: add common.secret_type
         ['credential_group_id', 'COMMON.GROUP', { style: { width: '800px' }, sortable: false }],
         ['created_at', 'COMMON.CREATED', { style: { width: '300px' } }],
     ],
@@ -209,14 +211,10 @@ export const credentialsSetup = (props, context, eventName) => {
 
     state.sortBy = 'name';
 
-    state.daynamicForm = {
+    const dynamicFormState = reactive({
         form: [],
         value: {},
-    };
-
-    const dynamicFormTemp = computed(() => state.daynamicForm);
-
-
+    });
 
     const sortSelectIndex = computed(() => {
         console.debug('temp sortable', tableState.selectIndex);
@@ -385,7 +383,6 @@ export const credentialsSetup = (props, context, eventName) => {
         getSelectCredentialsIds,
         getFirstSelectedCredentialsId,
         credentialsFormState,
-        dynamicFormTemp,
         clickCreate,
         credentialsFormConfirm,
         credentialsFormCancel,
@@ -395,6 +392,7 @@ export const credentialsSetup = (props, context, eventName) => {
         ...toRefs(schemaState),
         listSchema,
         schemaChange,
+        dynamicFormState
     });
 };
 

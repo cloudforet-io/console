@@ -41,8 +41,10 @@
                             <p-row>
                                 <p-col :col="6">
                                     <p-row style="width: 100%" direction="column">
-                                        <PFieldGroup label="Issue Type">
-                                            <PSelectDropdown v-model="formState.issue_type" :items="issueTypeSelectItems" />
+                                        <PFieldGroup label="Secret Type">
+                                            <PSelectDropdown v-model="formState.scheme_type" :items="schemaTypeItems"
+                                                             @input="onSchemaTypeChange"
+                                            />
                                         </PFieldGroup>
                                     </p-row>
                                 </p-col>
@@ -133,6 +135,7 @@ import CardLayout from '@/components/molecules/layouts/card-layout/CardLayout.vu
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
 import PLabel from '@/components/atoms/labels/Label.vue';
 import PDynamicForm, { map, setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+import _ from 'lodash';
 
 
 export const getDataInputType = () => {
@@ -162,7 +165,7 @@ const components = {
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
     const selectiveOptions = [];
-    const optionSelected = reactive({ selected: _.isEmpty(getDataInputType()) ? 'json' : 'form' });
+    const optionSelected = reactive({ selected: 'form'});
 
     // state.selected = reactive({selected: _.isEmpty(getDataInputType()) ? 'json' : 'form'});
     state.values = {};
@@ -178,10 +181,17 @@ const setup = (props, context) => {
         name: '',
         tags: {},
         issue_type: 'credential',
+        scheme_type: props.selectedSchemaId,
         data: '',
     });
 
     const onOptionChange = () => {};
+
+    const onSchemaTypeChange = (id) => {
+        props.dynamicFormState.form = _.find(props.schemaList, {'schema_id':id}).fields;
+    }
+    onSchemaTypeChange(props.selectedSchemaId);
+
     const dynamicForm = computed(() => props.dynamicFormState.form);
     const dynamicFormExist = computed(() => dynamicForm.value.length > 0);
     const vdApi = setValidation(props.dynamicFormState.form, state.values);
@@ -195,11 +205,15 @@ const setup = (props, context) => {
         vdApi.allValidation = newVdApi.allValidation;
     });
 
-    const issueTypeSelectItems = [
-        /* TODO:: Remove this comment out part when token feature is ready.
-        { type: 'item', label: 'Token', name: 'token' }, */
-        { type: 'item', label: 'credential', name: 'credential' },
-    ];
+    // const issueTypeSelectItems = [
+    //     /* TODO:: Remove this comment out part when token feature is ready.
+    //     { type: 'item', label: 'Token', name: 'token' }, */
+    //     { type: 'item', label: 'credential', name: 'credential' },
+    // ];
+
+    const schemaTypeItems = computed(() => {
+        return props.schemaList.map((schema) => ({ type: 'item', label: schema.name, name: schema.schema_id }))
+    })
 
 
     const optionType = makeTrItems(selectiveOptions,
@@ -264,8 +278,9 @@ const setup = (props, context) => {
         dynamicForm,
         dynamicFormExist,
         onOptionChange,
+        onSchemaTypeChange,
         vdApi,
-        issueTypeSelectItems,
+        schemaTypeItems,
         optionType,
         proxyVisible: makeProxy('visible', props, context.emit),
         confirm,
@@ -295,6 +310,14 @@ export default {
             default: () => ({
                 form: [{}],
             }),
+        },
+        schemaList: {
+            type: Array,
+            default: () => [],
+        },
+        selectedSchemaId: {
+            type: String,
+            default: '',
         },
     },
     setup(props, context) {
