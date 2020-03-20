@@ -29,24 +29,10 @@ export default {
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
                 state.sortBy, state.sortDesc,
-                state.searchText,
+                state.searchText, state.searchQueries,
             ))),
         });
 
-        const getSchemaList = async () => {
-            console.log('get schema success')
-            state.schema = [];
-            try {
-                const res = await context.parent.$http.post('/repository/schema/list');
-                state.schema = res.data.results;
-                if (!state.selectedSchemaId) {
-                    console.log('schema test', state.schema[0])
-                    state.selectedSchemaId = state.schema[0].schema_id;
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        };
 
         const getSchemaInit = async () => {
             await getSchemaList();
@@ -71,6 +57,23 @@ export default {
             } catch (e) {
                 console.error(e);
                 state.loading = false;
+            }
+        };
+
+
+        const getSchemaList = async () => {
+            state.schema = [];
+            try {
+                const res = await context.parent.$http.post('/repository/schema/list');
+                state.schema = res.data.results;
+                if (!state.selectedSchemaId) {
+                    console.log('schema test', state.schema[0])
+                    state.selectedSchemaId = state.schema[0].schema_id;
+                    state.selectedSchemaName = state.schema[0].name;
+                }
+                requestCredentialsList();
+            } catch (e) {
+                console.error(e);
             }
         };
 
@@ -159,7 +162,7 @@ export default {
         mountBusEvent(credentialsEventBus, credentialsEventNames.deleteCredentials, deleteCredentials);
         mountBusEvent(credentialsEventBus, credentialsEventNames.getPluginCredentialsForm, getPluginCredentialsForm);
 
-        requestCredentialsList();
+        // requestCredentialsList();
         return {
             ...toRefs(state),
         };

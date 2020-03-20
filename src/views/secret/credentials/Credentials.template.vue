@@ -5,7 +5,7 @@
                 <schema-filter
                                :schema="schema"
                                :selected-schema-id.sync="selectedSchemaId"
-                               @schemaChange="listSchema"
+                               @schemaChange="schemaChange"
                 />
             </div>
         </template>
@@ -136,6 +136,7 @@ import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import SchemaFilter from '@/views/secret/credentials/modules/SchemaFilter.vue';
+import {SearchQuery} from "@/components/organisms/search/query-search-bar/autocompleteHandler";
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
@@ -215,9 +216,7 @@ export const credentialsSetup = (props, context, eventName) => {
 
     const dynamicFormTemp = computed(() => state.daynamicForm);
 
-    const getCredentials = () => {
-        eventBus.$emit(eventName.getCredentialsList);
-    };
+
 
     const sortSelectIndex = computed(() => {
         console.debug('temp sortable', tableState.selectIndex);
@@ -340,6 +339,33 @@ export const credentialsSetup = (props, context, eventName) => {
         getPluginTemplate();
     }
 
+    const schemaState = reactive({
+        schema: [],
+        selectedSchemaId: undefined,
+        selectedSchemaName: undefined,
+        searchQueries: computed(() => []),
+        //new SearchQuery('name', '=', schemaState.selectedSchemaName)
+    });
+
+    const getCredentials = () => {
+        if (!schemaState.selectedSchemaId) {
+            return;
+        }
+        eventBus.$emit(eventName.getCredentialsList);
+    };
+
+    const listSchema = () => {
+        credentialsEventBus.$emit('getSchemaList');
+
+    };
+
+    const schemaChange = (schema) => {
+        state.selectedSchemaName = schema.name;
+        listSchema();
+    }
+
+    listSchema();
+
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
@@ -366,7 +392,9 @@ export const credentialsSetup = (props, context, eventName) => {
         clickDelete,
         getEmptyString,
         checkModalConfirm,
-
+        ...toRefs(schemaState),
+        listSchema,
+        schemaChange,
     });
 };
 
@@ -396,23 +424,9 @@ export default {
         });
         const state = credentialsSetup(props, context, dataBind.items);
 
-        const schemaState = reactive({
-            schema: [],
-            selectedSchemaId: undefined,
-        });
-
-        const listSchema = () => {
-            console.log('listSchema')
-            credentialsEventBus.$emit('getSchemaList');
-        };
-
-        listSchema();
-
         return {
             ...toRefs(state),
             ...toRefs(dataBind),
-            ...toRefs(schemaState),
-            listSchema,
         };
     },
 };
