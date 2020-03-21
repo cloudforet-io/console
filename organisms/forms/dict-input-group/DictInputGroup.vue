@@ -9,18 +9,15 @@
             />
             {{ $t('BTN.ADD') }}
         </p-button>
-        <span v-for="(d, idx) in pairList" :key="d.id" class="dict-group">
-            <p-dict-input v-bind.sync="d.syncState"
-                          :key-invalid="enableValidation && d.state.keyInvalid"
-                          :value-invalid="enableValidation && d.state.valueInvalid"
-                          :key-invalid-text="d.state.keyInvalidText"
-                          :value-invalid-text="d.state.valueInvalidText"
+        <span v-for="(d, idx) in proxyItems" :key="idx" class="dict-group">
+            <p-dict-input :name.sync="d.key" :value.sync="d.value"
+                          :key-invalid="showValidation && invalidMessages[idx] && !!invalidMessages[idx].key"
+                          :value-invalid="showValidation && invalidMessages[idx] && !!invalidMessages[idx].value"
+                          :key-invalid-text="invalidMessages[idx] && invalidMessages[idx].key"
+                          :value-invalid-text="invalidMessages[idx] && invalidMessages[idx].value"
                           :disabled="disabled"
                           @change:key="onChangeKey(idx, d, $event)"
                           @change:value="onChangeValue(idx, d, $event)"
-                          @blur:key="onBlurKey(idx, d)"
-                          @blur:value="onBlurValue(idx, d)"
-                          @focus:key="onFocusKey(idx, d)"
             />
             <p-icon-button name="ic_delete" :disabled="disabled"
                            @click="deletePair(idx, d)"
@@ -37,10 +34,10 @@ import {
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
     dictIGProps, DictIGPropsType,
+    DictItem,
 } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
-import {
-    DictInputToolSet, toDictInputTSList, DictInputListState, DictInputListStateType,
-} from '@/components/molecules/forms/dict-input/DictInput.toolset';
+
+import { makeProxy } from '@/lib/compostion-util';
 
 const PDictInput = () => import('@/components/molecules/forms/dict-input/DictInput.vue');
 const PIconButton = () => import('@/components/molecules/buttons/IconButton.vue');
@@ -60,99 +57,49 @@ export default defineComponent({
     setup(props: DictIGPropsType): any {
         const vm: any = getCurrentInstance();
 
-        const state: UnwrapRef<DictInputListStateType> = props.listState
-            ? props.listState.state : reactive({
-                pairList: toDictInputTSList(props.dict),
-                newDict: {},
-                isAllValid: false,
-            });
+        interface StateType {
+            proxyItems: Ref<DictItem[]>;
+        }
 
-        const setNewDict = (pair: DictInputToolSet) => {
-            state.newDict[pair.syncState.name] = pair.syncState.value || null;
+        const state: UnwrapRef<StateType> = reactive({
+            proxyItems: makeProxy('items'),
+        });
+
+
+        const onChangeKey = (idx: number, pair: DictItem) => {
+            if (!props.showValidation) return;
+            vm.$emit('change', idx, pair);
+            vm.$emit('change:key', idx, pair);
         };
 
-        const emitValidate = () => {
-            vm.$emit('validate', state.isAllValid, state.newDict);
+        const onChangeValue = (idx: number, pair: DictItem) => {
+            if (!props.showValidation) return;
+            vm.$emit('change', idx, pair);
+            vm.$emit('change:value', idx, pair);
         };
 
-        const onChangeKey = (idx: number, pair: DictInputToolSet) => {
-            if (!props.enableValidation) return;
-            pair.validateKey(state.newDict);
-        };
-
-        const onChangeValue = (idx: number, pair: DictInputToolSet) => {
-            if (!props.enableValidation) return;
-            pair.validateValue();
-        };
-
-        const onFocusKey = (idx: number, pair: DictInputToolSet) => {
-            if (!props.enableValidation) return;
-            if (!pair.state.keyInvalid) delete state.newDict[pair.syncState.name];
-        };
-        const onBlurKey = (idx: number, pair: DictInputToolSet) => {
-            if (!props.enableValidation) return;
-            if (!pair.state.keyInvalid) setNewDict(pair);
-            emitValidate();
-        };
-        const onBlurValue = (idx: number, pair: DictInputToolSet) => {
-            if (!props.enableValidation) return;
-            if (pair.isValid.value) setNewDict(pair);
-            emitValidate();
-        };
-
-        /**
-         * @public
-         */
-        const validateAll = () => {
-            state.newDict = {};
-            let res = true;
-            state.pairList.forEach((pair: any) => {
-                res = pair.validate(state.newDict) && res;
-                if (res) setNewDict(pair);
-            });
-            emitValidate();
-            return res;
-        };
-
-        const deletePair = (idx: number, pair: DictInputToolSet) => {
-            state.pairList.splice(idx, 1);
-            if (!props.enableValidation) return;
-
-            if (!pair.state.keyInvalid) {
-                delete state.newDict[pair.syncState.name];
-                state.pairList.some((p: any) => {
-                    if (p.syncState.name === pair.syncState.name) {
-                        if (p.validateKey(state.newDict)) setNewDict(p);
-                    }
-                    return p.syncState.name === pair.syncState.name;
-                });
-            }
-            emitValidate();
+        const deletePair = (idx: number, pair: DictItem) => {
+            state.proxyItems.splice(idx, 1);
+            if (!props.showValidation) return;
+            vm.$emit('change', idx, pair);
+            vm.$emit('change:delete', idx, pair);
         };
 
         const addPair = () => {
-            const pair: any = new DictInputToolSet();
-            state.pairList.push(pair);
-            if (props.enableValidation) pair.validate(state.newDict);
-            emitValidate();
+            const pair: any = new DictItem();
+            state.proxyItems.push(pair);
+            vm.$emit('change', state.proxyItems.length - 1, pair);
+            vm.$emit('change:add', state.proxyItems.length - 1, pair);
         };
 
-        watch(() => props.enableValidation, (val, prevVal) => {
-            if (val && val !== prevVal) validateAll();
-        });
-
-        if (props.showEmptyInput) state.pairList.push(new DictInputToolSet() as any);
+        if (props.showEmptyInput) state.proxyItems.push(new DictItem() as any);
 
         return {
             ...toRefs(state),
             onChangeKey,
             onChangeValue,
-            onFocusKey,
-            onBlurKey,
-            onBlurValue,
             deletePair,
             addPair,
-            validateAll,
         };
     },
 });

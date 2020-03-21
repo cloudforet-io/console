@@ -2,13 +2,19 @@ import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
+import _ from 'lodash';
 import {
     number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
-import { dictIGProps, DictIGState } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
-import { DictInputListState, toDictInputTSList } from '@/components/molecules/forms/dict-input/DictInput.toolset';
+import {
+    dictIGProps,
+    DictIGState, DictIGToolSet, dictValidation,
+    toDictItems,
+} from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
 
 export default {
     title: 'organisms/forms/DictInputGroup',
@@ -22,177 +28,130 @@ export default {
     },
 };
 
-
-const getState = (props, context) => {
-    const state = reactive({
-        result: {},
-        proxyDict: computed({
-            get: () => props.dict,
-            set: (val) => { context.emit('update:dict', val); },
-        }),
-    });
-
-    return state;
+const actions = {
+    change: action('change'),
+    'change:key': action('change:key'),
+    'change:value': action('change:value'),
+    'change:add': action('change:add'),
+    'change:delete': action('change:delete'),
 };
 
+
 export const defaultCase = () => ({
-    components: { PDictInputGroup },
+    components: { PDictInputGroup, PButton },
     props: getKnobProps(dictIGProps, {
-        dict: {
-            key1: 'value1',
-            key2: 'value2',
-            key3: 'value3',
-        },
+        showValidation: true,
+    }, {
+        items: true,
+        invalidMessages: true,
     }),
-    template: `<div style="width: 80vw; background-color: white;">
-        <p-dict-input-group v-bind="$props"
-                            @validate="onValidate"
+    template: `<div class="w-full h-screen flex flex-col pt-10">
+        <p-dict-input-group class="bg-white" v-bind="$props"
+                            :items.sync="items"
+                            :invalid-messages="invalidMessages"
+                            v-on="actions"
         >
         </p-dict-input-group>
-        <br><br>
-        <div style="margin: 1rem 0; padding: 1rem; border-radius: 5px; background-color: slateblue;">
-            <strong>new dict:</strong>
-            <br><br>
-            <pre>{{result}}</pre>
+        <p-button class="my-5" style-type="dark" @click="allValidation()">Validate</p-button>
+        <div class="border border-primary py-3 rounded w-full">
+            <pre>{{items}}</pre>
         </div>
     </div>`,
     setup(props, context) {
-        const state = getState(props, context);
-
-        return {
-            ...toRefs(state),
-            onValidate(isValid, newDict) {
-                action('validate')(isValid, newDict);
-                if (isValid) state.result = { ...newDict };
-            },
-        };
-    },
-});
-
-
-export const useListState = () => ({
-    components: { PDictInputGroup },
-    props: getKnobProps(dictIGProps, {
-        dict: {
-            key1: 'value1',
-            key2: 'value2',
-            key3: 'value3',
-        },
-    }),
-    template: `<div style="width: 80vw; background-color: white;">
-        <p-dict-input-group v-bind="$props"
-                            @validate="onValidate"
-        >
-        </p-dict-input-group>
-        <br><br>
-        <div style="margin: 1rem 0; padding: 1rem; border-radius: 5px; background-color: slateblue;">
-            <strong>new dict:</strong>
-            <br><br>
-            <pre>{{result}}</pre>
-        </div>
-    </div>`,
-    setup(props, context) {
-        const state = getState(props, context);
-
-        return {
-            ...toRefs(state),
-            onValidate(isValid, newDict) {
-                action('validate')(isValid, newDict);
-                if (isValid) state.result = { ...newDict };
-            },
-        };
-    },
-});
-
-
-export const useState = () => ({
-    components: { PDictInputGroup },
-    template: `<div style="width: 80vw; background-color: white;">
-        <p-dict-input-group v-bind="dictIG.state"
-                            @validate="onValidate"
-        >
-        </p-dict-input-group>
-        <br><br>
-        <div style="margin: 1rem 0; padding: 1rem; border-radius: 5px; background-color: slateblue;">
-            <strong>new dict:</strong>
-            <br><br>
-            <pre>{{result}}</pre>
-        </div>
-    </div>`,
-    setup(props, context) {
-        const dictIG = new DictIGState({
-            enableValidation: true,
+        const state = reactive({
+            items: toDictItems({ key1: 'val1' }),
+            newDict: {},
         });
-        const result = ref({});
+        const vds = dictValidation(computed(() => state.items));
+
         return {
-            dictIG,
-            result,
-            onValidate(isValid, newDict) {
-                action('validate')(isValid, newDict);
-                if (isValid) result.value = { ...newDict };
-            },
+            ...toRefs(state),
+            ...vds,
+            actions,
         };
     },
 });
 
-// export const useListState = () => ({
-//     components: { PDictInputGroup },
-//     template: `<div style="width: 80vw; background-color: white;">
-//         <p-dict-input-group v-bind="dictIG.state"
-//                             @validate="onValidate"
-//         >
-//         </p-dict-input-group>
-//         <br><br>
-//         <div style="margin: 1rem 0; padding: 1rem; border-radius: 5px; background-color: slateblue;">
-//             <strong>new dict:</strong>
-//             <br><br>
-//             <pre>{{result}}</pre>
-//         </div>
-//     </div>`,
-//     setup(props, context) {
-//         const dictIG = new DictIGState({
-//             enableValidation: true,
-//             listState: new DictInputListState({ pairList: toDictInputTSList(props.dict) }),
-//         });
-//         const result = ref({});
-//         return {
-//             dictIG,
-//             result,
-//             onValidate(isValid, newDict) {
-//                 action('validate')(isValid, newDict);
-//                 if (isValid) result.value = { ...newDict };
-//             },
-//         };
-//     },
-// });
+
+export const autoValidation = () => ({
+    components: { PDictInputGroup, PButton },
+    props: getKnobProps(dictIGProps, {
+        showValidation: true,
+    }, {
+        items: true,
+        invalidMessages: true,
+    }),
+    template: `<div class="w-full h-screen flex flex-col pt-10">
+        <p-dict-input-group class="bg-white" v-bind="$props"
+                            :items.sync="items"
+                            :invalid-messages="invalidMessages"
+                            v-on="myActions"
+        >
+        </p-dict-input-group>
+        <div class="border border-primary my-5 py-3 rounded w-full">
+            <pre>{{items}}</pre>
+        </div>
+    </div>`,
+    setup(props, context) {
+        const state = reactive({
+            items: toDictItems({ key1: 'val1' }),
+            newDict: {},
+        });
+        const vds = dictValidation(computed(() => state.items));
+        const myActions = {
+            ...actions,
+            'change:value': _.debounce((idx, pair) => {
+                actions['change:value'](idx, pair);
+                vds.itemValidation(idx, 'value');
+            }, 100),
+            'change:key': _.debounce((idx, pair) => {
+                actions['change:key'](idx, pair);
+                vds.allValidation('key', false);
+            }, 100),
+            'change:add': (idx, pair) => {
+                actions['change:add'](idx, pair);
+                vds.itemValidation(idx);
+            },
+            'change:delete': (idx, pair) => {
+                actions['change:delete'](idx, pair);
+                vds.allValidation();
+            },
+        };
+
+        return {
+            ...toRefs(state),
+            ...vds,
+            myActions,
+        };
+    },
+});
 
 
 export const useToolSet = () => ({
-    components: { PDictInputGroup },
-    template: `<div style="width: 80vw; background-color: white;">
-        <p-dict-input-group v-bind="ts.state"
-                            @validate="onValidate"
+    components: { PDictInputGroup, PButton },
+    template: `<div class="w-full h-screen flex flex-col pt-10">
+        <p-dict-input-group class="bg-white" v-bind="state"
+                            :items.sync="syncState.items"
+                            v-on="events"
         >
         </p-dict-input-group>
-        <br><br>
-        <div style="margin: 1rem 0; padding: 1rem; border-radius: 5px; background-color: slateblue;">
-            <strong>new dict:</strong>
-            <br><br>
-            <pre>{{result}}</pre>
+        <div class="border border-primary py-3 px-3 rounded w-full">
+            <p class="mt-3">isAllValid: {{vdState.isAllValid}}</p>
+            <p class="mt-3">newDict: </p>
+            <pre>{{vdState.newDict}}</pre>
+            <p class="mt-3">items: </p>
+            <pre>{{syncState.items}}</pre>
         </div>
     </div>`,
     setup(props, context) {
-        const ts = new DictIGState({
-            enableValidation: true,
+        const ts = new DictIGToolSet({
+            showValidation: true,
         });
-        const result = ref({});
+
         return {
-            ts,
-            result,
-            onValidate(isValid, newDict) {
-                action('validate')(isValid, newDict);
-                if (isValid) result.value = { ...newDict };
-            },
+            ...ts,
         };
     },
 });
+
+
