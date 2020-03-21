@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+/* eslint-disable camelcase, @typescript-eslint/camelcase */
 import { arrayOf } from '@/lib/casual';
 // eslint-disable-next-line import/no-cycle
 import { modelType } from '@/lib/mock/casual';
@@ -186,7 +186,7 @@ const repository = (casual) => {
     return casual;
 };
 
-export interface collectorCasual {
+export interface CollectorCasual {
     pluginOption?: any;
     _pluginOption?: any;
     pluginVersions?: any;

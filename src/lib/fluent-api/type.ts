@@ -110,6 +110,6 @@ export interface ReferenceInfo {
 
 export interface Tags {
     tags?: {
-        [key: string]: string | null;
+        [key: string]: any;
     };
 }

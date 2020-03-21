@@ -31,9 +31,9 @@
             </template>
         </p-info-panel>
 
-        <p-dict-panel :dict.sync="tags"
-                      :edit-mode.sync="tagEdit"
-                      :fetch-api="tagsFetchApi"
+        <p-dict-panel :dict.sync="tagsTs.syncState.dict"
+                      :edit-mode.sync="tagsTs.syncState.editMode"
+                      v-on="tagsListeners"
         />
 
         <p-info-panel class="last-panel" :info-title="$t('PANEL.FILTER_FORMAT')">
@@ -63,6 +63,7 @@ import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
 
 const setBaseInfoStates = (props, parent) => {
     const state = reactive({
@@ -85,18 +86,14 @@ const setBaseInfoStates = (props, parent) => {
 };
 
 const setTagStates = (props) => {
-    const state = reactive({
-        tags: _.get(props.item, 'tags', {}),
-        tagEdit: false,
-    });
+    const tagsApi = new DictPanelAPI(undefined, {
+        dict: _.get(props.item, 'tags', {}),
+    }, computed(() => props.item), props.tagsFetchApi);
 
-    watch(() => props.item, (val) => {
-        state.tags = _.get(val, 'tags', {});
-        state.tagEdit = false;
-    });
 
     return {
-        ...toRefs(state),
+        tagsTs: { ...tagsApi.ts },
+        tagsListeners: tagsApi.listeners,
     };
 };
 
@@ -130,7 +127,7 @@ export default {
             default: () => ({}),
         },
         tagsFetchApi: {
-            type: Function,
+            type: [Object, Function],
             required: true,
         },
     },

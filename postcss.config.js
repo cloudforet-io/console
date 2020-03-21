@@ -5,7 +5,6 @@ module.exports = {
         require('postcss-easy-import')({
             path: ['src', 'node_modules'],
         }),
-        require('stylelint'),
         require('tailwindcss'),
         require('postcss-hexrgba'),
         require('postcss-mixins'),

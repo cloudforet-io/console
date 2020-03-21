@@ -1,117 +1,97 @@
-import { reactive } from '@vue/composition-api';
-import { AxiosInstance } from 'axios';
-import { api } from '@/lib/api/axios';
+import {
+    HelperToolSet, initReactive, StateToolSet, SyncStateToolSet,
+} from '@/lib/toolset';
+import { Ref, UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { watch } from '@vue/composition-api';
+import _ from 'lodash';
 
-
-export const getDictPanelProps = () => ({
+export const dictPanelProps = {
+    /**
+     * sync
+     */
     dict: {
         type: Object,
         default: () => ({}),
     },
     /**
-     * Show default empty input in edit mode.
-     */
-    showEmptyInput: {
-        type: Boolean,
-        default: false,
-    },
-    fetchApi: {
-        type: Function,
-        // eslint-disable-next-line no-empty-function
-        default: () => {},
-    },
-    /**
-     * edit mode controller. sync prop.
+     * sync
      */
     editMode: {
         type: Boolean,
         default: false,
     },
-});
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    showEmptyInput: {
+        type: Boolean,
+        default: false,
+    },
+};
 
-type paramsFormatterType = (data?: any, state?: any) => any;
-type callbackType = (res?: any, data?: any, state?: any) => void;
-type methodType = 'post' | 'get';
 
-export type fetchApiType = (data?: any) => Promise<any>;
+interface DictPanelType {
+    showEmptyInput: boolean;
+    loading: boolean;
+}
 
-export class ApiHandler {
-    public static apiCaller: AxiosInstance = api.instance;
+interface DictPanelSyncType {
+    dict: object;
+    editMode: boolean;
+}
 
-    public url: string;
+export interface DictPanelPropsType extends DictPanelType, DictPanelSyncType {}
 
-    public paramsFormatter: paramsFormatterType;
+@StateToolSet<DictPanelType>()
+@SyncStateToolSet<DictPanelSyncType>()
+export class DictPanelState<D, SyncD, S extends DictPanelType, SyncS extends DictPanelSyncType> {
+    state: UnwrapRef<S> = null as UnwrapRef<S>;
 
-    public state: any;
+    syncState: UnwrapRef<SyncS> = null as UnwrapRef<SyncS>;
 
-    public callback: callbackType;
-
-    private readonly _api: fetchApiType;
-
-    public constructor(
-        url: string,
-        paramsFormatter: paramsFormatterType = ((data, state) => ({ ...state, ...data })),
-        // eslint-disable-next-line no-empty-function
-        callback: callbackType = (() => {}),
-        state: any = {},
-    ) {
-        this.url = url;
-        this.paramsFormatter = paramsFormatter;
-        this.callback = callback;
-        this.state = state;
-
-        this._api = (data?: any) => new Promise(async (resolve, reject) => {
-            try {
-                const res = await ApiHandler.apiCaller.post(this.url, this.paramsFormatter(data, this.state));
-                this.callback(res, data, this.state);
-                resolve(res);
-            } catch (e) {
-                reject(e);
-            }
-        });
+    static initState(): DictPanelType {
+        return {
+            showEmptyInput: false,
+            loading: false,
+        };
     }
 
-    get api() {
-        return this._api;
+    static initSyncState(): DictPanelSyncType {
+        return {
+            dict: {},
+            editMode: false,
+        };
+    }
+
+    constructor(initData: D = {} as D, initSyncData: SyncD = {} as SyncD, lazy = false) {
+        this.state = initReactive(lazy, DictPanelState.initState(), initData);
+        this.syncState = initReactive(lazy, DictPanelState.initSyncState(), initSyncData);
     }
 }
 
-export const mockApi: fetchApiType = (data: any) => new Promise((resolve) => {
-    setTimeout(() => { resolve(data); }, 1000);
-});
+@HelperToolSet()
+export class DictPanelToolSet<D=any, SyncD=any> extends DictPanelState<D, SyncD, DictPanelType, DictPanelSyncType> {
+    selectedItem: Ref<any> | Ref<Readonly<any>>;
 
-
-export interface DictPanelPropsType {
-    dict?: object;
-    showEmptyInput?: boolean;
-    fetchApi?: fetchApiType;
-    editMode?: boolean;
-}
-
-
-export class DictPanelState {
-    public state: DictPanelPropsType;
-
-    public syncState: DictPanelPropsType;
-
-    public static initState: DictPanelPropsType = {
-        showEmptyInput: false,
-        fetchApi: undefined,
+    static initToolSet(_this: DictPanelToolSet): void {
+        watch(() => _this.selectedItem.value, (val) => {
+            console.log('selected item changed', val);
+            _this.syncState.dict = _.get(val, 'tags', {});
+            _this.syncState.editMode = false;
+        });
     }
 
-    public static initSyncState: DictPanelPropsType = {
-        dict: {},
-        editMode: false,
+    listeners: any = {
+        save: () => { this.syncState.editMode = false; },
     }
 
-    public constructor(initData: object = {}, initSyncData: object = {}) {
-        this.state = reactive({
-            ...DictPanelState.initState,
-            ...initData,
-        });
-        this.syncState = reactive({
-            ...DictPanelState.initSyncState,
-            ...initSyncData,
-        });
+    constructor(initData: D = {} as D,
+        initSyncData: SyncD = {} as SyncD,
+        parentItem: Ref<any> | Ref<Readonly<any>>,
+        lazy = false) {
+        super(initData, initSyncData);
+        this.selectedItem = parentItem;
+        if (!lazy) DictPanelToolSet.initToolSet(this);
     }
 }

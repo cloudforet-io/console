@@ -2,8 +2,7 @@
     <general-page-layout class="collector-page">
         <p-horizontal-layout :line="false">
             <template #container="{ height }">
-                <p-toolbox-table :items="items"
-                                 :fields="fields"
+                <p-toolbox-table :items="items" :fields="fields"
                                  :selectable="true"
                                  :sortable="true"
                                  :dragable="true"
@@ -96,7 +95,7 @@
                :active-tab.sync="activeTab"
         >
             <template #detail>
-                <collector-detail :item="selectedItem" :tags-fetch-api="tagsApi.api" />
+                <collector-detail :item="selectedItem" :tags-fetch-api="tagsApi" />
             </template>
             <template #credentials>
                 <collector-credentials :collector="selectedItem"
@@ -359,7 +358,6 @@ export const collectorSetup = (props, context, AcHandler, tagsApi) => {
         updateModalState,
         scheduleState,
         AcHandler,
-        tagsApi,
     });
 
     const onClickUpdate = () => {
@@ -421,6 +419,7 @@ export const collectorSetup = (props, context, AcHandler, tagsApi) => {
         onClickDelete,
         onClickCollectData,
         collectByCredential,
+        tagsApi: tagsApi || (() => {}),
     };
 };
 
