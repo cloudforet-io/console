@@ -3,6 +3,7 @@
         <template #sidebar="prop">
             <slot name="sidebar"
                   :width="prop.width"
+                  :height="prop.height"
             />
         </template>
         <template #default>
@@ -47,6 +48,12 @@
         },
     };
 </script>
+
+<style lang="postcss">
+    .app > .app-body > main {
+        overflow: hidden;
+    }
+</style>
 
 <style lang="postcss" scoped>
     .right-container {

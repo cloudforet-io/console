@@ -71,6 +71,7 @@ export default {
             transition: false,
             sbContainerStyle: computed(() => ({
                 width: `${state.width}px`,
+                height: '100%',
                 overflow: 'hidden',
             })),
             sbStyle: computed(() => ({
@@ -149,12 +150,13 @@ export default {
         }
     }
     .main {
-        height: calc(100vh - $(lnb-height));
+        /*height: calc(100% - $(lnb-height));*/
         display: flex;
         flex-direction: column;
         justify-content: stretch;
         flex-grow: 1;
         width: 100%;
+        overflow: auto;
     }
     .resizer-container {
         display: flex;
@@ -170,7 +172,7 @@ export default {
             }
         }
         &.prohibit-line {
-            @apply border-l border-gray2;
+            @apply border-l  border-gray2;
             background-color: transparent;
             &:hover {
                 @apply border-l border-secondary;
