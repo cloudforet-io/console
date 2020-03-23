@@ -73,7 +73,8 @@ export abstract class ActionAPI<parameter=any, resp=any> {
     }
 
     clone(): this {
-        return this.constructor(this.baseUrl, this.apiState, this.transformer);
+        // @ts-ignore
+        return new this.constructor(this.baseUrl, this.apiState, this.transformer);
     }
 }
 export const operatorMap = Object.freeze({
