@@ -31,9 +31,9 @@
             </template>
         </p-info-panel>
 
-        <p-dict-panel :dict.sync="tagsTs.syncState.dict"
-                      :edit-mode.sync="tagsTs.syncState.editMode"
-                      v-on="tagsListeners"
+        <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
+                      :edit-mode.sync="tagsApi.ts.syncState.editMode"
+                      v-on="tagsApi.ts.listeners"
         />
 
         <p-info-panel class="last-panel" :info-title="$t('PANEL.FILTER_FORMAT')">
@@ -48,9 +48,9 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import {
-    watch, computed, reactive, toRefs,
+    watch, computed, reactive, toRefs, defineComponent,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import { DictIGState } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
@@ -64,6 +64,7 @@ import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { fluentApi } from '@/lib/fluent-api';
 
 const setBaseInfoStates = (props, parent) => {
     const state = reactive({
@@ -86,14 +87,16 @@ const setBaseInfoStates = (props, parent) => {
 };
 
 const setTagStates = (props) => {
-    const tagsApi = new DictPanelAPI(undefined, {
-        dict: _.get(props.item, 'tags', {}),
-    }, computed(() => props.item), props.tagsFetchApi);
+    const tagsApi = new DictPanelAPI(fluentApi.inventory().collector());
 
+    watch(() => props.item, async (item) => {
+        tagsApi.setId(item.collector_id);
+        tagsApi.ts.toReadMode();
+        await tagsApi.getData();
+    });
 
     return {
-        tagsTs: { ...tagsApi.ts },
-        tagsListeners: tagsApi.listeners,
+        tagsApi,
     };
 };
 
@@ -116,7 +119,7 @@ const setFilterFormatStates = (props, parent) => {
     };
 };
 
-export default {
+export default defineComponent({
     name: 'CollectorDetail',
     components: {
         PInfoPanel, PDictPanel, PDataTable, PStatus,
@@ -133,7 +136,7 @@ export default {
     },
     setup(props, { parent }) {
         const baseInfoStates = setBaseInfoStates(props, parent);
-        const tagStates = setTagStates(props, parent);
+        const tagStates = setTagStates(props);
         const filterFormatStates = setFilterFormatStates(props, parent);
         return {
             ...baseInfoStates,
@@ -141,7 +144,7 @@ export default {
             ...filterFormatStates,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

@@ -27,6 +27,11 @@ export interface BaseActionState<T> {
     parameter: T ;
 }
 
+export interface FluentActionState<T> {
+    parameter: T;
+    only: string[];
+}
+
 export interface Sort {
     key: string;
     desc?: boolean;

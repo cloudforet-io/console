@@ -69,14 +69,12 @@ export default {
         //     },
         // );
 
-        const updateApi = fluentApi.inventory().collector().update();
 
         const state = reactive({
             ...collectorSetup(
                 props,
                 context,
                 new ACHandler(),
-                updateApi,
             ),
         });
 

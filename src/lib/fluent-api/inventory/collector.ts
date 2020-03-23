@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import {
-    CreateAction,
+    CreateAction, FluentGetAction,
     GetAction, ListAction,
     Resource,
     ResourceActions, SingleDeleteAction, UpdateAction
@@ -36,12 +36,14 @@ interface UpdateParameter extends Tags, IdParameter {
 }
 
 class Create extends CreateAction<CreateParameter, any> {}
-class Update extends UpdateAction<UpdateParameter, any> {}
+class Update extends UpdateAction<UpdateParameter, any> {
+    protected idField = idField;
+}
 
 class Delete extends SingleDeleteAction<IdParameter, any> {
     protected idField = idField;
 }
-class Get extends GetAction<IdParameter, CollectorModel> {
+class Get extends FluentGetAction<IdParameter, CollectorModel> {
     protected idField = idField;
 }
 class List extends ListAction<any, CollectorListResp> {}

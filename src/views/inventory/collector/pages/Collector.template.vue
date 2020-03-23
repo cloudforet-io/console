@@ -179,6 +179,7 @@ import {
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
+import { fluentApi } from '@/lib/fluent-api';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -346,7 +347,7 @@ const scheduleState = reactive({
     deleteVisible: false,
 });
 
-export const collectorSetup = (props, context, AcHandler, tagsApi) => {
+export const collectorSetup = (props, context, AcHandler) => {
     const state = reactive({
         ...setTableData(props, context),
         ...setTabData(props, context),
@@ -419,7 +420,7 @@ export const collectorSetup = (props, context, AcHandler, tagsApi) => {
         onClickDelete,
         onClickCollectData,
         collectByCredential,
-        tagsApi: tagsApi || (() => {}),
+        tagsApi: fluentApi.inventory().collector().update(),
     };
 };
 
