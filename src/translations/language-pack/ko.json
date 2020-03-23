@@ -330,6 +330,14 @@
 		"TAG": "태그",
 		"VM": "VM"
 	},
+	"PLUGIN": {
+		"BTN": {
+			"RECOVERY": "복구"
+		},
+		"TAB": {
+			"PLUGIN": "플러그인"
+		}
+	},
 	"SECRET": {
 		"BTN": {
 			"None": ""

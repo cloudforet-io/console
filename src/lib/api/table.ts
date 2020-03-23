@@ -12,7 +12,7 @@ import {
 import {
     BaseApiState, transformHandlerType, getDataAPI, DynamicFluentAPIToolSet,
 } from '@/lib/api/toolset';
-import { forceRefArg, readonlyRefArg } from '@/lib/type';
+import {cnaRefArgs, forceRefArg, readonlyRefArg} from '@/lib/type';
 import {
     baseAutocompleteHandler,
     SearchQueryType,
@@ -97,7 +97,7 @@ export class QuerySearchTableFluentAPI<
     T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>,
     action extends QueryAPI<parameter, resp> = QueryAPI<parameter, resp>,
     > extends BaseTableFluentAPI<parameter, resp, initData, initSyncData, T, action> {
-    protected constructor(
+    constructor(
         action: action,
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
@@ -346,7 +346,7 @@ export class HistoryAPI<initData = any, initSyncData = any> extends TabSearchTab
     constructor(
         url: readonlyRefArg<string>,
         idKey: string,
-        private id: readonlyRefArg<string>,
+        private id: readonlyRefArg<cnaRefArgs<string>>,
         initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
         public dataSource: DataSource[] = defaultHistoryDataSource,
         isShow: forceRefArg<boolean>,
