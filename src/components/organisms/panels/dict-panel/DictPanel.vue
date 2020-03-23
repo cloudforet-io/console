@@ -116,7 +116,7 @@ export default defineComponent({
             reset();
         };
 
-        const onSave = () => {
+        const onSave = async () => {
             if (!state.showValidation) state.showValidation = true;
             if (!allValidation()) return;
 

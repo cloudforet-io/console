@@ -72,26 +72,29 @@ export class DictPanelState<D, SyncD, S extends DictPanelType, SyncS extends Dic
 
 @HelperToolSet()
 export class DictPanelToolSet<D=any, SyncD=any> extends DictPanelState<D, SyncD, DictPanelType, DictPanelSyncType> {
-    selectedItem: Ref<any> | Ref<Readonly<any>>;
+    // selectedItem: Ref<any> | Ref<Readonly<any>>;
 
     static initToolSet(_this: DictPanelToolSet): void {
-        watch(() => _this.selectedItem.value, (val) => {
-            console.log('selected item changed', val);
-            _this.syncState.dict = _.get(val, 'tags', {});
-            _this.syncState.editMode = false;
-        });
+        // watch(() => _this.selectedItem.value, (val) => {
+        //     _this.syncState.dict = _.get(val, 'tags', {});
+        //     _this.syncState.editMode = false;
+        // });
     }
 
     listeners: any = {
-        save: () => { this.syncState.editMode = false; },
+        save: this.toReadMode,
     }
 
     constructor(initData: D = {} as D,
         initSyncData: SyncD = {} as SyncD,
-        parentItem: Ref<any> | Ref<Readonly<any>>,
+        // parentItem: Ref<any> | Ref<Readonly<any>>,
         lazy = false) {
         super(initData, initSyncData);
-        this.selectedItem = parentItem;
+        // this.selectedItem = parentItem;
         if (!lazy) DictPanelToolSet.initToolSet(this);
+    }
+
+    toReadMode() {
+        this.syncState.editMode = false;
     }
 }
