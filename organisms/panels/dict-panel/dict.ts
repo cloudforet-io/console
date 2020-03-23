@@ -1,45 +1,79 @@
 import { DictPanelToolSet } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
-import { Tags, UpdateAction } from '@/lib/fluent-api';
-import { AxiosResponse } from 'axios';
-import { Ref, UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { getCurrentInstance } from '@vue/composition-api';
+import {
+    DictResource,
+} from '@/lib/fluent-api';
+import { FluentResourceAPIToolSet } from '@/lib/api/toolset';
 
-
-export class DictPanelAPI<D=any, SyncD=any> {
+export class DictPanelAPI<
+    param=any, resp=any, D=any, SyncD=any,
+    T extends DictPanelToolSet<D, SyncD> = DictPanelToolSet<D, SyncD>,
+    actions extends DictResource<param, resp> = DictResource<param, resp>,
+> extends FluentResourceAPIToolSet<param, resp, actions> {
     ts: DictPanelToolSet;
 
-    api: UpdateAction<Tags, AxiosResponse>;
+    protected idKey: string;
 
-    listeners: {save: any};
+    protected tagsKey: string;
 
-    protected vm = getCurrentInstance();
+    // protected resourceItem: Ref<any> | Ref<Readonly<any>>;
 
-    constructor(initData: D = {} as D,
+    private id = '';
+
+    constructor(actions: actions,
+        // resourceItem?: Ref<any> | Ref<Readonly<any>>,
+        initData: D = {} as D,
         initSyncData: SyncD = {} as SyncD,
-        parentItem: Ref<any> | Ref<Readonly<any>>,
-        api: UpdateAction<Tags, AxiosResponse>) {
-        this.ts = new DictPanelToolSet<D, SyncD>(initData, initSyncData, parentItem);
-        this.api = api;
-
-        this.listeners = {
-            save: async () => {
-                this.ts.state.loading = true;
-                this.api = this.api.setParameter({
-                    tags: this.ts.syncState.dict,
-                });
-                this.api.debug();
-                debugger;
-                try {
-                    await this.api.execute();
-                    this.ts.listeners.save();
-                    // @ts-ignore
-                    // this.vm.$emit('update', this.ts.syncState.dict);
-                } catch (e) {
-                    console.error(e);
-                } finally {
-                    this.ts.state.loading = false;
-                }
-            },
+        tagsKey = 'tags') {
+        super(actions);
+        this.ts = new DictPanelToolSet<D, SyncD>(initData, initSyncData);
+        this.idKey = this.actions.get().getIdField();
+        this.tagsKey = tagsKey;
+        this.ts.listeners = {
+            save: this.updateData,
         };
+
+        // this.resourceItem = resourceItem;
+
+        // watch(() => this.resourceItem.value, async (val) => {
+        //     this.id = this.resourceItem.value[this.idKey];
+        //     this.ts.toReadMode();
+        //     await this.getData();
+        // });
+    }
+
+    setId(id: string) {
+        this.id = id;
+    }
+
+    getData = async () => {
+        this.ts.state.loading = true;
+        try {
+            const res = await this.actions.get()
+                .setId(this.id)
+                .setOnly(this.tagsKey)
+                .execute();
+            this.ts.syncState.dict = res.data[this.tagsKey];
+        } catch (e) {
+            console.error(e);
+        } finally {
+            this.ts.state.loading = false;
+        }
+    }
+
+    updateData = async () => {
+        this.ts.state.loading = true;
+        try {
+            await this.actions.update()
+                .setParameter({
+                    [this.idKey]: this.id,
+                    [this.tagsKey]: { ...this.ts.syncState.dict },
+                } as any)
+                .execute();
+            this.ts.toReadMode();
+        } catch (e) {
+            console.error(e);
+        } finally {
+            this.ts.state.loading = false;
+        }
     }
 }
