@@ -14,6 +14,8 @@ import directive from '@/directives';
 import { i18n } from '@/translations';
 import { Util } from '@/lib/global-util';
 import LocalStorageStore from '@/store/toolset';
+import webFontLoader from 'webfontloader';
+import { webFonts, fontUrls } from '@/styles/web-fonts';
 import App from './App.vue';
 import '@/styles/style.scss';
 
@@ -32,6 +34,13 @@ Vue.use(SvgIcon, {
 Vue.use(LiquorTree);
 
 Vue.prototype.$velocity = velocity;
+
+webFontLoader.load({
+    google: {
+        families: webFonts,
+        urls: fontUrls,
+    },
+});
 
 /** ***************************************************************
  * This is a Global Bus Event;

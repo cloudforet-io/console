@@ -78,7 +78,8 @@
     "vue-router": "^3.1.6",
     "vue-search-select": "^2.8.3",
     "vue-svgicon": "^3.2.6",
-    "vuex": "^3.1.1"
+    "vuex": "^3.1.1",
+    "webfontloader": "^1.6.28"
   },
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.6.0",
