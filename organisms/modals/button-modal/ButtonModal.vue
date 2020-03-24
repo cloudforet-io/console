@@ -64,6 +64,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
+// @ts-ignore
 import PContentModal, { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';

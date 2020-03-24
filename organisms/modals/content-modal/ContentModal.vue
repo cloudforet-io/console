@@ -23,13 +23,21 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, defineComponent,
+    reactive, toRefs, computed, defineComponent, Ref,
 } from '@vue/composition-api';
+// @ts-ignore
 import PModal, { propsMixin } from '@/components/molecules/modals/Modal.vue';
 import { makeProxy } from '@/lib/compostion-util';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 export const setup = (props, context) => {
-    const state: any = reactive({
+    interface StateType {
+        proxyVisible: boolean;
+        modal: any;
+        allBodyClass: Readonly<any[]>;
+    }
+
+    const state: UnwrapRef<StateType> = reactive({
         proxyVisible: makeProxy('visible', props, context.emit),
         modal: null,
         allBodyClass: computed(() => {
@@ -98,7 +106,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="postcss" scoped>/* b-modal */
+<style lang="postcss" scoped>
 .modal-content {
     @apply bg-white border border-gray3;
     display: flex;
