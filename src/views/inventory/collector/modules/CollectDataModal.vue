@@ -121,11 +121,11 @@ export default {
         visible: Boolean,
         loading: Boolean,
         credentials: Array,
-        isCredentialType: Boolean,
     },
     setup(props, context) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, context.emit),
+            isCredentialType: computed(() => !!props.collector.plugin_info.credential_id),
             showValidation: false,
             collectModeIdx: 0,
             collectModeMenu: makeTrItems([
@@ -149,7 +149,7 @@ export default {
             ]),
             crdMenuIdx: 0,
             selectedCrd: computed(() => {
-                if (props.isCredentialType) return props.credentials[0];
+                if (state.isCredentialType) return props.credentials[0];
                 if (state.crdMenuIdx === 0) return null;
                 return props.credentials[state.crdMenuIdx - 1];
             }),
@@ -206,7 +206,7 @@ export default {
             if (props.credentials.length > 0) return;
 
             const params = {};
-            if (props.isCredentialType) {
+            if (state.isCredentialType) {
                 // eslint-disable-next-line camelcase
                 params.credential_id = props.collector.plugin_info.credential_id;
             } else {

@@ -24,7 +24,7 @@
                      name="ic_delete" color="transparent inherit"
                      class="close-btn"
                      :class="{disabled: loading}"
-                     @click="onCloseClick"
+                     @click.stop="onCloseClick"
                 />
             </div>
         </template>
@@ -62,7 +62,9 @@
     </p-content-modal>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from '@vue/composition-api';
+// @ts-ignore
 import PContentModal, { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLoadingButton from '@/components/molecules/buttons/LoadingButton.vue';
@@ -71,11 +73,12 @@ import PButton from '@/components/atoms/buttons/Button.vue';
 export const setup = (props, context) => {
     const state = contentModalSetup(props, context);
     const onCloseClick = () => {
-        if (props.disabled) return;
+        if (props.loading) return;
         context.emit('close');
         state.proxyVisible.value = false;
     };
     const onCancelClick = () => {
+        if (props.loading) return;
         context.emit('cancel');
         if (props.hideOnCancel) {
             state.proxyVisible.value = false;
@@ -92,13 +95,13 @@ export const setup = (props, context) => {
     };
 };
 
-export default {
+export default defineComponent({
     name: 'PButtonModal',
     components: {
         PI, PContentModal, PButton, PLoadingButton,
     },
     mixins: [PContentModal],
-    events: ['close', 'cancel', 'confirm'],
+    // events: ['close', 'cancel', 'confirm'],
     setup(props, context) {
         return setup(props, context);
     },
@@ -142,7 +145,7 @@ export default {
         },
     },
 
-};
+});
 </script>
 <style lang="postcss" scoped>
     .header {

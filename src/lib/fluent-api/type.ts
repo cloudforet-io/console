@@ -27,6 +27,11 @@ export interface BaseActionState<T> {
     parameter: T ;
 }
 
+export interface GetActionState<T> {
+    parameter: T;
+    only: string[];
+}
+
 export interface Sort {
     key: string;
     desc?: boolean;
@@ -110,6 +115,6 @@ export interface ReferenceInfo {
 
 export interface Tags {
     tags?: {
-        [key: string]: string | null;
+        [key: string]: any;
     };
 }

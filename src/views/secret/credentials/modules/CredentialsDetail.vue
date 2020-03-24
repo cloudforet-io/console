@@ -18,7 +18,10 @@
         <p-dynamic-view name="Base Information" view_type="item" :data="item||{}"
                         :data_source="baseDataSource"
         />
-        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="confirm" />
+        <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
+                      :edit-mode.sync="tagsApi.ts.syncState.editMode"
+                      v-on="tagsApi.ts.listeners"
+        />
     </div>
 </template>
 
@@ -26,7 +29,9 @@
 /* eslint-disable camelcase */
 
 import { ref, watch } from '@vue/composition-api';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { fluentApi } from '@/lib/fluent-api';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
@@ -78,40 +83,18 @@ export default {
             },
         ];
 
-        // const baseDefs = makeTrItems([
-        //     ['credential_id', 'COMMON.ID', { copyFlag: true }],
-        //     ['name', 'COMMON.NAME', { copyFlag: true }],
-        //     ['issue_type', 'COMMON.ISSUE_TYPE', { copyFlag: true }],
-        //     ['created_at', 'COMMON.CREAT', { copyFlag: true }],
-        //     ['credential_group_id', 'COMMON.GROUP', { full: true }],
-        // ], parent, {});
-        const tags = ref({ ...props.tags });
-        watch(() => props.item, (value) => {
-            tags.value = _.isEmpty(value) ? {} : value.tags;
+        const tagsApi = new DictPanelAPI(fluentApi.secret().secret());
+
+        watch(() => props.item, async (item) => {
+            tagsApi.setId(item.credential_id);
+            tagsApi.ts.toReadMode();
+            await tagsApi.getData();
         });
-        const dictPanel = ref(null);
-        const resetTag = () => {
-            dictPanel.value.reset();
-        };
-        // const getEmptyString = object => (_.isEmpty(object) ? '' : object);
-        mountBusEvent(credentialsEventBus, props.tagResetEvent, resetTag);
+
         return {
             baseDataSource,
-            tags,
-            dictPanel,
-            confirm(...event) {
-                credentialsEventBus.$emit(props.tagConfirmEvent, props.item.credential_id, ...event);
-            },
+            tagsApi,
         };
     },
 };
 </script>
-
-<!--<style lang="scss" scoped>-->
-<!--    .p-label {-->
-<!--        left-margin: 0.5rem;-->
-<!--        margin-bottom:5px;-->
-<!--        margin-right: 0.5rem;-->
-<!--        color:$dark;-->
-<!--    }-->
-<!--</style>-->

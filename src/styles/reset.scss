@@ -1,12 +1,19 @@
 /*************************
  ****** GLOBAL CSS *******
  *************************/
-
-$font-basic: arial, sans-serif;
+$font-basic: 'Roboto', arial, sans-serif;
 $primary4: #F8F8FC;
 $dark: #222532;
 
 /* INIT */
+//html:lang(ko), body:lang(ko) {
+//    font-family: 'Roboto', $font-basic;
+//}
+//
+//html:lang(en), body:lang(en) {
+//    font-family: 'Roboto', $font-basic;
+//}
+
 html, body {
     font-family: $font-basic;
     background-color: $primary4;

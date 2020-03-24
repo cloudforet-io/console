@@ -4,19 +4,19 @@ import axios, {
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import config from '@/lib/config';
 import { setMockData } from '@/lib/mock';
-import {dataTableProps} from "@/components/organisms/tables/data-table/toolset";
+import { dataTableProps } from '@/components/organisms/tables/data-table/toolset';
 
 const MockAdapter = require('axios-mock-adapter');
 
 
 class APIError extends Error {
-    public status: number;
+    status: number;
 
-    public code:string;
+    code: string;
 
-    public axiosError:AxiosError;
+    axiosError: AxiosError;
 
-    constructor(axiosError:AxiosError) {
+    constructor(axiosError: AxiosError) {
         super();
 
         // @ts-ignore
@@ -49,15 +49,15 @@ class APIError extends Error {
 const refreshUrl = '/identity/token/refresh';
 
 export class API {
-    public instance: AxiosInstance ;
+    instance: AxiosInstance ;
 
-    protected refreshInstance : AxiosInstance ;
+    protected refreshInstance: AxiosInstance ;
 
-    protected axiosOptions:any;
+    protected axiosOptions: any;
 
     private vm: any;
 
-    public newInstance() {
+    newInstance() {
         const instance = axios.create(this.axiosOptions);
         if (config.get('NO_SERVER_MODE')) {
             console.warn('YOU ARE USE NO SERVER MODE!!!!!');
@@ -73,7 +73,7 @@ export class API {
     }
 
 
-    public init(baseURL:string, vm:any) {
+    init(baseURL: string, vm: any) {
         this.axiosOptions = {
             baseURL,
             headers: {
@@ -94,19 +94,17 @@ export class API {
             if (this.vm.$ls.user.state.isSignedIn) {
                 request.headers.Authorization = `Bearer ${this.vm.$ls.user.state.accessToken}`;
                 if (request.method?.toUpperCase() === 'POST' && !!request.data) {
-                    if (typeof request.data ==='string'){
+                    if (typeof request.data === 'string') {
                         try {
-                            const data = JSON.parse(request.data)
+                            const data = JSON.parse(request.data);
                             data.domain_id = this.vm.$ls.domain.state.domainId;
-                            request.data = JSON.stringify(data)
+                            request.data = JSON.stringify(data);
                         } catch (e) {
-                           console.debug(e)
+                            console.debug(e);
                         }
-
                     } else {
                         request.data.domain_id = this.vm.$ls.domain.state.domainId;
                     }
-
                 }
             }
             return request;
@@ -126,15 +124,15 @@ export class API {
         return this.instance;
     }
 
-    protected setRefreshRequestInterceptor(handler:(request:AxiosRequestConfig)=>AxiosRequestConfig):void {
+    protected setRefreshRequestInterceptor(handler: (request: AxiosRequestConfig) => AxiosRequestConfig): void {
         this.refreshInstance.interceptors.request.use(handler);
     }
 
-    protected setRequestInterceptor(handler:(request:AxiosRequestConfig)=>AxiosRequestConfig):void {
+    protected setRequestInterceptor(handler: (request: AxiosRequestConfig) => AxiosRequestConfig): void {
         this.instance.interceptors.request.use(handler);
     }
 
-    protected setResponseInterceptor(responseHandler:(response:AxiosResponse)=>AxiosResponse|Promise<AxiosResponse>, errorHandler?:(error:AxiosError)=>AxiosError|Promise<AxiosError>):void {
+    protected setResponseInterceptor(responseHandler: (response: AxiosResponse) => AxiosResponse|Promise<AxiosResponse>, errorHandler?: (error: AxiosError) => AxiosError|Promise<AxiosError>): void {
         this.instance.interceptors.response.use(responseHandler, errorHandler);
     }
 }

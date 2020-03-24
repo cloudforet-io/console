@@ -29,7 +29,7 @@ export default defineComponent({
         PMenuList,
     },
     setup() {
-        const vm:any = getCurrentInstance();
+        const vm: any = getCurrentInstance();
         const state = reactive({
             language: computed({
                 set(val) { vm.$ls.user.state.language = val; },
@@ -45,12 +45,13 @@ export default defineComponent({
             tooltip: computed(() => `Language: ${LANGUAGES[state.language]}`),
         });
 
-        const changeLanguage = (item) => {
-            state.language = item.key;
+        const changeLanguage = (item?: any) => {
+            state.language = item ? item.key : state.language;
             vm.$i18n.locale = state.language;
+            document.getElementsByTagName('HTML')[0].setAttribute('lang', state.language);
         };
 
-        vm.$i18n.locale = state.language;
+        changeLanguage();
 
         return {
             ...toRefs((state)),

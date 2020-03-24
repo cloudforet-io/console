@@ -5,15 +5,20 @@
                         :data_source="baseDataSource" :root-mode="true"
         />
         <p-dynamic-details :details="item.metadata.details" :data="item||{}" />
-        <p-dict-panel ref="dictPanel" :dict.sync="dict" @confirm="confirm" />
+        <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
+                      :edit-mode.sync="tagsApi.ts.syncState.editMode"
+                      v-on="tagsApi.ts.listeners"
+        />
     </div>
 </template>
 
 <script>
 /* eslint-disable camelcase */
-
 import { ref, watch } from '@vue/composition-api';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import {fluentApi} from '@/lib/fluent-api';
+
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import ServerEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent } from '@/lib/compostion-util';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
@@ -126,25 +131,18 @@ export default {
                 },
             },
         ];
-        const dict = ref({ ...props.item.tags });
-        watch(() => props.item, (value) => {
-            if (value) {
-                dict.value = value.tags || {};
-            }
+
+        const tagsApi = new DictPanelAPI(fluentApi.inventory().server());
+
+        watch(() => props.item, async (item) => {
+            tagsApi.setId(item.server_id);
+            tagsApi.ts.toReadMode();
+            await tagsApi.getData();
         });
-        const dictPanel = ref(null);
-        const resetTag = () => {
-            dictPanel.value.reset();
-        };
-        mountBusEvent(ServerEventBus, props.tagResetEvent, resetTag);
 
         return {
             baseDataSource,
-            dict,
-            dictPanel,
-            confirm(...event) {
-                ServerEventBus.$emit(props.tagConfirmEvent, props.item.server_id, ...event);
-            },
+            tagsApi,
         };
     },
 };

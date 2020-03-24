@@ -9,8 +9,9 @@ import {
     Query,
     QueryActionState,
     FilterItem,
-    ShortFilterType,
+    ShortFilterType, GetActionState,
 } from '@/lib/fluent-api/type';
+import { isNotEmpty } from '@/lib/util';
 
 
 export abstract class ActionAPI<parameter=any, resp=any> {
@@ -18,6 +19,11 @@ export abstract class ActionAPI<parameter=any, resp=any> {
 
     protected method: ApiMethods = 'post';
 
+    protected baseUrl: string;
+
+    protected apiState: BaseActionState<parameter>;
+
+    protected transformer: ((any) => any|Promise<any>)|null;
 
     protected abstract getParameter: () => parameter
 
@@ -35,11 +41,14 @@ export abstract class ActionAPI<parameter=any, resp=any> {
         return resp;
     }
 
-    constructor(
-        protected baseUrl: string,
-        protected apiState: BaseActionState<parameter> = {} as BaseActionState<parameter>,
-        protected transformer: ((any) => any|Promise<any>)|null = null,
+    protected constructor(
+        baseUrl: string,
+        apiState?: BaseActionState<parameter>,
+        transformer: ((any) => any|Promise<any>)|null = null,
     ) {
+        this.baseUrl = baseUrl;
+        this.apiState = apiState || {} as BaseActionState<parameter>;
+        this.transformer = transformer;
     }
 
     setTransformer(func: (any) => any|Promise<any>) {
@@ -64,7 +73,8 @@ export abstract class ActionAPI<parameter=any, resp=any> {
     }
 
     clone(): this {
-        return this.constructor(this.baseUrl, this.apiState, this.transformer);
+        // @ts-ignore
+        return new this.constructor(this.baseUrl, this.apiState, this.transformer);
     }
 }
 export const operatorMap = Object.freeze({
@@ -212,16 +222,19 @@ interface SingleItemActionInterface{
     setId: (id: string) => any;
 }
 export abstract class RawParameterAction<parameter, resp> extends ActionAPI<parameter, resp> {
-    protected apiState = {
-        parameter: {} as parameter,
-    };
-
     protected getParameter = () => this.apiState.parameter;
+
+    constructor(
+        baseUrl: string,
+        apiState: BaseActionState<parameter> = { parameter: {} as parameter },
+        transformer: ((any) => any|Promise<any>)|null = null,
+    ) {
+        super(baseUrl, apiState, transformer);
+    }
 }
 
 export abstract class SetParameterAction<parameter, resp> extends RawParameterAction<parameter, resp> {
     setParameter(parameter: parameter) {
-        // @ts-ignore
         this.apiState.parameter = parameter;
         return this.clone();
     }
@@ -235,7 +248,6 @@ export abstract class UpdateAction<parameter, resp> extends SetParameterAction<p
     protected path = 'update'
 }
 
-
 export abstract class SingleItemAction<parameter, resp> extends RawParameterAction<parameter, resp> implements SingleItemActionInterface {
     protected abstract idField: string;
 
@@ -245,8 +257,40 @@ export abstract class SingleItemAction<parameter, resp> extends RawParameterActi
         return this.clone();
     }
 }
+
 export abstract class GetAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'get';
+
+    protected apiState: GetActionState<parameter>;
+
+    constructor(
+        baseUrl: string,
+        apiState: GetActionState<parameter> = {
+            parameter: {} as parameter,
+            only: [] as string[],
+        },
+        transformer: ((any) => any|Promise<any>)|null = null,
+    ) {
+        super(baseUrl, undefined, transformer);
+        this.apiState = apiState;
+    }
+
+    protected getParameter = () => {
+        const query = { only: this.apiState.only };
+        return {
+            ...this.apiState.parameter,
+            query,
+        };
+    };
+
+    setOnly(...args: string[]) {
+        this.apiState.only = args;
+        return this.clone();
+    }
+
+    getIdField() {
+        return this.idField;
+    }
 }
 
 export abstract class SingleDeleteAction<parameter, resp> extends SingleItemAction<parameter, resp> {
@@ -256,6 +300,7 @@ export abstract class SingleDeleteAction<parameter, resp> extends SingleItemActi
 export abstract class SingleEnableAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'enable';
 }
+
 export abstract class SingleDisableAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'disable';
 }
@@ -295,7 +340,6 @@ export abstract class MultiEnableAction<parameter, resp> extends MultiItemAction
 export abstract class MultiDisableAction<parameter, resp> extends MultiItemAction<parameter, resp> {
     protected path = 'disable';
 }
-
 
 export abstract class MultiDeleteAction<parameter, resp> extends MultiItemAction<parameter, resp> {
     protected path = 'delete';
@@ -340,4 +384,11 @@ export type ServiceResources<resources extends string> = { [key in resources]?: 
 
 export abstract class Service {
     protected abstract name: string;
+}
+
+export interface BaseResources<parameter, resp> extends Resource, ResourceActions<'update'|'get'>{}
+
+export interface DictResource<parameter, resp> extends Resource, ResourceActions<'update'|'get'> {
+    update: () => UpdateAction<parameter, resp>;
+    get: () => GetAction<parameter, resp>;
 }
