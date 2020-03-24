@@ -47,7 +47,7 @@ export default {
     props: {
         height: {
             type: String,
-            default: `calc(100vh - ${styles['lnb-height']})`,
+            default: '100%',
         },
         initWidth: {
             type: Number,
@@ -71,11 +71,12 @@ export default {
             transition: false,
             sbContainerStyle: computed(() => ({
                 width: `${state.width}px`,
-                overflow: 'auto',
+                height: '100%',
+                overflow: 'hidden',
             })),
             sbStyle: computed(() => ({
                 width: 'auto',
-                height: `${props.height}px`,
+                height: '100%',
                 minWidth: `${props.minWidth}px`,
                 maxWidth: `${props.maxWidth}px`,
                 opacity: state.hide && !state.transition ? 0 : 1,
@@ -149,12 +150,13 @@ export default {
         }
     }
     .main {
-        height: calc(100vh - $(lnb-height));
+        /*height: calc(100% - $(lnb-height));*/
         display: flex;
         flex-direction: column;
         justify-content: stretch;
         flex-grow: 1;
         width: 100%;
+        overflow: auto;
     }
     .resizer-container {
         display: flex;
@@ -170,7 +172,7 @@ export default {
             }
         }
         &.prohibit-line {
-            @apply border-l border-gray2;
+            @apply border-l  border-gray2;
             background-color: transparent;
             &:hover {
                 @apply border-l border-secondary;
