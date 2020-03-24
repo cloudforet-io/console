@@ -115,12 +115,12 @@ export default defineComponent({
         }
         &.transparent {
             &.disabled {
-                @apply text-gray2;
-                border-color: transparent;
-                background-color: transparent;
+                color: theme('colors.gray2') !important;;
+                border-color: transparent !important;
+                background-color: transparent !important;
                 cursor: unset;
                 &:hover {
-                    @apply text-gray2;
+                    color: theme('colors.gray2') !important;;
                 }
             }
         }
