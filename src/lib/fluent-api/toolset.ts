@@ -9,7 +9,7 @@ import {
     Query,
     QueryActionState,
     FilterItem,
-    ShortFilterType, FluentActionState,
+    ShortFilterType, GetActionState,
 } from '@/lib/fluent-api/type';
 import { isNotEmpty } from '@/lib/util';
 
@@ -260,17 +260,12 @@ export abstract class SingleItemAction<parameter, resp> extends RawParameterActi
 
 export abstract class GetAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'get';
-}
 
-
-export abstract class FluentGetAction<parameter, resp> extends SingleItemAction<parameter, resp> {
-    protected path = 'get';
-
-    protected apiState: FluentActionState<parameter>;
+    protected apiState: GetActionState<parameter>;
 
     constructor(
         baseUrl: string,
-        apiState: FluentActionState<parameter> = {
+        apiState: GetActionState<parameter> = {
             parameter: {} as parameter,
             only: [] as string[],
         },
@@ -391,14 +386,9 @@ export abstract class Service {
     protected abstract name: string;
 }
 
-// export type DictResource<parameter, resp> = {
-//     update: UpdateAction<parameter, resp>;
-//     get: GetAction<parameter, resp>;
-// }
-
 export interface BaseResources<parameter, resp> extends Resource, ResourceActions<'update'|'get'>{}
 
 export interface DictResource<parameter, resp> extends Resource, ResourceActions<'update'|'get'> {
     update: () => UpdateAction<parameter, resp>;
-    get: () => FluentGetAction<parameter, resp>;
+    get: () => GetAction<parameter, resp>;
 }

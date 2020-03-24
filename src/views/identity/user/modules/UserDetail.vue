@@ -6,14 +6,20 @@
             </template>
         </p-info-panel>
 
-        <p-dict-panel ref="dictPanel" :dict.sync="tags" @confirm="confirm" />
+        <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
+                      :edit-mode.sync="tagsApi.ts.syncState.editMode"
+                      v-on="tagsApi.ts.listeners"
+        />
     </div>
 </template>
 
 <script>
 import { ref, watch } from '@vue/composition-api';
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { fluentApi } from '@/lib/fluent-api';
+
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PStatus from '@/components/molecules/status/Status.vue';
 import { timestampFormatter, arrayFormatter, userStateFormatter } from '@/lib/util';
 import { mountBusEvent } from '@/lib/compostion-util';
@@ -46,27 +52,21 @@ export default {
             ['domain_id', 'COMMON.DOMAIN_ID'],
             ['timezone', 'COMMON.TIMEZONE'],
         ], parent, { copyFlag: true });
-        const tags = ref({ ...props.tags });
-        watch(() => props.item, (value) => {
-            if (value) {
-                tags.value = value.tags || {};
-            }
+
+        const tagsApi = new DictPanelAPI(fluentApi.identity().user());
+
+        watch(() => props.item, async (item) => {
+            tagsApi.setId(item.user_id);
+            tagsApi.ts.toReadMode();
+            await tagsApi.getData();
         });
-        const dictPanel = ref(null);
-        const resetTag = () => {
-            dictPanel.value.reset();
-        };
-        mountBusEvent(userEventBus, props.tagResetEvent, resetTag);
+
         return {
             baseDefs,
-            tags,
-            dictPanel,
-            confirm(...event) {
-                userEventBus.$emit(props.tagConfirmEvent, props.item.user_id, ...event);
-            },
             userStateFormatter,
             timestampFormatter,
             arrayFormatter,
+            tagsApi,
         };
     },
 };

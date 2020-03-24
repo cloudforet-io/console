@@ -27,7 +27,7 @@ export interface BaseActionState<T> {
     parameter: T ;
 }
 
-export interface FluentActionState<T> {
+export interface GetActionState<T> {
     parameter: T;
     only: string[];
 }

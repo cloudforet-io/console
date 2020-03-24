@@ -2,13 +2,13 @@ import { DictPanelToolSet } from '@/components/organisms/panels/dict-panel/DictP
 import {
     DictResource,
 } from '@/lib/fluent-api';
-import { FluentResourceAPIToolSet } from '@/lib/api/toolset';
+import { ResourceAPIToolSet } from '@/lib/api/toolset';
 
 export class DictPanelAPI<
     param=any, resp=any, D=any, SyncD=any,
     T extends DictPanelToolSet<D, SyncD> = DictPanelToolSet<D, SyncD>,
     actions extends DictResource<param, resp> = DictResource<param, resp>,
-> extends FluentResourceAPIToolSet<param, resp, actions> {
+> extends ResourceAPIToolSet<param, resp, actions> {
     ts: DictPanelToolSet;
 
     protected idKey: string;
@@ -21,12 +21,13 @@ export class DictPanelAPI<
 
     constructor(actions: actions,
         // resourceItem?: Ref<any> | Ref<Readonly<any>>,
+        idKey?: string,
+        tagsKey = 'tags',
         initData: D = {} as D,
-        initSyncData: SyncD = {} as SyncD,
-        tagsKey = 'tags') {
+        initSyncData: SyncD = {} as SyncD) {
         super(actions);
         this.ts = new DictPanelToolSet<D, SyncD>(initData, initSyncData);
-        this.idKey = this.actions.get().getIdField();
+        this.idKey = idKey || this.actions.get().getIdField();
         this.tagsKey = tagsKey;
         this.ts.listeners = {
             save: this.updateData,
@@ -43,6 +44,10 @@ export class DictPanelAPI<
 
     setId(id: string) {
         this.id = id;
+    }
+
+    setIdKey(idKey: string) {
+        this.idKey = idKey;
     }
 
     getData = async () => {

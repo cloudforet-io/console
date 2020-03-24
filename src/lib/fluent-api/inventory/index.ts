@@ -1,8 +1,11 @@
-import Server from '@/lib/fluent-api/inventory/server';
 import { Service, ServiceResources } from '@/lib/fluent-api/toolset';
+import Server from '@/lib/fluent-api/inventory/server';
 import Collector from '@/lib/fluent-api/inventory/collector';
-import CloudServiceType from './cloud-service-type';
+import Region from '@/lib/fluent-api/inventory/region';
+import Zone from '@/lib/fluent-api/inventory/zone';
+import Pool from '@/lib/fluent-api/inventory/pool';
 import CloudService from './cloud-service';
+import CloudServiceType from './cloud-service-type';
 
 export default class Inventory extends Service implements ServiceResources<'cloudServiceType'> {
     protected name = 'inventory'
@@ -14,4 +17,10 @@ export default class Inventory extends Service implements ServiceResources<'clou
     server() { return new Server(this.name); }
 
     collector() { return new Collector(this.name); }
+
+    region() { return new Region(this.name); }
+
+    zone() { return new Zone(this.name); }
+
+    pool() { return new Pool(this.name); }
 }

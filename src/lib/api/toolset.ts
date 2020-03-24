@@ -1,16 +1,11 @@
-import Vue from 'vue';
 import { AxiosResponse } from 'axios';
 import { getCurrentInstance } from '@vue/composition-api';
 import { readonlyArgs } from '@/lib/type';
 import { SearchQueryType } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import { responseData } from '@/lib/mock/toolset';
 import {
-    ActionAPI, BaseResources, ListType, QueryAPI, Resource, ResourceActions,
+    ActionAPI, BaseResources,
 } from '@/lib/fluent-api';
-import { ToolboxTableToolSet } from '@/components/organisms/tables/toolbox-table/toolset';
 import { api } from './axios';
-
-import functions = Casual.functions;
 
 export abstract class DynamicAPI {}
 
@@ -20,7 +15,7 @@ interface GetDataAPI {
 
 }
 
-export abstract class FluentResourceAPIToolSet<
+export abstract class ResourceAPIToolSet<
     parameter = any,
     resp = any,
     actions extends BaseResources<parameter, resp> = BaseResources<parameter, resp>,

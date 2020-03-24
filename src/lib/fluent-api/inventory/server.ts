@@ -2,10 +2,10 @@
 import {
     GetAction, GetDataAction, ListAction,
     Resource,
-    ResourceActions,
+    ResourceActions, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
-    CollectionInfo, DataSourceItem, ListType, TimeStamp,
+    CollectionInfo, DataSourceItem, ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
 
 
@@ -28,6 +28,10 @@ class Get extends GetAction<ServerGetParameter, ServerModel> {
     protected idField = 'server_id'
 }
 
+class Update extends UpdateAction<any, any> {
+    protected idField = 'server_id'
+}
+
 
 class List extends ListAction<any, ListType<ServerModel>> {}
 
@@ -37,9 +41,11 @@ class GetData extends GetDataAction<any, ListType<any>> {
 export default class Server extends Resource implements ResourceActions<'get'| 'list'|'getData'> {
     protected name = 'server';
 
-    public get(): Get { return new Get(this.baseUrl); }
+    get(): Get { return new Get(this.baseUrl); }
 
-    public list(): List { return new List(this.baseUrl); }
+    list(): List { return new List(this.baseUrl); }
 
-    public getData(): GetData { return new GetData(this.baseUrl); }
+    getData(): GetData { return new GetData(this.baseUrl); }
+
+    update() { return new Update(this.baseUrl); }
 }

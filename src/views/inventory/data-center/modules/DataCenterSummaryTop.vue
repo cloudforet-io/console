@@ -5,18 +5,20 @@
                    :item="item"
                    :defs="topPanel"
         />
-        <p-dict-panel v-show="isVisible"
-                      ref="tagPanel"
-                      :dict.sync="tags"
-                      @confirm="updateTag"
+        <p-dict-panel v-if="isVisible"
+                      :dict.sync="tagsApi.ts.syncState.dict"
+                      :edit-mode.sync="tagsApi.ts.syncState.editMode"
+                      v-on="tagsApi.ts.listeners"
         />
     </div>
 </template>
 
 <script>
 import _ from 'lodash';
-import InfoPanel from '@/components/organisms/panels/info-panel/InfoPanel';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin';
+import InfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { fluentApi } from '@/lib/fluent-api';
 
 export default {
     name: 'ProjectSummary',
@@ -41,15 +43,13 @@ export default {
             renderTitle: null,
             renderData: [],
             item: {},
-            tags: {},
+            idKey: '',
+            tagsApi: null,
         };
     },
     computed: {
         topPanelTitle() {
             return this.$t('COMMON.BASE_INFO');
-        },
-        destructTags() {
-            return _.toPairsIn(this.tags);
         },
         topPanel() {
             return [
@@ -75,41 +75,32 @@ export default {
         this.setInitData();
     },
     methods: {
-        async updateTag() {
-            const selectedNodeDT = this.selectedNode.node.data;
-            const tags = { tags: this.tags };
-            const param = { ...tags };
-            const key = `${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}_id`;
-            param[key] = selectedNodeDT.id;
-            const url = `/inventory/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/update`;
-            await this.$http.post(url, param).then((response) => {
-                if (!this.isEmpty(response.data)) {
-                    this.tags = response.data.tags;
-                }
-            }).catch((error) => {
-                console.error(error);
-            });
-        },
         async setInitData() {
             const selectedNodeDT = this.selectedNode.node.data;
+            const key = this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase();
             const param = {};
-            const key = `${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}_id`;
-            param[key] = selectedNodeDT.id;
-            const url = `/inventory/${this.replaceAll(selectedNodeDT.item_type, '_', '-').toLowerCase()}/get`;
-            await this.$http.post(url, param).then((response) => {
-                if (!this.isEmpty(response.data)) {
+            this.idKey = `${key}_id`;
+            param[this.idKey] = selectedNodeDT.id;
+            const url = `/inventory/${key}/get`;
+
+            try {
+                const response = await this.$http.post(url, param);
+                if (response.data) {
                     this.item = {
-                        id: response.data.hasOwnProperty('region_id') ? response.data.region_id : response.data.hasOwnProperty('zone_id') ? response.data.zone_id : response.data.pool_id,
+                        id: response.data[this.idKey],
                         name: response.data.name,
                         create: this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone),
                     };
-                    this.tags = response.data.tags;
+                    this.tagsApi = new DictPanelAPI(fluentApi.inventory()[key]());
+                    this.tagsApi.ts.syncState.dict = response.data.tags;
+                    this.tagsApi.setIdKey(this.idKey);
+                    this.tagsApi.setId(this.item.id);
+                    this.tagsApi.ts.toReadMode();
                     this.isVisible = true;
-                    console.debug('this.item', this.item);
                 }
-            }).catch((error) => {
-                console.error(error);
-            });
+            } catch (e) {
+                console.error(e);
+            }
         },
     },
 };

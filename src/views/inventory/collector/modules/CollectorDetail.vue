@@ -53,9 +53,7 @@ import {
     watch, computed, reactive, toRefs, defineComponent,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import { DictIGState } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
-import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { makeTrItems } from '@/lib/view-helper';
 import config from '@/lib/config';
 
