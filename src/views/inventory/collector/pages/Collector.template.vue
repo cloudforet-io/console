@@ -154,7 +154,6 @@
                             :collector="selectedItem"
                             :loading="collectDataState.loading"
                             :credentials="collectDataState.credentials"
-                            :is-credential-type="collectDataState.isCredentialType"
         />
 
         <p-table-check-modal v-if="checkModalState.mode"
@@ -310,7 +309,6 @@ const crdState = reactive({
 const collectDataState = reactive({
     loading: false,
     credentials: [],
-    isCredentialType: true,
     modalVisible: false,
 });
 
@@ -399,13 +397,11 @@ export const collectorSetup = (props, context, AcHandler) => {
     };
 
     const onClickCollectData = () => {
-        collectDataState.isCredentialType = !!state.selectedItem.plugin_info.credential_id;
         collectDataState.credentials = [];
         collectDataState.modalVisible = true;
     };
 
     const collectByCredential = (crd) => {
-        collectDataState.isCredentialType = true;
         collectDataState.credentials = [crd];
         collectDataState.modalVisible = true;
     };
