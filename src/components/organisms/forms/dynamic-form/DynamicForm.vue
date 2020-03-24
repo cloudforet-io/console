@@ -8,6 +8,7 @@
             <slot>
                 <div class="form-container">
                     <p-text-input v-if="formType === 'input'"
+                                  :class="{'is-invalid': typeof invalid === 'boolean' ? invalid : false}"
                                   v-model="proxyValue"
                                   :type="inputType"
                                   :placeholder="formData.placeholder"
