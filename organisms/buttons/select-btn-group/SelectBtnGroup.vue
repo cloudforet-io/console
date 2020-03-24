@@ -3,7 +3,7 @@
         <p-button v-for="btn in btnsData"
                   :key="btn.name"
                   :style="dynamicStyle"
-                  :class="{ active:selected===btn.name, 'select-btn': !space, 'select-next-btn': space }"
+                  :class="{ active:selected === btn.name, 'select-btn': !space, 'select-next-btn': space }"
                   v-bind="btn.vbind"
                   @click="clickEvent(btn.name)"
         >
@@ -13,21 +13,21 @@
 </template>
 
 <script lang="ts">
-    import {
-        reactive, computed, toRefs,
-         defineComponent,
-    } from '@vue/composition-api';
+import {
+    reactive, computed, toRefs,
+    defineComponent,
+} from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 
     interface BtnType{
-        label: string,
-        name: string
+        label: string;
+        name: string;
     }
     interface Props {
-        buttons:Array<string|BtnType>,
-        selected:string,
-        space?:boolean,
-        dynamicStyle?:Object,
+        buttons: Array<string|BtnType>;
+        selected: string;
+        space?: boolean;
+        dynamicStyle?: Record<string, any>;
     }
 
 
@@ -46,11 +46,11 @@ export default defineComponent({
             default: null,
         },
     },
-    setup(props:Props, context) {
+    setup(props: Props, context) {
         const state = reactive({
             btnsData: computed(() => {
-                const buttons :Array<BtnType> = [];
-                props.buttons.forEach((value:string|BtnType) => {
+                const buttons: Array<BtnType> = [];
+                props.buttons.forEach((value: string|BtnType) => {
                     if (typeof value === 'string') {
                         buttons.push({ name: value, label: value });
                     } else {
@@ -63,7 +63,7 @@ export default defineComponent({
         });
         return {
             ...toRefs(state),
-            clickEvent(name:string) {
+            clickEvent(name: string) {
                 if (props.selected !== name) {
                     context.emit('update:selected', name);
                     context.emit('clickButton', name);
@@ -86,7 +86,6 @@ export default defineComponent({
         &::-webkit-scrollbar {
             display: none !important; /* scroll hide in window,chrome */
         }
-
         .select-btn{
             margin-right: 0.5rem;
             min-width: auto;
