@@ -47,7 +47,7 @@ export default {
     props: {
         height: {
             type: String,
-            default: `calc(100vh - ${styles['lnb-height']})`,
+            default: '100%',
         },
         initWidth: {
             type: Number,
