@@ -28,6 +28,7 @@ export default {
     flex-direction: column;
     height: 100%;
     justify-content: stretch;
+    overflow-y: auto;
 
     .page-contents {
         width: 100%;
