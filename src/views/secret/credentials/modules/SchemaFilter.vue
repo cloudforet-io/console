@@ -2,7 +2,7 @@
     <div class="schema-filter-container">
         <div class="rows">
             <header>Secret Type</header>
-            <div v-for="(scheme, idx) in schema" :key="idx"
+            <div v-for="(scheme, idx) in allSchema" :key="idx"
                  class="filter" :class="{selected: proxySelectedSchemaId === scheme.schema_id}"
                  @click.stop="onClickSchemaText(scheme.schema_id)"
             >
@@ -16,57 +16,58 @@
 <script>
 import { toRefs, reactive, computed } from '@vue/composition-api';
 
-    import PI from '@/components/atoms/icons/PI.vue';
-    import PButton from '@/components/atoms/buttons/Button.vue';
-    import PRadio from '@/components/molecules/forms/radio/Radio.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PRadio from '@/components/molecules/forms/radio/Radio.vue';
 
-    import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/lib/compostion-util';
 
-    export default {
-        name: 'SchemaFilter',
-        events: ['schemaChange'],
-        components: {
-            PI,
-            PButton,
-            PRadio,
+export default {
+    name: 'SchemaFilter',
+    events: ['schemaChange'],
+    components: {
+        PI,
+        PButton,
+        PRadio,
+    },
+    props: {
+        filters: {
+            type: Array,
+            default: () => [],
         },
-        props: {
-            filters: {
-                type: Array,
-                default: () => [],
-            },
-            schema: {
-                type: Array,
-                default: () => [],
-            },
-            selectedSchemaId: {
-                type: String,
-                default: undefined,
-            },
+        schema: {
+            type: Array,
+            default: () => [],
         },
-        setup(props, context) {
-            const state = reactive({
-                search: '',
-                proxySelectedSchemaId: makeProxy('selectedSchemaId', props, context.emit),
-            });
-
-
-            const onSchemaChange = (val) => {
-                context.emit('schemaChange', val);
-            };
-
-            const onClickSchemaText = (val) => {
-                state.proxySelectedSchemaId = val;
-                onSchemaChange(val);
-            };
-
-            return {
-                ...toRefs(state),
-                onSchemaChange,
-                onClickSchemaText,
-            };
+        selectedSchemaId: {
+            type: String,
+            default: null,
         },
-    };
+    },
+    setup(props, context) {
+        const state = reactive({
+            search: '',
+            allSchema: computed(() => [{ schema_id: null, name: 'All' }, ...props.schema]),
+            proxySelectedSchemaId: makeProxy('selectedSchemaId', props, context.emit),
+        });
+
+
+        const onSchemaChange = (val) => {
+            context.emit('schemaChange', val);
+        };
+
+        const onClickSchemaText = (val) => {
+            state.proxySelectedSchemaId = val;
+            onSchemaChange(val);
+        };
+
+        return {
+            ...toRefs(state),
+            onSchemaChange,
+            onClickSchemaText,
+        };
+    },
+};
 </script>
 
 <style lang="postcss" scoped>

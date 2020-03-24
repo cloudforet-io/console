@@ -115,7 +115,7 @@
 </template>
 <script>
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
@@ -215,7 +215,7 @@ const setup = (props, context) => {
     // ];
 
     const schemaTypeItems = computed(() => [
-        { type: 'item', label: 'All', name: null },
+        { type: 'item', label: 'All', name: null},
         ...props.schemaList.map(schema => ({ type: 'item', label: schema.name, name: schema.schema_id })),
     ]);
 
@@ -275,13 +275,8 @@ const setup = (props, context) => {
         }
     };
 
-    const schemaState = reactive({
-        schemaList: [],
-    });
-
     return {
         ...state,
-        ...toRefs(schemaState),
         optionSelected,
         formState,
         dynamicForm,
@@ -319,6 +314,10 @@ export default {
             default: () => ({
                 form: [{}],
             }),
+        },
+        schemaList: {
+            type: Array,
+            default: () => [],
         },
         selectedSchemaId: {
             type: String,

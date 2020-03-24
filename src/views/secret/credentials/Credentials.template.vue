@@ -3,9 +3,9 @@
         <template #sidebar="{width}">
             <div :style="{width: width}">
                 <schema-filter
-                        :schema="schema"
-                        :selected-schema-id.sync="selectedSchemaId"
-                        @schemaChange="schemaChange"
+                    :schema="schema"
+                    :selected-schema-id.sync="selectedSchemaId"
+                    @schemaChange="schemaChange"
                 />
             </div>
         </template>
@@ -138,7 +138,7 @@ import PCredentialsForm from '@/views/secret/credentials/modules/CredentialsForm
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import SchemaFilter from '@/views/secret/credentials/modules/SchemaFilter.vue';
-import {SearchQuery} from "@/components/organisms/search/query-search-bar/autocompleteHandler";
+import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
@@ -159,9 +159,9 @@ export const getDataInputType = () => {
 
 export const CredentialsTableReactive = parent => reactive({
     fields: makeTrItems([
-        ['credential_id', 'COMMON.ID', { style: { width: '400px' } }],
+        // ['credential_id', 'COMMON.ID', { style: { width: '400px' } }],
         ['name', 'COMMON.NAME', { style: { width: '400px' } }],
-        ['secret_type', 'COMMON.ISSUE_TYPE', { style: { width: '400px' } }], //todo: add common.secret_type
+        ['issue_type', 'COMMON.ISSUE_TYPE', { style: { width: '400px' } }], // todo: add common.secret_type
         ['credential_group_id', 'COMMON.GROUP', { style: { width: '800px' }, sortable: false }],
         ['created_at', 'COMMON.CREATED', { style: { width: '300px' } }],
     ],
@@ -339,10 +339,12 @@ export const credentialsSetup = (props, context, eventName) => {
 
     const schemaState = reactive({
         schema: [],
-        selectedSchemaId: undefined,
-        selectedSchemaName: undefined,
-        searchQueries: computed(() => []),
-        //new SearchQuery('name', '=', schemaState.selectedSchemaName)
+        selectedSchemaId: null,
+        selectedScheme: null,
+        searchQueries: computed(() => {
+            if (state.selectedScheme) return [];//[new SearchQuery('name', '=', schemaState.selectedSchemaName)];
+            return [];
+        }),
     });
 
     const getCredentials = () => {
@@ -358,9 +360,9 @@ export const credentialsSetup = (props, context, eventName) => {
     };
 
     const schemaChange = (schema) => {
-        state.selectedSchemaName = schema.name;
+        state.selectedScheme = schema;
         listSchema();
-    }
+    };
 
     listSchema();
 
@@ -392,7 +394,7 @@ export const credentialsSetup = (props, context, eventName) => {
         ...toRefs(schemaState),
         listSchema,
         schemaChange,
-        dynamicFormState
+        dynamicFormState,
     });
 };
 

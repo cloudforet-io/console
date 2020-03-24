@@ -60,11 +60,6 @@ export default {
             try {
                 const res = await context.parent.$http.post('/repository/schema/list');
                 state.schema = res.data.results;
-                if (!state.selectedSchemaId) {
-                    console.log('schema test', state.schema[0])
-                    state.selectedSchemaId = state.schema[0].schema_id;
-                    state.selectedSchemaName = state.schema[0].name;
-                }
                 requestCredentialsList();
             } catch (e) {
                 console.error(e);
