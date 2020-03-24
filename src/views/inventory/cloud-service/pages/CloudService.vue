@@ -63,6 +63,7 @@ export default {
 
         // eslint-disable-next-line camelcase
         const adminParams = computed(() => ({ cloud_services: dvApiHandler.tableTS.selectState.selectItems.map(v => v.cloud_service_id) }));
+        // @ts-ignore
         const adminTabIsShow = tabIsShow(dvApiHandler, state, 'admin');
         const adminIsShow = computed(() => {
             let result = false;
@@ -73,6 +74,7 @@ export default {
         });
 
         const adminApiHandler = new AdminTableAPI('/inventory/cloud-service/member/list', adminParams, undefined, undefined, undefined, undefined, adminIsShow);
+        // @ts-ignore
         const historyTabIsShow = tabIsShow(dvApiHandler, state, 'history');
 
         const historyIsShow = computed(() => {
