@@ -116,13 +116,12 @@ export default defineComponent({
             reset();
         };
 
-        const onSave = async () => {
+        const onSave = () => {
             if (!state.showValidation) state.showValidation = true;
             if (!allValidation()) return;
 
             vm.$emit('update:dict', newDict.value);
             vm.$emit('save', newDict.value);
-            reset();
         };
 
         return {
