@@ -165,7 +165,7 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 
 export const CdgTableReactive = parent => reactive({
     fields: makeTrItems([
-        ['credential_group_id', 'COMMON.ID'],
+        // ['credential_group_id', 'COMMON.ID'],
         ['name', 'COMMON.NAME'],
         ['created_at', 'COMMON.CREAT'],
     ],

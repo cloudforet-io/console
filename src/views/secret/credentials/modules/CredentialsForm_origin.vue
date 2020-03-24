@@ -19,7 +19,7 @@
                                     <PFieldGroup
                                         label="Credentials Name"
                                         :invalid-text="validateLeftHalfAPI.invalidMsg.name"
-                                        :invalid="showValidation && validateLeftHalfAPI.invalidState.name"
+                                        :invalid="validateLeftHalfAPI.invalidState.name"
                                         :valid="validateLeftHalfAPI.validState.name"
                                         :required="true"
                                     >
@@ -32,7 +32,6 @@
                                                     :class="{
                                                         'is-invalid':invalid
                                                     }"
-                                                    @input="validateLeftHalfAPI.fieldValidation('name')"
                                                 />
                                             </p-col>
                                         </template>
@@ -43,7 +42,7 @@
                                 <p-col :col="6">
                                     <p-row style="width: 100%" direction="column">
                                         <PFieldGroup label="Secret Type">
-                                            <PSelectDropdown v-model="formState.schema_type" :items="schemaTypeItems"
+                                            <PSelectDropdown v-model="formState.scheme_type" :items="schemaTypeItems"
                                                              @input="onSchemaTypeChange"
                                             />
                                         </PFieldGroup>
@@ -72,23 +71,22 @@
                             <p-select-btn-group style="min-width: 6rem"
                                                 :space="true"
                                                 :dynamic-style="{'min-width': '96px', 'display': 'inline-flex'}"
-                                                :buttons="inputTypeItems"
-                                                :selected.sync="selectedInputType"
-                                                @clickButton="onChangeInputType"
+                                                :buttons="optionType"
+                                                :selected.sync="optionSelected.selected"
                             />
-                            <PFieldGroup v-if="selectedInputType === 'Form'"
-                                         :invalid-text="validateRightHalfJsonAPI.invalidMsg.form"
-                                         :invalid="validateRightHalfJsonAPI.invalidState.form"
+                            <PFieldGroup v-if="optionSelected.selected === 'form'"
+                                         :invalid-text="validaterightHalfJsonAPI.invalidMsg.form"
+                                         :invalid="validaterightHalfJsonAPI.invalidState.form"
                             >
                                 <template v-slot:default="{invalid}">
-                                    <div v-if="dynamicForm.length > 0" class="form-editor">
+                                    <div v-if="dynamicFormExist" class="form-editor">
                                         <p-dynamic-form v-for="(fm, idx) in dynamicForm" :key="idx"
                                                         v-model="values[fm.key]"
                                                         :form="fm"
-                                                        :invalid="showValidation && vdApi.invalidState[fm.key]"
+                                                        :invalid="vdApi.invalidState[fm.key]"
                                                         :invalid-text="vdApi.invalidMsg[fm.key]"
                                                         :validatable="true"
-                                                        @change="onOptionChange(fm.key)"
+                                                        @change="onOptionChange"
                                         />
                                     </div>
                                     <div v-else style="display:block" class="form-editor invalid-feedback">
@@ -98,9 +96,9 @@
                             </PFieldGroup>
 
                             <PFieldGroup v-else
-                                         :invalid-text="validateRightHalfJsonAPI.invalidMsg.data"
-                                         :invalid="validateRightHalfJsonAPI.invalidState.data"
-                                         :valid="validateRightHalfJsonAPI.validState.data"
+                                         :invalid-text="validaterightHalfJsonAPI.invalidMsg.data"
+                                         :invalid="validaterightHalfJsonAPI.invalidState.data"
+                                         :valid="validaterightHalfJsonAPI.validState.data"
                             >
                                 <template v-slot:default="{invalid}">
                                     <div>
@@ -117,7 +115,7 @@
 </template>
 <script>
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from '@vue/composition-api';
 import { makeTrItems } from '@/lib/view-helper';
 import { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
@@ -138,8 +136,6 @@ import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/Sel
 import PLabel from '@/components/atoms/labels/Label.vue';
 import PDynamicForm, { map, setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
 import _ from 'lodash';
-import fluentApi from '@/lib/fluent-api';
-import schema from '@/lib/fluent-api/repository/schema';
 
 
 export const getDataInputType = () => {
@@ -168,79 +164,65 @@ const components = {
 
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
+    const selectiveOptions = [];
+    const optionSelected = reactive({ selected: 'form' });
 
-    const allItem = { type: 'item', label: 'All', name: null };
-    const schemaAPI = fluentApi.repository().schema().list();
-    const secretAPI = fluentApi.secret().secret();
-    const schemaState = reactive({
-        schemaList: [],
-        selectedSchema: null,
-        dynamicForm: [],
-        values: {},
-        showValidation: false,
-        inputTypeItems: computed(() => {
-            const res = {};
-            // return makeTrItems(res,context.parent, { vbind: { styleType: 'dark', outline: true } })
-            return makeTrItems([
-                ['Json'],
-                ['Form'],
-            ],
-            context.parent, { vbind: { styleType: 'dark', outline: true }});
-        }),
-        selectedInputType: 'Json',
-    });
-    const listSchema = async () => {
-        const res = await schemaAPI.execute();
-        schemaState.schemaList = res.data.results;
-        if (props.selectedSchemaId) {
-            schemaState.selectedSchema = _.find(schemaState.schemaList, { schema_id: props.selectedSchemaId });
-            console.log('selected Schema', schemaState.selectedSchema);
-            schemaState.dynamicForm = schemaState.selectedSchema.fields || [];
-        } else schemaState.selectedSchema = null;
-    };
-    listSchema();
+    // state.selected = reactive({selected: _.isEmpty(getDataInputType()) ? 'json' : 'form'});
+    state.values = {};
 
-    state.selected = reactive({ selected: _.isEmpty(getDataInputType()) ? 'json' : 'form' });
+    if (optionSelected.selected === 'json') {
+        selectiveOptions.push(['json', null, { label: 'Json' }]);
+    } else {
+        selectiveOptions.push(['form', null, { label: 'Form' }]);
+        selectiveOptions.push(['json', null, { label: 'Json' }]);
+    }
 
     const formState = reactive({
         name: '',
         tags: {},
         issue_type: 'credential',
-        schema_type: props.selectedSchemaId,
+        scheme_type: props.selectedSchemaId,
         data: '',
     });
 
-    const onSchemaTypeChange = (name) => {
-        if (name) {
-            schemaState.dynamicForm = _.find(schemaState.schemaList, { schema_id: name }).fields;
-        } else schemaState.dynamicForm = [];
-    };
-    // TODO: form to json, json to form
-    const onChangeInputType = () => {
-        formState.data = '';
-        schemaState.values = {};
-    }
-    const vdApi = setValidation(schemaState.dynamicForm, schemaState.values);
+    const onOptionChange = () => {};
 
-    watch(() => schemaState.dynamicForm, () => {
-        schemaState.values = reactive({});
-        const newVdApi = setValidation(schemaState.dynamicForm, schemaState.values);
+    const onSchemaTypeChange = (id) => {
+        if (id) {
+            props.dynamicFormState.form = _.find(props.schemaList, { schema_id: id }).fields;
+        }
+        props.dynamicFormState.form = [];
+    };
+    onSchemaTypeChange(props.selectedSchemaId);
+
+    const dynamicForm = computed(() => props.dynamicFormState.form);
+    const dynamicFormExist = computed(() => dynamicForm.value.length > 0);
+    const vdApi = setValidation(props.dynamicFormState.form, state.values);
+
+    watch(() => props.dynamicFormState, () => {
+        state.values = reactive({});
+        const newVdApi = setValidation(props.dynamicFormState.form, state.values);
         vdApi.invalidMsg = newVdApi.invalidMsg;
         vdApi.invalidState = newVdApi.invalidState;
         vdApi.fieldValidation = newVdApi.fieldValidation;
         vdApi.allValidation = newVdApi.allValidation;
     });
 
-    const onOptionChange = async (key) => {
-        if (!schemaState.showValidation) return;
-        await vdApi.fieldValidation(key);
-    };
+    // const issueTypeSelectItems = [
+    //     /* TODO:: Remove this comment out part when token feature is ready.
+    //     { type: 'item', label: 'Token', name: 'token' }, */
+    //     { type: 'item', label: 'credential', name: 'credential' },
+    // ];
 
-    const schemaTypeItems = computed(() => {
-        const result = [allItem, ...schemaState.schemaList.map(schema => ({ type: 'item', label: schema.name, name: schema.schema_id }))];
-        console.log('result test', result);
-        return result;
-    });
+    const schemaTypeItems = computed(() => [
+        { type: 'item', label: 'All', name: null},
+        ...props.schemaList.map(schema => ({ type: 'item', label: schema.name, name: schema.schema_id })),
+    ]);
+
+
+    const optionType = makeTrItems(selectiveOptions,
+        context.parent,
+        { vbind: { styleType: 'dark', outline: true } });
 
     const leftHalfValidations = {
         name: [requiredValidation(), credentialsNameValidation(context.parent)],
@@ -250,49 +232,64 @@ const setup = (props, context) => {
         data: [requiredValidation(), jsonParseValidation()],
     };
     const validateLeftHalfAPI = formValidation(formState, leftHalfValidations);
-    const validateRightHalfJsonAPI = formValidation(formState, rightHalfJsonValidations);
+    const validaterightHalfJsonAPI = formValidation(formState, rightHalfJsonValidations);
+
+
     const confirm = async () => {
-        schemaState.showValidation = true;
-        const leftHalfResult = await validateLeftHalfAPI.allValidation();
-        const rightHalfResult = schemaState.selectedInputType === 'Json' ? await validateRightHalfJsonAPI.allValidation() : await vdApi.allValidation();
-
-        if (leftHalfResult && rightHalfResult) {
-            const params = {
-                name: formState.name,
-            };
-            const keyArr = ['name', 'issue_type', 'tags', 'data'];
-
-            if (schemaState.selectedInputType === 'Form') {
-                const formParam = {};
-                for (const [k, v] of Object.entries(schemaState.values)) {
-                    formParam[k] = v;
-                }
-                formState.data = formParam;
-            } else {
-                formState.data = JSON.parse(formState.data);
-            }
-            keyArr.forEach((key) => {
-                if (formState[key]) {
-                    params[key] = formState[key];
-                }
+        if (optionSelected.selected === 'form' && !dynamicFormExist.value) {
+            context.root.$notify({
+                group: 'noticeBottomRight',
+                type: 'alert',
+                title: 'Template unavailable',
+                text: 'Please, check selected plug-in availability!.',
+                duration: 2000,
+                speed: 1000,
             });
-            context.emit('confirm', params);
+            context.emit('close');
+        } else {
+            const leftHalfResult = await validateLeftHalfAPI.allValidation();
+            const rightHalfResult = optionSelected.selected === 'json' ? await validaterightHalfJsonAPI.allValidation() : await vdApi.allValidation();
+
+            if (leftHalfResult && rightHalfResult) {
+                const params = {
+                    name: formState.name,
+                };
+                const keyArr = ['name', 'issue_type', 'tags', 'data'];
+
+                if (optionSelected.selected === 'form') {
+                    const formParam = {};
+                    for (const [k, v] of Object.entries(state.values)) {
+                        formParam[k] = v;
+                    }
+                    formState.data = formParam;
+                } else {
+                    formState.data = JSON.parse(formState.data);
+                }
+                keyArr.forEach((key) => {
+                    if (formState[key]) {
+                        params[key] = formState[key];
+                    }
+                });
+                context.emit('confirm', params);
+            }
         }
     };
 
     return {
         ...state,
-        ...toRefs(schemaState),
+        optionSelected,
         formState,
+        dynamicForm,
+        dynamicFormExist,
         onOptionChange,
         onSchemaTypeChange,
-        onChangeInputType,
         vdApi,
         schemaTypeItems,
+        optionType,
         proxyVisible: makeProxy('visible', props, context.emit),
         confirm,
         validateLeftHalfAPI,
-        validateRightHalfJsonAPI,
+        validaterightHalfJsonAPI,
     };
 };
 
@@ -311,6 +308,16 @@ export default {
         visible: {
             type: Boolean,
             default: false,
+        },
+        dynamicFormState: {
+            type: Object,
+            default: () => ({
+                form: [{}],
+            }),
+        },
+        schemaList: {
+            type: Array,
+            default: () => [],
         },
         selectedSchemaId: {
             type: String,
