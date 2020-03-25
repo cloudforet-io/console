@@ -372,6 +372,7 @@
 	},
 	"TAB": {
 		"ADMIN": "Admin",
+		"CREDENTIALS": "Credentials",
 		"DATA": "Data",
 		"DETAILS": "Details",
 		"HISTORY": "History",

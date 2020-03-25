@@ -68,7 +68,6 @@ import PQuerySearchTags from '@/components/organisms/search/query-search-tags/Qu
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
-import VerticalPageLayout from '@/views/containers/page-layout/VerticalPageLayout.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
@@ -87,7 +86,6 @@ import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origi
 export default {
     name: 'Supervisor',
     components: {
-        VerticalPageLayout,
         PHorizontalLayout,
         PDynamicView,
         PTab,
