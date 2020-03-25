@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import {
+    CollectAction,
     CreateAction, GetAction, ListAction, Resource,
     ResourceActions, SingleDeleteAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
@@ -33,17 +34,33 @@ interface UpdateParameter extends Tags, IdParameter {
     name: string;
 }
 
+export interface CollectParameter extends IdParameter {
+    collect_mode: string;
+    filter?: any;
+    credential_id?: string;
+    credential_group_id?: string;
+}
+
 class Create extends CreateAction<CreateParameter, any> {}
+
 class Update extends UpdateAction<UpdateParameter, any> {
     protected idField = idField;
 }
+
 class Delete extends SingleDeleteAction<IdParameter, any> {
     protected idField = idField;
 }
+
 class Get extends GetAction<IdParameter, CollectorModel> {
     protected idField = idField;
 }
+
 class List extends ListAction<any, CollectorListResp> {}
+
+class Collect extends CollectAction<CollectParameter, any> {
+    protected idField = idField;
+}
+
 export default class Collector extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
     protected name = 'collector';
 
@@ -56,4 +73,6 @@ export default class Collector extends Resource implements ResourceActions<'crea
     get() { return new Get(this.baseUrl); }
 
     list() { return new List(this.baseUrl); }
+
+    collect() { return new Collect(this.baseUrl); }
 }
