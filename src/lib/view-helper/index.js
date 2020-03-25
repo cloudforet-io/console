@@ -48,7 +48,7 @@ export const makeItem = (parent, commonOption, name, trLabel, extra) => {
  *  )
  */
 
-export const makeTrItems = (items, parent, commonOption = {}) => {
+export const makeTrItems = (items, parent=null  , commonOption = {}) => {
     const result = [];
     items.forEach((item) => {
         result.push(makeItem(null, commonOption, ...item));

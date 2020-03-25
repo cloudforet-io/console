@@ -69,6 +69,10 @@ export class ToolboxTableState<
             pageNationValues: undefined,
             padding: true,
             toolboxBackground: true,
+            sortable: true,
+            dragable: true,
+            rowClickMultiSelectMode: true,
+            selectable: true,
         };
     }
 

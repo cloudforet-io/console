@@ -1,15 +1,12 @@
 <template>
-    <div class="error">
-        <div id="notfound">
-            <div class="notfound">
-                <div class="notfound-error">
-                    <h1>Oops!</h1>
-                </div>
-                <h2>{{ errorMessage }}</h2><br>
-                <p>Error code: {{ errorStatus }}</p><br>
-            </div>
+    <div id='oops'>
+        <div id='error-text'>
+            <span>404</span>
+            <p id="error-message">PAGE NOT FOUND</p>
+            <p id="sub-message">The page you are looking for could not be found.</p>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -31,69 +28,66 @@ export default {
 </script>
 
 <style lang="css" scoped>
+    @import url(https://fonts.googleapis.com/css?family=Roboto);
     * {
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
+        paading: 0;
+        margin: 0;
     }
-
-    #notfound .notfound {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        -webkit-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
-    }
-
-    .notfound {
-        max-width: 410px;
-        width: 100%;
+    #oops  {
+        background: #ffffff;
         text-align: center;
-    }
-
-    .notfound .notfound-error {
-        height: 280px;
-        position: relative;
-        z-index: -1;
-    }
-
-    .notfound .notfound-error h1 {
-        font-size: 230px;
-        margin: 0px;
+        margin-bottom: 50px;
         font-weight: 900;
-        position: absolute;
-        left: 50%;
-        -webkit-transform: translateX(-50%);
-        -ms-transform: translateX(-50%);
-        transform: translateX(-50%);
-        -webkit-text-fill-color: transparent;
-        background:url('~@/assets/images/redirect/error/bg.jpg') no-repeat;
-        -webkit-background-clip: text;
-        background-size: cover;
-        background-position: center;
+        font-size: 40px;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        line-height: 1.5em;
+        z-index: 9999;
+        left: 0px;
     }
-
-
-    .notfound h2 {
-        color: #000;
+    #error-text  {
+        top: 40%;
+        position: relative;
+        font-family: 'Roboto', sans-serif;
+    }
+    #error-text #error-message {
+        margin: 60px 0 0 0;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 800;
         font-size: 2rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        margin-top: 0;
     }
-
-    .notfound p {
-        font-size: 1.2rem;
-        font-weight: 300;
+    #error-text #sub-message  {
+        color: #444444;
+        margin: -20px 0 0 0;
+        font-family: 'Roboto', sans-serif;
+        font-weight: lighter;
+        font-size: 1.3rem;
     }
+    #error-text span  {
+        position: relative;
+        background: #4568DC;  /* fallback for old browsers */
+        /*background: -webkit-linear-gradient(to right, #B06AB3, #4568DC);  !* Chrome 10-25, Safari 5.1-6 *!*/
+        /*background: linear-gradient(to right, #B06AB3, #4568DC); !* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ *!*/
+        background-color: #9921e8;
+        background-image: linear-gradient(315deg, #9921e8 0%, #5f72be 74%);
+        color: #fff;
+        font-size: 450%;
+        padding: 0 20px;
+        border-radius: 5px;
+        font-weight: bolder;
+        transition: all .5s;
+        box-shadow: 5px 5px 5px 0px rgba(50, 50, 50, 0.4);
+    }
+    /* CSS Error Page Responsive */
+    @media only screen and (max-width:640px) {
 
-
-    @media only screen and (max-width: 767px) {
-        .notfound .notfound-error {
-            height: 142px;
+        #error-text span  {
+            font-size: 200%;
         }
-        .notfound .notfound-error h1 {
-            font-size: 112px;
+
+        #error-text a:hover  {
+            color: #fff;
         }
     }
 </style>

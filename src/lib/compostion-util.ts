@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import VueI18n from 'vue-i18n';
 import { debug } from 'webpack';
 import { isNotEmpty } from '@/lib/util';
-import {BaseTableAPI} from "@/lib/api/table";
+import { BaseTableAPI } from '@/lib/api/table';
 
 /**
  * make proxy computed that same name as props
@@ -16,7 +16,7 @@ import {BaseTableAPI} from "@/lib/api/table";
  * @return {Ref<*>}
  */
 /* eslint-disable arrow-parens */
-export const makeProxy = <T extends any>(name:string, props:any = null, emit:any = null):Ref<T> => {
+export const makeProxy = <T extends any>(name: string, props: any = null, emit: any = null): Ref<T> => {
     let _props = props;
     let _emit = emit;
     if (!_props && !_emit) {
@@ -47,7 +47,7 @@ export const makeProxy = <T extends any>(name:string, props:any = null, emit:any
  * @param name
  * @return {function(...[*]=)}
  */
-export const makeByPass = (emit:any, name:string) => (...event: any) => {
+export const makeByPass = (emit: any, name: string) => (...event: any) => {
     emit(name, ...event);
 };
 
@@ -57,7 +57,7 @@ export const makeByPass = (emit:any, name:string) => (...event: any) => {
  * @param eventName
  * @param handler
  */
-export const mountBusEvent = (bus:any, eventName:string, handler:Function) => {
+export const mountBusEvent = (bus: any, eventName: string, handler: Function) => {
     bus.$on(eventName, handler);
     onUnmounted(() => bus.$off(eventName, handler));
 };
@@ -67,7 +67,7 @@ export const mountBusEvent = (bus:any, eventName:string, handler:Function) => {
  * @param disabled
  * @return {{onMouseOut: onMouseOut, isMouseOver: Ref<HasDefined<S> extends true ? S : RefValue<T>>, onMouseOver: onMouseOver}}
  */
-export const mouseOverState = (disabled?:boolean) => {
+export const mouseOverState = (disabled?: boolean) => {
     const disable = disabled || false;
     const isMouseOver = ref(false);
     const onMouseOver = () => {
@@ -93,7 +93,7 @@ export const mouseOverState = (disabled?:boolean) => {
  * @param eventName
  * @param func
  */
-export const windowEventMount = (eventName:string, func:any) => {
+export const windowEventMount = (eventName: string, func: any) => {
     onMounted(() => window.addEventListener(eventName, func));
     onUnmounted(() => window.removeEventListener(eventName, func));
 };
@@ -103,11 +103,11 @@ export const windowEventMount = (eventName:string, func:any) => {
  * @param eventName
  * @param func
  */
-export const documentEventMount = (eventName:string, func:any) => {
+export const documentEventMount = (eventName: string, func: any) => {
     onMounted(() => document.addEventListener(eventName, func));
     onUnmounted(() => document.removeEventListener(eventName, func));
 };
-type validationFunction = (value:any, data?: any)=> boolean|Promise<boolean>;
+type validationFunction = (value: any, data?: any, options?: any) => boolean|Promise<boolean>;
 type message = string|VueI18n.TranslateResult;
 
 export class Validation {
@@ -116,7 +116,7 @@ export class Validation {
      * @param func validation func, if invalid return false
      * @param invalidMessage
      */
-    constructor(public func:validationFunction, public invalidMessage:message) { }
+    public constructor(public func: validationFunction, public invalidMessage: message) { }
 }
 
 /**
@@ -133,7 +133,7 @@ export class Validation {
  *          }
  *      }
  */
-export const formValidation = (data:any, validation:object) => {
+export const formValidation = (data: any, validation: object) => {
     const validationFields = Object.keys(validation);
     const invalidMsg = reactive(Object.fromEntries(validationFields.map(x => [x, ''])));
     const invalidState = reactive(Object.fromEntries(validationFields.map(x => [x, false])));
@@ -144,7 +144,7 @@ export const formValidation = (data:any, validation:object) => {
      * @param name
      * @return {boolean}
      */
-    const fieldValidation = async (name:string) => {
+    const fieldValidation = async (name: string) => {
         const vds = validation[name];
         for (let i = 0; i < vds.length; i++) {
             const vd = vds[i];
@@ -165,7 +165,7 @@ export const formValidation = (data:any, validation:object) => {
      * @return {boolean}
      */
     const allValidation = async () => {
-        let result :boolean = true;
+        let result = true;
         const vds = Object.keys(validation);
         for (let i = 0; i < vds.length; i++) {
             // eslint-disable-next-line no-await-in-loop
@@ -186,9 +186,9 @@ export const formValidation = (data:any, validation:object) => {
     };
 };
 
-export const requiredValidation = (invalidMessage:message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
+export const requiredValidation = (invalidMessage: message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
 
-export const jsonParseValidation = (invalidMessage:message) => new Validation((value) => {
+export const jsonParseValidation = (invalidMessage: message) => new Validation((value) => {
     try {
         if (value[0] !== '{' && value[value.length - 1] !== '}') return false;
         JSON.parse(value);
@@ -198,13 +198,13 @@ export const jsonParseValidation = (invalidMessage:message) => new Validation((v
     return true;
 },
 invalidMessage || 'Invalid Json string format!');
-export const numberMinValidation = (min:number, invalidMessage?:message) => new Validation(value => (value ? Number(value) >= min : true), invalidMessage || `value must bigger then ${min}`);
-export const numberMaxValidation = (max:number, invalidMessage?:message) => new Validation(value => (value ? Number(value) <= max : true), invalidMessage || `value must smaller then ${max}`);
-export const lengthMinValidation = (min:number, invalidMessage?:message) => new Validation(value => (value ? value.length >= min : true), invalidMessage || `value length must bigger then ${min}`);
-export const lengthMaxValidation = (max:number, invalidMessage?:message) => new Validation(value => (value ? value.length <= max : true), invalidMessage || `value length must smaller then ${max}`);
-export const checkTimeZoneValidation = (invalidMessage:message) => new Validation(value => (value ? moment.tz.names().indexOf(value) !== -1 : true), invalidMessage || 'can not find timezone');
+export const numberMinValidation = (min: number, invalidMessage?: message) => new Validation(value => (value ? Number(value) >= min : true), invalidMessage || `value must bigger then ${min}`);
+export const numberMaxValidation = (max: number, invalidMessage?: message) => new Validation(value => (value ? Number(value) <= max : true), invalidMessage || `value must smaller then ${max}`);
+export const lengthMinValidation = (min: number, invalidMessage?: message) => new Validation(value => (value ? value.length >= min : true), invalidMessage || `value length must bigger then ${min}`);
+export const lengthMaxValidation = (max: number, invalidMessage?: message) => new Validation(value => (value ? value.length <= max : true), invalidMessage || `value length must smaller then ${max}`);
+export const checkTimeZoneValidation = (invalidMessage: message) => new Validation(value => (value ? moment.tz.names().indexOf(value) !== -1 : true), invalidMessage || 'can not find timezone');
 
-export const credentialsNameValidation = (parent:any, invalidMessage:message) => new Validation(async (value) => {
+export const credentialsNameValidation = (parent: any, invalidMessage: message) => new Validation(async (value) => {
     let result = false;
     await parent.$http.post('/secret/credential/list', { name: value, domain_id: parent.$ls.domain.state.domainId }).then((res) => {
         if (res.data.total_count === 0) {
@@ -216,7 +216,7 @@ export const credentialsNameValidation = (parent:any, invalidMessage:message) =>
     return result;
 }, invalidMessage || 'same name exists!');
 
-export const userIDValidation = (parent:any, invalidMessage:message) => new Validation(async (value) => {
+export const userIDValidation = (parent: any, invalidMessage: message) => new Validation(async (value) => {
     let result = false;
     // eslint-disable-next-line camelcase
     await parent.$http.post('/identity/user/get', { user_id: value  }).catch((error) => {
@@ -228,11 +228,11 @@ export const userIDValidation = (parent:any, invalidMessage:message) => new Vali
 }, invalidMessage || 'same ID exists!');
 
 interface tabState {
-    activeTab:Ref<string>;
-    activeMultiTab:Ref<string>
+    activeTab: Ref<string>;
+    activeMultiTab: Ref<string>;
 }
 
-export const tabIsShow = (handler:BaseTableAPI<any, any>, state:tabState, tabName:string) => computed(() => {
+export const tabIsShow = (handler: BaseTableAPI<any, any>, state: tabState, tabName: string) => computed(() => {
     let result = false;
     if (handler.tableTS.selectState.isSelectOne) {
         result = state.activeTab.value === tabName;

@@ -96,18 +96,34 @@
                                  color="transparent inherit"
                             />
                         </span>
-                        <span class="name">Secret</span>
+                        <span class="name">Secret Manager</span>
                     </router-link>
                 </li>
 
                 <li>
                     <router-link class="service" to="/secret/credentials-group">
-                        Credentials Group
+                        Secret Group
                     </router-link>
                 </li>
                 <li>
                     <router-link class="service" to="/secret/credentials">
-                        Credentials
+                        Secret
+                    </router-link>
+                </li>
+                <li>
+                    <router-link class="group" to="/plugin">
+                        <span class="icon">
+                            <p-i name="ic_identity"
+                                 color="transparent inherit"
+                            />
+                        </span>
+                        <span class="name">Plugin</span>
+                    </router-link>
+                </li>
+
+                <li>
+                    <router-link class="service" to="/plugin/supervisor">
+                        Supervisor
                     </router-link>
                 </li>
             </ul>

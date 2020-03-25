@@ -3,14 +3,14 @@ import Casual from 'casual-browserify';
 import originCasual from '@/lib/casual';
 import serverModels, { serverCasual } from '@/lib/mock/casual/server';
 import memberModels, { memberCasual } from '@/lib/mock/casual/member';
-import collectorModels, { collectorCasual } from '@/lib/mock/casual/collector';
+import collectorModels, { CollectorCasual } from '@/lib/mock/casual/collector';
 import credentialModels, { credentialsCasual } from '@/lib/mock/casual/credentials';
 import repositoryModels, { repositoryCasual } from '@/lib/mock/casual/repository';
 import pluginModels, { pluginCasual } from '@/lib/mock/casual/plugin';
 
 type originCasualType = Casual.Generators & Casual.Casual;
 type casualType = originCasualType &
-    collectorCasual & serverCasual &
+    CollectorCasual & serverCasual &
     memberCasual & credentialsCasual &
     repositoryCasual & pluginCasual;
 

@@ -14,12 +14,14 @@ export default {
     extends: CredentialsTemplate,
     setup(props, context) {
         const credentialsEventNames = eventNames;
+        credentialsEventNames.getSchemaList = 'getSchemaList';
         credentialsEventNames.getCredentialsList = 'getCredentialsData';
         credentialsEventNames.tagConfirmEvent = 'credentialsTagConfirmEvent';
         credentialsEventNames.createCredentials = 'createCredentials';
         credentialsEventNames.updateCredentials = 'updateCredentials';
         credentialsEventNames.deleteCredentials = 'deleteCredentials';
         credentialsEventNames.getPluginCredentialsForm = 'getPluginCredentialsForm';
+        credentialsEventNames.getSchemaTypeForm = 'getSchemaTypeForm';
 
         const state = credentialsSetup(props, context, credentialsEventNames);
 
@@ -28,7 +30,7 @@ export default {
             query: computed(() => (defaultQuery(
                 state.thisPage, state.pageSize,
                 state.sortBy, state.sortDesc,
-                state.searchText,
+                state.searchText, state.searchQueries,
             ))),
         });
 
@@ -49,6 +51,18 @@ export default {
             } catch (e) {
                 console.error(e);
                 state.loading = false;
+            }
+        };
+
+
+        const getSchemaList = async () => {
+            state.schema = [];
+            try {
+                const res = await context.parent.$http.post('/repository/schema/list');
+                state.schema = res.data.results;
+                requestCredentialsList();
+            } catch (e) {
+                console.error(e);
             }
         };
 
@@ -116,27 +130,27 @@ export default {
             });
         };
 
-        const getPluginCredentialsForm = async (items) => {
-            const params = {
-                plugin_id: items.plugin_id,
-            };
+        // const getPluginCredentialsForm = async (items) => {
+        //     const params = {
+        //         plugin_id: items.plugin_id,
+        //     };
+        //
+        //     try {
+        //         const res = await context.parent.$http.post('/repository/plugin/get', params);
+        //         state.dynamicFormState.form = res.data.template.credentials;
+        //     } catch (e) {
+        //         console.error(e);
+        //         state.loading = false;
+        //     }
+        // };
 
-            try {
-                const res = await context.parent.$http.post('/repository/plugin/get', params);
-                state.daynamicForm.form = res.data.template.credentials;
-            } catch (e) {
-                console.error(e);
-                state.loading = false;
-            }
-        };
-
+        mountBusEvent(credentialsEventBus, credentialsEventNames.getSchemaList, getSchemaList);
         mountBusEvent(credentialsEventBus, credentialsEventNames.getCredentialsList, requestCredentialsList);
         mountBusEvent(credentialsEventBus, credentialsEventNames.tagConfirmEvent, credentialsTagConfirm);
         mountBusEvent(credentialsEventBus, credentialsEventNames.createCredentials, createCredentials);
         mountBusEvent(credentialsEventBus, credentialsEventNames.deleteCredentials, deleteCredentials);
-        mountBusEvent(credentialsEventBus, credentialsEventNames.getPluginCredentialsForm, getPluginCredentialsForm);
-
-        requestCredentialsList();
+        // mountBusEvent(credentialsEventBus, credentialsEventNames.getPluginCredentialsForm, getPluginCredentialsForm);
+        // requestCredentialsList();
         return {
             ...toRefs(state),
         };

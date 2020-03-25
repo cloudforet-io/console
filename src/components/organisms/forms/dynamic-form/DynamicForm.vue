@@ -8,6 +8,7 @@
             <slot>
                 <div class="form-container">
                     <p-text-input v-if="formType === 'input'"
+                                  :class="{'is-invalid': typeof invalid === 'boolean' ? invalid : false}"
                                   v-model="proxyValue"
                                   :type="inputType"
                                   :placeholder="formData.placeholder"
@@ -44,10 +45,10 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import _ from 'lodash';
 import {
-    ref, computed, reactive, toRefs, watch,
+    ref, computed, reactive, toRefs, defineComponent,
 } from '@vue/composition-api';
 import {
     formValidation, makeProxy, requiredValidation,
@@ -158,7 +159,7 @@ export const setValidation = (forms, values) => {
     };
 };
 
-export default {
+export default defineComponent({
     name: 'PDynamicForm',
     events: ['input', 'change'],
     components: {
@@ -197,7 +198,7 @@ export default {
             ...changeActions,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

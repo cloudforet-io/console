@@ -8,6 +8,7 @@ const knobMapper = {
     Boolean: boolean,
     Number: number,
     Object: object,
+    Array: object,
 }
 
 const getKnobProp = (k, v, knob, option) => {
@@ -18,7 +19,7 @@ const getKnobProp = (k, v, knob, option) => {
     } else return knob(k, v);
 };
 
-export const getKnobProps = (props, data = {}, knobs = {}, options = {}) => {
+export const getKnobProps = (props, data = {}, disable = {}, knobs = {}, options = {}) => {
     const res = {};
 
     if(props instanceof Array) {
@@ -27,15 +28,16 @@ export const getKnobProps = (props, data = {}, knobs = {}, options = {}) => {
     };
 
     _.forEach(props, (v, k) => {
-        res[k] = {};
-
         let type = v.type || v;
         if (type instanceof Array) { type = type[0] };
         const knob = knobs[k] || knobMapper[type.name];
         const defaultVal = data[k] || v.default;
         const option = options[k];
 
-        res[k].default = getKnobProp(k, defaultVal, knob, option);
+        if (!disable[k]) {
+            res[k] = {};
+            res[k].default = getKnobProp(k, defaultVal, knob, option);
+        }
     })
 
     return res;

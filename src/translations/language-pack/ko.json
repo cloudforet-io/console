@@ -183,7 +183,7 @@
 		"STATUS": "상태(Status)",
 		"SUMMARY": "",
 		"TAG": "태그",
-		"TIMEZONE": "타임존",
+		"TIMEZONE": "표준 시간대",
 		"TITLE": "{1} {0}",
 		"TR_NOTI": "아이디·비번 찾기",
 		"TR_NOTI_CON": "",
@@ -329,6 +329,14 @@
 		"SCHEDULE": "스케줄",
 		"TAG": "태그",
 		"VM": "VM"
+	},
+	"PLUGIN": {
+		"BTN": {
+			"RECOVERY": "복구"
+		},
+		"TAB": {
+			"PLUGIN": "플러그인"
+		}
 	},
 	"SECRET": {
 		"BTN": {

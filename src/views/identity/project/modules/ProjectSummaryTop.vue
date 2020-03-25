@@ -5,10 +5,10 @@
                       :item="item"
                       :defs="topPanel"
         />
-        <p-dict-panel v-show="isVisible"
-                      ref="tagPanel"
-                      :dict.sync="tags"
-                      @confirm="updateTag"
+        <p-dict-panel v-if="isVisible"
+                      :dict.sync="tagsApi.ts.syncState.dict"
+                      :edit-mode.sync="tagsApi.ts.syncState.editMode"
+                      v-on="tagsApi.ts.listeners"
         />
     </div>
 </template>
@@ -16,7 +16,9 @@
 <script>
 import _ from 'lodash';
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { fluentApi } from '@/lib/fluent-api';
 
 export default {
     name: 'ProjectSummary',
@@ -41,15 +43,13 @@ export default {
             renderTitle: null,
             renderData: [],
             item: {},
-            tags: {},
+            idKey: '',
+            tagsApi: null,
         };
     },
     computed: {
         topPanelTitle() {
             return this.$t('COMMON.BASE_INFO');
-        },
-        destructTags() {
-            return _.toPairsIn(this.tags);
         },
         topPanel() {
             return [
@@ -75,36 +75,31 @@ export default {
         this.setInitData();
     },
     methods: {
-        async updateTag() {
-            const selectedNodeDT = this.selectedNode.node.data;
-            const tags = { tags: this.tags };
-            const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id, ...tags } : { project_id: selectedNodeDT.id, ...tags };
-            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/update`;
-            await this.$http.post(url, param).then((response) => {
-                if (!this.isEmpty(response.data)) {
-                    this.tags = response.data.tags;
-                }
-            }).catch((error) => {
-                console.error(error);
-            });
-        },
         async setInitData() {
             const selectedNodeDT = this.selectedNode.node.data;
-            const param = (selectedNodeDT.item_type === 'PROJECT_GROUP') ? { project_group_id: selectedNodeDT.id } : { project_id: selectedNodeDT.id };
-            const url = `/identity/${this.replaceAll(selectedNodeDT.item_type, '_', '-')}/get`;
-            await this.$http.post(url, param).then((response) => {
-                if (!this.isEmpty(response.data)) {
+            const key = selectedNodeDT.item_type.toLowerCase();
+            this.idKey = `${key}_id`;
+            const param = { [this.idKey]: selectedNodeDT.id };
+            const url = `/identity/${_.kebabCase(key)}/get`;
+
+            try {
+                const response = await this.$http.post(url, param);
+                if (response.data) {
                     this.item = {
-                        id: response.data.hasOwnProperty('project_group_id') ? response.data.project_group_id : response.data.project_id,
+                        id: response.data[this.idKey],
                         name: response.data.name,
                         create: this.getDatefromTimeStamp(response.data.created_at.seconds, localStorage.timeZone),
                     };
-                    this.tags = response.data.tags;
+                    this.tagsApi = new DictPanelAPI(fluentApi.identity()[_.camelCase(key)]());
+                    this.tagsApi.ts.syncState.dict = response.data.tags;
+                    this.tagsApi.setIdKey(this.idKey);
+                    this.tagsApi.setId(this.item.id);
+                    this.tagsApi.ts.toReadMode();
                     this.isVisible = true;
                 }
-            }).catch((error) => {
-                console.error(error);
-            });
+            } catch (e) {
+                console.error(e);
+            }
         },
     },
 };

@@ -242,7 +242,6 @@ export default {
 <style lang="postcss" scoped>
 .card-list {
     height: 100%;
-    overflow-y: scroll;
     padding-top: 1.625rem;
     padding-bottom: 2.25rem;
     .beta {

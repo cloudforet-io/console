@@ -27,6 +27,11 @@ export interface BaseActionState<T> {
     parameter: T ;
 }
 
+export interface GetActionState<T> {
+    parameter: T;
+    only: string[];
+}
+
 export interface Sort {
     key: string;
     desc?: boolean;
@@ -69,21 +74,31 @@ export interface DataSourceItem {
     view_option?: any;
 }
 
-export interface historyItem {
+export interface DynamicViewMetaData {
+    name: string;
+    data_source: DataSourceItem[];
+}
+
+export interface DefaultMetaData{
+    details?: DynamicViewMetaData;
+    sub_data?: DynamicViewMetaData;
+}
+
+export interface HistoryItem {
     update_at: number;
     key: string;
     update_by: string;
 }
 
 export interface CollectionInfo {
-    update_history: historyItem[];
+    update_history: HistoryItem[];
     state: string;
     collectors: string[];
     pinned_keys: string[];
 
 }
 
-export interface timestamp {
+export interface TimeStamp {
     seconds: string;
     nanos: number;
 }
@@ -91,4 +106,15 @@ export interface timestamp {
 export interface ListType<T> {
     results: T[];
     total_count: number;
+}
+
+export interface ReferenceInfo {
+    resource_id?: string;
+    external_link?: string;
+}
+
+export interface Tags {
+    tags?: {
+        [key: string]: any;
+    };
 }

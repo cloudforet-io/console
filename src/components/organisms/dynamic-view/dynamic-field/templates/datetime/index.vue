@@ -37,7 +37,7 @@ export default {
             if (props.view_option.display_format) {
                 result = time.toFormat(props.view_option.display_format);
             } else {
-                result = time.toFormat('yyyy-LL-dd HH:mm:ss ZZZZ');
+                result = time.toFormat('yyyy-LL-dd HH:mm:ss'); // 'yyyy-LL-dd HH:mm:ss ZZZZ' For display Timezone
             }
         }
         return h('span', data, result);

@@ -2,8 +2,7 @@
     <general-page-layout class="collector-page">
         <p-horizontal-layout :line="false">
             <template #container="{ height }">
-                <p-toolbox-table :items="items"
-                                 :fields="fields"
+                <p-toolbox-table :items="items" :fields="fields"
                                  :selectable="true"
                                  :sortable="true"
                                  :dragable="true"
@@ -96,7 +95,7 @@
                :active-tab.sync="activeTab"
         >
             <template #detail>
-                <collector-detail :item="selectedItem" :tags-fetch-api="tagsApi.api" />
+                <collector-detail :item="selectedItem" :tags-fetch-api="tagsApi" />
             </template>
             <template #credentials>
                 <collector-credentials :collector="selectedItem"
@@ -155,7 +154,6 @@
                             :collector="selectedItem"
                             :loading="collectDataState.loading"
                             :credentials="collectDataState.credentials"
-                            :is-credential-type="collectDataState.isCredentialType"
         />
 
         <p-table-check-modal v-if="checkModalState.mode"
@@ -180,6 +178,7 @@ import {
 import { timestampFormatter, collectorStateFormatter } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import collectorEventBus from '@/views/inventory/collector/CollectorEventBus';
+import { fluentApi } from '@/lib/fluent-api';
 
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -310,7 +309,6 @@ const crdState = reactive({
 const collectDataState = reactive({
     loading: false,
     credentials: [],
-    isCredentialType: true,
     modalVisible: false,
 });
 
@@ -347,7 +345,7 @@ const scheduleState = reactive({
     deleteVisible: false,
 });
 
-export const collectorSetup = (props, context, AcHandler, tagsApi) => {
+export const collectorSetup = (props, context, AcHandler) => {
     const state = reactive({
         ...setTableData(props, context),
         ...setTabData(props, context),
@@ -359,7 +357,6 @@ export const collectorSetup = (props, context, AcHandler, tagsApi) => {
         updateModalState,
         scheduleState,
         AcHandler,
-        tagsApi,
     });
 
     const onClickUpdate = () => {
@@ -400,13 +397,11 @@ export const collectorSetup = (props, context, AcHandler, tagsApi) => {
     };
 
     const onClickCollectData = () => {
-        collectDataState.isCredentialType = !!state.selectedItem.plugin_info.credential_id;
         collectDataState.credentials = [];
         collectDataState.modalVisible = true;
     };
 
     const collectByCredential = (crd) => {
-        collectDataState.isCredentialType = true;
         collectDataState.credentials = [crd];
         collectDataState.modalVisible = true;
     };
@@ -421,6 +416,7 @@ export const collectorSetup = (props, context, AcHandler, tagsApi) => {
         onClickDelete,
         onClickCollectData,
         collectByCredential,
+        tagsApi: fluentApi.inventory().collector().update(),
     };
 };
 

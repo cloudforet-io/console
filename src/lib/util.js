@@ -100,7 +100,7 @@ export const platformBadgeColor = Object.freeze({
     WINDOWS: { backgroundColor: styles.secondary },
 });
 export const getTimezone = () => localStorage.getItem('timezone') || 'UTC';
-export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(ts)).setZone(getTimezone()).toFormat('yyyy-LL-dd HH:mm:ss ZZZZ');
+export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(ts)).setZone(getTimezone()).toFormat('yyyy-LL-dd HH:mm:ss'); // 'yyyy-LL-dd HH:mm:ss ZZZZ' for display Timezone
 
 // formatter
 export const timestampFormatter = value => getLocalDatetimeFromTimeStamp(value.seconds);
