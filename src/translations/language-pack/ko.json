@@ -372,6 +372,7 @@
 	},
 	"TAB": {
 		"ADMIN": "관리자",
+		"CREDENTIALS": "암호(Credentials)",
 		"DATA": "데이터",
 		"DETAILS": "상세 정보",
 		"HISTORY": "수집 기록",
