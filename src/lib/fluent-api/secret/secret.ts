@@ -32,7 +32,19 @@ class Delete extends SingleDeleteAction<IdParameter, any> {
 class Get extends GetAction<IdParameter, any> {
     protected idField = idField;
 }
-class List extends ListAction<any, SecretListResp> {}
+class List extends ListAction<any, ListType<any>> {
+    setSecretId(id: string): this{
+        this.apiState.extraParameter.credential_id = id;
+        delete this.apiState.extraParameter.credential_group_id;
+        return this.clone();
+    }
+
+    setSecretGroupId(id: string): this{
+        this.apiState.extraParameter.credential_group_id = id;
+        delete this.apiState.extraParameter.credential_id;
+        return this.clone();
+    }
+}
 export default class Secret extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
     protected name = 'credential';
 
