@@ -114,7 +114,7 @@ export default {
                 { title: this.$t('COL_NM.MEMORY'), contents: this.base.memory, copyFlag: true },
                 { title: this.$t('COL_NM.O_TYPE'), contents: this.serverData.os_type, copyFlag: true },
                 { title: this.$t('COL_NM.O_DIS'), contents: this.os.os_distro, copyFlag: true },
-                { title: this.$t('COL_NM.PROJ'), contents: this.serverData.project_id, copyFlag: true },
+                { title: this.$t('COL_NM.PROJECT'), contents: this.serverData.project_id, copyFlag: true },
                 { title: this.$t('COL_NM.O_DETAIL'), contents: this.os.os_details, copyFlag: true },
                 { title: this.$t('COL_NM.REGION'), contents: this.regionInfo.region_id, copyFlag: true },
                 { title: this.$t('COL_NM.O_ARCH'), contents: this.os.os_arch, copyFlag: true },

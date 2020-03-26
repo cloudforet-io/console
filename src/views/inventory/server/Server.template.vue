@@ -206,7 +206,7 @@ export const serverTableReactive = parent => reactive({
         ['os_distro', 'COMMON.O_DIS'],
         ['server_type', 'COMMON.SE_TYPE'],
         ['platform_type', 'COMMON.PLATFORM'],
-        ['project', 'COMMON.PROJ'],
+        ['project', 'COMMON.PROJECT'],
         ['pool', 'COMMON.POOL'],
         ['updated_at', 'COMMON.UPDATE'],
     ],

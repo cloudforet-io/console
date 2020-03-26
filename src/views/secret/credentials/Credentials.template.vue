@@ -161,7 +161,8 @@ export const CredentialsTableReactive = parent => reactive({
     fields: makeTrItems([
         // ['credential_id', 'COMMON.ID', { style: { width: '400px' } }],
         ['name', 'COMMON.NAME', { style: { width: '400px' } }],
-        ['issue_type', 'COMMON.ISSUE_TYPE', { style: { width: '400px' } }], // todo: add common.secret_type
+        ['provider', 'COMMON.PROVIDER', { style: { width: '400px' } }],
+        ['secret_type', 'COMMON.SECRET_TYPE', { style: { width: '400px' } }], // todo: add common.secret_type
         ['credential_group_id', 'COMMON.GROUP', { style: { width: '800px' }, sortable: false }],
         ['created_at', 'COMMON.CREATED', { style: { width: '300px' } }],
     ],

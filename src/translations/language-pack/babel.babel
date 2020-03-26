@@ -91,27 +91,6 @@
                             </folder_node>
                         </children>
                     </folder_node>
-                    <concept_node>
-                        <name>None</name>
-                        <definition_loaded>false</definition_loaded>
-                        <description></description>
-                        <comment>폴더 유지를 위한 번역</comment>
-                        <default_text></default_text>
-                        <translations>
-                            <translation>
-                                <language>en-US</language>
-                                <approved>false</approved>
-                            </translation>
-                            <translation>
-                                <language>ko-KR</language>
-                                <approved>false</approved>
-                            </translation>
-                            <translation>
-                                <language>ja-JP</language>
-                                <approved>false</approved>
-                            </translation>
-                        </translations>
-                    </concept_node>
                 </children>
             </folder_node>
             <folder_node>
@@ -901,27 +880,6 @@
                     </concept_node>
                     <concept_node>
                         <name>COUNT</name>
-                        <definition_loaded>false</definition_loaded>
-                        <description></description>
-                        <comment></comment>
-                        <default_text></default_text>
-                        <translations>
-                            <translation>
-                                <language>en-US</language>
-                                <approved>false</approved>
-                            </translation>
-                            <translation>
-                                <language>ko-KR</language>
-                                <approved>false</approved>
-                            </translation>
-                            <translation>
-                                <language>ja-JP</language>
-                                <approved>false</approved>
-                            </translation>
-                        </translations>
-                    </concept_node>
-                    <concept_node>
-                        <name>CREAT</name>
                         <definition_loaded>false</definition_loaded>
                         <description></description>
                         <comment></comment>
@@ -2727,7 +2685,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>PG_GR</name>
+                        <name>PROJECT_GRP</name>
                         <definition_loaded>false</definition_loaded>
                         <description></description>
                         <comment></comment>
@@ -2790,7 +2748,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>PG_ID</name>
+                        <name>PROJECT_ID</name>
                         <definition_loaded>false</definition_loaded>
                         <description></description>
                         <comment></comment>
@@ -2811,7 +2769,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>PG_NM</name>
+                        <name>PROJECT_NM</name>
                         <definition_loaded>false</definition_loaded>
                         <description></description>
                         <comment></comment>
@@ -3084,7 +3042,7 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>PROJ</name>
+                        <name>PROJECT</name>
                         <definition_loaded>false</definition_loaded>
                         <description></description>
                         <comment></comment>
@@ -6424,7 +6382,7 @@
                         </children>
                     </folder_node>
                     <concept_node>
-                        <name>JASON_ALERT</name>
+                        <name>JSON_ALERT</name>
                         <definition_loaded>false</definition_loaded>
                         <description></description>
                         <comment></comment>
@@ -6461,6 +6419,27 @@
                             </translation>
                             <translation>
                                 <language>ja-JP</language>
+                                <approved>false</approved>
+                            </translation>
+                        </translations>
+                    </concept_node>
+                    <concept_node>
+                        <name>SECRET_TYPE</name>
+                        <definition_loaded>false</definition_loaded>
+                        <description></description>
+                        <comment></comment>
+                        <default_text></default_text>
+                        <translations>
+                            <translation>
+                                <language>en-US</language>
+                                <approved>false</approved>
+                            </translation>
+                            <translation>
+                                <language>ja-JP</language>
+                                <approved>false</approved>
+                            </translation>
+                            <translation>
+                                <language>ko-KR</language>
                                 <approved>false</approved>
                             </translation>
                         </translations>
