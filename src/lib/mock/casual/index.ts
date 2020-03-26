@@ -7,12 +7,14 @@ import collectorModels, { CollectorCasual } from '@/lib/mock/casual/collector';
 import credentialModels, { credentialsCasual } from '@/lib/mock/casual/credentials';
 import repositoryModels, { repositoryCasual } from '@/lib/mock/casual/repository';
 import pluginModels, { pluginCasual } from '@/lib/mock/casual/plugin';
+import serviceAccountModels, { serviceAccountCasual } from '@/lib/mock/casual/serviceAccount';
 
 type originCasualType = Casual.Generators & Casual.Casual;
 type casualType = originCasualType &
     CollectorCasual & serverCasual &
     memberCasual & credentialsCasual &
-    repositoryCasual & pluginCasual;
+    repositoryCasual & pluginCasual &
+    serviceAccountCasual;
 
 export type modelType = (casual: casualType) => casualType;
 
@@ -25,6 +27,7 @@ const models: modelType[][] = [
     credentialModels,
     repositoryModels,
     pluginModels,
+    serviceAccountModels,
 ];
 
 const getModels = (origin: originCasualType): casualType => {

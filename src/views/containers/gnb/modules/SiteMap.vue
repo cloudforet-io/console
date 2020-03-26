@@ -85,8 +85,13 @@
                     </router-link>
                 </li>
                 <li>
-                    <router-link class="service last" to="/identity/project">
+                    <router-link class="service" to="/identity/project">
                         Project
+                    </router-link>
+                </li>
+                <li>
+                    <router-link class="service last" to="/identity/cloud-account">
+                       Cloud Account
                     </router-link>
                 </li>
                 <li>
@@ -100,11 +105,11 @@
                     </router-link>
                 </li>
 
-                <li>
-                    <router-link class="service" to="/secret/credentials-group">
-                        Secret Group
-                    </router-link>
-                </li>
+<!--                <li>-->
+<!--                    <router-link class="service" to="/secret/credentials-group">-->
+<!--                        Secret Group-->
+<!--                    </router-link>-->
+<!--                </li>-->
                 <li>
                     <router-link class="service" to="/secret/credentials">
                         Secret

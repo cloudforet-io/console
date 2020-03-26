@@ -8,7 +8,7 @@
             <template #default="{node}">
                 <span class="tree-scope"
                       @click="onNodeClick(node, $event)"
-                      @click.right.stop.prevent="onNodeRightClick(node)"
+                      @click.right.stop.prevent="onNodeRightClick(node, $event)"
                 >
                     <span>
                         <slot name="icon"
@@ -90,8 +90,8 @@ export default defineComponent({
             }
         };
 
-        const onNodeRightClick = (node) => {
-            emit('node:clicked:right', node);
+        const onNodeRightClick = (node, e) => {
+            emit('node:clicked:right', node, e);
         };
 
         const deleteNode = (node, propagation: boolean = true, multiple: boolean = false) => {

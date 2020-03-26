@@ -76,6 +76,34 @@ export abstract class BaseTableFluentAPI<
         this.defaultReset();
     }
 }
+
+export class SearchTableFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
+    action extends QueryAPI<any, any> = QueryAPI<parameter, resp>,
+    > extends BaseTableFluentAPI<parameter, resp, action> {
+    tableTS: T;
+    constructor(
+        action: action,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+    ) {
+        super(action);
+        this.tableTS = new SearchTableToolSet(initData, initSyncData) as T;
+
+    }
+    protected getAction = () => this.getDefaultAction().setKeyword(this.tableTS.searchText.value);
+
+    resetAll = () => {
+        this.defaultReset();
+        this.tableTS.searchText.value = '';
+    };
+
+}
+
 export interface ACHandlerMeta {
     handlerClass: typeof baseAutocompleteHandler;
     args: any;
@@ -88,6 +116,8 @@ export const defaultACHandler: ACHandlerMeta = {
         suggestKeys: [],
     },
 };
+
+
 
 export class QuerySearchTableFluentAPI<
     parameter = any,
@@ -397,3 +427,31 @@ export class QuerySearchTableAPI<initData = any, initSyncData = any,
         this.tableTS.querySearch.state.searchText = '';
     };
 }
+
+// export class TabQuerySearchTableAPI<initData = any, initSyncData = any,
+//     T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>> extends QuerySearchTableAPI<initData, initSyncData> {
+//     public constructor(
+//         url: string, only?: string[], extraParams?: object, fixSearchQuery: SearchQueryType[] = [],
+//         initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
+//         acHandlerMeta: ACHandlerMeta = defaultACHandler,
+//         isShow: forceRefArg<boolean>,
+//     ) {
+//         super(url, only, extraParams, fixSearchQuery, initData, initSyncData, acHandlerMeta);
+//         this.isShow = isShow;
+//         onMounted(() => {
+//             watch([isShow], (origin, before) => {
+//                 let show;
+//                 let preShow;
+//                 if (origin) {
+//                     show = origin[0];
+//                 }
+//                 if (before) {
+//                     preShow = before[0];
+//                 }
+//                 if (show && (show !== preShow)) {
+//                     this.getData();
+//                 }
+//             });
+//         });
+//     }
+// }
