@@ -21,7 +21,8 @@
         @clickRefresh="apiHandler.getData"
     >
         <template #toolbox-left>
-            <div class="w-full">
+            <slot name="toolbox-left" />
+            <div class="left-toolbox-item w-1/2">
                 <p-search :search-text.sync="apiHandler.tableTS.searchText.value" @onSearch="apiHandler.getData" />
             </div>
         </template>
@@ -110,3 +111,12 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+    .left-toolbox-item{
+        margin-left: 1rem;
+    &:last-child {
+         flex-grow: 1;
+     }
+    }
+
+</style>
