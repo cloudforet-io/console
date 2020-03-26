@@ -24,16 +24,18 @@
     </p-box-layout>
 </template>
 
-<script>
-import { ref, onMounted, getCurrentInstance } from '@vue/composition-api';
+<script lang="ts">
+import {
+    ref, onMounted, getCurrentInstance, defineComponent,
+} from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
+// @ts-ignore
 import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 import PBoxLayout from '@/components/molecules/layouts/box-layout/BoxLayout.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 
-export default {
+export default defineComponent({
     name: 'PTagsInput',
-    events: ['update:tags', 'change'],
     directives: {
         focus: {
             inserted(el, binding) {
@@ -69,6 +71,7 @@ export default {
             default: true,
         },
     },
+    // @ts-ignore
     setup(props, { emit, refs }) {
         const tagTools = tagList(makeProxy('tags', props, emit), props.noDuplicate);
         const value = ref(props.placeholder);
@@ -82,10 +85,10 @@ export default {
             emit('change', tagTools.tags);
         };
 
-        const vm = getCurrentInstance();
+        const vm: any = getCurrentInstance();
 
-        const box = ref(null);
-        const fake = ref(null);
+        const box: any = ref(null);
+        const fake: any = ref(null);
         const inputWidth = ref(0);
         const maxWidth = ref(0);
 
@@ -122,7 +125,7 @@ export default {
             setWidth,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
