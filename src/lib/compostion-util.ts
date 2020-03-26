@@ -116,7 +116,7 @@ export class Validation {
      * @param func validation func, if invalid return false
      * @param invalidMessage
      */
-    public constructor(public func: validationFunction, public invalidMessage: message) { }
+    constructor(public func: validationFunction, public invalidMessage: message) { }
 }
 
 /**
@@ -146,6 +146,7 @@ export const formValidation = (data: any, validation: object) => {
      */
     const fieldValidation = async (name: string) => {
         const vds = validation[name];
+        // eslint-disable-next-line no-plusplus
         for (let i = 0; i < vds.length; i++) {
             const vd = vds[i];
             // eslint-disable-next-line no-await-in-loop
@@ -167,6 +168,7 @@ export const formValidation = (data: any, validation: object) => {
     const allValidation = async () => {
         let result = true;
         const vds = Object.keys(validation);
+        // eslint-disable-next-line no-plusplus
         for (let i = 0; i < vds.length; i++) {
             // eslint-disable-next-line no-await-in-loop
             const validateResult = await fieldValidation(vds[i]);
@@ -186,7 +188,7 @@ export const formValidation = (data: any, validation: object) => {
     };
 };
 
-export const requiredValidation = (invalidMessage: message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
+export const requiredValidation = (invalidMessage?: message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
 
 export const jsonParseValidation = (invalidMessage: message) => new Validation((value) => {
     try {
@@ -219,7 +221,7 @@ export const credentialsNameValidation = (parent: any, invalidMessage: message) 
 export const userIDValidation = (parent: any, invalidMessage: message) => new Validation(async (value) => {
     let result = false;
     // eslint-disable-next-line camelcase
-    await parent.$http.post('/identity/user/get', { user_id: value  }).catch((error) => {
+    await parent.$http.post('/identity/user/get', { user_id: value }).catch((error) => {
         if (error.response.data.error.code === 'ERROR_NOT_FOUND') {
             result = true;
         }
@@ -227,12 +229,12 @@ export const userIDValidation = (parent: any, invalidMessage: message) => new Va
     return result;
 }, invalidMessage || 'same ID exists!');
 
-interface tabState {
+interface TabState {
     activeTab: Ref<string>;
     activeMultiTab: Ref<string>;
 }
 
-export const tabIsShow = (handler: BaseTableAPI<any, any>, state: tabState, tabName: string) => computed(() => {
+export const tabIsShow = (handler: BaseTableAPI<any, any>, state: TabState, tabName: string) => computed(() => {
     let result = false;
     if (handler.tableTS.selectState.isSelectOne) {
         result = state.activeTab.value === tabName;

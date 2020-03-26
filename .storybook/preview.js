@@ -6,7 +6,6 @@ import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 
 import Vue from 'vue';
-import BootstrapVue from 'bootstrap-vue';
 import store from '@/store';
 import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
@@ -22,7 +21,6 @@ import "@/styles/style.scss";
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
 Vue.mixin(Util);
-Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
 Vue.use(SvgIcon, {

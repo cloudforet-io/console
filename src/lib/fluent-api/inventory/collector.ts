@@ -35,7 +35,7 @@ interface UpdateParameter extends Tags, IdParameter {
 }
 
 export interface CollectParameter extends IdParameter {
-    collect_mode: string;
+    collect_mode?: string;
     filter?: any;
     credential_id?: string;
     credential_group_id?: string;
