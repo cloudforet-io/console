@@ -1,0 +1,53 @@
+<template>
+    <div class="item-container" :class="{active: active}" v-on="$listeners">
+        <slot name="side">
+            <p-i :name="icon" width="2rem" height="2rem" />
+        </slot>
+        <div class="flex-grow pl-2">
+            <slot name="title">
+                <p class="title">
+                    {{ title }}
+                </p>
+            </slot>
+            <slot name="contents" />
+        </div>
+        <slot name="extra" />
+    </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import { selectableItemProps, SelectableItemPropsType } from '@/components/molecules/selectable-item/SelectableItem.toolset';
+
+import PI from '@/components/atoms/icons/PI.vue';
+
+export default defineComponent({
+    name: 'SelectableItem',
+    components: { PI },
+    props: selectableItemProps,
+    setup(props: SelectableItemPropsType) {
+        return {
+        };
+    },
+});
+</script>
+
+<style lang="postcss" scoped>
+    .item-container {
+        @apply flex p-2 items-center justify-between w-full bg-white cursor-pointer;
+        &:hover {
+            @apply bg-gray3;
+        }
+        &.active {
+            @apply bg-blue-200 text-secondary;
+            &:hover {
+                @apply bg-gray3;
+            }
+        }
+        /* TODO: disabled item style */
+    }
+.title {
+    @apply text-sm;
+    color: inherit;
+}
+</style>
