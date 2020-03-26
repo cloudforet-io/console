@@ -2,12 +2,13 @@
 import {
     GetAction, GetDataAction, ListAction,
     Resource,
-    ResourceActions, UpdateAction,
+    ResourceActions, SubMultiItemAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
     CollectionInfo, DataSourceItem, ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
 
+const idField = 'server_id';
 
 interface ServerModel {
     server_id: string;
@@ -25,20 +26,33 @@ interface ServerGetParameter {
 }
 
 class Get extends GetAction<ServerGetParameter, ServerModel> {
-    protected idField = 'server_id'
+    protected idField = idField
 }
 
 class Update extends UpdateAction<any, any> {
-    protected idField = 'server_id'
+    protected idField = idField
 }
 
 
 class List extends ListAction<any, ListType<ServerModel>> {}
 
 class GetData extends GetDataAction<any, ListType<any>> {
-    protected idField = 'server_id'
+    protected idField = idField
 }
-export default class Server extends Resource implements ResourceActions<'get'| 'list'|'getData'> {
+
+class ChangeProject extends SubMultiItemAction<any,any>{
+    path = 'change-project'
+    protected idField = 'project_id'
+
+    protected subIdsField = 'servers'
+
+    setReleaseProject(){
+        this.apiState.parameter.release_project = true
+        return this.clone();
+    }
+
+}
+export default class Server extends Resource implements ResourceActions<'get'| 'list'|'getData'|'changeProject'|'update'> {
     protected name = 'server';
 
     get(): Get { return new Get(this.baseUrl); }
@@ -48,4 +62,6 @@ export default class Server extends Resource implements ResourceActions<'get'| '
     getData(): GetData { return new GetData(this.baseUrl); }
 
     update() { return new Update(this.baseUrl); }
+
+    changeProject(){return new ChangeProject(this.baseUrl);}
 }

@@ -382,8 +382,14 @@ export const serverSetup = (props, context, eventName,apiHandler,  ChangeProject
     const clickProject = () => {
         projectModalVisible.value = true;
     };
+    const changeProjectAction = fluentApi.inventory().server().changeProject();
     const changeProject = async (node?:ProjectNode|null) => {
-        await ChangeProjectAPI.fetchData(apiHandler.tableTS.selectState.firstSelectItem.server_id , node ? node.data.id : undefined);
+        const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
+        if (node){
+            await action.setId(node.data.id).execute()
+        } else {
+            await action.setReleaseProject().execute()
+        }
         await apiHandler.getData();
         projectModalVisible.value = false;
     };
