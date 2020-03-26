@@ -1,7 +1,7 @@
 <template>
     <div>
         <p-selectable-item v-for="(item, idx) in items" :key="getItem(item, mapper.key)"
-                           :icon="getItem(item, mapper.icon)"
+                           :icon-url="getItem(item, mapper.iconUrl)"
                            :title="getItem(item, mapper.title)"
                            :active="proxySelectedIndexes.includes(idx)"
                            :disabled="proxyDisabledIndexes.includes(idx)"
@@ -42,6 +42,7 @@ export default defineComponent({
         const onItemClick = (item, idx) => {
             const foundIdx = _.indexOf(state.proxySelectedIndexes, idx);
             if (foundIdx !== -1) {
+                if (props.mustSelect && state.proxySelectedIndexes.length === 1) return;
                 state.proxySelectedIndexes.splice(foundIdx, 1);
                 vm.$emit('unselected', item, idx, state.proxySelectedIndexes);
             } else if (props.multiSelectable || state.proxySelectedIndexes.length === 0) {

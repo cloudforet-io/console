@@ -33,7 +33,7 @@ const getState = (props, context) => {
 export const defaultCase = () => ({
     components: { PSelectableItem },
     props: getKnobProps(selectableItemProps, {
-        icon: 'aws-ec2',
+        iconUrl: 'https://assets-console-cloudone-dev.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
         title: 'EC2 Collector',
     }),
     template: `
@@ -53,7 +53,6 @@ export const defaultCase = () => ({
 export const extraSlot = () => ({
     components: { PSelectableItem },
     props: getKnobProps(selectableItemProps, {
-        icon: 'aws-ec2',
         title: 'EC2 Collector',
     }),
     template: `
