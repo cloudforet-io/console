@@ -186,7 +186,7 @@ export const formValidation = (data: any, validation: object) => {
     };
 };
 
-export const requiredValidation = (invalidMessage: message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
+export const requiredValidation = (invalidMessage?: message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
 
 export const jsonParseValidation = (invalidMessage: message) => new Validation((value) => {
     try {

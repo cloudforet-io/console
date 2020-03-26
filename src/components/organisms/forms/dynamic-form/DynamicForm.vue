@@ -48,10 +48,10 @@
 <script lang="ts">
 import _ from 'lodash';
 import {
-    ref, computed, reactive, toRefs, defineComponent,
+    computed, reactive, toRefs, defineComponent,
 } from '@vue/composition-api';
 import {
-    formValidation, makeProxy, requiredValidation,
+    formValidation, requiredValidation,
 } from '@/lib/compostion-util';
 
 
@@ -161,7 +161,6 @@ export const setValidation = (forms, values) => {
 
 export default defineComponent({
     name: 'PDynamicForm',
-    events: ['input', 'change'],
     components: {
         PFieldGroup,
         PTextInput,

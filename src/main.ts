@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueCookies from 'vue-cookies';
-import BootstrapVue from 'bootstrap-vue';
 import VueInputAutowidth from 'vue-input-autowidth';
 import VueAlertify from 'vue-alertify';
 import velocity from 'velocity-animate';
@@ -22,7 +21,6 @@ import '@/styles/style.scss';
 Vue.mixin(Util);
 Vue.use(VueCookies);
 Vue.use(VueCompositionApi);
-Vue.use(BootstrapVue);
 Vue.use(VueAlertify);
 Vue.use(VueInputAutowidth);
 Vue.use(Notifications, { velocity });
