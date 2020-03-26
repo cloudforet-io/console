@@ -28,8 +28,8 @@
                     @changeSort="getServers"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary-dark" :disabled="selectIndex.length === 0" @click="clickCollectData">
-                            <!--                        :disabled="true" @click="clickCollectData"-->
+                        <p-button style-type="primary-dark" :disabled="true">
+                            <!--                        :disabled="selectIndex.length === 0" @click="clickCollectData"-->
                             {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
