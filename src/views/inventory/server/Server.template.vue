@@ -28,7 +28,8 @@
                     @changeSort="getServers"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary-dark" :disabled="true" @click="clickCollectData">
+                        <p-button style-type="primary-dark" :disabled="selectIndex.length === 0" @click="clickCollectData">
+                            <!--                        :disabled="true" @click="clickCollectData"-->
                             {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
@@ -154,6 +155,11 @@
             @confirm="checkModalConfirm"
         />
         <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
+
+        <s-collect-modal v-if="collectModalVisible"
+                         :visible.sync="collectModalVisible" :resources="getSelectServerItems"
+                         id-key="server_id" filter-key="server_id" type="SERVER"
+        />
     </general-page-layout>
 </template>
 
@@ -194,6 +200,7 @@ import {
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { ChangeServerProject, MockChangeProject } from '@/lib/api/fetch';
+import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 
 export const serverTableReactive = parent => reactive({
     fields: makeTrItems([
@@ -254,7 +261,7 @@ export const eventNames = {
     deleteServer: '',
 };
 
-export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectAPI:ChangeServerProject) => {
+export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectAPI: ChangeServerProject) => {
     const eventBus = serverEventBus;
     const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
@@ -278,7 +285,7 @@ export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectA
         isSelectedOne: computed(() => tableState.selectIndex.length === 1),
         isSelectedMulti: computed(() => tableState.selectIndex.length > 1),
     });
-    const state:any = requestToolboxTableMetaReactive();
+    const state: any = requestToolboxTableMetaReactive();
     state.sortBy = 'name';
     const getServers = () => {
         eventBus.$emit(eventName.getServerList);
@@ -307,7 +314,7 @@ export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectA
         });
         return items;
     });
-    const getSelectServerIds = computed(() => (getSelectServerItems.value ? getSelectServerItems.value.map((v:any) => v.server_id) : []));
+    const getSelectServerIds = computed(() => (getSelectServerItems.value ? getSelectServerItems.value.map((v: any) => v.server_id) : []));
     const getFirstSelectServerItem = computed(() => (getSelectServerItems.value.length >= 1 ? getSelectServerItems.value[0] : {}));
     const getSubData = computed(() => _.get(getFirstSelectServerItem.value, ['metadata', 'sub_data'], []));
     const getFirstSelectServerId = computed(() => (getSelectServerIds.value.length >= 1 ? getSelectServerIds.value[0] : ''));
@@ -391,23 +398,28 @@ export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectA
     const clickProject = () => {
         projectModalVisible.value = true;
     };
-    const changeProject = async (node?:ProjectNode|null) => {
+    const changeProject = async (node?: ProjectNode|null) => {
         await ChangeProjectAPI.fetchData(getSelectServerIds.value, node ? node.data.id : undefined);
         getServers();
         projectModalVisible.value = false;
     };
+
+    const collectModalState = reactive({
+        collectModalVisible: false,
+    });
     return reactive({
         ...toRefs(state),
         ...toRefs(tableState),
         ...toRefs(tabData),
         ...toRefs(tabAction),
+        ...toRefs(collectModalState),
         tags,
         dropdown,
         serverStateFormatter,
         timestampFormatter,
         platformBadgeFormatter,
         clickCollectData() {
-            console.debug('add');
+            collectModalState.collectModalVisible = true;
         },
         getServers,
         clickMenuEvent(menuName) {
@@ -463,12 +475,13 @@ export default {
         PIconButton,
         PDynamicView,
         SProjectTreeModal,
+        SCollectModal,
     },
     setup(props, context) {
         const dataBind = reactive({
             items: computed(() => []),
         });
-        const state:any = serverSetup(
+        const state: any = serverSetup(
             props,
             context,
             dataBind.items,
