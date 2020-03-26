@@ -6,16 +6,15 @@ import {
 import {
     ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
-import { CollectorPluginModel } from '@/lib/fluent-api/inventory/collector-plugin';
 
-const idField = 'credential_id';
+const idField = 'service_account_id';
 
 interface IdParameter {
     [idField]: string;
 }
 
 
-export type SecretListResp = ListType<any>
+export type ServiceAccountListResp = ListType<any>
 
 interface CreateParameter extends Tags {
     name: string;
@@ -32,21 +31,9 @@ class Delete extends SingleDeleteAction<IdParameter, any> {
 class Get extends GetAction<IdParameter, any> {
     protected idField = idField;
 }
-class List extends ListAction<any, ListType<any>> {
-    setSecretId(id: string): this{
-        this.apiState.extraParameter.credential_id = id;
-        delete this.apiState.extraParameter.credential_group_id;
-        return this.clone();
-    }
-
-    setSecretGroupId(id: string): this{
-        this.apiState.extraParameter.credential_group_id = id;
-        delete this.apiState.extraParameter.credential_id;
-        return this.clone();
-    }
-}
-export default class Secret extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
-    protected name = 'credential';
+class List extends ListAction<any, ServiceAccountListResp> {}
+export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
+    protected name = 'service-account';
 
     create() { return new Create(this.baseUrl); }
 

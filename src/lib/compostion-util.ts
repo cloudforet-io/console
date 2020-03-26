@@ -219,8 +219,8 @@ export const credentialsNameValidation = (parent: any, invalidMessage: message) 
 export const userIDValidation = (parent: any, invalidMessage: message) => new Validation(async (value) => {
     let result = false;
     // eslint-disable-next-line camelcase
-    await parent.$http.post('/identity/user/get', { user_id: value, domain_id: parent.$ls.domain.state.domainId }).then().catch((error) => {
-        if (error.code === 'ERROR_NOT_FOUND') {
+    await parent.$http.post('/identity/user/get', { user_id: value  }).catch((error) => {
+        if (error.response.data.error.code === 'ERROR_NOT_FOUND') {
             result = true;
         }
     });

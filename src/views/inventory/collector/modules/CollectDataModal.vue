@@ -40,20 +40,16 @@
                     </p>
                     <p-field-group :label="isCredentialType ?$t('COMMON.CREDENTIAL') :$t('COMMON.CREDENTIAL_GRP')">
                         <div v-if="isCredentialType">
-                            <p-text-input :value="selectedCrd ? selectedCrd.name : ''"
+                            <p-text-input :value="credentials[0] ? credentials[0].name : ''"
                                           disabled
                             />
                         </div>
                         <div v-else>
-                            <p-dropdown-menu-btn :menu="crdsMenu" @clickMenuEvent="onClickCrdMenu">
-                                {{ crdsMenu[crdMenuIdx].label }}
-                            </p-dropdown-menu-btn>
+                            <p-select-dropdown v-model="selectedCrdId" :items="crdsMenu" />
                         </div>
                     </p-field-group>
                     <p-field-group :label="$t('COMMON.COL_MODE')">
-                        <p-dropdown-menu-btn :menu="collectModeMenu">
-                            {{ collectModeMenu[collectModeIdx].label }}
-                        </p-dropdown-menu-btn>
+                        <p-select-dropdown v-model="selectedCollectMode" :items="collectModeMenu" />
                     </p-field-group>
                 </p-col>
                 <p-col class="right-container">
@@ -84,27 +80,31 @@
     </p-button-modal>
 </template>
 
-<script>
-import { toRefs, reactive, computed } from '@vue/composition-api';
+<script lang="ts">
+import {
+    toRefs, reactive, computed, defineComponent, SetupContext,
+} from '@vue/composition-api';
 import _ from 'lodash';
 import config from '@/lib/config';
 import { makeTrItems } from '@/lib/view-helper';
-import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
 import { makeProxy } from '@/lib/compostion-util';
-import { defaultAutocompleteHandler } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+// @ts-ignore
 import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PTextInput from '@/components/atoms/inputs/TextInput.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
+import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/SelectDropdown.vue';
+import { fluentApi } from '@/lib/fluent-api';
+import { CollectParameter } from '@/lib/fluent-api/inventory/collector';
+import { AxiosResponse } from 'axios';
 
 
-export default {
+export default defineComponent({
     name: 'CollectDataModal',
     components: {
         PButtonModal,
@@ -115,45 +115,48 @@ export default {
         PCol,
         PTextInput,
         PDropdownMenuBtn,
+        PSelectDropdown,
     },
     props: {
-        collector: Object,
+        collector: {
+            type: Object,
+            default: () => ({}),
+        },
         visible: Boolean,
-        loading: Boolean,
-        credentials: Array,
     },
-    setup(props, context) {
+    setup(props, context: SetupContext) {
         const state = reactive({
+            loading: false,
+            credentials: [],
             proxyVisible: makeProxy('visible', props, context.emit),
             isCredentialType: computed(() => !!props.collector.plugin_info.credential_id),
             showValidation: false,
-            collectModeIdx: 0,
             collectModeMenu: makeTrItems([
                 ['ALL', 'COMMON.ALL'],
                 ['CREATE', 'BTN.CREATE'],
                 ['UPDATE', 'BTN.UPDATE'],
             ], context.parent, { type: 'item' }),
+            selectedCollectMode: 'ALL',
             image: computed(() => _.get(props.collector, 'tags.icon', config.get('COLLECTOR_IMG'))),
             version: computed(() => _.get(props.collector, 'plugin_info.version', '')),
             description: computed(() => _.get(props.collector, 'tags.description', '')),
             filterFormats: computed(() => _.get(props.collector, 'plugin_info.options.filter_format', [])),
             filters: {},
             confirmBtnStyle: computed(() => {
-                const defaultStyle = { style: { padding: 0 } };
-                defaultStyle.styleType = props.loading ? 'gray2' : 'primary-dark';
+                const defaultStyle: any = { style: { padding: 0 } };
+                defaultStyle.styleType = state.loading ? 'gray2' : 'primary-dark';
                 return defaultStyle;
             }),
             crdsMenu: computed(() => [
+                // @ts-ignore
                 { type: 'item', label: context.parent.$t('COMMON.ALL'), name: 'all' },
-                ...props.credentials.map(crd => ({ type: 'item', label: crd.name, name: crd.credential_id })),
+                ...state.credentials.map((crd: any) => ({ type: 'item', label: crd.name, name: crd.credential_id })),
             ]),
-            crdMenuIdx: 0,
-            selectedCrd: computed(() => {
-                if (state.isCredentialType) return props.credentials[0];
-                if (state.crdMenuIdx === 0) return null;
-                return props.credentials[state.crdMenuIdx - 1];
-            }),
+            selectedCrdId: 'all',
         });
+
+        const collectorApi = fluentApi.inventory().collector();
+        const secretManagerApi = fluentApi.secret();
 
         let vdApi = setValidation(state.filterFormats, state.filters);
 
@@ -164,56 +167,76 @@ export default {
         };
 
         const onClickReset = () => {
-            if (props.loading) return;
+            if (state.loading) return;
 
-            state.collectModeIdx = 0;
+            state.selectedCollectMode = 'ALL';
             state.showValidation = false;
             state.filters = {};
             vdApi = setValidation(state.filterFormats, state.filters);
-            state.crdMenuIdx = 0;
+            state.selectedCrdId = 'all';
         };
 
-        const getParams = () => {
-            const params = {
+        const getParams = (): CollectParameter => {
+            const params: CollectParameter = {
                 // eslint-disable-next-line camelcase
                 collector_id: props.collector.collector_id,
                 // eslint-disable-next-line camelcase
-                collect_mode: state.collectModeMenu[state.collectModeIdx].name,
+                collect_mode: state.selectedCollectMode,
             };
 
             if (!_.isEmpty(state.filters)) params.filter = state.filters;
 
             // eslint-disable-next-line camelcase
-            if (state.selectedCrd) params.credential_id = state.selectedCrd.credential_id;
+            if (state.selectedCrdId === 'all') params.credential_group_id = props.collector.plugin_info.credential_group_id;
             // eslint-disable-next-line camelcase
-            else params.credential_group_id = props.collector.plugin_info.credential_group_id;
+            else params.credential_id = state.selectedCrdId;
 
             return params;
         };
         const onClickCollectConfirm = async () => {
-            if (props.loading) return;
+            state.loading = true;
             state.showValidation = true;
             if (await vdApi.allValidation()) {
-                CollectorEventBus.$emit('collectData', getParams());
+                try {
+                    await collectorApi.collect().setParameter(getParams()).execute();
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'success',
+                        text: 'Collect Data',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                } catch (e) {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Fail',
+                        text: 'Request Fail',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                }
             }
+            state.loading = false;
         };
 
-        const onClickCrdMenu = (name, idx) => {
-            state.crdMenuIdx = idx;
-        };
 
-        const listCredentials = () => {
-            if (props.credentials.length > 0) return;
-
-            const params = {};
+        const listCredentials = async () => {
+            if (state.credentials.length > 0) return;
+            state.loading = true;
+            let res: AxiosResponse;
             if (state.isCredentialType) {
-                // eslint-disable-next-line camelcase
-                params.credential_id = props.collector.plugin_info.credential_id;
+                res = await secretManagerApi.secret().list()
+                    .setSecretId(props.collector.plugin_info.credential_id)
+                    .execute();
             } else {
-                // eslint-disable-next-line camelcase
-                params.credential_group_id = props.collector.plugin_info.credential_group_id;
+                res = await secretManagerApi.secret().list()
+                    .setSecretGroupId(props.collector.plugin_info.credential_group_id)
+                    .execute();
             }
-            CollectorEventBus.$emit('listCredentials', params);
+            state.credentials = res.data.results;
+            state.loading = false;
         };
 
         listCredentials();
@@ -224,10 +247,9 @@ export default {
             onChange,
             onClickReset,
             onClickCollectConfirm,
-            onClickCrdMenu,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

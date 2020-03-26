@@ -367,6 +367,10 @@ export abstract class GetDataAction<parameter, resp> extends QueryAPI<parameter,
     }
 }
 
+export abstract class CollectAction<parameter, resp> extends SetParameterAction<parameter, resp> {
+    protected path = 'collect';
+}
+
 export type ResourceActions<actions extends string> = { [key in actions]: (...args: any[]) => ActionAPI<any, any> };
 
 export abstract class Resource {
