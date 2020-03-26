@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-list-item
+        <p-menu-item
             v-for="(item, idx) in getSelectedData"
             :key="idx"
             :type="'CON'"
@@ -13,12 +13,12 @@
 </template>
 <script>
 import _ from 'lodash';
-import PListItem from '@/components/molecules/list-items/ListItem';
+import PMenuItem from '@/components/molecules/menu-item/MenuItem.vue';
 
 export default {
     name: 'ProjectContext',
     components: {
-        PListItem,
+        PMenuItem,
     },
     props: {
         contextData: {
