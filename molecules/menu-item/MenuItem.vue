@@ -14,7 +14,7 @@
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
-    name: 'PListItem',
+    name: 'PMenuItem',
     components: { PI },
     props: {
         contents: {

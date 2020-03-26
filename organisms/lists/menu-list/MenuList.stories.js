@@ -11,7 +11,7 @@ export const defaultCase = () => ({
     components: { PMenuList },
     props: {
         listItems: {
-            default: object('list-items', [
+            default: object('menu-item', [
                 { key: 'item1', contents: 'item1', indent: 0 },
                 { key: 'item2', contents: 'item2', indent: 1 },
                 { key: 'item3', contents: 'item3' },
@@ -42,7 +42,7 @@ export const activatorSlotCase = () => ({
     components: { PMenuList },
     props: {
         listItems: {
-            default: object('list-items', [
+            default: object('menu-item', [
                 { key: 'item1', contents: 'item1', indent: 0 },
                 { key: 'item2', contents: 'item2', indent: 1 },
                 { key: 'item3', contents: 'item3' },
@@ -80,7 +80,7 @@ export const activatorContentsSlotCase = () => ({
     components: { PMenuList },
     props: {
         listItems: {
-            default: object('list-items', [
+            default: object('menu-item', [
                 { key: 'item1', contents: 'item1', indent: 0 },
                 { key: 'item2', contents: 'item2', indent: 1 },
                 { key: 'item3', contents: 'item3' },
