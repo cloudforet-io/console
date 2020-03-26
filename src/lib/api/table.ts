@@ -427,3 +427,31 @@ export class QuerySearchTableAPI<initData = any, initSyncData = any,
         this.tableTS.querySearch.state.searchText = '';
     };
 }
+
+// export class TabQuerySearchTableAPI<initData = any, initSyncData = any,
+//     T extends QuerySearchTableToolSet<initData, initSyncData> = QuerySearchTableToolSet<initData, initSyncData>> extends QuerySearchTableAPI<initData, initSyncData> {
+//     public constructor(
+//         url: string, only?: string[], extraParams?: object, fixSearchQuery: SearchQueryType[] = [],
+//         initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{},
+//         acHandlerMeta: ACHandlerMeta = defaultACHandler,
+//         isShow: forceRefArg<boolean>,
+//     ) {
+//         super(url, only, extraParams, fixSearchQuery, initData, initSyncData, acHandlerMeta);
+//         this.isShow = isShow;
+//         onMounted(() => {
+//             watch([isShow], (origin, before) => {
+//                 let show;
+//                 let preShow;
+//                 if (origin) {
+//                     show = origin[0];
+//                 }
+//                 if (before) {
+//                     preShow = before[0];
+//                 }
+//                 if (show && (show !== preShow)) {
+//                     this.getData();
+//                 }
+//             });
+//         });
+//     }
+// }
