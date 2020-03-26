@@ -1,7 +1,10 @@
 <template>
     <div class="item-container" :class="{active: active}" v-on="$listeners">
         <slot name="side">
-            <p-i :name="icon" width="2rem" height="2rem" />
+            <p-lazy-img :img-url="iconUrl"
+                        :error-icon="defaultIcon"
+                        width="2rem" height="2rem"
+            />
         </slot>
         <div class="flex-grow pl-2">
             <slot name="title">
@@ -18,12 +21,13 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import { selectableItemProps, SelectableItemPropsType } from '@/components/molecules/selectable-item/SelectableItem.toolset';
+import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default defineComponent({
     name: 'SelectableItem',
-    components: { PI },
+    components: { PI, PLazyImg },
     props: selectableItemProps,
     setup(props: SelectableItemPropsType) {
         return {

@@ -26,21 +26,28 @@ const getProps = () => getKnobProps(selectableListProps, {
         {
             id: '1',
             tags: {
-                icon: 'aws-ec2',
+                icon: 'https://assets-console-cloudone-dev.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
             },
             name: 'AWS EC2 Collector',
         },
         {
             id: '2',
             tags: {
-                icon: 'aws-network',
+                icon: 'https://assets-console-cloudone-dev.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
             },
             name: 'AWS Network Collector',
+        },
+        {
+            id: '3',
+            tags: {
+                icon: 'https://assets-console-cloudone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/gcp-compute.svg',
+            },
+            name: 'GCP Compute Collector',
         },
     ],
     mapper: {
         key: 'id',
-        icon: 'tags.icon',
+        iconUrl: 'tags.icon',
         title: 'name',
     },
 },
