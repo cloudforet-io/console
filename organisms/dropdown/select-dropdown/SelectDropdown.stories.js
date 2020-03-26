@@ -1,6 +1,6 @@
 import { ref } from '@vue/composition-api';
 import { boolean } from '@storybook/addon-knobs';
-import PSelectDropdown from './SelectDropdown';
+import PSelectDropdown from './SelectDropdown.vue';
 
 export default {
     title: 'organisms/dropdown/select-dropdown',

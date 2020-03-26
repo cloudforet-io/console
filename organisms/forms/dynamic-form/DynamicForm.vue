@@ -8,8 +8,8 @@
             <slot>
                 <div class="form-container">
                     <p-text-input v-if="formType === 'input'"
-                                  :class="{'is-invalid': typeof invalid === 'boolean' ? invalid : false}"
                                   v-model="proxyValue"
+                                  :class="{'is-invalid': typeof invalid === 'boolean' ? invalid : false}"
                                   :type="inputType"
                                   :placeholder="formData.placeholder"
                                   class="form"
@@ -161,7 +161,6 @@ export const setValidation = (forms, values) => {
 
 export default defineComponent({
     name: 'PDynamicForm',
-    events: ['input', 'change'],
     components: {
         PFieldGroup,
         PTextInput,
