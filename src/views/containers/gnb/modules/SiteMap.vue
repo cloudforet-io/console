@@ -101,7 +101,7 @@
                                  color="transparent inherit"
                             />
                         </span>
-                        <span class="name">Secret Manager</span>
+                        <span class="name">Secret</span>
                     </router-link>
                 </li>
 
@@ -112,7 +112,7 @@
 <!--                </li>-->
                 <li>
                     <router-link class="service" to="/secret/credentials">
-                        Secret
+                        Credentials
                     </router-link>
                 </li>
                 <li>
