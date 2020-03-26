@@ -161,7 +161,6 @@ export const setValidation = (forms, values) => {
 
 export default defineComponent({
     name: 'PDynamicForm',
-    events: ['input', 'change'],
     components: {
         PFieldGroup,
         PTextInput,
