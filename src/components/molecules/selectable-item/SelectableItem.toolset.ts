@@ -1,5 +1,5 @@
 export const selectableItemProps = {
-    icon: {
+    iconUrl: {
         type: String,
         default: '',
     },
@@ -15,11 +15,16 @@ export const selectableItemProps = {
         type: Boolean,
         default: false,
     },
+    defaultIcon: {
+        type: String,
+        default: '',
+    },
 };
 
 export interface SelectableItemPropsType {
-    icon?: string;
+    iconUrl?: string;
     title?: string;
     active?: boolean;
     disabled?: boolean;
+    defaultIcon?: string;
 }

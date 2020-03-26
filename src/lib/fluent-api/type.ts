@@ -9,10 +9,12 @@ export interface LongFilterType {
     operator: string;
 }
 
+type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$';
+
 export interface FilterItem extends LongFilterType {
     key: string;
-    value: string;
-    operator: string;
+    value: string | string[];
+    operator: OperatorType;
 }
 
 export interface ShortFilterType {
