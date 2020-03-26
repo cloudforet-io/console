@@ -172,18 +172,18 @@ export const makeValuesFetchHandler = (parent:any, valuesFetchUrl:string, values
 export class defaultAutocompleteHandler extends baseAutocompleteHandler {
     // eslint-disable-next-line class-methods-use-this
     get keys() {
-        return [];
+        return [] as any[];
     }
 
     // eslint-disable-next-line class-methods-use-this
     get suggestKeys() {
-        return [];
+        return [] as any[];
     }
 
     // todo: api 요청용 클라이언트를 import 방식으로 가져오게 변경하기 - sinsky
     // eslint-disable-next-line class-methods-use-this
     get parent() {
-        return null;
+        return null as any;
     }
 
     // eslint-disable-next-line class-methods-use-this
@@ -193,7 +193,7 @@ export class defaultAutocompleteHandler extends baseAutocompleteHandler {
 
     // eslint-disable-next-line class-methods-use-this
     get valuesFetchKeys() {
-        return [];
+        return [] as any[];
     }
 
     constructor() {

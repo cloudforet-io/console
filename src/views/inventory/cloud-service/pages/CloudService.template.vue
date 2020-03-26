@@ -18,6 +18,7 @@
                             :sortable="true"
                             :background="true"
                             :toolbox-background="false"
+                            :responsive="true"
                             :all-page="apiHandler.tableTS.state.allPage"
                             :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
                             :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
@@ -56,6 +57,9 @@
                                     </div>
                                 </p-row>
                             </template>
+                            <template v-slot:col-cloud_service_count-format="data">
+                                {{ data.value || 0 }}
+                            </template>
                         </p-toolbox-table>
                     </div>
                 </transition>
@@ -79,6 +83,7 @@
                                             <PDropdownMenuBtn :menu="csDropdownMenu"
                                                               @click-link="openLink"
                                                               @click-project="clickProject"
+                                                              @click-exportExcel="exportToolSet.getData()"
                                             >
                                                 Action
                                             </PDropdownMenuBtn>
@@ -238,12 +243,9 @@ export const cloudServiceSetup = (
         ...originDataSource.value,
     ]);
 
-    // const exportAction = fluentApi.addons().excel()._export();
+    const exportAction = fluentApi.addons().excel().export();
 
-    // const exportToolSet= new ExcelExportAPIToolSet(exportAction,dvApiHandler);
-    // const exportData =(format?:ExportType)=>{
-    //     exportToolSet.getData(format)
-    // };
+    const exportToolSet= new ExcelExportAPIToolSet(exportAction,dvApiHandler);
     watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
         if (preType && type !== preType) {
             const selectType = apiHandler.tableTS.selectState.firstSelectItem;
@@ -261,7 +263,7 @@ export const cloudServiceSetup = (
                 dvApiHandler.action.debug('')
                 dvApiHandler.getData();
 
-                // exportToolSet.action = exportAction.setDataSource(originDataSource.value)
+                exportToolSet.action = exportAction.setDataSource(originDataSource.value)
             }
         }
     });
@@ -325,8 +327,7 @@ export const cloudServiceSetup = (
             ['region', 'BTN.CHG_REGION'],
             [null, null, { type: 'divider' }],
             ['link', null, { label: 'console', disabled: noLink }],
-            ['exportExcel', null, { label: 'Export to Excel', disabled: false }],
-            ['exportCSV', null, { label: 'Export to CSV', disabled: false }],
+            ['exportExcel', null, { label: 'Export', disabled: false }],
         ],
         context.parent,
         { type: 'item', disabled: true }),
@@ -360,6 +361,7 @@ export const cloudServiceSetup = (
         projectModalVisible,
         clickProject,
         changeProject,
+        exportToolSet,
         // exportData,
     };
 };

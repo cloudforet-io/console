@@ -1,4 +1,4 @@
-import {Service, ServiceResources} from "@/lib/fluent-api";
+import {Service, ServiceResources} from "@/lib/fluent-api/toolset";
 import Excel from '@/lib/fluent-api/add-ons/excel';
 
 export default class AddOns extends Service implements ServiceResources<'excel'>  {

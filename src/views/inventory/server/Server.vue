@@ -1,5 +1,5 @@
 
-<script>
+<script lang="ts">
 /* eslint-disable camelcase */
 
 import {
@@ -10,26 +10,22 @@ import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/serve
 import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { mountBusEvent, tabIsShow } from '@/lib/compostion-util';
 import {
-    defaultAutocompleteHandler,
-    getEnumValues, getFetchValues,
-} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+  defaultAutocompleteHandler,
+  getEnumValues, getFetchValues, makeValuesFetchHandler,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler'
 import { getAllPage } from '@/components/organisms/pagenations/toolset';
 import { defaultQuery } from '@/lib/api/query';
-import { AdminTableAPI, HistoryAPI } from '@/lib/api/table';
+import { AdminTableAPI, HistoryAPI, QuerySearchTableFluentAPI } from '@/lib/api/table'
 import { ChangeServerProject } from '@/lib/api/fetch';
 import { useStore } from '@/store/toolset';
 import fluentApi from '@/lib/fluent-api';
+import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete'
 
 export default {
     name: 'Server',
     extends: ServerTemplate,
     setup(props, context) {
-        // const inventory = fluentApi.inventory();
-        // const cst = inventory.cloudServiceType().list();
-        // console.debug(cst.debug());
-        // console.debug(cst.execute());
-        // const another = cst.setThisPage(2);
-        // console.debug(another.execute());
+
 
         const serverEventNames = eventNames;
         serverEventNames.getServerList = 'getServerData';
@@ -42,27 +38,7 @@ export default {
         serverEventNames.closedServer = 'closedServer';
         serverEventNames.deleteServer = 'deleteServer';
 
-        class ACHandler extends defaultAutocompleteHandler {
-        // eslint-disable-next-line class-methods-use-this
-            get keys() {
-                return [
-                    'server_id', 'name', 'state', 'primary_ip_address', 'server_type', 'os_type', 'project_id',
-                    'data.os.os_arch', 'data.os.os_details', 'data.os.os_version',
-                    'data.base.memory', 'data.base.core', 'data.platform.type',
-                    'data.compute.instance_name', 'data.compute.keypair', 'data.compute.instance_id',
-                    'collection_info.state',
-                ];
-            }
-
-            // eslint-disable-next-line class-methods-use-this
-            get suggestKeys() {
-                return ['server_id', 'name', 'primary_ip_address'];
-            }
-
-            // eslint-disable-next-line class-methods-use-this
-            get parent() {
-                return context.parent;
-            }
+        class ACHandler extends QuerySearchTableACHandler {
 
             // eslint-disable-next-line class-methods-use-this
             get valuesFetchUrl() {
@@ -78,24 +54,50 @@ export default {
                 ];
             }
 
-            // eslint-disable-next-line no-shadow
-            constructor() {
-                super();
-                this.handlerMap.value.push(...[
+            constructor(args: QSTableACHandlerArgs) {
+                super(args);
+                this.handlerMap.value = [
+                    ...makeValuesFetchHandler(
+                        context.parent,
+                        '/inventory/server/list',
+                        [
+                            'server_id', 'name', 'primary_ip_address',
+                            'data.compute.instance_name', 'data.compute.instance_id',
+                            'data.vm.vm_name', 'data.vm.vm_id',
+                        ]),
                     getEnumValues('state', ['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED']),
                     getEnumValues('os_type', ['LINUX', 'WINDOWS']),
                     getEnumValues('collection_info.state', ['MANUAL', 'ACTIVE', 'DISCONNECTED']),
                     getEnumValues('server_type', ['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN']),
-                    getFetchValues('project_id', '/identity/project/list', this.parent),
-                ]);
+                    getFetchValues('project_id', '/identity/project/list', context.parent,),
+                ];
             }
         }
+
+        const args = {
+            keys:[
+                'server_id',
+                'name', 'state', 'primary_ip_address', 'server_type', 'os_type', 'project_id',
+                'data.os.os_arch', 'data.os.os_details', 'data.os.os_version',
+                'data.base.memory', 'data.base.core', 'data.platform.type',
+                'data.compute.instance_name', 'data.compute.keypair', 'data.compute.instance_id',
+                'collection_info.state',
+            ],
+            suggestKeys:['server_id', 'name', 'primary_ip_address'],
+        };
+        const action =  fluentApi.inventory().server().list();
+        const apiHandler = new QuerySearchTableFluentAPI(
+            action,
+            undefined,
+            undefined,
+            {handlerClass:ACHandler,args},
+        );
 
         const state = serverSetup(
             props,
             context,
             serverEventNames,
-            new ACHandler(),
+            apiHandler,
             new ChangeServerProject(),
         );
         const projectStore = context.parent.$ls.project;
@@ -113,17 +115,18 @@ export default {
             return result;
         };
 
+
         const numberTypeKeys = new Set(['data.base.memory', 'data.base.core']);
-        const valueFormatter = (key, value) => {
-            if (numberTypeKeys.has(key)) {
-                try {
-                    return Number(value);
-                } catch (e) {
-                    return value;
-                }
-            }
-            return value;
-        };
+        // const valueFormatter = (key, value) => {
+        //     if (numberTypeKeys.has(key)) {
+        //         try {
+        //             return Number(value);
+        //         } catch (e) {
+        //             return value;
+        //         }
+        //     }
+        //     return value;
+        // };
 
         // request server list
         // const requestState = reactive({
@@ -133,40 +136,20 @@ export default {
         //         state.queryListTools.tags, valueFormatter,
         //     ))),
         // });
-        const requestServerList = async () => {
-            console.debug('before', state.loading);
-            state.loading = true;
-            state.items = [];
-            let api = fluentApi.inventory().server().list();
-            api = api.setThisPage(state.thisPage).setPageSize(state.pageSize).setSortBy(state.sortBy).setSortDesc(state.sortDesc);
-            api = api.setFilter(...state.queryListTools.tags);
-            try {
-                api.debug();
-                const res = await api.execute();
-                state.items = matchProject(res.data.results);
-                state.allPage = getAllPage(res.data.total_count, state.pageSize);
-                state.selectIndex = [];
-                state.loading = false;
-            } catch (e) {
-                console.error(e);
-                state.loading = false;
-            }
-        };
-        mountBusEvent(serverEventBus, serverEventNames.getServerList, requestServerList);
 
 
         // change tag
-        const ServerTagConfirm = async (serverId, tags, originTags) => {
-            const idx = state.selectIndex[0];
+        const ServerTagConfirm = async (serverId:string, tags:any, originTags) => {
+            const idx = apiHandler.tableTS.syncState.selectIndex[0]
             try {
                 const res = await context.parent.$http.post('/inventory/server/update', {
                     server_id: serverId,
                     tags,
                 });
-                state.items[idx].tags = tags;
+                (apiHandler.tableTS.state.items as any[])[idx].tags = tags;
             } catch (e) {
                 serverEventBus.$emit(serverEventNames.tagResetEvent);
-                state.items[idx].tags = originTags;
+                (apiHandler.tableTS.state.items as any[])[idx].tags = originTags;
                 console.error(e);
             }
         };
@@ -183,12 +166,11 @@ export default {
 
 
         const requestServerAdmin = async () => {
-            console.debug(state.getSelectServerIds);
             state.admin.loading = true;
             state.admin.items = [];
             const res = await context.parent.$http.post('/inventory/server/member/list', {
                 query: requestAdminState.query,
-                servers: state.getSelectServerIds,
+                servers: apiHandler.tableTS.selectState.selectItems.map(value => value.server_id),
             });
             state.admin.items = res.data.results;
             state.admin.allPage = getAllPage(res.data.total_count, state.admin.pageSize);
@@ -197,9 +179,9 @@ export default {
         mountBusEvent(serverEventBus, serverEventNames.getServerAdmin, requestServerAdmin);
 
 
-        const getServersParam = (items, changeState) => {
+        const getServersParam = (items, changeState?) => {
             console.debug(items);
-            const result = { servers: _.map(items, 'server_id') };
+            const result:any = { servers: _.map(items, 'server_id') };
             if (changeState) {
                 result.state = changeState;
             }
@@ -207,7 +189,7 @@ export default {
         };
         const maintenanceServer = async (items) => {
             await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'MAINTENANCE')).then(async (_) => {
-                await requestServerList();
+                await apiHandler.getData();
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
@@ -232,7 +214,7 @@ export default {
 
         const closedServer = async (items) => {
             await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'CLOSED')).then(async (_) => {
-                await requestServerList();
+                await apiHandler.getData();
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
@@ -257,7 +239,7 @@ export default {
 
         const inServiceServer = async (items) => {
             await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'INSERVICE')).then(async (_) => {
-                await requestServerList();
+                await apiHandler.getData();
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
@@ -282,7 +264,7 @@ export default {
 
         const deleteServer = async (items) => {
             await context.parent.$http.post('/inventory/server/delete', getServersParam(items)).then(async (_) => {
-                await requestServerList();
+                await apiHandler.getData();
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
@@ -305,17 +287,17 @@ export default {
         };
         mountBusEvent(serverEventBus, serverEventNames.deleteServer, deleteServer);
 
-        requestServerList();
+        state.apiHandler.getData();
 
         const adminParams = computed(() => ({
-            servers: state.getSelectServerIds,
+            servers: state.apiHandler.tableTS.selectState.selectItems.map((item)=>item),
         }));
         // todo: move server.vue
         const adminIsShow = computed(() => {
             let result = false;
-            if (state.isSelectedOne) {
+            if (apiHandler.tableTS.selectState.isSelectOne) {
                 result = state.activeTab === 'admin';
-            } if (state.isSelectedMulti) {
+            } if (apiHandler.tableTS.selectState.isSelectMulti) {
                 result = state.multiSelectActiveTab === 'admin';
             }
             return result;
@@ -324,17 +306,18 @@ export default {
 
         const historyIsShow = computed(() => {
             let result = false;
-            if (state.isSelectedOne && state.activeTab === 'history') {
+            if (apiHandler.tableTS.selectState.isSelectOne && state.activeTab === 'history') {
                 result = true;
             }
             return result;
         });
-        const selectId = computed(() => state.getFirstSelectServerId);
+        const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem.server_id);
         const historyAPIHandler = new HistoryAPI('/inventory/server/get-data', 'server_id', selectId, undefined, undefined, undefined, historyIsShow);
         return {
             ...toRefs(state),
             adminApiHandler,
             historyAPIHandler,
+            apiHandler
         };
     },
 };

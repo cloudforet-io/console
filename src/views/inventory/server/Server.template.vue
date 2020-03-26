@@ -4,30 +4,30 @@
             <template #container="{ height }">
                 <p-toolbox-table
                     ref="toolbox"
-                    :items="items"
+                    :items="apiHandler.tableTS.state.items"
                     :fields="fields"
                     :selectable="true"
                     :sortable="true"
                     :dragable="true"
                     :hover="true"
                     :responsive="true"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    :all-page="allPage"
-                    :this-page.sync="thisPage"
-                    :select-index.sync="selectIndex"
-                    :page-size.sync="pageSize"
                     :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
                     :setting-visible="false"
-                    :loading="loading"
                     :use-spinner-loading="true"
                     :use-cursor-loading="true"
-                    @changePageSize="getServers"
-                    @changePageNumber="getServers"
-                    @clickRefresh="getServers"
-                    @changeSort="getServers"
+                    :all-page="apiHandler.tableTS.state.allPage"
+                    :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
+                    :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
+                    :this-page.sync="apiHandler.tableTS.syncState.thisPage"
+                    :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
+                    :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+                    :loading.sync="apiHandler.tableTS.syncState.loading"
+                    @changePageSize="apiHandler.getData()"
+                    @changePageNumber="apiHandler.getData()"
+                    @clickRefresh="apiHandler.getData()"
+                    @changeSort="apiHandler.getData()"
                 >
-                    <template slot="toolbox-left">
+                    <template #toolbox-left>
                         <p-button style-type="primary-dark" :disabled="true" @click="clickCollectData">
                             {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
@@ -40,28 +40,28 @@
                             @click-closed="clickClosed"
                             @click-delete="clickDelete"
                             @click-project="clickProject"
+                            @click-link="openLink"
+                            @click-exportExcel="exportToolSet.getData()"
                         >
                             Action
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
-                            <PQuerySearchBar :search-text.sync="searchText" :autocomplete-handler="ACHandler" @newQuery="queryListTools.addTag" />
+                            <p-query-search-bar
+                                    :search-text.sync="apiHandler.tableTS.querySearch.state.searchText"
+                                    :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler"
+                                    @newQuery="apiHandler.tableTS.querySearch.addTag"
+                            />
                         </div>
                     </template>
-                    <template v-if="queryListTools.tags.length !== 0" slot="toolbox-bottom">
+
+                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1"#toolbox-bottom>
                         <p-col :col="12" style="margin-bottom: .5rem;">
                             <p-hr style="width: 100%;" />
-                            <p-row style="margin-top: .5rem;">
-                                <div style="flex-grow: 0">
-                                    <p-icon-button name="ic_delete" @click="queryListTools.deleteAllTags" />
-                                </div>
-                                <div style="flex-grow: 1;margin-left: 1rem;">
-                                    <p-tag v-for="(tag, idx) in queryListTools.tags" :key="idx + tag" style="margin-top: 0.375rem;margin-bottom: 0.37rem"
-                                           @delete="queryListTools.deleteTag(idx)"
-                                    >
-                                        {{ tag.key }}:{{ tag.operator }} {{ tag.value }}
-                                    </p-tag>
-                                </div>
-                            </p-row>
+                            <p-query-search-tags style="margin-top: .5rem;"
+                                                 :tags="apiHandler.tableTS.querySearch.tags.value"
+                                                 @deleteTag="apiHandler.tableTS.querySearch.deleteTag"
+                                                 @deleteAllTags="apiHandler.tableTS.querySearch.deleteAllTags"
+                            />
                         </p-col>
                     </template>
                     <template v-slot:col-state-format="data">
@@ -96,18 +96,18 @@
                 </p-toolbox-table>
             </template>
         </p-horizontal-layout>
-        <p-tab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
+        <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
             <template #detail>
-                <p-server-detail :item="items[selectIndex[0]]" :tag-confirm-event="tagConfirmEvent" :tag-reset-event="tagResetEvent" />
+                <p-server-detail :item="apiHandler.tableTS.selectState.firstSelectItem" :tag-confirm-event="tagConfirmEvent" :tag-reset-event="tagResetEvent" />
             </template>
             <template #data>
                 <PDynamicSubData
-                    :select-id="getFirstSelectServerId" :sub-data="getSubData"
+                    :select-id="apiHandler.tableTS.selectState.firstSelectItem.server_id" :sub-data="apiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
                     url="/inventory/server/get-data" id-key="server_id"
                 />
             </template>
             <template #rawData>
-                <p-raw-data :item="items[selectIndex[0]]" />
+                <p-raw-data :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #admin>
                 <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
@@ -116,13 +116,13 @@
                 <p-dynamic-view :api-handler="historyAPIHandler" view_type="table" :data_source="historyAPIHandler.dataSource" />
             </template>
         </p-tab>
-        <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
+        <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
             <template #data>
                 <p-data-table
                     :fields="multiSelectFields"
                     :sortable="false"
                     :selectable="false"
-                    :items="getSelectServerItems"
+                    :items="apiHandler.tableTS.selectState.selectItems"
                     :col-copy="true"
                 >
                     <template v-slot:col-state-format="data">
@@ -149,7 +149,7 @@
             size="lg"
             :centered="true"
             :selectable="false"
-            :items="getSelectServerItems"
+            :items="apiHandler.tableTS.selectState.selectItems"
 
             @confirm="checkModalConfirm"
         />
@@ -165,7 +165,6 @@ import _ from 'lodash';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
-import { requestToolboxTableMetaReactive } from '@/components/organisms/tables/toolbox-table/ToolboxTable.util';
 import {
     timestampFormatter, serverStateFormatter, platformBadgeFormatter, getValue,
 } from '@/lib/util';
@@ -174,7 +173,6 @@ import { makeTrItems } from '@/lib/view-helper';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
-import PTag, { tagList } from '@/components/molecules/tags/Tag.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
@@ -189,41 +187,19 @@ import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import {
-    MockAdminTableAPI, MockHistoryAPI,
+    MockAdminTableAPI, MockHistoryAPI, QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { ChangeServerProject, MockChangeProject } from '@/lib/api/fetch';
+import fluentApi from "@/lib/fluent-api";
+import {ExcelExportAPIToolSet} from "@/lib/api/add-on";
+import {
+    getEnumValues, getFetchValues, makeValuesFetchHandler
+} from "@/components/organisms/search/query-search-bar/autocompleteHandler";
+import PQuerySearchTags from "@/components/organisms/search/query-search-tags/QuerySearchTags.vue";
+import {QSTableACHandlerArgs, QuerySearchTableACHandler} from "@/lib/api/auto-complete";
 
-export const serverTableReactive = parent => reactive({
-    fields: makeTrItems([
-        ['name', 'COMMON.NAME'],
-        ['state', 'COMMON.STATE'],
-        ['primary_ip_address', 'COMMON.IP', { sortable: false }],
-        ['core', 'COMMON.CORE'],
-        ['memory', 'COMMON.MEMORY'],
-        ['os_type', 'COMMON.O_TYPE'],
-        ['os_distro', 'COMMON.O_DIS'],
-        ['server_type', 'COMMON.SE_TYPE'],
-        ['platform_type', 'COMMON.PLATFORM'],
-        ['project', 'COMMON.PROJ'],
-        ['pool', 'COMMON.POOL'],
-        ['updated_at', 'COMMON.UPDATE'],
-    ],
-    parent),
-    multiSelectFields: makeTrItems([
-        ['name', 'COMMON.NAME'],
-        ['state', 'COMMON.STATE'],
-        ['primary_ip_address', 'COMMON.IP'],
-        ['os_type', 'COMMON.O_TYPE'],
-    ],
-    parent),
-    selectIndex: [],
-    items: [],
-    searchText: '',
-    loading: false,
-    toolbox: null, // template refs
-});
 
 /**
      * @typedef {Object} serverState
@@ -254,9 +230,33 @@ export const eventNames = {
     deleteServer: '',
 };
 
-export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectAPI:ChangeServerProject) => {
+
+export const serverSetup = (props, context, eventName,apiHandler,  ChangeProjectAPI:ChangeServerProject) => {
+
+    const fields= makeTrItems([
+            ['name', 'COMMON.NAME'],
+            ['state', 'COMMON.STATE'],
+            ['primary_ip_address', 'COMMON.IP', { sortable: false }],
+            ['core', 'COMMON.CORE'],
+            ['memory', 'COMMON.MEMORY'],
+            ['os_type', 'COMMON.O_TYPE'],
+            ['os_distro', 'COMMON.O_DIS'],
+            ['server_type', 'COMMON.SE_TYPE'],
+            ['platform_type', 'COMMON.PLATFORM'],
+            ['project', 'COMMON.PROJ'],
+            ['pool', 'COMMON.POOL'],
+            ['updated_at', 'COMMON.UPDATE'],
+        ],
+        context.parent);
+    const multiSelectFields= makeTrItems([
+        ['name', 'COMMON.NAME'],
+        ['state', 'COMMON.STATE'],
+        ['primary_ip_address', 'COMMON.IP'],
+        ['os_type', 'COMMON.O_TYPE'],
+    ],
+    context.parent);
+
     const eventBus = serverEventBus;
-    const tableState = serverTableReactive(context.parent);
     const tabData = reactive({
         tabs: makeTrItems([
             ['detail', 'TAB.DETAILS'],
@@ -274,15 +274,7 @@ export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectA
         multiSelectActiveTab: 'data',
     });
     const tags = ref({});
-    const tabAction = reactive({
-        isSelectedOne: computed(() => tableState.selectIndex.length === 1),
-        isSelectedMulti: computed(() => tableState.selectIndex.length > 1),
-    });
-    const state:any = requestToolboxTableMetaReactive();
-    state.sortBy = 'name';
-    const getServers = () => {
-        eventBus.$emit(eventName.getServerList);
-    };
+
 
     const admin = reactive({
         items: [],
@@ -294,23 +286,8 @@ export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectA
         searchText: '',
         loading: false,
     });
-    const sortSelectIndex = computed(() => {
-        const idxs = [...tableState.selectIndex];
-        idxs.sort((a, b) => a - b);
-        return idxs;
-    });
-    const isNotSelected = computed(() => tableState.selectIndex.length === 0);
-    const getSelectServerItems = computed(() => {
-        const items = [];
-        sortSelectIndex.value.forEach((idx) => {
-            items.push(tableState.items[idx]);
-        });
-        return items;
-    });
-    const getSelectServerIds = computed(() => (getSelectServerItems.value ? getSelectServerItems.value.map((v:any) => v.server_id) : []));
-    const getFirstSelectServerItem = computed(() => (getSelectServerItems.value.length >= 1 ? getSelectServerItems.value[0] : {}));
-    const getSubData = computed(() => _.get(getFirstSelectServerItem.value, ['metadata', 'sub_data'], []));
-    const getFirstSelectServerId = computed(() => (getSelectServerIds.value.length >= 1 ? getSelectServerIds.value[0] : ''));
+
+    const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
 
     const checkTableModalState = reactive({
         visible: false,
@@ -370,6 +347,19 @@ export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectA
         eventBus.$emit(checkTableModalState.confirmEventName, event);
         resetCheckTableModalState();
     };
+    const link = computed(():string|undefined => {
+        if (apiHandler.tableTS.selectState.isSelectOne) {
+            return _.get(apiHandler.tableTS.selectState.firstSelectItem, 'reference.external_link');
+        }
+        return undefined;
+    });
+    const openLink = () => {
+        if (link.value) {
+            window.open((link.value as string));
+        }
+    };
+
+    const noLink = computed(() => !link.value);
     const dropdown = reactive({
         ...makeTrItems([
             ['delete', 'BTN.DELETE'],
@@ -380,27 +370,28 @@ export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectA
             [null, null, { type: 'divider' }],
             ['project', 'COMMON.CHG_PRO'],
             ['pool', 'BTN.CHG_POOL', { disabled: true }],
+            [null, null, { type: 'divider' }],
+            ['link', null, { label: 'console', disabled: noLink }],
+            ['exportExcel', null, { label: 'Export', disabled: false }],
         ],
         context.parent,
         { type: 'item', disabled: isNotSelected }),
     });
-    const queryList = ref([]);
-    const queryListTools = tagList(queryList, true, eventBus, eventName.getServerList);
 
     const projectModalVisible = ref(false);
     const clickProject = () => {
         projectModalVisible.value = true;
     };
     const changeProject = async (node?:ProjectNode|null) => {
-        await ChangeProjectAPI.fetchData(getSelectServerIds.value, node ? node.data.id : undefined);
-        getServers();
+        await ChangeProjectAPI.fetchData(apiHandler.tableTS.selectState.firstSelectItem.server_id , node ? node.data.id : undefined);
+        await apiHandler.getData();
         projectModalVisible.value = false;
     };
-    return reactive({
-        ...toRefs(state),
-        ...toRefs(tableState),
+    const exportAction = fluentApi.addons().excel().export();
+
+    const exportToolSet= new ExcelExportAPIToolSet(exportAction,apiHandler);
+    return {
         ...toRefs(tabData),
-        ...toRefs(tabAction),
         tags,
         dropdown,
         serverStateFormatter,
@@ -409,7 +400,6 @@ export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectA
         clickCollectData() {
             console.debug('add');
         },
-        getServers,
         clickMenuEvent(menuName) {
             console.debug(menuName);
         },
@@ -417,23 +407,21 @@ export const serverSetup = (props, context, eventName, ACHandler, ChangeProjectA
         // EventBus Names
         ...eventNames,
         admin,
-        getSelectServerItems,
-        getSelectServerIds,
-        getFirstSelectServerId,
-        getFirstSelectServerItem,
-        getSubData,
         checkTableModalState,
         clickDelete,
         clickClosed,
         clickInService,
         clickMaintenance,
         checkModalConfirm,
-        ACHandler,
-        queryListTools,
         projectModalVisible,
         clickProject,
         changeProject,
-    });
+        openLink,
+        apiHandler,
+        fields,
+        multiSelectFields,
+        exportToolSet,
+    };
 };
 
 export default {
@@ -449,13 +437,13 @@ export default {
         PButton,
         PBadge,
         PDropdownMenuBtn,
+        PQuerySearchTags,
         PServerDetail,
         PTab,
         PDynamicSubData,
         PRawData,
         PDataTable,
         PQuerySearchBar,
-        PTag,
         PTableCheckModal,
         PRow,
         PCol,
@@ -465,14 +453,18 @@ export default {
         SProjectTreeModal,
     },
     setup(props, context) {
-        const dataBind = reactive({
-            items: computed(() => []),
-        });
+        const action =  fluentApi.inventory().server().list();
+        const apiHandler = new QuerySearchTableFluentAPI(
+            action,
+            undefined,
+            undefined,
+        );
+
         const state:any = serverSetup(
             props,
             context,
-            dataBind.items,
-            null,
+            eventNames,
+            apiHandler,
             new MockChangeProject(),
         );
         const mockAdminAPI = MockAdminTableAPI();
@@ -480,7 +472,7 @@ export default {
 
         return {
             ...toRefs(state),
-            ...toRefs(dataBind),
+            apiHandler,
             adminApiHandler: mockAdminAPI,
             historyAPIHandler: mockHistoryAPIHandler,
         };

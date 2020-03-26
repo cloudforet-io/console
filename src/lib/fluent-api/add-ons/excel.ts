@@ -7,6 +7,7 @@ import {
     DataSourceItem,
 } from '@/lib/fluent-api/type';
 import {readonlyRefArg} from "@/lib/type";
+import config from '@/lib/config';
 
 export type ExportType = 'xlsx' | 'csv';
 
