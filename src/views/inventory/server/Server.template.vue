@@ -29,7 +29,7 @@
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" :disabled="true">
-                            <!--                        :disabled="true"-->
+                            <!--                        :disabled="selectIndex.length === 0" @click="clickCollectData"-->
                             {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
