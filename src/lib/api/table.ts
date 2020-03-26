@@ -76,6 +76,34 @@ export abstract class BaseTableFluentAPI<
         this.defaultReset();
     }
 }
+
+export class SearchTableFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
+    action extends QueryAPI<any, any> = QueryAPI<parameter, resp>,
+    > extends BaseTableFluentAPI<parameter, resp, action> {
+    tableTS: T;
+    constructor(
+        action: action,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+    ) {
+        super(action);
+        this.tableTS = new SearchTableToolSet(initData, initSyncData) as T;
+
+    }
+    protected getAction = () => this.getDefaultAction().setKeyword(this.tableTS.searchText.value);
+
+    resetAll = () => {
+        this.defaultReset();
+        this.tableTS.searchText.value = '';
+    };
+
+}
+
 export interface ACHandlerMeta {
     handlerClass: typeof baseAutocompleteHandler;
     args: any;
@@ -88,6 +116,8 @@ export const defaultACHandler: ACHandlerMeta = {
         suggestKeys: [],
     },
 };
+
+
 
 export class QuerySearchTableFluentAPI<
     parameter = any,
