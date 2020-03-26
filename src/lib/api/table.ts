@@ -46,7 +46,7 @@ export abstract class BaseTableFluentAPI<
             .setPageSize(this.tableTS.syncState.pageSize as number);
     }
 
-    protected getAction = () => this.getDefaultAction()
+    getAction = () => this.getDefaultAction()
 
     getData = async () => {
         this.tableTS.syncState.loading = true;
@@ -95,7 +95,7 @@ export class SearchTableFluentAPI<
         this.tableTS = new SearchTableToolSet(initData, initSyncData) as T;
 
     }
-    protected getAction = () => this.getDefaultAction().setKeyword(this.tableTS.searchText.value);
+    getAction = () => this.getDefaultAction().setKeyword(this.tableTS.searchText.value);
 
     resetAll = () => {
         this.defaultReset();
@@ -142,7 +142,7 @@ export class QuerySearchTableFluentAPI<
         });
     }
 
-    protected getAction = () => this.getDefaultAction().setFilter(...this.tableTS.querySearch.tags.value);
+    getAction = () => this.getDefaultAction().setFilter(...this.tableTS.querySearch.tags.value);
 
     resetAll = () => {
         this.defaultReset();

@@ -1,14 +1,12 @@
 /* eslint-disable camelcase */
 import {
-    ActionAPI,
-    CreateAction, GetAction, ListAction, RawParameterAction, Resource,
-    ResourceActions, SingleDeleteAction, UpdateAction,
+    ActionAPI, Resource,
+    ResourceActions,
 } from '@/lib/fluent-api/toolset';
 import {
     DataSourceItem,
-    FilterItem,
-    ListType, QueryActionState, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
+import {readonlyRefArg} from "@/lib/type";
 
 export type ExportType = 'xlsx' | 'csv';
 
@@ -26,7 +24,7 @@ export interface ExcelExportApiState {
     url: string;
     param:any;
     templateOptions: ExcelExportOptions;
-    dataSource: DataSourceItem[];
+    dataSource: readonlyRefArg<DataSourceItem[]>;
 }
 
 export interface ExcelExportResp {
@@ -34,17 +32,16 @@ export interface ExcelExportResp {
 }
 
 
-
-export class Export extends ActionAPI<any, ExcelExportResp> {
-    path = 'export';
+export class ExportAction extends ActionAPI<any, ExcelExportResp> {
+    protected path = 'export';
 
     protected apiState: ExcelExportApiState ;
 
-    constructor(baseUrl: string, initState:ExcelExportApiState={} as ExcelExportApiState, transformer: null|((any) => any) = null) {
-        super(baseUrl, undefined, transformer);
+    constructor(baseUrl: string, initState:ExcelExportApiState={} as ExcelExportApiState) {
+        super(baseUrl ,undefined,undefined);
         this.apiState = {
             url: '',
-            param:{},
+            param:null,
             templateOptions:{},
             dataSource:[],
             ...initState
@@ -102,7 +99,7 @@ export class Export extends ActionAPI<any, ExcelExportResp> {
         return this.clone();
     }
 
-    setDataSource(dataSource: DataSourceItem[]){
+    setDataSource(dataSource:readonlyRefArg<DataSourceItem[]>){
         this.apiState.dataSource = dataSource;
         return this.clone();
     }
@@ -110,6 +107,6 @@ export class Export extends ActionAPI<any, ExcelExportResp> {
 export default class Excel extends Resource implements ResourceActions<'export'> {
     protected name = 'excel';
 
-    export() { return new Export(this.baseUrl); }
+    export() { return new ExportAction(this.baseUrl); }
 
 }

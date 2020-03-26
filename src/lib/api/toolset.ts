@@ -11,15 +11,18 @@ export abstract class DynamicAPI {}
 
 
 interface GetDataAPI {
-    getData: (...args: any[]) => void;
+    getData: (...args: any[]) => void|any;
+}
 
+interface UpdateDataAPI {
+    updateData: (...args: any[]) => void|any;
 }
 
 export abstract class ResourceAPIToolSet<
     parameter = any,
     resp = any,
     actions extends BaseResources<parameter, resp> = BaseResources<parameter, resp>,
-    > extends DynamicAPI implements GetDataAPI {
+    > extends DynamicAPI implements GetDataAPI,UpdateDataAPI {
     actions: actions;
 
     abstract getData: (...args: any[]) => void;
@@ -36,11 +39,11 @@ export abstract class DynamicFluentAPIToolSet<
     > extends DynamicAPI implements GetDataAPI {
     action: action;
 
-    abstract getData: (...args: any[]) => void;
+    abstract getData: (...args: any[]) => void|any;
 
     protected constructor(action: action) { super(); this.action = action; }
 
-    protected abstract getAction: () => action
+    abstract getAction: () => action
 }
 
 export abstract class DynamicReactiveAPI extends DynamicAPI {

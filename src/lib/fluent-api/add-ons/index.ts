@@ -1,8 +1,8 @@
+import {Service, ServiceResources} from "@/lib/fluent-api";
 import Excel from '@/lib/fluent-api/add-ons/excel';
-import {Service} from "@/lib/fluent-api";
 
-export default class AddOns extends Service {
-    protected name = 'add-ons'
+export default class AddOns extends Service implements ServiceResources<'excel'>  {
+    protected name = 'add-ons';
 
     excel() { return new Excel(this.name); }
 

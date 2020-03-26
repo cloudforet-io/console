@@ -197,6 +197,9 @@ import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/Proj
 import { ProjectNode } from '@/lib/api/tree';
 import { ChangeCloudServiceProject, MockChangeProject } from '@/lib/api/fetch';
 import { Computed } from '@/lib/type';
+import {ExcelExportAPIToolSet} from "@/lib/api/add-on";
+import fluentApi from "@/lib/fluent-api";
+import {ExportType} from "@/lib/fluent-api/add-ons/excel";
 
 
 export const cloudServiceSetup = (
@@ -234,6 +237,13 @@ export const cloudServiceSetup = (
         },
         ...originDataSource.value,
     ]);
+
+    // const exportAction = fluentApi.addons().excel()._export();
+
+    // const exportToolSet= new ExcelExportAPIToolSet(exportAction,dvApiHandler);
+    // const exportData =(format?:ExportType)=>{
+    //     exportToolSet.getData(format)
+    // };
     watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
         if (preType && type !== preType) {
             const selectType = apiHandler.tableTS.selectState.firstSelectItem;
@@ -250,6 +260,8 @@ export const cloudServiceSetup = (
                 dvApiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
                 dvApiHandler.action.debug('')
                 dvApiHandler.getData();
+
+                // exportToolSet.action = exportAction.setDataSource(originDataSource.value)
             }
         }
     });
@@ -313,6 +325,8 @@ export const cloudServiceSetup = (
             ['region', 'BTN.CHG_REGION'],
             [null, null, { type: 'divider' }],
             ['link', null, { label: 'console', disabled: noLink }],
+            ['exportExcel', null, { label: 'Export to Excel', disabled: false }],
+            ['exportCSV', null, { label: 'Export to CSV', disabled: false }],
         ],
         context.parent,
         { type: 'item', disabled: true }),
@@ -333,6 +347,7 @@ export const cloudServiceSetup = (
         await dvApiHandler.getData();
         projectModalVisible.value = false;
     };
+
     return {
         ...toRefs(state),
         apiHandler,
@@ -345,6 +360,7 @@ export const cloudServiceSetup = (
         projectModalVisible,
         clickProject,
         changeProject,
+        // exportData,
     };
 };
 
