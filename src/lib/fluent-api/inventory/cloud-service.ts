@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import {
     CreateAction,
-    GetAction, ListAction,
+    GetAction, GetDataAction, ListAction,
     Resource,
     ResourceActions, SingleDeleteAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
@@ -49,8 +49,12 @@ class Delete extends SingleDeleteAction<IdParameter, any> {
 class Get extends GetAction<IdParameter, CloudServiceModel> {
     protected idField = idField;
 }
+class GetData extends GetDataAction<any, ListType<any>> {
+    protected idField = idField
+}
+
 class List extends ListAction<any, CloudServiceListResp> {}
-export default class CloudService extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
+export default class CloudService extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'getData'> {
     protected name = 'cloud-service';
 
     create() { return new Create(this.baseUrl); }
@@ -60,6 +64,8 @@ export default class CloudService extends Resource implements ResourceActions<'c
     delete() { return new Delete(this.baseUrl); }
 
     get() { return new Get(this.baseUrl); }
+
+    getData(): GetData { return new GetData(this.baseUrl); }
 
     list() { return new List(this.baseUrl); }
 }

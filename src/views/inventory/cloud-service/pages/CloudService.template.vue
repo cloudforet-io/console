@@ -18,6 +18,7 @@
                             :sortable="true"
                             :background="true"
                             :toolbox-background="false"
+                            :responsive="true"
                             :all-page="apiHandler.tableTS.state.allPage"
                             :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
                             :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
@@ -56,6 +57,9 @@
                                     </div>
                                 </p-row>
                             </template>
+                            <template v-slot:col-cloud_service_count-format="data">
+                                {{ data.value || 0 }}
+                            </template>
                         </p-toolbox-table>
                     </div>
                 </transition>
@@ -79,6 +83,7 @@
                                             <PDropdownMenuBtn :menu="csDropdownMenu"
                                                               @click-link="openLink"
                                                               @click-project="clickProject"
+                                                              @click-exportExcel="exportToolSet.getData()"
                                             >
                                                 Action
                                             </PDropdownMenuBtn>
@@ -96,8 +101,9 @@
                             </template>
                             <template #data>
                                 <PDynamicSubData
-                                    :select-id="dvApiHandler.tableTS.selectState.firstSelectItem.cloud_service_id" :sub-data="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
-                                    url="/inventory/cloud-service/get-data" id-key="cloud_service_id"
+                                    :select-id="dvApiHandler.tableTS.selectState.firstSelectItem.cloud_service_id"
+                                    :sub-data="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
+                                    :action="csGetDataAction"
                                 />
                             </template>
                             <template #rawData>
@@ -197,6 +203,9 @@ import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/Proj
 import { ProjectNode } from '@/lib/api/tree';
 import { ChangeCloudServiceProject, MockChangeProject } from '@/lib/api/fetch';
 import { Computed } from '@/lib/type';
+import {ExcelExportAPIToolSet} from "@/lib/api/add-on";
+import fluentApi from "@/lib/fluent-api";
+import {ExportType} from "@/lib/fluent-api/add-ons/excel";
 
 
 export const cloudServiceSetup = (
@@ -234,6 +243,10 @@ export const cloudServiceSetup = (
         },
         ...originDataSource.value,
     ]);
+
+    const exportAction = fluentApi.addons().excel().export();
+
+    const exportToolSet= new ExcelExportAPIToolSet(exportAction,dvApiHandler);
     watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
         if (preType && type !== preType) {
             const selectType = apiHandler.tableTS.selectState.firstSelectItem;
@@ -250,6 +263,8 @@ export const cloudServiceSetup = (
                 dvApiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
                 dvApiHandler.action.debug('')
                 dvApiHandler.getData();
+
+                exportToolSet.action = exportAction.setDataSource(originDataSource.value)
             }
         }
     });
@@ -313,6 +328,7 @@ export const cloudServiceSetup = (
             ['region', 'BTN.CHG_REGION'],
             [null, null, { type: 'divider' }],
             ['link', null, { label: 'console', disabled: noLink }],
+            ['exportExcel', null, { label: 'Export', disabled: false }],
         ],
         context.parent,
         { type: 'item', disabled: true }),
@@ -333,6 +349,7 @@ export const cloudServiceSetup = (
         await dvApiHandler.getData();
         projectModalVisible.value = false;
     };
+    const csGetDataAction = fluentApi.inventory().cloudService().getData();
     return {
         ...toRefs(state),
         apiHandler,
@@ -345,6 +362,8 @@ export const cloudServiceSetup = (
         projectModalVisible,
         clickProject,
         changeProject,
+        exportToolSet,
+        csGetDataAction,
     };
 };
 

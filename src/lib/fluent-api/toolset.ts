@@ -4,14 +4,12 @@ import _ from 'lodash';
 import { api } from '@/lib/api/axios';
 import {
     ApiMethods,
-    BaseActionState,
     FilterType,
     Query,
     QueryActionState,
     FilterItem,
-    ShortFilterType, GetActionState,
+    ShortFilterType, GetActionState, RawParameterActionState,
 } from '@/lib/fluent-api/type';
-import { isNotEmpty } from '@/lib/util';
 
 
 export abstract class ActionAPI<parameter=any, resp=any> {
@@ -21,11 +19,11 @@ export abstract class ActionAPI<parameter=any, resp=any> {
 
     protected baseUrl: string;
 
-    protected apiState: BaseActionState<parameter>;
+    protected apiState: any;
 
     protected transformer: ((any) => any|Promise<any>)|null;
 
-    protected abstract getParameter: () => parameter
+    public abstract getParameter: () => parameter
 
     async execute(): Promise<AxiosResponse<resp>> {
         let resp: any;
@@ -43,11 +41,11 @@ export abstract class ActionAPI<parameter=any, resp=any> {
 
     protected constructor(
         baseUrl: string,
-        apiState?: BaseActionState<parameter>,
+        apiState?: any,
         transformer: ((any) => any|Promise<any>)|null = null,
     ) {
         this.baseUrl = baseUrl;
-        this.apiState = apiState || {} as BaseActionState<parameter>;
+        this.apiState = apiState || {};
         this.transformer = transformer;
     }
 
@@ -170,7 +168,7 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
     };
 
 
-    protected getParameter = () => ({
+    getParameter = () => ({
         query: this.query(),
         ...this.apiState.extraParameter,
     });
@@ -225,14 +223,19 @@ interface SingleItemActionInterface{
     setId: (id: string) => any;
 }
 export abstract class RawParameterAction<parameter, resp> extends ActionAPI<parameter, resp> {
-    protected getParameter = () => this.apiState.parameter;
+    getParameter = () => this.apiState.parameter;
+    protected apiState: RawParameterActionState<parameter>;
 
     constructor(
         baseUrl: string,
-        apiState: BaseActionState<parameter> = { parameter: {} as parameter },
+        initState: RawParameterActionState<parameter> = { parameter: {} as parameter },
         transformer: ((any) => any|Promise<any>)|null = null,
     ) {
-        super(baseUrl, apiState, transformer);
+        super(baseUrl, initState, transformer);
+        this.apiState = {
+            ...initState,
+        };
+
     }
 }
 
@@ -278,7 +281,7 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
         this.apiState = apiState;
     }
 
-    protected getParameter = () => {
+    getParameter = () => {
         const query = { only: this.apiState.only };
         return {
             ...this.apiState.parameter,

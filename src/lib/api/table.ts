@@ -19,8 +19,11 @@ import {
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { ApiQuery, defaultQuery } from '@/lib/api/query';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import { ListType, QueryAPI } from '@/lib/fluent-api';
+import {GetDataAction, ListType, QueryAPI} from '@/lib/fluent-api';
 
+interface DynamicTableDataSource{
+    dataSource: DataSource[]
+}
 
 export abstract class BaseTableFluentAPI<
     parameter = any,
@@ -46,7 +49,7 @@ export abstract class BaseTableFluentAPI<
             .setPageSize(this.tableTS.syncState.pageSize as number);
     }
 
-    protected getAction = () => this.getDefaultAction()
+    getAction = () => this.getDefaultAction()
 
     getData = async () => {
         this.tableTS.syncState.loading = true;
@@ -95,7 +98,10 @@ export class SearchTableFluentAPI<
         this.tableTS = new SearchTableToolSet(initData, initSyncData) as T;
 
     }
-    protected getAction = () => this.getDefaultAction().setKeyword(this.tableTS.searchText.value);
+    // @ts-ignore
+    getSearchTableDefaultAction:()=>action = ()=>this.getDefaultAction().setKeyword(this.tableTS.searchText.value);
+
+    getAction = () => this.getSearchTableDefaultAction();
 
     resetAll = () => {
         this.defaultReset();
@@ -103,6 +109,129 @@ export class SearchTableFluentAPI<
     };
 
 }
+
+export class SubDataFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
+    action extends GetDataAction<any, any> = GetDataAction<parameter, resp>,
+    > extends SearchTableFluentAPI<parameter, resp,initData,initSyncData,T, action> {
+
+    getAction = () => this.getSearchTableDefaultAction()
+        .setKeyPath(this.keyPath.value)
+        .setId(this.resourceId.value);
+
+    constructor(
+        action: action,
+        protected keyPath: forceRefArg<string>,
+        protected resourceId:forceRefArg<string>,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+    ) {
+        super(
+            action,
+            initData, // sub api can't support only query
+            initSyncData,
+        );
+        onMounted(() => {
+            watch([this.resourceId,this.keyPath],async (origin, before) => {
+                let id;
+                let path;
+                let preId;
+                let prePath;
+                if (origin) {
+                    id = origin[0];
+                    path = origin[1];
+                }
+                if (before) {
+                    preId = before[0];
+                    prePath = before[1];
+                }
+
+                if (id && path && (id !== preId || path !== prePath)) {
+                    await this.getData();
+                }
+            });
+        });
+    }
+
+}
+
+
+
+export class TabSearchTableFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
+    action extends QueryAPI<any, any> = QueryAPI<parameter, resp>,
+    > extends SearchTableFluentAPI<parameter, resp,initData,initSyncData,T, action> {
+
+    constructor(
+        action: action,
+        protected isShow: forceRefArg<boolean>,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+    ) {
+        super(
+            action,
+            initData, // sub api can't support only query
+            initSyncData,
+        );
+        onMounted(() => {
+            watch(this.isShow, async (show, preShow) => {
+                if (show && show !== preShow) {
+                    await this.getData();
+                }
+            });
+        });
+    }
+
+}
+
+export class HistoryFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
+    action extends GetDataAction<any, any> = GetDataAction<parameter, resp>,
+    > extends TabSearchTableFluentAPI<parameter, resp,initData,initSyncData,T, action> implements DynamicTableDataSource{
+
+
+    getAction = () => this.getSearchTableDefaultAction()
+        .setKeyPath('collection_info.update_history')
+        .setId(this.resourceId.value);
+
+
+    constructor(
+        action: action,
+        isShow: forceRefArg<boolean>,
+        protected resourceId:forceRefArg<string>,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+        public dataSource: DataSource[]=defaultHistoryDataSource
+    ) {
+        super(
+            action,
+            isShow,
+            initData, // sub api can't support only query
+            initSyncData,
+        );
+        onMounted(() => {
+            watch(this.resourceId, async (id, preId) => {
+                if (isShow.value && id && id !== preId) {
+                    await this.getData();
+                }
+            });
+        });
+
+    }
+}
+
 
 export interface ACHandlerMeta {
     handlerClass: typeof baseAutocompleteHandler;
@@ -116,7 +245,6 @@ export const defaultACHandler: ACHandlerMeta = {
         suggestKeys: [],
     },
 };
-
 
 
 export class QuerySearchTableFluentAPI<
@@ -142,13 +270,30 @@ export class QuerySearchTableFluentAPI<
         });
     }
 
-    protected getAction = () => this.getDefaultAction().setFilter(...this.tableTS.querySearch.tags.value);
+    getAction = () => this.getDefaultAction().setFilter(...this.tableTS.querySearch.tags.value);
 
     resetAll = () => {
         this.defaultReset();
         this.tableTS.querySearch.state.searchText = '';
     };
 }
+
+const defaultHistoryDataSource = [
+    { name: 'Update By', key: 'updated_by' },
+    { name: 'Key', key: 'key' },
+    {
+        name: 'Update At',
+        key: 'updated_at',
+        view_type: 'datetime',
+        view_option: {
+            source_type: 'timestamp',
+            source_format: 'seconds',
+        },
+    },
+
+];
+
+
 
 
 export abstract class BaseTableAPI<
@@ -269,6 +414,8 @@ interface DataSource {
 
 }
 
+
+
 export class TabSearchTableAPI<initData = any, initSyncData = any> extends SearchTableAPI<initData, initSyncData> {
     protected isShow: forceRefArg<boolean>;
 
@@ -356,20 +503,7 @@ export class SubDataAPI<initData = any, initSyncData = any> extends SearchTableA
     }
 }
 
-const defaultHistoryDataSource = [
-    { name: 'Update By', key: 'updated_by' },
-    { name: 'Key', key: 'key' },
-    {
-        name: 'Update At',
-        key: 'updated_at',
-        view_type: 'datetime',
-        view_option: {
-            source_type: 'timestamp',
-            source_format: 'seconds',
-        },
-    },
 
-];
 
 export class HistoryAPI<initData = any, initSyncData = any> extends TabSearchTableAPI<initData, initSyncData> {
     // @ts-ignore
@@ -389,7 +523,6 @@ export class HistoryAPI<initData = any, initSyncData = any> extends TabSearchTab
     }
 }
 
-export const MockHistoryAPI = () => new HistoryAPI('', '', '', undefined, undefined, [], computed(() => false));
 
 
 export class QuerySearchTableAPI<initData = any, initSyncData = any,

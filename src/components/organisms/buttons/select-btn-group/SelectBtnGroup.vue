@@ -86,10 +86,14 @@ export default defineComponent({
         &::-webkit-scrollbar {
             display: none !important; /* scroll hide in window,chrome */
         }
+
         .select-btn{
             margin-right: 0.5rem;
             min-width: auto;
             display: inline-flex;
+            &.active{
+
+            }
         }
 
         .select-next-btn {

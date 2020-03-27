@@ -65,7 +65,6 @@ import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
-import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { makeTrItems } from '@/lib/view-helper';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
@@ -89,7 +88,6 @@ export default {
         PHorizontalLayout,
         PDynamicView,
         PTab,
-        PDynamicSubData,
         PButton,
         PRawData,
         PDropdownMenuBtn,
