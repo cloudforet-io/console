@@ -229,15 +229,11 @@ export default {
         },
         checkValidity() {
             let targets = this.label.input;
-            targets = targets.replace(/,/gi, '').split(' ');
+            targets = targets.replace(/,/gi, ' ').split(' ');
             const labelArr = [];
             targets.forEach((value) => {
                 const current = this.replaceAll(value, ' ', '');
-                if (current.startsWith('#')) {
-                    labelArr.push(current);
-                } else {
-                    this.label.hashTagInvalidity = true;
-                }
+                labelArr.push(current);
             });
             return this.label.hashTagInvalidity ? false : labelArr;
         },

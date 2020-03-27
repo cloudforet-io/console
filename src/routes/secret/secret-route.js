@@ -8,7 +8,7 @@ export default {
     path: 'secret',
     name: 'secret',
     redirect: 'secret/credentials',
-    meta: { label: 'Secret Manager', breadcrumb: true },
+    meta: { label: 'Secret', breadcrumb: true },
     components: {
         lnb: SecretNavBar,
         main: Secret,
@@ -38,7 +38,7 @@ export default {
         {
             path: 'credentials',
             name: 'credentials',
-            meta: { label: 'Secret', breadcrumb: true },
+            meta: { label: 'Credentials', breadcrumb: true },
             component: Credentials,
         },
     ],

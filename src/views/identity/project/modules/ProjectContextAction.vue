@@ -169,7 +169,7 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                const targetObj = actionFlag[1] === 'PJ' ? this.$t('COMMON.PG') : this.$t('COMMON.PG_GR');
+                const targetObj = actionFlag[1] === 'PJ' ? this.$t('COMMON.PROJECT') : this.$t('COMMON.PROJECT_GRP');
                 if (actionFlag[0] === 'CRT') {
                     selectedLabel = this.$t('ORGANISMS.CREATE_ARG', [targetObj]);
                 } else if (actionFlag[0] === 'UPT') {
@@ -184,9 +184,9 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                const targetObj = actionFlag[1] === 'PJ' ? this.$t('COMMON.PG') : this.$t('COMMON.PG_GR');
+                const targetObj = actionFlag[1] === 'PJ' ? this.$t('COMMON.PROJECT') : this.$t('COMMON.PROJECT_GRP');
                 if (actionFlag[0] === 'CRT') {
-                    selectedLabel = this.$t('IDENTITY.PARENT_ARG', [this.$t('COMMON.PG_GR')]);
+                    selectedLabel = this.$t('IDENTITY.PARENT_ARG', [this.$t('COMMON.PROJECT_GRP')]);
                 } else if (actionFlag[0] === 'UPT') {
                     selectedLabel = this.$t('IDENTITY.SELECT_ARG', [targetObj]);
                 } else {
@@ -199,7 +199,7 @@ export default {
             let selectedLabel = '';
             const actionFlag = this.getSplitActionFlag();
             if (!this.isEmpty(actionFlag)) {
-                selectedLabel = actionFlag[1] === 'PJ' ? this.$t('COMMON.PG_NM') : this.$t('COMMON.PG_GR_NM');
+                selectedLabel = actionFlag[1] === 'PJ' ? this.$t('COMMON.PROJECT_NM') : this.$t('COMMON.PG_GR_NM');
             }
             return selectedLabel;
         },
@@ -265,7 +265,7 @@ export default {
                 this.$emit('update', flag, tree, nodeData);
             } else {
                 this.isValid.valid = true;
-                const target = flag[1] === 'PR' ? this.$t('COMMON.PG_GR') : this.$t('COMMON.PG');
+                const target = flag[1] === 'PR' ? this.$t('COMMON.PROJECT_GRP') : this.$t('COMMON.PROJECT');
                 this.isValid.errorMessage = this.$t('IDENTITY.REQ_FIELD', [target]);
             }
         },

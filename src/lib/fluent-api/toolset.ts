@@ -131,27 +131,30 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
             const filter: FilterType[] = [];
             // eslint-disable-next-line camelcase
             const mergeOpQuery: {
-                    [propName: string]: FilterType;
+                    [propName: string]: ShortFilterType;
                 } = {};
-                // @ts-ignore
             this.apiState.filter.forEach((q: FilterItem) => {
                 const op = operatorMap[q.operator];
+                const vals = typeof q.value === 'string' ? [q.value] : q.value;
+
                 if (mergeOperatorSet.has(op)) {
                     const prefix = `${q.key}:${op}`;
+
                     // if operation is ['contain_in', 'not_contain_in', 'in', 'not_in'] then merge filter
                     if (mergeOpQuery[prefix]) {
-                        ((mergeOpQuery[prefix] as ShortFilterType).v as string[]).push(q.value);
+                        mergeOpQuery[prefix].v = _.merge(mergeOpQuery[prefix].v, vals);
+                        // ((mergeOpQuery[prefix] as ShortFilterType).v as string[]).push(q.value);
                     } else {
                         mergeOpQuery[prefix] = {
                             k: q.key,
-                            v: [q.value],
+                            v: vals,
                             o: op,
                         };
                     }
                 } else {
                     filter.push({
                         k: q.key,
-                        v: q.value,
+                        v: vals,
                         o: op,
                     });
                 }

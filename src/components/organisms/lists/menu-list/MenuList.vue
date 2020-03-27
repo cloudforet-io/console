@@ -19,7 +19,7 @@
                  class="menu-container"
                  :style="{left: position}"
             >
-                <p-list-item
+                <p-menu-item
                     v-for="(item, idx) in listItems"
                     :key="idx"
                     class="menu"
@@ -35,7 +35,7 @@
 
 <script>
 import _ from 'lodash';
-import PListItem from '@/components/molecules/list-items/ListItem.vue';
+import PMenuItem from '@/components/molecules/menu-item/MenuItem.vue';
 import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 
@@ -44,7 +44,7 @@ const ACTIVATOR_MENU_SPACE = -8;
 export default {
     name: 'PMenuList',
     events: ['change', 'show', 'hide', 'select'],
-    components: { PListItem, PTooltipButton, PButton },
+    components: { PMenuItem, PTooltipButton, PButton },
     props: {
         listItems: {
             type: Array,

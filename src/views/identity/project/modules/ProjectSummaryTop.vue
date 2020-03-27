@@ -65,7 +65,7 @@ export default {
                 },
                 {
                     name: 'create',
-                    label: this.$t('COMMON.CREAT'),
+                    label: this.$t('COMMON.CREATE'),
                     copyFlag: true,
                 },
             ];

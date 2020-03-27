@@ -89,6 +89,10 @@ export default {
     border: 1px solid transparent;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
+    &[type="button"], &[type="reset"], &[type="submit"] {
+        appearance: none;
+    }
+
     &.disabled {
         @apply bg-gray2 text-gray1 border-gray3;
         background-color: theme('colors.gray2') !important;
@@ -132,7 +136,6 @@ export default {
     text-align: center;
     font-size: 1rem;
     line-height: 1.125rem;
-    -webkit-appearance:none;
 }
 .btn-sm {
     min-width:3.25rem;
@@ -140,11 +143,9 @@ export default {
     text-align: center;
     font-size: .75rem;
     line-height: .875rem;
-    -webkit-appearance:none;
 }
 .btn-block {
     display: flex;
     width: 100%;
-    -webkit-appearance:none;
 }
 </style>
