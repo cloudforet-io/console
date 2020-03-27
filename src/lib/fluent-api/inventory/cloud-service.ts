@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import {
     CreateAction,
-    GetAction, GetDataAction, ListAction,
+    GetAction, GetDataAction, ListAction, MemberListAction,
     Resource,
     ResourceActions, SingleDeleteAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
@@ -12,6 +12,8 @@ import {
 import Li from '@/components/atoms/lists/orun-list/Li.vue';
 
 const idField = 'cloud_service_id';
+const idsField = 'cloud_services';
+
 interface IdParameter {
     cloud_service_id: string;
 }
@@ -54,7 +56,12 @@ class GetData extends GetDataAction<any, ListType<any>> {
 }
 
 class List extends ListAction<any, CloudServiceListResp> {}
-export default class CloudService extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'getData'> {
+
+class MemberList extends MemberListAction<any,any>{
+    protected idsField = idsField;
+}
+
+export default class CloudService extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'getData'|'memberList'> {
     protected name = 'cloud-service';
 
     create() { return new Create(this.baseUrl); }
@@ -68,4 +75,7 @@ export default class CloudService extends Resource implements ResourceActions<'c
     getData(): GetData { return new GetData(this.baseUrl); }
 
     list() { return new List(this.baseUrl); }
+
+    memberList():MemberList{return  new MemberList(this.baseUrl)}
+
 }
