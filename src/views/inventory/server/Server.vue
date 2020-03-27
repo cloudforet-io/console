@@ -1,43 +1,325 @@
+<template>
+    <general-page-layout>
+        <p-horizontal-layout>
+            <template #container="{ height }">
+                <p-toolbox-table
+                    ref="toolbox"
+                    :items="apiHandler.tableTS.state.items"
+                    :fields="fields"
+                    :selectable="true"
+                    :sortable="true"
+                    :dragable="true"
+                    :hover="true"
+                    :responsive="true"
+                    :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
+                    :setting-visible="false"
+                    :use-spinner-loading="true"
+                    :use-cursor-loading="true"
+                    :all-page="apiHandler.tableTS.state.allPage"
+                    :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
+                    :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
+                    :this-page.sync="apiHandler.tableTS.syncState.thisPage"
+                    :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
+                    :page-size.sync="apiHandler.tableTS.syncState.pageSize"
+                    :loading.sync="apiHandler.tableTS.syncState.loading"
+                    @changePageSize="apiHandler.getData()"
+                    @changePageNumber="apiHandler.getData()"
+                    @clickRefresh="apiHandler.getData()"
+                    @changeSort="apiHandler.getData()"
+                >
+                    <template #toolbox-left>
+                        <p-button style-type="primary-dark" :disabled="true" @click="clickCollectData">
+                            {{ $t('BTN.COLLECT_DATA') }}
+                        </p-button>
+                        <PDropdownMenuBtn
+                            id="server-dropdown-btn"
+                            class="left-toolbox-item"
+                            :menu="dropdown"
+                            @click-in-service="clickInService"
+                            @click-maintenance="clickMaintenance"
+                            @click-closed="clickClosed"
+                            @click-delete="clickDelete"
+                            @click-project="clickProject"
+                            @click-link="openLink"
+                            @click-exportExcel="exportToolSet.getData()"
+                        >
+                            Action
+                        </PDropdownMenuBtn>
+                        <div class="left-toolbox-item">
+                            <p-query-search-bar
+                                    :search-text.sync="apiHandler.tableTS.querySearch.state.searchText"
+                                    :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler"
+                                    @newQuery="apiHandler.tableTS.querySearch.addTag"
+                            />
+                        </div>
+                    </template>
+
+                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1"#toolbox-bottom>
+                        <p-col :col="12" style="margin-bottom: .5rem;">
+                            <p-hr style="width: 100%;" />
+                            <p-query-search-tags style="margin-top: .5rem;"
+                                                 :tags="apiHandler.tableTS.querySearch.tags.value"
+                                                 @deleteTag="apiHandler.tableTS.querySearch.deleteTag"
+                                                 @deleteAllTags="apiHandler.tableTS.querySearch.deleteAllTags"
+                            />
+                        </p-col>
+                    </template>
+                    <template v-slot:col-state-format="data">
+                        <p-status v-bind="serverStateFormatter(data.value)" />
+                    </template>
+                    <template />
+                    <template v-slot:col-updated_at-format="data">
+                        {{ timestampFormatter(data.value) }}
+                    </template>
+                    <template v-slot:col-core-format="data">
+                        {{ data | getValue(['item','data','base','core']) }}
+                    </template>
+                    <template v-slot:col-memory-format="data">
+                        {{ data | getValue(['item','data','base','memory']) }}
+                    </template>
+                    <template v-slot:col-pool-format="data">
+                        {{ data | getValue(['item','pool_info','name']) }}
+                    </template>
+                    <template v-slot:col-os_distro-format="data">
+                        {{ data | getValue(['item','data','os','od_distro']) }}
+                    </template>
+                    <template v-slot:col-server_type-format="data">
+                        <PBadge v-bind="platformBadgeFormatter(data.value)">
+                            {{ data.value }}
+                        </PBadge>
+                    </template>
+                    <template v-slot:col-platform_type-format="data">
+                        <PBadge v-bind="platformBadgeFormatter(data.item.data.platform.type)">
+                            {{ data | getValue(['item','data','platform','type']) }}
+                        </PBadge>
+                    </template>
+                </p-toolbox-table>
+            </template>
+        </p-horizontal-layout>
+        <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
+            <template #detail>
+                <p-server-detail :item="apiHandler.tableTS.selectState.firstSelectItem" :tag-confirm-event="tagConfirmEvent" :tag-reset-event="tagResetEvent" />
+            </template>
+            <template #data>
+                <PDynamicSubData
+                    :select-id="apiHandler.tableTS.selectState.firstSelectItem.server_id" :sub-data="apiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
+                    url="/inventory/server/get-data" id-key="server_id"
+                />
+            </template>
+            <template #rawData>
+                <p-raw-data :item="apiHandler.tableTS.selectState.firstSelectItem" />
+            </template>
+            <template #admin>
+                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
+            </template>
+            <template #history>
+                <p-dynamic-view :api-handler="historyAPIHandler" view_type="table" :data_source="historyAPIHandler.dataSource" />
+            </template>
+        </p-tab>
+        <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
+            <template #data>
+                <p-data-table
+                    :fields="multiSelectFields"
+                    :sortable="false"
+                    :selectable="false"
+                    :items="apiHandler.tableTS.selectState.selectItems"
+                    :col-copy="true"
+                >
+                    <template v-slot:col-state-format="data">
+                        <p-status v-bind="serverStateFormatter(data.value)" />
+                    </template>
+                    <template />
+                </p-data-table>
+            </template>
+            <template #admin>
+                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
+            </template>
+        </PTab>
+
+        <div v-else id="empty-space">
+            Select a Server above for details.
+        </div>
+        <p-table-check-modal
+            v-if="!!checkTableModalState.mode"
+            :visible.sync="checkTableModalState.visible"
+            :header-title="checkTableModalState.title"
+            :sub-title="checkTableModalState.subTitle"
+            :theme-color="checkTableModalState.themeColor"
+            :fields="multiSelectFields"
+            size="lg"
+            :centered="true"
+            :selectable="false"
+            :items="apiHandler.tableTS.selectState.selectItems"
+
+            @confirm="checkModalConfirm"
+        />
+        <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
+    </general-page-layout>
+</template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
 import {
-    ref, toRefs, computed, reactive,
+    reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import ServerTemplate, { serverSetup, eventNames } from '@/views/inventory/server/Server.template.vue';
-import serverEventBus from '@/views/inventory/server/ServerEventBus';
-import { mountBusEvent, tabIsShow } from '@/lib/compostion-util';
+import PStatus from '@/components/molecules/status/Status.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PBadge from '@/components/atoms/badges/Badge.vue';
 import {
-  defaultAutocompleteHandler,
-  getEnumValues, getFetchValues, makeValuesFetchHandler,
-} from '@/components/organisms/search/query-search-bar/autocompleteHandler'
-import { getAllPage } from '@/components/organisms/pagenations/toolset';
-import { defaultQuery } from '@/lib/api/query';
-import { AdminTableAPI, HistoryAPI, QuerySearchTableFluentAPI } from '@/lib/api/table'
-import { ChangeServerProject } from '@/lib/api/fetch';
-import { useStore } from '@/store/toolset';
-import fluentApi from '@/lib/fluent-api';
-import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete'
+    timestampFormatter, serverStateFormatter, platformBadgeFormatter, getValue,
+} from '@/lib/util';
+import serverEventBus from '@/views/inventory/server/ServerEventBus';
+import { makeTrItems } from '@/lib/view-helper';
+import PRow from '@/components/atoms/grid/row/Row.vue';
+import PCol from '@/components/atoms/grid/col/Col.vue';
+import PHr from '@/components/atoms/hr/Hr.vue';
+import PTab from '@/components/organisms/tabs/tab/Tab.vue';
+import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
+import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
+import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
+import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
+import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
+import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
+import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
+import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
+import {
+    AdminTableAPI, HistoryAPI, QuerySearchTableFluentAPI,
+} from '@/lib/api/table';
+import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
+import { ProjectNode } from '@/lib/api/tree';
+import fluentApi, {MultiItemAction} from "@/lib/fluent-api";
+import {ExcelExportAPIToolSet} from "@/lib/api/add-on";
+import {
+    getEnumValues, getFetchValues, makeValuesFetchHandler
+} from "@/components/organisms/search/query-search-bar/autocompleteHandler";
+import PQuerySearchTags from "@/components/organisms/search/query-search-tags/QuerySearchTags.vue";
+import {QSTableACHandlerArgs, QuerySearchTableACHandler} from "@/lib/api/auto-complete";
+import {ServerModel} from "@/lib/fluent-api/inventory/server";
+
+const defaultDataSource = [
+    { name: 'ID', key: 'server_id' },
+    { name: 'Name', key: 'name' },
+    {
+        name: 'State',
+        key: 'state',
+        view_type: 'enum',
+        view_option: {
+            INSERVICE: {
+                view_type: 'state',
+                view_option: {
+                    text_color: '#222532',
+                    icon: {
+                        color: '#60B731',
+                    },
+                },
+            },
+            PENDING: {
+                view_type: 'state',
+                view_option: {
+                    text_color: '#222532',
+                    icon: {
+                        color: '#FF7750',
+                    },
+                },
+            },
+            MAINTENANCE: {
+                view_type: 'state',
+                view_option: {
+                    text_color: '#222532',
+                    icon: {
+                        color: '#FFCE02',
+                    },
+                },
+            },
+            CLOSED: {
+                view_type: 'state',
+                view_option: {
+                    text_color: '#EF3817',
+                    icon: {
+                        color: '#EF3817',
+                    },
+                },
+            },
+            DELETED: {
+                view_type: 'state',
+                view_option: {
+                    text_color: '#858895',
+                    icon: {
+                        color: '#858895',
+                    },
+                },
+            },
+        },
+    },
+    { name: 'Primary IP', key: 'primary_ip_address' },
+    { name: 'Server Type', key: 'server_type' },
+    { name: 'OS Type', key: 'os_type' },
+    { name: 'Project', key: 'project' },
+    { name: 'Region', key: 'region_info.region_id' },
+    { name: 'Zone', key: 'zone_info.zone_id' },
+    { name: 'Pool', key: 'pool_info.pool_id' },
+    {
+        name: 'Created at',
+        key: 'created_at.seconds',
+        view_type: 'datetime',
+        view_option: {
+            source_type: 'timestamp',
+            source_format: 'seconds',
+        },
+    },
+    {
+        name: 'Updated at',
+        key: 'updated_at.seconds',
+        view_type: 'datetime',
+        view_option: {
+            source_type: 'timestamp',
+            source_format: 'seconds',
+        },
+    },
+    {
+        name: 'Deleted at',
+        key: 'deleted_at.seconds',
+        view_type: 'datetime',
+        view_option: {
+            source_type: 'timestamp',
+            source_format: 'seconds',
+        },
+    },
+];
 
 export default {
     name: 'Server',
-    extends: ServerTemplate,
+    filters: {
+        getValue,
+    },
+    components: {
+        GeneralPageLayout,
+        PStatus,
+        PHorizontalLayout,
+        PToolboxTable,
+        PButton,
+        PBadge,
+        PDropdownMenuBtn,
+        PQuerySearchTags,
+        PServerDetail,
+        PTab,
+        PDynamicSubData,
+        PRawData,
+        PDataTable,
+        PQuerySearchBar,
+        PTableCheckModal,
+        PRow,
+        PCol,
+        PHr,
+        PIconButton,
+        PDynamicView,
+        SProjectTreeModal,
+    },
     setup(props, context) {
-
-
-        const serverEventNames = eventNames;
-        serverEventNames.getServerList = 'getServerData';
-        serverEventNames.tagConfirmEvent = 'ServerTagConfirmEvent';
-        serverEventNames.tagResetEvent = 'resetTagEvent';
-        serverEventNames.getServerAdmin = 'requestAdmin';
-
-        serverEventNames.inServiceServer = 'inServiceServer';
-        serverEventNames.maintenanceServer = 'maintenanceServer';
-        serverEventNames.closedServer = 'closedServer';
-        serverEventNames.deleteServer = 'deleteServer';
-
         class ACHandler extends QuerySearchTableACHandler {
 
             // eslint-disable-next-line class-methods-use-this
@@ -93,212 +375,200 @@ export default {
             {handlerClass:ACHandler,args},
         );
 
-        const state = serverSetup(
-            props,
-            context,
-            serverEventNames,
-            apiHandler,
-            new ChangeServerProject(),
-        );
-        const projectStore = context.parent.$ls.project;
+        const fields= makeTrItems([
+                ['name', 'COMMON.NAME'],
+                ['state', 'COMMON.STATE'],
+                ['primary_ip_address', 'COMMON.IP', { sortable: false }],
+                ['core', 'COMMON.CORE'],
+                ['memory', 'COMMON.MEMORY'],
+                ['os_type', 'COMMON.O_TYPE'],
+                ['os_distro', 'COMMON.O_DIS'],
+                ['server_type', 'COMMON.SE_TYPE'],
+                ['platform_type', 'COMMON.PLATFORM'],
+                ['project', 'COMMON.PROJ'],
+                ['pool', 'COMMON.POOL'],
+                ['updated_at', 'COMMON.UPDATE'],
+            ],
+            context.parent);
+        const multiSelectFields= makeTrItems([
+                ['name', 'COMMON.NAME'],
+                ['state', 'COMMON.STATE'],
+                ['primary_ip_address', 'COMMON.IP'],
+                ['os_type', 'COMMON.O_TYPE'],
+            ],
+            context.parent);
 
-        projectStore.getProject();
-        const matchProject = (items) => {
-            const result = items.map((item) => {
-                try {
-                    item.project = item.project_id ? projectStore.state.projects[item.project_id] || item.project_id : '';
-                } catch (e) {
-                    item.project = item.project_id;
-                }
-                return item;
-            });
-            return result;
-        };
-
-
-        const numberTypeKeys = new Set(['data.base.memory', 'data.base.core']);
-        // const valueFormatter = (key, value) => {
-        //     if (numberTypeKeys.has(key)) {
-        //         try {
-        //             return Number(value);
-        //         } catch (e) {
-        //             return value;
-        //         }
-        //     }
-        //     return value;
-        // };
-
-        // request server list
-        // const requestState = reactive({
-        //     query: computed(() => (defaultQuery(
-        //         state.thisPage, state.pageSize,
-        //         state.sortBy, state.sortDesc, null,
-        //         state.queryListTools.tags, valueFormatter,
-        //     ))),
-        // });
+        const tabData = reactive({
+            tabs: makeTrItems([
+                    ['detail', 'TAB.DETAILS'],
+                    ['data', 'TAB.DATA'],
+                    ['rawData', 'TAB.RAW_DATA'],
+                    ['admin', 'TAB.ADMIN'],
+                    ['history', 'TAB.HISTORY'],
+                ],
+                context.parent),
+            activeTab: 'detail',
+            multiSelectTabs: makeTrItems([
+                ['data', 'TAB.DATA', { keepAlive: true }],
+                ['admin', 'TAB.ADMIN'],
+            ], context.parent),
+            multiSelectActiveTab: 'data',
+        });
+        const tags = ref({});
 
 
-        // change tag
-        const ServerTagConfirm = async (serverId:string, tags:any, originTags) => {
-            const idx = apiHandler.tableTS.syncState.selectIndex[0]
-            try {
-                const res = await context.parent.$http.post('/inventory/server/update', {
-                    server_id: serverId,
-                    tags,
-                });
-                (apiHandler.tableTS.state.items as any[])[idx].tags = tags;
-            } catch (e) {
-                serverEventBus.$emit(serverEventNames.tagResetEvent);
-                (apiHandler.tableTS.state.items as any[])[idx].tags = originTags;
-                console.error(e);
-            }
-        };
-        mountBusEvent(serverEventBus, serverEventNames.tagConfirmEvent, ServerTagConfirm);
-
-        // get server admin data
-        const requestAdminState = reactive({
-            query: computed(() => (defaultQuery(
-                state.admin.thisPage, state.admin.pageSize,
-                state.admin.sortBy, state.admin.sortDesc,
-                state.admin.searchText,
-            ))),
+        const admin = reactive({
+            items: [],
+            sortBy: '',
+            sortDesc: true,
+            pageSize: 15,
+            allPage: 1,
+            thisPage: 1,
+            searchText: '',
+            loading: false,
         });
 
 
-        const requestServerAdmin = async () => {
-            state.admin.loading = true;
-            state.admin.items = [];
-            const res = await context.parent.$http.post('/inventory/server/member/list', {
-                query: requestAdminState.query,
-                servers: apiHandler.tableTS.selectState.selectItems.map(value => value.server_id),
-            });
-            state.admin.items = res.data.results;
-            state.admin.allPage = getAllPage(res.data.total_count, state.admin.pageSize);
-            state.admin.loading = false;
+        const checkTableModalState = reactive({
+            visible: false,
+            mode: '',
+            item: null,
+            action: null as unknown as MultiItemAction<any, any>,
+            title: '',
+            subTitle: '',
+            themeColor: '',
+        });
+
+        const stateChangeAction =  fluentApi.inventory().server().changeState();
+        const deleteAction = fluentApi.inventory().server().delete();
+
+        const resetCheckTableModalState = () => {
+            checkTableModalState.visible = false;
+            checkTableModalState.mode = '';
+            checkTableModalState.action = null as unknown as MultiItemAction<any, any>;
+            checkTableModalState.title = '';
+            checkTableModalState.subTitle = '';
+            checkTableModalState.themeColor = '';
         };
-        mountBusEvent(serverEventBus, serverEventNames.getServerAdmin, requestServerAdmin);
+
+        const clickDelete = () => {
+            checkTableModalState.mode = 'delete';
+            checkTableModalState.action = deleteAction;
+            checkTableModalState.title = 'Server Delete';
+            checkTableModalState.subTitle = 'Are you Sure?';
+            checkTableModalState.themeColor = 'alert';
+            checkTableModalState.visible = true;
+        };
+        const clickMaintenance = () => {
+            checkTableModalState.mode = 'maintenance';
+            checkTableModalState.action = stateChangeAction.setMaintenance();
+            checkTableModalState.title = 'Set Maintenance';
+            checkTableModalState.subTitle = 'change Server State';
+            checkTableModalState.themeColor = 'primary';
+            checkTableModalState.visible = true;
+        };
+        const clickInService = () => {
+            checkTableModalState.mode = 'in-service';
+            checkTableModalState.action = stateChangeAction.setInService();
+            checkTableModalState.title = 'Set In-Service';
+            checkTableModalState.subTitle = 'change Server State';
+            checkTableModalState.themeColor = 'primary';
+            checkTableModalState.visible = true;
+        };
+        const clickClosed = () => {
+            checkTableModalState.mode = 'closed';
+            checkTableModalState.action = stateChangeAction.setClosed();
+            checkTableModalState.title = 'Set Closed';
+            checkTableModalState.subTitle = 'change Server State';
+            checkTableModalState.themeColor = 'primary';
+            checkTableModalState.visible = true;
+        };
 
 
-        const getServersParam = (items, changeState?) => {
-            console.debug(items);
-            const result:any = { servers: _.map(items, 'server_id') };
-            if (changeState) {
-                result.state = changeState;
+        const checkModalConfirm = (items:ServerModel[] ) => {
+            checkTableModalState.action.setIds(items.map(item =>item.server_id )).execute().then(()=>{
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'success',
+                    title: 'success',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).catch(()=>{
+                context.root.$notify({
+                    group: 'noticeBottomRight',
+                    type: 'alert',
+                    title: 'Fail',
+                    text: 'request Fail',
+                    duration: 2000,
+                    speed: 1000,
+                });
+            }).finally(()=>{
+                apiHandler.getData();
+                resetCheckTableModalState();
+            });
+        };
+        const link = computed(():string|undefined => {
+            if (apiHandler.tableTS.selectState.isSelectOne) {
+                return _.get(apiHandler.tableTS.selectState.firstSelectItem, 'reference.external_link');
             }
-            return result;
+            return undefined;
+        });
+        const openLink = () => {
+            if (link.value) {
+                window.open((link.value as string));
+            }
         };
-        const maintenanceServer = async (items) => {
-            await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'MAINTENANCE')).then(async (_) => {
-                await apiHandler.getData();
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'maintenance servers',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            }).catch((error) => {
-                console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            });
-        };
-        mountBusEvent(serverEventBus, serverEventNames.maintenanceServer, maintenanceServer);
 
-        const closedServer = async (items) => {
-            await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'CLOSED')).then(async (_) => {
-                await apiHandler.getData();
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'closed servers',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            }).catch((error) => {
-                console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            });
-        };
-        mountBusEvent(serverEventBus, serverEventNames.closedServer, closedServer);
+        const noLink = computed(() => !link.value);
+        const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
+        const dropdown = reactive({
+            ...makeTrItems([
+                    ['delete', 'BTN.DELETE'],
+                    [null, null, { type: 'divider' }],
+                    ['in-service', 'INVENTORY.BTN.SET_INSERVICE'],
+                    ['maintenance', 'INVENTORY.BTN.SET_MAINTENANCE'],
+                    ['closed', 'INVENTORY.BTN.SET_CLOSE'],
+                    [null, null, { type: 'divider' }],
+                    ['project', 'COMMON.CHG_PRO'],
+                    ['pool', 'BTN.CHG_POOL', { disabled: true }],
+                    [null, null, { type: 'divider' }],
+                    ['link', null, { label: 'console', disabled: noLink }],
+                    ['exportExcel', null, { label: 'Export', disabled: false }],
+                ],
+                context.parent,
+                { type: 'item', disabled: isNotSelected }),
+        });
 
-        const inServiceServer = async (items) => {
-            await context.parent.$http.post('/inventory/server/change-state', getServersParam(items, 'INSERVICE')).then(async (_) => {
-                await apiHandler.getData();
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'in-service servers',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            }).catch((error) => {
-                console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            });
+        const projectModalVisible = ref(false);
+        const clickProject = () => {
+            projectModalVisible.value = true;
         };
-        mountBusEvent(serverEventBus, serverEventNames.inServiceServer, inServiceServer);
-
-        const deleteServer = async (items) => {
-            await context.parent.$http.post('/inventory/server/delete', getServersParam(items)).then(async (_) => {
-                await apiHandler.getData();
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'success',
-                    title: 'success',
-                    text: 'delete servers',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            }).catch((error) => {
-                console.error(error);
-                context.root.$notify({
-                    group: 'noticeBottomRight',
-                    type: 'alert',
-                    title: 'Fail',
-                    text: 'request Fail',
-                    duration: 2000,
-                    speed: 1000,
-                });
-            });
+        const changeProjectAction = fluentApi.inventory().server().changeProject();
+        const changeProject = async (node?:ProjectNode|null) => {
+            const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
+            if (node){
+                await action.setId(node.data.id).execute()
+            } else {
+                await action.setReleaseProject().execute()
+            }
+            await apiHandler.getData();
+            projectModalVisible.value = false;
         };
-        mountBusEvent(serverEventBus, serverEventNames.deleteServer, deleteServer);
+        const exportAction = fluentApi.addons().excel().export();
 
-        state.apiHandler.getData();
+        const exportToolSet= new ExcelExportAPIToolSet(exportAction,apiHandler);
+
 
         const adminParams = computed(() => ({
-            servers: state.apiHandler.tableTS.selectState.selectItems.map((item)=>item),
+            servers: apiHandler.tableTS.selectState.selectItems.map((item)=>item.server_id),
         }));
-        // todo: move server.vue
         const adminIsShow = computed(() => {
             let result = false;
             if (apiHandler.tableTS.selectState.isSelectOne) {
-                result = state.activeTab === 'admin';
+                result = tabData.activeTab === 'admin';
             } if (apiHandler.tableTS.selectState.isSelectMulti) {
-                result = state.multiSelectActiveTab === 'admin';
+                result = tabData.multiSelectActiveTab === 'admin';
             }
             return result;
         });
@@ -306,7 +576,7 @@ export default {
 
         const historyIsShow = computed(() => {
             let result = false;
-            if (apiHandler.tableTS.selectState.isSelectOne && state.activeTab === 'history') {
+            if (apiHandler.tableTS.selectState.isSelectOne && tabData.activeTab === 'history') {
                 result = true;
             }
             return result;
@@ -314,11 +584,54 @@ export default {
         const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem.server_id);
         const historyAPIHandler = new HistoryAPI('/inventory/server/get-data', 'server_id', selectId, undefined, undefined, undefined, historyIsShow);
         return {
-            ...toRefs(state),
+            ...toRefs(tabData),
+            tags,
+            dropdown,
+            serverStateFormatter,
+            timestampFormatter,
+            platformBadgeFormatter,
+            clickCollectData() {
+                console.debug('add');
+            },
+            clickMenuEvent(menuName) {
+                console.debug(menuName);
+            },
+            admin,
+            checkTableModalState,
+            clickDelete,
+            clickClosed,
+            clickInService,
+            clickMaintenance,
+            checkModalConfirm,
+            projectModalVisible,
+            clickProject,
+            changeProject,
+            openLink,
+            apiHandler,
+            fields,
+            multiSelectFields,
+            exportToolSet,
             adminApiHandler,
             historyAPIHandler,
-            apiHandler
         };
     },
 };
+
 </script>
+
+<style lang="postcss" scoped>
+    .left-toolbox-item{
+        margin-left: 1rem;
+        &:last-child {
+            flex-grow: 1;
+        }
+    }
+
+    #empty-space{
+        text-align: center;
+        margin-bottom: 0.5rem;
+        @apply text-primary2;
+        /*color: $primary2;*/
+        /*font: 24px/32px Arial;*/
+    }
+</style>
