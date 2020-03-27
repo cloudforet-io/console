@@ -105,8 +105,9 @@
             </template>
             <template #data>
                 <PDynamicSubData
-                    :select-id="apiHandler.tableTS.selectState.firstSelectItem.server_id" :sub-data="apiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
-                    url="/inventory/server/get-data" id-key="server_id"
+                    :select-id="apiHandler.tableTS.selectState.firstSelectItem.server_id"
+                    :sub-data="apiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
+                    :action="getDataAction"
                 />
             </template>
             <template #rawData>
@@ -286,17 +287,16 @@ const deleteAtVF = {
 }
 
 const serverListDataSource= [
+    { name: 'Project', key: 'console_force_data.project' },
     { name: 'Name', key: 'name' },
     serverStateVF,
     { name: 'Primary IP', key: 'primary_ip_address' },
     { name: 'Server Type', key: 'server_type' },
     { name: 'OS Type', key: 'os_type' },
-    { name: 'Project', key: 'project' },
     { name: 'Pool', key: 'pool_info.pool_id' },
     updateAtVF,
-
-
 ];
+
 
 const baseInfoDetails = [
     { name: 'ID', key: 'server_id' },
@@ -305,7 +305,23 @@ const baseInfoDetails = [
     { name: 'Primary IP', key: 'primary_ip_address' },
     { name: 'Server Type', key: 'server_type' },
     { name: 'OS Type', key: 'os_type' },
-    { name: 'Project', key: 'project' },
+    { name: 'Project', key: 'console_force_data.project' },
+    { name: 'Region', key: 'region_info.region_id' },
+    { name: 'Zone', key: 'zone_info.zone_id' },
+    { name: 'Pool', key: 'pool_info.pool_id' },
+    createAtVF,
+    updateAtVF,
+    deleteAtVF,
+];
+
+const exportDataSource = [
+    { name: 'ID', key: 'server_id' },
+    { name: 'Name', key: 'name' },
+    serverStateVF,
+    { name: 'Primary IP', key: 'primary_ip_address' },
+    { name: 'Server Type', key: 'server_type' },
+    { name: 'OS Type', key: 'os_type' },
+    { name: 'Project', key: 'project_id' },
     { name: 'Region', key: 'region_info.region_id' },
     { name: 'Zone', key: 'zone_info.zone_id' },
     { name: 'Pool', key: 'pool_info.pool_id' },
@@ -575,7 +591,7 @@ export default {
             await apiHandler.getData();
             projectModalVisible.value = false;
         };
-        const exportAction = fluentApi.addons().excel().export().setDataSource(baseInfoDetails);
+        const exportAction = fluentApi.addons().excel().export().setDataSource(exportDataSource);
 
         const exportToolSet= new ExcelExportAPIToolSet(exportAction,apiHandler);
 
@@ -602,8 +618,9 @@ export default {
             return result;
         });
         const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem.server_id);
-        const getDataAPI = fluentApi.inventory().server().getData();
-        const historyAPIHandler = new HistoryFluentAPI(getDataAPI,historyIsShow,selectId);
+        const getDataAction = fluentApi.inventory().server().getData();
+        // @ts-ignore
+        const historyAPIHandler = new HistoryFluentAPI(getDataAction,historyIsShow,selectId);
         return {
             ...toRefs(tabData),
             dropdown,
@@ -631,6 +648,7 @@ export default {
             multiSelectFields,
             exportToolSet,
             adminApiHandler,
+            getDataAction,
             historyAPIHandler,
             baseInfoDetails,
         };

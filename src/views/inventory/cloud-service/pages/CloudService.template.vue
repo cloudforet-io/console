@@ -101,8 +101,9 @@
                             </template>
                             <template #data>
                                 <PDynamicSubData
-                                    :select-id="dvApiHandler.tableTS.selectState.firstSelectItem.cloud_service_id" :sub-data="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
-                                    url="/inventory/cloud-service/get-data" id-key="cloud_service_id"
+                                    :select-id="dvApiHandler.tableTS.selectState.firstSelectItem.cloud_service_id"
+                                    :sub-data="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
+                                    :action="csGetDataAction"
                                 />
                             </template>
                             <template #rawData>
@@ -348,7 +349,7 @@ export const cloudServiceSetup = (
         await dvApiHandler.getData();
         projectModalVisible.value = false;
     };
-
+    const csGetDataAction = fluentApi.inventory().cloudService().getData();
     return {
         ...toRefs(state),
         apiHandler,
@@ -362,7 +363,7 @@ export const cloudServiceSetup = (
         clickProject,
         changeProject,
         exportToolSet,
-        // exportData,
+        csGetDataAction,
     };
 };
 

@@ -110,6 +110,57 @@ export class SearchTableFluentAPI<
 
 }
 
+export class SubDataFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
+    action extends GetDataAction<any, any> = GetDataAction<parameter, resp>,
+    > extends SearchTableFluentAPI<parameter, resp,initData,initSyncData,T, action> {
+
+    getAction = () => this.getSearchTableDefaultAction()
+        .setKeyPath(this.keyPath.value)
+        .setId(this.resourceId.value);
+
+    constructor(
+        action: action,
+        protected keyPath: forceRefArg<string>,
+        protected resourceId:forceRefArg<string>,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+    ) {
+        super(
+            action,
+            initData, // sub api can't support only query
+            initSyncData,
+        );
+        onMounted(() => {
+            watch([this.resourceId,this.keyPath],async (origin, before) => {
+                let id;
+                let path;
+                let preId;
+                let prePath;
+                if (origin) {
+                    id = origin[0];
+                    path = origin[1];
+                }
+                if (before) {
+                    preId = before[0];
+                    prePath = before[1];
+                }
+
+                if (id && path && (id !== preId || path !== prePath)) {
+                    await this.getData();
+                }
+            });
+        });
+    }
+
+}
+
+
+
 export class TabSearchTableFluentAPI<
     parameter = any,
     resp extends ListType<any> = ListType<any>,
@@ -153,13 +204,13 @@ export class HistoryFluentAPI<
 
     getAction = () => this.getSearchTableDefaultAction()
         .setKeyPath('collection_info.update_history')
-        .setId(this.resource_id.value);
+        .setId(this.resourceId.value);
 
 
     constructor(
         action: action,
         isShow: forceRefArg<boolean>,
-        protected resource_id:forceRefArg<string>,
+        protected resourceId:forceRefArg<string>,
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
         public dataSource: DataSource[]=defaultHistoryDataSource
@@ -171,7 +222,7 @@ export class HistoryFluentAPI<
             initSyncData,
         );
         onMounted(() => {
-            watch(this.resource_id, async (id, preId) => {
+            watch(this.resourceId, async (id, preId) => {
                 if (isShow.value && id && id !== preId) {
                     await this.getData();
                 }
@@ -362,6 +413,8 @@ interface DataSource {
     view_option?: any;
 
 }
+
+
 
 export class TabSearchTableAPI<initData = any, initSyncData = any> extends SearchTableAPI<initData, initSyncData> {
     protected isShow: forceRefArg<boolean>;
