@@ -211,6 +211,11 @@
 	"ERROR": {
 		"None": ""
 	},
+	"FIELD": {
+		"NAME": "이름",
+		"PROJECT": "프로젝트",
+		"STATE": "상태"
+	},
 	"FORM": {
 		"LABEL": {
 			"EMAIL": "이메일",

@@ -425,9 +425,8 @@ export default {
         );
 
         const fields= makeTrItems([
-                ['project', 'COMMON.PROJ'],
-                ['name', 'COMMON.NAME'],
-                ['state', 'COMMON.STATE'],
+                ['name', 'FIELD.NAME'],
+                ['state', 'FIELD.STATE'],
                 ['primary_ip_address', 'COMMON.IP', { sortable: false }],
                 ['core', 'COMMON.CORE'],
                 ['memory', 'COMMON.MEMORY'],
@@ -435,6 +434,7 @@ export default {
                 ['os_distro', 'COMMON.O_DIS'],
                 ['server_type', 'COMMON.SE_TYPE'],
                 ['platform_type', 'COMMON.PLATFORM'],
+                ['project', 'FIELD.PROJECT'],
                 ['pool', 'COMMON.POOL'],
                 ['updated_at', 'COMMON.UPDATE'],
             ],
