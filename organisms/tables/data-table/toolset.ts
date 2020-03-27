@@ -64,38 +64,38 @@ export const dataTableProps = {
 };
 
 export interface DataTablePropsType extends TablePropsType {
-    fields?:any[];
+    fields?: any[];
     items?: any[];
-    sortable?:boolean;
+    sortable?: boolean;
     dragable?: boolean;
     rowClickMultiSelectMode?: boolean;
     selectable?: boolean;
-    colCopy?:boolean;
-    useSpinnerLoading?:boolean;
-    useCursorLoading?:boolean;
-    multiSelect?:boolean;
+    colCopy?: boolean;
+    useSpinnerLoading?: boolean;
+    useCursorLoading?: boolean;
+    multiSelect?: boolean;
 }
 export interface DataTableSyncType {
     sortBy: string;
-    sortDesc:boolean;
+    sortDesc: boolean;
     selectIndex: any[]|number;
-    loading:boolean;
+    loading: boolean;
 }
 export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncType{
-    fields:any[];
+    fields: any[];
     items: any[];
-    sortable:boolean;
+    sortable: boolean;
     dragable: boolean;
     rowClickMultiSelectMode: boolean;
     selectable: boolean;
     selectIndex: any[]|number;
-    colCopy:boolean;
-    loading:boolean;
-    useSpinnerLoading:boolean;
-    useCursorLoading:boolean;
-    multiSelect:boolean;
+    colCopy: boolean;
+    loading: boolean;
+    useSpinnerLoading: boolean;
+    useCursorLoading: boolean;
+    multiSelect: boolean;
     sortBy: string;
-    sortDesc:boolean;
+    sortDesc: boolean;
 }
 
 @StateToolSet<DataTablePropsType>()
@@ -106,7 +106,7 @@ export class DataTableState<
         initState extends DataTablePropsType = DataTablePropsType,
         initSync extends DataTableSyncType= DataTableSyncType
     > extends TableState< initData, initState> {
-    public syncState:optionalType<initSync, initSyncData>;
+    syncState: optionalType<initSync, initSyncData>;
 
     static initState() {
         return {
@@ -134,7 +134,7 @@ export class DataTableState<
         };
     }
 
-    constructor(initData:initData = {} as initData, initSyncData:initSyncData = {} as initSyncData, lazy = false) {
+    constructor(initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData, lazy = false) {
         super(initData, true);
         this.state = initReactive<optionalType<initState, initData>>(lazy, DataTableState.initState(), initData);
         this.syncState = initReactive<optionalType<initSync, initSyncData>>(lazy, DataTableState.initSyncState(), initSyncData);
@@ -142,20 +142,20 @@ export class DataTableState<
 }
 
 export interface DataTableSelectState {
-    isNotSelected:boolean;
-    isSelectOne:boolean;
-    isSelectMulti:boolean;
-    selectItems:readonly any[];
-    firstSelectItem:any;
+    isNotSelected: boolean;
+    isSelectOne: boolean;
+    isSelectMulti: boolean;
+    selectItems: readonly any[];
+    firstSelectItem: any;
 }
 
 
-export const initSelectState = (state:DataTablePropsType, syncState:DataTableSyncType):DataTableSelectState => {
-    const isNotSelected:Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 0 : true));
-    const isSelectOne:Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 1 : false));
-    const isSelectMulti:Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length > 1 : false));
-    const selectItems:Ref<readonly any[]> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).map(idx => (state.items as Array<any>)[idx]) : []));
-    const firstSelectItem:Ref<any> = computed(() => (!isNotSelected.value ? (state.items as Array<any>)[(syncState.selectIndex as number[])[0]] : {}));
+export const initSelectState = (state: DataTablePropsType, syncState: DataTableSyncType): DataTableSelectState => {
+    const isNotSelected: Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 0 : true));
+    const isSelectOne: Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length === 1 : false));
+    const isSelectMulti: Ref<boolean> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).length > 1 : false));
+    const selectItems: Ref<readonly any[]> = computed(() => (syncState.selectIndex ? (syncState.selectIndex as Array<any>).map(idx => (state.items as Array<any>)[idx]) : []));
+    const firstSelectItem: Ref<any> = computed(() => (!isNotSelected.value ? (state.items as Array<any>)[(syncState.selectIndex as number[])[0]] : {}));
     return reactive({
         isNotSelected,
         isSelectOne,
@@ -167,13 +167,13 @@ export const initSelectState = (state:DataTablePropsType, syncState:DataTableSyn
 
 @HelperToolSet()
 export class DataTableToolSet<initData, initSyncData> extends DataTableState< initData, initSyncData> {
-    public selectState:DataTableSelectState= null as unknown as DataTableSelectState;
+    selectState: DataTableSelectState= null as unknown as DataTableSelectState;
 
-    static initToolSet(_this:any) {
+    static initToolSet(_this: any) {
         _this.selectState = initSelectState(_this.state, _this.syncState);
     }
 
-    constructor(initData:initData = {} as initData, initSyncData:initSyncData = {} as initSyncData) {
+    constructor(initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData) {
         super(initData, initSyncData);
         DataTableToolSet.initToolSet(this);
     }

@@ -32,7 +32,7 @@ import {tableProps, TablePropsType} from './toolset';
 export default defineComponent( {
     name: 'PTable',
     props: tableProps,
-    setup: function (props: TablePropsType, context) {
+    setup(props: TablePropsType, context) {
         const getStyle = (tableStyle: object | unknown, bgStyle: object | unknown): string | null => {
             if (bgStyle && tableStyle) {
                 return `bg-${tableStyle}`;
@@ -45,6 +45,7 @@ export default defineComponent( {
             }
             return null;
         };
+
         const classObject = computed(() => {
             const obj: Array<object | string> = [
                 {'table-sm': props.small},
@@ -62,7 +63,8 @@ export default defineComponent( {
             }
             return obj;
         });
-        const theadClassObject:Readonly<Ref<Readonly<string[] | null>>> = computed(():string[] | null=>{
+
+        const theadClassObject: Readonly<Ref<Readonly<string[] | null>>> = computed(():string[] | null => {
             if (props.theadStyleType){
                 return [`thead-${props.theadStyleType}`];
             }

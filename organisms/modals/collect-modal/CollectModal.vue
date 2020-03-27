@@ -14,7 +14,7 @@
     >
         <template #body>
             <div class="grid grid-cols-2">
-                <div class="left-container ">
+                <div class="left-container">
                     <p-selectable-list :items="collectors"
                                        :multi-selectable="false"
                                        :mapper="mapper"
