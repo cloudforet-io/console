@@ -35,6 +35,7 @@
                                 <PDropdownMenuBtn
                                     id="cloud-service-type-dropdown-btn"
                                     :menu="cstDropdownMenu"
+                                    @click-export="cstExportToolSet.getData()"
                                 >
                                     Action
                                 </PDropdownMenuBtn>
@@ -245,7 +246,13 @@ export const cloudServiceSetup = (
     ]);
 
     const exportAction = fluentApi.addons().excel().export();
-
+    const cstExportAction = exportAction.setDataSource([
+        {name:'provider',key:'provider'},
+        {name:'group',key:'group'},
+        {name:'name',key:'name'},
+        {name:'total count',key:'cloud_service_count'},
+    ]);
+    const cstExportToolSet= new ExcelExportAPIToolSet(cstExportAction,apiHandler);
     const exportToolSet= new ExcelExportAPIToolSet(exportAction,dvApiHandler);
     watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
         if (preType && type !== preType) {
@@ -284,6 +291,7 @@ export const cloudServiceSetup = (
             ['add', 'BTN.CREATE'],
             ['update', 'BTN.UPDATE'],
             ['delete', 'BTN.DELETE'],
+            ['export','BTN.EXPORT',{disabled:false}]
         ],
         context.parent,
         { type: 'item', disabled: true }),
@@ -364,6 +372,7 @@ export const cloudServiceSetup = (
         changeProject,
         exportToolSet,
         csGetDataAction,
+        cstExportToolSet,
     };
 };
 

@@ -339,6 +339,18 @@ export abstract class MultiItemAction<parameter, resp> extends RawParameterActio
         return this.clone();
     }
 }
+export abstract class MultiItemQueryAction<parameter, resp> extends QueryAPI<parameter, resp> {
+    protected abstract idsField: string;
+
+    setIds(ids: string[]) {
+        this.apiState.extraParameter[this.idsField] = ids;
+        return this.clone();
+    }
+}
+
+export abstract class MemberListAction<parameter, resp> extends MultiItemQueryAction<parameter, resp>{
+    path = 'member/list'
+}
 
 export abstract class MultiEnableAction<parameter, resp> extends MultiItemAction<parameter, resp> {
     protected path = 'enable';

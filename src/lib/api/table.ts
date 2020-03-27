@@ -19,7 +19,7 @@ import {
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { ApiQuery, defaultQuery } from '@/lib/api/query';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import {GetDataAction, ListType, QueryAPI} from '@/lib/fluent-api';
+import {GetDataAction, ListType, MemberListAction, QueryAPI} from '@/lib/fluent-api';
 
 interface DynamicTableDataSource{
     dataSource: DataSource[]
@@ -191,6 +191,58 @@ export class TabSearchTableFluentAPI<
     }
 
 }
+
+const defaultAdminDataSource = [
+    { name: 'Resource Type', key: 'resource_type' },
+    { name: 'Resource ID', key: 'resource_id' },
+    { name: 'Resource Name', key: 'name' },
+    {
+        name: 'labels', key: 'labels', view_type: 'list', view_option: { item: { view_type: 'badge' } },
+    },
+    { name: 'User ID', key: 'user_info.user_id' },
+    { name: 'Name', key: 'user_info.name' },
+    { name: 'Email', key: 'user_info.email' },
+];
+
+export class AdminFluentAPI<
+    parameter = any,
+    resp extends ListType<any> = ListType<any>,
+    initData = any,
+    initSyncData = any,
+    T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
+    action extends MemberListAction<any, any> = MemberListAction<parameter, resp>,
+    > extends TabSearchTableFluentAPI<parameter, resp,initData,initSyncData,T, action> implements DynamicTableDataSource{
+
+    getAction = () => this.getSearchTableDefaultAction()
+        .setIds(this.target.tableTS.selectState.selectItems.map(item =>item[this.idField]));
+
+    constructor(
+        action: action,
+        isShow: forceRefArg<boolean>,
+        protected idField:string,
+        protected target: BaseTableFluentAPI,
+        initData: initData = {} as initData,
+        initSyncData: initSyncData = {} as initSyncData,
+        public dataSource: DataSource[]=defaultAdminDataSource
+    ) {
+        super(
+            action,
+            isShow,
+            initData,
+            initSyncData,
+        );
+            watch(()=>this.target.tableTS.selectState.selectItems, async (selected, before) => {
+                console.debug(this.target.tableTS.selectState.selectItems);
+                if (isShow.value && selected.length >= 1 && selected !== before) {
+                    await this.getData();
+                }
+            });
+
+    }
+}
+
+
+
 
 export class HistoryFluentAPI<
     parameter = any,
@@ -458,18 +510,6 @@ export class TabSearchTableAPI<initData = any, initSyncData = any> extends Searc
         });
     }
 }
-
-const defaultAdminDataSource = [
-    { name: 'Resource Type', key: 'resource_type' },
-    { name: 'Resource ID', key: 'resource_id' },
-    { name: 'Resource Name', key: 'name' },
-    {
-        name: 'labels', key: 'labels', view_type: 'list', view_option: { item: { view_type: 'badge' } },
-    },
-    { name: 'User ID', key: 'user_info.user_id' },
-    { name: 'Name', key: 'user_info.name' },
-    { name: 'Email', key: 'user_info.email' },
-];
 
 export class AdminTableAPI<initData, initSyncData> extends TabSearchTableAPI<initData, initSyncData> {
     constructor(

@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import {
-    GetAction, GetDataAction, ListAction, MultiDeleteAction, MultiItemAction,
+    GetAction, GetDataAction, ListAction, MemberListAction, MultiDeleteAction, MultiItemAction,
     Resource,
     ResourceActions, SubMultiItemAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
@@ -83,7 +83,11 @@ class Delete extends MultiDeleteAction<any,any>{
 
 }
 
-export default class Server extends Resource implements ResourceActions<'get'|'list'|'getData'|'changeProject'|'update'|'changeState'> {
+class MemberList extends MemberListAction<any,any>{
+    protected idsField = idsField;
+}
+
+export default class Server extends Resource implements ResourceActions<'get'|'list'|'getData'|'changeProject'|'update'|'changeState'|'memberList'> {
     protected name = 'server';
 
     get(): Get { return new Get(this.baseUrl); }
@@ -99,4 +103,6 @@ export default class Server extends Resource implements ResourceActions<'get'|'l
     changeProject():ChangeProject{return new ChangeProject(this.baseUrl);}
 
     changeState():ChangeState{return new ChangeState(this.baseUrl);}
+
+    memberList():MemberList{return  new MemberList(this.baseUrl)}
 }

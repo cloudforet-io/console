@@ -189,6 +189,7 @@ import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import {
+    AdminFluentAPI,
     AdminTableAPI, HistoryAPI, HistoryFluentAPI, QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
@@ -596,9 +597,7 @@ export default {
         const exportToolSet= new ExcelExportAPIToolSet(exportAction,apiHandler);
 
 
-        const adminParams = computed(() => ({
-            servers: apiHandler.tableTS.selectState.selectItems.map((item)=>item.server_id),
-        }));
+
         const adminIsShow = computed(() => {
             let result = false;
             if (apiHandler.tableTS.selectState.isSelectOne) {
@@ -608,7 +607,12 @@ export default {
             }
             return result;
         });
-        const adminApiHandler = new AdminTableAPI('/inventory/server/member/list', adminParams, undefined, undefined, undefined, undefined, adminIsShow);
+        const adminApiHandler = new AdminFluentAPI(
+            fluentApi.inventory().server().memberList(),
+            adminIsShow,
+            'server_id',
+            apiHandler
+        );
 
         const historyIsShow = computed(() => {
             let result = false;
@@ -619,6 +623,7 @@ export default {
         });
         const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem.server_id);
         const getDataAction = fluentApi.inventory().server().getData();
+
         // @ts-ignore
         const historyAPIHandler = new HistoryFluentAPI(getDataAction,historyIsShow,selectId);
         return {
