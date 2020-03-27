@@ -19,7 +19,7 @@ export default defineComponent({
         // eslint-disable-next-line @typescript-eslint/camelcase,camelcase
         view_type: {
             type: String,
-            required: true,
+            default:'text',
         },
         // eslint-disable-next-line camelcase,@typescript-eslint/camelcase
         view_option: {
