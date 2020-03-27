@@ -170,7 +170,6 @@ import PBadge from '@/components/atoms/badges/Badge.vue';
 import {
     timestampFormatter, serverStateFormatter, platformBadgeFormatter, getValue,
 } from '@/lib/util';
-import serverEventBus from '@/views/inventory/server/ServerEventBus';
 import { makeTrItems } from '@/lib/view-helper';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -190,7 +189,7 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import {
     AdminFluentAPI,
-    AdminTableAPI, HistoryAPI, HistoryFluentAPI, QuerySearchTableFluentAPI,
+    HistoryFluentAPI, QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';

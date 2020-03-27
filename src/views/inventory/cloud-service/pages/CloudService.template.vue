@@ -199,14 +199,14 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import {AdminTableAPI, HistoryAPI, QuerySearchTableAPI, QuerySearchTableFluentAPI} from '@/lib/api/table';
+import {AdminFluentAPI, HistoryFluentAPI, QuerySearchTableAPI, QuerySearchTableFluentAPI} from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { ChangeCloudServiceProject, MockChangeProject } from '@/lib/api/fetch';
 import { Computed } from '@/lib/type';
 import {ExcelExportAPIToolSet} from "@/lib/api/add-on";
 import fluentApi from "@/lib/fluent-api";
-import {ExportType} from "@/lib/fluent-api/add-ons/excel";
+import {tabIsShow} from "@/lib/compostion-util";
 
 
 export const cloudServiceSetup = (
@@ -401,14 +401,23 @@ export default {
     setup(props, context) {
         // @ts-ignore
         const mockAPI = new QuerySearchTableAPI('', undefined, undefined, undefined, undefined, undefined, undefined);
-        const mockAdminAPI = new AdminTableAPI('', computed(() => ({})), undefined, undefined, undefined, undefined, computed(() => false));
-        const mockHistoryAPIHandler = new HistoryAPI('', '', computed(() => ''), undefined, undefined, undefined, computed(() => false));
+        const target = new QuerySearchTableFluentAPI(fluentApi.inventory().cloudService().list())
+        const adminApiHandler = new AdminFluentAPI(
+            fluentApi.inventory().cloudService().memberList(),
+            ref(false),
+            'cloud_service_id',
+            target,
+        );
+
+        // @ts-ignore
+        const historyAPIHandler = new HistoryFluentAPI(fluentApi.inventory().cloudService().getData(),ref(false),ref(''));
         const mockChangeProject = new MockChangeProject();
+
         return {
             // @ts-ignore
             ...cloudServiceSetup(context, mockAPI, mockAPI, mockChangeProject),
-            adminApiHandler: mockAdminAPI,
-            historyAPIHandler: mockHistoryAPIHandler,
+            adminApiHandler: adminApiHandler,
+            historyAPIHandler: historyAPIHandler,
         };
     },
 };
