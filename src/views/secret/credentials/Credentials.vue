@@ -150,7 +150,7 @@ export default {
         mountBusEvent(credentialsEventBus, credentialsEventNames.createCredentials, createCredentials);
         mountBusEvent(credentialsEventBus, credentialsEventNames.deleteCredentials, deleteCredentials);
         // mountBusEvent(credentialsEventBus, credentialsEventNames.getPluginCredentialsForm, getPluginCredentialsForm);
-        // requestCredentialsList();
+        requestCredentialsList();
         return {
             ...toRefs(state),
         };

@@ -1,128 +1,128 @@
 <template>
-    <p-vertical-page-layout2 :min-width="200" :init-width="260">
-        <template #sidebar="{width}">
-            <div :style="{width: width}">
-                <schema-filter
-                    :schema="schema"
-                    :selected-schema-id.sync="selectedSchemaId"
-                    @schemaChange="schemaChange"
-                />
-            </div>
-        </template>
-        <template #default>
-            <p-horizontal-layout>
-                <template #container="{ height }">
-                    <p-toolbox-table
-                        ref="toolbox"
-                        :items="items"
-                        :fields="fields"
-                        :selectable="true"
-                        :sortable="true"
-                        :dragable="true"
-                        :hover="true"
-                        :responsive="true"
-                        :sort-by.sync="sortBy"
-                        :sort-desc.sync="sortDesc"
-                        :all-page="allPage"
-                        :this-page.sync="thisPage"
-                        :select-index.sync="selectIndex"
-                        :page-size.sync="pageSize"
-                        :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
-                        :setting-visible="false"
-                        :loading="loading"
-                        :use-spinner-loading="true"
-                        :use-cursor-loading="true"
-                        @changePageSize="getCredentials"
-                        @changePageNumber="getCredentials"
-                        @clickRefresh="getCredentials"
-                        @changeSort="getCredentials"
-                    >
-                        <template #col-credential_group_id-format="{item}">
-                            <div>
-                                <PBadge v-for="(label, idx) in item.credential_groups" :key="idx" class="p-label"
-                                        style-type="gray2"
-                                >
-                                    {{ getEmptyString(label.name) }}
-                                </PBadge>
-                            </div>
-                        </template>
-                        <template slot="toolbox-left">
-                            <p-button style-type="primary-dark" @click="clickCreate">
-                                {{ $t('BTN.CREATE') }}
-                            </p-button>
-                            <PDropdownMenuBtn
-                                id="server-dropdown-btn"
-                                class="left-toolbox-item"
-                                :menu="dropdown"
-                                @click-delete="clickDelete"
+    <general-page-layout>
+        <!--        <template #sidebar="{width}">-->
+        <!--            <div :style="{width: width}">-->
+        <!--                <schema-filter-->
+        <!--                    :schema="schema"-->
+        <!--                    :selected-schema-id.sync="selectedSchemaId"-->
+        <!--                    @schemaChange="schemaChange"-->
+        <!--                />-->
+        <!--            </div>-->
+        <!--        </template>-->
+        <!--        <template #default>-->
+        <p-horizontal-layout>
+            <template #container="{ height }">
+                <p-toolbox-table
+                    ref="toolbox"
+                    :items="items"
+                    :fields="fields"
+                    :selectable="true"
+                    :sortable="true"
+                    :dragable="true"
+                    :hover="true"
+                    :responsive="true"
+                    :sort-by.sync="sortBy"
+                    :sort-desc.sync="sortDesc"
+                    :all-page="allPage"
+                    :this-page.sync="thisPage"
+                    :select-index.sync="selectIndex"
+                    :page-size.sync="pageSize"
+                    :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
+                    :setting-visible="false"
+                    :loading="loading"
+                    :use-spinner-loading="true"
+                    :use-cursor-loading="true"
+                    @changePageSize="getCredentials"
+                    @changePageNumber="getCredentials"
+                    @clickRefresh="getCredentials"
+                    @changeSort="getCredentials"
+                >
+                    <template #col-credential_group_id-format="{item}">
+                        <div>
+                            <PBadge v-for="(label, idx) in item.credential_groups" :key="idx" class="p-label"
+                                    style-type="gray2"
                             >
-                                Action
-                            </PDropdownMenuBtn>
-                            <div class="left-toolbox-item">
-                                <p-search :search-text.sync="searchText" @onSearch="getCredentials" />
-                            </div>
-                        </template>
-                        <template #col-created_at-format="data">
-                            {{ timestampFormatter(data.value) }}
-                        </template>
-                    </p-toolbox-table>
-                </template>
-            </p-horizontal-layout>
-            <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
-                <template #detail="{tabName}">
-                    <p-credentials-detail ref="credentialsDetail"
-                                          :item="items[selectIndex[0]]"
-                                          :tag-confirm-event="tagConfirmEvent"
-                                          :tag-reset-event="tagResetEvent"
-                    />
-                </template>
-            </PTab>
-            <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
-                <template #data="{tabName}">
-                    <p-data-table
-                        :fields="multiSelectFields"
-                        :sortable="false"
-                        :selectable="false"
-                        :items="getSelectedCredentialsItems"
-                        :col-copy="true"
-                    />
-                </template>
-            </PTab>
+                                {{ getEmptyString(label.name) }}
+                            </PBadge>
+                        </div>
+                    </template>
+                    <template slot="toolbox-left">
+                        <p-button style-type="primary-dark" @click="clickCreate">
+                            {{ $t('BTN.CREATE') }}
+                        </p-button>
+                        <PDropdownMenuBtn
+                            id="server-dropdown-btn"
+                            class="left-toolbox-item"
+                            :menu="dropdown"
+                            @click-delete="clickDelete"
+                        >
+                            Action
+                        </PDropdownMenuBtn>
+                        <div class="left-toolbox-item">
+                            <p-search :search-text.sync="searchText" @onSearch="getCredentials" />
+                        </div>
+                    </template>
+                    <template #col-created_at-format="data">
+                        {{ timestampFormatter(data.value) }}
+                    </template>
+                </p-toolbox-table>
+            </template>
+        </p-horizontal-layout>
+        <PTab v-if="isSelectedOne" :tabs="tabs" :active-tab.sync="activeTab">
+            <template #detail="{tabName}">
+                <p-credentials-detail ref="credentialsDetail"
+                                      :item="items[selectIndex[0]]"
+                                      :tag-confirm-event="tagConfirmEvent"
+                                      :tag-reset-event="tagResetEvent"
+                />
+            </template>
+        </PTab>
+        <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
+            <template #data="{tabName}">
+                <p-data-table
+                    :fields="multiSelectFields"
+                    :sortable="false"
+                    :selectable="false"
+                    :items="getSelectedCredentialsItems"
+                    :col-copy="true"
+                />
+            </template>
+        </PTab>
 
-            <div v-else id="empty-space">
-                Select a Credentials from above in details.
-            </div>
-            <p-table-check-modal
-                v-if="!!checkTableModalState.mode && checkTableModalState.visible"
-                :visible.sync="checkTableModalState.visible"
-                :header-title="checkTableModalState.title"
-                :sub-title="checkTableModalState.subTitle"
-                :theme-color="checkTableModalState.themeColor"
-                :fields="multiSelectFields"
-                size="lg"
-                :centered="true"
-                :selectable="false"
-                :double-confirm="doubleState.doubleConfirm"
-                :double-confirm-origin="doubleState.origin"
-                :double-confirm-title="doubleState.title"
-                :double-confirm-place-holder="doubleState.placeHolder"
-                :items="getSelectedCredentialsItems"
-                @confirm="checkModalConfirm"
-            />
-            <p-credentials-form v-if="credentialsFormState.visible"
-                                ref="CREDENTIAL_FORM"
-                                :header-title="credentialsFormState.headerTitle"
-                                :update-mode="credentialsFormState.updateMode"
-                                :item="credentialsFormState.item"
-                                :visible.sync="credentialsFormState.visible"
-                                :dynamic-form-state="dynamicFormState"
-                                :schema-list="schema"
-                                :selected-schema-id="selectedSchemaId"
-                                @confirm="credentialsFormConfirm"
-                                @close="credentialsFormCancel"
-            />
-        </template>
-    </p-vertical-page-layout2>
+        <div v-else id="empty-space">
+            Select a Credentials from above in details.
+        </div>
+        <p-table-check-modal
+            v-if="!!checkTableModalState.mode && checkTableModalState.visible"
+            :visible.sync="checkTableModalState.visible"
+            :header-title="checkTableModalState.title"
+            :sub-title="checkTableModalState.subTitle"
+            :theme-color="checkTableModalState.themeColor"
+            :fields="multiSelectFields"
+            size="lg"
+            :centered="true"
+            :selectable="false"
+            :double-confirm="doubleState.doubleConfirm"
+            :double-confirm-origin="doubleState.origin"
+            :double-confirm-title="doubleState.title"
+            :double-confirm-place-holder="doubleState.placeHolder"
+            :items="getSelectedCredentialsItems"
+            @confirm="checkModalConfirm"
+        />
+        <p-credentials-form v-if="credentialsFormState.visible"
+                            ref="CREDENTIAL_FORM"
+                            :header-title="credentialsFormState.headerTitle"
+                            :update-mode="credentialsFormState.updateMode"
+                            :item="credentialsFormState.item"
+                            :visible.sync="credentialsFormState.visible"
+                            :dynamic-form-state="dynamicFormState"
+                            :schema-list="schema"
+                            :selected-schema-id="selectedSchemaId"
+                            @confirm="credentialsFormConfirm"
+                            @close="credentialsFormCancel"
+        />
+        <!--        </template>-->
+    </general-page-layout>
 </template>
 
 <script>
@@ -139,6 +139,7 @@ import PBadge from '@/components/atoms/badges/Badge.vue';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import SchemaFilter from '@/views/secret/credentials/modules/SchemaFilter.vue';
 import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable');
@@ -161,8 +162,8 @@ export const CredentialsTableReactive = parent => reactive({
     fields: makeTrItems([
         // ['credential_id', 'COMMON.ID', { style: { width: '400px' } }],
         ['name', 'COMMON.NAME', { style: { width: '400px' } }],
-        // ['provider', 'COMMON.PROVIDER', { style: { width: '400px' } }], todo: add provider & icon
-        ['secret_type', 'SECRET.SECRET_TYPE', { style: { width: '400px' } }], // todo: add common.secret_type
+        // ['provider', 'COMMON.PROVIDER', { style: { width: '400px' } }],
+        ['issue_type', 'COMMON.ISSUE_TYPE', { style: { width: '400px' } }],
         ['credential_group_id', 'COMMON.GROUP', { style: { width: '800px' }, sortable: false }],
         ['created_at', 'COMMON.CREATED', { style: { width: '300px' } }],
     ],
@@ -343,29 +344,30 @@ export const credentialsSetup = (props, context, eventName) => {
         selectedSchemaId: null,
         selectedScheme: null,
         searchQueries: computed(() => {
-            if (state.selectedScheme) return [];//[new SearchQuery('name', '=', schemaState.selectedSchemaName)];
+            if (state.selectedScheme) return [];// [new SearchQuery('name', '=', schemaState.selectedSchemaName)];
             return [];
         }),
     });
 
     const getCredentials = () => {
-        if (!schemaState.selectedSchemaId) {
-            return;
-        }
+        // if (!schemaState.selectedSchemaId) {
+        //     return;
+        // }
         eventBus.$emit(eventName.getCredentialsList);
     };
 
-    const listSchema = () => {
-        credentialsEventBus.$emit('getSchemaList');
-
-    };
-
-    const schemaChange = (schema) => {
-        state.selectedScheme = schema;
-        listSchema();
-    };
-
-    listSchema();
+    // const listSchema = () => {
+    //     credentialsEventBus.$emit('getSchemaList');
+    //
+    // };
+    //
+    // const schemaChange = (schema) => {
+    //     state.selectedScheme = schema;
+    //     listSchema();
+    // };
+    //
+    // listSchema();
+    // getCredentials();
 
     return reactive({
         ...toRefs(state),
@@ -393,8 +395,8 @@ export const credentialsSetup = (props, context, eventName) => {
         getEmptyString,
         checkModalConfirm,
         ...toRefs(schemaState),
-        listSchema,
-        schemaChange,
+        // listSchema,
+        // schemaChange,
         dynamicFormState,
     });
 };
@@ -405,6 +407,7 @@ export default {
         getValue,
     },
     components: {
+        GeneralPageLayout,
         PCredentialsForm,
         PButton,
         PVerticalPageLayout2,
