@@ -167,7 +167,7 @@ export const CdgTableReactive = parent => reactive({
     fields: makeTrItems([
         // ['credential_group_id', 'COMMON.ID'],
         ['name', 'COMMON.NAME'],
-        ['created_at', 'COMMON.CREAT'],
+        ['created_at', 'COMMON.CREATE'],
     ],
     parent),
     multiSelectFields: makeTrItems([

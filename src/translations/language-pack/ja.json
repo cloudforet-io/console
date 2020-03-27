@@ -6,8 +6,7 @@
 				"KEY_EMPTY": "",
 				"VAL_EMPTY": ""
 			}
-		},
-		"None": ""
+		}
 	},
 	"BTN": {
 		"ACTION": "",
@@ -24,6 +23,7 @@
 		"DISABLE": "",
 		"EDIT": "",
 		"ENABLE": "",
+		"EXPORT": "",
 		"FIND": "",
 		"NO": "",
 		"OK": "",
@@ -50,7 +50,6 @@
 		"COMPUTE": "",
 		"CORE": "",
 		"COUNT": "",
-		"CREAT": "",
 		"CREATE": "",
 		"CREATED": "",
 		"CREATE_BY": "",
@@ -135,12 +134,6 @@
 		"O_DETAIL": "",
 		"O_DIS": "",
 		"O_TYPE": "",
-		"PG": "",
-		"PG_GR": "",
-		"PG_GR_ID": "",
-		"PG_GR_NM": "",
-		"PG_ID": "",
-		"PG_NM": "",
 		"PHONE": "",
 		"PL": "",
 		"PLATFORM": "",
@@ -153,8 +146,12 @@
 		"PRI_IP": "",
 		"PROCESSED": "",
 		"PROFILE": "",
-		"PROJ": "",
 		"PROJECT": "",
+		"PROJECT_GRP": "",
+		"PROJECT_GRP_ID": "",
+		"PROJECT_GRP_NM": "",
+		"PROJECT_ID": "",
+		"PROJECT_NM": "",
 		"PROTOCOL": "",
 		"PROVIDER": "",
 		"RAWDATA": "",
@@ -342,8 +339,9 @@
 		"BTN": {
 			"None": ""
 		},
-		"JASON_ALERT": "",
+		"JSON_ALERT": "",
 		"NO_FORMAT": "",
+		"SECRET_TYPE": "",
 		"TAB": {
 			"None": ""
 		}
@@ -382,7 +380,7 @@
 		"CREATE": "",
 		"DELETE": "",
 		"POOL": "",
-		"PROJECT": "",
+		"PROJ": "",
 		"PROJECT_GROUP": "",
 		"REGION": "",
 		"UPDATE": "",

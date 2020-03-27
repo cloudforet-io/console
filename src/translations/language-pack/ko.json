@@ -6,8 +6,7 @@
 				"KEY_EMPTY": "키를 입력해주세요.",
 				"VAL_EMPTY": "값을 입력해주세요."
 			}
-		},
-		"None": ""
+		}
 	},
 	"BTN": {
 		"ACTION": "작업",
@@ -24,6 +23,7 @@
 		"DISABLE": "비활성화",
 		"EDIT": "수정",
 		"ENABLE": "활성화",
+		"EXPORT": "내보내기",
 		"FIND": "찾기",
 		"NO": "아니오",
 		"OK": "확인",
@@ -50,7 +50,6 @@
 		"COMPUTE": "Compute",
 		"CORE": "코어(Core)",
 		"COUNT": "갯수",
-		"CREAT": "생성일",
 		"CREATE": "생성일",
 		"CREATED": "생성일",
 		"CREATE_BY": "생성자",
@@ -135,12 +134,6 @@
 		"O_DETAIL": "OS 세부사항",
 		"O_DIS": "OS 배포",
 		"O_TYPE": "OS 타입",
-		"PG": "프로젝트",
-		"PG_GR": "프로젝트 그룹",
-		"PG_GR_ID": "프로젝트 그룹 아이디",
-		"PG_GR_NM": "프로젝트 그룹 명",
-		"PG_ID": "프로젝트 아이디",
-		"PG_NM": "프로젝트 명",
 		"PHONE": "전화번호",
 		"PL": "풀(Pool)",
 		"PLATFORM": "플랫폼",
@@ -153,8 +146,12 @@
 		"PRI_IP": "대표 IP",
 		"PROCESSED": "수행되었습니다",
 		"PROFILE": "프로필",
-		"PROJ": "프로젝트",
-		"PROJECT": "Project",
+		"PROJECT": "프로젝트",
+		"PROJECT_GRP": "프로젝트 그룹",
+		"PROJECT_GRP_ID": "프로젝트 그룹 아이디",
+		"PROJECT_GRP_NM": "프로젝트 그룹 명",
+		"PROJECT_ID": "프로젝트 아이디",
+		"PROJECT_NM": "프로젝트 명",
 		"PROTOCOL": "프로토콜",
 		"PROVIDER": "프로바이더",
 		"RAWDATA": "Raw Data",
@@ -342,8 +339,9 @@
 		"BTN": {
 			"None": ""
 		},
-		"JASON_ALERT": "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (') )",
+		"JSON_ALERT": "Json 포맷을 확인해 주십시오. (Use double quotation( \" ) mark instead of single quotation (') )",
 		"NO_FORMAT": "템플릿이 존재하지 않습니다. 확인후 다시 시도해 주시기 바랍니다.",
+		"SECRET_TYPE": "계정 타입",
 		"TAB": {
 			"None": ""
 		}
@@ -382,7 +380,7 @@
 		"CREATE": "{0} 생성하기",
 		"DELETE": "삭제하기",
 		"POOL": "Pool",
-		"PROJECT": "프로젝트",
+		"PROJ": "프로젝트",
 		"PROJECT_GROUP": "프로젝트 그룹",
 		"REGION": "Region",
 		"UPDATE": "{0} 업데이트",

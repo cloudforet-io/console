@@ -194,9 +194,7 @@ import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import {
-    MockAdminTableAPI, MockHistoryAPI,
-} from '@/lib/api/table';
+
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { ChangeServerProject, MockChangeProject } from '@/lib/api/fetch';
@@ -213,7 +211,7 @@ export const serverTableReactive = parent => reactive({
         ['os_distro', 'COMMON.O_DIS'],
         ['server_type', 'COMMON.SE_TYPE'],
         ['platform_type', 'COMMON.PLATFORM'],
-        ['project', 'COMMON.PROJ'],
+        ['project', 'COMMON.PROJECT'],
         ['pool', 'COMMON.POOL'],
         ['updated_at', 'COMMON.UPDATE'],
     ],

@@ -104,7 +104,7 @@ export default {
     computed: {
         getSelectedTypeKey() {
             const currentType = this.$parent.selectedNode.node.data.item_type;
-            return (currentType === 'PROJECT_GROUP') ? 'COMMON.PG_GR' : 'COMMON.PG';
+            return (currentType === 'PROJECT_GROUP') ? 'COMMON.PROJECT_GRP' : 'COMMON.PROJECT';
         },
         getMemberModalTitle() {
             return this.$t('IDENTITY.DEL_ARG', [this.$t('COMMON.MEMBER')]);
