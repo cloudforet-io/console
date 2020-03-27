@@ -89,11 +89,11 @@
                         Project
                     </router-link>
                 </li>
-                <li>
-                    <router-link class="service last" to="/identity/cloud-account">
-                       Cloud Account
-                    </router-link>
-                </li>
+<!--                <li>-->
+<!--                    <router-link class="service last" to="/identity/cloud-account">-->
+<!--                       Cloud Account-->
+<!--                    </router-link>-->
+<!--                </li>-->
                 <li>
                     <router-link class="group" to="/secret">
                         <span class="icon">
@@ -105,32 +105,32 @@
                     </router-link>
                 </li>
 
-<!--                <li>-->
-<!--                    <router-link class="service" to="/secret/credentials-group">-->
-<!--                        Secret Group-->
-<!--                    </router-link>-->
-<!--                </li>-->
+                <li>
+                    <router-link class="service" to="/secret/credentials-group">
+                        Credentials Group
+                    </router-link>
+                </li>
                 <li>
                     <router-link class="service" to="/secret/credentials">
                         Credentials
                     </router-link>
                 </li>
-                <li>
-                    <router-link class="group" to="/plugin">
-                        <span class="icon">
-                            <p-i name="ic_identity"
-                                 color="transparent inherit"
-                            />
-                        </span>
-                        <span class="name">Plugin</span>
-                    </router-link>
-                </li>
+<!--                <li>-->
+<!--                    <router-link class="group" to="/plugin">-->
+<!--                        <span class="icon">-->
+<!--                            <p-i name="ic_identity"-->
+<!--                                 color="transparent inherit"-->
+<!--                            />-->
+<!--                        </span>-->
+<!--                        <span class="name">Plugin</span>-->
+<!--                    </router-link>-->
+<!--                </li>-->
 
-                <li>
-                    <router-link class="service" to="/plugin/supervisor">
-                        Supervisor
-                    </router-link>
-                </li>
+<!--                <li>-->
+<!--                    <router-link class="service" to="/plugin/supervisor">-->
+<!--                        Supervisor-->
+<!--                    </router-link>-->
+<!--                </li>-->
             </ul>
         </div>
         <div

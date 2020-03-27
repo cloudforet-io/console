@@ -74,7 +74,7 @@ const router = new VueRouter({
                 identityRoute,
                 inventoryRoute,
                 secretRoute,
-                pluginRoute,
+                // pluginRoute,
             ],
         },
         { path: '*', component: ErrorPage },
