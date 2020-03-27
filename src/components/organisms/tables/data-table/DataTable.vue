@@ -185,7 +185,7 @@ export default defineComponent({
         PTable, PTd, PTh, PTr, PI, PCheckBox, PCopyButton, PLottie, PRadio,
     },
     props: dataTableProps,
-    setup(props:DataTableSetupProps, context) {
+    setup(props: DataTableSetupProps, context) {
         const state = reactive({
             table: null,
             allState: false,
@@ -194,8 +194,8 @@ export default defineComponent({
             thHoverIndex: null,
         });
         const proxySelectIndex = makeProxy('selectIndex', props, context.emit);
-        const fieldsData:Ref<any> = computed(() => {
-            const data = _.flatMap(props.fields, (value:string|object) => {
+        const fieldsData: Ref<any> = computed(() => {
+            const data = _.flatMap(props.fields, (value: string|object) => {
                 if (typeof value === 'string') { return { name: value, label: value, sortable: true }; }
                 return { sortable: true, ...value };
             });
@@ -220,7 +220,7 @@ export default defineComponent({
         const dragSelectItems = (items) => {
             const select = [];
             if (items.length > 1) {
-                items.forEach((item:any) => {
+                items.forEach((item: any) => {
                     // @ts-ignore
                     select.push(Number(item.attributes['data-index'].value));
                 });
