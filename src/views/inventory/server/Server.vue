@@ -67,6 +67,9 @@
                     <template v-slot:col-state-format="data">
                         <p-status v-bind="serverStateFormatter(data.value)" />
                     </template>
+                    <template v-slot:col-project-format="data">
+                        {{data.item.console_force_data.project}}
+                    </template>
                     <template />
                     <template v-slot:col-updated_at-format="data">
                         {{ timestampFormatter(data.value) }}
@@ -98,7 +101,7 @@
         </p-horizontal-layout>
         <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
             <template #detail>
-                <p-server-detail :item="apiHandler.tableTS.selectState.firstSelectItem" :tag-confirm-event="tagConfirmEvent" :tag-reset-event="tagResetEvent" />
+                <p-server-detail :item="apiHandler.tableTS.selectState.firstSelectItem" :data-source="baseInfoDetails"/>
             </template>
             <template #data>
                 <PDynamicSubData
@@ -158,9 +161,7 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, toRefs, ref, computed,
-} from '@vue/composition-api';
+import { reactive, toRefs, ref, computed} from '@vue/composition-api';
 import _ from 'lodash';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -187,7 +188,7 @@ import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import {
-    AdminTableAPI, HistoryAPI, QuerySearchTableFluentAPI,
+    AdminTableAPI, HistoryAPI, HistoryFluentAPI, QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
@@ -199,70 +200,63 @@ import {
 import PQuerySearchTags from "@/components/organisms/search/query-search-tags/QuerySearchTags.vue";
 import {QSTableACHandlerArgs, QuerySearchTableACHandler} from "@/lib/api/auto-complete";
 import {ServerModel} from "@/lib/fluent-api/inventory/server";
+import {useStore} from "@/store/toolset";
+import {AxiosResponse} from "axios";
+import {CloudServiceListResp} from "@/lib/fluent-api/inventory/cloud-service";
 
-const defaultDataSource = [
-    { name: 'ID', key: 'server_id' },
-    { name: 'Name', key: 'name' },
-    {
-        name: 'State',
-        key: 'state',
-        view_type: 'enum',
-        view_option: {
-            INSERVICE: {
-                view_type: 'state',
-                view_option: {
-                    text_color: '#222532',
-                    icon: {
-                        color: '#60B731',
-                    },
+const serverStateVF ={
+    name: 'State',
+    key: 'state',
+    view_type: 'enum',
+    view_option: {
+        INSERVICE: {
+            view_type: 'state',
+            view_option: {
+                text_color: '#222532',
+                icon: {
+                    color: '#60B731',
                 },
             },
-            PENDING: {
-                view_type: 'state',
-                view_option: {
-                    text_color: '#222532',
-                    icon: {
-                        color: '#FF7750',
-                    },
+        },
+        PENDING: {
+            view_type: 'state',
+            view_option: {
+                text_color: '#222532',
+                icon: {
+                    color: '#FF7750',
                 },
             },
-            MAINTENANCE: {
-                view_type: 'state',
-                view_option: {
-                    text_color: '#222532',
-                    icon: {
-                        color: '#FFCE02',
-                    },
+        },
+        MAINTENANCE: {
+            view_type: 'state',
+            view_option: {
+                text_color: '#222532',
+                icon: {
+                    color: '#FFCE02',
                 },
             },
-            CLOSED: {
-                view_type: 'state',
-                view_option: {
-                    text_color: '#EF3817',
-                    icon: {
-                        color: '#EF3817',
-                    },
+        },
+        CLOSED: {
+            view_type: 'state',
+            view_option: {
+                text_color: '#EF3817',
+                icon: {
+                    color: '#EF3817',
                 },
             },
-            DELETED: {
-                view_type: 'state',
-                view_option: {
-                    text_color: '#858895',
-                    icon: {
-                        color: '#858895',
-                    },
+        },
+        DELETED: {
+            view_type: 'state',
+            view_option: {
+                text_color: '#858895',
+                icon: {
+                    color: '#858895',
                 },
             },
         },
     },
-    { name: 'Primary IP', key: 'primary_ip_address' },
-    { name: 'Server Type', key: 'server_type' },
-    { name: 'OS Type', key: 'os_type' },
-    { name: 'Project', key: 'project' },
-    { name: 'Region', key: 'region_info.region_id' },
-    { name: 'Zone', key: 'zone_info.zone_id' },
-    { name: 'Pool', key: 'pool_info.pool_id' },
-    {
+}
+const createAtVF = {
         name: 'Created at',
         key: 'created_at.seconds',
         view_type: 'datetime',
@@ -270,17 +264,18 @@ const defaultDataSource = [
             source_type: 'timestamp',
             source_format: 'seconds',
         },
+};
+const updateAtVF =  {
+    name: 'Updated at',
+    key: 'updated_at.seconds',
+    view_type: 'datetime',
+    view_option: {
+        source_type: 'timestamp',
+        source_format: 'seconds',
     },
-    {
-        name: 'Updated at',
-        key: 'updated_at.seconds',
-        view_type: 'datetime',
-        view_option: {
-            source_type: 'timestamp',
-            source_format: 'seconds',
-        },
-    },
-    {
+};
+
+const deleteAtVF = {
         name: 'Deleted at',
         key: 'deleted_at.seconds',
         view_type: 'datetime',
@@ -288,7 +283,35 @@ const defaultDataSource = [
             source_type: 'timestamp',
             source_format: 'seconds',
         },
-    },
+}
+
+const serverListDataSource= [
+    { name: 'Name', key: 'name' },
+    serverStateVF,
+    { name: 'Primary IP', key: 'primary_ip_address' },
+    { name: 'Server Type', key: 'server_type' },
+    { name: 'OS Type', key: 'os_type' },
+    { name: 'Project', key: 'project' },
+    { name: 'Pool', key: 'pool_info.pool_id' },
+    updateAtVF,
+
+
+];
+
+const baseInfoDetails = [
+    { name: 'ID', key: 'server_id' },
+    { name: 'Name', key: 'name' },
+    serverStateVF,
+    { name: 'Primary IP', key: 'primary_ip_address' },
+    { name: 'Server Type', key: 'server_type' },
+    { name: 'OS Type', key: 'os_type' },
+    { name: 'Project', key: 'project' },
+    { name: 'Region', key: 'region_info.region_id' },
+    { name: 'Zone', key: 'zone_info.zone_id' },
+    { name: 'Pool', key: 'pool_info.pool_id' },
+    createAtVF,
+    updateAtVF,
+    deleteAtVF,
 ];
 
 export default {
@@ -367,7 +390,17 @@ export default {
             ],
             suggestKeys:['server_id', 'name', 'primary_ip_address'],
         };
-        const action =  fluentApi.inventory().server().list();
+        const { project } = useStore();
+        project.getProject();
+        const action =  fluentApi.inventory().server().list()
+            .setTransformer((resp: AxiosResponse<CloudServiceListResp>) => {
+                const result = resp;
+                result.data.results = resp.data.results.map((item) => {
+                    item.console_force_data = { project: item.project_id ? project.state.projects[item.project_id] || item.project_id : '' };
+                    return item;
+                });
+                return result;
+            });
         const apiHandler = new QuerySearchTableFluentAPI(
             action,
             undefined,
@@ -376,6 +409,7 @@ export default {
         );
 
         const fields= makeTrItems([
+                ['project', 'COMMON.PROJ'],
                 ['name', 'COMMON.NAME'],
                 ['state', 'COMMON.STATE'],
                 ['primary_ip_address', 'COMMON.IP', { sortable: false }],
@@ -385,7 +419,6 @@ export default {
                 ['os_distro', 'COMMON.O_DIS'],
                 ['server_type', 'COMMON.SE_TYPE'],
                 ['platform_type', 'COMMON.PLATFORM'],
-                ['project', 'COMMON.PROJ'],
                 ['pool', 'COMMON.POOL'],
                 ['updated_at', 'COMMON.UPDATE'],
             ],
@@ -413,19 +446,6 @@ export default {
                 ['admin', 'TAB.ADMIN'],
             ], context.parent),
             multiSelectActiveTab: 'data',
-        });
-        const tags = ref({});
-
-
-        const admin = reactive({
-            items: [],
-            sortBy: '',
-            sortDesc: true,
-            pageSize: 15,
-            allPage: 1,
-            thisPage: 1,
-            searchText: '',
-            loading: false,
         });
 
 
@@ -555,7 +575,7 @@ export default {
             await apiHandler.getData();
             projectModalVisible.value = false;
         };
-        const exportAction = fluentApi.addons().excel().export();
+        const exportAction = fluentApi.addons().excel().export().setDataSource(baseInfoDetails);
 
         const exportToolSet= new ExcelExportAPIToolSet(exportAction,apiHandler);
 
@@ -582,10 +602,10 @@ export default {
             return result;
         });
         const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem.server_id);
-        const historyAPIHandler = new HistoryAPI('/inventory/server/get-data', 'server_id', selectId, undefined, undefined, undefined, historyIsShow);
+        const getDataAPI = fluentApi.inventory().server().getData();
+        const historyAPIHandler = new HistoryFluentAPI(getDataAPI,historyIsShow,selectId);
         return {
             ...toRefs(tabData),
-            tags,
             dropdown,
             serverStateFormatter,
             timestampFormatter,
@@ -596,7 +616,6 @@ export default {
             clickMenuEvent(menuName) {
                 console.debug(menuName);
             },
-            admin,
             checkTableModalState,
             clickDelete,
             clickClosed,
@@ -613,6 +632,7 @@ export default {
             exportToolSet,
             adminApiHandler,
             historyAPIHandler,
+            baseInfoDetails,
         };
     },
 };

@@ -12,15 +12,13 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 /* eslint-disable camelcase */
-import { ref, watch } from '@vue/composition-api';
+import {  watch } from '@vue/composition-api';
 import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
 import {fluentApi} from '@/lib/fluent-api';
 
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
-import ServerEventBus from '@/views/inventory/server/ServerEventBus';
-import { mountBusEvent } from '@/lib/compostion-util';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
@@ -42,7 +40,6 @@ export default {
       }
     },
     setup(props, { parent }) {
-
         const tagsApi = new DictPanelAPI(fluentApi.inventory().server());
 
         watch(() => props.item, async (item) => {
@@ -52,7 +49,6 @@ export default {
         });
 
         return {
-            baseDataSource,
             tagsApi,
         };
     },
