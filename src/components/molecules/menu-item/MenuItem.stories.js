@@ -1,5 +1,5 @@
 import { autoProps } from '@sb/storybook-util';
-import PMenuItem from 'src/components/molecules/menu-item/MenuItem.vue';
+import PMenuItem from '@/components/molecules/menu-item/MenuItem.vue';
 import { text, number, boolean } from '@storybook/addon-knobs';
 
 export default {
@@ -21,5 +21,5 @@ export const defaultCase = () => ({
             default: boolean('selected', false),
         },
     },
-    template: '<p-list-item :contents="contents" :indent="indent" :selected="selected"/>',
+    template: '<p-menu-item :contents="contents" :indent="indent" :selected="selected"/>',
 });
