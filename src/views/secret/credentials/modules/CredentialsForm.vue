@@ -98,9 +98,9 @@
                             <!--                            </PFieldGroup>-->
 
                             <PFieldGroup
-                                :invalid-text="validateRightHalfJsonAPI.invalidMsg.data"
-                                :invalid="validateRightHalfJsonAPI.invalidState.data"
-                                :valid="validateRightHalfJsonAPI.validState.data"
+                                :invalid-text="validateLeftHalfAPI.invalidMsg.data"
+                                :invalid="validateLeftHalfAPI.invalidState.data"
+                                :valid="validateLeftHalfAPI.validState.data"
                             >
                                 <template v-slot:default="{invalid}">
                                     <div>
@@ -243,25 +243,26 @@ const setup = (props, context) => {
     // });
 
     const leftHalfValidations = {
-        name: [requiredValidation(), credentialsNameValidation(context.parent)],
-    };
-
-    const rightHalfJsonValidations = {
+        name: [
+            requiredValidation(),
+            credentialsNameValidation(context.parent)
+        ],
         data: [requiredValidation(), jsonParseValidation()],
     };
+
     const validateLeftHalfAPI = formValidation(formState, leftHalfValidations);
-    const validateRightHalfJsonAPI = formValidation(formState, rightHalfJsonValidations);
     const confirm = async () => {
         schemaState.showValidation = true;
         const leftHalfResult = await validateLeftHalfAPI.allValidation();
-        const rightHalfResult = schemaState.selectedInputType === 'Json' ? await validateRightHalfJsonAPI.allValidation() : await vdApi.allValidation();
 
-        if (leftHalfResult && rightHalfResult) {
+        if (leftHalfResult) {
+            console.log(formState, formState.data);
             const params = {
                 name: formState.name,
                 data: JSON.parse(formState.data),
                 tags: formState.tags,
             };
+            console.log('params', params);
             context.emit('confirm', params);
         }
     };
@@ -278,7 +279,6 @@ const setup = (props, context) => {
         proxyVisible: makeProxy('visible', props, context.emit),
         confirm,
         validateLeftHalfAPI,
-        validateRightHalfJsonAPI,
     };
 };
 
