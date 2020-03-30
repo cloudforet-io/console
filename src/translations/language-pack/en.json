@@ -211,6 +211,11 @@
 	"ERROR": {
 		"None": ""
 	},
+	"FIELD": {
+		"NAME": "Name",
+		"PROJECT": "Project",
+		"STATE": "State"
+	},
 	"FORM": {
 		"LABEL": {
 			"EMAIL": "E-Mail",
