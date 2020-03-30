@@ -335,7 +335,7 @@ export const cloudServiceSetup = (
             ['project', 'COMMON.CHG_PRO', { disabled: csIsNotSelected }],
             ['region', 'BTN.CHG_REGION'],
             [null, null, { type: 'divider' }],
-            ['link', null, { label: 'console', disabled: noLink }],
+            ['link', null, { label: 'Console', disabled: noLink }],
             ['exportExcel', null, { label: 'Export', disabled: false }],
         ],
         context.parent,
