@@ -366,7 +366,8 @@ export default {
     .input-title{
         margin-bottom: 0px;
         text-align: left;
-        font: Bold 14px/28px Arial;
+        font-weight: bold;
+        font-size: .875 rem;
         letter-spacing: 0;
         color: #222532;
         opacity: 1;
