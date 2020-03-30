@@ -39,17 +39,17 @@
                                     </PFieldGroup>
                                 </p-col>
                             </p-row>
-<!--                            <p-row>-->
-<!--                                <p-col :col="6">-->
-<!--                                    <p-row style="width: 100%" direction="column">-->
-<!--                                        <PFieldGroup label="Secret Type">-->
-<!--                                            <PSelectDropdown v-model="formState.schema_type" :items="schemaTypeItems"-->
-<!--                                                             @input="onSchemaTypeChange"-->
-<!--                                            />-->
-<!--                                        </PFieldGroup>-->
-<!--                                    </p-row>-->
-<!--                                </p-col>-->
-<!--                            </p-row>-->
+                            <!--                            <p-row>-->
+                            <!--                                <p-col :col="6">-->
+                            <!--                                    <p-row style="width: 100%" direction="column">-->
+                            <!--                                        <PFieldGroup label="Secret Type">-->
+                            <!--                                            <PSelectDropdown v-model="formState.schema_type" :items="schemaTypeItems"-->
+                            <!--                                                             @input="onSchemaTypeChange"-->
+                            <!--                                            />-->
+                            <!--                                        </PFieldGroup>-->
+                            <!--                                    </p-row>-->
+                            <!--                                </p-col>-->
+                            <!--                            </p-row>-->
                             <p-row>
                                 <p-col :col="12">
                                     <PFieldGroup label="Tags">
@@ -76,31 +76,31 @@
                                                 :selected.sync="selectedInputType"
                                                 @clickButton="onChangeInputType"
                             />
-<!--                            <PFieldGroup v-if="selectedInputType === 'Form'"-->
-<!--                                         :invalid-text="validateRightHalfJsonAPI.invalidMsg.form"-->
-<!--                                         :invalid="validateRightHalfJsonAPI.invalidState.form"-->
-<!--                            >-->
-<!--                                <template v-slot:default="{invalid}">-->
-<!--                                    <div v-if="dynamicForm.length > 0" class="form-editor">-->
-<!--                                        <p-dynamic-form v-for="(fm, idx) in dynamicForm" :key="idx"-->
-<!--                                                        v-model="values[fm.key]"-->
-<!--                                                        :form="fm"-->
-<!--                                                        :invalid="showValidation && vdApi.invalidState[fm.key]"-->
-<!--                                                        :invalid-text="vdApi.invalidMsg[fm.key]"-->
-<!--                                                        :validatable="true"-->
-<!--                                                        @change="onOptionChange(fm.key)"-->
-<!--                                        />-->
-<!--                                    </div>-->
-<!--                                    <div v-else style="display:block" class="form-editor invalid-feedback">-->
-<!--                                        * {{ $t('SECRET.NO_FORMAT') }}-->
-<!--                                    </div>-->
-<!--                                </template>-->
-<!--                            </PFieldGroup>-->
+                            <!--                            <PFieldGroup v-if="selectedInputType === 'Form'"-->
+                            <!--                                         :invalid-text="validateRightHalfJsonAPI.invalidMsg.form"-->
+                            <!--                                         :invalid="validateRightHalfJsonAPI.invalidState.form"-->
+                            <!--                            >-->
+                            <!--                                <template v-slot:default="{invalid}">-->
+                            <!--                                    <div v-if="dynamicForm.length > 0" class="form-editor">-->
+                            <!--                                        <p-dynamic-form v-for="(fm, idx) in dynamicForm" :key="idx"-->
+                            <!--                                                        v-model="values[fm.key]"-->
+                            <!--                                                        :form="fm"-->
+                            <!--                                                        :invalid="showValidation && vdApi.invalidState[fm.key]"-->
+                            <!--                                                        :invalid-text="vdApi.invalidMsg[fm.key]"-->
+                            <!--                                                        :validatable="true"-->
+                            <!--                                                        @change="onOptionChange(fm.key)"-->
+                            <!--                                        />-->
+                            <!--                                    </div>-->
+                            <!--                                    <div v-else style="display:block" class="form-editor invalid-feedback">-->
+                            <!--                                        * {{ $t('SECRET.NO_FORMAT') }}-->
+                            <!--                                    </div>-->
+                            <!--                                </template>-->
+                            <!--                            </PFieldGroup>-->
 
                             <PFieldGroup
-                                         :invalid-text="validateRightHalfJsonAPI.invalidMsg.data"
-                                         :invalid="validateRightHalfJsonAPI.invalidState.data"
-                                         :valid="validateRightHalfJsonAPI.validState.data"
+                                :invalid-text="validateRightHalfJsonAPI.invalidMsg.data"
+                                :invalid="validateRightHalfJsonAPI.invalidState.data"
+                                :valid="validateRightHalfJsonAPI.validState.data"
                             >
                                 <template v-slot:default="{invalid}">
                                     <div>
@@ -185,7 +185,7 @@ const setup = (props, context) => {
                 ['Json'],
                 // ['Form'],
             ],
-            context.parent, { vbind: { styleType: 'dark', outline: true }});
+            context.parent, { vbind: { styleType: 'dark', outline: true } });
         }),
         selectedInputType: 'Json',
     });
@@ -219,7 +219,7 @@ const setup = (props, context) => {
     const onChangeInputType = () => {
         formState.data = '';
         schemaState.values = {};
-    }
+    };
     const vdApi = setValidation(schemaState.dynamicForm, schemaState.values);
 
     watch(() => schemaState.dynamicForm, () => {
@@ -259,23 +259,9 @@ const setup = (props, context) => {
         if (leftHalfResult && rightHalfResult) {
             const params = {
                 name: formState.name,
+                data: JSON.parse(formState.data),
+                tags: formState.tags,
             };
-            // const keyArr = ['name', 'issue_type', 'tags', 'data'];
-
-            if (schemaState.selectedInputType === 'Form') {
-                const formParam = {};
-                for (const [k, v] of Object.entries(schemaState.values)) {
-                    formParam[k] = v;
-                }
-                formState.data = formParam;
-            } else {
-                formState.data = JSON.parse(formState.data);
-            }
-            // keyArr.forEach((key) => {
-            //     if (formState[key]) {
-            //         params[key] = formState[key];
-            //     }
-            // });
             context.emit('confirm', params);
         }
     };
