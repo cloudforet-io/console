@@ -449,7 +449,7 @@ export default {
         @apply text-primary2;
         text-align: center;
         margin-bottom: 0.5rem;
-        font: 24px/32px Arial;
+        font-size: 1.5rem;
     }
     .p-label {
         @apply text-dark;

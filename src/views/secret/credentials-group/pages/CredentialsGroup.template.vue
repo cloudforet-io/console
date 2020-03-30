@@ -106,7 +106,7 @@
             </template>
         </PTab>
         <div v-else id="empty-space">
-            Select a Credential Group above for details.
+            Select a Credentials Group above for details.
         </div>
         <p-table-check-modal
             v-if="!!checkTableModalState.mode && checkTableModalState.visible"
@@ -414,6 +414,6 @@ export default {
         @apply text-primary2;
         text-align: center;
         margin-bottom: 0.5rem;
-        font: 24px/32px Arial;
+        font-size: 1.5rem;
     }
 </style>
