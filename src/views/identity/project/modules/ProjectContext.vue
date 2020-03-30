@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-list-item
+        <p-menu-item
             v-for="(item, idx) in getSelectedData"
             :key="idx"
             :type="'CON'"
@@ -13,12 +13,12 @@
 </template>
 <script>
 import _ from 'lodash';
-import PListItem from '@/components/molecules/list-items/ListItem';
+import PMenuItem from '@/components/molecules/menu-item/MenuItem.vue';
 
 export default {
     name: 'ProjectContext',
     components: {
-        PListItem,
+        PMenuItem,
     },
     props: {
         contextData: {
@@ -42,26 +42,26 @@ export default {
              * When Back panel or Root has clicked
             */
             selectRT: [
-                { flag: 'CRT_RT', contents: this.$t('ORGANISMS.CREATE_ARG', [this.$t('COMMON.PG_GR')]), indent: 0 },
+                { flag: 'CRT_RT', contents: this.$t('ORGANISMS.CREATE_ARG', [this.$t('COMMON.PROJECT_GRP')]), indent: 0 },
             ],
             /**
              * When Project has Selected
              */
             selectPT: [
-                { flag: 'UPT_PJ', contents: this.$t('ORGANISMS.UPDATE_ARG', [this.$t('COMMON.PG')]), indent: 0 },
-                { flag: 'DEL_PJ', contents: this.$t('ORGANISMS.DELETE_ARG', [this.$t('COMMON.PG')]), indent: 0 },
+                { flag: 'UPT_PJ', contents: this.$t('ORGANISMS.UPDATE_ARG', [this.$t('COMMON.PROJECT')]), indent: 0 },
+                { flag: 'DEL_PJ', contents: this.$t('ORGANISMS.DELETE_ARG', [this.$t('COMMON.PROJECT')]), indent: 0 },
             ],
             /**
              * When Project Group has Selected
              */
             selectPG: [
-                { flag: 'CRT_PR', contents: this.$t('ORGANISMS.CREATE_ARG', [this.$t('COMMON.PG_GR')]), indent: 0 },
-                { flag: 'UPT_PR', contents: this.$t('ORGANISMS.UPDATE_ARG', [this.$t('COMMON.PG_GR')]), indent: 0 },
-                { flag: 'DEL_PR', contents: this.$t('ORGANISMS.DELETE_ARG', [this.$t('COMMON.PG_GR')]), indent: 0 },
+                { flag: 'CRT_PR', contents: this.$t('ORGANISMS.CREATE_ARG', [this.$t('COMMON.PROJECT_GRP')]), indent: 0 },
+                { flag: 'UPT_PR', contents: this.$t('ORGANISMS.UPDATE_ARG', [this.$t('COMMON.PROJECT_GRP')]), indent: 0 },
+                { flag: 'DEL_PR', contents: this.$t('ORGANISMS.DELETE_ARG', [this.$t('COMMON.PROJECT_GRP')]), indent: 0 },
                 {
                     flag: '', contents: '', indent: 0, divider: true,
                 },
-                { flag: 'CRT_PJ', contents: this.$t('ORGANISMS.CREATE_ARG', [this.$t('COMMON.PG')]), indent: 0 },
+                { flag: 'CRT_PJ', contents: this.$t('ORGANISMS.CREATE_ARG', [this.$t('COMMON.PROJECT')]), indent: 0 },
             ],
         };
     },

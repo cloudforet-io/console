@@ -27,7 +27,7 @@
     >
         <template #toolbox-left>
             <slot name="toolbox-left" />
-            <div class="left-toolbox-item w-1/2">
+            <div class="left-toolbox-item">
                 <p-query-search-bar :search-text.sync="apiHandler.tableTS.querySearch.state.searchText" :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler.value"
                                     @newQuery="apiHandler.tableTS.querySearch.addTag"
                 />

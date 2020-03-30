@@ -6,8 +6,7 @@
 				"KEY_EMPTY": "Enter the Key.",
 				"VAL_EMPTY": "Enter the Value."
 			}
-		},
-		"None": ""
+		}
 	},
 	"BTN": {
 		"ACTION": "Actions",
@@ -24,6 +23,7 @@
 		"DISABLE": "Disable",
 		"EDIT": "Edit",
 		"ENABLE": "Enable",
+		"EXPORT": "Export",
 		"FIND": "Find",
 		"NO": "No",
 		"OK": "OK",
@@ -40,7 +40,7 @@
 		"CHG_PRO": "Change Project",
 		"COLLECT": "Collect",
 		"COLLECTOR": "Collector",
-		"COLLECT_CONT": "Collectting",
+		"COLLECT_CONT": "Collecting",
 		"COLLECT_PAST": "Collected",
 		"COL_DATA": "Collect Data",
 		"COL_ID": "Collector ID",
@@ -50,7 +50,6 @@
 		"COMPUTE": "Compute",
 		"CORE": "Core",
 		"COUNT": "Count",
-		"CREAT": "Created at",
 		"CREATE": "Created at",
 		"CREATED": "Created",
 		"CREATE_BY": "Created By",
@@ -135,12 +134,6 @@
 		"O_DETAIL": "OS Details",
 		"O_DIS": "OS Distro",
 		"O_TYPE": "OS Type",
-		"PG": "Project",
-		"PG_GR": "Project Group",
-		"PG_GR_ID": "Project Group ID",
-		"PG_GR_NM": "Project Group Name",
-		"PG_ID": "Project ID",
-		"PG_NM": "Project Name",
 		"PHONE": "Phone",
 		"PL": "Pool",
 		"PLATFORM": "Platform",
@@ -153,8 +146,12 @@
 		"PRI_IP": "Primary IP",
 		"PROCESSED": "processed",
 		"PROFILE": "Profile",
-		"PROJ": "Project",
 		"PROJECT": "Project",
+		"PROJECT_GRP": "Project Group",
+		"PROJECT_GRP_ID": "Project Group ID",
+		"PROJECT_GRP_NM": "Project Group Name",
+		"PROJECT_ID": "Project ID",
+		"PROJECT_NM": "Project Name",
 		"PROTOCOL": "Protocol",
 		"PROVIDER": "Provider",
 		"RAWDATA": "Raw Data",
@@ -213,6 +210,11 @@
 	},
 	"ERROR": {
 		"None": ""
+	},
+	"FIELD": {
+		"NAME": "Name",
+		"PROJECT": "Project",
+		"STATE": "State"
 	},
 	"FORM": {
 		"LABEL": {
@@ -342,8 +344,9 @@
 		"BTN": {
 			"None": ""
 		},
-		"JASON_ALERT": "Please, Check Json Format (Use double quotation( \\\" ) mark instead of single quotation (').",
+		"JSON_ALERT": "Please, Check Json Format (Use double quotation( \\\" ) mark instead of single quotation (').",
 		"NO_FORMAT": "No Template found.",
+		"SECRET_TYPE": "Secret Type",
 		"TAB": {
 			"None": ""
 		}
@@ -382,7 +385,7 @@
 		"CREATE": "Create {0}",
 		"DELETE": "Delete Selected",
 		"POOL": "Pool",
-		"PROJECT": "Project",
+		"PROJ": "Project",
 		"PROJECT_GROUP": "Project Group",
 		"REGION": "Region",
 		"UPDATE": "Update {0}",

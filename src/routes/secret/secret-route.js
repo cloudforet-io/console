@@ -7,8 +7,8 @@ const AddCredentials = () => import('@/views/secret/credentials-group/pages/AddC
 export default {
     path: 'secret',
     name: 'secret',
-    redirect: 'secret/credentials-group',
-    meta: { label: 'Secret Manager', breadcrumb: true },
+    redirect: 'secret/credentials',
+    meta: { label: 'Secret', breadcrumb: true },
     components: {
         lnb: SecretNavBar,
         main: Secret,
@@ -18,7 +18,7 @@ export default {
             path: 'credentials-group',
             name: 'credentialsGroup',
             redirect: '/secret/credentials-group',
-            meta: { label: 'Secret Group', breadcrumb: true },
+            meta: { label: 'Credentials Group', breadcrumb: true },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -38,7 +38,7 @@ export default {
         {
             path: 'credentials',
             name: 'credentials',
-            meta: { label: 'Secret', breadcrumb: true },
+            meta: { label: 'Credentials', breadcrumb: true },
             component: Credentials,
         },
     ],

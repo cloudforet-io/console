@@ -252,7 +252,7 @@ export default {
             }
         },
         actionCommand() {
-            const itemType = this.getSelectedInfo('item_type') === 'PROJECT_GROUP' ? this.$t('PG_GR') : this.$t('PG');
+            const itemType = this.getSelectedInfo('item_type') === 'PROJECT_GROUP' ? this.$t('PROJECT_GRP') : this.$t('PROJECT');
             if (this.actionFlag === 'delete') {
                 const obj = {};
                 obj.title = this.$t('DEL_MEM');

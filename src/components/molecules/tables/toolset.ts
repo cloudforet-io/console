@@ -77,25 +77,25 @@ export const tableProps = {
 
 
 export interface TablePropsType {
-    striped?:boolean;
-    bord?:boolean|null|unknown;
-    hover?:boolean;
-    small?:boolean;
+    striped?: boolean;
+    bord?: boolean|null|unknown;
+    hover?: boolean;
+    small?: boolean;
     background?: boolean;
     responsive?: boolean|string;
-    tableStyleType?:string;
+    tableStyleType?: string;
     theadStyleType?: string;
-    responsiveStyle?:object;
-    tableStyle?:object;
-    theadStyle?:object;
-    tbodyStyle?:object;
+    responsiveStyle?: object;
+    tableStyle?: object;
+    theadStyle?: object;
+    tbodyStyle?: object;
     tfootStyle?: object;
     tbodyClass?: object;
     tfootClass?: object;
 }
 @StateToolSet<TablePropsType>()
 export class TableState<initData, initSate extends TablePropsType = TablePropsType> {
-    public state:optionalType<initSate, initData>;
+    state: optionalType<initSate, initData>;
 
     static initState() {
         return {
@@ -108,7 +108,7 @@ export class TableState<initData, initSate extends TablePropsType = TablePropsTy
         };
     }
 
-    constructor(initData:initData = {} as initData, lazy = false) {
+    constructor(initData: initData = {} as initData, lazy = false) {
         if (lazy) {
             this.state = null as unknown as initSate;
         } else {

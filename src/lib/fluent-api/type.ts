@@ -9,10 +9,12 @@ export interface LongFilterType {
     operator: string;
 }
 
+type OperatorType = '' | '!' | '>' | '>=' | '<' | '<=' | '=' | '!=' | '$';
+
 export interface FilterItem extends LongFilterType {
     key: string;
-    value: string;
-    operator: string;
+    value: string | string[];
+    operator: OperatorType;
 }
 
 export interface ShortFilterType {
@@ -23,7 +25,7 @@ export interface ShortFilterType {
 
 export type FilterType = LongFilterType | ShortFilterType;
 
-export interface BaseActionState<T> {
+export interface RawParameterActionState<T> {
     parameter: T ;
 }
 
@@ -65,7 +67,8 @@ export interface QueryApiState {
 }
 
 
-export interface QueryActionState<T> extends BaseActionState<T & {query: () => Query}>, QueryApiState {}
+export interface QueryActionState<T> extends QueryApiState {}
+
 
 export interface DataSourceItem {
     name: string;
@@ -73,6 +76,8 @@ export interface DataSourceItem {
     view_type?: string;
     view_option?: any;
 }
+
+
 
 export interface DynamicViewMetaData {
     name: string;

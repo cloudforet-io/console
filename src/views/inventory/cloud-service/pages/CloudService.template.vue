@@ -18,6 +18,7 @@
                             :sortable="true"
                             :background="true"
                             :toolbox-background="false"
+                            :responsive="true"
                             :all-page="apiHandler.tableTS.state.allPage"
                             :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
                             :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
@@ -34,6 +35,7 @@
                                 <PDropdownMenuBtn
                                     id="cloud-service-type-dropdown-btn"
                                     :menu="cstDropdownMenu"
+                                    @click-export="cstExportToolSet.getData()"
                                 >
                                     Action
                                 </PDropdownMenuBtn>
@@ -55,6 +57,9 @@
                                         />
                                     </div>
                                 </p-row>
+                            </template>
+                            <template v-slot:col-cloud_service_count-format="data">
+                                {{ data.value || 0 }}
                             </template>
                         </p-toolbox-table>
                     </div>
@@ -79,6 +84,7 @@
                                             <PDropdownMenuBtn :menu="csDropdownMenu"
                                                               @click-link="openLink"
                                                               @click-project="clickProject"
+                                                              @click-exportExcel="exportToolSet.getData()"
                                             >
                                                 Action
                                             </PDropdownMenuBtn>
@@ -96,8 +102,9 @@
                             </template>
                             <template #data>
                                 <PDynamicSubData
-                                    :select-id="dvApiHandler.tableTS.selectState.firstSelectItem.cloud_service_id" :sub-data="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
-                                    url="/inventory/cloud-service/get-data" id-key="cloud_service_id"
+                                    :select-id="dvApiHandler.tableTS.selectState.firstSelectItem.cloud_service_id"
+                                    :sub-data="dvApiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
+                                    :action="csGetDataAction"
                                 />
                             </template>
                             <template #rawData>
@@ -192,11 +199,14 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import {AdminTableAPI, HistoryAPI, QuerySearchTableAPI, QuerySearchTableFluentAPI} from '@/lib/api/table';
+import {AdminFluentAPI, HistoryFluentAPI, QuerySearchTableAPI, QuerySearchTableFluentAPI} from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { ChangeCloudServiceProject, MockChangeProject } from '@/lib/api/fetch';
 import { Computed } from '@/lib/type';
+import {ExcelExportAPIToolSet} from "@/lib/api/add-on";
+import fluentApi from "@/lib/fluent-api";
+import {tabIsShow} from "@/lib/compostion-util";
 
 
 export const cloudServiceSetup = (
@@ -234,6 +244,16 @@ export const cloudServiceSetup = (
         },
         ...originDataSource.value,
     ]);
+
+    const exportAction = fluentApi.addons().excel().export();
+    const cstExportAction = exportAction.setDataSource([
+        {name:'provider',key:'provider'},
+        {name:'group',key:'group'},
+        {name:'name',key:'name'},
+        {name:'total count',key:'cloud_service_count'},
+    ]);
+    const cstExportToolSet= new ExcelExportAPIToolSet(cstExportAction,apiHandler);
+    const exportToolSet= new ExcelExportAPIToolSet(exportAction,dvApiHandler);
     watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
         if (preType && type !== preType) {
             const selectType = apiHandler.tableTS.selectState.firstSelectItem;
@@ -250,6 +270,8 @@ export const cloudServiceSetup = (
                 dvApiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
                 dvApiHandler.action.debug('')
                 dvApiHandler.getData();
+
+                exportToolSet.action = exportAction.setDataSource(originDataSource.value)
             }
         }
     });
@@ -269,6 +291,7 @@ export const cloudServiceSetup = (
             ['add', 'BTN.CREATE'],
             ['update', 'BTN.UPDATE'],
             ['delete', 'BTN.DELETE'],
+            ['export','BTN.EXPORT',{disabled:false}]
         ],
         context.parent,
         { type: 'item', disabled: true }),
@@ -313,6 +336,7 @@ export const cloudServiceSetup = (
             ['region', 'BTN.CHG_REGION'],
             [null, null, { type: 'divider' }],
             ['link', null, { label: 'console', disabled: noLink }],
+            ['exportExcel', null, { label: 'Export', disabled: false }],
         ],
         context.parent,
         { type: 'item', disabled: true }),
@@ -333,6 +357,7 @@ export const cloudServiceSetup = (
         await dvApiHandler.getData();
         projectModalVisible.value = false;
     };
+    const csGetDataAction = fluentApi.inventory().cloudService().getData();
     return {
         ...toRefs(state),
         apiHandler,
@@ -345,6 +370,9 @@ export const cloudServiceSetup = (
         projectModalVisible,
         clickProject,
         changeProject,
+        exportToolSet,
+        csGetDataAction,
+        cstExportToolSet,
     };
 };
 
@@ -373,14 +401,23 @@ export default {
     setup(props, context) {
         // @ts-ignore
         const mockAPI = new QuerySearchTableAPI('', undefined, undefined, undefined, undefined, undefined, undefined);
-        const mockAdminAPI = new AdminTableAPI('', computed(() => ({})), undefined, undefined, undefined, undefined, computed(() => false));
-        const mockHistoryAPIHandler = new HistoryAPI('', '', computed(() => ''), undefined, undefined, undefined, computed(() => false));
+        const target = new QuerySearchTableFluentAPI(fluentApi.inventory().cloudService().list())
+        const adminApiHandler = new AdminFluentAPI(
+            fluentApi.inventory().cloudService().memberList(),
+            ref(false),
+            'cloud_service_id',
+            target,
+        );
+
+        // @ts-ignore
+        const historyAPIHandler = new HistoryFluentAPI(fluentApi.inventory().cloudService().getData(),ref(false),ref(''));
         const mockChangeProject = new MockChangeProject();
+
         return {
             // @ts-ignore
             ...cloudServiceSetup(context, mockAPI, mockAPI, mockChangeProject),
-            adminApiHandler: mockAdminAPI,
-            historyAPIHandler: mockHistoryAPIHandler,
+            adminApiHandler: adminApiHandler,
+            historyAPIHandler: historyAPIHandler,
         };
     },
 };

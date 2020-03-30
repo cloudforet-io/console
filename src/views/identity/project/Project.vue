@@ -320,7 +320,7 @@ export default {
             // eslint-disable-next-line no-nested-ternary
             const param = flag[1] === 'RT' ? { is_root: true, ...paramBasic } : flag[1] === 'PR' ? { parent_project_group_id: nodeData.id, ...paramBasic } : { project_group_id: nodeData.id, ...paramBasic };
             const url = flag[1] === 'PJ' ? 'project' : 'project-group';
-            const arg = flag[1] === 'PJ' ? this.$t('COMMON.PG') : this.$t('COMMON.PG_GR');
+            const arg = flag[1] === 'PJ' ? this.$t('COMMON.PROJECT') : this.$t('COMMON.PROJECT_GRP');
 
             await this.$http.post(`/identity/${url}/create`, param).then((response) => {
                 const responseData = !this.isEmpty(response.data) ? response.data : {};
@@ -377,7 +377,7 @@ export default {
             const key = `${nodeData.item_type.toLowerCase()}_id`;
             const url = `/identity/${this.replaceAll(nodeData.item_type, '_', '-').toLowerCase()}/update`;
             const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: nodeData.id, ...basicParam } : { project_id: nodeData.id, ...basicParam };
-            const arg = flag[1] === 'PJ' ? this.$t('COMMON.PG') : this.$t('COMMON.PG_GR');
+            const arg = flag[1] === 'PJ' ? this.$t('COMMON.PROJECT') : this.$t('COMMON.PROJECT_GRP');
 
             await this.$http.post(url, param).then((response) => {
                 if (response.data[key] === nodeData.id) {
@@ -434,7 +434,7 @@ export default {
             const path = tree.getSelected().map(node => node.path);
             const url = `/identity/${this.replaceAll(nodeData.item_type, '_', '-').toLowerCase()}/delete`;
             const param = (nodeData.item_type === 'PROJECT_GROUP') ? { project_group_id: nodeData.id } : { project_id: nodeData.id };
-            const arg = (nodeData.item_type === 'PROJECT_GROUP') ? this.$t('COMMON.PG_GR') : this.$t('COMMON.PG');
+            const arg = (nodeData.item_type === 'PROJECT_GROUP') ? this.$t('COMMON.PROJECT_GRP') : this.$t('COMMON.PROJECT');
 
             await this.$http.post(url, param).then((response) => {
                 const responseData = response.data;

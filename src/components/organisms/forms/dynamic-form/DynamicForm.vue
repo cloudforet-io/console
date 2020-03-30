@@ -8,8 +8,8 @@
             <slot>
                 <div class="form-container">
                     <p-text-input v-if="formType === 'input'"
-                                  :class="{'is-invalid': typeof invalid === 'boolean' ? invalid : false}"
                                   v-model="proxyValue"
+                                  :class="{'is-invalid': typeof invalid === 'boolean' ? invalid : false}"
                                   :type="inputType"
                                   :placeholder="formData.placeholder"
                                   class="form"
@@ -48,10 +48,10 @@
 <script lang="ts">
 import _ from 'lodash';
 import {
-    ref, computed, reactive, toRefs, defineComponent,
+    computed, reactive, toRefs, defineComponent,
 } from '@vue/composition-api';
 import {
-    formValidation, makeProxy, requiredValidation,
+    formValidation, requiredValidation,
 } from '@/lib/compostion-util';
 
 

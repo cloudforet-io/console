@@ -1,6 +1,6 @@
 const Plugin = () => import('@/views/plugin/plugin');
 const PluginNavBar = () => import('@/views/plugin/pluginNavBar');
-const Supervisor = () => import('@/views/plugin/supervisor/pages/Supervisor.vue');
+// const Supervisor = () => import('@/views/plugin/supervisor/pages/Supervisor.vue');
 
 export default {
     path: 'plugin',
@@ -11,12 +11,12 @@ export default {
         lnb: PluginNavBar,
         main: Plugin,
     },
-    children: [
-        {
-            path: 'supervisor',
-            name: 'supervisor',
-            meta: { label: 'Supervisor', breadcrumb: true },
-            component: Supervisor,
-        },
-    ],
+    // children: [
+    //     {
+    //         path: 'supervisor',
+    //         name: 'supervisor',
+    //         meta: { label: 'Supervisor', breadcrumb: true },
+    //         component: Supervisor,
+    //     },
+    // ],
 };
