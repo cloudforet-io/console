@@ -8,14 +8,26 @@ import {
 } from '@/lib/fluent-api/type';
 import { CollectorPluginModel } from '@/lib/fluent-api/inventory/collector-plugin';
 
-const idField = 'credential_id';
+const idField = 'secret_id';
 
 interface IdParameter {
     [idField]: string;
 }
 
+export interface SecretModel extends IdParameter, Tags {
+    name: string;
+    secret_type: "CREDENTIALS"|"CONFIG"|string;
+    "secret_groups": string[];
+    "schema":string ;
+    "provider":string;
+    "service_account_id":string;
+    "project_id": string;
+    "domain_id":string;
+    created_at: TimeStamp;
 
-export type SecretListResp = ListType<any>
+}
+
+export type SecretListResp = ListType<SecretModel>
 
 interface CreateParameter extends Tags {
     name: string;
@@ -32,7 +44,7 @@ class Delete extends SingleDeleteAction<IdParameter, any> {
 class Get extends GetAction<IdParameter, any> {
     protected idField = idField;
 }
-class List extends ListAction<any, ListType<any>> {
+class List extends ListAction<any, SecretListResp> {
     setSecretId(id: string): this{
         this.apiState.extraParameter.credential_id = id;
         delete this.apiState.extraParameter.credential_group_id;
@@ -46,7 +58,7 @@ class List extends ListAction<any, ListType<any>> {
     }
 }
 export default class Secret extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
-    protected name = 'credential';
+    protected name = 'secret';
 
     create() { return new Create(this.baseUrl); }
 

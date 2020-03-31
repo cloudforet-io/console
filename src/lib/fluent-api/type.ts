@@ -50,6 +50,7 @@ export interface Query {
     page?: Page;
     sort?: Sort;
     keyword?: string;
+    count_only?:boolean;
 }
 
 export interface QueryApiState {
@@ -77,6 +78,12 @@ export interface DataSourceItem {
     view_option?: any;
 }
 
+export interface DynamicFormItem {
+    type:string
+    is_required:boolean
+    name:string
+    key: string
+}
 
 
 export interface DynamicViewMetaData {
