@@ -31,6 +31,10 @@ export const selectableListProps = {
         type: String,
         default: '',
     },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
 };
 
 interface MapperType {
@@ -45,6 +49,7 @@ interface SelectableListType {
     multiSelectable?: boolean;
     mustSelect?: boolean;
     defaultIcon?: string;
+    loading?: boolean;
 }
 
 interface SelectableListSyncType {
