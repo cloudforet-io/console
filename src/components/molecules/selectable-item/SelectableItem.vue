@@ -43,7 +43,7 @@ export default defineComponent({
             @apply bg-gray3;
         }
         &.active {
-            @apply bg-blue-200 text-secondary;
+            @apply bg-blue-200 text-secondary border border-secondary;
             &:hover {
                 @apply bg-gray3;
             }
