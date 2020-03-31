@@ -64,9 +64,11 @@ export abstract class ActionAPI<parameter=any, resp=any> {
         console.debug('url : ', this.url);
         console.debug('method : ', this.method);
         console.debug('state : ', this.apiState);
-        states.forEach(((key) => {
-            console.debug(`state.${key} : ${JSON.stringify(this.apiState[key])}`);
-        }));
+        if (states){
+            states.forEach(((key) => {
+                console.debug(`state.${key} : ${JSON.stringify(this.apiState[key])}`);
+            }));
+        }
         console.debug('*********************');
     }
 
@@ -103,6 +105,7 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
             sortDesc: true,
             keyword: '',
             extraParameter: {},
+            count_only:false,
             ...initState,
         };
     }
@@ -124,16 +127,20 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
         if (this.apiState.only.length > 0) {
             query.only = this.apiState.only;
         }
+        if (this.apiState.count_only){
+            query.count_only = this.apiState.count_only
+        }
         if (this.apiState.keyword) {
             query.keyword = this.apiState.keyword;
         }
-        if (this.apiState.filter.length > 0) {
+        if (this.apiState.filter.length > 0||this.apiState.fixFilter.length>0) {
             const filter: FilterType[] = [];
             // eslint-disable-next-line camelcase
             const mergeOpQuery: {
                     [propName: string]: ShortFilterType;
                 } = {};
-            this.apiState.filter.forEach((q: FilterItem) => {
+            const rawFilters = [...this.apiState.fixFilter,...this.apiState.filter];
+            rawFilters.forEach((q: FilterItem) => {
                 const op = operatorMap[q.operator];
                 const vals = typeof q.value === 'string' ? [q.value] : q.value;
 
@@ -178,13 +185,13 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
         return this.clone();
     }
 
-    setOnlyTotalCount() {
-        this.apiState.only = ['total_count'];
+    setCountOnly(value:boolean=true) {
+        this.apiState.count_only = value;
         return this.clone();
     }
 
     setFilter(...args: FilterItem[]) {
-        this.apiState.filter = [...this.apiState.fixFilter, ...args];
+        this.apiState.filter = args;
         return this.clone();
     }
 
