@@ -65,7 +65,9 @@
                     </template>
                     <template #col-name-format="data">
                         <span class="name">
-                            <img class="icon" :src="getIcon(data)">
+                            <p-lazy-img :img-url="getIcon(data)"
+                                        width="1.5rem" height="1.5rem"
+                            />
                             {{ data.value }}
                         </span>
                     </template>
@@ -190,6 +192,7 @@ import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
@@ -425,6 +428,7 @@ export default {
     components: {
         GeneralPageLayout,
         PStatus,
+        PLazyImg,
         PHorizontalLayout,
         PToolboxTable,
         PDataTable,
@@ -460,10 +464,7 @@ export default {
 
     .name {
         .icon {
-            display: inline-block;
-            width: 1.5rem;
-            height: 1.5rem;
-            margin-right: .5rem;
+            margin-right: 0.5rem;
         }
     }
 
