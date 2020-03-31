@@ -25,10 +25,11 @@ export const table = () => ({
                 :tableStyleType="tableStyleType"
                 :theadStyleType="theadStyleType"
                 :striped="striped"
-                :bord="bord"
+                :bordered="bordered"
                 :hover="hover"
                 :small="small"
                 :background="background"
+                :topBorder="topBorder"
                 :responsive="responsive"
                 
             >
@@ -58,8 +59,8 @@ export const table = () => ({
         responsive: {
             default: select('responsive', ['', true, 'sma', 'md', 'lg', 'xl'], ''),
         },
-        bord: {
-            default: select('responsive', ['', true, false], ''),
+        bordered: {
+            default: boolean('bordered', true),
         },
         striped: {
             default: boolean('striped', true),
@@ -72,6 +73,9 @@ export const table = () => ({
         },
         background: {
             default: boolean('background', true),
+        },
+        topBorder: {
+            default: boolean('topBorder', true),
         },
     },
     created() {

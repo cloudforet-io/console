@@ -64,10 +64,11 @@
             :thead-style="theadStyle"
             :tfoot-style="tfootStyle"
             :striped="striped"
-            :bord="bord"
+            :bordered="bordered"
             :hover="hover"
             :small="small"
             :background="background"
+            :top-border="topBorder"
             :responsive="responsive"
             :loading="loading"
             :use-spinner-loading="useSpinnerLoading"
@@ -162,7 +163,7 @@ export default {
         },
 
     },
-    setup(props:ToolBoxTableSetupProps, { emit }) {
+    setup(props: ToolBoxTableSetupProps, { emit }) {
         const pageSizeOptions = computed(() => (_.flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size }))));
         const proxyPageSize = makeProxy('pageSize');
         const proxyThisPage = makeProxy('thisPage');
