@@ -64,17 +64,15 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed, defineComponent, SetupContext, getCurrentInstance,
+    toRefs, reactive, computed, defineComponent, SetupContext,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import config from '@/lib/config';
 import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-// @ts-ignore
-import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -94,7 +92,6 @@ export default defineComponent({
     components: {
         PButtonModal,
         PButton,
-        PDynamicForm,
         PFieldGroup,
         PRow,
         PCol,
@@ -107,7 +104,7 @@ export default defineComponent({
     },
     props: collectModalProps,
     setup(props: CollectModalPropsType, context: SetupContext) {
-        const vm: any = getCurrentInstance();
+        // const vm: any = getCurrentInstance();
         // const dataSource = computed(() => props.dataSource || [
         //     {
         //         name: vm.$t('COMMON.ID'),
@@ -143,7 +140,7 @@ export default defineComponent({
             ).some(f => f.key === props.idKey)),
         });
 
-        const setMergedCollectors = () => {
+        const setMergedCollectors = (): void => {
             _.forEach(props.resources, (resource) => {
                 _.forEach(resource.collection_info.collectors, (collector) => {
                     if (state.mergedCollectors[collector]) state.mergedCollectors[collector].push(resource);
@@ -154,7 +151,7 @@ export default defineComponent({
 
         setMergedCollectors();
 
-        const getBadgeType = (idx) => {
+        const getBadgeType = (idx): string => {
             if (state.selectedIndexes[0] === idx) return 'secondary';
 
             return 'dark';
@@ -162,7 +159,7 @@ export default defineComponent({
 
 
         const collectorApi = fluentApi.inventory().collector();
-        const listCollector = async () => {
+        const listCollector = async (): Promise<void> => {
             state.loading = true;
 
             try {
@@ -184,7 +181,7 @@ export default defineComponent({
             }
         };
 
-        const collectData = async (id: string) => {
+        const collectData = async (id: string): Promise<void> => {
             try {
                 await collectorApi.collect().setParameter({
                     // eslint-disable-next-line camelcase
@@ -213,7 +210,7 @@ export default defineComponent({
             }
         };
 
-        const onClickCollectConfirm = async () => {
+        const onClickCollectConfirm = async (): Promise<void> => {
             state.loading = true;
 
             if (state.selectedCollector) await collectData(state.selectedCollector.collector_id);
@@ -253,13 +250,6 @@ export default defineComponent({
     height: 100%;
     overflow: auto;
     padding-right: 0.5rem;
-        .icon {
-            width: 3rem;
-            height: 3rem;
-        }
-    .name {
-        font-size: 1.125rem;
-    }
 }
 .right-container {
     padding-left: 0.5rem;
