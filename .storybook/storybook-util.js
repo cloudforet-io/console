@@ -11,6 +11,11 @@ const knobMapper = {
     Array: object,
 }
 
+const getDefaultValue = (defaultVal) => {
+    if (typeof defaultVal === 'function') return defaultVal();
+    return defaultVal;
+}
+
 const getKnobProp = (k, v, knob, option) => {
     if (knob === select) {
         return knob(k, option, v);
@@ -31,12 +36,13 @@ export const getKnobProps = (props, data = {}, disable = {}, knobs = {}, options
         let type = v.type || v;
         if (type instanceof Array) { type = type[0] };
         const knob = knobs[k] || knobMapper[type.name];
-        const defaultVal = data[k] || v.default;
+        const defaultVal = data.hasOwnProperty(k) ? data[k] : v.default;
         const option = options[k];
 
         if (!disable[k]) {
             res[k] = {};
-            res[k].default = getKnobProp(k, defaultVal, knob, option);
+            if (type.name === Function) res[k].default = defaultVal;
+            else res[k].default = getKnobProp(k, getDefaultValue(defaultVal), knob, option);
         }
     })
 
