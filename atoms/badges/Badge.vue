@@ -27,6 +27,10 @@ export default {
             type: String,
             default: undefined,
         },
+        outline: {
+            type: Boolean,
+            default: false,
+        },
     },
     render(h, { props, data, children }) {
         const newData = {
@@ -47,6 +51,7 @@ export default {
         } else {
             newData.class[`badge-${props.styleType}`] = true;
         }
+        if (props.outline) newData.class.outline = true;
         return h('span', newData, children);
     },
 };
@@ -58,10 +63,10 @@ export default {
     border-radius: 100px;
     background-clip: padding-box;
     text-align: center;
-    font-size: .75rem;
-    line-height: .875rem;
+    font-size: 0.75rem;
+    line-height: 0.875rem;
     letter-spacing: 0;
-    padding:  0.1875rem 0.5rem 0.1875rem 0.5rem;
+    padding: 0.1875rem 0.5rem 0.1875rem 0.5rem;
     @apply text-white bg-gray;
 }
 
@@ -69,6 +74,11 @@ export default {
     .badge-$(theme) {
         background-color: $color;
         color: $opposite-color;
+        &.outline {
+            background-color: transparent;
+            border: 1px solid $color;
+            color: $color;
+        }
     }
 }
 
