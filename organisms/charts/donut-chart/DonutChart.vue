@@ -157,10 +157,6 @@ export default {
                 return data.every(d => d.key && typeof d.value === 'number');
             },
         },
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
         preserve: {
             type: [Object, Boolean],
             default: () => ({

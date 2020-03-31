@@ -159,10 +159,6 @@ export default {
             type: Object,
             required: true,
         },
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
         preserve: {
             type: [Object, Boolean],
             default: false,
