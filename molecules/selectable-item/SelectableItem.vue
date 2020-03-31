@@ -38,7 +38,7 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
     .item-container {
-        @apply flex p-2 items-center justify-between w-full bg-white cursor-pointer;
+        @apply flex p-2 items-center justify-between w-full bg-white cursor-pointer border border-transparent;
         &:hover {
             @apply bg-gray3;
         }
