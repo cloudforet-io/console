@@ -26,7 +26,7 @@
 import {
     reactive, toRefs, watch, onMounted, onUnmounted,
 } from '@vue/composition-api';
-import PLottie from '@/components/molecules/lottie/PLottie';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { colorset } from '@/lib/util';
 
 
@@ -254,7 +254,7 @@ export default {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: rgba(theme('colors.white'), .5);
+            background: rgba(theme('colors.white'), 0.5);
             .spinner {
                 position: absolute;
                 display: inline-flex;
@@ -264,10 +264,10 @@ export default {
             }
 
             &.fade-in-enter-active {
-                transition: opacity .3s, visibility .3s;
+                transition: opacity 0.3s, visibility 0.3s;
             }
             &.fade-in-leave-active {
-                transition: opacity .3s, visibility .3s;
+                transition: opacity 0.3s, visibility 0.3s;
             }
             &.fade-in-enter, &.fade-in-leave-to {
                 visibility: hidden;
@@ -295,6 +295,5 @@ export default {
             font-size: 14px;
         }
     }
-
 
 </style>

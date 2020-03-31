@@ -14,12 +14,12 @@ import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/Dyn
 import { DataTableToolSet } from '@/components/organisms/tables/data-table/toolset';
 
 interface DataSourceType {
-    name:string;
-    key:string;
+    name: string;
+    key: string;
     // eslint-disable-next-line camelcase
-    view_type?:string;
+    view_type?: string;
     // eslint-disable-next-line camelcase
-    view_option?:any;
+    view_option?: any;
 }
 
 interface Props {
@@ -27,12 +27,12 @@ interface Props {
     data_source: DataSourceType[];
     data: any;
     // eslint-disable-next-line camelcase
-    key_path:string;
+    key_path: string;
 }
 
 interface Field {
-    name:string;
-    label:string;
+    name: string;
+    label: string;
 }
 
 
@@ -58,8 +58,8 @@ export default defineComponent({
             default: '',
         },
     },
-    setup(props:Props) {
-        const fields:Ref<Readonly<Field[]> > = computed(():Field[] => props.data_source.map((ds:DataSourceType):Field => ({
+    setup(props: Props) {
+        const fields: Ref<Readonly<Field[]> > = computed((): Field[] => props.data_source.map((ds: DataSourceType): Field => ({
             name: ds.key,
             label: ds.name,
         })));
@@ -70,12 +70,12 @@ export default defineComponent({
             items,
             colCopy: true,
             striped: true,
-            bord: false,
+            bordered: false,
             padding: false,
             hover: false,
         });
 
-        const slots:Ref<Readonly<DataSourceType[]>> = computed(():DataSourceType[] => props.data_source.map((ds:DataSourceType):DataSourceType => ({
+        const slots: Ref<Readonly<DataSourceType[]>> = computed((): DataSourceType[] => props.data_source.map((ds: DataSourceType): DataSourceType => ({
             ...ds,
             name: `col-${ds.key}-format`,
         })));

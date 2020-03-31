@@ -80,7 +80,7 @@ module.exports = {
       { allows: ["protected", "public"] }
     ],
     "@typescript-eslint/camelcase": ["off"], // use eslint camelcase rule
-    "@typescript-eslint/no-empty-function" : ["off"], // use eslint no-empty-function rule
+    "@typescript-eslint/no-empty-function": ["off"], // use eslint no-empty-function rule
     "@typescript-eslint/ban-ts-ignore": ["off"]
   },
   parserOptions: {

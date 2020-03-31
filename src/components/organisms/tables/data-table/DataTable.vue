@@ -9,10 +9,11 @@
         :thead-style="theadStyle"
         :tfoot-style="tfootStyle"
         :striped="striped"
-        :bord="bord"
+        :bordered="bordered"
         :hover="hover"
         :small="small"
         :background="background"
+        :top-border="topBorder"
         :responsive="responsive"
     >
         <template #caption>
@@ -116,7 +117,7 @@
                                 :index="index"
                                 :field="field"
                             >
-                                <p-td onselectstart="return true" style="user-select: all">
+                                <p-td onselectstart="return true" style="user-select: all;">
                                     <slot
                                         :name="'col-'+field+'-format'"
                                         :item="item"
@@ -438,37 +439,37 @@ export default defineComponent({
         }
     }
 
-    .select-checkbox{
-        cursor:pointer;
+    .select-checkbox {
+        cursor: pointer;
     }
-    tbody{
+    tbody {
         display: block;
-        tr{
+        tr {
             &.tr-selected {
                 @mixin selected-row;
             }
-            td{
+            td {
                 vertical-align: middle;
             }
         }
     }
-    thead{
-        tr{
-            th{
+    thead {
+        tr {
+            th {
                 vertical-align: middle;
-                white-space:nowrap;
+                white-space: nowrap;
                 .th-contents {
                     display: flex;
                     justify-content: space-between;
                 }
-                .sort-icon{
+                .sort-icon {
                     @apply text-gray2;
                     float: right;
                 }
                 &.fix-width {
                     min-width: 4.75rem;
                 }
-                &:last-child{
+                &:last-child {
                     padding-right: 1rem;
                 }
             }
@@ -486,16 +487,17 @@ export default defineComponent({
             left: 0;
         }
     }
-    .no-data-row{
-        &:hover{
+    .no-data-row {
+        &:hover {
             background-color: initial !important;
         }
-        .no-data{
+        .no-data {
             @apply text-primary2;
             text-align: center;
             padding-top: 2rem;
             padding-bottom: 2rem;
-            font: 24px/32px Arial;
+            font-size: 1.5rem;
+            line-height: 2rem;
         }
     }
 </style>

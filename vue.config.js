@@ -1,6 +1,17 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const StylelintPlugin = require('stylelint-webpack-plugin');
 const postcssConfig = require('./postcss.config');
+
+const extraPlugins = [];
+// if (process.env.NODE_ENV === 'development') {
+//     extraPlugins.push(
+//         new StylelintPlugin({
+//             files: ['src/**/*.{vue,scss}'],
+//         }),
+//     );
+// }
 
 module.exports = {
     lintOnSave: false,
@@ -30,9 +41,7 @@ module.exports = {
             new MonacoWebpackPlugin({
                 languages: ['json', 'html', 'python', 'javascript', 'css'],
             }),
-            // new StyleLintPlugin({
-            //     files: ['src/**/*.{vue}'],
-            // }),
+            ...extraPlugins,
         ],
     },
 
