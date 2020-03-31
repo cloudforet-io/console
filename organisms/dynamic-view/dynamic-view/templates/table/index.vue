@@ -2,23 +2,29 @@
     <p-toolbox-table
         :items="apiHandler.tableTS.state.items"
         :fields="fields"
-        :selectable="false"
-        :sortable="false"
-        :hover="true"
+        :selectable="apiHandler.tableTS.state.selectable !== null? apiHandler.tableTS.state.selectable : false"
+        :multiSelect="apiHandler.tableTS.state.multiSelect !== null? apiHandler.tableTS.state.multiSelect : true"
+        :sortable="apiHandler.tableTS.state.sortable !== null? apiHandler.tableTS.state.sortable : false"
+        :hover="apiHandler.tableTS.state.hover !== null? apiHandler.tableTS.state.hover : true"
+        :shadow="apiHandler.tableTS.state.shadow !== null? apiHandler.tableTS.state.shadow : false"
+        :border="apiHandler.tableTS.state.border !== null? apiHandler.tableTS.state.border : false"
+        :padding="apiHandler.tableTS.state.padding !== null? apiHandler.tableTS.state.padding : false"
+        :dragable="apiHandler.tableTS.state.dragable !== null? apiHandler.tableTS.state.dragable : false"
         :all-page="apiHandler.tableTS.state.allPage"
+        :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
+        :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
+        :select-index.sync="apiHandler.tableTS.syncState.selectIndex"
+        :loading.sync="apiHandler.tableTS.syncState.loading"
         :this-page.sync="apiHandler.tableTS.syncState.thisPage"
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-        :responsive-style="{'height': '24rem', 'overflow-y':'auto'}"
+        :responsive-style="responsiveStyle"
         :setting-visible="false"
-        :shadow="false"
-        :border="false"
-        :padding="false"
-        :loading="apiHandler.tableTS.syncState.loading"
         :use-spinner-loading="true"
         :use-cursor-loading="true"
         @changePageSize="apiHandler.getData"
         @changePageNumber="apiHandler.getData"
         @clickRefresh="apiHandler.getData"
+        @changeSort="apiHandler.getData"
     >
         <template #toolbox-left>
             <slot name="toolbox-left" />
@@ -84,12 +90,16 @@ export default {
             defaults: () => [],
         },
         data: {
-            type: [Object],
-            required: true,
+            type: [Array, Object],
+            default: () => ({}),
         },
         apiHandler: {
             type: Object,
             required: true,
+        },
+        responsiveStyle: {
+            type: Object,
+            default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
         },
     },
     setup(props:Props) {

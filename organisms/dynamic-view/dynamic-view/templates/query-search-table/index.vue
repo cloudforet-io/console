@@ -9,6 +9,7 @@
         :border="apiHandler.tableTS.state.border !== null? apiHandler.tableTS.state.border : true"
         :padding="apiHandler.tableTS.state.padding !== null? apiHandler.tableTS.state.padding : true"
         :dragable="apiHandler.tableTS.state.dragable !== null? apiHandler.tableTS.state.dragable : true"
+        :multiSelect="apiHandler.tableTS.state.multiSelect !== null? apiHandler.tableTS.state.multiSelect : true"
         :all-page="apiHandler.tableTS.state.allPage"
         :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
         :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
