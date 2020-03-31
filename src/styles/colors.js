@@ -81,6 +81,7 @@ const palette = {
 };
 
 const colorSet = {
+    transparent: 'transparent',
     black: palette.black,
     white: palette.white,
     gray: {

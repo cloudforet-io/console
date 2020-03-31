@@ -28,8 +28,8 @@
                                        :selected-indexes.sync="selectedIndexes"
                     >
                         <template #extra="{item, index}">
-                            <span class="">
-                                {{ mergedCollectors[item.collector_id].length }}
+                            <span class="count">
+                                {{ collectorResourceMap[item.collector_id].length }}
                             </span>
                         </template>
                     </p-selectable-list>
@@ -41,7 +41,8 @@
                     <p-data-table :fields="fields"
                                   :sortable="false"
                                   :selectable="false"
-                                  :items="selectedCollector ? mergedCollectors[selectedCollector.collector_id] : []"
+                                  :loading="resourceLoading"
+                                  :items="selectedCollector ? collectorResourceMap[selectedCollector.collector_id] : []"
                                   table-style-type="light"
                                   :top-border="false"
                                   bordered
@@ -64,7 +65,7 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed, defineComponent, SetupContext,
+    toRefs, reactive, computed, defineComponent, SetupContext, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import { makeTrItems } from '@/lib/view-helper';
@@ -115,8 +116,11 @@ export default defineComponent({
         //         key: 'name',
         //     },
         // ]);
+
+
         const state = reactive({
-            loading: false,
+            loading: true,
+            resourceLoading: true,
             proxyVisible: makeProxy('visible', props, context.emit),
             collectors: [],
             // fields: computed(() => dataSource.value.map(d => ({ label: d.name, name: d.key }))),
@@ -130,8 +134,8 @@ export default defineComponent({
                 title: 'name',
             },
             selectedIndexes: [0],
-            mergedCollectors: {},
-            mergedCollectorIds: computed(() => _.keys(state.mergedCollectors)),
+            collectorResourceMap: {},
+            mergedCollectorIds: computed(() => _.keys(state.collectorResourceMap)),
             selectedCollector: computed(() => state.collectors[state.selectedIndexes[0]]),
             hasFilterFormat: computed(() => _.get(
                 state.selectedCollector,
@@ -140,23 +144,23 @@ export default defineComponent({
             ).some(f => f.key === props.idKey)),
         });
 
-        const setMergedCollectors = (): void => {
+        const setCollectorResourceMap = (): void => {
+            state.resourceLoading = true;
+            state.collectorResourceMap = {};
             _.forEach(props.resources, (resource) => {
-                _.forEach(resource.collection_info.collectors, (collector) => {
-                    if (state.mergedCollectors[collector]) state.mergedCollectors[collector].push(resource);
-                    else state.mergedCollectors[collector] = [resource];
+                _.forEach(resource.collection_info.collectors, (collectorId: string) => {
+                    if (state.collectorResourceMap[collectorId]) state.collectorResourceMap[collectorId].push(resource);
+                    else state.collectorResourceMap[collectorId] = [resource];
                 });
             });
+            state.resourceLoading = false;
         };
-
-        setMergedCollectors();
 
         const getBadgeType = (idx): string => {
             if (state.selectedIndexes[0] === idx) return 'secondary';
 
             return 'dark';
         };
-
 
         const collectorApi = fluentApi.inventory().collector();
         const listCollector = async (): Promise<void> => {
@@ -186,7 +190,7 @@ export default defineComponent({
                 await collectorApi.collect().setParameter({
                     // eslint-disable-next-line camelcase
                     collector_id: id,
-                    filter: { [props.idKey]: state.mergedCollectors[state.selectedCollector.collector_id].map(r => r[props.idKey]) },
+                    filter: { [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) },
                 }).execute();
                 context.root.$notify({
                     group: 'noticeBottomRight',
@@ -218,7 +222,16 @@ export default defineComponent({
             state.loading = false;
         };
 
-        listCollector();
+
+        const initiate = async (): Promise<void> => {
+            state.selectedIndexes = [0];
+            setCollectorResourceMap();
+            await listCollector();
+        };
+
+        watch(() => props.visible, async (val) => {
+            if (val) await initiate();
+        });
 
 
         return {
@@ -250,6 +263,11 @@ export default defineComponent({
     height: 100%;
     overflow: auto;
     padding-right: 0.5rem;
+    .count {
+        font-size: 1.125rem;
+        line-height: 1.375rem;
+        font-weight: bold;
+    }
 }
 .right-container {
     padding-left: 0.5rem;
