@@ -45,8 +45,8 @@ interface MapperType {
     title: string;
 }
 
-interface SelectableListType {
-    items: SelectableItemPropsType[];
+interface SelectableListType<item=any> {
+    items: item[];
     mapper: MapperType;
     multiSelectable?: boolean;
     mustSelect?: boolean;
@@ -65,7 +65,8 @@ export interface SelectableListPropsType extends SelectableListType, SelectableL
 export class SelectableListState<
     initData,
     initSyncData,
-    initState extends SelectableListType = SelectableListType,
+    item=any,
+    initState extends SelectableListType = SelectableListType<item>,
     initSync extends SelectableListSyncType= SelectableListSyncType
     > {
     state:optionalType<initState, initData>
@@ -98,20 +99,20 @@ export class SelectableListState<
         this.syncState = initReactive<optionalType<initSync, initSyncData>>(lazy, SelectableListState.initSyncState(), initSyncData);
     }
 }
-export interface SelectableListSelectState {
+export interface SelectableListSelectState<item=any> {
     isNotSelected: boolean;
     isSelectOne: boolean;
     isSelectMulti: boolean;
-    selectItems: readonly any[];
-    firstSelectItem: any;
+    selectItems: readonly item[];
+    firstSelectItem: item;
 }
 
-const initSelectState = (state: SelectableListType, syncState: SelectableListSyncType): SelectableListSelectState => {
+const initSelectState = <item=any>(state: SelectableListType, syncState: SelectableListSyncType): SelectableListSelectState => {
     const isNotSelected: Ref<boolean> = computed(() => (syncState.selectedIndexes ? (syncState.selectedIndexes as Array<any>).length === 0 : true));
     const isSelectOne: Ref<boolean> = computed(() => (syncState.selectedIndexes ? (syncState.selectedIndexes as Array<any>).length === 1 : false));
     const isSelectMulti: Ref<boolean> = computed(() => (syncState.selectedIndexes ? (syncState.selectedIndexes as Array<any>).length > 1 : false));
-    const selectItems: Ref<readonly any[]> = computed(() => (syncState.selectedIndexes ? (syncState.selectedIndexes as Array<any>).map(idx => (state.items as Array<any>)[idx]) : []));
-    const firstSelectItem: Ref<any> = computed(() => (!isNotSelected.value ? (state.items as Array<any>)[(syncState.selectedIndexes as number[])[0]] : {}));
+    const selectItems: Ref<readonly item[]> = computed(() => (syncState.selectedIndexes ? (syncState.selectedIndexes as Array<any>).map(idx => (state.items as Array<item>)[idx]) : []));
+    const firstSelectItem: Ref<item> = computed(() => (!isNotSelected.value ? (state.items as Array<item>)[(syncState.selectedIndexes as number[])[0]] : {} as item));
     return reactive({
         isNotSelected,
         isSelectOne,
@@ -122,8 +123,8 @@ const initSelectState = (state: SelectableListType, syncState: SelectableListSyn
 };
 
 @HelperToolSet()
-export class SelectableListToolset<initData, initSyncData> extends SelectableListState<initData, initSyncData> {
-    selectState: SelectableListSelectState= null as unknown as SelectableListSelectState;
+export class SelectableListToolset<initData, initSyncData,item=any> extends SelectableListState<initData, initSyncData,item> {
+    selectState: SelectableListSelectState<item>= null as unknown as SelectableListSelectState;
 
     static initToolSet(_this: any) {
         _this.selectState = initSelectState(_this.state, _this.syncState);
