@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { computed, defineComponent } from '@vue/composition-api';
 // @ts-ignore
 import PContentModal, { setup as contentModalSetup } from '@/components/organisms/modals/content-modal/ContentModal.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -148,6 +148,9 @@ export default defineComponent({
 });
 </script>
 <style lang="postcss" scoped>
+    .scrollable-body {
+        display: flex;
+    }
     .header {
         display: flex;
         justify-content: space-between;
