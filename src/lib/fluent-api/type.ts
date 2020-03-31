@@ -50,6 +50,7 @@ export interface Query {
     page?: Page;
     sort?: Sort;
     keyword?: string;
+    count_only?:boolean;
 }
 
 export interface QueryApiState {

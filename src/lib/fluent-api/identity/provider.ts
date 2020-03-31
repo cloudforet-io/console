@@ -14,13 +14,15 @@ interface IdParameter {
     [idField]: string;
 }
 
-interface ProviderModel extends Tags,IdParameter{
-    "name": string
-    "template": {
-        "data": DynamicFormItem[]
+export interface ProviderModel extends Tags,IdParameter{
+    name: string
+    template: {
+        service_account:{
+            data: DynamicFormItem[]
+        }
     },
     capability: {
-        "supported_schema":string[]
+        supported_schema:string[]
     },
     created_at: TimeStamp
 }
