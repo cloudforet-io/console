@@ -39,17 +39,17 @@
                                     </PFieldGroup>
                                 </p-col>
                             </p-row>
-                            <p-row>
-                                <p-col :col="6">
-                                    <p-row style="width: 100%" direction="column">
-                                        <PFieldGroup label="Secret Type">
-                                            <PSelectDropdown v-model="formState.schema_type" :items="schemaTypeItems"
-                                                             @input="onSchemaTypeChange"
-                                            />
-                                        </PFieldGroup>
-                                    </p-row>
-                                </p-col>
-                            </p-row>
+<!--                            <p-row>-->
+<!--                                <p-col :col="6">-->
+<!--                                    <p-row style="width: 100%" direction="column">-->
+<!--                                        <PFieldGroup label="Secret Type">-->
+<!--                                            <PSelectDropdown v-model="formState.schema_type" :items="schemaTypeItems"-->
+<!--                                                             @input="onSchemaTypeChange"-->
+<!--                                            />-->
+<!--                                        </PFieldGroup>-->
+<!--                                    </p-row>-->
+<!--                                </p-col>-->
+<!--                            </p-row>-->
                             <p-row>
                                 <p-col :col="12">
                                     <PFieldGroup label="Tags">
@@ -76,28 +76,28 @@
                                                 :selected.sync="selectedInputType"
                                                 @clickButton="onChangeInputType"
                             />
-                            <PFieldGroup v-if="selectedInputType === 'Form'"
-                                         :invalid-text="validateRightHalfJsonAPI.invalidMsg.form"
-                                         :invalid="validateRightHalfJsonAPI.invalidState.form"
-                            >
-                                <template v-slot:default="{invalid}">
-                                    <div v-if="dynamicForm.length > 0" class="form-editor">
-                                        <p-dynamic-form v-for="(fm, idx) in dynamicForm" :key="idx"
-                                                        v-model="values[fm.key]"
-                                                        :form="fm"
-                                                        :invalid="showValidation && vdApi.invalidState[fm.key]"
-                                                        :invalid-text="vdApi.invalidMsg[fm.key]"
-                                                        :validatable="true"
-                                                        @change="onOptionChange(fm.key)"
-                                        />
-                                    </div>
-                                    <div v-else style="display:block" class="form-editor invalid-feedback">
-                                        * {{ $t('SECRET.NO_FORMAT') }}
-                                    </div>
-                                </template>
-                            </PFieldGroup>
+<!--                            <PFieldGroup v-if="selectedInputType === 'Form'"-->
+<!--                                         :invalid-text="validateRightHalfJsonAPI.invalidMsg.form"-->
+<!--                                         :invalid="validateRightHalfJsonAPI.invalidState.form"-->
+<!--                            >-->
+<!--                                <template v-slot:default="{invalid}">-->
+<!--                                    <div v-if="dynamicForm.length > 0" class="form-editor">-->
+<!--                                        <p-dynamic-form v-for="(fm, idx) in dynamicForm" :key="idx"-->
+<!--                                                        v-model="values[fm.key]"-->
+<!--                                                        :form="fm"-->
+<!--                                                        :invalid="showValidation && vdApi.invalidState[fm.key]"-->
+<!--                                                        :invalid-text="vdApi.invalidMsg[fm.key]"-->
+<!--                                                        :validatable="true"-->
+<!--                                                        @change="onOptionChange(fm.key)"-->
+<!--                                        />-->
+<!--                                    </div>-->
+<!--                                    <div v-else style="display:block" class="form-editor invalid-feedback">-->
+<!--                                        * {{ $t('SECRET.NO_FORMAT') }}-->
+<!--                                    </div>-->
+<!--                                </template>-->
+<!--                            </PFieldGroup>-->
 
-                            <PFieldGroup v-else
+                            <PFieldGroup
                                          :invalid-text="validateRightHalfJsonAPI.invalidMsg.data"
                                          :invalid="validateRightHalfJsonAPI.invalidState.data"
                                          :valid="validateRightHalfJsonAPI.validState.data"
@@ -183,7 +183,7 @@ const setup = (props, context) => {
             // return makeTrItems(res,context.parent, { vbind: { styleType: 'dark', outline: true } })
             return makeTrItems([
                 ['Json'],
-                ['Form'],
+                // ['Form'],
             ],
             context.parent, { vbind: { styleType: 'dark', outline: true }});
         }),
@@ -236,11 +236,11 @@ const setup = (props, context) => {
         await vdApi.fieldValidation(key);
     };
 
-    const schemaTypeItems = computed(() => {
-        const result = [allItem, ...schemaState.schemaList.map(schema => ({ type: 'item', label: schema.name, name: schema.schema_id }))];
-        console.log('result test', result);
-        return result;
-    });
+    // const schemaTypeItems = computed(() => {
+    //     const result = [allItem, ...schemaState.schemaList.map(schema => ({ type: 'item', label: schema.name, name: schema.schema_id }))];
+    //     console.log('result test', result);
+    //     return result;
+    // });
 
     const leftHalfValidations = {
         name: [requiredValidation(), credentialsNameValidation(context.parent)],
@@ -260,7 +260,7 @@ const setup = (props, context) => {
             const params = {
                 name: formState.name,
             };
-            const keyArr = ['name', 'issue_type', 'tags', 'data'];
+            // const keyArr = ['name', 'issue_type', 'tags', 'data'];
 
             if (schemaState.selectedInputType === 'Form') {
                 const formParam = {};
@@ -271,11 +271,11 @@ const setup = (props, context) => {
             } else {
                 formState.data = JSON.parse(formState.data);
             }
-            keyArr.forEach((key) => {
-                if (formState[key]) {
-                    params[key] = formState[key];
-                }
-            });
+            // keyArr.forEach((key) => {
+            //     if (formState[key]) {
+            //         params[key] = formState[key];
+            //     }
+            // });
             context.emit('confirm', params);
         }
     };
@@ -288,7 +288,7 @@ const setup = (props, context) => {
         onSchemaTypeChange,
         onChangeInputType,
         vdApi,
-        schemaTypeItems,
+        // schemaTypeItems,
         proxyVisible: makeProxy('visible', props, context.emit),
         confirm,
         validateLeftHalfAPI,

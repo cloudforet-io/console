@@ -569,7 +569,7 @@ export default {
                     ['project', 'COMMON.CHG_PRO'],
                     ['pool', 'BTN.CHG_POOL', { disabled: true }],
                     [null, null, { type: 'divider' }],
-                    ['link', null, { label: 'console', disabled: noLink }],
+                    ['link', null, { label: 'Console', disabled: noLink }],
                     ['exportExcel', null, { label: 'Export', disabled: false }],
                 ],
                 context.parent,
