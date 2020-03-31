@@ -28,7 +28,10 @@
                     @changeSort="apiHandler.getData()"
                 >
                     <template #toolbox-left>
-                        <p-button style-type="primary-dark" :disabled="apiHandler.tableTS.syncState.selectIndex.length === 0" @click="clickCollectData">
+                        <p-button style-type="primary-dark"
+                                  :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
+                                  @click="clickCollectData"
+                        >
                             {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
@@ -158,10 +161,9 @@
             @confirm="checkModalConfirm"
         />
         <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
-        <s-collect-modal v-if="collectModalVisible"
-                         :visible.sync="collectModalVisible"
+        <s-collect-modal :visible.sync="collectModalVisible"
                          :resources="apiHandler.tableTS.selectState.selectItems"
-                         id-key="server_id" filter-key="server_id" type="SERVER"
+                         id-key="server_id"
         />
     </general-page-layout>
 </template>
@@ -575,20 +577,20 @@ export default {
         const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
         const dropdown = reactive({
             ...makeTrItems([
-                    ['delete', 'BTN.DELETE'],
-                    [null, null, { type: 'divider' }],
-                    ['in-service', 'INVENTORY.BTN.SET_INSERVICE'],
-                    ['maintenance', 'INVENTORY.BTN.SET_MAINTENANCE'],
-                    ['closed', 'INVENTORY.BTN.SET_CLOSE'],
-                    [null, null, { type: 'divider' }],
-                    ['project', 'COMMON.CHG_PRO'],
-                    ['pool', 'BTN.CHG_POOL', { disabled: true }],
-                    [null, null, { type: 'divider' }],
-                    ['link', null, { label: 'Console', disabled: noLink }],
-                    ['exportExcel', null, { label: 'Export', disabled: false }],
-                ],
-                context.parent,
-                { type: 'item', disabled: isNotSelected }),
+                ['delete', 'BTN.DELETE'],
+                [null, null, { type: 'divider' }],
+                ['in-service', 'INVENTORY.BTN.SET_INSERVICE'],
+                ['maintenance', 'INVENTORY.BTN.SET_MAINTENANCE'],
+                ['closed', 'INVENTORY.BTN.SET_CLOSE'],
+                [null, null, { type: 'divider' }],
+                ['project', 'COMMON.CHG_PRO'],
+                ['pool', 'BTN.CHG_POOL', { disabled: true }],
+                [null, null, { type: 'divider' }],
+                ['link', null, { label: 'Console', disabled: noLink }],
+                ['exportExcel', null, { label: 'Export', disabled: false }],
+            ],
+            context.parent,
+            { type: 'item', disabled: isNotSelected }),
         });
 
         const projectModalVisible = ref(false);

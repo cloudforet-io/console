@@ -12,13 +12,13 @@ export const collectModalProps = {
         type: String,
         default: '',
     },
-    type: {
-        type: String,
-        default: undefined,
-        validator(val) {
-            return ['SERVER', undefined].includes(val);
-        },
-    },
+    // type: {
+    //     type: String,
+    //     default: undefined,
+    //     validator(val) {
+    //         return ['SERVER', undefined].includes(val);
+    //     },
+    // },
     nameKey: {
         type: String,
         default: 'name',
@@ -32,7 +32,7 @@ export const collectModalProps = {
 interface CollectModalType {
     resources: any[];
     idKey: string;
-    type: string | undefined;
+    // type: string | undefined;
     nameKey: string;
     // dataSource: any[];
 }
