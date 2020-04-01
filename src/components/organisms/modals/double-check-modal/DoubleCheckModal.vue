@@ -34,6 +34,7 @@
                         v-model="inputText"
                         :class="{'is-invalid': invalid}"
                         class="w-full"
+                        @keyup.enter="confirm()"
                     />
                 </p-field-group>
 
@@ -65,10 +66,21 @@ const setup = (props, context) => {
         inputText: '',
         invalid: false,
     });
-
+    const reset = () => {
+        checkState.inputText = '';
+        checkState.invalid = false;
+    };
+    const cancel = (...event) => {
+        reset();
+        context.emit('cancel', ...event);
+    };
+    const close = (...event) => {
+        reset();
+        context.emit('close', ...event);
+    };
     const confirm = () => {
         if (checkState.inputText === props.verificationText) {
-            checkState.invalid = false;
+            reset();
             context.emit('confirm');
         } else {
             checkState.invalid = true;
@@ -82,8 +94,8 @@ const setup = (props, context) => {
         footerCancelButtonBind,
         footerConfirmButtonBind,
         proxyVisible: makeProxy('visible', props, context.emit),
-        cancel: makeByPass(context.emit, 'cancel'),
-        close: makeByPass(context.emit, 'close'),
+        cancel,
+        close,
         confirm,
     };
 };
