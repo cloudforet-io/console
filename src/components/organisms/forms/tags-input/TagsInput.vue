@@ -1,5 +1,6 @@
 <template>
     <p-box-layout ref="box" class="p-tags-input"
+                  :class="{'is-invalid-tags-input':invalid}"
                   :box-style="boxStyle"
                   :style="{maxWidth: maxWidth ? `${maxWidth}px` : undefined}"
                   @click="onBoxClick"
@@ -70,6 +71,10 @@ export default defineComponent({
             type: Boolean,
             default: true,
         },
+        invalid: {
+            type: Boolean,
+            default: false,
+        },
     },
     // @ts-ignore
     setup(props, { emit, refs }) {
@@ -135,6 +140,9 @@ export default defineComponent({
     &.p-box-layout {
         padding-top: 0;
         padding-bottom: 0;
+    }
+    &.is-invalid-tags-input{
+        @apply  border-alert;
     }
     .input.p-text-input {
         border: none;

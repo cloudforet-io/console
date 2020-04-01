@@ -20,7 +20,7 @@ export default {
         type: {
             type: String,
             default: 'text',
-            validator: value => ['text', 'number', 'password'].indexOf(value) !== -1,
+            validator: value => ['text', 'number', 'password'].includes(value),
         },
         block: {
             type: Boolean,
