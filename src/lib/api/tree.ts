@@ -1,10 +1,86 @@
 /* eslint-disable camelcase */
 import { AxiosResponse } from 'axios';
 import { ref } from '@vue/composition-api';
-import { getDataAPI } from '@/lib/api/toolset';
+import { DynamicFluentAPIToolSet, getDataAPI } from '@/lib/api/toolset';
 // @ts-ignore
 import { ClassTypeOf } from '@/lib/type';
 import TreeItem, { TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
+import { ActionAPI, TreeAction } from '@/lib/fluent-api';
+
+export interface TreeResp<T> {
+    items: T[];
+}
+
+export abstract class BaseTreeFluentAPI<
+    initData = any,
+    node extends TreeItem = TreeItem,
+    parameter = any,
+    resp = any,
+    action extends TreeAction<any, any> = TreeAction<parameter, resp>,
+    T extends TreeToolSet<any> = TreeToolSet<initData >
+    > extends DynamicFluentAPIToolSet<parameter, resp, action> {
+    ts: T;
+
+    protected setFetchData() {
+        // @ts-ignore
+        this.ts.state.options?.fetchData = this.getData;
+    }
+
+    constructor(action: action, initData?: initData, treeRef = ref(null)) {
+        super(action);
+        // @ts-ignore
+        this.ts = new TreeToolSet(initData, treeRef);
+        this.setFetchData();
+    }
+
+    abstract getAction: (node: node) => action
+
+    protected abstract toNode: (data: AxiosResponse<any>) => node[];
+
+    getData = async (node?: any): Promise<node[]> => {
+        this.ts.state.loading = true;
+        let result: node[] = [];
+        try {
+            const resp = await this.getAction(node).execute();
+            result = this.toNode(resp);
+        } catch (e) {
+            console.error(e);
+        }
+        this.ts.state.loading = false;
+        return result;
+    };
+}
+
+export interface ProjectItemResp {
+    id: string;
+    name: string;
+    has_child: boolean;
+    item_type: 'PROJECT_GROUP'|'PROJECT';
+}
+
+export interface ProjectNode extends TreeItem{
+    data: ProjectItemResp;
+}
+
+
+export class ProjectTreeFluentAPI <
+    initData = any,
+    node extends ProjectNode = ProjectNode,
+    parameter = any,
+    resp = any,
+    action extends TreeAction<any, any> = TreeAction<parameter, resp>,
+    T extends TreeToolSet<any> = TreeToolSet<initData >
+    > extends BaseTreeFluentAPI<initData, node, resp, T> {
+    getAction = (node: node) => {
+        if (node.id !== 'root') {
+            return this.action.setItemId(node.data.id).setItemType(node.data.item_type);
+        }
+        return this.action.setRoot();
+    };
+
+    // eslint-disable-next-line max-len
+    protected toNode = (resp: AxiosResponse<TreeResp<ProjectItemResp>>) => resp.data.items.map(item => new TreeItem(item.name, item, undefined, undefined, undefined, item.item_type === 'PROJECT_GROUP') as node)
+}
 
 
 export abstract class BaseTreeAPI<
@@ -20,13 +96,13 @@ export abstract class BaseTreeAPI<
         this.ts.state.options?.fetchData = this.getData;
     }
 
-    protected abstract requestData: (node?:any)=>any;
+    protected abstract requestData: (node?: any) => any;
 
-    protected abstract toNode:(data: any)=>node[];
+    protected abstract toNode: (data: any) => node[];
 
-    public getData = async (node?:any):Promise<node[]> => {
+    getData = async (node?: any): Promise<node[]> => {
         this.ts.state.loading = true;
-        let result :node[] = [];
+        let result: node[] = [];
         try {
             const resp = await this.requestData(node);
             result = this.toNode(resp);
@@ -38,20 +114,10 @@ export abstract class BaseTreeAPI<
     };
 }
 
-export interface ProjectItemResp {
-    id:string,
-    name:string,
-    has_child:boolean,
-    item_type: 'PROJECT_GROUP'|'PROJECT',
-}
 export interface ProjectGroupItem {
-    project_group_id:string
-    name:string
-    text:string
-}
-
-export interface ProjectNode extends TreeItem{
-    data:ProjectItemResp;
+    project_group_id: string;
+    name: string;
+    text: string;
 }
 
 
@@ -62,10 +128,10 @@ export class ProjectTreeAPI<
         responses =any,
         T extends TreeToolSet<initData > = TreeToolSet<initData >
         > extends BaseTreeAPI<initData, node, responses, T> {
-        public ts: T;
+        ts: T;
 
 
-        public constructor(ToolSet:ClassTypeOf<T> = null as unknown as ClassTypeOf<T>, initData?:initData, initSyncData?:initSyncData, treeRef = ref(null)) {
+        constructor(ToolSet: ClassTypeOf<T> = null as unknown as ClassTypeOf<T>, initData?: initData, initSyncData?: initSyncData, treeRef = ref(null)) {
             super();
             // @ts-ignore
             this.ts = ToolSet ? new ToolSet(initData, initSyncData, treeRef) : TreeToolSet(initData, treeRef);
@@ -73,10 +139,10 @@ export class ProjectTreeAPI<
         }
 
 
-        protected requestData = async (node:node) => {
-            let url:string = '';
-            let data:any = {};
-            let cb: (resp:AxiosResponse<any>) => Promise<any[]> = null as unknown as (resp:AxiosResponse<any>) => Promise<any[]>;
+        protected requestData = async (node: node) => {
+            let url = '';
+            let data: any = {};
+            let cb: (resp: AxiosResponse<any>) => Promise<any[]> = null as unknown as (resp: AxiosResponse<any>) => Promise<any[]>;
             console.debug('request node', node);
             if (node.id !== 'root') {
                 url = '/identity/project/tree';
@@ -104,7 +170,7 @@ export class ProjectTreeAPI<
             return resp;
         };
 
-        protected toNode = (data:ProjectItemResp[]|ProjectGroupItem[]) => {
+        protected toNode = (data: ProjectItemResp[]|ProjectGroupItem[]) => {
             console.log(data);
             // @ts-ignore
             return data.map((item) => {
