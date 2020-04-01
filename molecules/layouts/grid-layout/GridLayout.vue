@@ -61,9 +61,8 @@ export default {
     setup(props, context) {
         const state = reactive({
             containerStyle: computed(() => ({
-                width: props.width,
                 display: 'grid',
-                'grid-template-columns': `repeat(${props.fixColumn || 'auto-fit'}, minmax(${props.cardMinWidth}, ${props.cardMaxWidth}))`,
+                'grid-template-columns': `repeat(${props.fixColumn || 'auto-fill'}, minmax(${props.cardMinWidth}, ${props.cardMaxWidth}))`,
                 'grid-auto-rows': props.cardHeight,
                 'row-gap': props.rowGap,
                 'column-gap': props.columnGap,
