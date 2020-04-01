@@ -26,11 +26,14 @@ export interface CloudServiceModel extends IdParameter, Tags {
     reference: ReferenceInfo;
     collection_info: CollectionInfo;
     region_info: any;
-    project_id: string;
+    project_info?: {
+        project_id: string;
+        name: string;
+    };
     domain_id: string;
     created_at: TimeStamp;
     updated_at: TimeStamp;
-    console_force_data?:any
+    console_force_data?: any;
 }
 
 export type CloudServiceListResp = ListType<CloudServiceModel>
@@ -56,7 +59,7 @@ class GetData extends GetDataAction<any, ListType<any>> {
 
 class List extends ListAction<any, CloudServiceListResp> {}
 
-class MemberList extends MemberListAction<any,any>{
+class MemberList extends MemberListAction<any, any> {
     protected idsField = idsField;
 }
 
@@ -75,6 +78,5 @@ export default class CloudService extends Resource implements ResourceActions<'c
 
     list() { return new List(this.baseUrl); }
 
-    memberList():MemberList{return  new MemberList(this.baseUrl)}
-
+    memberList(): MemberList { return new MemberList(this.baseUrl); }
 }

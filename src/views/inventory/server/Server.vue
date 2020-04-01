@@ -216,6 +216,7 @@ import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
+import {createAtVF, deleteAtVF, updateAtVF} from "@/lib/data-source";
 
 const serverStateVF = {
     name: 'State',
@@ -267,34 +268,6 @@ const serverStateVF = {
                 },
             },
         },
-    },
-};
-const createAtVF = {
-    name: 'Created at',
-    key: 'created_at.seconds',
-    view_type: 'datetime',
-    view_option: {
-        source_type: 'timestamp',
-        source_format: 'seconds',
-    },
-};
-const updateAtVF = {
-    name: 'Updated at',
-    key: 'updated_at.seconds',
-    view_type: 'datetime',
-    view_option: {
-        source_type: 'timestamp',
-        source_format: 'seconds',
-    },
-};
-
-const deleteAtVF = {
-    name: 'Deleted at',
-    key: 'deleted_at.seconds',
-    view_type: 'datetime',
-    view_option: {
-        source_type: 'timestamp',
-        source_format: 'seconds',
     },
 };
 

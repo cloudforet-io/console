@@ -2,8 +2,8 @@ import { Service } from '@/lib/fluent-api/toolset';
 import Project from '@/lib/fluent-api/identity/project';
 import ProjectGroup from '@/lib/fluent-api/identity/project-group';
 import User from '@/lib/fluent-api/identity/user';
-import ServiceAccount from  '@/lib/fluent-api/identity/service-account';
-import Provider from "@/lib/fluent-api/identity/provider";
+import ServiceAccount from '@/lib/fluent-api/identity/service-account';
+import Provider from '@/lib/fluent-api/identity/provider';
 
 export default class Identity extends Service {
     protected name = 'identity'
@@ -14,8 +14,7 @@ export default class Identity extends Service {
 
     user() { return new User(this.name); }
 
-    serviceAccount() {return new ServiceAccount(this.name)}
+    serviceAccount() { return new ServiceAccount(this.name); }
 
-    provider() {return new Provider(this.name)}
-
+    provider() { return new Provider(this.name); }
 }
