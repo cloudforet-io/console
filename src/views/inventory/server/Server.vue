@@ -169,6 +169,8 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
+
 import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
