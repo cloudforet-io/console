@@ -9,7 +9,6 @@ import {
     CollectionInfo, DefaultMetaData,
     ListType, ReferenceInfo, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
-import Li from '@/components/atoms/lists/orun-list/Li.vue';
 
 const idField = 'cloud_service_id';
 const idsField = 'cloud_services';

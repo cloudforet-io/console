@@ -77,7 +77,10 @@
                                                 :data="null"
                                 >
                                     <template #toolbox-left>
-                                        <p-button style-type="primary-dark" :disabled="true">
+                                        <p-button style-type="primary-dark"
+                                                  :disabled="dvApiHandler.tableTS.selectState.selectItems.length === 0"
+                                                  @click="clickCollectData"
+                                        >
                                             {{ $t('BTN.COLLECT_DATA') }}
                                         </p-button>
                                         <div class="left-toolbox-item">
@@ -170,6 +173,10 @@
             </template>
         </vertical-page-layout>
         <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
+        <s-collect-modal :visible.sync="collectModalVisible"
+                         :resources="dvApiHandler.tableTS.selectState.selectItems"
+                         id-key="cloud_service_id"
+        />
     </div>
 </template>
 <script lang="ts">
@@ -199,14 +206,17 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import {AdminFluentAPI, HistoryFluentAPI, QuerySearchTableAPI, QuerySearchTableFluentAPI} from '@/lib/api/table';
+import {
+    AdminFluentAPI, HistoryFluentAPI, QuerySearchTableAPI, QuerySearchTableFluentAPI,
+} from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { ChangeCloudServiceProject, MockChangeProject } from '@/lib/api/fetch';
 import { Computed } from '@/lib/type';
-import {ExcelExportAPIToolSet} from "@/lib/api/add-on";
-import fluentApi from "@/lib/fluent-api";
-import {tabIsShow} from "@/lib/compostion-util";
+import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
+import fluentApi from '@/lib/fluent-api';
+import { tabIsShow } from '@/lib/compostion-util';
+import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 
 
 export const cloudServiceSetup = (
@@ -237,8 +247,8 @@ export const cloudServiceSetup = (
         activeMultiTab: 'data',
     });
 
-    const originDataSource :Computed<any[]> = computed(() => _.get(apiHandler.tableTS.selectState.firstSelectItem, ['data_source'], []) as any[]);
-    const selectTypeDataSource:Computed<any[]> = computed(() => [
+    const originDataSource: Computed<any[]> = computed(() => _.get(apiHandler.tableTS.selectState.firstSelectItem, ['data_source'], []) as any[]);
+    const selectTypeDataSource: Computed<any[]> = computed(() => [
         {
             name: 'project', key: 'console_force_data.project', view_type: 'text', view_option: {},
         },
@@ -247,13 +257,13 @@ export const cloudServiceSetup = (
 
     const exportAction = fluentApi.addons().excel().export();
     const cstExportAction = exportAction.setDataSource([
-        {name:'provider',key:'provider'},
-        {name:'group',key:'group'},
-        {name:'name',key:'name'},
-        {name:'total count',key:'cloud_service_count'},
+        { name: 'provider', key: 'provider' },
+        { name: 'group', key: 'group' },
+        { name: 'name', key: 'name' },
+        { name: 'total count', key: 'cloud_service_count' },
     ]);
-    const cstExportToolSet= new ExcelExportAPIToolSet(cstExportAction,apiHandler);
-    const exportToolSet= new ExcelExportAPIToolSet(exportAction,dvApiHandler);
+    const cstExportToolSet = new ExcelExportAPIToolSet(cstExportAction, apiHandler);
+    const exportToolSet = new ExcelExportAPIToolSet(exportAction, dvApiHandler);
     watch(() => apiHandler.tableTS.selectState.firstSelectItem, (type, preType) => {
         if (preType && type !== preType) {
             const selectType = apiHandler.tableTS.selectState.firstSelectItem;
@@ -268,10 +278,10 @@ export const cloudServiceSetup = (
                 const keys = originDataSource.value.map(v => v.key);
                 dvApiHandler.tableTS.querySearch.acHandlerArgs.keys = keys;
                 dvApiHandler.tableTS.querySearch.acHandlerArgs.suggestKeys = keys;
-                dvApiHandler.action.debug('')
+                dvApiHandler.action.debug('');
                 dvApiHandler.getData();
 
-                exportToolSet.action = exportAction.setDataSource(originDataSource.value)
+                exportToolSet.action = exportAction.setDataSource(originDataSource.value);
             }
         }
     });
@@ -291,7 +301,7 @@ export const cloudServiceSetup = (
             ['add', 'BTN.CREATE'],
             ['update', 'BTN.UPDATE'],
             ['delete', 'BTN.DELETE'],
-            ['export','BTN.EXPORT',{disabled:false}]
+            ['export', 'BTN.EXPORT', { disabled: false }],
         ],
         context.parent,
         { type: 'item', disabled: true }),
@@ -310,7 +320,7 @@ export const cloudServiceSetup = (
     //     context.parent,
     //     { type: 'item' }),
     // });
-    const link = computed(():string|undefined => {
+    const link = computed((): string|undefined => {
         if (dvApiHandler.tableTS.selectState.isSelectOne) {
             return _.get(dvApiHandler.tableTS.selectState.firstSelectItem, 'data.reference.link')
                 || _.get(dvApiHandler.tableTS.selectState.firstSelectItem, 'reference.external_link');
@@ -335,7 +345,7 @@ export const cloudServiceSetup = (
             ['project', 'COMMON.CHG_PRO', { disabled: csIsNotSelected }],
             ['region', 'BTN.CHG_REGION'],
             [null, null, { type: 'divider' }],
-            ['link', null, { label: 'console', disabled: noLink }],
+            ['link', null, { label: 'Console', disabled: noLink }],
             ['exportExcel', null, { label: 'Export', disabled: false }],
         ],
         context.parent,
@@ -352,12 +362,20 @@ export const cloudServiceSetup = (
     const clickProject = () => {
         projectModalVisible.value = true;
     };
-    const changeProject = async (node?:ProjectNode|null) => {
+    const changeProject = async (node?: ProjectNode|null) => {
         await ChangeProjectAPI.fetchData(dvApiHandler.tableTS.selectState.selectItems.map(item => item.cloud_service_id), node ? node.data.id : undefined);
         await dvApiHandler.getData();
         projectModalVisible.value = false;
     };
     const csGetDataAction = fluentApi.inventory().cloudService().getData();
+
+    const collectModalState = reactive({
+        collectModalVisible: false,
+    });
+    const clickCollectData = () => {
+        collectModalState.collectModalVisible = true;
+    };
+
     return {
         ...toRefs(state),
         apiHandler,
@@ -373,6 +391,8 @@ export const cloudServiceSetup = (
         exportToolSet,
         csGetDataAction,
         cstExportToolSet,
+        ...toRefs(collectModalState),
+        clickCollectData,
     };
 };
 
@@ -397,11 +417,12 @@ export default {
         PRow,
         PEmpty,
         SProjectTreeModal,
+        SCollectModal,
     },
     setup(props, context) {
         // @ts-ignore
         const mockAPI = new QuerySearchTableAPI('', undefined, undefined, undefined, undefined, undefined, undefined);
-        const target = new QuerySearchTableFluentAPI(fluentApi.inventory().cloudService().list())
+        const target = new QuerySearchTableFluentAPI(fluentApi.inventory().cloudService().list());
         const adminApiHandler = new AdminFluentAPI(
             fluentApi.inventory().cloudService().memberList(),
             ref(false),
@@ -410,14 +431,14 @@ export default {
         );
 
         // @ts-ignore
-        const historyAPIHandler = new HistoryFluentAPI(fluentApi.inventory().cloudService().getData(),ref(false),ref(''));
+        const historyAPIHandler = new HistoryFluentAPI(fluentApi.inventory().cloudService().getData(), ref(false), ref(''));
         const mockChangeProject = new MockChangeProject();
 
         return {
             // @ts-ignore
             ...cloudServiceSetup(context, mockAPI, mockAPI, mockChangeProject),
-            adminApiHandler: adminApiHandler,
-            historyAPIHandler: historyAPIHandler,
+            adminApiHandler,
+            historyAPIHandler,
         };
     },
 };

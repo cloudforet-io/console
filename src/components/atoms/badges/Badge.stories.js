@@ -1,4 +1,6 @@
-import { select, text, color } from '@storybook/addon-knobs/vue';
+import {
+    select, text, color, boolean,
+} from '@storybook/addon-knobs/vue';
 import PBadge from './Badge.vue';
 
 export default {
@@ -16,13 +18,19 @@ const data = {};
 
 export const DefaultCase = () => ({
     components: { PBadge },
-    template: '<PBadge style="width: auto" :styleType="styleType" :text-color="textColor" :backgroundColor="backgroundColor">{{text}}</PBadge>',
+    template: `<PBadge style="width: auto" 
+                       :styleType="styleType"
+                       :text-color="textColor"
+                       :backgroundColor="backgroundColor"
+                       :outline="outline"
+    >{{text}}</PBadge>`,
     props: {
         styleType: {
             default: select('styleType', [
                 'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
                 'secondary', 'secondary1', 'secondary2',
                 'alert', 'safe', 'dark',
+                'gray', 'gray1', 'gray2', 'gray3',
             ], 'primary'),
         },
         text: {
@@ -33,6 +41,9 @@ export const DefaultCase = () => ({
         },
         backgroundColor: {
             default: color('backgroundColor', ''),
+        },
+        outline: {
+            default: boolean('outline', true),
         },
     },
     data() {
@@ -46,7 +57,11 @@ export const DefaultCase = () => ({
 });
 export const longBadge = () => ({
     components: { PBadge },
-    template: '<PBadge :styleType="styleType"  :text-color="textColor" :backgroundColor="backgroundColor">Badge with long size in length</PBadge>',
+    template: `<PBadge :styleType="styleType"  
+                       :text-color="textColor" 
+                       :backgroundColor="backgroundColor"
+                       :outline="outline"
+    >Badge with long size in length</PBadge>`,
     props: {
         styleType: {
             default: select('styleType', [
@@ -63,6 +78,9 @@ export const longBadge = () => ({
         },
         backgroundColor: {
             default: color('backgroundColor', ''),
+        },
+        outline: {
+            default: boolean('outline', true),
         },
     },
     data() {

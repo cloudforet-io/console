@@ -1,9 +1,10 @@
 <template>
     <p-button-modal :header-title="$t('COMMON.COL_DATA')"
                     centered
-                    size="xl"
+                    size="lg"
                     fade
                     backdrop
+                    :scrollable="false"
                     :loading="loading"
                     :footer-cancel-button-bind="{
                         styleType: 'dark',
@@ -13,26 +14,49 @@
                     @confirm="onClickCollectConfirm"
     >
         <template #body>
-            <div class="grid grid-cols-2">
+            <p class="title">
+                Select a Collector.
+            </p>
+            <div class="collect-modal-body">
                 <div class="left-container">
+                    <p class="sub-title">
+                        Collector List
+                    </p>
                     <p-selectable-list :items="collectors"
                                        :multi-selectable="false"
                                        :mapper="mapper"
                                        :selected-indexes.sync="selectedIndexes"
                     >
                         <template #extra="{item, index}">
-                            <p-badge :style-type="getBadgeType(index)">
-                                {{ mergedCollectors[item.collector_id].length }}
-                            </p-badge>
+                            <span class="count">
+                                {{ collectorResourceMap[item.collector_id].length }}
+                            </span>
                         </template>
                     </p-selectable-list>
                 </div>
                 <div class="right-container">
+                    <p class="sub-title">
+                        Server List
+                    </p>
                     <p-data-table :fields="fields"
                                   :sortable="false"
                                   :selectable="false"
-                                  :items="resources"
-                    />
+                                  :loading="resourceLoading"
+                                  :items="selectedResources"
+                                  table-style-type="light"
+                                  :top-border="false"
+                                  bordered
+                                  class="right-table"
+                    >
+                        <template #col-name-format="{value}">
+                            <p-badge outline style-type="gray">
+                                {{ value }}
+                            </p-badge>
+                        </template>
+                    </p-data-table>
+                    <div v-if="!hasFilterFormat" class="all-resource-msg">
+                        It collects all resources including items above.
+                    </div>
                 </div>
             </div>
         </template>
@@ -41,17 +65,15 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed, defineComponent, SetupContext,
+    toRefs, reactive, computed, defineComponent, SetupContext, watch,
 } from '@vue/composition-api';
 import _ from 'lodash';
-import config from '@/lib/config';
 import { makeTrItems } from '@/lib/view-helper';
 import { makeProxy } from '@/lib/compostion-util';
 
 import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
-// @ts-ignore
-import PDynamicForm, { setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
+
 import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
 import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -62,13 +84,15 @@ import { fluentApi } from '@/lib/fluent-api';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
+import {
+    collectModalProps, CollectModalPropsType,
+} from '@/components/organisms/modals/collect-modal/CollectModal.toolset';
 
 export default defineComponent({
     name: 'CollectDataModal',
     components: {
         PButtonModal,
         PButton,
-        PDynamicForm,
         PFieldGroup,
         PRow,
         PCol,
@@ -79,39 +103,29 @@ export default defineComponent({
         PSelectableList,
         PBadge,
     },
-    props: {
-        resources: {
-            type: Array,
-            default: () => [],
-            validator(resources) {
-                return resources.every(resource => resource && resource.collection_info && resource.collection_info.collectors);
-            },
-        },
-        visible: Boolean,
-        idKey: {
-            type: String,
-            default: '',
-        },
-        type: {
-            type: String,
-            default: 'SERVER',
-            validator(val) {
-                return ['SERVER'].includes(val);
-            },
-        },
-        nameKey: {
-            type: String,
-            default: 'name',
-        },
-    },
-    setup(props, context: SetupContext) {
+    props: collectModalProps,
+    setup(props: CollectModalPropsType, context: SetupContext) {
+        // const vm: any = getCurrentInstance();
+        // const dataSource = computed(() => props.dataSource || [
+        //     {
+        //         name: vm.$t('COMMON.ID'),
+        //         key: props.idKey,
+        //     },
+        //     {
+        //         name: vm.$t('COMMON.NAME'),
+        //         key: 'name',
+        //     },
+        // ]);
+
+
         const state = reactive({
-            loading: false,
+            loading: true,
+            resourceLoading: true,
             proxyVisible: makeProxy('visible', props, context.emit),
             collectors: [],
-            resourceKeys: computed(() => props.resources.map(resource => resource[props.idKey])),
+            // fields: computed(() => dataSource.value.map(d => ({ label: d.name, name: d.key }))),
             fields: makeTrItems(
-                [[props.nameKey, 'COMMON.NAME']],
+                [[props.idKey, 'COMMON.ID'], [props.nameKey, 'COMMON.NAME']],
                 context.parent,
             ),
             mapper: {
@@ -120,30 +134,40 @@ export default defineComponent({
                 title: 'name',
             },
             selectedIndexes: [0],
-            mergedCollectors: {},
-            mergedCollectorIds: computed(() => _.keys(state.mergedCollectors)),
+            collectorResourceMap: {},
+            mergedCollectorIds: computed(() => _.keys(state.collectorResourceMap)),
+            selectedCollector: computed(() => state.collectors[state.selectedIndexes[0]]),
+            hasFilterFormat: computed(() => _.get(
+                state.selectedCollector,
+                'plugin_info.options.filter_format',
+                [],
+            ).some(f => f.key === props.idKey)),
+            selectedResources: computed(() => (state.selectedCollector
+                ? state.collectorResourceMap[state.selectedCollector.collector_id] : [])),
         });
 
-        const setMergedCollectors = () => {
+        const setCollectorResourceMap = (): void => {
+            state.resourceLoading = true;
+            state.collectorResourceMap = {};
             _.forEach(props.resources, (resource) => {
-                _.forEach(resource.collection_info.collectors, (collector) => {
-                    if (state.mergedCollectors[collector]) state.mergedCollectors[collector].push(resource);
-                    else state.mergedCollectors[collector] = [resource];
+                _.forEach(resource.collection_info.collectors, (collectorId: string) => {
+                    if (state.collectorResourceMap[collectorId]) state.collectorResourceMap[collectorId].push(resource);
+                    else state.collectorResourceMap[collectorId] = [resource];
                 });
             });
+            state.resourceLoading = false;
         };
-        setMergedCollectors();
-        console.log('res', state.mergedCollectors);
 
-        const getBadgeType = (idx) => {
+        const getBadgeType = (idx): string => {
             if (state.selectedIndexes[0] === idx) return 'secondary';
+
             return 'dark';
         };
 
-
         const collectorApi = fluentApi.inventory().collector();
-        const listCollector = async () => {
+        const listCollector = async (): Promise<void> => {
             state.loading = true;
+
             try {
                 const res = await collectorApi.list().setFilter({
                     // key: 'plugin_info.options.supported_resource_type',
@@ -153,6 +177,7 @@ export default defineComponent({
                     value: state.mergedCollectorIds,
                     operator: '',
                 }).execute();
+
                 // @ts-ignore
                 state.collectors = res.data.results;
             } catch (e) {
@@ -162,12 +187,12 @@ export default defineComponent({
             }
         };
 
-        const collectData = async (id: string) => {
+        const collectData = async (id: string): Promise<void> => {
             try {
                 await collectorApi.collect().setParameter({
                     // eslint-disable-next-line camelcase
                     collector_id: id,
-                    filter: { [props.idKey]: state.resourceKeys },
+                    filter: { [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) },
                 }).execute();
                 context.root.$notify({
                     group: 'noticeBottomRight',
@@ -186,22 +211,30 @@ export default defineComponent({
                     duration: 2000,
                     speed: 1000,
                 });
+            } finally {
+                state.proxyVisible = false;
             }
         };
 
-        const collectDataAll = async () => {
-            const collectPromises = state.collectors.map((collector: any) => collectData(collector.collector_id));
-            await Promise.all(collectPromises);
-        };
-
-        const onClickCollectConfirm = async () => {
+        const onClickCollectConfirm = async (): Promise<void> => {
             state.loading = true;
-            // @ts-ignore
-            if (state.selectedIndexes[0]) await collectData(state.collectors[state.selectedIndexes[0]].collector_id);
+
+            if (state.selectedCollector) await collectData(state.selectedCollector.collector_id);
+
             state.loading = false;
         };
 
-        listCollector();
+
+        const initiate = async (): Promise<void> => {
+            state.selectedIndexes = [0];
+            setCollectorResourceMap();
+            await listCollector();
+        };
+
+        watch(() => props.visible, async (val) => {
+            if (val) await initiate();
+        });
+
 
         return {
             ...toRefs(state),
@@ -213,18 +246,46 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
+.collect-modal-body {
+    @apply grid grid-cols-2 overflow-hidden;
+    height: 450px;
+}
+.title {
+    font-size: 1.5rem;
+    line-height: 1.8125rem;
+    padding-bottom: 1.375rem;
+}
+.sub-title {
+    font-size: 0.875rem;
+    font-weight: bold;
+    line-height: 1.0625rem;
+    padding-bottom: 1.0625rem;
+}
 .left-container {
-    @apply border-r border-gray2;
-    padding-right: 2.5rem;
-        .icon {
-            width: 3rem;
-            height: 3rem;
-        }
-    .name {
+    height: 100%;
+    overflow: auto;
+    padding-right: 0.5rem;
+    .count {
         font-size: 1.125rem;
+        line-height: 1.375rem;
+        font-weight: bold;
     }
 }
 .right-container {
-    padding-left: 2.5rem;
+    padding-left: 0.5rem;
+    height: 100%;
+    .right-table {
+        @apply overflow-auto;
+        max-height: calc(450px * 0.85);
+    }
+    .all-resource-msg {
+        @apply bg-black text-white;
+        float: right;
+        height: 1.875rem;
+        border-radius: 100px;
+        box-shadow: 0 4px 4px rgba(theme('colors.black'), 0.17);
+        padding: 0 1rem;
+        line-height: 1.875rem;
+    }
 }
 </style>

@@ -50,7 +50,7 @@ export const tableProps = {
         type: Boolean,
         default: true,
     },
-    bord: {
+    bordered: {
         type: Boolean,
         default: null,
     },
@@ -66,6 +66,10 @@ export const tableProps = {
         type: Boolean,
         default: false,
     },
+    topBorder: {
+        type: Boolean,
+        default: true,
+    },
     responsive: {
         type: [String, Boolean],
         default: false,
@@ -78,10 +82,11 @@ export const tableProps = {
 
 export interface TablePropsType {
     striped?: boolean;
-    bord?: boolean|null|unknown;
+    bordered?: boolean|null|unknown;
     hover?: boolean;
     small?: boolean;
     background?: boolean;
+    topBorder?: boolean;
     responsive?: boolean|string;
     tableStyleType?: string;
     theadStyleType?: string;
@@ -100,10 +105,11 @@ export class TableState<initData, initSate extends TablePropsType = TablePropsTy
     static initState() {
         return {
             striped: true,
-            bord: null,
+            bordered: null,
             hover: true,
             small: false,
             background: false,
+            topBorder: true,
             responsive: false,
         };
     }

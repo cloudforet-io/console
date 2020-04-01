@@ -11,8 +11,10 @@
             <div v-if="headerVisible" class="modal-header" :class="headerClass">
                 <slot name="header" />
             </div>
-            <div v-if="bodyVisible" class="modal-body" :class="allBodyClass">
-                <slot name="body" />
+            <div v-if="bodyVisible" class="modal-body-container" :class="allBodyClass">
+                <div class="modal-body">
+                    <slot name="body" />
+                </div>
             </div>
             <div v-if="footerVisible" class="modal-footer" :class="footerClass">
                 <slot name="footer" />
@@ -128,12 +130,15 @@ export default defineComponent({
         padding: .875rem 1.5rem;
         font-size: 1.375rem;
     }
-    .modal-body {
+    .modal-body-container {
         flex-grow: 1;
-        padding:  2rem 1.5rem;
         max-height: $body-max-height;
+        overflow: hidden;
         &.scrollable {
             overflow: auto;
+        }
+        .modal-body {
+            margin: 2rem 1.5rem;
         }
     }
     .modal-footer {

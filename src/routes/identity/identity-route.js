@@ -3,7 +3,7 @@ const Identity = () => import('@/views/identity/Identity');
 const IdentityNavBar = () => import('@/views/identity/IdentityNavBar');
 const User = () => import('@/views/identity/user/User');
 const Project = () => import('@//views/identity/project/Project');
-// const ServiceAccount = ()=>import('@/views/identity/service-account/pages/ServiceAccount');
+const ServiceAccount = ()=>import('@/views/identity/service-account/pages/ServiceAccount');
 
 export default {
     path: 'identity',
@@ -27,11 +27,11 @@ export default {
             meta: { label: 'User', breadcrumb: true },
             component: User,
         },
-        // {
-        //     path: 'cloud-account',
-        //     name: 'CloudAccount',
-        //     meta: { label: 'CloudAccount', breadcrumb: true },
-        //     component: ServiceAccount,
-        // },
+        {
+            path: 'cloud-account',
+            name: 'CloudAccount',
+            meta: { label: 'CloudAccount', breadcrumb: true },
+            component: ServiceAccount,
+        },
     ],
 };

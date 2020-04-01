@@ -101,7 +101,12 @@ export class SearchTableFluentAPI<
     // @ts-ignore
     getSearchTableDefaultAction:()=>action = ()=>this.getDefaultAction().setKeyword(this.tableTS.searchText.value);
 
-    getAction = () => this.getSearchTableDefaultAction();
+    getAction = () => {
+        console.debug('before',this.action.getParameter());
+        const action = this.getSearchTableDefaultAction();
+        console.debug('after',action.getParameter());
+        return action;
+    };
 
     resetAll = () => {
         this.defaultReset();

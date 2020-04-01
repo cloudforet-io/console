@@ -28,7 +28,10 @@
                     @changeSort="apiHandler.getData()"
                 >
                     <template #toolbox-left>
-                        <p-button style-type="primary-dark" :disabled="true" @click="clickCollectData">
+                        <p-button style-type="primary-dark"
+                                  :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
+                                  @click="clickCollectData"
+                        >
                             {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
@@ -47,9 +50,9 @@
                         </PDropdownMenuBtn>
                         <div class="left-toolbox-item">
                             <p-query-search-bar
-                                    :search-text.sync="apiHandler.tableTS.querySearch.state.searchText"
-                                    :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler"
-                                    @newQuery="apiHandler.tableTS.querySearch.addTag"
+                                :search-text.sync="apiHandler.tableTS.querySearch.state.searchText"
+                                :autocomplete-handler="apiHandler.tableTS.querySearch.acHandler"
+                                @newQuery="apiHandler.tableTS.querySearch.addTag"
                             />
                         </div>
                     </template>
@@ -68,7 +71,7 @@
                         <p-status v-bind="serverStateFormatter(data.value)" />
                     </template>
                     <template v-slot:col-project-format="data">
-                        {{data.item.console_force_data.project}}
+                        {{ data.item.console_force_data.project }}
                     </template>
                     <template />
                     <template v-slot:col-updated_at-format="data">
@@ -101,7 +104,7 @@
         </p-horizontal-layout>
         <p-tab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="tabs" :active-tab.sync="activeTab">
             <template #detail>
-                <p-server-detail :item="apiHandler.tableTS.selectState.firstSelectItem" :data-source="baseInfoDetails"/>
+                <p-server-detail :item="apiHandler.tableTS.selectState.firstSelectItem" :data-source="baseInfoDetails" />
             </template>
             <template #data>
                 <PDynamicSubData
@@ -158,11 +161,17 @@
             @confirm="checkModalConfirm"
         />
         <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
+        <s-collect-modal :visible.sync="collectModalVisible"
+                         :resources="apiHandler.tableTS.selectState.selectItems"
+                         id-key="server_id"
+        />
     </general-page-layout>
 </template>
 
 <script lang="ts">
-import { reactive, toRefs, ref, computed} from '@vue/composition-api';
+import {
+    reactive, toRefs, ref, computed,
+} from '@vue/composition-api';
 import _ from 'lodash';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -193,19 +202,20 @@ import {
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
-import fluentApi, {MultiItemAction} from "@/lib/fluent-api";
-import {ExcelExportAPIToolSet} from "@/lib/api/add-on";
+import fluentApi, { MultiItemAction } from '@/lib/fluent-api';
+import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import {
-    getEnumValues, getFetchValues, makeValuesFetchHandler
-} from "@/components/organisms/search/query-search-bar/autocompleteHandler";
-import PQuerySearchTags from "@/components/organisms/search/query-search-tags/QuerySearchTags.vue";
-import {QSTableACHandlerArgs, QuerySearchTableACHandler} from "@/lib/api/auto-complete";
-import {ServerModel} from "@/lib/fluent-api/inventory/server";
-import {useStore} from "@/store/toolset";
-import {AxiosResponse} from "axios";
-import {CloudServiceListResp} from "@/lib/fluent-api/inventory/cloud-service";
+    getEnumValues, getFetchValues, makeValuesFetchHandler,
+} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
+import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
+import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import { ServerModel } from '@/lib/fluent-api/inventory/server';
+import { useStore } from '@/store/toolset';
+import { AxiosResponse } from 'axios';
+import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
+import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 
-const serverStateVF ={
+const serverStateVF = {
     name: 'State',
     key: 'state',
     view_type: 'enum',
@@ -256,17 +266,17 @@ const serverStateVF ={
             },
         },
     },
-}
-const createAtVF = {
-        name: 'Created at',
-        key: 'created_at.seconds',
-        view_type: 'datetime',
-        view_option: {
-            source_type: 'timestamp',
-            source_format: 'seconds',
-        },
 };
-const updateAtVF =  {
+const createAtVF = {
+    name: 'Created at',
+    key: 'created_at.seconds',
+    view_type: 'datetime',
+    view_option: {
+        source_type: 'timestamp',
+        source_format: 'seconds',
+    },
+};
+const updateAtVF = {
     name: 'Updated at',
     key: 'updated_at.seconds',
     view_type: 'datetime',
@@ -277,16 +287,16 @@ const updateAtVF =  {
 };
 
 const deleteAtVF = {
-        name: 'Deleted at',
-        key: 'deleted_at.seconds',
-        view_type: 'datetime',
-        view_option: {
-            source_type: 'timestamp',
-            source_format: 'seconds',
-        },
-}
+    name: 'Deleted at',
+    key: 'deleted_at.seconds',
+    view_type: 'datetime',
+    view_option: {
+        source_type: 'timestamp',
+        source_format: 'seconds',
+    },
+};
 
-const serverListDataSource= [
+const serverListDataSource = [
     { name: 'Project', key: 'console_force_data.project' },
     { name: 'Name', key: 'name' },
     serverStateVF,
@@ -357,10 +367,10 @@ export default {
         PIconButton,
         PDynamicView,
         SProjectTreeModal,
+        SCollectModal,
     },
     setup(props, context) {
         class ACHandler extends QuerySearchTableACHandler {
-
             // eslint-disable-next-line class-methods-use-this
             get valuesFetchUrl() {
                 return '/inventory/server/list';
@@ -385,18 +395,19 @@ export default {
                             'server_id', 'name', 'primary_ip_address',
                             'data.compute.instance_name', 'data.compute.instance_id',
                             'data.vm.vm_name', 'data.vm.vm_id',
-                        ]),
+                        ],
+                    ),
                     getEnumValues('state', ['PENDING', 'INSERVICE', 'MAINTENANCE', 'CLOSED', 'DELETED']),
                     getEnumValues('os_type', ['LINUX', 'WINDOWS']),
                     getEnumValues('collection_info.state', ['MANUAL', 'ACTIVE', 'DISCONNECTED']),
                     getEnumValues('server_type', ['BAREMETAL', 'VM', 'HYPERVISOR', 'UNKNOWN']),
-                    getFetchValues('project_id', '/identity/project/list', context.parent,),
+                    getFetchValues('project_id', '/identity/project/list', context.parent),
                 ];
             }
         }
 
         const args = {
-            keys:[
+            keys: [
                 'server_id',
                 'name', 'state', 'primary_ip_address', 'server_type', 'os_type', 'project_id',
                 'data.os.os_arch', 'data.os.os_details', 'data.os.os_version',
@@ -404,58 +415,62 @@ export default {
                 'data.compute.instance_name', 'data.compute.keypair', 'data.compute.instance_id',
                 'collection_info.state',
             ],
-            suggestKeys:['server_id', 'name', 'primary_ip_address'],
+            suggestKeys: ['server_id', 'name', 'primary_ip_address'],
         };
         const { project } = useStore();
+
         project.getProject();
-        const action =  fluentApi.inventory().server().list()
+        const action = fluentApi.inventory().server().list()
             .setTransformer((resp: AxiosResponse<CloudServiceListResp>) => {
                 const result = resp;
+
                 result.data.results = resp.data.results.map((item) => {
                     item.console_force_data = { project: item.project_id ? project.state.projects[item.project_id] || item.project_id : '' };
+
                     return item;
                 });
+
                 return result;
             });
         const apiHandler = new QuerySearchTableFluentAPI(
             action,
             undefined,
             undefined,
-            {handlerClass:ACHandler,args},
+            { handlerClass: ACHandler, args },
         );
 
-        const fields= makeTrItems([
-                ['name', 'FIELD.NAME'],
-                ['state', 'FIELD.STATE'],
-                ['primary_ip_address', 'COMMON.IP', { sortable: false }],
-                ['core', 'COMMON.CORE'],
-                ['memory', 'COMMON.MEMORY'],
-                ['os_type', 'COMMON.O_TYPE'],
-                ['os_distro', 'COMMON.O_DIS'],
-                ['server_type', 'COMMON.SE_TYPE'],
-                ['platform_type', 'COMMON.PLATFORM'],
-                ['project', 'FIELD.PROJECT'],
-                ['pool', 'COMMON.POOL'],
-                ['updated_at', 'COMMON.UPDATE'],
-            ],
-            context.parent);
-        const multiSelectFields= makeTrItems([
-                ['name', 'COMMON.NAME'],
-                ['state', 'COMMON.STATE'],
-                ['primary_ip_address', 'COMMON.IP'],
-                ['os_type', 'COMMON.O_TYPE'],
-            ],
-            context.parent);
+        const fields = makeTrItems([
+            ['name', 'FIELD.NAME'],
+            ['state', 'FIELD.STATE'],
+            ['primary_ip_address', 'COMMON.IP', { sortable: false }],
+            ['core', 'COMMON.CORE'],
+            ['memory', 'COMMON.MEMORY'],
+            ['os_type', 'COMMON.O_TYPE'],
+            ['os_distro', 'COMMON.O_DIS'],
+            ['server_type', 'COMMON.SE_TYPE'],
+            ['platform_type', 'COMMON.PLATFORM'],
+            ['project', 'FIELD.PROJECT'],
+            ['pool', 'COMMON.POOL'],
+            ['updated_at', 'COMMON.UPDATE'],
+        ],
+        context.parent);
+        const multiSelectFields = makeTrItems([
+            ['name', 'COMMON.NAME'],
+            ['state', 'COMMON.STATE'],
+            ['primary_ip_address', 'COMMON.IP'],
+            ['os_type', 'COMMON.O_TYPE'],
+        ],
+        context.parent);
 
         const tabData = reactive({
             tabs: makeTrItems([
-                    ['detail', 'TAB.DETAILS'],
-                    ['data', 'TAB.DATA'],
-                    ['rawData', 'TAB.RAW_DATA'],
-                    ['admin', 'TAB.ADMIN'],
-                    ['history', 'TAB.HISTORY'],
-                ],
-                context.parent),
+                ['detail', 'TAB.DETAILS'],
+                ['data', 'TAB.DATA'],
+                ['rawData', 'TAB.RAW_DATA'],
+                ['admin', 'TAB.ADMIN'],
+                ['history', 'TAB.HISTORY'],
+            ],
+            context.parent),
             activeTab: 'detail',
             multiSelectTabs: makeTrItems([
                 ['data', 'TAB.DATA', { keepAlive: true }],
@@ -475,7 +490,7 @@ export default {
             themeColor: '',
         });
 
-        const stateChangeAction =  fluentApi.inventory().server().changeState();
+        const stateChangeAction = fluentApi.inventory().server().changeState();
         const deleteAction = fluentApi.inventory().server().delete();
 
         const resetCheckTableModalState = () => {
@@ -521,8 +536,8 @@ export default {
         };
 
 
-        const checkModalConfirm = (items:ServerModel[] ) => {
-            checkTableModalState.action.setIds(items.map(item =>item.server_id )).execute().then(()=>{
+        const checkModalConfirm = (items: ServerModel[]) => {
+            checkTableModalState.action.setIds(items.map(item => item.server_id)).execute().then(() => {
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
@@ -530,7 +545,7 @@ export default {
                     duration: 2000,
                     speed: 1000,
                 });
-            }).catch(()=>{
+            }).catch(() => {
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'alert',
@@ -539,15 +554,17 @@ export default {
                     duration: 2000,
                     speed: 1000,
                 });
-            }).finally(()=>{
-                apiHandler.getData();
-                resetCheckTableModalState();
-            });
+            })
+                .finally(() => {
+                    apiHandler.getData();
+                    resetCheckTableModalState();
+                });
         };
-        const link = computed(():string|undefined => {
+        const link = computed((): string|undefined => {
             if (apiHandler.tableTS.selectState.isSelectOne) {
                 return _.get(apiHandler.tableTS.selectState.firstSelectItem, 'reference.external_link');
             }
+
             return undefined;
         });
         const openLink = () => {
@@ -560,20 +577,20 @@ export default {
         const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
         const dropdown = reactive({
             ...makeTrItems([
-                    ['delete', 'BTN.DELETE'],
-                    [null, null, { type: 'divider' }],
-                    ['in-service', 'INVENTORY.BTN.SET_INSERVICE'],
-                    ['maintenance', 'INVENTORY.BTN.SET_MAINTENANCE'],
-                    ['closed', 'INVENTORY.BTN.SET_CLOSE'],
-                    [null, null, { type: 'divider' }],
-                    ['project', 'COMMON.CHG_PRO'],
-                    ['pool', 'BTN.CHG_POOL', { disabled: true }],
-                    [null, null, { type: 'divider' }],
-                    ['link', null, { label: 'console', disabled: noLink }],
-                    ['exportExcel', null, { label: 'Export', disabled: false }],
-                ],
-                context.parent,
-                { type: 'item', disabled: isNotSelected }),
+                ['delete', 'BTN.DELETE'],
+                [null, null, { type: 'divider' }],
+                ['in-service', 'INVENTORY.BTN.SET_INSERVICE'],
+                ['maintenance', 'INVENTORY.BTN.SET_MAINTENANCE'],
+                ['closed', 'INVENTORY.BTN.SET_CLOSE'],
+                [null, null, { type: 'divider' }],
+                ['project', 'COMMON.CHG_PRO'],
+                ['pool', 'BTN.CHG_POOL', { disabled: true }],
+                [null, null, { type: 'divider' }],
+                ['link', null, { label: 'Console', disabled: noLink }],
+                ['exportExcel', null, { label: 'Export', disabled: false }],
+            ],
+            context.parent,
+            { type: 'item', disabled: isNotSelected }),
         });
 
         const projectModalVisible = ref(false);
@@ -581,50 +598,62 @@ export default {
             projectModalVisible.value = true;
         };
         const changeProjectAction = fluentApi.inventory().server().changeProject();
-        const changeProject = async (node?:ProjectNode|null) => {
+        const changeProject = async (node?: ProjectNode|null) => {
             const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
-            if (node){
-                await action.setId(node.data.id).execute()
+
+            if (node) {
+                await action.setId(node.data.id).execute();
             } else {
-                await action.setReleaseProject().execute()
+                await action.setReleaseProject().execute();
             }
+
             await apiHandler.getData();
             projectModalVisible.value = false;
         };
         const exportAction = fluentApi.addons().excel().export().setDataSource(exportDataSource);
 
-        const exportToolSet= new ExcelExportAPIToolSet(exportAction,apiHandler);
-
+        const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
 
 
         const adminIsShow = computed(() => {
             let result = false;
+
             if (apiHandler.tableTS.selectState.isSelectOne) {
                 result = tabData.activeTab === 'admin';
-            } if (apiHandler.tableTS.selectState.isSelectMulti) {
+            }
+
+            if (apiHandler.tableTS.selectState.isSelectMulti) {
                 result = tabData.multiSelectActiveTab === 'admin';
             }
+
             return result;
         });
         const adminApiHandler = new AdminFluentAPI(
             fluentApi.inventory().server().memberList(),
             adminIsShow,
             'server_id',
-            apiHandler
+            apiHandler,
         );
 
         const historyIsShow = computed(() => {
             let result = false;
+
             if (apiHandler.tableTS.selectState.isSelectOne && tabData.activeTab === 'history') {
                 result = true;
             }
+
             return result;
         });
         const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem.server_id);
         const getDataAction = fluentApi.inventory().server().getData();
 
         // @ts-ignore
-        const historyAPIHandler = new HistoryFluentAPI(getDataAction,historyIsShow,selectId);
+        const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
+
+        const collectModalState = reactive({
+            collectModalVisible: false,
+        });
+
         return {
             ...toRefs(tabData),
             dropdown,
@@ -632,7 +661,7 @@ export default {
             timestampFormatter,
             platformBadgeFormatter,
             clickCollectData() {
-                console.debug('add');
+                collectModalState.collectModalVisible = true;
             },
             clickMenuEvent(menuName) {
                 console.debug(menuName);
@@ -655,6 +684,7 @@ export default {
             getDataAction,
             historyAPIHandler,
             baseInfoDetails,
+            ...toRefs(collectModalState),
         };
     },
 };

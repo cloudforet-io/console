@@ -1,4 +1,4 @@
-/* eslint-disable global-require */
+/* eslint-disable global-require, @typescript-eslint/no-var-requires */
 
 module.exports = {
     plugins: () => [
@@ -8,6 +8,7 @@ module.exports = {
         require('tailwindcss'),
         require('postcss-hexrgba'),
         require('postcss-mixins'),
+        require('postcss-conditionals'),
         require('postcss-nested'),
         require('postcss-simple-vars')({
             variables() {

@@ -21,7 +21,7 @@ export default {
 
 <style lang="postcss" scoped>
 .p-box-layout {
-    padding: .5rem;
+    padding: 0.5rem;
     border: 1px solid;
     border-radius: 2px;
 
