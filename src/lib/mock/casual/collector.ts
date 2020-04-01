@@ -75,12 +75,13 @@ const credential = (casual) => {
     return casual;
 };
 
+
 const collector = (casual) => {
-    casual.define('collector', () => {
+    casual.define('collector', (params: any = {}) => {
         const crd = casual.random_element(['credential', 'credential_group']);
 
         return {
-            collector_id: casual.make_id('collector'),
+            collector_id: params.collector_id || casual.make_id('collector'),
             name: casual.word,
             state: casual.random_element(['ENABLED', 'DISABLED']),
             plugin_info: {
@@ -169,6 +170,7 @@ const collector = (casual) => {
     });
     return casual;
 };
+
 
 const repository = (casual) => {
     casual.define('repository', () => ({

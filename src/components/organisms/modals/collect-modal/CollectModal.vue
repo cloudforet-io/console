@@ -42,7 +42,7 @@
                                   :sortable="false"
                                   :selectable="false"
                                   :loading="resourceLoading"
-                                  :items="selectedCollector ? collectorResourceMap[selectedCollector.collector_id] : []"
+                                  :items="selectedResources"
                                   table-style-type="light"
                                   :top-border="false"
                                   bordered
@@ -142,6 +142,8 @@ export default defineComponent({
                 'plugin_info.options.filter_format',
                 [],
             ).some(f => f.key === props.idKey)),
+            selectedResources: computed(() => (state.selectedCollector
+                ? state.collectorResourceMap[state.selectedCollector.collector_id] : [])),
         });
 
         const setCollectorResourceMap = (): void => {
