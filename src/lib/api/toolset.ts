@@ -43,7 +43,7 @@ export abstract class DynamicFluentAPIToolSet<
 
     protected constructor(action: action) { super(); this.action = action; }
 
-    abstract getAction: () => action
+    abstract getAction: (...args: any[]) => action
 }
 
 export abstract class DynamicReactiveAPI extends DynamicAPI {

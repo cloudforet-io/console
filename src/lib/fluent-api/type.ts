@@ -110,6 +110,7 @@ export interface CollectionInfo {
 
 }
 
+
 export interface TimeStamp {
     seconds: string;
     nanos: number;
@@ -129,4 +130,14 @@ export interface Tags {
     tags?: {
         [key: string]: any;
     };
+}
+
+export interface ProjectGroupInfo extends Tags {
+    project_group_id: string;
+    name: string;
+    parent_project_group_info: null | ProjectGroupInfo;
+    domain_id: string;
+    created_by: string;
+    created_at: TimeStamp;
+    deleted_at: TimeStamp;
 }
