@@ -7,7 +7,6 @@
                     v-bind="treeApiHandler.ts.state"
                     :select-mode="true"
                     @node:selected="selected"
-                    @node:clicked:right="nodeClickedRight"
                 >
                     <template #icon="{node,isExpanded}">
                         <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' :
@@ -17,31 +16,27 @@
                         />
                     </template>
                 </p-tree>
-                <p-context-menu v-if="contextMenuVisible" ref="contextMenuRef"
-                                theme="secondary"
-                                :menu="menu"
-                                :style="contextMenuStyle"
-                                @clickMenuEvent="clickMenuEvent"
-                />
             </div>
         </template>
         <template #default>
-            <div v-if="treeApiHandler.ts.metaState.firstSelectedNode">
-                <p-horizontal-layout>
-                    <template #container="{ height }">
-                        <p-tab :tabs="tabs" :active-tab.sync="activeTab" :style="{'height': height+'px','overflow-x':'auto'}">
-                            <template #summary>
-                                <div class="h-full">
-                                    <PDynamicDetails
-                                        :details="details"
-                                        :data="treeApiHandler.ts.metaState.firstSelectedNode"
-                                    />
-                                </div>
-                            </template>
-                            <template #member />
-                        </p-tab>
+            <div v-if="treeApiHandler.ts.metaState.firstSelectedNode" class="flex flex-wrap overflow-hidden right-container">
+                <p-grid-layout
+                    card-min-width="300px"
+                    card-height="15rem"
+                    :items="cardItems"
+                >
+                    <template #card="{item}">
+                        <div>
+                            {{ item }}
+                        </div>
+                        <div v-if="item.summery">
+                            {{ item.summery }}
+                        </div>
+                        <div v-else>
+                            loading
+                        </div>
                     </template>
-                </p-horizontal-layout>
+                </p-grid-layout>
             </div>
             <p-empty v-else class="empty">
                 <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
@@ -59,34 +54,47 @@
 import {
     computed, defineComponent, getCurrentInstance, reactive, ref, toRefs,
 } from '@vue/composition-api';
-import { object } from '@storybook/addon-knobs';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
-import { ProjectNode, ProjectTreeAPI } from '@/lib/api/tree';
+import { ProjectTreeFluentAPI } from '@/lib/api/tree';
 import TreeItem, { TreeItemInterface, TreeState, TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
-import { makeTrItems } from '@/lib/view-helper/index';
 import PContextMenu from '@/components/organisms/context-menu/context-menu/ContextMenu.vue';
-import { windowEventMount } from '@/lib/compostion-util';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-import { QuerySearchTableAPI } from '@/lib/api/table';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
+import fluentApi from '@/lib/fluent-api';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import { ProjectModel } from '@/lib/fluent-api/identity/project';
 
-    interface ProjectItemData {
-        id: string;
-        name: string;
-        has_child: boolean;
-        item_type: 'PROJECT_GROUP'|'PROJECT';
-    }
-    interface pageState {
+
+interface ProjectSummery{
+        cloudService: number;
+        server: number;
+        members: number;
+}
+
+interface Summery {
+        [id: string]: ProjectSummery;
+}
+
+interface ProjectCardData{
+        projectGroupName: string;
+        projectId: string;
+        projectName: string;
+        providers?: string[];
+        summery?: ProjectSummery;
+}
+
+interface State {
         item: any;
-        contextMenuVisible: boolean;
-        sidebarStyle: {};
-    }
+        items: ProjectCardData[];
+}
+
 export default defineComponent({
     name: 'Project2',
     components: {
@@ -99,151 +107,80 @@ export default defineComponent({
         PDynamicDetails,
         PI,
         PEmpty,
+        PGridLayout,
     },
     setup(props, context) {
-        const state: any = reactive({
-            item: {},
-            contextMenuVisible: false,
-            contextItem: null,
-            tabs: makeTrItems([
-                ['summary', 'COMMON.SUMMARY'],
-                ['member', 'COMMON.MEMBER'],
-            ], context.parent),
-            activeTab: 'summary',
-            multiTabs: makeTrItems([
-                ['detail', 'TAB.DETAILS'],
-                ['data', 'TAB.DATA'],
-            ], context.parent),
-            activeMultiTab: '',
-            clientX: null,
-            clientY: null,
+        const state: UnwrapRef<State> = reactive({
+            item: [],
+            items: [],
         });
-        const treeRef = ref(null);
+        const summery = ref<Summery>({});
+
 
         /**
              Api Handler
              */
-        const contextRef = ref(null);
-        const treeApiHandler = new ProjectTreeAPI<any, any, ProjectNode, any, TreeToolSet<any>>(
-            TreeToolSet, undefined,
-        );
-
-        /**
-             multiple context menu options for tree depth
-             */
-
-        const rootMenu = [{
-            type: 'item', label: 'Create Project', name: 'create', disabled: false,
-        }];
-        const projectGrpMenu = [
-            {
-                type: 'item', label: 'Create Project Group', name: 'add', disabled: false,
-            },
-            {
-                type: 'item', label: 'Update Project Group', name: 'update', disabled: false,
-            },
-            {
-                type: 'item', label: 'Delete Project Group', name: 'delete', disabled: false,
-            },
-            {
-                type: 'item', label: 'Create Project', name: 'create', disabled: false,
-            },
-        ];
-        const projectMenu = [
-            {
-                type: 'item', label: 'Update Project', name: 'update', disabled: false,
-            },
-            {
-                type: 'item', label: 'Delete Project', name: 'delete', disabled: false,
-            },
-        ];
-        const menu = computed(() => {
-            if (!state.contextItem) return rootMenu;
-            if (state.contextItem.data.item_type === 'PROJECT_GROUP') return projectGrpMenu;
-            return projectMenu;
-        });
-
-        /**
-             Functions for Context Menu
-             */
-
-        const showContextMenu = (node?: TreeItemInterface<ProjectItemData>) => {
-            if (node) {
-                state.contextItem = node;
-            } else {
-                state.contextItem = null;
-            }
-            state.contextMenuVisible = true;
+        const treeAction = fluentApi.identity().project().tree()
+            .setSortBy('item_type')
+            .setIncludeProject();
+        const treeApiHandler = new ProjectTreeFluentAPI(treeAction, TreeToolSet);
+        const projectAPI = fluentApi.identity().project();
+        const projectGroupAPI = fluentApi.identity().projectGroup();
+        const generateRandom = function (min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
         };
-        const selected = async (event) => {
-            treeApiHandler.ts.getSelectedNode(event);
-            state.contextMenuVisible = false;
-        };
-        const treeClickedRight = (event) => {
-            state.clientX = event.clientX;
-            state.clientY = event.clientY;
-            showContextMenu();
-            console.log('clientX test', state.clientX);
-        };
-        const nodeClickedRight = (node, event) => {
-            state.clientX = event.clientX;
-            state.clientY = event.clientY;
-            showContextMenu(node);
-        };
-        const clickMenuEvent = (event) => {
-            console.log(treeApiHandler.ts.metaState.selectedNode);
-        };
-        const hideContextMenu = (event) => {
-            state.contextMenuVisible = false;
-        };
-        windowEventMount('click', hideContextMenu);
-
-        /**
-             Context menu style
-             */
-        const contextMenuStyle = computed(() => ({
-            top: `${state.clientY}px`,
-            left: `${state.clientX}px`,
-        }));
-
-        /**
-             dynamic view - summary
-             */
-        const details = [
-            {
-                name: 'Base Information',
-                data_source: [
-                    { name: 'ID', key: 'project_id' },
-                    { name: 'Name', key: 'name' },
-                    {
-                        name: 'Created at',
-                        key: 'created_at.seconds',
-                        view_type: 'datetime',
-                        view_option: {
-                            source_type: 'timestamp',
-                            source_format: 'seconds',
+        const getSummery = (id: string) => {
+            if (!summery.value[id]) {
+                setTimeout(() => {
+                    console.debug('start get summery', id);
+                    summery.value = {
+                        ...summery.value,
+                        [id]: {
+                            cloudService: generateRandom(3, 20),
+                            server: generateRandom(3, 20),
+                            members: generateRandom(3, 8),
                         },
-                    },
-                ],
-            },
-        ];
-        const projectItemData = ref({});
+                    };
+                    console.debug(summery.value);
+                }, generateRandom(300, 5000));
+            }
+        };
+        const selected = async (item) => {
+            treeApiHandler.ts.getSelectedNode(item);
+            const projectGroupId = item.data.id;
+            state.items = [];
+            try {
+                const res = await projectAPI.list().setFilter({
+                    key: 'project_group_id',
+                    value: projectGroupId,
+                    operator: '=',
+                }).execute();
+                state.items = res.data.results.map((it: ProjectModel) => ({
+                    projectGroupName: it.project_group_info.name,
+                    projectId: it.project_id,
+                    projectName: it.name,
+                }));
+                state.items.forEach((it) => {
+                    getSummery(it.projectId);
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
 
-        const vm = getCurrentInstance();
-
+        const cardItems = computed(() => state.items.map((item) => {
+            if (summery.value[item.projectId]) {
+                item.summery = summery.value[item.projectId];
+            }
+            return item;
+        }));
         return {
             treeRef: treeApiHandler.ts.treeRef,
             treeApiHandler,
             ...toRefs(state),
-            contextRef,
-            contextMenuStyle,
-            menu,
             selected,
-            treeClickedRight,
-            nodeClickedRight,
-            clickMenuEvent,
-            hideContextMenu,
-            details,
+            summery,
+            cardItems,
         };
     },
 });
@@ -252,6 +189,10 @@ export default defineComponent({
 <style lang="postcss" scoped>
     .treeSidebar {
         height: 100%;
+    }
+
+    .right-container {
+        width: 100%;
     }
 
     .empty {
