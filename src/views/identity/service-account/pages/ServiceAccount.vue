@@ -76,6 +76,23 @@
             <p-empty v-else class="header">
                 No Selected Provider
             </p-empty>
+            <p-table-check-modal
+                    :visible.sync="checkTableModalState.visible"
+                    :header-title="checkTableModalState.title"
+                    :sub-title="checkTableModalState.subTitle"
+                    :theme-color="checkTableModalState.themeColor"
+                    :double-confirm="doubleState.doubleConfirm"
+                    :double-confirm-origin="doubleState.origin"
+                    :double-confirm-title="doubleState.title"
+                    :double-confirm-place-holder="doubleState.placeHolder"
+                    :fields="multiSelectFields"
+                    size="lg"
+                    :centered="true"
+                    :selectable="false"
+                    :items="getSelectedCdgItems"
+
+                    @confirm="checkModalConfirm"
+            />
         </template>
     </p-vertical-page-layout2>
 </template>
@@ -84,7 +101,7 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, defineComponent, watch,
+    computed, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
@@ -115,6 +132,7 @@ import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origi
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
 import { SelectableListToolset } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
+import keyboardNavigation from 'liquor-tree/src/utils/keyboardNavigation';
 
 export default {
     name: 'ServiceAccount',
@@ -132,7 +150,6 @@ export default {
         PRow,
         PEmpty,
         SProjectTreeModal,
-        GeneralPageLayout,
         PDictPanel,
         PSelectableList,
     },
@@ -146,7 +163,7 @@ export default {
             'name',
             'provider',
             'tags.icon',
-            'template.service_account.data',
+            'template.service_account.schema',
         );
 
         providerListAPI.execute().then((resp) => {
@@ -154,18 +171,22 @@ export default {
             listToolset.syncState.selectedIndexes = [0];
         });
 
-        const accountDataSource = computed<DataSourceItem[]>(() => {
+        const accountDataSource = computed(() => {
             if (listToolset.selectState.isSelectOne) {
-                return [
-                    { name: 'name', key: 'name' },
-                    ...listToolset.selectState.firstSelectItem.template.service_account.data.map(item => ({
-                        name: item.name,
-                        key: item.key,
-                        view_type: 'text',
-                    })),
-                ];
+                const properties = listToolset.selectState.firstSelectItem.template.service_account.schema.properties;
+                console.debug(properties);
+                if (properties) {
+                    return [
+                        { name: 'name', key: 'name' },
+                        ...Object.entries(properties).map(([key, item]) => ({
+                            key: `data.${key}`,
+                            name: item.title,
+                            view_type: 'text',
+                        })),
+                    ];
+                }
             }
-            return [];
+            return [] as DataSourceItem[];
         });
 
 
@@ -240,6 +261,8 @@ export default {
                 }
             }
         });
+
+
 
 
         const secretDataSource: DataSourceItem[] = [
