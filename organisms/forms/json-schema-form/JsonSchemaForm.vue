@@ -6,12 +6,12 @@
                        :invalid="typeof invalid === 'boolean' ? invalid : false"
         >
             <div class="form-container">
-            <component
-                    v-model="proxyValue"
+                <component
                     :is="component"
+                    v-model="proxyValue"
                     :schema="schema"
                     :invalid="invalid"
-                    />
+                />
             </div>
         </p-field-group>
     </div>
@@ -25,24 +25,27 @@ import {
     computed, defineComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { Computed } from '@/lib/type';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
 interface State {
     component: any;
     loader: Computed<() => Promise<any>>;
-    proxyValue:any;
+    proxyValue: any;
+    type: string;
 }
 export interface JsonFieldSchema {
-    type:string
-    title:string
+    type: string;
+    title: string;
+    default?: any;
 }
 interface Props{
-    key:string
-    schema:JsonFieldSchema
-    required:boolean
-    value: any|undefined
-    invalidText: string
-    invalid:boolean|undefined
+    key: string;
+    schema: JsonFieldSchema;
+    required: boolean;
+    value: any|undefined;
+    invalidText: string;
+    invalid: boolean|undefined;
 }
 export default defineComponent({
     name: 'PJsonSchemaForm',
@@ -50,7 +53,7 @@ export default defineComponent({
         prop: 'value',
         event: 'input',
     },
-    components:{PFieldGroup},
+    components: { PFieldGroup },
     props: {
         schema: {
             type: Object,
@@ -72,17 +75,25 @@ export default defineComponent({
             default: undefined,
         },
     },
-    setup(props: Props,context) {
+    setup(props: Props, context) {
         // noinspection TypeScriptCheckImport
-        const state = reactive<State>({
+        const state: UnwrapRef<State> = reactive({
             component: null,
-            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.schema.type}/index.vue`)),
-            proxyValue : computed({
+            type: computed<string>(() => {
+                if (Object.prototype.hasOwnProperty.call(props.schema, 'enum')) {
+                    return 'enum';
+                } if (['string', 'number', 'integer'].includes(props.schema.type)) {
+                    return 'text';
+                }
+                return props.schema.type;
+            }),
+            loader: computed<() => Promise<any>>(() => () => import(`./templates/${state.type}/index.vue`)),
+            proxyValue: computed({
                 get: () => props.value,
                 set: (val) => {
                     context.emit('input', val); // for v-model
                 },
-            })
+            }),
         });
 
         onMounted((): void => {
@@ -93,8 +104,11 @@ export default defineComponent({
             })
                 .catch(() => {
                     // eslint-disable-next-line import/no-unresolved
-                    state.component = () => import('./templates/string/index.vue');
+                    state.component = () => import('./templates/text/index.vue');
                 });
+            if (!['boolean', 'string', 'number'].includes(typeof state.proxyValue) && Object.prototype.hasOwnProperty.call(props.schema, 'default')) {
+                state.proxyValue = props.schema.default;
+            }
         });
         return {
             ...toRefs(state),
