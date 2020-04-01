@@ -6,6 +6,7 @@ import {
     LoadingChartPropsType,
     OptionsType, PluginsType,
     SettingsType,
+    tooltips,
 } from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
 
 export const lineChartProps = {
@@ -67,13 +68,6 @@ export const settings = {
 };
 
 /** *************** Options ****************** */
-const tooltips = {
-    cornerRadius: 2,
-    caretSize: 6,
-    caretPadding: 8,
-    displayColors: false,
-    backgroundColor: dark,
-};
 
 
 const simpleOptions: OptionsType<LineChartPropsType> = props => ({
