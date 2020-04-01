@@ -26,7 +26,7 @@ export default {
             type: Array,
         },
         selectItem: {
-            type: String,
+            type: [String, Number],
         },
         invalid: {
             type: Boolean,
@@ -53,7 +53,7 @@ export default {
         const changSelectItem = (value) => {
             emit('input', value);
         };
-        const invalidClass = computed(() => ({ 'is-invalid': props.invalid }));
+        const invalidClass = computed(() => ({ 'is-invalid-btn': props.invalid }));
         return {
             selectItemLabel,
             changSelectItem,
@@ -65,7 +65,7 @@ export default {
 
 <style lang="postcss" scoped>
 .p-select-dropdown::v-deep{
-    &.is-invalid{
+    &.is-invalid-btn{
         div{
             .dropdown-btn{
                 @apply border border-alert;

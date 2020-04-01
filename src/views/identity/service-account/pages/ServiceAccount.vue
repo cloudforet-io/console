@@ -134,7 +134,13 @@ export default defineComponent( {
         PDictPanel,
         PSelectableList,
     },
-    setup(props) {
+    props:{
+      query:{
+          type:Object,
+          default:()=>({})
+      },
+    },
+    setup() {
         const listToolset = new SelectableListToolset<unknown,unknown,ProviderModel>();
         listToolset.state.mapper.iconUrl = 'tags.icon';
         listToolset.state.mapper.key = 'proivder';

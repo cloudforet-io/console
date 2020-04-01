@@ -8,6 +8,8 @@ import { debug } from 'webpack';
 import { isNotEmpty } from '@/lib/util';
 import { BaseTableAPI } from '@/lib/api/table';
 
+import validate = WebAssembly.validate;
+
 /**
  * make proxy computed that same name as props
  * @param name
@@ -40,6 +42,20 @@ export const makeProxy = <T extends any>(name: string, props: any = null, emit: 
     });
 };
 
+export const makeVModelProxy = <T extends any>(name = 'value', event = 'input', transform: ((val: any) => any)|null = null): Ref<T> => {
+    const vm = getCurrentInstance();
+    let setter: (val: any) => void;
+    if (transform) {
+        setter = val => { vm?.$emit(event, transform(val)); };
+    } else {
+        setter = val => { vm?.$emit(event, val); };
+    }
+
+    return computed({
+        get: () => vm?.$props[name],
+        set: setter,
+    });
+};
 
 /**
  * event by pass
