@@ -1,11 +1,12 @@
 /* eslint-disable camelcase */
 import {
     CreateAction, GetAction, ListAction, Resource,
-    ResourceActions, SingleDeleteAction, UpdateAction,
+    ResourceActions, SingleDeleteAction, TreeAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
     ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
+import project from "@/lib/fluent-api/identity/project";
 
 const idField = 'project_group_id';
 
@@ -32,7 +33,11 @@ class Get extends GetAction<IdParameter, any> {
     protected idField = idField;
 }
 class List extends ListAction<any, ProjectGroupListResp> {}
-export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
+
+
+
+
+export default class ProjectGroup extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
     protected name = 'project-group';
 
     create() { return new Create(this.baseUrl); }
@@ -44,4 +49,5 @@ export default class Project extends Resource implements ResourceActions<'create
     get() { return new Get(this.baseUrl); }
 
     list() { return new List(this.baseUrl); }
+
 }

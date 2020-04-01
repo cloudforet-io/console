@@ -231,6 +231,7 @@ interface SingleItemActionInterface{
 }
 export abstract class RawParameterAction<parameter, resp> extends ActionAPI<parameter, resp> {
     getParameter = () => this.apiState.parameter;
+
     protected apiState: RawParameterActionState<parameter>;
 
     constructor(
@@ -242,7 +243,6 @@ export abstract class RawParameterAction<parameter, resp> extends ActionAPI<para
         this.apiState = {
             ...initState,
         };
-
     }
 }
 
@@ -271,6 +271,88 @@ export abstract class SingleItemAction<parameter, resp> extends RawParameterActi
     }
 }
 
+interface TreeActionState<parameter = any> {
+    rootItemType: string;
+    item_id: string;
+    item_type: string;
+    sortBy: string;
+    sortDesc: boolean;
+    extraParameter: parameter;
+}
+
+export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, resp> {
+    protected path = 'tree';
+
+    protected apiState: TreeActionState<parameter>;
+
+    constructor(baseUrl: string, initState: TreeActionState<parameter> = {} as unknown as TreeActionState<parameter>, transformer: null|((any) => any) = null) {
+        super(baseUrl, undefined, transformer);
+        this.apiState = {
+            rootItemType: 'ROOT',
+            item_id: '',
+            item_type: '',
+            sortBy: '',
+            sortDesc: true,
+            extraParameter: {},
+            ...initState,
+        };
+    }
+
+    setRootItemType(name = 'ROOT') {
+        this.apiState.rootItemType = name;
+        return this.clone();
+    }
+
+    setRoot() {
+        this.apiState.item_type = this.apiState.rootItemType;
+        this.apiState.item_id = '';
+        return this.clone();
+    }
+
+    setItemType(val: string) {
+        this.apiState.item_type = val;
+        return this.clone();
+    }
+
+    setItemId(val: string) {
+        this.apiState.item_id = val;
+        return this.clone();
+    }
+
+
+    setSortBy(sortBy: string) {
+        this.apiState.sortBy = sortBy;
+        return this.clone();
+    }
+
+    setSortDesc(sortDesc: boolean) {
+        this.apiState.sortDesc = sortDesc;
+        return this.clone();
+    }
+
+    getParameter = () => {
+        const params: any = {};
+
+        if (this.apiState.item_type) {
+            params.item_type = this.apiState.item_type;
+            if (this.apiState.item_id) {
+                params.item_id = this.apiState.item_id;
+            }
+        }
+
+        if (this.apiState.sortBy) {
+            params.sort = {
+                key: this.apiState.sortBy,
+                desc: this.apiState.sortDesc,
+            };
+        }
+
+        return {
+            ...params,
+            ...this.apiState.extraParameter,
+        };
+    };
+}
 export abstract class GetAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected path = 'get';
 
@@ -355,7 +437,7 @@ export abstract class MultiItemQueryAction<parameter, resp> extends QueryAPI<par
     }
 }
 
-export abstract class MemberListAction<parameter, resp> extends MultiItemQueryAction<parameter, resp>{
+export abstract class MemberListAction<parameter, resp> extends MultiItemQueryAction<parameter, resp> {
     path = 'member/list'
 }
 
