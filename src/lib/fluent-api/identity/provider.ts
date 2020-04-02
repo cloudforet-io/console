@@ -1,12 +1,11 @@
 /* eslint-disable camelcase */
 import {
-    CreateAction, GetAction, ListAction, Resource,
-    ResourceActions, SingleDeleteAction, UpdateAction,
+    GetAction, ListAction, Resource, ResourceActions,
 } from '@/lib/fluent-api/toolset';
 import {
-    DynamicFormItem,
     ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
+import { JsonSchema } from '@/lib/type';
 
 const idField = 'provider';
 
@@ -14,17 +13,17 @@ interface IdParameter {
     [idField]: string;
 }
 
-export interface ProviderModel extends Tags,IdParameter{
-    name: string
+export interface ProviderModel extends Tags, IdParameter{
+    name: string;
     template: {
-        service_account:{
-            data: DynamicFormItem[]
-        }
-    },
+        service_account: {
+            schema: JsonSchema<'object'>;
+        };
+    };
     capability: {
-        supported_schema:string[]
-    },
-    created_at: TimeStamp
+        supported_schema: string[];
+    };
+    created_at: TimeStamp;
 }
 
 

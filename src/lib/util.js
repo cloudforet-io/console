@@ -1,4 +1,5 @@
-import moment from 'moment-timezone';
+import momentTimezone from 'moment-timezone';
+import moment from 'moment';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import styles from '@/styles/colors';
@@ -104,6 +105,7 @@ export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(t
 
 // formatter
 export const timestampFormatter = value => getLocalDatetimeFromTimeStamp(value.seconds);
+export const chartTimestampFormatter = value => moment.tz(moment.unix(value.seconds), getTimezone()).format('MM/DD[\n]HH:mm');
 
 export const serverStateFormatter = ColorBindFactory(serverStateColor, value => value.toLowerCase());
 export const userStateFormatter = ColorBindFactory(userStateColor, value => value.toLowerCase());

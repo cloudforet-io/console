@@ -3,6 +3,8 @@ import { TableState, tableProps, TablePropsType } from '@/components/molecules/t
 import {
     HelperToolSet, initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';
+import _ from 'lodash';
+import { Computed } from '@/lib/type';
 
 
 export const dataTableProps = {
@@ -165,12 +167,42 @@ export const initSelectState = (state: DataTablePropsType, syncState: DataTableS
     });
 };
 
+export interface LinkState {
+    link: string|undefined;
+    openLink: () => void;
+}
+
+export const initLinkState = (selectState: DataTableSelectState): LinkState => {
+    const link: Ref<string|undefined> = computed((): string|undefined => {
+        if (selectState.isSelectOne) {
+            return _.get(selectState.firstSelectItem, 'reference.external_link');
+        }
+        return undefined;
+    });
+    const openLink = () => {
+        if (link.value) {
+            window.open(link.value);
+        }
+    };
+    return reactive({
+        link,
+        openLink,
+    });
+};
+
 @HelperToolSet()
 export class DataTableToolSet<initData, initSyncData> extends DataTableState< initData, initSyncData> {
     selectState: DataTableSelectState= null as unknown as DataTableSelectState;
 
+    linkState: LinkState= null as unknown as LinkState;
+
+    noLink: Computed<boolean> = null as unknown as Computed<boolean>;
+
+
     static initToolSet(_this: any) {
         _this.selectState = initSelectState(_this.state, _this.syncState);
+        _this.linkState = initLinkState(_this.selectState);
+        _this.noLink = computed(() => !_this.linkState.link);
     }
 
     constructor(initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData) {
