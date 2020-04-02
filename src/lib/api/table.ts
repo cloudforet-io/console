@@ -105,9 +105,7 @@ export class SearchTableFluentAPI<
     getSearchTableDefaultAction: () => action = () => this.getDefaultAction().setKeyword(this.tableTS.searchText.value);
 
     getAction = () => {
-        console.debug('before', this.action.getParameter());
         const action = this.getSearchTableDefaultAction();
-        console.debug('after', action.getParameter());
         return action;
     };
 
@@ -248,7 +246,6 @@ export class AdminFluentAPI<
             initSyncData,
         );
         watch(() => this.target.tableTS.selectState.selectItems, async (selected, before) => {
-            console.debug(this.target.tableTS.selectState.selectItems);
             if (isShow.value && selected.length >= 1 && selected !== before) {
                 await this.getData();
             }

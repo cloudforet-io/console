@@ -26,10 +26,7 @@ export interface CloudServiceModel extends IdParameter, Tags {
     reference: ReferenceInfo;
     collection_info: CollectionInfo;
     region_info: any;
-    project_info?: {
-        project_id: string;
-        name: string;
-    };
+    project_id: string;
     domain_id: string;
     created_at: TimeStamp;
     updated_at: TimeStamp;
