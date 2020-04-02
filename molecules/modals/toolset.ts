@@ -18,13 +18,13 @@ export const modalSizeValidator = value => Object.keys(sizeMapping).includes(val
 
 export type ModalSizeType = 'sm'|'md'|'lg'|'xl';
 export interface ModalStateType {
-    fade:boolean;
-    scrollable:boolean;
+    fade: boolean;
+    scrollable: boolean;
     size: ModalSizeType;
 }
 
 export interface ModalSyncStateType {
-    visible:boolean
+    visible: boolean;
 }
 
 @StateToolSet<ModalStateType>()
@@ -33,39 +33,39 @@ export class ModalState<
         initData=any, initSyncData=any,
         initState extends ModalStateType=ModalStateType,
         initSyncState extends ModalSyncStateType = ModalSyncStateType> {
-    public state:optionalType<initState, initData>;
+    state: optionalType<initState, initData>;
 
-    public syncState:optionalType<initSyncState, initSyncData>;
+     syncState: optionalType<initSyncState, initSyncData>;
 
-    static initState() {
-        return {
-            fade: false,
-            scrollable: false,
-            size: 'md' as ModalSizeType,
-        };
-    }
+     static initState() {
+         return {
+             fade: false,
+             scrollable: false,
+             size: 'md' as ModalSizeType,
+         };
+     }
 
-    static initSyncState() {
-        return {
-            visible: false,
-        };
-    }
+     static initSyncState() {
+         return {
+             visible: false,
+         };
+     }
 
-    constructor(initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{}, lazy = false) {
-        this.state = initReactive(lazy, ModalState.initState(), initData);
-        this.syncState = initReactive(lazy, ModalState.initSyncState(), initSyncData);
-    }
+     constructor(initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{}, lazy = false) {
+         this.state = initReactive(lazy, ModalState.initState(), initData);
+         this.syncState = initReactive(lazy, ModalState.initSyncState(), initSyncData);
+     }
 }
 
 @HelperToolSet()
 export class ModalToolSet<initData=any, initSyncData=any> extends ModalState<initData, initSyncData> {
     // eslint-disable-next-line no-empty-function
-    public close:()=>void=() => {};
+    close: () => void=() => {};
 
     // eslint-disable-next-line no-empty-function
-    public open:()=>void=() => {};
+    open: () => void=() => {};
 
-    static initToolSet(_this:ModalToolSet) {
+    static initToolSet(_this: ModalToolSet) {
         _this.close = () => {
             if (_this.syncState.visible) {
                 _this.syncState.visible = false;
@@ -78,7 +78,7 @@ export class ModalToolSet<initData=any, initSyncData=any> extends ModalState<ini
         };
     }
 
-    constructor(initData:initData = <initData>{}, initSyncData:initSyncData = <initSyncData>{}, lazy = false) {
+    constructor(initData: initData = <initData>{}, initSyncData: initSyncData = <initSyncData>{}, lazy = false) {
         super(initData, initSyncData);
         if (!lazy) {
             ModalToolSet.initToolSet(this);

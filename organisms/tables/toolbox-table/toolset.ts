@@ -4,7 +4,7 @@ import {
     DataTableSelectState,
     DataTableState,
     DataTableSyncType,
-    DataTableToolSet,
+    DataTableToolSet, LinkState,
 } from '@/components/organisms/tables/data-table/toolset';
 // eslint-disable-next-line import/no-cycle
 import { QuerySearchToolSet } from '@/components/organisms/search/query-search-bar/toolset';
@@ -14,6 +14,7 @@ import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';
+import { Computed } from '@/lib/type';
 import { getAllPage } from '../../pagenations/toolset';
 
 export interface ToolBoxTablePropsType extends DataTablePropsType{
@@ -94,6 +95,10 @@ export class ToolboxTableState<
 @HelperToolSet()
 export class ToolboxTableToolSet<initData=any, initSyncData=any> extends ToolboxTableState<initData, initSyncData> implements DataTableToolSet<initData, initSyncData> {
      selectState: DataTableSelectState= {} as DataTableSelectState;
+
+     linkState: LinkState= null as unknown as LinkState;
+
+     noLink: Computed<boolean> = null as unknown as Computed<boolean>;
 
      setAllPage: (totalCount: number) => void = null as unknown as (totalCount: number) => void;
 

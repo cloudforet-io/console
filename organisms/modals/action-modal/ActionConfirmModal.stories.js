@@ -2,11 +2,11 @@ import { select, text } from '@storybook/addon-knobs/vue';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import PTableCheckModel from './ActionConfirmModal.vue';
 import { sizeMapping } from '@/components/molecules/modals/toolset';
+import PTableCheckModel from './ActionConfirmModal.vue';
 
 export default {
-    title: 'organisms/modals/table-check-modal',
+    title: 'organisms/modals/action-confirm-modal',
     component: PTableCheckModel,
     parameters: {
         info: {
