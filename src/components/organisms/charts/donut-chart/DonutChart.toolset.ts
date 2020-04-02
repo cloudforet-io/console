@@ -6,7 +6,7 @@ import {
     SettingsType,
     tooltips,
 } from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
-import { dark } from '@/styles/colors';
+import { gray } from '@/styles/colors';
 import Chart from 'chart.js';
 
 export const donutChartProps = {
@@ -24,9 +24,7 @@ export const donutChartProps = {
     },
 };
 
-export interface DonutChartPropsType extends LoadingChartPropsType {
-    styleType: string;
-}
+export type DonutChartPropsType = LoadingChartPropsType
 
 /** *************** Settings ****************** */
 const defaultSettings: SettingsType<DonutChartPropsType> = props => ({

@@ -13,7 +13,7 @@
 
 <script>
 import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
-import PDonutChart from '@/components/organisms/charts/donut-chart-d3/DonutChart';
+import PDonutChart from '@/components/organisms/charts/d3/donut-chart/DonutChart';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 
 export default {

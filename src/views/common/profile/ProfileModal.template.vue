@@ -5,7 +5,7 @@
                     backdrop
                     size="xl"
                     :footer-cancel-button-bind="{
-                        styleType: 'dark',
+                        styleType: 'gray900',
                         outline: true,
                     }"
                     :footer-confirm-button-bind="{

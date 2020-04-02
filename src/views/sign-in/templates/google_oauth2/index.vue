@@ -76,7 +76,7 @@ export default defineComponent({
                     width: 300,
                     height: 50,
                     longtitle: true,
-                    theme: 'dark',
+                    theme: 'gray900',
                     onsuccess: onLogIn,
                     onfailure: null,
                 });

@@ -32,6 +32,6 @@ export default {
         }
     }
 
-    @mixin box-color primary4, theme('colors.primary4'), theme('colors.gray3');
+    @mixin box-color primary4, theme('colors.primary4'), theme('colors.gray.100');
 }
 </style>

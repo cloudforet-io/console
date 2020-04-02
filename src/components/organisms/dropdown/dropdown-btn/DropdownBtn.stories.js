@@ -41,7 +41,7 @@ Action
     props: {
         styleType: {
             default: select('styleType', [
-                '', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark',
+                '', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900',
             ], 'primary'),
         },
         size: {

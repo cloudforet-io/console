@@ -14,28 +14,28 @@ import { ColorBindFactory } from '@/lib/view-helper';
 export const colorset = Object.freeze([
     styles.primary,
     styles.primary2,
-    styles.other1,
+    styles.coral.default,
     styles.secondary,
     styles.secondary1,
     styles.safe,
     styles.other4,
-    styles.other3,
-    styles.other2,
+    styles.green[400],
+    styles.yellow.default,
     styles.primary1,
 ]);
 
 export const serverStateColor = Object.freeze({
     INSERVICE: {
         iconColor: styles.safe,
-        textColor: styles.dark,
+        textColor: styles.gray[900],
     },
     PENDING: {
-        iconColor: styles.other1,
-        textColor: styles.dark,
+        iconColor: styles.coral.default,
+        textColor: styles.gray[900],
     },
     MAINTENANCE: {
-        iconColor: styles.other2,
-        textColor: styles.dark,
+        iconColor: styles.yellow.default,
+        textColor: styles.gray[900],
     },
     CLOSED: {
         iconColor: styles.alert,
@@ -51,7 +51,7 @@ export const serverStateColor = Object.freeze({
 export const collectorStateColor = Object.freeze({
     ENABLED: {
         iconColor: styles.safe,
-        textColor: styles.dark,
+        textColor: styles.gray[900],
     },
     DISABLED: {
         iconColor: styles.alert,
@@ -62,7 +62,7 @@ export const collectorStateColor = Object.freeze({
 export const userStateColor = Object.freeze({
     ENABLED: {
         iconColor: styles.safe,
-        textColor: styles.dark,
+        textColor: styles.gray[900],
     },
     DISABLED: {
         iconColor: styles.alert,
@@ -77,7 +77,7 @@ export const userStateColor = Object.freeze({
 export const cdgStateColor = Object.freeze({
     ENABLED: {
         iconColor: styles.safe,
-        textColor: styles.dark,
+        textColor: styles.gray[900],
     },
     DISABLED: {
         iconColor: styles.alert,
@@ -86,18 +86,18 @@ export const cdgStateColor = Object.freeze({
 });
 
 export const platformBadgeColor = Object.freeze({
-    BAREMETAL: { backgroundColor: styles.dark },
+    BAREMETAL: { backgroundColor: styles.gray[900] },
     HYPERVISOR: { backgroundColor: styles.primary },
     VM: { backgroundColor: styles.secondary1 },
     UNKNOWN: { backgroundColor: styles.gray },
-    AWS: { backgroundColor: styles.other2 },
+    AWS: { backgroundColor: styles.yellow.default },
     AZURE: { backgroundColor: styles.secondary },
     GCP: { backgroundColor: styles.safe },
     OPENSTACK: { backgroundColor: styles.alert },
     VMWARE: { backgroundColor: styles.other4 },
-    KVM: { backgroundColor: styles.dark },
-    XENSERVER: { backgroundColor: styles.dark },
-    LINUX: { backgroundColor: styles.other1 },
+    KVM: { backgroundColor: styles.gray[900] },
+    XENSERVER: { backgroundColor: styles.gray[900] },
+    LINUX: { backgroundColor: styles.coral.default },
     WINDOWS: { backgroundColor: styles.secondary },
 });
 export const getTimezone = () => localStorage.getItem('timezone') || 'UTC';
@@ -105,7 +105,7 @@ export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(t
 
 // formatter
 export const timestampFormatter = value => getLocalDatetimeFromTimeStamp(value.seconds);
-export const chartTimestampFormatter = value => moment.tz(moment.unix(value.seconds), getTimezone()).format('MM/DD[\n]HH:mm');
+export const chartTimestampFormatter = value => moment.tz(moment.unix(value.seconds), getTimezone()).format('M/DD[\n]HH:mm');
 
 export const serverStateFormatter = ColorBindFactory(serverStateColor, value => value.toLowerCase());
 export const userStateFormatter = ColorBindFactory(userStateColor, value => value.toLowerCase());

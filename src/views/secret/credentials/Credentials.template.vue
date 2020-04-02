@@ -40,7 +40,7 @@
                     <template #col-credential_group_id-format="{item}">
                         <div>
                             <PBadge v-for="(label, idx) in item.credential_groups" :key="idx" class="p-label"
-                                    style-type="gray2"
+                                    style-type="gray200"
                             >
                                 {{ getEmptyString(label.name) }}
                             </PBadge>
@@ -452,7 +452,7 @@ export default {
         font-size: 1.5rem;
     }
     .p-label {
-        @apply text-dark;
+        @apply text-gray-900;
         left-margin: 0.5rem;
         margin-bottom:5px;
         margin-right: 0.5rem;

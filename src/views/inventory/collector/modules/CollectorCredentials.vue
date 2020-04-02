@@ -6,7 +6,7 @@
             </template>
             <template #extra>
                 <router-link class="credential-btn" :to="credentialPath" target="_blank">
-                    <p-button outline style-type="dark">
+                    <p-button outline style-type="gray900">
                         {{ $t('INVENTORY.MANAGE_CRD') }}
                     </p-button>
                 </router-link>
@@ -44,7 +44,7 @@
                 <span>
                     <p-badge v-for="crdg in value"
                              :key="crdg.credential_group_id"
-                             style-type="gray2"
+                             style-type="gray200"
                     >
                         {{ crdg.name }}
                     </p-badge>
@@ -54,7 +54,7 @@
                 {{ timestampFormatter(value) }}
             </template>
             <template #col-collect-format="{item}">
-                <p-button outline style-type="dark" @click.stop="$emit('collectData', item)">
+                <p-button outline style-type="gray900" @click.stop="$emit('collectData', item)">
                     {{ $t('COMMON.COL_DATA') }}
                 </p-button>
             </template>

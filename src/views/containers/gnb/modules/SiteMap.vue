@@ -188,14 +188,14 @@ export default {
     }
 
     .sitemap {
-        @apply bg-primary4 text-dark;
+        @apply bg-primary4 text-gray-900;
         position: fixed;
         left: $gnb-width;
         top: 0;
         height: 100vh;
         width: $sitemap-width;
         overflow: hidden;
-        box-shadow: 4px 0 8px rgba(theme('colors.dark'), 0.32);
+        box-shadow: 4px 0 8px rgba(theme('colors.gray.900'), 0.32);
         text-align: left;
         .title {
             @apply text-gray;
@@ -239,7 +239,7 @@ export default {
         }
 
         .group {
-            @apply border-t border-gray3;
+            @apply border-t border-gray-100;
             padding: 1rem 1.75rem;
             font-size: 1rem;
             font-weight: bold;
@@ -269,7 +269,7 @@ export default {
         top: 0;
         height: 100vh;
         width: calc(100vw - $(gnb-width) - $(sitemap-width));
-        background-color: rgba(theme('colors.dark'), 0.32);
+        background-color: rgba(theme('colors.gray.900'), 0.32);
         overflow: hidden;
     }
 }

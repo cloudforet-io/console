@@ -133,16 +133,4 @@ const semanticColors = {
 module.exports = {
     ...semanticColors,
     ...colorSet,
-    /* temporary */
-    dark: palette.gray[900],
-    gray: palette.gray[500],
-    gray1: palette.gray[400],
-    gray2: palette.gray[200],
-    gray3: palette.gray[100],
-    other1: palette.coral[500],
-    other2: palette.yellow[500],
-    other3: palette.green[400],
-    other4: palette.green[600],
-    black: palette.black,
-    white: palette.white,
 };

@@ -132,7 +132,9 @@
                 >
                     <template #col-name-format="data">
                         <span class="name">
-                            <img class="icon" :src="getIcon(data)">
+                            <p-lazy-img :img-url="getIcon(data)"
+                                        width="1.5rem" height="1.5rem"
+                            />
                             {{ data.value }}
                         </span>
                     </template>

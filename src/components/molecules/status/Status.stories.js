@@ -41,33 +41,3 @@ export const iconStatus = () => ({
     ,
 });
 
-/*
-export const useUtil = () => ({
-    components: { PStatus },
-    template: `
-<div>
-<template v-for="state in states">
-<p-status icon="aws-ec2" v-bind="statusBind(state)"></p-status><br>
-</template>
-</div>
-`,
-    data() {
-        return {
-            states: ['ENABLED', 'DISABLED', 'DISABLED', 'ENABLED', 'DISABLED', 'ENABLED'],
-        };
-    },
-    methods: {
-        statusBind: statusBindFactory({
-            ENABLED: {
-                iconColor: safe,
-                textColor: safe,
-            },
-            DISABLED: {
-                iconColor: other1,
-                textColor: other1,
-            },
-        },
-        value => value.toLowerCase()),
-    },
-});
-*/

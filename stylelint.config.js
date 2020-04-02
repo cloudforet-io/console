@@ -8,5 +8,6 @@ module.exports = {
         'at-rule-no-unknown': [true, { ignoreAtRules: ['define-mixin', 'mixin', 'at'] }],
         'rule-empty-line-before': false,
         'selector-list-comma-newline-after': false,
+        'function-calc-no-invalid': 'off',
     },
 };

@@ -49,9 +49,9 @@ export const extraSlot = () => ({
                     <template #extra>
                         <p-row style="height: 100%;">
                             <p-col>
-                                <p-badge style-type="gray3">tag1</p-badge>
-                                <p-badge style-type="gray3">tag2</p-badge>
-                                <p-badge style-type="gray3">tag3</p-badge>
+                                <p-badge style-type="gray100">tag1</p-badge>
+                                <p-badge style-type="gray100">tag2</p-badge>
+                                <p-badge style-type="gray100">tag3</p-badge>
                             </p-col>
                             <p-col :flex-grow="0" align-self="flex-end">
                                 <p-badge style-type="primary">button1</p-badge>
