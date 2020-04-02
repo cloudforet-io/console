@@ -85,7 +85,7 @@
                                         </p-button>
                                         <div class="left-toolbox-item">
                                             <PDropdownMenuBtn :menu="csDropdownMenu"
-                                                              @click-link="openLink"
+                                                              @click-link="dvApiHandler.tableTS.linkState.openLink()"
                                                               @click-project="clickProject"
                                                               @click-exportExcel="exportToolSet.getData()"
                                             >
@@ -285,17 +285,7 @@ export const cloudServiceSetup = (
             }
         }
     });
-    // todo: CBT 끝나고 홞성화
-    // const cstIsNotSelected = computed(() => apiHandler.selectState.isNotSelected);
-    // const cstDropdownMenu = reactive({
-    //     ...makeTrItems([
-    //         ['add', 'BTN.CREATE'],
-    //         ['update', 'BTN.UPDATE', { disabled: cstIsNotSelected }],
-    //         ['delete', 'BTN.DELETE', { disabled: cstIsNotSelected }],
-    //     ],
-    //     context.parent,
-    //     { type: 'item' }),
-    // });
+
     const cstDropdownMenu = reactive({
         ...makeTrItems([
             ['add', 'BTN.CREATE'],
@@ -306,34 +296,8 @@ export const cloudServiceSetup = (
         context.parent,
         { type: 'item', disabled: true }),
     });
-    // todo: CBT 끝나고 홞성화
 
-    // const csDropdownMenu = reactive({
-    //     ...makeTrItems([
-    //         ['add', 'BTN.CREATE'],
-    //         ['update', 'BTN.UPDATE', { disabled: csIsNotSelectedOnlyOne }],
-    //         ['delete', 'BTN.DELETE', { disabled: csIsNotSelected }],
-    //         [null, null, { type: 'divider' }],
-    //         ['project', 'COMMON.CHG_PRO', { disabled: csIsNotSelected }],
-    //         ['region', 'BTN.CHG_REGION', { disabled: csIsNotSelected }],
-    //     ],
-    //     context.parent,
-    //     { type: 'item' }),
-    // });
-    const link = computed((): string|undefined => {
-        if (dvApiHandler.tableTS.selectState.isSelectOne) {
-            return _.get(dvApiHandler.tableTS.selectState.firstSelectItem, 'data.reference.link')
-                || _.get(dvApiHandler.tableTS.selectState.firstSelectItem, 'reference.external_link');
-        }
-        return undefined;
-    });
-    const openLink = () => {
-        if (link.value) {
-            window.open((link.value as string));
-        }
-    };
 
-    const noLink = computed(() => !link.value);
     const csIsNotSelected = computed(() => dvApiHandler.tableTS.selectState.isNotSelected);
     const csIsNotSelectedOnlyOne = computed(() => !dvApiHandler.tableTS.selectState.isSelectOne);
     const csDropdownMenu = reactive({
@@ -345,7 +309,7 @@ export const cloudServiceSetup = (
             ['project', 'COMMON.CHG_PRO', { disabled: csIsNotSelected }],
             ['region', 'BTN.CHG_REGION'],
             [null, null, { type: 'divider' }],
-            ['link', null, { label: 'Console', disabled: noLink }],
+            ['link', null, { label: 'Console', disabled: dvApiHandler.tableTS.noLink }],
             ['exportExcel', null, { label: 'Export', disabled: false }],
         ],
         context.parent,
@@ -384,7 +348,6 @@ export const cloudServiceSetup = (
         csDropdownMenu,
         selectTypeDataSource,
         detailsData,
-        openLink,
         projectModalVisible,
         clickProject,
         changeProject,

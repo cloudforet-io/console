@@ -175,7 +175,8 @@ export interface LinkState {
 export const initLinkState = (selectState: DataTableSelectState): LinkState => {
     const link: Ref<string|undefined> = computed((): string|undefined => {
         if (selectState.isSelectOne) {
-            return _.get(selectState.firstSelectItem, 'reference.external_link');
+            return _.get(selectState.firstSelectItem, 'data.reference.link')
+                || _.get(selectState.firstSelectItem, 'reference.external_link');
         }
         return undefined;
     });

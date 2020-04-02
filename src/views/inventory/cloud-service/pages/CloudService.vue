@@ -38,7 +38,14 @@ export default {
 
         const apiHandler = new QuerySearchTableFluentAPI(
             cstListAction,
-            undefined,
+            {
+                striped: true,
+                border: false,
+                shadow: false,
+                padding: false,
+                multiSelect: false,
+                selectable: true,
+            },
             undefined,
             csTypeACHandlerMeta,
         );
@@ -78,7 +85,7 @@ export default {
             fluentApi.inventory().cloudService().memberList(),
             adminIsShow,
             'cloud_service_id',
-            dvApiHandler
+            dvApiHandler,
         );
 
         // @ts-ignore
@@ -95,7 +102,7 @@ export default {
         const getDataAction = fluentApi.inventory().cloudService().getData();
 
         // @ts-ignore
-        const historyAPIHandler = new HistoryFluentAPI(getDataAction,historyIsShow,selectId);
+        const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
         return {
             ...toRefs(state),
             adminApiHandler,

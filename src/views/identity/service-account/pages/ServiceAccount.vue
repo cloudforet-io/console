@@ -21,7 +21,7 @@
                                             :data="null"
                             >
                                 <template #toolbox-left>
-                                    <p-button style-type="primary-dark" :disabled="true">
+                                    <p-button style-type="primary-dark" @click="clickOpenForm('add')">
                                         {{ $t('BTN.ADD') }}
                                     </p-button>
                                     <PDropdownMenuBtn
@@ -109,6 +109,9 @@
                 @confirm="deleteConfirm"
             />
             <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
+            <SServiceAccountFormModal v-if="formVisible" :visible.sync="formVisible" :schema="formSchema"
+                                      @confirm="formConfirm($event)"
+            />
         </template>
     </p-vertical-page-layout2>
 </template>
@@ -117,7 +120,7 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
@@ -142,11 +145,11 @@ import { DoubleCheckModalState } from '@/components/organisms/modals/double-chec
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/DoubleCheckModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
-import { idField as serviceAccountID } from '@/lib/fluent-api/identity/service-account';
+import { idField as serviceAccountID, ServiceAccountListResp } from '@/lib/fluent-api/identity/service-account';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
-import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import { createAtVF } from '@/lib/data-source';
+import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -163,6 +166,7 @@ export default {
         PDictPanel,
         PSelectableList,
         PDoubleCheckModal,
+        SServiceAccountFormModal,
     },
     setup(props, context) {
         const { project } = useStore();
@@ -230,7 +234,7 @@ export default {
 
 
         const ListAction = fluentApi.identity().serviceAccount().list()
-            .setTransformer((resp: AxiosResponse<CloudServiceListResp>) => {
+            .setTransformer((resp: AxiosResponse<ServiceAccountListResp>) => {
                 const result = resp;
                 result.data.results = resp.data.results.map((item) => {
                     item.console_force_data = { project: item.project_info ? project.state.projects[item.project_info.project_id] || item.project_info.project_id : '' };
@@ -419,6 +423,49 @@ export default {
                 },
             },
         ];
+
+        const formState = reactive({
+            mode: 'add' as 'add'|'update',
+            formVisible: false,
+            formSchema: {} as any,
+        });
+
+        const clickOpenForm = (mode: 'add'|'update') => {
+            formState.mode = mode;
+            formState.formSchema = listToolset.selectState.firstSelectItem.template.service_account.schema;
+            formState.formVisible = true;
+        };
+        const formConfirm = (item) => {
+            if (formState.mode === 'add') {
+                fluentApi.identity().serviceAccount().create().setParameter({
+                    provider: listToolset.selectState.firstSelectItem.provider,
+                    ...item,
+                })
+                    .execute()
+                    .then(() => {
+                        context.root.$notify({
+                            group: 'noticeBottomRight',
+                            type: 'success',
+                            title: 'Add Success',
+                            duration: 2000,
+                            speed: 1000,
+                        });
+                    })
+                    .catch(() => {
+                        context.root.$notify({
+                            group: 'noticeBottomRight',
+                            type: 'alert',
+                            title: 'Add Fail',
+                            duration: 2000,
+                            speed: 1000,
+                        });
+                    })
+                    .finally(() => {
+                        apiHandler.getData();
+                    });
+            }
+            formState.formVisible = false;
+        };
         apiHandler.getData();
         return {
             apiHandler,
@@ -439,6 +486,10 @@ export default {
             projectModalVisible,
             exportToolSet,
             adminApiHandler,
+            clickOpenForm,
+            formConfirm,
+            ...toRefs(formState),
+
         };
     },
 
