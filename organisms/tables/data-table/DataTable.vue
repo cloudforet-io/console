@@ -117,7 +117,7 @@
                                 :index="index"
                                 :field="field"
                             >
-                                <p-td onselectstart="return true">
+                                <p-td onselectstart="return true" style="user-select: all;">
                                     <slot
                                         :name="'col-'+field+'-format'"
                                         :item="item"

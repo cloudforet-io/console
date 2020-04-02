@@ -2,14 +2,14 @@
     <p-toolbox-table
         :items="apiHandler.tableTS.state.items"
         :fields="fields"
-        :selectable="typeof apiHandler.tableTS.state.selectable !== 'boolean'? apiHandler.tableTS.state.selectable : false"
-        :multi-select="typeof apiHandler.tableTS.state.multiSelect !== 'boolean'? apiHandler.tableTS.state.multiSelect : true"
-        :sortable="typeof apiHandler.tableTS.state.sortable !== 'boolean'? apiHandler.tableTS.state.sortable : false"
-        :hover="typeof apiHandler.tableTS.state.hover !== 'boolean'? apiHandler.tableTS.state.hover : true"
-        :shadow="typeof apiHandler.tableTS.state.shadow !== 'boolean'? apiHandler.tableTS.state.shadow : false"
-        :border="typeof apiHandler.tableTS.state.border !== 'boolean'? apiHandler.tableTS.state.border : false"
-        :padding="typeof apiHandler.tableTS.state.padding !== 'boolean'? apiHandler.tableTS.state.padding : false"
-        :dragable="typeof apiHandler.tableTS.state.dragable !== 'boolean'? apiHandler.tableTS.state.dragable : false"
+        :selectable="typeof apiHandler.tableTS.state.selectable === 'boolean'? apiHandler.tableTS.state.selectable : false"
+        :multi-select="typeof apiHandler.tableTS.state.multiSelect === 'boolean'? apiHandler.tableTS.state.multiSelect : true"
+        :sortable="typeof apiHandler.tableTS.state.sortable === 'boolean'? apiHandler.tableTS.state.sortable : false"
+        :hover="typeof apiHandler.tableTS.state.hover === 'boolean'? apiHandler.tableTS.state.hover : true"
+        :shadow="typeof apiHandler.tableTS.state.shadow === 'boolean'? apiHandler.tableTS.state.shadow : false"
+        :border="typeof apiHandler.tableTS.state.border === 'boolean'? apiHandler.tableTS.state.border : false"
+        :padding="typeof apiHandler.tableTS.state.padding === 'boolean'? apiHandler.tableTS.state.padding : false"
+        :dragable="typeof apiHandler.tableTS.state.dragable === 'boolean'? apiHandler.tableTS.state.dragable : false"
         :all-page="apiHandler.tableTS.state.allPage"
         :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
         :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
@@ -103,6 +103,7 @@ export default {
         },
     },
     setup(props: Props) {
+        console.debug(props.apiHandler);
         const fields: Ref<Readonly<Field[]>> = computed((): Field[] => props.data_source.map((ds: DataSourceType): Field => ({
             name: ds.key,
             label: ds.name,
