@@ -1,6 +1,8 @@
 <template>
     <div class="p-field-group">
-        <label v-if="label" class="form-label">{{ label }}</label>
+        <slot name="label" :class="{'form-label':true}">
+            <label v-if="label" class="form-label">{{ label }}</label>
+        </slot>
         <span v-if="required" class="required-mark">*</span>
         <slot :invalid="invalid" />
         <small v-if="helpText&&!invalid&&!valid" class="block mt-1 text-grey">
@@ -21,6 +23,7 @@ export default {
     props: {
         label: {
             type: String,
+            default: '',
         },
         helpText: {
             type: String,

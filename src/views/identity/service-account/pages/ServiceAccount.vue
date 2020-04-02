@@ -24,6 +24,16 @@
                                     <p-button style-type="primary-dark" :disabled="true">
                                         {{ $t('BTN.ADD') }}
                                     </p-button>
+                                    <PDropdownMenuBtn
+                                        class="left-toolbox-item"
+                                        :menu="dropdown"
+                                        @click-delete="accountDeleteClick"
+                                        @click-project="clickProject"
+                                        @click-link="apiHandler.tableTS.linkState.openLink()"
+                                        @click-exportExcel="exportToolSet.getData()"
+                                    >
+                                        Action
+                                    </PDropdownMenuBtn>
                                 </template>
                             </p-dynamic-view>
                         </template>
@@ -46,14 +56,24 @@
                                     <p-button style-type="primary-dark" :disabled="true">
                                         {{ $t('BTN.ADD') }}
                                     </p-button>
-                                    <p-button style-type="primary-dark" :disabled="secretApiHandler.tableTS.selectState.isNotSelected">
+                                    <p-button
+                                        class="left-toolbox-item"
+                                        style-type="primary-dark"
+                                        :disabled="secretApiHandler.tableTS.selectState.isNotSelected"
+                                        @click="secretDeleteClick"
+                                    >
                                         {{ $t('BTN.DELETE') }}
                                     </p-button>
                                 </template>
                             </p-dynamic-view>
                         </template>
-                        <template #rawData>
-                            <p-raw-data :item="apiHandler.tableTS.selectState.firstSelectItem" />
+                        <template #admin>
+                            <p-dynamic-view
+                                view_type="table"
+                                :api-handler="adminApiHandler"
+                                :data_source="adminApiHandler.dataSource"
+                                :data="null"
+                            />
                         </template>
                     </PTab>
                     <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
@@ -63,8 +83,15 @@
                         <template #data>
                             <p-dynamic-view
                                 view_type="simple-table"
-                                :data_source="supervisorDataSource"
+                                :data_source="accountDataSource"
                                 :data="apiHandler.tableTS.selectState.selectItems"
+                            />
+                        </template>
+                        <template #admin>
+                            <p-dynamic-view
+                                view_type="table"
+                                :api-handler="adminApiHandler"
+                                :data_source="adminApiHandler.dataSource"
                             />
                         </template>
                     </PTab>
@@ -76,6 +103,12 @@
             <p-empty v-else class="header">
                 No Selected Provider
             </p-empty>
+            <PDoubleCheckModal
+                v-bind="deleteTS.state"
+                :visible.sync="deleteTS.syncState.visible"
+                @confirm="deleteConfirm"
+            />
+            <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
         </template>
     </p-vertical-page-layout2>
 </template>
@@ -84,7 +117,7 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, defineComponent, watch,
+    computed, reactive, ref, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
@@ -95,26 +128,25 @@ import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
-import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import { makeTrItems } from '@/lib/view-helper/index';
-import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
-import PHr from '@/components/atoms/hr/Hr.vue';
-import PRow from '@/components/atoms/grid/row/Row.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
-import { SearchQuery } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
-import { QuerySearchTableToolSet, SearchTableToolSet } from '@/components/organisms/tables/toolbox-table/toolset';
-import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import { DataSourceItem, fluentApi, Tags } from '@/lib/fluent-api';
-import { QuerySearchTableFluentAPI, SearchTableFluentAPI, TabSearchTableFluentAPI } from '@/lib/api/table';
-import { AxiosResponse } from 'axios';
-import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
+import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
+import { AdminFluentAPI, SearchTableFluentAPI, TabSearchTableFluentAPI } from '@/lib/api/table';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
-import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
 import { SelectableListToolset } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
+import { DoubleCheckModalState } from '@/components/organisms/modals/double-check-modal/toolset';
+import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/DoubleCheckModal.vue';
+import { ProjectNode } from '@/lib/api/tree';
+import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
+import { idField as serviceAccountID } from '@/lib/fluent-api/identity/service-account';
+import { useStore } from '@/store/toolset';
+import { AxiosResponse } from 'axios';
+import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
+import { createAtVF } from '@/lib/data-source';
 
 export default {
     name: 'ServiceAccount',
@@ -124,19 +156,18 @@ export default {
         PDynamicView,
         PTab,
         PButton,
-        PRawData,
         PDropdownMenuBtn,
-        PHr,
-        PQuerySearchTags,
         PDynamicDetails,
-        PRow,
         PEmpty,
         SProjectTreeModal,
-        GeneralPageLayout,
         PDictPanel,
         PSelectableList,
+        PDoubleCheckModal,
     },
-    setup() {
+    setup(props, context) {
+        const { project } = useStore();
+        project.getProject();
+
         const listToolset = new SelectableListToolset<unknown, unknown, ProviderModel>();
         listToolset.state.mapper.iconUrl = 'tags.icon';
         listToolset.state.mapper.key = 'proivder';
@@ -146,7 +177,7 @@ export default {
             'name',
             'provider',
             'tags.icon',
-            'template.service_account.data',
+            'template.service_account.schema',
         );
 
         providerListAPI.execute().then((resp) => {
@@ -154,26 +185,37 @@ export default {
             listToolset.syncState.selectedIndexes = [0];
         });
 
-        const accountDataSource = computed<DataSourceItem[]>(() => {
+        const originDataSource = computed<any[]>(() => {
             if (listToolset.selectState.isSelectOne) {
-                return [
-                    { name: 'name', key: 'name' },
-                    ...listToolset.selectState.firstSelectItem.template.service_account.data.map(item => ({
-                        name: item.name,
-                        key: item.key,
-                        view_type: 'text',
-                    })),
-                ];
+                const properties = listToolset.selectState.firstSelectItem.template.service_account.schema.properties;
+                console.debug(properties);
+                if (properties) {
+                    return [
+                        { name: 'name', key: 'name' },
+                        ...Object.entries(properties).map(([key, item]) => ({
+                            key: `data.${key}`,
+                            name: item.title,
+                            view_type: 'text',
+                        })),
+                    ];
+                }
             }
-            return [];
+            return [] as DataSourceItem[];
         });
 
+        const accountDataSource = computed<any[]>(() => [
+            ...originDataSource.value,
+            {
+                name: 'project', key: 'console_force_data.project', view_type: 'text', view_option: {},
+            },
+            createAtVF,
+        ]);
 
         const singleItemTab = new TabBarState({
             tabs: makeTrItems([
                 ['detail', 'TAB.DETAILS'],
                 ['credentials', 'TAB.CREDENTIALS'],
-                ['rawData', 'TAB.RAW_DATA'],
+                ['admin', 'TAB.ADMIN'],
             ]),
         });
         singleItemTab.syncState.activeTab = 'detail';
@@ -181,12 +223,21 @@ export default {
         const multiItemTab = new TabBarState({
             tabs: makeTrItems([
                 ['data', 'TAB.DATA'],
+                ['admin', 'TAB.ADMIN'],
             ]),
         });
         multiItemTab.syncState.activeTab = 'data';
 
 
-        const ListAction = fluentApi.identity().serviceAccount().list();
+        const ListAction = fluentApi.identity().serviceAccount().list()
+            .setTransformer((resp: AxiosResponse<CloudServiceListResp>) => {
+                const result = resp;
+                result.data.results = resp.data.results.map((item) => {
+                    item.console_force_data = { project: item.project_info ? project.state.projects[item.project_info.project_id] || item.project_info.project_id : '' };
+                    return item;
+                });
+                return result;
+            });
 
         const apiHandler = new SearchTableFluentAPI(ListAction, {
             shadow: true,
@@ -195,6 +246,8 @@ export default {
             selectable: true,
             dragable: true,
         });
+        const exportAction = fluentApi.addons().excel().export();
+        const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
 
         watch(() => listToolset.selectState.firstSelectItem, (item, before) => {
             if (item && item.provider && item.provider !== before.provider) {
@@ -203,8 +256,42 @@ export default {
                     { key: 'provider', operator: '=', value: item.provider },
                 );
                 apiHandler.getData();
+                exportToolSet.action = exportAction.setDataSource(originDataSource.value);
             }
         });
+
+        const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
+        const isNotSelectOne = computed(() => !apiHandler.tableTS.selectState.isSelectOne);
+        const dropdown = reactive({
+            ...makeTrItems([
+                ['delete', 'BTN.DELETE', { disabled: isNotSelectOne }],
+                [null, null, { type: 'divider' }],
+                ['project', 'COMMON.CHG_PRO'],
+                [null, null, { type: 'divider' }],
+                ['link', null, { label: 'Console', disabled: apiHandler.tableTS.noLink }],
+                ['exportExcel', null, { label: 'Export', disabled: false }],
+            ],
+            context.parent,
+            { type: 'item', disabled: isNotSelected }),
+        });
+
+        const projectModalVisible = ref(false);
+        const clickProject = () => {
+            projectModalVisible.value = true;
+        };
+        const changeProjectAction = fluentApi.identity().serviceAccount().changeProject();
+        const changeProject = async (node?: ProjectNode|null) => {
+            const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.service_account_id));
+
+            if (node) {
+                await action.setId(node.data.id).execute();
+            } else {
+                await action.setReleaseProject().execute();
+            }
+
+            await apiHandler.getData();
+            projectModalVisible.value = false;
+        };
 
 
         const accountDetails = computed(() => [
@@ -230,16 +317,93 @@ export default {
         );
 
         watch(() => apiHandler.tableTS.selectState.firstSelectItem, (item, before) => {
-            if (item && item.service_account_id && item.service_account_id !== before.service_account_id) {
+            if (item && item[serviceAccountID] && item[serviceAccountID] !== before[serviceAccountID]) {
                 secretApiHandler.resetAll();
                 secretApiHandler.action = secretListAction.setFixFilter(
-                    { key: 'service_account_id', operator: '=', value: item.service_account_id },
+                    { key: serviceAccountID, operator: '=', value: item[serviceAccountID] },
                 );
                 if (secretIsShow.value) {
                     secretApiHandler.getData();
                 }
             }
         });
+        const adminIsShow = computed(() => {
+            let result = false;
+            if (listToolset.selectState.isSelectOne) {
+                if (apiHandler.tableTS.selectState.isSelectOne) {
+                    result = singleItemTab.syncState.activeTab === 'admin';
+                }
+
+                if (apiHandler.tableTS.selectState.isSelectMulti) {
+                    result = multiItemTab.syncState.activeTab === 'admin';
+                }
+            }
+            return result;
+        });
+        const adminApiHandler = new AdminFluentAPI(
+            fluentApi.identity().serviceAccount().memberList(),
+            adminIsShow,
+            serviceAccountID,
+            apiHandler,
+            {
+                striped: true,
+                border: false,
+                shadow: false,
+                padding: false,
+                multiSelect: false,
+            },
+        );
+
+        const deleteTS = new DoubleCheckModalState();
+        const deleteAction = ref<any>(null);
+        const deleteTargetHandler = ref<any>(null);
+        const accountDeleteAction = fluentApi.identity().serviceAccount().delete();
+
+        const accountDeleteClick = () => {
+            const name = apiHandler.tableTS.selectState.firstSelectItem.name;
+            deleteAction.value = accountDeleteAction.setId(apiHandler.tableTS.selectState.firstSelectItem[serviceAccountID]);
+            deleteTargetHandler.value = apiHandler;
+            deleteTS.state.headerTitle = 'Delete Account';
+            deleteTS.state.subTitle = `You will Permanently lose your [${name}]`;
+            deleteTS.state.verificationText = name;
+            deleteTS.syncState.visible = true;
+        };
+
+        const secretDeleteAction = fluentApi.secret().secret().delete();
+
+        const secretDeleteClick = () => {
+            const name = secretApiHandler.tableTS.selectState.firstSelectItem.name;
+            deleteAction.value = secretDeleteAction.setId(secretApiHandler.tableTS.selectState.firstSelectItem.secret_id);
+            deleteTargetHandler.value = secretApiHandler;
+            deleteTS.state.headerTitle = 'Delete Secret';
+            deleteTS.state.subTitle = `You will Permanently lose your [${name}]`;
+            deleteTS.state.verificationText = name;
+            deleteTS.syncState.visible = true;
+        };
+        const deleteConfirm = () => {
+            deleteAction.value.execute()
+                .then(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Deleted Success',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                }).catch(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Deleted Fail',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .finally(() => {
+                    deleteTargetHandler.value.getData();
+                });
+            deleteTS.syncState.visible = false;
+        };
 
 
         const secretDataSource: DataSourceItem[] = [
@@ -265,6 +429,16 @@ export default {
             secretApiHandler,
             secretDataSource,
             listToolset,
+            deleteTS,
+            accountDeleteClick,
+            deleteConfirm,
+            secretDeleteClick,
+            dropdown,
+            clickProject,
+            changeProject,
+            projectModalVisible,
+            exportToolSet,
+            adminApiHandler,
         };
     },
 
@@ -273,5 +447,11 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+    .left-toolbox-item{
+        margin-left: 1rem;
+        &:last-child {
+            flex-grow: 1;
+        }
+    }
 
 </style>
