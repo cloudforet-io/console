@@ -40,12 +40,12 @@ export default defineComponent({
     .item-container {
         @apply flex p-2 items-center justify-between w-full bg-white cursor-pointer border border-transparent;
         &:hover {
-            @apply bg-gray3;
+            @apply bg-gray-100;
         }
         &.active {
             @apply bg-blue-200 text-secondary border border-secondary;
             &:hover {
-                @apply bg-gray3;
+                @apply bg-gray-100;
             }
         }
         /* TODO: disabled item style */

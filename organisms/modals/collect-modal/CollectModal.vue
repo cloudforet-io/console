@@ -7,7 +7,7 @@
                     :scrollable="false"
                     :loading="loading"
                     :footer-cancel-button-bind="{
-                        styleType: 'dark',
+                        styleType: 'gray900',
                         outline: true,
                     }"
                     :visible.sync="proxyVisible"
@@ -161,7 +161,7 @@ export default defineComponent({
         const getBadgeType = (idx): string => {
             if (state.selectedIndexes[0] === idx) return 'secondary';
 
-            return 'dark';
+            return 'gray900';
         };
 
         const collectorApi = fluentApi.inventory().collector();

@@ -1,20 +1,22 @@
+
 <script lang="ts">
 import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 import PLoadingChart, { chartSetup } from '@/components/organisms/charts/loading-chart/LoadingChart.vue';
 import {
-    donutChartProps, DonutChartPropsType, options, plugins, settings,
-} from '@/components/organisms/charts/donut-chart/DonutChart.toolset';
+    barChartProps,
+    BarChartPropsType,
+    options, plugins, settings,
+} from '@/components/organisms/charts/bar-chart/BarChart.toolset';
 
 import { colorset } from '@/lib/util';
-import hexToRgba from 'hex-to-rgba';
 
 export default defineComponent({
-    name: 'PDonutChart',
+    name: 'PBarChart',
     extends: PLoadingChart,
-    props: donutChartProps,
-    setup(props: DonutChartPropsType) {
+    props: barChartProps,
+    setup(props: BarChartPropsType) {
         const state: any = reactive(chartSetup(props));
 
         state.options = computed(() => options[props.styleType](props));
@@ -22,14 +24,15 @@ export default defineComponent({
         state.datasets = computed(() => {
             if (state.chartRef) {
                 const res = props.dataset.map((d, i) => ({
+                    label: d.label,
                     data: d.data,
                     ...settings[props.styleType](props),
-                    borderColor: '#fff',
-                    backgroundColor: colorset,
+                    borderColor: colorset[i],
+                    backgroundColor: colorset[i],
                 }));
                 return res;
             }
-            return [];
+            return [{}];
         });
 
         return {

@@ -40,7 +40,7 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
     .tab-pane{
-        @apply bg-white border border-gray3;
+        @apply bg-white border border-gray-100;
         width: 100%;
         padding: 1rem 1rem 2.5rem;
         border-radius: 0px 2px 2px 2px;

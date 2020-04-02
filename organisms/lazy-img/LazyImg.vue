@@ -1,15 +1,14 @@
 <template>
-    <span>
+    <span class="inline-block" :style="{height, width}">
         <slot v-if="loading && !isError"
               name="preloader" :height="height" :width="width"
               :loading="loading"
         >
             <p-lottie name="spinner"
                       auto
-                      :style="{height, width}"
                       :height="height"
                       :width="width"
-                      class="inline-block"
+                      class="w-full h-full"
             />
         </slot>
         <img v-show="!loading && !isError"

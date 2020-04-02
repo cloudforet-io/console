@@ -49,7 +49,7 @@ import {
     reactive, toRefs, computed,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
-import PChart, { setTooltips } from '@/components/molecules/charts/Chart.vue';
+import PChart, { setTooltips } from '@/components/molecules/charts/ChartD3.vue';
 import colorStyles from '@/styles/colors';
 
 const LABELS = {
@@ -172,11 +172,11 @@ export default {
             }
         }
         .key-label {
-            fill: theme('colors.dark');
+            fill: theme('colors.gray.900');
             font-size: 12px;
         }
         .value-label {
-            fill: theme('colors.dark');
+            fill: theme('colors.gray.900');
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;

@@ -125,7 +125,7 @@ export default defineComponent({
         footerCancelButtonBind: {
             type: Object,
             default: () => ({
-                styleType: 'dark',
+                styleType: 'gray900',
                 outline: true,
             }),
         },
@@ -157,13 +157,13 @@ export default defineComponent({
         align-items: center;
         width: 100%;
         .close-btn {
-            @apply text-dark;
+            @apply text-gray-900;
             cursor: pointer;
             &:hover {
                 @apply text-secondary;
             }
             &.disabled {
-                @apply text-gray2;
+                @apply text-gray-200;
             }
         }
     }

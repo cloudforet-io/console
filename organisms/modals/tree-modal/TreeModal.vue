@@ -51,7 +51,7 @@ import { modalSizeValidator } from '@/components/molecules/modals/toolset';
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
     const footerCancelButtonBind = reactive({
-        styleType: 'dark',
+        styleType: 'gray900',
         outline: true,
     });
     const footerConfirmButtonBind = computed(() => ({
@@ -111,7 +111,7 @@ export default {
 
 <style lang="postcss" scoped>
     .p-tree-modal-block{
-        @apply bg-primary4 border border-gray2 rounded-sm overflow-auto h-auto;
+        @apply bg-primary4 border border-gray-200 rounded-sm overflow-auto h-auto;
         max-height: 50vh;
     }
 

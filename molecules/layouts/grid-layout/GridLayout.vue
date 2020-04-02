@@ -82,7 +82,7 @@ export default {
     }
 
     .card-item {
-        @apply bg-white border border-gray3;
+        @apply bg-white border border-gray-100;
         box-shadow: 0 0 8px rgba(theme('colors.primary'), 0.08);
         border-radius: 2px;
     }

@@ -139,7 +139,7 @@ export default {
         @apply bg-white;
         position: absolute;
         bottom: 0;
-        box-shadow: 4px 0px 8px rgba(theme('colors.dark'), 0.52);
+        box-shadow: 4px 0px 8px rgba(theme('colors.gray.900'), 0.52);
         &.fade-in-enter-active {
             transition: opacity .15s, visibility .15s;
         }

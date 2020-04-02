@@ -96,7 +96,7 @@ export default {
         }
 
         @mixin notice-color alert, theme('colors.alert');
-        @mixin notice-color warning, theme('colors.other1');
+        @mixin notice-color warning, theme('colors.coral.default');
         @mixin notice-color success, theme('colors.safe');
     }
     .alert-icon {
