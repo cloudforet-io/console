@@ -33,7 +33,6 @@ export const iconButton = () => ({
 <p-icon-button 
     @click="click"
     name="ic_refresh"
-    :dark="dark"
     :disabled="disabled"
     :iconStyle="iconStyle"
     :buttonStyle="buttonStyle"
@@ -45,9 +44,6 @@ export const iconButton = () => ({
 </p-icon-button>`,
     props: {
         // ...autoProps(PIconButton),
-        dark: {
-            default: boolean('dark', false),
-        },
         iconStyle: {
             default: select('icon_style', [...Object.keys(iconStyleMapping)], 'solid'),
         },
@@ -64,7 +60,7 @@ export const iconButton = () => ({
             default: select('flip', ['', ...Object.keys(flipMapping)], ''),
         },
         buttonStyle: {
-            default: select('style', ['white', 'transparent', 'dark'], 'white'),
+            default: select('style', ['white', 'transparent', 'gray900'], 'white'),
         },
     },
     methods: {

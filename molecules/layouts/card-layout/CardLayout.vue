@@ -55,7 +55,7 @@ export default {
         width: 100%;
         table-layout: fixed;
         .card-container {
-            @apply border-r border-gray2;
+            @apply border-r border-gray-200;
             vertical-align: top;
             &.no-border {
                 border-right: 0;

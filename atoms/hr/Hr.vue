@@ -22,7 +22,7 @@ export default {
         width: 100%;
         border: none;
         height: 1px;
-        @apply text-gray2 bg-gray2;
+        @apply text-gray-200 bg-gray-200;
         margin-top: 0px;
         margin-bottom: 0px;
     }

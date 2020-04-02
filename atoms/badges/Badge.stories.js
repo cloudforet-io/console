@@ -29,8 +29,8 @@ export const DefaultCase = () => ({
             default: select('styleType', [
                 'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
                 'secondary', 'secondary1', 'secondary2',
-                'alert', 'safe', 'dark',
-                'gray', 'gray1', 'gray2', 'gray3',
+                'alert', 'safe', 'gray900',
+                'gray', 'gray200', 'gray100',
             ], 'primary'),
         },
         text: {
@@ -68,9 +68,9 @@ export const longBadge = () => ({
                 '',
                 'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
                 'secondary', 'secondary1', 'secondary2',
-                'other1', 'other2', 'other3', 'other4',
-                'gray', 'gray1', 'gray2', 'gray3',
-                'alert', 'safe', 'dark',
+                'coral', 'yellow',
+                'gray', 'gray200', 'gray100',
+                'alert', 'safe', 'gray900',
             ], ''),
         },
         textColor: {

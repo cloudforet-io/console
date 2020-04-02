@@ -13,9 +13,9 @@ export default {
                 return [
                     'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
                     'secondary', 'secondary1', 'secondary2',
-                    'other1', 'other2', 'other3', 'other4',
-                    'gray', 'gray1', 'gray2', 'gray3',
-                    'alert', 'safe', 'dark',
+                    'coral', 'yellow',
+                    'gray', 'gray200', 'gray100',
+                    'alert', 'safe', 'gray900',
                 ].indexOf(value) !== -1;
             },
         },
@@ -95,16 +95,13 @@ export default {
 
 @mixin badge-color alert, theme('colors.alert'), theme('colors.white');
 @mixin badge-color safe, theme('colors.safe'), theme('colors.white');
-@mixin badge-color dark, theme('colors.dark'), theme('colors.white');
+@mixin badge-color gray900, theme('colors.gray.900'), theme('colors.white');
 
-@mixin badge-color gray, theme('colors.gray'), theme('colors.white');
-@mixin badge-color gray1, theme('colors.gray1'), theme('colors.white');
-@mixin badge-color gray2, theme('colors.gray2'), theme('colors.dark');
-@mixin badge-color gray3, theme('colors.gray3'), theme('colors.gray');
+@mixin badge-color gray, theme('colors.gray.default'), theme('colors.white');
+@mixin badge-color gray200, theme('colors.gray.200'), theme('colors.gray.900');
+@mixin badge-color gray100, theme('colors.gray.100'), theme('colors.gray.default');
 
-@mixin badge-color other1, theme('colors.other1'), theme('colors.white');
-@mixin badge-color other2, theme('colors.other2'), theme('colors.white');
-@mixin badge-color other3, theme('colors.other3'), theme('colors.white');
-@mixin badge-color other4, theme('colors.other4'), theme('colors.white');
+@mixin badge-color coral, theme('colors.coral.default'), theme('colors.white');
+@mixin badge-color yellow, theme('colors.yellow.default'), theme('colors.white');
 
 </style>

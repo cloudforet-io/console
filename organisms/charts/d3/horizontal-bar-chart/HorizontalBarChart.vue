@@ -172,11 +172,11 @@ export default {
             }
         }
         .key-label {
-            fill: theme('colors.dark');
+            fill: theme('colors.gray.900');
             font-size: 12px;
         }
         .value-label {
-            fill: theme('colors.dark');
+            fill: theme('colors.gray.900');
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;

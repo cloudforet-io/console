@@ -164,7 +164,7 @@ export const cardItemSlot = () => ({
                         <p-row style="height: 100%;">
                             <p-col>
                                 <template v-if="item.tags">
-                                    <p-badge v-for="(tag, idx) in item.tags" :key="idx" style-type="gray3">
+                                    <p-badge v-for="(tag, idx) in item.tags" :key="idx" style-type="gray100">
                                         {{tag}}
                                     </p-badge>
                                 </template>

@@ -53,7 +53,7 @@
 
         <slot name="bottom">
             <div class="bottom">
-                <p-button outline style-type="dark" size="lg"
+                <p-button outline style-type="gray900" size="lg"
                           class="txt-btn" @click="$emit('cancel', $event)"
                 >
                     {{ $t('BTN.CANCEL') }}
@@ -203,7 +203,7 @@ export default {
             margin-right: .5rem;
         }
         &.warning {
-            @apply text-other1;
+            @apply text-coral;
         }
     }
     .txt-btn {

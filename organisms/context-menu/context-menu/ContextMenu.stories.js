@@ -58,7 +58,7 @@ export const defaultCase = () => ({
 </div>`,
     props: {
         theme: {
-            default: select('theme', ['secondary', 'dark'], 'secondary'),
+            default: select('theme', ['secondary', 'gray900'], 'secondary'),
         },
         menu: {
             default: object('menu', [
