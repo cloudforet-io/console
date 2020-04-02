@@ -17,6 +17,7 @@ export interface ProjectModel extends IdParameter, Tags{
     name: string;
     state: string;
     project_group_info: ProjectGroupInfo;
+    providers?: string[];
     created_by: string;
     created_at: TimeStamp;
     deleted_at: TimeStamp;
@@ -39,7 +40,16 @@ class Delete extends SingleDeleteAction<IdParameter, any> {
 class Get extends GetAction<IdParameter, ProjectModel> {
     protected idField = idField;
 }
-class List extends ListAction<any, ProjectListResp> {}
+
+interface ProjectListParameter {
+    include_provider: boolean;
+}
+class List extends ListAction<ProjectListParameter, ProjectListResp> {
+    setIncludeProvider(val = true) {
+        this.apiState.extraParameter.include_provider = val;
+        return this.clone();
+    }
+}
 
 
 interface ProjectTreeParameter {
@@ -47,9 +57,8 @@ interface ProjectTreeParameter {
 }
 
 class Tree extends TreeAction<ProjectTreeParameter, any> {
-    setIncludeProject(val = true) {
-        this.apiState.extraParameter.include_project = val;
-        return this.clone();
+    setExcludeProject(val = true) {
+        return val ? this.setExcludeType('PROJECT') : this.setExcludeType('');
     }
 }
 
