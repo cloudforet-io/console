@@ -13,7 +13,7 @@ import PLineChart from '@/components/organisms/charts/line-chart/LineChart.vue';
 import { lineChartProps } from '@/components/organisms/charts/line-chart/LineChart.toolset';
 
 export default {
-    title: 'organisms/LineChart',
+    title: 'organisms/charts/LineChart',
     component: PLineChart,
     parameters: {
         info: {
@@ -73,7 +73,7 @@ export const multiCase = () => ({
         gradient: false,
     }),
     template: `
-    <div style="width: 80vw;">
+    <div class="bg-white" style="width: 80vw;">
         <PLineChart v-bind="$props" class="inline-block" style="min-height: 200px; min-width: 300px; height: 30%; width: 50%;"></PLineChart>
         <PLineChart v-bind="$props" class="inline-block" style="height: 200px; width: 300px;"></PLineChart>
         <PLineChart v-bind="$props" class="inline-block" style="height: 200px; width: 300px;"></PLineChart>

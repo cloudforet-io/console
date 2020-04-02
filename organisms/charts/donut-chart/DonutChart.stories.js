@@ -9,6 +9,7 @@ import { getKnobProps } from '@sb/storybook-util';
 import { donutChartProps } from '@/components/organisms/charts/donut-chart/DonutChart.toolset';
 import { ChartData } from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
 import PDonutChart from './DonutChart.vue';
+import casual, { arrayOf } from '@/lib/casual';
 
 export default {
     title: 'organisms/charts/DonutChart',
@@ -32,7 +33,7 @@ const getState = (props, context) => {
 export const defaultCase = () => ({
     components: { PDonutChart },
     props: getKnobProps(donutChartProps, {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        labels: arrayOf(7, () => casual.word),
         dataset: [
             new ChartData('line1', [12, 19, 3, 5, 2, 3, 9]),
         ],
