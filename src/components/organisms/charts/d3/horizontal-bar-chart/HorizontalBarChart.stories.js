@@ -1,10 +1,10 @@
 // eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
-import PHorizontalBarChart from './HorizontalBarChart';
+import PHorizontalBarChart from '@/components/organisms/charts/d3/horizontal-bar-chart/HorizontalBarChart';
 import { autoProps } from '@sb/storybook-util';
-import { sampleDataGenerator } from './HorizontalBarChart.map';
+import { sampleDataGenerator } from '@/components/organisms/charts/d3/horizontal-bar-chart/HorizontalBarChart.map';
 
 export default {
-    title: 'Organisms/charts/bar-chart-d3',
+    title: 'Organisms/charts/d3/bar-chart',
     component: PHorizontalBarChart,
     parameters: {
         centered: { disable: true },

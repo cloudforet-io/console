@@ -1,11 +1,11 @@
 // eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
 import countries from 'countries-and-timezones';
-import PDonutChart from './DonutChart';
+import PDonutChart from '@/components/organisms/charts/d3/donut-chart/DonutChart';
 import { autoProps } from '@sb/storybook-util';
-import { sampleDataGenerator } from './DonutChart.map';
+import { sampleDataGenerator } from '@/components/organisms/charts/d3/donut-chart/DonutChart.map';
 
 export default {
-    title: 'Organisms/charts/donut-chart-d3',
+    title: 'organisms/charts/d3/donut-chart',
     component: PDonutChart,
     parameters: {
         centered: { disable: true },

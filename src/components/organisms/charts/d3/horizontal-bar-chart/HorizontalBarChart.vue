@@ -49,7 +49,7 @@ import {
     reactive, toRefs, computed,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
-import PChart, { setTooltips } from '@/components/molecules/charts/Chart.vue';
+import PChart, { setTooltips } from '@/components/molecules/charts/ChartD3.vue';
 import colorStyles from '@/styles/colors';
 
 const LABELS = {

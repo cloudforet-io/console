@@ -1,4 +1,4 @@
-import regions from './aws-regions.json';
+import regions from '@/components/organisms/charts/d3/bubble-chart/aws-regions.json';
 
 export const sampleDataGenerator = function () {
     const regionKeys = Object.keys(regions);
