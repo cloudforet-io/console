@@ -24,9 +24,7 @@ export const donutChartProps = {
     },
 };
 
-export interface DonutChartPropsType extends LoadingChartPropsType {
-    styleType: string;
-}
+export type DonutChartPropsType = LoadingChartPropsType
 
 /** *************** Settings ****************** */
 const defaultSettings: SettingsType<DonutChartPropsType> = props => ({

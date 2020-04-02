@@ -45,7 +45,6 @@ export const lineChartProps = {
 
 export interface LineChartPropsType extends LoadingChartPropsType {
     color?: string;
-    styleType: string;
     min?: number;
     max?: number;
     gradient: boolean;

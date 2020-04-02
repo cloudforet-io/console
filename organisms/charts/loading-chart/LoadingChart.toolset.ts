@@ -23,6 +23,7 @@ export interface LoadingChartPropsType {
     labels: any[];
     dataset: ChartData[];
     loading: boolean;
+    styleType: string;
 }
 
 export const loadingChartProps = {
@@ -44,6 +45,10 @@ export const loadingChartProps = {
     loading: {
         type: Boolean,
         default: true,
+    },
+    styleType: {
+        type: String,
+        default: 'default',
     },
 };
 

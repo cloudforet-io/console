@@ -1,11 +1,11 @@
 import { action } from '@storybook/addon-actions';
-import PHorizontalStackBarChart from './HorizontalStackBarChart';
 import { autoProps } from '@sb/storybook-util';
+import PHorizontalStackBarChart from '@/components/organisms/charts/d3/horizontal-stack-bar-chart/HorizontalStackBarChart.vue';
 
-import { sampleDataGenerator } from './HorizontalStackBarChart.map';
+import { sampleDataGenerator } from '@/components/organisms/charts/d3/horizontal-stack-bar-chart/HorizontalStackBarChart.map';
 
 export default {
-    title: 'Organisms/charts/horizontal-stack-bar-chart',
+    title: 'organisms/charts/d3/horizontal-stack-bar-chart',
     component: PHorizontalStackBarChart,
     parameters: {
         centered: { disable: true },

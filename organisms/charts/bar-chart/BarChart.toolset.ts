@@ -28,7 +28,6 @@ export const barChartProps = {
 };
 
 export interface BarChartPropsType extends LoadingChartPropsType {
-    styleType: string;
     stacked: boolean;
     minBarLength: number;
 }
