@@ -31,7 +31,7 @@
                     >
                         {{ hour }}
                     </span>
-                    <p-button style-type="dark" :outline="!isAllHours"
+                    <p-button style-type="gray900" :outline="!isAllHours"
                               class="all-btn"
                               @click="onClickAllHours"
                     >
@@ -178,7 +178,7 @@ export default {
         vertical-align: unset;
     }
     .time-block {
-        @apply border border-gray2;
+        @apply border border-gray-200;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -190,7 +190,7 @@ export default {
         font-size: .875rem;
         cursor: pointer;
         &:hover {
-            @apply bg-other4 text-white;
+            @apply bg-green-600 text-white;
         }
         &.active {
             @apply bg-safe text-white;

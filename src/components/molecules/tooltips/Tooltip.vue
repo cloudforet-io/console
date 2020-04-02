@@ -136,7 +136,7 @@ export default {
         }
 
         &.popover {
-            $color: theme('colors.dark');
+            $color: theme('colors.gray.900');
 
             .popover-inner {
                 background: $color;

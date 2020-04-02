@@ -243,7 +243,7 @@ export default defineComponent({
         align-items: flex-start;
         justify-content: center;
         &.line {
-            @apply border-l border-gray1;
+            @apply border-l border-gray-400;
             background-color: transparent;
             &:hover {
                 @apply border-l border-secondary;
@@ -259,7 +259,7 @@ export default defineComponent({
         }
 
         .dragger {
-            @apply text-dark;
+            @apply text-gray-900;
             display: inline-block;
             cursor: pointer;
             height: 30px;
@@ -277,7 +277,7 @@ export default defineComponent({
             margin-top: 1rem;
             margin-left: 1rem;
             justify-content: center;
-            @apply text-gray1;
+            @apply text-gray-400;
             &:hover {
                 @apply text-secondary;
             }

@@ -129,7 +129,7 @@ export const GlobalEnum = {
             DELETED: {
                 msg: 'Deleted',
                 icon: 'fas fa-minus-circle',
-                color: 'dark',
+                color: 'gray900',
             },
         },
     ),

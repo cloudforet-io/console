@@ -101,7 +101,7 @@ export default {
         }
     }
     .beta {
-        @apply text-other1;
+        @apply text-coral;
         font-size: .5rem;
         font-weight: bold;
         vertical-align: super;

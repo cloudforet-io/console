@@ -471,7 +471,7 @@ export default defineComponent({
                     justify-content: space-between;
                 }
                 .sort-icon {
-                    @apply text-gray2;
+                    @apply text-gray-200;
                     float: right;
                 }
                 &.fix-width {

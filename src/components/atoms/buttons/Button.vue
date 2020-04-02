@@ -94,10 +94,10 @@ export default {
     }
 
     &.disabled {
-        @apply bg-gray2 text-gray1 border-gray3;
-        background-color: theme('colors.gray2') !important;
-        border-color: theme('colors.gray3') !important;
-        color: theme('colors.gray1') !important;
+        @apply bg-gray-200 text-gray-400 border-gray-100;
+        background-color: theme('colors.gray.200') !important;
+        border-color: theme('colors.gray.100') !important;
+        color: theme('colors.gray.400') !important;
         background-repeat: no-repeat;
         background-clip: padding-box;
         border-width: 1px;
@@ -117,17 +117,14 @@ export default {
 
     @mixin btn-color alert, theme('colors.alert'), theme('colors.white');
     @mixin btn-color safe, theme('colors.safe'), theme('colors.white');
-    @mixin btn-color dark, theme('colors.dark'), theme('colors.white');
+    @mixin btn-color gray900, theme('colors.gray.900'), theme('colors.white');
 
-    @mixin btn-color gray, theme('colors.gray'), theme('colors.white');
-    @mixin btn-color gray1, theme('colors.gray1'), theme('colors.white');
-    @mixin btn-color gray2, theme('colors.gray2'), theme('colors.white');
-    @mixin btn-color gray3, theme('colors.gray3'), theme('colors.white');
+    @mixin btn-color gray, theme('colors.gray.default'), theme('colors.white');
+    @mixin btn-color gray200, theme('colors.gray.200'), theme('colors.white');
+    @mixin btn-color gray100, theme('colors.gray.100'), theme('colors.white');
 
-    @mixin btn-color other1, theme('colors.other1'), theme('colors.white');
-    @mixin btn-color other2, theme('colors.other2'), theme('colors.white');
-    @mixin btn-color other3, theme('colors.other3'), theme('colors.white');
-    @mixin btn-color other4, theme('colors.other4'), theme('colors.white');
+    @mixin btn-color coral, theme('colors.coral.default'), theme('colors.white');
+    @mixin btn-color yellow, theme('colors.yellow.default'), theme('colors.white');
 }
 
 .btn-lg {

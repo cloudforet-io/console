@@ -6,7 +6,7 @@
                     fade
                     backdrop
                     :footer-cancel-button-bind="{
-                        styleType: 'dark',
+                        styleType: 'gray900',
                         outline: true,
                     }"
                     :footer-confirm-button-bind="confirmBtnStyle"
@@ -78,7 +78,7 @@ export default {
             proxyVisible: makeProxy('visible', props, emit),
             confirmBtnStyle: computed(() => {
                 const defaultStyle = { style: { padding: 0 } };
-                defaultStyle.styleType = crdVerifyState.loading ? 'gray2' : 'safe';
+                defaultStyle.styleType = crdVerifyState.loading ? 'gray200' : 'safe';
                 return defaultStyle;
             }),
             fields: makeTrItems([

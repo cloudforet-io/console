@@ -133,7 +133,7 @@ export default defineComponent({
         border-collapse: separate;
         border-spacing: 0;
         th {
-            @apply text-gray1;
+            @apply text-gray-400;
             position: sticky;
             z-index: 1;
             top: 0;
@@ -176,7 +176,7 @@ export default defineComponent({
         /*}*/
         /*&.table-light {*/
         /*    th {*/
-        /*        box-shadow: inset 0 1px 0 theme('colors.gray1'), inset 0 -1px 0 theme('colors.gray1');*/
+        /*        box-shadow: inset 0 1px 0 theme('colors.gray.400'), inset 0 -1px 0 theme('colors.gray.400');*/
         /*    }*/
         /*}*/
     }
@@ -216,7 +216,7 @@ export default defineComponent({
         }
     }
 
-    .table-default { @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.dark'), theme('colors.secondary2'); }
-    .table-light { @mixin table-theme theme('colors.white'), transparent, theme('colors.gray2'), transparent; }
+    .table-default { @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.900'), theme('colors.secondary2'); }
+    .table-light { @mixin table-theme theme('colors.white'), transparent, theme('colors.gray.200'), transparent; }
 
 </style>

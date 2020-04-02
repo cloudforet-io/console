@@ -6,7 +6,7 @@
                     backdrop
                     :loading="loading"
                     :footer-cancel-button-bind="{
-                        styleType: 'dark',
+                        styleType: 'gray900',
                         outline: true,
                     }"
                     :footer-confirm-button-bind="confirmBtnStyle"
@@ -144,7 +144,7 @@ export default defineComponent({
             filters: {},
             confirmBtnStyle: computed(() => {
                 const defaultStyle: any = { style: { padding: 0 } };
-                defaultStyle.styleType = state.loading ? 'gray2' : 'primary-dark';
+                defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';
                 return defaultStyle;
             }),
             crdsMenu: computed(() => [
@@ -254,7 +254,7 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .left-container {
-    @apply border-r border-gray2;
+    @apply border-r border-gray-200;
     padding-right: 2.5rem;
     .img-container {
         padding-right: 2.5rem;
@@ -280,7 +280,7 @@ export default defineComponent({
     padding-left: 2.5rem;
 }
 .sub-header {
-    @apply text-gray1;
+    @apply text-gray-400;
     margin-bottom: .875rem;
     font-size: .875rem;
     font-weight: bold;

@@ -36,7 +36,7 @@
                                  :to="{path: '/secret/credentials', query: {plugin_id: confState.pluginId}}"
                                  target="_blank"
                     >
-                        <p-button outline style-type="dark">
+                        <p-button outline style-type="gray900">
                             {{ $t('INVENTORY.CRT_CRD') }}
                         </p-button>
                     </router-link>

@@ -60,7 +60,7 @@
                 <div>
                     <PBadge v-for="(label, idx) in data.item.labels"
                             :key="idx"
-                            class="p-label" style-type="gray2"
+                            class="p-label" style-type="gray200"
                     >
                         {{ getEmptyString(label) }}
                     </PBadge>

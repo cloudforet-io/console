@@ -56,9 +56,9 @@ import {
     reactive, toRefs, computed, onMounted,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
-import PChart, { setTooltips } from '@/components/molecules/charts/Chart';
-import PChartLegend from '@/components/organisms/legends/ChartLegend';
-import countries from './countries.json';
+import PChart, { setTooltips } from '@/components/molecules/charts/ChartD3.vue';
+import PChartLegend from '@/components/organisms/legends/ChartLegend.vue';
+import countries from '@/components/organisms/charts/d3/bubble-chart/countries.json';
 import { colorset } from '@/lib/util';
 
 const setSizeTools = (props, context) => {

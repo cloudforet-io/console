@@ -74,7 +74,7 @@ export default {
         cursor: pointer;
     }
     .p-nav-link {
-        @apply flex no-underline border border-gray3 bg-white;
+        @apply flex no-underline border border-gray-100 bg-white;
         font: 14px/16px Arial;
         min-width: 7.5rem;
         min-height: 2rem;

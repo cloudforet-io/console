@@ -20,7 +20,7 @@ export default {
 
 <style lang="postcss" scoped>
     .fnb {
-        @apply text-gray2;
+        @apply text-gray-200;
         height: $fnb-height;
         .fnb-contents {
             @apply border-t border-primary3;

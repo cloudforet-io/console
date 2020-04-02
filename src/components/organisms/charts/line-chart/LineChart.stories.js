@@ -6,11 +6,14 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
-import { LineChartData, lineChartProps } from '@/components/organisms/charts/line-chart/LineChart.toolset';
-import PLineChart from './LineChart.vue';
+import { ChartData } from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
+import casual, { arrayOf } from '@/lib/casual';
+import { chartTimestampFormatter } from '@/lib/util';
+import PLineChart from '@/components/organisms/charts/line-chart/LineChart.vue';
+import { lineChartProps } from '@/components/organisms/charts/line-chart/LineChart.toolset';
 
 export default {
-    title: 'organisms/LineChart',
+    title: 'organisms/charts/LineChart',
     component: PLineChart,
     parameters: {
         info: {
@@ -32,19 +35,24 @@ export const defaultCase = () => ({
     props: getKnobProps(lineChartProps, {
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         dataset: [
-            new LineChartData('line1', [12, 19, 3, 5, 2, 3, 9]),
+            new ChartData('line1', [12, 19, 3, 5, 2, 3, 9]),
         ],
         loading: false,
     }),
     template: `
     <div style="width: 80vw;">
-        <PLineChart v-bind="$props"></PLineChart>
+        <PLineChart v-bind="$props" ref="lineChart"></PLineChart>
+        <button class="my-2 w-full h-12 border border-secondary text-secondary text-center" @click="onRedraw">REDRAW</button>
     </div>`,
     setup(props, context) {
         const state = getState(props, context);
-
+        const lineChart = ref(null);
         return {
+            lineChart,
             ...toRefs(state),
+            onRedraw() {
+                lineChart.value.initChart();
+            },
         };
     },
 });
@@ -53,26 +61,26 @@ export const defaultCase = () => ({
 export const multiCase = () => ({
     components: { PLineChart },
     props: getKnobProps(lineChartProps, {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        labels: arrayOf(7, () => chartTimestampFormatter(casual._timestamp())),
         dataset: [
-            new LineChartData('line1', [12, 19, 3, 5, 2, 3, 9]),
-            new LineChartData('line2', [2, 3, 7, 10, 30, 24, 39]),
-            new LineChartData('line2', [1, 2, 5, 7, 8, 34, 20]),
-            new LineChartData('line2', [0, 0, 0, 10, 20, 30, 54]),
+            new ChartData('line1', arrayOf(7, () => casual.integer(0, 500))),
+            new ChartData('line2', arrayOf(7, () => casual.integer(0, 500))),
+            new ChartData('line3', arrayOf(7, () => casual.integer(0, 500))),
         ],
         styleType: 'multi',
         loading: false,
+        max: 500,
+        gradient: false,
     }),
     template: `
-    <div>
-        <PLineChart v-bind="$props" class="inline-block border border-secondary" style="min-height: 200px; min-width: 300px; height: 30%; width: 50%;"></PLineChart>
-        <PLineChart v-bind="$props" class="inline-block border border-secondary" style="height: 200px; width: 300px;"></PLineChart>
-        <PLineChart v-bind="$props" class="inline-block border border-secondary" style="height: 200px; width: 300px;"></PLineChart>
-        <PLineChart v-bind="$props" class="inline-block border border-secondary" style="min-height: 200px; min-width: 300px; height: 30%; width: 50%;"></PLineChart>
+    <div class="bg-white" style="width: 80vw;">
+        <PLineChart v-bind="$props" class="inline-block" style="min-height: 200px; min-width: 300px; height: 30%; width: 50%;"></PLineChart>
+        <PLineChart v-bind="$props" class="inline-block" style="height: 200px; width: 300px;"></PLineChart>
+        <PLineChart v-bind="$props" class="inline-block" style="height: 200px; width: 300px;"></PLineChart>
+        <PLineChart v-bind="$props" class="inline-block" style="min-height: 200px; min-width: 300px; height: 30%; width: 50%;"></PLineChart>
     </div>`,
     setup(props, context) {
         const state = getState(props, context);
-
         return {
             ...toRefs(state),
         };
