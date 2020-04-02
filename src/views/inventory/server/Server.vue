@@ -43,7 +43,7 @@
                             @click-closed="clickClosed"
                             @click-delete="clickDelete"
                             @click-project="clickProject"
-                            @click-link="openLink"
+                            @click-link="apiHandler.tableTS.linkState.openLink()"
                             @click-exportExcel="exportToolSet.getData()"
                         >
                             Action
@@ -216,7 +216,7 @@ import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
-import {createAtVF, deleteAtVF, updateAtVF} from "@/lib/data-source";
+import { createAtVF, deleteAtVF, updateAtVF } from '@/lib/data-source';
 
 const serverStateVF = {
     name: 'State',
@@ -535,20 +535,6 @@ export default {
                     resetCheckTableModalState();
                 });
         };
-        const link = computed((): string|undefined => {
-            if (apiHandler.tableTS.selectState.isSelectOne) {
-                return _.get(apiHandler.tableTS.selectState.firstSelectItem, 'reference.external_link');
-            }
-
-            return undefined;
-        });
-        const openLink = () => {
-            if (link.value) {
-                window.open((link.value as string));
-            }
-        };
-
-        const noLink = computed(() => !link.value);
         const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
         const dropdown = reactive({
             ...makeTrItems([
@@ -561,7 +547,7 @@ export default {
                 ['project', 'COMMON.CHG_PRO'],
                 ['pool', 'BTN.CHG_POOL', { disabled: true }],
                 [null, null, { type: 'divider' }],
-                ['link', null, { label: 'Console', disabled: noLink }],
+                ['link', null, { label: 'Console', disabled: apiHandler.tableTS.noLink }],
                 ['exportExcel', null, { label: 'Export', disabled: false }],
             ],
             context.parent,
@@ -650,7 +636,6 @@ export default {
             projectModalVisible,
             clickProject,
             changeProject,
-            openLink,
             apiHandler,
             fields,
             multiSelectFields,

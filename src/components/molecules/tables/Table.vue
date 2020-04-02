@@ -8,7 +8,7 @@
             <thead :class="theadClassObject" :style="theadStyle">
                 <slot name="head" />
             </thead>
-            <tbody :class="tbodyClass" :style="tbodyStyle">
+            <tbody :class="tbodyClass" :style="tbodyStyle"   :onselectstart="tbodyOnSelectStart? 'return true':'return false'">
                 <!--            is="transition-group" name="table-row"-->
                 <!--            @before-enter="beforRowEnter"-->
                 <!--            @enter="rowEnter"-->

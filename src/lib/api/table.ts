@@ -12,17 +12,19 @@ import {
 import {
     BaseApiState, transformHandlerType, getDataAPI, DynamicFluentAPIToolSet,
 } from '@/lib/api/toolset';
-import {cnaRefArgs, forceRefArg, readonlyRefArg} from '@/lib/type';
+import { cnaRefArgs, forceRefArg, readonlyRefArg } from '@/lib/type';
 import {
     baseAutocompleteHandler,
     SearchQueryType,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { ApiQuery, defaultQuery } from '@/lib/api/query';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import {GetDataAction, ListType, MemberListAction, QueryAPI} from '@/lib/fluent-api';
+import {
+    GetDataAction, ListType, MemberListAction, QueryAPI,
+} from '@/lib/fluent-api';
 
 interface DynamicTableDataSource{
-    dataSource: DataSource[]
+    dataSource: DataSource[];
 }
 
 export abstract class BaseTableFluentAPI<
@@ -89,6 +91,7 @@ export class SearchTableFluentAPI<
     action extends QueryAPI<any, any> = QueryAPI<parameter, resp>,
     > extends BaseTableFluentAPI<parameter, resp, action> {
     tableTS: T;
+
     constructor(
         action: action,
         initData: initData = {} as initData,
@@ -96,15 +99,15 @@ export class SearchTableFluentAPI<
     ) {
         super(action);
         this.tableTS = new SearchTableToolSet(initData, initSyncData) as T;
-
     }
+
     // @ts-ignore
-    getSearchTableDefaultAction:()=>action = ()=>this.getDefaultAction().setKeyword(this.tableTS.searchText.value);
+    getSearchTableDefaultAction: () => action = () => this.getDefaultAction().setKeyword(this.tableTS.searchText.value);
 
     getAction = () => {
-        console.debug('before',this.action.getParameter());
+        console.debug('before', this.action.getParameter());
         const action = this.getSearchTableDefaultAction();
-        console.debug('after',action.getParameter());
+        console.debug('after', action.getParameter());
         return action;
     };
 
@@ -112,7 +115,6 @@ export class SearchTableFluentAPI<
         this.defaultReset();
         this.tableTS.searchText.value = '';
     };
-
 }
 
 export class SubDataFluentAPI<
@@ -122,8 +124,7 @@ export class SubDataFluentAPI<
     initSyncData = any,
     T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
     action extends GetDataAction<any, any> = GetDataAction<parameter, resp>,
-    > extends SearchTableFluentAPI<parameter, resp,initData,initSyncData,T, action> {
-
+    > extends SearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> {
     getAction = () => this.getSearchTableDefaultAction()
         .setKeyPath(this.keyPath.value)
         .setId(this.resourceId.value);
@@ -131,17 +132,24 @@ export class SubDataFluentAPI<
     constructor(
         action: action,
         protected keyPath: forceRefArg<string>,
-        protected resourceId:forceRefArg<string>,
+        protected resourceId: forceRefArg<string>,
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
     ) {
         super(
             action,
-            initData, // sub api can't support only query
+            {
+                striped: true,
+                border: false,
+                shadow: false,
+                padding: false,
+                selectable: false,
+                ...initData,
+            }, // sub api can't support only query
             initSyncData,
         );
         onMounted(() => {
-            watch([this.resourceId,this.keyPath],async (origin, before) => {
+            watch([this.resourceId, this.keyPath], async (origin, before) => {
                 let id;
                 let path;
                 let preId;
@@ -161,9 +169,7 @@ export class SubDataFluentAPI<
             });
         });
     }
-
 }
-
 
 
 export class TabSearchTableFluentAPI<
@@ -173,8 +179,7 @@ export class TabSearchTableFluentAPI<
     initSyncData = any,
     T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
     action extends QueryAPI<any, any> = QueryAPI<parameter, resp>,
-    > extends SearchTableFluentAPI<parameter, resp,initData,initSyncData,T, action> {
-
+    > extends SearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> {
     constructor(
         action: action,
         protected isShow: forceRefArg<boolean>,
@@ -194,7 +199,6 @@ export class TabSearchTableFluentAPI<
             });
         });
     }
-
 }
 
 const defaultAdminDataSource = [
@@ -216,37 +220,56 @@ export class AdminFluentAPI<
     initSyncData = any,
     T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
     action extends MemberListAction<any, any> = MemberListAction<parameter, resp>,
-    > extends TabSearchTableFluentAPI<parameter, resp,initData,initSyncData,T, action> implements DynamicTableDataSource{
-
+    > extends TabSearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> implements DynamicTableDataSource {
     getAction = () => this.getSearchTableDefaultAction()
-        .setIds(this.target.tableTS.selectState.selectItems.map(item =>item[this.idField]));
+        .setIds(this.target.tableTS.selectState.selectItems.map(item => item[this.idField]));
 
     constructor(
         action: action,
         isShow: forceRefArg<boolean>,
-        protected idField:string,
+        protected idField: string,
         protected target: BaseTableFluentAPI,
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
-        public dataSource: DataSource[]=defaultAdminDataSource
+        public dataSource: DataSource[] = defaultAdminDataSource,
     ) {
         super(
             action,
             isShow,
-            initData,
+            {
+                striped: true,
+                border: false,
+                shadow: false,
+                padding: false,
+                multiSelect: false,
+                selectable: false,
+                ...initData,
+            }, // sub api can't support only query
             initSyncData,
         );
-            watch(()=>this.target.tableTS.selectState.selectItems, async (selected, before) => {
-                console.debug(this.target.tableTS.selectState.selectItems);
-                if (isShow.value && selected.length >= 1 && selected !== before) {
-                    await this.getData();
-                }
-            });
-
+        watch(() => this.target.tableTS.selectState.selectItems, async (selected, before) => {
+            console.debug(this.target.tableTS.selectState.selectItems);
+            if (isShow.value && selected.length >= 1 && selected !== before) {
+                await this.getData();
+            }
+        });
     }
 }
 
+const defaultHistoryDataSource = [
+    { name: 'Update By', key: 'updated_by' },
+    { name: 'Key', key: 'key' },
+    {
+        name: 'Update At',
+        key: 'updated_at',
+        view_type: 'datetime',
+        view_option: {
+            source_type: 'timestamp',
+            source_format: 'seconds',
+        },
+    },
 
+];
 
 
 export class HistoryFluentAPI<
@@ -256,9 +279,7 @@ export class HistoryFluentAPI<
     initSyncData = any,
     T extends SearchTableToolSet<initData, initSyncData> = SearchTableToolSet<initData, initSyncData>,
     action extends GetDataAction<any, any> = GetDataAction<parameter, resp>,
-    > extends TabSearchTableFluentAPI<parameter, resp,initData,initSyncData,T, action> implements DynamicTableDataSource{
-
-
+    > extends TabSearchTableFluentAPI<parameter, resp, initData, initSyncData, T, action> implements DynamicTableDataSource {
     getAction = () => this.getSearchTableDefaultAction()
         .setKeyPath('collection_info.update_history')
         .setId(this.resourceId.value);
@@ -267,17 +288,27 @@ export class HistoryFluentAPI<
     constructor(
         action: action,
         isShow: forceRefArg<boolean>,
-        protected resourceId:forceRefArg<string>,
+        protected resourceId: forceRefArg<string>,
         initData: initData = {} as initData,
         initSyncData: initSyncData = {} as initSyncData,
-        public dataSource: DataSource[]=defaultHistoryDataSource
+        public dataSource: DataSource[] = defaultHistoryDataSource,
     ) {
         super(
             action,
             isShow,
-            initData, // sub api can't support only query
+            {
+                striped: true,
+                border: false,
+                shadow: false,
+                padding: false,
+                multiSelect: false,
+                selectable: false,
+
+                ...initData,
+            }, // sub api can't support only query
             initSyncData,
         );
+
         onMounted(() => {
             watch(this.resourceId, async (id, preId) => {
                 if (isShow.value && id && id !== preId) {
@@ -285,7 +316,6 @@ export class HistoryFluentAPI<
                 }
             });
         });
-
     }
 }
 
@@ -334,23 +364,6 @@ export class QuerySearchTableFluentAPI<
         this.tableTS.querySearch.state.searchText = '';
     };
 }
-
-const defaultHistoryDataSource = [
-    { name: 'Update By', key: 'updated_by' },
-    { name: 'Key', key: 'key' },
-    {
-        name: 'Update At',
-        key: 'updated_at',
-        view_type: 'datetime',
-        view_option: {
-            source_type: 'timestamp',
-            source_format: 'seconds',
-        },
-    },
-
-];
-
-
 
 
 export abstract class BaseTableAPI<
@@ -472,7 +485,6 @@ interface DataSource {
 }
 
 
-
 export class TabSearchTableAPI<initData = any, initSyncData = any> extends SearchTableAPI<initData, initSyncData> {
     protected isShow: forceRefArg<boolean>;
 
@@ -549,7 +561,6 @@ export class SubDataAPI<initData = any, initSyncData = any> extends SearchTableA
 }
 
 
-
 export class HistoryAPI<initData = any, initSyncData = any> extends TabSearchTableAPI<initData, initSyncData> {
     // @ts-ignore
     constructor(
@@ -567,7 +578,6 @@ export class HistoryAPI<initData = any, initSyncData = any> extends TabSearchTab
         }));
     }
 }
-
 
 
 export class QuerySearchTableAPI<initData = any, initSyncData = any,
