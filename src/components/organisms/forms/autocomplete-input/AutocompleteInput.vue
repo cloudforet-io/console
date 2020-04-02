@@ -6,7 +6,7 @@
         />
         <p-context-menu v-if="visibleContext"
                         ref="contextMenuRef" class="context-menu-box"
-                        theme="dark"
+                        theme="gray900"
                         :menu="acState.items"
                         @clickMenuEvent="clickMenuEvent"
                         @onEndOfUpKey="isFocused=true"

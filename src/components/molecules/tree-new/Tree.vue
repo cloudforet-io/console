@@ -143,7 +143,7 @@ export default defineComponent({
         width: 1rem;
         height: 1rem;
         left: 0;
-        background: theme('colors.gray');
+        background: theme('colors.gray.default');
         background-repeat: no-repeat;
         transition: background-image .25s;
         transform: rotate(0deg) translateY(-50%) translateX(0);
@@ -203,11 +203,11 @@ export default defineComponent({
             &.selected > .tree-content {
                 @mixin tree-selected theme('colors.primary2'), theme('colors.white');
                 &:hover {
-                    @mixin tree-selected theme('colors.primary2'), theme('colors.dark');
+                    @mixin tree-selected theme('colors.primary2'), theme('colors.gray.900');
                 }
             }
             > .tree-content:hover {
-                @mixin tree-selected transparent, theme('colors.dark');
+                @mixin tree-selected transparent, theme('colors.gray.900');
             }
         }
     }

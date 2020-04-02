@@ -164,7 +164,7 @@ export default {
         justify-content: center;
         width: 1rem;
         &.line {
-            @apply border-l border-gray2;
+            @apply border-l border-gray-200;
             background-color: transparent;
             &:hover {
                 @apply border-l border-secondary;
@@ -172,14 +172,14 @@ export default {
             }
         }
         &.prohibit-line {
-            @apply border-l  border-gray2;
+            @apply border-l  border-gray-200;
             background-color: transparent;
             &:hover {
                 @apply border-l border-secondary;
             }
         }
         .resizer {
-            @apply text-gray1;
+            @apply text-gray-400;
             display: inline-block;
             font-size: 1.5rem;
             font-weight: 600;

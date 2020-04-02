@@ -83,7 +83,7 @@ export default {
 
 <style lang="postcss" scoped>
     .p-search {
-        @apply border border-gray2 bg-white;
+        @apply border border-gray-200 bg-white;
         position: relative;
         display: inline-flex;
         flex-wrap: nowrap;
@@ -91,10 +91,10 @@ export default {
         height: 2rem;
         border-radius: 2px;
         &.hovered {
-            @apply border-dark;
+            @apply border-gray-900;
         }
         &.focused {
-            @apply text-dark border-dark;
+            @apply text-gray-900 border-gray-900;
         }
         .p-search-input {
             width: 100%;

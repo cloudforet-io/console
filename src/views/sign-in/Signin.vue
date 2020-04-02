@@ -109,7 +109,7 @@ export default defineComponent({
         -webkit-overflow-scrolling: touch;
         background-color: theme('colors.white');
         @mixin background-theme 'default-theme', theme('colors.white');
-        @mixin background-theme 'color-theme', theme('colors.gray');
+        @mixin background-theme 'color-theme', theme('colors.gray.default');
         @mixin background-theme 'image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg');
         @mixin background-theme 'video-theme', url('https://thumbs.gfycat.com/SpotlessUnfitCoral-size_restricted.gif'));
     }

@@ -5,7 +5,7 @@ import hexToRgba from 'hex-to-rgba';
 import {
     computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
-import { dark } from '@/styles/colors';
+import { gray } from '@/styles/colors';
 
 export class ChartData {
     label: string;
@@ -63,5 +63,5 @@ export const tooltips = {
     caretSize: 6,
     caretPadding: 8,
     displayColors: false,
-    backgroundColor: dark,
+    backgroundColor: gray[900],
 };

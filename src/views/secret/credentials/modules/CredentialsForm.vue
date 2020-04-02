@@ -180,12 +180,12 @@ const setup = (props, context) => {
         showValidation: false,
         inputTypeItems: computed(() => {
             const res = {};
-            // return makeTrItems(res,context.parent, { vbind: { styleType: 'dark', outline: true } })
+            // return makeTrItems(res,context.parent, { vbind: { styleType: 'gray900', outline: true } })
             return makeTrItems([
                 ['Json'],
                 // ['Form'],
             ],
-            context.parent, { vbind: { styleType: 'dark', outline: true } });
+            context.parent, { vbind: { styleType: 'gray900', outline: true } });
         }),
         selectedInputType: 'Json',
     });

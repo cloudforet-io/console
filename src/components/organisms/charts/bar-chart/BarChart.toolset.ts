@@ -2,7 +2,7 @@ import {
     loadingChartProps,
     LoadingChartPropsType, OptionsType, PluginsType, SettingsType, tooltips,
 } from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
-import { black, gray3 } from '@/styles/colors';
+import { black, gray } from '@/styles/colors';
 
 export const barChartProps = {
     ...loadingChartProps,
@@ -59,8 +59,8 @@ const defaultOptions: OptionsType<BarChartPropsType> = props => ({
             gridLines: {
                 drawTicks: false,
                 drawBorder: false,
-                color: gray3,
-                zeroLineColor: gray3,
+                color: gray[100],
+                zeroLineColor: gray[100],
             },
             ticks: {
                 padding: 10,
@@ -72,8 +72,8 @@ const defaultOptions: OptionsType<BarChartPropsType> = props => ({
             gridLines: {
                 drawTicks: false,
                 drawBorder: false,
-                color: gray3,
-                zeroLineColor: gray3,
+                color: gray[100],
+                zeroLineColor: gray[100],
 
             },
             ticks: {

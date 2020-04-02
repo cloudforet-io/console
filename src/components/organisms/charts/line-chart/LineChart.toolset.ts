@@ -1,5 +1,5 @@
 import { colorset } from '@/lib/util';
-import { dark, gray3 } from '@/styles/colors';
+import { gray } from '@/styles/colors';
 import Chart, { ChartOptions } from 'chart.js';
 import {
     loadingChartProps,
@@ -117,8 +117,8 @@ const multiOptions: OptionsType<LineChartPropsType> = props => ({
             gridLines: {
                 display: true,
                 drawTicks: false,
-                color: gray3,
-                zeroLineColor: gray3,
+                color: gray[100],
+                zeroLineColor: gray[100],
             },
             ticks: {
                 display: true,
@@ -133,8 +133,8 @@ const multiOptions: OptionsType<LineChartPropsType> = props => ({
             gridLines: {
                 display: true,
                 drawTicks: false,
-                color: gray3,
-                zeroLineColor: gray3,
+                color: gray[100],
+                zeroLineColor: gray[100],
             },
             ticks: {
                 autoSkip: true,

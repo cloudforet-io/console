@@ -110,14 +110,14 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .modal-content {
-    @apply bg-white border border-gray3;
+    @apply bg-white border border-gray-100;
     display: flex;
     flex-direction: column;
     width: 100%;
     pointer-events: auto;
     border-radius: 2px;
-    box-shadow: 0 0 1rem rgba(theme('colors.gray3'), .22);
-    transition: all .3s ease;
+    box-shadow: 0 0 1rem rgba(theme('colors.gray.100'), 0.22);
+    transition: all 0.3s ease;
     justify-content: space-between;
 
     $header-height: 3.5rem;
@@ -127,7 +127,7 @@ export default defineComponent({
 
     .modal-header {
         height: $header-height;
-        padding: .875rem 1.5rem;
+        padding: 0.875rem 1.5rem;
         font-size: 1.375rem;
     }
     .modal-body-container {
@@ -148,7 +148,6 @@ export default defineComponent({
     }
 }
 
-
 @define-mixin modal-color $color {
     .modal-header {
         border-bottom: 2px solid $color;
@@ -164,10 +163,6 @@ export default defineComponent({
 .modal-secondary1 { @mixin modal-color theme('colors.secondary1'); }
 .modal-safe { @mixin modal-color theme('colors.safe'); }
 .modal-alert { @mixin modal-color theme('colors.alert'); }
-.modal-other1 { @mixin modal-color theme('colors.other1'); }
-.modal-other2 { @mixin modal-color theme('colors.other2'); }
-.modal-other3 { @mixin modal-color theme('colors.other3'); }
-.modal-other4 { @mixin modal-color theme('colors.other4'); }
-.modal-dark { @mixin modal-color theme('colors.dark'); }
-.modal-gray { @mixin modal-color theme('colors.gray'); }
+.modal-gray900 { @mixin modal-color theme('colors.gray.900'); }
+.modal-gray { @mixin modal-color theme('colors.gray.default'); }
 </style>

@@ -1,8 +1,8 @@
 import { number, text, color } from '@storybook/addon-knobs/vue';
-import PChartLegend from './ChartLegend.vue';
 import {
-    alert, safe, other1, other2, gray,
+    safe,
 } from '@/styles/colors';
+import PChartLegend from './ChartLegend.vue';
 
 import { autoProps } from '../../../../.storybook/storybook-util';
 

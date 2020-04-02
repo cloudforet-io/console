@@ -34,7 +34,7 @@ export default {
         align-items: center;
         z-index: 10;
         height: $lnb-height;
-        box-shadow: 0px .25rem .5rem rgba(theme('colors.dark'), 0.08);
+        box-shadow: 0px .25rem .5rem rgba(theme('colors.gray.900'), 0.08);
         padding: 0 1.125rem;
     }
 </style>

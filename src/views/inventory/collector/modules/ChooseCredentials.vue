@@ -47,7 +47,7 @@
                     <p-badge v-for="crdg in value"
                              :key="crdg.credential_group_id"
                              class="badge"
-                             style-type="gray2"
+                             style-type="gray200"
                     >
                         {{ crdg.name }}
                     </p-badge>
@@ -59,7 +59,7 @@
                              }"
                              target="_blank"
                 >
-                    <p-button outline style-type="dark">
+                    <p-button outline style-type="gray900">
                         {{ $t('INVENTORY.MANAGE_CRD') }}
                     </p-button>
                 </router-link>

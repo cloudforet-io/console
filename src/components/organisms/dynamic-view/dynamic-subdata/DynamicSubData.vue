@@ -49,7 +49,7 @@ export default defineComponent({
     setup(props:Props ) {
         const selected = ref(props.subData[0].name);
         const buttons = computed(() => props.subData.map(dv => ({
-            name: dv.name, label: dv.name, vbind: { styleType: 'dark', outline: selected.value !== dv.name },
+            name: dv.name, label: dv.name, vbind: { styleType: 'gray900', outline: selected.value !== dv.name },
         })));
         const state = reactive({
             dvs: computed(() => _.keyBy(props.subData, 'name')),

@@ -55,7 +55,7 @@ export default {
     .p-field-group {
         margin-bottom: 1rem;
         .form-label {
-            @apply text-dark;
+            @apply text-gray-900;
             display: inline-block;
             font-size: .875rem;
             font-weight: bold;

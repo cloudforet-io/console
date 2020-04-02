@@ -129,7 +129,7 @@ export default {
         align-items: center;
         padding-bottom: 1rem;
         .label {
-            @apply text-gray1;
+            @apply text-gray-400;
             float: left;
             overflow: hidden;
             clear: left;

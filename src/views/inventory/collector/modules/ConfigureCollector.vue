@@ -216,7 +216,7 @@ export default {
         width: unset;
     }
     .collector-info {
-        @apply border-r border-gray2;
+        @apply border-r border-gray-200;
         .img {
             height: 5.5rem;
             width: 5.5rem;
@@ -228,7 +228,7 @@ export default {
         }
     }
     .sub-title {
-        @apply text-gray1;
+        @apply text-gray-400;
         font-weight: bold;
         font-size: .875rem;
         line-height: 1rem;

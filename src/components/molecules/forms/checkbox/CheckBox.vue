@@ -88,7 +88,7 @@ export default {
             width: 0;
         }
         .check {
-            @apply text-dark;
+            @apply text-gray-900;
         }
     }
 </style>

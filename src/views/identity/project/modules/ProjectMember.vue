@@ -59,7 +59,7 @@
             <template v-slot:col-labels-format="data">
                 <div>
                     <PBadge v-for="(label, idx) in data.item.labels" :key="idx"
-                            class="p-label" style-type="gray2"
+                            class="p-label" style-type="gray200"
                     >
                         {{ getEmptyString(label) }}
                     </PBadge>
@@ -276,7 +276,7 @@ export default {
 
 <style lang="postcss" scoped>
     .p-label {
-        @apply text-dark;
+        @apply text-gray-900;
         margin-bottom:5px;
         margin-right: 0.5rem;
     }

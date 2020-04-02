@@ -6,7 +6,7 @@
                     backdrop
                     :loading="loading"
                     :footer-cancel-button-bind="{
-                        styleType: 'dark',
+                        styleType: 'gray900',
                         outline: true,
                     }"
                     :footer-confirm-button-bind="confirmBtnBind"
@@ -85,7 +85,7 @@ export default {
             },
             confirmBtnBind: computed(() => {
                 const defaultStyle = { style: { padding: 0 } };
-                defaultStyle.styleType = props.loading ? 'gray2' : 'primary-dark';
+                defaultStyle.styleType = props.loading ? 'gray200' : 'primary-dark';
                 return defaultStyle;
             }),
             onClickConfirm: async () => {

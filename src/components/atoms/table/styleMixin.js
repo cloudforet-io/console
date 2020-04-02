@@ -1,4 +1,4 @@
-const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
+const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900'];
 export const mixin = {
     props: {
         styleType: {

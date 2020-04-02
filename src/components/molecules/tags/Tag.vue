@@ -1,6 +1,6 @@
 <template>
     <p-badge class="p-tag" :class="{deletable: deletable}"
-             style-type="gray2" v-on="$listeners"
+             style-type="gray200" v-on="$listeners"
     >
         <slot />
         <p-i v-if="deletable" name="ic_delete" width="1rem"
@@ -99,11 +99,11 @@ export default defineComponent({
         &.deletable {
             padding-right: 0.15rem;
             .icon {
-                @apply text-gray1;
+                @apply text-gray-400;
                 cursor: pointer;
             }
             &:hover {
-                @apply bg-gray3;
+                @apply bg-gray-100;
                 .icon {
                     @apply text-alert;
                 }

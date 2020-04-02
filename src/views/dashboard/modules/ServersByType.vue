@@ -114,7 +114,7 @@ export default {
         padding-bottom: 1rem;
     }
     .card-layout {
-        @apply border border-gray2;
+        @apply border border-gray-200;
         border-radius: 2px;
     }
 </style>

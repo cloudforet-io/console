@@ -40,7 +40,7 @@
                     <p-row style="height: 100%;">
                         <p-col>
                             <template v-if="item.labels">
-                                <p-badge v-for="(label, idx) in item.labels" :key="idx" style-type="gray3"
+                                <p-badge v-for="(label, idx) in item.labels" :key="idx" style-type="gray100"
                                          style="margin-right: .5rem;"
                                 >
                                     {{ label }}
@@ -245,7 +245,7 @@ export default {
     padding-top: 1.625rem;
     padding-bottom: 2.25rem;
     .beta {
-        @apply text-other1;
+        @apply text-coral;
         font-size: .5rem;
         font-weight: bold;
         vertical-align: super;

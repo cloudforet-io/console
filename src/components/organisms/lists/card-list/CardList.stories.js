@@ -92,13 +92,13 @@ export const extraSlot = () => ({
                 <template #extra>
                     <p-row style="height: 100%;">
                         <p-col>
-                            <p-badge style-type="gray3">
+                            <p-badge style-type="gray100">
                                 tag1
                             </p-badge>
-                            <p-badge style-type="gray3">
+                            <p-badge style-type="gray100">
                                 tag2
                             </p-badge>
-                            <p-badge style-type="gray3">
+                            <p-badge style-type="gray100">
                                 tag3
                             </p-badge>
                         </p-col>
