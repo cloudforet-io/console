@@ -4,7 +4,7 @@ import { autoProps } from '@sb/storybook-util';
 import { sampleDataGenerator } from './HorizontalBarChart.map';
 
 export default {
-    title: 'Organisms/charts/horizontal-bar-chart',
+    title: 'Organisms/charts/bar-chart-d3',
     component: PHorizontalBarChart,
     parameters: {
         centered: { disable: true },

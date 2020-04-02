@@ -105,7 +105,7 @@ export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(t
 
 // formatter
 export const timestampFormatter = value => getLocalDatetimeFromTimeStamp(value.seconds);
-export const chartTimestampFormatter = value => moment.tz(moment.unix(value.seconds), getTimezone()).format('MM/DD[\n]HH:mm');
+export const chartTimestampFormatter = value => moment.tz(moment.unix(value.seconds), getTimezone()).format('M/DD[\n]HH:mm');
 
 export const serverStateFormatter = ColorBindFactory(serverStateColor, value => value.toLowerCase());
 export const userStateFormatter = ColorBindFactory(userStateColor, value => value.toLowerCase());

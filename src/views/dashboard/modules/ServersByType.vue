@@ -25,7 +25,7 @@ import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 
 import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout.vue';
 import PHorizontalStackBarChart from '@/components/organisms/charts/horizontal-stack-bar-chart/HorizontalStackBarChart.vue';
-import PHorizontalBarChart from '@/components/organisms/charts/horizontal-bar-chart/HorizontalBarChart.vue';
+import PHorizontalBarChart from '@/components/organisms/charts/horizontal-bar-chart-d3/HorizontalBarChart.vue';
 import PCardLayout from '@/components/molecules/layouts/card-layout/CardLayout.vue';
 
 export default {

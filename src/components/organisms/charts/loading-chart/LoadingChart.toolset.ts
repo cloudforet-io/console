@@ -23,7 +23,6 @@ export interface LoadingChartPropsType {
     labels: any[];
     dataset: ChartData[];
     loading: boolean;
-    gradient: boolean;
 }
 
 export const loadingChartProps = {
@@ -43,10 +42,6 @@ export const loadingChartProps = {
         default: 'line',
     },
     loading: {
-        type: Boolean,
-        default: true,
-    },
-    gradient: {
         type: Boolean,
         default: true,
     },

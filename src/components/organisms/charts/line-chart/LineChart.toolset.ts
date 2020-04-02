@@ -1,5 +1,5 @@
 import { colorset } from '@/lib/util';
-import { dark } from '@/styles/colors';
+import { dark, gray3 } from '@/styles/colors';
 import Chart, { ChartOptions } from 'chart.js';
 import {
     loadingChartProps,
@@ -37,6 +37,10 @@ export const lineChartProps = {
         type: Number,
         default: undefined,
     },
+    gradient: {
+        type: Boolean,
+        default: true,
+    },
 };
 
 export interface LineChartPropsType extends LoadingChartPropsType {
@@ -44,6 +48,7 @@ export interface LineChartPropsType extends LoadingChartPropsType {
     styleType: string;
     min?: number;
     max?: number;
+    gradient: boolean;
 }
 
 /** *************** Settings ****************** */
@@ -113,6 +118,8 @@ const multiOptions: OptionsType<LineChartPropsType> = props => ({
             gridLines: {
                 display: true,
                 drawTicks: false,
+                color: gray3,
+                zeroLineColor: gray3,
             },
             ticks: {
                 display: true,
@@ -127,11 +134,17 @@ const multiOptions: OptionsType<LineChartPropsType> = props => ({
             gridLines: {
                 display: true,
                 drawTicks: false,
+                color: gray3,
+                zeroLineColor: gray3,
             },
             ticks: {
                 autoSkip: true,
                 autoSkipPadding: 50,
                 padding: 10,
+            },
+            afterTickToLabelConversion(scaleInstance) {
+                scaleInstance.ticks[0] = null;
+                scaleInstance.ticks[scaleInstance.ticks.length - 1] = null;
             },
         }],
     },
