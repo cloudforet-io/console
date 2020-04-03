@@ -141,7 +141,7 @@ const setDrawTools = (props, context) => {
 };
 
 export default {
-    name: 'PDonutChart',
+    name: 'PPieChart',
     events: ['legendClick'],
     components: { PChart, PChartLegend },
     directives: { tooltip: VTooltip },

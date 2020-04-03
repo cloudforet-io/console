@@ -17,7 +17,7 @@
   "dependencies": {
     "@johmun/vue-tags-input": "^2.1.0",
     "@storybook/addon-google-analytics": "^5.3.17",
-    "@vue/composition-api": "^0.4.0",
+    "@vue/composition-api": "^0.5.0",
     "animated-number-vue": "^1.0.0",
     "axios": "^0.19.1",
     "axios-auth-refresh": "^2.2.3",

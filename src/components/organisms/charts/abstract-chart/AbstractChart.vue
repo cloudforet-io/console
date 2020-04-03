@@ -14,57 +14,17 @@
 
 <script lang="ts">
 import {
-    computed,
-    defineComponent, getCurrentInstance, reactive, ref, toRefs, watch,
+    defineComponent,
 } from '@vue/composition-api';
-import Chart from 'chart.js';
 import {
-    loadingChartProps, LoadingChartPropsType,
-} from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
+    abstractChartProps,
+} from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
-export const chartSetup = (props: LoadingChartPropsType) => {
-    const chartRef: any = ref(null);
-    const vm: any = getCurrentInstance();
-
-    const state: any = reactive({
-        chart: null,
-        options: {},
-        plugins: [{}],
-        datasets: computed(() => props.dataset.map((d, i) => ({
-            label: d.label,
-            data: d.data,
-        }))),
-    });
-
-    const initChart = (): void => {
-        state.chart = new Chart(chartRef.value, {
-            type: props.type,
-            data: {
-                labels: props.labels,
-                datasets: vm.datasets,
-            },
-            options: vm.options,
-            plugins: vm.plugins,
-        });
-    };
-
-    watch(() => chartRef.value, (val) => {
-        if (val) vm.initChart();
-    });
-
-    return {
-        chartRef,
-        ...toRefs(state),
-        initChart,
-    };
-};
-
 export default defineComponent({
-    name: 'PLoadingChart',
-    props: loadingChartProps,
+    name: 'PAbstractChart',
+    props: abstractChartProps,
     components: { PLottie },
-    setup: chartSetup,
 });
 </script>
 
