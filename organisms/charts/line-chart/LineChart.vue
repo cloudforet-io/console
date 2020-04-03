@@ -7,7 +7,7 @@ import PAbstractChart from '@/components/organisms/charts/abstract-chart/Abstrac
 import {
     lineChartProps, LineChartPropsType, lineChartThemes,
 } from '@/components/organisms/charts/line-chart/LineChart.toolset';
-import { AbstractChartToolset, ChartToolsetType } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
+import { AbstractChartToolset, AbstractChartStateType } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
@@ -16,7 +16,7 @@ export default defineComponent({
     extends: PAbstractChart,
     props: lineChartProps,
     setup(props: LineChartPropsType) {
-        const state: UnwrapRef<ChartToolsetType> = new AbstractChartToolset<LineChartPropsType>(props, lineChartThemes).ts;
+        const state: UnwrapRef<AbstractChartStateType> = new AbstractChartToolset<LineChartPropsType>(props, lineChartThemes).chartState;
 
         return {
             ...toRefs(state),

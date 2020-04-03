@@ -2,12 +2,12 @@ import Chart, {
     ChartDataSets, ChartOptions, ChartPluginsOptions, ChartTooltipOptions,
 } from 'chart.js';
 import {
-    computed, reactive, Ref, SetupContext, toRefs, watch,
+    computed, reactive, Ref, watch,
 } from '@vue/composition-api';
 import { gray } from '@/styles/colors';
 import { colorset } from '@/lib/util';
 import {
-    HelperToolSet, initReactive, optionalType, StateToolSet,
+    HelperToolSet, initReactive, StateToolSet,
 } from '@/lib/toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
@@ -25,7 +25,7 @@ export const abstractChartProps = {
     },
     type: {
         type: String,
-        default: 'line',
+        default: '',
     },
     loading: {
         type: Boolean,
@@ -134,7 +134,7 @@ export const abstractChartThemes: ChartThemeGroupType<AbstractChartPropsType> = 
     },
 };
 
-export interface ChartToolsetType {
+export interface AbstractChartStateType {
     chartRef: HTMLCanvasElement | null;
     chart: Chart | null;
     options: Ref<ChartOptions> | Ref<Readonly<ChartOptions>>;
@@ -144,36 +144,37 @@ export interface ChartToolsetType {
 
 @HelperToolSet()
 export class AbstractChartToolset<D extends AbstractChartPropsType = AbstractChartPropsType> extends AbstractChartState<D> {
-    ts: UnwrapRef<ChartToolsetType>;
+    // TODO: ts -> chartState
+    chartState: UnwrapRef<AbstractChartStateType>;
 
-    // eslint-disable-next-line no-empty-function
+    // eslint-disable-next-line no-empty-function,@typescript-eslint/explicit-function-return-type
     static initToolSet() {}
 
     constructor(initData: D, themeGroup: ChartThemeGroupType<D> = abstractChartThemes) {
         super(initData);
-        this.ts = this.initChartState(themeGroup);
+        this.chartState = this.initChartState(themeGroup);
 
         // TODO: separate update logic and initiate logic
-        watch(() => this.ts.chartRef, (val) => {
+        watch(() => this.chartState.chartRef, (val) => {
             if (val) this.initChart();
         });
     }
 
-    initChartState(themeGroup: ChartThemeGroupType<D>): UnwrapRef<ChartToolsetType> {
+    initChartState(themeGroup: ChartThemeGroupType<D>): UnwrapRef<AbstractChartStateType> {
         return reactive({
             chartRef: null,
             chart: null,
             options: computed(() => themeGroup[this.state.styleType].options(this.state)),
             plugins: computed(() => themeGroup[this.state.styleType].plugins(this.state)),
             datasets: computed(() => {
-                if (this.ts.chartRef) {
+                if (this.chartState.chartRef) {
                     return this.state.dataset.map((d, i) => ({
                         label: d.label,
                         data: d.data,
                         borderColor: this.state.colors[i],
                         backgroundColor: this.state.colors[i],
                         // @ts-ignore
-                        ...themeGroup[this.state.styleType].settings(this.state, this.ts.chartRef, i),
+                        ...themeGroup[this.state.styleType].settings(this.state, this.chartState.chartRef, i),
                     }));
                 }
                 return [{}];
@@ -183,14 +184,14 @@ export class AbstractChartToolset<D extends AbstractChartPropsType = AbstractCha
 
     initChart(): void {
         // @ts-ignore
-        this.ts.chart = new Chart(this.ts.chartRef, {
+        this.chartState.chart = new Chart(this.chartState.chartRef, {
             type: this.state.type,
             data: {
                 labels: this.state.labels,
-                datasets: this.ts.datasets,
+                datasets: this.chartState.datasets,
             },
-            options: this.ts.options,
-            plugins: this.ts.plugins,
+            options: this.chartState.options,
+            plugins: this.chartState.plugins,
         });
     }
 }

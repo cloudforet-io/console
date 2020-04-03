@@ -14,6 +14,9 @@ export const lineChartProps = {
     type: {
         type: String,
         default: 'line',
+        validator(type: string): boolean {
+            return ['line'].includes(type);
+        },
     },
     styleType: {
         type: String,

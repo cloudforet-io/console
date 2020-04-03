@@ -12,8 +12,7 @@ export default {
 
 <style lang="postcss" scoped>
 .p-pane-layout {
-    @apply bg-white border border-gray-100;
-    box-shadow: 0 0 8px rgba(theme('colors.primary'), 0.08);
+    @apply bg-white border border-gray-200;
     border-radius: 2px;
 }
 </style>
