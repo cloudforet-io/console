@@ -1,15 +1,5 @@
 <template>
     <general-page-layout>
-        <!--        <template #sidebar="{width}">-->
-        <!--            <div :style="{width: width}">-->
-        <!--                <schema-filter-->
-        <!--                    :schema="schema"-->
-        <!--                    :selected-schema-id.sync="selectedSchemaId"-->
-        <!--                    @schemaChange="schemaChange"-->
-        <!--                />-->
-        <!--            </div>-->
-        <!--        </template>-->
-        <!--        <template #default>-->
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-toolbox-table
@@ -121,7 +111,6 @@
                             @confirm="credentialsFormConfirm"
                             @close="credentialsFormCancel"
         />
-        <!--        </template>-->
     </general-page-layout>
 </template>
 
@@ -163,13 +152,12 @@ export const CredentialsTableReactive = parent => reactive({
         // ['credential_id', 'COMMON.ID', { style: { width: '400px' } }],
         ['name', 'COMMON.NAME', { style: { width: '400px' } }],
         // ['provider', 'COMMON.PROVIDER', { style: { width: '400px' } }],
-        ['issue_type', 'COMMON.ISSUE_TYPE', { style: { width: '400px' } }],
-        ['credential_group_id', 'COMMON.GROUP', { style: { width: '800px' }, sortable: false }],
+        ['secret_type', 'SECRET.SECRET_TYPE', { style: { width: '400px' } }],
         ['created_at', 'COMMON.CREATED', { style: { width: '300px' } }],
     ],
     parent),
     multiSelectFields: makeTrItems([
-        ['credential_id', 'COMMON.ID', { style: { width: '400px' } }],
+        ['secret_id', 'COMMON.ID', { style: { width: '400px' } }],
         ['name', 'COMMON.NAME', { style: { width: '600px' } }],
     ],
     parent),
@@ -350,24 +338,8 @@ export const credentialsSetup = (props, context, eventName) => {
     });
 
     const getCredentials = () => {
-        // if (!schemaState.selectedSchemaId) {
-        //     return;
-        // }
         eventBus.$emit(eventName.getCredentialsList);
     };
-
-    // const listSchema = () => {
-    //     credentialsEventBus.$emit('getSchemaList');
-    //
-    // };
-    //
-    // const schemaChange = (schema) => {
-    //     state.selectedScheme = schema;
-    //     listSchema();
-    // };
-    //
-    // listSchema();
-    // getCredentials();
 
     return reactive({
         ...toRefs(state),
@@ -410,7 +382,6 @@ export default {
         GeneralPageLayout,
         PCredentialsForm,
         PButton,
-        PVerticalPageLayout2,
         PHorizontalLayout,
         PToolboxTable,
         PDropdownMenuBtn,
@@ -420,7 +391,6 @@ export default {
         PSearch,
         PBadge,
         PTableCheckModal,
-        SchemaFilter,
     },
     setup(props, context) {
         const dataBind = reactive({

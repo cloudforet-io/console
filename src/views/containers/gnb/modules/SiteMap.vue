@@ -105,11 +105,11 @@
                     </router-link>
                 </li>
 
-                <li>
-                    <router-link class="service" to="/secret/credentials-group">
-                        Credentials Group
-                    </router-link>
-                </li>
+<!--                <li>-->
+<!--                    <router-link class="service" to="/secret/credentials-group">-->
+<!--                        Credentials Group-->
+<!--                    </router-link>-->
+<!--                </li>-->
                 <li>
                     <router-link class="service" to="/secret/credentials">
                         Credentials
