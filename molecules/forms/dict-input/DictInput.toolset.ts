@@ -54,7 +54,7 @@ export class DictInputState<
         } as DictInputSyncType;
     }
 
-    constructor(initData: D = {} as D, initSyncData: SyncD = {} as SyncD, lazy: boolean = false) {
+    constructor(initData: D = {} as D, initSyncData: SyncD = {} as SyncD, lazy = false) {
         this.state = initReactive(lazy, DictInputState.initState(), initData);
         this.syncState = initReactive(lazy, DictInputState.initSyncState(), initSyncData);
     }
