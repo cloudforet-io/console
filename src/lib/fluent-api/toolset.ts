@@ -478,7 +478,7 @@ export abstract class GetDataAction<parameter, resp> extends QueryAPI<parameter,
     }
 
     setKeyPath(keyPath: string) {
-        // eslint-disable-next-line @typescript-eslint/camelcase
+        // @ts-ignore
         this.apiState.extraParameter.key_path = keyPath;
         return this.clone();
     }

@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import {
     CreateAction, GetAction, ListAction, Resource,
-    ResourceActions, SingleDeleteAction, TreeAction, UpdateAction,
+    ResourceActions, SingleDeleteAction, SingleItemAction, TreeAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
     ListType, ProjectGroupInfo, Tags, TimeStamp,
@@ -50,7 +50,6 @@ class List extends ListAction<ProjectListParameter, ProjectListResp> {
         return this.clone();
     }
 }
-
 
 interface ProjectTreeParameter {
     include_project: boolean;
