@@ -1,13 +1,13 @@
 /* eslint-disable camelcase */
-import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
+import PJsonSchemaFieldGroup from '@/components/organisms/forms/json-schema-field-group/JsonSchemaFieldGroup.vue';
 import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
-import md from './JsonSchemaForm.md';
+import md from './JsonSchemaFieldGroup.md';
 
 export default {
-    title: 'organisms/forms/json-schema-form',
-    component: PJsonSchemaForm,
+    title: 'organisms/forms/json-schema-field-group',
+    component: PJsonSchemaFieldGroup,
     parameters: {
         notes: md,
     },
@@ -66,10 +66,10 @@ const defaultSchema = {
 };
 
 export const defaultCase = () => ({
-    components: { PJsonSchemaForm },
+    components: { PJsonSchemaFieldGroup },
     template: `
     <div class="w-64">
-        <PJsonSchemaForm
+        <PJsonSchemaFieldGroup
                 v-for="form in forms"
                 :key="form.key"
                 v-model="data[form.key]"
@@ -96,10 +96,10 @@ export const defaultCase = () => ({
 });
 
 export const ignoreSchemaDefaultValue = () => ({
-    components: { PJsonSchemaForm },
+    components: { PJsonSchemaFieldGroup },
     template: `
     <div class="w-64">
-        <PJsonSchemaForm
+        <PJsonSchemaFieldGroup
                 v-for="form in forms"
                 :key="form.key"
                 v-model="data[form.key]"
@@ -149,10 +149,10 @@ export const ignoreSchemaDefaultValue = () => ({
 
 
 export const invalidForm = () => ({
-    components: { PJsonSchemaForm },
+    components: { PJsonSchemaFieldGroup },
     template: `
     <div class="w-64">
-        <PJsonSchemaForm
+        <PJsonSchemaFieldGroup
                 v-for="form in forms"
                 :key="form.key"
                 v-model="data[form.key]"

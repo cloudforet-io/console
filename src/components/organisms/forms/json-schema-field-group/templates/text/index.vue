@@ -7,7 +7,7 @@
                   :placeholder="schema.examples?schema.examples[0]||'':''"
     />
     <p-text-input v-else
-                  v-model.number="proxyValue"
+                  v-model.trim="proxyValue"
                   :class="{'is-invalid': typeof invalid === 'boolean' ? invalid : false}"
                   class="w-full"
                   :placeholder="schema.examples?schema.examples[0]||'':''"
