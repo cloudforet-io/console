@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
 import countries from 'countries-and-timezones';
-import PDonutChart from '@/components/organisms/charts/d3/donut-chart/DonutChart';
+import PDonutChart from '@/components/organisms/charts/d3/donut-chart/DonutChart.vue';
 import { autoProps } from '@sb/storybook-util';
 import { sampleDataGenerator } from '@/components/organisms/charts/d3/donut-chart/DonutChart.map';
 

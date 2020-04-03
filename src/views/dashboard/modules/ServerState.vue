@@ -13,14 +13,14 @@
 
 <script>
 import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout';
-import PDonutChart from '@/components/organisms/charts/d3/donut-chart/DonutChart';
+import PPieChart from '@/components/organisms/charts/d3/donut-chart/DonutChart';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 
 export default {
     name: 'ServerState',
     components: {
         PBoardLayout,
-        PDonutChart,
+        PPieChart,
     },
     props: {
         drawBy: {

@@ -1,39 +1,24 @@
 
 <script lang="ts">
-import {
-    computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
-import PLoadingChart, { chartSetup } from '@/components/organisms/charts/loading-chart/LoadingChart.vue';
+import { defineComponent, toRefs } from '@vue/composition-api';
+// @ts-ignore
+import PAbstractChart from '@/components/organisms/charts/abstract-chart/AbstractChart.vue';
 import {
     barChartProps,
-    BarChartPropsType,
-    options, plugins, settings,
+    BarChartPropsType, barChartThemes,
 } from '@/components/organisms/charts/bar-chart/BarChart.toolset';
-
-import { colorset } from '@/lib/util';
+import {
+    AbstractChartToolset,
+    ChartToolsetType,
+} from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 export default defineComponent({
     name: 'PBarChart',
-    extends: PLoadingChart,
+    extends: PAbstractChart,
     props: barChartProps,
     setup(props: BarChartPropsType) {
-        const state: any = reactive(chartSetup(props));
-
-        state.options = computed(() => options[props.styleType](props));
-        state.plugins = computed(() => plugins[props.styleType](props));
-        state.datasets = computed(() => {
-            if (state.chartRef) {
-                const res = props.dataset.map((d, i) => ({
-                    label: d.label,
-                    data: d.data,
-                    ...settings[props.styleType](props),
-                    borderColor: colorset[i],
-                    backgroundColor: colorset[i],
-                }));
-                return res;
-            }
-            return [{}];
-        });
+        const state: UnwrapRef<ChartToolsetType> = new AbstractChartToolset<BarChartPropsType>(props, barChartThemes).ts;
 
         return {
             ...toRefs(state),

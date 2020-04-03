@@ -6,18 +6,18 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
-import { donutChartProps } from '@/components/organisms/charts/donut-chart/DonutChart.toolset';
-import { ChartData } from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
-import PDonutChart from './DonutChart.vue';
+import { pieChartProps } from '@/components/organisms/charts/pie-chart/PieChart.toolset';
+import { ChartData } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
+import PPieChart from '@/components/organisms/charts/pie-chart/PieChart.vue';
 import casual, { arrayOf } from '@/lib/casual';
 
 export default {
-    title: 'organisms/charts/DonutChart',
-    component: PDonutChart,
+    title: 'organisms/charts/PieChart',
+    component: PPieChart,
     parameters: {
         info: {
             summary: '',
-            components: { PDonutChart },
+            components: { PPieChart },
         },
         knobs: { escapeHTML: false },
     },
@@ -31,8 +31,8 @@ const getState = (props, context) => {
 };
 
 export const defaultCase = () => ({
-    components: { PDonutChart },
-    props: getKnobProps(donutChartProps, {
+    components: { PPieChart },
+    props: getKnobProps(pieChartProps, {
         labels: arrayOf(7, () => casual.word),
         dataset: [
             new ChartData('line1', [12, 19, 3, 5, 2, 3, 9]),
@@ -41,9 +41,9 @@ export const defaultCase = () => ({
     }),
     template: `
     <div class="text-center" style="width: 80vw;">
-        <PDonutChart v-bind="$props" class="border border-gray" style="height: 170px; width: 170px;"></PDonutChart>
-        <PDonutChart v-bind="$props" class="border border-gray" style="height: 150px; width: 200px;"></PDonutChart>
-        <PDonutChart v-bind="$props" class="border border-gray" style="height: 250px; width: 200px;"></PDonutChart>
+        <PPieChart v-bind="$props" class="border border-gray" style="height: 170px; width: 170px;"></PPieChart>
+        <PPieChart v-bind="$props" class="border border-gray" style="height: 150px; width: 200px;"></PPieChart>
+        <PPieChart v-bind="$props" class="border border-gray" style="height: 250px; width: 200px;"></PPieChart>
     </div>`,
     setup(props, context) {
         const state = getState(props, context);
