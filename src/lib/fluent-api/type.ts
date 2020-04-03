@@ -50,10 +50,10 @@ export interface Query {
     page?: Page;
     sort?: Sort;
     keyword?: string;
-    count_only?:boolean;
+    count_only?: boolean;
 }
 
-export interface QueryApiState {
+export interface QueryApiState<T=any> {
     filter: FilterItem[];
     fixFilter: FilterItem[];
     only: string[];
@@ -62,13 +62,10 @@ export interface QueryApiState {
     sortBy: string;
     sortDesc: boolean;
     keyword: string;
-    extraParameter: any;
+    extraParameter: T;
     count_only: boolean;
     query: () => Query;
 }
-
-
-export interface QueryActionState<T> extends QueryApiState {}
 
 
 export interface DataSourceItem {
@@ -79,10 +76,10 @@ export interface DataSourceItem {
 }
 
 export interface DynamicFormItem {
-    type:string
-    is_required:boolean
-    name:string
-    key: string
+    type: string;
+    is_required: boolean;
+    name: string;
+    key: string;
 }
 
 
