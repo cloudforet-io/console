@@ -61,7 +61,7 @@ import {
     reactive, toRefs, computed, onMounted,
 } from '@vue/composition-api';
 import { VTooltip } from 'v-tooltip';
-import PChart, { setTooltips } from '@/components/molecules/charts/Chart.vue';
+import PChart, { setTooltips } from '@/components/molecules/charts/ChartD3.vue';
 import PChartLegend from '@/components/organisms/legends/ChartLegend.vue';
 import { colorset } from '@/lib/util';
 import colorStyles from '@/styles/colors';
@@ -141,7 +141,7 @@ const setDrawTools = (props, context) => {
 };
 
 export default {
-    name: 'PDonutChart',
+    name: 'PPieChart',
     events: ['legendClick'],
     components: { PChart, PChartLegend },
     directives: { tooltip: VTooltip },

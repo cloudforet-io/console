@@ -6,14 +6,14 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
-import { ChartData } from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
+import { ChartData } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
 import casual, { arrayOf } from '@/lib/casual';
 import { chartTimestampFormatter } from '@/lib/util';
 import PLineChart from '@/components/organisms/charts/line-chart/LineChart.vue';
 import { lineChartProps } from '@/components/organisms/charts/line-chart/LineChart.toolset';
 
 export default {
-    title: 'organisms/LineChart',
+    title: 'organisms/charts/LineChart',
     component: PLineChart,
     parameters: {
         info: {
@@ -70,10 +70,9 @@ export const multiCase = () => ({
         styleType: 'multi',
         loading: false,
         max: 500,
-        gradient: false,
     }),
     template: `
-    <div style="width: 80vw;">
+    <div class="bg-white" style="width: 80vw;">
         <PLineChart v-bind="$props" class="inline-block" style="min-height: 200px; min-width: 300px; height: 30%; width: 50%;"></PLineChart>
         <PLineChart v-bind="$props" class="inline-block" style="height: 200px; width: 300px;"></PLineChart>
         <PLineChart v-bind="$props" class="inline-block" style="height: 200px; width: 300px;"></PLineChart>

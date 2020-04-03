@@ -222,7 +222,7 @@ const setup = (props, context) => {
 
     const optionType = makeTrItems(selectiveOptions,
         context.parent,
-        { vbind: { styleType: 'dark', outline: true } });
+        { vbind: { styleType: 'gray900', outline: true } });
 
     const leftHalfValidations = {
         name: [requiredValidation(), credentialsNameValidation(context.parent)],

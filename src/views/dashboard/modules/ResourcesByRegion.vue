@@ -16,7 +16,7 @@
 
 <script>
 import PBoardLayout from '@/components/organisms/layouts/board-layout/BoardLayout.vue';
-import PBubbleChart from '@/components/organisms/charts/bubble-chart/BubbleChart.vue';
+import PBubbleChart from '@/components/organisms/charts/d3/bubble-chart/BubbleChart.vue';
 import DashboardEventBus from '@/views/dashboard/DashboardEventBus';
 
 export default {

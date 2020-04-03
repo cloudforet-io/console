@@ -2,14 +2,14 @@
     <p-toolbox-table
         :items="apiHandler.tableTS.state.items"
         :fields="fields"
-        :selectable="apiHandler.tableTS.state.selectable !== null? apiHandler.tableTS.state.selectable : true"
-        :sortable="apiHandler.tableTS.state.sortable !== null? apiHandler.tableTS.state.sortable : true"
-        :hover="apiHandler.tableTS.state.hover !== null? apiHandler.tableTS.state.hover : true"
-        :shadow="apiHandler.tableTS.state.shadow !== null? apiHandler.tableTS.state.shadow : true"
-        :border="apiHandler.tableTS.state.border !== null? apiHandler.tableTS.state.border : true"
-        :padding="apiHandler.tableTS.state.padding !== null? apiHandler.tableTS.state.padding : true"
-        :dragable="apiHandler.tableTS.state.dragable !== null? apiHandler.tableTS.state.dragable : true"
-        :multiSelect="apiHandler.tableTS.state.multiSelect !== null? apiHandler.tableTS.state.multiSelect : true"
+        :selectable="typeof apiHandler.tableTS.state.selectable === 'boolean'? apiHandler.tableTS.state.selectable : true"
+        :sortable="typeof apiHandler.tableTS.state.sortable === 'boolean'? apiHandler.tableTS.state.sortable : true"
+        :hover="typeof apiHandler.tableTS.state.hover === 'boolean'? apiHandler.tableTS.state.hover : true"
+        :shadow="typeof apiHandler.tableTS.state.shadow === 'boolean'? apiHandler.tableTS.state.shadow : true"
+        :border="typeof apiHandler.tableTS.state.border === 'boolean'? apiHandler.tableTS.state.border : true"
+        :padding="typeof apiHandler.tableTS.state.padding === 'boolean'? apiHandler.tableTS.state.padding : true"
+        :dragable="typeof apiHandler.tableTS.state.dragable === 'boolean'? apiHandler.tableTS.state.dragable : true"
+        :multi-select="typeof apiHandler.tableTS.state.multiSelect === 'boolean'? apiHandler.tableTS.state.multiSelect : true"
         :all-page="apiHandler.tableTS.state.allPage"
         :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
         :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
@@ -65,32 +65,32 @@ import PQuerySearchTags from '@/components/organisms/search/query-search-tags/Qu
 
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
-import {QuerySearchTableAPI} from "@/lib/api/table";
+import { QuerySearchTableAPI } from '@/lib/api/table';
 
 interface DataSourceType {
-    name:string;
-    key:string;
-    view_type?:string;
-    view_option?:any;
+    name: string;
+    key: string;
+    view_type?: string;
+    view_option?: any;
 }
 
 interface Props {
     data_source: DataSourceType[];
     data: any;
-    rootMode:boolean;
-    apiHandler:QuerySearchTableAPI;
+    rootMode: boolean;
+    apiHandler: QuerySearchTableAPI;
 }
 
 interface SlotBind {
-    name:string;
-    view_type:string;
-    view_option:any;
-    path:string[];
+    name: string;
+    view_type: string;
+    view_option: any;
+    path: string[];
 }
 
 interface Field {
-    name:string;
-    label:string;
+    name: string;
+    label: string;
 }
 
 
@@ -123,12 +123,12 @@ export default {
             default: () => ({ height: '24rem', 'overflow-y': 'auto' }),
         },
     },
-    setup(props:Props) {
-        const fields:Ref<Readonly<Field[]>> = computed(():Field[] => props.data_source.map((ds:DataSourceType):Field => ({
+    setup(props: Props) {
+        const fields: Ref<Readonly<Field[]>> = computed((): Field[] => props.data_source.map((ds: DataSourceType): Field => ({
             name: ds.key,
             label: ds.name,
         })));
-        const slots:Ref<Readonly<SlotBind[]>> = computed(():SlotBind[] => props.data_source.map((ds:DataSourceType):SlotBind => ({
+        const slots: Ref<Readonly<SlotBind[]>> = computed((): SlotBind[] => props.data_source.map((ds: DataSourceType): SlotBind => ({
             name: `col-${ds.key}-format`,
             view_type: ds.view_type || 'text',
             view_option: ds.view_option,

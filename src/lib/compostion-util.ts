@@ -205,6 +205,9 @@ export const formValidation = (data: any, validation: object) => {
 };
 
 export const requiredValidation = (invalidMessage?: message) => new Validation(value => isNotEmpty(value), invalidMessage || 'Required field!');
+// eslint-disable-next-line max-len
+export const noEmptySpaceValidation = (invalidMessage?: message) => new Validation((value: string) => isNotEmpty(value) && value.trim().length === value.length, invalidMessage || 'You Must Remove Empty Space');
+
 
 export const jsonParseValidation = (invalidMessage: message) => new Validation((value) => {
     try {

@@ -1,5 +1,5 @@
 import { withKnobs  } from '@storybook/addon-knobs/vue';
-import PChart from './Chart.vue';
+import PChart from '@/components/molecules/charts/ChartD3.vue';
 import { autoProps } from '@sb/storybook-util';
 
 export default {

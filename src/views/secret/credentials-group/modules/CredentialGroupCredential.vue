@@ -44,7 +44,7 @@
                 </p-button>
             </template>
             <template #col-credential_groups-format="{value}">
-                <p-badge v-for="(grp, index) in value" :key="index" style-type="gray2"
+                <p-badge v-for="(grp, index) in value" :key="index" style-type="gray200"
                          class="group-badge"
                 >
                     {{ grp.name }}

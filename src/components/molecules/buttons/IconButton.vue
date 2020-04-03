@@ -38,7 +38,7 @@ export default defineComponent({
         buttonStyle: {
             type: String,
             default: 'transparent',
-            validator: value => ['white', 'transparent', 'dark'].indexOf(value) !== -1,
+            validator: value => ['white', 'transparent', 'gray900'].indexOf(value) !== -1,
         },
         disabled: {
             type: Boolean,
@@ -90,37 +90,37 @@ export default defineComponent({
         max-width: 2rem;
         min-height: 2rem;
         max-height: 2rem;
-        @apply text-gray1;
+        @apply text-gray-400;
         &:hover {
             @apply text-white;
         }
         &.disabled {
-            @apply bg-gray2;
+            @apply bg-gray-200;
             cursor: unset;
             &:hover {
                 color: inherit;
             }
         }
         &.white {
-            @apply bg-white border-gray2;
+            @apply bg-white border-gray-200;
             &:hover {
-                @apply text-gray2;
+                @apply text-gray-200;
             }
         }
-        &.dark {
-            @Qapply bg-dark;
+        &.gray900 {
+            @apply bg-gray-900;
         }
         &:not(:disabled):not(.disabled):hover {
             @apply bg-secondary border-secondary;
         }
         &.transparent {
             &.disabled {
-                color: theme('colors.gray2') !important;;
+                color: theme('colors.gray.200') !important;;
                 border-color: transparent !important;
                 background-color: transparent !important;
                 cursor: unset;
                 &:hover {
-                    color: theme('colors.gray2') !important;;
+                    color: theme('colors.gray.200') !important;;
                 }
             }
         }

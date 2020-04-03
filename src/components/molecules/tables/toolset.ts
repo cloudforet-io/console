@@ -2,7 +2,7 @@ import { reactive } from '@vue/composition-api';
 import { optionalType, StateToolSet } from '@/lib/toolset';
 
 
-const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
+const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900'];
 export const tableProps = {
     tableStyleType: {
         type: String,
@@ -15,7 +15,7 @@ export const tableProps = {
         type: String,
         default: null,
         validator(value) {
-            return [null, 'light', 'dark'].indexOf(value) !== -1;
+            return [null, 'light', 'gray900'].indexOf(value) !== -1;
         },
     },
     responsiveStyle: {
@@ -76,6 +76,10 @@ export const tableProps = {
         validator(value) {
             return [false, true, 'sm', 'md', 'lg', 'xl'].indexOf(value) !== -1;
         },
+    },
+    tbodyOnSelectStart: {
+        type: Boolean,
+        default: true,
     },
 };
 

@@ -37,7 +37,7 @@
                     <template v-slot:col-labels-format="data">
                         <div>
                             <PBadge v-for="(label, idx) in data.item.labels" :key="idx"
-                                    class="p-label" style-type="gray2"
+                                    class="p-label" style-type="gray200"
                             >
                                 {{ getEmptyString(label) }}
                             </PBadge>
@@ -85,7 +85,7 @@ export default {
             selectIndex: [],
             buttons: {
                 cancelButton: {
-                    styleType: 'dark',
+                    styleType: 'gray900',
                     outline: true,
                 },
                 confirmButton: {
@@ -209,7 +209,7 @@ export default {
 </script>
 <style lang="postcss" scoped>
     .p-label {
-        @apply text-dark;
+        @apply text-gray-900;
         margin-bottom:5px;
         margin-right: 0.5rem;
     }
@@ -223,7 +223,7 @@ export default {
     }
 
     .tag-input {
-        @bg-primary4 border border-gray3;
+        @bg-primary4 border border-gray-100;
         height: 20vh;
         overflow-y: auto;
         opacity: 1;

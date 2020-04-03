@@ -287,7 +287,7 @@ export default {
 </script>
 <style lang="postcss" scoped>
     .tag-input {
-        @apply bg-primary4 border border-gray3;
+        @apply bg-primary4 border border-gray-100;
         height: 20vh;
         overflow-y: auto;
         opacity: 1;

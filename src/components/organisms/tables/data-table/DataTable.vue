@@ -15,6 +15,7 @@
         :background="background"
         :top-border="topBorder"
         :responsive="responsive"
+        :tbody-on-select-start="!isDragging"
     >
         <template #caption>
             <slot name="caption" />
@@ -85,7 +86,6 @@
                     <p-tr :key="index" :data-index="index"
                           :class="{'tr-selected': isSelected(index)} "
                           v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
-                          onselectstart="return false"
                           @click.left="rowLeftClick( item, index, $event )"
                           @click.right="rowRightClick( item, index, $event )"
                           @click.middle="rowMiddleClick( item, index, $event )"
@@ -143,7 +143,7 @@
 <script lang="ts">
 import DragSelect from 'dragselect';
 import {
-    toRefs, computed, reactive, watch, onMounted, Ref, defineComponent,
+    toRefs, computed, reactive, watch, onMounted, Ref, defineComponent, ref,
 } from '@vue/composition-api';
 import _ from 'lodash';
 import PTable from '@/components/molecules/tables/Table.vue';
@@ -218,6 +218,7 @@ export default defineComponent({
             }
             return false;
         });
+        const isDragging = ref(false);
         const dragSelectItems = (items) => {
             const select = [];
             if (items.length > 1) {
@@ -227,6 +228,11 @@ export default defineComponent({
                 });
                 proxySelectIndex.value = select;
             }
+            isDragging.value = false;
+        };
+
+        const dragStart = () => {
+            isDragging.value = true;
         };
 
         const makeTableText = (el) => {
@@ -368,6 +374,7 @@ export default defineComponent({
                     selectables: dragSelectAbles.value,
                     area: selectArea.value,
                     callback: dragSelectItems,
+                    onDragStart: dragStart,
                 });
             }
         });
@@ -424,6 +431,7 @@ export default defineComponent({
             isThOver,
             clickColCopy,
             getValueFunc,
+            isDragging,
         };
     },
 
@@ -463,7 +471,7 @@ export default defineComponent({
                     justify-content: space-between;
                 }
                 .sort-icon {
-                    @apply text-gray2;
+                    @apply text-gray-200;
                     float: right;
                 }
                 &.fix-width {

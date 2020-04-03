@@ -76,7 +76,7 @@
                 </p-tag>
             </p-box-layout>
             <p-row>
-                <p-button class="cancel-btn" style-type="dark" outline
+                <p-button class="cancel-btn" style-type="gray900" outline
                           @click="goBack"
                 >
                     {{ $t('BTN.CANCEL') }}

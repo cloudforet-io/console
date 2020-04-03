@@ -1,11 +1,11 @@
 // eslint-disable-next-line import/no-extraneous-dependencies,import/extensions
 import { text, number } from '@storybook/addon-knobs/vue';
-import PBubbleChart from './BubbleChart';
+import PBubbleChart from '@/components/organisms/charts/d3/bubble-chart/BubbleChart.vue';
 import { autoProps } from '@sb/storybook-util';
-import { sampleDataGenerator } from './BubbleChart.map';
+import { sampleDataGenerator } from '@/components/organisms/charts/d3/bubble-chart/BubbleChart.map';
 
 export default {
-    title: 'Organisms/charts/bubble-chart',
+    title: 'organisms/charts/d3/bubble-chart',
     component: PBubbleChart,
     parameters: {
         centered: { disable: true },

@@ -73,6 +73,9 @@ export default {
         theme: {
             type: String,
             default: 'secondary',
+            validator(theme) {
+                return ['secondary', 'gray900'].includes(theme);
+            },
         },
         loading: {
             type: Boolean,
@@ -128,7 +131,7 @@ export default {
 <style lang="postcss" scoped>
 
     @define-mixin context-item-them $theme, $color, $hover-bg-color, $hover-color, $active-bg-color, $active-color, $disabled-color {
-        &.$(theme){
+        &.$(theme) {
             color: $color;
             &:hover {
                 background-color: $hover-bg-color;
@@ -166,19 +169,21 @@ export default {
         &.$(theme) {
             background-color: $bg-color;
             border: 1px solid $border-color;
-            .context-divider{
+            .context-divider {
                 border-top-color: $border-color;
             }
         }
     }
-    .no-drag {-ms-user-select: none; -moz-user-select: none; -webkit-user-select: none; -khtml-user-select: none; user-select:none;}
+    .no-drag {
+        user-select: none;
+    }
 
     .p-context-menu {
-        padding: 0px;
+        padding: 0;
         border-radius: 2px;
-        margin: 0px;
+        margin: 0;
         min-width: 8.5rem;
-        cursor:default;
+        cursor: default;
         position: absolute;
         top: 95%;
         left: 0;
@@ -189,41 +194,43 @@ export default {
         background-clip: padding-box;
         display: block;
 
-        .context-divider{
+        .context-divider {
             margin: 0;
             border-top-width: 1px;
             border-top-style: solid;
         }
-        @mixin context-menu-color secondary, theme('colors.secondary2'), theme('colors.secondary');
-        @mixin context-menu-color dark, theme('colors.white'), theme('colors.dark');
 
-        .context-content{
+        @mixin context-menu-color secondary, theme('colors.secondary2'), theme('colors.secondary');
+        @mixin context-menu-color gray900, theme('colors.white'), theme('colors.gray.900');
+
+        .context-content {
             padding-left: 1rem;
             padding-right: 1rem;
-
         }
-        .context-header{
+        .context-header {
             margin-top: 0.875rem;
             margin-bottom: 0.25rem;
-            font: Bold 12px Arial;
-            @mixin context-header-theme secondary, theme('colors.dark');
-            @mixin context-header-theme dark, theme('colors.gray1');
+            font-weight: bold;
+            font-size: 0.75rem;
+
+            @mixin context-header-theme secondary, theme('colors.gray.900');
+            @mixin context-header-theme gray900, theme('colors.gray.400');
         }
-        .context-item{
+        .context-item {
             display: block;
             padding-bottom: 0.5rem;
             padding-top: 0.5rem;
             line-height: 1rem;
-            font-size: .875rem;
+            font-size: 0.875rem;
             cursor: pointer;
-            &:active{
+            &:active {
                 font-weight: bold;
             }
             white-space: nowrap;
-            @mixin context-item-them secondary, theme('colors.secondary'), theme('colors.secondary'), theme('colors.white'), theme('colors.secondary2'),
-                                     theme('colors.secondary'), theme('colors.gray2');
-            @mixin context-item-them dark, theme('colors.dark'), theme('colors.gray3'), theme('colors.dark'), theme('colors.white'), theme('colors.dark'), theme('colors.gray2');
-        }
 
+            @mixin context-item-them secondary, theme('colors.secondary'), theme('colors.secondary'), theme('colors.white'), theme('colors.secondary2'),
+                                     theme('colors.secondary'), theme('colors.gray.200');
+            @mixin context-item-them gray900, theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'), theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
+        }
     }
 </style>

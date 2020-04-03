@@ -52,7 +52,7 @@ export const defaultCase = () => ({
                             v-on="actions"
         >
         </p-dict-input-group>
-        <p-button class="my-5" style-type="dark" @click="allValidation()">Validate</p-button>
+        <p-button class="my-5" style-type="gray900" @click="allValidation()">Validate</p-button>
         <div class="border border-primary py-3 rounded w-full">
             <pre>{{items}}</pre>
         </div>

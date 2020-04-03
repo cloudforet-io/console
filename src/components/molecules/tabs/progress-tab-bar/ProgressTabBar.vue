@@ -100,7 +100,7 @@ $height: 2.5rem;
     align-items: center;
     justify-content: center;
     .tab-nav-item {
-        @apply bg-gray3 border-t border-b border-gray2 text-gray;
+        @apply bg-gray-100 border-t border-b border-gray-200 text-gray;
         position: relative;
         display: flex;
         align-items: center;
@@ -111,37 +111,37 @@ $height: 2.5rem;
         font-size: .875rem;
         cursor: pointer;
         &:last-child {
-            @apply border-r border-gray2;
+            @apply border-r border-gray-200;
             .triangle, .triangle-bg {
                 display: none;
             }
         }
         &:first-child {
-            @apply border-l border-gray2;
+            @apply border-l border-gray-200;
         }
         &.active {
-            @apply bg-dark border-dark text-white;
+            @apply bg-gray-900 border-gray-900 text-white;
             font-size: 1rem;
             font-weight: bold;
             .triangle {
-                @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.dark');
+                @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.gray.900');
             }
             .triangle-bg {
-                @mixin triangle-color calc($(height) / 2), theme('colors.dark');
+                @mixin triangle-color calc($(height) / 2), theme('colors.gray.900');
             }
         }
         &.done {
-            @apply border-dark bg-white;
+            @apply border-gray-900 bg-white;
             .triangle {
                 @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.white');
             }
             .triangle-bg {
-                @mixin triangle-color calc($(height) / 2), theme('colors.dark');
+                @mixin triangle-color calc($(height) / 2), theme('colors.gray.900');
             }
             &.active {
-                @apply bg-dark;
+                @apply bg-gray-900;
                 .triangle {
-                    @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.dark');
+                    @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.gray.900');
                 }
             }
         }
@@ -162,10 +162,10 @@ $height: 2.5rem;
             }
         }
         .triangle {
-            @mixin triangle calc(($(height) / 2) - 1px), 2, theme('colors.gray3');
+            @mixin triangle calc(($(height) / 2) - 1px), 2, theme('colors.gray.100');
         }
         .triangle-bg {
-            @mixin triangle calc($(height) / 2), 1, theme('colors.gray2');
+            @mixin triangle calc($(height) / 2), 1, theme('colors.gray.200');
         }
         .help {
             margin-left: .5rem;

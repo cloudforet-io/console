@@ -1,49 +1,22 @@
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    defineComponent, toRefs,
 } from '@vue/composition-api';
-import PLoadingChart, { chartSetup } from '@/components/organisms/charts/loading-chart/LoadingChart.vue';
+// @ts-ignore
+import PAbstractChart from '@/components/organisms/charts/abstract-chart/AbstractChart.vue';
 import {
-    lineChartProps, LineChartPropsType, options, settings, plugins,
+    lineChartProps, LineChartPropsType, lineChartThemes,
 } from '@/components/organisms/charts/line-chart/LineChart.toolset';
-import Chart from 'chart.js';
-import hexToRgba from 'hex-to-rgba';
-import { colorset } from '@/lib/util';
+import { AbstractChartToolset, ChartToolsetType } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
 export default defineComponent({
-    name: 'LineChart',
-    extends: PLoadingChart,
+    name: 'PLineChart',
+    extends: PAbstractChart,
     props: lineChartProps,
     setup(props: LineChartPropsType) {
-        const state: any = reactive(chartSetup(props));
-
-        const getGradientColor = (color: string) => {
-            const ctx: CanvasRenderingContext2D = state.chartRef.getContext('2d');
-            const gradient = ctx.createLinearGradient(0, 0, 0, 150);
-            gradient.addColorStop(0, hexToRgba(color, 0.25));
-            gradient.addColorStop(0.5, hexToRgba(color, 0.125));
-            gradient.addColorStop(1, hexToRgba(color, 0));
-            return gradient;
-        };
-
-        state.options = computed(() => options[props.styleType](props));
-        state.plugins = computed(() => plugins[props.styleType](props));
-        state.datasets = computed(() => {
-            if (state.chartRef) {
-                const res = props.dataset.map((d, i) => ({
-                    label: d.label,
-                    data: d.data,
-                    ...settings[props.styleType](props),
-                    borderColor: props.color || colorset[i],
-                    backgroundColor: props.gradient
-                        ? getGradientColor(props.color || colorset[i])
-                        : hexToRgba(props.color || colorset[i], 0.04),
-                }));
-                return res;
-            }
-            return [];
-        });
+        const state: UnwrapRef<ChartToolsetType> = new AbstractChartToolset<LineChartPropsType>(props, lineChartThemes).ts;
 
         return {
             ...toRefs(state),
