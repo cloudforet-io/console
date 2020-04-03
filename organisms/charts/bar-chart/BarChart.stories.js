@@ -7,7 +7,7 @@ import {
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
 import { barChartProps } from '@/components/organisms/charts/bar-chart/BarChart.toolset';
-import { ChartData } from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
+import { ChartData } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
 import casual, { arrayOf } from '@/lib/casual';
 import PBarChart from '@/components/organisms/charts/bar-chart/BarChart.vue';
 

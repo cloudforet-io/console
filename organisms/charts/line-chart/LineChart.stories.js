@@ -6,7 +6,7 @@ import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
 import { getKnobProps } from '@sb/storybook-util';
-import { ChartData } from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
+import { ChartData } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
 import casual, { arrayOf } from '@/lib/casual';
 import { chartTimestampFormatter } from '@/lib/util';
 import PLineChart from '@/components/organisms/charts/line-chart/LineChart.vue';
@@ -70,7 +70,6 @@ export const multiCase = () => ({
         styleType: 'multi',
         loading: false,
         max: 500,
-        gradient: false,
     }),
     template: `
     <div class="bg-white" style="width: 80vw;">
