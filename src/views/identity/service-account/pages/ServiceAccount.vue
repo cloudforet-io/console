@@ -44,7 +44,10 @@
                                 :details="accountDetails"
                                 :data="apiHandler.tableTS.selectState.firstSelectItem"
                             />
-                            <p-dict-panel :dict.sync="apiHandler.tableTS.selectState.firstSelectItem.tags" />
+                            <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
+                                          :edit-mode.sync="tagsApi.ts.syncState.editMode"
+                                          v-on="tagsApi.ts.listeners"
+                            />
                         </template>
                         <template #credentials>
                             <p-dynamic-view view_type="table"
@@ -150,6 +153,7 @@ import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
 
 export default {
     name: 'ServiceAccount',
@@ -466,6 +470,15 @@ export default {
             }
             formState.formVisible = false;
         };
+
+        const tagsApi = new DictPanelAPI(fluentApi.identity().serviceAccount());
+
+        watch(() => apiHandler.tableTS.selectState.firstSelectItem, async (item) => {
+            console.debug(item);
+            tagsApi.setId(item.service_account_id);
+            tagsApi.ts.toReadMode();
+            await tagsApi.getData();
+        });
         apiHandler.getData();
         return {
             apiHandler,
@@ -489,7 +502,7 @@ export default {
             clickOpenForm,
             formConfirm,
             ...toRefs(formState),
-
+            tagsApi,
         };
     },
 
