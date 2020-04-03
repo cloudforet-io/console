@@ -140,7 +140,6 @@ import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/Proj
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import { AdminFluentAPI, SearchTableFluentAPI, TabSearchTableFluentAPI } from '@/lib/api/table';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
 import { SelectableListToolset } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
@@ -154,6 +153,7 @@ import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
 import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 
 export default {
     name: 'ServiceAccount',
