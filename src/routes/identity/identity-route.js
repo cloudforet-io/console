@@ -28,9 +28,9 @@ export default {
             component: User,
         },
         {
-            path: 'cloud-account',
-            name: 'cloudAccount',
-            meta: { label: 'Cloud Account', breadcrumb: true },
+            path: 'service-account',
+            name: 'serviceAccount',
+            meta: { label: 'Service Account', breadcrumb: true },
             component: ServiceAccount,
         },
     ],

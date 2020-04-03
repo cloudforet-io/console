@@ -154,7 +154,7 @@ import {
     Validation,
     lengthMaxValidation,
     lengthMinValidation,
-    checkTimeZoneValidation,
+    checkTimeZoneValidation, noEmptySpaceValidation,
 } from '@/lib/compostion-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup_origin.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
@@ -212,7 +212,7 @@ const setup = (props, context) => {
 
     const addUserValidations = { ...defaultValidation };
     const updateUserValidations = { ...defaultValidation };
-    const userIdVds = [requiredValidation(), userIDValidation(context.parent)];
+    const userIdVds = [requiredValidation(), noEmptySpaceValidation(), userIDValidation(context.parent)];
 
     const pluginAuthIDValidation = parent => new Validation(async (value) => {
         let result = false;
@@ -239,7 +239,7 @@ const setup = (props, context) => {
     } else {
         // eslint-disable-next-line camelcase
         addUserValidations.user_id = [...userIdVds];
-        addUserValidations.password1 = [requiredValidation(), lengthMinValidation(5), lengthMaxValidation(12)];
+        addUserValidations.password1 = [requiredValidation(), noEmptySpaceValidation(), lengthMinValidation(5), lengthMaxValidation(12)];
         addUserValidations.password2 = [requiredValidation(), pwdCheckValidation];
 
         updateUserValidations.password1 = [lengthMinValidation(5), lengthMaxValidation(12)];

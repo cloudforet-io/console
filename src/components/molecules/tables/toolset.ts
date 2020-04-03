@@ -77,6 +77,10 @@ export const tableProps = {
             return [false, true, 'sm', 'md', 'lg', 'xl'].indexOf(value) !== -1;
         },
     },
+    tbodyOnSelectStart: {
+        type: Boolean,
+        default: true,
+    },
 };
 
 
