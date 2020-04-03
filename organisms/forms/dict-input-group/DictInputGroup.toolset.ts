@@ -191,13 +191,18 @@ export const getNewDict = (items: DictItem[], invalidMessages: InvalidMessage) =
     return res;
 };
 
+interface VdState {
+    isAllValid: boolean;
+    newDict: {[id: string]: string};
+}
+
 @HelperToolSet()
 export class DictIGToolSet<D=any, SyncD=DictIGSyncType> extends DictIGState<D, SyncD> {
     allValidation: ((type?: string, reset?: boolean) => boolean) = null as any;
 
     itemValidation: (idx: number, type?: string) => boolean = null as any;
 
-    vdState: UnwrapRef<any> = null as any;
+    vdState: UnwrapRef<VdState> = null as unknown as UnwrapRef<VdState>;
 
     events: any = {
         'change:value': _.debounce((idx) => { this.itemValidation(idx, 'value'); }, 100),
