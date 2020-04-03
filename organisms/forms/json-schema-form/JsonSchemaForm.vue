@@ -1,125 +1,52 @@
 <template>
-    <div>
-        <p-field-group :label="schema.title"
-                       :required="required"
-                       :invalid-text="invalidText"
-                       :invalid="typeof invalid === 'boolean' ? invalid : false"
-        >
-            <div class="form-container">
-                <component
-                    :is="component"
-                    v-model="proxyValue"
-                    :schema="schema"
-                    :invalid="invalid"
-                />
-            </div>
-        </p-field-group>
-    </div>
+    <fragment>
+        <PJsonSchemaFieldGroup
+            v-for="field in properties"
+            :key="field.key"
+            :value="item[field.key]"
+            :schema="field.schema"
+            :invalid="invalidState[field.key]||false"
+            :invalid-text="invalidText[field.key]||''"
+            :required="field.required||false"
+            @input="updateData(field.key,$event)"
+        />
+    </fragment>
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase,vue/prop-name-casing,@typescript-eslint/camelcase */
-import PFieldGroup from '@/components/molecules/forms/field-group/FieldGroup.vue';
+import { Fragment } from 'vue-fragment';
+import { JsonSchemaFormProps, JsonSchemaProperty } from '@/components/organisms/forms/json-schema-form/toolset';
+import PJsonSchemaFieldGroup from '@/components/organisms/forms/json-schema-field-group/JsonSchemaFieldGroup.vue';
 
-import {
-    computed, defineComponent, onMounted, reactive, toRefs,
-} from '@vue/composition-api';
-import { Computed } from '@/lib/type';
-import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-
-
-interface State {
-    component: any;
-    loader: Computed<() => Promise<any>>;
-    proxyValue: any;
-    type: string;
-}
-export interface JsonFieldSchema {
-    type: string;
-    title: string;
-    default?: any;
-}
-interface Props{
-    key: string;
-    schema: JsonFieldSchema;
-    required: boolean;
-    value: any|undefined;
-    invalidText: string;
-    invalid: boolean|undefined;
-}
-export default defineComponent({
+export default {
     name: 'PJsonSchemaForm',
-    model: {
-        prop: 'value',
-        event: 'input',
-    },
-    components: { PFieldGroup },
+    components: { Fragment, PJsonSchemaFieldGroup },
     props: {
-        schema: {
+        item: {
             type: Object,
-            required: true,
-        },
-        required: {
-            type: Boolean,
-            required: false,
-        },
-        value: {
             default: undefined,
+        },
+        properties: {
+            type: Array,
+            default: (): JsonSchemaProperty[] => ([]),
         },
         invalidText: {
-            type: String,
-            default: '',
+            type: Object,
+            default: () => ({}),
         },
-        invalid: {
-            type: Boolean,
-            default: undefined,
+        invalidState: {
+            type: Object,
+            default: () => ({}),
         },
     },
-    setup(props: Props, context) {
-        // noinspection TypeScriptCheckImport
-        const state: UnwrapRef<State> = reactive({
-            component: null,
-            type: computed<string>(() => {
-                if (Object.prototype.hasOwnProperty.call(props.schema, 'enum')) {
-                    return 'enum';
-                } if (['string', 'number', 'integer'].includes(props.schema.type)) {
-                    return 'text';
-                }
-                return props.schema.type;
-            }),
-            loader: computed<() => Promise<any>>(() => () => import(`./templates/${state.type}/index.vue`)),
-            proxyValue: computed({
-                get: () => props.value,
-                set: (val) => {
-                    context.emit('input', val); // for v-model
-                },
-            }),
-        });
+    setup(props: JsonSchemaFormProps, context) {
+        const updateData = (key, val) => {
+            context.emit('update:item', { ...props.item, [key]: val });
+        };
 
-        onMounted((): void => {
-            // @ts-ignore
-            state.loader().then(() => {
-                // @ts-ignore
-                state.component = () => state.loader();
-            })
-                .catch(() => {
-                    // eslint-disable-next-line import/no-unresolved
-                    state.component = () => import('./templates/text/index.vue');
-                });
-            if (!['boolean', 'string', 'number'].includes(typeof state.proxyValue) && Object.prototype.hasOwnProperty.call(props.schema, 'default')) {
-                state.proxyValue = props.schema.default;
-            }
-        });
         return {
-            ...toRefs(state),
+            updateData,
         };
     },
-});
+};
 </script>
-
-<style lang="postcss" scoped>
-    .form-container {
-        display: flex;
-        width: 100%;
-    }
-</style>
