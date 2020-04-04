@@ -27,10 +27,19 @@
                 >
                     <template #card="{item}">
                         <div>
-                            {{ item }}
+                            {{ item.projectGroupName }}<br>
+                            {{ item.projectName }}<br><br><br>
+
+                            <img v-for="(url, index) in item.providers" :src="url" :key="index" style="width:32px; height:32px; display: inline"/>
+                            <span v-if="item.extraProviders"> + {{item.extraProviders}}</span>
                         </div>
-                        <div v-if="item.summery">
-                            {{ item.summery }}
+                        <br>
+                        <br>
+                        <hr class="solid">
+                        <div v-if="item.summary">
+                            Cloud Service   {{ item.summary.cloudService }}<br>
+                            Server   {{ item.summary.server }}<br>
+                            Member   {{ item.summary.members }}
                         </div>
                         <div v-else>
                             loading
@@ -70,24 +79,28 @@ import PEmpty from '@/components/atoms/empty/Empty.vue';
 import fluentApi from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
+import { AxiosResponse } from 'axios';
+import { useStore } from '@/store/toolset';
+import { ProviderListResp } from '@/lib/fluent-api/identity/provider';
 
 
-interface ProjectSummery{
+interface ProjectSummary{
         cloudService: number;
         server: number;
         members: number;
 }
 
-interface Summery {
-        [id: string]: ProjectSummery;
+interface Summary {
+        [id: string]: ProjectSummary;
 }
 
 interface ProjectCardData{
         projectGroupName: string;
         projectId: string;
         projectName: string;
-        providers?: string[];
-        summery?: ProjectSummery;
+        providers: string[];
+        extraProviders: number;
+        summary?: ProjectSummary;
 }
 
 interface State {
@@ -114,34 +127,36 @@ export default defineComponent({
             item: [],
             items: [],
         });
-        const summery = ref<Summery>({});
+        const summary = ref<Summary>({});
 
+        const { provider } = useStore();
+        provider.getProvider();
 
         /**
              Api Handler
              */
         const treeAction = fluentApi.identity().project().tree()
             .setSortBy('item_type')
-            .setIncludeProject();
+            .setExcludeProject();
         const treeApiHandler = new ProjectTreeFluentAPI(treeAction, TreeToolSet);
         const projectAPI = fluentApi.identity().project();
         const projectGroupAPI = fluentApi.identity().projectGroup();
         const generateRandom = function (min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         };
-        const getSummery = (id: string) => {
-            if (!summery.value[id]) {
+        const getSummary = (id: string) => {
+            if (!summary.value[id]) {
                 setTimeout(() => {
-                    console.debug('start get summery', id);
-                    summery.value = {
-                        ...summery.value,
+                    console.debug('start get summary', id);
+                    summary.value = {
+                        ...summary.value,
                         [id]: {
                             cloudService: generateRandom(3, 20),
                             server: generateRandom(3, 20),
                             members: generateRandom(3, 8),
                         },
                     };
-                    console.debug(summery.value);
+                    console.debug(summary.value);
                 }, generateRandom(300, 5000));
             }
         };
@@ -154,14 +169,21 @@ export default defineComponent({
                     key: 'project_group_id',
                     value: projectGroupId,
                     operator: '=',
-                }).execute();
-                state.items = res.data.results.map((it: ProjectModel) => ({
-                    projectGroupName: it.project_group_info.name,
-                    projectId: it.project_id,
-                    projectName: it.name,
-                }));
+                }).setIncludeProvider().execute();
+                state.items = res.data.results.map((it: ProjectModel) => {
+                    const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
+                    providers.push(...providers, ...providers, ...providers);
+                    const extraProviders = providers.length > 5 ? providers.length - 5 : 0;
+                    return {
+                        projectGroupName: it.project_group_info.name,
+                        projectId: it.project_id,
+                        projectName: it.name,
+                        extraProviders,
+                        providers: providers.splice(0, 5),
+                    };
+                });
                 state.items.forEach((it) => {
-                    getSummery(it.projectId);
+                    getSummary(it.projectId);
                 });
             } catch (e) {
                 console.error(e);
@@ -169,8 +191,9 @@ export default defineComponent({
         };
 
         const cardItems = computed(() => state.items.map((item) => {
-            if (summery.value[item.projectId]) {
-                item.summery = summery.value[item.projectId];
+            console.log('card items', item);
+            if (summary.value[item.projectId]) {
+                item.summary = summary.value[item.projectId];
             }
             return item;
         }));
@@ -179,7 +202,7 @@ export default defineComponent({
             treeApiHandler,
             ...toRefs(state),
             selected,
-            summery,
+            summary,
             cardItems,
         };
     },

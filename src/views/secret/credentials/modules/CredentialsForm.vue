@@ -169,12 +169,11 @@ const components = {
 const setup = (props, context) => {
     const state = contentModalSetup(props, context);
 
-    const allItem = { type: 'item', label: 'All', name: null };
     const schemaAPI = fluentApi.repository().schema().list();
     const secretAPI = fluentApi.secret().secret();
-    const schemaState = reactive({
-        schemaList: [],
-        selectedSchema: null,
+    const dynamicFormState = reactive({
+        // schemaList: [],
+        // selectedSchema: null,
         dynamicForm: [],
         values: {},
         showValidation: false,
@@ -189,42 +188,41 @@ const setup = (props, context) => {
         }),
         selectedInputType: 'Json',
     });
-    const listSchema = async () => {
-        const res = await schemaAPI.execute();
-        schemaState.schemaList = res.data.results;
-        if (props.selectedSchemaId) {
-            schemaState.selectedSchema = _.find(schemaState.schemaList, { schema_id: props.selectedSchemaId });
-            console.log('selected Schema', schemaState.selectedSchema);
-            schemaState.dynamicForm = schemaState.selectedSchema.fields || [];
-        } else schemaState.selectedSchema = null;
-    };
-    listSchema();
+    // const listSchema = async () => {
+    //     const res = await schemaAPI.execute();
+    //     dynamicFormState.schemaList = res.data.results;
+    //     if (props.selectedSchemaId) {
+    //         dynamicFormState.selectedSchema = _.find(dynamicFormState.schemaList, { schema_id: props.selectedSchemaId });
+    //         console.log('selected Schema', dynamicFormState.selectedSchema);
+    //         dynamicFormState.dynamicForm = dynamicFormState.selectedSchema.fields || [];
+    //     } else dynamicFormState.selectedSchema = null;
+    // };
+    // listSchema();
 
     state.selected = reactive({ selected: _.isEmpty(getDataInputType()) ? 'json' : 'form' });
 
     const formState = reactive({
         name: '',
         tags: {},
-        issue_type: 'credential',
-        schema_type: props.selectedSchemaId,
+        secret_type: 'CREDENTIALS',
         data: '',
     });
 
     const onSchemaTypeChange = (name) => {
         if (name) {
-            schemaState.dynamicForm = _.find(schemaState.schemaList, { schema_id: name }).fields;
-        } else schemaState.dynamicForm = [];
+            dynamicFormState.dynamicForm = _.find(dynamicFormState.schemaList, { schema_id: name }).fields;
+        } else dynamicFormState.dynamicForm = [];
     };
     // TODO: form to json, json to form
     const onChangeInputType = () => {
         formState.data = '';
-        schemaState.values = {};
+        dynamicFormState.values = {};
     };
-    const vdApi = setValidation(schemaState.dynamicForm, schemaState.values);
+    const vdApi = setValidation(dynamicFormState.dynamicForm, dynamicFormState.values);
 
-    watch(() => schemaState.dynamicForm, () => {
-        schemaState.values = reactive({});
-        const newVdApi = setValidation(schemaState.dynamicForm, schemaState.values);
+    watch(() => dynamicFormState.dynamicForm, () => {
+        dynamicFormState.values = reactive({});
+        const newVdApi = setValidation(dynamicFormState.dynamicForm, dynamicFormState.values);
         vdApi.invalidMsg = newVdApi.invalidMsg;
         vdApi.invalidState = newVdApi.invalidState;
         vdApi.fieldValidation = newVdApi.fieldValidation;
@@ -232,12 +230,12 @@ const setup = (props, context) => {
     });
 
     const onOptionChange = async (key) => {
-        if (!schemaState.showValidation) return;
+        if (!dynamicFormState.showValidation) return;
         await vdApi.fieldValidation(key);
     };
 
     // const schemaTypeItems = computed(() => {
-    //     const result = [allItem, ...schemaState.schemaList.map(schema => ({ type: 'item', label: schema.name, name: schema.schema_id }))];
+    //     const result = [allItem, ...dynamicFormState.schemaList.map(schema => ({ type: 'item', label: schema.name, name: schema.schema_id }))];
     //     console.log('result test', result);
     //     return result;
     // });
@@ -252,13 +250,14 @@ const setup = (props, context) => {
 
     const validateLeftHalfAPI = formValidation(formState, leftHalfValidations);
     const confirm = async () => {
-        schemaState.showValidation = true;
+        dynamicFormState.showValidation = true;
         const leftHalfResult = await validateLeftHalfAPI.allValidation();
 
         if (leftHalfResult) {
             console.log(formState, formState.data);
             const params = {
                 name: formState.name,
+                secret_type: formState.secret_type,
                 data: JSON.parse(formState.data),
                 tags: formState.tags,
             };
@@ -269,7 +268,7 @@ const setup = (props, context) => {
 
     return {
         ...state,
-        ...toRefs(schemaState),
+        ...toRefs(dynamicFormState),
         formState,
         onOptionChange,
         onSchemaTypeChange,

@@ -44,7 +44,10 @@
                                 :details="accountDetails"
                                 :data="apiHandler.tableTS.selectState.firstSelectItem"
                             />
-                            <p-dict-panel :dict.sync="apiHandler.tableTS.selectState.firstSelectItem.tags" />
+                            <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
+                                          :edit-mode.sync="tagsApi.ts.syncState.editMode"
+                                          v-on="tagsApi.ts.listeners"
+                            />
                         </template>
                         <template #credentials>
                             <p-dynamic-view view_type="table"
@@ -137,7 +140,6 @@ import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/Proj
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import { AdminFluentAPI, SearchTableFluentAPI, TabSearchTableFluentAPI } from '@/lib/api/table';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel_origin.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
 import { SelectableListToolset } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
@@ -150,6 +152,8 @@ import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -466,6 +470,15 @@ export default {
             }
             formState.formVisible = false;
         };
+
+        const tagsApi = new DictPanelAPI(fluentApi.identity().serviceAccount());
+
+        watch(() => apiHandler.tableTS.selectState.firstSelectItem, async (item) => {
+            console.debug(item);
+            tagsApi.setId(item.service_account_id);
+            tagsApi.ts.toReadMode();
+            await tagsApi.getData();
+        });
         apiHandler.getData();
         return {
             apiHandler,
@@ -489,7 +502,7 @@ export default {
             clickOpenForm,
             formConfirm,
             ...toRefs(formState),
-
+            tagsApi,
         };
     },
 

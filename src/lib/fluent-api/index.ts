@@ -3,7 +3,8 @@ import PluginService from './plugin';
 import SecretService from './secret';
 import IdentityService from './identity';
 import RepositoryService from './repository';
-import AddOns from "./add-ons";
+import AddOns from './add-ons';
+import Statistics from './statistics';
 
 export class FluentApi {
     inventory = () => new InventoryService();
@@ -17,6 +18,8 @@ export class FluentApi {
     repository = () => new RepositoryService();
 
     addons = () => new AddOns();
+
+    statistics = () => new Statistics();
 }
 
 // @ts-ignore

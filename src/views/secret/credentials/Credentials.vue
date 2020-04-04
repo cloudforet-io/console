@@ -38,9 +38,8 @@ export default {
             state.loading = true;
             state.items = [];
             try {
-                const res = await context.parent.$http.post('/secret/credential/list', {
+                const res = await context.parent.$http.post('/secret/secret/list', {
                     query: requestState.query,
-                    include_credential_group: true,
                     domain_id: context.parent.$store.getters['domain/id'],
                 });
                 state.items = res.data.results;
@@ -69,8 +68,8 @@ export default {
         // change tag
         const credentialsTagConfirm = async (credentialsId, tags, originTags) => {
             const idx = state.selectIndex[0];
-            await context.parent.$http.post('/secret/credential/update', {
-                credential_id: credentialsId,
+            await context.parent.$http.post('/secret/secret/update', {
+                secret_id: credentialsId,
                 domain_id: context.parent.$store.getters['domain/id'],
                 tags,
             }).then((_) => {
@@ -83,13 +82,13 @@ export default {
         };
 
         const deleteCredentials = async (items) => {
-            await context.parent.$http.post('/secret/credential/delete', { credential_id: items[0].credential_id }).then(async (_) => {
+            await context.parent.$http.post('/secret/secret/delete', { secret_id: items[0].secret_id }).then(async (_) => {
                 await requestCredentialsList();
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
-                    text: 'Selected credentials is successfully deleted.',
+                    text: 'Selected secrets is successfully deleted.',
                     duration: 2000,
                     speed: 1000,
                 });
@@ -107,13 +106,13 @@ export default {
         };
 
         const createCredentials = async (item) => {
-            await context.parent.$http.post('/secret/credential/create', item).then(async (_) => {
+            await context.parent.$http.post('/secret/secret/create', item).then(async (_) => {
                 await requestCredentialsList();
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'success',
                     title: 'success',
-                    text: 'New Credentials has been successfully created.',
+                    text: 'New secrets has been successfully created.',
                     duration: 2000,
                     speed: 1000,
                 });
@@ -122,8 +121,8 @@ export default {
                 context.root.$notify({
                     group: 'noticeBottomRight',
                     type: 'alert',
-                    title: 'Fail to create credentials',
-                    text: 'Request to create credentials has failed.',
+                    title: 'Fail to create secrets',
+                    text: 'Request to create secrets has failed.',
                     duration: 2000,
                     speed: 1000,
                 });

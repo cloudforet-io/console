@@ -53,9 +53,9 @@ export default {
     },
     setup(props, { parent }) {
         const baseDataSource = [
-            { name: 'ID', key: 'credential_id' },
-            { name: 'name', key: 'name' },
-            { name: 'issue_type', key: 'issue_type' },
+            { name: 'ID', key: 'secret_id' },
+            { name: 'Name', key: 'name' },
+            { name: 'Secret Type', key: 'secret_type' },
             {
                 name: 'Created at',
                 key: 'created_at.seconds',
@@ -65,28 +65,28 @@ export default {
                     source_format: 'seconds',
                 },
             },
-            {
-                name: 'Group',
-                key: 'credential_groups',
-                view_type: 'list',
-                view_option: {
-                    sub_key: 'name',
-                    delimiter: ' ',
-                    item: {
-                        view_type: 'badge',
-                        view_option: {
-                            text_color: '#222532',
-                            background_color: '#DCDDE2',
-                        },
-                    },
-                },
-            },
+            // {
+            //     name: 'Group',
+            //     key: 'secret_groups',
+            //     view_type: 'list',
+            //     view_option: {
+            //         sub_key: 'name',
+            //         delimiter: ' ',
+            //         item: {
+            //             view_type: 'badge',
+            //             view_option: {
+            //                 text_color: '#222532',
+            //                 background_color: '#DCDDE2',
+            //             },
+            //         },
+            //     },
+            // },
         ];
 
         const tagsApi = new DictPanelAPI(fluentApi.secret().secret());
 
         watch(() => props.item, async (item) => {
-            tagsApi.setId(item.credential_id);
+            tagsApi.setId(item.secret_id);
             tagsApi.ts.toReadMode();
             await tagsApi.getData();
         });

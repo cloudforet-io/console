@@ -6,9 +6,8 @@ import {
     ApiMethods,
     FilterType,
     Query,
-    QueryActionState,
     FilterItem,
-    ShortFilterType, GetActionState, RawParameterActionState,
+    ShortFilterType, GetActionState, RawParameterActionState, QueryApiState,
 } from '@/lib/fluent-api/type';
 
 
@@ -64,7 +63,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
         console.debug('url : ', this.url);
         console.debug('method : ', this.method);
         console.debug('state : ', this.apiState);
-        if (states){
+        if (states) {
             states.forEach(((key) => {
                 console.debug(`state.${key} : ${JSON.stringify(this.apiState[key])}`);
             }));
@@ -91,9 +90,9 @@ export const operatorMap = Object.freeze({
 const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
 
 export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
-    protected apiState: QueryActionState<parameter> ;
+    protected apiState: QueryApiState<parameter> ;
 
-    constructor(baseUrl: string, initState: QueryActionState<parameter> = {} as unknown as QueryActionState<parameter>, transformer: null|((any) => any) = null) {
+    constructor(baseUrl: string, initState: QueryApiState<parameter> = {} as unknown as QueryApiState<parameter>, transformer: null|((any) => any) = null) {
         super(baseUrl, undefined, transformer);
         this.apiState = {
             filter: [] as unknown as FilterItem[],
@@ -105,7 +104,7 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
             sortDesc: true,
             keyword: '',
             extraParameter: {},
-            count_only:false,
+            count_only: false,
             ...initState,
         };
     }
@@ -127,19 +126,19 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
         if (this.apiState.only.length > 0) {
             query.only = this.apiState.only;
         }
-        if (this.apiState.count_only){
-            query.count_only = this.apiState.count_only
+        if (this.apiState.count_only) {
+            query.count_only = this.apiState.count_only;
         }
         if (this.apiState.keyword) {
             query.keyword = this.apiState.keyword;
         }
-        if (this.apiState.filter.length > 0||this.apiState.fixFilter.length>0) {
+        if (this.apiState.filter.length > 0 || this.apiState.fixFilter.length > 0) {
             const filter: FilterType[] = [];
             // eslint-disable-next-line camelcase
             const mergeOpQuery: {
                     [propName: string]: ShortFilterType;
                 } = {};
-            const rawFilters = [...this.apiState.fixFilter,...this.apiState.filter];
+            const rawFilters = [...this.apiState.fixFilter, ...this.apiState.filter];
             rawFilters.forEach((q: FilterItem) => {
                 const op = operatorMap[q.operator];
                 const vals = typeof q.value === 'string' ? [q.value] : q.value;
@@ -185,7 +184,7 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
         return this.clone();
     }
 
-    setCountOnly(value:boolean=true) {
+    setCountOnly(value = true) {
         this.apiState.count_only = value;
         return this.clone();
     }
@@ -278,6 +277,7 @@ interface TreeActionState<parameter = any> {
     sortBy: string;
     sortDesc: boolean;
     extraParameter: parameter;
+    exclude_type: string;
 }
 
 export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, resp> {
@@ -293,6 +293,7 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
             item_type: '',
             sortBy: '',
             sortDesc: true,
+            exclude_type: '',
             extraParameter: {},
             ...initState,
         };
@@ -330,6 +331,11 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
         return this.clone();
     }
 
+    protected setExcludeType(val: string) {
+        this.apiState.exclude_type = val;
+        return this.clone();
+    }
+
     getParameter = () => {
         const params: any = {};
 
@@ -345,6 +351,10 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
                 key: this.apiState.sortBy,
                 desc: this.apiState.sortDesc,
             };
+        }
+
+        if (this.apiState.exclude_type) {
+            params.exclude_type = this.apiState.exclude_type;
         }
 
         return {
@@ -468,7 +478,7 @@ export abstract class GetDataAction<parameter, resp> extends QueryAPI<parameter,
     }
 
     setKeyPath(keyPath: string) {
-        // eslint-disable-next-line @typescript-eslint/camelcase
+        // @ts-ignore
         this.apiState.extraParameter.key_path = keyPath;
         return this.clone();
     }
