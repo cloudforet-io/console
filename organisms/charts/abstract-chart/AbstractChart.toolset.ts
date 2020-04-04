@@ -2,12 +2,12 @@ import Chart, {
     ChartDataSets, ChartOptions, ChartPluginsOptions, ChartTooltipOptions,
 } from 'chart.js';
 import {
-    computed, reactive, Ref, watch,
+    computed, reactive, Ref, watch, watchEffect,
 } from '@vue/composition-api';
 import { gray } from '@/styles/colors';
 import { colorset } from '@/lib/util';
 import {
-    HelperToolSet, initReactive, StateToolSet,
+    HelperToolSet, StateToolSet,
 } from '@/lib/toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
@@ -17,7 +17,7 @@ export const abstractChartProps = {
      */
     labels: {
         type: Array,
-        default: () => [],
+        default: undefined,
     },
     dataset: {
         type: Array,
@@ -54,7 +54,7 @@ export class ChartData {
 
 export interface AbstractChartPropsType {
     type: string;
-    labels: string[];
+    labels?: string[];
     dataset: ChartData[];
     loading: boolean;
     styleType: string;
@@ -109,8 +109,8 @@ export class AbstractChartState<D extends AbstractChartPropsType = AbstractChart
         };
     }
 
-    constructor(initData: D = {} as D, lazy = false) {
-        this.state = initReactive(lazy, AbstractChartState.initState(), initData);
+    constructor(props: D = {} as D, lazy = false) {
+        this.state = props; // initReactive(lazy, AbstractChartState.initState(), initData);
     }
 }
 
@@ -144,7 +144,6 @@ export interface AbstractChartStateType {
 
 @HelperToolSet()
 export class AbstractChartToolset<D extends AbstractChartPropsType = AbstractChartPropsType> extends AbstractChartState<D> {
-    // TODO: ts -> chartState
     chartState: UnwrapRef<AbstractChartStateType>;
 
     // eslint-disable-next-line no-empty-function,@typescript-eslint/explicit-function-return-type
@@ -155,8 +154,8 @@ export class AbstractChartToolset<D extends AbstractChartPropsType = AbstractCha
         this.chartState = this.initChartState(themeGroup);
 
         // TODO: separate update logic and initiate logic
-        watch(() => this.chartState.chartRef, (val) => {
-            if (val) this.initChart();
+        watch(() => this.chartState.chartRef, (chartRef) => {
+            if (chartRef) this.initChart();
         });
     }
 
@@ -187,7 +186,7 @@ export class AbstractChartToolset<D extends AbstractChartPropsType = AbstractCha
         this.chartState.chart = new Chart(this.chartState.chartRef, {
             type: this.state.type,
             data: {
-                labels: this.state.labels,
+                labels: this.state.labels || new Array(this.state.dataset[0].data.length).fill(''),
                 datasets: this.chartState.datasets,
             },
             options: this.chartState.options,
