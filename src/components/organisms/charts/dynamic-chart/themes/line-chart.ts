@@ -1,54 +1,23 @@
-import { gray } from '@/styles/colors';
 import Chart, { ChartDataSets } from 'chart.js';
-import {
-    abstractChartProps,
-    AbstractChartPropsType,
-    ChartOptionsType, ChartPluginsType,
-    ChartSettingsType,
-    tooltips, ChartThemeGroupType, defaultPlugins,
-} from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
+import { gray } from '@/styles/colors';
 import Color from 'color';
+import {
+    ChartOptionsType, ChartPluginsType,
+    ChartSettingsType, ChartThemeGroupType, defaultPlugins, defaultThemeProps,
+    DefaultThemePropsType, tooltips,
+} from '@/components/organisms/charts/dynamic-chart/DynamicChart.toolset';
 
-export const lineChartProps = {
-    ...abstractChartProps,
-    type: {
-        type: String,
-        default: 'line',
-        validator(type: string): boolean {
-            return ['line'].includes(type);
-        },
-    },
-    styleType: {
-        type: String,
-        default: 'default',
-        validator(style: string): boolean {
-            return ['default', 'multi'].includes(style);
-        },
-    },
-    min: {
-        type: Number,
-        default: undefined,
-    },
-    max: {
-        type: Number,
-        default: undefined,
-    },
-    gradientHeight: {
-        type: Number,
-        default: undefined,
-    },
-};
 
-export interface LineChartPropsType extends AbstractChartPropsType {
-    min?: number;
-    max?: number;
-    gradientHeight?: number;
+/** *************** default ****************** */
+export interface LineDefaultThemePropsType extends DefaultThemePropsType {
+    gradientHeight: number;
 }
 
-/** *************** THEMES ****************** */
+export const lineDefaultThemeProps = {
+    ...defaultThemeProps,
+    gradientHeight: 100,
+} as LineDefaultThemePropsType;
 
-
-/** default */
 const getGradientColor = (color: string, chartRef: HTMLCanvasElement, gradientHeight: number) => {
     const ctx: CanvasRenderingContext2D = chartRef.getContext('2d') as CanvasRenderingContext2D;
     const gradient = ctx.createLinearGradient(0, 0, 0, gradientHeight);
@@ -58,15 +27,15 @@ const getGradientColor = (color: string, chartRef: HTMLCanvasElement, gradientHe
     return gradient;
 };
 
-const defaultSettings: ChartSettingsType<LineChartPropsType> = (props, chartRef, i): ChartDataSets => ({
+const defaultSettings: ChartSettingsType<LineDefaultThemePropsType> = (themeProps, chartRef, i): ChartDataSets => ({
     borderWidth: 1,
     fill: true,
     pointRadius: 0,
     lineTension: 0.5,
-    backgroundColor: getGradientColor(props.colors[i], chartRef, props.gradientHeight || 100),
+    backgroundColor: getGradientColor(themeProps.colors[i], chartRef, themeProps.gradientHeight || 100),
 });
 
-const defaultOptions: ChartOptionsType<LineChartPropsType> = props => ({
+const defaultOptions: ChartOptionsType<LineDefaultThemePropsType> = themeProps => ({
     maintainAspectRatio: false,
     legend: {
         display: false,
@@ -99,16 +68,26 @@ const defaultOptions: ChartOptionsType<LineChartPropsType> = props => ({
     tooltips,
 });
 
-/** multi */
+/** *************** multi ****************** */
+export interface LineMultiThemePropsType extends DefaultThemePropsType {
+    min?: number;
+    max?: number;
+}
 
-const multiSettings: ChartSettingsType<LineChartPropsType> = props => ({
+export const lineMultiThemePropsType = {
+    ...defaultThemeProps,
+    min: 0,
+    max: undefined,
+} as LineMultiThemePropsType;
+
+const multiSettings: ChartSettingsType<LineMultiThemePropsType> = themeProps => ({
     fill: false,
     borderWidth: 2,
     lineTension: 0,
     pointRadius: 0,
 });
 
-const multiOptions: ChartOptionsType<LineChartPropsType> = props => ({
+const multiOptions: ChartOptionsType<LineMultiThemePropsType> = themeProps => ({
     maintainAspectRatio: false,
     legend: {
         display: false,
@@ -126,8 +105,8 @@ const multiOptions: ChartOptionsType<LineChartPropsType> = props => ({
                 autoSkip: true,
                 autoSkipPadding: 20,
                 padding: 10,
-                min: props.min,
-                max: props.max,
+                min: themeProps.min,
+                max: themeProps.max,
             },
         }],
         xAxes: [{
@@ -154,7 +133,7 @@ const multiOptions: ChartOptionsType<LineChartPropsType> = props => ({
     },
 });
 
-const multiPlugins: ChartPluginsType<LineChartPropsType> = props => [{
+const multiPlugins: ChartPluginsType<LineMultiThemePropsType> = themeProps => [{
     beforeInit(chart: Chart) {
         const labels: any = chart.data.labels;
         labels.forEach((e, i, a) => {
@@ -165,8 +144,12 @@ const multiPlugins: ChartPluginsType<LineChartPropsType> = props => [{
     },
 }];
 
+export type LineTheme = ChartThemeGroupType<
+    LineDefaultThemePropsType |
+    LineMultiThemePropsType
+    >
 
-export const lineChartThemes: ChartThemeGroupType<LineChartPropsType> = {
+export default {
     default: {
         settings: defaultSettings,
         options: defaultOptions,
@@ -177,4 +160,4 @@ export const lineChartThemes: ChartThemeGroupType<LineChartPropsType> = {
         options: multiOptions,
         plugins: multiPlugins,
     },
-};
+} as LineTheme;

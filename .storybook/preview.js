@@ -6,6 +6,7 @@ import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 
 import Vue from 'vue';
+import VueRouter from 'vue-router';
 import store from '@/store';
 import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
@@ -18,6 +19,7 @@ import { i18n } from '@/translations';
 import LiquorTree from 'liquor-tree';
 import "@/styles/style.scss";
 
+Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
 Vue.mixin(Util);
@@ -54,5 +56,6 @@ addDecorator(centered);
 addDecorator(() => ({
     i18n,
     store,
+    router: new VueRouter(),
     template: '<story/>',
 }));
