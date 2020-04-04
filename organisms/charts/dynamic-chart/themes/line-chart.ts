@@ -10,11 +10,13 @@ import {
 
 /** *************** default ****************** */
 export interface LineDefaultThemePropsType extends DefaultThemePropsType {
+    gradient: boolean;
     gradientHeight: number;
 }
 
 export const lineDefaultThemeProps = {
     ...defaultThemeProps,
+    gradient: true,
     gradientHeight: 100,
 } as LineDefaultThemePropsType;
 
@@ -29,10 +31,13 @@ const getGradientColor = (color: string, chartRef: HTMLCanvasElement, gradientHe
 
 const defaultSettings: ChartSettingsType<LineDefaultThemePropsType> = (themeProps, chartRef, i): ChartDataSets => ({
     borderWidth: 1,
-    fill: true,
+    fill: 'start',
     pointRadius: 0,
-    lineTension: 0.5,
-    backgroundColor: getGradientColor(themeProps.colors[i], chartRef, themeProps.gradientHeight || 100),
+    pointBorderWidth: 0,
+    lineTension: 0.25,
+    backgroundColor: themeProps.gradient
+        ? getGradientColor(themeProps.colors[i], chartRef, themeProps.gradientHeight || 100)
+        : themeProps.colors[i],
 });
 
 const defaultOptions: ChartOptionsType<LineDefaultThemePropsType> = themeProps => ({
@@ -52,7 +57,8 @@ const defaultOptions: ChartOptionsType<LineDefaultThemePropsType> = themeProps =
                 display: false,
             },
             ticks: {
-                beginAtZero: true,
+                min: -20,
+                suggestedMax: 80,
                 display: false,
             },
         }],
