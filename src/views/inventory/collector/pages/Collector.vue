@@ -283,6 +283,7 @@ export default {
 
 
         const listCredentialsByCollector = async (query) => {
+            console.log('selected item test', state.selectedItem);
             const crdId = _.get(state.selectedItem, 'plugin_info.credential_id');
             const crdgId = _.get(state.selectedItem, 'plugin_info.credential_group_id');
 
@@ -440,6 +441,9 @@ export default {
             }
         };
         mountBusEvent(CollectorEventBus, 'deleteCollectorSchedule', deleteCollectorSchedule);
+
+
+        getCollectorList();
 
         return {
             ...toRefs(state),

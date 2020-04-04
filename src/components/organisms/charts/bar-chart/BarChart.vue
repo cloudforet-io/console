@@ -9,7 +9,7 @@ import {
 } from '@/components/organisms/charts/bar-chart/BarChart.toolset';
 import {
     AbstractChartToolset,
-    ChartToolsetType,
+    AbstractChartStateType,
 } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
@@ -18,7 +18,7 @@ export default defineComponent({
     extends: PAbstractChart,
     props: barChartProps,
     setup(props: BarChartPropsType) {
-        const state: UnwrapRef<ChartToolsetType> = new AbstractChartToolset<BarChartPropsType>(props, barChartThemes).ts;
+        const state: UnwrapRef<AbstractChartStateType> = new AbstractChartToolset<BarChartPropsType>(props, barChartThemes).chartState;
 
         return {
             ...toRefs(state),

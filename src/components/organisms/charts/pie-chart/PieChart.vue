@@ -6,7 +6,7 @@ import {
     pieChartProps, PieChartPropsType, pieChartThemes,
 } from '@/components/organisms/charts/pie-chart/PieChart.toolset';
 
-import { AbstractChartToolset, ChartToolsetType } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
+import { AbstractChartToolset, AbstractChartStateType } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 export default defineComponent({
@@ -14,7 +14,7 @@ export default defineComponent({
     extends: PAbstractChart,
     props: pieChartProps,
     setup(props: PieChartPropsType) {
-        const state: UnwrapRef<ChartToolsetType> = new AbstractChartToolset<PieChartPropsType>(props, pieChartThemes).ts;
+        const state: UnwrapRef<AbstractChartStateType> = new AbstractChartToolset<PieChartPropsType>(props, pieChartThemes).chartState;
 
         return {
             ...toRefs(state),

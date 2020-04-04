@@ -7,7 +7,7 @@
             />
         </transition>
         <transition name="fade-in">
-            <canvas v-if="!loading" ref="chartRef" />
+            <canvas v-if="!loading" ref="chartRef"/>
         </transition>
     </div>
 </template>
@@ -56,5 +56,9 @@ export default defineComponent({
     }
     .fade-in-enter-to {
         opacity: 1;
+    }
+    canvas {
+        height: 100%;
+        width: 100%;
     }
 </style>
