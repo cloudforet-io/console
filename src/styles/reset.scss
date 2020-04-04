@@ -1,8 +1,8 @@
 /*************************
  ****** GLOBAL CSS *******
  *************************/
-$font-basic: 'Roboto', arial, sans-serif;
-$primary4: #F8F8FC;
+$font-basic: 'Noto Sans', 'Roboto', arial, sans-serif;
+$primary4: #f8f8fc;
 $dark: #222532;
 
 /* INIT */
@@ -33,7 +33,6 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
 }
-
 
 i, span, div, input, textarea, article, main, ul, li {
   font-size: inherit;

@@ -18,6 +18,8 @@ import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
 import LiquorTree from 'liquor-tree';
 import "@/styles/style.scss";
+import webFontLoader from 'webfontloader';
+import { fontUrls, webFonts } from '@/styles/web-fonts';
 
 Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
@@ -32,6 +34,13 @@ Vue.use(SvgIcon, {
 Vue.use(LiquorTree);
 
 Vue.prototype.$velocity = velocity;
+
+webFontLoader.load({
+    google: {
+        families: webFonts,
+        urls: fontUrls,
+    },
+});
 /*****************************************************************
  * This is a Global Bus Event;
  * Please, name your '$emit' event name as action + Event such as

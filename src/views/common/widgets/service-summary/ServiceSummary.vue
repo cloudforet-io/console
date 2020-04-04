@@ -3,27 +3,46 @@
         <p class="title">
             {{ title }}
         </p>
-        <router-link class="count" :to="to">
-            {{ count }}
+        <router-link class="count" :to="to" :style="{color: color}">
+            {{ count | numbers }}
         </router-link>
-        <p-line-chart class="line-chart" :dataset="data" :loading="loading"
-                      :gradient-height="100" :colors="[color]"
+        <p-dynamic-chart class="line-chart" :dataset="dataset" :loading="loading"
+                         type="line"
+                         :theme-props="themeProps"
         />
     </p-pane-layout>
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
-import { serviceSummaryProps } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
+import { computed, defineComponent } from '@vue/composition-api';
+import numeral from 'numeral';
+import {
+    serviceSummaryProps,
+    ServiceSummaryPropsType,
+} from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
-import PLineChart from '@/components/organisms/charts/line-chart/LineChart.vue';
+import PDynamicChart from '@/components/organisms/charts/dynamic-chart/DynamicChart.vue';
+import { lineDefaultThemeProps } from '@/components/organisms/charts/dynamic-chart/themes/line-chart';
+import { ChartData } from '@/components/organisms/charts/dynamic-chart/DynamicChart.toolset';
 
 export default defineComponent({
     name: 'ServiceSummary',
-    components: { PPaneLayout, PLineChart },
+    filters: {
+        numbers(val) {
+            return val < 1000 ? val : numeral(val).format('0.0a');
+        },
+    },
+    components: { PPaneLayout, PDynamicChart },
     props: serviceSummaryProps,
-    setup() {
-        return {};
+    setup(props: ServiceSummaryPropsType) {
+        return {
+            themeProps: computed(() => ({
+                ...lineDefaultThemeProps,
+                colors: [props.color],
+            })),
+            count: computed(() => props.data[props.data.length - 1]),
+            dataset: computed(() => [new ChartData(props.title, props.data)]),
+        };
     },
 });
 </script>
@@ -36,6 +55,7 @@ export default defineComponent({
     width: 100%;
     max-width: 446px;
     .title {
+        font-family: theme('fontFamily.sans');
         font-size: 1.125rem;
         text-transform: uppercase;
         font-weight: bold;

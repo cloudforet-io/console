@@ -14,7 +14,7 @@
             </p-tooltip>
         </li>
         <li>
-            <site-map ref="sitemap" />
+            <site-map ref="sitemap" class="sitemap" margin="56px" />
         </li>
         <li class="menu-3">
             <language-menu />
@@ -56,7 +56,7 @@ export default {
         all: unset;
         list-style: none;
         flex-grow: 1;
-        padding: .75rem 0;
+        padding: 0.75rem 0;
         text-align: center;
         &:first-child {
             padding-top: 1rem;
