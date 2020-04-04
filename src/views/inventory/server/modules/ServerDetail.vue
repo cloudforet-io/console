@@ -14,9 +14,9 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import {  watch } from '@vue/composition-api';
+import { watch } from '@vue/composition-api';
 import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
-import {fluentApi} from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
@@ -32,12 +32,12 @@ export default {
     props: {
         item: {
             type: Object,
-            default: () =>({}),
+            default: () => ({}),
         },
-      dataSource:{
-          type:Array,
-            default:()=> []
-      }
+        dataSource: {
+            type: Array,
+            default: () => [],
+        },
     },
     setup(props, { parent }) {
         const tagsApi = new DictPanelAPI(fluentApi.inventory().server());
