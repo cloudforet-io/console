@@ -19,7 +19,20 @@ export const selectableItemProps = {
         type: String,
         default: '',
     },
+    color: {
+        type: String,
+        default: '',
+    },
+    theme: {
+        type: String,
+        default: 'default',
+        validator(theme) {
+            return ['default', 'card'].includes(theme);
+        },
+    },
 };
+
+export type ThemeType = 'default' | 'card';
 
 export interface SelectableItemPropsType {
     iconUrl?: string;
@@ -27,4 +40,6 @@ export interface SelectableItemPropsType {
     active?: boolean;
     disabled?: boolean;
     defaultIcon?: string;
+    color?: string;
+    theme?: ThemeType;
 }

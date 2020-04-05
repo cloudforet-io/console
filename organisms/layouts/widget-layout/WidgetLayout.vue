@@ -15,7 +15,9 @@
                     </template>
                 </p-tooltip-button>
             </slot>
-            <slot name="extra" />
+            <div class="flex-grow">
+                <slot name="extra" />
+            </div>
         </div>
         <div :class="{padding}">
             <slot />
