@@ -30,8 +30,10 @@
                             {{ item.projectGroupName }}<br>
                             {{ item.projectName }}<br><br><br>
 
-                            <img v-for="(url, index) in item.providers" :src="url" :key="index" style="width:32px; height:32px; display: inline"/>
-                            <span v-if="item.extraProviders"> + {{item.extraProviders}}</span>
+                            <img v-for="(url, index) in item.providers" :key="index" :src="url"
+                                 style="width:32px; height:32px; display: inline"
+                            >
+                            <span v-if="item.extraProviders"> + {{ item.extraProviders }}</span>
                         </div>
                         <br>
                         <br>
@@ -73,6 +75,7 @@ import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
+import _ from 'lodash';
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';

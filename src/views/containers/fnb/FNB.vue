@@ -21,12 +21,12 @@ export default {
 <style lang="postcss" scoped>
     .fnb {
         @apply text-gray-200;
-        height: $fnb-height;
+        height: 40px;
         .fnb-contents {
             @apply border-t border-primary3;
             height: 100%;
-            padding: .5rem 0;
-            margin: 0rem 1.5rem;
+            padding: 0.5rem 0;
+            margin: 0 1.5rem;
         }
     }
 </style>

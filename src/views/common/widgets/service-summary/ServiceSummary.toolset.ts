@@ -1,5 +1,5 @@
 import { Location } from 'vue-router';
-import {colorset} from "@/lib/util";
+import { colorset } from '@/lib/util';
 
 export const serviceSummaryProps = {
     title: {
@@ -9,10 +9,6 @@ export const serviceSummaryProps = {
     to: {
         type: [String, Object],
         default: '/dashboard',
-    },
-    count: {
-        type: Number,
-        default: 0,
     },
     data: {
         type: Array,
@@ -31,8 +27,7 @@ export const serviceSummaryProps = {
 export interface ServiceSummaryPropsType {
     title: string;
     to: Location | string;
-    count: number;
-    data: number;
+    data: number[];
     loading: boolean;
     color: string;
 }

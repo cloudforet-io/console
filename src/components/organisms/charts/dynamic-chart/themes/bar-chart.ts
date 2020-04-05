@@ -19,7 +19,7 @@ export const barDefaultThemeProps = {
 } as BarDefaultThemePropsType;
 
 
-const defaultSettings: ChartSettingsType<BarDefaultThemePropsType> = themeProps => ({
+const defaultSettings: ChartSettingsType<BarDefaultThemePropsType> = themeProps => i => ({
     // barThickness: 8,
     borderWidth: 0,
     minBarLength: themeProps.minBarLength,

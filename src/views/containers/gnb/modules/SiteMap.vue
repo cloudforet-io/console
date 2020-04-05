@@ -13,131 +13,133 @@
             </template>
         </p-tooltip-button>
 
-        <div v-if="visible" class="sitemap">
-            <div class="title">
-                <p-button class="back-btn" @click="hide">
-                    <template>
-                        <p-i name="ic_back" width="2rem" height="2rem" />
-                    </template>
-                </p-button>
-                <span class="name">Services</span>
+        <div v-if="visible" class="sitemap" :style="{left: margin}">
+            <div class="contents">
+                <div class="title">
+                    <p-button class="back-btn" @click="hide">
+                        <template>
+                            <p-i name="ic_back" width="2rem" height="2rem" />
+                        </template>
+                    </p-button>
+                    <span class="name">Services</span>
+                </div>
+
+                <ul @click="hide">
+                    <li>
+                        <router-link class="group" to="/dashboard">
+                            <span class="icon">
+                                <p-i name="ic_dashboard"
+                                     color="transparent inherit"
+                                />
+                            </span>
+                            <span class="name">Dashboard</span>
+                        </router-link>
+                    </li>
+
+                    <li>
+                        <router-link class="group" to="/inventory">
+                            <span class="icon">
+                                <p-i name="ic_inventory"
+                                     color="transparent inherit"
+                                />
+                            </span>
+                            <span class="name">Inventory</span>
+                        </router-link>
+                    </li>
+
+                    <li>
+                        <router-link class="service" to="/inventory/data-center">
+                            Data Center
+                        </router-link>
+                    </li>
+
+                    <li>
+                        <router-link class="service" to="/inventory/server">
+                            Server
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link class="service" to="/inventory/cloud-service">
+                            Cloud Service
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link class="service last" to="/inventory/collector">
+                            Collector
+                        </router-link>
+                    </li>
+
+                    <li>
+                        <router-link class="group" to="/identity">
+                            <span class="icon">
+                                <p-i name="ic_identity"
+                                     color="transparent inherit"
+                                />
+                            </span>
+                            <span class="name">Identity</span>
+                        </router-link>
+                    </li>
+
+                    <li>
+                        <router-link class="service" to="/identity/user">
+                            User
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link class="service" to="/identity/project">
+                            Project
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link class="service last" to="/identity/service-account">
+                            Service Account
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link class="group" to="/secret">
+                            <span class="icon">
+                                <p-i name="ic_secret"
+                                     color="transparent inherit"
+                                />
+                            </span>
+                            <span class="name">Secret</span>
+                        </router-link>
+                    </li>
+
+                    <!--                <li>-->
+                    <!--                    <router-link class="service" to="/secret/credentials-group">-->
+                    <!--                        Credentials Group-->
+                    <!--                    </router-link>-->
+                    <!--                </li>-->
+                    <li>
+                        <router-link class="service" to="/secret/credentials">
+                            Credentials
+                        </router-link>
+                    </li>
+                    <!--                <li>-->
+                    <!--                    <router-link class="group" to="/plugin">-->
+                    <!--                        <span class="icon">-->
+                    <!--                            <p-i name="ic_identity"-->
+                    <!--                                 color="transparent inherit"-->
+                    <!--                            />-->
+                    <!--                        </span>-->
+                    <!--                        <span class="name">Plugin</span>-->
+                    <!--                    </router-link>-->
+                    <!--                </li>-->
+
+                    <!--                <li>-->
+                    <!--                    <router-link class="service" to="/plugin/supervisor">-->
+                    <!--                        Supervisor-->
+                    <!--                    </router-link>-->
+                    <!--                </li>-->
+                </ul>
             </div>
-
-            <ul @click="hide">
-                <li>
-                    <router-link class="group" to="/dashboard">
-                        <span class="icon">
-                            <p-i name="ic_dashboard"
-                                 color="transparent inherit"
-                            />
-                        </span>
-                        <span class="name">Dashboard</span>
-                    </router-link>
-                </li>
-
-                <li>
-                    <router-link class="group" to="/inventory">
-                        <span class="icon">
-                            <p-i name="ic_inventory"
-                                 color="transparent inherit"
-                            />
-                        </span>
-                        <span class="name">Inventory</span>
-                    </router-link>
-                </li>
-
-                <li>
-                    <router-link class="service" to="/inventory/data-center">
-                        Data Center
-                    </router-link>
-                </li>
-
-                <li>
-                    <router-link class="service" to="/inventory/server">
-                        Server
-                    </router-link>
-                </li>
-                <li>
-                    <router-link class="service" to="/inventory/cloud-service">
-                        Cloud Service
-                    </router-link>
-                </li>
-                <li>
-                    <router-link class="service last" to="/inventory/collector">
-                        Collector
-                    </router-link>
-                </li>
-
-                <li>
-                    <router-link class="group" to="/identity">
-                        <span class="icon">
-                            <p-i name="ic_identity"
-                                 color="transparent inherit"
-                            />
-                        </span>
-                        <span class="name">Identity</span>
-                    </router-link>
-                </li>
-
-                <li>
-                    <router-link class="service" to="/identity/user">
-                        User
-                    </router-link>
-                </li>
-                <li>
-                    <router-link class="service" to="/identity/project">
-                        Project
-                    </router-link>
-                </li>
-                <li>
-                    <router-link class="service last" to="/identity/service-account">
-                        Service Account
-                    </router-link>
-                </li>
-                <li>
-                    <router-link class="group" to="/secret">
-                        <span class="icon">
-                            <p-i name="ic_secret"
-                                 color="transparent inherit"
-                            />
-                        </span>
-                        <span class="name">Secret</span>
-                    </router-link>
-                </li>
-
-<!--                <li>-->
-<!--                    <router-link class="service" to="/secret/credentials-group">-->
-<!--                        Credentials Group-->
-<!--                    </router-link>-->
-<!--                </li>-->
-                <li>
-                    <router-link class="service" to="/secret/credentials">
-                        Credentials
-                    </router-link>
-                </li>
-                <!--                <li>-->
-                <!--                    <router-link class="group" to="/plugin">-->
-                <!--                        <span class="icon">-->
-                <!--                            <p-i name="ic_identity"-->
-                <!--                                 color="transparent inherit"-->
-                <!--                            />-->
-                <!--                        </span>-->
-                <!--                        <span class="name">Plugin</span>-->
-                <!--                    </router-link>-->
-                <!--                </li>-->
-
-                <!--                <li>-->
-                <!--                    <router-link class="service" to="/plugin/supervisor">-->
-                <!--                        Supervisor-->
-                <!--                    </router-link>-->
-                <!--                </li>-->
-            </ul>
+            <div
+                v-if="visible"
+                class="backdrop"
+                @click.stop="hide"
+            />
         </div>
-        <div
-            v-if="visible"
-            class="backdrop"
-            @click.stop="hide"
-        />
     </div>
 </template>
 
@@ -153,6 +155,12 @@ export default {
         PButton,
         PI,
         PTooltipButton,
+    },
+    props: {
+        margin: {
+            type: String,
+            default: '',
+        },
     },
     setup(props) {
         const state = reactive({
@@ -188,15 +196,22 @@ export default {
     }
 
     .sitemap {
-        @apply bg-primary4 text-gray-900;
         position: fixed;
-        left: $gnb-width;
+        width: 100%;
         top: 0;
         height: 100vh;
-        width: $sitemap-width;
         overflow: hidden;
-        box-shadow: 4px 0 8px rgba(theme('colors.gray.900'), 0.32);
-        text-align: left;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        .contents {
+            @apply bg-primary4 text-gray-900;
+            box-shadow: 4px 0 8px rgba(theme('colors.gray.900'), 0.32);
+            text-align: left;
+            height: 100%;
+            min-width: $sitemap-width;
+            width: $sitemap-width;
+        }
         .title {
             @apply text-gray;
             display: flex;
@@ -206,7 +221,7 @@ export default {
             font-weight: bold;
             line-height: 1.5rem;
             .name {
-                padding-left: .5rem;
+                padding-left: 0.5rem;
             }
             .back-btn {
                 padding: 0;
@@ -220,11 +235,7 @@ export default {
                 }
             }
         }
-        ul {
-            all:unset;
-        }
         li {
-            all:unset;
             display: block;
             cursor: pointer;
             &:hover {
@@ -245,11 +256,11 @@ export default {
             font-weight: bold;
             vertical-align: middle;
             .name {
-                padding-left: .5rem;
+                padding-left: 0.5rem;
             }
             .icon {
                 display: inline-block;
-                margin-left: .5rem;
+                margin-left: 0.5rem;
                 text-align: center;
                 color: inherit;
                 width: 1.5rem;
@@ -257,20 +268,16 @@ export default {
             }
         }
         .service {
-            padding: .5rem  0 .5rem 4.5rem;
+            padding: 0.5rem  0 0.5rem 4.5rem;
             &.last {
                 margin-bottom: 1rem;
             }
         }
     }
     .backdrop {
-        position: fixed;
-        left: calc($(gnb-width) + $(sitemap-width));
-        top: 0;
-        height: 100vh;
-        width: calc(100vw - $(gnb-width) - $(sitemap-width));
         background-color: rgba(theme('colors.gray.900'), 0.32);
-        overflow: hidden;
+        width: 100%;
+        height: 100%;
     }
 }
 </style>

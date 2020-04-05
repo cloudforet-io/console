@@ -29,31 +29,63 @@ export const defaultCase = () => ({
     components: { ServiceSummary },
     props: getKnobProps(serviceSummaryProps, {
         title: 'projects',
-        count: 434,
+        data: [0, 0, 200, 300, 500, 800, 1300],
     }, {
-        data: true,
         loading: true,
     }, {
         color,
     }),
     template: `
     <div style="width: 80vw;">
-        <ServiceSummary v-bind="$props" :data="data" :loading="loading"></ServiceSummary>
+        <ServiceSummary v-bind="$props" :loading="loading"></ServiceSummary>
         <button class="w-full my-3 border border-gray" @click="draw">REDRAW</button>
     </div>`,
     setup(props, context) {
         const state = reactive({
-            data: [],
             loading: true,
         });
 
         const draw = () => {
-            console.log('draw');
             state.loading = true;
             setTimeout(() => {
-                state.data = [
-                    new ChartData(casual.word, [12, 19, 3, 5, 2, 3, 9]),
-                ];
+                state.loading = false;
+            }, 100);
+        };
+
+        draw();
+
+        return {
+            ...toRefs(state),
+            draw,
+        };
+    },
+});
+
+
+export const zeroCase = () => ({
+    components: { ServiceSummary },
+    props: getKnobProps(serviceSummaryProps, {
+        title: 'projects',
+        count: 434,
+        data: [0, 0, 0, 0, 0, 0, 0],
+    }, {
+        loading: true,
+    }, {
+        color,
+    }),
+    template: `
+    <div style="width: 80vw;">
+        <ServiceSummary v-bind="$props" :loading="loading"></ServiceSummary>
+        <button class="w-full my-3 border border-gray" @click="draw">REDRAW</button>
+    </div>`,
+    setup(props, context) {
+        const state = reactive({
+            loading: true,
+        });
+
+        const draw = () => {
+            state.loading = true;
+            setTimeout(() => {
                 state.loading = false;
             }, 100);
         };

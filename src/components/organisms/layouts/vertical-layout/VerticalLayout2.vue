@@ -150,7 +150,6 @@ export default {
         }
     }
     .main {
-        /*height: calc(100% - $(lnb-height));*/
         display: flex;
         flex-direction: column;
         justify-content: stretch;
@@ -191,9 +190,9 @@ export default {
                 cursor: pointer;
             }
         }
-        .btn-vertical-hide{
+        .btn-vertical-hide {
             margin-top: 1rem;
-            margin-left: .5rem;
+            margin-left: 0.5rem;
             justify-content: center;
             &:hover {
                 @apply text-secondary;
