@@ -20,25 +20,27 @@ export const lineDefaultThemeProps = {
     gradientHeight: 100,
 } as LineDefaultThemePropsType;
 
-const getGradientColor = (color: string, chartRef: HTMLCanvasElement, gradientHeight: number) => {
-    const ctx: CanvasRenderingContext2D = chartRef.getContext('2d') as CanvasRenderingContext2D;
-    const gradient = ctx.createLinearGradient(0, 0, 0, gradientHeight);
+const getGradientColor = (gradient, color: string) => {
     gradient.addColorStop(0, Color(color).alpha(0.25));
     gradient.addColorStop(0.5, Color(color).alpha(0.125));
     gradient.addColorStop(1, Color(color).alpha(0));
     return gradient;
 };
 
-const defaultSettings: ChartSettingsType<LineDefaultThemePropsType> = (themeProps, chartRef, i): ChartDataSets => ({
-    borderWidth: 1,
-    fill: 'start',
-    pointRadius: 0,
-    pointBorderWidth: 0,
-    lineTension: 0.25,
-    backgroundColor: themeProps.gradient
-        ? getGradientColor(themeProps.colors[i], chartRef, themeProps.gradientHeight || 100)
-        : themeProps.colors[i],
-});
+const defaultSettings: ChartSettingsType<LineDefaultThemePropsType> = (themeProps, chartRef, dataset) => {
+    const ctx: CanvasRenderingContext2D = chartRef.getContext('2d') as CanvasRenderingContext2D;
+    const gradient = ctx.createLinearGradient(0, 0, 0, themeProps.gradientHeight);
+    return i => ({
+        borderWidth: 1,
+        fill: 'start',
+        pointRadius: 0,
+        pointBorderWidth: 0,
+        lineTension: 0.25,
+        backgroundColor: themeProps.gradient
+            ? getGradientColor(gradient, themeProps.colors[i])
+            : themeProps.colors[i],
+    });
+};
 
 const defaultOptions: ChartOptionsType<LineDefaultThemePropsType> = themeProps => ({
     maintainAspectRatio: false,
@@ -86,7 +88,7 @@ export const lineMultiThemePropsType = {
     max: undefined,
 } as LineMultiThemePropsType;
 
-const multiSettings: ChartSettingsType<LineMultiThemePropsType> = themeProps => ({
+const multiSettings: ChartSettingsType<LineMultiThemePropsType> = themeProps => i => ({
     fill: false,
     borderWidth: 2,
     lineTension: 0,
