@@ -4,7 +4,7 @@
                    v-on="$listeners"
         >
             <template #target>
-                <span>
+                <span class="inline-flex">
                     <slot name="button" :active="active">
                         <p-button ref="button" class="tooltip-btn" :class="{
                             active: active,

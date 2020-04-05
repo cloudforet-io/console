@@ -212,8 +212,12 @@
 		"None": ""
 	},
 	"FIELD": {
+		"CLOUD_SERVICE": "",
 		"NAME": "",
 		"PROJECT": "",
+		"PROJECT_GRP": "",
+		"RANK": "",
+		"SERVER": "",
 		"STATE": ""
 	},
 	"FORM": {

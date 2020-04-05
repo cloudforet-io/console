@@ -212,8 +212,12 @@
 		"None": ""
 	},
 	"FIELD": {
+		"CLOUD_SERVICE": "Cloud Service",
 		"NAME": "Name",
 		"PROJECT": "Project",
+		"PROJECT_GRP": "Project Group",
+		"RANK": "Rank",
+		"SERVER": "Server",
 		"STATE": "State"
 	},
 	"FORM": {
