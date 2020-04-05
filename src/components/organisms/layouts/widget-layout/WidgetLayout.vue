@@ -15,6 +15,7 @@
                     </template>
                 </p-tooltip-button>
             </slot>
+            <slot name="extra" />
         </div>
         <div :class="{padding}">
             <slot />
@@ -61,6 +62,7 @@ export default defineComponent({
 
         .help {
             @apply text-gray-400;
+            display: inline-flex;
             cursor: help;
         }
 
