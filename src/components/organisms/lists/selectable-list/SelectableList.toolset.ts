@@ -1,6 +1,8 @@
-import { SelectableItemPropsType } from '@/components/molecules/selectable-item/SelectableItem.toolset';
-import {HelperToolSet, initReactive, optionalType, StateToolSet, SyncStateToolSet} from "@/lib/toolset";
-import {computed, reactive, Ref} from "@vue/composition-api";
+import { SelectableItemPropsType, ThemeType } from '@/components/molecules/selectable-item/SelectableItem.toolset';
+import {
+    HelperToolSet, initReactive, optionalType, StateToolSet, SyncStateToolSet,
+} from '@/lib/toolset';
+import { computed, reactive, Ref } from '@vue/composition-api';
 
 export const selectableListProps = {
     items: {
@@ -37,12 +39,20 @@ export const selectableListProps = {
         type: Boolean,
         default: false,
     },
+    theme: {
+        type: String,
+        default: 'default',
+        validator(theme) {
+            return ['default', 'card'].includes(theme);
+        },
+    },
 };
 
 interface MapperType {
     key: string;
     iconUrl: string;
     title: string;
+    color: string;
 }
 
 interface SelectableListType<item=any> {
@@ -52,6 +62,7 @@ interface SelectableListType<item=any> {
     mustSelect?: boolean;
     defaultIcon?: string;
     loading?: boolean;
+    theme: ThemeType;
 }
 
 interface SelectableListSyncType {
@@ -69,28 +80,31 @@ export class SelectableListState<
     initState extends SelectableListType = SelectableListType<item>,
     initSync extends SelectableListSyncType= SelectableListSyncType
     > {
-    state:optionalType<initState, initData>
+    state: optionalType<initState, initData>
+
     syncState: optionalType<initSync, initSyncData>;
 
-    static initState() {
+    static initState(): SelectableListType {
         return {
-            items:[],
+            items: [],
             mapper: {
-                key:'',
-                iconUrl:'',
+                key: '',
+                iconUrl: '',
                 title: '',
+                color: '',
             },
             multiSelectable: false,
-            mustSelect:true,
-            defaultIcon:'',
-            loading: false
-        }
+            mustSelect: true,
+            defaultIcon: '',
+            loading: false,
+            theme: 'default',
+        };
     }
 
     static initSyncState() {
         return {
-            selectedIndexes:[],
-            disabledIndexes:[],
+            selectedIndexes: [],
+            disabledIndexes: [],
         };
     }
 
@@ -107,7 +121,7 @@ export interface SelectableListSelectState<item=any> {
     firstSelectItem: item;
 }
 
-const initSelectState = <item=any>(state: SelectableListType, syncState: SelectableListSyncType): SelectableListSelectState => {
+const initSelectState = function <item=any> (state: SelectableListType, syncState: SelectableListSyncType): SelectableListSelectState {
     const isNotSelected: Ref<boolean> = computed(() => (syncState.selectedIndexes ? (syncState.selectedIndexes as Array<any>).length === 0 : true));
     const isSelectOne: Ref<boolean> = computed(() => (syncState.selectedIndexes ? (syncState.selectedIndexes as Array<any>).length === 1 : false));
     const isSelectMulti: Ref<boolean> = computed(() => (syncState.selectedIndexes ? (syncState.selectedIndexes as Array<any>).length > 1 : false));
@@ -123,7 +137,7 @@ const initSelectState = <item=any>(state: SelectableListType, syncState: Selecta
 };
 
 @HelperToolSet()
-export class SelectableListToolset<initData, initSyncData,item=any> extends SelectableListState<initData, initSyncData,item> {
+export class SelectableListToolset<initData, initSyncData, item=any> extends SelectableListState<initData, initSyncData, item> {
     selectState: SelectableListSelectState<item>= null as unknown as SelectableListSelectState;
 
     static initToolSet(_this: any) {

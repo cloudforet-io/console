@@ -45,7 +45,6 @@
                     <p-tr>
                         <p-td class="text-center">
                             <p-i name="ic_top1" />
-                            <!--                            {{ index + 1 }}-->
                         </p-td>
                         <p-td class="project-field">
                             {{ item.project_group }}
@@ -128,6 +127,8 @@ export default defineComponent({
                 ...barDefaultThemeProps,
                 colors: _.values(state.colors),
                 stacked: true,
+                horizontal: true,
+                ticksCount: 7,
             })),
             fields: computed(() => makeTrItems([['rank', 'FIELD.RANK'],
                 ['project_group', 'FIELD.PROJECT_GRP'],
