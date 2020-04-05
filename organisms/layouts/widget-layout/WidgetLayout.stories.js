@@ -46,3 +46,26 @@ export const defaultCase = () => ({
         };
     },
 });
+
+export const extraSlot = () => ({
+    components: { PWidgetLayout },
+    props: getKnobProps(widgetLayoutProps, {
+        title: 'title',
+        help: 'help',
+    }),
+    template: `
+    <div style="width: 80vw;">
+        <PWidgetLayout v-bind="$props">
+            <template #extra>
+                extra
+            </template>
+        </PWidgetLayout>
+    </div>`,
+    setup(props, context) {
+        const state = getState(props, context);
+
+        return {
+            ...toRefs(state),
+        };
+    },
+});

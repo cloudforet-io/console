@@ -26,42 +26,46 @@
                 :fields="fieldsData"
             >
                 <p-tr>
-                    <p-th v-if="selectable" style="width: 16px;">
+                    <p-th v-if="selectable" class="all-select">
                         <PCheckBox v-if="multiSelect"
                                    v-model="allState"
                                    @change="selectAllToggle"
                         />
                     </p-th>
                     <p-th
-                        v-for="(field,index) in fieldsData"
+                        v-for="(field, index) in fieldsData"
                         :key="index"
                         :style="field.style ||{}"
                         :class="{'fix-width': colCopy}"
-                        @click="theadClick(field,index,$event)"
+                        @click="theadClick(field, index, $event)"
                         @mouseenter="thHoverIndex=index"
                         @mouseleave="thHoverIndex=null"
                     >
-                        <span class="th-contents">
-                            <span :style="{visibility: isThOver(index) ? 'hidden' : 'visible'}">
-                                {{ field.label ? field.label : field.name }}
+                        <slot :name="`th-${field.name}`" :index="index" :field="field"
+                              :sortable="sortable"
+                        >
+                            <span class="th-contents">
+                                <span :style="{visibility: isThOver(index) ? 'hidden' : 'visible'}">
+                                    {{ field.label ? field.label : field.name }}
+                                </span>
+                                <p-copy-button v-if="isThOver(index)"
+                                               class="copy-btn"
+                                               :value="clickColCopy(index)"
+                                />
+                                <template v-if="sortable&&field.sortable">
+                                    <p-i
+                                        v-if="sortable&&field.name==sortBy"
+                                        :name="sortIcon"
+                                        class="sort-icon"
+                                    />
+                                    <p-i
+                                        v-else
+                                        name="ic_table_sort"
+                                        class="sort-icon"
+                                    />
+                                </template>
                             </span>
-                            <p-copy-button v-if="isThOver(index)"
-                                           class="copy-btn"
-                                           :value="clickColCopy(index)"
-                            />
-                            <template v-if="sortable&&field.sortable">
-                                <p-i
-                                    v-if="sortable&&field.name==sortBy"
-                                    :name="sortIcon"
-                                    class="sort-icon"
-                                />
-                                <p-i
-                                    v-else
-                                    name="ic_table_sort"
-                                    class="sort-icon"
-                                />
-                            </template>
-                        </span>
+                        </slot>
                     </p-th>
                 </p-tr>
             </slot>
@@ -83,54 +87,60 @@
                 <slot v-for="(item, index) in items" name="row" :fields="fieldsName"
                       :item="item" :index="index"
                 >
-                    <p-tr :key="index" :data-index="index"
-                          :class="{'tr-selected': isSelected(index)} "
-                          v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
-                          @click.left="rowLeftClick( item, index, $event )"
-                          @click.right="rowRightClick( item, index, $event )"
-                          @click.middle="rowMiddleClick( item, index, $event )"
-                          @mouseover="rowMouseOver(item,index, $event)"
-                          @mouseout="rowMouseOut(item,index, $event)"
+                    <slot :name="'row-'+index"
+                          :item="item"
+                          :index="index"
+                          :fields="fieldsName"
                     >
-                        <p-td v-if="selectable"
-                              class="select-checkbox"
-                              @click.stop.prevent="selectClick"
-                              @mouseenter="hoverIndex=index"
-                              @mouseleave="hoverIndex=null"
+                        <p-tr :key="index" :data-index="index"
+                              :class="{'tr-selected': isSelected(index)} "
+                              v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
+                              @click.left="rowLeftClick( item, index, $event )"
+                              @click.right="rowRightClick( item, index, $event )"
+                              @click.middle="rowMiddleClick( item, index, $event )"
+                              @mouseover="rowMouseOver(item,index, $event)"
+                              @mouseout="rowMouseOut(item,index, $event)"
                         >
-                            <PCheckBox v-if="multiSelect"
-                                       v-model="proxySelectIndex"
-                                       :value="index"
-                                       :hovered="hoverIndex===index"
-                            />
-                            <p-radio v-else
-                                     v-model="proxySelectIndex[0]"
-                                     :value="index"
-                                     :hovered="hoverIndex===index"
-                            />
-                        </p-td>
-                        <template v-for="field in fieldsName">
-                            <slot
-                                :name="'col-'+field"
-                                :item="item"
-                                :value=" item? item[field] :''"
-                                :index="index"
-                                :field="field"
+                            <p-td v-if="selectable"
+                                  class="select-checkbox"
+                                  @click.stop.prevent="selectClick"
+                                  @mouseenter="hoverIndex=index"
+                                  @mouseleave="hoverIndex=null"
                             >
-                                <p-td onselectstart="return true" style="user-select: all;">
-                                    <slot
-                                        :name="'col-'+field+'-format'"
-                                        :item="item"
-                                        :value="getValueFunc(item,field)"
-                                        :index="index"
-                                        :field="field"
-                                    >
-                                        {{ getValueFunc(item,field) }}
-                                    </slot>
-                                </p-td>
-                            </slot>
-                        </template>
-                    </p-tr>
+                                <PCheckBox v-if="multiSelect"
+                                           v-model="proxySelectIndex"
+                                           :value="index"
+                                           :hovered="hoverIndex===index"
+                                />
+                                <p-radio v-else
+                                         v-model="proxySelectIndex[0]"
+                                         :value="index"
+                                         :hovered="hoverIndex===index"
+                                />
+                            </p-td>
+                            <template v-for="field in fieldsName">
+                                <slot
+                                    :name="'col-'+field"
+                                    :item="item"
+                                    :value=" item? item[field] :''"
+                                    :index="index"
+                                    :field="field"
+                                >
+                                    <p-td onselectstart="return true" style="user-select: all;">
+                                        <slot
+                                            :name="'col-'+field+'-format'"
+                                            :item="item"
+                                            :value="getValueFunc(item,field)"
+                                            :index="index"
+                                            :field="field"
+                                        >
+                                            {{ getValueFunc(item,field) }}
+                                        </slot>
+                                    </p-td>
+                                </slot>
+                            </template>
+                        </p-tr>
+                    </slot>
                 </slot>
             </slot>
         </template>
@@ -469,6 +479,7 @@ export default defineComponent({
                 .th-contents {
                     display: flex;
                     justify-content: space-between;
+                    padding: 0.25rem 0 0.25rem 0.75rem;
                 }
                 .sort-icon {
                     @apply text-gray-200;
@@ -478,7 +489,13 @@ export default defineComponent({
                     min-width: 4.75rem;
                 }
                 &:last-child {
-                    padding-right: 1rem;
+                    .th-contents {
+                        padding-right: 1rem;
+                    }
+                }
+                &.all-select {
+                    width: 1rem;
+                    padding: 0.25rem 0 0.25rem 0.75rem;
                 }
             }
         }
