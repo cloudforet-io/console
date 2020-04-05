@@ -6,8 +6,10 @@
             <template #target>
                 <span>
                     <slot name="button" :active="active">
-                        <p-button ref="button" class="tooltip-btn" :class="{active: active}"
-                                  @click="onClick"
+                        <p-button ref="button" class="tooltip-btn" :class="{
+                            active: active,
+                            [theme]: true
+                        }"
                         >
                             <slot name="buttonContents">
                                 {{ contents }}
@@ -53,6 +55,13 @@ export default {
             type: Boolean,
             default: false,
         },
+        theme: {
+            type: String,
+            default: 'primary-dark',
+            validator(theme) {
+                return ['primary-dark', 'transparent'];
+            },
+        },
     },
     computed: {
         options() {
@@ -61,23 +70,29 @@ export default {
             }, this.tooltipOptions);
         },
     },
-    methods: {
-        onClick() {
-        },
-    },
 };
 </script>
 
 <style scoped lang="postcss">
+
+    @define-mixin theme $theme, $color {
+        &.$(theme) {
+            &:hover, &.active {
+                background-color: $color;
+            }
+        }
+    }
     .tooltip-btn {
         @apply text-primary4;
         display: inline-block;
         padding: 0;
         border-radius: 2px;
-        border: 0px;
+        border: 0;
         min-width: 32px;
-        &:hover, &.active {
-            @apply bg-primary-dark;
-        }
+
+        @mixin theme primary-dark, theme('colors.primary-dark');
+        @mixin theme transparent, transparent;
     }
+
+
 </style>

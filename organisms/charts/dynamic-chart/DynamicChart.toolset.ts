@@ -91,15 +91,15 @@ export class DynamicChartState<D, S extends DynamicChartPropsType = DynamicChart
 }
 
 export interface ChartSettingsType<T extends DefaultThemePropsType = DefaultThemePropsType> {
-    (themeProps: T, chartRef: HTMLCanvasElement, index: number): ChartDataSets;
+    (themeProps: T, chartRef: HTMLCanvasElement, dataset: ChartData[]): {(index: number): ChartDataSets};
 }
 
 export interface ChartOptionsType<T extends DefaultThemePropsType = DefaultThemePropsType> {
-    (themeProps: T): ChartOptions;
+    (themeProps: T, dataset: ChartData[]): ChartOptions;
 }
 
 export interface ChartPluginsType<T extends DefaultThemePropsType = DefaultThemePropsType> {
-    (themeProps: T): ChartPluginsOptions;
+    (themeProps: T, dataset: ChartData[]): ChartPluginsOptions;
 }
 
 export interface ChartThemeType<T extends DefaultThemePropsType = DefaultThemePropsType> {
@@ -121,7 +121,7 @@ export const tooltips: ChartTooltipOptions = {
     backgroundColor: gray[900],
 };
 
-export const defaultSettings = (): ChartDataSets => ({});
+export const defaultSettings = () => (): ChartDataSets => ({});
 
 export const defaultOptions = (): ChartOptions => ({});
 

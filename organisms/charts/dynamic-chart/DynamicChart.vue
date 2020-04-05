@@ -41,17 +41,21 @@ export default defineComponent({
         const state: UnwrapRef<DynamicChartStateType> = reactive({
             chartRef: null,
             chart: null,
-            options: computed(() => themes[props.type][props.styleType].options(props.themeProps)),
-            plugins: computed(() => themes[props.type][props.styleType].plugins(props.themeProps)),
+            options: computed(() => themes[props.type][props.styleType].options(props.themeProps, props.dataset)),
+            plugins: computed(() => themes[props.type][props.styleType].plugins(props.themeProps, props.dataset)),
             datasets: computed(() => {
                 if (state.chartRef) {
+                    const settings = themes[props.type][props.styleType].settings(
+                        props.themeProps,
+                        state.chartRef,
+                        props.dataset,
+                    );
                     return props.dataset.map((d, i) => ({
                         label: d.label,
                         data: d.data,
                         borderColor: props.themeProps.colors[i],
                         backgroundColor: props.themeProps.colors[i],
-                        // @ts-ignore
-                        ...themes[props.type][props.styleType].settings(props.themeProps, state.chartRef, i),
+                        ...settings(i),
                     }));
                 }
                 return [{}];
