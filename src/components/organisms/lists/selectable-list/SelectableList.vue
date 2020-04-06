@@ -11,6 +11,8 @@
                                :title="getItem(item, mapper.title)"
                                :active="proxySelectedIndexes.includes(idx)"
                                :disabled="proxyDisabledIndexes.includes(idx)"
+                               :color="getItem(item, mapper.color)"
+                               :theme="theme"
                                @click="onItemClick(item, idx)"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -38,12 +40,10 @@ export default defineComponent({
     name: 'SelectableList',
     components: { PSelectableItem, PLottie },
     props: selectableListProps,
-    setup(props: SelectableListPropsType) {
-        const vm: any = getCurrentInstance();
-
+    setup(props: SelectableListPropsType, { emit }) {
         const state = reactive({
-            proxySelectedIndexes: makeProxy('selectedIndexes'),
-            proxyDisabledIndexes: makeProxy('disabledIndexes'),
+            proxySelectedIndexes: makeProxy('selectedIndexes', props, emit),
+            proxyDisabledIndexes: makeProxy('disabledIndexes', props, emit),
         });
 
         const getItem = (item, key) => _.get(item, key);
@@ -53,13 +53,13 @@ export default defineComponent({
             if (foundIdx !== -1) {
                 if (props.mustSelect && state.proxySelectedIndexes.length === 1) return;
                 state.proxySelectedIndexes.splice(foundIdx, 1);
-                vm.$emit('unselected', item, idx, state.proxySelectedIndexes);
+                emit('unselected', item, idx, state.proxySelectedIndexes);
             } else if (props.multiSelectable || state.proxySelectedIndexes.length === 0) {
                 state.proxySelectedIndexes = [...state.proxySelectedIndexes, idx];
-                vm.$emit('selected', item, idx, state.proxySelectedIndexes);
+                emit('selected', item, idx, state.proxySelectedIndexes);
             } else {
                 state.proxySelectedIndexes = [idx];
-                vm.$emit('selected', item, idx, state.proxySelectedIndexes);
+                emit('selected', item, idx, state.proxySelectedIndexes);
             }
         };
         return {
@@ -78,5 +78,13 @@ export default defineComponent({
         width: 100%;
         align-items: center;
         justify-content: center;
+    }
+    .item-container {
+        &.card {
+            margin-bottom: 0.5rem;
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
     }
 </style>

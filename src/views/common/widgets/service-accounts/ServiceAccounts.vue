@@ -9,24 +9,25 @@
             />
         </div>
         <div class="mt-4">
-            <router-link v-for="(d, i) in data" :key="labels[i]"
-                         to="/identity/service-account"
-                         class="legend"
+            <p-selectable-list :items="data" :mapper="mapper" theme="card"
+                               @selected="onSelected"
             >
-                <div class="bar" :style="{backgroundColor: d.tags.color}" />
-                <p-lazy-img :img-url="d.tags.icon" height="2rem" width="2rem" />
-                <span class="name">{{ d.name }}</span>
-                <p-badge :background-color="d.tags.color" class="count">
-                    {{ d.count }}
-                </p-badge>
-            </router-link>
+                <template #contents="{item}">
+                    <span class="ml-2 text-base">{{ item.name }}</span>
+                </template>
+                <template #extra="{item}">
+                    <p-badge :background-color="item.tags.color" class="count">
+                        {{ item.count }}
+                    </p-badge>
+                </template>
+            </p-selectable-list>
         </div>
     </p-widget-layout>
 </template>
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PDynamicChart from '@/components/organisms/charts/dynamic-chart/DynamicChart.vue';
@@ -34,6 +35,7 @@ import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import { ChartData } from '@/components/organisms/charts/dynamic-chart/DynamicChart.toolset';
 import { pieDefaultThemeProps } from '@/components/organisms/charts/dynamic-chart/themes/pie-chart';
+import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
 
 export default defineComponent({
     name: 'ServiceAccounts',
@@ -42,8 +44,11 @@ export default defineComponent({
         PDynamicChart,
         PLazyImg,
         PBadge,
+        PSelectableList,
     },
     setup() {
+        const vm: any = getCurrentInstance();
+
         const state = reactive({
             data: [],
             loading: true,
@@ -100,6 +105,15 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
+            mapper: {
+                key: 'name',
+                iconUrl: 'tags.icon',
+                title: 'name',
+                color: 'tags.color',
+            },
+            onSelected(item) {
+                vm.$router.push('/identity/service-account');
+            },
         };
     },
 });
@@ -114,32 +128,8 @@ export default defineComponent({
         width: 180px;
         height: 180px;
     }
-    .legend {
-        @apply border border-gray-200;
-        border-radius: 2px;
-        display: flex;
-        width: 100%;
-        align-items: center;
-        height: 3rem;
-        margin-top: 0.5rem;
-        cursor: pointer;
-        &:hover {
-            @apply bg-blue-200;
-        }
-        .bar {
-            border-radius: 2px 0 0 2px;
-            width: 4px;
-            margin-right: 0.625rem;
-            height: 100%;
-        }
-        .name {
-            margin-left: 1rem;
-            flex-grow: 1;
-        }
-        .count {
-            margin-right: 1rem;
-            font-size: 0.875rem;
-            font-weight: bold;
-        }
+    .count {
+        font-size: 0.875rem;
+        font-weight: bold;
     }
 </style>
