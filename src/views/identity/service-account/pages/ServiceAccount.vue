@@ -56,7 +56,10 @@
                                             :data="null"
                             >
                                 <template #toolbox-left>
-                                    <p-button style-type="primary-dark" :disabled="true">
+                                    <p-button
+                                        style-type="primary-dark"
+                                        @click="clickSecretAddForm()"
+                                    >
                                         {{ $t('BTN.ADD') }}
                                     </p-button>
                                     <p-button
@@ -115,6 +118,9 @@
             <SServiceAccountFormModal v-if="formVisible" :visible.sync="formVisible" :schema="formSchema"
                                       @confirm="formConfirm($event)"
             />
+            <SSecretCreateFormModal v-if="secretFormVisible" :visible.sync="secretFormVisible" :schema-names="secretSchemas"
+                                    @confirm="secretFormConfirm($event)"
+            />
         </template>
     </p-vertical-page-layout2>
 </template>
@@ -154,6 +160,7 @@ import { createAtVF } from '@/lib/data-source';
 import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
 import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -171,6 +178,7 @@ export default {
         PSelectableList,
         PDoubleCheckModal,
         SServiceAccountFormModal,
+        SSecretCreateFormModal,
     },
     setup(props, context) {
         const { project } = useStore();
@@ -186,6 +194,7 @@ export default {
             'provider',
             'tags.icon',
             'template.service_account.schema',
+            'capability.supported_schema',
         );
 
         providerListAPI.execute().then((resp) => {
@@ -196,7 +205,6 @@ export default {
         const originDataSource = computed<any[]>(() => {
             if (listToolset.selectState.isSelectOne) {
                 const properties = listToolset.selectState.firstSelectItem.template.service_account.schema.properties;
-                console.debug(properties);
                 if (properties) {
                     return [
                         { name: 'name', key: 'name' },
@@ -427,12 +435,52 @@ export default {
                 },
             },
         ];
+        const secretFormState = reactive({
+            secretFormVisible: false,
+            secretSchemas: [] as string[],
+        });
+        const clickSecretAddForm = () => {
+            secretFormState.secretSchemas = listToolset.selectState.firstSelectItem.capability.supported_schema;
+            secretFormState.secretFormVisible = true;
+        };
+        const secretFormConfirm = (item) => {
+            fluentApi.secret().secret().create().setParameter({
+                ...item,
+                secret_type: 'CREDENTIALS',
+                service_account_id: apiHandler.tableTS.selectState.firstSelectItem.service_account_id,
+            })
+                .execute()
+                .then(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Add Success',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .catch(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Add Fail',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .finally(() => {
+                    secretApiHandler.getData();
+                });
+            secretFormState.secretFormVisible = false;
+        };
+
 
         const formState = reactive({
             mode: 'add' as 'add'|'update',
             formVisible: false,
             formSchema: {} as any,
         });
+
 
         const clickOpenForm = (mode: 'add'|'update') => {
             formState.mode = mode;
@@ -474,7 +522,6 @@ export default {
         const tagsApi = new DictPanelAPI(fluentApi.identity().serviceAccount());
 
         watch(() => apiHandler.tableTS.selectState.firstSelectItem, async (item) => {
-            console.debug(item);
             tagsApi.setId(item.service_account_id);
             tagsApi.ts.toReadMode();
             await tagsApi.getData();
@@ -501,7 +548,10 @@ export default {
             adminApiHandler,
             clickOpenForm,
             formConfirm,
+            clickSecretAddForm,
             ...toRefs(formState),
+            ...toRefs(secretFormState),
+            secretFormConfirm,
             tagsApi,
         };
     },
