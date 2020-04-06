@@ -47,7 +47,7 @@ export default defineComponent({
         });
 
         const api = async () => new Promise((resolve) => {
-            setTimeout(() => {
+            setTimeout(() => { // inventory/job/list { state = CREATED | IN_PROGRESS}
                 resolve([{
                     collector_id: casual._uuid(),
                     name: 'Collector Name',

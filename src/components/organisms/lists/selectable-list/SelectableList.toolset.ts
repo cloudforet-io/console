@@ -46,6 +46,10 @@ export const selectableListProps = {
             return ['default', 'card'].includes(theme);
         },
     },
+    grid: {
+        type: Number,
+        default: 1,
+    },
 };
 export type MapperKeyType = string | ((key: string) => string);
 interface MapperType {
@@ -63,6 +67,7 @@ interface SelectableListType<item=any> {
     defaultIcon?: string;
     loading?: boolean;
     theme: ThemeType;
+    grid: number;
 }
 
 interface SelectableListSyncType {
@@ -98,6 +103,7 @@ export class SelectableListState<
             defaultIcon: '',
             loading: false,
             theme: 'default',
+            grid: 1,
         };
     }
 

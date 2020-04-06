@@ -2,7 +2,8 @@
     <p-widget-layout class="summary" :title="title" :padding="false">
         <router-link class="count" :to="to" :style="{
             color: color,
-        }">
+        }"
+        >
             {{ count | numbers }}
         </router-link>
         <p-dynamic-chart class="line-chart" :dataset="dataset" :loading="loading"
@@ -19,16 +20,17 @@ import {
     serviceSummaryProps,
     ServiceSummaryPropsType,
 } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue'
+import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PDynamicChart from '@/components/organisms/charts/dynamic-chart/DynamicChart.vue';
 import { lineDefaultThemeProps } from '@/components/organisms/charts/dynamic-chart/themes/line-chart';
 import { ChartData } from '@/components/organisms/charts/dynamic-chart/DynamicChart.toolset';
 
+// TODO: browser tooltip for exact count
 export default defineComponent({
     name: 'ServiceSummary',
     filters: {
         numbers(val) {
-            return val < 1000 ? val : numeral(val).format('0.0a');
+            return val < 10000 ? val : numeral(val).format('0.0a');
         },
     },
     components: { PWidgetLayout, PDynamicChart },
