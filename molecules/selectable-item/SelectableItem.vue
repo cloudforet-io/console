@@ -45,6 +45,7 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 @define-mixin item-theme $border-color, $hover-bg-color, $active-color, $active-bg-color {
+    position: relative;
     display: flex;
     align-items: center;
     width: 100%;
@@ -52,6 +53,17 @@ export default defineComponent({
     background-color: theme('colors.white');
     cursor: pointer;
     border-width: 1px;
+    min-height: 3rem;
+    height: 100%;
+    .bar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        border-radius: 2px 0 0 2px;
+        width: 4px;
+        height: 100%;
+        background-color: currentColor;
+    }
     .contents {
         display: flex;
         width: 100%;
@@ -74,13 +86,6 @@ export default defineComponent({
         @apply text-sm;
         color: inherit;
     }
-    .bar {
-        border-radius: 2px 0 0 2px;
-        width: 4px;
-        height: 100%;
-        background-color: currentColor;
-        min-height: 3rem;
-    }
 }
 .item-container {
     &.default {
@@ -90,7 +95,7 @@ export default defineComponent({
         @mixin item-theme theme('colors.gray.200'), theme('colors.blue.200'), theme('colors.secondary'), theme('colors.blue.200');
         border-radius: 2px;
         .contents {
-            padding: 0.5rem 1rem 0.5rem 0.625rem;
+            padding: 0.5rem 1rem;
         }
     }
 }

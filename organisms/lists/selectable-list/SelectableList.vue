@@ -30,7 +30,7 @@ import _ from 'lodash';
 import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { selectableListProps, SelectableListPropsType } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
+import { selectableListProps, SelectableListPropsType, MapperKeyType } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
 import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { makeProxy } from '@/lib/compostion-util';
@@ -46,7 +46,7 @@ export default defineComponent({
             proxyDisabledIndexes: makeProxy('disabledIndexes', props, emit),
         });
 
-        const getItem = (item, key) => _.get(item, key);
+        const getItem = (item, key: MapperKeyType) => (typeof key === 'string' ? _.get(item, key) : key(item));
 
         const onItemClick = (item, idx) => {
             const foundIdx = _.indexOf(state.proxySelectedIndexes, idx);
