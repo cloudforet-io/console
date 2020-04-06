@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="list-container" :class="[`grid-cols-${grid}`, theme]">
         <div v-if="loading" class="spinner-container">
             <p-lottie name="spinner" auto
                       :size="1.5"
@@ -46,7 +46,7 @@ export default defineComponent({
             proxyDisabledIndexes: makeProxy('disabledIndexes', props, emit),
         });
 
-        const getItem = (item, key: MapperKeyType) => (typeof key === 'string' ? _.get(item, key) : key(item));
+        const getItem = (item, key: MapperKeyType) => (typeof key === 'function' ? key(item) : _.get(item, key));
 
         const onItemClick = (item, idx) => {
             const foundIdx = _.indexOf(state.proxySelectedIndexes, idx);
@@ -79,12 +79,12 @@ export default defineComponent({
         align-items: center;
         justify-content: center;
     }
-    .item-container {
+    .list-container {
+        display: grid;
         &.card {
-            margin-bottom: 0.5rem;
-            &:last-child {
-                margin-bottom: 0;
-            }
+            grid-row-gap: 0.5rem;
+            grid-column-gap: 0.5rem;
         }
     }
+
 </style>
