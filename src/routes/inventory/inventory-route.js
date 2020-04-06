@@ -1,3 +1,5 @@
+import CloudServicePage from '@/views/inventory/cloud-service/pages/CloudServicePage';
+
 const Inventory = () => import('@/views/inventory/Inventory.vue');
 const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
 
@@ -35,8 +37,23 @@ export default {
         {
             path: 'cloud-service',
             name: 'cloudService',
+            redirect: '/inventory/cloud-service',
             meta: { label: 'Cloud Service', breadcrumb: true, beta: true },
-            component: CloudService,
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: 'cloudServiceMain',
+                    component: CloudService,
+                },
+                {
+                    path: ':provider/:group/:name',
+                    name: 'cloudServicePage',
+                    props: true,
+                    component: CloudServicePage,
+                },
+            ],
+
         },
         {
             path: 'collector',
