@@ -205,7 +205,6 @@ export default {
         const originDataSource = computed<any[]>(() => {
             if (listToolset.selectState.isSelectOne) {
                 const properties = listToolset.selectState.firstSelectItem.template.service_account.schema.properties;
-                console.debug(properties);
                 if (properties) {
                     return [
                         { name: 'name', key: 'name' },
@@ -441,7 +440,6 @@ export default {
             secretSchemas: [] as string[],
         });
         const clickSecretAddForm = () => {
-            console.debug('click add', listToolset.selectState.firstSelectItem);
             secretFormState.secretSchemas = listToolset.selectState.firstSelectItem.capability.supported_schema;
             secretFormState.secretFormVisible = true;
         };
@@ -524,7 +522,6 @@ export default {
         const tagsApi = new DictPanelAPI(fluentApi.identity().serviceAccount());
 
         watch(() => apiHandler.tableTS.selectState.firstSelectItem, async (item) => {
-            console.debug(item);
             tagsApi.setId(item.service_account_id);
             tagsApi.ts.toReadMode();
             await tagsApi.getData();

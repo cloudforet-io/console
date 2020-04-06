@@ -33,14 +33,19 @@ import {
 } from '@/lib/compostion-util';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import { DictIGToolSet } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
-import { CustomKeywords, JsonSchemaFormToolSet } from '@/components/organisms/forms/json-schema-form/toolset';
+import {
+    CustomKeywords,
+    JsonSchemaFormToolSet,
+    makeCustomError,
+    CustomValidator,
+} from '@/components/organisms/forms/json-schema-form/toolset';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
 import { JsonSchemaObjectType } from '@/lib/type';
-import { validationAutoChange } from '@/components/molecules/tabs/progress-tab-bar/ProgressTabBar.stories';
 import fluentApi from '@/lib/fluent-api';
 import { watch } from '@vue/composition-api';
 import { AxiosResponse } from 'axios';
 import Ajv from 'ajv';
+import { resolvePath } from 'vue-router/src/util/path';
 
 export default {
     name: 'SSecretCreateFormModal',
@@ -82,32 +87,23 @@ export default {
             showValidation: true,
         });
         const fixFormTS = new JsonSchemaFormToolSet();
+
+        const checkNameUnique = (...args: any[]) => fluentApi.secret().secret().list()
+            .setFilter({ key: 'name', operator: '=', value: args[1] })
+            .setCountOnly()
+            .execute()
+            .then(resp => resp.data.total_count === 0);
+
         const validation: CustomKeywords = {
-            uniqueName: {
-                async: true,
-                validate: (...args: any[]) => fluentApi.secret().secret().list()
-                    .setFilter({ key: 'name', operator: '=', value: args[1] })
-                    .setCountOnly()
-                    .execute()
-                    .then(resp => (resp.data.total_count === 0 ? Promise.resolve(true) : Promise.reject(new Ajv.ValidationError([
-                        {
-                            keyword: 'uniqueName',
-                            message: 'Duplicated',
-                            dataPath: '.name',
-                            schemaPath: '',
-                            params: {},
-                        },
-                    ])))),
-                errors: false,
-            },
+            uniqueName: new CustomValidator(checkNameUnique, 'name is duplicated'),
         };
+
         const makeFixSchema = () => {
             const sch = new JsonSchemaObjectType(undefined, undefined, true);
             sch.addStringProperty('name', 'Name', true, undefined, { uniqueName: true });
             sch.addEnumProperty('schemaName', 'Secret Type', props.schemaNames, true, { default: props.schemaNames[0] });
             return sch;
         };
-        makeFixSchema();
         watch(() => props.schemaNames, (after, before) => {
             if (after !== before) {
                 const sch = makeFixSchema();
