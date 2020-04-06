@@ -10,6 +10,7 @@
         </div>
         <div class="mt-4">
             <p-selectable-list :items="data" :mapper="mapper" theme="card"
+                               :loading="loading"
                                @selected="onSelected"
             >
                 <template #contents="{item}">
