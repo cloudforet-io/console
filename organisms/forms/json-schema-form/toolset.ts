@@ -5,8 +5,7 @@ import {
 import { computed, reactive, Ref } from '@vue/composition-api';
 import _ from 'lodash';
 import Ajv, { KeywordDefinition } from 'ajv';
-import { JsonSchema, JsonSchemaObjectType } from '@/lib/type';
-import { collectAllDependants } from 'ts-loader/dist/utils';
+import { JsonSchemaObjectType } from '@/lib/type';
 
 export class JsonSchemaProperty {
     constructor(
@@ -190,3 +189,27 @@ export class JsonSchemaFormToolSet<initData, initSyncData> extends JsonSchemaFor
         JsonSchemaFormToolSet.initToolSet(this);
     }
 }
+
+export const makeCustomValidate = (
+    validateFunc: (...args: any[]) => PromiseLike<boolean>,
+    field: string,
+    errorMsg: string,
+) => (
+    {
+        aysnc: true,
+        validate: async (...args: any[]) => validateFunc(...args).then((result) => {
+            console.debug(args, result);
+            if (!result) {
+                return Promise.reject(new Ajv.ValidationError([{
+                    keyword: 'customError',
+                    message: errorMsg,
+                    dataPath: args[3],
+                    schemaPath: '',
+                    params: {},
+                }]));
+            }
+            return Promise.resolve(true);
+        }),
+        errors: false,
+
+    });
