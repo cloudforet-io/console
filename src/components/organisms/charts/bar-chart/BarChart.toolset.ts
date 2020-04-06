@@ -1,19 +1,27 @@
 import {
-    loadingChartProps,
-    LoadingChartPropsType, OptionsType, PluginsType, SettingsType, tooltips,
-} from '@/components/organisms/charts/loading-chart/LoadingChart.toolset';
+    abstractChartProps,
+    AbstractChartPropsType,
+    ChartOptionsType,
+    ChartSettingsType,
+    tooltips,
+    ChartThemeGroupType,
+    defaultPlugins,
+} from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
 import { black, gray } from '@/styles/colors';
 
 export const barChartProps = {
-    ...loadingChartProps,
+    ...abstractChartProps,
     type: {
         type: String,
         default: 'bar',
+        validator(type: string): boolean {
+            return ['bar', 'horizontalBar'].includes(type);
+        },
     },
     styleType: {
         type: String,
         default: 'default',
-        validator(style: string) {
+        validator(style: string): boolean {
             return ['default'].includes(style);
         },
     },
@@ -27,14 +35,18 @@ export const barChartProps = {
     },
 };
 
-export interface BarChartPropsType extends LoadingChartPropsType {
+export interface BarChartPropsType extends AbstractChartPropsType {
     stacked: boolean;
     minBarLength: number;
 }
 
 
-/** *************** Settings ****************** */
-const defaultSettings: SettingsType<BarChartPropsType> = props => ({
+/** *************** THEMES ****************** */
+
+
+/** default */
+
+const defaultSettings: ChartSettingsType<BarChartPropsType> = props => ({
     // barThickness: 8,
     borderWidth: 0,
     minBarLength: props.minBarLength,
@@ -42,13 +54,7 @@ const defaultSettings: SettingsType<BarChartPropsType> = props => ({
     barPercentage: 0.7,
 });
 
-export const settings = {
-    default: defaultSettings,
-};
-
-/** *************** Options ****************** */
-
-const defaultOptions: OptionsType<BarChartPropsType> = props => ({
+const defaultOptions: ChartOptionsType<BarChartPropsType> = props => ({
     maintainAspectRatio: false,
     legend: {
         display: false,
@@ -85,16 +91,10 @@ const defaultOptions: OptionsType<BarChartPropsType> = props => ({
     tooltips,
 });
 
-
-export const options = {
-    default: defaultOptions,
-};
-
-/** *************** Plugins ****************** */
-
-const defaultPlugins: PluginsType<BarChartPropsType> = props => [{
-}];
-
-export const plugins = {
-    default: defaultPlugins,
+export const barChartThemes: ChartThemeGroupType<BarChartPropsType> = {
+    default: {
+        settings: defaultSettings,
+        options: defaultOptions,
+        plugins: defaultPlugins,
+    },
 };

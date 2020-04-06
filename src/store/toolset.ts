@@ -5,8 +5,9 @@ import Lockr from 'lockr';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import { api } from '@/lib/api/axios';
+import fluentApi from '@/lib/fluent-api';
 
-const bindLocalStorage = (prefix:string, name:string, state:any) => computed({
+const bindLocalStorage = (prefix: string, name: string, state: any) => computed({
     get: () => state[name],
     set: (val) => {
         state[name] = val;
@@ -16,8 +17,8 @@ const bindLocalStorage = (prefix:string, name:string, state:any) => computed({
 });
 
 
-const initData = (prefix:string, names:string[]) => {
-    const init :any = {};
+const initData = (prefix: string, names: string[]) => {
+    const init: any = {};
     Lockr.prefix = prefix;
     names.forEach((name) => {
         init[name] = Lockr.get(name);
@@ -25,8 +26,8 @@ const initData = (prefix:string, names:string[]) => {
     return init;
 };
 
-const initState = (prefix:string, names:string[], data:any) => {
-    const state :any = {};
+const initState = (prefix: string, names: string[], data: any) => {
+    const state: any = {};
     names.forEach((name) => {
         state[name] = bindLocalStorage(prefix, name, data);
     });
@@ -34,11 +35,11 @@ const initState = (prefix:string, names:string[], data:any) => {
 };
 
 abstract class Store<T> {
-    public state:T;
+    state: T;
 
-    protected data:any;
+    protected data: any;
 
-    protected constructor(protected prefix:string, protected names: string[]) {
+    protected constructor(protected prefix: string, protected names: string[]) {
         this.data = reactive({ ...initData(this.prefix, this.names) });
         this.state = reactive({}) as T;
     }
@@ -48,27 +49,27 @@ abstract class Store<T> {
         return Lockr;
     };
 
-    public reset() {
+    reset() {
         this.getLockr().flush();
     }
 }
 
 interface UserState {
-    refreshToken:string|null;
-    accessToken:string|null;
-    language:string|null;
-    timezone:string|null;
-    userId:string|null;
-    userType:'USER'|'DOMAIN_OWNER'|null;
-    isLocalType:Readonly<boolean>;
-    isDomainOwner:Readonly<boolean>;
-    isSignedIn:Readonly<boolean>;
-    userUrl:Readonly<string>;
-    paramIdName:Readonly<string>;
+    refreshToken: string|null;
+    accessToken: string|null;
+    language: string|null;
+    timezone: string|null;
+    userId: string|null;
+    userType: 'USER'|'DOMAIN_OWNER'|null;
+    isLocalType: Readonly<boolean>;
+    isDomainOwner: Readonly<boolean>;
+    isSignedIn: Readonly<boolean>;
+    userUrl: Readonly<string>;
+    paramIdName: Readonly<string>;
 }
 
 class UserStore extends Store<UserState> {
-    public constructor(prefix:string) {
+    constructor(prefix: string) {
         super(prefix, [
             'refreshToken',
             'accessToken',
@@ -86,12 +87,12 @@ class UserStore extends Store<UserState> {
         });
     }
 
-    public setToken(refresh:string, access:string) {
+    setToken(refresh: string, access: string) {
         this.state.refreshToken = refresh;
         this.state.accessToken = access;
     }
 
-    public async setUser(userType:'USER'|'DOMAIN_OWNER', userId:string, vm : any) {
+    async setUser(userType: 'USER'|'DOMAIN_OWNER', userId: string, vm: any) {
         this.state.userId = userId;
         this.state.userType = userType;
 
@@ -108,13 +109,13 @@ class UserStore extends Store<UserState> {
 }
 
 interface DomainState {
-    domainId:string;
-    domainName:string;
-    authType:string;
-    pluginOption:any;
+    domainId: string;
+    domainName: string;
+    authType: string;
+    pluginOption: any;
 }
 class DomainStore extends Store<DomainState> {
-    public constructor(prefix:string) {
+    constructor(prefix: string) {
         super(prefix, [
             'domainId',
             'domainName',
@@ -127,7 +128,7 @@ class DomainStore extends Store<DomainState> {
         });
     }
 
-    public getDomain= async (vm:any) => {
+    getDomain= async (vm: any) => {
         const { hostname } = window.location;
         this.state.domainName = hostname.split('.')[0];
         const resp = await api.newInstance().post('/identity/domain/list', {
@@ -151,12 +152,12 @@ class DomainStore extends Store<DomainState> {
 
 
 interface ProjectState {
-    projects:any;
-    ttl:DateTime;
+    projects: any;
+    ttl: DateTime;
 }
 
 class ProjectStore extends Store<ProjectState> {
-    public constructor(prefix:string) {
+    constructor(prefix: string) {
         super(prefix, [
             'projects',
             'ttl',
@@ -166,28 +167,22 @@ class ProjectStore extends Store<ProjectState> {
         });
     }
 
-    public isExpiration():boolean {
-        let result:boolean = true;
+    isExpiration(): boolean {
+        let result = true;
         if (this.state.ttl) {
             result = this.state.ttl < DateTime.local();
         }
         return result;
     }
 
-    public getProject= async () => {
+    getProject= async () => {
         console.debug('isEXP?', this.isExpiration());
+        const projectAPI = fluentApi.identity().project();
         if (this.isExpiration()) {
             const result = {};
             try {
                 console.debug('request project names');
-                const res = await api.instance.post(
-                    '/identity/project/list',
-                    {
-                        query: {
-                            only: ['project_id', 'name', 'project_group'],
-                        },
-                    },
-                );
+                const res = await projectAPI.list().setOnly('project_id', 'name', 'project_group').execute();
                 res.data.results.forEach((project) => {
                     result[project.project_id] = `${project.project_group_info.name}/${project.name}`;
                 });
@@ -200,6 +195,55 @@ class ProjectStore extends Store<ProjectState> {
     }
 }
 
+interface ProviderState {
+    providers: any;
+    ttl: DateTime;
+}
+
+class ProviderStore extends Store<ProviderState> {
+    constructor(prefix: string) {
+        super(prefix, [
+            'providers',
+            'ttl',
+        ]);
+        this.state = reactive({
+            ...initState(this.prefix, this.names, this.data),
+        });
+    }
+
+    isExpiration(): boolean {
+        let result = true;
+        if (this.state.ttl) {
+            result = this.state.ttl < DateTime.local();
+        }
+        return result;
+    }
+
+    getProvider = async () => {
+        console.debug('isEXP?', this.isExpiration());
+        const providerAPI = fluentApi.identity().provider();
+        if (this.isExpiration()) {
+            const result = {};
+            try {
+                console.debug('request provider');
+                const res = await providerAPI.list().execute();
+
+                res.data.results.forEach((provider) => {
+                    result[provider.provider] = {
+                        name: provider.name,
+                        icon: provider.tags?.icon,
+                        color: provider.tags?.color,
+                    };
+                });
+                this.state.ttl = DateTime.local().plus({ hours: 1 });
+            } catch (e) {
+                console.debug(e);
+            }
+            this.state.providers = result;
+        }
+    }
+}
+
 
 export default {
     name: 'LocalStorage',
@@ -208,11 +252,12 @@ export default {
             user: new UserStore('user/'),
             domain: new DomainStore('domain/'),
             project: new ProjectStore('project/'),
+            provider: new ProviderStore('provider/'),
         };
         return {
             ...state,
-            logout(vm?:any) {
-                let routerMeta:any = null;
+            logout(vm?: any) {
+                let routerMeta: any = null;
                 if (vm) {
                     routerMeta = {
                         name: vm.$ls.user.state.isDomainOwner ? 'AdminLogin' : 'Login',
@@ -224,6 +269,7 @@ export default {
                 state.user.reset();
                 state.domain.reset();
                 state.project.reset();
+                state.provider.reset();
                 if (vm) {
                     console.debug(routerMeta);
                     vm.$router.push(routerMeta);

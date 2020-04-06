@@ -8,7 +8,7 @@ import {
 } from '@/lib/fluent-api/type';
 import { CollectorPluginModel } from '@/lib/fluent-api/inventory/collector-plugin';
 
-const idField = 'credential_group_id';
+const idField = 'secret_group_id';
 
 interface IdParameter {
     [idField]: string;
@@ -34,7 +34,7 @@ class Get extends GetAction<IdParameter, any> {
 }
 class List extends ListAction<any, SecretGroupListResp> {}
 export default class SecretGroup extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
-    protected name = 'credential-group';
+    protected name = 'secret-group';
 
     create() { return new Create(this.baseUrl); }
 

@@ -411,8 +411,6 @@ export const collectorSetup = (props, context, AcHandler) => {
         collectDataState.modalVisible = true;
     };
 
-    collectorState.getCollectors();
-
     return {
         ...toRefs(state),
         onClickUpdate,
