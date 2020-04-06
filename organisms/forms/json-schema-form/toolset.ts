@@ -4,7 +4,7 @@ import {
 } from '@/lib/toolset';
 import { computed, reactive, Ref } from '@vue/composition-api';
 import _ from 'lodash';
-import Ajv, { KeywordDefinition } from 'ajv';
+import Ajv, { KeywordDefinition, SchemaValidateFunction } from 'ajv';
 import { JsonSchemaObjectType } from '@/lib/type';
 
 export class JsonSchemaProperty {
@@ -213,3 +213,32 @@ export const makeCustomValidate = (
         errors: false,
 
     });
+
+export const makeCustomError = (message: string, dataPath: string, keyword = 'CustomError') => new Ajv.ValidationError([{
+    keyword,
+    message,
+    dataPath,
+    schemaPath: '',
+    params: {},
+}]);
+
+export class CustomValidator {
+    validate: SchemaValidateFunction;
+
+    constructor(
+        public validateFunction: (...args: any[]) => PromiseLike<boolean>,
+        message: string,
+        public errors = false,
+        public async = true,
+    ) {
+        this.validate = (...args: any[]) => new Promise((resolve, reject) => {
+            // @ts-ignore
+            validateFunction(...args).then((resp) => {
+                if (!resp) {
+                    return reject(makeCustomError(message, args[3]));
+                }
+                return resolve(resp);
+            });
+        });
+    }
+}
