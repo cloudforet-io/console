@@ -57,7 +57,7 @@ export default defineComponent({
         const api = async () => new Promise((resolve) => {
             setTimeout(() => {
                 resolve([{
-                    date: '4/1',
+                    date: '4/1', // MM/DD
                     success: 40,
                     failure: 11,
                 }, {

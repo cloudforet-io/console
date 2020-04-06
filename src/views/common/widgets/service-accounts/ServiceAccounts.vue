@@ -74,8 +74,9 @@ export default defineComponent({
                 }, {
                     name: 'GCP',
                     tags: {
-                        icon: 'http://',
-                        color: '#4285F4',
+                        description: 'GCP', // front-end data = name
+                        icon: 'http://', // front-end data
+                        color: '#4285F4',// front-end data
                     },
                     count: 0,
                 }, {
@@ -123,7 +124,6 @@ export default defineComponent({
 <style lang="postcss" scoped>
     .service-accounts {
         min-width: 330px;
-        max-width: 446px;
     }
     .chart {
         width: 180px;
