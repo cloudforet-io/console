@@ -89,12 +89,20 @@ export default {
                     .setFilter({ key: 'name', operator: '=', value: args[1] })
                     .setCountOnly()
                     .execute()
-                    .then(resp => (resp.data.total_count === 0?true:false)),
+                    .then(resp => (resp.data.total_count === 0 ? Promise.resolve(true) : Promise.reject(new Ajv.ValidationError([
+                        {
+                            keyword: 'uniqueName',
+                            message: 'Duplicated',
+                            dataPath: '.name',
+                            schemaPath: '',
+                            params: {},
+                        },
+                    ])))),
                 errors: false,
             },
         };
         const makeFixSchema = () => {
-            const sch = new JsonSchemaObjectType(undefined, undefined, true, true);
+            const sch = new JsonSchemaObjectType(undefined, undefined, true);
             sch.addStringProperty('name', 'Name', true, undefined, { uniqueName: true });
             sch.addEnumProperty('schemaName', 'Secret Type', props.schemaNames, true, { default: props.schemaNames[0] });
             return sch;
