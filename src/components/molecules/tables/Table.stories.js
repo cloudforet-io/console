@@ -51,7 +51,7 @@ export const table = () => ({
             `,
     props: {
         tableStyleType: {
-            default: select('tableStyleType', ['', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900'], ''),
+            default: select('tableStyleType', ['', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900', 'primary4'], ''),
         },
         theadStyleType: {
             default: select('theadStyleType', ['', 'light', 'gray900'], ''),

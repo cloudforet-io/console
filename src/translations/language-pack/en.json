@@ -213,11 +213,13 @@
 	},
 	"FIELD": {
 		"CLOUD_SERVICE": "Cloud Service",
+		"COLLECTOR": "Collector",
 		"NAME": "Name",
 		"PROJECT": "Project",
 		"PROJECT_GRP": "Project Group",
 		"RANK": "Rank",
 		"SERVER": "Server",
+		"START_TIME": "Start Time",
 		"STATE": "State"
 	},
 	"FORM": {
