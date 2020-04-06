@@ -213,11 +213,13 @@
 	},
 	"FIELD": {
 		"CLOUD_SERVICE": "클라우드 서비스",
+		"COLLECTOR": "컬렉터",
 		"NAME": "이름",
 		"PROJECT": "프로젝트",
 		"PROJECT_GRP": "프로젝트 그룹",
 		"RANK": "순위",
 		"SERVER": "서버",
+		"START_TIME": "시작 시간",
 		"STATE": "상태"
 	},
 	"FORM": {
