@@ -47,12 +47,12 @@ export const selectableListProps = {
         },
     },
 };
-
+export type MapperKeyType = string | ((key: string) => string);
 interface MapperType {
-    key: string;
-    iconUrl: string;
-    title: string;
-    color: string;
+    key: MapperKeyType;
+    iconUrl: MapperKeyType;
+    title: MapperKeyType;
+    color: MapperKeyType;
 }
 
 interface SelectableListType<item=any> {
