@@ -137,6 +137,7 @@ export default defineComponent({
 .daily-updates {
     min-width: 332px;
     max-width: 446px;
+    overflow-y: auto;
 }
 .group-name {
     @apply text-base font-bold mb-1;
