@@ -31,8 +31,12 @@ class Delete extends SingleDeleteAction<IdParameter, any> {
 class Get extends GetAction<IdParameter, any> {
     protected idField = idField;
 }
+
+class GetByName extends GetAction<{name: string}, any> {
+    protected idField = 'name';
+}
 class List extends ListAction<any, SchemaListResp> {}
-export default class Schema extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
+export default class Schema extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'getByName'> {
     protected name = 'schema';
 
     create() { return new Create(this.baseUrl); }
@@ -44,4 +48,6 @@ export default class Schema extends Resource implements ResourceActions<'create'
     get() { return new Get(this.baseUrl); }
 
     list() { return new List(this.baseUrl); }
+
+    getByName() { return new GetByName(this.baseUrl); }
 }
