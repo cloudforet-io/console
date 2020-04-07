@@ -25,7 +25,7 @@
                 </span>
             </span>
         </div>
-        <div class="main" :style="{height: height}">
+        <div class="main" :style="mainStyle">
             <slot />
         </div>
     </div>
@@ -80,6 +80,10 @@ export default {
                 minWidth: `${props.minWidth}px`,
                 maxWidth: `${props.maxWidth}px`,
                 opacity: state.hide && !state.transition ? 0 : 1,
+            })),
+            mainStyle: computed(() => ({
+                width: `calc( 100% - ${state.width}px )`,
+                height: props.height,
             })),
         });
 
@@ -153,8 +157,7 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: stretch;
-        flex-grow: 1;
-        width: 100%;
+        /*flex-grow: 1;*/
         overflow: auto;
     }
     .resizer-container {
