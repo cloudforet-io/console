@@ -59,7 +59,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import _ from 'lodash';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PTextPagenation from '@/components/organisms/pagenations/textPagenation.vue';
@@ -67,10 +67,10 @@ import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
+import { gridLayoutProps } from '@/components/molecules/layouts/grid-layout/toolset';
 
 const setTools = (props, context) => {
     const state = reactive({
-        allPage: computed(() => Math.ceil((props.totalCount || 1) / props.pageSize)),
         proxyThisPage: makeProxy('thisPage', props, context.emit),
         proxyPageSize: makeProxy('pageSize', props, context.emit),
         pageSizeOptions: computed(() => (_.flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size })))),
@@ -86,7 +86,7 @@ const setTools = (props, context) => {
             state.proxyThisPage = 1;
             context.emit('changePageSize', sizeNum);
         }
-    }
+    };
     return {
         ...toRefs(state),
         changePageNumber,
@@ -95,7 +95,7 @@ const setTools = (props, context) => {
 };
 
 export default {
-    name: 'ToolboxGridLayout',
+    name: 'PToolboxGridLayout',
     components: {
         PGridLayout,
         PTextPagenation,
@@ -104,42 +104,7 @@ export default {
     },
     events: ['pageChange', 'clickMenuEvent', 'clickRefresh'],
     props: {
-        cardMinWidth: {
-            type: String,
-            default: '12rem',
-        },
-        cardMaxWidth: {
-            type: String,
-            default: '1fr',
-        },
-        cardHeight: {
-            type: String,
-            default: '20rem',
-        },
-        rowGap: {
-            type: String,
-            default: '1rem',
-        },
-        fixColumn: {
-            type: Number,
-            default: null,
-        },
-        columnGap: {
-            type: String,
-            default: '1rem',
-        },
-        cardClass: {
-            type: Function,
-            default: () => [],
-        },
-        cardStyle: {
-            type: Function,
-            default: () => ({}),
-        },
-        items: {
-            type: Array,
-            default: () => ['1', '2', '3', '4', '5', '1', '2', '3', '4', '5'],
-        },
+        ...gridLayoutProps,
         pagenationVisible: {
             type: Boolean,
             default: true,
@@ -167,9 +132,9 @@ export default {
             type: Array,
             default: () => [15, 30, 45],
         },
-        totalCount: {
+        allPage: {
             type: Number,
-            default: 0,
+            default: 1,
         },
     },
     setup(props, context) {

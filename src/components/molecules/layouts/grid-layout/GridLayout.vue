@@ -1,5 +1,5 @@
 <template>
-    <div class="container" :style="containerStyle">
+    <div class="p-grid-layout" :style="containerStyle">
         <div v-for="(item, index) in items"
              :key="index"
              class="card-item"
@@ -13,51 +13,15 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { reactive, computed, toRefs } from '@vue/composition-api';
+import { gridLayoutProps } from '@/components/molecules/layouts/grid-layout/toolset';
 
 export default {
-    name: 'GridLayout',
+    name: 'PGridLayout',
     components: {
     },
-    props: {
-        cardMinWidth: {
-            type: String,
-            default: '12rem',
-        },
-        cardMaxWidth: {
-            type: String,
-            default: '1fr',
-        },
-        cardHeight: {
-            type: String,
-            default: '20rem',
-        },
-        rowGap: {
-            type: String,
-            default: '1rem',
-        },
-        fixColumn: {
-            type: Number,
-            default: null,
-        },
-        columnGap: {
-            type: String,
-            default: '1rem',
-        },
-        cardClass: {
-            type: Function,
-            default: () => [],
-        },
-        cardStyle: {
-            type: Function,
-            default: () => ({}),
-        },
-        items: {
-            type: Array,
-            default: () => [],
-        },
-    },
+    props: gridLayoutProps,
     setup(props, context) {
         const state = reactive({
             containerStyle: computed(() => ({
