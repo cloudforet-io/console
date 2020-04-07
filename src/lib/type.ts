@@ -49,10 +49,23 @@ export class JsonSchemaObjectType implements JsonSchema<'object'> {
     constructor(
         public properties: any = {},
         public required: string[] = [],
+        public $async = false,
     ) { }
 
     addStringProperty(name: string, label: string, required?: boolean, placeHolder?: string, extra?: any) {
         this.properties[name] = StringProperty(label, required, placeHolder, extra);
-        this.required.push(name);
+        if (required) {
+            this.required.push(name);
+        }
+    }
+
+    addEnumProperty(name: string, label: string, enumData: any[], required?: boolean, extra?: any) {
+        this.properties[name] = StringProperty(label, required, undefined, {
+            ...extra,
+            enum: enumData,
+        });
+        if (required) {
+            this.required.push(name);
+        }
     }
 }
