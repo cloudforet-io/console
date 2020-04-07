@@ -39,6 +39,10 @@ export const gridLayoutProps = {
         type: Array,
         default: () => [],
     },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
 };
 export interface GridLayoutPropsType {
     items?: any[];
@@ -59,14 +63,22 @@ export interface GridLayoutStateType extends GridLayoutPropsType{
     cardHeight: string;
     columnGap: string;
 }
-
+export interface GridLayoutSyncStateType {
+   loading: boolean;
+}
 
 @StateToolSet<GridLayoutStateType>()
+@SyncStateToolSet<GridLayoutSyncStateType>()
 export class GridLayoutState<
     initData=any,
+    initSyncData=any,
     initState extends GridLayoutStateType=GridLayoutStateType,
+    initSyncState extends GridLayoutSyncStateType=GridLayoutSyncStateType,
     > {
     state: optionalType<initState, initData>;
+
+    syncState: optionalType<initSyncState, initSyncData>;
+
 
     static initState() {
         return {
@@ -78,7 +90,15 @@ export class GridLayoutState<
     }
 
 
-    constructor(initData: initData = {} as initData, lazy = false) {
+    static initSyncState() {
+        return {
+            loading: false,
+        };
+    }
+
+
+    constructor(initData: initData = {} as initData, initSyncData: initSyncData = {}as initSyncData, lazy = false) {
         this.state = initReactive(lazy, GridLayoutState.initState(), initData);
+        this.syncState = initReactive(lazy, GridLayoutState.initSyncState(), initSyncData);
     }
 }
