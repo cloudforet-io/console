@@ -39,7 +39,7 @@ export default {
         },
         fixColumn: {
             type: Number,
-            default: 0,
+            default: null,
         },
         columnGap: {
             type: String,
@@ -76,7 +76,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-
     .icon {
         @apply inline-block
     }
@@ -85,5 +84,11 @@ export default {
         @apply bg-white border border-gray-100;
         box-shadow: 0 0 8px rgba(theme('colors.primary'), 0.08);
         border-radius: 2px;
+        cursor: pointer;
+        &:hover {
+             @apply border-l border-secondary;
+             cursor: pointer;
+         }
     }
+
 </style>
