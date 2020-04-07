@@ -33,12 +33,10 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    $min-width: 1200px;
     .app {
         display: flex;
         overflow-y: hidden;
         width: 100vw;
-        min-width: $min-width;
         .gnb {
             display: inline-block;
             height: 100vh;
