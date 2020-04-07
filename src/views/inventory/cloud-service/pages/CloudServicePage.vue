@@ -29,7 +29,7 @@
             </template>
         </p-horizontal-layout>
         <PTab v-if="apiHandler.tableTS.selectState.isSelectOne" :tabs="singleItemTab.state.tabs" :active-tab.sync="singleItemTab.syncState.activeTab">
-            <<template #detail>
+            <template #detail>
                 <PDynamicDetails
                     :details="apiHandler.tableTS.selectState.firstSelectItem.metadata.details"
                     :data="apiHandler.tableTS.selectState.firstSelectItem"
@@ -244,7 +244,7 @@ export default {
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
         getDataSource(props.provider, props.group, props.name);
         watch(() => [props.provider, props.group, props.name], async (after, before) => {
-            if (after[0] !== before[0] || after[1] !== before[1] || after[2] !== before[2]) {
+            if (after && (before && (after[0] !== before[0] || after[1] !== before[1] || after[2] !== before[2]))) {
                 apiHandler.resetAll();
                 await getDataSource(after[0], after[1], after[2]);
                 apiHandler.action = csListAction.setFixFilter(

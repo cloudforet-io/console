@@ -34,9 +34,34 @@
                     />
                 </template>
                 <template #card="{item}">
-                    {{ item.provider }} / {{ item.group }}<br>
-                    {{ item.name }}<br>
-                    {{ item.cloud_service_count }}<br>
+                    <div class="top">
+                        <div class="text-content">
+                            <div class="sub-title">
+                                {{ item.provider }} / {{ item.group }}
+                            </div>
+                            <div class="title">
+                                {{ item.name }}
+                            </div>
+                        </div>
+                        <div class="side-content">
+                            <img v-if="item.tags.icon"
+                                 width="48px" height="48px"
+                                 :src="item.tags.icon"
+                                 :alt="item.name"
+                            >
+                            <img v-else-if="providerStore.state.providers[item.provider]"
+                                 width="48px" height="48px"
+                                 :src="providerStore.state.providers[item.provider].icon"
+                                 :alt="item.provider"
+                            >
+                            <div v-else class="bg-gray-200 w-full h-full" />
+                        </div>
+                    </div>
+                    <div class="bottom">
+                        <div class="total-count">
+                            {{ item.cloud_service_count }}
+                        </div>
+                    </div>
                 </template>
             </PToolboxGridLayout>
         </template>
@@ -79,8 +104,11 @@ export default {
         PSelectableList,
     },
     setup(props, context) {
-        const { project } = useStore();
-        project.getProject();
+        const {
+            provider,
+        } = useStore();
+        const providerStore = provider;
+        providerStore.getProvider();
         const vm = getCurrentInstance();
 
         const listToolset = new SelectableListToolset<unknown, unknown, ProviderModel>();
@@ -92,8 +120,6 @@ export default {
             'name',
             'provider',
             'tags.icon',
-            'template.service_account.schema',
-            'capability.supported_schema',
         );
 
         providerListAPI.execute().then((resp) => {
@@ -145,6 +171,7 @@ export default {
             listToolset,
             apiHandler,
             clickCard,
+            providerStore,
         };
     },
 
@@ -160,6 +187,37 @@ export default {
         }
     }
     >>> .cst-card-item{
-        @apply p-6;
+        @apply p-6 flex flex-col justify-between;
+        .top{
+            @apply flex justify-between;
+            .text-content{
+                .sub-title{
+                    @apply text-gray-500;
+                    font-family: "Noto Sans";
+                    font-size: 0.875rem;
+                    line-height: 1.0625rem;
+                }
+                .title{
+                    @apply font-bold;
+                    font-family: "Noto Sans";
+                    font-size: 1.125rem;
+                    line-height: 1.375rem;
+
+                }
+            }
+            .side-content{
+                @apply w-12 h-12 flex justify-around content-around;
+            }
+
+        }
+        .bottom{
+            @apply flex ;
+            .total-count {
+                @apply font-bold text-4xl;
+                font-family: "Noto Sans";
+            }
+
+        }
+
     }
 </style>
