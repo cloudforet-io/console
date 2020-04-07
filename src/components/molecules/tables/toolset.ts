@@ -103,8 +103,8 @@ export interface TablePropsType {
     tfootClass?: object;
 }
 @StateToolSet<TablePropsType>()
-export class TableState<initData, initSate extends TablePropsType = TablePropsType> {
-    state: optionalType<initSate, initData>;
+export class TableState<initData, initState extends TablePropsType = TablePropsType> {
+    state: optionalType<initState, initData>;
 
     static initState() {
         return {
@@ -120,12 +120,12 @@ export class TableState<initData, initSate extends TablePropsType = TablePropsTy
 
     constructor(initData: initData = {} as initData, lazy = false) {
         if (lazy) {
-            this.state = null as unknown as initSate;
+            this.state = null as unknown as initState;
         } else {
             this.state = reactive({
                 ...TableState.initState(),
                 ...initData,
-            }) as optionalType<initSate, initData>;
+            }) as optionalType<initState, initData>;
         }
     }
 }

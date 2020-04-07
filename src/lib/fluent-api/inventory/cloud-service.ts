@@ -3,7 +3,7 @@ import {
     CreateAction,
     GetAction, GetDataAction, ListAction, MemberListAction,
     Resource,
-    ResourceActions, SingleDeleteAction, UpdateAction,
+    ResourceActions, SingleDeleteAction, SubMultiItemAction, UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
     CollectionInfo, DefaultMetaData,
@@ -60,7 +60,21 @@ class MemberList extends MemberListAction<any, any> {
     protected idsField = idsField;
 }
 
-export default class CloudService extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'getData'|'memberList'> {
+class ChangeProject extends SubMultiItemAction<any, any> {
+    path = 'change-project'
+
+    idField = 'project_id'
+
+    protected subIdsField = idsField;
+
+    setReleaseProject() {
+        this.apiState.parameter.release_project = true;
+        return this.clone();
+    }
+}
+
+
+export default class CloudService extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'getData'|'memberList'|'changeProject'> {
     protected name = 'cloud-service';
 
     create() { return new Create(this.baseUrl); }
@@ -76,4 +90,6 @@ export default class CloudService extends Resource implements ResourceActions<'c
     list() { return new List(this.baseUrl); }
 
     memberList(): MemberList { return new MemberList(this.baseUrl); }
+
+    changeProject() { return new ChangeProject(this.baseUrl); }
 }
