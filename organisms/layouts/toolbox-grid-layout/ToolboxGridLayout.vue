@@ -42,8 +42,8 @@
             </div>
         </div>
         <p-grid-layout v-bind="$props" v-on="$listeners">
-            <template #card>
-                <slot name="cardItem" />
+            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                <slot :name="slot" v-bind="scope" />
             </template>
         </p-grid-layout>
         <div class="bottom">
