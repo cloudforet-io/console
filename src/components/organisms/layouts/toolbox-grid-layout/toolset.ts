@@ -8,11 +8,10 @@ import {
     HelperToolSet,
     initReactive, optionalType, StateToolSet, SyncStateToolSet,
 } from '@/lib/toolset';
-import { Computed } from '@/lib/type';
 import {
     GridLayoutPropsType,
     GridLayoutState,
-    GridLayoutStateType,
+    GridLayoutStateType, GridLayoutSyncStateType,
 } from '@/components/molecules/layouts/grid-layout/toolset';
 import { getAllPage } from '@/components/organisms/pagenations/toolset';
 
@@ -23,10 +22,7 @@ export interface ToolBoxGridLayoutPropsType extends GridLayoutPropsType{
     allPage?: number;
     pageNationValues?: number[];
 }
-export interface ToolBoxGridLayoutSyncType{
-    pageSize?: number;
-    thisPage?: number;
-}
+
 
 export interface ToolBoxGridLayoutStateType extends GridLayoutStateType{
     pagenationVisible: boolean;
@@ -35,7 +31,7 @@ export interface ToolBoxGridLayoutStateType extends GridLayoutStateType{
     allPage: number;
     pageNationValues: number[];
 }
-export interface ToolBoxGridLayoutSyncStateType {
+export interface ToolBoxGridLayoutSyncStateType extends GridLayoutSyncStateType{
     pageSize: number;
     thisPage: number;
 }
@@ -47,9 +43,7 @@ export class ToolboxGridLayoutState<
     initSyncData=any,
     initState extends ToolBoxGridLayoutStateType=ToolBoxGridLayoutStateType,
     initSyncState extends ToolBoxGridLayoutSyncStateType=ToolBoxGridLayoutSyncStateType,
-    > extends GridLayoutState<initData, initState> {
-    syncState: optionalType<initState, initData>;
-
+    > extends GridLayoutState<initData, initSyncData, initState, initSyncState> {
     static initState() {
         return {
             ...GridLayoutState.initState(),
@@ -64,13 +58,14 @@ export class ToolboxGridLayoutState<
 
     static initSyncState() {
         return {
+            ...GridLayoutState.initSyncState(),
             pageSize: 24,
             thisPage: 1,
         };
     }
 
     constructor(initData: initData = {} as initData, initSyncData: initSyncData = {}as initSyncData, lazy = false) {
-        super(initData, true);
+        super(initData, initSyncData, true);
         this.state = initReactive(lazy, ToolboxGridLayoutState.initState(), initData);
         this.syncState = initReactive(lazy, ToolboxGridLayoutState.initSyncState(), initSyncData);
     }
