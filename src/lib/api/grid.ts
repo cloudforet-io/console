@@ -59,7 +59,7 @@ export abstract class BaseGridFluentAPI<
     }
 }
 
-export class SearchTableFluentAPI<
+export class SearchGridFluentAPI<
     parameter = any,
     resp extends ListType<any> = ListType<any>,
     initData = any,
@@ -104,7 +104,7 @@ export const defaultACHandler: ACHandlerMeta = {
 };
 
 
-export class QuerySearchTableFluentAPI<
+export class QuerySearchGridFluentAPI<
     parameter = any,
     resp extends ListType<any> = ListType<any>,
     initData = any,
