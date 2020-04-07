@@ -111,8 +111,8 @@ export default {
                 ...makeTrItems([
                     ['credential_id', 'COMMON.ID', { size: '400px' }],
                     ['name', 'COMMON.NAME', { size: '400px' }],
-                    ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
-                    ['credential_groups', 'COMMON.GROUP', { size: '800px', sortable: false }],
+                    // ['issue_type', 'COMMON.ISSUE_TYPE', { size: '400px' }],
+                    // ['credential_groups', 'COMMON.GROUP', { size: '800px', sortable: false }],
                     ['created_at', 'COMMON.CREATED', { size: '300px' }],
                 ], parent),
                 { name: 'collect', label: ' ', sortable: false }],
@@ -122,8 +122,9 @@ export default {
             thisPage: 1,
             allPage: computed(() => Math.ceil(props.totalCount / state.pageSize) || 1),
             onClickVerify() { emit('verifyModalVisible:update', true); },
-            credentialPath: computed(() => (_.get(props.collector, 'plugin_info.credential_id')
-                ? '/secret/credentials' : '/secret/credentials-group')),
+            // credentialPath: computed(() => (_.get(props.collector, 'plugin_info.credential_id')
+            //     ? '/secret/credentials' : '/secret/credentials-group')),
+            credentialPath: '/secret/credentials',
         });
 
         const query = computed(() => (defaultQuery(
