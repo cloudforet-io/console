@@ -57,7 +57,7 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .p-badge {
     display: inline-block;
     border-radius: 100px;

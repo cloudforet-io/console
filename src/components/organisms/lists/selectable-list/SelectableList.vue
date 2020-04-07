@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="list-container" :class="[`grid-cols-${grid}`, theme]">
         <div v-if="loading" class="spinner-container">
             <p-lottie name="spinner" auto
                       :size="1.5"
@@ -11,6 +11,8 @@
                                :title="getItem(item, mapper.title)"
                                :active="proxySelectedIndexes.includes(idx)"
                                :disabled="proxyDisabledIndexes.includes(idx)"
+                               :color="getItem(item, mapper.color)"
+                               :theme="theme"
                                @click="onItemClick(item, idx)"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -28,7 +30,7 @@ import _ from 'lodash';
 import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { selectableListProps, SelectableListPropsType } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
+import { selectableListProps, SelectableListPropsType, MapperKeyType } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
 import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { makeProxy } from '@/lib/compostion-util';
@@ -38,28 +40,26 @@ export default defineComponent({
     name: 'SelectableList',
     components: { PSelectableItem, PLottie },
     props: selectableListProps,
-    setup(props: SelectableListPropsType) {
-        const vm: any = getCurrentInstance();
-
+    setup(props: SelectableListPropsType, { emit }) {
         const state = reactive({
-            proxySelectedIndexes: makeProxy('selectedIndexes'),
-            proxyDisabledIndexes: makeProxy('disabledIndexes'),
+            proxySelectedIndexes: makeProxy('selectedIndexes', props, emit),
+            proxyDisabledIndexes: makeProxy('disabledIndexes', props, emit),
         });
 
-        const getItem = (item, key) => _.get(item, key);
+        const getItem = (item, key: MapperKeyType) => (typeof key === 'function' ? key(item) : _.get(item, key));
 
         const onItemClick = (item, idx) => {
             const foundIdx = _.indexOf(state.proxySelectedIndexes, idx);
             if (foundIdx !== -1) {
                 if (props.mustSelect && state.proxySelectedIndexes.length === 1) return;
                 state.proxySelectedIndexes.splice(foundIdx, 1);
-                vm.$emit('unselected', item, idx, state.proxySelectedIndexes);
+                emit('unselected', item, idx, state.proxySelectedIndexes);
             } else if (props.multiSelectable || state.proxySelectedIndexes.length === 0) {
                 state.proxySelectedIndexes = [...state.proxySelectedIndexes, idx];
-                vm.$emit('selected', item, idx, state.proxySelectedIndexes);
+                emit('selected', item, idx, state.proxySelectedIndexes);
             } else {
                 state.proxySelectedIndexes = [idx];
-                vm.$emit('selected', item, idx, state.proxySelectedIndexes);
+                emit('selected', item, idx, state.proxySelectedIndexes);
             }
         };
         return {
@@ -79,4 +79,12 @@ export default defineComponent({
         align-items: center;
         justify-content: center;
     }
+    .list-container {
+        display: grid;
+        &.card {
+            grid-row-gap: 0.5rem;
+            grid-column-gap: 0.5rem;
+        }
+    }
+
 </style>

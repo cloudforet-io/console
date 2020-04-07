@@ -51,7 +51,7 @@ export default {
 <style lang="postcss">
     $space: 8px;
     .p-tooltip-target {
-        display: inline-block;
+        display: inline-flex;
     }
     .p-tooltip {
         display: block !important;

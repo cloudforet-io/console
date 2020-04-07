@@ -22,4 +22,50 @@ export interface JsonSchema<T extends JsonSchemaType=JsonSchemaType> {
     };
     enum?: any[];
     items?: JsonSchema;
+    required?: string[];
+}
+
+
+export const StringProperty = (label: string, required?, placeholder?: string, extra?: any): JsonSchema<'string'> => {
+    const result: any = {
+        type: 'string',
+        title: label,
+    };
+    if (placeholder) {
+        result.examples = [placeholder];
+    }
+    if (required) {
+        result.minLength = 4;
+    }
+    return {
+        ...result,
+        ...extra,
+    };
+};
+
+export class JsonSchemaObjectType implements JsonSchema<'object'> {
+    type: 'object'='object';
+
+    constructor(
+        public properties: any = {},
+        public required: string[] = [],
+        public $async = false,
+    ) { }
+
+    addStringProperty(name: string, label: string, required?: boolean, placeHolder?: string, extra?: any) {
+        this.properties[name] = StringProperty(label, required, placeHolder, extra);
+        if (required) {
+            this.required.push(name);
+        }
+    }
+
+    addEnumProperty(name: string, label: string, enumData: any[], required?: boolean, extra?: any) {
+        this.properties[name] = StringProperty(label, required, undefined, {
+            ...extra,
+            enum: enumData,
+        });
+        if (required) {
+            this.required.push(name);
+        }
+    }
 }

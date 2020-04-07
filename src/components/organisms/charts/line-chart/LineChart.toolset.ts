@@ -7,13 +7,16 @@ import {
     ChartSettingsType,
     tooltips, ChartThemeGroupType, defaultPlugins,
 } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
-import hexToRgba from 'hex-to-rgba';
+import Color from 'color';
 
 export const lineChartProps = {
     ...abstractChartProps,
     type: {
         type: String,
         default: 'line',
+        validator(type: string): boolean {
+            return ['line'].includes(type);
+        },
     },
     styleType: {
         type: String,
@@ -30,24 +33,28 @@ export const lineChartProps = {
         type: Number,
         default: undefined,
     },
+    gradientHeight: {
+        type: Number,
+        default: undefined,
+    },
 };
 
 export interface LineChartPropsType extends AbstractChartPropsType {
     min?: number;
     max?: number;
+    gradientHeight?: number;
 }
 
 /** *************** THEMES ****************** */
 
 
 /** default */
-
-const getGradientColor = (color: string, chartRef: HTMLCanvasElement) => {
+const getGradientColor = (color: string, chartRef: HTMLCanvasElement, gradientHeight: number) => {
     const ctx: CanvasRenderingContext2D = chartRef.getContext('2d') as CanvasRenderingContext2D;
-    const gradient = ctx.createLinearGradient(0, 0, 0, 150);
-    gradient.addColorStop(0, hexToRgba(color, 0.25));
-    gradient.addColorStop(0.5, hexToRgba(color, 0.125));
-    gradient.addColorStop(1, hexToRgba(color, 0));
+    const gradient = ctx.createLinearGradient(0, 0, 0, gradientHeight);
+    gradient.addColorStop(0, Color(color).alpha(0.25));
+    gradient.addColorStop(0.5, Color(color).alpha(0.125));
+    gradient.addColorStop(1, Color(color).alpha(0));
     return gradient;
 };
 
@@ -56,7 +63,7 @@ const defaultSettings: ChartSettingsType<LineChartPropsType> = (props, chartRef,
     fill: true,
     pointRadius: 0,
     lineTension: 0.5,
-    backgroundColor: getGradientColor(props.colors[i], chartRef),
+    backgroundColor: getGradientColor(props.colors[i], chartRef, props.gradientHeight || 100),
 });
 
 const defaultOptions: ChartOptionsType<LineChartPropsType> = props => ({
@@ -66,8 +73,8 @@ const defaultOptions: ChartOptionsType<LineChartPropsType> = props => ({
     },
     layout: {
         padding: {
-            left: 10,
-            right: 10,
+            left: -10,
+            bottom: -10,
         },
     },
     scales: {

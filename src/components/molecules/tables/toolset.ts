@@ -2,7 +2,7 @@ import { reactive } from '@vue/composition-api';
 import { optionalType, StateToolSet } from '@/lib/toolset';
 
 
-const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900'];
+const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900', 'primary4'];
 export const tableProps = {
     tableStyleType: {
         type: String,

@@ -6,6 +6,7 @@ import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 
 import Vue from 'vue';
+import VueRouter from 'vue-router';
 import store from '@/store';
 import directive from '@/directives';
 import VueInputAutowidth from 'vue-input-autowidth';
@@ -17,7 +18,10 @@ import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
 import LiquorTree from 'liquor-tree';
 import "@/styles/style.scss";
+import webFontLoader from 'webfontloader';
+import { fontUrls, webFonts } from '@/styles/web-fonts';
 
+Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
 Vue.mixin(Util);
@@ -30,6 +34,13 @@ Vue.use(SvgIcon, {
 Vue.use(LiquorTree);
 
 Vue.prototype.$velocity = velocity;
+
+webFontLoader.load({
+    google: {
+        families: webFonts,
+        urls: fontUrls,
+    },
+});
 /*****************************************************************
  * This is a Global Bus Event;
  * Please, name your '$emit' event name as action + Event such as
@@ -54,5 +65,6 @@ addDecorator(centered);
 addDecorator(() => ({
     i18n,
     store,
+    router: new VueRouter(),
     template: '<story/>',
 }));

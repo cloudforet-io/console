@@ -1,16 +1,19 @@
 /* eslint-disable camelcase */
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
 import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
-import md from './JsonSchemaForm.md';
+import {
+    CustomKeywords,
+    CustomValidator,
+    JsonSchemaFormToolSet,
+} from '@/components/organisms/forms/json-schema-form/toolset';
+import { JsonSchemaObjectType } from '@/lib/type';
 
 export default {
     title: 'organisms/forms/json-schema-form',
     component: PJsonSchemaForm,
-    parameters: {
-        notes: md,
-    },
 };
 const defaultSchema = {
     type: 'object',
@@ -62,120 +65,91 @@ const defaultSchema = {
             },
         },
     },
-    required: ['domain', 'client_id'],
+    required: ['domain', 'not-required', 'number_field', 'integer_field'],
 };
 
 export const defaultCase = () => ({
-    components: { PJsonSchemaForm },
+    components: { PJsonSchemaForm, PButton },
     template: `
     <div class="w-64">
         <PJsonSchemaForm
-                v-for="form in forms"
-                :key="form.key"
-                v-model="data[form.key]"
-                :schema="form.schema"
-                :invalid="false"
-                :required="form.required"
+          v-bind="jscTS.state"
+          :item.sync="jscTS.syncState.item" 
         />
-        <pre>{{data}}</pre>
+        <PButton style-type="primary" @click="jscTS.formState.validator()"> Validate!</PButton>
+        <pre>{{jscTS.syncState.item}}</pre>
     </div>
   `,
     setup(props, context) {
-        const schema = defaultSchema;
-        const data = reactive(_.zipObject(Object.keys(schema.properties)));
-        const forms = computed(() => Object.entries(schema.properties).map(([key, value]) => ({
-            key,
-            schema: value,
-            required: schema.required ? schema.required.includes(key) : false,
-        })));
+        const jscTS = new JsonSchemaFormToolSet();
+        jscTS.setProperty(defaultSchema);
         return {
-            forms,
-            data,
+            jscTS,
         };
     },
 });
 
-export const ignoreSchemaDefaultValue = () => ({
-    components: { PJsonSchemaForm },
+export const customSchemaForm = () => ({
+    components: { PJsonSchemaForm, PButton },
     template: `
     <div class="w-64">
         <PJsonSchemaForm
-                v-for="form in forms"
-                :key="form.key"
-                v-model="data[form.key]"
-                :schema="form.schema"
-                :invalid="false"
-                :required="form.required"
+          v-bind="jscTS.state"
+          :item.sync="jscTS.syncState.item" 
         />
-        <pre>{{data}}</pre>
+        <PButton style-type="primary" @click="jscTS.formState.validator()"> Validate!</PButton>
+        <pre>{{jscTS.syncState.item}}</pre>
     </div>
   `,
     setup(props, context) {
-        const schema = {
-            type: 'object',
-            properties: {
-                default_field: {
-                    title: 'Email Domain',
-                    type: 'string',
-                    default: 'one@spaceone.dev',
-                },
-                no_default_field: {
-                    title: 'No Default',
-                    type: 'string',
-                },
-                force_default_field: {
-                    title: 'Force Default',
-                    type: 'string',
-                    default: "you can't see me",
-                },
-            },
-        };
-        const data = reactive({
-            default_field: null,
-            no_default_field: null,
-            force_default_field: 'this is vue default',
-        });
-        const forms = computed(() => Object.entries(schema.properties).map(([key, value]) => ({
-            key,
-            schema: value,
-            required: schema.required ? schema.required.includes(key) : false,
-        })));
+        const jscTS = new JsonSchemaFormToolSet();
+        const schema = new JsonSchemaObjectType();
+        schema.addStringProperty('name', 'Name', true);
+        schema.addStringProperty('email', 'EMail', true);
+
+        jscTS.setProperty(schema, ['name', 'email']);
         return {
-            forms,
-            data,
+            jscTS,
         };
     },
 });
 
-
-export const invalidForm = () => ({
-    components: { PJsonSchemaForm },
+export const customValidatorForm = () => ({
+    components: { PJsonSchemaForm, PButton },
     template: `
     <div class="w-64">
         <PJsonSchemaForm
-                v-for="form in forms"
-                :key="form.key"
-                v-model="data[form.key]"
-                :schema="form.schema"
-                :invalid="true"
-                invalidText="this is invalid text"
-                :required="form.required"
+          v-bind="jscTS.state"
+          :item.sync="jscTS.syncState.item" 
         />
-        <pre>{{data}}</pre>
+        <PButton style-type="primary" @click="jscTS.formState.validator()"> Validate!</PButton>
+        <pre>{{jscTS.syncState.item}}</pre>
     </div>
   `,
     setup(props, context) {
-        const schema = defaultSchema;
-        const data = reactive(_.zipObject(Object.keys(schema.properties)));
+        const jscTS = new JsonSchemaFormToolSet();
+        const checkEmail = (...args) => {
+            const prom = new Promise((resolve, reject) => {
+                const data = args[1] || '';
+                console.debug(data.indexOf('@'));
+                if (data.indexOf('@') !== -1) {
+                    resolve(true);
+                }
+                resolve(false);
+            });
+            return prom;
+        };
 
-        const forms = computed(() => Object.entries(schema.properties).map(([key, value]) => ({
-            key,
-            schema: value,
-            required: schema.required ? schema.required.includes(key) : false,
-        })));
+        const validation = {
+            isEmail: new CustomValidator(checkEmail, 'is it email?'),
+        };
+        const schema = new JsonSchemaObjectType(undefined, undefined, true);
+        schema.addStringProperty('name', 'Name', true);
+        schema.addStringProperty('emailDomain', 'EMail Domain', true, 'you start @ text', { isEmail: true });
+
+        jscTS.setProperty(schema, ['name', 'emailDomain'], validation);
         return {
-            forms,
-            data,
+            jscTS,
         };
     },
 });

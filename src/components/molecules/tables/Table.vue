@@ -8,7 +8,7 @@
             <thead :class="theadClassObject" :style="theadStyle">
                 <slot name="head" />
             </thead>
-            <tbody :class="tbodyClass" :style="tbodyStyle"   :onselectstart="tbodyOnSelectStart? 'return true':'return false'">
+            <tbody :class="tbodyClass" :style="tbodyStyle" :onselectstart="tbodyOnSelectStart? 'return true':'return false'">
                 <!--            is="transition-group" name="table-row"-->
                 <!--            @before-enter="beforRowEnter"-->
                 <!--            @enter="rowEnter"-->
@@ -133,17 +133,17 @@ export default defineComponent({
         border-collapse: separate;
         border-spacing: 0;
         th {
-            @apply text-gray-400;
+            @apply text-gray;
             position: sticky;
             z-index: 1;
             top: 0;
-            padding: 0.25rem 0 0.25rem 0.75rem;
             line-height: 1.5rem;
             text-align: left;
             letter-spacing: 0;
         }
         tr {
             td {
+                font-family: theme('fontFamily.serif');
                 height: 2.5rem;
                 padding: 0 0.75rem;
                 z-index: 0;
@@ -158,37 +158,16 @@ export default defineComponent({
                 }
             }
         }
-        /*&.table-hover {*/
-        /*    tr:hover {*/
-        /*        @apply bg-secondary2;*/
-        /*    }*/
-        /*}*/
-        /*&.table-striped {*/
-        /*    tr:nth-of-type(odd) {*/
-        /*        background-color: transparent;*/
-        /*    }*/
-        /*    tr:nth-of-type(even) {*/
-        /*        @apply bg-primary4;*/
-        /*    }*/
-        /*    tr:hover {*/
-        /*        @apply bg-secondary2;*/
-        /*    }*/
-        /*}*/
-        /*&.table-light {*/
-        /*    th {*/
-        /*        box-shadow: inset 0 1px 0 theme('colors.gray.400'), inset 0 -1px 0 theme('colors.gray.400');*/
-        /*    }*/
-        /*}*/
     }
 
     @define-mixin table-theme $th-bg-color, $stripe-bg-color, $border-color, $hover-color {
         th {
             background-color: $th-bg-color;
-            border-bottom: 1px solid $border-color;
         }
         &.top-border {
             th {
                 border-top: 1px solid $border-color;
+                border-bottom: 1px solid $border-color;
             }
         }
         &.table-bordered {
@@ -203,10 +182,10 @@ export default defineComponent({
         }
         &.table-striped {
             tr:nth-of-type(odd) {
-                background-color: transparent;
+                background-color: $stripe-bg-color;
             }
             tr:nth-of-type(even) {
-                background-color: $stripe-bg-color;
+                background-color: transparent;
             }
             &.table-hover {
                 tr:hover {
@@ -217,6 +196,22 @@ export default defineComponent({
     }
 
     .table-default { @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.900'), theme('colors.secondary2'); }
-    .table-light { @mixin table-theme theme('colors.white'), transparent, theme('colors.gray.200'), transparent; }
+    .table-light {
+         @mixin table-theme theme('colors.white'), transparent, theme('colors.gray.200'), transparent;
+         th {
+             border-bottom: 1px solid theme('colors.gray.200');
+         }
+     }
+    .table-primary4 {
+        @mixin table-theme theme('colors.white'), transparent, theme('colors.white'), transparent;
+        tr {
+            @apply bg-primary4;
+        }
+        &.table-bordered {
+            td {
+                border-bottom-width: 4px;
+            }
+        }
+    }
 
 </style>
