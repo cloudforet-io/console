@@ -5,6 +5,7 @@
              class="card-item"
              :class="cardClass(item, index)"
              :style="cardStyle(item, index)"
+             @click="$emit('card:click',item,$event)"
         >
             <slot name="card" :item="item">
                 {{ item }}
