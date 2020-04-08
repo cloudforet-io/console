@@ -1,11 +1,7 @@
 <template>
     <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
-            <PSelectableList
-                class="w-full"
-                v-bind="listToolset.state"
-                :selected-indexes.sync="listToolset.syncState.selectedIndexes"
-            />
+            <p-grid-layout class="provider-list" :items="providerList" />
         </template>
         <template #default>
             <PToolboxGridLayout
@@ -61,6 +57,12 @@
                         <div class="total-count">
                             {{ item.cloud_service_count }}
                         </div>
+                        <div v-if="todayCreated[item.cloud_service_type_id]" class="today-created">
+                            <p-i name="ic_list_increase" width="12px" height="12px" />
+                            <div class="number">
+                                {{ todayCreated[item.cloud_service_type_id] }}
+                            </div>
+                        </div>
                     </div>
                 </template>
             </PToolboxGridLayout>
@@ -82,13 +84,21 @@ import { fluentApi } from '@/lib/fluent-api';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
 import { SelectableListToolset } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
-import { useStore } from '@/store/toolset';
+import { ProviderStoreType, useStore } from '@/store/toolset';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import PHr from '@/components/atoms/hr/Hr.vue';
+import { AxiosResponse } from 'axios';
+import CloudServiceType, { CloudServiceTypeListResp } from '@/lib/fluent-api/inventory/cloud-service-type';
+import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
+import _ from 'lodash';
+import construct from '@babel/runtime-corejs2/helpers/esm/construct';
+import PI from '@/components/atoms/icons/PI.vue';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
+import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 
 export default {
     name: 'ServiceAccount',
@@ -97,37 +107,59 @@ export default {
         PButton,
         PDropdownMenuBtn,
         PEmpty,
+        PI,
         PHr,
         PQuerySearchBar,
         PQuerySearchTags,
         PToolboxGridLayout,
+        PGridLayout,
         PSelectableList,
     },
     setup(props, context) {
         const {
             provider,
         } = useStore();
-        const providerStore = provider;
+        const providerStore: ProviderStoreType = provider;
         providerStore.getProvider();
         const vm = getCurrentInstance();
 
-        const listToolset = new SelectableListToolset<unknown, unknown, ProviderModel>();
-        listToolset.state.mapper.iconUrl = 'tags.icon';
-        listToolset.state.mapper.key = 'proivder';
-        listToolset.state.mapper.title = 'name';
 
-        const providerListAPI = fluentApi.identity().provider().list().setOnly(
-            'name',
-            'provider',
-            'tags.icon',
-        );
-
-        providerListAPI.execute().then((resp) => {
-            listToolset.state.items = resp.data.results;
-            listToolset.syncState.selectedIndexes = [0];
+        const providerListState = new GridLayoutState({
+            items: computed(() => [
+                ...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })),
+            ]),
         });
+
+        // providerListAPI.execute().then((resp) => {
+        //     listToolset.state.items = resp.data.results;
+        //     listToolset.syncState.selectedIndexes = [0];
+        // });
+
+        const metricAPI = fluentApi.inventory().cloudService().list().setCountOnly();
+        // .setFixFilter({ key: 'created_at', operator: '>', value: '2222222222222' });
+        const createdData = reactive({});
+        const todayCreated = ref(createdData);
+        const getMetric = (resp: AxiosResponse<CloudServiceTypeListResp>) => {
+            const ids = resp.data.results.map(item => item.cloud_service_type_id);
+            todayCreated.value = reactive(_.zipObject(ids));
+            resp.data.results.forEach((item) => {
+                const id = item.cloud_service_type_id;
+                const setMetric = (count) => { todayCreated.value[id] = count; };
+                metricAPI.setFilter(
+                    { key: 'provider', operator: '=', value: item.provider },
+                    { key: 'cloud_service_group', operator: '=', value: item.group },
+                    { key: 'cloud_service_type', operator: '=', value: item.name },
+                ).execute().then((rp) => {
+                    if (rp.data.total_count) {
+                        setMetric(rp.data.total_count);
+                    }
+                });
+            });
+            return resp;
+        };
         const listAction = fluentApi.inventory().cloudServiceType().list()
-            .setOnly('provider', 'group', 'name', 'tags.icon')
+            .setOnly('provider', 'group', 'name', 'tags.icon', 'cloud_service_type_id')
+            .setTransformer(getMetric)
             .setCloudServiceCount();
 
         const apiHandler = new QuerySearchGridFluentAPI(
@@ -136,7 +168,7 @@ export default {
                 cardClass: () => ['cst-card-item'],
                 cardMinWidth: '19.125rem',
                 cardHeight: '9rem',
-
+                columnGap: '0.5rem',
             },
             undefined,
             {
@@ -167,11 +199,18 @@ export default {
             });
             console.debug(item);
         };
+        // const items = computed(() => apiHandler.gridTS.state.items.map(item => ({
+        //     ...item,
+        //     todayCreat: todayCreated.value[item.cloud_service_type_id],
+        // })));
         return {
             listToolset,
             apiHandler,
             clickCard,
             providerStore,
+            providerList,
+            // items,
+            todayCreated,
         };
     },
 
@@ -185,6 +224,9 @@ export default {
         &:last-child {
             flex-grow: 1;
         }
+    }
+    .provider-list{
+        @apply w-full px-4 pt-4;
     }
     >>> .cst-card-item{
         @apply p-6 flex flex-col justify-between;
@@ -211,10 +253,20 @@ export default {
 
         }
         .bottom{
-            @apply flex ;
+            @apply flex items-center;
             .total-count {
                 @apply font-bold text-4xl;
                 font-family: "Noto Sans";
+            }
+            .today-created{
+                @apply border-green-500 w-10 flex h-6 ml-2 justify-center items-center;
+                border-radius: 6.25rem;
+                border-width: 0.0625rem;
+                .number{
+                    @apply font-bold text-sm text-green-500 w-3 h-4 text-right;
+                    font-family: "Noto Sans";
+                    line-height: 1.0625rem;
+                }
             }
 
         }

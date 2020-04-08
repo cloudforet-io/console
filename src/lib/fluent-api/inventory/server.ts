@@ -12,7 +12,7 @@ const idField = 'server_id';
 const idsField = 'servers';
 export interface ServerModel {
     server_id: string;
-
+    project_id?: string;
     tags: any;
     data: any;
     collection_info: CollectionInfo;
@@ -20,6 +20,8 @@ export interface ServerModel {
     created_at: TimeStamp;
     updated_at: TimeStamp;
 }
+
+export type ServerListResp = ListType<ServerModel&any>
 
 interface ServerGetParameter {
     server_id: string;
@@ -34,20 +36,21 @@ class Update extends UpdateAction<any, any> {
 }
 
 
-class List extends ListAction<any, ListType<ServerModel>> {}
+class List extends ListAction<any, ServerListResp> {}
 
 class GetData extends GetDataAction<any, ListType<any>> {
     protected idField = idField
 }
 
-class ChangeProject extends SubMultiItemAction<any,any>{
+class ChangeProject extends SubMultiItemAction<any, any> {
     path = 'change-project'
+
     protected idField = 'project_id'
 
     protected subIdsField = idsField
 
-    setReleaseProject(){
-        this.apiState.parameter.release_project = true
+    setReleaseProject() {
+        this.apiState.parameter.release_project = true;
         return this.clone();
     }
 }
@@ -55,7 +58,7 @@ class ChangeProject extends SubMultiItemAction<any,any>{
 export type ServerState = 'MAINTENANCE'|'CLOSED'|'INSERVICE'
 
 interface StateParameter {
-    state:ServerState
+    state: ServerState;
 
 }
 
@@ -64,26 +67,27 @@ class ChangeState extends MultiItemAction<StateParameter, any> {
 
     protected idsField = idsField;
 
-    setMaintenance(){
+    setMaintenance() {
         this.apiState.parameter.state = 'MAINTENANCE';
-        return this.clone()
+        return this.clone();
     }
-    setClosed(){
+
+    setClosed() {
         this.apiState.parameter.state = 'CLOSED';
-        return this.clone()
+        return this.clone();
     }
-    setInService(){
+
+    setInService() {
         this.apiState.parameter.state = 'INSERVICE';
-        return this.clone()
+        return this.clone();
     }
 }
 
-class Delete extends MultiDeleteAction<any,any>{
+class Delete extends MultiDeleteAction<any, any> {
     protected idsField = idsField;
-
 }
 
-class MemberList extends MemberListAction<any,any>{
+class MemberList extends MemberListAction<any, any> {
     protected idsField = idsField;
 }
 
@@ -94,15 +98,15 @@ export default class Server extends Resource implements ResourceActions<'get'|'l
 
     list(): List { return new List(this.baseUrl); }
 
-    delete(): Delete { return  new Delete(this.baseUrl);}
+    delete(): Delete { return new Delete(this.baseUrl); }
 
     getData(): GetData { return new GetData(this.baseUrl); }
 
-    update():Update { return new Update(this.baseUrl); }
+    update(): Update { return new Update(this.baseUrl); }
 
-    changeProject():ChangeProject{return new ChangeProject(this.baseUrl);}
+    changeProject(): ChangeProject { return new ChangeProject(this.baseUrl); }
 
-    changeState():ChangeState{return new ChangeState(this.baseUrl);}
+    changeState(): ChangeState { return new ChangeState(this.baseUrl); }
 
-    memberList():MemberList{return  new MemberList(this.baseUrl)}
+    memberList(): MemberList { return new MemberList(this.baseUrl); }
 }
