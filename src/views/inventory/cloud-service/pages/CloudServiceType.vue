@@ -1,15 +1,35 @@
 <template>
     <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
-            <p-grid-layout class="provider-list" v-bind="providerListState.state">
+            <p-grid-layout
+                class="provider-list"
+                v-bind="providerListState.state"
+                @card:click="selectProvider=$event.provider"
+            >
                 <template #card="{item}">
-                    <img
-                        width="32px" height="32px"
-                        :src="item.icon"
-                        :alt="item.provider"
-                    >
-                    <div>
-                        {{ item.name }}
+                    <div class="left">
+                        <template>
+                            <img v-if="item.icon"
+                                 width="32px" height="32px"
+                                 :src="item.icon"
+                                 :alt="item.provider"
+                            >
+                            <p-i v-else name="ic_provider_other"
+                                 width="32px"
+                                 height="32px"
+                            />
+                        </template>
+                        <div class="title">
+                            {{ item.name }}
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div
+                            class="total-count"
+                            :style="{'background-color': item.color||'#3C2C84','border-color': item.color||'#3C2C84'}"
+                        >
+                            {{ providerTotalCount[item.provider] }}
+                        </div>
                     </div>
                 </template>
             </p-grid-layout>
@@ -61,7 +81,9 @@
                                  :src="providerStore.state.providers[item.provider].icon"
                                  :alt="item.provider"
                             >
-                            <div v-else class="bg-gray-200 w-full h-full" />
+                            <p-i v-else name="ic_provider_other" width="48px"
+                                 height="48px"
+                            />
                         </div>
                     </div>
                     <div class="bottom">
@@ -85,7 +107,7 @@
 /* eslint-disable camelcase */
 
 import {
-    computed, getCurrentInstance, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -110,6 +132,7 @@ import construct from '@babel/runtime-corejs2/helpers/esm/construct';
 import PI from '@/components/atoms/icons/PI.vue';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
+import keyboardNavigation from 'liquor-tree/src/utils/keyboardNavigation';
 
 export default {
     name: 'ServiceAccount',
@@ -130,18 +153,48 @@ export default {
             provider,
         } = useStore();
         const providerStore: ProviderStoreType = provider;
-        providerStore.getProvider();
+        const providerTotalCount = ref<any>(null);
+        const resourceCountAPI = fluentApi.inventory().cloudService().list().setCountOnly();
+        onMounted(async () => {
+            await providerStore.getProvider();
+            const prs = Object.keys(providerStore.state.providers);
+            providerTotalCount.value = reactive<any>(_.zipObject(
+                ['all', ...prs],
+                Array(prs.length),
+            ));
+
+            resourceCountAPI.execute().then((resp) => {
+                providerTotalCount.value.all = resp.data.total_count;
+            });
+            prs.forEach((key) => {
+                resourceCountAPI.setFilter({ key: 'provider', operator: '=', value: key }).execute().then((resp) => {
+                    providerTotalCount.value[key] = resp.data.total_count;
+                });
+            });
+        });
         const vm = getCurrentInstance();
-        const selectProvider = ref('aws');
+        const selectProvider = ref('all');
         const providerListState = new GridLayoutState({
             items: computed(() => [
+                {
+                    provider: 'all', icon: '', color: '', name: 'All',
+                },
                 ...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })),
             ]),
-            cardClass: () => ['provider-card-item'],
+            cardClass: (item) => {
+                const _class = ['provider-card-item'];
+                if (item.provider === selectProvider.value) {
+                    _class.push('selected');
+                }
+                return _class;
+            },
             cardMinWidth: '14.125rem',
             cardHeight: '3.5rem',
             columnGap: '0.5rem',
+            rowGap: '0.5rem',
+            fixColumn: 1,
         });
+
 
         // providerListAPI.execute().then((resp) => {
         //     listToolset.state.items = resp.data.results;
@@ -157,7 +210,9 @@ export default {
             todayCreated.value = reactive(_.zipObject(ids));
             resp.data.results.forEach((item) => {
                 const id = item.cloud_service_type_id;
-                const setMetric = (count) => { todayCreated.value[id] = count; };
+                const setMetric = (count) => {
+                    todayCreated.value[id] = count;
+                };
                 metricAPI.setFilter(
                     { key: 'provider', operator: '=', value: item.provider },
                     { key: 'cloud_service_group', operator: '=', value: item.group },
@@ -194,9 +249,13 @@ export default {
         );
         watch(selectProvider, (after, before) => {
             if (after && after !== before) {
-                apiHandler.action = listAction.setFixFilter(
-                    { key: 'provider', operator: '=', value: after },
-                );
+                if (after === 'all') {
+                    apiHandler.action = listAction.setFixFilter();
+                } else {
+                    apiHandler.action = listAction.setFixFilter(
+                        { key: 'provider', operator: '=', value: after },
+                    );
+                }
                 apiHandler.resetAll();
                 apiHandler.getData();
             }
@@ -212,16 +271,14 @@ export default {
             });
             console.debug(item);
         };
-        // const items = computed(() => apiHandler.gridTS.state.items.map(item => ({
-        //     ...item,
-        //     todayCreat: todayCreated.value[item.cloud_service_type_id],
-        // })));
         return {
+            selectProvider,
             apiHandler,
             clickCard,
             providerStore,
             todayCreated,
             providerListState,
+            providerTotalCount,
         };
     },
 
@@ -238,12 +295,35 @@ export default {
     }
     .provider-list{
         @apply w-full px-4 pt-4;
+
     }
     >>> .provider-card-item{
-        @apply px-4 py-3 flex justify-between;
+        @apply px-4 py-3 flex items-center justify-between;
+        &.selected{
+            @apply border-blue-500 bg-blue-100;
+        }
+        .left{
+            @apply flex items-center;
+            .title{
+                @apply ml-4 text-base;
+                font-family: "Noto Sans";
+
+            }
+        }
+        .right{
+            .total-count{
+                @apply w-10 flex h-6 ml-2 justify-center items-center text-white;
+                border-radius: 6.25rem;
+                border-width: 0.0625rem;
+
+            }
+        }
+
     }
+
     >>> .cst-card-item{
         @apply p-6 flex flex-col justify-between;
+
         .top{
             @apply flex justify-between;
             .text-content{
