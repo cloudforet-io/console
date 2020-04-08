@@ -1,7 +1,18 @@
 <template>
     <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
-            <p-grid-layout class="provider-list" :items="providerList" />
+            <p-grid-layout class="provider-list" v-bind="providerListState.state">
+                <template #card="{item}">
+                    <img
+                        width="32px" height="32px"
+                        :src="item.icon"
+                        :alt="item.provider"
+                    >
+                    <div>
+                        {{ item.name }}
+                    </div>
+                </template>
+            </p-grid-layout>
         </template>
         <template #default>
             <PToolboxGridLayout
@@ -113,7 +124,6 @@ export default {
         PQuerySearchTags,
         PToolboxGridLayout,
         PGridLayout,
-        PSelectableList,
     },
     setup(props, context) {
         const {
@@ -122,12 +132,15 @@ export default {
         const providerStore: ProviderStoreType = provider;
         providerStore.getProvider();
         const vm = getCurrentInstance();
-
-
+        const selectProvider = ref('aws');
         const providerListState = new GridLayoutState({
             items: computed(() => [
                 ...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })),
             ]),
+            cardClass: () => ['provider-card-item'],
+            cardMinWidth: '14.125rem',
+            cardHeight: '3.5rem',
+            columnGap: '0.5rem',
         });
 
         // providerListAPI.execute().then((resp) => {
@@ -179,10 +192,10 @@ export default {
                 },
             },
         );
-        watch(() => listToolset.selectState.firstSelectItem, (after, before) => {
+        watch(selectProvider, (after, before) => {
             if (after && after !== before) {
                 apiHandler.action = listAction.setFixFilter(
-                    { key: 'provider', operator: '=', value: after.provider },
+                    { key: 'provider', operator: '=', value: after },
                 );
                 apiHandler.resetAll();
                 apiHandler.getData();
@@ -204,13 +217,11 @@ export default {
         //     todayCreat: todayCreated.value[item.cloud_service_type_id],
         // })));
         return {
-            listToolset,
             apiHandler,
             clickCard,
             providerStore,
-            providerList,
-            // items,
             todayCreated,
+            providerListState,
         };
     },
 
@@ -227,6 +238,9 @@ export default {
     }
     .provider-list{
         @apply w-full px-4 pt-4;
+    }
+    >>> .provider-card-item{
+        @apply px-4 py-3 flex justify-between;
     }
     >>> .cst-card-item{
         @apply p-6 flex flex-col justify-between;
@@ -268,6 +282,7 @@ export default {
                     line-height: 1.0625rem;
                 }
             }
+
 
         }
 
