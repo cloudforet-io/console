@@ -48,7 +48,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
         this.transformer = transformer;
     }
 
-    setTransformer(func: (any) => any|Promise<any>) {
+    setTransformer(func: (resp: AxiosResponse<resp>) => any|Promise<any>) {
         this.transformer = func;
         return this.clone();
     }
@@ -141,11 +141,10 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
             const rawFilters = [...this.apiState.fixFilter, ...this.apiState.filter];
             rawFilters.forEach((q: FilterItem) => {
                 const op = operatorMap[q.operator];
-                const vals = typeof q.value === 'string' ? [q.value] : q.value;
 
                 if (mergeOperatorSet.has(op)) {
                     const prefix = `${q.key}:${op}`;
-
+                    const vals = Array.isArray(q.value) ? q.value : [q.value];
                     // if operation is ['contain_in', 'not_contain_in', 'in', 'not_in'] then merge filter
                     if (mergeOpQuery[prefix]) {
                         mergeOpQuery[prefix].v = _.merge(mergeOpQuery[prefix].v, vals);
@@ -160,7 +159,7 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
                 } else {
                     filter.push({
                         k: q.key,
-                        v: vals,
+                        v: q.value,
                         o: op,
                     });
                 }
