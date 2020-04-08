@@ -130,6 +130,7 @@ export const cardTheme = () => ({
                     icon: 'https://assets-console-cloudone-dev.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
                 },
                 name: 'AWS Network Collector',
+                color: '#abcdef',
             },
             {
                 id: '3',

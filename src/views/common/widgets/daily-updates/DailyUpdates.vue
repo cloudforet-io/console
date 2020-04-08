@@ -120,9 +120,6 @@ export default defineComponent({
                 key: 'resource_id',
                 iconUrl: 'tags.icon',
                 title: 'name',
-                color(item) {
-                    return colors[item.update_type];
-                },
             },
             onSelected(item) {
                 vm.$router.push('/identity/service-account');
