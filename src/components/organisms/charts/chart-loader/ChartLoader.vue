@@ -1,37 +1,45 @@
 <template>
-    <div class="p-chart-container">
+    <div class="p-loader">
         <transition name="fade-in">
-            <p-lottie v-if="loading" name="spinner" class="spinner"
-                      auto
-                      :size="1.5"
-            />
+            <slot name="loader" :loading="loading">
+                <p-lottie v-if="loading" name="spinner" class="spinner"
+                          auto
+                          :size="1.5"
+                />
+            </slot>
         </transition>
         <transition name="fade-in">
-            <canvas v-if="!loading" ref="chartRef"/>
+            <div v-if="!loading" class="w-full h-full">
+                <slot name="default" />
+            </div>
         </transition>
     </div>
 </template>
 
 <script lang="ts">
-import {
-    defineComponent,
-} from '@vue/composition-api';
-import {
-    abstractChartProps,
-} from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
+import { defineComponent } from '@vue/composition-api';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 export default defineComponent({
-    name: 'PAbstractChart',
-    props: abstractChartProps,
+    name: 'PChartLoader',
     components: { PLottie },
+    props: {
+        loading: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    setup() {
+        return {};
+    },
 });
 </script>
 
 <style lang="postcss" scoped>
-    .p-chart-container {
+    .p-loader {
         position: relative;
-        display: inline-block;
+        width: 100%;
+        height: 100%;
     }
     .spinner {
         position: absolute;
@@ -56,9 +64,5 @@ export default defineComponent({
     }
     .fade-in-enter-to {
         opacity: 1;
-    }
-    canvas {
-        height: 100%;
-        width: 100%;
     }
 </style>

@@ -1,12 +1,9 @@
 <template>
     <p-widget-layout title="Resources by Top 5 Projects" help="Top 5 Projects">
         <div class="flex justify-center">
-            <p-dynamic-chart :dataset="dataset" type="horizontalBar"
-                             :labels="labels"
-                             :loading="loading"
-                             :theme-props="themeProps"
-                             class="chart"
-            />
+            <p-chart-loader :loading="loading" class="chart">
+                <canvas ref="chartRef" />
+            </p-chart-loader>
         </div>
         <div class="mt-4">
             <p-data-table :fields="fields"
@@ -87,62 +84,79 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import _ from 'lodash';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, Ref, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PDynamicChart from '@/components/organisms/charts/dynamic-chart/DynamicChart.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
-import { ChartData } from '@/components/organisms/charts/dynamic-chart/DynamicChart.toolset';
-import { barDefaultThemeProps } from '@/components/organisms/charts/dynamic-chart/themes/bar-chart';
 import { makeTrItems } from '@/lib/view-helper';
-import { secondary, secondary1 } from '@/styles/colors';
+import {
+    secondary, secondary1,
+} from '@/styles/colors';
 import PTr from '@/components/atoms/table/Tr.vue';
 import PTd from '@/components/atoms/table/Td.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
+import { SChartToolSet } from '@/lib/chart/toolset';
+import { SBarChart } from '@/lib/chart/bar-chart';
 
 export default defineComponent({
     name: 'TopProjects',
     components: {
         PWidgetLayout,
-        PDynamicChart,
         PBadge,
         PDataTable,
         PTr,
         PTd,
         PI,
+        PChartLoader,
     },
-    setup(props) {
-        const state = reactive({
-            data: [],
-            loading: true,
-            dataset: computed(() => [
-                new ChartData('Server', state.data.map(d => d.servers)),
-                new ChartData('Cloud Service', state.data.map(d => d.cloud_services)),
-            ]),
-            labels: computed(() => state.data.map((d, i) => `Top ${i + 1}`)),
-            themeProps: computed(() => ({
-                ...barDefaultThemeProps,
-                colors: _.values(state.colors),
-                stacked: true,
-                horizontal: true,
-                ticksCount: 7,
-            })),
-            fields: computed(() => makeTrItems([['rank', 'FIELD.RANK'],
-                ['project_group', 'FIELD.PROJECT_GRP'],
-                ['project', 'FIELD.PROJECT'],
-                ['servers', 'FIELD.SERVER'],
-                ['cloud_services', 'FIELD.CLOUD_SERVICE'],
-            ])),
-            colors: {
-                servers: secondary,
-                cloud_services: secondary1,
-            },
-        });
+    setup() {
+        interface DataType {
+            project_group: string;
+            project: string;
+            servers: number;
+            cloud_services: number;
+        }
 
-        const api = async () => new Promise((resolve) => {
+        interface InitDataType {
+            data: Array<DataType | undefined>;
+            loading: boolean;
+            colors: {
+                servers: string;
+                cloud_services: string;
+            };
+            fields: Ref<Readonly<string[]>>;
+        }
+
+        const ts = new SChartToolSet<SBarChart, InitDataType>(SBarChart,
+            (chart: SBarChart) => (chart.addData(ts.state.data.map(d => d.servers), 'Server')
+                .addData(ts.state.data.map(d => d.cloud_services), 'Cloud Service')
+                .setLabels(ts.state.data.map((d, i) => `Top ${i + 1}`))
+                .setColors(_.values(ts.state.colors))
+                .setTicksCount(7)
+                .setCategoryPercentage(0.75)
+                .setBarPercentage(0.8)
+                .setStacked(true)
+                .apply()), {
+                data: [],
+                loading: true,
+                colors: {
+                    servers: secondary,
+                    cloud_services: secondary1,
+                },
+                fields: computed(() => makeTrItems([['rank', 'FIELD.RANK'],
+                    ['project_group', 'FIELD.PROJECT_GRP'],
+                    ['project', 'FIELD.PROJECT'],
+                    ['servers', 'FIELD.SERVER'],
+                    ['cloud_services', 'FIELD.CLOUD_SERVICE'],
+                ])),
+            }, { type: 'horizontalBar' });
+
+        const api = async (): Promise<DataType[]> => new Promise((resolve) => {
             setTimeout(() => {
                 resolve([{
                     project_group: 'Group',
@@ -173,16 +187,17 @@ export default defineComponent({
             }, 1000);
         });
 
-        const getData = async () => {
-            state.loading = true;
-            state.data = await api();
-            state.loading = false;
+
+        const getData = async (): Promise<void> => {
+            ts.state.loading = true;
+            ts.state.data = await api();
+            ts.state.loading = false;
         };
 
         getData();
 
         return {
-            ...toRefs(state),
+            ...toRefs(ts.state),
         };
     },
 });

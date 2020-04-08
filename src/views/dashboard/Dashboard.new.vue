@@ -3,9 +3,15 @@
         <div class="grid grid-flow-col gap-2">
             <div class="grid grid-cols-1 gap-2">
                 <div class="grid grid-cols-3 gap-2">
-                    <service-summary title="projects" :loading="projects.loading" :data="projects.data" />
-                    <service-summary title="servers" :loading="servers.loading" :data="servers.data" />
-                    <service-summary title="cloud services" :loading="cloudServices.loading" :data="cloudServices.data" />
+                    <service-summary title="projects" :loading="projects.loading" :data="projects.data"
+                                     :color="projects.color"
+                    />
+                    <service-summary title="servers" :loading="servers.loading" :data="servers.data"
+                                     :color="servers.color"
+                    />
+                    <service-summary title="cloud services" :loading="cloudServices.loading" :data="cloudServices.data"
+                                     :color="cloudServices.color"
+                    />
                 </div>
                 <div class="grid gap-2 custom-grid">
                     <service-accounts />
@@ -31,6 +37,7 @@ import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue'
 import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
+import { primary, secondary, secondary1 } from '@/styles/colors';
 
 export default defineComponent({
     name: 'Dashboard',
@@ -48,14 +55,17 @@ export default defineComponent({
             projects: {
                 data: [],
                 loading: true,
+                color: primary,
             },
             servers: {
                 data: [],
                 loading: true,
+                color: secondary,
             },
             cloudServices: {
                 data: [],
                 loading: true,
+                color: secondary1,
             },
         });
 
@@ -85,10 +95,10 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .collection-state {
-    border-right: 0;
+    @apply rounded-r-none border-r-0;
 }
 .collecting-jobs {
-    border-left: 0;
+    @apply rounded-l-none border-l-0;
 }
 .custom-grid {
     grid-template-columns: 1fr 2fr;
