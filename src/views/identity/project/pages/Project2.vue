@@ -20,10 +20,18 @@
         </template>
         <template #default>
             <div v-if="treeApiHandler.ts.metaState.firstSelectedNode">
-                <p-grid-layout
+<!--                <div v-if="treeApiHandler.ts.metaState.selectedNode">-->
+<!--                    <pre>no data</pre>-->
+<!--                </div>-->
+                <p-toolbox-grid-layout
                     card-min-width="18.75rem"
                     card-height="15rem"
                     :items="cardItems"
+                    :this-page.sync="thisPage"
+                    :page-size.sync="pageSize"
+                    @changePageNumber="getData()"
+                    @changePageSize="getData()"
+                    @clickRefresh="getData()"
                 >
                     <template #card="{item}">
                         <div class="project-description">
@@ -54,7 +62,7 @@
                             </div>
                         </div>
                     </template>
-                </p-grid-layout>
+                </p-toolbox-grid-layout>
             </div>
             <p-empty v-else class="empty">
                 <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
@@ -83,6 +91,7 @@ import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.v
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import _ from 'lodash';
+import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
@@ -94,7 +103,6 @@ import { useStore } from '@/store/toolset';
 import { ProviderListResp } from '@/lib/fluent-api/identity/provider';
 import config from '@/lib/config';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
-import _ from 'lodash';
 
 
 interface Summary {
@@ -113,6 +121,11 @@ interface ProjectCardData{
 interface State {
         item: any;
         items: ProjectCardData[];
+        selectedId: string;
+        totalCount: number;
+        thisPage: number;
+        pageSize: number;
+        allPage: number;
 }
 
 export default defineComponent({
@@ -128,11 +141,17 @@ export default defineComponent({
         PI,
         PEmpty,
         PGridLayout,
+        PToolboxGridLayout,
     },
     setup(props, context) {
         const state: UnwrapRef<State> = reactive({
             item: [],
             items: [],
+            thisPage: 1,
+            totalCount: 0,
+            pageSize: 12,
+            allPage: 1,
+            selectedId: '',
         });
         const summary = ref<Summary>({});
 
@@ -147,7 +166,6 @@ export default defineComponent({
             .setExcludeProject();
         const treeApiHandler = new ProjectTreeFluentAPI(treeAction, TreeToolSet);
         const projectAPI = fluentApi.identity().project();
-        const projectGroupAPI = fluentApi.identity().projectGroup();
 
         const getSummary = (id: string) => {
             if (!summary.value[id]) {
@@ -160,16 +178,19 @@ export default defineComponent({
                     });
             }
         };
-        const selected = async (item) => {
-            treeApiHandler.ts.getSelectedNode(item);
-            const projectGroupId = item.data.id;
+        const getData = async () => {
             state.items = [];
             try {
-                const res = await projectAPI.list().setFilter({
-                    key: 'project_group_id',
-                    value: projectGroupId,
-                    operator: '=',
-                }).setIncludeProvider().execute();
+                const res = await projectAPI.list()
+                    .setThisPage(state.thisPage)
+                    .setPageSize(state.pageSize)
+                    .setFilter({
+                        key: 'project_group_id',
+                        value: state.selectedId,
+                        operator: '=',
+                    })
+                    .setIncludeProvider()
+                    .execute();
                 state.items = res.data.results.map((it: ProjectModel) => {
                     const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
                     const extraProviders = providers.length > 5 ? providers.length - 5 : 0;
@@ -181,16 +202,25 @@ export default defineComponent({
                         providers: providers.splice(0, 5),
                     };
                 });
+                state.totalCount = res.data.total_count;
                 state.items.forEach((it) => {
                     getSummary(it.projectId);
                 });
             } catch (e) {
+                state.items = [];
+                state.allPage = 1;
                 console.error(e);
             }
         };
 
+        const selected = async (item) => {
+            treeApiHandler.ts.getSelectedNode(item);
+            state.selectedId = item.data.id;
+            state.items = [];
+            await getData();
+        };
+
         const cardItems = computed(() => state.items.map((item) => {
-            console.log('card items', item);
             if (summary.value[item.projectId]) {
                 item.summary = summary.value[item.projectId];
             }
@@ -203,6 +233,7 @@ export default defineComponent({
             selected,
             summary,
             cardItems,
+            getData,
         };
     },
 });

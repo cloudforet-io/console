@@ -1,11 +1,13 @@
-import CloudServicePage from '@/views/inventory/cloud-service/pages/CloudServicePage';
+const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
 
 const Inventory = () => import('@/views/inventory/Inventory.vue');
 const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
 
 const DataCenter = () => import('@/views/inventory/data-center/DataCenter.vue');
 const Server = () => import('@/views/inventory/server/Server.vue');
-const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudService.vue');
+// const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudService.vue');
+const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
+
 
 const Collector = () => import('@/views/inventory/collector/pages/Collector.vue');
 
