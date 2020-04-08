@@ -211,7 +211,7 @@ import {
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import { ServerModel } from '@/lib/fluent-api/inventory/server';
+import { ServerListResp, ServerModel } from '@/lib/fluent-api/inventory/server';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
@@ -396,7 +396,7 @@ export default {
 
         project.getProject();
         const action = fluentApi.inventory().server().list()
-            .setTransformer((resp: AxiosResponse<CloudServiceListResp>) => {
+            .setTransformer((resp: AxiosResponse<ServerListResp>) => {
                 const result = resp;
 
                 result.data.results = resp.data.results.map((item) => {

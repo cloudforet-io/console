@@ -9,7 +9,7 @@ import {
 } from '@/lib/fluent-api/type';
 
 
-interface CloudServiceTypeModel {
+export interface CloudServiceTypeModel {
     provider: string;
     group: string;
     name: string;
@@ -25,7 +25,7 @@ interface CloudServiceTypeModel {
     created_at: TimeStamp;
     updated_at: TimeStamp;
 }
-
+export type CloudServiceTypeListResp = ListType<CloudServiceTypeModel>
 interface CstGetParameter {
     cloud_service_type_id: string;
 }
@@ -38,7 +38,7 @@ interface CstListParameter {
     include_cloud_service_count?: boolean;
 }
 
-class List extends ListAction<CstListParameter, ListType<CloudServiceTypeModel>> {
+class List extends ListAction<CstListParameter, CloudServiceTypeListResp> {
     setCloudServiceCount(isShow = true): this{
         // eslint-disable-next-line @typescript-eslint/camelcase
         this.apiState.extraParameter.include_cloud_service_count = isShow;

@@ -194,9 +194,16 @@ class ProjectStore extends Store<ProjectState> {
         }
     }
 }
+interface ProviderInfo{
+    [provider: string]: {
+        name: string;
+        icon: string;
+        color: string;
+    };
+}
 
 interface ProviderState {
-    providers: any;
+    providers: ProviderInfo;
     ttl: DateTime;
 }
 
@@ -243,7 +250,7 @@ class ProviderStore extends Store<ProviderState> {
         }
     }
 }
-
+export type ProviderStoreType = ProviderStore;
 
 export default {
     name: 'LocalStorage',
