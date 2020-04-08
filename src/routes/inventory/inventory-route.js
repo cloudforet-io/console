@@ -1,9 +1,13 @@
+const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
+
 const Inventory = () => import('@/views/inventory/Inventory.vue');
 const InventoryNavBar = () => import('@/views/inventory/InventoryNavBar.vue');
 
 const DataCenter = () => import('@/views/inventory/data-center/DataCenter.vue');
 const Server = () => import('@/views/inventory/server/Server.vue');
-const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudService.vue');
+// const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudService.vue');
+const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
+
 
 const Collector = () => import('@/views/inventory/collector/pages/Collector.vue');
 
@@ -35,8 +39,23 @@ export default {
         {
             path: 'cloud-service',
             name: 'cloudService',
+            redirect: '/inventory/cloud-service',
             meta: { label: 'Cloud Service', breadcrumb: true, beta: true },
-            component: CloudService,
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: 'cloudServiceMain',
+                    component: CloudService,
+                },
+                {
+                    path: ':provider/:group/:name',
+                    name: 'cloudServicePage',
+                    props: true,
+                    component: CloudServicePage,
+                },
+            ],
+
         },
         {
             path: 'collector',

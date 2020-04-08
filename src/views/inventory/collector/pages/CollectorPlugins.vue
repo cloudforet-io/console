@@ -1,11 +1,11 @@
 <script>
 import {
-    ref, toRefs, computed, reactive,
+    ref, toRefs, computed, reactive, onMounted,
 } from '@vue/composition-api';
 import CollectorPluginsTemplate, { setup } from '@/views/inventory/collector/pages/CollectorPlugins.template.vue';
 import { mountBusEvent } from '@/lib/compostion-util';
 import CollectorEventBus from '@/views/inventory/collector/CollectorEventBus';
-import {defaultQuery} from "@/lib/api/query";
+import { defaultQuery } from '@/lib/api/query';
 
 export default {
     name: 'CollectorPlugins',
@@ -18,7 +18,14 @@ export default {
         const listRepositories = async () => {
             state.repositories = [];
             try {
-                const res = await context.parent.$http.post('/repository/repository/list');
+                const res = await context.parent.$http.post('/repository/repository/list', {
+                    query: {
+                        sort: {
+                            key: 'repository_type',
+                            desc: true,
+                        },
+                    },
+                });
                 state.repositories = res.data.results;
                 if (!state.selectedRepoId) {
                     state.selectedRepoId = state.repositories[0].repository_id;
@@ -72,7 +79,9 @@ export default {
             }
         };
         mountBusEvent(CollectorEventBus, 'listVersions', listVersions);
-
+        onMounted(async () => {
+            await listPluginsInit();
+        });
         return {
             ...toRefs(state),
         };
