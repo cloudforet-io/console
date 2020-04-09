@@ -29,12 +29,38 @@
                     @clickRefresh="apiHandler.getData()"
                     @card:click="clickCard"
                 >
-                    <template #toolbox-left>
-                        <p-query-search-bar
-                            :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
-                            :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
-                            @newQuery="apiHandler.gridTS.querySearch.addTag"
-                        />
+                    <template #toolbox-top>
+                        <p id="parent-project-grp">project group</p>
+                        <p id="current-project-grp">{{ projectSummary[0].project_group_info.name}}</p>
+                    </template>
+                    <template #toolbox-bottom>
+                        <div class="tool">
+                            <div class="tool-left">
+                                <div class="tool-left-btn">
+                                    <p-button style-type="primary-dark" @click="clickOpenForm('Create Project')">
+                                        {{ $t('INVENTORY.CRT_PROJ') }}
+                                    </p-button>
+                                </div>
+                                <div class="tool-left-search">
+                                    <p-query-search-bar
+                                        :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
+                                        :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
+                                        @newQuery="apiHandler.gridTS.querySearch.addTag"
+
+                                    />
+                                </div>
+                            </div>
+                            <div class="tool-right">
+                                <div class="tool-right-checkbox" style="user-select: none">
+                                    <PCheckBox :value="false" :disabled="true" />    Select All
+                                </div>
+                                <div class="tool-right-btn">
+                                    <p-button outline style-type="alert">
+                                        Delete
+                                    </p-button>
+                                </div>
+                            </div>
+                        </div>
                     </template>
                     <template v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
                         <p-hr style="width: 100%;" />
@@ -96,24 +122,18 @@ import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLay
 import PTree from '@/components/molecules/tree-new/Tree.vue';
 import { ProjectTreeFluentAPI } from '@/lib/api/tree';
 import TreeItem, { TreeItemInterface, TreeState, TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
-import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
-import PTab from '@/components/organisms/tabs/tab/Tab.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
-import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import _ from 'lodash';
 import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/ToolboxGridLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import fluentApi from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ProjectModel, ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
-import { ProviderListResp } from '@/lib/fluent-api/identity/provider';
-import config from '@/lib/config';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
 import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
@@ -141,21 +161,17 @@ import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/tool
         selectedId: string;
     }
 
-export default{
+export default {
     name: 'Project2',
     components: {
         PVerticalPageLayout2,
-        PLazyImg,
         PTree,
-        PTab,
-        PHorizontalLayout,
-        PDynamicView,
-        PDynamicDetails,
+        PButton,
         PI,
         PQuerySearchBar,
         PQuerySearchTags,
+        PCheckBox,
         PEmpty,
-        PGridLayout,
         PToolboxGridLayout,
     },
     setup(props, context) {
@@ -166,6 +182,7 @@ export default{
         });
         const { provider } = useStore();
         provider.getProvider();
+        const vm = getCurrentInstance();
 
         /**
              Api Handler
@@ -179,6 +196,7 @@ export default{
 
         const createdData = reactive({});
         const cardSummary = ref(createdData);
+        const projectSummary = ref(createdData);
         const getCard = (resp: AxiosResponse<ProjectListResp>) => {
             const ids = resp.data.results.map(item => item.project_id);
             cardSummary.value = reactive(_.zipObject(ids));
@@ -203,6 +221,7 @@ export default{
                 };
             });
             resp.data.results = temp;
+            projectSummary.value = resp.data.results;
             return resp;
         };
 
@@ -227,7 +246,6 @@ export default{
 
         watch(() => treeApiHandler.ts.metaState.firstSelectedNode, (after: any, before: any) => {
             if ((after && !before) || (after && after.data.id !== before.data.id)) {
-                console.debug(after);
                 apiHandler.action = listAction.setFixFilter({
                     key: 'project_group_id',
                     value: after.data.id,
@@ -246,7 +264,16 @@ export default{
         };
 
         const clickCard = (item) => {
-            console.log('click card');
+            vm?.$router.push({
+                name: 'projectDetail',
+                params: {
+                    id: item.project_id,
+                    name: item.name,
+                    project_group: item.project_group_info,
+                    tags: item.tags,
+                },
+            });
+            console.debug(item);
         };
         return {
             treeRef: treeApiHandler.ts.treeRef,
@@ -256,6 +283,7 @@ export default{
             selected,
             clickCard,
             cardSummary,
+            projectSummary,
         };
     },
 };
@@ -266,9 +294,17 @@ export default{
         height: 100%;
     }
 
-    /*.right-container {*/
-    /*    width: 100%;*/
-    /*}*/
+    #parent-project-grp {
+        font-size: .75rem;
+        padding-top: .5rem;
+    }
+
+    #current-project-grp {
+        padding-top: .7rem;
+        padding-bottom: .5rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
 
     .empty {
         flex-direction: column;
@@ -328,4 +364,33 @@ export default{
         float: right;
         color: #0069CC;
     }
+
+    .tool {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        .tool-left {
+            display: flex;
+            .tool-left-btn {
+                margin-right: 1rem;
+            }
+            .tool-left-search {
+                width: auto;
+            }
+        }
+        .tool-right {
+            display: flex;
+            justify-content: flex-end;
+            .tool-right-checkbox {
+                padding-top: .5rem;
+            }
+            .tool-right-btn {
+                margin-left: 1rem;
+            }
+        }
+
+    }
+
 </style>
