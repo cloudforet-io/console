@@ -1,8 +1,11 @@
 <template>
     <div>
-        <p-panel-top>Base Information</p-panel-top>
+        <p-panel-top >
+            Base Information
+        </p-panel-top>
         <p-dynamic-view view_type="item" :data="item||{}"
                         :data_source="dataSource" :root-mode="true"
+                        class="mb-6"
         />
         <p-dynamic-details :details="item.metadata.details" :data="item||{}" />
         <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
