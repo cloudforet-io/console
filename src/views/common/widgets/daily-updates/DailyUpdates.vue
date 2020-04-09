@@ -132,8 +132,6 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .daily-updates {
-    min-width: 332px;
-    max-width: 446px;
     overflow-y: auto;
 }
 .group-name {

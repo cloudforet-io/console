@@ -9,7 +9,8 @@ import {
     Scriptable,
 } from 'chart.js';
 import { colorset } from '@/lib/util';
-import {gray} from "@/styles/colors";
+import { gray } from '@/styles/colors';
+import _ from 'lodash';
 
 export interface SChartInterface extends Chart {
     metaDatasets: ChartDataSets;
@@ -59,8 +60,7 @@ export abstract class SChart extends Chart implements SChartInterface {
     ): Chart.ChartConfiguration {
         return {
             type,
-            options: settings.options,
-            plugins: settings.plugins,
+            ..._.cloneDeep(settings),
             ...config,
         };
     }
