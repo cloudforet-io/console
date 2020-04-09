@@ -1,7 +1,9 @@
 <template>
-    <div class="grid-container">
+    <div class="grid-list-container">
         <div class="toolbox">
-            <slot name="toolbox-top" />
+            <div class="toolbox-top">
+                <slot name="toolbox-top" />
+            </div>
             <div class="toolbox-middle">
                 <div class="left" :style="{width: '100%'}">
                     <slot name="toolbox-left" />
@@ -35,7 +37,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="$slots['toolbox-bottom']" class="toolbox-bottom">
+            <div class="toolbox-bottom">
                 <slot name="toolbox-bottom" />
             </div>
         </div>
@@ -44,16 +46,17 @@
                 <slot :name="slot" v-bind="scope" />
             </template>
         </p-grid-layout>
-        <div class="bottom">
-            <slot name="bottom">
-                <div class="bottom-page">
-                    <p-text-pagenation :this-page.sync="proxyThisPage"
-                                       :all-page="allPage"
-                                       @pageChange="changePageNumber"
-                    />
-                </div>
-            </slot>
-        </div>
+
+<!--        <div class="bottom">-->
+<!--            <slot name="bottom">-->
+<!--                <div class="bottom-page">-->
+<!--                    <p-text-pagenation :this-page.sync="proxyThisPage"-->
+<!--                                       :all-page="allPage"-->
+<!--                                       @pageChange="changePageNumber"-->
+<!--                    />-->
+<!--                </div>-->
+<!--            </slot>-->
+<!--        </div>-->
     </div>
 </template>
 
@@ -128,7 +131,7 @@ export default {
         },
         pageNationValues: {
             type: Array,
-            default: () => [15, 30, 45],
+            default: () => [12, 24, 36],
         },
         allPage: {
             type: Number,
@@ -147,61 +150,44 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .grid-container {
+    .grid-list-container {
         display: flex;
         flex-direction: column;
         width: 100%;
         height: 100%;
-        padding-right: 1rem;
-        padding-left: 1rem;
-
-        .toolbox {
-            margin-top: 0.5rem;
-
+    }
+    /*.toolbox {*/
+    /*    margin-top: 0.5rem;*/
         .toolbox-middle{
             display: flex;
             justify-content: space-between;
             flex-wrap: nowrap;
             align-items: center;
             margin-bottom: 1rem;
-                .left{
+            .left{
                     display: inline-flex;
                     flex-wrap: wrap;
                     width: auto;
                     justify-content: flex-start;
-                }
-                .right{
+            }
+            .right{
                     display: inline-flex;
                     flex-wrap:nowrap;
                     width: auto;
                     justify-content: flex-end;
-                }
             }
         }
-    }
-    /*.toolbox {*/
-    /*    !*display: flex;*!*/
-    /*    !*justify-content: space-between;*!*/
-    /*    !*align-items: center;*!*/
 
-    /*    .left-top {*/
-    /*        display: flex;*/
-    /*        flex-wrap: wrap;*/
-    /*        width: auto;*/
-    /*        justify-content: flex-start;*/
-    /*    }*/
-
-    /*    .right-top {*/
-    /*        display: inline-flex;*/
-    /*        flex-wrap:nowrap;*/
-    /*        width: auto;*/
-    /*        justify-content: flex-end;*/
-    /*    }*/
     /*}*/
-
+    .grid-card-container {
+        display: flex;
+        flex-grow: 1;
+        height: 100%;
+    }
 
     .bottom {
-        margin-top: 1.6rem;
+        /*margin-top: 1.6rem;*/
+        margin-top: auto;
         text-align: center;
     }
 </style>
