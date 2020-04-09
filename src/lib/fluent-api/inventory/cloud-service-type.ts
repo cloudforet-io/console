@@ -5,25 +5,29 @@ import {
     ResourceActions,
 } from '@/lib/fluent-api/toolset';
 import {
-    CollectionInfo, DataSourceItem, ListType, TimeStamp,
+    CollectionInfo, DataSourceItem, ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
 
-
-export interface CloudServiceTypeModel {
+const idField = 'cloud_service_type_id';
+const idsField = 'cloud_service_types';
+interface IdParameter {
+    [idField]: string;
+}
+export interface CloudServiceTypeModel extends IdParameter, Tags {
     provider: string;
     group: string;
     name: string;
 
     data_source: DataSourceItem[];
     labels?: string[];
-    cloud_service_type_id: string;
-    tags: any;
 
     collection_info: CollectionInfo;
     cloud_service_count?: number;
 
     created_at: TimeStamp;
     updated_at: TimeStamp;
+    deleted_at: TimeStamp;
+
 }
 export type CloudServiceTypeListResp = ListType<CloudServiceTypeModel>
 interface CstGetParameter {

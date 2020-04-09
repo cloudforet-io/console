@@ -21,6 +21,9 @@ import "@/styles/style.scss";
 import webFontLoader from 'webfontloader';
 import { fontUrls, webFonts } from '@/styles/web-fonts';
 
+import tailwindConfig from './tailwind.config';
+import _ from 'lodash';
+
 Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
 Vue.use(VueCompositionApi);
@@ -57,6 +60,24 @@ addParameters({
             }
             return null;
         },
+    },
+    viewport: {
+        viewports: {
+            ..._.mapValues(tailwindConfig.theme.screens, (v, k) => ({
+                name: k,
+                styles: {
+                    width: v.min || v.max,
+                    height: '100vh',
+                }
+            })),
+            '3xl': {
+                name: '3xl',
+                styles: {
+                    width: '3440px',
+                    height: '100vh',
+                }
+            }
+        }
     },
 });
 addDecorator(withA11y);

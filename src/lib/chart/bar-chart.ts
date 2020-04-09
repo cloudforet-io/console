@@ -89,7 +89,7 @@ export class SBarChart extends SChart implements SBarChartInterface {
     static initConfig(type: string, settings: SettingsInterface, config: ChartConfiguration): ChartConfiguration {
         const newConfig = {
             type,
-            ...settings,
+            ..._.cloneDeep(settings),
             ...config,
         };
         if (newConfig.type === 'horizontalBar') {
@@ -97,6 +97,7 @@ export class SBarChart extends SChart implements SBarChartInterface {
             _.set(newConfig, 'options.scales.yAxes', _.get(newConfig, 'options.scales.xAxes'));
             _.set(newConfig, 'options.scales.xAxes', y);
         }
+        console.log('initConfig', newConfig);
         return newConfig;
     }
 

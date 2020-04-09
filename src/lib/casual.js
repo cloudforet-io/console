@@ -52,6 +52,12 @@ const provider = {
         const randomTimes = casual.integer(0, 4);
         return arrayOf(randomTimes, casual._label);
     },
+    reference() {
+        return {
+            resource_id: casual.make_id('resource'),
+            external_link: casual.url,
+        };
+    },
     cidr() {
         return `${casual.ip}/${casual.random_element([24, 16, 20])}`;
     },
@@ -85,6 +91,12 @@ casual.define('ipAddress', () => ({
     ip_address: casual.ip,
     subnet_id: casual.make_id('subnet'),
     cidr: casual.cidr,
+}));
+
+casual.define('resourceData', () => ({
+    name: casual.word,
+    ipAddress: arrayOf(casual.integer(3, 20), casual._ipAddress),
+    state: casual.random_element(['INSERVICE', 'PENDING', 'MAINTENANCE', 'CLOSED', 'DELETED']),
 }));
 
 export default casual;

@@ -114,7 +114,6 @@ export default defineComponent({
 <style lang="postcss" scoped>
 .chart {
     height: 254px;
-    min-width: 556px;
 }
 .legend {
     @apply uppercase ml-6 inline-flex items-center;

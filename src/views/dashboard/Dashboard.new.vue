@@ -1,30 +1,27 @@
 <template>
-    <div class="grid gap-2 m-2">
-        <div class="grid grid-flow-col gap-2">
-            <div class="grid grid-cols-1 gap-2">
-                <div class="grid grid-cols-3 gap-2">
-                    <service-summary title="projects" :loading="projects.loading" :data="projects.data"
-                                     :color="projects.color"
-                    />
-                    <service-summary title="servers" :loading="servers.loading" :data="servers.data"
-                                     :color="servers.color"
-                    />
-                    <service-summary title="cloud services" :loading="cloudServices.loading" :data="cloudServices.data"
-                                     :color="cloudServices.color"
-                    />
-                </div>
-                <div class="grid gap-2 custom-grid">
-                    <service-accounts />
-                    <top-projects />
-                </div>
-            </div>
-            <daily-updates />
-        </div>
-        <div class="grid grid-cols-2">
-            <collection-state class="collection-state" />
-            <collecting-jobs class="collecting-jobs" />
-        </div>
-        <cloud-services />
+    <div class="dashboard grid gap-4 m-4 grid-flow-row grid-cols-12">
+        <service-summary class="col-start-1 col-end-5 lg:col-end-4"
+                         title="projects" :loading="projects.loading" :data="projects.data"
+                         :color="projects.color"
+        />
+        <service-summary class="col-start-5 col-end-9 lg:col-start-4 lg:col-end-7"
+                         title="servers" :loading="servers.loading" :data="servers.data"
+                         :color="servers.color"
+        />
+        <service-summary class="col-start-9 col-end-13 lg:col-start-7 lg:col-end-10"
+                         title="cloud services" :loading="cloudServices.loading" :data="cloudServices.data"
+                         :color="cloudServices.color"
+        />
+        <service-accounts class="col-start-1 col-end-7 lg:col-end-4" />
+        <daily-updates class="col-start-7 col-end-13 lg:col-start-10
+                              row-start-2 row-end-3 lg:row-start-1"
+        />
+        <top-projects class="col-start-1 col-end-13 lg:col-start-4 lg:col-end-10
+                             lg:row-start-2"
+        />
+        <collection-state class="col-start-1 col-end-13 lg:col-end-7" />
+        <collecting-jobs class="col-start-1 col-end-13 lg:col-start-7" />
+        <cloud-services class="col-start-1 col-end-13" />
     </div>
 </template>
 
@@ -93,14 +90,23 @@ export default defineComponent({
 });
 </script>
 
-<style lang="postcss" scoped>
-.collection-state {
-    @apply rounded-r-none border-r-0;
-}
-.collecting-jobs {
-    @apply rounded-l-none border-l-0;
-}
-.custom-grid {
-    grid-template-columns: 1fr 2fr;
-}
+<style lang="postcss">
+    @media (max-width: 477px) {
+        html, body {
+            font-size: 12px;
+        }
+    }
+
+    @media (min-width: 478px) and (max-width: 676px) {
+        html, body {
+            font-size: 14px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        html, body {
+            font-size: 16px;
+        }
+    }
+
 </style>
