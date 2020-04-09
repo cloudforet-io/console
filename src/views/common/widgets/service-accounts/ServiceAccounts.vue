@@ -130,8 +130,7 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
     .chart {
-        width: 180px;
-        height: 180px;
+        height: 11.25rem;
     }
     .count {
         font-size: 0.875rem;
