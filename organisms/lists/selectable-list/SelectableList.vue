@@ -1,5 +1,5 @@
 <template>
-    <div class="list-container" :class="[`grid-cols-${grid}`, theme]">
+    <div class="list-container" :class="[theme]">
         <div v-if="loading" class="spinner-container">
             <p-lottie name="spinner" auto
                       :size="1.5"
