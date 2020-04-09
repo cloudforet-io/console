@@ -70,13 +70,6 @@ addParameters({
                     height: '100vh',
                 }
             })),
-            '2xl': {
-                name: '2xl',
-                styles: {
-                    width: '2560px',
-                    height: '100vh',
-                }
-            },
             '3xl': {
                 name: '3xl',
                 styles: {
