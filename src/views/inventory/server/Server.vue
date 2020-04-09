@@ -57,7 +57,7 @@
                         </div>
                     </template>
 
-                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1"#toolbox-bottom>
+                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1" #toolbox-bottom>
                         <p-col :col="12" style="margin-bottom: .5rem;">
                             <p-hr style="width: 100%;" />
                             <p-query-search-tags style="margin-top: .5rem;"
@@ -95,7 +95,7 @@
                         </PBadge>
                     </template>
                     <template v-slot:col-platform_type-format="data">
-                        <PBadge v-bind="platformBadgeFormatter(data.item.data.platform.type)">
+                        <PBadge v-if="data.item.data.platform && data.item.data.platform.type" v-bind="platformBadgeFormatter(data.item.data.platform.type)">
                             {{ data | getValue(['item','data','platform','type']) }}
                         </PBadge>
                     </template>
