@@ -10,8 +10,10 @@ import {
 
 const idField = 'server_id';
 const idsField = 'servers';
-export interface ServerModel {
-    server_id: string;
+interface IdParameter {
+    [idField]: string;
+}
+export interface ServerModel extends IdParameter, Tags{
     project_id?: string;
     tags: any;
     data: any;

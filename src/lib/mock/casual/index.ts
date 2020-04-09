@@ -1,20 +1,21 @@
 /* eslint-disable import/no-cycle */
 import Casual from 'casual-browserify';
 import originCasual from '@/lib/casual';
-import serverModels, { serverCasual } from '@/lib/mock/casual/server';
+import serverModels, { ServerCasual } from '@/lib/mock/casual/server';
 import memberModels, { memberCasual } from '@/lib/mock/casual/member';
 import collectorModels, { CollectorCasual } from '@/lib/mock/casual/collector';
 import credentialModels, { credentialsCasual } from '@/lib/mock/casual/credentials';
 import repositoryModels, { repositoryCasual } from '@/lib/mock/casual/repository';
 import pluginModels, { pluginCasual } from '@/lib/mock/casual/plugin';
 import serviceAccountModels, { serviceAccountCasual } from '@/lib/mock/casual/serviceAccount';
+import cloudServiceTypeModels, { CloudServiceTypeCasual } from '@/lib/mock/casual/cloudServiceType';
 
 type originCasualType = Casual.Generators & Casual.Casual;
 type casualType = originCasualType &
-    CollectorCasual & serverCasual &
+    CollectorCasual & ServerCasual &
     memberCasual & credentialsCasual &
     repositoryCasual & pluginCasual &
-    serviceAccountCasual;
+    serviceAccountCasual & CloudServiceTypeCasual
 
 export type modelType = (casual: casualType) => casualType;
 
@@ -28,6 +29,7 @@ const models: modelType[][] = [
     repositoryModels,
     pluginModels,
     serviceAccountModels,
+    cloudServiceTypeModels,
 ];
 
 const getModels = (origin: originCasualType): casualType => {
