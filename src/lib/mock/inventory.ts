@@ -11,6 +11,10 @@ export const DOMAIN_INFO = {
 
 export default [
     new MockData('/inventory/server/list', () => makeArrayResults(arrayOf(15, casual._server), 80)),
+    new MockData('/inventory/cloud-service-type/list', () => makeArrayResults(arrayOf(15, casual._cloudServiceType), 1)),
+    new MockData('/inventory/cloud-service-type/get', () => casual.cloudServiceType),
+    new MockData('/inventory/cloud-service/list', () => makeArrayResults(arrayOf(15, casual._cloudService), 80)),
+    new MockData('/inventory/cloud-service/get', () => casual.cloudService),
     new MockData(RegExp('.*?/.*?/member/list'), () => makeArrayResults(arrayOf(5, casual._member), 35)),
     new MockData('/inventory/collector/list', (req) => {
         const params: any = JSON.parse(req.data);

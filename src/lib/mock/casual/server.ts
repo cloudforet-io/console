@@ -158,7 +158,7 @@ const server = (casual) => {
     return casual;
 };
 
-export interface serverCasual {
+export interface ServerCasual {
     securityGroupRule?: any;
     _securityGroupRule?: any;
     serverData?: any;
