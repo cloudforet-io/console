@@ -8,9 +8,6 @@ import {
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import { getKnobProps } from '@sb/storybook-util';
 import { serviceSummaryProps } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
-import casual, { arrayOf } from '@/lib/casual';
-import { ChartData } from '@/components/organisms/charts/abstract-chart/AbstractChart.toolset';
-import { primary, secondary, secondary1 } from '@/styles/colors';
 
 export default {
     title: 'views/widgets/ServiceSummary',
@@ -31,18 +28,15 @@ export const defaultCase = () => ({
         title: 'projects',
         data: [0, 0, 200, 300, 500, 800, 1300],
     }, {
-        loading: true,
     }, {
         color,
     }),
     template: `
     <div style="width: 80vw;">
         <ServiceSummary v-bind="$props" :loading="loading"></ServiceSummary>
-        <button class="w-full my-3 border border-gray" @click="draw">REDRAW</button>
     </div>`,
     setup(props, context) {
         const state = reactive({
-            loading: true,
         });
 
         const draw = () => {
@@ -52,11 +46,9 @@ export const defaultCase = () => ({
             }, 100);
         };
 
-        draw();
 
         return {
             ...toRefs(state),
-            draw,
         };
     },
 });

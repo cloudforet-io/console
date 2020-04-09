@@ -1,7 +1,7 @@
 <template>
     <div>
         <p-row class="all-container">
-            <p-col :flex-grow="0" flex-basis="50%" class="container collector-info">
+            <p-col :flex-grow="0" flex-basis="50%" class="area collector-info">
                 <p-row>
                     <p-col :flex-grow="0">
                         <p-lottie v-if="imgLoading || !plugin"
@@ -56,8 +56,8 @@
                     </p-col>
                 </p-row>
             </p-col>
-<!--            <p-col v-if="pluginOptions.length > 0" class="container mx-auto options">-->
-            <p-col v-if="pluginOptions.length > 0" class="container options">
+            <!--            <p-col v-if="pluginOptions.length > 0" class="container mx-auto options">-->
+            <p-col v-if="pluginOptions.length > 0" class="area options">
                 <p class="sub-title">
                     {{ $t('INVENTORY.OPTIONS') }}
                 </p>
@@ -210,7 +210,7 @@ export default {
 <style lang="postcss" scoped>
 .all-container {
     padding: 2.4rem 0;
-    .container {
+    .area {
         padding: 0 2.5rem;
         margin: unset;
         width: unset;

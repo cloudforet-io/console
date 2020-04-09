@@ -1,5 +1,10 @@
 <template>
     <p-widget-layout class="collecting-jobs" title="Collecting Jobs" help="Collecting Jobs">
+        <template #extra>
+            <div class="flex justify-end">
+                <p-i name="ic_refresh" class="cursor-pointer" @click="getData" />
+            </div>
+        </template>
         <p-data-table :items="data" :loading="loading" :fields="fields"
                       :top-border="false"
                       :striped="false"
@@ -78,6 +83,7 @@ export default defineComponent({
 
         const getData = async () => {
             state.loading = true;
+            state.data = [];
             state.data = await api();
             state.loading = false;
         };
@@ -89,6 +95,7 @@ export default defineComponent({
             timeFormatter(value) {
                 return moment.tz(moment.unix(value.seconds), getTimezone()).format('MM/DD HH:mm ~');
             },
+            getData,
         };
     },
 });
