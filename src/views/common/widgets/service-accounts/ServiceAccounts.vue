@@ -1,12 +1,9 @@
 <template>
     <p-widget-layout class="service-accounts" title="Service Accounts">
         <div class="flex justify-center">
-            <p-dynamic-chart :dataset="dataset" type="doughnut"
-                             :labels="labels"
-                             :loading="loading"
-                             :theme-props="themeProps"
-                             class="chart"
-            />
+            <p-chart-loader :loading="loading" class="chart">
+                <canvas ref="chartRef" />
+            </p-chart-loader>
         </div>
         <div class="mt-4">
             <p-selectable-list :items="data" :mapper="mapper" theme="card"
@@ -28,41 +25,52 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, getCurrentInstance, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PDynamicChart from '@/components/organisms/charts/dynamic-chart/DynamicChart.vue';
 import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
-import { ChartData } from '@/components/organisms/charts/dynamic-chart/DynamicChart.toolset';
-import { pieDefaultThemeProps } from '@/components/organisms/charts/dynamic-chart/themes/pie-chart';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
+import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
+import { SPieChart } from '@/lib/chart/pie-chart';
+import { SChartToolSet } from '@/lib/chart/toolset';
 
 export default defineComponent({
     name: 'ServiceAccounts',
     components: {
         PWidgetLayout,
-        PDynamicChart,
         PLazyImg,
         PBadge,
         PSelectableList,
+        PChartLoader,
     },
     setup() {
         const vm: any = getCurrentInstance();
 
-        const state = reactive({
-            data: [],
-            loading: true,
-            dataset: computed(() => [new ChartData('Account', state.data.map(d => d.count))]),
-            labels: computed(() => state.data.map(d => d.name)),
-            colors: computed(() => state.data.map(d => d.tags.color)),
-            themeProps: computed(() => ({
-                ...pieDefaultThemeProps,
-                colors: state.colors,
-            })),
-        });
+        type DataType = {
+            name: string;
+            tags: {
+                description?: string;
+                icon: string;
+                color: string;
+            };
+            count: number;
+        };
+        interface StateInterface {
+            data: DataType[];
+            loading: boolean;
+        }
 
-        const api = async () => new Promise((resolve) => {
+        const ts = new SChartToolSet<SPieChart, StateInterface>(SPieChart,
+            (chart => chart.addData(ts.state.data.map(d => d.count), 'Account')
+                .setLabels(ts.state.data.map(d => d.name))
+                .setColors(ts.state.data.map(d => d.tags.color))
+                .apply()), {
+                data: [],
+                loading: true,
+            });
+
+        const api = async (): Promise<DataType[]> => new Promise<DataType[]>((resolve) => {
             setTimeout(() => {
                 resolve([{
                     name: 'AWS',
@@ -70,15 +78,15 @@ export default defineComponent({
                         icon: 'http://',
                         color: '#ff9900',
                     },
-                    count: 0,
+                    count: 3,
                 }, {
                     name: 'GCP',
                     tags: {
                         description: 'GCP', // front-end data = name
                         icon: 'http://', // front-end data
-                        color: '#4285F4',// front-end data
+                        color: '#4285F4', // front-end data
                     },
-                    count: 0,
+                    count: 4,
                 }, {
                     name: 'Azure',
                     tags: {
@@ -97,23 +105,22 @@ export default defineComponent({
             }, 1000);
         });
 
-        const getData = async () => {
-            state.loading = true;
-            state.data = await api();
-            state.loading = false;
+        const getData = async (): Promise<void> => {
+            ts.state.loading = true;
+            ts.state.data = await api();
+            ts.state.loading = false;
         };
 
         getData();
 
         return {
-            ...toRefs(state),
+            ...toRefs(ts.state),
             mapper: {
                 key: 'name',
                 iconUrl: 'tags.icon',
                 title: 'name',
-                color: 'tags.color',
             },
-            onSelected(item) {
+            onSelected(item): void {
                 vm.$router.push('/identity/service-account');
             },
         };

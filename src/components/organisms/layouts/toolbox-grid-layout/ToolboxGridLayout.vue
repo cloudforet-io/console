@@ -1,9 +1,7 @@
 <template>
     <div class="grid-container">
         <div class="toolbox">
-            <div v-if="$slots['toolbox-top']" class="toolbox-top">
-                <slot name="toolbox-top" />
-            </div>
+            <slot name="toolbox-top" />
             <div class="toolbox-middle">
                 <div class="left" :style="{width: '100%'}">
                     <slot name="toolbox-left" />

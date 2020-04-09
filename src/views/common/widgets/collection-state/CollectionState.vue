@@ -1,11 +1,8 @@
 <template>
     <p-widget-layout title="Collection State">
-        <p-dynamic-chart :dataset="dataset" type="bar"
-                         :labels="labels"
-                         :loading="loading"
-                         :theme-props="themeProps"
-                         class="chart"
-        />
+        <p-chart-loader :loading="loading" class="chart">
+            <canvas ref="chartRef" />
+        </p-chart-loader>
         <template #extra>
             <div class="flex justify-end">
                 <span v-for="(color, legend) in colors" :key="legend" class="legend">
@@ -19,42 +16,53 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    defineComponent, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import PDynamicChart from '@/components/organisms/charts/dynamic-chart/DynamicChart.vue';
-import { ChartData } from '@/components/organisms/charts/dynamic-chart/DynamicChart.toolset';
-import { barDefaultThemeProps } from '@/components/organisms/charts/dynamic-chart/themes/bar-chart';
 import { primary, coral } from '@/styles/colors';
 import _ from 'lodash';
+import { SChartToolSet } from '@/lib/chart/toolset';
+import { SBarChart } from '@/lib/chart/bar-chart';
+import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 
 export default defineComponent({
     name: 'CollectionState',
     components: {
         PWidgetLayout,
-        PDynamicChart,
+        PChartLoader,
     },
     setup() {
-        const state = reactive({
-            data: [],
-            loading: true,
-            dataset: computed(() => [
-                new ChartData('Success', state.data.map(d => d.success)),
-                new ChartData('Failure', state.data.map(d => d.failure)),
-            ]),
-            labels: computed(() => state.data.map(d => d.date)),
+        interface DataType {
+            date: string;
+            success: number;
+            failure: number;
+        }
+        interface InitDataType {
+            data: Array<DataType | undefined>;
+            loading: boolean;
             colors: {
-                success: primary,
-                failure: coral.default,
-            },
-            legends: computed(() => _.keys(state.colors)),
-            themeProps: computed(() => ({
-                ...barDefaultThemeProps,
-                colors: _.values(state.colors),
-            })),
-        });
+                success: string;
+                failure: string;
+            };
+        }
 
-        const api = async () => new Promise((resolve) => {
+        const ts = new SChartToolSet<SBarChart, InitDataType>(SBarChart,
+            (chart: SBarChart) => (chart.addData(ts.state.data.map(d => d.success), 'Success')
+                .addData(ts.state.data.map(d => d.failure), 'Failure')
+                .setLabels(ts.state.data.map(d => d.date))
+                .setColors(_.values(ts.state.colors))
+                .setTicksCount(5)
+                .apply()), {
+                data: [],
+                loading: true,
+                colors: {
+                    success: primary,
+                    failure: coral.default,
+                },
+            });
+
+
+        const api = async (): Promise<DataType[]> => new Promise((resolve) => {
             setTimeout(() => {
                 resolve([{
                     date: '4/1', // MM/DD
@@ -88,16 +96,16 @@ export default defineComponent({
             }, 1000);
         });
 
-        const getData = async () => {
-            state.loading = true;
-            state.data = await api();
-            state.loading = false;
+        const getData = async (): Promise<void> => {
+            ts.state.loading = true;
+            ts.state.data = await api();
+            ts.state.loading = false;
         };
 
         getData();
 
         return {
-            ...toRefs(state),
+            ...toRefs(ts.state),
         };
     },
 });

@@ -120,9 +120,6 @@ export default defineComponent({
                 key: 'resource_id',
                 iconUrl: 'tags.icon',
                 title: 'name',
-                color(item) {
-                    return colors[item.update_type];
-                },
             },
             onSelected(item) {
                 vm.$router.push('/identity/service-account');
@@ -137,6 +134,7 @@ export default defineComponent({
 .daily-updates {
     min-width: 332px;
     max-width: 446px;
+    overflow-y: auto;
 }
 .group-name {
     @apply text-base font-bold mb-1;
