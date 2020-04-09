@@ -5,7 +5,7 @@
                 <canvas ref="chartRef" />
             </p-chart-loader>
         </div>
-        <div class="mt-4">
+        <div class="mt-4 overflow-auto">
             <p-data-table :fields="fields"
                           :sortable="false"
                           :selectable="false"
@@ -216,7 +216,7 @@ export default defineComponent({
     background-color: currentColor;
 }
 .custom-th {
-    @apply flex items-center justify-center uppercase font-bold;
+    @apply flex items-center justify-center uppercase font-bold px-1;
     font-family: theme('fontFamily.sans');
 }
 .project-field {

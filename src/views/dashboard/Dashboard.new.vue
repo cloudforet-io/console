@@ -12,9 +12,10 @@
                          title="cloud services" :loading="cloudServices.loading" :data="cloudServices.data"
                          :color="cloudServices.color"
         />
-        <service-accounts class="col-start-1 col-end-7 lg:col-end-4" />
-        <daily-updates class="col-start-7 col-end-13 lg:col-start-10
-                              row-start-2 row-end-3 lg:row-start-1"
+        <service-accounts class="col-start-1 col-end-13 sm:col-end-7 lg:col-end-4
+                                 row-start-3 row-end-4 sm:row-start-2 sm:row-end-3" />
+        <daily-updates class=" col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
+                              row-start-2 row-end-3 sm:row-start-2 sm:row-end-3 lg:row-start-1"
         />
         <top-projects class="col-start-1 col-end-13 lg:col-start-4 lg:col-end-10
                              lg:row-start-2"
