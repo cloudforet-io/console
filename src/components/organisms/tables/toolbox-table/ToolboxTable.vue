@@ -219,7 +219,7 @@ export default {
 
         padding: 1rem;
         .toolbox {
-            margin-top: 0.5rem;
+            /*margin-top: 0.5rem;*/
             .toolbox-middle{
                 display: flex;
                 justify-content: space-between;

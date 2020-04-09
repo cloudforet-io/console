@@ -20,42 +20,54 @@
         </template>
         <template #default>
             <div v-if="treeApiHandler.ts.metaState.firstSelectedNode">
-<!--                <div v-if="treeApiHandler.ts.metaState.selectedNode">-->
-<!--                    <pre>no data</pre>-->
-<!--                </div>-->
                 <p-toolbox-grid-layout
-                    card-min-width="18.75rem"
-                    card-height="15rem"
-                    :items="cardItems"
-                    :this-page.sync="thisPage"
-                    :page-size.sync="pageSize"
-                    @changePageNumber="getData()"
-                    @changePageSize="getData()"
-                    @clickRefresh="getData()"
+                    v-bind="apiHandler.gridTS.state"
+                    :this-page.sync="apiHandler.gridTS.syncState.thisPage"
+                    :page-size.sync="apiHandler.gridTS.syncState.pageSize"
+                    @changePageNumber="apiHandler.getData()"
+                    @changePageSize="apiHandler.getData()"
+                    @clickRefresh="apiHandler.getData()"
+                    @card:click="clickCard"
                 >
+                    <template #toolbox-left>
+                        <p-query-search-bar
+                            :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
+                            :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
+                            @newQuery="apiHandler.gridTS.querySearch.addTag"
+                        />
+                    </template>
+                    <template v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
+                        <p-hr style="width: 100%;" />
+                        <p-query-search-tags
+                            class="py-2"
+                            :tags="apiHandler.gridTS.querySearch.tags.value"
+                            @deleteTag="apiHandler.gridTS.querySearch.deleteTag"
+                            @deleteAllTags="apiHandler.gridTS.querySearch.deleteAllTags"
+                        />
+                    </template>
                     <template #card="{item}">
                         <div class="project-description">
                             <div class="project">
                                 <p id="project-group-name">
-                                    {{ item.projectGroupName }}
+                                    {{ item.project_group_info.name }}
                                 </p>
                                 <p id="project-name">
-                                    {{ item.projectName }}
+                                    {{ item.name }}
                                 </p>
-                                <div v-if="item.providers" class="providers">
-                                    <img v-for="(url, index) in item.providers" :key="index" :src="url"
+                                <div v-if="item.force_console_data.providers" class="providers">
+                                    <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
                                          class="provider-icon"
                                     >
-                                    <span v-if="item.extraProviders"> + {{ item.extraProviders }}</span>
+                                    <span v-if="item.force_console_data.extraProviders"> + {{ item.force_console_data.extraProviders }}</span>
                                 </div>
                             </div>
                         </div>
                         <hr class="solid">
                         <div class="project-summary">
-                            <div v-if="item.summary" class="summary-item">
-                                <span class="summary-item-text">Cloud Service</span>   <span class="summary-item-num">{{ item.summary.cloud_service }}</span><br>
-                                <span class="summary-item-text">Server</span>   <span class="summary-item-num">{{ item.summary.server }}</span><br>
-                                <span class="summary-item-text">Member</span>   <span class="summary-item-num">{{ item.summary.member }}</span>
+                            <div v-if="cardSummary[item.project_id]" class="summary-item">
+                                <span class="summary-item-text">Cloud Service</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].cloud_service }}</span><br>
+                                <span class="summary-item-text">Server</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].server }}</span><br>
+                                <span class="summary-item-text">Member</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].member }}</span>
                             </div>
                             <div v-else class="loading">
                                 loading
@@ -78,7 +90,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, defineComponent, getCurrentInstance, reactive, ref, toRefs,
+    computed, defineComponent, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PTree from '@/components/molecules/tree-new/Tree.vue';
@@ -97,38 +109,39 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import fluentApi from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
-import { ProjectModel } from '@/lib/fluent-api/identity/project';
+import { ProjectModel, ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProviderListResp } from '@/lib/fluent-api/identity/provider';
 import config from '@/lib/config';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
+import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
+import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
+import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
+import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
+import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 
 
-interface Summary {
+    interface Summary {
         [id: string]: ProjectSummaryResp;
-}
+    }
 
-interface ProjectCardData{
+    interface ProjectCardData{
         projectGroupName: string;
         projectId: string;
         projectName: string;
         providers: string[];
         extraProviders: number;
         summary?: ProjectSummaryResp;
-}
+    }
 
-interface State {
+    interface State {
         item: any;
         items: ProjectCardData[];
         selectedId: string;
-        totalCount: number;
-        thisPage: number;
-        pageSize: number;
-        allPage: number;
-}
+    }
 
-export default defineComponent({
+export default{
     name: 'Project2',
     components: {
         PVerticalPageLayout2,
@@ -139,6 +152,8 @@ export default defineComponent({
         PDynamicView,
         PDynamicDetails,
         PI,
+        PQuerySearchBar,
+        PQuerySearchTags,
         PEmpty,
         PGridLayout,
         PToolboxGridLayout,
@@ -147,14 +162,8 @@ export default defineComponent({
         const state: UnwrapRef<State> = reactive({
             item: [],
             items: [],
-            thisPage: 1,
-            totalCount: 0,
-            pageSize: 12,
-            allPage: 1,
             selectedId: '',
         });
-        const summary = ref<Summary>({});
-
         const { provider } = useStore();
         provider.getProvider();
 
@@ -166,77 +175,90 @@ export default defineComponent({
             .setExcludeProject();
         const treeApiHandler = new ProjectTreeFluentAPI(treeAction, TreeToolSet);
         const projectAPI = fluentApi.identity().project();
+        const statisticsAPI = fluentApi.statistics().projectSummary();
 
-        const getSummary = (id: string) => {
-            if (!summary.value[id]) {
-                fluentApi.statistics().projectSummary().setId(id).execute()
-                    .then((resp) => {
-                        summary.value = {
-                            ...summary.value,
-                            [id]: resp.data,
-                        };
-                    });
-            }
-        };
-        const getData = async () => {
-            state.items = [];
-            try {
-                const res = await projectAPI.list()
-                    .setThisPage(state.thisPage)
-                    .setPageSize(state.pageSize)
-                    .setFilter({
-                        key: 'project_group_id',
-                        value: state.selectedId,
-                        operator: '=',
-                    })
-                    .setIncludeProvider()
-                    .execute();
-                state.items = res.data.results.map((it: ProjectModel) => {
-                    const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
-                    const extraProviders = providers.length > 5 ? providers.length - 5 : 0;
-                    return {
-                        projectGroupName: it.project_group_info.name,
-                        projectId: it.project_id,
-                        projectName: it.name,
+        const createdData = reactive({});
+        const cardSummary = ref(createdData);
+        const getCard = (resp: AxiosResponse<ProjectListResp>) => {
+            const ids = resp.data.results.map(item => item.project_id);
+            cardSummary.value = reactive(_.zipObject(ids));
+            resp.data.results.forEach((item) => {
+                const id = item.project_id;
+                const setCard = (items) => { cardSummary.value[id] = items; };
+                statisticsAPI.setId(id).execute().then((rp) => {
+                    if (rp.data) {
+                        setCard(rp.data);
+                    }
+                });
+            });
+            const temp = resp.data.results.map((it) => {
+                const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
+                const extraProviders = providers.length > 5 ? providers.length - 5 : 0;
+                return {
+                    ...it,
+                    force_console_data: {
                         extraProviders,
                         providers: providers.splice(0, 5),
-                    };
-                });
-                state.totalCount = res.data.total_count;
-                state.items.forEach((it) => {
-                    getSummary(it.projectId);
-                });
-            } catch (e) {
-                state.items = [];
-                state.allPage = 1;
-                console.error(e);
-            }
+                    },
+                };
+            });
+            resp.data.results = temp;
+            return resp;
         };
 
+        const listAction = projectAPI.list().setTransformer(getCard).setIncludeProvider();
+
+        const apiHandler = new QuerySearchGridFluentAPI(
+            listAction,
+            {
+                cardClass: () => ['project-card-item'],
+                cardMinWidth: '18.75rem',
+                cardHeight: '15rem',
+            },
+            undefined,
+            {
+                handlerClass: QuerySearchTableACHandler,
+                args: {
+                    keys: ['name'],
+                    suggestKeys: [],
+                },
+            },
+        );
+
+        watch(() => treeApiHandler.ts.metaState.firstSelectedNode, (after: any, before: any) => {
+            if ((after && !before) || (after && after.data.id !== before.data.id)) {
+                console.debug(after);
+                apiHandler.action = listAction.setFixFilter({
+                    key: 'project_group_id',
+                    value: after.data.id,
+                    operator: '=',
+                });
+                apiHandler.resetAll();
+                apiHandler.getData();
+            }
+        });
+
         const selected = async (item) => {
+            console.log('selected test', item);
             treeApiHandler.ts.getSelectedNode(item);
             state.selectedId = item.data.id;
             state.items = [];
-            await getData();
         };
 
-        const cardItems = computed(() => state.items.map((item) => {
-            if (summary.value[item.projectId]) {
-                item.summary = summary.value[item.projectId];
-            }
-            return item;
-        }));
+        const clickCard = (item) => {
+            console.log('click card');
+        };
         return {
             treeRef: treeApiHandler.ts.treeRef,
             treeApiHandler,
+            apiHandler,
             ...toRefs(state),
             selected,
-            summary,
-            cardItems,
-            getData,
+            clickCard,
+            cardSummary,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

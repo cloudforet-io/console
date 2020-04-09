@@ -2,6 +2,18 @@
     <general-page-layout>
         <p-horizontal-layout>
             <template #container="{ height }">
+                <div class="cloud-service-page-nav">
+                    <div class="left">
+                        <p-i name="ic_back" width="2rem" height="2rem"
+                             @click="$router.push({name:'cloudServiceMain'})"
+                        />
+
+                        <div class="title">
+                            <span class="group">{{ $route.params.group }}/</span><span class="name">{{ $route.params.name }}</span>
+                        </div>
+                    </div>
+                    <div class="right" />
+                </div>
                 <p-dynamic-view view_type="query-search-table"
                                 :api-handler="apiHandler"
                                 :data_source="dataSource"
@@ -11,13 +23,12 @@
                                 :data="null"
                 >
                     <template #toolbox-left>
-                        <p-button style-type="primary-dark" @click="clickOpenForm('add')">
-                            {{ $t('BTN.ADD') }}
+                        <p-button style-type="primary-dark">
+                            {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
                             class="left-toolbox-item"
-                            :menu="dropdown"
-                            @click-delete="accountDeleteClick"
+                            :menu="csDropdownMenu"
                             @click-project="clickProject"
                             @click-link="apiHandler.tableTS.linkState.openLink()"
                             @click-exportExcel="exportToolSet.getData()"
@@ -67,7 +78,7 @@
             <template #data>
                 <p-dynamic-view
                     view_type="simple-table"
-                    :data_source="accountDataSource"
+                    :data_source="dataSource"
                     :data="apiHandler.tableTS.selectState.selectItems"
                 />
             </template>
@@ -115,7 +126,7 @@ import {
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
-import fluentApi, { MultiItemAction } from '@/lib/fluent-api';
+import fluentApi from '@/lib/fluent-api';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import {
     getEnumValues, getFetchValues, makeValuesFetchHandler,
@@ -131,7 +142,8 @@ import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { Computed } from '@/lib/type';
 import { ChangeCloudServiceProject } from '@/lib/api/fetch';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
-import { stringify } from 'postcss';
+import PIconButton from '@/components/molecules/buttons/IconButton.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 export default {
     name: 'CloudServicePage',
@@ -142,6 +154,8 @@ export default {
         GeneralPageLayout,
         PHorizontalLayout,
         PDynamicView,
+        PI,
+        PIconButton,
         PTab,
         PDynamicSubData,
         PButton,
@@ -256,26 +270,10 @@ export default {
                 exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
             }
         });
-
-
         apiHandler.getData();
-        const changeProjectAPI = new ChangeCloudServiceProject();
-
-
-        const cstDropdownMenu = reactive({
-            ...makeTrItems([
-                ['add', 'BTN.CREATE'],
-                ['update', 'BTN.UPDATE'],
-                ['delete', 'BTN.DELETE'],
-                ['export', 'BTN.EXPORT', { disabled: false }],
-            ],
-            context.parent,
-            { type: 'item', disabled: true }),
-        });
 
 
         const csIsNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
-        const csIsNotSelectedOnlyOne = computed(() => !apiHandler.tableTS.selectState.isSelectOne);
         const csDropdownMenu = reactive({
             ...makeTrItems([
                 ['add', 'BTN.CREATE'],
@@ -300,7 +298,6 @@ export default {
         const changeProjectAction = fluentApi.inventory().cloudService().changeProject();
         const changeProject = async (node?: ProjectNode|null) => {
             const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.cloud_service_id));
-
             if (node) {
                 await action.setId(node.data.id).execute();
             } else {
@@ -320,6 +317,41 @@ export default {
             collectModalState.collectModalVisible = true;
         };
 
+
+        const adminIsShow = computed(() => {
+            let result = false;
+            if (apiHandler.tableTS.selectState.isSelectOne) {
+                result = singleItemTab.syncState.activeTab === 'admin';
+            }
+
+            if (apiHandler.tableTS.selectState.isSelectMulti) {
+                result = multiItemTab.syncState.activeTab === 'admin';
+            }
+            return result;
+        });
+
+        const adminApiHandler = new AdminFluentAPI(
+            fluentApi.inventory().cloudService().memberList(),
+            adminIsShow,
+            'cloud_service_id',
+            apiHandler,
+        );
+
+        // @ts-ignore
+
+        const historyIsShow = computed(() => {
+            let result = false;
+            if (apiHandler.tableTS.selectState.isSelectOne) {
+                result = singleItemTab.syncState.activeTab === 'history';
+            }
+            return result;
+        });
+        const selectId = computed(() => apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id);
+        const getDataAction = fluentApi.inventory().cloudService().getData();
+
+        // @ts-ignore
+        const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
+
         return {
             ...toRefs(state),
             apiHandler,
@@ -331,6 +363,10 @@ export default {
             csGetDataAction,
             ...toRefs(collectModalState),
             clickCollectData,
+            singleItemTab,
+            multiItemTab,
+            adminApiHandler,
+            historyAPIHandler,
         };
     },
 };
@@ -338,6 +374,23 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+    .cloud-service-page-nav{
+        @apply flex items-center justify-between mb-6;
+        .left{
+            @apply flex;
+            .title{
+                line-height: 1.8125rem;
+                .group{
+                    @apply text-2xl text-gray-500 ;
+                }
+                .name{
+                    @apply text-2xl font-bold;
+                }
+
+            }
+        }
+
+    }
     .left-toolbox-item{
         margin-left: 1rem;
         &:last-child {
