@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout class="service-accounts" title="Service Accounts">
+    <p-widget-layout title="Service Accounts">
         <div class="flex justify-center">
             <p-chart-loader :loading="loading" class="chart">
                 <canvas ref="chartRef" />
@@ -129,9 +129,6 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .service-accounts {
-        min-width: 330px;
-    }
     .chart {
         width: 180px;
         height: 180px;

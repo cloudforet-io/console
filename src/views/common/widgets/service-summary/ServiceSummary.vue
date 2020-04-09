@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout class="summary" :title="title" :padding="false">
+    <p-widget-layout :title="title" :padding="false">
         <router-link class="count" :to="to" :style="{
             color: color,
         }"
@@ -41,6 +41,7 @@ export default defineComponent({
             (chart: SLineChart) => chart.addData(props.data, props.title)
                 .setLabels(new Array(props.data.length).fill(''))
                 .setGradientHeight(100)
+                .setColors([props.color])
                 .apply());
 
         return {
@@ -52,10 +53,6 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.summary {
-    min-width: 216px;
-    max-width: 446px;
-}
 .count {
     display: inline-block;
     line-height: 2.5rem;

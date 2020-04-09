@@ -1,4 +1,5 @@
 
+const plugin = require('tailwindcss/plugin');
 const colors = require('./src/styles/colors');
 
 module.exports = {
@@ -17,7 +18,28 @@ module.exports = {
             sans: ['Noto Sans'],
             serif: ['Roboto'],
         },
+        screens: {
+            '2xs': { min: '375px' },
+            xs: { min: '478px' },
+            sm: { min: '576px' },
+            md: { min: '768px' },
+            lg: { min: '1024px' },
+            xl: { min: '1920px' },
+            // '2xl': { min: '2560px' },
+            // '3xl': { min: '3440px' },
+        },
     },
-    variants: {},
-    plugins: [],
+    variants: ['responsive', 'important'],
+    plugins: [
+        plugin(({ addVariant }) => {
+            addVariant('important', ({ container }) => {
+                container.walkRules((rule) => {
+                    rule.selector = `.\\!${rule.selector.slice(1)}`;
+                    rule.walkDecls((decl) => {
+                        decl.important = true;
+                    });
+                });
+            });
+        }),
+    ],
 };
