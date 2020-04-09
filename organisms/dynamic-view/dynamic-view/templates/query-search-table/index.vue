@@ -45,9 +45,11 @@
             </p-col>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{item}">
-            <p-dynamic-field :key="slot.name" :view_type="slot.view_type" :view_option="slot.view_option"
-                             :data="getValue(item,slot.path)"
-            />
+            <slot :name="slot.name" :item="item">
+                <p-dynamic-field :key="slot.name" :view_type="slot.view_type" :view_option="slot.view_option"
+                                 :data="getValue(item,slot.path)"
+                />
+            </slot>
         </template>
     </p-toolbox-table>
 </template>
