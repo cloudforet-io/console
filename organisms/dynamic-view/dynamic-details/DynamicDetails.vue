@@ -4,7 +4,9 @@
             <p-panel-top :key="dv.name">
                 {{ dv.name }}
             </p-panel-top>
-            <p-dynamic-view :key="dv.name+'-dv'" v-bind="dv" :data="data" />
+            <p-dynamic-view :key="dv.name+'-dv'" v-bind="dv" :data="data"
+                            class="mb-6"
+            />
         </template>
     </div>
     <p-empty v-else style="margin-top: 1rem">
@@ -20,16 +22,16 @@ import PEmpty from '@/components/atoms/empty/Empty.vue';
 
 interface DV{
     // eslint-disable-next-line camelcase
-    data_source:any[]
+    data_source: any[];
     // eslint-disable-next-line camelcase
-    view_type?:string;
+    view_type?: string;
     // eslint-disable-next-line camelcase
-    key_path?:string;
+    key_path?: string;
 }
 
 interface Props {
-    details:DV[];
-    data:any;
+    details: DV[];
+    data: any;
 }
 
 
@@ -50,7 +52,7 @@ export default defineComponent({
     },
     setup(props) {
         const dvs = computed(() => {
-            const result:DV[] = [];
+            const result: DV[] = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const dv of props.details as DV[]) {
                 if (!dv.view_type) {
