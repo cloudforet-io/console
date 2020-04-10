@@ -282,6 +282,7 @@
 		"CONF_COL": "Configure Collector",
 		"CRT_COLL": "Create Collector",
 		"CRT_CRD": "Create new credentials",
+		"CRT_PROJ": "Create Project",
 		"CRT_FAIL_ARG": "Fail to create {0}. Please, check your action.",
 		"CRT_SUCC_ARG": "New {0} has been successfully created.",
 		"DEL_COL": "Delete Collectors",

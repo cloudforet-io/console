@@ -172,7 +172,7 @@ export default defineComponent({
         .tree-content {
             padding: .5rem 0;
             height: 2rem;
-            font-size: .875rem;
+            /*font-size: .875rem;*/
             border-radius: 2px;
             .tree-anchor {
                 @apply text-gray;
