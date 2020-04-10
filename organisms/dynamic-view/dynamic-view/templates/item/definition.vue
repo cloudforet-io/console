@@ -1,17 +1,28 @@
 <template>
-    <div class="content-container">
-        <span class="content">
-            <p-dt class="label">{{ name }}</p-dt>
-            <span class="data" @mouseleave="onMouseOut">
-                <p-dd @mouseenter="onMouseOver">
-                    <p-dynamic-field ref="field" :view_type="view_type" :view_option="view_option"
-                                     :data="data"
-                    />
-                </p-dd>
-                <p-copy-button v-if="isMouseOver" class="copy-btn" :value="value" />
-            </span>
-        </span>
-    </div>
+    <tr class="def" @mouseleave="onMouseOut">
+        <td class="key">
+            {{ name }}
+        </td>
+        <td class="value" @mouseenter="onMouseOver">
+            <p-dynamic-field ref="field" :view_type="view_type" :view_option="view_option"
+                             :data="data"
+            />
+            <p-copy-button v-if="isMouseOver&&value" class="copy-btn" :value="value" />
+        </td>
+    </tr>
+    <!--    <div class="content-container">-->
+    <!--        <span class="content">-->
+    <!--            <p-dt class="label">{{ name }}</p-dt>-->
+<!--    <span class="data" @mouseleave="onMouseOut">-->
+<!--        <p-dd @mouseenter="onMouseOver">-->
+<!--            <p-dynamic-field ref="field" :view_type="view_type" :view_option="view_option"-->
+<!--                             :data="data"-->
+<!--            />-->
+<!--        </p-dd>-->
+<!--        <p-copy-button v-if="isMouseOver" class="copy-btn" :value="value" />-->
+<!--    </span>-->
+<!--        </span>-->
+<!--    </div>-->
 </template>
 
 <script lang="ts">
@@ -43,7 +54,7 @@ export default defineComponent({
         },
         view_option: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
         view_type: {
             type: String,
@@ -64,56 +75,71 @@ export default defineComponent({
 </script>
 
 <style scoped lang="postcss">
-.content-container {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    width: 100%;
-    flex-basis: 50%;
-    max-width: 50%;
-    .content {
-        display: flex;
-        align-items: center;
-        padding-bottom: 1rem;
-        .label {
-            @apply text-gray-400;
-            float: left;
-            overflow: hidden;
-            clear: left;
-            text-align: left;
-            word-break: break-word;
-            padding: 0 1rem;
-            text-align: left;
-            font-weight: bold;
-            min-width: 10rem;
+.def{
+    .key{
+        @apply px-4 text-sm font-bold max-w-xs h-8;
+        line-height: 1.0625rem;
+        width: 18rem;
+        font-family: Noto Sans;
 
-        }
-        .label-common {
-            width: 25%;
-        }
-        .label-full {
-            width: 12.5%;
-        }
+    }
+    .value{
+        @apply h-8 px-4;
+        font-family: Noto Sans;
 
-        .data {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            text-align: left;
-            color: #222532;
-            opacity: 1;
-            dd {
-                margin: 0;
-            }
-        }
-        .copy-btn::v-deep {
-            flex: 1;
-            height: 1rem;
-            .p-copy-btn {
-                top: -.3rem;
-            }
-        }
+
     }
 }
+/*.content-container {*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*    align-items: center;*/
+/*    width: 100%;*/
+/*    flex-basis: 50%;*/
+/*    max-width: 50%;*/
+/*    .content {*/
+/*        display: flex;*/
+/*        align-items: center;*/
+/*        padding-bottom: 1rem;*/
+/*        .label {*/
+/*            @apply text-gray-400;*/
+/*            float: left;*/
+/*            overflow: hidden;*/
+/*            clear: left;*/
+/*            text-align: left;*/
+/*            word-break: break-word;*/
+/*            padding: 0 1rem;*/
+/*            text-align: left;*/
+/*            font-weight: bold;*/
+/*            min-width: 10rem;*/
+
+/*        }*/
+/*        .label-common {*/
+/*            width: 25%;*/
+/*        }*/
+/*        .label-full {*/
+/*            width: 12.5%;*/
+/*        }*/
+
+/*        .data {*/
+/*            flex: 1;*/
+/*            display: flex;*/
+/*            align-items: center;*/
+/*            text-align: left;*/
+/*            color: #222532;*/
+/*            opacity: 1;*/
+/*            dd {*/
+/*                margin: 0;*/
+/*            }*/
+/*        }*/
+/*        .copy-btn::v-deep {*/
+/*            flex: 1;*/
+/*            height: 1rem;*/
+/*            .p-copy-btn {*/
+/*                top: -.3rem;*/
+/*            }*/
+/*        }*/
+/*    }*/
+/*}*/
 
 </style>

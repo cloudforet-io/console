@@ -25,7 +25,7 @@ import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/Dynam
 import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/SelectBtnGroup.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import {SubDataAPI, SubDataFluentAPI} from "@/lib/api/table";
-import fluentApi, {GetDataAction} from "@/lib/fluent-api";
+import {GetDataAction, fluentApi} from "@/lib/fluent-api";
 import {ExcelExportAPIToolSet} from "@/lib/api/add-on";
 
 interface Props {
