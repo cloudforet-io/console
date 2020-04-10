@@ -18,7 +18,7 @@ import { defaultQuery } from '@/lib/api/query';
 import { AdminTableAPI, HistoryAPI, QuerySearchTableFluentAPI } from '@/lib/api/table'
 import { ChangeServerProject } from '@/lib/api/fetch';
 import { useStore } from '@/store/toolset';
-import fluentApi from '@/lib/fluent-api';
+import {fluentApi} from '@/lib/fluent-api';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete'
 
 export default {

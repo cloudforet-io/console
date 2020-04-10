@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import { arrayOf } from '@/lib/casual';
-// eslint-disable-next-line import/no-cycle
-import { modelType } from '@/lib/mock/casual';
+import { ModelType } from '@/lib/mock/casual/type';
 
 
 const repository = (casual) => {
@@ -17,12 +16,12 @@ const repository = (casual) => {
     return casual;
 };
 
-export interface repositoryCasual {
+export interface RepositoryCasual {
     repository?: any;
     _repository?: any;
 }
 
-const result: modelType[] = [
+const result: ModelType[] = [
     repository,
 ];
 

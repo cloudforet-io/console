@@ -1,10 +1,6 @@
 /* eslint-disable camelcase */
 import { arrayOf } from '@/lib/casual';
-// eslint-disable-next-line import/no-cycle
-import { modelType } from '@/lib/mock/casual/index';
-import {
-    CollectionInfo, DefaultMetaData, ReferenceInfo, TimeStamp,
-} from '@/lib/fluent-api';
+import { ModelType } from '@/lib/mock/casual/type';
 
 
 const cloudServiceType = (casual) => {
@@ -39,7 +35,7 @@ const cloudService = (casual) => {
         cloud_service_group: casual.word,
         data: casual.resourceData,
         // metadata: DefaultMetaData;
-        reference: casual.reference,
+        reference: casual._reference,
         project_id: casual.make_id('project'),
         cloud_service_type_id: casual.make_id('cs'),
         name: casual.word,
@@ -58,7 +54,7 @@ const cloudService = (casual) => {
     return casual;
 };
 
-const result: modelType[] = [
+const result: ModelType[] = [
     cloudServiceType, cloudService,
 ];
 export interface CloudServiceTypeCasual{

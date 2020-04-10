@@ -1,16 +1,15 @@
 /* eslint-disable camelcase */
 import { arrayOf } from '@/lib/casual';
-// eslint-disable-next-line import/no-cycle
-import { modelType } from '@/lib/mock/casual';
+import {ModelType} from "@/lib/mock/casual/type";
 
-const pluginVersion: modelType = (casual) => {
+const pluginVersion: ModelType = (casual) => {
     casual.define('pluginVersion', () => ({
         version: arrayOf(casual.integer(1, 5), () => `v${casual.integer(1, 5)}`),
     }));
     return casual;
 };
 
-const pluginOption: modelType = (casual) => {
+const pluginOption: ModelType = (casual) => {
     casual.define('pluginOption', () => {
         const res: any = {
             key: casual.uuid,
@@ -67,7 +66,7 @@ const plugin = (casual) => {
     return casual;
 };
 
-export interface pluginCasual {
+export interface PluginCasual {
     pluginVersion?: any;
     _pluginVersion?: any;
     pluginOption?: any;
@@ -76,7 +75,7 @@ export interface pluginCasual {
     _plugin?: any;
 }
 
-const result: modelType[] = [
+const result: ModelType[] = [
     pluginVersion, pluginOption, plugin,
 ];
 

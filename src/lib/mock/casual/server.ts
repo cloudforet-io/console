@@ -1,9 +1,8 @@
 /* eslint-disable camelcase */
-import { arrayOf } from '@/lib/casual';
-// eslint-disable-next-line import/no-cycle
-import { modelType } from '@/lib/mock/casual/index';
+import { arrayOf, CustomCasual } from '@/lib/casual';
+import { ModelType } from '@/lib/mock/casual/type';
 
-const securityGroupRule = (casual) => {
+const securityGroupRule = (casual: CustomCasual): CustomCasual => {
     casual.define('securityGroupRule', () => ({
         port_range_min: casual.integer(0, 1000),
         port_range_max: casual.integer(28200, 65535),
@@ -180,7 +179,7 @@ export interface ServerCasual {
 }
 
 
-const result: modelType[] = [
+const result: ModelType[] = [
     securityGroupRule, serverData, nic, disk,
     zoneInfo, poolInfo, regionInfo, collectInfo,
     server,

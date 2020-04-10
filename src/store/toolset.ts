@@ -5,7 +5,7 @@ import Lockr from 'lockr';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import { api } from '@/lib/api/axios';
-import fluentApi from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 
 const bindLocalStorage = (prefix: string, name: string, state: any) => computed({
     get: () => state[name],
