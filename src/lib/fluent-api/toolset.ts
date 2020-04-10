@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+/* eslint-disable camelcase, @typescript-eslint/no-explicit-any */
 import { AxiosResponse } from 'axios';
 import _ from 'lodash';
 import { api } from '@/lib/api/axios';
@@ -7,8 +7,9 @@ import {
     FilterType,
     Query,
     FilterItem,
-    ShortFilterType, GetActionState, RawParameterActionState, QueryApiState,
+    ShortFilterType, GetActionState, RawParameterActionState, QueryApiState, StatQueryApiState, StatQuery,
 } from '@/lib/fluent-api/type';
+import { isNotEmpty } from '@/lib/util';
 
 
 export abstract class ActionAPI<parameter=any, resp=any> {
@@ -20,17 +21,16 @@ export abstract class ActionAPI<parameter=any, resp=any> {
 
     protected apiState: any;
 
-    protected transformer: ((any) => any|Promise<any>)|null;
+    protected transformer: ((resp) => any|Promise<any>)|null;
 
     public abstract getParameter: () => parameter
 
-    async execute(): Promise<AxiosResponse<resp>> {
-        let resp: any;
+    async execute(): Promise<AxiosResponse<resp>|any> {
+        let resp: AxiosResponse<resp> | any;
         if (this.method === 'get') {
             resp = await api.instance[this.method](this.url);
         } else {
-            // @ts-ignore
-            resp = await api.instance[this.method](this.url, this.getParameter());
+            resp = await api.instance[this.method as string](this.url, this.getParameter());
         }
         if (this.transformer) {
             resp = await this.transformer(resp);
@@ -44,21 +44,21 @@ export abstract class ActionAPI<parameter=any, resp=any> {
         transformer: ((any) => any|Promise<any>)|null = null,
     ) {
         this.baseUrl = baseUrl;
-        this.apiState = apiState || {};
+        this.apiState = apiState || {} as any;
         this.transformer = transformer;
     }
 
-    setTransformer(func: (resp: AxiosResponse<resp>) => any|Promise<any>) {
+    setTransformer(func: (resp: AxiosResponse<resp>) => any|Promise<any>): this {
         this.transformer = func;
         return this.clone();
     }
 
 
-    get url() {
+    get url(): string {
         return this.baseUrl + this.path;
     }
 
-    debug(...states: string[]) {
+    debug(...states: string[]): void {
         console.debug('*********************');
         console.debug('url : ', this.url);
         console.debug('method : ', this.method);
@@ -76,7 +76,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
         return new this.constructor(this.baseUrl, this.apiState, this.transformer);
     }
 }
-export const operatorMap = Object.freeze({
+export const OPERATOR_MAP = Object.freeze({
     '': 'contain_in', // merge operator
     '!': 'not_contain', // merge operator
     '>': 'gt',
@@ -87,12 +87,62 @@ export const operatorMap = Object.freeze({
     '!=': 'not_in', // merge operator
     $: 'regex',
 });
-const mergeOperatorSet = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
+const MERGE_OPERATOR_SET = new Set(['contain_in', 'not_contain_in', 'in', 'not_in']);
+
+type MergeQueryType = {[k: string]: ShortFilterType};
+
+const mergeQuery = (targetQuery: MergeQueryType, q: FilterItem, op: string): void => {
+    const prefix = `${q.key}:${op}`;
+    const vals = Array.isArray(q.value) ? q.value : [q.value];
+    if (targetQuery[prefix]) {
+        targetQuery[prefix].v = _.merge(targetQuery[prefix].v, vals);
+    } else {
+        targetQuery[prefix] = {
+            k: q.key,
+            v: vals,
+            o: op,
+        };
+    }
+};
+
+const filterItemToQuery = (filters: FilterItem[], fixedFilters: FilterItem[] = []): FilterType[] | undefined => {
+    const filter: FilterType[] = [];
+
+    const mergeOpQuery: MergeQueryType = {};
+    const rawFilters: FilterItem[] = [...fixedFilters, ...filters];
+
+    rawFilters.forEach((q: FilterItem) => {
+        const op = OPERATOR_MAP[q.operator];
+
+        if (MERGE_OPERATOR_SET.has(op)) {
+            mergeQuery(mergeOpQuery, q, op);
+        } else {
+            filter.push({ k: q.key, v: q.value, o: op });
+        }
+    });
+
+    if (filter.length > 0 || !_.isEmpty(mergeOpQuery)) {
+        return [...filter, ...Object.values(mergeOpQuery)];
+    }
+    return undefined;
+};
+
+function getQueryWithApiState<T>(keys: string[], apiState: any): T {
+    const res: T = {} as T;
+    keys.forEach((k) => {
+        if (isNotEmpty(apiState[k])) res[k] = apiState[k];
+    });
+    return res;
+}
 
 export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
     protected apiState: QueryApiState<parameter> ;
 
-    constructor(baseUrl: string, initState: QueryApiState<parameter> = {} as unknown as QueryApiState<parameter>, transformer: null|((any) => any) = null) {
+    constructor(
+        baseUrl: string,
+        initState: QueryApiState<parameter> = {} as unknown as QueryApiState<parameter>,
+        transformer: null|((any) => any) = null,
+    ) {
         super(baseUrl, undefined, transformer);
         this.apiState = {
             filter: [] as unknown as FilterItem[],
@@ -109,7 +159,7 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
         };
     }
 
-    protected query = () => {
+    protected query = (): Query => {
         const query: Query = {};
         if (this.apiState.thisPage !== 0) {
             query.page = {
@@ -133,102 +183,137 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
             query.keyword = this.apiState.keyword;
         }
         if (this.apiState.filter.length > 0 || this.apiState.fixFilter.length > 0) {
-            const filter: FilterType[] = [];
-            // eslint-disable-next-line camelcase
-            const mergeOpQuery: {
-                    [propName: string]: ShortFilterType;
-                } = {};
-            const rawFilters = [...this.apiState.fixFilter, ...this.apiState.filter];
-            rawFilters.forEach((q: FilterItem) => {
-                const op = operatorMap[q.operator];
-
-                if (mergeOperatorSet.has(op)) {
-                    const prefix = `${q.key}:${op}`;
-                    const vals = Array.isArray(q.value) ? q.value : [q.value];
-                    // if operation is ['contain_in', 'not_contain_in', 'in', 'not_in'] then merge filter
-                    if (mergeOpQuery[prefix]) {
-                        mergeOpQuery[prefix].v = _.merge(mergeOpQuery[prefix].v, vals);
-                        // ((mergeOpQuery[prefix] as ShortFilterType).v as string[]).push(q.value);
-                    } else {
-                        mergeOpQuery[prefix] = {
-                            k: q.key,
-                            v: vals,
-                            o: op,
-                        };
-                    }
-                } else {
-                    filter.push({
-                        k: q.key,
-                        v: q.value,
-                        o: op,
-                    });
-                }
-            });
-            // eslint-disable-next-line camelcase
-            if (filter.length > 0 || !_.isEmpty(mergeOpQuery)) {
-                query.filter = [...filter, ...Object.values(mergeOpQuery)];
-            }
+            const newFilter: FilterType[] | undefined = filterItemToQuery(this.apiState.filter, this.apiState.fixFilter);
+            if (newFilter) query.filter = newFilter;
         }
         return query as Query;
     };
 
 
-    getParameter = () => ({
+    getParameter = (): Query & parameter => ({
         query: this.query(),
         ...this.apiState.extraParameter,
     });
 
-    setOnly(...args: string[]) {
+    setOnly(...args: string[]): this {
         this.apiState.only = args;
         return this.clone();
     }
 
-    setCountOnly(value = true) {
+    setCountOnly(value = true): this {
         this.apiState.count_only = value;
         return this.clone();
     }
 
-    setFilter(...args: FilterItem[]) {
+    setFilter(...args: FilterItem[]): this {
         this.apiState.filter = args;
         return this.clone();
     }
 
-    setFixFilter(...args: FilterItem[]) {
+    setFixFilter(...args: FilterItem[]): this {
         this.apiState.fixFilter = args;
         return this.clone();
     }
 
-    setThisPage(thisPage: number) {
+    setThisPage(thisPage: number): this {
         this.apiState.thisPage = thisPage;
         return this.clone();
     }
 
-    setPageSize(pageSize: number) {
+    setPageSize(pageSize: number): this {
         this.apiState.pageSize = pageSize;
         return this.clone();
     }
 
-    setSortBy(sortBy: string) {
+    setSortBy(sortBy: string): this {
         this.apiState.sortBy = sortBy;
         return this.clone();
     }
 
-    setSortDesc(sortDesc: boolean) {
+    setSortDesc(sortDesc: boolean): this {
         this.apiState.sortDesc = sortDesc;
         return this.clone();
     }
 
-    setKeyword(keyword: string) {
+    setKeyword(keyword: string): this {
         this.apiState.keyword = keyword;
         return this.clone();
     }
 }
 
+
+export abstract class StatisticsAction<parameter, resp> extends ActionAPI<parameter, resp> {
+    protected apiState: StatQueryApiState<parameter> ;
+
+    constructor(
+        baseUrl: string,
+        initState: QueryApiState<parameter> = {} as QueryApiState<parameter>,
+        transformer: null|((any) => any) = null,
+    ) {
+        super(baseUrl, undefined, transformer);
+        this.apiState = {
+            filter: [],
+            limit: undefined,
+            start: undefined,
+            end: undefined,
+            aggregate: [],
+            merge: [],
+            extraParameter: {} as parameter,
+            ...initState,
+        };
+    }
+
+    protected query = (): StatQuery => {
+        const query: StatQuery = getQueryWithApiState<StatQuery>(['limit', 'start', 'end', 'aggregate', 'merge'], this.apiState);
+        if (this.apiState.filter.length > 0) {
+            const newFilter = filterItemToQuery(this.apiState.filter);
+            if (newFilter) query.filter = newFilter;
+        }
+        return query as StatQuery;
+    };
+
+    getParameter = (): StatQuery & parameter => ({
+        query: this.query(),
+        ...this.apiState.extraParameter,
+    });
+
+    setFilter(...args: FilterItem[]): this {
+        this.apiState.filter = args;
+        return this.clone();
+    }
+
+    setAggregate(...args: Array<string|undefined>): this {
+        this.apiState.aggregate = args;
+        return this.clone();
+    }
+
+    setMerge(...args: Array<string|undefined>): this {
+        this.apiState.merge = args;
+        return this.clone();
+    }
+
+    setLimit(limit: number|undefined): this {
+        this.apiState.limit = limit;
+        return this.clone();
+    }
+
+    setStart(start: string|undefined): this {
+        this.apiState.start = start;
+        return this.clone();
+    }
+
+    setEnd(end: string|undefined): this {
+        this.apiState.end = end;
+        return this.clone();
+    }
+}
+
+
 interface SingleItemActionInterface{
     setId: (id: string) => any;
 }
 export abstract class RawParameterAction<parameter, resp> extends ActionAPI<parameter, resp> {
-    getParameter = () => this.apiState.parameter;
+    getParameter = (): parameter => this.apiState.parameter;
 
     protected apiState: RawParameterActionState<parameter>;
 
@@ -245,7 +330,7 @@ export abstract class RawParameterAction<parameter, resp> extends ActionAPI<para
 }
 
 export abstract class SetParameterAction<parameter, resp> extends RawParameterAction<parameter, resp> {
-    setParameter(parameter: parameter) {
+    setParameter(parameter: parameter): this {
         this.apiState.parameter = parameter;
         return this.clone();
     }
@@ -263,7 +348,7 @@ export abstract class SingleItemAction<parameter, resp> extends RawParameterActi
     protected abstract idField: string;
 
 
-    setId(id: string) {
+    setId(id: string): this {
         this.apiState.parameter[this.idField] = id;
         return this.clone();
     }
@@ -298,44 +383,44 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
         };
     }
 
-    setRootItemType(name = 'ROOT') {
+    setRootItemType(name = 'ROOT'): this {
         this.apiState.rootItemType = name;
         return this.clone();
     }
 
-    setRoot() {
+    setRoot(): this {
         this.apiState.item_type = this.apiState.rootItemType;
         this.apiState.item_id = '';
         return this.clone();
     }
 
-    setItemType(val: string) {
+    setItemType(val: string): this {
         this.apiState.item_type = val;
         return this.clone();
     }
 
-    setItemId(val: string) {
+    setItemId(val: string): this {
         this.apiState.item_id = val;
         return this.clone();
     }
 
 
-    setSortBy(sortBy: string) {
+    setSortBy(sortBy: string): this {
         this.apiState.sortBy = sortBy;
         return this.clone();
     }
 
-    setSortDesc(sortDesc: boolean) {
+    setSortDesc(sortDesc: boolean): this {
         this.apiState.sortDesc = sortDesc;
         return this.clone();
     }
 
-    protected setExcludeType(val: string) {
+    protected setExcludeType(val: string): this {
         this.apiState.exclude_type = val;
         return this.clone();
     }
 
-    getParameter = () => {
+    getParameter = (): parameter & Query => {
         const params: any = {};
 
         if (this.apiState.item_type) {
@@ -379,7 +464,7 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
         this.apiState = apiState;
     }
 
-    getParameter = () => {
+    getParameter = (): parameter & Query => {
         const query = { only: this.apiState.only };
         return {
             ...this.apiState.parameter,
@@ -387,12 +472,12 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
         };
     };
 
-    setOnly(...args: string[]) {
+    setOnly(...args: string[]): this {
         this.apiState.only = args;
         return this.clone();
     }
 
-    getIdField() {
+    getIdField(): string {
         return this.idField;
     }
 }
@@ -414,7 +499,7 @@ export abstract class SingleDisableAction<parameter, resp> extends SingleItemAct
 export abstract class SubMultiItemAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected abstract subIdsField: string;
 
-    setSubIds(subIds: string[]) {
+    setSubIds(subIds: string[]): this {
         this.apiState.parameter[this.subIdsField] = subIds;
         return this.clone();
     }
@@ -432,7 +517,7 @@ export abstract class SubMultiItemRemoveAction<parameter, resp> extends SubMulti
 export abstract class MultiItemAction<parameter, resp> extends RawParameterAction<parameter, resp> {
     protected abstract idsField: string;
 
-    setIds(ids: string[]) {
+    setIds(ids: string[]): this {
         this.apiState.parameter[this.idsField] = ids;
         return this.clone();
     }
@@ -440,7 +525,7 @@ export abstract class MultiItemAction<parameter, resp> extends RawParameterActio
 export abstract class MultiItemQueryAction<parameter, resp> extends QueryAPI<parameter, resp> {
     protected abstract idsField: string;
 
-    setIds(ids: string[]) {
+    setIds(ids: string[]): this {
         this.apiState.extraParameter[this.idsField] = ids;
         return this.clone();
     }
@@ -471,12 +556,12 @@ export abstract class GetDataAction<parameter, resp> extends QueryAPI<parameter,
 
     protected abstract idField: string;
 
-    setId(id: string) {
+    setId(id: string): this {
         this.apiState.extraParameter[this.idField] = id;
         return this.clone();
     }
 
-    setKeyPath(keyPath: string) {
+    setKeyPath(keyPath: string): this {
         // @ts-ignore
         this.apiState.extraParameter.key_path = keyPath;
         return this.clone();
@@ -487,12 +572,12 @@ export abstract class CollectAction<parameter, resp> extends SetParameterAction<
     protected path = 'collect';
 }
 
-export type ResourceActions<actions extends string> = { [key in actions]: (...args: any[]) => ActionAPI<any, any> };
+export type ResourceActions<actions extends string> = { [key in actions]: (...args: any[]) => ActionAPI};
 
 export abstract class Resource {
     protected abstract name: string;
 
-    get baseUrl() {
+    get baseUrl(): string {
         return `/${this.service}/${this.name}/`;
     }
 

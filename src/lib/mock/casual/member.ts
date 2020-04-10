@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import { arrayOf } from '@/lib/casual';
-// eslint-disable-next-line import/no-cycle
-import { modelType } from '@/lib/mock/casual/index';
+import { ModelType } from '@/lib/mock/casual/type';
 
 const userInfo = (casual) => {
     casual.define('userInfo', () => ({
@@ -33,14 +32,14 @@ const member = (casual) => {
     return casual;
 };
 
-export interface memberCasual {
+export interface MemberCasual {
     userInfo?: any;
     _userInfo?: any;
     member?: any;
     _member?: any;
 }
 
-const result: modelType[] = [
+const result: ModelType[] = [
     userInfo, member,
 ];
 

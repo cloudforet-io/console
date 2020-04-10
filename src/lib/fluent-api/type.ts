@@ -1,6 +1,4 @@
 /* eslint-disable camelcase */
-import { Ref } from '@vue/composition-api';
-
 export type ApiMethods = 'post' | 'get' | 'delete' | 'put';
 
 export interface LongFilterType {
@@ -65,6 +63,27 @@ export interface QueryApiState<T=any> {
     extraParameter: T;
     count_only: boolean;
     query: () => Query;
+}
+
+export interface StatQuery {
+    filter?: FilterType[];
+    // sort: string;
+    limit?: number;
+    start?: string;
+    end?: string;
+    aggregate?: Array<undefined | string>;
+    merge?: Array<undefined | string>;
+}
+
+export interface StatQueryApiState<T=any> {
+    filter: FilterItem[];
+    // sortBy: string;
+    limit?: number;
+    start?: string;
+    end?: string;
+    aggregate: Array<undefined | string>;
+    merge: Array<undefined | string>;
+    extraParameter: T;
 }
 
 
