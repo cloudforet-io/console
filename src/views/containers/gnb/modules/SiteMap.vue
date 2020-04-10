@@ -116,22 +116,24 @@
                             Credentials
                         </router-link>
                     </li>
-                    <!--                <li>-->
-                    <!--                    <router-link class="group" to="/plugin">-->
-                    <!--                        <span class="icon">-->
-                    <!--                            <p-i name="ic_identity"-->
-                    <!--                                 color="transparent inherit"-->
-                    <!--                            />-->
-                    <!--                        </span>-->
-                    <!--                        <span class="name">Plugin</span>-->
-                    <!--                    </router-link>-->
-                    <!--                </li>-->
+                    <template v-if="$ls.user.state.isDomainOwner">
+                        <li>
+                            <router-link class="group" to="/plugin">
+                                <span class="icon">
+                                    <p-i name="ic_identity"
+                                         color="transparent inherit"
+                                    />
+                                </span>
+                                <span class="name">Plugin</span>
+                            </router-link>
+                        </li>
 
-                    <!--                <li>-->
-                    <!--                    <router-link class="service" to="/plugin/supervisor">-->
-                    <!--                        Supervisor-->
-                    <!--                    </router-link>-->
-                    <!--                </li>-->
+                        <li>
+                            <router-link class="service" to="/plugin/supervisor/plugins">
+                                Plugins
+                            </router-link>
+                        </li>
+                    </template>
                 </ul>
             </div>
             <div

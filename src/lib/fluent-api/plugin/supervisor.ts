@@ -5,7 +5,7 @@ import {
     ResourceActions,
 } from '@/lib/fluent-api/toolset';
 import {
-    ListType,  Tags, TimeStamp,
+    ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
 
 const idField = 'supervisor_id';
@@ -14,11 +14,11 @@ interface IdParameter {
 }
 
 export interface SupervisorModel extends IdParameter, Tags {
-    name: string
-    hostname: string
-    state:string
-    is_public:boolean
-    labels?: any
+    name: string;
+    hostname: string;
+    state: string;
+    is_public: boolean;
+    labels?: any;
     domain_id: string;
     created_at: TimeStamp;
     updated_at: TimeStamp;

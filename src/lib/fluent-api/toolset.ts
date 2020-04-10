@@ -414,7 +414,7 @@ export abstract class SingleDisableAction<parameter, resp> extends SingleItemAct
 export abstract class SubMultiItemAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected abstract subIdsField: string;
 
-    setSubIds(subIds: string[]) {
+    setSubIds(subIds: any[]) {
         this.apiState.parameter[this.subIdsField] = subIds;
         return this.clone();
     }
