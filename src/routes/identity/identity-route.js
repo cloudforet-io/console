@@ -2,7 +2,8 @@ const Identity = () => import('@/views/identity/Identity');
 
 const IdentityNavBar = () => import('@/views/identity/IdentityNavBar');
 const User = () => import('@/views/identity/user/User');
-const Project = () => import('@//views/identity/project/Project');
+const Project = () => import('@//views/identity/project/pages/Project2');
+const ProjectDetail = () => import('@/views/identity/project/pages/ProjectDetail');
 const ServiceAccount = ()=>import('@/views/identity/service-account/pages/ServiceAccount');
 
 export default {
@@ -15,11 +16,32 @@ export default {
         main: Identity,
     },
     children: [
+        // {
+        //     path: 'project',
+        //     name: 'project',
+        //     meta: { label: 'Project', breadcrumb: true },
+        //     component: Project,
+        // },
         {
             path: 'project',
             name: 'project',
+            redirect: '/identity/project',
             meta: { label: 'Project', breadcrumb: true },
-            component: Project,
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: 'projectMain',
+                    component: Project,
+                },
+                {
+                    path: ':id',
+                    name: 'projectDetail',
+                    props: true,
+                    component: ProjectDetail,
+                },
+            ],
+
         },
         {
             path: 'user',
