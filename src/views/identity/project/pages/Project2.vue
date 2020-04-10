@@ -1,7 +1,14 @@
 <template>
     <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{height}">
-            <div class="treeSidebar" @click.right.stop.prevent="treeClickedRight">
+            <div class="treeSidebar">
+                <div id="tree-header">
+                    Project Group
+                    <p-i name="ic_plus" color="transparent inherit"
+                         width="1rem" height="1rem" class="add-btn"
+                         @click="openProjectGroupForm()"
+                    />
+                </div>
                 <p-tree
                     ref="treeRef"
                     v-bind="treeApiHandler.ts.state"
@@ -30,14 +37,19 @@
                     @card:click="clickCard"
                 >
                     <template #toolbox-top>
-                        <p id="parent-project-grp">project group</p>
-                        <p id="current-project-grp">{{ projectSummary[0].project_group_info.name}}</p>
+                        <p id="parent-project-grp">
+                            project group
+                        </p>
+                        <p id="current-project-grp">
+                            Current Project Group
+                        </p>
+                        <!--                        <p id="current-project-grp">{{ projectSummary[0].project_group_info.name}}</p>-->
                     </template>
                     <template #toolbox-bottom>
                         <div class="tool">
                             <div class="tool-left">
                                 <div class="tool-left-btn">
-                                    <p-button style-type="primary-dark" @click="clickOpenForm('Create Project')">
+                                    <p-button style-type="primary-dark" @click="openProjectForm()">
                                         {{ $t('INVENTORY.CRT_PROJ') }}
                                     </p-button>
                                 </div>
@@ -46,7 +58,6 @@
                                         :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
                                         :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
                                         @newQuery="apiHandler.gridTS.querySearch.addTag"
-
                                     />
                                 </div>
                             </div>
@@ -109,6 +120,12 @@
                     Please, Click an item from left table.
                 </div>
             </p-empty>
+            <SProjectGroupCreateFormModal v-if="projectGroupFormVisible" :visible.sync="projectGroupFormVisible"
+                                          @confirm="projectGroupFormConfirm($event)"
+            />
+            <SProjectCreateFormModal v-if="projectFormVisible" :visible.sync="projectFormVisible"
+                                     @confirm="projectFormConfirm($event)"
+            />
         </template>
     </p-vertical-page-layout2>
 </template>
@@ -129,7 +146,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
-import fluentApi from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ProjectModel, ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
@@ -140,6 +157,8 @@ import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
+import SProjectCreateFormModal from '@/views/identity/project/modules/ProjectCreateFormModal.vue';
+import SProjectGroupCreateFormModal from '@/views/identity/project/modules/ProjectGroupCreateFormModal.vue';
 
 
     interface Summary {
@@ -173,6 +192,8 @@ export default {
         PCheckBox,
         PEmpty,
         PToolboxGridLayout,
+        SProjectCreateFormModal,
+        SProjectGroupCreateFormModal,
     },
     setup(props, context) {
         const state: UnwrapRef<State> = reactive({
@@ -185,8 +206,8 @@ export default {
         const vm = getCurrentInstance();
 
         /**
-             Api Handler
-             */
+             Tree, Project, Statistics API Handler Declaration
+         */
         const treeAction = fluentApi.identity().project().tree()
             .setSortBy('item_type')
             .setExcludeProject();
@@ -194,9 +215,16 @@ export default {
         const projectAPI = fluentApi.identity().project();
         const statisticsAPI = fluentApi.statistics().projectSummary();
 
+        /**
+        * Make Card Data
+        */
         const createdData = reactive({});
         const cardSummary = ref(createdData);
         const projectSummary = ref(createdData);
+
+        // Get & Refine Card Data for setTransformer action in fluent API
+        // First, Get statistics info of Project
+        // Second, Get providers list from Provider store and save them to force_console_data
         const getCard = (resp: AxiosResponse<ProjectListResp>) => {
             const ids = resp.data.results.map(item => item.project_id);
             cardSummary.value = reactive(_.zipObject(ids));
@@ -225,8 +253,13 @@ export default {
             return resp;
         };
 
+        // Use fluent API with multiple options(include setTransformer action) and Get project list
         const listAction = projectAPI.list().setTransformer(getCard).setIncludeProvider();
 
+        /**
+         * QuerySearch Grid Fluent API Declaration
+         * QuerySearch Grid API : Grid layout with query search bar & List Action(with fluent API)
+         */
         const apiHandler = new QuerySearchGridFluentAPI(
             listAction,
             {
@@ -243,7 +276,7 @@ export default {
                 },
             },
         );
-
+        // Execute Api Handler above when Tree clicked
         watch(() => treeApiHandler.ts.metaState.firstSelectedNode, (after: any, before: any) => {
             if ((after && !before) || (after && after.data.id !== before.data.id)) {
                 apiHandler.action = listAction.setFixFilter({
@@ -256,6 +289,9 @@ export default {
             }
         });
 
+        /**
+         * Click Tree Item
+         */
         const selected = async (item) => {
             console.log('selected test', item);
             treeApiHandler.ts.getSelectedNode(item);
@@ -263,6 +299,9 @@ export default {
             state.items = [];
         };
 
+        /**
+         * Click Card Item
+         */
         const clickCard = (item) => {
             vm?.$router.push({
                 name: 'projectDetail',
@@ -275,15 +314,97 @@ export default {
             });
             console.debug(item);
         };
+
+        /**
+         * Handling Form
+         */
+        // Make and Confirm Project Group Form
+        const formState = reactive({
+            projectGroupFormVisible: false,
+            projectFormVisible: false,
+        });
+        const openProjectGroupForm = () => {
+            formState.projectGroupFormVisible = true;
+        };
+        const projectGroupFormConfirm = (item) => {
+            fluentApi.identity().projectGroup().create().setParameter({
+                ...item,
+            })
+                .execute()
+                .then(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Add Success',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .catch(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Add Fail',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .finally(() => {
+                    fluentApi.identity().project().tree()
+                        .setSortBy('item_type')
+                        .setExcludeProject();
+                });
+            formState.projectGroupFormVisible = false;
+        };
+
+        // Make and Confirm Project Group Form
+        const openProjectForm = () => {
+            formState.projectFormVisible = true;
+        };
+        const projectFormConfirm = (item) => {
+            fluentApi.identity().project().create().setParameter({
+                project_group_id: state.selectedId,
+                ...item,
+            })
+                .execute()
+                .then(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Add Success',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .catch(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Add Fail',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .finally(() => {
+                    apiHandler.getData();
+                });
+            formState.projectFormVisible = false;
+        };
+
         return {
             treeRef: treeApiHandler.ts.treeRef,
             treeApiHandler,
             apiHandler,
             ...toRefs(state),
+            ...toRefs(formState),
             selected,
             clickCard,
             cardSummary,
             projectSummary,
+            openProjectForm,
+            projectFormConfirm,
+            openProjectGroupForm,
+            projectGroupFormConfirm,
         };
     },
 };
@@ -292,6 +413,19 @@ export default {
 <style lang="postcss" scoped>
     .treeSidebar {
         height: 100%;
+    }
+
+    #tree-header {
+        @apply text-gray-500;
+        margin-left: 1.25rem;
+        margin-top: 1.5rem;
+        margin-bottom: .8rem;
+        font-weight: bold;
+        font-size: 0.88rem;
+    }
+
+    .add-btn {
+        cursor: pointer;
     }
 
     #parent-project-grp {
@@ -313,20 +447,20 @@ export default {
     }
 
     .project-description {
-        margin-left: 24px;
-        margin-right: 24px;
-        margin-top: 24px;
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+        margin-top: 1.5rem;
     }
 
     #project-group-name {
-        font-size: 12px;
-        margin-bottom: 4px;
+        font-size: .75rem;
+        margin-bottom: .25rem;
     }
 
     #project-name {
-        font-size: 18px;
+        font-size: 1.12rem;
         font-weight: bold;
-        margin-bottom: 22.4px;
+        margin-bottom: 1.4rem;
     }
 
     .provider-icon {
@@ -338,31 +472,31 @@ export default {
 
     .solid {
         @apply border-l border-gray-100;
-        margin-top: 19.6px;
+        margin-top: 1.2rem;
         margin-left: 0px;
     }
 
     .project-summary {
-        margin-top: 14px;
-        margin-left: 24px;
-        margin-right: 24px;
+        margin-top: 0.87rem;
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
     }
 
     .summary-item-text {
         display: inline-block;
-        font-size: 14px;
+        font-size: 0.88rem;
         text-align: left;
-        margin-bottom: 15px;
+        margin-bottom: .9rem;
     }
 
     .summary-item-num {
+        @apply text-gray-500;
         display: inline-block;
-        font-size: 16px;
+        font-size: 1rem;
         font-weight: bold;
-        margin-bottom: 12px;
+        margin-bottom: 0.75rem;
         text-align: right;
         float: right;
-        color: #0069CC;
     }
 
     .tool {
