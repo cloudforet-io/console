@@ -111,6 +111,7 @@ export const serverStateFormatter = ColorBindFactory(serverStateColor, value => 
 export const userStateFormatter = ColorBindFactory(userStateColor, value => value.toLowerCase());
 
 export const platformBadgeFormatter = (value) => {
+    // eslint-disable-next-line no-prototype-builtins
     if (platformBadgeColor.hasOwnProperty(value)) {
         return platformBadgeColor[value];
     }
@@ -136,8 +137,10 @@ export const getValue = (scope, paths, defaultValue) => {
 
 export const isSelectedType = (d, t) => {
     if (t.toUpperCase() === 'N') {
+        // eslint-disable-next-line no-restricted-globals
         return (Number.isInteger(d) && !isNaN(d));
     } if (t.toUpperCase() === 'D' || t.toUpperCase() === 'F') {
+        // eslint-disable-next-line no-restricted-globals
         return (!isNaN(parseFloat(d)));
     } if (t.toUpperCase() === 'B') {
         return ['1', '0', 1, 0, true, false].includes(d);
@@ -151,7 +154,7 @@ export const isSelectedType = (d, t) => {
     } if (t.toUpperCase() === 'A') {
         return Array.isArray(d);
     }
-    throw 'Please, Check data type';
+    throw new Error('Please, Check data type');
 };
 
 /** @function
@@ -173,7 +176,7 @@ export const selectToCopyToClipboard = (t) => {
  * @param value
  * @returns {boolean}
  */
-export const isNotEmpty = (value) => {
+export const isNotEmpty = (value): boolean => {
     if (['boolean', 'number'].includes(typeof value)) return true;
     if (value instanceof Array) return !!value.length;
     return !_.isEmpty(value); // String, Object
@@ -187,6 +190,12 @@ export const isNotEmpty = (value) => {
  * @return {Object}
  */
 export class MenuItem {
+    name: string;
+
+    label: string;
+
+    type: string;
+
     constructor(name, label) {
         this.name = name;
         this.label = label || name;

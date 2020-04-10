@@ -16,15 +16,14 @@ interface IdParameter {
 
 export interface SecretModel extends IdParameter, Tags {
     name: string;
-    secret_type: "CREDENTIALS"|"CONFIG"|string;
-    "secret_groups": string[];
-    "schema":string ;
-    "provider":string;
-    "service_account_id":string;
-    "project_id": string;
-    "domain_id":string;
+    secret_type: 'CREDENTIALS'|'CONFIG'|string;
+    'secret_groups': string[];
+    'schema': string ;
+    'provider': string;
+    'service_account_id': string;
+    'project_id': string;
+    'domain_id': string;
     created_at: TimeStamp;
-
 }
 
 export type SecretListResp = ListType<SecretModel>

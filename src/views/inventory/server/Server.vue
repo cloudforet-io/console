@@ -204,7 +204,7 @@ import {
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
-import fluentApi, { MultiItemAction } from '@/lib/fluent-api';
+import { MultiItemAction, fluentApi } from '@/lib/fluent-api';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import {
     getEnumValues, getFetchValues, makeValuesFetchHandler,

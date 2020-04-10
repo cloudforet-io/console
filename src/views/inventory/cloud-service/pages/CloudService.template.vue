@@ -214,7 +214,7 @@ import { ProjectNode } from '@/lib/api/tree';
 import { ChangeCloudServiceProject, MockChangeProject } from '@/lib/api/fetch';
 import { Computed } from '@/lib/type';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
-import fluentApi from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 import { tabIsShow } from '@/lib/compostion-util';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 

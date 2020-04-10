@@ -138,7 +138,7 @@ import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/Sel
 import PLabel from '@/components/atoms/labels/Label.vue';
 import PDynamicForm, { map, setValidation } from '@/components/organisms/forms/dynamic-form/DynamicForm.vue';
 import _ from 'lodash';
-import fluentApi from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 import schema from '@/lib/fluent-api/repository/schema';
 
 
@@ -243,7 +243,7 @@ const setup = (props, context) => {
     const leftHalfValidations = {
         name: [
             requiredValidation(),
-            credentialsNameValidation(context.parent)
+            credentialsNameValidation(context.parent),
         ],
         data: [requiredValidation(), jsonParseValidation()],
     };

@@ -1,9 +1,8 @@
 /* eslint-disable camelcase, @typescript-eslint/camelcase */
 import { arrayOf } from '@/lib/casual';
-// eslint-disable-next-line import/no-cycle
-import { modelType } from '@/lib/mock/casual';
+import { ModelType } from '@/lib/mock/casual/type';
 
-const pluginOption: modelType = (casual) => {
+const pluginOption: ModelType = (casual) => {
     casual.define('pluginOption', () => {
         const res: any = {
             key: casual.uuid,
@@ -201,7 +200,7 @@ export interface CollectorCasual {
     _repository?: any;
 }
 
-const result: modelType[] = [
+const result: ModelType[] = [
     pluginOption, pluginVersions, pluginInfo,
     collector, repository,
 ];

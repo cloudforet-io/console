@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { readonlyArgs } from '@/lib/type';
 import { SearchQueryType } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 
-export const operatorMap = Object.freeze({
+export const OPERATOR_MAP = Object.freeze({
     '': 'contain_in', // merge operator
     '!': 'not_contain', // merge operator
     '>': 'gt',
@@ -88,7 +88,7 @@ export const defaultQuery = (
         // eslint-disable-next-line camelcase
         const mergeOpQuery: { [propName: string]: Filter; } = {};
         searchQueries.forEach((q) => {
-            const op = operatorMap[q.operator];
+            const op = OPERATOR_MAP[q.operator];
             const value = valueFormatter ? valueFormatter(q.key, q.value) : q.value;
             if (mergeOperatorSet.has(op)) {
                 const prefix = `${q.key}:${op}`;

@@ -60,6 +60,7 @@ module.exports = {
     "import/prefer-default-export": ["off"],
     "no-new": ["off"],
     "prefer-template": ["error"],
+    "no-plusplus": ["off"],
 
     // typescript rules
     "@typescript-eslint/explicit-member-accessibility": [
