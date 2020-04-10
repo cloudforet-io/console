@@ -1,16 +1,22 @@
 /* eslint-disable camelcase */
-import { Service } from '@/lib/fluent-api/toolset';
-import Inventory from '@/lib/fluent-api/statistics/inventory';
-import Identity from '@/lib/fluent-api/statistics/identity';
-import { ProjectSummary } from '@/lib/fluent-api/statistics/identity/project-summary';
+import {Service, SingleItemAction} from '@/lib/fluent-api/toolset';
+
+export interface ProjectSummaryResp {
+    member: number;
+    server: number;
+    cloud_service: number;
+    subnet: number;
+}
+
+class ProjectSummary extends SingleItemAction<any, ProjectSummaryResp> {
+    idField = 'project_id';
+
+    path = '/project-summary'
+}
 
 
 export default class Statistics extends Service {
     protected name = 'statistics';
 
-    projectSummary(): ProjectSummary { return new ProjectSummary(this.name); }
-
-    inventory(): Inventory { return new Inventory(this.name); }
-
-    identity(): Identity { return new Identity(this.name); }
+    projectSummary() { return new ProjectSummary(this.name); }
 }

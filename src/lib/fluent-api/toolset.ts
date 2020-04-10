@@ -105,7 +105,7 @@ const mergeQuery = (targetQuery: MergeQueryType, q: FilterItem, op: string): voi
     }
 };
 
-const filterItemToQuery = (filters: FilterItem[], fixedFilters: FilterItem[] = []): FilterType[] | undefined => {
+export const filterItemToQuery = (filters: FilterItem[], fixedFilters: FilterItem[] = []): FilterType[] | undefined => {
     const filter: FilterType[] = [];
 
     const mergeOpQuery: MergeQueryType = {};
