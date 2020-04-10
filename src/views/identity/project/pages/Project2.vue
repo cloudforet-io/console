@@ -91,7 +91,10 @@
                                 <p id="project-name">
                                     {{ item.name }}
                                 </p>
-                                <div v-if="item.force_console_data.providers" class="providers">
+                                <div v-if="item.force_console_data.providers.length == 0" class="empty-providers">
+                                    <p id="empty-provider"></p>
+                                </div>
+                                <div v-else-if="item.force_console_data.providers" class="providers">
                                     <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
                                          class="provider-icon"
                                     >
@@ -241,6 +244,9 @@ export default {
             });
             const temp = resp.data.results.map((it) => {
                 const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
+                if (providers.length == 0) {
+
+                }
                 const extraProviders = providers.length > 5 ? providers.length - 5 : 0;
                 return {
                     ...it,
@@ -470,6 +476,10 @@ export default {
         max-height: 2rem;
         display: inline;
         margin-right: .5rem;
+    }
+
+    #empty-provider {
+        padding-top: 1.2rem;
     }
 
     .solid {
