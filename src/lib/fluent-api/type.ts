@@ -76,14 +76,14 @@ export interface StatQuery {
 }
 
 export interface StatQueryApiState<T=any> {
-    filter: FilterItem[];
+    filter?: FilterItem[];
     // sortBy: string;
     limit?: number;
     start?: string;
     end?: string;
-    aggregate: Array<undefined | string>;
-    merge: Array<undefined | string>;
-    extraParameter: T;
+    aggregate?: Array<undefined | string>;
+    merge?: Array<undefined | string>;
+    extraParameter?: T;
 }
 
 

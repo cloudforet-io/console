@@ -107,14 +107,14 @@ import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layo
 
 import PI from '@/components/atoms/icons/PI.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
-import fluentApi from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ProjectModel, ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProviderListResp } from '@/lib/fluent-api/identity/provider';
 import config from '@/lib/config';
-import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
+import { ProjectSummaryResp } from '@/lib/fluent-api/statistics/identity/project-summary';
 import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
@@ -141,7 +141,7 @@ import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/tool
         selectedId: string;
     }
 
-export default{
+export default {
     name: 'Project2',
     components: {
         PVerticalPageLayout2,

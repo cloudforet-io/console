@@ -130,7 +130,7 @@ const filterItemToQuery = (filters: FilterItem[], fixedFilters: FilterItem[] = [
 function getQueryWithApiState<T>(keys: string[], apiState: any): T {
     const res: T = {} as T;
     keys.forEach((k) => {
-        if (isNotEmpty(apiState[k])) res[k] = apiState[k];
+        if (apiState[k]) res[k] = apiState[k];
     });
     return res;
 }
@@ -190,7 +190,7 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
     };
 
 
-    getParameter = (): Query & parameter => ({
+    getParameter = (): {query: Query} & parameter => ({
         query: this.query(),
         ...this.apiState.extraParameter,
     });
@@ -242,12 +242,12 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
 }
 
 
-export abstract class StatisticsAction<parameter, resp> extends ActionAPI<parameter, resp> {
-    protected apiState: StatQueryApiState<parameter> ;
+export abstract class StatisticsQueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
+    protected apiState: StatQueryApiState<parameter>;
 
     constructor(
         baseUrl: string,
-        initState: QueryApiState<parameter> = {} as QueryApiState<parameter>,
+        initState: StatQueryApiState<parameter> = {} as StatQueryApiState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
         super(baseUrl, undefined, transformer);
@@ -265,16 +265,16 @@ export abstract class StatisticsAction<parameter, resp> extends ActionAPI<parame
 
     protected query = (): StatQuery => {
         const query: StatQuery = getQueryWithApiState<StatQuery>(['limit', 'start', 'end', 'aggregate', 'merge'], this.apiState);
-        if (this.apiState.filter.length > 0) {
-            const newFilter = filterItemToQuery(this.apiState.filter);
+        if (isNotEmpty(this.apiState.filter)) {
+            const newFilter = filterItemToQuery(this.apiState.filter || []);
             if (newFilter) query.filter = newFilter;
         }
         return query as StatQuery;
     };
 
-    getParameter = (): StatQuery & parameter => ({
+    getParameter = (): {query: StatQuery} & parameter => ({
         query: this.query(),
-        ...this.apiState.extraParameter,
+        ...this.apiState.extraParameter as parameter,
     });
 
     setFilter(...args: FilterItem[]): this {
@@ -307,7 +307,6 @@ export abstract class StatisticsAction<parameter, resp> extends ActionAPI<parame
         return this.clone();
     }
 }
-
 
 interface SingleItemActionInterface{
     setId: (id: string) => any;
@@ -420,7 +419,7 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
         return this.clone();
     }
 
-    getParameter = (): parameter & Query => {
+    getParameter = (): parameter & any => {
         const params: any = {};
 
         if (this.apiState.item_type) {
@@ -464,7 +463,7 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
         this.apiState = apiState;
     }
 
-    getParameter = (): parameter & Query => {
+    getParameter = (): {query: Query} & parameter => {
         const query = { only: this.apiState.only };
         return {
             ...this.apiState.parameter,
@@ -499,7 +498,7 @@ export abstract class SingleDisableAction<parameter, resp> extends SingleItemAct
 export abstract class SubMultiItemAction<parameter, resp> extends SingleItemAction<parameter, resp> {
     protected abstract subIdsField: string;
 
-    setSubIds(subIds: string[]): this {
+    setSubIds(subIds: any[]): this {
         this.apiState.parameter[this.subIdsField] = subIds;
         return this.clone();
     }
@@ -572,6 +571,18 @@ export abstract class CollectAction<parameter, resp> extends SetParameterAction<
     protected path = 'collect';
 }
 
+
+export abstract class CountAction<parameter, resp> extends StatisticsQueryAPI<parameter, resp> {
+    protected path = 'count';
+}
+
+export abstract class TrendsAction<parameter, resp> extends StatisticsQueryAPI<parameter, resp> {
+    protected path = 'trends';
+}
+
+export abstract class DiffAction<parameter, resp> extends StatisticsQueryAPI<parameter, resp> {
+    protected path = 'diff';
+}
 export type ResourceActions<actions extends string> = { [key in actions]: (...args: any[]) => ActionAPI};
 
 export abstract class Resource {

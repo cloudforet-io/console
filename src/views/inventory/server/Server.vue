@@ -57,7 +57,7 @@
                         </div>
                     </template>
 
-                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1"#toolbox-bottom>
+                    <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1" #toolbox-bottom>
                         <p-col :col="12" style="margin-bottom: .5rem;">
                             <p-hr style="width: 100%;" />
                             <p-query-search-tags style="margin-top: .5rem;"
@@ -95,7 +95,7 @@
                         </PBadge>
                     </template>
                     <template v-slot:col-platform_type-format="data">
-                        <PBadge v-bind="platformBadgeFormatter(data.item.data.platform.type)">
+                        <PBadge v-if="data.item.data.platform && data.item.data.platform.type" v-bind="platformBadgeFormatter(data.item.data.platform.type)">
                             {{ data | getValue(['item','data','platform','type']) }}
                         </PBadge>
                     </template>
@@ -204,7 +204,7 @@ import {
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
-import fluentApi, { MultiItemAction } from '@/lib/fluent-api';
+import { MultiItemAction, fluentApi } from '@/lib/fluent-api';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import {
     getEnumValues, getFetchValues, makeValuesFetchHandler,

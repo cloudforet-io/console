@@ -23,7 +23,10 @@
                                 :data="null"
                 >
                     <template #toolbox-left>
-                        <p-button style-type="primary-dark">
+                        <p-button style-type="primary-dark"
+                                  :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
+                                  @click="clickCollectData"
+                        >
                             {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
@@ -126,7 +129,7 @@ import {
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
-import fluentApi from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import {
     getEnumValues, getFetchValues, makeValuesFetchHandler,
@@ -351,6 +354,7 @@ export default {
 
         // @ts-ignore
         const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
+
 
         return {
             ...toRefs(state),

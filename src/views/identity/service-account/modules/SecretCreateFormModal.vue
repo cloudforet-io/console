@@ -41,7 +41,7 @@ import {
 } from '@/components/organisms/forms/json-schema-form/toolset';
 import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/JsonSchemaForm.vue';
 import { JsonSchemaObjectType } from '@/lib/type';
-import fluentApi from '@/lib/fluent-api';
+import { fluentApi } from '@/lib/fluent-api';
 import { watch } from '@vue/composition-api';
 import { AxiosResponse } from 'axios';
 import Ajv from 'ajv';

@@ -1,14 +1,17 @@
-import {GetAction, Resource, ResourceActions, ServiceResources} from '@/lib/fluent-api';
+import {
+    Resource, ServiceResources,
+} from '@/lib/fluent-api/toolset';
+import Server from './server';
+import CloudService from './cloud-service';
+import Jobs from './jobs';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface GetParameter {
-    //
-}
-class Get extends GetAction<GetParameter, any> {
 
-}
+export default class Inventory extends Resource implements ServiceResources<'server' | 'cloudService' | 'jobs'> {
+    protected name ='inventory'
 
-export default class Inventory extends Resource implements ServiceResources<'server' | 'cloudService'> {
-    name: 'inventory'
-    server() {}
+    server(): Server { return new Server(this.name); }
+
+    cloudService(): CloudService { return new CloudService(this.name); }
+
+    jobs(): Jobs { return new Jobs(this.name); }
 }

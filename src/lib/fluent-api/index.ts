@@ -7,24 +7,21 @@ import AddOns from './add-ons';
 import Statistics from './statistics';
 
 export class FluentApi {
-    inventory = () => new InventoryService();
+    inventory = (): InventoryService => new InventoryService();
 
-    plugin = () => new PluginService();
+    plugin = (): PluginService => new PluginService();
 
-    secret = () => new SecretService();
+    secret = (): SecretService => new SecretService();
 
-    identity = () => new IdentityService();
+    identity = (): IdentityService => new IdentityService();
 
-    repository = () => new RepositoryService();
+    repository = (): RepositoryService => new RepositoryService();
 
-    addons = () => new AddOns();
+    addons = (): AddOns => new AddOns();
 
-    statistics = () => new Statistics();
+    statistics = (): Statistics => new Statistics();
 }
 
-// @ts-ignore
 export const fluentApi = new FluentApi();
-// @ts-ignore
-export default fluentApi;
 export * from './type';
 export * from './toolset';
