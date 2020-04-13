@@ -70,16 +70,16 @@
 
 <script>
 import _ from 'lodash';
-import ProjectContext from '@/views/identity/project/modules/ProjectContext';
+import ProjectContext from '@/views/identity/project/origin/ProjectContext';
 import AreaTree from '@/components/organisms/trees/area-tree/AreaTree';
 import PTab from '@/components/organisms/tabs/tab/Tab';
 import HorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout';
 import { makeTrItems } from '@/lib/view-helper';
 
-const projectSummaryTop = () => import('@/views/identity/project/modules/ProjectSummaryTop');
-const projectSummaryBottom = () => import('@/views/identity/project/modules/ProjectSummaryBottom');
-const projectMember = () => import('@/views/identity/project/modules/ProjectMember');
-const ProjectContextAction = () => import('@/views/identity/project/modules/ProjectContextAction');
+const projectSummaryTop = () => import('@/views/identity/project/origin/ProjectSummaryTop');
+const projectSummaryBottom = () => import('@/views/identity/project/origin/ProjectSummaryBottom');
+const projectMember = () => import('@/views/identity/project/origin/ProjectMember');
+const ProjectContextAction = () => import('@/views/identity/project/origin/ProjectContextAction');
 const PTableCheckModal = () => import('@/components/organisms/modals/action-modal/ActionConfirmModal');
 
 export default {
