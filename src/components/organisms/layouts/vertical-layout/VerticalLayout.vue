@@ -123,9 +123,9 @@ export default defineComponent({
         this.finalizeDefaultLeftWidth();
     },
     methods: {
-        ...mapActions('layout', [
-            'setVerticalLeftWidth',
-        ]),
+        // ...mapActions('layout', [
+        //     'setVerticalLeftWidth',
+        // ]),
         mouseOnOver(flag) {
             if (this.isMinimized) {
                 this.lineCass = false;
@@ -144,8 +144,8 @@ export default defineComponent({
         },
         finalizeDefaultLeftWidth() {
             if (this.autoSaveLeftWidth) {
-                if (this.isMinimized) this.setVerticalLeftWidth(`${this.previousWidth}px`);
-                else this.setVerticalLeftWidth(`${this.leftContainerWidth}px`);
+            //     if (this.isMinimized) this.setVerticalLeftWidth(`${this.previousWidth}px`);
+            // else this.setVerticalLeftWidth(`${this.leftContainerWidth}px`);
             }
         },
         onMousedown() {
@@ -190,7 +190,7 @@ export default defineComponent({
             if (flag) {
                 this.previousWidth = this.leftContainerWidth;
                 this.leftContainerWidth = this.minLeftSize;
-                this.setVerticalLeftWidth(`${this.previousWidth}px`);
+                // this.setVerticalLeftWidth(`${this.previousWidth}px`);
                 this.mouseOver = false;
             } else {
                 this.leftContainerWidth = this.previousWidth;

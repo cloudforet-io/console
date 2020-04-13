@@ -25,7 +25,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
 
     public abstract getParameter: () => parameter
 
-    async execute(): Promise<AxiosResponse<resp>|any> {
+    async execute(): Promise<AxiosResponse<resp>> {
         let resp: AxiosResponse<resp> | any;
         if (this.method === 'get') {
             resp = await api.instance[this.method](this.url);
