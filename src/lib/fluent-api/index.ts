@@ -5,6 +5,7 @@ import IdentityService from './identity';
 import RepositoryService from './repository';
 import AddOns from './add-ons';
 import Statistics from './statistics';
+import StatisticsTest from './statistics/index-new';
 
 export class FluentApi {
     inventory = (): InventoryService => new InventoryService();
@@ -20,6 +21,8 @@ export class FluentApi {
     addons = (): AddOns => new AddOns();
 
     statistics = (): Statistics => new Statistics();
+
+    statisticsTest = (): StatisticsTest => new StatisticsTest();
 }
 
 export const fluentApi = new FluentApi();

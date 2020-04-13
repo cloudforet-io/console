@@ -29,7 +29,7 @@
                                         :menu="dropdown"
                                         @click-delete="accountDeleteClick"
                                         @click-project="clickProject"
-                                        @click-link="apiHandler.tableTS.linkState.openLink()"
+                                        @click-link="clickLink"
                                         @click-exportExcel="exportToolSet.getData()"
                                     >
                                         Action
@@ -162,6 +162,8 @@ import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 
+import nunjucks from 'nunjucks';
+
 export default {
     name: 'ServiceAccount',
     components: {
@@ -193,6 +195,7 @@ export default {
             'name',
             'provider',
             'tags.icon',
+            'tags.external_link_template',
             'template.service_account.schema',
             'capability.supported_schema',
         );
@@ -278,13 +281,14 @@ export default {
 
         const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
         const isNotSelectOne = computed(() => !apiHandler.tableTS.selectState.isSelectOne);
+        const hasLink = computed(()=> isNotSelectOne.value || !listToolset.selectState.firstSelectItem?.tags?.external_link_template? true :false)
         const dropdown = reactive({
             ...makeTrItems([
                 ['delete', 'BTN.DELETE', { disabled: isNotSelectOne }],
                 [null, null, { type: 'divider' }],
                 ['project', 'COMMON.CHG_PRO'],
                 [null, null, { type: 'divider' }],
-                ['link', null, { label: 'Console', disabled: apiHandler.tableTS.noLink }],
+                ['link', null, { label: 'Console', disabled: hasLink }],
                 ['exportExcel', null, { label: 'Export', disabled: false }],
             ],
             context.parent,
@@ -489,10 +493,12 @@ export default {
         };
         const formConfirm = (item) => {
             if (formState.mode === 'add') {
-                fluentApi.identity().serviceAccount().create().setParameter({
+
+                const param = {
                     provider: listToolset.selectState.firstSelectItem.provider,
                     ...item,
-                })
+                };
+                fluentApi.identity().serviceAccount().create().setParameter(param)
                     .execute()
                     .then(() => {
                         context.root.$notify({
@@ -526,6 +532,13 @@ export default {
             tagsApi.ts.toReadMode();
             await tagsApi.getData();
         });
+
+        const clickLink=()=>{
+            const linkTemplate = listToolset.selectState.firstSelectItem?.tags?.external_link_template;
+            const link =  nunjucks.renderString(linkTemplate, apiHandler.tableTS.selectState.firstSelectItem)
+            console.debug(linkTemplate,link);
+            window.open(link)
+        }
         apiHandler.getData();
         return {
             apiHandler,
@@ -553,6 +566,7 @@ export default {
             ...toRefs(secretFormState),
             secretFormConfirm,
             tagsApi,
+            clickLink,
         };
     },
 
