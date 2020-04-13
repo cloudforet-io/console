@@ -362,7 +362,7 @@ export default defineComponent({
         const isThOver = index => props.colCopy && state.thHoverIndex === index;
         const clickColCopy = (idx) => {
             let result = '';
-            const arr = Array.from(dragSelectAbles.value);
+            const arr = Array.from(dragSelectAbles.value as any[]);
             arr.forEach((el) => {
                 // @ts-ignore
                 const children = Array.from(el.children);
@@ -381,8 +381,8 @@ export default defineComponent({
             if (props.selectable && props.dragable) {
                 // @ts-ignore
                 dragSelect = new DragSelect({
-                    selectables: dragSelectAbles.value,
-                    area: selectArea.value,
+                    selectables: dragSelectAbles.value as any[],
+                    area: selectArea.value as HTMLElement|SVGElement|Document,
                     callback: dragSelectItems,
                     onDragStart: dragStart,
                 });

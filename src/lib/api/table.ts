@@ -507,7 +507,7 @@ export class TabSearchTableAPI<initData = any, initSyncData = any> extends Searc
                 let show;
                 let parm;
                 let preShow;
-                let preParm = [null, null, null, null];
+                let preParm;
                 if (origine) {
                     show = origine[0];
                     parm = origine[1];
