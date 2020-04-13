@@ -29,6 +29,7 @@ import PTagsInput from './components/organisms/forms/tags-input/TagsInput.vue';
 import PRadio from './components/molecules/forms/radio/Radio.vue';
 import PSelect from './components/molecules/forms/select/Select.vue';
 import PGridLayout from './components/molecules/layouts/grid-layout/GridLayout.vue';
+import './styles/style.scss';
 
 export {
     PI,
