@@ -6,7 +6,7 @@
             />
         </div>
         <template v-else>
-            <p-selectable-item v-for="(item, idx) in items" :key="getItem(item, mapper.key)"
+            <p-selectable-item v-for="(item, idx) in items" :key="getItem(item, mapper.key) || idx"
                                :icon-url="getItem(item, mapper.iconUrl)"
                                :title="getItem(item, mapper.title)"
                                :active="proxySelectedIndexes.includes(idx)"
@@ -46,7 +46,10 @@ export default defineComponent({
             proxyDisabledIndexes: makeProxy('disabledIndexes', props, emit),
         });
 
-        const getItem = (item, key: MapperKeyType) => (typeof key === 'function' ? key(item) : _.get(item, key));
+        const getItem = (item, key: MapperKeyType) => {
+            if (typeof key === 'function') return key(item);
+            return _.get(item, key);
+        };
 
         const onItemClick = (item, idx) => {
             const foundIdx = _.indexOf(state.proxySelectedIndexes, idx);

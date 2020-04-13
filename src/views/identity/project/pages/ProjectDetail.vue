@@ -3,26 +3,26 @@
         <p>api 주세요~~</p>
         <PTab :tabs="tabs" :active-tab.sync="activeTab">
             <template #member="{height}">
-                    <p-dynamic-view view_type="query-search-table"
-                                    :api-handler="apiHandler"
-                                    :data_source="dataSource"
-                                    :vbind="{responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}}"
-                                    :data="null"
-                    >
-                        <template #toolbox-left>
-                            <p-button style-type="primary-dark">
-                                {{ $t('BTN.ADD') }}
-                            </p-button>
-                            <p-button
-                                    class="toolbox-left-btn"
-                                    outline
-                                    style-type="alert"
-                                    :disabled="apiHandler.tableTS.selectState.isNotSelected"
-                            >
-                                Delete
-                            </p-button>
-                        </template>
-                    </p-dynamic-view>
+                <p-dynamic-view view_type="query-search-table"
+                                :api-handler="apiHandler"
+                                :data_source="dataSource"
+                                :vbind="{responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}}"
+                                :data="null"
+                >
+                    <template #toolbox-left>
+                        <p-button style-type="primary-dark">
+                            {{ $t('BTN.ADD') }}
+                        </p-button>
+                        <p-button
+                            class="toolbox-left-btn"
+                            outline
+                            style-type="alert"
+                            :disabled="apiHandler.tableTS.selectState.isNotSelected"
+                        >
+                            Delete
+                        </p-button>
+                    </template>
+                </p-dynamic-view>
             </template>
             <template #Tags>
                 <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
@@ -51,13 +51,12 @@ import {
     AdminFluentAPI,
     QuerySearchTableFluentAPI,
     SearchTableFluentAPI,
-    TabSearchTableFluentAPI
+    TabSearchTableFluentAPI,
 } from '@/lib/api/table';
-import {DictPanelAPI} from "@/components/organisms/panels/dict-panel/dict";
-import {fluentApi} from "@/lib/fluent-api";
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
-import PDynamicSubData from "@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue";
-import {QuerySearchTableACHandler} from "@/lib/api/auto-complete";
+import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
+import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 
 export default {
     name: 'ProjectDetail',
@@ -74,14 +73,14 @@ export default {
     setup(props, context) {
         const state = reactive({
             dataSource: [],
-        })
+        });
         const tabData = reactive({
             tabs: makeTrItems([
-                    ['detail', 'COMMON.SUMMARY', { keepAlive: true }],
-                    ['member', 'COMMON.MEMBER'],
-                    ['Tags', 'COMMON.TAG'],
-                ],
-                context.parent),
+                ['detail', 'COMMON.SUMMARY', { keepAlive: true }],
+                ['member', 'COMMON.MEMBER'],
+                ['Tags', 'COMMON.TAG'],
+            ],
+            context.parent),
             activeTab: 'detail',
         });
 
@@ -91,8 +90,8 @@ export default {
             args: {
                 keys: projectKeyAutoCompletes,
                 suggestKeys: projectKeyAutoCompletes,
-            }
-        }
+            },
+        };
 
         const MemberListAction = fluentApi.identity().project().list();
         const apiHandler = new QuerySearchTableFluentAPI(MemberListAction, {
@@ -101,12 +100,11 @@ export default {
             padding: true,
             selectable: true,
             dragable: true,
-        }, undefined, projectACHandlerMeta,
-        );
+        }, undefined, projectACHandlerMeta);
         const dataSource: DataSourceItem[] = [
-            { name: 'member_id', key: 'member_id'},
+            { name: 'member_id', key: 'member_id' },
             { name: 'name', key: 'name' },
-        ]
+        ];
         const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
         const isNotSelectOne = computed(() => !apiHandler.tableTS.selectState.isSelectOne);
 
@@ -116,7 +114,7 @@ export default {
             tagsApi.setId(project_id);
             tagsApi.ts.toReadMode();
             await tagsApi.getData();
-        }
+        };
         loadTag();
 
         return {
