@@ -20,7 +20,7 @@
 
 import ResourcesByRegion from '@/views/dashboard/modules/ResourcesByRegion';
 import ServersByType from '@/views/dashboard/modules/ServersByType';
-import ProjectSummary from '@/views/identity/project/modules/ProjectSummary';
+import ProjectSummary from '@/views/identity/project/origin/ProjectSummary';
 
 export default {
     name: 'Bottom',

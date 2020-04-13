@@ -237,6 +237,7 @@ export default {
                 const id = item.project_id;
                 const setCard = (items) => { cardSummary.value[id] = items; };
                 statisticsAPI.setId(id).execute().then((rp) => {
+                    console.log('statistics test', rp)
                     if (rp.data) {
                         setCard(rp.data);
                     }
@@ -244,9 +245,6 @@ export default {
             });
             const temp = resp.data.results.map((it) => {
                 const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
-                if (providers.length == 0) {
-
-                }
                 const extraProviders = providers.length > 5 ? providers.length - 5 : 0;
                 return {
                     ...it,
@@ -472,8 +470,8 @@ export default {
     }
 
     .provider-icon {
-        max-width: 2rem;
-        max-height: 2rem;
+        max-width: 1.5rem;
+        max-height: 1.5rem;
         display: inline;
         margin-right: .5rem;
     }
