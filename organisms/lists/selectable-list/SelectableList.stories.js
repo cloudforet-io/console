@@ -175,3 +175,69 @@ export const cardTheme = () => ({
         };
     },
 });
+
+
+export const loadingSkeleton = () => ({
+    components: { PSelectableList },
+    props: getKnobProps(selectableListProps, {
+        items: [
+            {
+                id: '1',
+                tags: {
+                    icon: 'https://assets-console-cloudone-dev.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
+                },
+                name: 'AWS EC2 Collector',
+                color: '#aaaaaa',
+            },
+            {
+                id: '2',
+                tags: {
+                    icon: 'https://assets-console-cloudone-dev.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
+                },
+                name: 'AWS Network Collector',
+                color: '#abcdef',
+            },
+            {
+                id: '3',
+                tags: {
+                    icon: 'https://assets-console-cloudone-stg.s3.ap-northeast-2.amazonaws.com/console-assets/icons/gcp-compute.svg',
+                },
+                name: 'GCP Compute Collector',
+            },
+        ],
+        mapper: {
+            key: 'id',
+            iconUrl: 'tags.icon',
+            title: 'name',
+            color: 'color',
+        },
+        theme: 'card',
+        loading: true,
+    },
+    {
+        selectedIndexes: true,
+        disabledIndexes: true,
+    }),
+    template: `
+    <div style="width: 80vw; border: 1px solid gray;">
+        <PSelectableList v-bind="$props"
+                         :selected-indexes.sync="selectedIndexes"
+                         v-on="actions"
+        >
+            <template #extra="{item}">
+                extra: {{item.id}}
+            </template>
+        </PSelectableList>
+    </div>`,
+    setup(props, context) {
+        const state = reactive({
+            selectedIndexes: [],
+            disabledIndexes: [],
+        });
+
+        return {
+            ...toRefs(state),
+            actions,
+        };
+    },
+});
