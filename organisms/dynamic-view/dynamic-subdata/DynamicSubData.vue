@@ -47,7 +47,7 @@ export default defineComponent({
         },
     },
     setup(props:Props ) {
-        const selected = ref(props.subData[0].name);
+        const selected = ref(props.subData[0]?.name);
         const buttons = computed(() => props.subData.map(dv => ({
             name: dv.name, label: dv.name, vbind: { styleType: 'gray900', outline: selected.value !== dv.name },
         })));
@@ -58,7 +58,7 @@ export default defineComponent({
         // eslint-disable-next-line camelcase
         const selectData = computed(() => {
             if (!state.dvs[selected.value]) {
-                selected.value = buttons.value[0].name;
+                selected.value = buttons.value[0]?.name;
             }
             // eslint-disable-next-line camelcase
             return { view_type: 'table', ...state.dvs[selected.value] };
