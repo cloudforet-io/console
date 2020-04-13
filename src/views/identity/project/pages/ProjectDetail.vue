@@ -54,7 +54,6 @@ import {
     TabSearchTableFluentAPI
 } from '@/lib/api/table';
 import {DictPanelAPI} from "@/components/organisms/panels/dict-panel/dict";
-import {fluentApi} from "@/lib/fluent-api";
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PDynamicSubData from "@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue";
 import {QuerySearchTableACHandler} from "@/lib/api/auto-complete";
