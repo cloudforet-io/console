@@ -54,14 +54,14 @@
 
 <script>
 import _ from 'lodash';
-import ProjectContext from '@/views/identity/project/modules/ProjectContext.vue';
+import ProjectContext from '@/views/identity/project/origin/ProjectContext.vue';
 import PAreaTree from '@/components/organisms/trees/area-tree/AreaTree.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 
-const projectSummaryTop = () => import('@/views/identity/project/modules/ProjectSummaryTop');
-const projectSummaryBottom = () => import('@/views/identity/project/modules/ProjectSummaryBottom');
-const projectMember = () => import('@/views/identity/project/modules/ProjectMember');
+const projectSummaryTop = () => import('@/views/identity/project/origin/ProjectSummaryTop');
+const projectSummaryBottom = () => import('@/views/identity/project/origin/ProjectSummaryBottom');
+const projectMember = () => import('@/views/identity/project/origin/ProjectMember');
 
 export default {
     name: 'Project1',

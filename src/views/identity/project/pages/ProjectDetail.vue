@@ -1,6 +1,5 @@
 <template>
     <general-page-layout>
-        <p>api 주세요~~</p>
         <PTab :tabs="tabs" :active-tab.sync="activeTab">
             <template #member="{height}">
                 <p-dynamic-view view_type="query-search-table"
@@ -53,7 +52,7 @@ import {
     SearchTableFluentAPI,
     TabSearchTableFluentAPI,
 } from '@/lib/api/table';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import {DictPanelAPI} from "@/components/organisms/panels/dict-panel/dict";
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
@@ -66,14 +65,9 @@ export default {
 
         PDictPanel,
         PTab,
-        PDynamicSubData,
         PButton,
-        PDynamicDetails,
     },
     setup(props, context) {
-        const state = reactive({
-            dataSource: [],
-        });
         const tabData = reactive({
             tabs: makeTrItems([
                 ['detail', 'COMMON.SUMMARY', { keepAlive: true }],
@@ -95,14 +89,14 @@ export default {
 
         const MemberListAction = fluentApi.identity().project().list();
         const apiHandler = new QuerySearchTableFluentAPI(MemberListAction, {
-            shadow: true,
-            border: true,
+            shadow: false,
+            border: false,
             padding: true,
             selectable: true,
             dragable: true,
         }, undefined, projectACHandlerMeta);
         const dataSource: DataSourceItem[] = [
-            { name: 'member_id', key: 'member_id' },
+            { name: 'project_id', key: 'project_id' },
             { name: 'name', key: 'name' },
         ];
         const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
@@ -117,11 +111,11 @@ export default {
         };
         loadTag();
 
+        apiHandler.getData();
         return {
             apiHandler,
             dataSource,
             ...toRefs(tabData),
-            ...state,
             tagsApi,
         };
     },
