@@ -1,27 +1,41 @@
 <template>
-    <div class="item-container" :class="{active: active, [theme]: true}" v-on="$listeners">
-        <slot name="bar" :color="color">
-            <div v-if="color" class="bar" :style="{color}" />
-        </slot>
-        <div class="contents">
-            <slot name="side">
-                <p-lazy-img :img-url="iconUrl"
-                            :error-icon="defaultIcon"
-                            width="2rem" height="2rem"
-                />
-            </slot>
-            <div class="flex-grow pl-2">
-                <slot name="contents" :color="color">
-                    <slot name="title">
-                        <p class="title">
-                            {{ title }}
-                        </p>
-                    </slot>
-                    <slot name="contents-bottom" />
-                </slot>
+    <div class="item-container" :class="{
+        active: active,
+        [theme]: true,
+        skeleton: loading
+    }" v-on="$listeners"
+    >
+        <div v-if="loading" class="contents">
+            <div class="avatar" />
+            <div class="grid grid-cols-1 gap-1 w-full">
+                <div class="line" />
+                <div class="line" />
             </div>
-            <slot name="extra" :color="color" />
         </div>
+        <template v-else>
+            <slot name="bar" :color="color">
+                <div v-if="color" class="bar" :style="{color}" />
+            </slot>
+            <div class="contents">
+                <slot name="side">
+                    <p-lazy-img :img-url="iconUrl"
+                                :error-icon="defaultIcon"
+                                width="2rem" height="2rem"
+                    />
+                </slot>
+                <div class="flex-grow pl-2">
+                    <slot name="contents" :color="color">
+                        <slot name="title">
+                            <p class="title">
+                                {{ title }}
+                            </p>
+                        </slot>
+                        <slot name="contents-bottom" />
+                    </slot>
+                </div>
+                <slot name="extra" :color="color" />
+            </div>
+        </template>
     </div>
 </template>
 
@@ -44,6 +58,21 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
+@define-mixin skeleton $base-color, $shine-color, $total-width, $offset {
+    @keyframes shine {
+        from {
+            background-position: -$offset;
+        }
+        to {
+            background-position: calc($(total-width) - $(offset));
+        }
+    }
+    background-image: linear-gradient(90deg, $(base-color) 0, $(shine-color) 40px, $(base-color) 80px);
+    background-size: $total-width;
+    background-repeat: repeat;
+    animation: shine 1.5s infinite linear;
+}
+
 @define-mixin item-theme $border-color, $hover-bg-color, $active-color, $active-bg-color {
     position: relative;
     display: flex;
@@ -82,6 +111,28 @@ export default defineComponent({
             background-color: $hover-bg-color;
         }
     }
+
+    &.skeleton {
+            border-color: transparent;
+        .avatar {
+            @apply rounded-sm h-8 w-8 mr-4;
+
+            @mixin skeleton theme('colors.primary3'), theme('colors.gray.100'), 11rem, 0;
+        }
+        .line {
+            @apply rounded-sm h-3 w-24;
+
+            @mixin skeleton theme('colors.primary3'), theme('colors.gray.100'), 11rem, 3rem;
+            &:last-child {
+                @apply opacity-50 w-32;
+            }
+        }
+        &:hover {
+            background-color: theme('colors.white');
+            cursor: unset;
+        }
+    }
+
     .title {
         @apply text-sm;
         color: inherit;

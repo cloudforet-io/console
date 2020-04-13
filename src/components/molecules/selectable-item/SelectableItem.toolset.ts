@@ -30,6 +30,10 @@ export const selectableItemProps = {
             return ['default', 'card'].includes(theme);
         },
     },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
 };
 
 export type ThemeType = 'default' | 'card';
@@ -42,4 +46,5 @@ export interface SelectableItemPropsType {
     defaultIcon?: string;
     color?: string;
     theme?: ThemeType;
+    loading?: boolean;
 }
