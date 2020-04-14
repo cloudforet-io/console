@@ -7,7 +7,7 @@
             Please Confirm your ID or Password.
         </p>
         <div id="login-info" class="field-group text-left md:flex md:flex-wrap md:justify-between">
-            <div class="form">
+            <form class="form">
                 <div class="flex flex-col md:w-full form">
                     <p class="input-title">
                         Admin User ID
@@ -18,6 +18,7 @@
                                 v-model="userId"
                                 placeholder="User ID"
                                 class="w-full"
+                                autocomplete="username"
                                 :class="{
                                     'is-invalid':invalid
                                 }"
@@ -26,7 +27,7 @@
                         </template>
                     </PFieldGroup>
                 </div>
-                <div class="flex flex-col mb-4 md:w-full form">
+                <div class="flex flex-col mb-4 md:w-full">
                     <p class="input-title">
                         Password
                     </p>
@@ -37,6 +38,7 @@
                                 type="password"
                                 class="w-full"
                                 placeholder="Password"
+                                autocomplete="current-password"
                                 :class="{
                                     'is-invalid':invalid
                                 }"
@@ -46,7 +48,7 @@
                         </template>
                     </PFieldGroup>
                 </div>
-            </div>
+            </form>
         </div>
         <div class="flex flex-col mb-10 md:w-full">
             <p-button style-type="primary" type="submit" size="lg"
