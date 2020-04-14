@@ -1,5 +1,5 @@
 <template>
-    <p-data-table v-bind="ts.state">
+    <p-data-table v-bind="ts.state" v-on="$listeners">
         <template v-for="slot of slots" v-slot:[slot.name]="{value}">
             <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
         </template>

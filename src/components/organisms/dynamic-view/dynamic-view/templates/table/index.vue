@@ -21,6 +21,7 @@
         :setting-visible="false"
         :use-spinner-loading="true"
         :use-cursor-loading="true"
+        v-on="$listeners"
         @changePageSize="apiHandler.getData"
         @changePageNumber="apiHandler.getData"
         @clickRefresh="apiHandler.getData"
