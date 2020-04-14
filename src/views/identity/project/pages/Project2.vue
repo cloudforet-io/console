@@ -92,7 +92,7 @@
                                     {{ item.name }}
                                 </p>
                                 <div v-if="item.force_console_data.providers.length == 0" class="empty-providers">
-                                    <p id="empty-provider"></p>
+                                    <p id="empty-provider" />
                                 </div>
                                 <div v-else-if="item.force_console_data.providers" class="providers">
                                     <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
@@ -216,7 +216,7 @@ export default {
         const treeAction = fluentApi.identity().project().tree()
             .setSortBy('item_type')
             .setExcludeProject();
-        const treeApiHandler = new ProjectTreeFluentAPI(treeAction, TreeToolSet);
+        const treeApiHandler = new ProjectTreeFluentAPI(treeAction);
         const projectAPI = fluentApi.identity().project();
         const statisticsAPI = fluentApi.statistics().projectSummary();
 
@@ -237,7 +237,6 @@ export default {
                 const id = item.project_id;
                 const setCard = (items) => { cardSummary.value[id] = items; };
                 statisticsAPI.setId(id).execute().then((rp) => {
-                    console.log('statistics test', rp)
                     if (rp.data) {
                         setCard(rp.data);
                     }
@@ -318,7 +317,7 @@ export default {
                     tags: item.tags,
                 },
             });
-            console.debug(item);
+            console.debug('item test', item)
         };
 
         /**
@@ -341,7 +340,8 @@ export default {
                     context.root.$notify({
                         group: 'noticeBottomRight',
                         type: 'success',
-                        title: 'Add Success',
+                        title: 'Success',
+                        text: 'Create Project Group',
                         duration: 2000,
                         speed: 1000,
                     });
@@ -351,6 +351,7 @@ export default {
                         group: 'noticeBottomRight',
                         type: 'alert',
                         title: 'Add Fail',
+                        text: 'Request Fail',
                         duration: 2000,
                         speed: 1000,
                     });
@@ -377,7 +378,8 @@ export default {
                     context.root.$notify({
                         group: 'noticeBottomRight',
                         type: 'success',
-                        title: 'Add Success',
+                        title: 'Success',
+                        text: 'Create Project',
                         duration: 2000,
                         speed: 1000,
                     });
@@ -386,7 +388,8 @@ export default {
                     context.root.$notify({
                         group: 'noticeBottomRight',
                         type: 'alert',
-                        title: 'Add Fail',
+                        title: 'Fail',
+                        text: 'Request Fail',
                         duration: 2000,
                         speed: 1000,
                     });
@@ -400,7 +403,6 @@ export default {
         return {
             treeRef: treeApiHandler.ts.treeRef,
             treeApiHandler,
-            apiHandler,
             ...toRefs(state),
             ...toRefs(formState),
             selected,
@@ -408,6 +410,7 @@ export default {
             cardSummary,
             projectSummary,
             openProjectForm,
+            apiHandler,
             projectFormConfirm,
             openProjectGroupForm,
             projectGroupFormConfirm,
@@ -467,6 +470,10 @@ export default {
         font-size: 1.12rem;
         font-weight: bold;
         margin-bottom: 1.4rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        padding-bottom: 0.56rem;
     }
 
     .provider-icon {
@@ -477,7 +484,7 @@ export default {
     }
 
     #empty-provider {
-        padding-top: 1.2rem;
+        padding-top: 1.1rem;
     }
 
     .solid {
@@ -512,11 +519,11 @@ export default {
     .tool {
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
         justify-content: space-between;
         margin-bottom: 1.5rem;
         .tool-left {
             display: flex;
+            flex-wrap: wrap;
             .tool-left-btn {
                 margin-right: 1rem;
             }
