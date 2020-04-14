@@ -220,4 +220,10 @@ export default defineComponent({
         display: flex;
         justify-content: space-between;
     }
+
+    .tree-scope span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 12.5rem;
+    }
 </style>
