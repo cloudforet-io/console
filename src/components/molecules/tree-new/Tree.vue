@@ -43,12 +43,12 @@
 import {
     reactive, toRefs, defineComponent, computed, getCurrentInstance,
 } from '@vue/composition-api';
-import {
-    TreePropsInterface, treeProps, TreeOptionsInterface, TreeItemInterface,
-} from './ToolSet';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { isNotEmpty } from '@/lib/util';
+import {
+    TreePropsInterface, treeProps, TreeOptionsInterface, TreeItemInterface,
+} from './ToolSet';
 
 export default defineComponent({
     name: 'PTreeNew',
@@ -94,15 +94,15 @@ export default defineComponent({
             emit('node:clicked:right', node, e);
         };
 
-        const deleteNode = (node, propagation: boolean = true, multiple: boolean = false) => {
+        const deleteNode = (node, propagation = true, multiple = false) => {
             if (!state.tree) return;
             if (propagation) node.children = [];
             state.tree.remove({ text: node.data.text }, multiple);
         };
 
         type addType = 'append' | 'prepend' | 'before' | 'after';
-        const addNode = (node, newItem:string | TreeItemInterface = { text: '' }, type: addType = 'append') => {
-            node[type](newItem);
+        const addNode = (node, newItem: string | TreeItemInterface = { text: '' }, type: addType = 'append') => {
+            if (state.tree) state.tree[type](node, newItem);
         };
 
         const onFetch = (node) => {
