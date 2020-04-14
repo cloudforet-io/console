@@ -457,13 +457,13 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
             parameter: {} as parameter,
             only: [] as string[],
         },
-        transformer: ((any) => any|Promise<any>)|null = null,
+        transformer: ((any) => any | Promise<any>) | null = null,
     ) {
         super(baseUrl, undefined, transformer);
         this.apiState = apiState;
     }
 
-    getParameter = (): {query: Query} & parameter => {
+    getParameter = (): { query: Query } & parameter => {
         const query = { only: this.apiState.only };
         return {
             ...this.apiState.parameter,
@@ -530,7 +530,20 @@ export abstract class MultiItemQueryAction<parameter, resp> extends QueryAPI<par
     }
 }
 
+export abstract class SingleItemQueryAction<parameter, resp> extends QueryAPI<parameter, resp> {
+    protected abstract idField: string;
+
+    setId(id: string): this {
+        this.apiState.extraParameter[this.idField] = id;
+        return this.clone();
+    }
+}
+
 export abstract class MemberListAction<parameter, resp> extends MultiItemQueryAction<parameter, resp> {
+    path = 'member/list'
+}
+
+export abstract class SingleItemMemberListAction<parameter, resp> extends SingleItemQueryAction<parameter, resp> {
     path = 'member/list'
 }
 

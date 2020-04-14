@@ -1,7 +1,17 @@
 /* eslint-disable camelcase */
 import {
-    CreateAction, GetAction, ListAction, Resource,
-    ResourceActions, SingleDeleteAction, SingleItemAction, TreeAction, UpdateAction,
+    CreateAction,
+    GetAction,
+    ListAction,
+    MemberListAction,
+    Resource,
+    ResourceActions,
+    SingleDeleteAction,
+    SingleItemMemberListAction,
+    SubMultiItemAction,
+    SubMultiItemAddAction,
+    TreeAction,
+    UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
     ListType, ProjectGroupInfo, Tags, TimeStamp,
@@ -51,6 +61,10 @@ class List extends ListAction<ProjectListParameter, ProjectListResp> {
     }
 }
 
+class MemberList extends SingleItemMemberListAction<any, any> {
+    protected idField = idField;
+}
+
 interface ProjectTreeParameter {
     include_project: boolean;
 }
@@ -61,7 +75,21 @@ class Tree extends TreeAction<ProjectTreeParameter, any> {
     }
 }
 
-export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'tree'> {
+abstract class MemberAction extends SubMultiItemAction<any, any> {
+    idField = idField;
+
+    protected subIdsField = 'users';
+}
+
+class AddMember extends MemberAction {
+    path = 'member/add'
+}
+
+class RemoveMember extends MemberAction {
+    path = 'member/remove'
+}
+
+export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'memberList'|'tree'|'addMember'|'removeMember'> {
     protected name = 'project';
 
     create() { return new Create(this.baseUrl); }
@@ -74,5 +102,11 @@ export default class Project extends Resource implements ResourceActions<'create
 
     list() { return new List(this.baseUrl); }
 
+    memberList() { return new MemberList(this.baseUrl); }
+
     tree() { return new Tree(this.baseUrl); }
+
+    addMember() { return new AddMember(this.baseUrl); }
+
+    removeMember() { return new RemoveMember(this.baseUrl); }
 }
