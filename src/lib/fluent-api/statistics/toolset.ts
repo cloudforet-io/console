@@ -160,8 +160,8 @@ export abstract class StatisticsQueryAPI<parameter, resp> extends ActionAPI<para
         return this.clone();
     }
 
-    setSort(sort: object): this {
-        this.apiState.sort = sort;
+    setSort(key: string, desc = true): this {
+        this.apiState.sort = { key, desc };
         return this.clone();
     }
 
@@ -303,9 +303,4 @@ export abstract class DiffQueryAPI<parameter, resp> extends ActionAPI<parameter,
         this.apiState.groupBy = args;
         return this.clone();
     }
-}
-
-
-export abstract class StatQueryAction<resp> extends StatQueryAPI<undefined, StatResponse<resp>> {
-    protected path = 'stat'
 }

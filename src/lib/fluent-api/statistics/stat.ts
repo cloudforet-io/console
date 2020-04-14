@@ -13,9 +13,9 @@ const query = {
         operator: OPERATORS.count,
         alias: 'count',
     }, {
-        key: 'cloud_service_id',
+        key: 'cloud_service_type',
         operator: OPERATORS.value,
-        alias: 'id',
+        alias: 'name',
     }, {
         key: 'provider',
         operator: OPERATORS.value,
@@ -50,14 +50,14 @@ interface Response {
 fluentApi.statistics().stat().query<Response>()
     .setServiceType('inventory.cloud-service')
     .addField('cloud_service_id', OPERATORS.count, 'count')
-    .addField('cloud_service_id', OPERATORS.value, 'id')
+    .addField('cloud_service_type', OPERATORS.value, 'name')
     .addField('provider', OPERATORS.value, 'provider')
     .addField('cloud_service_group', OPERATORS.value, 'group')
     .setGroupBy('provider', 'cloud_service_group')
     .setLimit(12)
  */
 
-class Query<value> extends StatQueryAPI<any, StatResponse<value>> {
+class Query<value> extends StatQueryAPI<undefined, StatResponse<value>> {
     path = 'query'
 }
 

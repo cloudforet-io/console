@@ -100,3 +100,31 @@ export const cardTheme = () => ({
         };
     },
 });
+
+
+export const skeleton = () => ({
+    components: { PSelectableItem },
+    props: getKnobProps(selectableItemProps, {
+        iconUrl: 'https://assets-console-cloudone-dev.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
+        title: 'EC2 Collector',
+        color: '#222222',
+        theme: 'card',
+        loading: true,
+    }, {}, {
+        theme: select,
+        color,
+    }, {
+        theme: ['default', 'card'],
+    }),
+    template: `
+    <div style="width: 80vw;">
+        <PSelectableItem v-bind="$props"></PSelectableItem>
+    </div>`,
+    setup(props, context) {
+        const state = getState(props, context);
+
+        return {
+            ...toRefs(state),
+        };
+    },
+});
