@@ -102,7 +102,10 @@ export default defineComponent({
 
         type addType = 'append' | 'prepend' | 'before' | 'after';
         const addNode = (node, newItem: string | TreeItemInterface = { text: '' }, type: addType = 'append') => {
-            if (state.tree) state.tree[type](node, newItem);
+            if (state.tree) {
+                const target = node || state.tree.model[state.tree.model.length - 1];
+                state.tree[type](target, newItem);
+            }
         };
 
         const onFetch = (node) => {
