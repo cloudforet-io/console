@@ -48,12 +48,6 @@ export default {
 };
 </script>
 
-<style lang="postcss">
-    .app > .app-body > main {
-        overflow: hidden;
-    }
-</style>
-
 <style lang="postcss" scoped>
     .right-container {
         height: 100%;
