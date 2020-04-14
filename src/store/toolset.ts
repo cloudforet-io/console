@@ -194,7 +194,7 @@ class ProjectStore extends Store<ProjectState> {
         }
     }
 }
-interface ProviderInfo{
+export interface ProviderInfo{
     [provider: string]: {
         name: string;
         icon: string;
