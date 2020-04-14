@@ -31,10 +31,10 @@ export interface TreeOptionsInterface {
     parentSelect?: boolean;
     keyboardNavigation?: boolean;
     propertyNames?: {
-        id?: string,
-        text?: string,
-        children?: string,
-        isBatch?: string,
+        id?: string;
+        text?: string;
+        children?: string;
+        isBatch?: string;
     };
     deletion?: [boolean, (node: TreeNode) => boolean];
     fetchData?: (node: TreeNode) => Promise<any>;
@@ -63,7 +63,7 @@ export default class TreeItem implements TreeItemInterface {
         public children?: TreeItemInterface[],
         public state?: TreeStateType,
         public id?: number|string,
-        public isBatch?:boolean,
+        public isBatch?: boolean,
     ) { }
 }
 
@@ -84,7 +84,7 @@ export interface TreePropsInterface {
 
 @StateToolSet<TreePropsInterface>()
 export class TreeState<initData, initState extends TreePropsInterface = TreePropsInterface> {
-    public state:optionalType<initState, initData>
+    state: optionalType<initState, initData>
 
     static initState() {
         return {
@@ -101,7 +101,7 @@ export class TreeState<initData, initState extends TreePropsInterface = TreeProp
         };
     }
 
-    constructor(initData:initData = <initData>{}, lazy:boolean = false) {
+    constructor(initData: initData = <initData>{}, lazy = false) {
         this.state = initReactive(lazy, TreeState.initState(), initData);
     }
 }
@@ -151,20 +151,20 @@ export const treeProps = {
 };
 
 export interface TreeMetaState {
-    selectedNode:any[];
-    firstSelectedNode:Ref<any>;
+    selectedNode: any[];
+    firstSelectedNode: Ref<any>;
 }
 
 @HelperToolSet()
 export class TreeToolSet<initDataType> extends TreeState<initDataType> {
-    public metaState:TreeMetaState = null as unknown as TreeMetaState;
+    metaState: TreeMetaState = null as unknown as TreeMetaState;
 
-    public tree:Ref<any>=null as unknown as Ref<any>;
+    tree: Ref<any>=null as unknown as Ref<any>;
 
     // eslint-disable-next-line no-empty-function
-    public getSelectedNode:(event?:any)=>void=() => {};
+    getSelectedNode: (event?: any) => void=() => {};
 
-    static initToolSet(_this:any, treeRef:Ref<any> = ref(null), treePath:string[] = ['treeRef', 'value', '$refs', 'tree']) {
+    static initToolSet(_this: any, treeRef: Ref<any> = ref(null), treePath: string[] = ['treeRef', 'value', '$refs', 'tree']) {
         _this.treeRef = treeRef;
         _this.metaState = reactive({
             selectedNode: null,
@@ -177,13 +177,13 @@ export class TreeToolSet<initDataType> extends TreeState<initDataType> {
             }),
         });
         _this.tree = computed(() => _.get(_this, treePath));
-        _this.getSelectedNode = (event?:any) => {
+        _this.getSelectedNode = (event?: any) => {
             console.debug('getSelectedNode', event, _this.tree.value.selected());
             _this.metaState.selectedNode = event ? [event] : [];
         };
     }
 
-    constructor(initData:initDataType = {} as initDataType, public treeRef:Ref<any> = ref(null)) {
+    constructor(initData: initDataType = {} as initDataType, public treeRef: Ref<any> = ref(null)) {
         super(initData);
         TreeToolSet.initToolSet(this, treeRef);
     }
