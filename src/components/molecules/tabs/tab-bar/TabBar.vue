@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import { computed } from '@vue/composition-api';
-import {TabItem} from "@/components/molecules/tabs/tab-bar/toolset";
+import { TabItem } from '@/components/molecules/tabs/tab-bar/toolset';
 
 export const tabBarProps = {
     props: {
@@ -69,40 +69,34 @@ export default {
 
 <style lang="postcss" scoped>
 .p-nav-tabs {
-    @apply flex flex-wrap pl-0 mb-0;
+    @apply flex flex-wrap pl-0 mb-0 bg-white ;
     > li {
         cursor: pointer;
     }
     .p-nav-link {
-        @apply flex no-underline border border-gray-100 bg-white;
-        font: 14px/16px Arial;
-        min-width: 7.5rem;
-        min-height: 2rem;
-        max-height: 2rem;
-        border-radius: 2px 2px 0px 0px;
+        @apply flex no-underline text-sm min-h-9;
+        min-width: 5rem;
         text-align: center;
         margin-bottom: -1px;
         .label {
-            line-height: 2rem;
-            width: 100%;
+            @apply px-4 py-3 w-full;
+            line-height: 1rem;
         }
         &:hover {
             @apply text-secondary;
         }
         &.active {
-            @apply text-primary;
+            @apply text-primary font-bold;
             font-weight: bold;
-            box-shadow: 0.25rem -0.25rem 0.75rem -0.25rem  #4D49B614,
-                        -0.25rem -0.25rem 0.75rem -0.25rem #4D49B614;
-            &:not(.one-tab) .label {
+            &:not(.one-tab) {
                 @apply border-b-2 border-primary;
             }
-            &.one-tab .label {
+            &.one-tab{
                 @apply border-b-2 border-white;
             }
         }
         &:not(.active) {
-            box-shadow: inset 0px -8px 8px -8px #4D49B614;
+            @apply text-gray-500;
         }
     }
 }
