@@ -44,7 +44,7 @@ const setup = (props, context) => {
         sortDesc: true,
     });
     const footerCancelButtonBind = reactive({
-        styleType: 'dark',
+        styleType: 'gray900',
         outline: true,
     });
     const footerConfirmButtonBind = computed(() => ({
