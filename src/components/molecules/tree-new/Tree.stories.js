@@ -4,8 +4,8 @@ import {
 import { action } from '@storybook/addon-actions';
 import _ from 'lodash';
 import { number, select, object } from '@storybook/addon-knobs/vue';
-import PTree from './Tree.vue';
 import TreeItem, { TreeState, TreeToolSet } from '@/components/molecules/tree-new/ToolSet';
+import PTree from './Tree.vue';
 
 export default {
     title: 'molecules/tree-new/Tree',
@@ -370,6 +370,7 @@ export const add = () => ({
         >
         </p-tree-new>
         <br>
+        <button class="p-2 border-gray border" @click="nodeClick(undefined, 'new Item', 'after')">add to root node</button>
         <hr>
         <br>
         <h3>Click the target node where you want to add</h3>
