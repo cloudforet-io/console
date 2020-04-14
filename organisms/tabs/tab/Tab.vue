@@ -1,6 +1,6 @@
 <template>
-    <div class="tab">
-        <p-tab-bar :active-tab.sync="proxyActiveTab" :tabs="tabs" />
+    <div class="p-tab">
+        <p-tab-bar class="p-tab-bar" :active-tab.sync="proxyActiveTab" :tabs="tabs" />
         <div class="tab-content">
             <template v-for="tab in tabData">
                 <div v-if="tab.keepAlive || tab.name === proxyActiveTab"
@@ -39,11 +39,14 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-    .tab-pane{
-        @apply bg-white border border-gray-100;
-        width: 100%;
-        padding: 1rem 1rem 2.5rem;
-        border-radius: 0px 2px 2px 2px;
-        box-shadow: 0px 0px 8px #4D49B614;
+.p-tab{
+    @apply rounded-sm border  border-gray-200 bg-white;
+    .p-tab-bar{
+        @apply border-b border-gray-100;
     }
+    .tab-pane{
+        @apply w-full p-4;
+        }
+    }
+
 </style>
