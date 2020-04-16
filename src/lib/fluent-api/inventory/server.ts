@@ -96,19 +96,19 @@ class MemberList extends MemberListAction<any, any> {
 export default class Server extends Resource implements ResourceActions<'get'|'list'|'getData'|'changeProject'|'update'|'changeState'|'memberList'> {
     protected name = 'server';
 
-    get(): Get { return new Get(this.baseUrl); }
+    get(): Get { return new Get(this.api, this.baseUrl); }
 
-    list(): List { return new List(this.baseUrl); }
+    list(): List { return new List(this.api, this.baseUrl); }
 
-    delete(): Delete { return new Delete(this.baseUrl); }
+    delete(): Delete { return new Delete(this.api, this.baseUrl); }
 
-    getData(): GetData { return new GetData(this.baseUrl); }
+    getData(): GetData { return new GetData(this.api, this.baseUrl); }
 
-    update(): Update { return new Update(this.baseUrl); }
+    update(): Update { return new Update(this.api, this.baseUrl); }
 
-    changeProject(): ChangeProject { return new ChangeProject(this.baseUrl); }
+    changeProject(): ChangeProject { return new ChangeProject(this.api, this.baseUrl); }
 
-    changeState(): ChangeState { return new ChangeState(this.baseUrl); }
+    changeState(): ChangeState { return new ChangeState(this.api, this.baseUrl); }
 
-    memberList(): MemberList { return new MemberList(this.baseUrl); }
+    memberList(): MemberList { return new MemberList(this.api, this.baseUrl); }
 }

@@ -21,7 +21,7 @@ class Diff<value> extends DiffQueryAPI<any, HistoryResponse<value>> {
 export default class History extends Resource implements ResourceActions<'query'|'diff'> {
     name = 'history'
 
-    query<value>(): Query<value> { return new Query(this.baseUrl); }
+    query<value>(): Query<value> { return new Query(this.api, this.baseUrl); }
 
-    diff<value>(): Diff<value> { return new Diff(this.baseUrl); }
+    diff<value>(): Diff<value> { return new Diff(this.api, this.baseUrl); }
 }

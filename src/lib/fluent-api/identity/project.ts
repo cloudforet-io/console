@@ -1,7 +1,17 @@
 /* eslint-disable camelcase */
 import {
-    CreateAction, GetAction, ListAction, Resource,
-    ResourceActions, SingleDeleteAction, SingleItemAction, TreeAction, UpdateAction,
+    CreateAction,
+    GetAction,
+    ListAction,
+    MemberListAction,
+    Resource,
+    ResourceActions,
+    SingleDeleteAction,
+    SingleItemMemberListAction,
+    SubMultiItemAction,
+    SubMultiItemAddAction,
+    TreeAction,
+    UpdateAction,
 } from '@/lib/fluent-api/toolset';
 import {
     ListType, ProjectGroupInfo, Tags, TimeStamp,
@@ -51,6 +61,10 @@ class List extends ListAction<ProjectListParameter, ProjectListResp> {
     }
 }
 
+class MemberList extends SingleItemMemberListAction<any, any> {
+    protected idField = idField;
+}
+
 interface ProjectTreeParameter {
     include_project: boolean;
 }
@@ -61,18 +75,38 @@ class Tree extends TreeAction<ProjectTreeParameter, any> {
     }
 }
 
-export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'tree'> {
+abstract class MemberAction extends SubMultiItemAction<any, any> {
+    idField = idField;
+
+    protected subIdsField = 'users';
+}
+
+class AddMember extends MemberAction {
+    path = 'member/add'
+}
+
+class RemoveMember extends MemberAction {
+    path = 'member/remove'
+}
+
+export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'memberList'|'tree'|'addMember'|'removeMember'> {
     protected name = 'project';
 
-    create() { return new Create(this.baseUrl); }
+    create() { return new Create(this.api, this.baseUrl); }
 
-    update() { return new Update(this.baseUrl); }
+    update() { return new Update(this.api, this.baseUrl); }
 
-    delete() { return new Delete(this.baseUrl); }
+    delete() { return new Delete(this.api, this.baseUrl); }
 
-    get() { return new Get(this.baseUrl); }
+    get() { return new Get(this.api, this.baseUrl); }
 
-    list() { return new List(this.baseUrl); }
+    list() { return new List(this.api, this.baseUrl); }
 
-    tree() { return new Tree(this.baseUrl); }
+    memberList() { return new MemberList(this.api, this.baseUrl); }
+
+    tree() { return new Tree(this.api, this.baseUrl); }
+
+    addMember() { return new AddMember(this.api, this.baseUrl); }
+
+    removeMember() { return new RemoveMember(this.api, this.baseUrl); }
 }

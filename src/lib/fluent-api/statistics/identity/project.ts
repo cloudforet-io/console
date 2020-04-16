@@ -19,7 +19,7 @@ class Count extends CountAction<undefined, ListType<ProjectCountModel>> {}
 export default class Project extends Resource implements ResourceActions<'trends' | 'count'> {
     protected name = 'project'
 
-    trends(): Trends { return new Trends(this.baseUrl); }
+    trends(): Trends { return new Trends(this.api, this.baseUrl); }
 
-    count(): Count { return new Count(this.baseUrl); }
+    count(): Count { return new Count(this.api, this.baseUrl); }
 }
