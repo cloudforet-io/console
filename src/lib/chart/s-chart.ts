@@ -21,6 +21,9 @@ export interface SChartInterface extends Chart {
     setPlugins: (...args) => SChartInterface;
     setLabels: (...args) => SChartInterface;
     setColors: (...args) => SChartInterface;
+    setBorderWidth: (...args) => SChartInterface;
+    setTooltipEnabled: (...args) => SChartInterface;
+    setAnimationDuration: (...args) => SChartInterface;
     apply: (...args) => SChartInterface;
 }
 
@@ -100,6 +103,21 @@ export abstract class SChart extends Chart implements SChartInterface {
 
     setColors(colors: string[]): this {
         this.colors = colors;
+        return this;
+    }
+
+    setTooltipEnabled(enabled: boolean): this {
+        if (this.options.tooltips) this.options.tooltips.enabled = enabled;
+        return this;
+    }
+
+    setBorderWidth(width: number): this {
+        this.metaDatasets.borderWidth = width;
+        return this;
+    }
+
+    setAnimationDuration(duration: number): this {
+        _.set(this, 'options.animation.duration', duration);
         return this;
     }
 

@@ -1,7 +1,10 @@
 <template>
-    <p-widget-layout title="Resources by Top 5 Projects" help="Top 5 Projects">
+    <p-widget-layout title="Resources by Top 5 Projects" help="Top 5 Projects" class="top-projects">
         <div class="flex justify-center">
             <p-chart-loader :loading="loading" class="chart">
+                <template #loader>
+                    <p-skeleton width="100%" height="100%" />
+                </template>
                 <canvas ref="chartRef" />
             </p-chart-loader>
         </div>
@@ -102,6 +105,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { SBarChart } from '@/lib/chart/bar-chart';
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 
 export default defineComponent({
     name: 'TopProjects',
@@ -113,6 +117,7 @@ export default defineComponent({
         PTd,
         PI,
         PChartLoader,
+        PSkeleton,
     },
     setup() {
         interface DataType {
@@ -204,6 +209,11 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
+.top-projects::v-deep {
+    .padding {
+        padding-bottom: 1.5rem;
+    }
+}
 .chart {
     height: 180px;
 }

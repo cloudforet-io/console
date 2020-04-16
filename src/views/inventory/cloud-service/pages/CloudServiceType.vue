@@ -232,7 +232,7 @@ export default {
         const apiHandler = new QuerySearchGridFluentAPI(
             listAction,
             {
-                cardClass: () => ['cst-card-item'],
+                cardClass: () => ['card-item', 'cst-card-item'],
                 cardMinWidth: '19.125rem',
                 cardHeight: '9rem',
                 columnGap: '0.5rem',

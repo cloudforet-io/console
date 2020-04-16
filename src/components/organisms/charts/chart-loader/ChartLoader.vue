@@ -1,12 +1,14 @@
 <template>
     <div class="p-loader">
         <transition name="fade-in">
-            <slot name="loader" :loading="loading">
-                <p-lottie v-if="loading" name="spinner" class="spinner"
-                          auto
-                          :size="1.5"
-                />
-            </slot>
+            <div v-if="loading" class="loader w-full h-full">
+                <slot name="loader" :loading="loading">
+                    <p-lottie name="spinner" class="h-full"
+                              auto
+                              :size="1.5"
+                    />
+                </slot>
+            </div>
         </transition>
         <transition name="fade-in">
             <div v-if="!loading" class="w-full h-full">
@@ -41,13 +43,10 @@ export default defineComponent({
         width: 100%;
         height: 100%;
     }
-    .spinner {
+    .loader {
         position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
         &.fade-in-enter-active {
-            transition: opacity 0.15s;
+            transition: opacity 0.5s;
         }
         &.fade-in-enter {
             opacity: 0;
@@ -57,7 +56,7 @@ export default defineComponent({
         }
     }
     .fade-in-leave-active {
-        transition: opacity 0.15s;
+        transition: opacity 0.5s;
     }
     .fade-in-leave-to {
         opacity: 0;
