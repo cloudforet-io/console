@@ -96,6 +96,12 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
     .daily-updates {
-        height: 48rem;
+        height: 33.75rem;
+    }
+
+    @screen lg {
+        .daily-updates {
+            height: 48rem;
+        }
     }
 </style>

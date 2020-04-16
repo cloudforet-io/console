@@ -1,7 +1,13 @@
 <template>
     <p-widget-layout title="Cloud Services">
         <template #default>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2">
+            <div class="grid gap-2
+                        grid-cols-1
+                        sm:grid-cols-2
+                        lg:grid-cols-3
+                        xl:grid-cols-4
+                        2xl:grid-cols-6"
+            >
                 <template v-if="loading">
                     <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
                         <p-skeleton width="2rem" height="2rem" class="mr-4" />
@@ -11,6 +17,14 @@
                         </div>
                     </div>
                 </template>
+                <router-link v-else-if="data.length === 0" to="/inventory/cloud-service"
+                             class="no-data rounded-sm bg-gray-100 flex items-center justify-center"
+                >
+                    <p-i name="ic_plus_square" width="1rem" height="1rem"
+                         class="mr-4"
+                    />
+                    Create a Collector
+                </router-link>
                 <template v-else>
                     <p-selectable-item v-for="(item, index) in data" :key="index"
                                        :icon-url="iconUrl(item)" theme="card"
@@ -114,7 +128,6 @@ export default defineComponent({
                 const res = await api.execute();
                 state.data = res.data.values;
             } catch (e) {
-                // TODO: no data
                 state.data = arrayOf(12, () => ({
                     provider: 'aws',
                     group: 'group name',
@@ -163,5 +176,8 @@ export default defineComponent({
 }
 .more {
     @apply text-sm text-blue-600 font-normal float-right inline-flex items-center cursor-pointer;
+}
+.no-data {
+    height: 3.5rem;
 }
 </style>

@@ -7,6 +7,7 @@
         </template>
         <p-data-table :items="items" :loading="loading" :fields="fields"
                       :responsive-style="responsiveStyle"
+                      :table-style="tableStyle"
                       :top-border="false"
                       :striped="false"
                       bordered
@@ -19,7 +20,7 @@
                 </div>
             </template>
             <template #no-data="{fields}">
-                <p-tr key="noData" class="no-data-row bg-primary3">
+                <p-tr key="noData" class="bg-primary3">
                     <p-td class="no-data" :colspan="fields.length" />
                 </p-tr>
             </template>
@@ -73,9 +74,9 @@ export default defineComponent({
             responsiveStyle: {
                 height: '100%',
             },
-            tableStyle: {
+            tableStyle: computed(() => (!ts.syncState.loading && ts.state.items.length === 0 ? {
                 height: '100%',
-            },
+            } : {})),
         }, {
             loading: true,
         });
