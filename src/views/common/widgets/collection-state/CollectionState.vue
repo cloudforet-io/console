@@ -18,9 +18,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, toRefs } from '@vue/composition-api';
+import {
+    defineComponent, toRefs, computed, Ref,
+} from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import { coral, primary } from '@/styles/colors';
+import { coral, primary, gray } from '@/styles/colors';
 import _ from 'lodash';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { SBarChart } from '@/lib/chart/bar-chart';
@@ -28,6 +30,7 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
+import casual, { arrayOf } from '@/lib/casual';
 
 export default defineComponent({
     name: 'CollectionState',
@@ -46,8 +49,8 @@ export default defineComponent({
             data: Array<DataType | undefined>;
             loading: boolean;
             colors: {
-                success: string;
-                failure: string;
+                success: Ref<Readonly<string>>;
+                failure: Ref<Readonly<string>>;
             };
         }
 
@@ -61,61 +64,61 @@ export default defineComponent({
                 data: [],
                 loading: true,
                 colors: {
-                    success: primary,
-                    failure: coral.default,
+                    success: computed(() => (ts.state.loading ? gray[500] : primary)),
+                    failure: computed(() => (ts.state.loading ? gray[500] : coral.default)),
                 },
             });
 
-        fluentApi.statisticsTest().history().query()
+        interface Data {
+            state: string;
+            count: number;
+            date: string;
+        }
+        const api = fluentApi.statisticsTest().history().query<Data>()
             .addField('state', OPERATORS.value, 'state')
+            .addField('created_at', OPERATORS.value, 'date')
             .setLimit(7)
             .setSort('created_at')
+            .setGroupBy('created_at')
             .setFilterOr(
                 { key: 'state', operator: '=', value: 'FINISHED' },
                 { key: 'state', operator: '=', value: 'FAILURE' },
             );
 
-        const api = async (): Promise<DataType[]> => new Promise((resolve) => {
-            setTimeout(() => {
-                resolve([{
-                    date: '4/1', // MM/DD
-                    success: 40,
-                    failure: 11,
-                }, {
-                    date: '4/1',
-                    success: 40,
-                    failure: 11,
-                }, {
-                    date: '4/1',
-                    success: 40,
-                    failure: 11,
-                }, {
-                    date: '4/1',
-                    success: 40,
-                    failure: 11,
-                }, {
-                    date: '4/1',
-                    success: 40,
-                    failure: 11,
-                }, {
-                    date: '4/1',
-                    success: 40,
-                    failure: 11,
-                }, {
-                    date: '4/1',
-                    success: 40,
-                    failure: 11,
-                }]);
-            }, 1000);
-        });
+        // const api = async (): Promise<DataType[]> => new Promise((resolve) => {
+        //     setTimeout(() => {
+        //         resolve([{
+        //             date: '4/1', // MM/DD
+        //             success: 40,
+        //             failure: 11,
+        //         }]);
+        //     }, 1000);
+        // });
 
         const getData = async (): Promise<void> => {
             ts.state.loading = true;
-            ts.state.data = await api();
-            ts.state.loading = false;
+            ts.state.data = [];
+            try {
+                const res = await api.execute();
+                // res.data.values.forEach(v => {
+                //     ts.state.data.push({
+                //         date: v.c
+                //     })
+                // })
+            } catch (e) {
+                ts.state.data = arrayOf(7, () => ({
+                    date: casual.date('MM/DD'),
+                    success: casual.integer(0, 100),
+                    failure: casual.integer(0, 100),
+                }));
+            } finally {
+                ts.state.loading = false;
+            }
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+        }, 1000);
 
         return {
             ...toRefs(ts.state),

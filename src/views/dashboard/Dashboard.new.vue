@@ -55,15 +55,15 @@ export default defineComponent({
         const state = reactive({
             projects: {
                 color: primary,
-                api: fluentApi.statisticsTest().history().diff().setTopic('topic'),
+                api: fluentApi.statisticsTest().history().query().setTopic('topic'),
             },
             servers: {
                 color: secondary,
-                api: fluentApi.statisticsTest().history().diff().setTopic('topic'),
+                api: fluentApi.statisticsTest().history().query().setTopic('topic'),
             },
             cloudServices: {
                 color: secondary1,
-                api: fluentApi.statisticsTest().history().diff().setTopic('topic'),
+                api: fluentApi.statisticsTest().history().query().setTopic('topic'),
             },
         });
 

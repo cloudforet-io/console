@@ -162,7 +162,6 @@ export default defineComponent({
                     }
                 });
             } catch (e) {
-                console.error(e);
                 // TODO: no data case
                 ts.state.data = {
                     aws: { ...providerStore.state.providers.aws, count: casual.integer(0, 50) },
@@ -178,7 +177,9 @@ export default defineComponent({
             }
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+        }, 1000);
 
         return {
             ...toRefs(ts.state),

@@ -6,11 +6,13 @@
         >
             <animated-number :value="count"
                              :format-value="countFormatter"
-                             :duration="3000"
+                             :duration="1500"
+                             :round="1"
                              easing="easeInOutSine"
             />
         </router-link>
         <p-chart-loader :loading="loading" class="line-chart">
+            <template #loader>&zwnj;</template>
             <canvas ref="chartRef" />
         </p-chart-loader>
     </p-widget-layout>
@@ -72,7 +74,6 @@ export default defineComponent({
                 const res = await summaryApi.value.execute();
                 ts.state.data = res.data.values.map(d => d.count);
             } catch (e) {
-                console.error(e);
                 // TODO: no data case
                 ts.state.data = arrayOf(7, () => casual.integer(0, 1000000));
             } finally {
@@ -80,7 +81,9 @@ export default defineComponent({
             }
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+        }, 1000);
 
         return {
             ...toRefs(ts.state),

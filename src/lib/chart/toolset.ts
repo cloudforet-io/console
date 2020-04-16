@@ -44,6 +44,7 @@ export class SChartToolSet<C extends SChart, D=any> {
 
         watch(() => this.state.chartRef, (val) => {
             if (val) {
+                console.log('init chart!!!', this.ChartClass.name);
                 this.state.chart = new this.ChartClass(val, config);
                 this.draw(this.state.chart);
             }

@@ -114,7 +114,6 @@ export default defineComponent({
                 const res = await api.execute();
                 state.data = res.data.values;
             } catch (e) {
-                console.error(e);
                 // TODO: no data
                 state.data = arrayOf(12, () => ({
                     provider: 'aws',
@@ -127,7 +126,9 @@ export default defineComponent({
             }
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+        }, 1000);
 
         return {
             ...toRefs(state),
