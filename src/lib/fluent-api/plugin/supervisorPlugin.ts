@@ -10,6 +10,7 @@ import {
 } from '@/lib/fluent-api/type';
 
 const idField = 'plugin_id';
+const idFields = 'plugins';
 interface IdParameter {
     plugin_id: string;
 }
@@ -37,7 +38,7 @@ class Recovery extends SubMultiItemAction<any, any> {
 export default class SupervisorPlugin extends Resource implements ResourceActions<'list'> {
     protected name = 'supervisor/plugin';
 
-    list() { return new List(this.baseUrl); }
+    list() { return new List(this.api, this.baseUrl); }
 
-    recovery() { return new Recovery(this.baseUrl); }
+    recovery() { return new Recovery(this.api, this.baseUrl); }
 }

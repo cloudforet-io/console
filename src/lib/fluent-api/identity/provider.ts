@@ -8,6 +8,7 @@ import {
 import { JsonSchema } from '@/lib/type';
 
 const idField = 'provider';
+const idsField = 'providers';
 
 interface IdParameter {
     [idField]: string;
@@ -37,7 +38,7 @@ class List extends ListAction<any, ProviderListResp> {}
 export default class Provider extends Resource implements ResourceActions<'get'|'list'> {
     protected name = 'provider';
 
-    get() { return new Get(this.baseUrl); }
+    get() { return new Get(this.api, this.baseUrl); }
 
-    list() { return new List(this.baseUrl); }
+    list() { return new List(this.api, this.baseUrl); }
 }

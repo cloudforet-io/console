@@ -9,6 +9,7 @@ import {
 } from '@/lib/fluent-api/type';
 
 const idField = 'supervisor_id';
+const idsField = 'supervisors'
 interface IdParameter {
     supervisor_id: string;
 }
@@ -33,7 +34,7 @@ class List extends ListAction<any, SupervisorListResp> {}
 export default class Supervisor extends Resource implements ResourceActions<'get'|'list'> {
     protected name = 'supervisor';
 
-    get() { return new Get(this.baseUrl); }
+    get() { return new Get(this.api, this.baseUrl); }
 
-    list() { return new List(this.baseUrl); }
+    list() { return new List(this.api, this.baseUrl); }
 }

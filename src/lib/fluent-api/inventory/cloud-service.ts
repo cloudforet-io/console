@@ -77,19 +77,19 @@ class ChangeProject extends SubMultiItemAction<any, any> {
 export default class CloudService extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'getData'|'memberList'|'changeProject'> {
     protected name = 'cloud-service';
 
-    create() { return new Create(this.baseUrl); }
+    create() { return new Create(this.api, this.baseUrl); }
 
-    update() { return new Update(this.baseUrl); }
+    update() { return new Update(this.api, this.baseUrl); }
 
-    delete() { return new Delete(this.baseUrl); }
+    delete() { return new Delete(this.api, this.baseUrl); }
 
-    get() { return new Get(this.baseUrl); }
+    get() { return new Get(this.api, this.baseUrl); }
 
-    getData(): GetData { return new GetData(this.baseUrl); }
+    getData(): GetData { return new GetData(this.api, this.baseUrl); }
 
-    list() { return new List(this.baseUrl); }
+    list() { return new List(this.api, this.baseUrl); }
 
-    memberList(): MemberList { return new MemberList(this.baseUrl); }
+    memberList(): MemberList { return new MemberList(this.api, this.baseUrl); }
 
-    changeProject() { return new ChangeProject(this.baseUrl); }
+    changeProject() { return new ChangeProject(this.api, this.baseUrl); }
 }

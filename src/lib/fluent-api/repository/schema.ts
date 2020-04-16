@@ -39,15 +39,15 @@ class List extends ListAction<any, SchemaListResp> {}
 export default class Schema extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'getByName'> {
     protected name = 'schema';
 
-    create() { return new Create(this.baseUrl); }
+    create() { return new Create(this.api, this.baseUrl); }
 
-    update() { return new Update(this.baseUrl); }
+    update() { return new Update(this.api, this.baseUrl); }
 
-    delete() { return new Delete(this.baseUrl); }
+    delete() { return new Delete(this.api, this.baseUrl); }
 
-    get() { return new Get(this.baseUrl); }
+    get() { return new Get(this.api, this.baseUrl); }
 
-    list() { return new List(this.baseUrl); }
+    list() { return new List(this.api, this.baseUrl); }
 
-    getByName() { return new GetByName(this.baseUrl); }
+    getByName() { return new GetByName(this.api, this.baseUrl); }
 }

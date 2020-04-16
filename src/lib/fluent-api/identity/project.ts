@@ -92,21 +92,21 @@ class RemoveMember extends MemberAction {
 export default class Project extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'|'memberList'|'tree'|'addMember'|'removeMember'> {
     protected name = 'project';
 
-    create() { return new Create(this.baseUrl); }
+    create() { return new Create(this.api, this.baseUrl); }
 
-    update() { return new Update(this.baseUrl); }
+    update() { return new Update(this.api, this.baseUrl); }
 
-    delete() { return new Delete(this.baseUrl); }
+    delete() { return new Delete(this.api, this.baseUrl); }
 
-    get() { return new Get(this.baseUrl); }
+    get() { return new Get(this.api, this.baseUrl); }
 
-    list() { return new List(this.baseUrl); }
+    list() { return new List(this.api, this.baseUrl); }
 
-    memberList() { return new MemberList(this.baseUrl); }
+    memberList() { return new MemberList(this.api, this.baseUrl); }
 
-    tree() { return new Tree(this.baseUrl); }
+    tree() { return new Tree(this.api, this.baseUrl); }
 
-    addMember() { return new AddMember(this.baseUrl); }
+    addMember() { return new AddMember(this.api, this.baseUrl); }
 
-    removeMember() { return new RemoveMember(this.baseUrl); }
+    removeMember() { return new RemoveMember(this.api, this.baseUrl); }
 }

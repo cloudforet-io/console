@@ -6,9 +6,10 @@ import {
 import {
     ListType, Tags, TimeStamp,
 } from '@/lib/fluent-api/type';
-import project from "@/lib/fluent-api/identity/project";
+import project from '@/lib/fluent-api/identity/project';
 
 const idField = 'project_group_id';
+const idsField = 'project_groups';
 
 interface IdParameter {
     [idField]: string;
@@ -35,19 +36,16 @@ class Get extends GetAction<IdParameter, any> {
 class List extends ListAction<any, ProjectGroupListResp> {}
 
 
-
-
 export default class ProjectGroup extends Resource implements ResourceActions<'create'|'update'|'delete'|'get'|'list'> {
     protected name = 'project-group';
 
-    create() { return new Create(this.baseUrl); }
+    create() { return new Create(this.api, this.baseUrl); }
 
-    update() { return new Update(this.baseUrl); }
+    update() { return new Update(this.api, this.baseUrl); }
 
-    delete() { return new Delete(this.baseUrl); }
+    delete() { return new Delete(this.api, this.baseUrl); }
 
-    get() { return new Get(this.baseUrl); }
+    get() { return new Get(this.api, this.baseUrl); }
 
-    list() { return new List(this.baseUrl); }
-
+    list() { return new List(this.api, this.baseUrl); }
 }

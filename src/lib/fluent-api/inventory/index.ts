@@ -10,17 +10,17 @@ import CloudServiceType from './cloud-service-type';
 export default class Inventory extends Service implements ServiceResources<'cloudServiceType'> {
     protected name = 'inventory'
 
-    cloudServiceType() { return new CloudServiceType(this.name); }
+    cloudServiceType() { return new CloudServiceType(this.api, this.name); }
 
-    cloudService() { return new CloudService(this.name); }
+    cloudService() { return new CloudService(this.api, this.name); }
 
-    server() { return new Server(this.name); }
+    server() { return new Server(this.api, this.name); }
 
-    collector() { return new Collector(this.name); }
+    collector() { return new Collector(this.api, this.name); }
 
-    region() { return new Region(this.name); }
+    region() { return new Region(this.api, this.name); }
 
-    zone() { return new Zone(this.name); }
+    zone() { return new Zone(this.api, this.name); }
 
-    pool() { return new Pool(this.name); }
+    pool() { return new Pool(this.api, this.name); }
 }
