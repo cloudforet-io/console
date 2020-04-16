@@ -1,5 +1,6 @@
 import { reactive } from '@vue/composition-api';
 import { optionalType, StateToolSet } from '@/lib/toolset';
+import {UnwrapRef} from "@vue/composition-api/dist/reactivity";
 
 
 const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900', 'primary4'];
@@ -104,7 +105,7 @@ export interface TablePropsType {
 }
 @StateToolSet<TablePropsType>()
 export class TableState<initData, initState extends TablePropsType = TablePropsType> {
-    state: optionalType<initState, initData>;
+    state: UnwrapRef<optionalType<initState, initData>>;
 
     static initState() {
         return {
@@ -120,12 +121,12 @@ export class TableState<initData, initState extends TablePropsType = TablePropsT
 
     constructor(initData: initData = {} as initData, lazy = false) {
         if (lazy) {
-            this.state = null as unknown as initState;
+            this.state = null as unknown as UnwrapRef<initState>;
         } else {
             this.state = reactive({
                 ...TableState.initState(),
                 ...initData,
-            }) as optionalType<initState, initData>;
+            }) as UnwrapRef<optionalType<initState, initData>>;
         }
     }
 }
