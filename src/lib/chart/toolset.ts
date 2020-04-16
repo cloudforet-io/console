@@ -15,7 +15,7 @@ interface ChartStateType<C> {
 
 @HelperToolSet()
 export class SChartToolSet<C extends SChart, D=any> {
-    state: optionalType<ChartStateType<C>, D>;
+    state: ChartStateType<C> & D;
 
     ChartClass: new (...args) => C;
 
@@ -30,7 +30,7 @@ export class SChartToolSet<C extends SChart, D=any> {
         initData: D = {} as D,
         config: ChartConfiguration = {},
     ) {
-        this.state = initReactive<optionalType<ChartStateType<C>, D>>(false, {
+        this.state = initReactive<ChartStateType<C> & D>(false, {
             chartRef: null,
             chart: null,
         }, initData);

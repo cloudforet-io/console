@@ -7,7 +7,13 @@ import {
     FilterType,
     Query,
     FilterItem,
-    ShortFilterType, GetActionState, RawParameterActionState, QueryApiState, StatQueryApiState, StatQuery,
+    ShortFilterType,
+    GetActionState,
+    RawParameterActionState,
+    QueryApiState,
+    StatQueryApiState,
+    StatQuery,
+    BaseQueryState, BaseQuery,
 } from '@/lib/fluent-api/type';
 import { isNotEmpty } from '@/lib/util';
 
@@ -135,7 +141,62 @@ function getQueryWithApiState<T>(keys: string[], apiState: any): T {
     return res;
 }
 
-export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
+
+export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
+    protected apiState: BaseQueryState<parameter> ;
+
+    protected constructor(
+        baseUrl: string,
+        initState: BaseQueryState<parameter> = {} as BaseQueryState<parameter>,
+        transformer: null|((any) => any) = null,
+    ) {
+        super(baseUrl, undefined, transformer);
+        this.apiState = {
+            filter: [],
+            filterOr: [],
+            fixFilter: [],
+            extraParameter: {},
+            ...initState,
+        };
+    }
+
+    protected abstract query = (): BaseQuery => this.getBaseQuery<BaseQuery>({} as BaseQuery);
+
+    protected getBaseQuery<Q extends BaseQuery>(query: Q): Q {
+        if (this.apiState.filter.length > 0 || this.apiState.fixFilter.length > 0) {
+            const newFilter: FilterType[] | undefined = filterItemToQuery(this.apiState.filter, this.apiState.fixFilter);
+            if (newFilter) query.filter = newFilter;
+        }
+        if (isNotEmpty(this.apiState.filterOr)) {
+            const newFilter = filterItemToQuery(this.apiState.filterOr);
+            if (newFilter) query.filter_or = newFilter;
+        }
+        return query as Q;
+    }
+
+    getParameter = (): any => ({
+        query: this.query(),
+        ...this.apiState.extraParameter,
+    });
+
+    setFilter(...args: FilterItem[]): this {
+        this.apiState.filter = args;
+        return this.clone();
+    }
+
+    setFixFilter(...args: FilterItem[]): this {
+        this.apiState.fixFilter = args;
+        return this.clone();
+    }
+
+    setFilterOr(...args: FilterItem[]): this {
+        this.apiState.filterOr = args;
+        return this.clone();
+    }
+}
+
+
+export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, resp> {
     protected apiState: QueryApiState<parameter> ;
 
     constructor(
@@ -182,18 +243,8 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
         if (this.apiState.keyword) {
             query.keyword = this.apiState.keyword;
         }
-        if (this.apiState.filter.length > 0 || this.apiState.fixFilter.length > 0) {
-            const newFilter: FilterType[] | undefined = filterItemToQuery(this.apiState.filter, this.apiState.fixFilter);
-            if (newFilter) query.filter = newFilter;
-        }
-        return query as Query;
+        return this.getBaseQuery<Query>(query) as Query;
     };
-
-
-    getParameter = (): {query: Query} & parameter => ({
-        query: this.query(),
-        ...this.apiState.extraParameter,
-    });
 
     setOnly(...args: string[]): this {
         this.apiState.only = args;
@@ -202,16 +253,6 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
 
     setCountOnly(value = true): this {
         this.apiState.count_only = value;
-        return this.clone();
-    }
-
-    setFilter(...args: FilterItem[]): this {
-        this.apiState.filter = args;
-        return this.clone();
-    }
-
-    setFixFilter(...args: FilterItem[]): this {
-        this.apiState.fixFilter = args;
         return this.clone();
     }
 

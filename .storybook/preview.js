@@ -17,12 +17,16 @@ import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 import { i18n } from '@/translations';
 import LiquorTree from 'liquor-tree';
+import Skeleton from 'vue-loading-skeleton';
+import Fragment from "vue-fragment";
+
 import "@/styles/style.scss";
 import webFontLoader from 'webfontloader';
 import { fontUrls, webFonts } from '@/styles/web-fonts';
 
 import tailwindConfig from './tailwind.config';
 import _ from 'lodash';
+
 
 Vue.use(VueRouter);
 Vue.use(Notifications, { velocity });
@@ -35,6 +39,8 @@ Vue.use(SvgIcon, {
     classPrefix: 'p-i'
 })
 Vue.use(LiquorTree);
+Vue.use(Skeleton, {prefix: 'p'});
+Vue.use(Fragment.Plugin);
 
 Vue.prototype.$velocity = velocity;
 

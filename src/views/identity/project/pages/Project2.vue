@@ -92,7 +92,7 @@
                                     {{ item.name }}
                                 </p>
                                 <div v-if="item.force_console_data.providers.length == 0" class="empty-providers">
-                                    <p id="empty-provider"></p>
+                                    <p id="empty-provider" />
                                 </div>
                                 <div v-else-if="item.force_console_data.providers" class="providers">
                                     <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
@@ -237,7 +237,6 @@ export default {
                 const id = item.project_id;
                 const setCard = (items) => { cardSummary.value[id] = items; };
                 statisticsAPI.setId(id).execute().then((rp) => {
-                    console.log('statistics test', rp)
                     if (rp.data) {
                         setCard(rp.data);
                     }
@@ -269,7 +268,7 @@ export default {
         const apiHandler = new QuerySearchGridFluentAPI(
             listAction,
             {
-                cardClass: () => ['project-card-item'],
+                cardClass: () => ['card-item', 'project-card-item'],
                 cardMinWidth: '18.75rem',
                 cardHeight: '15rem',
             },
@@ -534,7 +533,6 @@ export default {
                 margin-left: 1rem;
             }
         }
-
     }
 
 </style>

@@ -13,7 +13,7 @@ interface SLineChartInterface extends SChartInterface {
     setMin: (...args) => SLineChartInterface;
     setMax: (...args) => SLineChartInterface;
     // setPointRadius: (...args) => SLineChartInterface;
-    // setLineTension: (...args) => SLineChartInterface;
+    setLineTension: (...args) => SLineChartInterface;
     // setBackgroundColor: (...args) => SLineChartInterface;
 }
 
@@ -159,13 +159,18 @@ export class SLineChart extends SChart implements SLineChartInterface {
          return this;
      }
 
+     setLineTension(tension: number): this {
+         this.metaDatasets.lineTension = tension;
+         return this;
+     }
+
      protected getBackgroundColor: Scriptable<ChartColor> = ({ dataIndex }): ChartColor => {
          const color = this.colors[dataIndex || 0];
          if (!this.gradientHeight) return color;
          const gradient = this.ctx?.createLinearGradient(0, 0, 0, this.gradientHeight);
-         gradient?.addColorStop(0, Color(color).alpha(0.25));
-         gradient?.addColorStop(0.5, Color(color).alpha(0.125));
-         gradient?.addColorStop(1, Color(color).alpha(0));
+         gradient?.addColorStop(0, Color(color).alpha(0.25).toString());
+         gradient?.addColorStop(0.5, Color(color).alpha(0.125).toString());
+         gradient?.addColorStop(1, Color(color).alpha(0).toString());
          return gradient || color;
      }
 }
