@@ -5,6 +5,7 @@ import {
 } from '@/lib/toolset';
 import _ from 'lodash';
 import { Computed } from '@/lib/type';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
 export const dataTableProps = {
@@ -55,6 +56,10 @@ export const dataTableProps = {
         type: Boolean,
         default: false,
     },
+    useSkeletonLoading: {
+        type: Boolean,
+        default: false,
+    },
     /**
      * @name multiSelect
      * @description When it's 'false', should NOT give value 'true' to 'dragable' prop.
@@ -66,7 +71,7 @@ export const dataTableProps = {
 };
 
 export interface DataTablePropsType extends TablePropsType {
-    fields?: any[];
+    fields?: any[] | Readonly<any[]>;
     items?: any[];
     sortable?: boolean;
     dragable?: boolean;
@@ -75,6 +80,7 @@ export interface DataTablePropsType extends TablePropsType {
     colCopy?: boolean;
     useSpinnerLoading?: boolean;
     useCursorLoading?: boolean;
+    useSkeletonLoading?: boolean;
     multiSelect?: boolean;
 }
 export interface DataTableSyncType {
@@ -95,6 +101,7 @@ export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncTy
     loading: boolean;
     useSpinnerLoading: boolean;
     useCursorLoading: boolean;
+    useSkeletonLoading: boolean;
     multiSelect: boolean;
     sortBy: string;
     sortDesc: boolean;
@@ -108,7 +115,7 @@ export class DataTableState<
         initState extends DataTablePropsType = DataTablePropsType,
         initSync extends DataTableSyncType= DataTableSyncType
     > extends TableState< initData, initState> {
-    syncState: optionalType<initSync, initSyncData>;
+    syncState: UnwrapRef<optionalType<initSync, initSyncData>>;
 
     static initState() {
         return {
@@ -123,6 +130,7 @@ export class DataTableState<
             colCopy: false,
             useSpinnerLoading: true,
             useCursorLoading: true,
+            useSkeletonLoading: false,
             multiSelect: true,
         };
     }
@@ -138,8 +146,8 @@ export class DataTableState<
 
     constructor(initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData, lazy = false) {
         super(initData, true);
-        this.state = initReactive<optionalType<initState, initData>>(lazy, DataTableState.initState(), initData);
-        this.syncState = initReactive<optionalType<initSync, initSyncData>>(lazy, DataTableState.initSyncState(), initSyncData);
+        this.state = initReactive<UnwrapRef<optionalType<initState, initData>>>(lazy, DataTableState.initState(), initData);
+        this.syncState = initReactive<UnwrapRef<optionalType<initSync, initSyncData>>>(lazy, DataTableState.initSyncState(), initSyncData);
     }
 }
 

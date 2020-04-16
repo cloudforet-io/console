@@ -162,34 +162,32 @@ export default defineComponent({
             }, { type: 'horizontalBar' });
 
         const api = async (): Promise<DataType[]> => new Promise((resolve) => {
-            setTimeout(() => {
-                resolve([{
-                    project_group: 'Group',
-                    project: 'Project',
-                    servers: 300,
-                    cloud_services: 325,
-                }, {
-                    project_group: 'Group',
-                    project: 'Project',
-                    servers: 200,
-                    cloud_services: 325,
-                }, {
-                    project_group: 'Group',
-                    project: 'Project',
-                    servers: 200,
-                    cloud_services: 325,
-                }, {
-                    project_group: 'Group',
-                    project: 'Project',
-                    servers: 100,
-                    cloud_services: 325,
-                }, {
-                    project_group: 'Group',
-                    project: 'Project',
-                    servers: 50,
-                    cloud_services: 325,
-                }]);
-            }, 1000);
+            resolve([{
+                project_group: 'Group',
+                project: 'Project',
+                servers: 300,
+                cloud_services: 325,
+            }, {
+                project_group: 'Group',
+                project: 'Project',
+                servers: 200,
+                cloud_services: 325,
+            }, {
+                project_group: 'Group',
+                project: 'Project',
+                servers: 200,
+                cloud_services: 325,
+            }, {
+                project_group: 'Group',
+                project: 'Project',
+                servers: 100,
+                cloud_services: 325,
+            }, {
+                project_group: 'Group',
+                project: 'Project',
+                servers: 50,
+                cloud_services: 325,
+            }]);
         });
 
 
@@ -199,7 +197,9 @@ export default defineComponent({
             ts.state.loading = false;
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+        }, 1000);
 
         return {
             ...toRefs(ts.state),

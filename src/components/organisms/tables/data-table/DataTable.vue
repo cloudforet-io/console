@@ -71,11 +71,12 @@
             </slot>
         </template>
         <template #body>
-            <p-tr v-if="loading&&useSpinnerLoading" key="loading" class="no-data-row">
-                <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
-                    <p-lottie name="spinner" :size="2"
+            <p-tr v-if="loading" key="loading" class="no-data-row">
+                <p-td :class="useSpinnerLoading? 'no-data' : ''" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
+                    <p-lottie v-if="useSpinnerLoading" name="spinner" :size="2"
                               :auto="true"
                     />
+                    <div v-else-if="useSkeletonLoading"></div>
                 </p-td>
             </p-tr>
             <p-tr v-else-if="showNoData" key="noData" class="no-data-row">
@@ -513,9 +514,9 @@ export default defineComponent({
         }
     }
     .no-data-row {
-        &:hover {
-            background-color: initial !important;
-        }
+        /*&:hover {*/
+        /*    background-color: initial !important;*/
+        /*}*/
         .no-data {
             @apply text-primary2;
             text-align: center;

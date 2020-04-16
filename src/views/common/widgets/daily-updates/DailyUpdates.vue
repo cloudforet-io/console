@@ -136,7 +136,6 @@ export default defineComponent({
                 const res = await serverApi.execute();
                 state.serverData = res.data.values;
             } catch (e) {
-                console.error(e);
                 // TODO: no data
                 state.serverData = [{
                     count: casual.integer(-30, 30),
@@ -155,7 +154,6 @@ export default defineComponent({
                 const res = await cloudServiceApi.execute();
                 state.cloudServiceData = res.data.values;
             } catch (e) {
-                console.error(e);
                 // TODO: no data
                 state.cloudServiceData = arrayOf(casual.integer(5, 15), () => ({
                     provider: casual.random_element(['aws', 'azure', 'google_cloud']),
@@ -189,7 +187,9 @@ export default defineComponent({
             state.loading = false;
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+        }, 1000);
 
         return {
             ...toRefs(state),

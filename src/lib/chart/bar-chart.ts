@@ -165,7 +165,7 @@ export class SBarChart extends SChart implements SBarChartInterface {
                 if (ds.data) return _.max(ds.data as number[]);
                 return 0;
             })) as number;
-        const stepSize = Math.floor(max / (this.ticksCount || max));
+        const stepSize = max / (this.ticksCount || 1);
         const axes = this.config.type === 'horizontalBar'
             ? _.get(this, 'options.scales.xAxes', [])
             : _.get(this, 'options.scales.yAxes', []);
@@ -174,13 +174,6 @@ export class SBarChart extends SChart implements SBarChartInterface {
             _.set(origin[i], 'ticks.max', max);
         });
     }
-
-    protected changeAxes(): void {
-        const y = _.get(this, 'options.scales.yAxes');
-        _.set(this, 'options.scales.yAxes', _.get(this, 'options.scales.yAxes'));
-        _.set(this, 'options.scales.xAxes', y);
-    }
-
 
     protected getBackgroundColor: Scriptable<ChartColor> =
         ({ datasetIndex }): ChartColor => this.colors[datasetIndex || 0]
