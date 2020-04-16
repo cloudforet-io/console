@@ -1,5 +1,5 @@
 <template>
-    <p-widget-layout :title="title" :padding="false">
+    <p-widget-layout :title="title" class="service-summary">
         <router-link class="count" :to="to" :style="{
             color: countColor,
         }"
@@ -12,7 +12,9 @@
             />
         </router-link>
         <p-chart-loader :loading="loading" class="line-chart">
-            <template #loader>&zwnj;</template>
+            <template #loader>
+                &zwnj;
+            </template>
             <canvas ref="chartRef" />
         </p-chart-loader>
     </p-widget-layout>
@@ -98,6 +100,9 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
+.service-summary::v-deep .widget-contents {
+    padding: 0;
+}
 .count {
     display: inline-block;
     line-height: 3rem;

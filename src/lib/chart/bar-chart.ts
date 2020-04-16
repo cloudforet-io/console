@@ -97,7 +97,6 @@ export class SBarChart extends SChart implements SBarChartInterface {
             _.set(newConfig, 'options.scales.yAxes', _.get(newConfig, 'options.scales.xAxes'));
             _.set(newConfig, 'options.scales.xAxes', y);
         }
-        console.log('initConfig', newConfig);
         return newConfig;
     }
 
