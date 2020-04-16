@@ -7,9 +7,7 @@ import {
     FilterType,
     GetActionState,
     Query,
-    FilterItem,
     ShortFilterType,
-    GetActionState,
     RawParameterActionState,
     QueryApiState,
     StatQueryApiState,
@@ -152,11 +150,12 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
     protected apiState: BaseQueryState<parameter> ;
 
     protected constructor(
+        api: ApiType,
         baseUrl: string,
         initState: BaseQueryState<parameter> = {} as BaseQueryState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             filter: [],
             filterOr: [],

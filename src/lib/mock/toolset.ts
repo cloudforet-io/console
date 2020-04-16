@@ -1,5 +1,4 @@
 import { AxiosRequestConfig } from 'axios';
-import { getConfigParseResult } from 'ts-loader/dist/config';
 
 
 type methods = 'POST'|'GET'|'PUT'|'DELETE'|'ANY';

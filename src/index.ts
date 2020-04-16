@@ -1,7 +1,18 @@
 /* eslint-disable import/first,import/newline-after-import */
 import './styles/style.scss';
 
-export * from './lib/fluent-api';
+// lib
+import * as Fluent from '@/lib/fluent-api';
+import * as Mock from '@/lib/mock';
+import * as ApiToolSet from '@/lib/api';
+import * as Translations from '@/translations';
+export {
+    Fluent,
+    Mock,
+    ApiToolSet,
+    Translations,
+};
+
 
 // atom components
 export { default as PI } from './components/atoms/icons/PI.vue';

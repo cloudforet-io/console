@@ -4,7 +4,7 @@ import {
     BaseQueryState,
     FilterItem, FilterType, TimeStamp,
 } from '@/lib/fluent-api/type';
-import { BaseQueryAPI } from '@/lib/fluent-api/toolset';
+import {ApiType, BaseQueryAPI} from '@/lib/fluent-api/toolset';
 import { isNotEmpty } from '@/lib/util';
 
 export interface StatResponse<value> {
