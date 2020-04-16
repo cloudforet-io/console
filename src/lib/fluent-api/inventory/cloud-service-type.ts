@@ -53,8 +53,8 @@ export default class CloudServiceType extends Resource implements ResourceAction
     protected name = 'cloud-service-type';
 
     get(): Get {
-        return new Get(this.baseUrl);
+        return new Get(this.api, this.baseUrl);
     }
 
-    list(): List { return new List(this.baseUrl); }
+    list(): List { return new List(this.api, this.baseUrl); }
 }

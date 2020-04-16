@@ -18,5 +18,5 @@ class ProjectSummary extends SingleItemAction<any, ProjectSummaryResp> {
 export default class Statistics extends Service {
     protected name = 'statistics';
 
-    projectSummary() { return new ProjectSummary(this.name); }
+    projectSummary() { return new ProjectSummary(this.api, this.name); }
 }

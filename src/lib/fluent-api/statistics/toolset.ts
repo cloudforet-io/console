@@ -90,11 +90,12 @@ export abstract class StatisticsQueryAPI<parameter, resp> extends BaseQueryAPI<p
     protected apiState: StatisticsQueryState<parameter> ;
 
     protected constructor(
+        api: ApiType,
         baseUrl: string,
         initState: StatisticsQueryState<parameter> = {} as StatisticsQueryState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             fields: [],
             groupBy: [],
@@ -163,11 +164,12 @@ export abstract class StatQueryAPI<parameter, resp> extends StatisticsQueryAPI<p
     protected apiState: StatQueryState<parameter> ;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: StatQueryState<parameter> = {} as StatQueryState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             serviceType: '',
             dataSource: undefined,
@@ -207,11 +209,12 @@ export abstract class HistoryQueryAPI<parameter, resp> extends StatisticsQueryAP
     protected apiState: HistoryQueryState<parameter> ;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: HistoryQueryState<parameter> = {} as HistoryQueryState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             topic: '',
             fields: [],
@@ -244,11 +247,12 @@ export abstract class DiffQueryAPI<parameter, resp> extends BaseQueryAPI<paramet
     protected apiState: DiffQueryState<parameter> ;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: DiffQueryState<parameter> = {} as DiffQueryState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             topic: '',
             field: '',

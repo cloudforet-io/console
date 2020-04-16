@@ -10,5 +10,5 @@ class Trends extends TrendsAction<undefined, ListType<JobsTrendsModel>> {}
 export default class Jobs extends Resource implements ResourceActions<'trends'> {
     protected name = 'jobs'
 
-    trends(): Trends { return new Trends(this.baseUrl); }
+    trends(): Trends { return new Trends(this.api, this.baseUrl); }
 }
