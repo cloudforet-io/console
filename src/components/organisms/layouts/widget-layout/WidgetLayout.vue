@@ -19,7 +19,7 @@
                 <slot name="extra" />
             </div>
         </div>
-        <div :class="{padding}">
+        <div class="widget-contents">
             <slot />
         </div>
     </p-pane-layout>
@@ -68,8 +68,9 @@ export default defineComponent({
             cursor: help;
         }
 
-        .padding {
+        .widget-contents {
             padding: 0 1.5rem 2.5rem 1.5rem;
+            flex-grow: 1;
         }
     }
 </style>

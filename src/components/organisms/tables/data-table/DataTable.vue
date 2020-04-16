@@ -80,7 +80,7 @@
                     </p-td>
                 </p-tr>
             </slot>
-            <slot v-else-if="showNoData" name="no-data">
+            <slot v-else-if="showNoData" name="no-data" :fields="fieldsData">
                 <p-tr key="noData" class="no-data-row">
                     <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
                         {{ $t('ORGANISMS.NO_DATA') }}

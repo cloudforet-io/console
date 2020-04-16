@@ -38,7 +38,7 @@
                         </template>
                         <template #extra>
                             <p-i :name="getIcon(item.count)" height="0.75rem" width="0.75rem" />
-                            <span class="count">{{ item.count }}</span>
+                            <span class="count">{{  Math.abs(item.count) }}</span>
                         </template>
                     </p-selectable-item>
                 </template>

@@ -17,6 +17,15 @@
                           :top-border="false"
                           striped
             >
+                <template #skeleton-rank>
+                    <p-skeleton width="1.5rem" height="1.5rem" />
+                </template>
+                <template #no-data="{fields}">
+                    <p-tr key="noData" class="no-data-row bg-primary3">
+                        <p-td class="no-data" :colspan="fields.length" />
+                    </p-tr>
+                </template>
+
                 <!-- th -->
                 <template #th-rank="{field}">
                     <div class="text-center">
@@ -209,10 +218,8 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.top-projects::v-deep {
-    .padding {
-        padding-bottom: 1.5rem;
-    }
+.top-projects::v-deep .widget-contents {
+    padding-bottom: 1.5rem;
 }
 .chart {
     height: 180px;
