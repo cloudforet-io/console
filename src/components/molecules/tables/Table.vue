@@ -143,7 +143,6 @@ export default defineComponent({
         }
         tr {
             td {
-                font-family: theme('fontFamily.serif');
                 height: 2.5rem;
                 padding: 0 0.75rem;
                 z-index: 0;
@@ -163,6 +162,7 @@ export default defineComponent({
     @define-mixin table-theme $th-bg-color, $stripe-bg-color, $border-color, $hover-color {
         th {
             background-color: $th-bg-color;
+            height: 2rem;
         }
         &.top-border {
             th {
@@ -195,9 +195,11 @@ export default defineComponent({
         }
     }
 
-    .table-default { @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.900'), theme('colors.secondary2'); }
+    .table-default {
+        @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.black'), theme('colors.secondary3');
+    }
     .table-light {
-         @mixin table-theme theme('colors.white'), transparent, theme('colors.gray.200'), transparent;
+         @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.200'), theme('colors.secondary3');
          th {
              border-bottom: 1px solid theme('colors.gray.200');
          }

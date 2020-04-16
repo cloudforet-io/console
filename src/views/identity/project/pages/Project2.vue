@@ -272,7 +272,7 @@ export default {
         const apiHandler = new QuerySearchGridFluentAPI(
             listAction,
             {
-                cardClass: () => ['project-card-item'],
+                cardClass: () => ['card-item', 'project-card-item'],
                 cardMinWidth: '18.75rem',
                 cardHeight: '15rem',
             },
@@ -547,7 +547,6 @@ export default {
                 margin-left: 1rem;
             }
         }
-
     }
 
 </style>

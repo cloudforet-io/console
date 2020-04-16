@@ -55,6 +55,7 @@ fluentApi.statistics().stat().query<Response>()
     .addField('cloud_service_group', OPERATORS.value, 'group')
     .setGroupBy('provider', 'cloud_service_group')
     .setLimit(12)
+
  */
 
 class Query<value> extends StatQueryAPI<undefined, StatResponse<value>> {

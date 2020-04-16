@@ -1,5 +1,5 @@
 import momentTimezone from 'moment-timezone';
-import moment from 'moment';
+import moment, {Moment} from 'moment';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import styles from '@/styles/colors';
@@ -102,6 +102,10 @@ export const platformBadgeColor = Object.freeze({
 });
 export const getTimezone = () => localStorage.getItem('timezone') || 'UTC';
 export const getLocalDatetimeFromTimeStamp = ts => DateTime.fromSeconds(Number(ts)).setZone(getTimezone()).toFormat('yyyy-LL-dd HH:mm:ss'); // 'yyyy-LL-dd HH:mm:ss ZZZZ' for display Timezone
+export const getTimestamp = (momentTime: Moment) => ({
+    seconds: `${momentTime.unix()}`,
+    nanos: 0,
+});
 
 // formatter
 export const timestampFormatter = value => getLocalDatetimeFromTimeStamp(value.seconds);
