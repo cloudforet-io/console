@@ -143,7 +143,6 @@ export default defineComponent({
         }
         tr {
             td {
-                font-family: theme('fontFamily.serif');
                 height: 2.5rem;
                 padding: 0 0.75rem;
                 z-index: 0;
