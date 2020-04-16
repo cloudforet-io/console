@@ -319,7 +319,6 @@ export const customColSlot = () => ({
 //                 :fields="fields"
 //                 :hover="true"
 //                 :loading="loading"
-//                 :useSpinnerLoding="useSpinnerLoading"
 //                 :useCursorLoding="useCursorLoading"
 //                 @rowLeftClick="rowLeftClick"
 //                 @rowRightClick="rowRightClick"
@@ -333,7 +332,6 @@ export const customColSlot = () => ({
 //         loading: {
 //             default: boolean('loading', true),
 //         },
-//         useSpinnerLoading: { default: boolean('useSpinnerLoading', true) },
 //         useCursorLoading: {
 //             default: boolean('useCursorLoading', false),
 //         },

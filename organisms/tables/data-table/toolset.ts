@@ -48,17 +48,13 @@ export const dataTableProps = {
         type: Boolean,
         default: false,
     },
-    useSpinnerLoading: {
-        type: Boolean,
-        default: false,
-    },
     useCursorLoading: {
         type: Boolean,
         default: false,
     },
-    useSkeletonLoading: {
-        type: Boolean,
-        default: false,
+    skeletonRows: {
+        type: Number,
+        default: 5,
     },
     /**
      * @name multiSelect
@@ -78,9 +74,8 @@ export interface DataTablePropsType extends TablePropsType {
     rowClickMultiSelectMode?: boolean;
     selectable?: boolean;
     colCopy?: boolean;
-    useSpinnerLoading?: boolean;
     useCursorLoading?: boolean;
-    useSkeletonLoading?: boolean;
+    skeletonRows?: number;
     multiSelect?: boolean;
 }
 export interface DataTableSyncType {
@@ -99,9 +94,8 @@ export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncTy
     selectIndex: any[]|number;
     colCopy: boolean;
     loading: boolean;
-    useSpinnerLoading: boolean;
     useCursorLoading: boolean;
-    useSkeletonLoading: boolean;
+    skeletonRows: number;
     multiSelect: boolean;
     sortBy: string;
     sortDesc: boolean;
@@ -128,9 +122,8 @@ export class DataTableState<
             selectable: false,
 
             colCopy: false,
-            useSpinnerLoading: true,
             useCursorLoading: true,
-            useSkeletonLoading: false,
+            skeletonRows: 5,
             multiSelect: true,
         };
     }

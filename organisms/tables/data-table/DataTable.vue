@@ -71,19 +71,22 @@
             </slot>
         </template>
         <template #body>
-            <p-tr v-if="loading" key="loading" class="no-data-row">
-                <p-td :class="useSpinnerLoading? 'no-data' : ''" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
-                    <p-lottie v-if="useSpinnerLoading" name="spinner" :size="2"
-                              :auto="true"
-                    />
-                    <div v-else-if="useSkeletonLoading"></div>
-                </p-td>
-            </p-tr>
-            <p-tr v-else-if="showNoData" key="noData" class="no-data-row">
-                <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
-                    {{ $t('ORGANISMS.NO_DATA') }}
-                </p-td>
-            </p-tr>
+            <slot v-if="loading" name="loading">
+                <p-tr v-for="s in skeletons" :key="s">
+                    <p-td v-for="(field, index) in fieldsData" :key="index">
+                        <slot :name="'skeleton-'+field.name" :index="index" :field="field">
+                            <p-skeleton />
+                        </slot>
+                    </p-td>
+                </p-tr>
+            </slot>
+            <slot v-else-if="showNoData" name="no-data">
+                <p-tr key="noData" class="no-data-row">
+                    <p-td class="no-data" :colspan="selectable? fieldsData.length +1 :fieldsData.length">
+                        {{ $t('ORGANISMS.NO_DATA') }}
+                    </p-td>
+                </p-tr>
+            </slot>
             <slot v-else name="body" :items="items">
                 <slot v-for="(item, index) in items" name="row" :fields="fieldsName"
                       :item="item" :index="index"
@@ -166,6 +169,7 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { selectToCopyToClipboard } from '@/lib/util';
 import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 // eslint-disable-next-line import/named
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { dataTableProps, DataTableSetupProps } from './toolset';
 
 const PCheckBox = () => import('@/components/molecules/forms/checkbox/CheckBox.vue');
@@ -194,7 +198,16 @@ const loadingHandler = (props) => {
 export default defineComponent({
     name: 'PDataTable',
     components: {
-        PTable, PTd, PTh, PTr, PI, PCheckBox, PCopyButton, PLottie, PRadio,
+        PSkeleton,
+        PTable,
+        PTd,
+        PTh,
+        PTr,
+        PI,
+        PCheckBox,
+        PCopyButton,
+        PLottie,
+        PRadio,
     },
     props: dataTableProps,
     setup(props: DataTableSetupProps, context) {
@@ -222,7 +235,7 @@ export default defineComponent({
         const showNoData = computed(() => {
             // eslint-disable-next-line no-prototype-builtins
             if (!props.items || !props.items.hasOwnProperty('length') || props.items.length === 0) {
-                if (props.useSpinnerLoading && props.loading) {
+                if (props.loading) {
                     return false;
                 }
                 return true;
@@ -230,6 +243,7 @@ export default defineComponent({
             return false;
         });
         const isDragging = ref(false);
+        const skeletons = computed(() => _.range(props.skeletonRows));
         const dragSelectItems = (items) => {
             const select = [];
             if (items.length > 1) {
@@ -443,6 +457,7 @@ export default defineComponent({
             clickColCopy,
             getValueFunc,
             isDragging,
+            skeletons,
         };
     },
 
