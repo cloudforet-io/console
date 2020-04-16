@@ -2,12 +2,11 @@
     <div class="p-grid-layout" :style="containerStyle">
         <div v-for="(item, index) in items"
              :key="index"
-             class="card-item"
              :class="cardClass(item, index)"
              :style="cardStyle(item, index)"
              @click="$emit('card:click',item,$event)"
         >
-            <slot name="card" :item="item">
+            <slot name="card" :item="item" :index="index">
                 {{ item }}
             </slot>
         </div>
@@ -42,7 +41,7 @@ export default {
 
 <style lang="postcss" scoped>
     .icon {
-        @apply inline-block
+        @apply inline-block;
     }
 
     .card-item {
