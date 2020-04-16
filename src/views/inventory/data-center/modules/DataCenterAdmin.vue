@@ -22,7 +22,6 @@
                          :page-size.sync="tablePage.pageSize"
                          :loading="loading"
                          :setting-visible="false"
-                         :use-spinner-loading="true"
                          :use-cursor-loading="true"
                          @changePageSize="changePageSize"
                          @changeSort="getMembers"

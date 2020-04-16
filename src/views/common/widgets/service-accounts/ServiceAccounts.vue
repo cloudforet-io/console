@@ -12,7 +12,7 @@
             <template v-if="loading">
                 <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
                     <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
-                    <p-skeleton height="0.75rem" class="flex-grow" />
+                    <p-skeleton class="flex-grow" />
                 </div>
             </template>
             <p-grid-layout v-else :items="items" row-gap="0.5rem"

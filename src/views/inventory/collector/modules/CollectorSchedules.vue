@@ -16,7 +16,6 @@
                          :selectable="true"
                          :multi-select="false"
                          :select-index.sync="proxySelectIndex"
-                         use-spinner-loading
                          use-cursor-loading
                          @changePageSize="listSchedules"
                          @changePageNumber="listSchedules"
