@@ -8,21 +8,18 @@ on:
     branches:
       - master
 
-jobs:        
+jobs:
   publish-npm:
     runs-on: ubuntu-latest
     steps:
-      - name: version check
-        id: check
-        uses: EndBug/version-check@v1
       - uses: actions/checkout@v2
-        if: steps.check.outputs.changed == 'true'
       - uses: actions/setup-node@v1
-        if: steps.check.outputs.changed == 'true'
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
-
+      - name: version check
+        id: check
+        uses: EndBug/version-check@v1
       - name: Checkout submodules
         if: steps.check.outputs.changed == 'true'
         uses: srt32/git-actions@v0.0.3
