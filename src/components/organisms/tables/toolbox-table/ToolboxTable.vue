@@ -72,6 +72,7 @@
             :responsive="responsive"
             :loading="loading"
             :use-cursor-loading="useCursorLoading"
+            :skeleton-rows="pageSize"
             v-on="$listeners"
             @changeSort="changeSort"
         >

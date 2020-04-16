@@ -21,8 +21,29 @@
                     <p-skeleton width="1.5rem" height="1.5rem" />
                 </template>
                 <template #no-data="{fields}">
-                    <p-tr key="noData" class="no-data-row bg-primary3">
-                        <p-td class="no-data" :colspan="fields.length" />
+                    <p-tr key="noData" class="bg-primary3">
+                        <p-td :colspan="3" class="rounded-l-sm" />
+                        <p-td class="text-center">
+                            <p-badge :background-color="colors.servers">
+                                0
+                            </p-badge>
+                        </p-td>
+                        <p-td class="text-center rounded-r-sm">
+                            <p-badge :background-color="colors.cloud_services">
+                                0
+                            </p-badge>
+                        </p-td>
+                    </p-tr>
+                    <p-tr key="blank" class="!bg-white h-2" />
+                    <p-tr key="create-project" class="!bg-gray-100 cursor-pointer">
+                        <router-link to="/identity/project" tag="td" :colspan="fields.length"
+                                     class="rounded-sm text-center"
+                        >
+                            <p-i name="ic_plus_square" width="1rem" height="1rem"
+                                 class="mr-4"
+                            />
+                            Create a Project
+                        </router-link>
                     </p-tr>
                 </template>
 
@@ -115,6 +136,8 @@ import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { SBarChart } from '@/lib/chart/bar-chart';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import casual, { arrayOf } from '@/lib/casual';
+
 
 export default defineComponent({
     name: 'TopProjects',
@@ -171,32 +194,12 @@ export default defineComponent({
             }, { type: 'horizontalBar' });
 
         const api = async (): Promise<DataType[]> => new Promise((resolve) => {
-            resolve([{
-                project_group: 'Group',
-                project: 'Project',
-                servers: 300,
-                cloud_services: 325,
-            }, {
-                project_group: 'Group',
-                project: 'Project',
-                servers: 200,
-                cloud_services: 325,
-            }, {
-                project_group: 'Group',
-                project: 'Project',
-                servers: 200,
-                cloud_services: 325,
-            }, {
-                project_group: 'Group',
-                project: 'Project',
-                servers: 100,
-                cloud_services: 325,
-            }, {
-                project_group: 'Group',
-                project: 'Project',
-                servers: 50,
-                cloud_services: 325,
-            }]);
+            resolve(arrayOf(5, () => ({
+                project_group: casual.word,
+                project: casual.word,
+                servers: casual.integer(0, 300),
+                cloud_services: casual.integer(0, 300),
+            })) as DataType[]);
         });
 
 

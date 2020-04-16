@@ -20,6 +20,10 @@
                     <p-skeleton width="100%" height="0.625rem" />
                 </div>
             </div>
+            <div v-else-if="data.length === 0" class="h-full flex flex-col justify-center">
+                <img :src="'./images/illust_no-update.svg'" class="mb-4 flex-shrink-0 ">
+                <img :src="'./images/illust_list.svg'" class="hidden lg:block">
+            </div>
             <p-grid-layout v-else :items="data" row-gap="0.5rem"
                            column-gap="0"
                            card-height="auto" :card-class="() => []"
@@ -38,7 +42,7 @@
                         </template>
                         <template #extra>
                             <p-i :name="getIcon(item.count)" height="0.75rem" width="0.75rem" />
-                            <span class="count">{{  Math.abs(item.count) }}</span>
+                            <span class="count">{{ Math.abs(item.count) }}</span>
                         </template>
                     </p-selectable-item>
                 </template>
@@ -213,8 +217,10 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .daily-updates {
-    overflow-y: auto;
     background-color: rgba(theme('colors.white'), 0.8);
+    &::v-deep .widget-contents {
+        overflow-y: auto;
+    }
 }
 .group-name {
     @apply text-base font-bold mb-1;
