@@ -2,7 +2,7 @@
     <p-pane-layout class="widget-layout">
         <div class="title">
             <span class="mr-2">{{ title }}</span>
-            <slot name="help">
+            <slot name="help" :help="help">
                 <p-tooltip-button v-if="help"
                                   class="help" :tooltip="help"
                                   position="top" theme="gray"

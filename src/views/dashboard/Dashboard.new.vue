@@ -1,22 +1,23 @@
 <template>
-    <div class="dashboard grid gap-4 m-4 grid-flow-row grid-cols-12">
+    <div class="bg-primary-dark grid gap-4 p-4 grid-flow-row grid-cols-12">
         <service-summary class="col-start-1 col-end-5 lg:col-end-4"
-                         title="projects" :loading="projects.loading" :data="projects.data"
+                         title="projects" :api="projects.api"
                          :color="projects.color"
         />
         <service-summary class="col-start-5 col-end-9 lg:col-start-4 lg:col-end-7"
-                         title="servers" :loading="servers.loading" :data="servers.data"
+                         title="servers" :api="servers.api"
                          :color="servers.color"
         />
         <service-summary class="col-start-9 col-end-13 lg:col-start-7 lg:col-end-10"
-                         title="cloud services" :loading="cloudServices.loading" :data="cloudServices.data"
+                         title="cloud services" :api="cloudServices.api"
                          :color="cloudServices.color"
         />
         <service-accounts class="col-start-1 col-end-13 sm:col-end-7 lg:col-end-4
                                  row-start-3 row-end-4 sm:row-start-2 sm:row-end-3"
         />
-        <daily-updates class=" col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
-                              row-start-2 row-end-3 sm:row-start-2 sm:row-end-3 lg:row-start-1"
+        <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
+                              row-start-2 row-end-3 sm:row-start-2 sm:row-end-3 lg:row-start-1
+                              daily-updates"
         />
         <top-projects class="col-start-1 col-end-13 lg:col-start-4 lg:col-end-10
                              lg:row-start-2"
@@ -37,6 +38,7 @@ import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAcco
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import TopProjects from '@/views/common/widgets/top-projects/TopProjects.vue';
 import { primary, secondary, secondary1 } from '@/styles/colors';
+import { fluentApi } from '@/lib/fluent-api';
 
 export default defineComponent({
     name: 'Dashboard',
@@ -52,38 +54,18 @@ export default defineComponent({
     setup() {
         const state = reactive({
             projects: {
-                data: [],
-                loading: true,
                 color: primary,
+                api: fluentApi.statisticsTest().history().diff().setTopic('topic'),
             },
             servers: {
-                data: [],
-                loading: true,
                 color: secondary,
+                api: fluentApi.statisticsTest().history().diff().setTopic('topic'),
             },
             cloudServices: {
-                data: [],
-                loading: true,
                 color: secondary1,
+                api: fluentApi.statisticsTest().history().diff().setTopic('topic'),
             },
         });
-
-        const api = (): Promise<any> => new Promise((resolve) => {
-            setTimeout(() => {
-                resolve([0, 0, 200, 300, 500, 800, 1300]);
-            }, 100);
-        });
-
-        const getData = async (type: string) => {
-            state[type].loading = true;
-            state[type].data = await api();
-            state[type].loading = false;
-        };
-
-        getData('projects');
-        getData('servers');
-        getData('cloudServices');
-
 
         return {
             ...toRefs(state),
@@ -110,5 +92,10 @@ export default defineComponent({
             font-size: 16px;
         }
     }
+</style>
 
+<style lang="postcss" scoped>
+    .daily-updates {
+        height: 48rem;
+    }
 </style>

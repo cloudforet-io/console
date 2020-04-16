@@ -1,6 +1,9 @@
 <template>
     <p-widget-layout title="Collection State">
         <p-chart-loader :loading="loading" class="chart">
+            <template #loader>
+                <p-skeleton width="100%" height="100%" />
+            </template>
             <canvas ref="chartRef" />
         </p-chart-loader>
         <template #extra>
@@ -15,21 +18,23 @@
 </template>
 
 <script lang="ts">
-import {
-    defineComponent, toRefs,
-} from '@vue/composition-api';
+import { defineComponent, toRefs } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
-import { primary, coral } from '@/styles/colors';
+import { coral, primary } from '@/styles/colors';
 import _ from 'lodash';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { SBarChart } from '@/lib/chart/bar-chart';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import { fluentApi } from '@/lib/fluent-api';
+import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
 
 export default defineComponent({
     name: 'CollectionState',
     components: {
         PWidgetLayout,
         PChartLoader,
+        PSkeleton,
     },
     setup() {
         interface DataType {
@@ -61,6 +66,14 @@ export default defineComponent({
                 },
             });
 
+        fluentApi.statisticsTest().history().query()
+            .addField('state', OPERATORS.value, 'state')
+            .setLimit(7)
+            .setSort('created_at')
+            .setFilterOr(
+                { key: 'state', operator: '=', value: 'FINISHED' },
+                { key: 'state', operator: '=', value: 'FAILURE' },
+            );
 
         const api = async (): Promise<DataType[]> => new Promise((resolve) => {
             setTimeout(() => {

@@ -29,7 +29,7 @@ export const gridLayoutProps = {
     },
     cardClass: {
         type: Function,
-        default: () => [],
+        default: () => ['card-item'],
     },
     cardStyle: {
         type: Function,
@@ -86,6 +86,7 @@ export class GridLayoutState<
             cardMinWidth: '12rem',
             cardHeight: '12rem',
             columnGap: '1rem',
+            cardClass: () => ['card-item'],
         };
     }
 

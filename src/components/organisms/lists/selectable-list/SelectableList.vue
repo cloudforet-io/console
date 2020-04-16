@@ -1,17 +1,9 @@
 <template>
     <div class="list-container" :class="[theme]">
         <div v-if="loading" class="spinner-container">
-            <p-selectable-item>
-                <template #side>
-                    <div class="bg-primary3 rounded-sm h-8 w-8" />
-                </template>
-                <template #contents>
-                    <div class="grid gap-1 grid-cols-1">
-                        <div class="bg-primary3 rounded-sm h-3 w-3/5" />
-                        <div class="bg-primary3 rounded-sm h-3 opacity-50 w-4/5" />
-                    </div>
-                </template>
-            </p-selectable-item>
+            <p-lottie name="spinner" auto
+                      :size="1.5"
+            />
         </div>
         <template v-else>
             <p-selectable-item v-for="(item, idx) in items" :key="getItem(item, mapper.key) || idx"
