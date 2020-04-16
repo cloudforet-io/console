@@ -6,8 +6,8 @@
                     <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
                         <p-skeleton width="2rem" height="2rem" class="mr-4" />
                         <div class="grid grid-cols-1 gap-1 w-full">
-                            <p-skeleton width="80%" />
-                            <p-skeleton width="100%" />
+                            <p-skeleton width="80%" height="0.625rem" />
+                            <p-skeleton width="100%" height="0.625rem" />
                         </div>
                     </div>
                 </template>

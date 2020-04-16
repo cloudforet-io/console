@@ -23,7 +23,7 @@ export const skeletonProps = {
     },
     height: {
         type: String,
-        default: '0.625rem',
+        default: '0.875rem',
     },
     tag: {
         type: String,

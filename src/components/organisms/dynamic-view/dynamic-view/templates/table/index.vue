@@ -19,7 +19,6 @@
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
         :responsive-style="responsiveStyle"
         :setting-visible="false"
-        :use-spinner-loading="true"
         :use-cursor-loading="true"
         v-on="$listeners"
         @changePageSize="apiHandler.getData"

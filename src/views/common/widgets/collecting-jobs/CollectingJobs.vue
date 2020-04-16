@@ -11,6 +11,12 @@
                       bordered
                       table-style-type="primary4"
         >
+            <template #skeleton-name>
+                <div class="flex items-center">
+                    <p-skeleton class="flex-shrink-0 mr-4" width="1.5rem" height="1.5rem" />
+                    <p-skeleton />
+                </div>
+            </template>
             <template #col-name-format="{value}">
                 <p-i class="working-icon" name="ic_working" height="1rem"
                      width="1rem"
@@ -38,10 +44,12 @@ import moment from 'moment';
 import { fluentApi, TimeStamp } from '@/lib/fluent-api';
 import { OPERATORS } from '@/lib/fluent-api/statistics/toolset';
 import { DataTableToolSet } from '@/components/organisms/tables/data-table/toolset';
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 
 export default defineComponent({
     name: 'CollectingJobs',
     components: {
+        PSkeleton,
         PWidgetLayout,
         PI,
         PDataTable,
@@ -52,6 +60,8 @@ export default defineComponent({
                 ['name', 'FIELD.COLLECTOR'],
                 ['start', 'FIELD.START_TIME'],
             ])),
+        }, {
+            loading: true,
         });
 
         interface Data {

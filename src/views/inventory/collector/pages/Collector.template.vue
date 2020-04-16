@@ -17,7 +17,6 @@
                                  :responsive-style="{'height': height+'px', 'overflow-y':'auto', 'overflow-x':'auto'}"
                                  :setting-visible="false"
                                  :loading="loading"
-                                 :use-spinner-loading="true"
                                  :use-cursor-loading="true"
                                  @changePageSize="getCollectors"
                                  @changePageNumber="getCollectors"
