@@ -16,7 +16,7 @@
                 </div>
             </template>
             <p-grid-layout v-else :items="items" row-gap="0.5rem"
-                           column-gap="0"
+                           column-gap="0" :fix-column="1" card-min-width="0"
                            card-height="auto" :card-class="() => []"
             >
                 <template #card="{item, index}">
@@ -25,7 +25,11 @@
                                        @click="onItemClick(item, idx)"
                     >
                         <template #contents>
-                            <span class="ml-2 text-base">{{ item.name }}</span>
+                            <div v-tooltip.bottom-start="{content: item.name, delay: {show: 500}}"
+                                 class="ml-2 text-base truncate leading-tight"
+                            >
+                                {{ item.name }}
+                            </div>
                         </template>
                         <template #extra>
                             <p-badge :background-color="item.color" class="count">
@@ -162,7 +166,6 @@ export default defineComponent({
                     }
                 });
             } catch (e) {
-                // TODO: no data case
                 ts.state.data = {
                     aws: { ...providerStore.state.providers.aws, count: casual.integer(0, 50) },
                     azure: { ...providerStore.state.providers.azure, count: casual.integer(0, 50) },

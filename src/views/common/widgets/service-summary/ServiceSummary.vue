@@ -76,7 +76,6 @@ export default defineComponent({
                 const res = await summaryApi.value.execute();
                 ts.state.data = res.data.values.map(d => d.count);
             } catch (e) {
-                // TODO: no data case
                 ts.state.data = arrayOf(7, () => casual.integer(0, 1000000));
             } finally {
                 ts.state.loading = false;
