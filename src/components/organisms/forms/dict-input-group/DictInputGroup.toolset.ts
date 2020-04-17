@@ -32,6 +32,10 @@ export const dictIGProps = {
         type: Object,
         default: () => ({}),
     },
+    showHeader: {
+        type: Boolean,
+        default: false,
+    },
 };
 
 export class DictItem {
