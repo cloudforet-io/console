@@ -1,14 +1,24 @@
 <template>
     <div>
-        <p-button class="add-btn" style-type="primary-dark"
-                  :disabled="disabled"
-                  @click="addPair"
-        >
-            <p-i name="ic_plus" color="transparent inherit"
-                 width="1rem" height="1rem"
-            />
-            {{ $t('BTN.ADD') }}
-        </p-button>
+        <slot name="addButton" :disabled="disabled" :addPair="addPair">
+            <p-button class="add-btn" style-type="primary-dark"
+                      :disabled="disabled"
+                      @click="addPair"
+            >
+                <p-i name="ic_plus" color="transparent inherit"
+                     width="1rem" height="1rem"
+                />
+                {{ $t('BTN.ADD') }}
+            </p-button>
+        </slot>
+        <div v-if="showHeader" class="tag-header">
+            <div class="key">
+                Key
+            </div>
+            <div class="value">
+                Value
+            </div>
+        </div>
         <span v-for="(d, idx) in proxyItems" :key="idx" class="dict-group">
             <p-dict-input :name.sync="d.key" :value.sync="d.value"
                           :key-invalid="showValidation && invalidMessages[idx] && !!invalidMessages[idx].key"
@@ -27,7 +37,6 @@
 </template>
 
 <script lang="ts">
-import _ from 'lodash';
 import {
     toRefs, reactive, watch, getCurrentInstance, defineComponent, Ref,
 } from '@vue/composition-api';
@@ -111,6 +120,17 @@ export default defineComponent({
         margin-bottom: .5rem;
         .p-i-icon {
             margin-right: .5rem;
+        }
+    }
+    .tag-header{
+        @apply py-4;
+        .key{
+            @apply inline-block font-bold;
+            width: 15rem;
+        }
+        .value{
+            @apply inline-block font-bold;
+            width: 20rem;
         }
     }
     .dict-group {
