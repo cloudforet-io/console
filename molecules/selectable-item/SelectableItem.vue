@@ -12,9 +12,10 @@
                 <p-lazy-img :img-url="iconUrl"
                             :error-icon="defaultIcon"
                             width="2rem" height="2rem"
+                            class="flex-shrink-0"
                 />
             </slot>
-            <div class="flex-grow pl-2">
+            <div class="flex-grow pl-2 overflow-hidden">
                 <slot name="contents" :color="color">
                     <slot name="title">
                         <p class="title">
@@ -70,11 +71,7 @@ export default defineComponent({
         background-color: currentColor;
     }
     .contents {
-        display: flex;
-        width: 100%;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.5rem;
+        @apply flex items-center w-full content-between p-2 overflow-hidden;
     }
     &:hover {
         background-color: $hover-bg-color;
