@@ -54,7 +54,7 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs,  computed,  getCurrentInstance,
+    reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
@@ -124,11 +124,11 @@ export default {
             await tagsApi.getData();
             state.items = toDictItems(tagsApi.ts.syncState.dict);
         };
-        const onSave = () => {
+        const onSave = async () => {
             if (!state.showValidation) state.showValidation = true;
             if (!allValidation()) return;
             tagsApi.ts.syncState.dict = newDict.value;
-            tagsApi.updateData();
+            await tagsApi.updateData();
 
             goBack();
         };

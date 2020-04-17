@@ -542,7 +542,6 @@ export default {
         };
         apiHandler.getData();
         const editTag = () => {
-            console.debug(apiHandler.tableTS.selectState.firstSelectItem.service_account_id);
             vm?.$router.push({ name: 'serviceAccountTags', params: { resourceId: apiHandler.tableTS.selectState.firstSelectItem.service_account_id } });
         };
         return {
