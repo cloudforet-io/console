@@ -60,7 +60,7 @@ module.exports = {
                 .tap((opts) => {
                     opts.transpileOnly = false;
                     opts.happyPackMode = false;
-                    opts.configFile = 'tsconfig.build.json';
+                    // opts.configFile = 'tsconfig.build.json';
                     return opts;
                 });
         }
