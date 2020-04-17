@@ -26,6 +26,7 @@ import { fontUrls, webFonts } from '@/styles/web-fonts';
 
 import tailwindConfig from './tailwind.config';
 import _ from 'lodash';
+import VTooltip from 'v-tooltip';
 
 
 Vue.use(VueRouter);
@@ -41,6 +42,7 @@ Vue.use(SvgIcon, {
 Vue.use(LiquorTree);
 Vue.use(Skeleton, {prefix: 'p'});
 Vue.use(Fragment.Plugin);
+Vue.use(VTooltip, { defaultClass: 'p-tooltip' });
 
 Vue.prototype.$velocity = velocity;
 

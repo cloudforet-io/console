@@ -15,7 +15,7 @@
                           :loading="loading"
                           :items="data"
                           :top-border="false"
-                          striped
+                          class="data-table"
             >
                 <template #skeleton-rank>
                     <p-skeleton width="1.5rem" height="1.5rem" />
@@ -76,10 +76,10 @@
                         <p-td class="text-center">
                             <p-i name="ic_top1" />
                         </p-td>
-                        <p-td class="project-field">
+                        <p-td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}" class="project-field">
                             {{ item.project_group }}
                         </p-td>
-                        <p-td class="project-field">
+                        <p-td v-tooltip.bottom="{content: item.project, delay: {show: 500}}" class="project-field">
                             {{ item.project }}
                         </p-td>
                         <p-td class="text-center">
@@ -96,6 +96,16 @@
                 </template>
 
                 <!-- others -->
+                <template #col-project_group="{value}">
+                    <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
+                        {{ value }}
+                    </p-td>
+                </template>
+                <template #col-project="{value}">
+                    <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
+                        {{ value }}
+                    </p-td>
+                </template>
                 <template #col-rank-format="{index}">
                     <div class="text-center">
                         {{ index + 1 }}
@@ -137,6 +147,9 @@ import { SChartToolSet } from '@/lib/chart/toolset';
 import { SBarChart } from '@/lib/chart/bar-chart';
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import casual, { arrayOf } from '@/lib/casual';
+import { languages } from 'monaco-editor';
+
+import css = languages.css;
 
 
 export default defineComponent({
@@ -195,8 +208,8 @@ export default defineComponent({
 
         const api = async (): Promise<DataType[]> => new Promise((resolve) => {
             resolve(arrayOf(5, () => ({
-                project_group: casual.word,
-                project: casual.word,
+                project_group: casual.text,
+                project: casual.text,
                 servers: casual.integer(0, 300),
                 cloud_services: casual.integer(0, 300),
             })) as DataType[]);
@@ -237,15 +250,41 @@ export default defineComponent({
 }
 .custom-th {
     @apply flex items-center justify-center uppercase font-bold px-1;
-    font-family: theme('fontFamily.sans');
+    font-size: 0.75rem;
 }
 .project-field {
-    font-family: theme('fontFamily.sans');
-    font-size: 0.875rem;
-    font-weight: bold;
+    @apply truncate font-bold;
 }
 .p-badge {
-    font-weight: bold;
-    font-size: 0.875rem;
+    @apply font-bold;
+}
+.data-table::v-deep {
+    .p-table {
+        table-layout: fixed;
+        font-size: 0.875rem;
+    }
+    td {
+        @apply truncate;
+        &:first-child {
+            padding: 0;
+        }
+    }
+    th {
+        &:first-child {
+            width: 2.75rem;
+        }
+        &:nth-child(2) {
+            width: 8.875rem;
+        }
+        &:nth-child(3) {
+            width: 6.25rem;
+        }
+        &:nth-child(4) {
+            width: 6rem;
+        }
+        &:last-child {
+            width: 9rem;
+        }
+    }
 }
 </style>

@@ -6,11 +6,9 @@
                        position="right"
                        @click="hideSitemap"
             >
-                <template #target>
-                    <router-link to="/dashboard">
-                        <p-i name="btn_gnb_top-logo" width="56px" height="56px" />
-                    </router-link>
-                </template>
+                <router-link to="/dashboard">
+                    <p-i name="btn_gnb_top-logo" width="56px" height="56px" />
+                </router-link>
             </p-tooltip>
         </li>
         <li>

@@ -31,10 +31,10 @@
                                        @click="onSelected(item, index)"
                     >
                         <template #contents>
-                            <div class="group-name">
+                            <div v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group-name">
                                 {{ item.group }}
                             </div>
-                            <div class="name">
+                            <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="name">
                                 {{ item.name }}
                             </div>
                         </template>
@@ -130,8 +130,8 @@ export default defineComponent({
             } catch (e) {
                 state.data = arrayOf(12, () => ({
                     provider: 'aws',
-                    group: 'group name',
-                    name: 'name',
+                    group: casual.text,
+                    name: casual.text,
                     count: casual.integer(0),
                 })) as Value[];
             } finally {
@@ -164,11 +164,11 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .group-name {
-    @apply text-base font-bold mb-1;
+    @apply text-base font-bold mb-1 truncate leading-tight;
     font-family: theme('fontFamily.sans');
 }
 .name {
-    @apply text-xs text-gray;
+    @apply text-xs text-gray truncate leading-tight;
     font-family: theme('fontFamily.serif');
 }
 .count {
