@@ -1,3 +1,5 @@
+import { fluentApi } from '@/lib/fluent-api';
+
 const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
 
 const Inventory = () => import('@/views/inventory/Inventory.vue');
@@ -13,6 +15,7 @@ const Collector = () => import('@/views/inventory/collector/pages/Collector.vue'
 
 const CollectorPlugins = () => import('@/views/inventory/collector/pages/CollectorPlugins.vue');
 const CollectorCreator = () => import('@/views/inventory/collector/pages/CollectorCreator.vue');
+const TagsPage = () => import('@/views/common/tags/TagsPage.vue');
 
 export default {
     path: 'inventory',
@@ -32,9 +35,26 @@ export default {
         },
         {
             path: 'server',
-            name: 'server',
-            meta: { label: 'Server', breadcrumb: true },
-            component: Server,
+            meta: {
+                label: 'Server',
+                breadcrumb: true,
+                api: fluentApi.inventory().server(),
+            },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: 'server',
+                    component: Server,
+                },
+                {
+                    path: ':resourceId/tags',
+                    name: 'serverTags',
+                    meta: { label: 'tags' },
+                    props: true,
+                    component: TagsPage,
+                },
+            ],
         },
         {
             path: 'cloud-service',

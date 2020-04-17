@@ -11,6 +11,7 @@
 	"BTN": {
 		"ACTION": "Actions",
 		"ADD": "Add",
+		"ADD_TAG": "Add Tag",
 		"BACK": "Back",
 		"CANCEL": "Cancel",
 		"CHG_POOL": "Change Pool",

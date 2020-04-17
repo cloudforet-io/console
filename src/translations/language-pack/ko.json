@@ -11,6 +11,7 @@
 	"BTN": {
 		"ACTION": "작업",
 		"ADD": "추가",
+		"ADD_TAG": "태그 추가",
 		"BACK": "이전으",
 		"CANCEL": "취소",
 		"CHG_POOL": "풀 변경하기",

@@ -44,10 +44,13 @@
                                 :details="accountDetails"
                                 :data="apiHandler.tableTS.selectState.firstSelectItem"
                             />
-                            <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
-                                          :edit-mode.sync="tagsApi.ts.syncState.editMode"
-                                          v-on="tagsApi.ts.listeners"
-                            />
+                            <p-dict-panel :dict="apiHandler.tableTS.selectState.firstSelectItem.tags">
+                                <template #extra>
+                                    <p-button style-type="primary" @click="editTag">
+                                        {{ $t('BTN.ADD') }}
+                                    </p-button>
+                                </template>
+                            </p-dict-panel>
                         </template>
                         <template #credentials>
                             <p-dynamic-view view_type="table"
@@ -127,9 +130,8 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-
 import {
-    computed, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
@@ -161,7 +163,6 @@ import SServiceAccountFormModal from '@/views/identity/service-account/modules/S
 import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
-
 import nunjucks from 'nunjucks';
 
 export default {
@@ -185,6 +186,7 @@ export default {
     setup(props, context) {
         const { project } = useStore();
         project.getProject();
+        const vm = getCurrentInstance();
 
         const listToolset = new SelectableListToolset<unknown, unknown, ProviderModel>();
         listToolset.state.mapper.iconUrl = 'tags.icon';
@@ -281,7 +283,7 @@ export default {
 
         const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
         const isNotSelectOne = computed(() => !apiHandler.tableTS.selectState.isSelectOne);
-        const hasLink = computed(()=> isNotSelectOne.value || !listToolset.selectState.firstSelectItem?.tags?.external_link_template? true :false)
+        const hasLink = computed(() => (!!(isNotSelectOne.value || !listToolset.selectState.firstSelectItem?.tags?.external_link_template)));
         const dropdown = reactive({
             ...makeTrItems([
                 ['delete', 'BTN.DELETE', { disabled: isNotSelectOne }],
@@ -493,7 +495,6 @@ export default {
         };
         const formConfirm = (item) => {
             if (formState.mode === 'add') {
-
                 const param = {
                     provider: listToolset.selectState.firstSelectItem.provider,
                     ...item,
@@ -533,13 +534,16 @@ export default {
             await tagsApi.getData();
         });
 
-        const clickLink=()=>{
+        const clickLink = () => {
             const linkTemplate = listToolset.selectState.firstSelectItem?.tags?.external_link_template;
-            const link =  nunjucks.renderString(linkTemplate, apiHandler.tableTS.selectState.firstSelectItem)
-            console.debug(linkTemplate,link);
-            window.open(link)
-        }
+            const link = nunjucks.renderString(linkTemplate, apiHandler.tableTS.selectState.firstSelectItem);
+            console.debug(linkTemplate, link);
+            window.open(link);
+        };
         apiHandler.getData();
+        const editTag = () => {
+            vm?.$router.push({ name: 'serviceAccountTags', params: { resourceId: apiHandler.tableTS.selectState.firstSelectItem.service_account_id } });
+        };
         return {
             apiHandler,
             accountDataSource,
@@ -567,9 +571,9 @@ export default {
             secretFormConfirm,
             tagsApi,
             clickLink,
+            editTag,
         };
     },
-
 };
 
 </script>

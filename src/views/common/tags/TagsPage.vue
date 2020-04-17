@@ -1,0 +1,177 @@
+<template>
+    <general-page-layout>
+        <div class="page-nav">
+            <div class="left">
+                <p-i name="ic_back" width="2rem" height="2rem"
+                     @click="onSave()"
+                />
+
+                <div class="title">
+                    {{ resource.label || 'Service' }} / {{ resourceId }} / Tags
+                </div>
+            </div>
+            <div class="right" />
+        </div>
+        <p-pane-layout class="w-full px-4 py-8">
+            <div v-if="items.length == 0" class="comment">
+                <span class="highlight">[{{ resourceId }}]</span> 와 관련된 태그가 없습니다.<br>
+                아래 버튼을 눌러 태그를 추가할 수 있습니다.
+            </div>
+            <div v-else class="comment">
+                <span class="highlight">[{{ resourceId }}]</span> 와 관련된 태그를 추가합니다.<br>
+                키-값 페어는 필수 항목이며, 키는 문자로 시작해야하고 문자, 숫자, 밑줄만 포함할 수 있습니다.
+            </div>
+
+            <p-dict-input-group
+                :items.sync="items"
+                :disabled="loading"
+                :invalid-messages="invalidMessages"
+                :show-validation="showValidation"
+                :show-header="true"
+                v-on="dictIGListeners"
+            >
+                <template #addButton="scope">
+                    <p-button outline style-type="primary" :disabled="scope.disabled"
+                              @click="scope.addPair($event)"
+                    >
+                        <p-i name="ic_plus" />  <span>{{ $t('BTN.ADD_TAG') }}</span>
+                    </p-button>
+                </template>
+            </p-dict-input-group>
+        </p-pane-layout>
+        <div class="buttons">
+            <p-button outline style-type="primary-dark" @click="goBack">
+                {{ $t('BTN.CANCEL') }}
+            </p-button>
+            <p-button style-type="primary" @click="onSave">
+                {{ $t('BTN.SAVE') }}
+            </p-button>
+        </div>
+    </general-page-layout>
+</template>
+
+<script lang="ts">
+/* eslint-disable camelcase */
+
+import {
+    reactive, toRefs, computed, getCurrentInstance,
+} from '@vue/composition-api';
+import PButton from '@/components/atoms/buttons/Button.vue';
+import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+
+import PI from '@/components/atoms/icons/PI.vue';
+import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import {
+    DictItem,
+    dictValidation,
+    getNewDict,
+    toDictItems,
+} from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
+import _ from 'lodash';
+import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
+import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
+
+export default {
+    name: 'CloudServicePage',
+    components: {
+        GeneralPageLayout,
+        PI,
+        PButton,
+        PPaneLayout,
+        PDictInputGroup,
+    },
+    props: {
+        resourceId: {
+            type: String,
+            defulat: '',
+            // required: true,
+        },
+    },
+    setup(props, context) {
+        const vm = getCurrentInstance();
+
+        const state = reactive({
+            showValidation: true,
+            loading: false,
+            items: [] as unknown as DictItem[],
+            parentRouter: computed(() => vm?.$route.matched[vm?.$route.matched.length - 2]),
+            resource: computed(() => state.parentRouter?.meta),
+        });
+
+
+        if (!state.resource) {
+            console.error(`please add resource fluentAPI to ${state.parentRouter?.name || state.parentRouter?.path} router.meta.api`);
+        }
+        const goBack = () => {
+            vm?.$router.push(state.parentRouter?.path as string);
+        };
+
+        const tagsApi = new DictPanelAPI(state.resource.api);
+
+
+        const { invalidMessages, allValidation, itemValidation } = dictValidation(computed(() => state.items as unknown as DictItem[]));
+        const isAllValid = computed(() => _.every(invalidMessages.value, (item: any) => !item.key && !item.value));
+        const newDict = computed(() => getNewDict(state.items as unknown as DictItem[], invalidMessages.value));
+
+        const dictIGListeners = {
+            'change:value': _.debounce((idx) => { itemValidation(idx, 'value'); }, 100),
+            'change:key': _.debounce(() => { allValidation('key', false); }, 100),
+            'change:add': (idx) => { itemValidation(idx); },
+            'change:delete': () => { allValidation(); },
+        };
+        const reset = async () => {
+            tagsApi.setId(props.resourceId);
+            await tagsApi.getData();
+            state.items = toDictItems(tagsApi.ts.syncState.dict);
+        };
+        const onSave = async () => {
+            if (!state.showValidation) state.showValidation = true;
+            if (!allValidation()) return;
+            tagsApi.ts.syncState.dict = newDict.value;
+            await tagsApi.updateData();
+
+            goBack();
+        };
+        reset();
+
+        return {
+            ...toRefs(state),
+            invalidMessages,
+            goBack,
+            tagsApi,
+            onSave,
+            dictIGListeners,
+
+        };
+    },
+};
+
+</script>
+
+<style lang="postcss" scoped>
+    .page-nav{
+        @apply flex items-center justify-between mb-6;
+        .left{
+            @apply flex;
+            .title{
+                @apply font-bold text-2xl;
+                line-height: 120%;
+            }
+        }
+
+    }
+    .comment{
+        @apply mb-6;
+        line-height: 150%;
+        .highlight{
+            @apply font-bold;
+        }
+    }
+    .buttons{
+        @apply flex mt-8;
+        justify-content: flex-end;
+        .p-button{
+            @apply ml-4;
+        }
+    }
+</style>
