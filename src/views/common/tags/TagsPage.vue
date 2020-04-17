@@ -83,8 +83,12 @@ export default {
     props: {
         resourceId: {
             type: String,
-            defulat: '',
+            default: '',
             // required: true,
+        },
+        nextPath: {
+            type: String,
+            default: '',
         },
     },
     setup(props, context) {
@@ -103,7 +107,10 @@ export default {
             console.error(`please add resource fluentAPI to ${state.parentRouter?.name || state.parentRouter?.path} router.meta.api`);
         }
         const goBack = () => {
-            vm?.$router.push(state.parentRouter?.path as string);
+            if (!vm?.$route.query.nextPath) {
+                vm?.$router.push(state.parentRouter?.path as string);
+            }
+            vm?.$router.push(vm?.$route.query.nextPath as string);
         };
 
         const tagsApi = new DictPanelAPI(state.resource.api);

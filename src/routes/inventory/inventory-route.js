@@ -70,9 +70,27 @@ export default {
                 },
                 {
                     path: ':provider/:group/:name',
-                    name: 'cloudServicePage',
                     props: true,
-                    component: CloudServicePage,
+                    meta: {
+                        label: 'Cloud Service',
+                        api: fluentApi.inventory().server(),
+                    },
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: '/',
+                            name: 'cloudServicePage',
+                            props: true,
+                            component: CloudServicePage,
+                        },
+                        {
+                            path: ':resourceId/tags',
+                            name: 'cloudServicePageTags',
+                            meta: { label: 'tags' },
+                            props: true,
+                            component: TagsPage,
+                        },
+                    ],
                 },
             ],
 

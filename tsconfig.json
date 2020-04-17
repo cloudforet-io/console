@@ -13,8 +13,6 @@
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "declaration": true,
-    "outDir": "dist",
     "baseUrl": ".",
     "types": ["webpack-env"],
     "paths": {
