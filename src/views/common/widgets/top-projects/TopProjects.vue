@@ -16,6 +16,7 @@
                           :items="data"
                           :top-border="false"
                           class="data-table"
+                          @rowLeftClick="onRowClick"
             >
                 <template #skeleton-rank>
                     <p-skeleton width="1.5rem" height="1.5rem" />
@@ -72,7 +73,7 @@
 
                 <!-- top 1 row -->
                 <template #row-0="{index, fields, item}">
-                    <p-tr>
+                    <p-tr @click="onRowClick">
                         <p-td class="text-center">
                             <p-i name="ic_top1" />
                         </p-td>
@@ -130,7 +131,7 @@
 /* eslint-disable camelcase */
 import _ from 'lodash';
 import {
-    computed, defineComponent, Ref, toRefs,
+    computed, defineComponent, getCurrentInstance, Ref, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
@@ -165,6 +166,8 @@ export default defineComponent({
         PSkeleton,
     },
     setup() {
+        const vm: any = getCurrentInstance();
+
         interface DataType {
             project_group: string;
             project: string;
@@ -228,6 +231,9 @@ export default defineComponent({
 
         return {
             ...toRefs(ts.state),
+            onRowClick() {
+                vm.$router.push('/identity/project');
+            },
         };
     },
 });
@@ -264,7 +270,7 @@ export default defineComponent({
         font-size: 0.875rem;
     }
     td {
-        @apply truncate;
+        @apply truncate cursor-pointer;
         &:first-child {
             padding: 0;
         }

@@ -12,6 +12,8 @@
                       :striped="false"
                       bordered
                       table-style-type="primary4"
+                      class="data-table"
+                      @rowLeftClick="onRowClick"
         >
             <template #skeleton-name>
                 <div class="flex items-center">
@@ -39,7 +41,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, reactive, toRefs, computed,
+    defineComponent, reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -66,6 +68,7 @@ export default defineComponent({
         PDataTable,
     },
     setup() {
+        const vm: any = getCurrentInstance();
         const ts = new DataTableToolSet({
             fields: computed(() => makeTrItems([
                 ['name', 'FIELD.COLLECTOR'],
@@ -124,6 +127,9 @@ export default defineComponent({
                 return moment.tz(moment.unix(value.seconds), getTimezone()).format('MM/DD HH:mm ~');
             },
             getData,
+            onRowClick() {
+                vm.$router.push('/inventory/collector');
+            },
         };
     },
 });
@@ -137,4 +143,11 @@ export default defineComponent({
 .working-icon {
     animation: spin 2s linear infinite;
 }
+.data-table::v-deep {
+    overflow-y: auto;
+    td:first-child {
+        @apply cursor-pointer;
+    }
+}
+
 </style>
