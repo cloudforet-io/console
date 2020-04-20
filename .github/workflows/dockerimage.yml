@@ -21,11 +21,11 @@ jobs:
       uses: kciter/aws-ecr-action@v1
       with:
         # The AWS access key id
-        access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        access_key_id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
         # The AWS secret access key
-        secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        secret_access_key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
         # AWS Account ID
-        account_id: 072548720675
+        account_id: ${{ secrets.DEV_AWS_ACCOUNT_ID }}
         # Name of your ECR repository
         repo: cloudone/webconsole/client
         # The AWS region
