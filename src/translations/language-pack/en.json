@@ -6,7 +6,8 @@
 				"KEY_EMPTY": "Enter the Key.",
 				"VAL_EMPTY": "Enter the Value."
 			}
-		}
+		},
+		"SELECTED_OF": "{selectedCount} selected of {totalCount}"
 	},
 	"BTN": {
 		"ACTION": "Actions",
