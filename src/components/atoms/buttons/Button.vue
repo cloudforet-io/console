@@ -73,6 +73,7 @@ export default {
 }
 
 .btn {
+    @apply font-bold;
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -84,7 +85,6 @@ export default {
     height: 2rem;
     text-align: center;
     letter-spacing: 0;
-    font-weight: 400;
     font-size: .875rem;
     line-height: 2rem;
     border: 1px solid transparent;

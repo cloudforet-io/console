@@ -6,7 +6,8 @@
 				"KEY_EMPTY": "키를 입력해주세요.",
 				"VAL_EMPTY": "값을 입력해주세요."
 			}
-		}
+		},
+		"SELECTED_OF": "{totalCount}개 중 {selectedCount}개 선택"
 	},
 	"BTN": {
 		"ACTION": "작업",
