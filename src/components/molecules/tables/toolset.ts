@@ -1,6 +1,6 @@
 import { reactive } from '@vue/composition-api';
 import { optionalType, StateToolSet } from '@/lib/toolset';
-import {UnwrapRef} from "@vue/composition-api/dist/reactivity";
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
 const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900', 'primary4'];
@@ -53,7 +53,7 @@ export const tableProps = {
     },
     bordered: {
         type: Boolean,
-        default: null,
+        default: true,
     },
     hover: {
         type: Boolean,
@@ -109,8 +109,8 @@ export class TableState<initData, initState extends TablePropsType = TablePropsT
 
     static initState() {
         return {
-            striped: true,
-            bordered: null,
+            striped: false,
+            bordered: true,
             hover: true,
             small: false,
             background: false,

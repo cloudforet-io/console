@@ -472,8 +472,8 @@ export default defineComponent({
     @define-mixin selected-row {
         background-color: theme('colors.primary3') !important;
         td {
-            @apply text-secondary;
-        }
+            @apply text-secondary ;
+      }
     }
 
     .select-checkbox {
@@ -496,25 +496,21 @@ export default defineComponent({
                 vertical-align: middle;
                 white-space: nowrap;
                 .th-contents {
-                    display: flex;
-                    justify-content: space-between;
-                    padding: 0.25rem 0 0.25rem 0.75rem;
+                    @apply flex justify-between pl-4 py-1 text-black;
                 }
                 .sort-icon {
-                    @apply text-gray-200;
-                    float: right;
+                    @apply text-gray-500 float-right;
                 }
                 &.fix-width {
-                    min-width: 4.75rem;
+                    @apply min-w-19;
                 }
                 &:last-child {
                     .th-contents {
-                        padding-right: 1rem;
+                        @apply pr-4;
                     }
                 }
                 &.all-select {
-                    width: 1rem;
-                    padding: 0.25rem 0 0.25rem 0.75rem;
+                    @apply w-4 py-1 pl-4 max-w-15 min-w-15;
                 }
             }
         }
