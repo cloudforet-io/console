@@ -1,44 +1,47 @@
 <template>
-    <p-widget-layout class="daily-updates" title="Daily Updates" help="Daily Updates">
+    <p-widget-layout ref="widgetRef" class="daily-updates" title="Daily Updates"
+                     help="Daily Updates"
+    >
         <template #help="{help}">
-            <p-tooltip-button class="help" :tooltip="help"
-                              position="top" theme="gray"
-            >
-                <template #button>
-                    <p-i name="ic_tooltip"
-                         width="1rem" height="1rem"
-                         color="inherit transparent"
-                    />
-                </template>
-            </p-tooltip-button>
+            <p-i v-tooltip="'Daily Updates'" class="help"
+                 name="ic_tooltip" width="1rem"
+                 height="1rem"
+                 color="inherit transparent"
+            />
         </template>
         <template #default>
             <div v-if="loading" class="flex items-center overflow-hidden">
                 <p-skeleton width="2rem" height="2rem" class="mr-4" />
                 <div class="grid grid-cols-1 gap-1 w-full">
-                    <p-skeleton width="80%" />
-                    <p-skeleton width="100%" />
+                    <p-skeleton width="80%" height="0.625rem" />
+                    <p-skeleton width="100%" height="0.625rem" />
                 </div>
             </div>
-            <p-grid-layout v-else :items="data" row-gap="0.5rem"
-                           column-gap="0"
-                           card-height="auto" :card-class="() => []"
+            <div v-else-if="data.length === 0" class="h-full flex flex-col justify-center">
+                <img :src="'./images/illust_no-update.svg'" class="mb-4 flex-shrink-0 ">
+                <img :src="'./images/illust_list.svg'" class="hidden lg:block">
+            </div>
+            <p-grid-layout v-else :items="data"
+                           row-gap="0.5rem" column-gap="0"
+                           :fix-column="1" card-height="auto"
+                           card-min-width="0"
+                           :card-class="() => []"
             >
                 <template #card="{item, index}">
-                    <p-selectable-item :icon-url="iconUrl(item)" theme="card"
-                                       @click="onItemClick(item, idx)"
-                    >
+                    <p-selectable-item :icon-url="iconUrl(item)" theme="card" @click="onItemClick(item, idx)">
                         <template #contents>
-                            <div class="group-name">
+                            <div v-tooltip.bottom-start="{content: item.group, delay: {show: 500}}" class="group-name">
                                 {{ item.group }}
                             </div>
-                            <div class="name">
+                            <div v-tooltip.bottom-start="{content: item.name, delay: {show: 500}}" class="name">
                                 {{ item.name }}
                             </div>
                         </template>
                         <template #extra>
-                            <p-i :name="getIcon(item.count)" height="0.75rem" width="0.75rem" />
-                            <span class="count">{{ item.count }}</span>
+                            <div class="inline-flex items-center">
+                                <p-i :name="getIcon(item.count)" height="0.75rem" width="0.75rem" />
+                                <span class="count">{{ Math.abs(item.count) }}</span>
+                            </div>
                         </template>
                     </p-selectable-item>
                 </template>
@@ -69,6 +72,7 @@ import { number } from '@storybook/addon-knobs';
 import casual, { arrayOf } from '@/lib/casual';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import _ from 'lodash';
+import { VTooltip } from 'v-tooltip';
 
 export default defineComponent({
     name: 'DailyUpdates',
@@ -115,6 +119,7 @@ export default defineComponent({
             data: Data[];
             loading: boolean;
             providers: ProviderInfo;
+            widgetRef: any;
         }
 
         const state: UnwrapRef<StateInterface> = reactive({
@@ -123,6 +128,7 @@ export default defineComponent({
             data: [],
             loading: true,
             providers: computed(() => providerStore.state.providers),
+            widgetRef: null,
         });
 
 
@@ -136,8 +142,6 @@ export default defineComponent({
                 const res = await serverApi.execute();
                 state.serverData = res.data.values;
             } catch (e) {
-                console.error(e);
-                // TODO: no data
                 state.serverData = [{
                     count: casual.integer(-30, 30),
                 }];
@@ -155,14 +159,12 @@ export default defineComponent({
                 const res = await cloudServiceApi.execute();
                 state.cloudServiceData = res.data.values;
             } catch (e) {
-                console.error(e);
-                // TODO: no data
                 state.cloudServiceData = arrayOf(casual.integer(5, 15), () => ({
                     provider: casual.random_element(['aws', 'azure', 'google_cloud']),
                     // eslint-disable-next-line camelcase
-                    cloud_service_type: casual.word,
+                    cloud_service_type: casual.title,
                     // eslint-disable-next-line camelcase
-                    cloud_service_group: casual.word,
+                    cloud_service_group: casual.full_name,
                     count: casual.integer(-30, 30),
                 })) as CloudService[];
             }
@@ -189,7 +191,10 @@ export default defineComponent({
             state.loading = false;
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+            console.log(vm.$el);
+        }, 1000);
 
         return {
             ...toRefs(state),
@@ -213,15 +218,17 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .daily-updates {
-    overflow-y: auto;
     background-color: rgba(theme('colors.white'), 0.8);
+    &::v-deep .widget-contents {
+        overflow-y: auto;
+    }
 }
 .group-name {
-    @apply text-base font-bold mb-1;
+    @apply text-base font-bold mb-1 truncate leading-tight;
     font-family: theme('fontFamily.sans');
 }
 .name {
-    @apply text-xs text-gray;
+    @apply text-xs text-gray truncate leading-tight;
     font-family: theme('fontFamily.serif');
 }
 .count {

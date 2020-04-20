@@ -11,6 +11,7 @@
 	"BTN": {
 		"ACTION": "",
 		"ADD": "",
+		"ADD_TAG": "",
 		"BACK": "",
 		"CANCEL": "",
 		"CHG_POOL": "",

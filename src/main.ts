@@ -19,7 +19,7 @@ import Skeleton from 'vue-loading-skeleton';
 import Fragment from 'vue-fragment';
 import App from './App.vue';
 import '@/styles/style.scss';
-
+import VTooltip from 'v-tooltip';
 
 Vue.mixin(Util);
 Vue.use(VueCookies);
@@ -35,6 +35,7 @@ Vue.use(LiquorTree);
 // @ts-ignore
 Vue.use(Skeleton, { prefix: 'p' });
 Vue.use(Fragment.Plugin);
+Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 
 Vue.prototype.$velocity = velocity;
 

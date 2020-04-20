@@ -3,26 +3,28 @@
         <p-panel-top>
             <template>{{ $t('WORD.TAGS') }}</template>
             <template #extra>
-                <p-button v-if="!editMode" style-type="primary-dark"
-                          @click="onClickEditMode"
-                >
-                    {{ $t('BTN.EDIT') }}
-                </p-button>
-                <div v-else class="extra-btns">
-                    <p-button style-type="secondary" outline
-                              :disabled="loading"
-                              @click="onCancel"
+                <slot name="extra">
+                    <p-button v-if="!editMode" style-type="primary-dark"
+                              @click="onClickEditMode"
                     >
-                        {{ $t('BTN.CANCEL') }}
+                        {{ $t('BTN.EDIT') }}
                     </p-button>
-                    <p-loading-button :loading="loading"
-                                      :disabled="showValidation && !isAllValid"
-                                      :button-bind="{styleType: 'secondary'}"
-                                      @click="onSave"
-                    >
-                        {{ $t('BTN.SAVE') }}
-                    </p-loading-button>
-                </div>
+                    <div v-else class="extra-btns">
+                        <p-button style-type="secondary" outline
+                                  :disabled="loading"
+                                  @click="onCancel"
+                        >
+                            {{ $t('BTN.CANCEL') }}
+                        </p-button>
+                        <p-loading-button :loading="loading"
+                                          :disabled="showValidation && !isAllValid"
+                                          :button-bind="{styleType: 'secondary'}"
+                                          @click="onSave"
+                        >
+                            {{ $t('BTN.SAVE') }}
+                        </p-loading-button>
+                    </div>
+                </slot>
             </template>
         </p-panel-top>
         <p-dict-input-group v-if="editMode"

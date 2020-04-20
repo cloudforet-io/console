@@ -66,5 +66,5 @@ class Query<value> extends StatQueryAPI<undefined, StatResponse<value>> {
 export default class Stat extends Resource implements ResourceActions<'query'> {
     name = 'stat'
 
-    query<value>(): Query<value> { return new Query<value>(this.baseUrl); }
+    query<value>(): Query<value> { return new Query<value>(this.api, this.baseUrl); }
 }

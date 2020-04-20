@@ -16,6 +16,8 @@ COPY pkg/nginx.conf ${NGINX_CONF_PATH}/spaceone_console.conf
 
 COPY package.json package-lock.json *.js ${BUILD_PATH}/
 RUN npm install
+RUN npm install -g increase-memory-limit
+RUN increase-memory-limit
 
 COPY public ${BUILD_PATH}/public
 COPY src ${BUILD_PATH}/src

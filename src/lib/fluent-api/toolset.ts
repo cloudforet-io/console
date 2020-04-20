@@ -1,14 +1,13 @@
 /* eslint-disable camelcase, @typescript-eslint/no-explicit-any */
-import { AxiosResponse } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
-import { api } from '@/lib/api/axios';
 import {
     ApiMethods,
-    FilterType,
-    Query,
     FilterItem,
-    ShortFilterType,
+    FilterType,
     GetActionState,
+    Query,
+    ShortFilterType,
     RawParameterActionState,
     QueryApiState,
     StatQueryApiState,
@@ -17,6 +16,10 @@ import {
 } from '@/lib/fluent-api/type';
 import { isNotEmpty } from '@/lib/util';
 
+
+export interface ApiType {
+    instance: AxiosInstance;
+}
 
 export abstract class ActionAPI<parameter=any, resp=any> {
     protected abstract path: string;
@@ -34,9 +37,9 @@ export abstract class ActionAPI<parameter=any, resp=any> {
     async execute(): Promise<AxiosResponse<resp>> {
         let resp: AxiosResponse<resp> | any;
         if (this.method === 'get') {
-            resp = await api.instance[this.method](this.url);
+            resp = await this.api.instance[this.method](this.url);
         } else {
-            resp = await api.instance[this.method as string](this.url, this.getParameter());
+            resp = await this.api.instance[this.method as string](this.url, this.getParameter());
         }
         if (this.transformer) {
             resp = await this.transformer(resp);
@@ -45,6 +48,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
     }
 
     protected constructor(
+        public api: ApiType,
         baseUrl: string,
         apiState?: any,
         transformer: ((any) => any|Promise<any>)|null = null,
@@ -79,7 +83,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
 
     clone(): this {
         // @ts-ignore
-        return new this.constructor(this.baseUrl, this.apiState, this.transformer);
+        return new this.constructor(this.api, this.baseUrl, this.apiState, this.transformer);
     }
 }
 export const OPERATOR_MAP = Object.freeze({
@@ -146,11 +150,12 @@ export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter,
     protected apiState: BaseQueryState<parameter> ;
 
     protected constructor(
+        api: ApiType,
         baseUrl: string,
         initState: BaseQueryState<parameter> = {} as BaseQueryState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             filter: [],
             filterOr: [],
@@ -200,11 +205,12 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     protected apiState: QueryApiState<parameter> ;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: QueryApiState<parameter> = {} as unknown as QueryApiState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             filter: [] as unknown as FilterItem[],
             fixFilter: [] as unknown as FilterItem[],
@@ -287,11 +293,12 @@ export abstract class StatisticsQueryAPI<parameter, resp> extends ActionAPI<para
     protected apiState: StatQueryApiState<parameter>;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: StatQueryApiState<parameter> = {} as StatQueryApiState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             filter: [],
             limit: undefined,
@@ -358,11 +365,12 @@ export abstract class RawParameterAction<parameter, resp> extends ActionAPI<para
     protected apiState: RawParameterActionState<parameter>;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: RawParameterActionState<parameter> = { parameter: {} as parameter },
         transformer: ((any) => any|Promise<any>)|null = null,
     ) {
-        super(baseUrl, initState, transformer);
+        super(api, baseUrl, initState, transformer);
         this.apiState = {
             ...initState,
         };
@@ -409,8 +417,8 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
 
     protected apiState: TreeActionState<parameter>;
 
-    constructor(baseUrl: string, initState: TreeActionState<parameter> = {} as unknown as TreeActionState<parameter>, transformer: null|((any) => any) = null) {
-        super(baseUrl, undefined, transformer);
+    constructor(api: ApiType, baseUrl: string, initState: TreeActionState<parameter> = {} as unknown as TreeActionState<parameter>, transformer: null|((any) => any) = null) {
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             rootItemType: 'ROOT',
             item_id: '',
@@ -493,6 +501,7 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
     protected apiState: GetActionState<parameter>;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         apiState: GetActionState<parameter> = {
             parameter: {} as parameter,
@@ -500,7 +509,7 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
         },
         transformer: ((any) => any | Promise<any>) | null = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = apiState;
     }
 
@@ -646,14 +655,16 @@ export abstract class Resource {
         return `/${this.service}/${this.name}/`;
     }
 
-    constructor(protected service: string) {
+    constructor(public api: ApiType, protected service: string) {
     }
 }
 
-export type ServiceResources<resources extends string> = { [key in resources]?: (service: string) => Resource};
+export type ServiceResources<resources extends string> = { [key in resources]?: (api: ApiType, service: string) => Resource};
 
 export abstract class Service {
     protected abstract name: string;
+
+    constructor(public api: ApiType) { }
 }
 
 export interface BaseResources<parameter, resp> extends Resource, ResourceActions<'update'|'get'>{}

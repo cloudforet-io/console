@@ -5,6 +5,7 @@ import {
 } from '@/lib/toolset';
 import _ from 'lodash';
 import { Computed } from '@/lib/type';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 
 
 export const dataTableProps = {
@@ -47,13 +48,13 @@ export const dataTableProps = {
         type: Boolean,
         default: false,
     },
-    useSpinnerLoading: {
-        type: Boolean,
-        default: false,
-    },
     useCursorLoading: {
         type: Boolean,
         default: false,
+    },
+    skeletonRows: {
+        type: Number,
+        default: 5,
     },
     /**
      * @name multiSelect
@@ -66,15 +67,15 @@ export const dataTableProps = {
 };
 
 export interface DataTablePropsType extends TablePropsType {
-    fields?: any[];
+    fields?: any[] | Readonly<any[]>;
     items?: any[];
     sortable?: boolean;
     dragable?: boolean;
     rowClickMultiSelectMode?: boolean;
     selectable?: boolean;
     colCopy?: boolean;
-    useSpinnerLoading?: boolean;
     useCursorLoading?: boolean;
+    skeletonRows?: number;
     multiSelect?: boolean;
 }
 export interface DataTableSyncType {
@@ -93,8 +94,8 @@ export interface DataTableSetupProps extends DataTablePropsType, DataTableSyncTy
     selectIndex: any[]|number;
     colCopy: boolean;
     loading: boolean;
-    useSpinnerLoading: boolean;
     useCursorLoading: boolean;
+    skeletonRows: number;
     multiSelect: boolean;
     sortBy: string;
     sortDesc: boolean;
@@ -108,7 +109,7 @@ export class DataTableState<
         initState extends DataTablePropsType = DataTablePropsType,
         initSync extends DataTableSyncType= DataTableSyncType
     > extends TableState< initData, initState> {
-    syncState: optionalType<initSync, initSyncData>;
+    syncState: UnwrapRef<optionalType<initSync, initSyncData>>;
 
     static initState() {
         return {
@@ -121,8 +122,8 @@ export class DataTableState<
             selectable: false,
 
             colCopy: false,
-            useSpinnerLoading: true,
             useCursorLoading: true,
+            skeletonRows: 5,
             multiSelect: true,
         };
     }
@@ -138,8 +139,8 @@ export class DataTableState<
 
     constructor(initData: initData = {} as initData, initSyncData: initSyncData = {} as initSyncData, lazy = false) {
         super(initData, true);
-        this.state = initReactive<optionalType<initState, initData>>(lazy, DataTableState.initState(), initData);
-        this.syncState = initReactive<optionalType<initSync, initSyncData>>(lazy, DataTableState.initSyncState(), initSyncData);
+        this.state = initReactive<UnwrapRef<optionalType<initState, initData>>>(lazy, DataTableState.initState(), initData);
+        this.syncState = initReactive<UnwrapRef<optionalType<initSync, initSyncData>>>(lazy, DataTableState.initSyncState(), initSyncData);
     }
 }
 

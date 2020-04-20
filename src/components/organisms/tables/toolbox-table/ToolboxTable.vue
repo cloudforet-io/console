@@ -71,8 +71,8 @@
             :top-border="topBorder"
             :responsive="responsive"
             :loading="loading"
-            :use-spinner-loading="useSpinnerLoading"
             :use-cursor-loading="useCursorLoading"
+            :skeleton-rows="pageSize"
             v-on="$listeners"
             @changeSort="changeSort"
         >

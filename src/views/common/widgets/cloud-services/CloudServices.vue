@@ -1,26 +1,40 @@
 <template>
     <p-widget-layout title="Cloud Services">
         <template #default>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2">
+            <div class="grid gap-2
+                        grid-cols-1
+                        sm:grid-cols-2
+                        lg:grid-cols-3
+                        xl:grid-cols-4
+                        2xl:grid-cols-6"
+            >
                 <template v-if="loading">
                     <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
                         <p-skeleton width="2rem" height="2rem" class="mr-4" />
                         <div class="grid grid-cols-1 gap-1 w-full">
-                            <p-skeleton width="80%" />
-                            <p-skeleton width="100%" />
+                            <p-skeleton width="80%" height="0.625rem" />
+                            <p-skeleton width="100%" height="0.625rem" />
                         </div>
                     </div>
                 </template>
+                <router-link v-else-if="data.length === 0" to="/inventory/cloud-service"
+                             class="no-data rounded-sm bg-gray-100 flex items-center justify-center"
+                >
+                    <p-i name="ic_plus_square" width="1rem" height="1rem"
+                         class="mr-4"
+                    />
+                    Create a Collector
+                </router-link>
                 <template v-else>
                     <p-selectable-item v-for="(item, index) in data" :key="index"
                                        :icon-url="iconUrl(item)" theme="card"
                                        @click="onSelected(item, index)"
                     >
                         <template #contents>
-                            <div class="group-name">
+                            <div v-tooltip.bottom="{content: item.group, delay: {show: 500}}" class="group-name">
                                 {{ item.group }}
                             </div>
-                            <div class="name">
+                            <div v-tooltip.bottom="{content: item.name, delay: {show: 500}}" class="name">
                                 {{ item.name }}
                             </div>
                         </template>
@@ -114,12 +128,10 @@ export default defineComponent({
                 const res = await api.execute();
                 state.data = res.data.values;
             } catch (e) {
-                console.error(e);
-                // TODO: no data
                 state.data = arrayOf(12, () => ({
                     provider: 'aws',
-                    group: 'group name',
-                    name: 'name',
+                    group: casual.text,
+                    name: casual.text,
                     count: casual.integer(0),
                 })) as Value[];
             } finally {
@@ -127,7 +139,9 @@ export default defineComponent({
             }
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+        }, 1000);
 
         return {
             ...toRefs(state),
@@ -150,11 +164,11 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .group-name {
-    @apply text-base font-bold mb-1;
+    @apply text-base font-bold mb-1 truncate leading-tight;
     font-family: theme('fontFamily.sans');
 }
 .name {
-    @apply text-xs text-gray;
+    @apply text-xs text-gray truncate leading-tight;
     font-family: theme('fontFamily.serif');
 }
 .count {
@@ -162,5 +176,8 @@ export default defineComponent({
 }
 .more {
     @apply text-sm text-blue-600 font-normal float-right inline-flex items-center cursor-pointer;
+}
+.no-data {
+    height: 3.5rem;
 }
 </style>

@@ -4,5 +4,5 @@ import Excel from '@/lib/fluent-api/add-ons/excel';
 export default class AddOns extends Service implements ServiceResources<'excel'> {
     protected name = 'add-ons';
 
-    excel() { return new Excel(this.name); }
+    excel() { return new Excel(this.api, this.name); }
 }

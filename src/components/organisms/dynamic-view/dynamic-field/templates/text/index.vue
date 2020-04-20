@@ -14,7 +14,7 @@ export default {
         },
     },
     render(h, { props, data }) {
-        let text:string = (typeof props.data === 'string') ? props.data : JSON.stringify(props.data);
+        let text: string = (typeof props.data === 'string') ? props.data : JSON.stringify(props.data);
         text = text === 'null' ? '' : text;
         return h('span', data, text);
     },

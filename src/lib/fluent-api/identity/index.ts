@@ -8,13 +8,13 @@ import Provider from '@/lib/fluent-api/identity/provider';
 export default class Identity extends Service {
     protected name = 'identity'
 
-    project() { return new Project(this.name); }
+    project() { return new Project(this.api, this.name); }
 
-    projectGroup() { return new ProjectGroup(this.name); }
+    projectGroup() { return new ProjectGroup(this.api, this.name); }
 
-    user() { return new User(this.name); }
+    user() { return new User(this.api, this.name); }
 
-    serviceAccount() { return new ServiceAccount(this.name); }
+    serviceAccount() { return new ServiceAccount(this.api, this.name); }
 
-    provider() { return new Provider(this.name); }
+    provider() { return new Provider(this.api, this.name); }
 }

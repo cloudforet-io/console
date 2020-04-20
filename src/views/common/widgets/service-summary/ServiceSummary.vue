@@ -1,16 +1,20 @@
 <template>
-    <p-widget-layout :title="title" :padding="false">
+    <p-widget-layout :title="title" class="service-summary">
         <router-link class="count" :to="to" :style="{
             color: countColor,
         }"
         >
             <animated-number :value="count"
                              :format-value="countFormatter"
-                             :duration="3000"
+                             :duration="1500"
+                             :round="1"
                              easing="easeInOutSine"
             />
         </router-link>
         <p-chart-loader :loading="loading" class="line-chart">
+            <template #loader>
+                &zwnj;
+            </template>
             <canvas ref="chartRef" />
         </p-chart-loader>
     </p-widget-layout>
@@ -33,7 +37,7 @@ import { SChartToolSet } from '@/lib/chart/toolset';
 import { HistoryQueryAPI, HistoryResponse, OPERATORS } from '@/lib/fluent-api/statistics/toolset';
 import { gray } from '@/styles/colors';
 import casual, { arrayOf } from '@/lib/casual';
-// TODO: browser tooltip for exact count
+
 export default defineComponent({
     name: 'ServiceSummary',
     components: { PWidgetLayout, PChartLoader, AnimatedNumber },
@@ -72,15 +76,15 @@ export default defineComponent({
                 const res = await summaryApi.value.execute();
                 ts.state.data = res.data.values.map(d => d.count);
             } catch (e) {
-                console.error(e);
-                // TODO: no data case
                 ts.state.data = arrayOf(7, () => casual.integer(0, 1000000));
             } finally {
                 ts.state.loading = false;
             }
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+        }, 1000);
 
         return {
             ...toRefs(ts.state),
@@ -95,6 +99,9 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
+.service-summary::v-deep .widget-contents {
+    padding: 0;
+}
 .count {
     display: inline-block;
     line-height: 3rem;

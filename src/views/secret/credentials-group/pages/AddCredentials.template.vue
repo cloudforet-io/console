@@ -31,7 +31,6 @@
                 :page-size.sync="pageSize"
                 :setting-visible="false"
                 :loading="loading"
-                :use-spinner-loading="true"
                 :use-cursor-loading="true"
                 @rowLeftClick="onSelect"
                 @changePageSize="getCd"

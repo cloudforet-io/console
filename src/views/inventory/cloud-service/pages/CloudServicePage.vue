@@ -48,6 +48,13 @@
                     :details="apiHandler.tableTS.selectState.firstSelectItem.metadata.details"
                     :data="apiHandler.tableTS.selectState.firstSelectItem"
                 />
+                <p-dict-panel :dict="apiHandler.tableTS.selectState.firstSelectItem.tags">
+                    <template #extra>
+                        <p-button style-type="primary" @click="editTag">
+                            {{ $t('BTN.ADD') }}
+                        </p-button>
+                    </template>
+                </p-dict-panel>
             </template>
             <template #data>
                 <PDynamicSubData
@@ -108,7 +115,7 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, ref, computed, watch,
+    reactive, toRefs, ref, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import {
@@ -147,6 +154,7 @@ import { ChangeCloudServiceProject } from '@/lib/api/fetch';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 
 export default {
     name: 'CloudServicePage',
@@ -169,6 +177,7 @@ export default {
         PEmpty,
         SProjectTreeModal,
         SCollectModal,
+        PDictPanel,
     },
     props: {
         provider: {
@@ -187,6 +196,8 @@ export default {
 
     },
     setup(props, context) {
+        const vm = getCurrentInstance();
+
         const state = reactive({
             originDataSource: [],
             dataSource: computed(() => [
@@ -355,7 +366,15 @@ export default {
         // @ts-ignore
         const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
 
-
+        const editTag = () => {
+            vm?.$router.push({
+                name: 'cloudServicePageTags',
+                params: { resourceId: apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id },
+                query: {
+                    nextPath: vm?.$route.fullPath,
+                },
+            });
+        };
         return {
             ...toRefs(state),
             apiHandler,
@@ -371,6 +390,7 @@ export default {
             multiItemTab,
             adminApiHandler,
             historyAPIHandler,
+            editTag,
         };
     },
 };

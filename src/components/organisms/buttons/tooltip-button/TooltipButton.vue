@@ -3,21 +3,19 @@
         <p-tooltip :contents="tooltip" :position="position" :options="options"
                    v-on="$listeners"
         >
-            <template #target>
-                <span class="inline-flex">
-                    <slot name="button" :active="active">
-                        <p-button ref="button" class="tooltip-btn" :class="{
-                            active: active,
-                            [theme]: true
-                        }"
-                        >
-                            <slot name="buttonContents">
-                                {{ contents }}
-                            </slot>
-                        </p-button>
-                    </slot>
-                </span>
-            </template>
+            <span class="inline-flex">
+                <slot name="button" :active="active">
+                    <p-button ref="button" class="tooltip-btn" :class="{
+                        active: active,
+                        [theme]: true
+                    }"
+                    >
+                        <slot name="buttonContents">
+                            {{ contents }}
+                        </slot>
+                    </p-button>
+                </slot>
+            </span>
         </p-tooltip>
     </div>
 </template>

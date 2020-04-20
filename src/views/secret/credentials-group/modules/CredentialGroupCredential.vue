@@ -21,7 +21,6 @@
             :border="false"
             :padding="false"
             :loading="loading"
-            :use-spinner-loading="true"
             :use-cursor-loading="true"
             @changePageSize="getData"
             @changePageNumber="getData"

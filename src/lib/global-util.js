@@ -39,33 +39,6 @@ export const Util = {
             return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
         },
         /** ********************************************************************************
-         * Name       : consoleLogEnv
-         * Input   => (s: any String   => String)
-         *             o: any object   => Object)
-         * Output  => print out on console.log
-         * Description:  Console.log if only when it's not in production.
-         ********************************************************************************* */
-        consoleLogEnv(s, o) {
-            const processEnv = this.$root.$options.components.App.props.processEnv.default;
-            if (!this.isEmpty(processEnv) && processEnv != 'production') {
-                if (!this.isEmpty(o)) {
-                    console.log(s, o);
-                } else {
-                    console.log(s);
-                }
-            }
-        },
-        /** ********************************************************************************
-         * Name       : colSelector
-         * Input   => (l: length of data   => Number)
-         * Output  => (String): with First letter
-         * Description:  return String with selected col size
-         ********************************************************************************* */
-        colSelector(l) {
-            const colNumber = Math.round(12 / l);
-            return `col-xs-6 col-sm-6 col-md-6 col-lg-${colNumber} col`;
-        },
-        /** ********************************************************************************
          * Name       : isSelectedType
          * Input   => (t: type to check  =>  n: Number, s:String, b:Boolean, o:Object, a:Arr
          *             d: data to check  => Any)
@@ -90,50 +63,6 @@ export const Util = {
                 return Array.isArray(d);
             }
             throw 'Please, Check data type';
-        },
-        /** ********************************************************************************
-         * Name       : selectIconHtml
-         * Input   => (o: icon object   =>  Object, c: class)
-         *            {type: type of font awesome ex: fal, fab,
-         *             icon: icon name,
-         *             size: size of icon ex: -1 ~ 10
-         *             color: variant color
-         *            }
-         * Output  => boolean whether it's checked type
-         * Description:  Create a string of <i/> Dom tag with given option
-         ********************************************************************************* */
-        selectIconHtml(o, c) {
-            /** ****************************************************************
-             * Note:: Please add a new type letter when New font Type has added.
-             * ****************************************************************
-             */
-            const fontAwesome = ['l', 'b', 'd', 's'];
-            let returnHtml = '';
-            let defaultClass = 'fal ';
-            if (o.hasOwnProperty('type') && fontAwesome.includes(o.type)) {
-                defaultClass = `fa${o.type} `;
-            }
-            if (o.hasOwnProperty('icon')) {
-                defaultClass += o.icon;
-            } else {
-                defaultClass += 'fa-hashtag';
-            }
-            if (o.hasOwnProperty('size') && o.size > -2 && o.size <= 10) {
-                if (o.size === -1) {
-                    defaultClass += ' fa-xs';
-                } else if (o.size === 0) {
-                    defaultClass += ' fa-sm';
-                } else if (o.size === 1) {
-                    defaultClass += ' fa-lg';
-                } else {
-                    defaultClass += ` fa-${o.size}x`;
-                }
-            }
-            if (o.hasOwnProperty('color')) {
-                defaultClass += ` ${o.color}`;
-            }
-            returnHtml = `<i class="${defaultClass}"> </i>`;
-            return c ? defaultClass : returnHtml;
         },
         // /** ********************************************************************************
         //  * Name       : tr
@@ -304,26 +233,6 @@ export const Util = {
          * Output  => Boolean or Null
          * Description:  return the result of validation
          ********************************************************************************* */
-        validateSameness(value, boolOnly, checkValue) {
-            if (this.isEmpty(value) || this.isEmpty(checkValue)) {
-                if (boolOnly) {
-                    return false;
-                }
-                return null;
-            }
-            if (value !== checkValue) {
-                return false;
-            }
-            return true;
-        },
-        /** ********************************************************************************
-         * Name       : validateSameness
-         * Input   => (value                           =>  String
-         *             boolOnly                        =>  Bolean
-         *             checkValue                      =>  String)
-         * Output  => Boolean or Null
-         * Description:  return the result of validation
-         ********************************************************************************* */
         getSelectedValArr(data, path) {
             const returnArray = [];
             if (data.length > 0) {
@@ -336,84 +245,6 @@ export const Util = {
             return returnArray;
         },
         /** ********************************************************************************
-         * Name       : isImageUrlValid
-         * Input   => (url                            =>   String
-         * Output  => Boolean
-         * Description:  return image url is valid
-         ********************************************************************************* */
-        async isImageUrlValid(url) {
-            async function checkImage(imageSrc, good, bad) {
-                const img = new Image();
-                img.onload = await good;
-                img.onerror = await bad;
-                img.src = imageSrc;
-            }
-            const returnVal = await checkImage(url, () => true, () => false);
-            return returnVal;
-        },
-        /** ********************************************************************************
-         * Name       : validateSameness
-         * Input   => (value                           =>  String
-         *             boolOnly                        =>  Bolean
-         *             checkValue                      =>  String)
-         * Output  => Boolean or Null
-         * Description:  return the result of validation
-         ********************************************************************************* */
-        getRightChildrenIndex(ref_data, key) {
-            let returnVal = [];
-            if (this.isEmpty(key)) {
-                return returnVal;
-            }
-
-            // means Array
-            if (this.isSelectedType(key, 'a')) {
-                key.forEach((curItem) => {
-                    const index = ref_data.findIndex(x => x.$options.name === curItem);
-                    if (index > -1) {
-                        returnVal.push(index);
-                    }
-                });
-            } else {
-                returnVal = ref_data.findIndex(x => x.$options.name === key);
-            }
-
-            return returnVal;
-        },
-        /** ********************************************************************************
-         * Name       : selectIconType
-         * Input   => (value                           =>  String
-         *             boolOnly                        =>  Bolean
-         *             checkValue                      =>  String)
-         * Output  => Boolean true or false
-         * Description:  return the result of validation
-         ********************************************************************************* */
-        selectIconType(tag) {
-            let returnVal = false;
-            let allowedIcon = null;
-
-            if (!this.isEmpty(tag)) {
-                let key = '';
-                const iconVal = tag.hasOwnProperty('icon') ? tag.icon : this.isSelectedType(tag, 's') ? tag : '';
-                if (tag.hasOwnProperty('icon')) {
-                    key = tag.icon.includes('svg') ? 'src' : 'file_name';
-                } else if (this.isSelectedType(tag, 's')) {
-                    key = 'file_name';
-                }
-                allowedIcon = iconVal.toUpperCase().includes('AWS') ? _.get(GlobalEnum, 'COLLECTOR.AWS') : allowedIcon;
-                returnVal = !this.isEmpty(allowedIcon) ? allowedIcon.some(icon => icon[key] === iconVal) : returnVal;
-            }
-            return returnVal;
-        },
-        /** ********************************************************************************
-         * Name       : getCollectModeSelectList
-         *
-         * Output  => Array
-         * Description:  return Array of language select list.
-         ********************************************************************************* */
-        getCollectModeSelectList() {
-            return Object.values(GlobalEnum.COLLECT_MODE);
-        },
-        /** ********************************************************************************
          * Name       : replaceAll
          *
          * Output  => Array
@@ -421,37 +252,6 @@ export const Util = {
          ********************************************************************************* */
         replaceAll(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
-        },
-        /** ********************************************************************************
-         * Name       : replaceFilterFormat
-         * str : String
-         * int : Integer
-         * bool: Boolean
-         * float: Float
-         * list: List (seperate by comma)
-         * Output  => Array
-         * Description:  return appropriate type by its key.
-         ********************************************************************************* */
-        replaceFilterFormat(str, placeHolder) {
-            let returnVal = '';
-
-            const filterFormatArr = {
-                str: 'String',
-                int: 'Integer',
-                bool: 'Boolean',
-                float: 'Float',
-                list: 'List',
-            };
-
-            const holderAdditional = {
-                list: '(seperate by comma)',
-            };
-
-            if (filterFormatArr.hasOwnProperty(str)) {
-                returnVal = (placeHolder && holderAdditional.hasOwnProperty(str)) ? `${filterFormatArr[str]} ${holderAdditional[str]}` : filterFormatArr[str];
-            }
-
-            return returnVal;
         },
     },
     data() {

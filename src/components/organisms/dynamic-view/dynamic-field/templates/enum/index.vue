@@ -13,7 +13,7 @@ export default {
             default: () => {},
         },
         data: {
-            type: String,
+            type: [String, Object, Array, Boolean, Number],
             required: true,
         },
     },

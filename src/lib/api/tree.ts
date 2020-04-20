@@ -171,7 +171,6 @@ export class ProjectTreeAPI<
         };
 
         protected toNode = (data: ProjectItemResp[]|ProjectGroupItem[]) => {
-            console.log(data);
             // @ts-ignore
             return data.map((item) => {
                 if (item.item_type) {

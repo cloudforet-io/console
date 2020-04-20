@@ -16,7 +16,6 @@
                          :page-size.sync="pageSize"
                          :setting-visible="false"
                          :loading="loading"
-                         use-spinner-loading
                          use-cursor-loading
                          @changePageSize="listCredentials"
                          @changePageNumber="listCredentials"

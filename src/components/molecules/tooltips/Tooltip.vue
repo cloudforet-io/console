@@ -1,10 +1,9 @@
 <template>
-    <span v-tooltip="tooltipOptions"
-          class="p-tooltip-target"
-          v-on="$listeners"
+    <component :is="tag" v-tooltip="tooltipOptions"
+               v-on="$listeners"
     >
-        <slot name="target" />
-    </span>
+        <slot />
+    </component>
 </template>
 
 <script>
@@ -16,6 +15,10 @@ export default {
     name: 'PTooltip',
     directives: { tooltip: VTooltip },
     props: {
+        tag: {
+            type: String,
+            default: 'span',
+        },
         contents: {
             type: String,
             default: null,
@@ -50,9 +53,6 @@ export default {
 
 <style lang="postcss">
     $space: 8px;
-    .p-tooltip-target {
-        display: inline-flex;
-    }
     .p-tooltip {
         display: block !important;
         z-index: 10000;
