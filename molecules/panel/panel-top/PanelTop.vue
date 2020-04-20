@@ -20,7 +20,7 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
     .p-panel-top {
-        margin-bottom: 1rem;
+        @apply mb-4 mx-4;
         .top-contents {
             display: flex;
             width: 100%;
