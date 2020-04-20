@@ -32,10 +32,11 @@ jobs:
         region: ap-northeast-2
         # Comma-separated string of ECR image tags
         tags: latest,${{ github.sha }}
-
-    - uses: Embraser01/update-git-branch-action@v1.0.0
-      if: github.ref == 'refs/heads/master'
+    
+    - name: Merge to uat branch
+      uses: devmasx/merge-branch@v1.1.0
       with:
-        branch: build
-        # To push-force to the branch
-        force: 1
+        type: now
+        target_branch: 'build'
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
