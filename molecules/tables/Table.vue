@@ -50,7 +50,7 @@ export default defineComponent({
         const classObject: any = computed((): Array<object | string> => {
             let obj: Array<object | string> = [
                 { 'table-sm': props.small },
-                { 'table-striped': props.striped },
+                // { 'table-striped': props.striped },
                 { 'table-hover': props.hover },
                 { 'top-border': props.topBorder },
             ];
@@ -143,17 +143,14 @@ export default defineComponent({
         }
         tr {
             td {
-                height: 2.5rem;
-                padding: 0 0.75rem;
-                z-index: 0;
-                white-space: nowrap;
-                overflow: hidden;
+                @apply h-10 px-4 z-0 whitespace-no-wrap overflow-hidden align-middle min-w-28;
+                line-height: 150%;
+
                 text-overflow: ellipsis;
-                vertical-align: middle;
             }
             &:first-child {
                 td {
-                    border-top: 0;
+                    @apply border-t-0;
                 }
             }
         }
@@ -166,8 +163,8 @@ export default defineComponent({
         }
         &.top-border {
             th {
-                border-top: 1px solid $border-color;
-                border-bottom: 1px solid $border-color;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
             }
         }
         &.table-bordered {
@@ -196,10 +193,10 @@ export default defineComponent({
     }
 
     .table-default {
-        @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.black'), theme('colors.secondary3');
+        @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), 'none';
     }
     .table-light {
-         @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.200'), theme('colors.secondary3');
+         @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.secondary3');
          th {
              border-bottom: 1px solid theme('colors.gray.200');
          }
