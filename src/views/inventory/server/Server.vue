@@ -14,6 +14,7 @@
                     :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
                     :setting-visible="false"
                     :use-cursor-loading="true"
+                    :excel-visible="true"
                     :all-page="apiHandler.tableTS.state.allPage"
                     :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
                     :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
@@ -25,6 +26,7 @@
                     @changePageNumber="apiHandler.getData()"
                     @clickRefresh="apiHandler.getData()"
                     @changeSort="apiHandler.getData()"
+                    @clickExcel="exportToolSet.getData()"
                 >
                     <template #toolbox-left>
                         <p-button style-type="primary-dark"
@@ -59,7 +61,7 @@
                     </template>
 
                     <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1" #toolbox-bottom>
-                        <p-col :col="12" style="margin-bottom: .5rem;">
+                        <p-col :col="12">
                             <p-hr style="width: 100%;" />
                             <p-query-search-tags style="margin-top: .5rem;"
                                                  :tags="apiHandler.tableTS.querySearch.tags.value"
@@ -550,7 +552,6 @@ export default {
                 ['pool', 'BTN.CHG_POOL', { disabled: true }],
                 [null, null, { type: 'divider' }],
                 ['link', null, { label: 'Console', disabled: apiHandler.tableTS.noLink }],
-                ['exportExcel', null, { label: 'Export', disabled: false }],
             ],
             context.parent,
             { type: 'item', disabled: isNotSelected }),

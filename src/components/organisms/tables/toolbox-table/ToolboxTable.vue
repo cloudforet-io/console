@@ -26,6 +26,12 @@
                             {{ proxyPageSize }}
                         </PDropdownMenuBtn>
                     </div>
+                    <div v-if="excelVisible" class="tool">
+                        <p-icon-button
+                            name="ic_excel"
+                            @click="$emit('clickExcel',$event)"
+                        />
+                    </div>
                     <div v-if="settingVisible" class="tool">
                         <p-icon-button
                             name="ic_setting"
@@ -131,6 +137,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        excelVisible: {
+            type: Boolean,
+            default: false,
+        },
         pageSize: {
             type: Number,
             default: 15,
@@ -218,14 +228,13 @@ export default {
         }
 
         .toolbox {
-            @apply p-4;
+            @apply px-4 py-6;
             /*margin-top: 0.5rem;*/
             .toolbox-middle{
                 display: flex;
                 justify-content: space-between;
                 flex-wrap: nowrap;
                 align-items: center;
-                margin-bottom: 1rem;
                 .left{
                     display: flex;
                     flex-wrap: wrap;
@@ -252,7 +261,8 @@ export default {
                 }
             }
             .toolbox-bottom{
-                width: auto;
+                @apply w-full mt-4;
+
             }
 
         }

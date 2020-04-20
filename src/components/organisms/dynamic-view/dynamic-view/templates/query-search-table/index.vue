@@ -10,6 +10,7 @@
         :padding="typeof apiHandler.tableTS.state.padding === 'boolean'? apiHandler.tableTS.state.padding : true"
         :dragable="typeof apiHandler.tableTS.state.dragable === 'boolean'? apiHandler.tableTS.state.dragable : true"
         :multi-select="typeof apiHandler.tableTS.state.multiSelect === 'boolean'? apiHandler.tableTS.state.multiSelect : true"
+        :excel-visible="typeof apiHandler.tableTS.state.excelVisible === 'boolean'? apiHandler.tableTS.state.excelVisible : false"
         :all-page="apiHandler.tableTS.state.allPage"
         :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
         :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
@@ -35,7 +36,7 @@
             </div>
         </template>
         <template v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
-            <p-col :col="12" style="margin-bottom: .5rem;">
+            <p-col :col="12">
                 <p-hr style="width: 100%;" />
                 <p-query-search-tags style="margin-top: .5rem;"
                                      :tags="apiHandler.tableTS.querySearch.tags.value"
@@ -146,7 +147,6 @@ export default {
 </script>
 <style lang="postcss" scoped>
     .left-toolbox-item{
-        margin-left: 1rem;
         &:last-child {
             flex-grow: 1;
         }

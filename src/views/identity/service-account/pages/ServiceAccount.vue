@@ -19,6 +19,7 @@
                                                 responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}
                                             }"
                                             :data="null"
+                                            @clickExcel="exportToolSet.getData()"
                             >
                                 <template #toolbox-left>
                                     <p-button style-type="primary-dark" @click="clickOpenForm('add')">
@@ -270,6 +271,7 @@ export default {
             padding: true,
             selectable: true,
             dragable: true,
+            excelVisible: true,
         });
         const exportAction = fluentApi.addons().excel().export();
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
@@ -295,7 +297,6 @@ export default {
                 ['project', 'COMMON.CHG_PRO'],
                 [null, null, { type: 'divider' }],
                 ['link', null, { label: 'Console', disabled: hasLink }],
-                ['exportExcel', null, { label: 'Export', disabled: false }],
             ],
             context.parent,
             { type: 'item', disabled: isNotSelected }),
@@ -584,7 +585,7 @@ export default {
 
 <style lang="postcss" scoped>
     .left-toolbox-item{
-        margin-left: 1rem;
+        @apply mx-4;
         &:last-child {
             flex-grow: 1;
         }

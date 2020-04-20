@@ -23,6 +23,7 @@ const actions = {
     changePageNumber: action('changePageNumber'),
     theadClick: action('theadClick'),
     clickSetting: action('clickSetting'),
+    clickExcel: action('clickExcel'),
     clickRefresh: action('clickRefresh'),
 };
 const data = {
@@ -74,12 +75,14 @@ export const table = () => ({
     :thisPage.sync="thisPage"
     :selectIndex.sync="selectIndex"
     :pageSize.sync="pageSize"
+    :excelVisible="true"
     @rowLeftClick="rowLeftClick"
     @rowRightClick="rowRightClick"
     @changePageSize="changePageSize"
     @changePageNumber="changePageNumber"
     @clickSetting="clickSetting"
     @clickRefresh="clickRefresh"
+    @clickExcel="clickExcel"
     @theadClick="theadClick"
 >
     <template #toolbox-left><div style="border: 1px solid green; min-width: 300px "></div></template>
@@ -119,12 +122,14 @@ export const rowSlot = () => ({
         :thisPage.sync="thisPage"
         :selectIndex.sync="selectIndex"
         :pageSize.sync="pageSize"
+        :excelVisible="true"
         @rowLeftClick="rowLeftClick"
         @rowRightClick="rowRightClick"
         @changePageSize="changePageSize"
         @changePageNumber="changePageNumber"
         @clickSetting="clickSetting"
         @clickRefresh="clickRefresh"
+        @clickExcel="clickExcel"
         @theadClick="theadClick"
     >
         <template #row="scope">
@@ -165,12 +170,14 @@ export const colSlot = () => ({
         :thisPage.sync="thisPage"
         :selectIndex.sync="selectIndex"
         :pageSize.sync="pageSize"
+        :excelVisible="true"
         @rowLeftClick="rowLeftClick"
         @rowRightClick="rowRightClick"
         @changePageSize="changePageSize"
         @changePageNumber="changePageNumber"
         @clickSetting="clickSetting"
         @clickRefresh="clickRefresh"
+        @clickExcel="clickExcel"
         @theadClick="theadClick"
     >
         <template #col-name="scope">
