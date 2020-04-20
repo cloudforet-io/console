@@ -22,6 +22,9 @@
                             >
                                 <template #toolbox-left>
                                     <p-button style-type="primary-dark" @click="clickOpenForm('add')">
+                                        <p-i name="ic_plus_bold" width="1rem" height="1rem"
+                                             class="mr-1"
+                                        />
                                         {{ $t('BTN.ADD') }}
                                     </p-button>
                                     <PDropdownMenuBtn
@@ -137,7 +140,7 @@ import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLay
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
-
+import PI from '@/components/atoms/icons/PI.vue';
 
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -182,6 +185,7 @@ export default {
         PDoubleCheckModal,
         SServiceAccountFormModal,
         SSecretCreateFormModal,
+        PI,
     },
     setup(props, context) {
         const { project } = useStore();

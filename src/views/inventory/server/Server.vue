@@ -31,7 +31,9 @@
                                   :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
                                   @click="clickCollectData"
                         >
-                            {{ $t('BTN.COLLECT_DATA') }}
+                            <p-i name="ic_plus_bold" width="1rem" height="1rem"
+                                 class="mr-1"
+                            /> {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
@@ -216,6 +218,7 @@ import { AxiosResponse } from 'axios';
 import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 import { createAtVF, deleteAtVF, updateAtVF } from '@/lib/data-source';
+import PI from '@/components/atoms/icons/PI.vue';
 
 const serverStateVF = {
     name: 'State',
@@ -335,9 +338,9 @@ export default {
         PDataTable,
         PQuerySearchBar,
         PTableCheckModal,
-        PRow,
         PCol,
         PHr,
+        PI,
         PIconButton,
         PDynamicView,
         SProjectTreeModal,

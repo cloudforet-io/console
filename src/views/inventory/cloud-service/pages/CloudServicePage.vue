@@ -27,6 +27,9 @@
                                   :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
                                   @click="clickCollectData"
                         >
+                            <p-i name="ic_plus_bold" width="1rem" height="1rem"
+                                 class="mr-1"
+                            />
                             {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn

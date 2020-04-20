@@ -3,10 +3,10 @@
 // @ts-ignore
 import icon from 'vue-svgicon'
 icon.register({
-  'ic_tree_pool': {
+  'ic_plus_bold': {
     width: 16,
     height: 16,
     viewBox: '0 0 16 16',
-    data: '<path pid="0" _fill="none" d="M0 0h16v16H0z"/><path pid="1" d="M1 2h14v2.6H1V2zm1 3.2v9.5h12V5.2H2zm8.2 2.9H5.5v-1h4.8v1h-.1z"/>'
+    data: '<path pid="0" d="M6.9 6.9H2.4V9h4.5v4.5H9V9.1h4.5V6.9H9.1V2.4H6.9v4.5z" fill-rule="evenodd" clip-rule="evenodd"/>'
   }
 })
