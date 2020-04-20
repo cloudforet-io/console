@@ -7,12 +7,10 @@
             <canvas ref="chartRef" />
         </p-chart-loader>
         <template #extra>
-            <div class="flex justify-end">
-                <span v-for="(color, legend) in colors" :key="legend" class="legend">
-                    <span class="color" :style="{color}" />
-                    {{ legend }}
-                </span>
-            </div>
+            <span v-for="(color, legend) in colors" :key="legend" class="legend">
+                <span class="color" :style="{color}" />
+                {{ legend }}
+            </span>
         </template>
     </p-widget-layout>
 </template>
@@ -132,7 +130,7 @@ export default defineComponent({
     height: 254px;
 }
 .legend {
-    @apply uppercase ml-6 inline-flex items-center;
+    @apply uppercase ml-6 inline-flex items-center float-right;
     font-size: 0.875rem;
     font-family: theme('fontFamily.serif');
     font-weight: normal;

@@ -1,14 +1,14 @@
 <template>
     <div class="lnb">
-        <p-breadcrumb :current-idx="currentIdx"
-                      :routes="routes"
+        <p-route-breadcrumb :current-idx="currentIdx"
+                            :routes="routes"
         />
     </div>
 </template>
 
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
-import PBreadcrumb from '@/components/molecules/breadcrumbs/breadcrumb/Breadcrumb.vue';
+import PRouteBreadcrumb from '@/components/molecules/breadcrumbs/breadcrumb/RouteBreadcrumb.vue';
 
 export const setRouteState = (routes, currentIdx) => reactive({
     currentIdx: currentIdx || 1,
@@ -17,7 +17,7 @@ export const setRouteState = (routes, currentIdx) => reactive({
 
 export default {
     name: 'LNBTemplate',
-    components: { PBreadcrumb },
+    components: { PRouteBreadcrumb },
     setup() {
         return {
             ...toRefs(setRouteState()),
@@ -28,13 +28,9 @@ export default {
 
 <style lang="postcss" scoped>
     .lnb {
-        @apply bg-white;
+        @apply bg-white border-b border-gray-200;
         position: relative;
-        display: flex;
-        align-items: center;
-        z-index: 10;
-        height: 40px;
-        box-shadow: 0px 0.25rem 0.5rem rgba(theme('colors.gray.900'), 0.08);
-        padding: 0 1.125rem;
+        height: 3rem;
+        padding: 0 1rem;
     }
 </style>
