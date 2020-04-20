@@ -88,12 +88,25 @@ export default {
             .execute()
             .then(resp => resp.data.total_count === 0);
 
+        const checkNameLength = (...args) => {
+            const prom = new Promise<boolean>((resolve, reject) => {
+                console.debug(args)
+                const data = args[1] || '';
+                if (data.length < 20) {
+                    resolve(true);
+                }
+                resolve(false);
+            });
+            return prom;
+        };
+
         const validation: CustomKeywords = {
             uniqueName: new CustomValidator(checkNameUnique, 'name is duplicated'),
+            longName: new CustomValidator(checkNameLength, 'Should not be longer than 20 characters'),
         };
 
         const sch = new JsonSchemaObjectType(undefined, undefined, true);
-        sch.addStringProperty('name', 'Name', true, undefined, { uniqueName: true });
+        sch.addStringProperty('name', 'Name', true, undefined, { uniqueName: true, longName: true});
         fixFormTS.setProperty(sch, ['name'], validation);
         const confirm = async () => {
             const fixFormValid = await fixFormTS.formState.validator();

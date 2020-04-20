@@ -1,14 +1,14 @@
 <template>
     <div class="user-info">
         <p v-if="!loginFail" class="subtitle">
-            Welcome to SPACEONE Console
+            Multicloud Managed Service
         </p>
         <p v-else-if="loginFail" id="errorMsg" class="subtitle">
             Please Confirm your ID or Password.
         </p>
-        <div id="login-info" class="field-group text-left md:flex md:flex-wrap md:justify-between">
-            <div class="form">
-                <div class="flex flex-col md:w-full form">
+        <div id="login-info" class="field-group text-left ">
+            <form class="form">
+                <div class="flex flex-col w-full">
                     <p class="input-title">
                         User ID
                     </p>
@@ -18,6 +18,7 @@
                                 v-model="userId"
                                 placeholder="User ID"
                                 class="w-full"
+                                autocomplete="username"
                                 :class="{
                                     'is-invalid':invalid
                                 }"
@@ -26,7 +27,7 @@
                         </template>
                     </PFieldGroup>
                 </div>
-                <div class="flex flex-col mb-4 md:w-full form">
+                <div class="flex flex-col mb-4 w-full">
                     <p class="input-title">
                         Password
                     </p>
@@ -37,6 +38,7 @@
                                 type="password"
                                 class="w-full"
                                 placeholder="Password"
+                                autocomplete="current-password"
                                 :class="{
                                     'is-invalid':invalid
                                 }"
@@ -46,7 +48,7 @@
                         </template>
                     </PFieldGroup>
                 </div>
-            </div>
+            </form>
         </div>
         <div class="flex flex-col mb-10 md:w-full">
             <p-button style-type="primary" type="submit" size="lg"
@@ -58,7 +60,7 @@
         <div class="btn-divider">
             OR
         </div>
-        <div class="flex flex-col mb-4 md:w-full">
+        <div class="flex flex-col mb-4 w-full">
             <p-button
                 outline
                 style-type="gray"
@@ -171,10 +173,6 @@ export default defineComponent({
 
     #errorMsg {
         color: red;
-    }
-
-    .w-full {
-        width: 22rem;
     }
 
     .btn-divider {

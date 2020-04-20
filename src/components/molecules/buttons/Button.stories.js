@@ -54,6 +54,9 @@ export const iconButton = () => ({
         iconStyle: {
             default: select('icon_style', [...Object.keys(iconStyleMapping)], 'solid'),
         },
+        disabled: {
+            default: boolean('disabled', false),
+        },
         size: {
             default: select('size', ['', ...Object.keys(sizeMapping)], ''),
         },
