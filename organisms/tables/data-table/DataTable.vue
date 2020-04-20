@@ -73,6 +73,9 @@
         <template #body>
             <slot v-if="loading" name="loading">
                 <p-tr v-for="s in skeletons" :key="s">
+                    <p-td v-if="selectable" class="!pr-0 text-center">
+                        <p-skeleton width="1rem" height="1rem" />
+                    </p-td>
                     <p-td v-for="(field, index) in fieldsData" :key="index">
                         <slot :name="'skeleton-'+field.name" :index="index" :field="field">
                             <p-skeleton />
