@@ -83,7 +83,7 @@ export default {
 
 <style lang="postcss" scoped>
     .p-search {
-        @apply border border-gray-200 bg-white;
+        @apply border border-gray-300 bg-white;
         position: relative;
         display: inline-flex;
         flex-wrap: nowrap;

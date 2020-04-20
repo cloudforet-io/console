@@ -96,8 +96,8 @@ export default {
 
     &.disabled {
         @apply bg-gray-200 text-gray-400 border-gray-100;
-        background-color: theme('colors.gray.200') !important;
-        border-color: theme('colors.gray.100') !important;
+        background-color: theme('colors.gray.100') !important;
+        border-color: theme('colors.gray.300') !important;
         color: theme('colors.gray.400') !important;
         background-repeat: no-repeat;
         background-clip: padding-box;

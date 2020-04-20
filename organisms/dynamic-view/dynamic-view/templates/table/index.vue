@@ -10,6 +10,7 @@
         :border="typeof apiHandler.tableTS.state.border === 'boolean'? apiHandler.tableTS.state.border : false"
         :padding="typeof apiHandler.tableTS.state.padding === 'boolean'? apiHandler.tableTS.state.padding : false"
         :dragable="typeof apiHandler.tableTS.state.dragable === 'boolean'? apiHandler.tableTS.state.dragable : false"
+        :excel-visible="typeof apiHandler.tableTS.state.excelVisible === 'boolean'? apiHandler.tableTS.state.excelVisible : false"
         :all-page="apiHandler.tableTS.state.allPage"
         :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
         :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
@@ -124,7 +125,6 @@ export default {
 </script>
 <style lang="postcss" scoped>
     .left-toolbox-item{
-        margin-left: 1rem;
     &:last-child {
          flex-grow: 1;
      }
