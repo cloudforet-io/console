@@ -20,7 +20,7 @@
                             @pageChange="changePageNumber"
                         />
                     </div>
-                    <div v-if="pageSizeVisible" class="tool">
+                    <div v-if="pageSizeVisible" class="tool" >
                         <PDropdownMenuBtn
                             class="page-size-dropdown"
                             :menu="pageSizeOptions"
@@ -28,6 +28,12 @@
                         >
                             {{ proxyPageSize }}
                         </PDropdownMenuBtn>
+                    </div>
+                    <div v-if="excelVisible" class="tool">
+                        <p-icon-button
+                            name="ic_excel"
+                            @click="$emit('clickExcel',$event)"
+                        />
                     </div>
                     <div v-if="refreshVisible" class="tool">
                         <p-icon-button
@@ -47,16 +53,16 @@
             </template>
         </p-grid-layout>
 
-<!--        <div class="bottom">-->
-<!--            <slot name="bottom">-->
-<!--                <div class="bottom-page">-->
-<!--                    <p-text-pagenation :this-page.sync="proxyThisPage"-->
-<!--                                       :all-page="allPage"-->
-<!--                                       @pageChange="changePageNumber"-->
-<!--                    />-->
-<!--                </div>-->
-<!--            </slot>-->
-<!--        </div>-->
+        <!--        <div class="bottom">-->
+        <!--            <slot name="bottom">-->
+        <!--                <div class="bottom-page">-->
+        <!--                    <p-text-pagenation :this-page.sync="proxyThisPage"-->
+        <!--                                       :all-page="allPage"-->
+        <!--                                       @pageChange="changePageNumber"-->
+        <!--                    />-->
+        <!--                </div>-->
+        <!--            </slot>-->
+        <!--        </div>-->
     </div>
 </template>
 
@@ -113,6 +119,10 @@ export default {
         pageSizeVisible: {
             type: Boolean,
             default: true,
+        },
+        excelVisible: {
+            type: Boolean,
+            default: false,
         },
         refreshVisible: {
             type: Boolean,
@@ -175,6 +185,9 @@ export default {
                     flex-wrap:nowrap;
                     width: auto;
                     justify-content: flex-end;
+                .tool{
+                    @apply ml-4;
+                }
             }
         }
 

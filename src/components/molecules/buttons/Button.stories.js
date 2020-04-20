@@ -1,6 +1,7 @@
 import { action } from '@storybook/addon-actions';
 import { text, select, boolean } from '@storybook/addon-knobs/vue';
 
+import icon from 'vue-svgicon';
 import PIconButton from './IconButton.vue';
 import PCopyButton from './CopyButton.vue';
 
@@ -10,6 +11,9 @@ import {
     rotatingMapping,
     sizeMapping,
 } from '../../atoms/icons/PiMapping';
+
+const icons = Object.keys(icon.icons);
+
 
 export default {
     title: 'molecules/buttons',
@@ -32,7 +36,7 @@ export const iconButton = () => ({
     template: `
 <p-icon-button 
     @click="click"
-    name="ic_refresh"
+    :name="name"
     :disabled="disabled"
     :iconStyle="iconStyle"
     :buttonStyle="buttonStyle"
@@ -43,6 +47,9 @@ export const iconButton = () => ({
 >
 </p-icon-button>`,
     props: {
+        name: {
+            default: select('name', icons, 'ic_refresh'),
+        },
         // ...autoProps(PIconButton),
         iconStyle: {
             default: select('icon_style', [...Object.keys(iconStyleMapping)], 'solid'),

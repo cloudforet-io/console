@@ -8,7 +8,7 @@ import PpageTitle from '@/components/organisms/title/page-title/pageTitle.vue';
 import { action } from '@storybook/addon-actions';
 
 export default {
-    title: 'Molecules/title/page-title',
+    title: 'Organisms/title/page-title',
     component: PpageTitle,
     // parameters: {
     //     notes: md,

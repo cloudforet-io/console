@@ -14,6 +14,7 @@
                     :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
                     :setting-visible="false"
                     :use-cursor-loading="true"
+                    :excel-visible="true"
                     :all-page="apiHandler.tableTS.state.allPage"
                     :sort-by.sync="apiHandler.tableTS.syncState.sortBy"
                     :sort-desc.sync="apiHandler.tableTS.syncState.sortDesc"
@@ -25,13 +26,16 @@
                     @changePageNumber="apiHandler.getData()"
                     @clickRefresh="apiHandler.getData()"
                     @changeSort="apiHandler.getData()"
+                    @clickExcel="exportToolSet.getData()"
                 >
                     <template #toolbox-left>
                         <p-button style-type="primary-dark"
                                   :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
                                   @click="clickCollectData"
                         >
-                            {{ $t('BTN.COLLECT_DATA') }}
+                            <p-i name="ic_plus_bold" width="1rem" height="1rem"
+                                 class="mr-1"
+                            /> {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
@@ -57,7 +61,7 @@
                     </template>
 
                     <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1" #toolbox-bottom>
-                        <p-col :col="12" style="margin-bottom: .5rem;">
+                        <p-col :col="12">
                             <p-hr style="width: 100%;" />
                             <p-query-search-tags style="margin-top: .5rem;"
                                                  :tags="apiHandler.tableTS.querySearch.tags.value"
@@ -216,6 +220,7 @@ import { AxiosResponse } from 'axios';
 import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 import { createAtVF, deleteAtVF, updateAtVF } from '@/lib/data-source';
+import PI from '@/components/atoms/icons/PI.vue';
 
 const serverStateVF = {
     name: 'State',
@@ -335,9 +340,9 @@ export default {
         PDataTable,
         PQuerySearchBar,
         PTableCheckModal,
-        PRow,
         PCol,
         PHr,
+        PI,
         PIconButton,
         PDynamicView,
         SProjectTreeModal,
@@ -547,7 +552,6 @@ export default {
                 ['pool', 'BTN.CHG_POOL', { disabled: true }],
                 [null, null, { type: 'divider' }],
                 ['link', null, { label: 'Console', disabled: apiHandler.tableTS.noLink }],
-                ['exportExcel', null, { label: 'Export', disabled: false }],
             ],
             context.parent,
             { type: 'item', disabled: isNotSelected }),

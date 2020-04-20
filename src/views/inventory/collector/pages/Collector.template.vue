@@ -25,6 +25,9 @@
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" @click="$router.push({path: '/inventory/collector/create/plugins'})">
+                            <p-i name="ic_plus_bold" width="1rem" height="1rem"
+                                 class="mr-1"
+                            />
                             {{ $t('BTN.CREATE') }}
                         </p-button>
                         <PDropdownMenuBtn class="left-toolbox-item"
@@ -195,6 +198,7 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
 
+
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
 const PToolboxTable = () => import('@/components/organisms/tables/toolbox-table/ToolboxTable');
@@ -208,7 +212,6 @@ const CollectDataModal = () => import('@/views/inventory/collector/modules/Colle
 const CollectorDetail = () => import('@/views/inventory/collector/modules/CollectorDetail');
 const CollectorCredentials = () => import('@/views/inventory/collector/modules/CollectorCredentials');
 const CollectorSchedules = () => import('@/views/inventory/collector/modules/CollectorSchedules');
-
 const collectorState = reactive({
     selectIndex: [],
     items: [],
@@ -446,6 +449,7 @@ export default {
         CollectorDetail,
         CollectorCredentials,
         CollectorSchedules,
+        PI,
     },
     setup(props, context) {
         return collectorSetup(props, context);

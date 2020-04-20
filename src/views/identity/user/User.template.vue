@@ -28,6 +28,9 @@
                 >
                     <template slot="toolbox-left">
                         <p-button style-type="primary-dark" @click="clickAdd">
+                            <p-i name="ic_plus_bold" width="1rem" height="1rem"
+                                 class="mr-1"
+                            />
                             {{ $t('BTN.CREATE') }}
                         </p-button>
                         <PDropdownMenuBtn
@@ -134,6 +137,7 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
@@ -412,6 +416,7 @@ export default {
         PCol,
         PHr,
         PIconButton,
+        PI,
     },
     setup(props, context) {
         const dataBind = reactive({

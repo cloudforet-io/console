@@ -21,16 +21,20 @@
                                     responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}
                                 }"
                                 :data="null"
+                                @clickExcel="exportToolSet.getData()"
                 >
                     <template #toolbox-left>
                         <p-button style-type="primary-dark"
                                   :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
                                   @click="clickCollectData"
                         >
+                            <p-i name="ic_plus_bold" width="1rem" height="1rem"
+                                 class="mr-1"
+                            />
                             {{ $t('BTN.COLLECT_DATA') }}
                         </p-button>
                         <PDropdownMenuBtn
-                            class="left-toolbox-item"
+                            class="left-toolbox-item mr-4"
                             :menu="csDropdownMenu"
                             @click-project="clickProject"
                             @click-link="apiHandler.tableTS.linkState.openLink()"
@@ -115,7 +119,7 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, ref, computed, watch, getCurrentInstance,
+    reactive, toRefs, ref, computed, watch, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import {
@@ -267,10 +271,14 @@ export default {
             padding: true,
             selectable: true,
             dragable: true,
+            excelVisible: true,
         });
         const exportAction = fluentApi.addons().excel().export();
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
-        getDataSource(props.provider, props.group, props.name);
+        onMounted(async () => {
+            await getDataSource(props.provider, props.group, props.name);
+            exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
+        });
         watch(() => [props.provider, props.group, props.name], async (after, before) => {
             if (after && (before && (after[0] !== before[0] || after[1] !== before[1] || after[2] !== before[2]))) {
                 apiHandler.resetAll();
@@ -281,6 +289,7 @@ export default {
                     { key: 'cloud_service_type', operator: '=', value: after[2] },
                 );
                 await apiHandler.getData();
+                console.debug(state.exportDataSource);
                 exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
             }
         });
@@ -298,7 +307,6 @@ export default {
                 ['region', 'BTN.CHG_REGION'],
                 [null, null, { type: 'divider' }],
                 ['link', null, { label: 'Console', disabled: apiHandler.tableTS.noLink }],
-                ['exportExcel', null, { label: 'Export', disabled: false }],
             ],
             context.parent,
             { type: 'item', disabled: true }),
