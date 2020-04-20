@@ -8,6 +8,7 @@
             <slot name="title">
                 {{ title }}
             </slot>
+            <slot name="title-area" />
         </div>
         <div class="extra">
             <slot name="extra">

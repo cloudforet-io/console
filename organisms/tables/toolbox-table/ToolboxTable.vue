@@ -217,8 +217,8 @@ export default {
             @apply bg-white;
         }
 
-        padding: 1rem;
         .toolbox {
+            @apply p-4;
             /*margin-top: 0.5rem;*/
             .toolbox-middle{
                 display: flex;
