@@ -1,22 +1,52 @@
 <template>
-    <p-widget-layout class="daily-updates" title="Daily Updates" help="Daily Updates">
-        <p-selectable-list :items="data" :mapper="mapper" theme="card"
-                           :loading="loading"
-                           @selected="onSelected"
-        >
-            <template #contents="{item}">
-                <div class="group-name">
-                    {{ item.group_name }}
+    <p-widget-layout ref="widgetRef" class="daily-updates" title="Daily Updates"
+                     help="Daily Updates"
+    >
+        <template #help="{help}">
+            <p-i v-tooltip="'Daily Updates'" class="help"
+                 name="ic_tooltip" width="1rem"
+                 height="1rem"
+                 color="inherit transparent"
+            />
+        </template>
+        <template #default>
+            <div v-if="loading" class="flex items-center overflow-hidden">
+                <p-skeleton width="2rem" height="2rem" class="mr-4" />
+                <div class="grid grid-cols-1 gap-1 w-full">
+                    <p-skeleton width="80%" height="0.625rem" />
+                    <p-skeleton width="100%" height="0.625rem" />
                 </div>
-                <div class="name">
-                    {{ item.name }}
-                </div>
-            </template>
-            <template #extra="{item}">
-                <p-i :name="stateIcons[item.update_type]" height="0.75rem" width="0.75rem" />
-                <span class="count">{{ item.count }}</span>
-            </template>
-        </p-selectable-list>
+            </div>
+            <div v-else-if="data.length === 0" class="h-full flex flex-col justify-center">
+                <img :src="'./images/illust_no-update.svg'" class="mb-4 flex-shrink-0 ">
+                <img :src="'./images/illust_list.svg'" class="hidden lg:block">
+            </div>
+            <p-grid-layout v-else :items="data"
+                           row-gap="0.5rem" column-gap="0"
+                           :fix-column="1" card-height="auto"
+                           card-min-width="0"
+                           :card-class="() => []"
+            >
+                <template #card="{item, index}">
+                    <p-selectable-item :icon-url="iconUrl(item)" theme="card" @click="onItemClick(item, idx)">
+                        <template #contents>
+                            <div v-tooltip.bottom-start="{content: item.group, delay: {show: 500}}" class="group-name">
+                                {{ item.group }}
+                            </div>
+                            <div v-tooltip.bottom-start="{content: item.name, delay: {show: 500}}" class="name">
+                                {{ item.name }}
+                            </div>
+                        </template>
+                        <template #extra>
+                            <div class="inline-flex items-center">
+                                <p-i :name="getIcon(item.count)" height="0.75rem" width="0.75rem" />
+                                <span class="count">{{ Math.abs(item.count) }}</span>
+                            </div>
+                        </template>
+                    </p-selectable-item>
+                </template>
+            </p-grid-layout>
+        </template>
     </p-widget-layout>
 </template>
 
@@ -27,7 +57,22 @@ import {
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { safe, alert, yellow } from '@/styles/colors';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
+import PSelectableItem from '@/components/molecules/selectable-item/SelectableItem.vue';
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import PTooltipButton from '@/components/organisms/buttons/tooltip-button/TooltipButton.vue';
+import { fluentApi } from '@/lib/fluent-api';
+import {
+    DiffQueryAPI, DiffResponse, HistoryResponse, OPERATORS,
+} from '@/lib/fluent-api/statistics/toolset';
+import moment from 'moment';
+import { getTimestamp } from '@/lib/util';
+import { ProviderInfo, ProviderStoreType, useStore } from '@/store/toolset';
+import { number } from '@storybook/addon-knobs';
+import casual, { arrayOf } from '@/lib/casual';
+import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
+import _ from 'lodash';
+import { VTooltip } from 'v-tooltip';
 
 export default defineComponent({
     name: 'DailyUpdates',
@@ -35,96 +80,137 @@ export default defineComponent({
         PWidgetLayout,
         PSelectableList,
         PI,
+        PGridLayout,
+        PSelectableItem,
+        PSkeleton,
+        PTooltipButton,
     },
     setup() {
         const vm: any = getCurrentInstance();
 
-        const colors = {
-            ADD: safe,
-            DELETE: alert,
-            UPDATE: yellow.default,
-        };
+        const {
+            provider,
+        } = useStore();
+        const providerStore: ProviderStoreType = provider;
 
-        const stateIcons = {
-            ADD: 'ic_list_increase',
-            DELETE: 'ic_list_decrease',
-            UPDATE: '',
-        };
+        interface CloudService {
+            provider: string;
+            // eslint-disable-next-line camelcase
+            cloud_service_type: string;
+            // eslint-disable-next-line camelcase
+            cloud_service_group: string;
+            count: number;
+        }
 
-        const state: any = reactive({
+        interface Server {
+            count: number;
+        }
+
+        interface Data {
+            group: string;
+            name?: string;
+            count: number;
+            provider?: string;
+        }
+
+        interface StateInterface {
+            serverData: Server[];
+            cloudServiceData: CloudService[];
+            data: Data[];
+            loading: boolean;
+            providers: ProviderInfo;
+            widgetRef: any;
+        }
+
+        const state: UnwrapRef<StateInterface> = reactive({
+            serverData: [],
+            cloudServiceData: [],
             data: [],
             loading: true,
+            providers: computed(() => providerStore.state.providers),
+            widgetRef: null,
         });
 
-        const api = async () => new Promise((resolve) => {
-            setTimeout(() => {
-                resolve([{
-                    // provider: string - provider store > icon
-                    // group: string,
-                    // name: string | undefined,
-                    // tags: {
-                    //     icon: 'http://', 비어있는 경우, provider icon 으로 대체
-                    // },
-                    // update_type: 'ADD' | 'DELETE'
-                    // count: number
-                    resource_id: 'AWS',
-                    group_name: 'Group Name',
-                    name: 'Resource Name',
-                    update_type: 'ADD',
-                    tags: {
-                        icon: 'http://',
-                    },
-                    count: 0,
-                }, {
-                    resource_id: 'GCP',
-                    group_name: 'Group Name',
-                    name: 'Resource Name',
-                    update_type: 'UPDATE',
-                    tags: {
-                        icon: 'http://',
-                    },
-                    count: 0,
-                }, {
-                    resource_id: 'Azure',
-                    group_name: 'Group Name',
-                    name: 'Resource Name',
-                    update_type: 'DELETE',
-                    tags: {
-                        icon: 'http://',
-                    },
-                    count: 0,
-                }, {
-                    resource_id: 'Others',
-                    group_name: 'Group Name',
-                    name: 'Resource Name',
-                    update_type: 'ADD',
-                    tags: {
-                        icon: 'http://',
-                    },
-                    count: 0,
-                }]);
-            }, 1000);
-        });
 
-        const getData = async () => {
+        const serverApi = fluentApi.statisticsTest().history().diff<Server>()
+            .setTopic('inventory_server_daily_diff')
+            .setFrom(getTimestamp(moment().subtract(1, 'day')))
+            .setField('count');
+
+        const getServerData = async (): Promise<void> => {
+            try {
+                const res = await serverApi.execute();
+                state.serverData = res.data.values;
+            } catch (e) {
+                state.serverData = [{
+                    count: casual.integer(-30, 30),
+                }];
+            }
+        };
+
+        const cloudServiceApi = fluentApi.statisticsTest().history().diff<CloudService>()
+            .setTopic('inventory_cloud_service_daily_diff')
+            .setGroupBy('cloud_service_type', 'cloud_service_group', 'provider')
+            .setFrom(getTimestamp(moment().subtract(1, 'day')))
+            .setField('count');
+
+        const getCloudServiceData = async (): Promise<void> => {
+            try {
+                const res = await cloudServiceApi.execute();
+                state.cloudServiceData = res.data.values;
+            } catch (e) {
+                state.cloudServiceData = arrayOf(casual.integer(5, 15), () => ({
+                    provider: casual.random_element(['aws', 'azure', 'google_cloud']),
+                    // eslint-disable-next-line camelcase
+                    cloud_service_type: casual.title,
+                    // eslint-disable-next-line camelcase
+                    cloud_service_group: casual.full_name,
+                    count: casual.integer(-30, 30),
+                })) as CloudService[];
+            }
+        };
+
+
+        const getData = async (): Promise<void> => {
             state.loading = true;
-            state.data = await api();
+            await providerStore.getProvider();
+            state.data = [];
+            await Promise.all([getServerData(), getCloudServiceData()]);
+            state.data = [
+                ...state.serverData.map(d => ({
+                    group: 'Server',
+                    count: d.count,
+                })),
+                ...state.cloudServiceData.map(d => ({
+                    group: d.cloud_service_group,
+                    name: d.cloud_service_type,
+                    count: d.count,
+                    provider: d.provider,
+                })),
+            ];
             state.loading = false;
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+            console.log(vm.$el);
+        }, 1000);
 
         return {
             ...toRefs(state),
-            mapper: {
-                key: 'resource_id',
-                iconUrl: 'tags.icon',
-                title: 'name',
-            },
-            onSelected(item) {
+            onItemClick(item) {
                 vm.$router.push('/identity/service-account');
             },
-            stateIcons,
+            iconUrl: (item: Data): string => _.get(
+                state.providers,
+                `state.providers[${item.provider}].icon`,
+                '',
+            ) as string,
+            getIcon(count: number): string {
+                if (count > 0) return 'ic_list_increase';
+                if (count < 0) return 'ic_list_decrease';
+                return '';
+            },
         };
     },
 });
@@ -132,17 +218,24 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .daily-updates {
-    overflow-y: auto;
+    background-color: rgba(theme('colors.white'), 0.8);
+    &::v-deep .widget-contents {
+        overflow-y: auto;
+    }
 }
 .group-name {
-    @apply text-base font-bold mb-1;
+    @apply text-base font-bold mb-1 truncate leading-tight;
     font-family: theme('fontFamily.sans');
 }
 .name {
-    @apply text-xs text-gray;
+    @apply text-xs text-gray truncate leading-tight;
     font-family: theme('fontFamily.serif');
 }
 .count {
     @apply text-lg font-bold ml-1;
+}
+.help {
+    display: inline-flex;
+    cursor: help;
 }
 </style>

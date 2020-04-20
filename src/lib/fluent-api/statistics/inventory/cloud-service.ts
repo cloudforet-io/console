@@ -11,7 +11,7 @@ class Count extends CountAction<undefined, CloudServiceCountModel> {}
 export default class CloudService extends Resource implements ResourceActions<'diff' | 'count'> {
     protected name = 'cloud-service'
 
-    diff(): Diff { return new Diff(this.baseUrl); }
+    diff(): Diff { return new Diff(this.api, this.baseUrl); }
 
-    count(): Count { return new Count(this.baseUrl); }
+    count(): Count { return new Count(this.api, this.baseUrl); }
 }

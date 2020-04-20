@@ -42,7 +42,20 @@ export interface Page {
     limit?: number;
 }
 
-export interface Query {
+export interface BaseQuery {
+    filter?: FilterType[];
+    filter_or?: FilterType[];
+}
+
+export interface BaseQueryState<param> {
+    filter: FilterItem[];
+    filterOr: FilterItem[];
+    fixFilter: FilterItem[];
+    extraParameter: param;
+    query: () => StatQuery;
+}
+
+export interface Query extends BaseQuery {
     filter?: FilterType[];
     only?: string[];
     page?: Page;
@@ -51,7 +64,7 @@ export interface Query {
     count_only?: boolean;
 }
 
-export interface QueryApiState<T=any> {
+export interface QueryApiState<T=any> extends BaseQueryState<T> {
     filter: FilterItem[];
     fixFilter: FilterItem[];
     only: string[];
@@ -129,7 +142,7 @@ export interface CollectionInfo {
 
 export interface TimeStamp {
     seconds: string;
-    nanos: number;
+    nanos?: number;
 }
 
 export interface ListType<T> {

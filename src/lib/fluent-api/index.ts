@@ -1,3 +1,5 @@
+import { api as consoleApi } from '@/lib/api/axios';
+import { ApiType } from '@/lib/fluent-api/toolset';
 import InventoryService from './inventory';
 import PluginService from './plugin';
 import SecretService from './secret';
@@ -8,23 +10,25 @@ import Statistics from './statistics';
 import StatisticsTest from './statistics/index-new';
 
 export class FluentApi {
-    inventory = (): InventoryService => new InventoryService();
+    constructor(public api: ApiType) { }
 
-    plugin = (): PluginService => new PluginService();
+    inventory = (): InventoryService => new InventoryService(this.api);
 
-    secret = (): SecretService => new SecretService();
+    plugin = (): PluginService => new PluginService(this.api);
 
-    identity = (): IdentityService => new IdentityService();
+    secret = (): SecretService => new SecretService(this.api);
 
-    repository = (): RepositoryService => new RepositoryService();
+    identity = (): IdentityService => new IdentityService(this.api);
 
-    addons = (): AddOns => new AddOns();
+    repository = (): RepositoryService => new RepositoryService(this.api);
 
-    statistics = (): Statistics => new Statistics();
+    addons = (): AddOns => new AddOns(this.api);
 
-    statisticsTest = (): StatisticsTest => new StatisticsTest();
+    statistics = (): Statistics => new Statistics(this.api);
+
+    statisticsTest = (): StatisticsTest => new StatisticsTest(this.api);
 }
 
-export const fluentApi = new FluentApi();
+export const fluentApi = new FluentApi(consoleApi);
 export * from './type';
 export * from './toolset';

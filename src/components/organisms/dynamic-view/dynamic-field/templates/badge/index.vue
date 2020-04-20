@@ -10,10 +10,10 @@ export default {
         // eslint-disable-next-line camelcase,vue/prop-name-casing
         view_option: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
         data: {
-            type: String,
+            type: [String, Object, Array, Boolean, Number],
             required: true,
         },
     },

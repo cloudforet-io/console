@@ -1,12 +1,20 @@
 <template>
-    <p-widget-layout :title="title" :padding="false">
+    <p-widget-layout :title="title" class="service-summary">
         <router-link class="count" :to="to" :style="{
-            color: color,
+            color: countColor,
         }"
         >
-            {{ count | numbers }}
+            <animated-number :value="count"
+                             :format-value="countFormatter"
+                             :duration="1500"
+                             :round="1"
+                             easing="easeInOutSine"
+            />
         </router-link>
         <p-chart-loader :loading="loading" class="line-chart">
+            <template #loader>
+                &zwnj;
+            </template>
             <canvas ref="chartRef" />
         </p-chart-loader>
     </p-widget-layout>
@@ -14,48 +22,89 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, toRefs,
+    computed, defineComponent, Ref, toRefs,
 } from '@vue/composition-api';
 import numeral from 'numeral';
 import {
     serviceSummaryProps,
     ServiceSummaryPropsType,
 } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
+import AnimatedNumber from 'animated-number-vue';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import { SLineChart } from '@/lib/chart/line-chart';
 import { SChartToolSet } from '@/lib/chart/toolset';
+import { HistoryQueryAPI, HistoryResponse, OPERATORS } from '@/lib/fluent-api/statistics/toolset';
+import { gray } from '@/styles/colors';
+import casual, { arrayOf } from '@/lib/casual';
 
-// TODO: browser tooltip for exact count
 export default defineComponent({
     name: 'ServiceSummary',
-    filters: {
-        numbers(val): string {
-            return val < 10000 ? val : numeral(val).format('0.0a');
-        },
-    },
-    components: { PWidgetLayout, PChartLoader },
+    components: { PWidgetLayout, PChartLoader, AnimatedNumber },
     props: serviceSummaryProps,
     setup(props: ServiceSummaryPropsType) {
-        const ts = new SChartToolSet<SLineChart>(SLineChart,
-            (chart: SLineChart) => chart.addData(props.data, props.title)
-                .setLabels(new Array(props.data.length).fill(''))
+        interface Data {count: number}
+        interface StateInterface {
+            data: Data[];
+            loading: boolean;
+        }
+        const ts = new SChartToolSet<SLineChart, StateInterface>(SLineChart,
+            (chart: SLineChart) => chart.addData(ts.state.data, props.title)
+                .setLabels(new Array(ts.state.data.length).fill(''))
                 .setGradientHeight(100)
+                .setLineTension(0.02)
                 .setColors([props.color])
-                .apply());
+                .apply(), {
+                data: [],
+                loading: true,
+            });
+
+
+        const summaryApi: Ref<Readonly<
+            HistoryQueryAPI<undefined, HistoryResponse<Data>>>
+            > = computed(() => props.api
+                .setLimit(7)
+                .setSort('created_at')
+                .addField('', OPERATORS.count, 'count')
+                .setTopic('topic'));
+        // .setFrom(getTimestamp(moment().subtract(7, 'day'))));
+
+        const getData = async (): Promise<void> => {
+            ts.state.loading = true;
+            ts.state.data = [];
+            try {
+                const res = await summaryApi.value.execute();
+                ts.state.data = res.data.values.map(d => d.count);
+            } catch (e) {
+                ts.state.data = arrayOf(7, () => casual.integer(0, 1000000));
+            } finally {
+                ts.state.loading = false;
+            }
+        };
+
+        setTimeout(() => {
+            getData();
+        }, 1000);
 
         return {
             ...toRefs(ts.state),
-            count: computed(() => props.data[props.data.length - 1]),
+            count: computed(() => ts.state.data[ts.state.data.length - 1] || 0),
+            countColor: computed(() => (ts.state.loading ? gray[500] : props.color)),
+            countFormatter(val): string {
+                return val < 10000 ? val : numeral(val).format('0.0a');
+            },
         };
     },
 });
 </script>
 
 <style lang="postcss" scoped>
+.service-summary::v-deep .widget-contents {
+    padding: 0;
+}
 .count {
     display: inline-block;
-    line-height: 2.5rem;
+    line-height: 3rem;
     font-size: 2.5rem;
     font-weight: bold;
     margin-left: 1.5rem;
@@ -66,6 +115,6 @@ export default defineComponent({
     }
 }
 .line-chart {
-    height: 100px;
+    height: 6.25rem;
 }
 </style>

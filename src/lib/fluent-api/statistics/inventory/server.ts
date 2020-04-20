@@ -12,7 +12,7 @@ class Count extends CountAction<undefined, ServerCountModel> {}
 export default class Server extends Resource implements ResourceActions<'diff' | 'count'> {
     protected name = 'server'
 
-    diff(): Diff { return new Diff(this.baseUrl); }
+    diff(): Diff { return new Diff(this.api, this.baseUrl); }
 
-    count(): Count { return new Count(this.baseUrl); }
+    count(): Count { return new Count(this.api, this.baseUrl); }
 }

@@ -1,7 +1,7 @@
 import { Resource, ResourceActions } from '@/lib/fluent-api/toolset';
 import {
     DiffQueryAPI,
-    HistoryQueryAPI,
+    HistoryQueryAPI, HistoryResponse,
 } from '@/lib/fluent-api/statistics/toolset';
 
 
@@ -9,11 +9,11 @@ import {
 /*
  */
 
-class Query extends HistoryQueryAPI<any, any> {
+class Query<value> extends HistoryQueryAPI<any, HistoryResponse<value>> {
     path = 'query'
 }
 
-class Diff extends DiffQueryAPI<any, any> {
+class Diff<value> extends DiffQueryAPI<any, HistoryResponse<value>> {
     path = 'diff'
 }
 
@@ -21,7 +21,7 @@ class Diff extends DiffQueryAPI<any, any> {
 export default class History extends Resource implements ResourceActions<'query'|'diff'> {
     name = 'history'
 
-    query(): Query { return new Query(this.baseUrl); }
+    query<value>(): Query<value> { return new Query(this.api, this.baseUrl); }
 
-    diff(): Diff { return new Diff(this.baseUrl); }
+    diff<value>(): Diff<value> { return new Diff(this.api, this.baseUrl); }
 }

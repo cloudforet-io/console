@@ -2,7 +2,7 @@
     <p-pane-layout class="widget-layout">
         <div class="title">
             <span class="mr-2">{{ title }}</span>
-            <slot name="help">
+            <slot name="help" :help="help">
                 <p-tooltip-button v-if="help"
                                   class="help" :tooltip="help"
                                   position="top" theme="gray"
@@ -19,7 +19,7 @@
                 <slot name="extra" />
             </div>
         </div>
-        <div :class="{padding}">
+        <div class="widget-contents">
             <slot />
         </div>
     </p-pane-layout>
@@ -52,14 +52,9 @@ export default defineComponent({
         width: 100%;
 
         .title {
-            font-family: theme('fontFamily.sans');
+            @apply flex items-center uppercase leading-tight font-bold;
             font-size: 1.125rem;
-            line-height: 1.375rem;
-            text-transform: uppercase;
-            font-weight: bold;
             margin: 1.5rem 1.5rem 1rem 1.5rem;
-            display: flex;
-            align-items: center;
         }
 
         .help {
@@ -68,8 +63,9 @@ export default defineComponent({
             cursor: help;
         }
 
-        .padding {
+        .widget-contents {
             padding: 0 1.5rem 2.5rem 1.5rem;
+            flex-grow: 1;
         }
     }
 </style>

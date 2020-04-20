@@ -1,16 +1,25 @@
 /* eslint-disable camelcase, @typescript-eslint/no-explicit-any */
-import { AxiosResponse } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
-import { api } from '@/lib/api/axios';
 import {
     ApiMethods,
-    FilterType,
-    Query,
     FilterItem,
-    ShortFilterType, GetActionState, RawParameterActionState, QueryApiState, StatQueryApiState, StatQuery,
+    FilterType,
+    GetActionState,
+    Query,
+    ShortFilterType,
+    RawParameterActionState,
+    QueryApiState,
+    StatQueryApiState,
+    StatQuery,
+    BaseQueryState, BaseQuery,
 } from '@/lib/fluent-api/type';
 import { isNotEmpty } from '@/lib/util';
 
+
+export interface ApiType {
+    instance: AxiosInstance;
+}
 
 export abstract class ActionAPI<parameter=any, resp=any> {
     protected abstract path: string;
@@ -28,9 +37,9 @@ export abstract class ActionAPI<parameter=any, resp=any> {
     async execute(): Promise<AxiosResponse<resp>> {
         let resp: AxiosResponse<resp> | any;
         if (this.method === 'get') {
-            resp = await api.instance[this.method](this.url);
+            resp = await this.api.instance[this.method](this.url);
         } else {
-            resp = await api.instance[this.method as string](this.url, this.getParameter());
+            resp = await this.api.instance[this.method as string](this.url, this.getParameter());
         }
         if (this.transformer) {
             resp = await this.transformer(resp);
@@ -39,6 +48,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
     }
 
     protected constructor(
+        public api: ApiType,
         baseUrl: string,
         apiState?: any,
         transformer: ((any) => any|Promise<any>)|null = null,
@@ -73,7 +83,7 @@ export abstract class ActionAPI<parameter=any, resp=any> {
 
     clone(): this {
         // @ts-ignore
-        return new this.constructor(this.baseUrl, this.apiState, this.transformer);
+        return new this.constructor(this.api, this.baseUrl, this.apiState, this.transformer);
     }
 }
 export const OPERATOR_MAP = Object.freeze({
@@ -135,15 +145,72 @@ function getQueryWithApiState<T>(keys: string[], apiState: any): T {
     return res;
 }
 
-export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
+
+export abstract class BaseQueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
+    protected apiState: BaseQueryState<parameter> ;
+
+    protected constructor(
+        api: ApiType,
+        baseUrl: string,
+        initState: BaseQueryState<parameter> = {} as BaseQueryState<parameter>,
+        transformer: null|((any) => any) = null,
+    ) {
+        super(api, baseUrl, undefined, transformer);
+        this.apiState = {
+            filter: [],
+            filterOr: [],
+            fixFilter: [],
+            extraParameter: {},
+            ...initState,
+        };
+    }
+
+    protected abstract query = (): BaseQuery => this.getBaseQuery<BaseQuery>({} as BaseQuery);
+
+    protected getBaseQuery<Q extends BaseQuery>(query: Q): Q {
+        if (this.apiState.filter.length > 0 || this.apiState.fixFilter.length > 0) {
+            const newFilter: FilterType[] | undefined = filterItemToQuery(this.apiState.filter, this.apiState.fixFilter);
+            if (newFilter) query.filter = newFilter;
+        }
+        if (isNotEmpty(this.apiState.filterOr)) {
+            const newFilter = filterItemToQuery(this.apiState.filterOr);
+            if (newFilter) query.filter_or = newFilter;
+        }
+        return query as Q;
+    }
+
+    getParameter = (): any => ({
+        query: this.query(),
+        ...this.apiState.extraParameter,
+    });
+
+    setFilter(...args: FilterItem[]): this {
+        this.apiState.filter = args;
+        return this.clone();
+    }
+
+    setFixFilter(...args: FilterItem[]): this {
+        this.apiState.fixFilter = args;
+        return this.clone();
+    }
+
+    setFilterOr(...args: FilterItem[]): this {
+        this.apiState.filterOr = args;
+        return this.clone();
+    }
+}
+
+
+export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, resp> {
     protected apiState: QueryApiState<parameter> ;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: QueryApiState<parameter> = {} as unknown as QueryApiState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             filter: [] as unknown as FilterItem[],
             fixFilter: [] as unknown as FilterItem[],
@@ -182,18 +249,8 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
         if (this.apiState.keyword) {
             query.keyword = this.apiState.keyword;
         }
-        if (this.apiState.filter.length > 0 || this.apiState.fixFilter.length > 0) {
-            const newFilter: FilterType[] | undefined = filterItemToQuery(this.apiState.filter, this.apiState.fixFilter);
-            if (newFilter) query.filter = newFilter;
-        }
-        return query as Query;
+        return this.getBaseQuery<Query>(query) as Query;
     };
-
-
-    getParameter = (): {query: Query} & parameter => ({
-        query: this.query(),
-        ...this.apiState.extraParameter,
-    });
 
     setOnly(...args: string[]): this {
         this.apiState.only = args;
@@ -202,16 +259,6 @@ export abstract class QueryAPI<parameter, resp> extends ActionAPI<parameter, res
 
     setCountOnly(value = true): this {
         this.apiState.count_only = value;
-        return this.clone();
-    }
-
-    setFilter(...args: FilterItem[]): this {
-        this.apiState.filter = args;
-        return this.clone();
-    }
-
-    setFixFilter(...args: FilterItem[]): this {
-        this.apiState.fixFilter = args;
         return this.clone();
     }
 
@@ -246,11 +293,12 @@ export abstract class StatisticsQueryAPI<parameter, resp> extends ActionAPI<para
     protected apiState: StatQueryApiState<parameter>;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: StatQueryApiState<parameter> = {} as StatQueryApiState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             filter: [],
             limit: undefined,
@@ -317,11 +365,12 @@ export abstract class RawParameterAction<parameter, resp> extends ActionAPI<para
     protected apiState: RawParameterActionState<parameter>;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: RawParameterActionState<parameter> = { parameter: {} as parameter },
         transformer: ((any) => any|Promise<any>)|null = null,
     ) {
-        super(baseUrl, initState, transformer);
+        super(api, baseUrl, initState, transformer);
         this.apiState = {
             ...initState,
         };
@@ -368,8 +417,8 @@ export abstract class TreeAction<parameter, resp> extends ActionAPI<parameter, r
 
     protected apiState: TreeActionState<parameter>;
 
-    constructor(baseUrl: string, initState: TreeActionState<parameter> = {} as unknown as TreeActionState<parameter>, transformer: null|((any) => any) = null) {
-        super(baseUrl, undefined, transformer);
+    constructor(api: ApiType, baseUrl: string, initState: TreeActionState<parameter> = {} as unknown as TreeActionState<parameter>, transformer: null|((any) => any) = null) {
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             rootItemType: 'ROOT',
             item_id: '',
@@ -452,18 +501,19 @@ export abstract class GetAction<parameter, resp> extends SingleItemAction<parame
     protected apiState: GetActionState<parameter>;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         apiState: GetActionState<parameter> = {
             parameter: {} as parameter,
             only: [] as string[],
         },
-        transformer: ((any) => any|Promise<any>)|null = null,
+        transformer: ((any) => any | Promise<any>) | null = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = apiState;
     }
 
-    getParameter = (): {query: Query} & parameter => {
+    getParameter = (): { query: Query } & parameter => {
         const query = { only: this.apiState.only };
         return {
             ...this.apiState.parameter,
@@ -530,7 +580,20 @@ export abstract class MultiItemQueryAction<parameter, resp> extends QueryAPI<par
     }
 }
 
+export abstract class SingleItemQueryAction<parameter, resp> extends QueryAPI<parameter, resp> {
+    protected abstract idField: string;
+
+    setId(id: string): this {
+        this.apiState.extraParameter[this.idField] = id;
+        return this.clone();
+    }
+}
+
 export abstract class MemberListAction<parameter, resp> extends MultiItemQueryAction<parameter, resp> {
+    path = 'member/list'
+}
+
+export abstract class SingleItemMemberListAction<parameter, resp> extends SingleItemQueryAction<parameter, resp> {
     path = 'member/list'
 }
 
@@ -592,14 +655,16 @@ export abstract class Resource {
         return `/${this.service}/${this.name}/`;
     }
 
-    constructor(protected service: string) {
+    constructor(public api: ApiType, protected service: string) {
     }
 }
 
-export type ServiceResources<resources extends string> = { [key in resources]?: (service: string) => Resource};
+export type ServiceResources<resources extends string> = { [key in resources]?: (api: ApiType, service: string) => Resource};
 
 export abstract class Service {
     protected abstract name: string;
+
+    constructor(public api: ApiType) { }
 }
 
 export interface BaseResources<parameter, resp> extends Resource, ResourceActions<'update'|'get'>{}

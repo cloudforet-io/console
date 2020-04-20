@@ -1,7 +1,10 @@
 <template>
-    <p-widget-layout title="Resources by Top 5 Projects" help="Top 5 Projects">
+    <p-widget-layout title="Resources by Top 5 Projects" help="Top 5 Projects" class="top-projects">
         <div class="flex justify-center">
             <p-chart-loader :loading="loading" class="chart">
+                <template #loader>
+                    <p-skeleton width="100%" height="100%" />
+                </template>
                 <canvas ref="chartRef" />
             </p-chart-loader>
         </div>
@@ -12,8 +15,39 @@
                           :loading="loading"
                           :items="data"
                           :top-border="false"
-                          striped
+                          class="data-table"
+                          @rowLeftClick="onRowClick"
             >
+                <template #skeleton-rank>
+                    <p-skeleton width="1.5rem" height="1.5rem" />
+                </template>
+                <template #no-data="{fields}">
+                    <p-tr key="noData" class="bg-primary3">
+                        <p-td :colspan="3" class="rounded-l-sm" />
+                        <p-td class="text-center">
+                            <p-badge :background-color="colors.servers">
+                                0
+                            </p-badge>
+                        </p-td>
+                        <p-td class="text-center rounded-r-sm">
+                            <p-badge :background-color="colors.cloud_services">
+                                0
+                            </p-badge>
+                        </p-td>
+                    </p-tr>
+                    <p-tr key="blank" class="!bg-white h-2" />
+                    <p-tr key="create-project" class="!bg-gray-100 cursor-pointer">
+                        <router-link to="/identity/project" tag="td" :colspan="fields.length"
+                                     class="rounded-sm text-center"
+                        >
+                            <p-i name="ic_plus_square" width="1rem" height="1rem"
+                                 class="mr-4"
+                            />
+                            Create a Project
+                        </router-link>
+                    </p-tr>
+                </template>
+
                 <!-- th -->
                 <template #th-rank="{field}">
                     <div class="text-center">
@@ -39,14 +73,14 @@
 
                 <!-- top 1 row -->
                 <template #row-0="{index, fields, item}">
-                    <p-tr>
+                    <p-tr @click="onRowClick">
                         <p-td class="text-center">
                             <p-i name="ic_top1" />
                         </p-td>
-                        <p-td class="project-field">
+                        <p-td v-tooltip.bottom="{content: item.project_group, delay: {show: 500}}" class="project-field">
                             {{ item.project_group }}
                         </p-td>
-                        <p-td class="project-field">
+                        <p-td v-tooltip.bottom="{content: item.project, delay: {show: 500}}" class="project-field">
                             {{ item.project }}
                         </p-td>
                         <p-td class="text-center">
@@ -63,6 +97,16 @@
                 </template>
 
                 <!-- others -->
+                <template #col-project_group="{value}">
+                    <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
+                        {{ value }}
+                    </p-td>
+                </template>
+                <template #col-project="{value}">
+                    <p-td v-tooltip.bottom="{content: value, delay: {show: 500}}">
+                        {{ value }}
+                    </p-td>
+                </template>
                 <template #col-rank-format="{index}">
                     <div class="text-center">
                         {{ index + 1 }}
@@ -87,7 +131,7 @@
 /* eslint-disable camelcase */
 import _ from 'lodash';
 import {
-    computed, defineComponent, Ref, toRefs,
+    computed, defineComponent, getCurrentInstance, Ref, toRefs,
 } from '@vue/composition-api';
 import PWidgetLayout from '@/components/organisms/layouts/widget-layout/WidgetLayout.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
@@ -102,6 +146,12 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PChartLoader from '@/components/organisms/charts/chart-loader/ChartLoader.vue';
 import { SChartToolSet } from '@/lib/chart/toolset';
 import { SBarChart } from '@/lib/chart/bar-chart';
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
+import casual, { arrayOf } from '@/lib/casual';
+import { languages } from 'monaco-editor';
+
+import css = languages.css;
+
 
 export default defineComponent({
     name: 'TopProjects',
@@ -113,8 +163,11 @@ export default defineComponent({
         PTd,
         PI,
         PChartLoader,
+        PSkeleton,
     },
     setup() {
+        const vm: any = getCurrentInstance();
+
         interface DataType {
             project_group: string;
             project: string;
@@ -157,34 +210,12 @@ export default defineComponent({
             }, { type: 'horizontalBar' });
 
         const api = async (): Promise<DataType[]> => new Promise((resolve) => {
-            setTimeout(() => {
-                resolve([{
-                    project_group: 'Group',
-                    project: 'Project',
-                    servers: 300,
-                    cloud_services: 325,
-                }, {
-                    project_group: 'Group',
-                    project: 'Project',
-                    servers: 200,
-                    cloud_services: 325,
-                }, {
-                    project_group: 'Group',
-                    project: 'Project',
-                    servers: 200,
-                    cloud_services: 325,
-                }, {
-                    project_group: 'Group',
-                    project: 'Project',
-                    servers: 100,
-                    cloud_services: 325,
-                }, {
-                    project_group: 'Group',
-                    project: 'Project',
-                    servers: 50,
-                    cloud_services: 325,
-                }]);
-            }, 1000);
+            resolve(arrayOf(5, () => ({
+                project_group: casual.text,
+                project: casual.text,
+                servers: casual.integer(0, 300),
+                cloud_services: casual.integer(0, 300),
+            })) as DataType[]);
         });
 
 
@@ -194,16 +225,24 @@ export default defineComponent({
             ts.state.loading = false;
         };
 
-        getData();
+        setTimeout(() => {
+            getData();
+        }, 1000);
 
         return {
             ...toRefs(ts.state),
+            onRowClick() {
+                vm.$router.push('/identity/project');
+            },
         };
     },
 });
 </script>
 
 <style lang="postcss" scoped>
+.top-projects::v-deep .widget-contents {
+    padding-bottom: 1.5rem;
+}
 .chart {
     height: 180px;
 }
@@ -217,15 +256,41 @@ export default defineComponent({
 }
 .custom-th {
     @apply flex items-center justify-center uppercase font-bold px-1;
-    font-family: theme('fontFamily.sans');
+    font-size: 0.75rem;
 }
 .project-field {
-    font-family: theme('fontFamily.sans');
-    font-size: 0.875rem;
-    font-weight: bold;
+    @apply truncate font-bold;
 }
 .p-badge {
-    font-weight: bold;
-    font-size: 0.875rem;
+    @apply font-bold;
+}
+.data-table::v-deep {
+    .p-table {
+        table-layout: fixed;
+        font-size: 0.875rem;
+    }
+    td {
+        @apply truncate cursor-pointer;
+        &:first-child {
+            padding: 0;
+        }
+    }
+    th {
+        &:first-child {
+            width: 2.75rem;
+        }
+        &:nth-child(2) {
+            width: 8.875rem;
+        }
+        &:nth-child(3) {
+            width: 6.25rem;
+        }
+        &:nth-child(4) {
+            width: 6rem;
+        }
+        &:last-child {
+            width: 9rem;
+        }
+    }
 }
 </style>

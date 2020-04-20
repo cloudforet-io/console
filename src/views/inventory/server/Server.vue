@@ -13,7 +13,6 @@
                     :responsive="true"
                     :responsive-style="{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}"
                     :setting-visible="false"
-                    :use-spinner-loading="true"
                     :use-cursor-loading="true"
                     :all-page="apiHandler.tableTS.state.allPage"
                     :sort-by.sync="apiHandler.tableTS.syncState.sortBy"

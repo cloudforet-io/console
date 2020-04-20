@@ -15,8 +15,11 @@ import { Util } from '@/lib/global-util';
 import LocalStorageStore from '@/store/toolset';
 import webFontLoader from 'webfontloader';
 import { webFonts, fontUrls } from '@/styles/web-fonts';
+import Skeleton from 'vue-loading-skeleton';
+import Fragment from 'vue-fragment';
 import App from './App.vue';
 import '@/styles/style.scss';
+import VTooltip from 'v-tooltip';
 
 Vue.mixin(Util);
 Vue.use(VueCookies);
@@ -28,8 +31,11 @@ Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i',
 });
-
 Vue.use(LiquorTree);
+// @ts-ignore
+Vue.use(Skeleton, { prefix: 'p' });
+Vue.use(Fragment.Plugin);
+Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 
 Vue.prototype.$velocity = velocity;
 

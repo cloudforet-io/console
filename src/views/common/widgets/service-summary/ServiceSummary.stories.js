@@ -8,6 +8,7 @@ import {
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import { getKnobProps } from '@sb/storybook-util';
 import { serviceSummaryProps } from '@/views/common/widgets/service-summary/ServiceSummary.toolset';
+import { fluentApi } from '@/lib/fluent-api';
 
 export default {
     title: 'views/widgets/ServiceSummary',
@@ -26,67 +27,21 @@ export const defaultCase = () => ({
     components: { ServiceSummary },
     props: getKnobProps(serviceSummaryProps, {
         title: 'projects',
-        data: [0, 0, 200, 300, 500, 800, 1300],
+        api: fluentApi.statisticsTest().history().diff().setTopic('topic'),
     }, {
     }, {
         color,
     }),
     template: `
     <div style="width: 80vw;">
-        <ServiceSummary v-bind="$props" :loading="loading"></ServiceSummary>
+        <ServiceSummary v-bind="$props"></ServiceSummary>
     </div>`,
     setup(props, context) {
         const state = reactive({
         });
 
-        const draw = () => {
-            state.loading = true;
-            setTimeout(() => {
-                state.loading = false;
-            }, 100);
-        };
-
-
         return {
             ...toRefs(state),
-        };
-    },
-});
-
-
-export const zeroCase = () => ({
-    components: { ServiceSummary },
-    props: getKnobProps(serviceSummaryProps, {
-        title: 'projects',
-        count: 434,
-        data: [0, 0, 0, 0, 0, 0, 0],
-    }, {
-        loading: true,
-    }, {
-        color,
-    }),
-    template: `
-    <div style="width: 80vw;">
-        <ServiceSummary v-bind="$props" :loading="loading"></ServiceSummary>
-        <button class="w-full my-3 border border-gray" @click="draw">REDRAW</button>
-    </div>`,
-    setup(props, context) {
-        const state = reactive({
-            loading: true,
-        });
-
-        const draw = () => {
-            state.loading = true;
-            setTimeout(() => {
-                state.loading = false;
-            }, 100);
-        };
-
-        draw();
-
-        return {
-            ...toRefs(state),
-            draw,
         };
     },
 });

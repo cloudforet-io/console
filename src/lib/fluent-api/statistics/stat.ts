@@ -55,6 +55,7 @@ fluentApi.statistics().stat().query<Response>()
     .addField('cloud_service_group', OPERATORS.value, 'group')
     .setGroupBy('provider', 'cloud_service_group')
     .setLimit(12)
+
  */
 
 class Query<value> extends StatQueryAPI<undefined, StatResponse<value>> {
@@ -65,5 +66,5 @@ class Query<value> extends StatQueryAPI<undefined, StatResponse<value>> {
 export default class Stat extends Resource implements ResourceActions<'query'> {
     name = 'stat'
 
-    query<value>(): Query<value> { return new Query<value>(this.baseUrl); }
+    query<value>(): Query<value> { return new Query<value>(this.api, this.baseUrl); }
 }

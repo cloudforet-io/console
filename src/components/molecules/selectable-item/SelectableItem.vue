@@ -2,40 +2,31 @@
     <div class="item-container" :class="{
         active: active,
         [theme]: true,
-        skeleton: loading
     }" v-on="$listeners"
     >
-        <div v-if="loading" class="contents">
-            <div class="avatar" />
-            <div class="grid grid-cols-1 gap-1 w-full">
-                <div class="line" />
-                <div class="line" />
-            </div>
-        </div>
-        <template v-else>
-            <slot name="bar" :color="color">
-                <div v-if="color" class="bar" :style="{color}" />
+        <slot name="bar" :color="color">
+            <div v-if="color" class="bar" :style="{color}" />
+        </slot>
+        <div class="contents">
+            <slot name="side">
+                <p-lazy-img :img-url="iconUrl"
+                            :error-icon="defaultIcon"
+                            width="2rem" height="2rem"
+                            class="flex-shrink-0"
+                />
             </slot>
-            <div class="contents">
-                <slot name="side">
-                    <p-lazy-img :img-url="iconUrl"
-                                :error-icon="defaultIcon"
-                                width="2rem" height="2rem"
-                    />
-                </slot>
-                <div class="flex-grow pl-2">
-                    <slot name="contents" :color="color">
-                        <slot name="title">
-                            <p class="title">
-                                {{ title }}
-                            </p>
-                        </slot>
-                        <slot name="contents-bottom" />
+            <div class="flex-grow pl-2 overflow-hidden">
+                <slot name="contents" :color="color">
+                    <slot name="title">
+                        <p class="title">
+                            {{ title }}
+                        </p>
                     </slot>
-                </div>
-                <slot name="extra" :color="color" />
+                    <slot name="contents-bottom" />
+                </slot>
             </div>
-        </template>
+            <slot name="extra" :color="color" />
+        </div>
     </div>
 </template>
 
@@ -43,12 +34,13 @@
 import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import { selectableItemProps, SelectableItemPropsType } from '@/components/molecules/selectable-item/SelectableItem.toolset';
 import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
-
 import PI from '@/components/atoms/icons/PI.vue';
 
 export default defineComponent({
     name: 'SelectableItem',
-    components: { PI, PLazyImg },
+    components: {
+        PI, PLazyImg,
+    },
     props: selectableItemProps,
     setup(props: SelectableItemPropsType) {
         return {
@@ -58,21 +50,6 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-@define-mixin skeleton $base-color, $shine-color, $total-width, $offset {
-    @keyframes shine {
-        from {
-            background-position: -$offset;
-        }
-        to {
-            background-position: calc($(total-width) - $(offset));
-        }
-    }
-    background-image: linear-gradient(90deg, $(base-color) 0, $(shine-color) 40px, $(base-color) 80px);
-    background-size: $total-width;
-    background-repeat: repeat;
-    animation: shine 1.5s infinite linear;
-}
-
 @define-mixin item-theme $border-color, $hover-bg-color, $active-color, $active-bg-color {
     position: relative;
     display: flex;
@@ -94,11 +71,7 @@ export default defineComponent({
         background-color: currentColor;
     }
     .contents {
-        display: flex;
-        width: 100%;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.5rem;
+        @apply flex items-center w-full content-between p-2 overflow-hidden;
     }
     &:hover {
         background-color: $hover-bg-color;
@@ -109,27 +82,6 @@ export default defineComponent({
         border-color: $active-color;
         &:hover {
             background-color: $hover-bg-color;
-        }
-    }
-
-    &.skeleton {
-            border-color: transparent;
-        .avatar {
-            @apply rounded-sm h-8 w-8 mr-4;
-
-            @mixin skeleton theme('colors.primary3'), theme('colors.gray.100'), 11rem, 0;
-        }
-        .line {
-            @apply rounded-sm h-3 w-24;
-
-            @mixin skeleton theme('colors.primary3'), theme('colors.gray.100'), 11rem, 3rem;
-            &:last-child {
-                @apply opacity-50 w-32;
-            }
-        }
-        &:hover {
-            background-color: theme('colors.white');
-            cursor: unset;
         }
     }
 

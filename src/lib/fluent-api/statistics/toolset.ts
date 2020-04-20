@@ -1,8 +1,10 @@
 /* eslint-disable camelcase */
 import {
+    BaseQuery,
+    BaseQueryState,
     FilterItem, FilterType, TimeStamp,
 } from '@/lib/fluent-api/type';
-import { ActionAPI, filterItemToQuery } from '@/lib/fluent-api/toolset';
+import {ApiType, BaseQueryAPI} from '@/lib/fluent-api/toolset';
 import { isNotEmpty } from '@/lib/util';
 
 export interface StatResponse<value> {
@@ -35,12 +37,8 @@ export interface FieldType {
     alias: string;
 }
 
-export interface BaseQueryState<param> {
-    extraParameter: param;
-    query: () => StatQuery;
-}
 
-export interface StatisticsQuery {
+export interface StatisticsQuery extends BaseQuery {
     fields: FieldType[];
     group_by?: string[];
     filter?: FilterType[];
@@ -52,8 +50,6 @@ export interface StatisticsQuery {
 export interface StatisticsQueryState<param> extends BaseQueryState<param> {
     fields: FieldType[];
     groupBy: Array<string>;
-    filter: Array<FilterItem>;
-    filterOr: Array<FilterItem>;
     sort: object;
     limit?: number;
 }
@@ -76,7 +72,7 @@ export interface HistoryQueryState<param> extends StatisticsQueryState<param> {
     topic: string;
 }
 
-export interface DiffQuery {
+export interface DiffQuery extends BaseQuery {
     topic: string;
     field: string;
     from: TimeStamp;
@@ -90,21 +86,22 @@ export interface DiffQueryState<param> extends BaseQueryState<param> {
     groupBy: Array<string>;
 }
 
-
-export abstract class StatisticsQueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
+export abstract class StatisticsQueryAPI<parameter, resp> extends BaseQueryAPI<parameter, resp> {
     protected apiState: StatisticsQueryState<parameter> ;
 
     protected constructor(
+        api: ApiType,
         baseUrl: string,
         initState: StatisticsQueryState<parameter> = {} as StatisticsQueryState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             fields: [],
             groupBy: [],
             filter: [],
             filterOr: [],
+            fixFilter: [],
             sort: {},
             limit: undefined,
             extraParameter: {},
@@ -117,17 +114,9 @@ export abstract class StatisticsQueryAPI<parameter, resp> extends ActionAPI<para
     protected getStatisticsQuery<Q extends StatisticsQuery>(query: Q): Q {
         if (isNotEmpty(this.apiState.fields)) query.fields = this.apiState.fields;
         if (isNotEmpty(this.apiState.groupBy)) query.group_by = this.apiState.groupBy;
-        if (isNotEmpty(this.apiState.filter)) {
-            const newFilter = filterItemToQuery(this.apiState.filter);
-            if (newFilter) query.filter = newFilter;
-        }
-        if (isNotEmpty(this.apiState.filterOr)) {
-            const newFilter = filterItemToQuery(this.apiState.filterOr);
-            if (newFilter) query.filter_or = newFilter;
-        }
         if (isNotEmpty(this.apiState.sort)) query.sort = this.apiState.sort;
         if (isNotEmpty(this.apiState.limit)) query.limit = this.apiState.limit;
-        return query as Q;
+        return this.getBaseQuery<StatisticsQuery>(query) as Q;
     }
 
     getParameter = (): any => ({
@@ -175,11 +164,12 @@ export abstract class StatQueryAPI<parameter, resp> extends StatisticsQueryAPI<p
     protected apiState: StatQueryState<parameter> ;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: StatQueryState<parameter> = {} as StatQueryState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             serviceType: '',
             dataSource: undefined,
@@ -187,6 +177,7 @@ export abstract class StatQueryAPI<parameter, resp> extends StatisticsQueryAPI<p
             groupBy: [],
             filter: [],
             filterOr: [],
+            fixFilter: [],
             sort: {},
             limit: undefined,
             extraParameter: {},
@@ -218,17 +209,19 @@ export abstract class HistoryQueryAPI<parameter, resp> extends StatisticsQueryAP
     protected apiState: HistoryQueryState<parameter> ;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: HistoryQueryState<parameter> = {} as HistoryQueryState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             topic: '',
             fields: [],
             groupBy: [],
             filter: [],
             filterOr: [],
+            fixFilter: [],
             sort: {},
             limit: undefined,
             extraParameter: {},
@@ -250,20 +243,24 @@ export abstract class HistoryQueryAPI<parameter, resp> extends StatisticsQueryAP
 }
 
 
-export abstract class DiffQueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
+export abstract class DiffQueryAPI<parameter, resp> extends BaseQueryAPI<parameter, resp> {
     protected apiState: DiffQueryState<parameter> ;
 
     constructor(
+        api: ApiType,
         baseUrl: string,
         initState: DiffQueryState<parameter> = {} as DiffQueryState<parameter>,
         transformer: null|((any) => any) = null,
     ) {
-        super(baseUrl, undefined, transformer);
+        super(api, baseUrl, undefined, transformer);
         this.apiState = {
             topic: '',
             field: '',
             from: undefined,
             groupBy: [],
+            filter: [],
+            filterOr: [],
+            fixFilter: [],
             extraParameter: {},
             ...initState,
         };
@@ -281,7 +278,7 @@ export abstract class DiffQueryAPI<parameter, resp> extends ActionAPI<parameter,
             from: this.apiState.from,
         } as DiffQuery;
         if (isNotEmpty(this.apiState.groupBy)) query.group_by = this.apiState.groupBy;
-        return query;
+        return this.getBaseQuery<DiffQuery>(query);
     }
 
     setTopic(topic: string): this {

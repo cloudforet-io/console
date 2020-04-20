@@ -12,6 +12,7 @@ export default {
         function getClass(prop) {
             if (!prop.forceClass) {
                 const cls = {
+                    'p-button': true,
                     btn: true,
                     disabled: prop.disabled,
                     'btn-block': prop.block,

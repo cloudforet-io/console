@@ -11,6 +11,7 @@
 	"BTN": {
 		"ACTION": "",
 		"ADD": "",
+		"ADD_TAG": "",
 		"BACK": "",
 		"CANCEL": "",
 		"CHG_POOL": "",
@@ -214,6 +215,8 @@
 	"FIELD": {
 		"CLOUD_SERVICE": "",
 		"COLLECTOR": "",
+		"EMAIL": "",
+		"ID": "",
 		"NAME": "",
 		"PROJECT": "",
 		"PROJECT_GRP": "",
@@ -244,6 +247,7 @@
 		},
 		"CHECK_HASH": "",
 		"CRT_FAIL_ARG": "",
+		"CRT_PROJ": "",
 		"CRT_SUCC_ARG": "",
 		"DEL_ARG": "",
 		"DEL_FAIL_ARG": "",
@@ -283,6 +287,7 @@
 		"CRT_COLL": "",
 		"CRT_CRD": "",
 		"CRT_FAIL_ARG": "",
+		"CRT_PROJ": "",
 		"CRT_SUCC_ARG": "",
 		"DEL_COL": "",
 		"DEL_FAIL_ARG": "",
