@@ -214,8 +214,10 @@
 		"None": ""
 	},
 	"FIELD": {
+		"ACCOUNT_NAME": "계정 이름",
 		"CLOUD_SERVICE": "클라우드 서비스",
 		"COLLECTOR": "컬렉터",
+		"CREDENTIALS": "암호",
 		"EMAIL": "이메일",
 		"ID": "아이디",
 		"NAME": "이름",
@@ -223,6 +225,7 @@
 		"PROJECT_GRP": "프로젝트 그룹",
 		"RANK": "순위",
 		"SERVER": "서버",
+		"SERVICE_PROVIDER": "서비스 프로바이더",
 		"START_TIME": "시작 시간",
 		"STATE": "상태"
 	},

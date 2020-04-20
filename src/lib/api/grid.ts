@@ -8,6 +8,7 @@ import {
     SearchGridLayoutToolSet,
     ToolboxGridLayoutToolSet,
 } from '@/components/organisms/layouts/toolbox-grid-layout/toolset';
+import { AxiosResponse } from 'axios';
 
 
 export abstract class BaseGridFluentAPI<
@@ -37,8 +38,9 @@ export abstract class BaseGridFluentAPI<
     getData = async () => {
         this.gridTS.syncState.loading = true;
         this.gridTS.state.items = [];
+        let res: PromiseLike<AxiosResponse<any>>|any = null;
         try {
-            const res = await this.getAction().execute();
+            res = await this.getAction().execute();
             this.gridTS.state.items = res.data.results;
             this.gridTS.setAllPage(res.data.total_count);
         } catch (e) {
@@ -46,6 +48,7 @@ export abstract class BaseGridFluentAPI<
             this.gridTS.state.allPage = 1;
         }
         this.gridTS.syncState.loading = false;
+        return res;
     };
 
     protected defaultReset = () => {

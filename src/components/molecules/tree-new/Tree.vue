@@ -103,8 +103,11 @@ export default defineComponent({
         type addType = 'append' | 'prepend' | 'before' | 'after';
         const addNode = (node, newItem: string | TreeItemInterface = { text: '' }, type: addType = 'append') => {
             if (state.tree) {
-                const target = node || state.tree.model[state.tree.model.length - 1];
-                state.tree[type](target, newItem);
+                if (node) {
+                    state.tree[type](node, newItem);
+                } else {
+                    state.tree[type](newItem);
+                }
             }
         };
 
@@ -209,6 +212,9 @@ export default defineComponent({
                     @mixin tree-selected theme('colors.primary2'), theme('colors.gray.900');
                 }
             }
+            &:hover {
+             @mixin tree-selected "~@/assets/icons/ic_tree_arrow--opened.svg";
+             }
             > .tree-content:hover {
                 @mixin tree-selected transparent, theme('colors.gray.900');
             }

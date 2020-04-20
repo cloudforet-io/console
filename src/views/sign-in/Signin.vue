@@ -1,12 +1,10 @@
 <template>
     <div>
-        <div class="flex items-center text-center h-screen w-full wrapper default-theme">
-            <div id="login-container" class="max-w-md mx-auto justify-center bg-white lg sm:max-w-xl md:max-w-sm md:mx-auto">
+        <div class="p-4 flex items-center text-center h-screen w-full wrapper default-theme">
+            <div id="login-container" class="max-w-md m-auto justify-center bg-white lg sm:max-w-xl md:max-w-sm md:mx-auto">
                 <img id="logo" src="@/assets/images/brand/brand_logo.png">
                 <div class="header">
-                    <p id="title">
-                        Sign in to SPACEONE
-                    </p>
+                    <img id="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.png">
                 </div>
                 <div class="user-info">
                     <component :is="component" @onLogin="login" />
@@ -90,7 +88,6 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-
     @define-mixin background-theme $theme, $background {
         &.$(theme) {
             background: $background;
@@ -102,12 +99,13 @@ export default defineComponent({
     .wrapper {
         position: absolute;
         width: 100%;
-        height: auto;
+        height: 100%;
         top: 0;
         bottom: 0;
-        overflow: no-display;
-        -webkit-overflow-scrolling: touch;
-        background-color: theme('colors.white');
+        overflow: hidden;
+        background: url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg') no-repeat center center fixed;
+        background-size: cover;
+        /*background-color: theme('colors.white');*/
         @mixin background-theme 'default-theme', theme('colors.white');
         @mixin background-theme 'color-theme', theme('colors.gray.default');
         @mixin background-theme 'image-theme', url('~@/assets/images/landing/cloudone_console_sign-in_bg.jpg');
@@ -116,7 +114,10 @@ export default defineComponent({
 
     #login-container {
         background-color: white;
-        padding: 24px 16px 10px;
+        /*max-width: 328px;*/
+        /*width: 100%;*/
+        /*margin: 1rem;*/
+        padding: 1.5rem 1rem 0.62rem;
     }
 
     #logo {
@@ -126,6 +127,13 @@ export default defineComponent({
         margin: 0 auto;
         width: 100px;
         height: 100px;
+    }
+
+    #logo-text {
+        text-align: center;
+        margin: 0 auto;
+        width: 217px;
+        height: 27px;
     }
 
     .header{

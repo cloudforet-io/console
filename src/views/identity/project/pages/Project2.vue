@@ -38,10 +38,10 @@
                 >
                     <template #toolbox-top>
                         <p id="parent-project-grp">
-                            project group
+                            {{ parentGroup }}
                         </p>
                         <p id="current-project-grp">
-                            Current Project Group
+                            {{ currentGroup }}
                         </p>
                         <!--                        <p id="current-project-grp">{{ projectSummary[0].project_group_info.name}}</p>-->
                     </template>
@@ -206,6 +206,10 @@ export default {
             items: [],
             selectedId: '',
         });
+        const treeState = reactive({
+            parentGroup: '',
+            currentGroup: '',
+        });
         const { provider } = useStore();
         provider.getProvider();
         const vm = getCurrentInstance();
@@ -300,6 +304,8 @@ export default {
         const selected = async (item) => {
             console.log('selected test', item);
             treeApiHandler.ts.getSelectedNode(item);
+            treeState.currentGroup = item.data.name;
+            if (item.parent) { treeState.parentGroup = item.parent.data.name; } else { treeState.parentGroup = ''; }
             state.selectedId = item.data.id;
             state.items = [];
         };
@@ -317,7 +323,6 @@ export default {
                     tags: item.tags,
                 },
             });
-            console.debug('item test', item)
         };
 
         /**
@@ -404,6 +409,7 @@ export default {
             treeRef: treeApiHandler.ts.treeRef,
             treeApiHandler,
             ...toRefs(state),
+            ...toRefs(treeState),
             ...toRefs(formState),
             selected,
             clickCard,
