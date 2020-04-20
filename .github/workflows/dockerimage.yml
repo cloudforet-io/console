@@ -1,9 +1,12 @@
 name: Docker Image CI
 
+#on:
+#  push:
+#    branches: [ master ]
 on:
   push:
-    branches: [ master ]
-
+    branches-ignore:
+      - '**'
 jobs:
 
   build:
@@ -33,3 +36,10 @@ jobs:
         # Comma-separated string of ECR image tags
         tags: latest,${{ github.sha }}
 
+    - name: Merge to uat branch
+      uses: devmasx/merge-branch@v1.1.0
+      with:
+        type: now
+        target_branch: 'build'
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
