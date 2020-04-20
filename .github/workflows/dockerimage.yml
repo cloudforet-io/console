@@ -32,4 +32,8 @@ jobs:
         region: ap-northeast-2
         # Comma-separated string of ECR image tags
         tags: latest,${{ github.sha }}
-
+    - uses: Embraser01/update-git-branch-action@v1.0.0
+        if: github.ref == 'refs/heads/master'
+        with:
+          branch: build
+          force: 1 # To push-force to the branch
