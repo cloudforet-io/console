@@ -16,20 +16,20 @@ jobs:
       uses: srt32/git-actions@v0.0.3
       with:
         args: git submodule update --init --recursive
-        
+
     - name: AWS ECR
       uses: kciter/aws-ecr-action@v1
       with:
         # The AWS access key id
-        access_key_id: '${{ secrets.AWS_ACCESS_KEY_ID }}'
+        access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         # The AWS secret access key
-        secret_access_key: '${{ secrets.AWS_SECRET_ACCESS_KEY }}'
+        secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # AWS Account ID
-        account_id: '072548720675'
+        account_id: 072548720675
         # Name of your ECR repository
-        repo: 'cloudone/webconsole/client'
+        repo: cloudone/webconsole/client
         # The AWS region
-        region: 'ap-northeast-2'
+        region: ap-northeast-2
         # Comma-separated string of ECR image tags
         tags: latest,${{ github.sha }}
-        
+
