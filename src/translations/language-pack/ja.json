@@ -214,8 +214,10 @@
 		"None": ""
 	},
 	"FIELD": {
+		"ACCOUNT_NAME": "",
 		"CLOUD_SERVICE": "",
 		"COLLECTOR": "",
+		"CREDENTIALS": "",
 		"EMAIL": "",
 		"ID": "",
 		"NAME": "",
@@ -223,6 +225,7 @@
 		"PROJECT_GRP": "",
 		"RANK": "",
 		"SERVER": "",
+		"SERVICE_PROVIDER": "",
 		"START_TIME": "",
 		"STATE": ""
 	},

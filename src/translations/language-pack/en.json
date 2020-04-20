@@ -214,8 +214,10 @@
 		"None": ""
 	},
 	"FIELD": {
+		"ACCOUNT_NAME": "Account Name",
 		"CLOUD_SERVICE": "Cloud Service",
 		"COLLECTOR": "Collector",
+		"CREDENTIALS": "Credentials",
 		"EMAIL": "Email",
 		"ID": "ID",
 		"NAME": "Name",
@@ -223,6 +225,7 @@
 		"PROJECT_GRP": "Project Group",
 		"RANK": "Rank",
 		"SERVER": "Server",
+		"SERVICE_PROVIDER": "Service Provider",
 		"START_TIME": "Start Time",
 		"STATE": "State"
 	},
