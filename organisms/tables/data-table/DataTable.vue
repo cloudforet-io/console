@@ -45,13 +45,14 @@
                               :sortable="sortable"
                         >
                             <span class="th-contents">
-                                <span :style="{visibility: isThOver(index) ? 'hidden' : 'visible'}">
+                                <span>
                                     {{ field.label ? field.label : field.name }}
+                                    <p-copy-button v-if="colCopy"
+                                                   class="ml-2"
+                                                   @copy="clickColCopy(index)"
+                                    />
                                 </span>
-                                <p-copy-button v-if="isThOver(index)"
-                                               class="copy-btn"
-                                               :value="clickColCopy(index)"
-                                />
+
                                 <template v-if="sortable&&field.sortable">
                                     <p-i
                                         v-if="sortable&&field.name==sortBy"
@@ -73,7 +74,7 @@
         <template #body>
             <slot v-if="loading" name="loading">
                 <p-tr v-for="s in skeletons" :key="s">
-                    <p-td v-if="selectable" class="!pr-0 text-center">
+                    <p-td v-if="selectable" class="!pr-0  min-w-4 w-4">
                         <p-skeleton width="1rem" height="1rem" />
                     </p-td>
                     <p-td v-for="(field, index) in fieldsData" :key="index">
@@ -169,7 +170,7 @@ import PTd from '@/components/atoms/table/Td.vue';
 import PTh from '@/components/atoms/table/Th.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { selectToCopyToClipboard } from '@/lib/util';
+import { copyAnyData, selectToCopyToClipboard } from '@/lib/util';
 import { makeProxy, windowEventMount } from '@/lib/compostion-util';
 // eslint-disable-next-line import/named
 import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
@@ -377,7 +378,6 @@ export default defineComponent({
             });
             return selectItem;
         };
-        const isThOver = index => props.colCopy && state.thHoverIndex === index;
         const clickColCopy = (idx) => {
             let result = '';
             const arr = Array.from(dragSelectAbles.value as any[]);
@@ -391,7 +391,7 @@ export default defineComponent({
                     }
                 });
             });
-            return result;
+            copyAnyData(result);
         };
 
         let dragSelect = null;
@@ -456,7 +456,6 @@ export default defineComponent({
             selectClick,
             selectAllToggle,
             getSelectItem,
-            isThOver,
             clickColCopy,
             getValueFunc,
             isDragging,
@@ -520,12 +519,6 @@ export default defineComponent({
     }
     .fade-enter-active {
         transition: opacity 0s;
-    }
-    .copy-btn::v-deep {
-        position: absolute !important;
-        .p-copy-btn {
-            left: 0;
-        }
     }
     .no-data-row {
         /*&:hover {*/
