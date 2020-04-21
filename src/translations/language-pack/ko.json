@@ -397,7 +397,8 @@
 		"DETAILS": "상세 정보",
 		"HISTORY": "수집 기록",
 		"MONITORING": "모니터링",
-		"RAW_DATA": "원본 데이터"
+		"RAW_DATA": "원본 데이터",
+		"SECRET": "암호"
 	},
 	"TREE_TYPE": {
 		"CREATE": "{0} 생성하기",

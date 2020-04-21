@@ -20,6 +20,7 @@
         />
         <service-accounts class="col-start-1 col-end-13 sm:col-end-7 lg:col-end-4
                                  row-start-5 row-end-6 sm:row-start-2 sm:row-end-3"
+                          :title="'SERVICE ACCOUNTS'"
         />
         <daily-updates class="col-start-1 sm:col-start-7 lg:col-start-10 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1

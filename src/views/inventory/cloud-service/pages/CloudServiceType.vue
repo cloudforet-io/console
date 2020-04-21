@@ -180,14 +180,17 @@ export default {
         const vm = getCurrentInstance();
         const selectProvider = ref('all');
         const providerListState = new GridLayoutState({
-            items: computed(() => [
-                {
+            items: computed(() => {
+                const result = [{
                     provider: 'all', icon: '', color: '', name: 'All',
-                },
-                ...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })),
-            ]),
+                }];
+                if (providerStore.state.providers) {
+                    result.push(...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })));
+                }
+                return result;
+            }),
             cardClass: (item) => {
-                const _class = ['provider-card-item'];
+                const _class = ['provider-card-item', 'card-item'];
                 if (item.provider === selectProvider.value) {
                     _class.push('selected');
                 }
@@ -308,10 +311,8 @@ export default {
 
     }
     >>> .provider-card-item{
-        @apply px-4 py-3 flex items-center justify-between;
-        &.selected{
-            @apply border-blue-500 bg-blue-100;
-        }
+        @apply px-4 py-3 flex items-center justify-between bg-transparent;
+
         .left{
             @apply flex items-center;
             .title{
@@ -328,6 +329,14 @@ export default {
 
             }
         }
+        &.selected{
+            @apply border-blue-600 bg-blue-200 text-blue-600;
+            .left{
+                .title{
+                    @apply text-blue-600;
+                }
+            }
+        }
 
     }
 
@@ -339,13 +348,11 @@ export default {
             .text-content{
                 .sub-title{
                     @apply text-gray-500;
-                    font-family: "Noto Sans";
                     font-size: 0.875rem;
                     line-height: 1.0625rem;
                 }
                 .title{
                     @apply font-bold;
-                    font-family: "Noto Sans";
                     font-size: 1.125rem;
                     line-height: 1.375rem;
 

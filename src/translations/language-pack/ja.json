@@ -397,7 +397,8 @@
 		"DETAILS": "",
 		"HISTORY": "",
 		"MONITORING": "",
-		"RAW_DATA": ""
+		"RAW_DATA": "",
+		"SECRET": ""
 	},
 	"TREE_TYPE": {
 		"CREATE": "",

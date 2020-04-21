@@ -1,17 +1,50 @@
 <template>
     <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
-            <PSelectableList
-                class="w-full"
-                v-bind="listToolset.state"
-                :selected-indexes.sync="listToolset.syncState.selectedIndexes"
-            />
+            <p-grid-layout
+                class="provider-list"
+                v-bind="providerListState.state"
+                @card:click="selectProvider=$event.provider"
+            >
+                <template #card="{item}">
+                    <div class="left">
+                        <template>
+                            <img v-if="item.tags&&item.tags.icon"
+                                 width="32px" height="32px"
+                                 :src="item.tags.icon"
+                                 :alt="item.provider"
+                            >
+                            <p-i v-else name="ic_provider_other"
+                                 width="32px"
+                                 height="32px"
+                            />
+                        </template>
+                        <div class="title">
+                            {{ item.name }}
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div
+                            class="total-count"
+                            :style="{'background-color': item.tags.color||'#3C2C84','border-color': item.tags.color||'#3C2C84'}"
+                        >
+                            {{ providerTotalCount[item.provider] }}
+                        </div>
+                    </div>
+                </template>
+            </p-grid-layout>
         </template>
         <template #default>
-            <template v-if="!listToolset.selectState.isNotSelected">
+            <template v-if="selectProvider">
                 <div class="w-full h-full">
                     <p-horizontal-layout>
                         <template #container="{ height }">
+                            <PPageTitle
+                                class="mb-6 mt-2"
+                                :use-selected-count="true" :use-total-count="true" title="Cloud Service"
+                                :total-count="apiHandler.totalCount.value"
+                                :selected-count="apiHandler.tableTS.selectState.selectItems.length"
+                            />
                             <p-dynamic-view view_type="table"
                                             :api-handler="apiHandler"
                                             :data_source="accountDataSource"
@@ -52,12 +85,15 @@
                             <p-dict-panel :dict="apiHandler.tableTS.selectState.firstSelectItem.tags">
                                 <template #extra>
                                     <p-button style-type="primary" @click="editTag">
-                                        {{ $t('BTN.ADD') }}
+                                        {{ $t('BTN.EDIT') }}
                                     </p-button>
                                 </template>
                             </p-dict-panel>
                         </template>
                         <template #credentials>
+                            <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="secretApiHandler.totalCount.value">
+                                {{ $t('TAB.SECRET') }}
+                            </PPanelTop>
                             <p-dynamic-view view_type="table"
                                             :api-handler="secretApiHandler"
                                             :data_source="secretDataSource"
@@ -82,6 +118,9 @@
                             </p-dynamic-view>
                         </template>
                         <template #admin>
+                            <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
+                                {{ $t('TAB.ADMIN') }}
+                            </PPanelTop>
                             <p-dynamic-view
                                 view_type="table"
                                 :api-handler="adminApiHandler"
@@ -102,6 +141,9 @@
                             />
                         </template>
                         <template #admin>
+                            <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
+                                {{ $t('TAB.ADMIN') }}
+                            </PPanelTop>
                             <p-dynamic-view
                                 view_type="table"
                                 :api-handler="adminApiHandler"
@@ -136,7 +178,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, getCurrentInstance, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, onMounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLayout2.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
@@ -161,7 +203,7 @@ import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/
 import { ProjectNode } from '@/lib/api/tree';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { idField as serviceAccountID, ServiceAccountListResp } from '@/lib/fluent-api/identity/service-account';
-import { useStore } from '@/store/toolset';
+import { ProviderStoreType, useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
@@ -170,6 +212,11 @@ import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 import nunjucks from 'nunjucks';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import _ from 'lodash';
+import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
+import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -184,40 +231,73 @@ export default {
         PEmpty,
         SProjectTreeModal,
         PDictPanel,
-        PSelectableList,
         PDoubleCheckModal,
         SServiceAccountFormModal,
         SSecretCreateFormModal,
         PIconTextButton,
+        PPanelTop,
+        PGridLayout,
+        PPageTitle,
     },
     setup(props, context) {
         const { project } = useStore();
         project.getProject();
-        const vm = getCurrentInstance();
-
-        const listToolset = new SelectableListToolset<unknown, unknown, ProviderModel>();
-        listToolset.state.mapper.iconUrl = 'tags.icon';
-        listToolset.state.mapper.key = 'proivder';
-        listToolset.state.mapper.title = 'name';
-
+        const resourceCountAPI = fluentApi.identity().serviceAccount().list().setCountOnly();
         const providerListAPI = fluentApi.identity().provider().list().setOnly(
             'name',
             'provider',
             'tags.icon',
+            'tags.color',
             'tags.external_link_template',
             'template.service_account.schema',
             'capability.supported_schema',
         );
 
-        providerListAPI.execute().then((resp) => {
-            listToolset.state.items = resp.data.results;
-            listToolset.syncState.selectedIndexes = [0];
+
+        const selectProvider = ref<string>('');
+        const providers = ref<{[key in string]: ProviderModel}>({});
+        const selectProviderItem = computed<ProviderModel>(() => providers.value[selectProvider.value]);
+        const providerTotalCount = ref({});
+
+        const vm = getCurrentInstance();
+        const providerListState = new GridLayoutState({
+            items: computed(() => Object.values(providers.value)),
+            cardClass: (item) => {
+                const _class = ['provider-card-item', 'card-item'];
+                if (item.provider === selectProvider.value) {
+                    _class.push('selected');
+                }
+                return _class;
+            },
+            cardMinWidth: '14.125rem',
+            cardHeight: '3.5rem',
+            columnGap: '0.5rem',
+            rowGap: '0.5rem',
+            fixColumn: 1,
         });
 
+        onMounted(async () => {
+            const resp = await providerListAPI.execute();
+            const prs = resp.data.results.map(item => item.provider);
+            providers.value = _.zipObject(prs, resp.data.results);
+            providerTotalCount.value = reactive<any>(_.zipObject(
+                prs,
+                Array(prs.length),
+            ));
+            selectProvider.value = prs[0];
+
+            prs.forEach((key) => {
+                resourceCountAPI.setFilter({ key: 'provider', operator: '=', value: key }).execute().then((res) => {
+                    providerTotalCount.value[key] = res.data.total_count;
+                });
+            });
+        });
+
+
         const originDataSource = computed<any[]>(() => {
-            if (listToolset.selectState.isSelectOne) {
-                const properties = listToolset.selectState.firstSelectItem.template.service_account.schema.properties;
-                if (properties) {
+            if (selectProviderItem.value) {
+                const properties = selectProviderItem.value.template.service_account.schema.properties || {};
+                if (selectProviderItem) {
                     return [
                         { name: 'name', key: 'name' },
                         ...Object.entries(properties).map(([key, item]) => ({
@@ -242,7 +322,7 @@ export default {
         const singleItemTab = new TabBarState({
             tabs: makeTrItems([
                 ['detail', 'TAB.DETAILS'],
-                ['credentials', 'TAB.CREDENTIALS'],
+                ['credentials', 'TAB.SECRET'],
                 ['admin', 'TAB.ADMIN'],
             ]),
         });
@@ -278,11 +358,11 @@ export default {
         const exportAction = fluentApi.addons().excel().export();
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
 
-        watch(() => listToolset.selectState.firstSelectItem, (item, before) => {
-            if (item && item.provider && item.provider !== before.provider) {
+        watch(selectProvider, (after, before) => {
+            if (after && after !== before) {
                 apiHandler.resetAll();
                 apiHandler.action = ListAction.setFixFilter(
-                    { key: 'provider', operator: '=', value: item.provider },
+                    { key: 'provider', operator: '=', value: after },
                 );
                 apiHandler.getData();
                 exportToolSet.action = exportAction.setDataSource(originDataSource.value);
@@ -291,7 +371,7 @@ export default {
 
         const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
         const isNotSelectOne = computed(() => !apiHandler.tableTS.selectState.isSelectOne);
-        const hasLink = computed(() => (!!(isNotSelectOne.value || !listToolset.selectState.firstSelectItem?.tags?.external_link_template)));
+        const hasLink = computed(() => (!!(isNotSelectOne.value || !selectProviderItem.value?.tags?.external_link_template)));
         const dropdown = reactive({
             ...makeTrItems([
                 ['delete', 'BTN.DELETE', { disabled: isNotSelectOne }],
@@ -358,7 +438,7 @@ export default {
         });
         const adminIsShow = computed(() => {
             let result = false;
-            if (listToolset.selectState.isSelectOne) {
+            if (selectProvider.value) {
                 if (apiHandler.tableTS.selectState.isSelectOne) {
                     result = singleItemTab.syncState.activeTab === 'admin';
                 }
@@ -453,7 +533,7 @@ export default {
             secretSchemas: [] as string[],
         });
         const clickSecretAddForm = () => {
-            secretFormState.secretSchemas = listToolset.selectState.firstSelectItem.capability.supported_schema;
+            secretFormState.secretSchemas = selectProviderItem.value.capability.supported_schema;
             secretFormState.secretFormVisible = true;
         };
         const secretFormConfirm = (item) => {
@@ -497,13 +577,13 @@ export default {
 
         const clickOpenForm = (mode: 'add'|'update') => {
             formState.mode = mode;
-            formState.formSchema = listToolset.selectState.firstSelectItem.template.service_account.schema;
+            formState.formSchema = selectProviderItem.value.template.service_account.schema;
             formState.formVisible = true;
         };
         const formConfirm = (item) => {
             if (formState.mode === 'add') {
                 const param = {
-                    provider: listToolset.selectState.firstSelectItem.provider,
+                    provider: selectProvider.value,
                     ...item,
                 };
                 fluentApi.identity().serviceAccount().create().setParameter(param)
@@ -542,7 +622,7 @@ export default {
         });
 
         const clickLink = () => {
-            const linkTemplate = listToolset.selectState.firstSelectItem?.tags?.external_link_template;
+            const linkTemplate = selectProviderItem.value?.tags?.external_link_template;
             const link = nunjucks.renderString(linkTemplate, apiHandler.tableTS.selectState.firstSelectItem);
             console.debug(linkTemplate, link);
             window.open(link);
@@ -559,7 +639,6 @@ export default {
             accountDetails,
             secretApiHandler,
             secretDataSource,
-            listToolset,
             deleteTS,
             accountDeleteClick,
             deleteConfirm,
@@ -579,6 +658,9 @@ export default {
             tagsApi,
             clickLink,
             editTag,
+            providerListState,
+            selectProvider,
+            providerTotalCount,
         };
     },
 };
@@ -591,6 +673,39 @@ export default {
         &:last-child {
             flex-grow: 1;
         }
+    }
+    .provider-list{
+        @apply w-full px-4 pt-4;
+
+    }
+    >>> .provider-card-item{
+        @apply px-4 py-3 flex items-center justify-between bg-transparent;
+
+        .left{
+            @apply flex items-center;
+            .title{
+                @apply ml-4 text-base;
+                font-family: "Noto Sans";
+
+            }
+        }
+        .right{
+            .total-count{
+                @apply w-10 flex h-6 ml-2 justify-center items-center text-white;
+                border-radius: 6.25rem;
+                border-width: 0.0625rem;
+
+            }
+        }
+        &.selected{
+            @apply border-blue-600 bg-blue-200 text-blue-600;
+            .left{
+                .title{
+                    @apply text-blue-600;
+                }
+            }
+        }
+
     }
 
 </style>

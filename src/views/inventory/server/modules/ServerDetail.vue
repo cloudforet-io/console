@@ -11,7 +11,7 @@
         <p-dict-panel :dict="tags">
             <template #extra>
                 <p-button style-type="primary" @click="editTag">
-                    {{ $t('BTN.ADD') }}
+                    {{ $t('BTN.EDIT') }}
                 </p-button>
             </template>
         </p-dict-panel>
