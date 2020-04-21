@@ -1,12 +1,13 @@
 <template>
     <div class="p-panel-top">
-        <div class="top-contents">
-            <span class="title">
-                <slot />
-            </span>
-            <div class="extra">
-                <slot name="extra" />
-            </div>
+        <span class="title">
+            <slot />
+        </span>
+        <span v-if="useTotalCount" class="total-count">
+            &nbsp;({{ totalCount }})
+        </span>
+        <div class="extra">
+            <slot name="extra" />
         </div>
     </div>
 </template>
@@ -15,24 +16,34 @@ import { defineComponent } from '@vue/composition-api';
 
 export default defineComponent({
     name: 'PPanelTop',
+    props: {
+        useTotalCount: {
+            type: Boolean,
+            default: false,
+        },
+        totalCount: {
+            type: Number,
+            default: 0,
+        },
+    },
 });
 </script>
 
 <style lang="postcss" scoped>
     .p-panel-top {
-        @apply mb-4 mx-4;
-        .top-contents {
-            display: flex;
-            width: 100%;
-            height: 2rem;
-            align-items: center;
-        }
+        @apply mb-4 mx-4 mt-8;
+        display: flex;
+        width: 100%;
+        height: 2rem;
+        align-items: center;
         .title {
             @apply font-bold text-2xl;
-            font-family: Noto Sans;
-            padding-right: 1rem;
+        }
+        .total-count{
+            @apply text-gray-500 text-lg;
         }
         .extra {
+            @apply pl-4;
             flex-grow: 1;
         }
     }

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top>
+        <p-panel-top :use-total-count="true" :total-count="items? items.length:0">
             <template>{{ $t('WORD.TAGS') }}</template>
             <template #extra>
                 <slot name="extra">

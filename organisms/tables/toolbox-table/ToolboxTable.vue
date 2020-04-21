@@ -1,6 +1,9 @@
 <template>
     <div :class="{'toolbox-table': true,background:toolboxBackground,'no-padding':!padding,'toolbox-shadow': shadow, 'toolbox-border': border}">
         <div class="toolbox">
+            <p-row v-if="$slots['toolbox-top']" class="toolbox-top">
+                <slot name="toolbox-top" />
+            </p-row>
             <p-row class="toolbox-middle">
                 <div class="left" :style="{width:$slots['toolbox-center'] ? 'auto' : '100%'}">
                     <slot name="toolbox-left" />
@@ -171,7 +174,6 @@ export default {
             type: Boolean,
             default: true,
         },
-
     },
     setup(props: ToolBoxTableSetupProps, { emit }) {
         const pageSizeOptions = computed(() => (_.flatMap(props.pageNationValues, size => ({ type: 'item', label: size, name: size }))));
@@ -230,6 +232,9 @@ export default {
         .toolbox {
             @apply px-4 py-6;
             /*margin-top: 0.5rem;*/
+            .toolbox-top{
+                @apply w-full mb-4;
+            }
             .toolbox-middle{
                 display: flex;
                 justify-content: space-between;

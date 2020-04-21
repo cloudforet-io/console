@@ -1,35 +1,24 @@
 <template>
-    <tr class="def" @mouseleave="onMouseOut">
+    <tr class="def">
         <td class="key">
             {{ name }}
         </td>
-        <td class="value" @mouseenter="onMouseOver">
+        <td class="value" :class="{hover:isMouseOver}">
             <p-dynamic-field ref="field" :view_type="view_type" :view_option="view_option"
                              :data="data"
             />
-            <p-copy-button v-if="isMouseOver&&value" class="copy-btn" :value="value" />
+            <PCopyButton v-if="typeof data !== 'undefined'&& data !== ''" class="ml-2" @copy="copy"
+                         @mouseover="onMouseOver()" @mouseout="onMouseOut()"
+            />
         </td>
     </tr>
-    <!--    <div class="content-container">-->
-    <!--        <span class="content">-->
-    <!--            <p-dt class="label">{{ name }}</p-dt>-->
-<!--    <span class="data" @mouseleave="onMouseOut">-->
-<!--        <p-dd @mouseenter="onMouseOver">-->
-<!--            <p-dynamic-field ref="field" :view_type="view_type" :view_option="view_option"-->
-<!--                             :data="data"-->
-<!--            />-->
-<!--        </p-dd>-->
-<!--        <p-copy-button v-if="isMouseOver" class="copy-btn" :value="value" />-->
-<!--    </span>-->
-<!--        </span>-->
-<!--    </div>-->
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
 
 import {
-    computed, defineComponent, Ref, ref,
+    computed, defineComponent, ref,
 } from '@vue/composition-api';
 
 import { mouseOverState } from '@/lib/compostion-util';
@@ -37,6 +26,7 @@ import PDt from '@/components/atoms/lists/dl-list/Dt.vue';
 import PDd from '@/components/atoms/lists/dl-list/Dd.vue';
 import PCopyButton from '@/components/molecules/buttons/CopyButton.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
+import { copyAnyData } from '@/lib/util';
 
 export default defineComponent({
     name: 'Definition',
@@ -62,12 +52,13 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const field = ref(null);
-        // @ts-ignore
-        const value = computed(() => field.value.$el.innerText);
+        const field = ref<any>(null);
+        const copy = () => {
+            copyAnyData(field.value?.$el.innerText);
+        };
         return {
             field,
-            value,
+            copy,
             ...mouseOverState(),
         };
     },
@@ -77,16 +68,18 @@ export default defineComponent({
 <style scoped lang="postcss">
 .def{
     .key{
-        @apply px-4 text-sm font-bold max-w-xs h-8;
+        @apply py-2 px-4 text-sm font-bold max-w-xs;
         line-height: 1.0625rem;
         width: 18rem;
         font-family: Noto Sans;
 
     }
     .value{
-        @apply h-8 px-4;
+        @apply py-2 px-4;
         font-family: Noto Sans;
-
+        &.hover{
+            @apply text-blue-500;
+        }
 
     }
 }
