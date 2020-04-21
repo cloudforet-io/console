@@ -54,7 +54,7 @@
                 <p-dict-panel :dict="apiHandler.tableTS.selectState.firstSelectItem.tags">
                     <template #extra>
                         <p-button style-type="primary" @click="editTag">
-                            {{ $t('BTN.ADD') }}
+                            {{ $t('BTN.EDIT') }}
                         </p-button>
                     </template>
                 </p-dict-panel>
@@ -67,9 +67,12 @@
                 />
             </template>
             <template #rawData>
-                <p-raw-data :item="apiHandler.tableTS.selectState.firstSelectItem" />
+                <p-raw-data class="my-8 mx-4" :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #admin>
+                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
+                    {{ $t('TAB.ADMIN') }}
+                </PPanelTop>
                 <p-dynamic-view
                     view_type="table"
                     :api-handler="adminApiHandler"
@@ -77,6 +80,9 @@
                 />
             </template>
             <template #history>
+                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="historyAPIHandler.totalCount.value">
+                    {{ $t('TAB.HISTORY') }}
+                </PPanelTop>
                 <p-dynamic-view
                     view_type="table"
                     :api-handler="historyAPIHandler"
@@ -96,6 +102,9 @@
                 />
             </template>
             <template #admin>
+                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
+                    {{ $t('TAB.ADMIN') }}
+                </PPanelTop>
                 <p-dynamic-view
                     view_type="table"
                     :api-handler="adminApiHandler"
@@ -149,6 +158,7 @@ import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
 import PI from '@/components/atoms/icons/PI.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 
 export default {
     name: 'CloudServicePage',
@@ -172,6 +182,7 @@ export default {
         SProjectTreeModal,
         SCollectModal,
         PDictPanel,
+        PPanelTop,
     },
     props: {
         provider: {
