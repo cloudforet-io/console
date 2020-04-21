@@ -21,16 +21,19 @@
                                     responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}
                                 }"
                                 :data="null"
+                                @clickExcel="exportToolSet.getData()"
                 >
                     <template #toolbox-left>
-                        <p-button style-type="primary-dark"
-                                  :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
-                                  @click="clickCollectData"
+                        <PIconTextButton style-type="primary-dark"
+                                         name="ic_plus_bold"
+                                         :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
+                                         @click="clickCollectData"
                         >
                             {{ $t('BTN.COLLECT_DATA') }}
-                        </p-button>
+                        </PIconTextButton>
+
                         <PDropdownMenuBtn
-                            class="left-toolbox-item"
+                            class="left-toolbox-item mr-4"
                             :menu="csDropdownMenu"
                             @click-project="clickProject"
                             @click-link="apiHandler.tableTS.linkState.openLink()"
@@ -48,6 +51,13 @@
                     :details="apiHandler.tableTS.selectState.firstSelectItem.metadata.details"
                     :data="apiHandler.tableTS.selectState.firstSelectItem"
                 />
+                <p-dict-panel :dict="apiHandler.tableTS.selectState.firstSelectItem.tags">
+                    <template #extra>
+                        <p-button style-type="primary" @click="editTag">
+                            {{ $t('BTN.ADD') }}
+                        </p-button>
+                    </template>
+                </p-dict-panel>
             </template>
             <template #data>
                 <PDynamicSubData
@@ -108,12 +118,10 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, ref, computed, watch,
+    reactive, toRefs, ref, computed, watch, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import {
-    timestampFormatter, serverStateFormatter, platformBadgeFormatter, getValue,
-} from '@/lib/util';
+import { getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
@@ -125,28 +133,22 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import {
     AdminFluentAPI,
-    HistoryFluentAPI, QuerySearchTableFluentAPI, SearchTableFluentAPI,
+    HistoryFluentAPI, QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { fluentApi } from '@/lib/fluent-api';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
-import {
-    getEnumValues, getFetchValues, makeValuesFetchHandler,
-} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import { ServerModel } from '@/lib/fluent-api/inventory/server';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
-import { Computed } from '@/lib/type';
-import { ChangeCloudServiceProject } from '@/lib/api/fetch';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 export default {
     name: 'CloudServicePage',
@@ -158,7 +160,7 @@ export default {
         PHorizontalLayout,
         PDynamicView,
         PI,
-        PIconButton,
+        PIconTextButton,
         PTab,
         PDynamicSubData,
         PButton,
@@ -169,6 +171,7 @@ export default {
         PEmpty,
         SProjectTreeModal,
         SCollectModal,
+        PDictPanel,
     },
     props: {
         provider: {
@@ -187,6 +190,8 @@ export default {
 
     },
     setup(props, context) {
+        const vm = getCurrentInstance();
+
         const state = reactive({
             originDataSource: [],
             dataSource: computed(() => [
@@ -256,10 +261,14 @@ export default {
             padding: true,
             selectable: true,
             dragable: true,
+            excelVisible: true,
         });
         const exportAction = fluentApi.addons().excel().export();
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
-        getDataSource(props.provider, props.group, props.name);
+        onMounted(async () => {
+            await getDataSource(props.provider, props.group, props.name);
+            exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
+        });
         watch(() => [props.provider, props.group, props.name], async (after, before) => {
             if (after && (before && (after[0] !== before[0] || after[1] !== before[1] || after[2] !== before[2]))) {
                 apiHandler.resetAll();
@@ -270,6 +279,7 @@ export default {
                     { key: 'cloud_service_type', operator: '=', value: after[2] },
                 );
                 await apiHandler.getData();
+                console.debug(state.exportDataSource);
                 exportToolSet.action = exportAction.setDataSource(state.exportDataSource);
             }
         });
@@ -287,7 +297,6 @@ export default {
                 ['region', 'BTN.CHG_REGION'],
                 [null, null, { type: 'divider' }],
                 ['link', null, { label: 'Console', disabled: apiHandler.tableTS.noLink }],
-                ['exportExcel', null, { label: 'Export', disabled: false }],
             ],
             context.parent,
             { type: 'item', disabled: true }),
@@ -355,7 +364,15 @@ export default {
         // @ts-ignore
         const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
 
-
+        const editTag = () => {
+            vm?.$router.push({
+                name: 'cloudServicePageTags',
+                params: { resourceId: apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id },
+                query: {
+                    nextPath: vm?.$route.fullPath,
+                },
+            });
+        };
         return {
             ...toRefs(state),
             apiHandler,
@@ -371,6 +388,7 @@ export default {
             multiItemTab,
             adminApiHandler,
             historyAPIHandler,
+            editTag,
         };
     },
 };

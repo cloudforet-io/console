@@ -1,7 +1,10 @@
 import { action } from '@storybook/addon-actions';
 import { text, select, boolean } from '@storybook/addon-knobs/vue';
 
+import icon from 'vue-svgicon';
 import PIconButton from './IconButton.vue';
+import PIconTextButton from './IconTextButton.vue';
+
 import PCopyButton from './CopyButton.vue';
 
 import {
@@ -10,6 +13,9 @@ import {
     rotatingMapping,
     sizeMapping,
 } from '../../atoms/icons/PiMapping';
+
+const icons = Object.keys(icon.icons);
+
 
 export default {
     title: 'molecules/buttons',
@@ -32,7 +38,7 @@ export const iconButton = () => ({
     template: `
 <p-icon-button 
     @click="click"
-    name="ic_refresh"
+    :name="name"
     :disabled="disabled"
     :iconStyle="iconStyle"
     :buttonStyle="buttonStyle"
@@ -43,9 +49,15 @@ export const iconButton = () => ({
 >
 </p-icon-button>`,
     props: {
+        name: {
+            default: select('name', icons, 'ic_refresh'),
+        },
         // ...autoProps(PIconButton),
         iconStyle: {
             default: select('icon_style', [...Object.keys(iconStyleMapping)], 'solid'),
+        },
+        disabled: {
+            default: boolean('disabled', false),
         },
         size: {
             default: select('size', ['', ...Object.keys(sizeMapping)], ''),
@@ -68,6 +80,44 @@ export const iconButton = () => ({
     },
 });
 
+
+export const iconTextButton = () => ({
+    components: { PIconTextButton },
+    template: `
+<p-icon-text-button 
+    @click="click"
+    :name="name"
+    :disabled="disabled"
+    :styleType="styleType"
+    :size="size"
+    :iconDirection="iconDirection"
+>
+   icon text button 
+</p-icon-text-button>`,
+    props: {
+        name: {
+            default: select('name', icons, 'ic_plus_bold'),
+        },
+        disabled: {
+            default: boolean('disabled', false),
+        },
+        size: {
+            default: select('size', ['', ...Object.keys(sizeMapping)], ''),
+        },
+        styleType: {
+            default: select('style', [
+                'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
+                'secondary', 'secondary1', 'secondary2',
+                'coral', 'yellow'], 'primary'),
+        },
+        iconDirection: {
+            default: select('iconDirection', ['left', 'right'], 'left'),
+        },
+    },
+    methods: {
+        ...actions,
+    },
+});
 
 export const copyButton = () => ({
     components: { PCopyButton },

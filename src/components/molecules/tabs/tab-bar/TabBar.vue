@@ -91,9 +91,6 @@ export default {
             &:not(.one-tab) {
                 @apply border-b-2 border-primary;
             }
-            &.one-tab {
-                @apply border-b-2 border-white;
-            }
         }
         &:not(.active) {
             @apply text-gray-500;

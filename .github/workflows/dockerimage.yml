@@ -1,0 +1,45 @@
+name: Docker Image CI
+
+#on:
+#  push:
+#    branches: [ master ]
+on:
+  push:
+    branches-ignore:
+      - '**'
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Checkout submodules
+      uses: srt32/git-actions@v0.0.3
+      with:
+        args: git submodule update --init --recursive
+
+    - name: AWS ECR
+      uses: kciter/aws-ecr-action@v1
+      with:
+        # The AWS access key id
+        access_key_id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+        # The AWS secret access key
+        secret_access_key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+        # AWS Account ID
+        account_id: ${{ secrets.DEV_AWS_ACCOUNT_ID }}
+        # Name of your ECR repository
+        repo: cloudone/webconsole/client
+        # The AWS region
+        region: ap-northeast-2
+        # Comma-separated string of ECR image tags
+        tags: latest,${{ github.sha }}
+
+    - name: Merge to uat branch
+      uses: devmasx/merge-branch@v1.1.0
+      with:
+        type: now
+        target_branch: 'build'
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

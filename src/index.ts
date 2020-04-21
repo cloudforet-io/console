@@ -2,10 +2,10 @@
 import './styles/style.scss';
 
 // lib
-import * as Fluent from '@/lib/fluent-api';
-import * as Mock from '@/lib/mock';
-import * as ApiToolSet from '@/lib/api';
-import * as Translations from '@/translations';
+import * as Fluent from './lib/fluent-api';
+import * as Mock from './lib/mock';
+import * as ApiToolSet from './lib/api';
+import * as Translations from './translations';
 export {
     Fluent,
     Mock,

@@ -1,11 +1,11 @@
 import { toRefs, reactive } from '@vue/composition-api';
 import { object, number } from '@storybook/addon-knobs/vue';
-import PRouteBreadcrumb from './RouteBreadcrumb.vue';
-import md from './RouteBreadcrumb.md';
+import PRouteBreadcrumb from '@/components/molecules/breadcrumbs/breadcrumb/RouteBreadcrumb.vue';
+import md from '@/components/molecules/breadcrumbs/breadcrumb/RouteBreadcrumb.md';
 
 
 export default {
-    title: 'molecules/breadcrumbs/RouteBreadcrumbItem',
+    title: 'molecules/breadcrumbs/RouteBreadcrumb',
     component: PRouteBreadcrumb,
     parameters: {
         notes: md,
@@ -75,7 +75,7 @@ const getState = () => reactive({
 
 export const defaultCase = () => ({
     components: { PRouteBreadcrumb },
-    template: `<p-breadcrumb :current-idx="currentIdx"
+    template: `<p-route-breadcrumb :current-idx="currentIdx"
                       :routes="routes"
         />`,
     setup() {

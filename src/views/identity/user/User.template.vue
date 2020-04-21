@@ -27,9 +27,12 @@
                     @changeSort="getUsers"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary-dark" @click="clickAdd">
+                        <PIconTextButton style-type="primary-dark"
+                                         name="ic_plus_bold"
+                                         @click="clickAdd"
+                        >
                             {{ $t('BTN.CREATE') }}
-                        </p-button>
+                        </PIconTextButton>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
                             class="left-toolbox-item"
@@ -134,6 +137,8 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
+import PI from '@/components/atoms/icons/PI.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
@@ -395,6 +400,7 @@ export default {
         getValue,
     },
     components: {
+        PIconTextButton,
         GeneralPageLayout,
         PUserForm,
         PStatus,
@@ -412,6 +418,7 @@ export default {
         PCol,
         PHr,
         PIconButton,
+        PI,
     },
     setup(props, context) {
         const dataBind = reactive({

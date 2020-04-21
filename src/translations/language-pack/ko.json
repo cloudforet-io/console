@@ -6,11 +6,13 @@
 				"KEY_EMPTY": "키를 입력해주세요.",
 				"VAL_EMPTY": "값을 입력해주세요."
 			}
-		}
+		},
+		"SELECTED_OF": "{totalCount}개 중 {selectedCount}개 선택"
 	},
 	"BTN": {
 		"ACTION": "작업",
 		"ADD": "추가",
+		"ADD_TAG": "태그 추가",
 		"BACK": "이전으",
 		"CANCEL": "취소",
 		"CHG_POOL": "풀 변경하기",
@@ -212,8 +214,10 @@
 		"None": ""
 	},
 	"FIELD": {
+		"ACCOUNT_NAME": "계정 이름",
 		"CLOUD_SERVICE": "클라우드 서비스",
 		"COLLECTOR": "컬렉터",
+		"CREDENTIALS": "암호",
 		"EMAIL": "이메일",
 		"ID": "아이디",
 		"NAME": "이름",
@@ -221,6 +225,7 @@
 		"PROJECT_GRP": "프로젝트 그룹",
 		"RANK": "순위",
 		"SERVER": "서버",
+		"SERVICE_PROVIDER": "서비스 프로바이더",
 		"START_TIME": "시작 시간",
 		"STATE": "상태"
 	},

@@ -6,11 +6,13 @@
 				"KEY_EMPTY": "",
 				"VAL_EMPTY": ""
 			}
-		}
+		},
+		"SELECTED_OF": ""
 	},
 	"BTN": {
 		"ACTION": "",
 		"ADD": "",
+		"ADD_TAG": "",
 		"BACK": "",
 		"CANCEL": "",
 		"CHG_POOL": "",
@@ -212,8 +214,10 @@
 		"None": ""
 	},
 	"FIELD": {
+		"ACCOUNT_NAME": "",
 		"CLOUD_SERVICE": "",
 		"COLLECTOR": "",
+		"CREDENTIALS": "",
 		"EMAIL": "",
 		"ID": "",
 		"NAME": "",
@@ -221,6 +225,7 @@
 		"PROJECT_GRP": "",
 		"RANK": "",
 		"SERVER": "",
+		"SERVICE_PROVIDER": "",
 		"START_TIME": "",
 		"STATE": ""
 	},

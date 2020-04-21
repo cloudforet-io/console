@@ -12,10 +12,10 @@
                 <p-lazy-img :img-url="iconUrl"
                             :error-icon="defaultIcon"
                             width="2rem" height="2rem"
-                            class="flex-shrink-0"
+                            class="flex-shrink-0 mr-2"
                 />
             </slot>
-            <div class="flex-grow pl-2 overflow-hidden">
+            <div class="flex-grow overflow-hidden">
                 <slot name="contents" :color="color">
                     <slot name="title">
                         <p class="title">

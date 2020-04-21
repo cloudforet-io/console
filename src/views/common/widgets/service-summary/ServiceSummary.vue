@@ -37,7 +37,7 @@ import { SChartToolSet } from '@/lib/chart/toolset';
 import { HistoryQueryAPI, HistoryResponse, OPERATORS } from '@/lib/fluent-api/statistics/toolset';
 import { gray } from '@/styles/colors';
 import casual, { arrayOf } from '@/lib/casual';
-// TODO: browser tooltip for exact count
+
 export default defineComponent({
     name: 'ServiceSummary',
     components: { PWidgetLayout, PChartLoader, AnimatedNumber },

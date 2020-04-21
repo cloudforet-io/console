@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top >
+        <p-panel-top>
             Base Information
         </p-panel-top>
         <p-dynamic-view view_type="item" :data="item||{}"
@@ -8,19 +8,22 @@
                         class="mb-6"
         />
         <p-dynamic-details :details="item.metadata.details" :data="item||{}" />
-        <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
-                      :edit-mode.sync="tagsApi.ts.syncState.editMode"
-                      v-on="tagsApi.ts.listeners"
-        />
+        <p-dict-panel :dict="tags">
+            <template #extra>
+                <p-button style-type="primary" @click="editTag">
+                    {{ $t('BTN.ADD') }}
+                </p-button>
+            </template>
+        </p-dict-panel>
     </div>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { watch } from '@vue/composition-api';
-import { DictPanelAPI } from '@/lib/api/dict';
-import { fluentApi } from '@/lib/fluent-api';
-
+import {
+    getCurrentInstance, reactive, ref, toRefs, watch,
+} from '@vue/composition-api';
+import PButton from '@/components/atoms/buttons/Button.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
@@ -29,7 +32,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 export default {
     name: 'PServerDetail',
     components: {
-        PDictPanel, PDynamicView, PDynamicDetails, PPanelTop,
+        PDictPanel, PDynamicView, PDynamicDetails, PPanelTop, PButton,
 
     },
     props: {
@@ -42,17 +45,22 @@ export default {
             default: () => [],
         },
     },
-    setup(props, { parent }) {
-        const tagsApi = new DictPanelAPI(fluentApi.inventory().server());
-
-        watch(() => props.item, async (item) => {
-            tagsApi.setId(item.server_id);
-            tagsApi.ts.toReadMode();
-            await tagsApi.getData();
+    setup(props) {
+        const vm = getCurrentInstance();
+        const state = reactive({
+            tags: {},
+            resourceId: '',
         });
-
+        watch(() => props.item, async (item) => {
+            state.tags = item.tags;
+            state.resourceId = item.server_id;
+        });
+        const editTag = () => {
+            vm?.$router.push({ name: 'serverTags', params: { resourceId: state.resourceId } });
+        };
         return {
-            tagsApi,
+            ...toRefs(state),
+            editTag,
         };
     },
 };

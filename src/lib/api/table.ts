@@ -142,6 +142,7 @@ export class SubDataFluentAPI<
                 shadow: false,
                 padding: false,
                 selectable: false,
+                excelVisible: true,
                 ...initData,
             }, // sub api can't support only query
             initSyncData,

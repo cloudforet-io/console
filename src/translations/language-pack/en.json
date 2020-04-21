@@ -6,11 +6,13 @@
 				"KEY_EMPTY": "Enter the Key.",
 				"VAL_EMPTY": "Enter the Value."
 			}
-		}
+		},
+		"SELECTED_OF": "{selectedCount} selected of {totalCount}"
 	},
 	"BTN": {
 		"ACTION": "Actions",
 		"ADD": "Add",
+		"ADD_TAG": "Add Tag",
 		"BACK": "Back",
 		"CANCEL": "Cancel",
 		"CHG_POOL": "Change Pool",
@@ -212,8 +214,10 @@
 		"None": ""
 	},
 	"FIELD": {
+		"ACCOUNT_NAME": "Account Name",
 		"CLOUD_SERVICE": "Cloud Service",
 		"COLLECTOR": "Collector",
+		"CREDENTIALS": "Credentials",
 		"EMAIL": "Email",
 		"ID": "ID",
 		"NAME": "Name",
@@ -221,6 +225,7 @@
 		"PROJECT_GRP": "Project Group",
 		"RANK": "Rank",
 		"SERVER": "Server",
+		"SERVICE_PROVIDER": "Service Provider",
 		"START_TIME": "Start Time",
 		"STATE": "State"
 	},
