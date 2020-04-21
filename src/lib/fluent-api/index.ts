@@ -1,5 +1,6 @@
 import { api as consoleApi } from '@/lib/api/axios';
 import { ApiType } from '@/lib/fluent-api/toolset';
+import Monitoring from '@/lib/fluent-api/monitoring';
 import InventoryService from './inventory';
 import PluginService from './plugin';
 import SecretService from './secret';
@@ -25,6 +26,8 @@ export class FluentApi {
     addons = (): AddOns => new AddOns(this.api);
 
     statistics = (): Statistics => new Statistics(this.api);
+
+    monitoring = (): Monitoring => new Monitoring(this.api);
 
     statisticsTest = (): StatisticsTest => new StatisticsTest(this.api);
 }

@@ -18,7 +18,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { watch } from '@vue/composition-api';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { DictPanelAPI } from '@/lib/api/dict';
 import { fluentApi } from '@/lib/fluent-api';
 
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';

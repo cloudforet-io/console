@@ -158,7 +158,7 @@ import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { DictPanelAPI } from '@/lib/api/dict';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 

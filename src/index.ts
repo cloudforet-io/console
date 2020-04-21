@@ -37,7 +37,7 @@ export { default as PTr } from './components/atoms/table/Tr.vue';
 // molecule components
 export { default as PNoticeAlert } from './components/molecules/alert/notice/NoticeAlert.vue';
 export { default as PNumberBadge } from './components/molecules/badges/number-badge/NumberBadge.vue';
-export { default as PBreadcrumb } from './components/molecules/breadcrumbs/breadcrumb/Breadcrumb.vue';
+export { default as PRouteBreadcrumb } from './components/molecules/breadcrumbs/breadcrumb/RouteBreadcrumb.vue';
 
 // molecule button components
 export { default as PCopyButton } from './components/molecules/buttons/CopyButton.vue';

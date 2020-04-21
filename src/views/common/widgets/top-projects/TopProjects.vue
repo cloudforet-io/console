@@ -189,7 +189,7 @@ export default defineComponent({
                 .setColors(_.values(ts.state.colors))
                 .setTicksCount(7)
                 .setCategoryPercentage(0.75)
-                .setBarPercentage(0.8)
+                .setBarPercentage(0.5)
                 .setStacked(true)
                 .apply()), {
                 data: [],

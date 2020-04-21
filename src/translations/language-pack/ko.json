@@ -389,6 +389,7 @@
 		"DATA": "데이터",
 		"DETAILS": "상세 정보",
 		"HISTORY": "수집 기록",
+		"MONITORING": "모니터링",
 		"RAW_DATA": "원본 데이터"
 	},
 	"TREE_TYPE": {
@@ -404,6 +405,7 @@
 	"WORD": {
 		"CIDR": "CIDR",
 		"CLOUDSERVICE": "클라우드 서비스",
+		"INSTANCE": "인스턴스",
 		"KEY": "키",
 		"SERVER": "서버",
 		"TAG": "태그",

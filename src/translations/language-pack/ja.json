@@ -389,6 +389,7 @@
 		"DATA": "",
 		"DETAILS": "",
 		"HISTORY": "",
+		"MONITORING": "",
 		"RAW_DATA": ""
 	},
 	"TREE_TYPE": {
@@ -404,6 +405,7 @@
 	"WORD": {
 		"CIDR": "",
 		"CLOUDSERVICE": "",
+		"INSTANCE": "",
 		"KEY": "",
 		"SERVER": "",
 		"TAG": "",

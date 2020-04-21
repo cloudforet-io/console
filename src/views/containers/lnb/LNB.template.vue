@@ -8,7 +8,7 @@
 
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
-import PBreadcrumb from '@/components/molecules/breadcrumbs/breadcrumb/Breadcrumb.vue';
+import PRouteBreadcrumb from '@/components/molecules/breadcrumbs/breadcrumb/RouteBreadcrumb.vue';
 
 export const setRouteState = (routes, currentIdx) => reactive({
     currentIdx: currentIdx || 1,
@@ -17,7 +17,7 @@ export const setRouteState = (routes, currentIdx) => reactive({
 
 export default {
     name: 'LNBTemplate',
-    components: { PBreadcrumb },
+    components: { PRouteBreadcrumb },
     setup() {
         return {
             ...toRefs(setRouteState()),

@@ -1,24 +1,26 @@
 <template>
     <p-pane-layout class="widget-layout">
-        <div class="title">
-            <span class="mr-2">{{ title }}</span>
-            <slot name="help" :help="help">
-                <p-tooltip-button v-if="help"
-                                  class="help" :tooltip="help"
-                                  position="top" theme="gray"
-                >
-                    <template #button>
-                        <p-i name="ic_tooltip"
-                             width="1rem" height="1rem"
-                             color="inherit transparent"
-                        />
-                    </template>
-                </p-tooltip-button>
-            </slot>
-            <div class="flex-grow">
-                <slot name="extra" />
+        <slot name="title">
+            <div class="title">
+                <span class="mr-2">{{ title }}</span>
+                <slot name="help" :help="help">
+                    <p-tooltip-button v-if="help"
+                                      class="help" :tooltip="help"
+                                      position="top" theme="gray"
+                    >
+                        <template #button>
+                            <p-i name="ic_tooltip"
+                                 width="1rem" height="1rem"
+                                 color="inherit transparent"
+                            />
+                        </template>
+                    </p-tooltip-button>
+                </slot>
+                <div class="flex-grow">
+                    <slot name="extra" />
+                </div>
             </div>
-        </div>
+        </slot>
         <div class="widget-contents">
             <slot />
         </div>
