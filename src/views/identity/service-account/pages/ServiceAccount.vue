@@ -39,6 +39,12 @@
                 <div class="w-full h-full">
                     <p-horizontal-layout>
                         <template #container="{ height }">
+                            <PPageTitle
+                                class="mb-6 mt-2"
+                                :use-selected-count="true" :use-total-count="true" title="Cloud Service"
+                                :total-count="apiHandler.totalCount.value"
+                                :selected-count="apiHandler.tableTS.selectState.selectItems.length"
+                            />
                             <p-dynamic-view view_type="table"
                                             :api-handler="apiHandler"
                                             :data_source="accountDataSource"
@@ -210,6 +216,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import _ from 'lodash';
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -230,6 +237,7 @@ export default {
         PIconTextButton,
         PPanelTop,
         PGridLayout,
+        PPageTitle,
     },
     setup(props, context) {
         const { project } = useStore();
