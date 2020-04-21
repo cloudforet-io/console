@@ -31,11 +31,13 @@
                 v-on="dictIGListeners"
             >
                 <template #addButton="scope">
-                    <p-button outline style-type="primary" :disabled="scope.disabled"
-                              @click="scope.addPair($event)"
+                    <p-icon-text-button
+                        outline style-type="primary" :disabled="scope.disabled"
+                        name="ic_plus_bold"
+                        @click="scope.addPair($event)"
                     >
-                        <p-i name="ic_plus" />  <span>{{ $t('BTN.ADD_TAG') }}</span>
-                    </p-button>
+                        {{ $t('BTN.ADD_TAG') }}
+                    </p-icon-text-button>
                 </template>
             </p-dict-input-group>
         </p-pane-layout>
@@ -70,6 +72,7 @@ import {
 import _ from 'lodash';
 import PDictInputGroup from '@/components/organisms/forms/dict-input-group/DictInputGroup.vue';
 import PPaneLayout from '@/components/molecules/layouts/pane-layout/PaneLayout.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 export default {
     name: 'CloudServicePage',
@@ -79,6 +82,7 @@ export default {
         PButton,
         PPaneLayout,
         PDictInputGroup,
+        PIconTextButton,
     },
     props: {
         resourceId: {
