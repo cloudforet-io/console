@@ -51,7 +51,7 @@ export default defineComponent({
         }
     }
     .tab-pane{
-        @apply w-full py-8;
+        @apply w-full;
         }
     }
 

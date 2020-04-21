@@ -14,7 +14,7 @@ import {
     toDictItems,
 } from '@/components/organisms/forms/dict-input-group/DictInputGroup.toolset';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { DictPanelAPI } from '@/lib/api/dict';
 
 export default {
     title: 'organisms/forms/DictInputGroup',

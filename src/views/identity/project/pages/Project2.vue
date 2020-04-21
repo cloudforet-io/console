@@ -29,21 +29,27 @@
             <div v-if="treeApiHandler.ts.metaState.firstSelectedNode">
                 <p-toolbox-grid-layout
                     v-bind="apiHandler.gridTS.state"
+                    card-height="16.2rem"
                     :this-page.sync="apiHandler.gridTS.syncState.thisPage"
                     :page-size.sync="apiHandler.gridTS.syncState.pageSize"
                     @changePageNumber="apiHandler.getData()"
                     @changePageSize="apiHandler.getData()"
                     @clickRefresh="apiHandler.getData()"
-                    @card:click="clickCard"
+                    @card:click.capture="clickCard"
                 >
                     <template #toolbox-top>
-                        <p id="parent-project-grp">
-                            {{ parentGroup }}
-                        </p>
-                        <p id="current-project-grp">
-                            {{ currentGroup }}
-                        </p>
-                        <!--                        <p id="current-project-grp">{{ projectSummary[0].project_group_info.name}}</p>-->
+                        <div>
+                            <p id="parent-project-grp">
+                                {{ parentGroup }}
+                            </p>
+                            <p id="current-project-grp">
+                                {{ currentGroup }}
+                                <p-i v-if="!hasChildProject && !hasChildProjectGroup " name="ic_transhcan" color="transparent inherit"
+                                     width="1.5rem" height="1.5rem" class="add-btn"
+                                     @click="openProjectGroupDeleteForm()"
+                                />
+                            </p>
+                        </div>
                     </template>
                     <template #toolbox-bottom>
                         <div class="tool">
@@ -72,63 +78,121 @@
                                 </div>
                             </div>
                         </div>
-                    </template>
-                    <template v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
-                        <p-hr style="width: 100%;" />
-                        <p-query-search-tags
-                            class="py-2"
-                            :tags="apiHandler.gridTS.querySearch.tags.value"
-                            @deleteTag="apiHandler.gridTS.querySearch.deleteTag"
-                            @deleteAllTags="apiHandler.gridTS.querySearch.deleteAllTags"
-                        />
+                        <div v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
+                            <p-hr style="width: 100%;" />
+                            <p-query-search-tags
+                                class="py-2"
+                                :tags="apiHandler.gridTS.querySearch.tags.value"
+                                @deleteTag="apiHandler.gridTS.querySearch.deleteTag"
+                                @deleteAllTags="apiHandler.gridTS.querySearch.deleteAllTags"
+                            />
+                        </div>
+                        <div v-if="!hasChildProject" class="empty-project">
+                            <p>Looks like you don't have any Project.</p>
+                        </div>
                     </template>
                     <template #card="{item}">
-                        <div class="project-description">
-                            <div class="project">
-                                <p id="project-group-name">
-                                    {{ item.project_group_info.name }}
-                                </p>
-                                <p id="project-name">
-                                    {{ item.name }}
-                                </p>
-                                <div v-if="item.force_console_data.providers.length == 0" class="empty-providers">
-                                    <p id="empty-provider" />
-                                </div>
-                                <div v-else-if="item.force_console_data.providers" class="providers">
-                                    <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
-                                         class="provider-icon"
+                        <div v-if="treeApiHandler.ts.metaState.firstSelectedNode && item">
+                            <div class="project-description">
+                                <div class="project">
+                                    <PCheckBox :style="{float:'right'}"/>
+                                    <div v-if="parentGroup" class="project-group-name">
+                                        {{ parentGroup }} > {{ item.project_group_info.name }}
+                                    </div>
+                                    <p v-else-if="!parentGroup" class="project-group-name">
+                                        {{ item.project_group_info.name }}
+                                    </p>
+                                    <p id="project-name">
+                                        {{ item.name }}
+                                    </p>
+                                    <div v-if="item.force_console_data.providers.length == 0" class="empty-providers"
+                                         @click="clickServiceAccount"
                                     >
-                                    <span v-if="item.force_console_data.extraProviders"> + {{ item.force_console_data.extraProviders }}</span>
+                                        <p>
+                                            <p-i :name="hover ? 'btn_circle_plus_blue' : 'btn_circle_plus_blue--hover'"
+                                                 color="transparent inherit"
+                                                 width="1rem" height="1rem" class="btn_circle_plus_blue"
+                                            />
+                                            Add Service Account
+                                        </p>
+                                    </div>
+                                    <div v-else-if="item.force_console_data.providers" class="providers">
+                                        <img v-for="(url, index) in item.force_console_data.providers" :key="index" :src="url"
+                                             class="provider-icon"
+                                        >
+                                        <span v-if="item.force_console_data.extraProviders"> + {{ item.force_console_data.extraProviders }}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <hr class="solid">
-                        <div class="project-summary">
-                            <div v-if="cardSummary[item.project_id]" class="summary-item">
-                                <span class="summary-item-text">Cloud Service</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].cloud_service }}</span><br>
-                                <span class="summary-item-text">Server</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].server }}</span><br>
-                                <span class="summary-item-text">Member</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].member }}</span>
-                            </div>
-                            <div v-else class="loading">
-                                loading
+                            <hr class="solid">
+                            <div class="project-summary">
+                                <div v-if="cardSummary[item.project_id]" class="summary-item">
+                                    <span class="summary-item-text">Cloud Service</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].cloud_service }}</span><br>
+                                    <span class="summary-item-text">Server</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].server }}</span><br>
+                                    <span class="summary-item-text">Member</span>   <span class="summary-item-num">{{ cardSummary[item.project_id].member }}</span>
+                                </div>
+                                <div v-else class="loading">
+                                    <div v-for="v in skeletons" :key="v" class="flex items-center p-2">
+                                        <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
+                                        <p-skeleton class="flex-grow" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </template>
                 </p-toolbox-grid-layout>
             </div>
-            <p-empty v-else class="empty">
+            <div v-else class="empty">
                 <p-i :width="'14rem'" :height="'14rem'" :name="'ic_no_selected_proj'" />
-                <div class="empty-msg">
-                    No Selected Project<br>
-                    Please, Click an item from left table.
+                <div class="empty-project-grp">
+                    <p class="title">
+                        Let's begin your <br>
+                        resource management!<br>
+                    </p>
+                    <p class="content">
+                        Getting started with grouping your scattered resource and <br>
+                        accounts with your own project.<br><br>
+                    </p>
+                    <p class="content-order">
+                        1. Name your project group first. <br>
+                        2. Register your project. <br>
+                        3. Integrate with your resources.
+                    </p>
+                    <p-button style-type="primary-dark"
+                              @click="openProjectGroupForm"
+                    >
+                        <p-i name="ic_plus" color="transparent inherit"
+                             width="1rem" height="1rem" class="add-btn"
+                        />
+                        Create Project Group
+                    </p-button>
                 </div>
-            </p-empty>
+            </div>
             <SProjectGroupCreateFormModal v-if="projectGroupFormVisible" :visible.sync="projectGroupFormVisible"
                                           @confirm="projectGroupFormConfirm($event)"
             />
             <SProjectCreateFormModal v-if="projectFormVisible" :visible.sync="projectFormVisible"
                                      @confirm="projectFormConfirm($event)"
             />
+            <p-button-modal
+                :header-title="headerTitle"
+                :centered="true"
+                size="md"
+                :fade="true"
+                :backdrop="true"
+                :visible.sync="projectGroupDeleteFormVisible"
+                :theme-color="themeColor"
+                :footer-confirm-button-bind="{
+                    styleType: 'alert',
+                }"
+                @confirm="projectGroupDeleteFormConfirm"
+            >
+                <template #body>
+                    <p class="delete-modal-content">
+                        {{ modalContent }}
+                    </p>
+                </template>
+            </p-button-modal>
         </template>
     </p-vertical-page-layout2>
 </template>
@@ -149,6 +213,7 @@ import PI from '@/components/atoms/icons/PI.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PCheckBox from '@/components/molecules/forms/checkbox/CheckBox.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
+import PSkeleton from '@/components/atoms/skeletons/Skeleton.vue';
 import { fluentApi } from '@/lib/fluent-api';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ProjectModel, ProjectListResp } from '@/lib/fluent-api/identity/project';
@@ -156,12 +221,13 @@ import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProviderListResp } from '@/lib/fluent-api/identity/provider';
 import config from '@/lib/config';
-import { ProjectSummaryResp } from '@/lib/fluent-api/statistics/identity/project-summary';
+import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
 import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
+import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 import SProjectCreateFormModal from '@/views/identity/project/modules/ProjectCreateFormModal.vue';
 import SProjectGroupCreateFormModal from '@/views/identity/project/modules/ProjectGroupCreateFormModal.vue';
 
@@ -183,7 +249,11 @@ import SProjectGroupCreateFormModal from '@/views/identity/project/modules/Proje
         item: any;
         items: ProjectCardData[];
         selectedId: string;
+        node: any;
+        hasChildProject: boolean;
+        hasChildProjectGroup: boolean;
     }
+
 
 export default {
     name: 'Project2',
@@ -195,8 +265,9 @@ export default {
         PQuerySearchBar,
         PQuerySearchTags,
         PCheckBox,
-        PEmpty,
+        PSkeleton,
         PToolboxGridLayout,
+        PButtonModal,
         SProjectCreateFormModal,
         SProjectGroupCreateFormModal,
     },
@@ -205,11 +276,15 @@ export default {
             item: [],
             items: [],
             selectedId: '',
+            node: {},
+            hasChildProject: true,
+            hasChildProjectGroup: true,
         });
-        const treeState = reactive({
+        const projectState = reactive({
             parentGroup: '',
             currentGroup: '',
         });
+        const treeState = new TreeState().state;
         const { provider } = useStore();
         provider.getProvider();
         const vm = getCurrentInstance();
@@ -222,7 +297,15 @@ export default {
             .setExcludeProject();
         const treeApiHandler = new ProjectTreeFluentAPI(treeAction);
         const projectAPI = fluentApi.identity().project();
+        const projectGroupAPI = fluentApi.identity().projectGroup();
         const statisticsAPI = fluentApi.statistics().projectSummary();
+
+        /**
+             Add Node to Tree
+         */
+
+        const addMode = ['append', 'prepend', 'before', 'after'];
+        const addModeIdx = ref(0);
 
         /**
         * Make Card Data
@@ -231,9 +314,6 @@ export default {
         const cardSummary = ref(createdData);
         const projectSummary = ref(createdData);
 
-        // Get & Refine Card Data for setTransformer action in fluent API
-        // First, Get statistics info of Project
-        // Second, Get providers list from Provider store and save them to force_console_data
         const getCard = (resp: AxiosResponse<ProjectListResp>) => {
             const ids = resp.data.results.map(item => item.project_id);
             cardSummary.value = reactive(_.zipObject(ids));
@@ -262,7 +342,6 @@ export default {
             return resp;
         };
 
-        // Use fluent API with multiple options(include setTransformer action) and Get project list
         const listAction = projectAPI.list().setTransformer(getCard).setIncludeProvider();
 
         /**
@@ -285,8 +364,8 @@ export default {
                 },
             },
         );
-        // Execute Api Handler above when Tree clicked
-        watch(() => treeApiHandler.ts.metaState.firstSelectedNode, (after: any, before: any) => {
+
+        watch(() => treeApiHandler.ts.metaState.firstSelectedNode, async (after: any, before: any) => {
             if ((after && !before) || (after && after.data.id !== before.data.id)) {
                 apiHandler.action = listAction.setFixFilter({
                     key: 'project_group_id',
@@ -294,7 +373,10 @@ export default {
                     operator: '=',
                 });
                 apiHandler.resetAll();
-                apiHandler.getData();
+                const resp = await apiHandler.getData();
+                const projectTotal = resp?.data?.total_count;
+                if (projectTotal > 0) state.hasChildProject = true;
+                else state.hasChildProject = false;
             }
         });
 
@@ -302,11 +384,15 @@ export default {
          * Click Tree Item
          */
         const selected = async (item) => {
-            console.log('selected test', item);
             treeApiHandler.ts.getSelectedNode(item);
-            treeState.currentGroup = item.data.name;
-            if (item.parent) { treeState.parentGroup = item.parent.data.name; } else { treeState.parentGroup = ''; }
+            projectState.currentGroup = item.data.name;
+            if (item.parent) { projectState.parentGroup = item.parent.data.name; } else { projectState.parentGroup = ''; }
             state.selectedId = item.data.id;
+            state.node = item;
+            state.hasChildProjectGroup = true;
+            const res = await projectGroupAPI.list().setFilter({ key: 'parent_project_group_id', operator: '=', value: state.selectedId }).execute();
+            if (res.data.total_count === 0) state.hasChildProjectGroup = false;
+            else state.hasChildProjectGroup = true;
             state.items = [];
         };
 
@@ -325,19 +411,67 @@ export default {
             });
         };
 
+        const clickServiceAccount = (item) => {
+            vm?.$router.push({
+                name: 'serviceAccount',
+            });
+        };
+
         /**
          * Handling Form
          */
-        // Make and Confirm Project Group Form
         const formState = reactive({
             projectGroupFormVisible: false,
             projectFormVisible: false,
+            projectGroupDeleteFormVisible: false,
+            headerTitle: '',
+            themeColor: '',
+            modalContent: '',
         });
+
+        const openProjectGroupDeleteForm = () => {
+            formState.projectGroupDeleteFormVisible = true;
+            formState.headerTitle = 'Delete Project Group';
+            formState.themeColor = 'alert';
+            formState.modalContent = 'Are you sure you want to delete this Project group?';
+        };
+
+        const projectGroupDeleteFormConfirm = () => {
+            console.log('node test', state.node);
+            fluentApi.identity().projectGroup().delete().setId(state.selectedId)
+                .execute()
+                .then(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Success',
+                        text: 'Delete Project Group',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .catch(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Fail',
+                        text: 'Delete Request Fail',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .finally(() => {
+                    window.location.reload();
+                });
+            formState.projectGroupDeleteFormVisible = false;
+        };
+
         const openProjectGroupForm = () => {
             formState.projectGroupFormVisible = true;
         };
         const projectGroupFormConfirm = (item) => {
             fluentApi.identity().projectGroup().create().setParameter({
+                parent_project_group_id: state.selectedId,
                 ...item,
             })
                 .execute()
@@ -362,14 +496,12 @@ export default {
                     });
                 })
                 .finally(() => {
-                    fluentApi.identity().project().tree()
-                        .setSortBy('item_type')
-                        .setExcludeProject();
+                    const newNode = new TreeItem(item.name, item, undefined, undefined, undefined, true);
+                    treeApiHandler.ts.treeRef.value.addNode(undefined, newNode, addMode[addModeIdx.value]);
                 });
             formState.projectGroupFormVisible = false;
         };
 
-        // Make and Confirm Project Group Form
         const openProjectForm = () => {
             formState.projectFormVisible = true;
         };
@@ -408,15 +540,22 @@ export default {
         return {
             treeRef: treeApiHandler.ts.treeRef,
             treeApiHandler,
+            treeState,
+            addMode,
+            addModeIdx,
             ...toRefs(state),
-            ...toRefs(treeState),
+            ...toRefs(projectState),
             ...toRefs(formState),
+            skeletons: _.range(3),
             selected,
             clickCard,
+            clickServiceAccount,
             cardSummary,
             projectSummary,
             openProjectForm,
             apiHandler,
+            openProjectGroupDeleteForm,
+            projectGroupDeleteFormConfirm,
             projectFormConfirm,
             openProjectGroupForm,
             projectGroupFormConfirm,
@@ -467,7 +606,8 @@ export default {
         margin-top: 1.5rem;
     }
 
-    #project-group-name {
+    .project-group-name {
+        @apply text-gray-500;
         font-size: .75rem;
         margin-bottom: .25rem;
     }
@@ -475,11 +615,10 @@ export default {
     #project-name {
         font-size: 1.12rem;
         font-weight: bold;
-        margin-bottom: 1.4rem;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
-        padding-bottom: 0.56rem;
+        padding-bottom: 1.3rem;
     }
 
     .provider-icon {
@@ -489,8 +628,13 @@ export default {
         margin-right: .5rem;
     }
 
-    #empty-provider {
-        padding-top: 1.1rem;
+    .empty-providers {
+        z-index: 999;
+        p {
+            @apply text-secondary;
+            z-index: 999;
+            font-size: 0.87rem;
+        }
     }
 
     .solid {
@@ -546,6 +690,33 @@ export default {
             .tool-right-btn {
                 margin-left: 1rem;
             }
+        }
+    }
+
+    .empty-project {
+        text-align: center;
+        padding-top: 11.2rem;
+        font-size: 1rem;
+    }
+
+    .empty-project-grp {
+        .title {
+            @apply text-primary-dark;
+            font-weight: bold;
+            font-size: 1.5rem;
+            padding-top: 2rem;
+            padding-bottom: 1rem;
+            line-height: 120%;
+        }
+        .content {
+            font-size: .9rem;
+            padding-bottom: 1rem;
+            line-height: 150%;
+        }
+        .content-order {
+            font-size: .9rem;
+            padding-bottom: 2.5rem;
+            line-height: 180%;
         }
     }
 

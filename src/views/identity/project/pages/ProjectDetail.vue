@@ -1,38 +1,50 @@
 <template>
     <general-page-layout>
         <div class="top">
-            <div class="project-name">
-                <p-i name="ic_back" width="2rem" height="2rem"
-                     @click="$router.push({name:'projectMain'})"
-                />
+            <div class="project-info">
+                <span>
+                    <p-i name="ic_back" width="2rem" height="2rem"
+                         cursor="pointer" margin-top="-10px"
+                         @click="$router.push({name:'projectMain'})"
+                    />
+                </span>
                 <span>{{ item.name || 'Project' }}</span>
+                <p-i name="ic_transhcan" color="transparent inherit"
+                     width="1.5rem" height="1.5rem" class="delete-btn"
+                     @click="openProjectDeleteForm()"
+                />
             </div>
         </div>
         <PTab :tabs="tabs" :active-tab.sync="activeTab">
+            <template #summary="{height}">
+                <project-dashboard ref="ProjectDashboard" />
+            </template>
             <template #member="{height}">
-                <p-dynamic-view view_type="query-search-table"
-                                :api-handler="apiHandler"
-                                :data_source="dataSource"
-                                :vbind="{responsiveStyle:{'height': 600+'px', 'overflow-y':'auto','overflow-x':'auto'}}"
-                                :data="null"
-                >
-                    <template #toolbox-left>
-                        <p-button style-type="primary-dark"
-                                  @click="openMemberAddForm()"
-                        >
-                            {{ $t('BTN.ADD') }}
-                        </p-button>
-                        <p-button
-                            class="toolbox-left-btn"
-                            outline
-                            style-type="alert"
-                            :disabled="apiHandler.tableTS.selectState.isNotSelected"
-                            @click="memberDeleteClick"
-                        >
-                            Delete
-                        </p-button>
-                    </template>
-                </p-dynamic-view>
+                <div :style="{'border-width':'0px'}">
+                    <p-dynamic-view view_type="query-search-table"
+                                    :api-handler="apiHandler"
+                                    :data_source="dataSource"
+                                    :vbind="{responsiveStyle:{'height': 480+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding': 0}}"
+                                    :data="null"
+                    >
+                        <template #toolbox-left>
+                            <p-button style-type="primary-dark"
+                                      @click="openMemberAddForm()"
+                            >
+                                {{ $t('BTN.ADD') }}
+                            </p-button>
+                            <p-button
+                                class="toolbox-left-btn"
+                                outline
+                                style-type="alert"
+                                :disabled="apiHandler.tableTS.selectState.isNotSelected"
+                                @click="memberDeleteClick"
+                            >
+                                Delete
+                            </p-button>
+                        </template>
+                    </p-dynamic-view>
+                </div>
             </template>
             <template #Tags>
                 <div class="tags">
@@ -43,12 +55,31 @@
                 </div>
             </template>
         </PTab>
+        <p-button-modal
+            :header-title="headerTitle"
+            :centered="true"
+            size="md"
+            :fade="true"
+            :backdrop="true"
+            :visible.sync="projectDeleteFormVisible"
+            :theme-color="themeColor"
+            :footer-confirm-button-bind="{
+                styleType: 'alert',
+            }"
+            @confirm="projectDeleteFormConfirm"
+        >
+            <template #body>
+                <p class="delete-modal-content">
+                    {{ modalContent }}
+                </p>
+            </template>
+        </p-button-modal>
         <SProjectMemberAddModal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="addMember()" />
         <PTableCheckModal
             v-bind="deleteTS.state"
             :size="'lg'"
             :visible.sync="deleteTS.syncState.visible"
-            @confirm="deleteConfirm"
+            @confirm="memberDeleteConfirm"
         />
     </general-page-layout>
 </template>
@@ -64,6 +95,7 @@ import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details
 import PI from '@/components/atoms/icons/PI.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
+import PTabBar from '@/components/molecules/tabs/tab-bar/TabBar.vue';
 import { makeTrItems } from '@/lib/view-helper';
 
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
@@ -73,7 +105,7 @@ import {
     SearchTableFluentAPI,
     TabSearchTableFluentAPI,
 } from '@/lib/api/table';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { DictPanelAPI } from '@/lib/api/dict';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
@@ -81,11 +113,15 @@ import SProjectMemberAddModal from '@/views/identity/project/modules/ProjectMemb
 import { ProjectModel } from '@/lib/fluent-api/identity/project';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/TableCheckModal.vue';
 import { TableCheckModalState } from '@/components/organisms/modals/table-modal/toolset';
+import ProjectDashboard from '@/views/identity/project/pages/ProjectDashboard.vue';
+import PButtonModal from '@/components/organisms/modals/button-modal/ButtonModal.vue';
 
 export default {
     name: 'ProjectDetail',
     components: {
+        ProjectDashboard,
         PTableCheckModal,
+        PButtonModal,
         GeneralPageLayout,
         PDynamicView,
         PDictPanel,
@@ -124,12 +160,12 @@ export default {
         // Tab
         const tabData = reactive({
             tabs: makeTrItems([
-                ['detail', 'COMMON.SUMMARY', { keepAlive: true }],
+                ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
                 ['member', 'COMMON.MEMBER'],
                 ['Tags', 'COMMON.TAG'],
             ],
             context.parent),
-            activeTab: 'detail',
+            activeTab: 'summary',
         });
 
         // Auto Complete Handler for query search bar
@@ -160,8 +196,6 @@ export default {
             { name: 'Group', key: 'user_info.group' },
             { name: 'Language', key: 'user_info.language' },
         ];
-        const isNotSelected = computed(() => apiHandler.tableTS.selectState.isNotSelected);
-        const isNotSelectOne = computed(() => !apiHandler.tableTS.selectState.isSelectOne);
 
         // Tag
         const tagsApi = new DictPanelAPI(fluentApi.identity().project());
@@ -174,9 +208,51 @@ export default {
 
         // Member modal
         const formState = reactive({
+            projectDeleteFormVisible: false,
+            headerTitle: '',
+            themeColor: '',
+            modalContent: '',
             memberAddFormVisible: false,
             memberDeleteFormVisible: false,
         });
+
+        const openProjectDeleteForm = () => {
+            formState.projectDeleteFormVisible = true;
+            formState.headerTitle = 'Delete Project';
+            formState.themeColor = 'alert';
+            formState.modalContent = 'Are you sure you want to delete this Project?';
+        };
+
+        const projectDeleteFormConfirm = () => {
+            fluentApi.identity().project().delete().setId(projectId.value)
+                .execute()
+                .then(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'success',
+                        title: 'Success',
+                        text: 'Delete Project',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .catch(() => {
+                    context.root.$notify({
+                        group: 'noticeBottomRight',
+                        type: 'alert',
+                        title: 'Fail',
+                        text: 'Delete Request Fail',
+                        duration: 2000,
+                        speed: 1000,
+                    });
+                })
+                .finally(() => {
+                    vm?.$router.push({
+                        name: 'projectMain',
+                    });
+                });
+            formState.projectDeleteFormVisible = false;
+        };
         const openMemberAddForm = () => {
             console.log('open member add form');
             formState.memberAddFormVisible = true;
@@ -216,7 +292,7 @@ export default {
             deleteTS.syncState.visible = true;
         };
 
-        const deleteConfirm = async (items) => {
+        const memberDeleteConfirm = async (items) => {
             await memberDeleteAction.setSubIds(items.map(it => it.user_info.user_id)).execute()
                 .then(() => {
                     context.root.$notify({
@@ -253,31 +329,34 @@ export default {
             tagsApi,
             ...toRefs(formState),
             deleteTS,
+            openProjectDeleteForm,
+            projectDeleteFormConfirm,
             openMemberAddForm,
             addMember,
             memberDeleteClick,
-            deleteConfirm,
+            memberDeleteConfirm,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-    .toolbox-left-btn {
-        margin-left: 1rem;
-    }
-
-    .project-name {
+    .project-info {
         padding-bottom: 36px;
         span {
-            padding-left: 14.6px;
+            padding-right: 14.6px;
             font-weight: bold;
             font-size: 24px;
         }
     }
 
+    .delete-btn {
+        margin-top: -10px;
+        cursor: pointer;
+    }
+
     .tags {
-        padding-top: 2rem;
-        min-height: 680px;
+        padding-top: 1rem;
+        min-height: 560px;
     }
 </style>

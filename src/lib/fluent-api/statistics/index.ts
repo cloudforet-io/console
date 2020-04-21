@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import {Service, SingleItemAction} from '@/lib/fluent-api/toolset';
+import { Service, SingleItemAction } from '@/lib/fluent-api/toolset';
 
 export interface ProjectSummaryResp {
     member: number;
