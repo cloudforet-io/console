@@ -45,7 +45,7 @@ export default defineComponent({
         @apply border-b border-gray-100;
     }
     .tab-pane{
-        @apply w-full py-8;
+        @apply w-full;
         }
     }
 
