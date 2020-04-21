@@ -1,14 +1,14 @@
 <template>
     <div class="grid gap-4 grid-flow-row grid-cols-12">
         <service-summary class="col-start-1 col-end-13
-                                sm:col-end-5
+                                sm:col-end-6
                                 lg:col-end-5
                                 "
                          title="servers" :api="servers.api"
                          :color="servers.color"
         />
         <service-summary class="col-start-1 col-end-13
-                                sm:col-start-5 sm:col-end-10
+                                sm:col-start-6 sm:col-end-13
                                 lg:col-start-5 lg:col-end-10"
                          title="cloud services" :api="cloudServices.api"
                          :color="cloudServices.color"
@@ -20,16 +20,16 @@
              lg:row-start-3 resources-tab"
         >
             <PTab :tabs="tabs" :active-tab.sync="activeTab">
-                <template #server="{height}">
+                <template #server>
                     <service-accounts
                         :title="'RESOURCES BY REGION'"
-                        :class="'flex flex-row-reverse'"
+                        reverse
                     />
                 </template>
-                <template #cloud_service="{height}">
+                <template #cloud_service>
                     <service-accounts
                         :title="'RESOURCES BY REGION'"
-                        :class="'flex flex-row-reverse'"
+                        reverse
                     />
                 </template>
             </PTab>
@@ -37,7 +37,7 @@
         <service-accounts-table
             class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10 lg:row-start-4"
         />
-        <daily-updates class="col-start-1 col-end-13 sm:col-start-7 sm:col-end-13 lg:col-start-10 col-end-13
+        <daily-updates class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-10 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
         />
@@ -108,14 +108,11 @@ export default {
 
 <style scoped>
     .daily-updates {
-        height: 46.5rem;
+        height: 45rem;
     }
 
     .health-dashboard {
-        height: 36rem;
+        height: 34rem;
     }
 
-    .resources-tab {
-        height: 24rem;
-    }
 </style>

@@ -29,7 +29,7 @@ export default {
             path: 'project',
             name: 'project',
             redirect: '/identity/project',
-            meta: { label: 'Project', breadcrumb: true },
+            meta: { label: 'Project', breadcrumb: true, api: fluentApi.identity().project() },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -42,6 +42,13 @@ export default {
                     name: 'projectDetail',
                     props: true,
                     component: ProjectDetail,
+                },
+                {
+                    path: ':resourceId/tags',
+                    name: 'projectTags',
+                    meta: { label: 'tags' },
+                    props: true,
+                    component: TagsPage,
                 },
             ],
 

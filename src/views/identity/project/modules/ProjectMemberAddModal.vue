@@ -8,7 +8,7 @@
         :visible.sync="proxyVisible"
         @confirm="confirm($event)"
     >
-        <template #body="{height}">
+        <template #body>
             <p-dynamic-view view_type="query-search-table"
                             :api-handler="apiHandler"
                             :data_source="dataSource"
