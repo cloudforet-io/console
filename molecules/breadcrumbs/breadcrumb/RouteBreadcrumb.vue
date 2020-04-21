@@ -91,13 +91,15 @@ export default {
     font-size: 0.875rem;
     box-sizing: content-box;
     height: calc(100% - 0.25rem);
-    &:hover {
-        @apply text-secondary;
+    .link {
+        @apply h-full inline-flex items-center cursor-pointer border-primary;
+        &:hover {
+            @apply text-secondary;
+        }
     }
     &.now {
         .link {
-            @apply h-full inline-flex items-center cursor-pointer border-primary text-primary;
-            font-weight: bold;
+            @apply text-primary font-bold;
             border-bottom-width: 0.25rem;
             &:hover {
                 @apply text-secondary;
