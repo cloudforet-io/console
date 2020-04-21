@@ -35,7 +35,7 @@
                     @changePageNumber="apiHandler.getData()"
                     @changePageSize="apiHandler.getData()"
                     @clickRefresh="apiHandler.getData()"
-                    @card:click.capture="clickCard"
+                    @card:click.self="clickCard"
                 >
                     <template #toolbox-top>
                         <div>
