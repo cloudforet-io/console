@@ -18,25 +18,14 @@ import {
     defineComponent,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
-
-    interface BtnType{
-        label: string;
-        name: string;
-    }
-    interface Props {
-        buttons: Array<string|BtnType>;
-        selected: string;
-        space?: boolean;
-        dynamicStyle?: Record<string, any>;
-    }
-
+import { Props, BtnType } from './SelectBtnGroup.toolset';
 
 export default defineComponent({
     name: 'PSelectBtnGroup',
     components: { PButton },
     props: {
         buttons: Array,
-        selected: String,
+        selected: [String, Number],
         space: {
             type: Boolean,
             default: false,

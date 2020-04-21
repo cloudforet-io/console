@@ -7,7 +7,9 @@
 				"VAL_EMPTY": "Enter the Value."
 			}
 		},
-		"SELECTED_OF": "{selectedCount} selected of {totalCount}"
+		"LIMIT_OF": "Limit {limitCount} {itemName}",
+		"SELECTED_OF": "{selectedCount} selected of {totalCount}",
+		"TIMEZONE_OF": "All times shown are in {timezone}."
 	},
 	"BTN": {
 		"ACTION": "Actions",
@@ -411,11 +413,14 @@
 	"WORD": {
 		"CIDR": "CIDR",
 		"CLOUDSERVICE": "cloud service",
-		"INSTANCE": "Instance",
 		"KEY": "Key",
+		"LOCAL_TIME": "Local Time",
+		"RESOURCE": "Resource",
 		"SERVER": "server",
+		"STATISTICS": "Statistics",
 		"TAG": "tag",
 		"TAGS": "Tags",
+		"TIME_RANGE": "Time Range",
 		"USER": "user",
 		"VALUE": "Value",
 		"VM": "vm"
