@@ -7,7 +7,9 @@
 				"VAL_EMPTY": ""
 			}
 		},
-		"SELECTED_OF": ""
+		"LIMIT_OF": "",
+		"SELECTED_OF": "",
+		"TIMEZONE_OF": ""
 	},
 	"BTN": {
 		"ACTION": "",
@@ -410,11 +412,14 @@
 	"WORD": {
 		"CIDR": "",
 		"CLOUDSERVICE": "",
-		"INSTANCE": "",
 		"KEY": "",
+		"LOCAL_TIME": "",
+		"RESOURCE": "",
 		"SERVER": "",
+		"STATISTICS": "",
 		"TAG": "",
 		"TAGS": "",
+		"TIME_RANGE": "",
 		"USER": "",
 		"VALUE": "",
 		"VM": ""
