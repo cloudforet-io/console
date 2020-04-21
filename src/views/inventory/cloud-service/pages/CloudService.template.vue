@@ -111,7 +111,7 @@
                                 />
                             </template>
                             <template #rawData>
-                                <p-raw-data :item="dvApiHandler.tableTS.selectState.firstSelectItem" />
+                                <p-raw-data  class="my-8 mx-4" :item="dvApiHandler.tableTS.selectState.firstSelectItem" />
                             </template>
                             <template #admin>
                                 <p-dynamic-view

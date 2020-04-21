@@ -77,10 +77,12 @@ export default {
         @apply flex no-underline text-sm min-h-9;
         min-width: 5rem;
         text-align: center;
-        margin-bottom: -1px;
+        margin-bottom: -4px;
         .label {
-            @apply px-4 py-3 w-full;
-            line-height: 1rem;
+            @apply px-4 w-full;
+            padding-top: 0.59375rem;
+            padding-bottom: 0.59375rem;
+            line-height: 150%;
         }
         &:hover {
             @apply text-secondary;
@@ -89,7 +91,7 @@ export default {
             @apply text-primary font-bold;
             font-weight: bold;
             &:not(.one-tab) {
-                @apply border-b-2 border-primary;
+                @apply border-b-4 border-primary;
             }
         }
         &:not(.active) {

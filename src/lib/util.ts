@@ -1,5 +1,5 @@
 import momentTimezone from 'moment-timezone';
-import moment, {Moment} from 'moment';
+import moment, { Moment } from 'moment';
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import styles from '@/styles/colors';
@@ -173,6 +173,14 @@ export const selectToCopyToClipboard = (t) => {
     textArea.select();
     document.execCommand('Copy');
     textArea.remove();
+};
+
+export const copyAnyData = (value) => {
+    if (Array.isArray(value)) {
+        selectToCopyToClipboard(_.toString(value));
+    } else if (typeof value === 'object') {
+        selectToCopyToClipboard(JSON.stringify(value));
+    } else selectToCopyToClipboard(value || '');
 };
 
 /** @function

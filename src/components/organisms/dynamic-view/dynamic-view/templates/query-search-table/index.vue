@@ -27,6 +27,9 @@
         @clickRefresh="apiHandler.getData"
         @changeSort="apiHandler.getData"
     >
+        <template #toolbox-top>
+            <slot name="toolbox-top" />
+        </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item">
@@ -35,7 +38,7 @@
                 />
             </div>
         </template>
-        <template v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
+        <template v-if="apiHandler.tableTS.querySearch.tags.value.length !== 0" #toolbox-bottom>
             <p-col :col="12">
                 <p-hr style="width: 100%;" />
                 <p-query-search-tags style="margin-top: .5rem;"
