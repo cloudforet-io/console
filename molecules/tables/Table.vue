@@ -193,10 +193,10 @@ export default defineComponent({
     }
 
     .table-default {
-        @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), 'none';
+        @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.blue.100');
     }
     .table-light {
-         @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.secondary3');
+         @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.blue.100');
          th {
              border-bottom: 1px solid theme('colors.gray.200');
          }
