@@ -127,7 +127,7 @@ export const copyButton = () => ({
 
     props: {
         copyText: {
-            default: text('title', 'Please, place any string to copy by button next to.'),
+            default: text('value', 'Please, place any string to copy by button next to.'),
         },
     },
     methods: {

@@ -127,6 +127,26 @@ export default {
 
     @mixin btn-color coral, theme('colors.coral.default'), theme('colors.white');
     @mixin btn-color yellow, theme('colors.yellow.default'), theme('colors.white');
+
+    &.btn-gray900-hover {
+        background-color: theme('colors.gray.900');
+        color: theme('colors.white');
+        &:not(:disabled):not(.disabled):hover {
+            border: 1px solid theme('colors.blue.500');
+            background-color: theme('colors.blue.200');
+            color: theme('colors.blue.500');
+        }
+    }
+    &.btn-outline-gray900-hover {
+        border: 1px solid theme('colors.gray.900');
+        color: theme('colors.gray.900');
+        background-color: transparent;
+        &:not(:disabled):not(.disabled):hover {
+            border: 1px solid theme('colors.blue.500');
+            background-color: theme('colors.blue.200');
+            color: theme('colors.blue.500');
+        }
+    }
 }
 
 .btn-lg {
