@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { TimeStamp } from '@/lib/fluent-api';
+import { TimeStamp } from '@/lib/fluent-api/type';
 
 export enum DataSourceState {
     enabled = 'ENABLED',
@@ -14,8 +14,8 @@ export enum MONITORING_TYPE {
 
 export enum STATISTICS_TYPE {
     average = 'AVERAGE',
-    max = 'MAXIMUM',
-    min = 'MINIMUM'
+    maximum = 'MAXIMUM',
+    minimum = 'MINIMUM'
 }
 
 
@@ -36,8 +36,15 @@ export interface MetricResp {
     chart_options: any;
 }
 
+export interface MetricListResp {
+    metrics: MetricResp[];
+    available_resources: {
+        [key: string]: boolean;
+    };
+}
+
 export interface MetricDataParameter extends MetricParameter {
-    metric_key: string;
+    metric: string;
     start: TimeStamp;
     end: TimeStamp;
     period?: number;
@@ -46,7 +53,7 @@ export interface MetricDataParameter extends MetricParameter {
 
 export interface MetricDataResp {
     labels: string[];
-    resource_values: any[];
+    resource_values: {[key: string]: number[]};
 }
 
 export interface DataSourceParameter {
@@ -79,4 +86,11 @@ export interface DataSourceResp {
     };
     tags: object;
     created_at: TimeStamp;
+}
+
+
+export interface MetricActionInterface {
+    setId: (...args) => this;
+    setResourceType: (...args) => this;
+    setResources: (...args) => this;
 }
