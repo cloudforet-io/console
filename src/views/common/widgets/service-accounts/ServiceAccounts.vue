@@ -1,7 +1,7 @@
 <template>
-    <p-widget-layout v-bind="$props">
-        <div v-bind="$props">
-            <div class="flex justify-center">
+    <p-widget-layout :title="title">
+        <div :class="{reverse:reverse}">
+            <div class="chart-container">
                 <p-chart-loader :loading="loading" class="chart">
                     <template #loader>
                         <canvas ref="loaderRef" />
@@ -9,7 +9,7 @@
                     <canvas ref="chartRef" />
                 </p-chart-loader>
             </div>
-            <div class="mt-4">
+            <div class="legends">
                 <template v-if="loading">
                     <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
                         <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
@@ -83,9 +83,13 @@ export default defineComponent({
             type: String,
             default: '',
         },
-        class: {
+        classes: {
             type: String,
             default: '',
+        },
+        reverse: {
+            type: Boolean,
+            default: false,
         },
     },
     setup() {
@@ -214,5 +218,27 @@ export default defineComponent({
     .count {
         font-size: 0.875rem;
         font-weight: bold;
+    }
+    .legends {
+        @apply mt-4 w-full flex-grow justify-center items-center m-auto;
+    }
+    .chart-container {
+        @apply flex justify-center items-center;
+    }
+    .reverse {
+        @apply block;
+        height: 24rem;
+    }
+
+    @screen md {
+        .reverse {
+            @apply flex flex-row-reverse;
+            .chart-container {
+                min-width: 40%;
+                .chart {
+                    height: 18rem;
+                }
+            }
+        }
     }
 </style>

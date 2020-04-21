@@ -1,6 +1,6 @@
 <template>
     <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
-        <template #sidebar="{height}">
+        <template #sidebar>
             <div class="treeSidebar">
                 <div id="tree-header">
                     Project Group
@@ -109,7 +109,7 @@
                                          @click="clickServiceAccount"
                                     >
                                         <p>
-                                            <p-i :name="hover ? 'btn_circle_plus_blue' : 'btn_circle_plus_blue--hover'"
+                                            <p-i :name="'btn_circle_plus_blue--hover'"
                                                  color="transparent inherit"
                                                  width="1rem" height="1rem" class="btn_circle_plus_blue"
                                             />
@@ -219,8 +219,6 @@ import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { ProjectModel, ProjectListResp } from '@/lib/fluent-api/identity/project';
 import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
-import { ProviderListResp } from '@/lib/fluent-api/identity/provider';
-import config from '@/lib/config';
 import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
 import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
@@ -320,11 +318,11 @@ export default {
             resp.data.results.forEach((item) => {
                 const id = item.project_id;
                 const setCard = (items) => { cardSummary.value[id] = items; };
-                statisticsAPI.setId(id).execute().then((rp) => {
-                    if (rp.data) {
-                        setCard(rp.data);
-                    }
-                });
+                // statisticsAPI.setId(id).execute().then((rp) => {
+                //     if (rp.data) {
+                //         setCard(rp.data);
+                //     }
+                // });
             });
             const temp = resp.data.results.map((it) => {
                 const providers = (it.providers as string[]).map(name => _.get(provider.state.providers, [name, 'icon']));
@@ -437,7 +435,6 @@ export default {
         };
 
         const projectGroupDeleteFormConfirm = () => {
-            console.log('node test', state.node);
             fluentApi.identity().projectGroup().delete().setId(state.selectedId)
                 .execute()
                 .then(() => {
