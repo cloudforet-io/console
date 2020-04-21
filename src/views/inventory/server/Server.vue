@@ -115,6 +115,13 @@
                     :action="getDataAction"
                 />
             </template>
+            <template #tag>
+                <s-tags-panel
+                    :is-show="activeTab==='tag'"
+                    :resource-id="apiHandler.tableTS.selectState.firstSelectItem.server_id"
+                    tag-page-name="serverTags"
+                />
+            </template>
             <template #rawData>
                 <p-raw-data class="my-8 mx-4" :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
@@ -237,6 +244,7 @@ import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
 import { MetricAPI } from '@/lib/api/monitoring';
 import { MONITORING_TYPE } from '@/lib/fluent-api/monitoring/type';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 
 const serverStateVF = {
     name: 'State',
@@ -363,6 +371,7 @@ export default {
         SProjectTreeModal,
         SCollectModal,
         SMonitoring,
+        STagsPanel,
     },
     setup(props, context) {
         class ACHandler extends QuerySearchTableACHandler {
@@ -461,6 +470,7 @@ export default {
             tabs: computed(() => makeTrItems([
                 ['detail', 'TAB.DETAILS'],
                 ['data', 'TAB.DATA'],
+                ['tag', 'TAB.TAG'],
                 ['rawData', 'TAB.RAW_DATA'],
                 ['admin', 'TAB.ADMIN'],
                 ['history', 'TAB.HISTORY'],
