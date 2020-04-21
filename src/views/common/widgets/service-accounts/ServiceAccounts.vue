@@ -1,44 +1,46 @@
 <template>
-    <p-widget-layout title="Service Accounts">
-        <div class="flex justify-center">
-            <p-chart-loader :loading="loading" class="chart">
-                <template #loader>
-                    <canvas ref="loaderRef" />
+    <p-widget-layout v-bind="$props">
+        <div v-bind="$props">
+            <div class="flex justify-center">
+                <p-chart-loader :loading="loading" class="chart">
+                    <template #loader>
+                        <canvas ref="loaderRef" />
+                    </template>
+                    <canvas ref="chartRef" />
+                </p-chart-loader>
+            </div>
+            <div class="mt-4">
+                <template v-if="loading">
+                    <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
+                        <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
+                        <p-skeleton class="flex-grow" />
+                    </div>
                 </template>
-                <canvas ref="chartRef" />
-            </p-chart-loader>
-        </div>
-        <div class="mt-4">
-            <template v-if="loading">
-                <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
-                    <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
-                    <p-skeleton class="flex-grow" />
-                </div>
-            </template>
-            <p-grid-layout v-else :items="items" row-gap="0.5rem"
-                           column-gap="0" :fix-column="1" card-min-width="0"
-                           card-height="auto" :card-class="() => []"
-            >
-                <template #card="{item, index}">
-                    <p-selectable-item :icon-url="item.icon" theme="card"
-                                       default-icon="ic_provider_other"
-                                       @click="onItemClick(item, idx)"
-                    >
-                        <template #contents>
-                            <div v-tooltip.bottom-start="{content: item.name, delay: {show: 500}}"
-                                 class="ml-2 text-base truncate leading-tight"
-                            >
-                                {{ item.name }}
-                            </div>
-                        </template>
-                        <template #extra>
-                            <p-badge :background-color="item.color" class="count">
-                                {{ item.count }}
-                            </p-badge>
-                        </template>
-                    </p-selectable-item>
-                </template>
-            </p-grid-layout>
+                <p-grid-layout v-else :items="items" row-gap="0.5rem"
+                               column-gap="0" :fix-column="1" card-min-width="0"
+                               card-height="auto" :card-class="() => []"
+                >
+                    <template #card="{item, index}">
+                        <p-selectable-item :icon-url="item.icon" theme="card"
+                                           default-icon="ic_provider_other"
+                                           @click="onItemClick(item, idx)"
+                        >
+                            <template #contents>
+                                <div v-tooltip.bottom-start="{content: item.name, delay: {show: 500}}"
+                                     class="ml-2 text-base truncate leading-tight"
+                                >
+                                    {{ item.name }}
+                                </div>
+                            </template>
+                            <template #extra>
+                                <p-badge :background-color="item.color" class="count">
+                                    {{ item.count }}
+                                </p-badge>
+                            </template>
+                        </p-selectable-item>
+                    </template>
+                </p-grid-layout>
+            </div>
         </div>
     </p-widget-layout>
 </template>
@@ -75,6 +77,16 @@ export default defineComponent({
         PSelectableItem,
         PSkeleton,
         PChartLoader,
+    },
+    props: {
+        title: {
+            type: String,
+            default: '',
+        },
+        class: {
+            type: String,
+            default: '',
+        },
     },
     setup() {
         const vm: any = getCurrentInstance();
