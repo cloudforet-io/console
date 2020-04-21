@@ -45,8 +45,8 @@ export const DefaultCase = () => ({
                 'secondary', 'secondary1', 'secondary2',
                 'coral', 'yellow',
                 'gray', 'gray200', 'gray100',
-                'alert', 'safe', 'gray900',
-            ], ''),
+                'alert', 'safe', 'gray900', 'gray900-hover',
+            ], 'primary'),
         },
         size: {
             default: select('size', ['', 'sm', 'lg'], ''),
@@ -55,7 +55,7 @@ export const DefaultCase = () => ({
             default: select('shape', ['', 'circle'], ''),
         },
         defaultSlot: {
-            default: text('default slot', 'button', 'slot'),
+            default: text('default slot', 'button'),
         },
         href: {
             default: text('href', ''),
@@ -102,7 +102,11 @@ export const block = () => ({
     props: {
         styleType: {
             default: select('styleType', [
-                '', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'gray900',
+                '', 'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
+                'secondary', 'secondary1', 'secondary2',
+                'coral', 'yellow',
+                'gray', 'gray200', 'gray100',
+                'alert', 'safe', 'gray900', 'gray900-hover',
             ], 'primary'),
         },
         size: {

@@ -119,10 +119,22 @@
                 <p-raw-data :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #admin>
-                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
+                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource">
+                    <template #toolbox-top>
+                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="adminApiHandler.totalCount">
+                            {{ $t('TAB.ADMIN') }}
+                        </PPanelTop>
+                    </template>
+                </p-dynamic-view>
             </template>
             <template #history>
-                <p-dynamic-view :api-handler="historyAPIHandler" view_type="table" :data_source="historyAPIHandler.dataSource" />
+                <p-dynamic-view :api-handler="historyAPIHandler" view_type="table" :data_source="historyAPIHandler.dataSource">
+                    <template #toolbox-top>
+                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="historyAPIHandler.totalCount">
+                            {{ $t('TAB.HISTORY') }}
+                        </PPanelTop>
+                    </template>
+                </p-dynamic-view>
             </template>
         </p-tab>
         <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
@@ -141,7 +153,13 @@
                 </p-data-table>
             </template>
             <template #admin>
-                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
+                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource">
+                    <template #toolbox-top>
+                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="adminApiHandler.totalCount">
+                            {{ $t('TAB.ADMIN') }}
+                        </PPanelTop>
+                    </template>
+                </p-dynamic-view>
             </template>
         </PTab>
 
@@ -215,6 +233,7 @@ import { AxiosResponse } from 'axios';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 import { createAtVF, deleteAtVF, updateAtVF } from '@/lib/data-source';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 
 const serverStateVF = {
     name: 'State',
@@ -319,6 +338,7 @@ export default {
         getValue,
     },
     components: {
+        PPanelTop,
         GeneralPageLayout,
         PStatus,
         PHorizontalLayout,

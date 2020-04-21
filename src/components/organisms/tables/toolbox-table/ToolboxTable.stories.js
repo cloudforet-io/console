@@ -85,6 +85,7 @@ export const table = () => ({
     @clickExcel="clickExcel"
     @theadClick="theadClick"
 >
+    <template #toolbox-top><div class="w-full h-8 border-green" style="border-width:1px" ></div></template>
     <template #toolbox-left><div style="border: 1px solid green; min-width: 300px "></div></template>
     <template #toolbox-bottom><div style="border: 1px solid blue; width: 100%;height: 50px;"></div></template>
 </p-toolbox-table>

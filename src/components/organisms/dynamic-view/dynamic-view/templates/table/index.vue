@@ -27,6 +27,9 @@
         @clickRefresh="apiHandler.getData"
         @changeSort="apiHandler.getData"
     >
+        <template #toolbox-top>
+            <slot name="toolbox-top" />
+        </template>
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item w-1/2">
@@ -34,9 +37,11 @@
             </div>
         </template>
         <template v-for="slot of slots" v-slot:[slot.name]="{item}">
-            <p-dynamic-field :key="slot.name" :view_type="slot.view_type" :view_option="slot.view_option"
-                             :data="getValue(item,slot.path)"
-            />
+            <slot :name="slot.name" :item="item">
+                <p-dynamic-field :key="slot.name" :view_type="slot.view_type" :view_option="slot.view_option"
+                                 :data="getValue(item,slot.path)"
+                />
+            </slot>
         </template>
     </p-toolbox-table>
 </template>

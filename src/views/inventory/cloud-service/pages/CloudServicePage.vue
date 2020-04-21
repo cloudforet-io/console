@@ -74,14 +74,26 @@
                     view_type="table"
                     :api-handler="adminApiHandler"
                     :data_source="adminApiHandler.dataSource"
-                />
+                >
+                    <template #toolbox-top>
+                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="adminApiHandler.totalCount">
+                            {{ $t('TAB.ADMIN') }}
+                        </PPanelTop>
+                    </template>
+                </p-dynamic-view>
             </template>
             <template #history>
                 <p-dynamic-view
                     view_type="table"
                     :api-handler="historyAPIHandler"
                     :data_source="historyAPIHandler.dataSource"
-                />
+                >
+                    <template #toolbox-top>
+                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="historyAPIHandler.totalCount">
+                            {{ $t('TAB.HISTORY') }}
+                        </PPanelTop>
+                    </template>
+                </p-dynamic-view>
             </template>
         </PTab>
         <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
@@ -100,7 +112,13 @@
                     view_type="table"
                     :api-handler="adminApiHandler"
                     :data_source="adminApiHandler.dataSource"
-                />
+                >
+                    <template #toolbox-top>
+                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="adminApiHandler.totalCount">
+                            {{ $t('TAB.ADMIN') }}
+                        </PPanelTop>
+                    </template>
+                </p-dynamic-view>
             </template>
         </PTab>
         <p-empty v-else style="height: auto;margin-top:4rem ">
@@ -149,6 +167,7 @@ import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
 import PI from '@/components/atoms/icons/PI.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 
 export default {
     name: 'CloudServicePage',
@@ -172,6 +191,7 @@ export default {
         SProjectTreeModal,
         SCollectModal,
         PDictPanel,
+        PPanelTop,
     },
     props: {
         provider: {

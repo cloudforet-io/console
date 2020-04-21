@@ -1,11 +1,19 @@
 <template>
-    <div v-if="subData.length >= 1">
+    <div v-if="subData.length >= 1" class="s-dynamic-subdata">
         <p-select-btn-group
             class="ml-4"
             :buttons="buttons" :selected.sync="selected" @clickButton="apiHandler.getData"
         />
-        <p-dynamic-view :api-handler="apiHandler" v-bind="selectData" @clickExcel="exportToolSet.getData()" />
+
+        <p-dynamic-view :api-handler="apiHandler" v-bind="selectData" @clickExcel="exportToolSet.getData()">
+            <template #toolbox-top>
+                <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="apiHandler.totalCount">
+                    {{ selected }}
+                </PPanelTop>
+            </template>
+        </p-dynamic-view>
     </div>
+
     <p-empty v-else style="margin-top: 1rem">
         No data
     </p-empty>
@@ -23,6 +31,7 @@ import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { SubDataAPI, SubDataFluentAPI } from '@/lib/api/table';
 import { GetDataAction, fluentApi } from '@/lib/fluent-api';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 
 interface Props {
     action: GetDataAction<any, any>;
@@ -32,7 +41,7 @@ interface Props {
 export default defineComponent({
     name: 'PDynamicSubData',
     components: {
-        PSelectBtnGroup, PDynamicView, PEmpty, PButton,
+        PSelectBtnGroup, PDynamicView, PEmpty, PButton, PPanelTop,
     },
     props: {
         action: Object,
@@ -45,7 +54,7 @@ export default defineComponent({
     setup(props: Props) {
         const selected = ref(props.subData[0]?.name);
         const buttons = computed(() => props.subData.map(dv => ({
-            name: dv.name, label: dv.name, vbind: { styleType: 'gray900', outline: selected.value !== dv.name },
+            name: dv.name, label: dv.name, vbind: { styleType: 'gray900-hover', outline: selected.value !== dv.name },
         })));
         const state = reactive({
             dvs: computed(() => _.keyBy(props.subData, 'name')),
@@ -72,6 +81,7 @@ export default defineComponent({
                 exportToolSet.action = exportAction.setDataSource(origin.data_source);
             }
         });
+        const totalCount = computed<number>(() => apiHandler.tableTS.state.items?.length || 0);
 
         return {
             ...toRefs(state),
@@ -80,6 +90,7 @@ export default defineComponent({
             apiHandler,
             selectData,
             exportToolSet,
+            totalCount,
         };
     },
 });

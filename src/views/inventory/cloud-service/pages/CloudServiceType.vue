@@ -180,12 +180,15 @@ export default {
         const vm = getCurrentInstance();
         const selectProvider = ref('all');
         const providerListState = new GridLayoutState({
-            items: computed(() => [
-                {
+            items: computed(() => {
+                const result = [{
                     provider: 'all', icon: '', color: '', name: 'All',
-                },
-                ...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })),
-            ]),
+                }];
+                if (providerStore.state.providers) {
+                    result.push(...Object.entries(providerStore.state.providers).map(([key, value]) => ({ provider: key, ...value })));
+                }
+                return result;
+            }),
             cardClass: (item) => {
                 const _class = ['provider-card-item'];
                 if (item.provider === selectProvider.value) {
