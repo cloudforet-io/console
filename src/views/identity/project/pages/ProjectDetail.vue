@@ -20,29 +20,31 @@
                 <project-dashboard ref="ProjectDashboard" />
             </template>
             <template #member="{height}">
-                <p-dynamic-view view_type="query-search-table"
-                                :api-handler="apiHandler"
-                                :data_source="dataSource"
-                                :vbind="{responsiveStyle:{'height': 480+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding': 0}}"
-                                :data="null"
-                >
-                    <template #toolbox-left>
-                        <p-button style-type="primary-dark"
-                                  @click="openMemberAddForm()"
-                        >
-                            {{ $t('BTN.ADD') }}
-                        </p-button>
-                        <p-button
-                            class="toolbox-left-btn"
-                            outline
-                            style-type="alert"
-                            :disabled="apiHandler.tableTS.selectState.isNotSelected"
-                            @click="memberDeleteClick"
-                        >
-                            Delete
-                        </p-button>
-                    </template>
-                </p-dynamic-view>
+                <div :style="{'border-width':'0px'}">
+                    <p-dynamic-view view_type="query-search-table"
+                                    :api-handler="apiHandler"
+                                    :data_source="dataSource"
+                                    :vbind="{responsiveStyle:{'height': 480+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding': 0}}"
+                                    :data="null"
+                    >
+                        <template #toolbox-left>
+                            <p-button style-type="primary-dark"
+                                      @click="openMemberAddForm()"
+                            >
+                                {{ $t('BTN.ADD') }}
+                            </p-button>
+                            <p-button
+                                class="toolbox-left-btn"
+                                outline
+                                style-type="alert"
+                                :disabled="apiHandler.tableTS.selectState.isNotSelected"
+                                @click="memberDeleteClick"
+                            >
+                                Delete
+                            </p-button>
+                        </template>
+                    </p-dynamic-view>
+                </div>
             </template>
             <template #Tags>
                 <div class="tags">
