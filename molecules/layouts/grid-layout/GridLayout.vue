@@ -45,8 +45,7 @@ export default {
     }
 
     .card-item {
-        @apply bg-white border border-gray-100;
-        box-shadow: 0 0 8px rgba(theme('colors.primary'), 0.08);
+        @apply bg-white border border-gray-200;
         border-radius: 2px;
         cursor: pointer;
         &:hover {
