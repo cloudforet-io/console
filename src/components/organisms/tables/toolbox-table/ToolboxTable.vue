@@ -57,7 +57,7 @@
             :sortable="sortable"
             :selectable="selectable"
             :multi-select="multiSelect"
-            :dragable="dragable"
+            :dragable="false"
             :col-copy="colCopy"
             :select-index.sync="proxySelectIndex"
             :sort-by.sync="proxySortBy"

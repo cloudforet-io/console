@@ -133,7 +133,7 @@
                                     :index="index"
                                     :field="field"
                                 >
-                                    <p-td onselectstart="return true" style="user-select: all;">
+                                    <p-td onselectstart="return true">
                                         <slot
                                             :name="'col-'+field+'-format'"
                                             :item="item"
@@ -470,14 +470,14 @@ export default defineComponent({
 <style lang="postcss" scoped>
 
     @define-mixin selected-row {
-        background-color: theme('colors.primary3') !important;
+        background-color: theme('colors.blue.200') !important;
         td {
             @apply text-secondary ;
       }
     }
 
     .select-checkbox {
-        cursor: pointer;
+        @apply cursor-pointer min-w-4 w-4;
     }
     tbody {
         display: block;
@@ -532,12 +532,11 @@ export default defineComponent({
         /*    background-color: initial !important;*/
         /*}*/
         .no-data {
-            @apply text-primary2;
-            text-align: center;
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-            font-size: 1.5rem;
-            line-height: 2rem;
+            @apply text-primary2 border-0 text-center py-12 text-2xl;
+            &:hover{
+                @apply bg-white;
+            }
+            line-height: 120%;
         }
     }
 </style>

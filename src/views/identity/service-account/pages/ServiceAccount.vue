@@ -22,12 +22,13 @@
                                             @clickExcel="exportToolSet.getData()"
                             >
                                 <template #toolbox-left>
-                                    <p-button style-type="primary-dark" @click="clickOpenForm('add')">
-                                        <p-i name="ic_plus_bold" width="1rem" height="1rem"
-                                             class="mr-1"
-                                        />
+                                    <PIconTextButton style-type="primary-dark"
+                                                     name="ic_plus_bold"
+                                                     @click="clickOpenForm('add')"
+                                    >
                                         {{ $t('BTN.ADD') }}
-                                    </p-button>
+                                    </PIconTextButton>
+
                                     <PDropdownMenuBtn
                                         class="left-toolbox-item"
                                         :menu="dropdown"
@@ -168,6 +169,7 @@ import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 import nunjucks from 'nunjucks';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -186,7 +188,7 @@ export default {
         PDoubleCheckModal,
         SServiceAccountFormModal,
         SSecretCreateFormModal,
-        PI,
+        PIconTextButton,
     },
     setup(props, context) {
         const { project } = useStore();
