@@ -7,6 +7,6 @@ icon.register({
     width: 16,
     height: 16,
     viewBox: '0 0 16 16',
-    data: '<path pid="0" _fill="none" d="M0 0h16v16H0z"/><path pid="1" d="M4 12.4V3.6L10.7 8 4 12.4zm1-7v5.1L8.8 8 5 5.4z" _fill="#a5acce"/>'
+    data: '<path pid="0" d="M5.5 4v8l5.3-4-5.3-4zm1 2l2.7 2-2.7 2V6z" _fill="#202433"/>'
   }
 })

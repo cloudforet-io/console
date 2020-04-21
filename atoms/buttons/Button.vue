@@ -12,6 +12,7 @@ export default {
         function getClass(prop) {
             if (!prop.forceClass) {
                 const cls = {
+                    'p-button': true,
                     btn: true,
                     disabled: prop.disabled,
                     'btn-block': prop.block,
@@ -72,6 +73,7 @@ export default {
 }
 
 .btn {
+    @apply font-bold;
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -83,7 +85,6 @@ export default {
     height: 2rem;
     text-align: center;
     letter-spacing: 0;
-    font-weight: 400;
     font-size: .875rem;
     line-height: 2rem;
     border: 1px solid transparent;
@@ -95,8 +96,8 @@ export default {
 
     &.disabled {
         @apply bg-gray-200 text-gray-400 border-gray-100;
-        background-color: theme('colors.gray.200') !important;
-        border-color: theme('colors.gray.100') !important;
+        background-color: theme('colors.gray.100') !important;
+        border-color: theme('colors.gray.300') !important;
         color: theme('colors.gray.400') !important;
         background-repeat: no-repeat;
         background-clip: padding-box;

@@ -5,7 +5,7 @@
           @click.stop.prevent="onClick"
     >
         <input type="checkbox">
-        <p-i class="check" width="1.25rem" height="1.25rem"
+        <p-i class="check-icon" width="1.25rem" height="1.25rem"
              v-bind="checkBoxBind"
         />
     </span>
@@ -87,8 +87,8 @@ export default {
             height: 0;
             width: 0;
         }
-        .check {
-            @apply text-gray-900;
+        .check-icon {
+            @apply text-gray-300 cursor-pointer;
         }
     }
 </style>

@@ -76,10 +76,11 @@ export default {
             })),
             sbStyle: computed(() => ({
                 width: 'auto',
-                height: '100%',
+                // height: '100%',
                 minWidth: `${props.minWidth}px`,
                 maxWidth: `${props.maxWidth}px`,
                 opacity: state.hide && !state.transition ? 0 : 1,
+                overflow: 'auto',
             })),
             mainStyle: computed(() => ({
                 width: `calc( 100% - ${state.width}px )`,

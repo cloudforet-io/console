@@ -66,6 +66,7 @@ export class ToolboxTableState<
             border: true,
             allPage: 1,
             settingVisible: false,
+            excelVisible: false,
             refreshVisible: true,
             pageNationValues: undefined,
             padding: true,

@@ -54,14 +54,9 @@ export default defineComponent({
         width: 100%;
 
         .title {
-            font-family: theme('fontFamily.sans');
+            @apply flex items-center uppercase leading-tight font-bold;
             font-size: 1.125rem;
-            line-height: 1.375rem;
-            text-transform: uppercase;
-            font-weight: bold;
             margin: 1.5rem 1.5rem 1rem 1.5rem;
-            display: flex;
-            align-items: center;
         }
 
         .help {
