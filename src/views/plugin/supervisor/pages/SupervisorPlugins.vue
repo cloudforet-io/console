@@ -25,7 +25,7 @@
                 <p-dict-panel :dict.sync="apiHandler.tableTS.selectState.firstSelectItem.tags" />
             </template>
             <template #rawData>
-                <p-raw-data :item="apiHandler.tableTS.selectState.firstSelectItem" />
+                <p-raw-data  class="my-8 mx-4" :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
         </PTab>
         <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"

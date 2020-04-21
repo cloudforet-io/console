@@ -395,7 +395,8 @@
 		"DETAILS": "Details",
 		"HISTORY": "History",
 		"MONITORING": "Monitoring",
-		"RAW_DATA": "Raw Data"
+		"RAW_DATA": "Raw Data",
+		"SECRET": "Secret"
 	},
 	"TREE_TYPE": {
 		"CREATE": "Create {0}",

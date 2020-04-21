@@ -54,7 +54,7 @@
                 <p-dict-panel :dict="apiHandler.tableTS.selectState.firstSelectItem.tags">
                     <template #extra>
                         <p-button style-type="primary" @click="editTag">
-                            {{ $t('BTN.ADD') }}
+                            {{ $t('BTN.EDIT') }}
                         </p-button>
                     </template>
                 </p-dict-panel>
@@ -67,33 +67,27 @@
                 />
             </template>
             <template #rawData>
-                <p-raw-data :item="apiHandler.tableTS.selectState.firstSelectItem" />
+                <p-raw-data class="my-8 mx-4" :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #admin>
+                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
+                    {{ $t('TAB.ADMIN') }}
+                </PPanelTop>
                 <p-dynamic-view
                     view_type="table"
                     :api-handler="adminApiHandler"
                     :data_source="adminApiHandler.dataSource"
-                >
-                    <template #toolbox-top>
-                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="adminApiHandler.totalCount">
-                            {{ $t('TAB.ADMIN') }}
-                        </PPanelTop>
-                    </template>
-                </p-dynamic-view>
+                />
             </template>
             <template #history>
+                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="historyAPIHandler.totalCount.value">
+                    {{ $t('TAB.HISTORY') }}
+                </PPanelTop>
                 <p-dynamic-view
                     view_type="table"
                     :api-handler="historyAPIHandler"
                     :data_source="historyAPIHandler.dataSource"
-                >
-                    <template #toolbox-top>
-                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="historyAPIHandler.totalCount">
-                            {{ $t('TAB.HISTORY') }}
-                        </PPanelTop>
-                    </template>
-                </p-dynamic-view>
+                />
             </template>
         </PTab>
         <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti"
@@ -108,17 +102,14 @@
                 />
             </template>
             <template #admin>
+                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
+                    {{ $t('TAB.ADMIN') }}
+                </PPanelTop>
                 <p-dynamic-view
                     view_type="table"
                     :api-handler="adminApiHandler"
                     :data_source="adminApiHandler.dataSource"
-                >
-                    <template #toolbox-top>
-                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="adminApiHandler.totalCount">
-                            {{ $t('TAB.ADMIN') }}
-                        </PPanelTop>
-                    </template>
-                </p-dynamic-view>
+                />
             </template>
         </PTab>
         <p-empty v-else style="height: auto;margin-top:4rem ">

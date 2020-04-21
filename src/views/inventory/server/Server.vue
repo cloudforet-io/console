@@ -116,25 +116,19 @@
                 />
             </template>
             <template #rawData>
-                <p-raw-data :item="apiHandler.tableTS.selectState.firstSelectItem" />
+                <p-raw-data class="my-8 mx-4" :item="apiHandler.tableTS.selectState.firstSelectItem" />
             </template>
             <template #admin>
-                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource">
-                    <template #toolbox-top>
-                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="adminApiHandler.totalCount">
-                            {{ $t('TAB.ADMIN') }}
-                        </PPanelTop>
-                    </template>
-                </p-dynamic-view>
+                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
+                    {{ $t('TAB.ADMIN') }}
+                </PPanelTop>
+                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
             </template>
             <template #history>
-                <p-dynamic-view :api-handler="historyAPIHandler" view_type="table" :data_source="historyAPIHandler.dataSource">
-                    <template #toolbox-top>
-                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="historyAPIHandler.totalCount">
-                            {{ $t('TAB.HISTORY') }}
-                        </PPanelTop>
-                    </template>
-                </p-dynamic-view>
+                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="historyAPIHandler.totalCount.value">
+                    {{ $t('TAB.HISTORY') }}
+                </PPanelTop>
+                <p-dynamic-view :api-handler="historyAPIHandler" view_type="table" :data_source="historyAPIHandler.dataSource" />
             </template>
             <template #monitoring>
                 <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
@@ -160,13 +154,10 @@
                 </p-data-table>
             </template>
             <template #admin>
-                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource">
-                    <template #toolbox-top>
-                        <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="adminApiHandler.totalCount">
-                            {{ $t('TAB.ADMIN') }}
-                        </PPanelTop>
-                    </template>
-                </p-dynamic-view>
+                <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="adminApiHandler.totalCount.value">
+                    {{ $t('TAB.ADMIN') }}
+                </PPanelTop>
+                <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
             </template>
             <template #monitoring>
                 <s-monitoring resource-type="'inventory.Server'" :resources="apiHandler.tableTS.selectState.selectItems" />

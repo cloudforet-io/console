@@ -1,5 +1,5 @@
 <template>
-    <div v-if="subData.length >= 1" class="s-dynamic-subdata">
+    <div v-if="subData.length >= 1" class="s-dynamic-subdata my-8">
         <p-select-btn-group
             class="ml-4"
             :buttons="buttons" :selected.sync="selected" @clickButton="apiHandler.getData"
@@ -7,14 +7,14 @@
 
         <p-dynamic-view :api-handler="apiHandler" v-bind="selectData" @clickExcel="exportToolSet.getData()">
             <template #toolbox-top>
-                <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="apiHandler.totalCount">
+                <PPanelTop style="margin: 0px" :use-total-count="true" :total-count="apiHandler.totalCount.value">
                     {{ selected }}
                 </PPanelTop>
             </template>
         </p-dynamic-view>
     </div>
 
-    <p-empty v-else style="margin-top: 1rem">
+    <p-empty v-else class="my-8">
         No data
     </p-empty>
 </template>

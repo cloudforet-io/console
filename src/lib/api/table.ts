@@ -2,8 +2,10 @@
 import Vue from 'vue';
 import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import {
+    ref,
     computed, getCurrentInstance, isRef, onMounted, reactive, Ref, watch,
 } from '@vue/composition-api';
+
 import {
     QuerySearchTableToolSet,
     SearchTableToolSet,
@@ -37,7 +39,7 @@ export abstract class BaseTableFluentAPI<
     > extends DynamicFluentAPIToolSet<parameter, resp, action> {
     tableTS: T;
 
-    totalCount=0
+    totalCount=ref<number>(0)
 
     protected constructor(action: action) {
         super(action);
@@ -61,19 +63,19 @@ export abstract class BaseTableFluentAPI<
         try {
             const res = await this.getAction().execute();
             this.tableTS.state.items = res.data.results;
-            this.totalCount = res.data.total_count;
+            this.totalCount.value = res.data.total_count;
             this.tableTS.setAllPage(res.data.total_count);
         } catch (e) {
             this.tableTS.state.items = [];
             this.tableTS.state.allPage = 1;
-            this.totalCount = 0;
+            this.totalCount.value = 0;
         }
         this.tableTS.syncState.loading = false;
     };
 
     protected defaultReset = () => {
         this.tableTS.state.allPage = 1;
-        this.totalCount = 0;
+        this.totalCount.value = 0;
         this.tableTS.state.items = [];
         this.tableTS.syncState.thisPage = 1;
         this.tableTS.syncState.selectIndex = [];
