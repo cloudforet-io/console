@@ -14,10 +14,10 @@
             <slot name="extra">
                 <template v-if="useTotalCount">
                     <template v-if="useSelectedCount&&selectedCount">
-                        ({{ $t('ACTION.SELECTED_OF',{selectedCount,totalCount}) }})
+                        &nbsp;({{ $t('ACTION.SELECTED_OF',{selectedCount,totalCount}) }})
                     </template>
                     <template v-else>
-                        ({{ totalCount }})
+                        &nbsp;({{ totalCount }})
                     </template>
                 </template>
                 <slot name="extra-area" />
@@ -68,6 +68,7 @@ export default {
         .title{
             @apply font-bold;
             font-size: 2rem;
+            line-height: 120%;
             &.child{
                 font-size: 1.5rem;
             }
