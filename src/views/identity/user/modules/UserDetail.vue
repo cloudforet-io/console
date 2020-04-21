@@ -5,11 +5,6 @@
                 <p-status v-bind="userStateFormatter(value)" />
             </template>
         </p-info-panel>
-
-        <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
-                      :edit-mode.sync="tagsApi.ts.syncState.editMode"
-                      v-on="tagsApi.ts.listeners"
-        />
     </div>
 </template>
 
@@ -29,16 +24,14 @@ import userEventBus from '@/views/identity/user/UserEventBus';
 export default {
     name: 'PUserDetail',
     components: {
-        PInfoPanel, PDictPanel, PStatus,
+        PInfoPanel, PStatus,
     },
     props: {
         item: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
-        // todo: need confirm that this is good way - sinsky
-        tagConfirmEvent: String,
-        tagResetEvent: String,
+
     },
     setup(props, { parent }) {
         const baseDefs = makeTrItems([
@@ -53,20 +46,12 @@ export default {
             ['timezone', 'COMMON.TIMEZONE'],
         ], parent, { copyFlag: true });
 
-        const tagsApi = new DictPanelAPI(fluentApi.identity().user());
-
-        watch(() => props.item, async (item) => {
-            tagsApi.setId(item.user_id);
-            tagsApi.ts.toReadMode();
-            await tagsApi.getData();
-        });
 
         return {
             baseDefs,
             userStateFormatter,
             timestampFormatter,
             arrayFormatter,
-            tagsApi,
         };
     },
 };

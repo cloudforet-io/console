@@ -31,11 +31,6 @@
             </template>
         </p-info-panel>
 
-        <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
-                      :edit-mode.sync="tagsApi.ts.syncState.editMode"
-                      v-on="tagsApi.ts.listeners"
-        />
-
         <p-info-panel class="last-panel" :info-title="$t('PANEL.FILTER_FORMAT')">
             <p-data-table
                 :fields="fields"
@@ -127,18 +122,12 @@ export default defineComponent({
             type: Object,
             default: () => ({}),
         },
-        tagsFetchApi: {
-            type: [Object, Function],
-            required: true,
-        },
     },
     setup(props, { parent }) {
         const baseInfoStates = setBaseInfoStates(props, parent);
-        const tagStates = setTagStates(props);
         const filterFormatStates = setFilterFormatStates(props, parent);
         return {
             ...baseInfoStates,
-            ...tagStates,
             ...filterFormatStates,
         };
     },

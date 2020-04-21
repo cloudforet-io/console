@@ -11,7 +11,7 @@ import {
     defaultAutocompleteHandler,
     getEnumValues, getSearchEnumValues,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import {defaultQuery} from "@/lib/api/query";
+import { defaultQuery } from '@/lib/api/query';
 
 export default {
     name: 'User',

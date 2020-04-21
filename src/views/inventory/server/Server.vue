@@ -242,7 +242,6 @@ import { createAtVF, deleteAtVF, updateAtVF } from '@/lib/data-source';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
 import { MetricAPI } from '@/lib/api/monitoring';
-import { MONITORING_TYPE } from '@/lib/fluent-api/monitoring/type';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 

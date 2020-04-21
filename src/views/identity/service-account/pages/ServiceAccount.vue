@@ -82,13 +82,14 @@
                                 :details="accountDetails"
                                 :data="apiHandler.tableTS.selectState.firstSelectItem"
                             />
-                            <p-dict-panel :dict="apiHandler.tableTS.selectState.firstSelectItem.tags">
-                                <template #extra>
-                                    <p-button style-type="primary" @click="editTag">
-                                        {{ $t('BTN.EDIT') }}
-                                    </p-button>
-                                </template>
-                            </p-dict-panel>
+
+                        </template>
+                        <template #tag>
+                            <s-tags-panel
+                                :is-show="singleItemTab.syncState.activeTab==='tag'"
+                                :resource-id="apiHandler.tableTS.selectState.firstSelectItem.service_account_id"
+                                tag-page-name="serviceAccountTags"
+                            />
                         </template>
                         <template #credentials>
                             <PPanelTop style="margin-bottom:-0.5rem;" :use-total-count="true" :total-count="secretApiHandler.totalCount.value">
@@ -184,8 +185,6 @@ import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLay
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/DropdownMenuBtn.vue';
@@ -195,20 +194,16 @@ import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/Proj
 import { DataSourceItem, fluentApi } from '@/lib/fluent-api';
 import { AdminFluentAPI, SearchTableFluentAPI, TabSearchTableFluentAPI } from '@/lib/api/table';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
-import PSelectableList from '@/components/organisms/lists/selectable-list/SelectableList.vue';
-import { SelectableListToolset } from '@/components/organisms/lists/selectable-list/SelectableList.toolset';
 import { ProviderModel } from '@/lib/fluent-api/identity/provider';
 import { DoubleCheckModalState } from '@/components/organisms/modals/double-check-modal/toolset';
 import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/DoubleCheckModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import { idField as serviceAccountID, ServiceAccountListResp } from '@/lib/fluent-api/identity/service-account';
-import { ProviderStoreType, useStore } from '@/store/toolset';
+import {  useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
-import { DictPanelAPI } from '@/lib/api/dict';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 import nunjucks from 'nunjucks';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
@@ -217,6 +212,7 @@ import _ from 'lodash';
 import { GridLayoutState } from '@/components/molecules/layouts/grid-layout/toolset';
 import PGridLayout from '@/components/molecules/layouts/grid-layout/GridLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
+import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -230,7 +226,6 @@ export default {
         PDynamicDetails,
         PEmpty,
         SProjectTreeModal,
-        PDictPanel,
         PDoubleCheckModal,
         SServiceAccountFormModal,
         SSecretCreateFormModal,
@@ -238,6 +233,7 @@ export default {
         PPanelTop,
         PGridLayout,
         PPageTitle,
+        STagsPanel,
     },
     setup(props, context) {
         const { project } = useStore();
@@ -259,7 +255,6 @@ export default {
         const selectProviderItem = computed<ProviderModel>(() => providers.value[selectProvider.value]);
         const providerTotalCount = ref({});
 
-        const vm = getCurrentInstance();
         const providerListState = new GridLayoutState({
             items: computed(() => Object.values(providers.value)),
             cardClass: (item) => {
@@ -322,6 +317,7 @@ export default {
         const singleItemTab = new TabBarState({
             tabs: makeTrItems([
                 ['detail', 'TAB.DETAILS'],
+                ['tag', 'TAB.TAG'],
                 ['credentials', 'TAB.SECRET'],
                 ['admin', 'TAB.ADMIN'],
             ]),
@@ -613,13 +609,6 @@ export default {
             formState.formVisible = false;
         };
 
-        const tagsApi = new DictPanelAPI(fluentApi.identity().serviceAccount());
-
-        watch(() => apiHandler.tableTS.selectState.firstSelectItem, async (item) => {
-            tagsApi.setId(item.service_account_id);
-            tagsApi.ts.toReadMode();
-            await tagsApi.getData();
-        });
 
         const clickLink = () => {
             const linkTemplate = selectProviderItem.value?.tags?.external_link_template;
@@ -628,9 +617,7 @@ export default {
             window.open(link);
         };
         apiHandler.getData();
-        const editTag = () => {
-            vm?.$router.push({ name: 'serviceAccountTags', params: { resourceId: apiHandler.tableTS.selectState.firstSelectItem.service_account_id } });
-        };
+
         return {
             apiHandler,
             accountDataSource,
@@ -655,9 +642,7 @@ export default {
             ...toRefs(formState),
             ...toRefs(secretFormState),
             secretFormConfirm,
-            tagsApi,
             clickLink,
-            editTag,
             providerListState,
             selectProvider,
             providerTotalCount,
