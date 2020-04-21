@@ -51,19 +51,19 @@
                     :details="apiHandler.tableTS.selectState.firstSelectItem.metadata.details"
                     :data="apiHandler.tableTS.selectState.firstSelectItem"
                 />
-                <p-dict-panel :dict="apiHandler.tableTS.selectState.firstSelectItem.tags">
-                    <template #extra>
-                        <p-button style-type="primary" @click="editTag">
-                            {{ $t('BTN.EDIT') }}
-                        </p-button>
-                    </template>
-                </p-dict-panel>
             </template>
             <template #data>
                 <PDynamicSubData
                     :select-id="apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id"
                     :sub-data="apiHandler.tableTS.selectState.firstSelectItem.metadata.sub_data"
                     :action="csGetDataAction"
+                />
+            </template>
+            <template #tag>
+                <s-tags-panel
+                    :is-show="singleItemTab.syncState.activeTab==='tag'"
+                    :resource-id="apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id"
+                    tag-page-name="cloudServicePageTags"
                 />
             </template>
             <template #rawData>
@@ -156,9 +156,9 @@ import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details
 import PEmpty from '@/components/atoms/empty/Empty.vue';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
 import PI from '@/components/atoms/icons/PI.vue';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 
 export default {
     name: 'CloudServicePage',
@@ -173,7 +173,7 @@ export default {
         PIconTextButton,
         PTab,
         PDynamicSubData,
-        PButton,
+        STagsPanel,
         PRawData,
         PDropdownMenuBtn,
         // PTableCheckModal,
@@ -181,7 +181,6 @@ export default {
         PEmpty,
         SProjectTreeModal,
         SCollectModal,
-        PDictPanel,
         PPanelTop,
     },
     props: {
@@ -222,6 +221,7 @@ export default {
             tabs: makeTrItems([
                 ['detail', 'TAB.DETAILS'],
                 ['data', 'TAB.DATA'],
+                ['tag', 'TAB.TAG'],
                 ['rawData', 'TAB.RAW_DATA'],
                 ['admin', 'TAB.ADMIN'],
                 ['history', 'TAB.HISTORY'],
@@ -375,15 +375,7 @@ export default {
         // @ts-ignore
         const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
 
-        const editTag = () => {
-            vm?.$router.push({
-                name: 'cloudServicePageTags',
-                params: { resourceId: apiHandler.tableTS.selectState.firstSelectItem.cloud_service_id },
-                query: {
-                    nextPath: vm?.$route.fullPath,
-                },
-            });
-        };
+
         return {
             ...toRefs(state),
             apiHandler,
@@ -399,7 +391,6 @@ export default {
             multiItemTab,
             adminApiHandler,
             historyAPIHandler,
-            editTag,
         };
     },
 };
