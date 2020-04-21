@@ -24,9 +24,12 @@
                                  @changeSort="getCollectors"
                 >
                     <template slot="toolbox-left">
-                        <p-button style-type="primary-dark" @click="$router.push({path: '/inventory/collector/create/plugins'})">
+                        <PIconTextButton style-type="primary-dark"
+                                         name="ic_plus_bold"
+                                         @click="$router.push({path: '/inventory/collector/create/plugins'})"
+                        >
                             {{ $t('BTN.CREATE') }}
-                        </p-button>
+                        </PIconTextButton>
                         <PDropdownMenuBtn class="left-toolbox-item"
                                           :menu="dropdown"
                                           @click-update="onClickUpdate"
@@ -194,6 +197,8 @@ import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
 const PHorizontalLayout = () => import('@/components/organisms/layouts/horizontal-layout/HorizontalLayout');
@@ -431,7 +436,7 @@ export default {
         PHorizontalLayout,
         PToolboxTable,
         PDataTable,
-        PButton,
+        PIconTextButton,
         PTag,
         PRow,
         PCol,

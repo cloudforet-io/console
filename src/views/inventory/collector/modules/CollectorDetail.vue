@@ -61,7 +61,7 @@ import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { DictPanelAPI } from '@/lib/api/dict';
 import { fluentApi } from '@/lib/fluent-api';
 
 const setBaseInfoStates = (props, parent) => {

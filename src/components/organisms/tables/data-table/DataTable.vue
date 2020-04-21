@@ -133,7 +133,7 @@
                                     :index="index"
                                     :field="field"
                                 >
-                                    <p-td onselectstart="return true" style="user-select: all;">
+                                    <p-td onselectstart="return true">
                                         <slot
                                             :name="'col-'+field+'-format'"
                                             :item="item"
@@ -470,14 +470,14 @@ export default defineComponent({
 <style lang="postcss" scoped>
 
     @define-mixin selected-row {
-        background-color: theme('colors.primary3') !important;
+        background-color: theme('colors.blue.200') !important;
         td {
-            @apply text-secondary;
-        }
+            @apply text-secondary ;
+      }
     }
 
     .select-checkbox {
-        cursor: pointer;
+        @apply cursor-pointer min-w-4 w-4;
     }
     tbody {
         display: block;
@@ -496,25 +496,21 @@ export default defineComponent({
                 vertical-align: middle;
                 white-space: nowrap;
                 .th-contents {
-                    display: flex;
-                    justify-content: space-between;
-                    padding: 0.25rem 0 0.25rem 0.75rem;
+                    @apply flex justify-between pl-4 py-1 text-black;
                 }
                 .sort-icon {
-                    @apply text-gray-200;
-                    float: right;
+                    @apply text-gray-500 float-right;
                 }
                 &.fix-width {
-                    min-width: 4.75rem;
+                    @apply min-w-19;
                 }
                 &:last-child {
                     .th-contents {
-                        padding-right: 1rem;
+                        @apply pr-4;
                     }
                 }
                 &.all-select {
-                    width: 1rem;
-                    padding: 0.25rem 0 0.25rem 0.75rem;
+                    @apply w-4 py-1 pl-4 max-w-15 min-w-15;
                 }
             }
         }
@@ -536,12 +532,11 @@ export default defineComponent({
         /*    background-color: initial !important;*/
         /*}*/
         .no-data {
-            @apply text-primary2;
-            text-align: center;
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-            font-size: 1.5rem;
-            line-height: 2rem;
+            @apply text-primary2 border-0 text-center py-12 text-2xl;
+            &:hover{
+                @apply bg-white;
+            }
+            line-height: 120%;
         }
     }
 </style>

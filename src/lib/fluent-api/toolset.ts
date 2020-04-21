@@ -288,74 +288,6 @@ export abstract class QueryAPI<parameter, resp> extends BaseQueryAPI<parameter, 
     }
 }
 
-
-export abstract class StatisticsQueryAPI<parameter, resp> extends ActionAPI<parameter, resp> {
-    protected apiState: StatQueryApiState<parameter>;
-
-    constructor(
-        api: ApiType,
-        baseUrl: string,
-        initState: StatQueryApiState<parameter> = {} as StatQueryApiState<parameter>,
-        transformer: null|((any) => any) = null,
-    ) {
-        super(api, baseUrl, undefined, transformer);
-        this.apiState = {
-            filter: [],
-            limit: undefined,
-            start: undefined,
-            end: undefined,
-            aggregate: [],
-            merge: [],
-            extraParameter: {} as parameter,
-            ...initState,
-        };
-    }
-
-    protected query = (): StatQuery => {
-        const query: StatQuery = getQueryWithApiState<StatQuery>(['limit', 'start', 'end', 'aggregate', 'merge'], this.apiState);
-        if (isNotEmpty(this.apiState.filter)) {
-            const newFilter = filterItemToQuery(this.apiState.filter || []);
-            if (newFilter) query.filter = newFilter;
-        }
-        return query as StatQuery;
-    };
-
-    getParameter = (): {query: StatQuery} & parameter => ({
-        query: this.query(),
-        ...this.apiState.extraParameter as parameter,
-    });
-
-    setFilter(...args: FilterItem[]): this {
-        this.apiState.filter = args;
-        return this.clone();
-    }
-
-    setAggregate(...args: Array<string|undefined>): this {
-        this.apiState.aggregate = args;
-        return this.clone();
-    }
-
-    setMerge(...args: Array<string|undefined>): this {
-        this.apiState.merge = args;
-        return this.clone();
-    }
-
-    setLimit(limit: number|undefined): this {
-        this.apiState.limit = limit;
-        return this.clone();
-    }
-
-    setStart(start: string|undefined): this {
-        this.apiState.start = start;
-        return this.clone();
-    }
-
-    setEnd(end: string|undefined): this {
-        this.apiState.end = end;
-        return this.clone();
-    }
-}
-
 interface SingleItemActionInterface{
     setId: (id: string) => any;
 }
@@ -634,18 +566,6 @@ export abstract class CollectAction<parameter, resp> extends SetParameterAction<
     protected path = 'collect';
 }
 
-
-export abstract class CountAction<parameter, resp> extends StatisticsQueryAPI<parameter, resp> {
-    protected path = 'count';
-}
-
-export abstract class TrendsAction<parameter, resp> extends StatisticsQueryAPI<parameter, resp> {
-    protected path = 'trends';
-}
-
-export abstract class DiffAction<parameter, resp> extends StatisticsQueryAPI<parameter, resp> {
-    protected path = 'diff';
-}
 export type ResourceActions<actions extends string> = { [key in actions]: (...args: any[]) => ActionAPI};
 
 export abstract class Resource {

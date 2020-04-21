@@ -19,11 +19,16 @@
                                                 responsiveStyle:{'height': height+'px', 'overflow-y':'auto','overflow-x':'auto'}
                                             }"
                                             :data="null"
+                                            @clickExcel="exportToolSet.getData()"
                             >
                                 <template #toolbox-left>
-                                    <p-button style-type="primary-dark" @click="clickOpenForm('add')">
+                                    <PIconTextButton style-type="primary-dark"
+                                                     name="ic_plus_bold"
+                                                     @click="clickOpenForm('add')"
+                                    >
                                         {{ $t('BTN.ADD') }}
-                                    </p-button>
+                                    </PIconTextButton>
+
                                     <PDropdownMenuBtn
                                         class="left-toolbox-item"
                                         :menu="dropdown"
@@ -137,7 +142,7 @@ import PVerticalPageLayout2 from '@/views/containers/page-layout/VerticalPageLay
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/HorizontalLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
-
+import PI from '@/components/atoms/icons/PI.vue';
 
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
 import PButton from '@/components/atoms/buttons/Button.vue';
@@ -160,10 +165,11 @@ import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { createAtVF } from '@/lib/data-source';
 import SServiceAccountFormModal from '@/views/identity/service-account/modules/ServiceAccountFormModal.vue';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { DictPanelAPI } from '@/lib/api/dict';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
 import SSecretCreateFormModal from '@/views/identity/service-account/modules/SecretCreateFormModal.vue';
 import nunjucks from 'nunjucks';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 export default {
     name: 'ServiceAccount',
@@ -182,6 +188,7 @@ export default {
         PDoubleCheckModal,
         SServiceAccountFormModal,
         SSecretCreateFormModal,
+        PIconTextButton,
     },
     setup(props, context) {
         const { project } = useStore();
@@ -266,6 +273,7 @@ export default {
             padding: true,
             selectable: true,
             dragable: true,
+            excelVisible: true,
         });
         const exportAction = fluentApi.addons().excel().export();
         const exportToolSet = new ExcelExportAPIToolSet(exportAction, apiHandler);
@@ -291,7 +299,6 @@ export default {
                 ['project', 'COMMON.CHG_PRO'],
                 [null, null, { type: 'divider' }],
                 ['link', null, { label: 'Console', disabled: hasLink }],
-                ['exportExcel', null, { label: 'Export', disabled: false }],
             ],
             context.parent,
             { type: 'item', disabled: isNotSelected }),
@@ -580,7 +587,7 @@ export default {
 
 <style lang="postcss" scoped>
     .left-toolbox-item{
-        margin-left: 1rem;
+        @apply mx-4;
         &:last-child {
             flex-grow: 1;
         }

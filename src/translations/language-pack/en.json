@@ -394,6 +394,7 @@
 		"DATA": "Data",
 		"DETAILS": "Details",
 		"HISTORY": "History",
+		"MONITORING": "Monitoring",
 		"RAW_DATA": "Raw Data"
 	},
 	"TREE_TYPE": {
@@ -409,6 +410,7 @@
 	"WORD": {
 		"CIDR": "CIDR",
 		"CLOUDSERVICE": "cloud service",
+		"INSTANCE": "Instance",
 		"KEY": "Key",
 		"SERVER": "server",
 		"TAG": "tag",

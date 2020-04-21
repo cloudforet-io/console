@@ -26,6 +26,12 @@
                             {{ proxyPageSize }}
                         </PDropdownMenuBtn>
                     </div>
+                    <div v-if="excelVisible" class="tool">
+                        <p-icon-button
+                            name="ic_excel"
+                            @click="$emit('clickExcel',$event)"
+                        />
+                    </div>
                     <div v-if="settingVisible" class="tool">
                         <p-icon-button
                             name="ic_setting"
@@ -51,7 +57,7 @@
             :sortable="sortable"
             :selectable="selectable"
             :multi-select="multiSelect"
-            :dragable="dragable"
+            :dragable="false"
             :col-copy="colCopy"
             :select-index.sync="proxySelectIndex"
             :sort-by.sync="proxySortBy"
@@ -130,6 +136,10 @@ export default {
         refreshVisible: {
             type: Boolean,
             default: true,
+        },
+        excelVisible: {
+            type: Boolean,
+            default: false,
         },
         pageSize: {
             type: Number,
@@ -217,15 +227,14 @@ export default {
             @apply bg-white;
         }
 
-        padding: 1rem;
         .toolbox {
+            @apply px-4 py-6;
             /*margin-top: 0.5rem;*/
             .toolbox-middle{
                 display: flex;
                 justify-content: space-between;
                 flex-wrap: nowrap;
                 align-items: center;
-                margin-bottom: 1rem;
                 .left{
                     display: flex;
                     flex-wrap: wrap;
@@ -252,7 +261,8 @@ export default {
                 }
             }
             .toolbox-bottom{
-                width: auto;
+                @apply w-full mt-4;
+
             }
 
         }

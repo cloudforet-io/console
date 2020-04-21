@@ -60,7 +60,7 @@ import PButton from '@/components/atoms/buttons/Button.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 
 import PI from '@/components/atoms/icons/PI.vue';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { DictPanelAPI } from '@/lib/api/dict';
 import {
     DictItem,
     dictValidation,

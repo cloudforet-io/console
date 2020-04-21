@@ -1,3 +1,5 @@
+const { colors } = require('tailwindcss/defaultTheme');
+
 const palette = {
     black: '#000000',
     white: '#FFFFFF',
@@ -79,7 +81,6 @@ const palette = {
         900: '#371E62',
     },
 };
-
 const colorSet = {
     transparent: 'transparent',
     black: palette.black,
@@ -112,6 +113,14 @@ const colorSet = {
     violet: {
         ...palette.violet,
         default: palette.violet[500],
+    },
+    peacock: {
+        ...colors.teal,
+        default: colors.teal[500],
+    },
+    indigo: {
+        ...colors.indigo,
+        default: colors.indigo[500],
     },
 };
 

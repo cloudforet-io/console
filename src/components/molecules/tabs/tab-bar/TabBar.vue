@@ -69,7 +69,7 @@ export default {
 
 <style lang="postcss" scoped>
 .p-nav-tabs {
-    @apply flex flex-wrap pl-0 mb-0 bg-white ;
+    @apply flex flex-wrap pl-0 mb-0 bg-white;
     > li {
         cursor: pointer;
     }
@@ -90,9 +90,6 @@ export default {
             font-weight: bold;
             &:not(.one-tab) {
                 @apply border-b-2 border-primary;
-            }
-            &.one-tab{
-                @apply border-b-2 border-white;
             }
         }
         &:not(.active) {

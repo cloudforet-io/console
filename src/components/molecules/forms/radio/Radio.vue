@@ -82,8 +82,7 @@ export default {
         width: 0;
     }
     .radio-icon {
-        @apply text-gray-900;
-        cursor: pointer;
+        @apply text-gray-300 cursor-pointer;
     }
 }
 </style>

@@ -94,7 +94,7 @@ export default defineComponent({
     }
 }
 .dropdown-btn{
-    @apply bg-white border-gray-200;
+    @apply bg-white border-gray-300;
     border-bottom-width: 1px;
     border-style: solid;
     min-width: 2rem;
@@ -102,7 +102,7 @@ export default defineComponent({
         @apply text-secondary;
     }
     &.disabled{
-        @apply border-gray-200 bg-gray-200 text-gray-400;
+        @apply border-gray-300 bg-gray-200 text-gray-400;
     }
     &:not(:disabled):not(.disabled):hover{
         @apply border-secondary bg-white text-secondary;
@@ -114,7 +114,7 @@ export default defineComponent({
     border-radius: 0px 2px 2px 0px;
 }
 .menu-btn{
-    @apply text-gray-900;
+    @apply text-gray-900 border-gray-300;
     min-width: 6.5rem;
     width: auto;
     padding-left: 1rem;

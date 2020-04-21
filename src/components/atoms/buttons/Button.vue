@@ -96,8 +96,8 @@ export default {
 
     &.disabled {
         @apply bg-gray-200 text-gray-400 border-gray-100;
-        background-color: theme('colors.gray.200') !important;
-        border-color: theme('colors.gray.100') !important;
+        background-color: theme('colors.gray.100') !important;
+        border-color: theme('colors.gray.300') !important;
         color: theme('colors.gray.400') !important;
         background-repeat: no-repeat;
         background-clip: padding-box;
@@ -119,6 +119,7 @@ export default {
     @mixin btn-color alert, theme('colors.alert'), theme('colors.white');
     @mixin btn-color safe, theme('colors.safe'), theme('colors.white');
     @mixin btn-color gray900, theme('colors.gray.900'), theme('colors.white');
+    @mixin btn-color black, theme('colors.black'), theme('colors.white');
 
     @mixin btn-color gray, theme('colors.gray.default'), theme('colors.white');
     @mixin btn-color gray200, theme('colors.gray.200'), theme('colors.white');

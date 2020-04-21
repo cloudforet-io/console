@@ -102,7 +102,7 @@ export default defineComponent({
             }
         }
         &.white {
-            @apply bg-white border-gray-200;
+            @apply bg-white border-gray-300;
             &:hover {
                 @apply text-gray-200;
             }
