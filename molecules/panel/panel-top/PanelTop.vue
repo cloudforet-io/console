@@ -33,7 +33,6 @@ export default defineComponent({
     .p-panel-top {
         @apply mb-4 mx-4 mt-8;
         display: flex;
-        width: 100%;
         height: 2rem;
         align-items: center;
         .title {
