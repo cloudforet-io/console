@@ -12,7 +12,7 @@ import {
     DictPanelToolSet,
 } from '@/components/organisms/panels/dict-panel/DictPanel.toolset';
 import { getKnobProps } from '@sb/storybook-util';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { DictPanelAPI } from '@/lib/api/dict';
 
 export default {
     title: 'organisms/panels/DictPanel',

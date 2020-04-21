@@ -15,7 +15,7 @@
 
 <script>
 import { ref, watch } from '@vue/composition-api';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { DictPanelAPI } from '@/lib/api/dict';
 import { fluentApi } from '@/lib/fluent-api';
 
 import PInfoPanel from '@/components/organisms/panels/info-panel/InfoPanel.vue';

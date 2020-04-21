@@ -22,7 +22,7 @@ export abstract class ResourceAPIToolSet<
     parameter = any,
     resp = any,
     actions extends BaseResources<parameter, resp> = BaseResources<parameter, resp>,
-    > extends DynamicAPI implements GetDataAPI,UpdateDataAPI {
+    > extends DynamicAPI implements GetDataAPI, UpdateDataAPI {
     actions: actions;
 
     abstract getData: (...args: any[]) => void;

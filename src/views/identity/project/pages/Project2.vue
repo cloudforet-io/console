@@ -156,7 +156,7 @@ import { AxiosResponse } from 'axios';
 import { useStore } from '@/store/toolset';
 import { ProviderListResp } from '@/lib/fluent-api/identity/provider';
 import config from '@/lib/config';
-import { ProjectSummaryResp } from '@/lib/fluent-api/statistics/identity/project-summary';
+import { ProjectSummaryResp } from '@/lib/fluent-api/statistics';
 import { QuerySearchGridFluentAPI } from '@/lib/api/grid';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import PQuerySearchBar from '@/components/organisms/search/query-search-bar/QuerySearchBar.vue';

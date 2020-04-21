@@ -12,7 +12,7 @@ import {
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import { defaultQuery } from '@/lib/api/query';
 import { fluentApi } from '@/lib/fluent-api';
-import { DictPanelAPI } from '@/components/organisms/panels/dict-panel/dict';
+import { DictPanelAPI } from '@/lib/api/dict';
 
 export default {
     name: 'Collector',

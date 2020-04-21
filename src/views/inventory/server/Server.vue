@@ -62,7 +62,7 @@
                     <template v-if="apiHandler.tableTS.querySearch.tags.value.length >= 1" #toolbox-bottom>
                         <p-col :col="12">
                             <p-hr style="width: 100%;" />
-                            <p-query-search-tags style="margin-top: .5rem;"
+                            <p-query-search-tags style="margin-top: 0.5rem;"
                                                  :tags="apiHandler.tableTS.querySearch.tags.value"
                                                  @deleteTag="apiHandler.tableTS.querySearch.deleteTag"
                                                  @deleteAllTags="apiHandler.tableTS.querySearch.deleteAllTags"
@@ -124,6 +124,13 @@
             <template #history>
                 <p-dynamic-view :api-handler="historyAPIHandler" view_type="table" :data_source="historyAPIHandler.dataSource" />
             </template>
+            <template #monitoring>
+                <s-monitoring :resource-type="metricAPIHandler.ts.state.resourceType"
+                              :data-tools="metricAPIHandler.ts.state.dataTools"
+                              :statistics-types="metricAPIHandler.ts.state.statisticsTypes"
+                              :resources="metricAPIHandler.ts.state.resources"
+                />
+            </template>
         </p-tab>
         <PTab v-else-if="apiHandler.tableTS.selectState.isSelectMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
             <template #data>
@@ -142,6 +149,9 @@
             </template>
             <template #admin>
                 <p-dynamic-view :api-handler="adminApiHandler" view_type="table" :data_source="adminApiHandler.dataSource" />
+            </template>
+            <template #monitoring>
+                <s-monitoring resource-type="'inventory.Server'" :resources="apiHandler.tableTS.selectState.selectItems" />
             </template>
         </PTab>
 
@@ -163,7 +173,7 @@
             @confirm="checkModalConfirm"
         />
         <s-project-tree-modal :visible.sync="projectModalVisible" @confirm="changeProject" />
-        <s-collect-modal :visible.sync="collectModalVisible"
+        <s-collect-modal :visible.sync="collectModalState.visible"
                          :resources="apiHandler.tableTS.selectState.selectItems"
                          id-key="server_id"
         />
@@ -174,12 +184,12 @@
 /* eslint-disable camelcase */
 
 import {
-    reactive, toRefs, ref, computed,
+    computed, reactive, ref, toRefs,
 } from '@vue/composition-api';
 import PStatus from '@/components/molecules/status/Status.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import {
-    timestampFormatter, serverStateFormatter, platformBadgeFormatter, getValue,
+    getValue, platformBadgeFormatter, serverStateFormatter, timestampFormatter,
 } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 import PCol from '@/components/atoms/grid/col/Col.vue';
@@ -196,16 +206,15 @@ import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionC
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
-import {
-    AdminFluentAPI,
-    HistoryFluentAPI, QuerySearchTableFluentAPI,
-} from '@/lib/api/table';
+import { AdminFluentAPI, HistoryFluentAPI, QuerySearchTableFluentAPI } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
-import { MultiItemAction, fluentApi } from '@/lib/fluent-api';
+import { fluentApi, MultiItemAction } from '@/lib/fluent-api';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
 import {
-    getEnumValues, getFetchValues, makeValuesFetchHandler,
+    getEnumValues,
+    getFetchValues,
+    makeValuesFetchHandler,
 } from '@/components/organisms/search/query-search-bar/autocompleteHandler';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/QuerySearchTags.vue';
 import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
@@ -215,6 +224,9 @@ import { AxiosResponse } from 'axios';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 import { createAtVF, deleteAtVF, updateAtVF } from '@/lib/data-source';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import SMonitoring from '@/components/organisms/monitoring/Monitoring.vue';
+import { MetricAPI } from '@/lib/api/monitoring';
+import { MONITORING_TYPE } from '@/lib/fluent-api/monitoring/type';
 
 const serverStateVF = {
     name: 'State',
@@ -339,6 +351,7 @@ export default {
         PDynamicView,
         SProjectTreeModal,
         SCollectModal,
+        SMonitoring,
     },
     setup(props, context) {
         class ACHandler extends QuerySearchTableACHandler {
@@ -434,14 +447,15 @@ export default {
         context.parent);
 
         const tabData = reactive({
-            tabs: makeTrItems([
+            tabs: computed(() => makeTrItems([
                 ['detail', 'TAB.DETAILS'],
                 ['data', 'TAB.DATA'],
                 ['rawData', 'TAB.RAW_DATA'],
                 ['admin', 'TAB.ADMIN'],
                 ['history', 'TAB.HISTORY'],
+                ['monitoring', 'TAB.MONITORING'],
             ],
-            context.parent),
+            context.parent)),
             activeTab: 'detail',
             multiSelectTabs: makeTrItems([
                 ['data', 'TAB.DATA', { keepAlive: true }],
@@ -555,12 +569,12 @@ export default {
         };
         const changeProjectAction = fluentApi.inventory().server().changeProject();
         const changeProject = async (node?: ProjectNode|null) => {
-            const action = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
+            const changeAction = changeProjectAction.setSubIds(apiHandler.tableTS.selectState.selectItems.map(item => item.server_id));
 
             if (node) {
-                await action.setId(node.data.id).execute();
+                await changeAction.setId(node.data.id).execute();
             } else {
-                await action.setReleaseProject().execute();
+                await changeAction.setReleaseProject().execute();
             }
 
             await apiHandler.getData();
@@ -607,8 +621,14 @@ export default {
         const historyAPIHandler = new HistoryFluentAPI(getDataAction, historyIsShow, selectId);
 
         const collectModalState = reactive({
-            collectModalVisible: false,
+            visible: false,
         });
+
+        const metricAPIHandler = new MetricAPI(
+            'inventory.Server',
+            'server_id',
+            apiHandler,
+        );
 
         return {
             ...toRefs(tabData),
@@ -617,7 +637,7 @@ export default {
             timestampFormatter,
             platformBadgeFormatter,
             clickCollectData() {
-                collectModalState.collectModalVisible = true;
+                collectModalState.visible = true;
             },
             clickMenuEvent(menuName) {
                 console.debug(menuName);
@@ -639,7 +659,8 @@ export default {
             getDataAction,
             historyAPIHandler,
             baseInfoDetails,
-            ...toRefs(collectModalState),
+            collectModalState,
+            metricAPIHandler,
         };
     },
 };
@@ -647,18 +668,16 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .left-toolbox-item{
+    .left-toolbox-item {
         margin-left: 1rem;
         &:last-child {
             flex-grow: 1;
         }
     }
 
-    #empty-space{
+    #empty-space {
+        @apply text-primary2;
         text-align: center;
         margin-bottom: 0.5rem;
-        @apply text-primary2;
-        /*color: $primary2;*/
-        /*font: 24px/32px Arial;*/
     }
 </style>
