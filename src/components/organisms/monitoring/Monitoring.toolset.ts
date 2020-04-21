@@ -3,6 +3,8 @@ import { UnwrapRef } from '@vue/composition-api/dist/reactivity';
 import { DataSourceResp, STATISTICS_TYPE } from '@/lib/fluent-api/monitoring/type';
 import _ from 'lodash';
 import { watch } from '@vue/composition-api';
+import Metric, { MetricList } from '@/lib/fluent-api/monitoring/metric';
+import { fluentApi } from '@/lib/fluent-api';
 
 export const monitoringProps = {
     resourceType: {
@@ -19,6 +21,9 @@ export const monitoringProps = {
     dataTools: { // aws cloud watch, data dog, ....
         type: Array,
         default: () => [],
+        validator(dataTools) {
+            return dataTools.every(d => d.id && d.name);
+        },
     },
     statisticsTypes: {
         type: Array,
@@ -28,18 +33,31 @@ export const monitoringProps = {
         type: Object,
         default: () => ({}),
     },
+    // apiHandler: {
+    //     type: Object,
+    //     default: () => ({}),
+    //     validator(api: MetricList) {
+    //         return api.getResourceType() && api.getId();
+    //     },
+    // },
 };
 
-interface MonitoringResourceType {
+export interface MonitoringResourceType {
     id: string;
     name?: string;
+}
+
+export interface DataToolType {
+    id: string;
+    name: string;
 }
 
 export interface MonitoringProps {
     resourceType: string;
     resources: MonitoringResourceType[];
-    dataTools: string[];
+    dataTools: DataToolType[];
     statisticsTypes: STATISTICS_TYPE[];
+    // apiHandler: MetricList;
 }
 
 @StateToolSet<MonitoringProps>()
@@ -52,6 +70,7 @@ export class MonitoringState<D, S extends MonitoringProps = MonitoringProps> {
             resources: [],
             dataTools: [],
             statisticsTypes: [],
+            // apiHandler: fluentApi.monitoring().metric().list(),
         };
     }
 
@@ -75,9 +94,14 @@ export class MonitoringToolSet<D> extends MonitoringState<D> {
 
     setDataTools(data: DataSourceResp[]): void {
         this.state.dataTools = _.chain(data).map((d) => {
-            if (d.plugin_info.options.supported_resource_type.some(t => this.state.resourceType === t)) return d.name;
+            if (d.plugin_info.options.supported_resource_type.some(t => this.state.resourceType === t)) {
+                return {
+                    id: d.data_source_id,
+                    name: d.name,
+                };
+            }
             return undefined;
-        }).compact().uniq()
+        }).compact().uniqBy('id')
             .value();
     }
 
