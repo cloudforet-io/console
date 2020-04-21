@@ -32,6 +32,7 @@ export default {
                     'coral', 'yellow',
                     'gray', 'gray200', 'gray100',
                     'alert', 'safe', 'gray900',
+                    'black',
                 ].indexOf(value) !== -1;
             },
         },
