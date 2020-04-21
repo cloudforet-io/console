@@ -52,14 +52,14 @@
                         </div>
                     </template>
                     <template #toolbox-bottom>
-                        <div class="tool">
-                            <div class="tool-left">
+                        <div class="flex flex-row xs:flex-col sm:flex-col md:flex-row lg:flex-row xl:flew-row tool">
+                            <div class="flex flex-row flex-wrap w-full tool-left">
                                 <div class="tool-left-btn">
                                     <p-button style-type="primary-dark" @click="openProjectForm()">
                                         {{ $t('INVENTORY.CRT_PROJ') }}
                                     </p-button>
                                 </div>
-                                <div class="tool-left-search">
+                                <div class="w-1/2 tool-left-search">
                                     <p-query-search-bar
                                         :search-text.sync="apiHandler.gridTS.querySearch.state.searchText"
                                         :autocomplete-handler="apiHandler.gridTS.querySearch.acHandler.value"
@@ -67,16 +67,16 @@
                                     />
                                 </div>
                             </div>
-                            <div class="tool-right">
-                                <div class="tool-right-checkbox" style="user-select: none">
-                                    <PCheckBox :value="false" :disabled="true" />    Select All
-                                </div>
-                                <div class="tool-right-btn">
-                                    <p-button outline style-type="alert">
-                                        Delete
-                                    </p-button>
-                                </div>
-                            </div>
+<!--                            <div class="tool-right">-->
+<!--                                <div class="tool-right-checkbox" style="user-select: none">-->
+<!--                                    <PCheckBox :value="false" :disabled="true" />    Select All-->
+<!--                                </div>-->
+<!--                                <div class="tool-right-btn">-->
+<!--                                    <p-button outline style-type="alert">-->
+<!--                                        Delete-->
+<!--                                    </p-button>-->
+<!--                                </div>-->
+<!--                            </div>-->
                         </div>
                         <div v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
                             <p-hr style="width: 100%;" />
@@ -87,7 +87,7 @@
                                 @deleteAllTags="apiHandler.gridTS.querySearch.deleteAllTags"
                             />
                         </div>
-                        <div v-if="!hasChildProject" class="empty-project">
+                        <div v-show="!hasChildProject" class="empty-project">
                             <p>Looks like you don't have any Project.</p>
                         </div>
                     </template>
@@ -95,7 +95,7 @@
                         <div v-if="treeApiHandler.ts.metaState.firstSelectedNode && item">
                             <div class="project-description">
                                 <div class="project">
-                                    <PCheckBox :style="{float:'right'}"/>
+<!--                                    <PCheckBox :style="{float:'right'}"/>-->
                                     <div v-if="parentGroup" class="project-group-name">
                                         {{ parentGroup }} > {{ item.project_group_info.name }}
                                     </div>
@@ -532,6 +532,7 @@ export default {
                     });
                 })
                 .finally(() => {
+                    state.hasChildProject = true;
                     apiHandler.getData();
                 });
             formState.projectFormVisible = false;
@@ -667,18 +668,11 @@ export default {
     }
 
     .tool {
-        display: flex;
-        flex-direction: row;
         justify-content: space-between;
         margin-bottom: 1.5rem;
         .tool-left {
-            display: flex;
-            flex-wrap: wrap;
             .tool-left-btn {
                 margin-right: 1rem;
-            }
-            .tool-left-search {
-                width: auto;
             }
         }
         .tool-right {

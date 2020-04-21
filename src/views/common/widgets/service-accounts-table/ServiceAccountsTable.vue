@@ -34,7 +34,7 @@
                 </template>
 
                 <!-- others -->
-                <template #col-service_provider="{value}">
+                <template #col-service_provider-format="{value}">
                     <div class="font-bold"
                          :style="{'padding-top':'0.5rem', 'padding-left':'1.04rem', 'vertical-align':'middle'}"
                     >
@@ -142,7 +142,7 @@ export default defineComponent({
 
             const api = async (): Promise<DataType[]> => new Promise((resolve) => {
                 resolve(arrayOf(5, () => ({
-                    service_provider: casual.integer(0, 3),
+                    service_provider: casual.integer(1, 3),
                     account_name: casual.text,
                     servers: casual.integer(0, 300),
                     cloud_services: casual.integer(0, 300),
@@ -184,36 +184,33 @@ export default defineComponent({
         @apply flex items-center justify-center uppercase font-bold px-1;
         font-size: 0.75rem;
     }
-    .project-field {
-        @apply truncate font-bold;
-    }
     .data-table::v-deep {
-    .p-table {
-        table-layout: fixed;
-        font-size: 0.875rem;
-    }
-    td {
-        @apply truncate cursor-pointer;
-    &:first-child {
-         padding: 0;
-     }
-    }
-    th {
-    &:first-child {
-         width: 7.6rem;
-     }
-    &:nth-child(2) {
-         width: 5.6rem;
-     }
-    &:nth-child(3) {
-         width: 7.6rem;
-     }
-    &:nth-child(4) {
-         width: 7.6rem;
-     }
-    &:last-child {
-         width: 7.6rem;
-     }
-    }
+        .p-table {
+            table-layout: fixed;
+            font-size: 0.875rem;
+        }
+        td {
+            @apply truncate cursor-pointer;
+            &:first-child {
+                 padding: 0;
+             }
+        }
+        th {
+            &:first-child {
+                 width: 5.6rem;
+             }
+            &:nth-child(2) {
+                 width: 6.6rem;
+             }
+            &:nth-child(3) {
+                 width: 7.6rem;
+             }
+            &:nth-child(4) {
+                 width: 7.6rem;
+             }
+            &:last-child {
+                 width: 7.6rem;
+             }
+        }
     }
 </style>

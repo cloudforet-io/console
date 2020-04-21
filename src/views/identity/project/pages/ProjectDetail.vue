@@ -15,26 +15,26 @@
                 />
             </div>
         </div>
-        <PTab :tabs="tabs" :active-tab.sync="activeTab">
+        <PTab :tabs="tabs" :active-tab.sync="activeTab" :style="{'background':'#f8f8fc', 'border-width':0+'px'}">
             <template #summary="{height}">
                 <project-dashboard ref="ProjectDashboard" />
             </template>
             <template #member="{height}">
-                <div :style="{'border-width':'0px'}">
-                    <p-dynamic-view view_type="query-search-table"
-                                    :api-handler="apiHandler"
-                                    :data_source="dataSource"
-                                    :vbind="{responsiveStyle:{'height': 480+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding': 0}}"
-                                    :data="null"
-                    >
-                        <template #toolbox-left>
-                            <p-button style-type="primary-dark"
+                <p-dynamic-view view_type="query-search-table"
+                                :api-handler="apiHandler"
+                                :data_source="dataSource"
+                                :vbind="{responsiveStyle:{'height': 480+'px', 'overflow-y':'auto','overflow-x':'auto', 'padding': 0}}"
+                                :data="null"
+                >
+                    <template #toolbox-left>
+                        <div class="toolbox-left">
+                            <p-button class="add-btn"
+                                      style-type="primary-dark"
                                       @click="openMemberAddForm()"
                             >
                                 {{ $t('BTN.ADD') }}
                             </p-button>
                             <p-button
-                                class="toolbox-left-btn"
                                 outline
                                 style-type="alert"
                                 :disabled="apiHandler.tableTS.selectState.isNotSelected"
@@ -42,9 +42,9 @@
                             >
                                 Delete
                             </p-button>
-                        </template>
-                    </p-dynamic-view>
-                </div>
+                        </div>
+                    </template>
+                </p-dynamic-view>
             </template>
             <template #Tags>
                 <div class="tags">
@@ -348,6 +348,12 @@ export default {
             font-weight: bold;
             font-size: 24px;
         }
+    }
+    .toolbox-left {
+        .add-btn {
+            margin-right: 1rem;
+        }
+        padding-right: 1rem;
     }
 
     .delete-btn {

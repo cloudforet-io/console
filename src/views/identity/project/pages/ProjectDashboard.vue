@@ -2,7 +2,8 @@
     <div class="grid gap-4 grid-flow-row grid-cols-12">
         <service-summary class="col-start-1 col-end-13
                                 sm:col-end-5
-                                lg:col-end-5"
+                                lg:col-end-5
+                                "
                          title="servers" :api="servers.api"
                          :color="servers.color"
         />
@@ -15,27 +16,34 @@
         <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
                                sm:col-end-13 lg:row-start-2"
         />
-        <service-accounts-table class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
-                             lg:row-start-3"
-        />
-        <PTab :tabs="tabs" :active-tab.sync="activeTab"
-              class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10 lg:row-start-4"
+        <div class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10
+             lg:row-start-3 resources-tab"
         >
-            <template #server="{height}">
-                <service-accounts/>
-            </template>
-            <template #cloud_service="{height}">
-                <service-accounts/>
-            </template>
-        </PTab>
-
-        <daily-updates class="col-start-1 col-end-13 sm:col-start-7 lg:col-start-10 col-end-13
+            <PTab :tabs="tabs" :active-tab.sync="activeTab">
+                <template #server="{height}">
+                    <service-accounts
+                        :title="'RESOURCES BY REGION'"
+                        :class="'flex flex-row-reverse'"
+                    />
+                </template>
+                <template #cloud_service="{height}">
+                    <service-accounts
+                        :title="'RESOURCES BY REGION'"
+                        :class="'flex flex-row-reverse'"
+                    />
+                </template>
+            </PTab>
+        </div>
+        <service-accounts-table
+            class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-10 lg:row-start-4"
+        />
+        <daily-updates class="col-start-1 col-end-13 sm:col-start-7 sm:col-end-13 lg:col-start-10 col-end-13
                               row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
                               daily-updates"
         />
-        <daily-updates class="col-start-1 col-end-13 sm:col-start-7 lg:col-start-10 col-end-13
-                              row-start-5 row-end-6 sm:row-start-3 sm:row-end-4 lg:row-start-3
-                              daily-updates"
+        <health-dashboard class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-10 col-end-13
+                              row-start-5 row-end-8 sm:row-start-3 sm:row-end-4 lg:row-start-3
+                              health-dashboard"
         />
     </div>
 </template>
@@ -46,6 +54,7 @@ import DailyUpdates from '@/views/common/widgets/daily-updates/DailyUpdates.vue'
 import ServiceAccounts from '@/views/common/widgets/service-accounts/ServiceAccounts.vue';
 import ServiceSummary from '@/views/common/widgets/service-summary/ServiceSummary.vue';
 import ServiceAccountsTable from '@/views/common/widgets/service-accounts-table/ServiceAccountsTable.vue';
+import HealthDashboard from '@/views/common/widgets/health-dashboard/HealthDashboard.vue';
 import { blue, secondary, secondary1 } from '@/styles/colors';
 import { reactive, toRefs } from '@vue/composition-api';
 import { fluentApi } from '@/lib/fluent-api';
@@ -61,6 +70,7 @@ export default {
         ServiceAccountsTable,
         PTab,
         ServiceAccounts,
+        HealthDashboard,
     },
     setup(props, context) {
         const state = reactive({
@@ -99,5 +109,13 @@ export default {
 <style scoped>
     .daily-updates {
         height: 46.5rem;
+    }
+
+    .health-dashboard {
+        height: 36rem;
+    }
+
+    .resources-tab {
+        height: 24rem;
     }
 </style>
