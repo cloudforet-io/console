@@ -4,7 +4,7 @@ import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
 // import md from './pageTitle.md';
-import PpageTitle from '@/components/organisms/title/page-title/pageTitle.vue';
+import PpageTitle from '@/components/organisms/title/page-title/PageTitle.vue';
 import { action } from '@storybook/addon-actions';
 
 export default {
