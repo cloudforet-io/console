@@ -29,14 +29,13 @@
                     @clickExcel="exportToolSet.getData()"
                 >
                     <template #toolbox-left>
-                        <p-button style-type="primary-dark"
-                                  :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
-                                  @click="clickCollectData"
+                        <PIconTextButton style-type="primary-dark"
+                                         name="ic_plus_bold"
+                                         :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
+                                         @click="clickCollectData"
                         >
-                            <p-i name="ic_plus_bold" width="1rem" height="1rem"
-                                 class="mr-1"
-                            /> {{ $t('BTN.COLLECT_DATA') }}
-                        </p-button>
+                            {{ $t('BTN.COLLECT_DATA') }}
+                        </PIconTextButton>
                         <PDropdownMenuBtn
                             id="server-dropdown-btn"
                             class="left-toolbox-item"
@@ -177,15 +176,12 @@
 import {
     reactive, toRefs, ref, computed,
 } from '@vue/composition-api';
-import _ from 'lodash';
 import PStatus from '@/components/molecules/status/Status.vue';
-import PButton from '@/components/atoms/buttons/Button.vue';
 import PBadge from '@/components/atoms/badges/Badge.vue';
 import {
     timestampFormatter, serverStateFormatter, platformBadgeFormatter, getValue,
 } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
-import PRow from '@/components/atoms/grid/row/Row.vue';
 import PCol from '@/components/atoms/grid/col/Col.vue';
 import PHr from '@/components/atoms/hr/Hr.vue';
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
@@ -197,7 +193,6 @@ import PQuerySearchBar from '@/components/organisms/search/query-search-bar/Quer
 import PServerDetail from '@/views/inventory/server/modules/ServerDetail.vue';
 import PRawData from '@/components/organisms/text-editor/raw-data/RawData.vue';
 import PTableCheckModal from '@/components/organisms/modals/action-modal/ActionConfirmModal.vue';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
@@ -217,10 +212,9 @@ import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-
 import { ServerListResp, ServerModel } from '@/lib/fluent-api/inventory/server';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
-import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 import { createAtVF, deleteAtVF, updateAtVF } from '@/lib/data-source';
-import PI from '@/components/atoms/icons/PI.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 const serverStateVF = {
     name: 'State',
@@ -329,7 +323,6 @@ export default {
         PStatus,
         PHorizontalLayout,
         PToolboxTable,
-        PButton,
         PBadge,
         PDropdownMenuBtn,
         PQuerySearchTags,
@@ -342,8 +335,7 @@ export default {
         PTableCheckModal,
         PCol,
         PHr,
-        PI,
-        PIconButton,
+        PIconTextButton,
         PDynamicView,
         SProjectTreeModal,
         SCollectModal,

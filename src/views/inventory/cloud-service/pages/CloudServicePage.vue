@@ -24,15 +24,14 @@
                                 @clickExcel="exportToolSet.getData()"
                 >
                     <template #toolbox-left>
-                        <p-button style-type="primary-dark"
-                                  :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
-                                  @click="clickCollectData"
+                        <PIconTextButton style-type="primary-dark"
+                                         name="ic_plus_bold"
+                                         :disabled="apiHandler.tableTS.selectState.selectItems.length === 0"
+                                         @click="clickCollectData"
                         >
-                            <p-i name="ic_plus_bold" width="1rem" height="1rem"
-                                 class="mr-1"
-                            />
                             {{ $t('BTN.COLLECT_DATA') }}
-                        </p-button>
+                        </PIconTextButton>
+
                         <PDropdownMenuBtn
                             class="left-toolbox-item mr-4"
                             :menu="csDropdownMenu"
@@ -122,9 +121,7 @@ import {
     reactive, toRefs, ref, computed, watch, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/Button.vue';
-import {
-    timestampFormatter, serverStateFormatter, platformBadgeFormatter, getValue,
-} from '@/lib/util';
+import { getValue } from '@/lib/util';
 import { makeTrItems } from '@/lib/view-helper';
 
 import PTab from '@/components/organisms/tabs/tab/Tab.vue';
@@ -136,29 +133,22 @@ import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.
 import PDynamicView from '@/components/organisms/dynamic-view/dynamic-view/DynamicView.vue';
 import {
     AdminFluentAPI,
-    HistoryFluentAPI, QuerySearchTableFluentAPI, SearchTableFluentAPI,
+    HistoryFluentAPI, QuerySearchTableFluentAPI,
 } from '@/lib/api/table';
 import SProjectTreeModal from '@/components/organisms/modals/tree-api-modal/ProjectTreeModal.vue';
 import { ProjectNode } from '@/lib/api/tree';
 import { fluentApi } from '@/lib/fluent-api';
 import { ExcelExportAPIToolSet } from '@/lib/api/add-on';
-import {
-    getEnumValues, getFetchValues, makeValuesFetchHandler,
-} from '@/components/organisms/search/query-search-bar/autocompleteHandler';
-import { QSTableACHandlerArgs, QuerySearchTableACHandler } from '@/lib/api/auto-complete';
-import { ServerModel } from '@/lib/fluent-api/inventory/server';
 import { useStore } from '@/store/toolset';
 import { AxiosResponse } from 'axios';
 import { CloudServiceListResp } from '@/lib/fluent-api/inventory/cloud-service';
 import SCollectModal from '@/components/organisms/modals/collect-modal/CollectModal.vue';
 import PDynamicDetails from '@/components/organisms/dynamic-view/dynamic-details/DynamicDetails.vue';
 import PEmpty from '@/components/atoms/empty/Empty.vue';
-import { Computed } from '@/lib/type';
-import { ChangeCloudServiceProject } from '@/lib/api/fetch';
 import { TabBarState } from '@/components/molecules/tabs/tab-bar/toolset';
-import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
 
 export default {
     name: 'CloudServicePage',
@@ -170,7 +160,7 @@ export default {
         PHorizontalLayout,
         PDynamicView,
         PI,
-        PIconButton,
+        PIconTextButton,
         PTab,
         PDynamicSubData,
         PButton,
