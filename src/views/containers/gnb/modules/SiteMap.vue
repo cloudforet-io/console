@@ -37,7 +37,7 @@
                     </li>
 
                     <li>
-                        <router-link class="group" to="/identity/project">
+                        <router-link class="group" to="/project">
                             <span class="icon">
                                 <p-i name="ic_project"
                                 />
@@ -92,14 +92,14 @@
                         </router-link>
                     </li>
                     <li>
-                        <router-link class="service last" to="/inventory/collector">
+                        <router-link class="service last" to="/plugin/collector">
                             Collector
                         </router-link>
                     </li>
 
                     <template v-if="$ls.user.state.isDomainOwner">
                         <li>
-                            <router-link class="group" to="/plugin">
+                            <router-link class="group" to="/management">
                                 <span class="icon">
                                     <p-i name="ic_plugin"
                                     />
@@ -109,7 +109,7 @@
                         </li>
 
                         <li>
-                            <router-link class="service" to="/plugin/supervisor/plugins">
+                            <router-link class="service" to="/management/supervisor/plugins">
                                 Plugins
                             </router-link>
                         </li>

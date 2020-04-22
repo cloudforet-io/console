@@ -9,6 +9,8 @@ import secretRoute from '@/routes/secret/secret-route';
 import DefaultContainer from '@/views/containers/DefaultContainer.vue';
 import pluginRoute from '@/routes/plugin/plugin-route';
 import projectRoute from '@/routes/project/project-route';
+import managementRoute from '@/routes/management/management-route';
+
 // Views
 import SignIn from '@/views/sign-in/Signin.vue';
 import ErrorPage from '@/views/common/error/ErrorPage.vue';
@@ -78,6 +80,7 @@ const router = new VueRouter({
                 secretRoute,
                 pluginRoute,
                 projectRoute,
+                managementRoute,
             ],
         },
         { path: '*', component: ErrorPage },
