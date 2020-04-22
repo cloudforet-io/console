@@ -1,18 +1,19 @@
 <template>
     <p-vertical-page-layout2 :min-width="260" :init-width="260" :max-width="400">
-        <template #sidebar>
-            <div class="treeSidebar">
+        <template #sidebar="{width}">
+            <div class="treeSidebar" :style="{width:width+'px'}">
                 <div id="tree-header">
                     Project Group
                     <p-i name="ic_plus" color="transparent inherit"
                          width="1rem" height="1rem" class="add-btn"
-                         @click="openProjectGroupForm()"
+                         @click="openProjectGroupForm"
                     />
                 </div>
                 <p-tree
                     ref="treeRef"
                     v-bind="treeApiHandler.ts.state"
                     :select-mode="true"
+                    :style="{width:width+'px'}"
                     @node:selected="selected"
                 >
                     <template #icon="{node,isExpanded}">
@@ -21,6 +22,13 @@
                              color="transparent inherit"
                              width="1rem" height="1rem"
                         />
+                    </template>
+                    <template #extra="{node, hoveredNode}">
+                        <span v-show="node===hoveredNode" @click.stop="openProjectGroupForm">
+                            <p-i :name="'ic_plus'" color="transparent inherit"
+                                 width="1rem" height="1rem"
+                            />
+                        </span>
                     </template>
                 </p-tree>
             </div>
@@ -67,16 +75,6 @@
                                     />
                                 </div>
                             </div>
-<!--                            <div class="tool-right">-->
-<!--                                <div class="tool-right-checkbox" style="user-select: none">-->
-<!--                                    <PCheckBox :value="false" :disabled="true" />    Select All-->
-<!--                                </div>-->
-<!--                                <div class="tool-right-btn">-->
-<!--                                    <p-button outline style-type="alert">-->
-<!--                                        Delete-->
-<!--                                    </p-button>-->
-<!--                                </div>-->
-<!--                            </div>-->
                         </div>
                         <div v-if="apiHandler.gridTS.querySearch.tags.value.length !== 0" slot="toolbox-bottom">
                             <p-hr style="width: 100%;" />
@@ -95,7 +93,6 @@
                         <div v-if="treeApiHandler.ts.metaState.firstSelectedNode && item">
                             <div class="project-description">
                                 <div class="project">
-<!--                                    <PCheckBox :style="{float:'right'}"/>-->
                                     <div v-if="parentGroup" class="project-group-name">
                                         {{ parentGroup }} > {{ item.project_group_info.name }}
                                     </div>
@@ -466,6 +463,7 @@ export default {
         const openProjectGroupForm = () => {
             formState.projectGroupFormVisible = true;
         };
+
         const projectGroupFormConfirm = (item) => {
             fluentApi.identity().projectGroup().create().setParameter({
                 parent_project_group_id: state.selectedId,
@@ -574,6 +572,7 @@ export default {
         margin-bottom: .8rem;
         font-weight: bold;
         font-size: 0.88rem;
+        overflow-x: hidden;
     }
 
     .add-btn {
