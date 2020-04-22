@@ -39,10 +39,11 @@ export abstract class BaseTableFluentAPI<
     > extends DynamicFluentAPIToolSet<parameter, resp, action> {
     tableTS: T;
 
-    totalCount=ref<number>(0)
+    totalCount: Ref<number>;
 
     protected constructor(action: action) {
         super(action);
+        this.totalCount = ref(0);
         this.tableTS = new ToolboxTableToolSet<initData, initSyncData>() as T;
     }
 
@@ -68,7 +69,7 @@ export abstract class BaseTableFluentAPI<
         } catch (e) {
             this.tableTS.state.items = [];
             this.tableTS.state.allPage = 1;
-            this.totalCount.value = 0;
+            // this.totalCount.value = 0;
         }
         this.tableTS.syncState.loading = false;
     };

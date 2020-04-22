@@ -1,6 +1,6 @@
 import { computed, Ref, watch } from '@vue/composition-api';
 import {
-    ActionAPI, BaseResources, FluentApi, Resource,
+    ActionAPI, BaseResources, FluentApi, OptionalResourceActions, Resource, ResourceActions,
 } from '@/lib/fluent-api';
 import _ from 'lodash';
 import { Computed, ComputedOrRef } from '@/lib/type';
@@ -26,9 +26,11 @@ interface BaseOptions {
     fields?: DynamicFieldType[];
 }
 
+export type GetAction<action=ActionAPI>=(action: action) => action;
+
 export interface DynamicLayoutApiProp{
-    resource: BaseResources<any, any>;
-    getAction?: (action: ActionAPI) => ActionAPI;
+    resource: Resource&ResourceActions<'get'|'list'|'getData'>;
+    getAction?: GetAction;
 }
 
 
@@ -41,7 +43,20 @@ export interface DynamicLayoutProps<options=BaseOptions> {
     data: any;
     isShow: boolean;
 }
+interface Field {
+    name: string;
+    label: string;
+}
 
+export const makeFields = (props: DynamicLayoutProps) => computed((): Field[] => (props.options.fields as DynamicFieldType[]).map((ds: DynamicFieldType): Field => ({
+    name: ds.key,
+    label: ds.name,
+})));
+
+export const makeTableSlots = (props: DynamicLayoutProps) => computed((): DynamicFieldType[] => (props.options.fields as DynamicFieldType[]).map(ds => ({
+    ...ds,
+    name: `col-${ds.key}-format`,
+})));
 
 export const makeDefs = (fields: ComputedOrRef<DynamicFieldType[]>, data: ComputedOrRef<any>) => computed<DynamicFieldBindType[]>(() => {
     if (fields.value) {
