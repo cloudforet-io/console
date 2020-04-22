@@ -13,8 +13,9 @@ import {
 
 export abstract class MetricAction<param extends MetricParameter, resp> extends SetParameterAction<param, resp> {
     setId(id: string): this {
-        this.apiState.parameter.data_source_id = id;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter.data_source_id = id;
+        return api;
     }
 
     setResourceType(type: string): this {
@@ -52,8 +53,9 @@ export class GetMetricData extends MetricAction<MetricDataParameter, MetricDataR
     path = 'get-data';
 
     setMetricKey(key: string): this {
-        this.apiState.parameter.metric = key;
-        return this.clone();
+        const api = this.clone();
+        api.apiState.parameter.metric = key;
+        return api;
     }
 
     setStart(start: TimeStamp): this {

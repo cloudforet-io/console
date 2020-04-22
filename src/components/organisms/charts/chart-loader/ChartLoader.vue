@@ -40,8 +40,8 @@ export default defineComponent({
 <style lang="postcss" scoped>
     .p-loader {
         position: relative;
-        width: 100%;
-        height: 100%;
+        /*width: 100%;*/
+        /*height: 100%;*/
     }
     .loader {
         position: absolute;
