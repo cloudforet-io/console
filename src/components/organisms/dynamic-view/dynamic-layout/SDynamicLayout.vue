@@ -52,6 +52,10 @@ export default defineComponent({
             type: Object,
             default: null,
         },
+        toolset: {
+            type: Object,
+            default: null,
+        },
         isShow: {
             type: Boolean,
             default: true,
