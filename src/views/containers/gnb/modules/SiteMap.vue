@@ -28,7 +28,7 @@
                     <li>
                         <router-link class="group" to="/dashboard">
                             <span class="icon">
-                                <p-i name="ic_dashboard"
+                                <p-i name="ic_dashboard" width="2rem" height="2rem"
                                      color="transparent inherit"
                                 />
                             </span>
@@ -37,30 +37,58 @@
                     </li>
 
                     <li>
+                        <router-link class="group" to="/identity/project">
+                            <span class="icon">
+                                <p-i name="ic_project"
+                                />
+                            </span>
+                            <span class="name">Project</span>
+                        </router-link>
+                    </li>
+                    <li>
                         <router-link class="group" to="/inventory">
                             <span class="icon">
                                 <p-i name="ic_inventory"
-                                     color="transparent inherit"
                                 />
                             </span>
                             <span class="name">Inventory</span>
                         </router-link>
                     </li>
-
-                    <li>
-                        <router-link class="service" to="/inventory/data-center">
-                            Data Center
-                        </router-link>
-                    </li>
-
                     <li>
                         <router-link class="service" to="/inventory/server">
                             Server
                         </router-link>
                     </li>
                     <li>
-                        <router-link class="service" to="/inventory/cloud-service">
+                        <router-link class="service last" to="/inventory/cloud-service">
                             Cloud Service
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link class="group" to="/identity">
+                            <span class="icon">
+                                <p-i name="ic_identity"
+                                />
+                            </span>
+                            <span class="name">Identity</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link class="service" to="/identity/service-account">
+                            Service Account
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link class="service last" to="/identity/user">
+                            User
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link class="group" to="/plugin">
+                            <span class="icon">
+                                <p-i name="ic_plugin"/>
+                            </span>
+                            <span class="name">Plugin</span>
                         </router-link>
                     </li>
                     <li>
@@ -69,68 +97,25 @@
                         </router-link>
                     </li>
 
-                    <li>
-                        <router-link class="group" to="/identity">
-                            <span class="icon">
-                                <p-i name="ic_identity"
-                                     color="transparent inherit"
-                                />
-                            </span>
-                            <span class="name">Identity</span>
-                        </router-link>
-                    </li>
-
-                    <li>
-                        <router-link class="service" to="/identity/user">
-                            User
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="service" to="/identity/project">
-                            Project
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="service last" to="/identity/service-account">
-                            Service Account
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link class="group" to="/secret">
-                            <span class="icon">
-                                <p-i name="ic_secret"
-                                     color="transparent inherit"
-                                />
-                            </span>
-                            <span class="name">Secret</span>
-                        </router-link>
-                    </li>
-
-                    <!--                <li>-->
-                    <!--                    <router-link class="service" to="/secret/credentials-group">-->
-                    <!--                        Credentials Group-->
-                    <!--                    </router-link>-->
-                    <!--                </li>-->
-                    <li>
-                        <router-link class="service" to="/secret/credentials">
-                            Credentials
-                        </router-link>
-                    </li>
                     <template v-if="$ls.user.state.isDomainOwner">
                         <li>
                             <router-link class="group" to="/plugin">
                                 <span class="icon">
-                                    <p-i name="ic_identity"
-                                         color="transparent inherit"
+                                    <p-i name="ic_plugin"
                                     />
                                 </span>
-                                <span class="name">Plugin</span>
+                                <span class="name">Management</span>
                             </router-link>
                         </li>
 
                         <li>
                             <router-link class="service" to="/plugin/supervisor/plugins">
                                 Plugins
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link class="service" to="/secret/credentials">
+                                Credentials
                             </router-link>
                         </li>
                     </template>
@@ -215,12 +200,12 @@ export default {
             width: $sitemap-width;
         }
         .title {
-            @apply text-gray;
+            @apply text-gray-500;
             display: flex;
             align-items: center;
             font-size: 1rem;
             padding: 1rem 1.75rem;
-            font-weight: bold;
+            font-weight: normal;
             line-height: 1.5rem;
             .name {
                 padding-left: 0.5rem;
@@ -252,7 +237,7 @@ export default {
         }
 
         .group {
-            @apply border-t border-gray-100;
+            @apply border-t border-gray-200;
             padding: 1rem 1.75rem;
             font-size: 1rem;
             font-weight: bold;

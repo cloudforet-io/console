@@ -29,7 +29,7 @@ export default {
             path: 'project',
             name: 'project',
             redirect: '/identity/project',
-            meta: { label: 'Project', breadcrumb: true },
+            meta: { label: 'Project', breadcrumb: true, api: fluentApi.identity().project() },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -43,17 +43,43 @@ export default {
                     props: true,
                     component: ProjectDetail,
                 },
+                {
+                    path: ':resourceId/tags',
+                    name: 'projectTags',
+                    meta: { label: 'tags' },
+                    props: true,
+                    component: TagsPage,
+                },
             ],
 
         },
         {
             path: 'user',
             name: 'user',
-            meta: { label: 'User', breadcrumb: true },
-            component: User,
+            meta: {
+                label: 'User',
+                breadcrumb: true,
+                api: fluentApi.identity().user(),
+            },
+            redirect: '/identity/user',
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: 'userMain',
+                    component: User,
+                },
+                {
+                    path: ':resourceId/tags',
+                    name: 'userTags',
+                    props: true,
+                    component: TagsPage,
+                },
+            ],
         },
         {
             path: 'service-account',
+            name: 'service-account',
             meta: {
                 label: 'Service Account',
                 breadcrumb: true,

@@ -101,6 +101,13 @@
             <template #detail>
                 <collector-detail :item="selectedItem" :tags-fetch-api="tagsApi" />
             </template>
+            <template #tag>
+                <s-tags-panel
+                    :is-show="activeTab==='tag'"
+                    :resource-id="selectedItem.collector_id"
+                    tag-page-name="collectorTags"
+                />
+            </template>
             <template #credentials>
                 <collector-credentials :collector="selectedItem"
                                        :total-count="crdState.totalCount"
@@ -198,6 +205,7 @@ import PHr from '@/components/atoms/hr/Hr.vue';
 import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import PLazyImg from '@/components/organisms/lazy-img/LazyImg.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab');
@@ -286,6 +294,7 @@ const setTabData = (props, context) => {
         activeTab: 'detail',
         tabs: makeTrItems([
             ['detail', 'PANEL.DETAILS', { keepAlive: true }],
+            ['tag', 'TAB.TAG'],
             ['credentials', 'PANEL.CREDENTIAL', { keepAlive: true }],
             ['schedules', 'PANEL.SCHEDULE', { keepAlive: true }],
         ], context.parent),
@@ -451,6 +460,7 @@ export default {
         CollectorDetail,
         CollectorCredentials,
         CollectorSchedules,
+        STagsPanel,
     },
     setup(props, context) {
         return collectorSetup(props, context);

@@ -1,7 +1,7 @@
 <template>
     <div class="user-info">
         <div class="g-signin2">
-            <div id="g-signin-btn" style="width: 70%;" />
+            <div id="g-signin-btn" class="w-full" />
         </div>
         <div class="btn-divider">
             OR
@@ -73,8 +73,8 @@ export default defineComponent({
 
                 gapi.signin2.render('g-signin-btn', {
                     scope: 'email',
-                    width: 300,
                     height: 50,
+                    width: 330,
                     longtitle: true,
                     theme: 'dark',
                     onsuccess: onLogIn,
@@ -93,7 +93,7 @@ export default defineComponent({
 <style lang="postcss" scoped>
 
     #g-signin-btn {
-        padding-top: 1.5rem;
+        padding-top: 3.5rem;
         padding-bottom: 3.5rem;
     }
 

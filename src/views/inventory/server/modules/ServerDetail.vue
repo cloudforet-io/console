@@ -8,13 +8,6 @@
                         class="mb-6"
         />
         <p-dynamic-details :details="item.metadata.details" :data="item||{}" />
-        <p-dict-panel :dict="tags">
-            <template #extra>
-                <p-button style-type="primary" @click="editTag">
-                    {{ $t('BTN.EDIT') }}
-                </p-button>
-            </template>
-        </p-dict-panel>
     </div>
 </template>
 
@@ -32,8 +25,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
 export default {
     name: 'PServerDetail',
     components: {
-        PDictPanel, PDynamicView, PDynamicDetails, PPanelTop, PButton,
-
+        PDynamicView, PDynamicDetails, PPanelTop,
     },
     props: {
         item: {
@@ -44,24 +36,6 @@ export default {
             type: Array,
             default: () => [],
         },
-    },
-    setup(props) {
-        const vm = getCurrentInstance();
-        const state = reactive({
-            tags: {},
-            resourceId: '',
-        });
-        watch(() => props.item, async (item) => {
-            state.tags = item.tags;
-            state.resourceId = item.server_id;
-        });
-        const editTag = () => {
-            vm?.$router.push({ name: 'serverTags', params: { resourceId: state.resourceId } });
-        };
-        return {
-            ...toRefs(state),
-            editTag,
-        };
     },
 };
 </script>

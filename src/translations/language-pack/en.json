@@ -398,7 +398,8 @@
 		"HISTORY": "History",
 		"MONITORING": "Monitoring",
 		"RAW_DATA": "Raw Data",
-		"SECRET": "Secret"
+		"SECRET": "Secret",
+		"TAG": "Tag"
 	},
 	"TREE_TYPE": {
 		"CREATE": "Create {0}",

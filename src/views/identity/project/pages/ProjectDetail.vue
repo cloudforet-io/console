@@ -16,10 +16,10 @@
             </div>
         </div>
         <PTab :tabs="tabs" :active-tab.sync="activeTab" :style="{'background':'#f8f8fc', 'border-width':0+'px'}">
-            <template #summary="{height}">
+            <template #summary>
                 <project-dashboard ref="ProjectDashboard" />
             </template>
-            <template #member="{height}">
+            <template #member>
                 <p-dynamic-view view_type="query-search-table"
                                 :api-handler="apiHandler"
                                 :data_source="dataSource"
@@ -46,13 +46,12 @@
                     </template>
                 </p-dynamic-view>
             </template>
-            <template #Tags>
-                <div class="tags">
-                    <p-dict-panel :dict.sync="tagsApi.ts.syncState.dict"
-                                  :edit-mode.sync="tagsApi.ts.syncState.editMode"
-                                  v-on="tagsApi.ts.listeners"
-                    />
-                </div>
+            <template #tag>
+                <s-tags-panel
+                    :is-show="activeTab==='tag'"
+                    :resource-id="projectId"
+                    tag-page-name="projectTags"
+                />
             </template>
         </PTab>
         <p-button-modal
@@ -106,7 +105,7 @@ import {
     TabSearchTableFluentAPI,
 } from '@/lib/api/table';
 import { DictPanelAPI } from '@/lib/api/dict';
-import PDictPanel from '@/components/organisms/panels/dict-panel/DictPanel.vue';
+import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 import PDynamicSubData from '@/components/organisms/dynamic-view/dynamic-subdata/DynamicSubData.vue';
 import { QuerySearchTableACHandler } from '@/lib/api/auto-complete';
 import SProjectMemberAddModal from '@/views/identity/project/modules/ProjectMemberAddModal.vue';
@@ -124,7 +123,7 @@ export default {
         PButtonModal,
         GeneralPageLayout,
         PDynamicView,
-        PDictPanel,
+        STagsPanel,
         PTab,
         PI,
         PButton,
@@ -136,6 +135,7 @@ export default {
         const item = ref({} as ProjectModel);
         const state = reactive({
             projectName: '',
+            projectId,
         });
 
         const getProject = async (id) => {
@@ -162,7 +162,7 @@ export default {
             tabs: makeTrItems([
                 ['summary', 'COMMON.SUMMARY', { keepAlive: true }],
                 ['member', 'COMMON.MEMBER'],
-                ['Tags', 'COMMON.TAG'],
+                ['tag', 'TAB.TAG'],
             ],
             context.parent),
             activeTab: 'summary',

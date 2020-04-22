@@ -79,6 +79,13 @@
                                :tag-reset-event="tagResetEvent"
                 />
             </template>
+            <template #tag>
+                <s-tags-panel
+                    :is-show="activeTab==='tag'"
+                    :resource-id="selectIndex[0]?items[selectIndex[0]].user_id:''"
+                    tag-page-name="userTags"
+                />
+            </template>
         </PTab>
         <PTab v-else-if="isSelectedMulti" :tabs="multiSelectTabs" :active-tab.sync="multiSelectActiveTab">
             <template #data="{tabName}">
@@ -139,6 +146,7 @@ import PIconButton from '@/components/molecules/buttons/IconButton.vue';
 import GeneralPageLayout from '@/views/containers/page-layout/GeneralPageLayout.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 import PIconTextButton from '@/components/molecules/buttons/IconTextButton.vue';
+import STagsPanel from '@/components/organisms/panels/tag-panel/STagsPanel.vue';
 
 const PTab = () => import('@/components/organisms/tabs/tab/Tab.vue');
 const PDataTable = () => import('@/components/organisms/tables/data-table/DataTable.vue');
@@ -208,6 +216,7 @@ export const userSetup = (props, context, eventName, ACHandler) => {
     const tabData = reactive({
         tabs: makeTrItems([
             ['detail', 'COMMON.DETAILS', { keepAlive: true }],
+            ['tag', 'TAB.TAG'],
         ],
         context.parent),
         activeTab: 'detail',
@@ -406,7 +415,6 @@ export default {
         PStatus,
         PHorizontalLayout,
         PToolboxTable,
-        PButton,
         PDropdownMenuBtn,
         PUserDetail,
         PTab,
@@ -418,7 +426,7 @@ export default {
         PCol,
         PHr,
         PIconButton,
-        PI,
+        STagsPanel,
     },
     setup(props, context) {
         const dataBind = reactive({

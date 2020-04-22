@@ -73,7 +73,7 @@ export default {
                     props: true,
                     meta: {
                         label: 'Cloud Service',
-                        api: fluentApi.inventory().server(),
+                        api: fluentApi.inventory().cloudService(),
                     },
                     component: { template: '<router-view />' },
                     children: [
@@ -99,13 +99,24 @@ export default {
             path: 'collector',
             name: 'collector',
             redirect: '/inventory/collector',
-            meta: { label: 'Collector', breadcrumb: true },
+            meta: {
+                label: 'Collector',
+                breadcrumb: true,
+                api: fluentApi.inventory().collector(),
+            },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: 'collectorMain',
                     component: Collector,
+                },
+                {
+                    path: ':resourceId/tags',
+                    name: 'collectorTags',
+                    meta: { label: 'tags' },
+                    props: true,
+                    component: TagsPage,
                 },
                 {
                     path: 'create',
