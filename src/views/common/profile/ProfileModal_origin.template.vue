@@ -121,7 +121,7 @@ import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/Sel
 
 
 export const profileSetup = (props, context) => {
-    const vm:any = getCurrentInstance();
+    const vm: any = getCurrentInstance();
 
     const userState = reactive({
         password: '',
@@ -156,7 +156,7 @@ export const profileSetup = (props, context) => {
         isDomainOwner: computed(() => vm.$ls.user.state.isDomainOwner),
     });
 
-    const params:any = {};
+    const params: any = {};
     if (state.isDomainOwner) {
         // eslint-disable-next-line camelcase
         params.owner_id = props.userId;
@@ -216,13 +216,13 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.profile-form {
-    text-align: left;
+    .profile-form {
+        text-align: left;
     .form-div {
         padding: 0 1rem;
     }
     .dropdown {
         text-align: left;
     }
-}
+    }
 </style>
