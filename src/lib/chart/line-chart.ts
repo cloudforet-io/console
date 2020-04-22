@@ -12,22 +12,16 @@ interface SLineChartInterface extends SChartInterface {
     setFill: (...args) => SLineChartInterface;
     setMin: (...args) => SLineChartInterface;
     setMax: (...args) => SLineChartInterface;
-    // setPointRadius: (...args) => SLineChartInterface;
     setLineTension: (...args) => SLineChartInterface;
-    // setBackgroundColor: (...args) => SLineChartInterface;
 }
 
-const lineChartSettings: SettingsInterface = {
+export const lineChartSettings: SettingsInterface = {
     metaDatasets: {
         borderWidth: 1,
         fill: 'start',
         pointRadius: 0,
         pointBorderWidth: 0,
         lineTension: 0.25,
-        // fill: false,
-        // borderWidth: 2,
-        // lineTension: 0,
-        // pointRadius: 0,
     },
     options: {
         maintainAspectRatio: false,
@@ -61,10 +55,6 @@ const lineChartSettings: SettingsInterface = {
             }],
         },
         tooltips,
-        // maintainAspectRatio: false,
-        // legend: {
-        //     display: false,
-        // },
         // scales: {
         //     yAxes: [{
         //         gridLines: {
@@ -104,16 +94,6 @@ const lineChartSettings: SettingsInterface = {
         // },
     },
     plugins: [{}],
-    // [{
-    //     beforeInit(chart: SLineChart): void {
-    //         const labels: (string | number | number[] | string[] | Date | Date[] | Moment | Moment[])[] | undefined = chart.data.labels;
-    //         labels?.forEach((e, i, a) => {
-    //             if (typeof e === 'string' && /\n/.test(e)) {
-    //                 a[i] = e.split(/\n/);
-    //             }
-    //         });
-    //     },
-    // }]
 };
 
 export class SLineChart extends SChart implements SLineChartInterface {
