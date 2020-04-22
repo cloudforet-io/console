@@ -1,0 +1,139 @@
+<template>
+    <div>
+        <p-panel-top>{{ name }}</p-panel-top>
+        <table v-if="!noData" class="content-table">
+            <tbody>
+                <Definition v-for="(bind, idx) in defs" :key="idx" class="def-row"
+                            v-bind="bind"
+                />
+            </tbody>
+        </table>
+        <p-empty v-else class="p-emty">
+            No Data
+        </p-empty>
+    </div>
+</template>
+
+<script lang="ts">
+import {
+    defineComponent, computed, reactive, watch,
+} from '@vue/composition-api';
+import _ from 'lodash';
+import PDl from '@/components/atoms/lists/dl-list/Dl.vue';
+import PEmpty from '@/components/atoms/empty/Empty.vue';
+import {
+    DynamicFieldType,
+    DynamicLayoutProps,
+    makeDefs,
+    DynamicLayoutApiProp,
+} from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
+import { api } from '@/lib/api/axios';
+import { GetAction } from '@/lib/fluent-api';
+import Definition from './definition.vue';
+
+export default defineComponent({
+    name: 'SDynamicLayoutItem',
+    components: {
+        PDl,
+        Definition,
+        PEmpty,
+        PPanelTop,
+    },
+    props: {
+        name: {
+            type: String,
+            required: true,
+        },
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
+        data: {
+            type: [Object, Array],
+            default: null,
+        },
+        api: {
+            type: Object,
+            default: null,
+        },
+        isShow: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    setup(props: DynamicLayoutProps) {
+        const state = reactive({
+            isApiMode: computed(() => !!props.api),
+            data: {},
+        });
+        const fields = computed<DynamicFieldType[]>(() => props.options.fields || []);
+        const onlyKeys = computed<string[]>(() => {
+            if (props.options.fields) {
+                if (props.options.root_path) {
+                    return props.options.fields.map(item => `${props.options.root_path}.${item.key}`);
+                }
+                return props.options.fields.map(item => item.key);
+            }
+            return [];
+        });
+        const getData = async () => {
+            let action: GetAction<any, any> = props.api?.resource.get() as GetAction<any, any>;
+            if (props.api?.getAction) {
+                action = props.api.getAction(action) as GetAction<any, any>;
+            }
+            if (onlyKeys.value.length) {
+                action = action.setOnly(...onlyKeys.value);
+            }
+            const resp = await action.execute();
+            state.data = resp.data || {};
+        };
+        if (state.isApiMode) {
+            watch(() => [props.isShow, props.api], (after, before) => {
+                const isShow: boolean = after[0] as boolean;
+                const afterApi: DynamicLayoutApiProp = after[1] as DynamicLayoutApiProp;
+                const beforeApi: DynamicLayoutApiProp = before[1] as DynamicLayoutApiProp;
+
+                if (isShow && afterApi && (afterApi.resource !== beforeApi?.resource || afterApi.getAction !== beforeApi.getAction)) {
+                    getData();
+                }
+            });
+        }
+
+        const readonlyData = computed(() => (state.isApiMode ? state.data : props.data));
+        const rootData = computed(() => {
+            if (props.options.root_path) {
+                return _.get(readonlyData.value, props.options.root_path);
+            }
+            return readonlyData.value;
+        });
+        const defs = makeDefs(fields, rootData);
+        const noData = computed(() => _.every(defs.value, def => !def.data));
+        return {
+            defs,
+            noData,
+        };
+    },
+});
+</script>
+
+<style lang="postcss" scoped>
+
+.content-table {
+    @apply w-full ;
+    border-spacing: 2px;
+    tbody{
+        >>>.def-row:nth-child(2n+1) {
+            td{
+                @apply bg-violet-100 border-l-2 border-white;
+
+            }
+
+        }
+    }
+}
+.p-emty{
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+</style>
