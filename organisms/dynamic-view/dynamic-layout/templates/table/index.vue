@@ -17,14 +17,14 @@
         :loading.sync="apiHandler.tableTS.syncState.loading"
         :this-page.sync="apiHandler.tableTS.syncState.thisPage"
         :page-size.sync="apiHandler.tableTS.syncState.pageSize"
-        :responsive-style="responsiveStyle"
+
         :setting-visible="false"
         :use-cursor-loading="true"
         v-on="$listeners"
-        @changePageSize="apiHandler.getData"
-        @changePageNumber="apiHandler.getData"
-        @clickRefresh="apiHandler.getData"
-        @changeSort="apiHandler.getData"
+        @changePageSize="getData"
+        @changePageNumber="getData"
+        @clickRefresh="getData"
+        @changeSort="getData"
     >
         <template #toolbox-top>
             <slot name="toolbox-top" />
@@ -32,48 +32,31 @@
         <template #toolbox-left>
             <slot name="toolbox-left" />
             <div class="left-toolbox-item w-1/2">
-                <p-search :search-text.sync="apiHandler.tableTS.searchText.value" @onSearch="apiHandler.getData" />
+                <p-search :search-text="proxySearchText" @update:search-text="updateSearchText($event)" @onSearch="getData" />
             </div>
         </template>
-        <template v-for="slot of slots" v-slot:[slot.name]="{item}">
-            <slot :name="slot.name" :item="item">
-                <p-dynamic-field :key="slot.name" :view_type="slot.view_type" :view_option="slot.options"
-                                 :data="getValue(item,slot.path)"
-                />
-            </slot>
+        <template v-for="slot of slots" v-slot:[slot.name]="{value}">
+            <p-dynamic-field :key="slot.key" v-bind="slot" :data="value" />
         </template>
     </p-toolbox-table>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { computed, Ref } from '@vue/composition-api';
+import {
+    computed, reactive, Ref, toRefs, watch,
+} from '@vue/composition-api';
 import _ from 'lodash';
 import PToolboxTable from '@/components/organisms/tables/toolbox-table/ToolboxTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PSearch from '@/components/molecules/search/Search.vue';
-import { SearchTableAPI } from '@/lib/api/table';
-
-interface DataSourceType {
-    name: string;
-    key: string;
-    view_type?: string;
-    view_option?: any;
-}
-
-interface Props {
-    data_source: DataSourceType[];
-    data: any;
-    rootMode: boolean;
-    apiHandler: SearchTableAPI;
-}
-
-interface SlotBind {
-    name: string;
-    view_type: string;
-    view_option: any;
-    path: string[];
-}
+import { SearchTableAPI, SearchTableFluentAPI } from '@/lib/api/table';
+import {
+    DynamicFieldType, DynamicLayoutApiProp,
+    DynamicLayoutProps,
+    makeFields, makeTableSlots, GetAction,
+} from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
+import { ActionAPI, QueryAPI, GetDataAction } from '@/lib/fluent-api';
 
 interface Field {
     name: string;
@@ -82,7 +65,7 @@ interface Field {
 
 
 export default {
-    name: 'PDynamicLayoutTable',
+    name: 'SDynamicLayoutTable',
     components: {
         PDynamicField,
         PToolboxTable,
@@ -97,34 +80,88 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        data: {
-            type: [Object, Array],
-            default: () => ({}),
-        },
         api: {
             type: Object,
             default: null,
         },
-        initData: {
+        toolset: {
             type: Object,
-            default: () => ({}),
+            default: null,
+        },
+        isShow: {
+            type: Boolean,
+            default: true,
         },
     },
-    setup(props: Props) {
-        const fields: Ref<Readonly<Field[]>> = computed((): Field[] => props.data_source.map((ds: DataSourceType): Field => ({
-            name: ds.key,
-            label: ds.name,
-        })));
-        const slots: Ref<Readonly<SlotBind[]>> = computed((): SlotBind[] => props.data_source.map((ds: DataSourceType): SlotBind => ({
-            name: `col-${ds.key}-format`,
-            view_type: ds.view_type || 'text',
-            view_option: ds.view_option,
-            path: ds.key.split('.'),
-        })));
+    setup(props: DynamicLayoutProps) {
+        let apiHandler: SearchTableFluentAPI = props.toolset as SearchTableFluentAPI || new SearchTableFluentAPI(null as unknown as QueryAPI<any, any>);
+        const state = reactive({
+            isToolsetMode: computed(() => !!props.toolset),
+        });
+        console.log(state.isToolsetMode, 'toolset mode');
+        console.log(apiHandler, 'handler');
+        const getData = async () => {
+            if (apiHandler.action && props.isShow) {
+                await apiHandler.getData();
+                console.log(apiHandler.tableTS.state.items);
+            }
+        };
+        let apiWatchStop: any = null;
+
+        watch(() => state.isToolsetMode, (after, before) => {
+            if (after !== before) {
+                if (!after) {
+                    // @ts-ignore
+                    apiWatchStop = watch(() => props.api, async (aft, bef) => {
+                        if (aft && (aft.resource !== bef?.resource || aft.getAction !== bef?.getAction)) {
+                            let action;
+                            if (props.options.root_path) {
+                                action = (aft.resource.getData() as GetDataAction<any, any>).setKeyPath(props.options.root_path);
+                            } else {
+                                action = aft.resource.list();
+                            }
+
+                            const getAction = props.api?.getAction;
+                            if (getAction) {
+                                action = getAction(action) as QueryAPI<any, any>;
+                            }
+                            // @ts-ignore
+                            apiHandler.action = action;
+                            await getData();
+                        }
+                    });
+                } else if (apiWatchStop) {
+                    apiWatchStop();
+                    apiHandler = props.toolset as SearchTableFluentAPI;
+                }
+            }
+        });
+        watch(() => props.isShow, async (aft, bef) => {
+            if (aft && aft !== bef) {
+                await getData();
+            }
+        });
+
+
+        const fields = makeFields(props);
+        const slots = makeTableSlots(props);
+        const proxySearchText = computed(() => apiHandler.tableTS.searchText.value);
+        const updateSearchText = (value) => {
+            try {
+                apiHandler.tableTS.searchText.value = value;
+            } catch (e) {
+                console.error(e);
+            }
+        };
         return {
+            ...toRefs(state),
             fields,
             slots,
-            getValue: (item, path) => _.get(item, path),
+            getData,
+            proxySearchText,
+            updateSearchText,
+            apiHandler,
+
         };
     },
 };

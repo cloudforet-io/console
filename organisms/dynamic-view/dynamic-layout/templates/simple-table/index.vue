@@ -15,13 +15,10 @@ import _ from 'lodash';
 import PDataTable from '@/components/organisms/tables/data-table/DataTable.vue';
 import PDynamicField from '@/components/organisms/dynamic-view/dynamic-field/DynamicField.vue';
 import PPanelTop from '@/components/molecules/panel/panel-top/PanelTop.vue';
-import { DynamicFieldType, DynamicLayoutProps } from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
-
-
-interface Field {
-    name: string;
-    label: string;
-}
+import {
+    DynamicLayoutProps,
+    makeFields, makeTableSlots,
+} from '@/components/organisms/dynamic-view/dynamic-layout/toolset';
 
 
 export default defineComponent({
@@ -47,16 +44,9 @@ export default defineComponent({
         },
     },
     setup(props: DynamicLayoutProps) {
-        const fields: Ref<Readonly<Field[]> > = computed((): Field[] => (props.options.fields as DynamicFieldType[]).map((ds: DynamicFieldType): Field => ({
-            name: ds.key,
-            label: ds.name,
-        })));
+        const fields = makeFields(props);
         const items = computed(() => (props.options.root_path ? _.get(props.data, props.options.root_path) : props.data));
-        console.log(items.value);
-        const slots = computed((): DynamicFieldType[] => (props.options.fields as DynamicFieldType[]).map(ds => ({
-            ...ds,
-            name: `col-${ds.key}-format`,
-        })));
+        const slots = makeTableSlots(props);
         return {
             fields,
             slots,
