@@ -292,7 +292,7 @@ interface SingleItemActionInterface{
     setId: (id: string) => any;
 }
 export abstract class RawParameterAction<parameter, resp> extends ActionAPI<parameter, resp> {
-    getParameter = (): parameter => this.apiState.parameter;
+    getParameter = (): parameter => ({ ...this.apiState.parameter });
 
     protected apiState: RawParameterActionState<parameter>;
 
