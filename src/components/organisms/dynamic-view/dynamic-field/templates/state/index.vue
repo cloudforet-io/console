@@ -8,21 +8,21 @@ export default {
     components: { PStatus },
     props: {
         // eslint-disable-next-line camelcase,vue/prop-name-casing
-        view_option: {
+        options: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
         data: {
             type: [String, Object, Array, Boolean, Number],
-            required: true,
+            default: '',
         },
     },
     render(h, { props }) {
         return h(PStatus, {
             props: {
-                icon: _.get(props.view_option, ['icon', 'image'], null),
-                iconColor: _.get(props.view_option, ['icon', 'color'], null),
-                textColor: _.get(props.view_option, ['text_color'], null),
+                icon: _.get(props.options, ['icon', 'image'], null),
+                iconColor: _.get(props.options, ['icon', 'color'], null),
+                textColor: _.get(props.options, ['text_color'], null),
                 text: props.data,
             },
         });

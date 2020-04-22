@@ -18,7 +18,7 @@ export default {
 
 export const defaultCase = () => ({
     components: { PDynamicField },
-    template: '<div><li v-for="raw in data"><PDynamicField view_type="text"  :data="raw"/></li></div>',
+    template: '<div><li v-for="raw in data"><PDynamicField type="text"  :data="raw"/></li></div>',
     setup() {
         return {
             data: [
@@ -32,7 +32,7 @@ export const defaultCase = () => ({
 
 export const datetimeType = () => ({
     components: { PDynamicField },
-    template: '<div><li v-for="ex in data"><PDynamicField view_type="datetime"  :view_option="ex.option" :data="ex.raw"/></li></div>',
+    template: '<div><li v-for="ex in data"><PDynamicField type="datetime"  :options="ex.option" :data="ex.raw"/></li></div>',
     setup() {
         return {
             data: [
@@ -71,7 +71,7 @@ export const datetimeType = () => ({
 
 export const unSupportType = () => ({
     components: { PDynamicField },
-    template: '<div><li v-for="raw in data"><PDynamicField view_type="mr.peng"  :data="raw"/></li></div>',
+    template: '<div><li v-for="raw in data"><PDynamicField type="mr.peng"  :data="raw"/></li></div>',
     setup() {
         return {
             data: [
@@ -85,7 +85,7 @@ export const unSupportType = () => ({
 
 export const stateType = () => ({
     components: { PDynamicField },
-    template: '<div><li v-for="{option,raw} in data"><PDynamicField view_type="state"  :view_option="option" :data="raw"/></li></div>',
+    template: '<div><li v-for="{option,raw} in data"><PDynamicField type="state"  :options="option" :data="raw"/></li></div>',
     setup() {
         return {
             data: [
@@ -126,7 +126,7 @@ export const stateType = () => ({
 
 export const badgeType = () => ({
     components: { PDynamicField },
-    template: '<div><li v-for="ex in data"><PDynamicField view_type="badge"  :view_option="ex.option" :data="ex.raw"/></li></div>',
+    template: '<div><li v-for="ex in data"><PDynamicField type="badge"  :options="ex.option" :data="ex.raw"/></li></div>',
     setup() {
         return {
             data: [
@@ -162,21 +162,21 @@ export const badgeType = () => ({
 
 export const listType = () => ({
     components: { PDynamicField },
-    template: '<div><li v-for="ex in example"><PDynamicField view_type="list"  :view_option="ex.option" :data="ex.data"/></li></div>',
+    template: '<div><li v-for="ex in example"><PDynamicField type="list"  :options="ex.option" :data="ex.data"/></li></div>',
     setup() {
         return {
             example: [
                 {
                     option: {
                         item: {
-                            view_option: {
+                            options: {
                                 text_color: '#FFCE02',
                                 icon: {
                                     image: 'aws-ec2',
                                     color: '#FFCE02',
                                 },
                             },
-                            view_type: 'state',
+                            type: 'state',
                         },
 
                     },
@@ -185,10 +185,10 @@ export const listType = () => ({
                 {
                     option: {
                         item: {
-                            view_option: {
+                            options: {
                                 background_color: '#FFCE02',
                             },
-                            view_type: 'badge',
+                            type: 'badge',
                         },
 
                     },
@@ -197,7 +197,7 @@ export const listType = () => ({
                 {
                     option: {
                         item: {
-                            view_type: 'text',
+                            type: 'text',
                         },
 
                     },
@@ -210,7 +210,7 @@ export const listType = () => ({
 });
 export const dictType = () => ({
     components: { PDynamicField },
-    template: '<PDynamicField view_type="dict" :data="data"/>',
+    template: '<PDynamicField type="dict" :data="data"/>',
     setup() {
         return {
             data: reactive({
@@ -223,57 +223,57 @@ export const dictType = () => ({
 
 export const enumType = () => ({
     components: { PDynamicField },
-    template: '<div><li v-for="d in data"><PDynamicField view_type="enum"  :view_option="option" :data="d"/></li></div>',
+    template: '<div><li v-for="d in data"><PDynamicField type="enum"  :options="option" :data="d"/></li></div>',
     setup() {
         return {
             option: {
                 AWS: {
-                    view_option: {
+                    options: {
                         text_color: '#FF7750',
                         icon: {
                             image: 'aws-ec2',
                             color: '#FF7750',
                         },
                     },
-                    view_type: 'state',
+                    type: 'state',
                 },
                 GCP: {
-                    view_option: {
+                    options: {
                         text_color: '#60B731',
                         icon: {
                             image: 'aws-ec2',
                             color: '#60B731',
                         },
                     },
-                    view_type: 'state',
+                    type: 'state',
                 },
                 AZURE: {
-                    view_option: {
+                    options: {
                         text_color: '#0080FB',
                         icon: {
                             image: 'aws-ec2',
                             color: '#0080FB',
                         },
                     },
-                    view_type: 'state',
+                    type: 'state',
                 },
                 AWSBadge: {
-                    view_option: {
+                    options: {
                         background_color: '#FF7750',
                     },
-                    view_type: 'badge',
+                    type: 'badge',
                 },
                 GCPBadge: {
-                    view_option: {
+                    options: {
                         background_color: '#60B731',
                     },
-                    view_type: 'badge',
+                    type: 'badge',
                 },
                 AZUREBadge: {
-                    view_option: {
+                    options: {
                         background_color: '#0080FB',
                     },
-                    view_type: 'badge',
+                    type: 'badge',
                 },
             },
             data: ['AWS', 'GCP', 'AZURE', 'SpaceOne', 'AWSBadge', 'GCPBadge', 'AZUREBadge'],
